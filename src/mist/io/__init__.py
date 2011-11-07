@@ -5,7 +5,7 @@ def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
     config = Configurator(root_factory=Root, settings=settings)
-    config.add_static_view('static', 'unweb.cloud:static')
+    config.add_static_view('static', 'mist.io:static')
     config.add_route('home', '/',
                      view='mist.io.views.home',
                      view_renderer='templates/home.pt')
