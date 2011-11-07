@@ -1,6 +1,6 @@
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
-from unweb.cloud.config import BACKENDS
+from mist.io.config import BACKENDS
 
 def home(request):
     return {'project':'mist.io'}

@@ -4,3 +4,4 @@ develop-eggs
 *.pyc
 *.pyo
 *.egg-info
+src/libcloud

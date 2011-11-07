@@ -29,10 +29,10 @@ setup(name='mist.io',
       zip_safe=False,
       install_requires=requires,
       tests_require=requires,
-      test_suite="mistio",
+      test_suite="mist.io",
       entry_points = """\
       [paste.app_factory]
-      main = mistio:main
+      main = mist.io:main
       """,
       paster_plugins=['pyramid'],
       )
