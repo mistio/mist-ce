@@ -1,0 +1,14 @@
+<ul class="actions" >
+    <li id="create"><a class="enabled">Create</a></li>
+    <li id="delete"><a class="enabled">Delete</a></li>
+</ul>
+
+<div class="images">
+    <div tal:repeat="image images">
+        <div class="image" tal:attributes="id image.id">
+        <input type="checkbox" tal:attributes="id string:chk-${image.id}" />
+        <h3 tal:content="image.name">test</h3>
+        </div>
+        <hr />
+    </div>
+</div>

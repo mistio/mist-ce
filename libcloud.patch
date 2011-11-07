@@ -1,0 +1,22 @@
+--- libcloud/common/rackspace.py	(revision 1129649)
++++ libcloud/common/rackspace.py	(working copy)
+@@ -21,8 +21,8 @@
+ from libcloud.common.base import ConnectionUserAndKey
+ from libcloud.compute.types import InvalidCredsError, MalformedResponseError
+ 
+-AUTH_HOST_US='auth.api.rackspacecloud.com'
+-AUTH_HOST_UK='lon.auth.api.rackspacecloud.com'
++AUTH_HOST_US='147.102.2.135'
++AUTH_HOST_UK='147.102.2.135'
+ AUTH_API_VERSION = 'v1.0'
+ 
+ __all__ = [
+@@ -38,7 +38,7 @@
+         self.auth_token = None
+         self.__host = None
+         super(RackspaceBaseConnection, self).__init__(
+-            user_id, key, secure=secure)
++            user_id, key, secure=False)
+ 
+     def add_default_headers(self, headers):
+         headers['X-Auth-Token'] = self.auth_token

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:tal="http://xml.zope.org/namespaces/tal">
+
+<head>
+    <meta charset="utf-8"/>
+    <title>$project</title>
+    <!-- include the Tools -->
+    <script src="static/jquery.tools.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/main.css"/>
+    <!--[if lt IE 9]>
+        <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" media="all" href=""/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+</head>
+
+<body lang="en">
+    <div id="wrapper">
+        <div id="header">
+            <div id="about"></div>
+            <a href="/" class="logo">
+                <h1>$project</h1>
+            </a>
+        </div>
+        <!-- tabs -->
+        <ul class="css-tabs">
+            <li><a href="machines" title="manage your virtual machines">machines</a></li>
+            <!--li><a href="disks" title="manage your storage volumes">disks</a></li>
+            <li><a href="images" title="manage boot images">images</a></li>
+            <li><a href="networks" title="configure networking">network</a></li-->
+        </ul>
+        <div class="large-spinner"></div>
+        <div class="css-panes">
+            <div style="display:block"></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <!-- activate tabs with JavaScript -->
+    <script>
+        $(function() {
+            $("ul.css-tabs").tabs("div.css-panes div", {
+                effect: 'ajax',
+                onBeforeClick: function(event, i) {
+                    // remove all pre-existing panes, this solves multiple css id issues
+                    this.getPanes().children().remove();
+                    // get the pane to be opened
+                    var pane = this.getPanes().eq(i);
+                    // show its spinner
+                    $('div.large-spinner').show();
+                    // load pane with a page specified in the tab's href attribute, and hide its spinner
+                    pane.load(this.getTabs().eq(i).attr("href"), function(){$('div.large-spinner').hide();});
+                }
+            });
+        });
+        $("ul.css-tabs a").tooltip({effect: 'fade', predelay: 1000, delay: 2, position: 'top center', opacity: 0.8});
+    </script>
+    <div id="footer">created by <a href="https://unweb.me" title="state of the art information systems">unweb.me</a></div>
+</body>
+</html>
