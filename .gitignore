@@ -1,6 +1,11 @@
 bin
 parts
 develop-eggs
+eggs
+include
+lib
+.mr.developer.cfg
+.installed.cfg
 *.pyc
 *.pyo
 *.egg-info
