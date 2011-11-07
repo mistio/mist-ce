@@ -16,7 +16,8 @@ def machines(request):
         else:
             conn = Driver(b['id'], b['secret'])
         nodes += conn.list_nodes()
-        images += conn.list_images()
+        #images += conn.list_images()
+        images = []
         sizes += conn.list_sizes()
     return {'nodes': nodes,
             'images': images,
