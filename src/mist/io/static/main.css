@@ -58,15 +58,19 @@ a img {border: 0;}
     line-height: 30px;
 }
 
+.medium {
+	font: 14px/22px;
+}
+
 body {
-    font: 16px/24px Georgia, serif;
+    font: 12px/20px Helvetica, sans-serif;
     height:100%;
     margin:0;
     padding:0;
 }
 
 .small, small {
-    font-size: 13px;
+    font-size: 11px;
     line-height: 18px;
 }
 
@@ -88,6 +92,23 @@ body {-webkit-tap-highlight-color: rgb(255,255,158);}
 cols    1     2      3      4      5      6      7      8      9      10
 px      68    160    252    344    436    528    620    712    804    896    */
 
+html{
+	width:100%;
+	height:100%;
+	overflow: hidden;
+}
+
+body {
+	background:url("../static/Mist-panorama2.jpg") no-repeat scroll center top transparent;
+}
+
+#logo-container {
+	background: url(../static/logo.png) 0 0 no-repeat;
+	width: 260px;
+	height: 96px;
+	margin: 36px 0;
+}
+
 #wrapper {
     width: 896px;
     margin: auto;
@@ -95,72 +116,6 @@ px      68    160    252    344    436    528    620    712    804    896    */
     -webkit-text-size-adjust: 100%; /* Stops Mobile Safari from auto-adjusting font-sizes */
 }
 
-
-
-/*        Tablet Layout: 768px.
-        Gutters: 24px.
-        Outer margins: 28px.
-        Inherits styles from: Default Layout.
------------------------------------------------------------------
-cols    1     2      3      4      5      6      7      8
-px      68    160    252    344    436    528    620    712    */
-
-@media only screen and (min-width: 768px) and (max-width: 991px) {
-
-    #wrapper {
-        width: 712px;
-        margin:auto;
-    }
-}
-
-
-
-/*        Mobile Layout: 320px.
-        Gutters: 24px.
-        Outer margins: 34px.
-        Inherits styles from: Default Layout.
----------------------------------------------
-cols    1     2      3
-px      68    160    252    */
-
-@media only screen and (max-width: 767px) {
-
-    #wrapper {
-        width: 252px;
-        margin: auto;
-    }
-
-}
-
-
-
-/*        Wide Mobile Layout: 480px.
-        Gutters: 24px.
-        Outer margins: 22px.
-        Inherits styles from: Default Layout, Mobile Layout.
-------------------------------------------------------------
-cols    1     2      3      4      5
-px      68    160    252    344    436    */
-
-@media only screen and (min-width: 480px) and (max-width: 767px) {
-
-    #wrapper {
-        width: 436px;
-                margin:auto;
-    }
-
-}
-
-body {
-    background:url("../static/raincloud.jpg") no-repeat scroll center top transparent;
-    font-family:"Lucida Grande","bitstream vera sans","trebuchet ms",sans-serif,verdana;
-    margin: 0;
-}
-
-h3 {
-    font-size: 18px;
-    line-height: 18px;
-}
 #footer {
     text-align:center;
     color: #666;
@@ -182,106 +137,11 @@ a:active {
   -moz-outline-style:none;
 }
 
-/* root element for tabs  */
-ul.css-tabs {
-    margin: 0 1em;
-    padding:0;
-    height:auto;
-}
-
-/* single tab */
-ul.css-tabs li {
-    float:left;
-    padding:0;
-    margin:1px 44px 1px 0;
-    list-style-type:none;
-    height:100%;
-}
-
-div.node input {
-    float:left;
-    margin-left: -6px;
-    margin-right: 17px;
-}
-
-div.machines {
-    width:92%;
-    height:82%;
-    overflow-y: auto;
-    padding:30px 0;
-}
-
 div.networks{
     width:92%;
     height:82%;
     overflow-y: auto;
     padding:30px 0;
-}
-
-/* link inside the tab. uses a background image */
-ul.css-tabs a {
-    float:left;
-    font-size:1.2em;
-    font-weight: bold;
-    display:block;
-    padding:10px 53px 5px;
-    margin-bottom: -1px;
-    z-index: 1;
-    text-decoration:none;
-    border:0px solid #213D55;
-    border-bottom:0px solid #213D55;
-    height:100%;
-    background-color:rgba(48, 48, 48, 0.7);
-    color:#b7b7b7;
-    position:relative;
-    outline:0;
-    -moz-border-radius:1em 1em 0 0;
-}
-
-ul.css-tabs a:hover {
-    color: #3baddb;
-}
-
-/* selected tab */
-ul.css-tabs a.current {
-    background-color:rgba(48, 48, 48, 0.5);
-    color: rgba(248, 248, 248, 0.85);
-    cursor:default;
-}
-
-
-/* tab pane */
-.css-panes > div {
-    display: none;
-    border:1px solid #666;
-    border-width: 0px;
-    padding:15px 20px;
-    background-color:rgba(48, 48, 48, 0.5);
-    margin: 0 18px 0 16px;
-    -moz-border-radius: 0 0 0em 1em;
-    height: 70%;
-    color: #b7b7b7;
-}
-
-.css-panes {
-    height: 80%;
-    clear: both;
-    width: 83%;
-}
-
-html{
-width:100%;
-height:100%;
-overflow: hidden;
-}
-
-/* CSS3 border radius for various elements. yea - CSS isn't perfect */
-.rounded, #sheet input, .error {
-    border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    -o-border-radius: 5px;
-    -khtml-border-radius: 5px;
 }
 
 /* validation error message */
@@ -309,78 +169,162 @@ overflow: hidden;
     background-color:rgba(221, 233, 255, 0.898) !important;
 }
 
-ul.actions {
-    float:right;
-    width:25%;
-    padding: 5px 0px 25px 25px;
-    height:100%;
-    overflow-y: auto;
-    margin-right: -31.2%;
-    margin-top: -2%;
-    border: 0px solid #666666;
-    -moz-border-radius: 0em 1em 1em 0em;
-    background-color: rgba(48, 48, 48, 0.5);
+/* Tabs */
+
+.css-tabs {
+	width: 100%;
+	overflow: auto;
+	background: #333 url('../static/bg-tabs.gif') bottom left repeat-x;
+	border-top: 1px solid #585858;
 }
 
-ul.actions li {
-    list-style: none;
+.css-tabs {
+	list-style-type: none;
 }
 
-ul.actions li a{
-    -moz-border-radius: .5em;
-    color: #666;
-    cursor:default;
-    display:block;
-    padding: 10px 25px;
-    margin-top: 1em;
-    font-weight: bold;
-    text-decoration: none;
-    width: 95px;
+.css-tabs li {
+	display: block;
+	float: left;
+	padding: 14px 0 14px 24px;
 }
 
-ul.actions li a.enabled{
-    border: 1px dotted #b7b7b7;
-    color: #F7F7F7;
-    cursor: pointer;
+.css-tabs a {
+	color: #b8b8b8;
+	text-decoration: none;
+	padding-right: 24px;
 }
 
-#machines {
-    display:block;
+.css-tabs a.current {
+	color: #fff;
+}
+
+/* All Panes */
+
+.css-panes {
+    clear: both;
+    width: 100%;
+	overflow: auto;
+	background: #f1f1f1;
+	border-top: 1px solid #fff;
+}
+
+/* Machines Pane */
+
+#machines-pane {
+	width: 100%;
+	overflow: auto;
+	display: none;
+}
+
+/* Actions */
+ 
+#actions-list {
+	float: right;
+	width: 180px;
+	border-left: 1px solid #dadada;
+	background: url(../static/bg-actions-side.gif) 0 0 repeat-y;
+}
+
+#actions-list ul {
+	list-style-type: none;
+}
+
+#actions-list li {
+	padding: 15px 15px 15px 44px;
+	border-bottom: 1px solid #dadada;
+	cursor: pointer;
+}
+
+li#create {
+	background: url(../static/icons/add.png) 16px center no-repeat;
+}
+
+li#start {
+	background: url(../static/icons/start.png) 16px center no-repeat;
+}
+
+li#reboot {
+	background: url(../static/icons/reboot.png) 16px center no-repeat;
+}
+
+li#destroy {
+	background: url(../static/icons/delete.png) 16px center no-repeat;
+}
+
+li#configure {
+	background: url(../static/icons/prefs.png) 16px center no-repeat;
+}
+
+
+/* Machines Pane : Machines List */
+
+#machines-list {
+	float: left;
+	width: 715px;
+}
+
+div.node {
+    padding: 15px;
+	border-bottom: 1px solid #d3d3d3;
+	cursor: pointer;
+}
+
+.node .select, .node .info {
+	display: block;
+	float: left;
+	width: 16px;
+	height: 16px;
+	margin: 0 14px 0 0;
+}
+
+.node .select {
+	background: url(../static/icons/select.png) center no-repeat;
+}
+
+.node .info {
+	background: url(../static/icons/info.png) center no-repeat;
+}
+
+.node .name {
+	margin: 0 14px 0 0;
+	padding: 19px 14px;
+	border-left: 1px solid #dadada;
+}
+
+.node .state, .node .ip {
+	display: block;
+	float: right;
+	margin: 0 14px;
+}
+
+.node .state {
+	background: url(../static/states/inactive.png) center no-repeat;
+	width: 26px;
+	height: 20px;
 }
 
 .large-spinner {
     background: url(../static/large-spinner.gif) no-repeat;
-    position: absolute;
-    margin: 200px 0 0 400px;
+	margin: 10px;
     height: 32px;
     width: 32px;
 }
 
-ul.actions li a.enabled:hover {
-    background-color:#f29400;
-    color: white;
-    border: 1px solid #fff
+/* Selected Node */
+
+.selected {
+	background: url(../static/bg-selected.gif) 0 0 repeat-x;
 }
 
-div#header {
-    height: 20%;
-    min-height: 100px;
-    margin-top:-25px;
+.selected .select {
+	background: url(../static/icons/deselect.png) center no-repeat;
 }
 
-div#wrapper {
-    width: 990px;
-    margin: 0 auto;
-    height: 100%;
+.waiting {
+    background: url(../static/large-spinner.gif) right center no-repeat;
+	
 }
 
-div.node {
-    margin:10px;
-}
-
-div.node input {
-    margin-right:10px;
-}
 a.logo {
     width: 250px;
 }
@@ -548,3 +492,106 @@ div#about {
     height:35px;
     width:35px;
 }
+
+/*
+ *
+ * CSS3 Effects
+ *
+ */
+
+/* CSS3 border radius */
+.rounded, #sheet input, .error {
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -o-border-radius: 4px;
+    -khtml-border-radius: 4px;
+}
+
+.rounded-bottom {
+    border-bottom-right-radius: 4px;
+    -webkit-border-bottom-right-radius: 4px;
+    -moz-border-radius-bottomright: 4px;
+    -o-border-bottom-right-radius: 4px;
+    -khtml-border-bottom-right-radius: 4px;
+	border-bottom-left-radius: 4px;
+    -webkit-border-bottom-left-radius: 4px;
+    -moz-border-radius-bottomleft: 4px;
+    -o-border-bottom-left-radius: 4px;
+    -khtml-border-bottom-left-radius: 4px;
+}
+
+.rounded-top {
+    border-top-right-radius: 4px;
+    -webkit-border-top-right-radius: 4px;
+    -moz-border-radius-topright: 4px;
+    -o-border-top-right-radius: 4px;
+    -khtml-border-top-right-radius: 4px;
+	border-top-left-radius: 4px;
+    -webkit-border-top-left-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    -o-border-top-left-radius: 4px;
+    -khtml-border-top-left-radius: 4px;
+}
+
+/* CSS3 drop shadow */
+.drop-shadow {
+	-moz-box-shadow: 0 5px 22px rgba(0,0,0,0.4);
+	-webkit-box-shadow: 0 5px 22px rgba(0,0,0,0.4);
+	box-shadow: 0 5px 22px rgba(0,0,0,0.4);
+}
+
+/*        Tablet Layout: 768px.
+        Gutters: 24px.
+        Outer margins: 28px.
+        Inherits styles from: Default Layout.
+-----------------------------------------------------------------
+cols    1     2      3      4      5      6      7      8
+px      68    160    252    344    436    528    620    712    */
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+
+    #wrapper {
+        width: 712px;
+        margin:auto;
+    }
+}
+
+
+
+/*        Mobile Layout: 320px.
+        Gutters: 24px.
+        Outer margins: 34px.
+        Inherits styles from: Default Layout.
+---------------------------------------------
+cols    1     2      3
+px      68    160    252    */
+
+@media only screen and (max-width: 767px) {
+
+    #wrapper {
+        width: 252px;
+        margin: auto;
+    }
+
+}
+
+
+
+/*        Wide Mobile Layout: 480px.
+        Gutters: 24px.
+        Outer margins: 22px.
+        Inherits styles from: Default Layout, Mobile Layout.
+------------------------------------------------------------
+cols    1     2      3      4      5
+px      68    160    252    344    436    */
+
+@media only screen and (min-width: 480px) and (max-width: 767px) {
+
+    #wrapper {
+        width: 436px;
+                margin:auto;
+    }
+
+}
+

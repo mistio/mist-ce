@@ -17,41 +17,58 @@
 <body lang="en">
     <div id="wrapper">
         <div id="header">
-            <div id="about"></div>
-            <a href="/" class="logo">
-                <h1>$project</h1>
-            </a>
+			<div id="logo-container"></div>
         </div>
         <!-- tabs -->
-        <ul class="css-tabs">
-            <li><a href="machines" title="manage your virtual machines">machines</a></li>
-            <!--li><a href="disks" title="manage your storage volumes">disks</a></li>
-            <li><a href="images" title="manage boot images">images</a></li>
-            <li><a href="networks" title="configure networking">network</a></li-->
+        <ul class="css-tabs rounded-top drop-shadow">
+            <li><a href="machines" class="medium" title="Manage your virtual machines.">machines</a></li>
+            <li><a href="disks" class="medium" title="Manage your storage volumes.">disks</a></li>
+            <li><a href="images" class="medium" title="Manage boot images.">images</a></li>
+            <li><a href="networks" class="medium" title="Configure networking.">network</a></li>
         </ul>
-        <div class="large-spinner"></div>
-        <div class="css-panes">
-            <div style="display:block"></div>
-            <div></div>
-            <div></div>
-            <div></div>
+        <div class="css-panes rounded-bottom drop-shadow">
+            <div id="machines-pane" style="display:block"></div>
+            <div id="disks-pane" style="display:block"></div>
+            <div id="images-pane" style="display:block"></div>
+            <div id="networks-pane" style="display:block"></div>
         </div>
+		
     </div>
     <!-- activate tabs with JavaScript -->
     <script>
         $(function() {
             $("ul.css-tabs").tabs("div.css-panes div", {
-                effect: 'ajax',
+				effect: 'fade',
                 onBeforeClick: function(event, i) {
-                    // remove all pre-existing panes, this solves multiple css id issues
-                    this.getPanes().children().remove();
-                    // get the pane to be opened
-                    var pane = this.getPanes().eq(i);
-                    // show its spinner
-                    $('div.large-spinner').show();
-                    // load pane with a page specified in the tab's href attribute, and hide its spinner
-                    pane.load(this.getTabs().eq(i).attr("href"), function(){$('div.large-spinner').hide();});
-                }
+					var me = this,
+						tab = me.getTabs().eq(i),
+						paneswrapper = $('.css-panes'),
+						panes = paneswrapper.children(),
+						newpane = panes.eq(i),
+						rest = panes.not(newpane).not($('.large-spinner'));
+					
+					tab.addClass('waiting');
+					
+					// Why??
+					//panes.show().fadeOut(300);
+					
+					// This solves various transition issues, like misplaced
+					// elements. Don't ask me.
+					panes.width(paneswrapper.width());
+					
+					// Explicitly set height
+					paneswrapper.height(paneswrapper.height());
+					
+					//fetch content using ajax
+					newpane.load(me.getTabs().eq(i).attr("href"), function(){
+						paneswrapper.animate({height : newpane.outerHeight(true)}, 300, function() {
+							paneswrapper.height('auto');
+						});
+						rest.html('');
+						newpane.children().hide().fadeIn(300);
+						tab.removeClass('waiting');
+					});
+				}
             });
         });
         $("ul.css-tabs a").tooltip({effect: 'fade', predelay: 1000, delay: 2, position: 'top center', opacity: 0.8});

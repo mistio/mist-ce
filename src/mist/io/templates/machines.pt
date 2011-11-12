@@ -1,20 +1,25 @@
-<ul class="actions" >
-    <li id="create"><a class="enabled" rel="#wizard">Create</a></li>
-    <li id="start"><a>Start</a></li>
-    <li id="reboot"><a>Reboot</a></li>
-    <li id="destroy"><a>Destroy</a></li>
-    <li id="configure"><a>Configure</a></li>
-</ul>
+<div id="actions-list">
+	<ul class="actions" >
+	    <li id="create"><a class="enabled" rel="#wizard">Create</a></li>
+	    <li id="start"><a>Start</a></li>
+	    <li id="reboot"><a>Reboot</a></li>
+	    <li id="destroy"><a>Destroy</a></li>
+	    <li id="configure"><a>Configure</a></li>
+	</ul>
+</div>
 
-<div class="machines">
+<div id="machines-list">
     <div tal:repeat="node nodes">
         <div class="node" tal:attributes="id node.id">
-        <input type="checkbox" tal:attributes="id string:chk-${node.id}" />
-        <h3 tal:content="node.name">test</h3>
-        <span tal:content="node.state"></span>
-        <span tal:content="node.public_ip"></span>
+        	<!--input class="select" type="checkbox" tal:attributes="id string:chk-${node.id}" /-->
+			<span class="select" tal:attributes="id string:chk-${node.id}"> </span>
+			<span class="info" tal:attributes="id string:info-${node.id}"> </span>
+	        <span class="name" tal:content="node.name">test</span>
+			<span class="state"></span>
+			<span class="ip" tal:content="node.public_ip"></span>
+	        <!--span class="state" tal:content="node.state"></span-->
+			
         </div>
-        <hr />
     </div>
 </div>
 
@@ -95,6 +100,21 @@ $(function() {
         $("#create .enabled[rel]").overlay().close();
     });
 
+});
+
+$('#machines-pane').click(function() {
+	$('.node').removeClass('selected');
+});
+
+$('.node').click(function() {
+	$('.node').removeClass('selected');
+	$(this).addClass('selected');
+	return false;
+});
+
+$('.node .select').click(function() {
+	$(this).parent().toggleClass('selected');
+	return false;
 });
 
 </script>
