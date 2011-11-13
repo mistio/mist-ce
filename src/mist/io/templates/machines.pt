@@ -1,10 +1,10 @@
 <div id="actions-list">
 	<ul class="actions" >
-	    <li id="create"><a class="enabled" rel="#wizard">Create</a></li>
+	    <li id="create" class="enabled"><a rel="#wizard">Create</a></li>
 	    <li id="start"><a>Start</a></li>
 	    <li id="reboot"><a>Reboot</a></li>
 	    <li id="destroy"><a>Destroy</a></li>
-	    <li id="configure"><a>Configure</a></li>
+	    <li id="shell"><a>Shell</a></li>
 	</ul>
 </div>
 <div id="button-header">
@@ -84,7 +84,7 @@
 
 <script>
 $(function() {
-    $("#create .enabled[rel]").overlay({
+    $(".enabled#create a[rel]").overlay({
             top: 'center',
             mask: {
                 color: '#000',
@@ -113,7 +113,7 @@ $(function() {
     });
 
     $('.cancel').click(function() {
-        $("#create .enabled[rel]").overlay().close();
+        $(".enabled#create a[rel]").overlay().close();
     });
 
 });
