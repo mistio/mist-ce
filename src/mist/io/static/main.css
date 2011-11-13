@@ -99,7 +99,7 @@ html{
 }
 
 body {
-	background:url("../static/Mist-panorama2.jpg") no-repeat scroll center top transparent;
+	background:url("../static/themist.jpg") repeat-x scroll center -300px transparent;
 }
 
 #logo-container {
