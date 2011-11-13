@@ -213,6 +213,7 @@ div.networks{
 #machines-pane {
 	width: 100%;
 	overflow: auto;
+	overflow-x: hidden;
 	display: none;
 }
 
