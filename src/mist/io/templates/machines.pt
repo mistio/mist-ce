@@ -9,8 +9,8 @@
 </div>
 <ul id="button-header">
 	<li class="head-button visible-in-list">
-		Select
-		<ul class="sub-menu rounded-bottom">
+		<a>Select</a>
+		<ul class="sub-menu rounded drop-shadow">
 			<li id="button-select-all">All</li>
 			<li id="button-deselect-all">None</li>
 		</ul>
@@ -164,12 +164,15 @@ $(document).ready(function(){
 	$('#machine-details').hide();
 	$('.head-button:not(.visible-in-list)').hide();
 	
-    $("ul.sub-menu").parent().append("<span></span>"); //Only shows drop down trigger when js is enabled (Adds empty span tag after ul.subnav*)  
-  
-    $("ul#button-header li").click(function() { //When trigger is clicked...  
-  		
+	//Only shows drop down trigger when js is enabled (Adds empty span tag after ul.subnav*)
+    $("ul.sub-menu").parent().append("<span></span>");
+  	
+	//When trigger is clicked... 
+    $("ul#button-header li").click(function() {  
+	
 		var $this = $(this);
 		$this.addClass('active');
+		
         //Following events are applied to the subnav itself (moving subnav up and down)  
         $this.parent().find("ul.sub-menu").slideDown(200).show(); //Drop down the subnav on click  
   
@@ -180,7 +183,7 @@ $(document).ready(function(){
   
         //Following events are applied to the trigger (Hover events for the trigger)  
         }).hover(function() {  
-            $this.addClass('active'); //On hover over, add class "subhover"  
+            $this.addClass('active');   
         });  
   
 });
