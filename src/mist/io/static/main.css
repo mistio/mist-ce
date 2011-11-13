@@ -99,7 +99,7 @@ html{
 }
 
 body {
-	background:url("../static/themist.jpg") repeat-x scroll center -300px transparent;
+	background: url("../static/themist.jpg") repeat-x scroll center -300px #000;
 }
 
 #logo-container {
