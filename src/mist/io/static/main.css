@@ -216,6 +216,102 @@ div.networks{
 	display: none;
 }
 
+/* Machines Pane : Machines List */
+
+#machines-list {
+	float: left;
+	width: 715px;
+}
+
+.header-state {
+	float: right;
+	margin: 0 14px;
+}
+
+div.node, div#button-header {
+    padding: 15px;
+	height: 20px;
+	border-bottom: 1px solid #d3d3d3;
+	cursor: pointer;
+}
+
+div.node-header {
+	background: #e6e6e6;
+}
+
+.node .select, .node .info {
+	display: block;
+	float: left;
+	width: 16px;
+	height: 16px;
+	margin: 0 14px 0 0;
+}
+
+.node .select {
+	background: url(../static/icons/select.png) center no-repeat;
+}
+
+.node .info {
+	background: url(../static/icons/info.png) center no-repeat;
+}
+
+.node .name {
+	margin: 0 14px 0 0;
+	padding: 19px 14px;
+	border-left: 1px solid #dadada;
+}
+
+.node-header .name {
+	padding: 19px 44px;
+	border: none;
+}
+
+.node .state, .node .ip {
+	display: block;
+	float: right;
+	margin: 0 14px;
+}
+
+.node .state {
+	background: url(../static/states/inactive.png) center no-repeat;
+	width: 26px;
+	height: 20px;
+}
+
+.node:hover {
+	background: #ededed;
+}
+
+.large-spinner {
+    background: url(../static/large-spinner.gif) no-repeat;
+	margin: 10px;
+    height: 32px;
+    width: 32px;
+}
+
+/* Selected Node */
+
+.node.selected {
+	background: url(../static/bg-selected.gif) 0 0 repeat-x;
+}
+
+.selected .select {
+	background: url(../static/icons/deselect.png) center no-repeat;
+}
+
+.waiting {
+    background: url(../static/large-spinner.gif) right center no-repeat;
+	
+}
+
+/* Machine Details Pane */
+
+#machine-details {
+	float: left;
+	width: 715px;
+	display: none;
+}
+
 /* Actions */
  
 #actions-list {
@@ -255,94 +351,6 @@ li#configure {
 	background: url(../static/icons/prefs.png) 16px center no-repeat;
 }
 
-
-/* Machines Pane : Machines List */
-
-#machines-list {
-	float: left;
-	width: 715px;
-}
-
-div.node {
-    padding: 15px;
-	border-bottom: 1px solid #d3d3d3;
-	cursor: pointer;
-}
-
-.node .select, .node .info {
-	display: block;
-	float: left;
-	width: 16px;
-	height: 16px;
-	margin: 0 14px 0 0;
-}
-
-.node .select {
-	background: url(../static/icons/select.png) center no-repeat;
-}
-
-.node .info {
-	background: url(../static/icons/info.png) center no-repeat;
-}
-
-.node .name {
-	margin: 0 14px 0 0;
-	padding: 19px 14px;
-	border-left: 1px solid #dadada;
-}
-
-.node .state, .node .ip {
-	display: block;
-	float: right;
-	margin: 0 14px;
-}
-
-.node .state {
-	background: url(../static/states/inactive.png) center no-repeat;
-	width: 26px;
-	height: 20px;
-}
-
-.large-spinner {
-    background: url(../static/large-spinner.gif) no-repeat;
-	margin: 10px;
-    height: 32px;
-    width: 32px;
-}
-
-/* Selected Node */
-
-.selected {
-	background: url(../static/bg-selected.gif) 0 0 repeat-x;
-}
-
-.selected .select {
-	background: url(../static/icons/deselect.png) center no-repeat;
-}
-
-.waiting {
-    background: url(../static/large-spinner.gif) right center no-repeat;
-	
-}
-
-a.logo {
-    width: 250px;
-}
-
-a.logo h1 {
-    background:url("../static/cloud.png") no-repeat scroll bottom left transparent ;
-    height:78px;
-    color: #b1b3b4;
-    margin-left: 1em;
-    margin-top: 0;
-    padding: .5em 0 0 2.6em;
-    line-height: .3em;
-    font-size: 1.5em;
-}
-
-a.logo:hover h1 {
-    color: #3baddb;
-}
 a img {
     border: none;
 }
@@ -353,6 +361,81 @@ div#about {
     font-size:.6em;
     float: right;
     width: 63%;
+}
+
+/* Pane overhead buttons styling */
+
+div#button-header {
+	background: #e9e9e9;
+	height: auto;
+	overflow: auto;
+}
+
+.head-button {
+	display: block;
+	float: left;
+	padding: 4px 10px;
+	margin: 0 36px 0 0;
+	border: 1px solid #cfcfcf;
+	border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -o-border-radius: 4px;
+    -khtml-border-radius: 4px;
+}
+
+.head-button:hover {
+	background: #e3e3e3;
+}
+
+.head-button.left {
+	margin-right: 0px;
+	border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    -o-border-radius: 0;
+    -khtml-border-radius: 0;
+	border-bottom-left-radius: 4px;
+    -webkit-border-bottom-left-radius: 4px;
+    -moz-border-radius-bottomleft: 4px;
+    -o-border-bottom-left-radius: 4px;
+    -khtml-border-bottom-left-radius: 4px;
+	border-top-left-radius: 4px;
+    -webkit-border-top-left-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    -o-border-top-left-radius: 4px;
+    -khtml-border-top-left-radius: 4px;
+}
+
+.head-button.mid {
+	margin-left: 0px;
+	margin-right: 0px;
+	border-left: 0px;
+	border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    -o-border-radius: 0;
+    -khtml-border-radius: 0;
+}
+
+.head-button.right {
+	margin-left: 0px;
+	border-left: 0px;
+	border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    -o-border-radius: 0;
+    -khtml-border-radius: 0;
+	border-bottom-right-radius: 4px;
+    -webkit-border-bottom-right-radius: 4px;
+    -moz-border-radius-bottomright: 4px;
+    -o-border-bottom-right-radius: 4px;
+    -khtml-border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+    -webkit-border-top-right-radius: 4px;
+    -moz-border-radius-topright: 4px;
+    -o-border-top-right-radius: 4px;
+    -khtml-border-top-right-radius: 4px;
 }
 
 /* tooltip styling. by default the element to be styled is .tooltip  */
@@ -532,6 +615,33 @@ div#about {
     -moz-border-radius-topleft: 4px;
     -o-border-top-left-radius: 4px;
     -khtml-border-top-left-radius: 4px;
+}
+
+.rounded-left {
+	border-bottom-left-radius: 4px;
+    -webkit-border-bottom-left-radius: 4px;
+    -moz-border-radius-bottomleft: 4px;
+    -o-border-bottom-left-radius: 4px;
+    -khtml-border-bottom-left-radius: 4px;
+	border-top-left-radius: 4px;
+    -webkit-border-top-left-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    -o-border-top-left-radius: 4px;
+    -khtml-border-top-left-radius: 4px;
+}
+
+.rounded-right {
+	border-bottom-right-radius: 4px;
+    -webkit-border-bottom-right-radius: 4px;
+    -moz-border-radius-bottomright: 4px;
+    -o-border-bottom-right-radius: 4px;
+    -khtml-border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+    -webkit-border-top-right-radius: 4px;
+    -moz-border-radius-topright: 4px;
+    -o-border-top-right-radius: 4px;
+    -khtml-border-top-right-radius: 4px;
+	
 }
 
 /* CSS3 drop shadow */

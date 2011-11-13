@@ -65,7 +65,7 @@
 							paneswrapper.height('auto');
 						});
 						rest.html('');
-						newpane.children().hide().fadeIn(300);
+						newpane.hide().fadeIn(300);
 						tab.removeClass('waiting');
 					});
 				}

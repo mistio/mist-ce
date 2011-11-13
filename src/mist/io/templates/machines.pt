@@ -7,20 +7,36 @@
 	    <li id="configure"><a>Configure</a></li>
 	</ul>
 </div>
-
+<div id="button-header">
+	<span id="button-select-all" class="head-button left visible-in-list">Select All</span>
+	<span id="button-deselect-all" class="head-button right visible-in-list">Deselect All</span>
+	<span class="head-button left visible-in-list">Action1</span>
+	<span class="head-button mid visible-in-list">Action2</span>
+	<span class="head-button right visible-in-list">Action2</span>
+	<span class="head-button visible-in-list">Action3</span>
+	<span id="button-back" class="head-button visible-in-details">Back</span>
+</div>
 <div id="machines-list">
+	
+	<!--div class="node node-header">
+        <span class="name">Name</span>
+		<span class="header-state">State</span>
+		<span class="ip">IP</span>
+    </div-->
     <div tal:repeat="node nodes">
         <div class="node" tal:attributes="id node.id">
         	<!--input class="select" type="checkbox" tal:attributes="id string:chk-${node.id}" /-->
 			<span class="select" tal:attributes="id string:chk-${node.id}"> </span>
-			<span class="info" tal:attributes="id string:info-${node.id}"> </span>
 	        <span class="name" tal:content="node.name">test</span>
 			<span class="state"></span>
 			<span class="ip" tal:content="node.public_ip"></span>
 	        <!--span class="state" tal:content="node.state"></span-->
-			
         </div>
     </div>
+</div>
+
+<div id="machine-details">
+	stuf
 </div>
 
 <!-- the form -->
@@ -102,19 +118,45 @@ $(function() {
 
 });
 
-$('#machines-pane').click(function() {
-	$('.node').removeClass('selected');
+$('.node').click(function() {
+	$('#machines-list').fadeOut(200, function() {
+		$('#machine-details').fadeIn(200);
+	});
+	$('.head-button:not(.visible-in-details)').fadeOut(200, function() {
+		$('.visible-in-details').fadeIn(200);
+	});
 });
 
-$('.node').click(function() {
+$('#button-back').click(function() {
+	$('#machine-details').fadeOut(200, function() {
+		$('#machines-list').fadeIn(200);
+	});
+	$('.head-button:not(.visible-in-list)').fadeOut(200, function() {
+		$('.visible-in-list').fadeIn(200);
+	});
+});
+
+$('#button-select-all').click(function() {
+	$('.node').addClass('selected');
+});
+
+$('#button-deselect-all').click(function() {
 	$('.node').removeClass('selected');
-	$(this).addClass('selected');
-	return false;
 });
 
 $('.node .select').click(function() {
 	$(this).parent().toggleClass('selected');
 	return false;
+});
+
+$('#node-header .select').click(function() {
+	$('.node').addClass('selected');
+	return false;
+});
+
+$(document).ready(function() {
+	$('#machine-details').hide();
+	$('.head-button:not(.visible-in-list)').hide();
 });
 
 </script>
