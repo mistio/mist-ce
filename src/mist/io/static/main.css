@@ -221,6 +221,8 @@ div.networks{
 #machines-list {
 	float: left;
 	width: 715px;
+    height: 194px;
+    overflow-y: scroll;
 }
 
 .header-state {
@@ -328,7 +330,22 @@ div.node-header {
 #actions-list li {
 	padding: 15px 15px 15px 44px;
 	border-bottom: 1px solid #dadada;
-	cursor: pointer;
+    opacity: .5;
+}
+
+#actions-list li.enabled {
+    opacity: 1.0;
+}
+#actions-list li a {
+	padding: 15px 95px 15px 44px;
+	cursor: default;
+    margin-left: -44px;
+    color: #B8B8B8;
+}
+
+#actions-list li.enabled a {
+    cursor: pointer;
+    color: #3C3C3C;
 }
 
 li#create {
@@ -347,7 +364,7 @@ li#destroy {
 	background: url(../static/icons/delete.png) 16px center no-repeat;
 }
 
-li#configure {
+li#shell {
 	background: url(../static/icons/prefs.png) 16px center no-repeat;
 }
 
