@@ -7,15 +7,20 @@
 	    <li id="configure"><a>Configure</a></li>
 	</ul>
 </div>
-<div id="button-header">
-	<span id="button-select-all" class="head-button left visible-in-list">Select All</span>
-	<span id="button-deselect-all" class="head-button right visible-in-list">Deselect All</span>
-	<span class="head-button left visible-in-list">Action1</span>
-	<span class="head-button mid visible-in-list">Action2</span>
-	<span class="head-button right visible-in-list">Action2</span>
-	<span class="head-button visible-in-list">Action3</span>
-	<span id="button-back" class="head-button visible-in-details">Back</span>
-</div>
+<ul id="button-header">
+	<li class="head-button visible-in-list">
+		Select
+		<ul class="sub-menu">
+			<li id="button-select-all">All</li>
+			<li id="button-select-none">None</li>
+		</ul>
+	</li>
+	<li class="head-button left visible-in-list">Action1</li>
+	<li class="head-button mid visible-in-list">Action2</li>
+	<li class="head-button right visible-in-list">Action2</li>
+	<li class="head-button visible-in-list">Action3</li>
+	<li id="button-back" class="head-button visible-in-details">Back</li>
+</ul>
 <div id="machines-list">
 	
 	<!--div class="node node-header">
