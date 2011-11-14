@@ -484,6 +484,7 @@ ul#button-header li ul.sub-menu {
 	background: #333;
 	margin: 0; padding: 0;
 	display: none;
+	width: 80px;
 	z-index: 1000;
 }
 
@@ -492,7 +493,7 @@ ul#button-header li ul.sub-menu li {
 	border: none;
 	color: #ddd;
 	background: none;
-
+	width: 100%;
 }
 
 ul#button-header li ul.sub-menu li:hover {
