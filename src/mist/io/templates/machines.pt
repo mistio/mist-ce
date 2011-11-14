@@ -8,9 +8,9 @@
 	</ul>
 </div>
 <ul id="button-header">
-	<li class="head-button visible-in-list">
-		<a>Select</a>
-		<ul class="sub-menu rounded drop-shadow">
+	<li class="head-button visible-in-list select-widget">
+		<span class="check"></span>
+		<ul class="sub-menu rounded-bottom">
 			<li id="button-select-all">All</li>
 			<li id="button-deselect-all">None</li>
 		</ul>
@@ -31,10 +31,10 @@
     <div tal:repeat="node nodes">
         <div class="node" tal:attributes="id node.id">
         	<!--input class="select" type="checkbox" tal:attributes="id string:chk-${node.id}" /-->
-			<span class="select" tal:attributes="id string:chk-${node.id}"> </span>
+			<span class="select" tal:attributes="id string:chk-${node.id}"><span class="check" /> </span>
 	        <span class="name" tal:content="node.name">test</span>
 			<span class="state"></span>
-			<span class="ip" tal:content="node.public_ip"></span>
+			<span class="ip" tal:repeat="ip node.public_ip" tal:content="ip"></span>
 	        <!--span class="state" tal:content="node.state"></span-->
         </div>
     </div>
@@ -143,19 +143,39 @@ $('#button-back').click(function() {
 
 $('#button-select-all').click(function() {
 	$('.node').addClass('selected');
+    $('#button-header .check').parent().addClass('selected');
 });
 
 $('#button-deselect-all').click(function() {
 	$('.node').removeClass('selected');
+    $('#button-header .check').parent().removeClass('selected');
+    $('#button-header .check').parent().removeClass('partial');    
 });
 
 $('.node .select').click(function() {
 	$(this).parent().toggleClass('selected');
+    if ($('.selected .check').length == $('.check').length -1){
+        $('#button-header .check').parent().addClass('selected');
+        $('#button-header .check').parent().removeClass('partial');        
+    } else if ($('.selected .check').length == 0) {
+        $('#button-header .check').parent().removeClass('selected');
+        $('#button-header .check').parent().removeClass('partial');
+    } else {
+        $('#button-header .check').parent().addClass('partial');
+        $('#button-header .check').parent().removeClass('selected');        
+    }
 	return false;
 });
 
-$('#node-header .select').click(function() {
-	$('.node').addClass('selected');
+$('#button-header .check').click(function() {
+    if ($('.selected .check').length == $('.check').length) {
+        $('.node').removeClass('selected');
+        $(this).parent().removeClass('selected')
+    } else {
+        $(this).parent().addClass('selected');
+        $('.node').addClass('selected');
+    }
+	
 	return false;
 });
 
@@ -164,30 +184,25 @@ $(document).ready(function(){
 	$('#machine-details').hide();
 	$('.head-button:not(.visible-in-list)').hide();
 	
-	//Only shows drop down trigger when js is enabled (Adds empty span tag after ul.subnav*)
-    $("ul.sub-menu").parent().append("<span></span>");
-  	
-	//When trigger is clicked... 
-    $("ul#button-header li")
-	.click(function() {  
-	
-		var $this = $(this),
-			menu = $this.find("ul.sub-menu");
-		
-		if (menu.length) {
-			$this.addClass('active');
-		}
-		
+    $("ul.sub-menu").parent().append("<span></span>"); //Only shows drop down trigger when js is enabled (Adds empty span tag after ul.subnav*)  
+  
+    $("ul#button-header li").click(function() { //When trigger is clicked...  
+  		
+		var $this = $(this);
+		$this.addClass('active');
         //Following events are applied to the subnav itself (moving subnav up and down)  
-        menu.slideDown(200).show(); //Drop down the subnav on click  
+        $this.parent().find("ul.sub-menu").slideDown(200).show(); //Drop down the subnav on click  
+  
+        $this.parent().hover(function() {  
+        }, function(){  
+            $this.parent().find("ul.sub-menu").slideUp(200, function(){ $this.removeClass('active')});  
+        });  
   
         //Following events are applied to the trigger (Hover events for the trigger)  
-    })
-	.mouseleave(function() {  
-		var $this = $(this),
-			menu = $this.find("ul.sub-menu");
-        menu.slideUp(200, function(){ $this.removeClass('active')});  
-    });
+        }).hover(function() {  
+            $this.addClass('active'); //On hover over, add class "subhover"  
+        });  
+  
 });
 
 </script>
