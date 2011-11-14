@@ -10,15 +10,15 @@
 <ul id="button-header">
 	<li class="head-button visible-in-list select-widget">
 		<span class="check"></span>
-		<ul class="sub-menu rounded-bottom">
+		<ul class="sub-menu rounded-right-bottom">
 			<li id="button-select-all">All</li>
 			<li id="button-deselect-all">None</li>
 		</ul>
 	</li>
-	<!--li class="head-button left visible-in-list">Action1</li>
-	<li class="head-button mid visible-in-list">Action2</li>
-	<li class="head-button right visible-in-list">Action2</li>
-	<li class="head-button visible-in-list">Action3</li-->
+	<li class="head-button right provider p1 visible-in-list visible-in-details end"></li>
+	<li class="head-button mid provider p2 visible-in-list visible-in-details"></li>
+	<li class="head-button left provider p3 visible-in-list visible-in-details"></li>
+	<!--li class="head-button visible-in-list">Action3</li-->
 	<li id="button-back" class="head-button visible-in-details">Back</li>
 </ul>
 <div id="machines-list">
@@ -213,21 +213,21 @@ $(document).ready(function(){
   
     $("ul#button-header li").click(function() { //When trigger is clicked...  
   		
-		var $this = $(this);
-		$this.addClass('active');
-        //Following events are applied to the subnav itself (moving subnav up and down)  
-        $this.parent().find("ul.sub-menu").slideDown(200).show(); //Drop down the subnav on click  
+		if ($(this).children('.check').length) {
+			var $this = $(this);
+			$this.addClass('active');
+	        //Following events are applied to the subnav itself (moving subnav up and down)  
+	        $this.find("ul.sub-menu").slideDown(200).show(); //Drop down the subnav on click  
   
-        $this.parent().hover(function() {  
-        }, function(){  
-            $this.parent().find("ul.sub-menu").slideUp(200, function(){ $this.removeClass('active')});  
-        });  
-  
+	        $this.parent().hover(function(){  
+	            $this.parent().find("ul.sub-menu").slideUp(200, function(){ $this.removeClass('active')});  
+	        });  
+		}
         //Following events are applied to the trigger (Hover events for the trigger)  
         }).hover(function() {  
             $this.addClass('active'); //On hover over, add class "subhover"  
         });  
-  
+			
 });
 
 </script>
