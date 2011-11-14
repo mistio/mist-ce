@@ -7,6 +7,8 @@
     <!-- include the Tools -->
     <script src="static/jquery.tools.min.js"></script>
     <link rel="stylesheet" type="text/css" href="static/main.css"/>
+    <!--link rel="stylesheet" type="text/css" href="static/rainbow.css"/-->
+
     <!--[if lt IE 9]>
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->

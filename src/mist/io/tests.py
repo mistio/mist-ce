@@ -13,4 +13,4 @@ class ViewTests(unittest.TestCase):
         from mist.io.views import home
         request = testing.DummyRequest()
         info = home(request)
-        self.assertEqual(info['project'], 'unweb.cloud')
+        self.assertEqual(info['project'], 'mist.io')

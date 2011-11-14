@@ -25,5 +25,8 @@ def main(global_config, **settings):
     config.add_route('networks', '/networks',
                      view='mist.io.views.network',
                      view_renderer='templates/network.pt')
+    
+    config.add_route('backends', '/backends/{backend}/machines/list',
+                     view='mist.io.views.list_machines')
     return config.make_wsgi_app()
 

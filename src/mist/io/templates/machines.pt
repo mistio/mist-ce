@@ -147,6 +147,8 @@ $('#button-back').click(function() {
 $('#button-select-all').click(function() {
 	$('.node').addClass('selected');
     $('#button-header .check').parent().addClass('selected');
+    $('#button-header .check').parent().removeClass('partial');    
+    update_actions();
     return false;
 });
 
@@ -154,6 +156,7 @@ $('#button-deselect-all').click(function() {
 	$('.node').removeClass('selected');
     $('#button-header .check').parent().removeClass('selected');
     $('#button-header .check').parent().removeClass('partial');
+    update_actions();
     return false;
 });
 
@@ -176,9 +179,12 @@ $('.node .select').click(function() {
 $('#button-header .check').click(function() {
     if ($('.node.selected .check').length == $('.node .check').length) {
         $('.node').removeClass('selected');
-        $(this).parent().removeClass('selected')
+        $(this).parent().removeClass('selected');
+        $(this).parent().removeClass('partial');
+        
     } else {
         $(this).parent().addClass('selected');
+        $(this).parent().removeClass('partial');
         $('.node').addClass('selected');
     }
 	update_actions();
