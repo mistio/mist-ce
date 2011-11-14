@@ -118,8 +118,8 @@ body {
 
 #footer {
     text-align:center;
-    color: #666;
-    font-size: .5em;
+    color: #d3d3d3;
+    font-size: 9px;
     padding:2em;
 }
 
@@ -256,11 +256,11 @@ ul#button-header .check {
     height: 11px;
     display: block;
     background-color: #f1f1f1;
-    margin: 4px 6px 4px 0px;
+    margin: 4px 14px 4px 4px;
 }
 
 ul#button-header .select-widget {
-    background: url(../static/icons/arrow_down.png) no-repeat scroll 26px 14px transparent;
+    background: url(../static/icons/arrow_down.png) no-repeat scroll 30px 14px transparent;
     opacity: 0.5;
 }
 
@@ -284,7 +284,6 @@ ul#button-header li:hover .select-widget {
 .node .name {
 	margin: 0 14px 0 0;
 	padding: 19px 14px;
-	border-left: 1px solid #dadada;
 }
 
 .node-header .name {
@@ -418,11 +417,10 @@ div#about {
 
 ul#button-header {
 	list-style: none;
-	padding: 17px;
 	background: #e9e9e9;
 	height: 30px;
 	overflow: visible;
-    padding: 10px 15px;
+    padding: 10px;
 }
 
 ul#button-header li {

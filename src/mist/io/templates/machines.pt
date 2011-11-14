@@ -4,7 +4,7 @@
 	    <li id="start"><a>Start</a></li>
 	    <li id="reboot"><a>Reboot</a></li>
 	    <li id="destroy"><a>Destroy</a></li>
-	    <li id="shell"><a>Shell</a></li>
+	    <li id="shell"><a>Console</a></li>
 	</ul>
 </div>
 <ul id="button-header">
@@ -15,10 +15,10 @@
 			<li id="button-deselect-all">None</li>
 		</ul>
 	</li>
-	<li class="head-button left visible-in-list">Action1</li>
+	<!--li class="head-button left visible-in-list">Action1</li>
 	<li class="head-button mid visible-in-list">Action2</li>
 	<li class="head-button right visible-in-list">Action2</li>
-	<li class="head-button visible-in-list">Action3</li>
+	<li class="head-button visible-in-list">Action3</li-->
 	<li id="button-back" class="head-button visible-in-details">Back</li>
 </ul>
 <div id="machines-list">
@@ -125,59 +125,78 @@ $(function() {
 
 $('.node').click(function() {
 	$('#machines-list').fadeOut(200, function() {
-		$('#machine-details').fadeIn(200);
+		$('#machine-details').fadeIn(200, update_actions);
 	});
 	$('.head-button:not(.visible-in-details)').fadeOut(200, function() {
 		$('.visible-in-details').fadeIn(200);
 	});
+    return false;
 });
 
 $('#button-back').click(function() {
 	$('#machine-details').fadeOut(200, function() {
-		$('#machines-list').fadeIn(200);
+		$('#machines-list').fadeIn(200, update_actions);
 	});
 	$('.head-button:not(.visible-in-list)').fadeOut(200, function() {
 		$('.visible-in-list').fadeIn(200);
+        
 	});
+    return false;
 });
 
 $('#button-select-all').click(function() {
 	$('.node').addClass('selected');
     $('#button-header .check').parent().addClass('selected');
+    return false;
 });
 
 $('#button-deselect-all').click(function() {
 	$('.node').removeClass('selected');
     $('#button-header .check').parent().removeClass('selected');
-    $('#button-header .check').parent().removeClass('partial');    
+    $('#button-header .check').parent().removeClass('partial');
+    return false;
 });
 
 $('.node .select').click(function() {
 	$(this).parent().toggleClass('selected');
-    if ($('.selected .check').length == $('.check').length -1){
+    if ($('.node.selected .check').length == $('.node .check').length){
         $('#button-header .check').parent().addClass('selected');
         $('#button-header .check').parent().removeClass('partial');        
-    } else if ($('.selected .check').length == 0) {
+    } else if ($('.node.selected .check').length == 0) {
         $('#button-header .check').parent().removeClass('selected');
         $('#button-header .check').parent().removeClass('partial');
     } else {
         $('#button-header .check').parent().addClass('partial');
         $('#button-header .check').parent().removeClass('selected');        
     }
+    update_actions();
 	return false;
 });
 
 $('#button-header .check').click(function() {
-    if ($('.selected .check').length == $('.check').length) {
+    if ($('.node.selected .check').length == $('.node .check').length) {
         $('.node').removeClass('selected');
         $(this).parent().removeClass('selected')
     } else {
         $(this).parent().addClass('selected');
         $('.node').addClass('selected');
     }
-	
+	update_actions();
 	return false;
 });
+
+function update_actions() {
+    if ($('#machines-list:visible').length == 0){
+        $('#actions-list #create').removeClass('enabled');
+        $('#actions-list #destroy').addClass('enabled');
+    } else if ($('.node.selected .check').length == 0){
+        $('#actions-list #create').addClass('enabled');
+        $('#actions-list #destroy').removeClass('enabled');
+    } else {
+        $('#actions-list #create').removeClass('enabled');
+        $('#actions-list #destroy').addClass('enabled');
+    }
+}
 
 $(document).ready(function(){  
   	
