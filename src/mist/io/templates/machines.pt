@@ -168,7 +168,8 @@ $(document).ready(function(){
     $("ul.sub-menu").parent().append("<span></span>");
   	
 	//When trigger is clicked... 
-    $("ul#button-header li").click(function() {  
+    $("ul#button-header li")
+	.click(function() {  
 	
 		var $this = $(this),
 			menu = $this.find("ul.sub-menu");
@@ -180,16 +181,13 @@ $(document).ready(function(){
         //Following events are applied to the subnav itself (moving subnav up and down)  
         menu.slideDown(200).show(); //Drop down the subnav on click  
   
-        $this.parent().hover(function() {  
-        }, function(){  
-            menu.slideUp(200, function(){ $this.removeClass('active')});  
-        });  
-  
         //Following events are applied to the trigger (Hover events for the trigger)  
-        }).hover(function() {  
-            $this.addClass('active drop-shadow');   
-        });  
-  
+    })
+	.mouseleave(function() {  
+		var $this = $(this),
+			menu = $this.find("ul.sub-menu");
+        menu.slideUp(200, function(){ $this.removeClass('active')});  
+    });
 });
 
 </script>
