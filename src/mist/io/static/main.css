@@ -268,7 +268,7 @@ ul#button-header li:hover .select-widget {
     opacity: 1;
 }
 
-#node-template {
+.node-template, .backend-template {
     display: none;
 }
 
@@ -322,6 +322,11 @@ ul#button-header li:hover .select-widget {
 
 .node.selected {
 	background: url(../static/bg-selected.gif) 0 0 repeat-x;
+}
+
+.node a {
+    margin-left: -55px;
+    padding: 20px 30px;
 }
 
 .selected .check {
@@ -428,7 +433,6 @@ ul#button-header {
 }
 
 ul#button-header li {
-	display: block;
 	float: left;
 	position: relative; /*--Declare X and Y axis base for sub navigation--*/
 	padding: 6px 10px;
@@ -530,6 +534,9 @@ ul#button-header li ul.sub-menu li:hover {
 	color: #fff;
 }
 
+ul#button-header li.backend-button {
+    float: right;
+}
 
 /* tooltip styling. by default the element to be styled is .tooltip  */
 .tooltip {

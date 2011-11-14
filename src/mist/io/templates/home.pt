@@ -12,6 +12,8 @@
     <!--[if lt IE 9]>
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <script src="static/mist.js"></script>
+
     <link rel="stylesheet" media="all" href=""/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 </head>
@@ -77,7 +79,7 @@
         $("ul.css-tabs a").tooltip({effect: 'fade', predelay: 1000, delay: 2, position: 'top center', opacity: 0.8});
         var backends = [];
     </script>
-    <script tal:repeat="backend backends" tal:content="string:backends.push(${backend})" />
+    <script tal:repeat="backend backends" tal:content="string:backends.push(new Backend('${backend['id']}','${backend['title']}',${backend['provider']},${backend['poll_interval']},${backend.host|'undefined'}));" />
     <div id="footer">created by <a href="https://unweb.me" title="state of the art information systems">unweb.me</a></div>
 </body>
 </html>

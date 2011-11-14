@@ -9,6 +9,7 @@ def home(request):
     for b in BACKENDS:
         backends.append({'id' : b['id'],
                          'title' :  b['title'],
+                         'provider' : b['provider'],
                          'poll_interval' : b['poll_interval'],
                          'status'   : 'off',
                         })
@@ -47,28 +48,13 @@ def list_machines(request):
     return Response(json.dumps(ret))
 
 def machines(request):
-    nodes = []
-    images = []
-    sizes = []
-    for b in BACKENDS:
-        Driver = get_driver(b['provider'])
-        if 'host' in b.keys():
-            conn = Driver(b['id'], b['secret'], False, host=b['host'], port=80)
-        else:
-            conn = Driver(b['id'], b['secret'])
-        nodes += conn.list_nodes()
-        #images += conn.list_images()
-        images = []
-        sizes += conn.list_sizes()
-    return {'nodes': nodes,
-            'images': images,
-            'sizes': sizes,
-            'backends': BACKENDS}
+    return {}
 
 def disks(request):
     return {}
 
 def images(request):
+    return {}
     images = []
     for b in BACKENDS:
         Driver = get_driver(b['provider'])
@@ -80,6 +66,7 @@ def images(request):
     return {'images': images}
 
 def network(request):
+    return {}
     networks = {}
     nodes = []
     for b in BACKENDS:
