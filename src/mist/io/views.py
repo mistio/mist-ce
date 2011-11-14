@@ -47,7 +47,6 @@ def list_machines(request):
     return Response(json.dumps(ret))
 
 def machines(request):
-    return {}
     nodes = []
     images = []
     sizes = []
