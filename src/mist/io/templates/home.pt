@@ -21,6 +21,7 @@
         <div id="header">
 			<div id="logo-container"></div>
         </div>
+        <div id="backends"
         <!-- tabs -->
         <ul class="css-tabs rounded-top drop-shadow">
             <li><a href="machines" class="medium" title="Manage your virtual machines.">machines</a></li>
@@ -74,7 +75,9 @@
             });
         });
         $("ul.css-tabs a").tooltip({effect: 'fade', predelay: 1000, delay: 2, position: 'top center', opacity: 0.8});
+        var backends = [];
     </script>
+    <script tal:repeat="backend backends" tal:content="string:backends.push(${backend})" />
     <div id="footer">created by <a href="https://unweb.me" title="state of the art information systems">unweb.me</a></div>
 </body>
 </html>

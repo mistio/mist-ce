@@ -5,18 +5,35 @@ from pyramid.response import Response
 import json
 
 def home(request):
-    return {'project':'mist.io','backends' : [b['id'] for b in BACKENDS]}
+    backends = []
+    for b in BACKENDS:
+        backends.append({'id' : b['id'],
+                         'title' :  b['title'],
+                         'poll_interval' : b['poll_interval'],
+                         'status'   : 'off',
+                        })
+    return {'project':'mist.io','backends' : backends}
 
 def list_machines(request):
     ret = []
+    found = False
     for b in BACKENDS:
         if request.matchdict['backend'] == b['id']:
-            Driver = get_driver(b['provider'])
-            if 'host' in b.keys():
-                conn = Driver(b['id'], b['secret'], False, host=b['host'], port=80)
-            else:
-                conn = Driver(b['id'], b['secret'])
-            machines = conn.list_nodes()
+            found = True
+            try:
+                Driver = get_driver(b['provider'])
+                if 'host' in b.keys():
+                    conn = Driver(b['id'], b['secret'], False, host=b['host'], port=80)
+                else:
+                    conn = Driver(b['id'], b['secret'])
+                machines = conn.list_nodes()
+                break
+            except Exception as e:
+                return Response(e, 500)
+    
+    if not found:
+        return Response('Invalid backend', 404)            
+    
     for m in machines:
         ret.append({'id'            : m.id,
                     'uuid'          : m.get_uuid(),
@@ -30,6 +47,7 @@ def list_machines(request):
     return Response(json.dumps(ret))
 
 def machines(request):
+    return {}
     nodes = []
     images = []
     sizes = []

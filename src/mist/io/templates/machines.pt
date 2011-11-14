@@ -21,22 +21,19 @@
 	<li class="head-button visible-in-list">Action3</li-->
 	<li id="button-back" class="head-button visible-in-details">Back</li>
 </ul>
-<div id="machines-list">
-	
+<div id="machines-list">	
 	<!--div class="node node-header">
         <span class="name">Name</span>
 		<span class="header-state">State</span>
 		<span class="ip">IP</span>
     </div-->
-    <div tal:repeat="node nodes">
-        <div class="node" tal:attributes="id node.id">
-        	<!--input class="select" type="checkbox" tal:attributes="id string:chk-${node.id}" /-->
-			<span class="select" tal:attributes="id string:chk-${node.id}"><span class="check" /> </span>
-	        <span class="name" tal:content="node.name">test</span>
-			<span class="state"></span>
-			<span class="ip" tal:repeat="ip node.public_ip" tal:content="ip"></span>
-	        <!--span class="state" tal:content="node.state"></span-->
-        </div>
+    <div id="node-template" class="node>
+		<span class="select" id="chk-node.id">
+            <span class="check"></span>
+        </span>
+	    <span class="name"></span>
+		<span class="state"></span>
+		<span class="ip"></span>
     </div>
 </div>
 

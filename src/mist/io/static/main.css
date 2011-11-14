@@ -268,6 +268,10 @@ ul#button-header li:hover .select-widget {
     opacity: 1;
 }
 
+#node-template {
+    display: none;
+}
+
 .node .select {
 	border: 1px solid rgba(155, 155, 155, 0.57);
     width: 11px;
