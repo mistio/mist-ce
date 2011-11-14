@@ -10,11 +10,12 @@
 <ul id="button-header">
 	<li class="head-button visible-in-list select-widget">
 		<span class="check"></span>
-		<ul class="sub-menu rounded-bottom">
+		<ul class="sub-menu rounded-right-bottom">
 			<li id="button-select-all">All</li>
 			<li id="button-deselect-all">None</li>
 		</ul>
 	</li>
+
     <li class="head-button visible-in-list backend-button backend-template"></li>
 	<li id="button-back" class="head-button visible-in-details">Back</li>
 </ul>
@@ -232,6 +233,22 @@ $(document).ready(function(){
         b.new_action(['list_machines']);
     });    
   
+    $("ul#button-header li").click(function() { //When trigger is clicked...  
+  		
+		if ($(this).children('.check').length) {
+			var $this = $(this);
+			$this.addClass('active');
+	        //Following events are applied to the subnav itself (moving subnav up and down)  
+	        $this.find("ul.sub-menu").slideDown(200).show(); //Drop down the subnav on click  
+  
+	        $this.parent().hover(function(){  
+	            $this.parent().find("ul.sub-menu").slideUp(200, function(){ $this.removeClass('active')});  
+	        });  
+		}
+        //Following events are applied to the trigger (Hover events for the trigger)  
+        }).hover(function() {  
+            $this.addClass('active'); //On hover over, add class "subhover"  
+        });  
 });
 
 

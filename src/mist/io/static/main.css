@@ -215,6 +215,7 @@ div.networks{
 	overflow: auto;
 	overflow-x: hidden;
 	display: none;
+	background: url(../static/bg-actions-side.gif) right top repeat-y;
 }
 
 /* Machines Pane : Machines List */
@@ -229,6 +230,42 @@ div.networks{
 .header-state {
 	float: right;
 	margin: 0 14px;
+}
+
+ul#button-header .check {
+	border: 1px solid rgba(155, 155, 155, 0.57);
+    width: 11px;
+    height: 11px;
+    display: block;
+    background-color: #f1f1f1;
+    margin: 4px 14px 4px 4px;
+}
+
+ul#button-header .select-widget {
+    background: url(../static/icons/arrow_down.png) no-repeat scroll 34px 14px transparent;
+    opacity: 0.5;
+}
+
+ul#button-header li:hover .select-widget {
+    opacity: 1;
+}
+
+ul#button-header li.provider {
+	width:20px;
+	height: 20px;
+	float: right;
+}
+
+ul#button-header li.p1 {
+	background: url('../static/providers/p1_sm.png') center no-repeat;
+}
+
+ul#button-header li.p2 {
+	background: url('../static/providers/p2_sm.png') center no-repeat;
+}
+
+ul#button-header li.p3 {
+	background: url('../static/providers/p3_sm.png') center no-repeat;
 }
 
 div.node, ul#button-header {
@@ -360,8 +397,8 @@ ul#button-header li:hover .select-widget {
  
 #actions-list {
 	float: right;
-	width: 180px;
-	border-left: 1px solid #dadada;
+	width: 181px;
+	border-left: 0px solid #dadada;
 	background: url(../static/bg-actions-side.gif) 0 0 repeat-y;
 }
 
@@ -427,9 +464,9 @@ div#about {
 ul#button-header {
 	list-style: none;
 	background: #e9e9e9;
-	height: 30px;
+	height: 34px;
 	overflow: visible;
-    padding: 10px;
+    padding: 8px 10px;
 }
 
 ul#button-header li {
@@ -503,6 +540,10 @@ ul#button-header li.right {
     -moz-border-radius-topright: 4px;
     -o-border-top-right-radius: 4px;
     -khtml-border-top-right-radius: 4px;
+}
+
+ul#button-header li.end {
+	margin-right: 10px;
 }
 
 ul#button-header li a { /*--Drop down trigger styles--*/
@@ -741,7 +782,24 @@ ul#button-header li.backend-button {
     -moz-border-radius-topright: 4px;
     -o-border-top-right-radius: 4px;
     -khtml-border-top-right-radius: 4px;
-	
+}
+
+.rounded-right-bottom {
+	border-bottom-right-radius: 4px;
+    -webkit-border-bottom-right-radius: 4px;
+    -moz-border-radius-bottomright: 4px;
+    -o-border-bottom-right-radius: 4px;
+    -khtml-border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+    -webkit-border-top-right-radius: 4px;
+    -moz-border-radius-topright: 4px;
+    -o-border-top-right-radius: 4px;
+    -khtml-border-top-right-radius: 4px;
+	border-bottom-left-radius: 4px;
+    -webkit-border-bottom-left-radius: 4px;
+    -moz-border-radius-bottomleft: 4px;
+    -o-border-bottom-left-radius: 4px;
+    -khtml-border-bottom-left-radius: 4px;
 }
 
 /* CSS3 drop shadow */
