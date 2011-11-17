@@ -4,16 +4,18 @@ from mist.io.config import BACKENDS
 from pyramid.response import Response
 import json
 
+
 def home(request):
     backends = []
     for b in BACKENDS:
-        backends.append({'id' : b['id'],
-                         'title' :  b['title'],
-                         'provider' : b['provider'],
-                         'poll_interval' : b['poll_interval'],
-                         'status'   : 'off',
+        backends.append({'id'           : b['id'],
+                         'title'        : b['title'],
+                         'provider'     : b['provider'],
+                         'poll_interval': b['poll_interval'],
+                         'status'       : 'off',
                         })
-    return {'project':'mist.io','backends' : backends}
+    return {'project': 'mist.io', 'backends': backends}
+
 
 def list_machines(request):
     ret = []
@@ -24,17 +26,21 @@ def list_machines(request):
             try:
                 Driver = get_driver(b['provider'])
                 if 'host' in b.keys():
-                    conn = Driver(b['id'], b['secret'], False, host=b['host'], port=80)
+                    conn = Driver(b['id'],
+                                  b['secret'],
+                                  False,
+                                  host=b['host'],
+                                  port=80)
                 else:
                     conn = Driver(b['id'], b['secret'])
                 machines = conn.list_nodes()
                 break
             except Exception as e:
                 return Response(e, 500)
-    
+
     if not found:
-        return Response('Invalid backend', 404)            
-    
+        return Response('Invalid backend', 404)
+
     for m in machines:
         ret.append({'id'            : m.id,
                     'uuid'          : m.get_uuid(),
@@ -44,14 +50,18 @@ def list_machines(request):
                     'state'         : m.state,
                     'private_ips'   : m.private_ips,
                     'public_ips'    : m.public_ips,
-                    'extra'         : m.extra,})
+                    'extra'         : m.extra,
+                    })
     return Response(json.dumps(ret))
+
 
 def machines(request):
     return {}
 
+
 def disks(request):
     return {}
+
 
 def images(request):
     return {}
@@ -64,6 +74,7 @@ def images(request):
             conn = Driver(b['id'], b['secret'])
         images += conn.list_images()
     return {'images': images}
+
 
 def network(request):
     return {}
@@ -80,4 +91,4 @@ def network(request):
     for node in nodes:
         networks.update({node.name : { 'public_ip': node.public_ip,
                                        'private_ip' : node.private_ip}})
-    return {'networks': networks }
+    return {'networks': networks}

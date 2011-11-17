@@ -1,5 +1,6 @@
 from libcloud.compute.types import Provider
 
+
 BACKENDS = [
 #    {'provider' : Provider.OPENSTACK,
 #     'title' : 'MOP OpenStack',
