@@ -29,7 +29,7 @@ def main(global_config, **settings):
                     renderer='templates/images.pt')
 
     config.add_route('networks', '/networks')
-    config.add_view('mist.io.views.network',
+    config.add_view('mist.io.views.networks',
                     route_name='networks',
                     renderer='templates/network.pt')
     
