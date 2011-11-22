@@ -15,9 +15,7 @@
             <li id="button-deselect-all">None</li>
         </ul>
     </li>
-    <li class="head-button backend-button backend-template">
-        <span class="waiting"></span>
-    </li>
+    <li class="head-button backend-button backend-template"></li>
     <li id="button-back" class="head-button visible-in-details">Back</li>
 </ul>
 <div id="machines-list">
