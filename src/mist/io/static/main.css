@@ -430,6 +430,10 @@ li#start {
     background: url(../static/icons/start.png) 16px center no-repeat;
 }
 
+li#stop {
+    background: url(../static/icons/stop.png) 16px center no-repeat;
+}
+
 li#reboot {
     background: url(../static/icons/reboot.png) 16px center no-repeat;
 }
@@ -572,6 +576,41 @@ ul#button-header li ul.sub-menu li:hover {
 
 ul#button-header li.backend-button {
     float: right;
+    padding-left: 40px;
+}
+
+.provider1.on {
+    background: url("/static/providers/p1_sm.png") no-repeat scroll 10px 5px transparent;   
+}
+
+.provider3.on {
+    background: url("/static/providers/p3_sm.png") no-repeat scroll 10px 5px transparent;  
+}
+
+.provider31.on {
+    background: url("/static/providers/p31_sm.png") no-repeat scroll 10px 5px transparent;
+}
+
+.provider1 {
+    background: url("/static/providers/p1_sm_off.png") no-repeat scroll 10px 5px transparent;
+}
+
+.provider3 {
+    background: url("/static/providers/p3_sm_off.png") no-repeat scroll 10px 5px transparent;
+}
+
+.provider31 {
+    background: url("/static/providers/p31_sm_off.png") no-repeat scroll 10px 5px transparent;
+}
+
+.backend {
+    color: transparent;
+    padding: 10px;
+}
+
+.wait {
+    background: url("/static/spinner.gif") no-repeat scroll 10px 7px transparent !important;    
+    
 }
 
 /* tooltip styling. by default the element to be styled is .tooltip  */

@@ -17,7 +17,7 @@ function Backend(id, title, provider, interval, host){
 
     this.update_status = function(new_status) {
         this.status = new_status;
-        alert(new_status);
+        try { update_backend_status(this); } catch(err){}
     };
 
     this.process_action = function(){

@@ -2,6 +2,7 @@
     <ul class="actions" >
         <li id="create" class="enabled"><a rel="#wizard">Create</a></li>
         <li id="start"><a>Start</a></li>
+        <li id="stop"><a>Stop</a></li>
         <li id="reboot"><a>Reboot</a></li>
         <li id="destroy"><a>Destroy</a></li>
         <li id="shell"><a>Console</a></li>
@@ -85,6 +86,8 @@
 </form>
 
 <script>
+
+// create vm overlay
 $(function() {
     $(".enabled#create a[rel]").overlay({
             top: 'center',
@@ -96,6 +99,7 @@ $(function() {
         });
     });
 
+// overlay logic
 $(function() {
     // validation logic is done inside the onBeforeSeek callback
     $('.start').click(function() {
@@ -145,6 +149,7 @@ $('#button-back').click(function() {
     return false;
 });
 
+// select all option
 $('#button-select-all').click(function() {
     $('.node').addClass('selected');
     $('#button-header .check').parent().addClass('selected');
@@ -153,6 +158,7 @@ $('#button-select-all').click(function() {
     return false;
 });
 
+// deselect all option
 $('#button-deselect-all').click(function() {
     $('.node').removeClass('selected');
     $('#button-header .check').parent().removeClass('selected');
@@ -161,6 +167,7 @@ $('#button-deselect-all').click(function() {
     return false;
 });
 
+// node checkbox click updates the header checkbox and the actions
 $('.node a').live('click', function() {
     $(this).parent().toggleClass('selected');
     if ($('.node.selected .check').length == $('.node .check').length){
@@ -177,6 +184,7 @@ $('.node a').live('click', function() {
     return false;
 });
 
+// header checkbox click toggles between select all/non
 $('#button-header .check').click(function() {
     if ($('.node.selected .check').length == $('.node .check').length) {
         $('.node').removeClass('selected');
@@ -192,6 +200,7 @@ $('#button-header .check').click(function() {
     return false;
 });
 
+// update the action list, enabling or disabling respective actions
 function update_actions() {
     if ($('#machines-list:visible').length == 0){ //single machine view
         $('#actions-list #create').removeClass('enabled');
@@ -200,6 +209,7 @@ function update_actions() {
     } else if ($('.node.selected .check').length == 0){
         $('#actions-list #create').addClass('enabled');
         $('#actions-list #destroy').removeClass('enabled');
+        $('#actions-list #reboot').removeClass('enabled');
     } else { //list machines view
         $('#actions-list #create').removeClass('enabled');
         $('#actions-list #destroy').addClass('enabled');
@@ -207,19 +217,23 @@ function update_actions() {
     }
 }
 
+// reboot action click
 $('#actions-list ul.actions li#reboot').click(function() {
      if ($('#machines-list:visible').length == 0){ //single machine view
-         var backend=backends[$('#machine-details span.backend').text()];
+         var backend = backends[$('#machine-details span.backend').text()];
          backend.new_action(['reboot',$('#machine-details span.id').text()]);
      } else {
-         //for machine in selected: 
-         b.new_action(['reboot',id]);
+         //for machine in selected:
+         $('#machines-list .node.selected .check').each(function(){
+            var backend = backends[$(this).parent().parent().parent().children('span.backend').text()];
+            backend.new_action(['reboot', $(this).parent().parent().parent()[0].id]);
+         });
      }
 
 });
 
-$("ul#button-header li").click(function() { //When trigger is clicked...
-
+// back button click
+$("ul#button-header li#button-back").click(function() { 
     var $this = $(this);
     $this.addClass('active');
     //Following events are applied to the subnav itself (moving subnav up and down)
@@ -246,6 +260,7 @@ $(document).ready(function(){
     backends.forEach(function(b, i){
         button =  $('.backend-template').clone();
         button.addClass('visible-in-list');
+        button.addClass('provider'+b.provider);
         button.appendTo('#button-header');
         button.text(b.title);
         button.fadeIn(200);
@@ -263,11 +278,26 @@ function update_machines_view(backend){
         node.appendTo('#machines-list');
         node.find('.name').text(machine.name);
         node.find('.backend').text(backends.indexOf(backend));
+        node.find('.backend').addClass('provider'+backend.provider);
         node.find('.ip').text(machine.public_ips[0]);
         node.find('.select')[0].id = 'chk-' + machine.id;
         node[0].id = machine.id;
         node.fadeIn(200);
     });
+}
+
+function update_backend_status(backend) {
+    var button = $('.provider'+backend.provider);
+    if (backend.status == 'wait'){
+        button.removeClass('on');
+        button.addClass('wait');
+    } else if (backend.status =='on'){
+        button.addClass('on');
+        button.removeClass('wait');
+    } else {
+        button.removeClass('on');
+        button.removeClass('wait');            
+    }
 }
 
 </script>
