@@ -20,11 +20,6 @@
     <li id="button-back" class="head-button visible-in-details">Back</li>
 </ul>
 <div id="machines-list">
-    <!--div class="node node-header">
-        <span class="name">Name</span>
-        <span class="header-state">State</span>
-        <span class="ip">IP</span>
-    </div-->
     <div class="node-template">
         <a><span class="select" id="chk-node.id">
             <span class="check"></span>
@@ -42,6 +37,9 @@
     <span class="backend" />
 </div>
 
+<div id="console">
+    <iframe />
+</div>
 <!-- the form -->
 <form action="#">
     <div class="overlay" id="wizard">
@@ -140,7 +138,7 @@ $('.node').live('click', function() {
 
 // Clicking on back button brings up the list again
 $('#button-back').click(function() {
-    $('#machine-details').fadeOut(200, function() {
+    $('#machine-details, #console').fadeOut(200, function() {
         $('#machines-list').fadeIn(200, update_actions);
     });
     $('.head-button:not(.visible-in-list)').fadeOut(200, function() {
@@ -210,10 +208,17 @@ function update_actions() {
         $('#actions-list #create').addClass('enabled');
         $('#actions-list #destroy').removeClass('enabled');
         $('#actions-list #reboot').removeClass('enabled');
-    } else { //list machines view
+        $('#actions-list #shell').removeClass('enabled');        
+    } else if ($('.node.selected .check').length == 1){ //list machines view
         $('#actions-list #create').removeClass('enabled');
         $('#actions-list #destroy').addClass('enabled');
         $('#actions-list #reboot').addClass('enabled');
+        $('#actions-list #shell').addClass('enabled');
+    } else {
+        $('#actions-list #create').removeClass('enabled');
+        $('#actions-list #destroy').addClass('enabled');
+        $('#actions-list #reboot').addClass('enabled');
+        $('#actions-list #shell').removeClass('enabled');        
     }
 }
 
@@ -221,19 +226,30 @@ function update_actions() {
 $('#actions-list ul.actions li#reboot').click(function() {
      if ($('#machines-list:visible').length == 0){ //single machine view
          var backend = backends[$('#machine-details span.backend').text()];
-         backend.new_action(['reboot',$('#machine-details span.id').text()]);
+         backend.newAction(['reboot',$('#machine-details span.id').text()]);
      } else {
          //for machine in selected:
          $('#machines-list .node.selected .check').each(function(){
             var backend = backends[$(this).parent().parent().parent().children('span.backend').text()];
-            backend.new_action(['reboot', $(this).parent().parent().parent()[0].id]);
+            backend.newAction(['reboot', $(this).parent().parent().parent()[0].id]);
          });
      }
 
 });
 
-// back button click
-$("ul#button-header li#button-back").click(function() { 
+// console action click
+$('#actions-list ul.actions li#shell').click(function() {
+    $("#machines-list").fadeOut(200, function(){
+        $('#console iframe')[0].src="https://" + $('#machines-list .node.selected .ip').text();
+        $('#console').fadeIn(200);
+        $('.head-button:not(.visible-in-details)').fadeOut(200, function() {
+            $('.visible-in-details').fadeIn(200);
+        });        
+    }); 
+});
+
+// header button click
+$("ul#button-header li").click(function() { 
     var $this = $(this);
     $this.addClass('active');
     //Following events are applied to the subnav itself (moving subnav up and down)
@@ -265,7 +281,7 @@ $(document).ready(function(){
         button.text(b.title);
         button.fadeIn(200);
         button.removeClass('backend-template');
-        b.new_action(['list_machines']);
+        b.newAction(['list_machines']);
     });
 });
 
@@ -280,6 +296,7 @@ function update_machines_view(backend){
         node.find('.backend').text(backends.indexOf(backend));
         node.find('.backend').addClass('provider'+backend.provider);
         node.find('.ip').text(machine.public_ips[0]);
+        node.find('.state').addClass('state'+machine.state);
         node.find('.select')[0].id = 'chk-' + machine.id;
         node[0].id = machine.id;
         node.fadeIn(200);

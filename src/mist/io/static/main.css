@@ -220,11 +220,22 @@ div.networks{
 
 /* Machines Pane : Machines List */
 
-#machines-list {
+#machines-list, #console {
     float: left;
     width: 715px;
     height: 300px;
     overflow-y: scroll;
+}
+
+#console {
+    display:none;
+    overflow: hidden;
+}
+
+#console iframe {
+    width: 100%;
+    height:105%;
+    font-size:200%;
 }
 
 .header-state {

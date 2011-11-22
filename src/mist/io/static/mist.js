@@ -8,19 +8,19 @@ function Backend(id, title, provider, interval, host){
     this.status = 'unknown';
     this.machines = [];
 
-    this.new_action = function(action){
+    this.newAction = function(action){
         this.action_queue.push(action);
         if (this.status == 'on' || this.status == 'unknown') {
-            this.process_action();
+            this.processAction();
         }
     };
 
-    this.update_status = function(new_status) {
+    this.updateStatus = function(new_status) {
         this.status = new_status;
         try { update_backend_status(this); } catch(err){}
     };
 
-    this.process_action = function(){
+    this.processAction = function(){
         if (this.action_queue.length == 0){
             return;
         }
@@ -32,17 +32,17 @@ function Backend(id, title, provider, interval, host){
 
         action = this.action_queue.shift();
 
-        this.update_status('wait');
+        this.updateStatus('wait');
         var backend = this;
         switch(action[0]) {
             case 'list_machines':
                 $.ajax({
                     url: 'backends/'+this.id+'/machines/list',
                     success: function(data) {
-                        backend.update_status('on');
+                        backend.updateStatus('on');
                         backend.machines = jQuery.parseJSON(data);
                         update_machines_view(backend);
-                        backend.process_action();
+                        backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         backend.status = 'off';
@@ -54,11 +54,11 @@ function Backend(id, title, provider, interval, host){
                 $.ajax({
                     url: 'backends/'+this.id+'/machines/'+action[1]+'/reboot',
                     success: function(data) {
-                        backend.update_status('on');
-                        backend.process_action();
+                        backend.updateStatus('on');
+                        backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.update_status('off');
+                        backend.updateStatus('off');
                         alert("backend " + backend.id + " is offline: " + errorThrown);
                     }
                 });
