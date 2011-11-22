@@ -28,11 +28,11 @@ def disks(request):
 def images(request):
     return {}
 
-    
+
 def networks(request):
     return {}
 
-    
+
 def list_machines(request):
     ret = []
     found = False
@@ -88,12 +88,11 @@ def list_images(self):
                 break
             except Exception as e:
                 return Response(e, 500)
-    
+
     if not found:
-        return Response('Invalid backend', 404)            
-    
+        return Response('Invalid backend', 404)
+
     for i in images:
         ret.append({'id'            : i.id,
                     'extra'         : i.extra,})
     return Response(json.dumps(ret))
-

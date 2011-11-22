@@ -1,42 +1,42 @@
 <div id="actions-list">
-	<ul class="actions" >
-	    <li id="create" class="enabled"><a rel="#wizard">Create</a></li>
-	    <li id="start"><a>Start</a></li>
-	    <li id="reboot"><a>Reboot</a></li>
-	    <li id="destroy"><a>Destroy</a></li>
-	    <li id="shell"><a>Console</a></li>
-	</ul>
+    <ul class="actions" >
+        <li id="create" class="enabled"><a rel="#wizard">Create</a></li>
+        <li id="start"><a>Start</a></li>
+        <li id="reboot"><a>Reboot</a></li>
+        <li id="destroy"><a>Destroy</a></li>
+        <li id="shell"><a>Console</a></li>
+    </ul>
 </div>
 <ul id="button-header">
-	<li class="head-button visible-in-list select-widget">
-		<span class="check"></span>
-		<ul class="sub-menu rounded-right-bottom">
-			<li id="button-select-all">All</li>
-			<li id="button-deselect-all">None</li>
-		</ul>
-	</li>
+    <li class="head-button visible-in-list select-widget">
+        <span class="check"></span>
+        <ul class="sub-menu rounded-right-bottom">
+            <li id="button-select-all">All</li>
+            <li id="button-deselect-all">None</li>
+        </ul>
+    </li>
 
     <li class="head-button visible-in-list backend-button backend-template"></li>
-	<li id="button-back" class="head-button visible-in-details">Back</li>
+    <li id="button-back" class="head-button visible-in-details">Back</li>
 </ul>
-<div id="machines-list">	
-	<!--div class="node node-header">
+<div id="machines-list">
+    <!--div class="node node-header">
         <span class="name">Name</span>
-		<span class="header-state">State</span>
-		<span class="ip">IP</span>
+        <span class="header-state">State</span>
+        <span class="ip">IP</span>
     </div-->
     <div class="node-template">
-		<a><span class="select" id="chk-node.id">
+        <a><span class="select" id="chk-node.id">
             <span class="check"></span>
         </span></a>
-	    <span class="name"></span>
-		<span class="state"></span>
-		<span class="ip"></span>
+        <span class="name"></span>
+        <span class="state"></span>
+        <span class="ip"></span>
     </div>
 </div>
 
 <div id="machine-details">
-	stuf
+    stuf
 </div>
 
 <!-- the form -->
@@ -120,37 +120,37 @@ $(function() {
 
 // Clicking on node brings up the details pane
 $('.node').live('click', function() {
-	$('#machines-list').fadeOut(200, function() {
-		$('#machine-details').fadeIn(200, update_actions);
-	});
-	$('.head-button:not(.visible-in-details)').fadeOut(200, function() {
-		$('.visible-in-details').fadeIn(200);
-	});
+    $('#machines-list').fadeOut(200, function() {
+        $('#machine-details').fadeIn(200, update_actions);
+    });
+    $('.head-button:not(.visible-in-details)').fadeOut(200, function() {
+        $('.visible-in-details').fadeIn(200);
+    });
     return false;
 });
 
 // Clicking on back button brings up the list again
 $('#button-back').click(function() {
-	$('#machine-details').fadeOut(200, function() {
-		$('#machines-list').fadeIn(200, update_actions);
-	});
-	$('.head-button:not(.visible-in-list)').fadeOut(200, function() {
-		$('.visible-in-list').fadeIn(200);
-        
-	});
+    $('#machine-details').fadeOut(200, function() {
+        $('#machines-list').fadeIn(200, update_actions);
+    });
+    $('.head-button:not(.visible-in-list)').fadeOut(200, function() {
+        $('.visible-in-list').fadeIn(200);
+
+    });
     return false;
 });
 
 $('#button-select-all').click(function() {
-	$('.node').addClass('selected');
+    $('.node').addClass('selected');
     $('#button-header .check').parent().addClass('selected');
-    $('#button-header .check').parent().removeClass('partial');    
+    $('#button-header .check').parent().removeClass('partial');
     update_actions();
     return false;
 });
 
 $('#button-deselect-all').click(function() {
-	$('.node').removeClass('selected');
+    $('.node').removeClass('selected');
     $('#button-header .check').parent().removeClass('selected');
     $('#button-header .check').parent().removeClass('partial');
     update_actions();
@@ -158,19 +158,19 @@ $('#button-deselect-all').click(function() {
 });
 
 $('.node a').live('click', function() {
-	$(this).parent().toggleClass('selected');
+    $(this).parent().toggleClass('selected');
     if ($('.node.selected .check').length == $('.node .check').length){
         $('#button-header .check').parent().addClass('selected');
-        $('#button-header .check').parent().removeClass('partial');        
+        $('#button-header .check').parent().removeClass('partial');
     } else if ($('.node.selected .check').length == 0) {
         $('#button-header .check').parent().removeClass('selected');
         $('#button-header .check').parent().removeClass('partial');
     } else {
         $('#button-header .check').parent().addClass('partial');
-        $('#button-header .check').parent().removeClass('selected');        
+        $('#button-header .check').parent().removeClass('selected');
     }
     update_actions();
-	return false;
+    return false;
 });
 
 $('#button-header .check').click(function() {
@@ -178,14 +178,14 @@ $('#button-header .check').click(function() {
         $('.node').removeClass('selected');
         $(this).parent().removeClass('selected');
         $(this).parent().removeClass('partial');
-        
+
     } else {
         $(this).parent().addClass('selected');
         $(this).parent().removeClass('partial');
         $('.node').addClass('selected');
     }
-	update_actions();
-	return false;
+    update_actions();
+    return false;
 });
 
 function update_actions() {
@@ -201,31 +201,31 @@ function update_actions() {
     }
 }
 
-$("ul#button-header li").click(function() { //When trigger is clicked...  
-    
+$("ul#button-header li").click(function() { //When trigger is clicked...
+
     var $this = $(this);
     $this.addClass('active');
-    //Following events are applied to the subnav itself (moving subnav up and down)  
-    $this.parent().find("ul.sub-menu").slideDown(200).show(); //Drop down the subnav on click  
+    //Following events are applied to the subnav itself (moving subnav up and down)
+    $this.parent().find("ul.sub-menu").slideDown(200).show(); //Drop down the subnav on click
 
-    $this.parent().hover(function() {  
-    }, function(){  
-        $this.parent().find("ul.sub-menu").slideUp(200, function(){ $this.removeClass('active')});  
-    });  
+    $this.parent().hover(function() {
+    }, function(){
+        $this.parent().find("ul.sub-menu").slideUp(200, function(){ $this.removeClass('active')});
+    });
 
-    //Following events are applied to the trigger (Hover events for the trigger)  
-}).hover(function() {  
-    $this.addClass('active'); //On hover over, add class "subhover"  
+    //Following events are applied to the trigger (Hover events for the trigger)
+}).hover(function() {
+    $this.addClass('active'); //On hover over, add class "subhover"
 });
 
 
-$(document).ready(function(){  
-  	
-	$('#machine-details').hide();
-	$('.head-button:not(.visible-in-list)').hide();
-	
-    $("ul.sub-menu").parent().append("<span></span>"); //Only shows drop down trigger when js is enabled (Adds empty span tag after ul.subnav*)  
-  
+$(document).ready(function(){
+
+    $('#machine-details').hide();
+    $('.head-button:not(.visible-in-list)').hide();
+
+    $("ul.sub-menu").parent().append("<span></span>"); //Only shows drop down trigger when js is enabled (Adds empty span tag after ul.subnav*)
+
     backends.forEach(function(b, i){
         button =  $('.backend-template').clone();
         button.appendTo('#button-header');
@@ -233,7 +233,7 @@ $(document).ready(function(){
         button.fadeIn(200);
         button.removeClass('.backend-template');
         b.new_action(['list_machines']);
-    });    
+    });
 });
 
 

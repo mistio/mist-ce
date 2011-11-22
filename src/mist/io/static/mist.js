@@ -7,26 +7,26 @@ function Backend(id, title, provider, interval, host){
     this.action_queue = [];
     this.status = 'unknown';
     this.machines = [];
-    
+
     this.new_action = function(action){
         this.action_queue.push(action);
         if (this.status == 'on' || this.status == 'unknown') {
             this.process_action();
         }
     }
-    
+
     this.process_action = function(){
         if (this.action_queue.length == 0){
             return;
         }
-        
+
         if (this.status == 'wait') {
             alert('waiterror!');
             return;
         }
-        
+
         action = this.action_queue.shift();
-        
+
         this.status = 'wait';
         backend = this;
         switch(action[0]) {
@@ -47,6 +47,6 @@ function Backend(id, title, provider, interval, host){
                 break;
             default:
                 alert('invalid action ' + action);
-        }           
+        }
     }
 }

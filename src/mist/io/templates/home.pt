@@ -21,7 +21,7 @@
 <body lang="en">
     <div id="wrapper">
         <div id="header">
-			<div id="logo-container"></div>
+            <div id="logo-container"></div>
         </div>
         <div id="backends"
         <!-- tabs -->
@@ -37,43 +37,43 @@
             <div id="images-pane" style="display:block"></div>
             <div id="networks-pane" style="display:block"></div>
         </div>
-		
+
     </div>
     <!-- activate tabs with JavaScript -->
     <script>
         $(function() {
             $("ul.css-tabs").tabs("div.css-panes div", {
-				effect: 'fade',
+                effect: 'fade',
                 onBeforeClick: function(event, i) {
-					var me = this,
-						tab = me.getTabs().eq(i),
-						paneswrapper = $('.css-panes'),
-						panes = paneswrapper.children(),
-						newpane = panes.eq(i),
-						rest = panes.not(newpane).not($('.large-spinner'));
-					
-					tab.addClass('waiting');
-					
-					// Why??
-					//panes.show().fadeOut(300);
-					
-					// This solves various transition issues, like misplaced
-					// elements. Don't ask me.
-					panes.width(paneswrapper.width());
-					
-					// Explicitly set height
-					paneswrapper.height(paneswrapper.height());
-					
-					//fetch content using ajax
-					newpane.load(me.getTabs().eq(i).attr("href"), function(){
-						paneswrapper.animate({height : newpane.outerHeight(true)}, 300, function() {
-							paneswrapper.height('auto');
-						});
-						rest.html('');
-						newpane.hide().fadeIn(300);
-						tab.removeClass('waiting');
-					});
-				}
+                    var me = this,
+                        tab = me.getTabs().eq(i),
+                        paneswrapper = $('.css-panes'),
+                        panes = paneswrapper.children(),
+                        newpane = panes.eq(i),
+                        rest = panes.not(newpane).not($('.large-spinner'));
+
+                    tab.addClass('waiting');
+
+                    // Why??
+                    //panes.show().fadeOut(300);
+
+                    // This solves various transition issues, like misplaced
+                    // elements. Don't ask me.
+                    panes.width(paneswrapper.width());
+
+                    // Explicitly set height
+                    paneswrapper.height(paneswrapper.height());
+
+                    //fetch content using ajax
+                    newpane.load(me.getTabs().eq(i).attr("href"), function(){
+                        paneswrapper.animate({height : newpane.outerHeight(true)}, 300, function() {
+                            paneswrapper.height('auto');
+                        });
+                        rest.html('');
+                        newpane.hide().fadeIn(300);
+                        tab.removeClass('waiting');
+                    });
+                }
             });
         });
         $("ul.css-tabs a").tooltip({effect: 'fade', predelay: 1000, delay: 2, position: 'top center', opacity: 0.8});
