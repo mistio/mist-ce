@@ -380,10 +380,6 @@ ul#button-header li:hover .select-widget {
     width: 15px;
 }
 
-.waiting {
-    background: url(../static/large-spinner.gif) right center no-repeat;
-}
-
 /* Machine Details Pane */
 
 #machine-details {

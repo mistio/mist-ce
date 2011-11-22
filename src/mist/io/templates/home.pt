@@ -52,8 +52,6 @@
                         newpane = panes.eq(i),
                         rest = panes.not(newpane).not($('.large-spinner'));
 
-                    tab.addClass('waiting');
-
                     // Why??
                     //panes.show().fadeOut(300);
 
@@ -71,7 +69,6 @@
                         });
                         rest.html('');
                         newpane.hide().fadeIn(300);
-                        tab.removeClass('waiting');
                     });
                 }
             });
