@@ -71,6 +71,23 @@ def list_machines(request):
                     })
     return Response(json.dumps(ret))
 
+def reboot_machine(request):
+    print 'reboot it' 
+    ret = []
+    found = False
+    for b in BACKENDS:
+        if request.matchdict['backend'] == b['id']:
+            found = True
+            try:
+                Driver = get_driver(b['provider'])
+                #continue with reboot action
+            except Exception as e:
+                return Response(e, 500)
+
+    if not found:
+        return Response('Invalid backend', 404)
+
+    return Response(json.dumps(ret))
 
 def list_images(self):
     ret = []

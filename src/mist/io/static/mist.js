@@ -28,7 +28,7 @@ function Backend(id, title, provider, interval, host){
         action = this.action_queue.shift();
 
         this.status = 'wait';
-        backend = this;
+        var backend = this;
         switch(action[0]) {
             case 'list_machines':
                 $.ajax({
@@ -37,6 +37,19 @@ function Backend(id, title, provider, interval, host){
                         backend.status = 'on';
                         backend.machines = jQuery.parseJSON(data);
                         update_machines_view(backend);
+                        backend.process_action();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        backend.status = 'off';
+                        alert("backend " + backend.id + " is offline: " + errorThrown);
+                    }
+                });
+                break;
+            case 'reboot':
+                $.ajax({
+                    url: 'backends/'+this.id+'/machines/'+action[1]+'/reboot',
+                    success: function(data) {
+                        backend.status = 'on';
                         backend.process_action();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {

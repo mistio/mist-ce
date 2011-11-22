@@ -37,5 +37,9 @@ def main(global_config, **settings):
     config.add_view('mist.io.views.list_machines',
                     route_name='backends')
 
+    config.add_route('reboot', '/backends/{backend}/machines/{machine}/reboot')
+    config.add_view('mist.io.views.reboot_machine',
+                    route_name='reboot')
+
     return config.make_wsgi_app()
 
