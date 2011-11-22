@@ -11,8 +11,15 @@ BACKENDS = [
     
     {'provider' : Provider.EC2,
      'title' : 'Amazon EC2',
-     'id' : 'AKIAJEEVXG4DN32QJLWA',
-     'secret' : '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',
+     'id' : 'AKIAIHIF64EDA6VJDISQ',
+     'secret' : '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',
      'poll_interval' : 5000,     
+     },
+    
+    {'provider' : Provider.RACKSPACE,
+     'title' : 'RackSpace Cloud',
+     'id' : 'unwebme',
+     'secret' : 'fb68dcedaa4e7f36b5bad4dc7bc28bed',
+     'poll_interval' : 5000,
      },
     ]

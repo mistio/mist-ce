@@ -10,3 +10,4 @@ lib
 *.pyo
 *.egg-info
 src/libcloud
+.DS_Store
