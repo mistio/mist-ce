@@ -15,8 +15,9 @@
             <li id="button-deselect-all">None</li>
         </ul>
     </li>
-
-    <li class="head-button backend-button backend-template"></li>
+    <li class="head-button backend-button backend-template">
+        <span class="waiting"></span>
+    </li>
     <li id="button-back" class="head-button visible-in-details">Back</li>
 </ul>
 <div id="machines-list">
@@ -136,7 +137,6 @@ $('#button-back').click(function() {
     });
     $('.head-button:not(.visible-in-list)').fadeOut(200, function() {
         $('.visible-in-list').fadeIn(200);
-
     });
     return false;
 });
