@@ -16,7 +16,7 @@
         </ul>
     </li>
 
-    <li class="head-button visible-in-list backend-button backend-template"></li>
+    <li class="head-button backend-button backend-template"></li>
     <li id="button-back" class="head-button visible-in-details">Back</li>
 </ul>
 <div id="machines-list">
@@ -228,10 +228,11 @@ $(document).ready(function(){
 
     backends.forEach(function(b, i){
         button =  $('.backend-template').clone();
+        button.addClass('visible-in-list');
         button.appendTo('#button-header');
         button.text(b.title);
         button.fadeIn(200);
-        button.removeClass('.backend-template');
+        button.removeClass('backend-template');
         b.new_action(['list_machines']);
     });
 });
