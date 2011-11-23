@@ -72,19 +72,28 @@ def list_machines(request):
     return Response(json.dumps(ret))
 
 def reboot_machine(request):
-    print 'reboot it'
+    "Reboot a machine, given the backend and machine id"
     ret = []
-    found = False
-    for b in BACKENDS:
-        if request.matchdict['backend'] == b['id']:
-            found = True
-            try:
-                Driver = get_driver(b['provider'])
-                #continue with reboot action
-            except Exception as e:
-                return Response(e, 500)
-
-    if not found:
+    BACKEND = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
+    if BACKEND:
+        BACKEND = BACKEND[0]
+        try:
+            Driver = get_driver(BACKEND['provider'])
+            if 'host' in BACKEND.keys():
+                conn = Driver(BACKEND['id'],
+                              BACKEND['secret'],
+                              False,
+                              host=BACKEND['host'],
+                              port=80)
+            else:
+                conn = Driver(BACKEND['id'], BACKEND['secret'])
+            machines = conn.list_nodes()
+            for machine in machines:         
+                if machine.id == request.matchdict['machine']:
+                    machine.reboot()
+        except Exception as e:
+            return Response(e, 500)
+    else:
         return Response('Invalid backend', 404)
 
     return Response(json.dumps(ret))

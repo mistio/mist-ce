@@ -208,6 +208,13 @@ $('#button-header .check').click(function() {
 });
 
 // update the action list, enabling or disabling respective actions
+//action codes on libcloud:
+//    RUNNING = 0
+//    REBOOTING = 1
+//    TERMINATED = 2
+//    PENDING = 3
+//    UNKNOWN = 4
+
 function update_actions() {
     if ($('#machines-list:visible').length == 0){ //single machine view
         $('#actions-list #create').removeClass('enabled');
