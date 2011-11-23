@@ -126,6 +126,35 @@ def destroy_machine(request):
 
     return Response(json.dumps(ret))
 
+def stop_machine(request):
+    "stop a machine, given the backend and machine id"
+    ret = []
+    BACKEND = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
+    if BACKEND:
+        BACKEND = BACKEND[0]
+        try:
+            Driver = get_driver(BACKEND['provider'])
+            if 'host' in BACKEND.keys():
+                conn = Driver(BACKEND['id'],
+                              BACKEND['secret'],
+                              False,
+                              host=BACKEND['host'],
+                              port=80)
+            else:
+                conn = Driver(BACKEND['id'], BACKEND['secret'])
+            machines = conn.list_nodes()
+            for machine in machines:         
+                if machine.id == request.matchdict['machine']:
+                    #TODO: execute the node shutdown
+                    #TODO: check which providers are stopped by libcloud, and inform the used
+                    print 'stoping machine', machine.id
+        except Exception as e:
+            return Response(e, 500)
+    else:
+        return Response('Invalid backend', 404)
+
+    return Response(json.dumps(ret))
+
 def list_images(self):
     ret = []
     found = False
