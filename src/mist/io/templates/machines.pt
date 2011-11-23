@@ -32,15 +32,14 @@
 </div>
 
 <div id="machine-details">
-    <ul>
+    <ul class="basic-info">
         <li class="name"></li>
         <li class="state"></li>
         <li class="backend"></li>
         <li class="id"></li>
         <li class="ip"></li>
     </ul>
-    <ul class="extra"></ul>
-
+    <ul class="extra-info"></ul>
 </div>
 
 <div id="console">
@@ -130,18 +129,34 @@ $(function() {
 
 // Clicking on node brings up the details pane
 $('.node').live('click', function() {
+    // populate basic info
+    /*
+    The way and order of doing this is very important, because update_actions()
+    depends on machine and backend id values put in DOM by the next steps.
+    The idea is that we put them first in DOM and then call update_actions().
+    */
+    var backend_id = $(this).find('.backend').text();
+    var machine_id = $(this)[0].id;
+    $('#machine-details li.name').text($(this).find('.name').text());
+    $('#machine-details li.state').text($(this).find('.state').text());
+    $('#machine-details li.backend').text(backend_id);
+    $('#machine-details li.id').text(machine_id);
+    $('#machine-details li.ip').text($(this).find('.ip').text());
+    // populate the extra info of the machine, each provider offers different ones
+    // delete entries placed there earlier
+    $('#machine-details .extra-info li').remove();
+    var machine = get_machine(backend_id, machine_id);
+    var extra = machine.extra;
+    for (var key in extra) {
+        var entry = '<li class="'+ key +'">' + key + ': ' +extra[key] + '</li>';
+        $('#machine-details .extra-info').append(entry.toString());
+    }
     $('#machines-list').fadeOut(200, function() {
         $('#machine-details').fadeIn(200, update_actions);
     });
     $('.head-button:not(.visible-in-details)').fadeOut(200, function() {
         $('.visible-in-details').fadeIn(200);
     });
-    $('#machine-details li.name').text($(this).find('.name').text());
-    $('#machine-details li.state').text($(this).find('.state').text());
-    $('#machine-details li.backend').text($(this).find('.backend').text());
-    $('#machine-details li.id').text($(this)[0].id);
-    $('#machine-details li.ip').text($(this).find('.ip').text());
-    $('#machine-details ul.extra').append($(this).find('ul.extra li'));
     return false;
 });
 
@@ -379,10 +394,6 @@ function update_machines_view(backend){
         node.find('.backend').addClass('provider'+backend.provider);
         node.find('.ip').text(machine.public_ips[0]);
         node.find('.state').addClass('state'+machine.state);
-        for (var key in machine.extra){
-            node.find('ul.extra').append('<li>'+ key + ': ' + machine.extra[key] + '</li>');
-        }
-        //node.find('.extra').text(JSON.stringify(machine.extra));
         node.find('.select')[0].id = 'chk-' + machine.id;
         node[0].id = machine.id;
         node.fadeIn(200);
@@ -403,7 +414,7 @@ function update_backend_status(backend) {
     }
 }
 
-function get_machine(backendIndex, machineId){
+function get_machine(backendIndex, machineId) {
     for (var m in backends[backendIndex].machines){
         if (backends[backendIndex].machines[m].id == machineId) {
             return backends[backendIndex].machines[m];
