@@ -215,23 +215,22 @@ $('#button-header .check').click(function() {
     return false;
 });
 
-// update the action list, enabling or disabling respective actions
-//action codes on libcloud:
-//    RUNNING = 0
-//    REBOOTING = 1
-//    TERMINATED = 2
-//    PENDING = 3
-//    UNKNOWN = 4
-
-
-
+/*
+update the action list, enabling or disabling respective actions
+action codes on libcloud:
+    RUNNING = 0
+    REBOOTING = 1
+    TERMINATED = 2
+    PENDING = 3
+    UNKNOWN = 4
+*/
 function update_actions() {
     var RUNNING = 0, REBOOTING = 1, TERMINATED = 2, PENDING = 3, UNKNOWN = 4;
-    var action_map = [ ['stop', 'destroy', 'reboot', 'shell'], // RUNNING
-                       ['destroy'], // REBOOTING
-                       ['start', 'destroy'], // TERMINATED
-                       ['destroy', 'reboot', 'shell'], //PENDING
-                       ['destroy', 'reboot', 'shell'] //UNKOWN
+    var action_map = [ ['stop', 'destroy', 'reboot', 'shell'],  // RUNNING
+                       ['destroy'],                             // REBOOTING
+                       ['start', 'destroy'],                    // TERMINATED
+                       ['destroy', 'reboot', 'shell'],          // PENDING
+                       ['destroy', 'reboot', 'shell']           // UNKOWN
                      ];
     var enabled_actions = ['start', 'stop', 'destroy', 'reboot', 'shell'];
     var selected_states = [];
@@ -384,10 +383,6 @@ function update_machines_view(backend){
         node.find('.backend').addClass('provider'+backend.provider);
         node.find('.ip').text(machine.public_ips[0]);
         node.find('.state').addClass('state'+machine.state);
-        for (var key in machine.extra){
-            node.find('ul.extra').append('<li>'+ key + ': ' + machine.extra[key] + '</li>');
-        }
-        //node.find('.extra').text(JSON.stringify(machine.extra));
         node.find('.select')[0].id = 'chk-' + machine.id;
         node[0].id = machine.id;
         node.fadeIn(200);
