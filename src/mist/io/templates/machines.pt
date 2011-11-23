@@ -243,6 +243,7 @@ function update_actions() {
         $('#actions-list #create').removeClass('enabled');
         $('#actions-list #destroy').addClass('enabled');
         $('#actions-list #reboot').addClass('enabled');
+        $('#actions-list #stop').addClass('enabled');
         $('#actions-list #shell').addClass('enabled');
     } else {
         $('#actions-list #create').removeClass('enabled');
@@ -262,6 +263,36 @@ $('#actions-list ul.actions li#reboot').click(function() {
          $('#machines-list .node.selected .check').each(function(){
             var backend = backends[$(this).parent().parent().parent().children('span.backend').text()];
             backend.newAction(['reboot', $(this).parent().parent().parent()[0].id]);
+         });
+     }
+
+});
+
+// destroy action click
+$('#actions-list ul.actions li#destroy').click(function() {
+     if ($('#machines-list:visible').length == 0){ //single machine view
+         var backend = backends[$('#machine-details span.backend').text()];
+         backend.newAction(['destroy',$('#machine-details span.id').text()]);
+     } else {
+         //for machine in selected:
+         $('#machines-list .node.selected .check').each(function(){
+            var backend = backends[$(this).parent().parent().parent().children('span.backend').text()];
+            backend.newAction(['destroy', $(this).parent().parent().parent()[0].id]);
+         });
+     }
+
+});
+
+// stop action click
+$('#actions-list ul.actions li#stop').click(function() {
+     if ($('#machines-list:visible').length == 0){ //single machine view
+         var backend = backends[$('#machine-details span.backend').text()];
+         backend.newAction(['stop',$('#machine-details span.id').text()]);
+     } else {
+         //for machine in selected:
+         $('#machines-list .node.selected .check').each(function(){
+            var backend = backends[$(this).parent().parent().parent().children('span.backend').text()];
+            backend.newAction(['stop', $(this).parent().parent().parent()[0].id]);
          });
      }
 
