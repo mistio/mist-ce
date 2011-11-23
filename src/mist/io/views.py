@@ -145,7 +145,7 @@ def stop_machine(request):
             machines = conn.list_nodes()
             for machine in machines:         
                 if machine.id == request.matchdict['machine']:
-                    #TODO: execute the node shutdown
+                    #machine.stop()
                     #TODO: check which providers are stopped by libcloud, and inform the used
                     print 'stoping machine', machine.id
         except Exception as e:
