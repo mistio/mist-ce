@@ -122,3 +122,7 @@ def list_images(self):
         ret.append({'id'            : i.id,
                     'extra'         : i.extra,})
     return Response(json.dumps(ret))
+
+# list sizes or flavors, may want to change the name depending on libcloud
+def list_sizes(self):
+    pass
