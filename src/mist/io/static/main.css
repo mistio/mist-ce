@@ -446,6 +446,7 @@ li#start {
 }
 
 li#stop {
+    display:none; /* until libcloud supports stop action*/
     background: url(../static/icons/stop.png) 16px center no-repeat;
 }
 
