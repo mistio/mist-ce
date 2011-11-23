@@ -215,11 +215,25 @@ $('#button-header .check').click(function() {
 //    PENDING = 3
 //    UNKNOWN = 4
 
+
+
 function update_actions() {
+    var RUNNING = 0, REBOOTING = 1, TERMINATED = 2, PENDING = 3, UNKNOWN = 4;
+    var action_map = [ ['stop','destroy','reboot','shell'], // RUNNING
+                       ['destroy'], // REBOOTING
+                       ['start', 'destroy'], // TERMINATED
+                       ['destroy', 'reboot', 'shell'], //PENDING
+                       ['destroy', 'reboot', 'shell'] //UNKOWN
+                     ];
+    var actions = ['start', 'stop', 'reboot', 'destroy', 'shell'];
+    
+    $('#actions-list ul li').removeClass('enabled');
+    
     if ($('#machines-list:visible').length == 0){ //single machine view
-        $('#actions-list #create').removeClass('enabled');
-        $('#actions-list #destroy').addClass('enabled');
-        $('#actions-list #reboot').addClass('enabled');
+        var machine = get_machine($('#machine-details .backend').text(), $('#machine-details .id').text());           
+        for (var action in action_map[machine.state]){
+            $('#actions-list #'+action_map[machine.state][action]).addClass('enabled');
+        }
     } else if ($('.node.selected .check').length == 0){
         $('#actions-list #create').addClass('enabled');
         $('#actions-list #destroy').removeClass('enabled');
@@ -255,13 +269,17 @@ $('#actions-list ul.actions li#reboot').click(function() {
 
 // console action click
 $('#actions-list ul.actions li#shell').click(function() {
-    $("#machines-list").fadeOut(200, function(){
-        $('#console iframe')[0].src="https://" + $('#machines-list .node.selected .ip').text();
-        $('#console').fadeIn(200);
-        $('.head-button:not(.visible-in-details)').fadeOut(200, function() {
-            $('.visible-in-details').fadeIn(200);
+    if ($('#machines-list:visible').length == 0){ //single machine view
+        $("#machines-list").fadeOut(200, function(){
+            $('#console iframe')[0].src="https://" + $('#machines-list .node.selected .ip').text();
+            $('#console').fadeIn(200);
+            $('.head-button:not(.visible-in-details)').fadeOut(200, function() {
+                $('.visible-in-details').fadeIn(200);
+            });
         });
-    });
+    } else {
+        // list view
+    }
 });
 
 // header button click
@@ -335,4 +353,11 @@ function update_backend_status(backend) {
     }
 }
 
+function get_machine(backendIndex, machineId){
+    for (var m in backends[backendIndex].machines){
+        if (backends[backendIndex].machines[m].id == machineId) {
+            return backends[backendIndex].machines[m];
+        }
+    }
+}
 </script>
