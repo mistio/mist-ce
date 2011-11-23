@@ -44,7 +44,7 @@
 </div>
 
 <div id="console">
-    <iframe />
+    <iframe onload="this.contentWindow.focus()" />
 </div>
 <!-- the form -->
 <form action="#">
