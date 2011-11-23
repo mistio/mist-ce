@@ -46,7 +46,8 @@ def list_machines(request):
                                   b['secret'],
                                   False,
                                   host=b['host'],
-                                  url=b.get('auth_url',None),
+                                  ex_force_auth_url=b.get('auth_url',None),
+                                  ex_force_auth_version=b.get('auth_version','1.0'),
                                   port=80)
                 else:
                     conn = Driver(b['id'], b['secret'])

@@ -232,7 +232,7 @@ function update_actions() {
                        ['destroy', 'reboot', 'shell'],          // PENDING
                        ['destroy', 'reboot', 'shell']           // UNKOWN
                      ];
-    var enabled_actions = ['start', 'stop', 'destroy', 'reboot', 'shell'];
+    var enabled_actions = ['start', 'stop', 'destroy', 'reboot', 'shell' ];
     var selected_states = [];
 
     $('#actions-list ul li').removeClass('enabled');
@@ -254,24 +254,28 @@ function update_actions() {
         $('.node.selected').each(function(){
             selected_states.push(get_machine($(this).find('.backend').text(), $(this)[0].id).state);
         });
-        console.log(selected_states);
-        $.each(selected_states, function(i, state){
-            $.each(action_map[state], function(j, action){
-                enabled_actions = enabled_actions.filter(function(){
-                    return $.inArray(action, enabled_actions)});
-            })
-        });
-
+        
+        console.log(enabled_actions);
+        for (stateIndex in selected_states){
+            for (actionIndex in enabled_actions){
+                 if (action_map[selected_states[stateIndex]].indexOf(enabled_actions[actionIndex]) < 0){
+                    enabled_actions.splice(actionIndex,1);
+                    console.log('removing ' + enabled_actions[actionIndex] + ' because not in ' + action_map[selected_states[stateIndex]]);
+                }       
+            }
+        }
+        console.log(enabled_actions);
         for (var action in enabled_actions){
             $('#actions-list #' + enabled_actions[action]).addClass('enabled');
         }
 
         if ($('.node.selected .check').length > 1){
             //disable console when multiple machines are selected
-            $('#actions-list #sheel').removeClass('enabled');
-        }
+            $('#actions-list #shell').removeClass('enabled');
+        } 
+            
+    } 
 
-    }
 }
 
 // reboot action click

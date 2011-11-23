@@ -45,7 +45,7 @@ function Backend(id, title, provider, interval, host){
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.status = 'off';
+                        backend.updateStatus('off');
                         alert("backend " + backend.id + " is offline\n " + jqXHR.statusText + ": " + jqXHR.responseText);
                     }
                 });
