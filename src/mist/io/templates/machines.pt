@@ -28,13 +28,19 @@
         <span class="name"></span>
         <span class="state"></span>
         <span class="ip"></span>
+        <ul class="extra"></ul>
     </div>
 </div>
 
 <div id="machine-details">
-    <span class="id" />
-    <span class="name" />
-    <span class="backend" />
+    <ul>
+        <li class="name"></li>
+        <li class="state"></li>
+        <li class="backend"></li>
+        <li class="id"></li>
+        <li class="ip"></li>
+    </ul>
+    <ul class="extra"></ul>
 </div>
 
 <div id="console">
@@ -130,9 +136,12 @@ $('.node').live('click', function() {
     $('.head-button:not(.visible-in-details)').fadeOut(200, function() {
         $('.visible-in-details').fadeIn(200);
     });
-    $('#machine-details span.name').text($(this).find('.name').text());
-    $('#machine-details span.backend').text($(this).find('.backend').text());
-    $('#machine-details span.id').text($(this)[0].id);
+    $('#machine-details li.name').text($(this).find('.name').text());
+    $('#machine-details li.state').text($(this).find('.state').text());
+    $('#machine-details li.backend').text($(this).find('.backend').text());
+    $('#machine-details li.id').text($(this)[0].id);
+    $('#machine-details li.ip').text($(this).find('.ip').text());
+    $('#machine-details ul.extra').append($(this).find('ul.extra li'));
     return false;
 });
 
@@ -208,7 +217,7 @@ function update_actions() {
         $('#actions-list #create').addClass('enabled');
         $('#actions-list #destroy').removeClass('enabled');
         $('#actions-list #reboot').removeClass('enabled');
-        $('#actions-list #shell').removeClass('enabled');        
+        $('#actions-list #shell').removeClass('enabled');
     } else if ($('.node.selected .check').length == 1){ //list machines view
         $('#actions-list #create').removeClass('enabled');
         $('#actions-list #destroy').addClass('enabled');
@@ -218,7 +227,7 @@ function update_actions() {
         $('#actions-list #create').removeClass('enabled');
         $('#actions-list #destroy').addClass('enabled');
         $('#actions-list #reboot').addClass('enabled');
-        $('#actions-list #shell').removeClass('enabled');        
+        $('#actions-list #shell').removeClass('enabled');
     }
 }
 
@@ -244,12 +253,12 @@ $('#actions-list ul.actions li#shell').click(function() {
         $('#console').fadeIn(200);
         $('.head-button:not(.visible-in-details)').fadeOut(200, function() {
             $('.visible-in-details').fadeIn(200);
-        });        
-    }); 
+        });
+    });
 });
 
 // header button click
-$("ul#button-header li").click(function() { 
+$("ul#button-header li").click(function() {
     var $this = $(this);
     $this.addClass('active');
     //Following events are applied to the subnav itself (moving subnav up and down)
@@ -267,7 +276,6 @@ $("ul#button-header li").click(function() {
 
 
 $(document).ready(function(){
-
     $('#machine-details').hide();
     $('.head-button:not(.visible-in-list)').hide();
 
@@ -285,7 +293,6 @@ $(document).ready(function(){
     });
 });
 
-
 function update_machines_view(backend){
     backend.machines.forEach(function(machine, index){
         node = $('.node-template').clone();
@@ -297,6 +304,10 @@ function update_machines_view(backend){
         node.find('.backend').addClass('provider'+backend.provider);
         node.find('.ip').text(machine.public_ips[0]);
         node.find('.state').addClass('state'+machine.state);
+        for (var key in machine.extra){
+            node.find('ul.extra').append('<li>'+ key + ': ' + machine.extra[key] + '</li>');
+        }
+        //node.find('.extra').text(JSON.stringify(machine.extra));
         node.find('.select')[0].id = 'chk-' + machine.id;
         node[0].id = machine.id;
         node.fadeIn(200);
@@ -313,7 +324,7 @@ function update_backend_status(backend) {
         button.removeClass('wait');
     } else {
         button.removeClass('on');
-        button.removeClass('wait');            
+        button.removeClass('wait');
     }
 }
 

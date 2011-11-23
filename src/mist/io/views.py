@@ -72,7 +72,7 @@ def list_machines(request):
     return Response(json.dumps(ret))
 
 def reboot_machine(request):
-    print 'reboot it' 
+    print 'reboot it'
     ret = []
     found = False
     for b in BACKENDS:

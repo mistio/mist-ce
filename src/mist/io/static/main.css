@@ -355,6 +355,10 @@ ul#button-header li:hover .select-widget {
     height: 20px;
 }
 
+.node .extra {
+    display:none;
+}
+
 .node:hover {
     background: #ededed;
 }
@@ -591,11 +595,11 @@ ul#button-header li.backend-button {
 }
 
 .provider1.on {
-    background: url("/static/providers/p1_sm.png") no-repeat scroll 10px 5px transparent;   
+    background: url("/static/providers/p1_sm.png") no-repeat scroll 10px 5px transparent;
 }
 
 .provider3.on {
-    background: url("/static/providers/p3_sm.png") no-repeat scroll 10px 5px transparent;  
+    background: url("/static/providers/p3_sm.png") no-repeat scroll 10px 5px transparent;
 }
 
 .provider31.on {
@@ -620,8 +624,8 @@ ul#button-header li.backend-button {
 }
 
 .wait {
-    background: url("/static/spinner.gif") no-repeat scroll 10px 7px transparent !important;    
-    
+    background: url("/static/spinner.gif") no-repeat scroll 10px 7px transparent !important;
+
 }
 
 /* tooltip styling. by default the element to be styled is .tooltip  */
