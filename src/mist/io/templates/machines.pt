@@ -28,19 +28,11 @@
         <span class="name"></span>
         <span class="state"></span>
         <span class="ip"></span>
-        <ul class="extra"></ul>
     </div>
 </div>
 
 <div id="machine-details">
-    <ul>
-        <li class="name"></li>
-        <li class="state"></li>
-        <li class="backend"></li>
-        <li class="id"></li>
-        <li class="ip"></li>
-    </ul>
-    <ul class="extra"></ul>
+    <ul class='info-list'></ul>
 </div>
 
 <div id="console">
@@ -130,18 +122,34 @@ $(function() {
 
 // Clicking on node brings up the details pane
 $('.node').live('click', function() {
+    // delete entries placed there earlier
+    $('#machine-details .info-list li').remove();
+    // populate with info based on backend id and machine id
+    var backend_id = $(this).find('.backend').text();
+    var machine_id = $(this)[0].id;
+
+    var machine = get_machine(backend_id, machine_id);
+    for (var key in machine) {
+        if (key!='extra') {
+            var entry = '<li class="'+ key +'">' + key + ': ' + machine[key] + '</li>';
+            $('#machine-details .info-list').append(entry);
+        }
+    }
+    for (var key in machine['extra']) {
+        var entry = '<li class="extra '+ key +'">' + key + ': ' + machine['extra'][key] + '</li>';
+        $('#machine-details .info-list').append(entry.toString());
+    }
+
+    // hide list view
     $('#machines-list').fadeOut(200, function() {
+        // show single view
         $('#machine-details').fadeIn(200, update_actions);
     });
+    // hide provider buttons
     $('.head-button:not(.visible-in-details)').fadeOut(200, function() {
         $('.visible-in-details').fadeIn(200);
     });
-    $('#machine-details li.name').text($(this).find('.name').text());
-    $('#machine-details li.state').text($(this).find('.state').text());
-    $('#machine-details li.backend').text($(this).find('.backend').text());
-    $('#machine-details li.id').text($(this)[0].id);
-    $('#machine-details li.ip').text($(this).find('.ip').text());
-    $('#machine-details ul.extra').append($(this).find('ul.extra li'));
+
     return false;
 });
 
@@ -227,12 +235,12 @@ function update_actions() {
                      ];
     var enabled_actions = ['start', 'stop', 'destroy', 'reboot', 'shell'];
     var selected_states = [];
-    
+
     $('#actions-list ul li').removeClass('enabled');
-    
-    if ($('#machines-list:visible').length == 0){ 
+
+    if ($('#machines-list:visible').length == 0){
         //single machine view
-        var machine = get_machine($('#machine-details .backend').text(), $('#machine-details .id').text());           
+        var machine = get_machine($('#machine-details .backend').text(), $('#machine-details .id').text());
         for (var action in action_map[machine.state]){
             $('#actions-list #'+action_map[machine.state][action]).addClass('enabled');
         }
@@ -243,7 +251,7 @@ function update_actions() {
             $('#actions-list #create').addClass('enabled');
             return;
         }
-        
+
         $('.node.selected').each(function(){
             selected_states.push(get_machine($(this).find('.backend').text(), $(this)[0].id).state);
         });
@@ -258,13 +266,13 @@ function update_actions() {
         for (var action in enabled_actions){
             $('#actions-list #' + enabled_actions[action]).addClass('enabled');
         }
-        
+
         if ($('.node.selected .check').length > 1){
             //disable console when multiple machines are selected
             $('#actions-list #sheel').removeClass('enabled');
-        } 
-            
-    } 
+        }
+
+    }
 }
 
 // reboot action click
@@ -325,7 +333,7 @@ $('#actions-list ul.actions li#shell').click(function() {
             $('.head-button:not(.visible-in-details)').fadeOut(200, function() {
                 $('.visible-in-details').fadeIn(200);
             });
-        });        
+        });
     }
 });
 
