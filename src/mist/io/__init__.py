@@ -41,5 +41,9 @@ def main(global_config, **settings):
     config.add_view('mist.io.views.reboot_machine',
                     route_name='reboot')
 
+    config.add_route('destroy', '/backends/{backend}/machines/{machine}/destroy')
+    config.add_view('mist.io.views.destroy_machine',
+                    route_name='destroy')
+
     return config.make_wsgi_app()
 
