@@ -43,6 +43,7 @@ function Backend(id, title, provider, interval, host){
                         backend.machines = jQuery.parseJSON(data);
                         update_machines_view(backend);
                         backend.processAction();
+                        try { refresh_machines(backend) } catch(err) {}
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         backend.updateStatus('off');
