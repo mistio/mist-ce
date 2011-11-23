@@ -2,12 +2,14 @@ from libcloud.compute.types import Provider
 
 
 BACKENDS = [
-#    {'provider' : Provider.OPENSTACK,
-#     'title' : 'MOP OpenStack',
-#     'id' : 'unweb',
-#     'host': '147.102.2.135',
-#     'auth_url': 'http://147.102.2.135',
-#     'secret' : '44f94619-8af5-43a6-87b0-360bbce2b38c'},
+    {'provider' : Provider.OPENSTACK,
+     'title' : 'MOP OpenStack',
+     'id' : 'unweb',
+     'host': '147.102.2.156',
+     'auth_url': 'http://147.102.2.156:8773',
+     'secret' : '68fc6627-20f1-4082-b99e-98a029d7499d',
+     'poll_interval' : 5000, 
+     },
     
     {'provider' : Provider.EC2,
      'title' : 'Amazon EC2',

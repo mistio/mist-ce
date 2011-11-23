@@ -46,14 +46,15 @@ def list_machines(request):
                                   b['secret'],
                                   False,
                                   host=b['host'],
+                                  url=b.get('auth_url',None),
                                   port=80)
                 else:
                     conn = Driver(b['id'], b['secret'])
                 machines = conn.list_nodes()
                 break
             except Exception as e:
-                import pdb;pdb.set_trace()
-                return Response(e, 500)
+                #import pdb;pdb.set_trace()
+                return Response(str(e), 500)
 
     if not found:
         return Response('Invalid backend', 404)
