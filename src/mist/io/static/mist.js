@@ -51,6 +51,34 @@ function Backend(id, title, provider, interval, host){
                     }
                 });
                 break;
+            case 'list_images':
+                $.ajax({
+                    url: 'backends/'+this.id+'/images/list',
+                    success: function(data) {
+                        backend.updateStatus('on');
+                        backend.images = jQuery.parseJSON(data);
+                        backend.processAction();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        backend.updateStatus('off');
+                        alert("backend " + backend.id + " is offline\n " + jqXHR.statusText + ": " + jqXHR.responseText);
+                    }
+                });
+                break;
+            case 'list_sizes':
+                $.ajax({
+                    url: 'backends/'+this.id+'/sizes/list',
+                    success: function(data) {
+                        backend.updateStatus('on');
+                        backend.sizes = jQuery.parseJSON(data);
+                        backend.processAction();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        backend.updateStatus('off');
+                        alert("backend " + backend.id + " is offline\n " + jqXHR.statusText + ": " + jqXHR.responseText);
+                    }
+                });
+                break;
             case 'reboot':
                 $.ajax({
                     url: 'backends/'+this.id+'/machines/'+action[1]+'/reboot',
