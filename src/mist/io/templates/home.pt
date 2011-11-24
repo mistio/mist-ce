@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8"/>
-    <title>${project} - Cloud services for human beings!</title>
+    <title>${project} - Down to earth cloud computing</title>
     <!-- include the Tools -->
     <script src="static/jquery.tools.min.js"></script>
     <link rel="stylesheet" type="text/css" href="static/main.css"/>
@@ -13,7 +13,7 @@
         <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <script src="static/mist.js"></script>
-    <link rel="icon" href="static/favicon.ico" />  
+    <link rel="icon" href="static/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 </head>
