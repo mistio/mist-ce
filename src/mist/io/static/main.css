@@ -403,6 +403,15 @@ ul#button-header li:hover .select-widget {
     display: none;
 }
 
+ul.basic-info, ul.extra-info {
+    padding-left: 50px;
+    list-style-type: none;
+}
+
+ul.basic-info {
+    padding-top: 20px;
+}
+
 /* Actions */
 
 #actions-list {

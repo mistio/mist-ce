@@ -37,6 +37,8 @@
         <li class="name"></li>
         <li class="state"></li>
         <li class="backend"></li>
+        <li class="image"></li>
+        <li class="size"></li>
         <li class="id"></li>
         <li class="ip"></li>
     </ul>
@@ -142,11 +144,28 @@ $('.node').live('click', function() {
     $('#machine-details li.state').text($(this).find('.state').text());
     $('#machine-details li.backend').text(backend_id);
     $('#machine-details li.id').text(machine_id);
-    $('#machine-details li.ip').text($(this).find('.ip').text());
+    $('#machine-details li.ip').text('Ip: ' + $(this).find('.ip').text());
     // populate the extra info of the machine, each provider offers different ones
     // delete entries placed there earlier
     $('#machine-details .extra-info li').remove();
     var machine = get_machine(backend_id, machine_id);
+
+    var machine_size = get_size(backend_id, machine);
+    var machine_image = get_image(backend_id, machine);
+    //show machine size and image if we have them. otherwise can't be shown
+    if (machine_size) {
+        $('#machine-details li.size').text('Machine size id:' + machine_size);
+        $('#machine-details li.size').append('bandwidth:' + machine_size.bandwidth);
+        $('#machine-details li.size').append('disk:' + machine_size.disk);
+        $('#machine-details li.size').append('driver:' + machine_size.driver);
+        $('#machine-details li.size').append('name:' + machine_size.name);
+        $('#machine-details li.size').append('price:' + machine_size.price);
+        $('#machine-details li.size').append('ram:' + machine_size.ram);
+    };  
+    if (machine_image) {
+        $('#machine-details li.image').text('Machine image id:' + machine_image.id);
+        $('#machine-details li.image').append(' image data:' + machine_image.extra);
+    }
     var extra = machine.extra;
     for (var key in extra) {
         var entry = '<li class="'+ key +'">' + key + ': ' +extra[key] + '</li>';
@@ -454,10 +473,26 @@ function update_backend_status(backend) {
     }
 }
 
-function get_machine(backendIndex, machineId) {
+function get_machine(backendIndex, machineId) { //get machine, given backend and machineId
     for (var m in backends[backendIndex].machines){
         if (backends[backendIndex].machines[m].id == machineId) {
             return backends[backendIndex].machines[m];
+        }
+    }
+}
+
+function get_image(backendIndex, machine) { //get image, given backend and machine
+    for (var m in backends[backendIndex].images){
+        if (backends[backendIndex].images[m].id == machine.extra.imageId) {
+            return backends[backendIndex].images[m];
+        }
+    }
+}
+
+function get_size(backendIndex, machine) { //get size, given backend and machine
+    for (var m in backends[backendIndex].sizes){
+        if (backends[backendIndex].sizes[m].id == machine.extra.flavorId) {
+            return backends[backendIndex].sizes[m];
         }
     }
 }
