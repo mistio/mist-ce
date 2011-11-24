@@ -43,10 +43,39 @@ function Backend(id, title, provider, interval, host){
                         backend.machines = jQuery.parseJSON(data);
                         update_machines_view(backend);
                         backend.processAction();
+                        try { refresh_machines(backend) } catch(err) {}
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.status = 'off';
-                        alert("backend " + backend.id + " is offline: " + errorThrown);
+                        backend.updateStatus('off');
+                        alert("backend " + backend.id + " is offline\n " + jqXHR.statusText + ": " + jqXHR.responseText);
+                    }
+                });
+                break;
+            case 'list_images':
+                $.ajax({
+                    url: 'backends/'+this.id+'/images/list',
+                    success: function(data) {
+                        backend.updateStatus('on');
+                        backend.images = jQuery.parseJSON(data);
+                        backend.processAction();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        backend.updateStatus('off');
+                        alert("backend " + backend.id + " is offline\n " + jqXHR.statusText + ": " + jqXHR.responseText);
+                    }
+                });
+                break;
+            case 'list_sizes':
+                $.ajax({
+                    url: 'backends/'+this.id+'/sizes/list',
+                    success: function(data) {
+                        backend.updateStatus('on');
+                        backend.sizes = jQuery.parseJSON(data);
+                        backend.processAction();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        backend.updateStatus('off');
+                        alert("backend " + backend.id + " is offline\n " + jqXHR.statusText + ": " + jqXHR.responseText);
                     }
                 });
                 break;
