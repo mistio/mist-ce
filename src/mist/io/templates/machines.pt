@@ -16,6 +16,7 @@
             <li id="button-deselect-all">None</li>
         </ul>
     </li>
+	<li id="selected-nodes-button" class="head-button visible-in-list">0 / 0</li>
     <li class="head-button backend-button backend-template"></li>
     <li id="button-back" class="head-button visible-in-details">Back</li>
 </ul>
@@ -336,10 +337,23 @@ $(document).ready(function(){
     $('.head-button:not(.visible-in-list)').hide();
 
     $("ul.sub-menu").parent().append("<span></span>"); //Only shows drop down trigger when js is enabled (Adds empty span tag after ul.subnav*)
-
+	
+	var buttonsAmount = backends.length;
+	
     backends.forEach(function(b, i){
         button =  $('.backend-template').clone();
         button.addClass('visible-in-list');
+		// Providers buttons grouping logic
+		if (buttonsAmount > 1) {
+			// Should be opposite because of right float
+			if (!i) {
+				button.addClass('right').addClass('end');
+			} else if (i = buttonsAmount - 1) {
+				button.addClass('left');
+			} else {
+				button.addClass('mid');
+			}
+		}
         button.addClass('provider'+b.provider);
         button.appendTo('#button-header');
         button.text(b.title);
