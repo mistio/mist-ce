@@ -49,5 +49,13 @@ def main(global_config, **settings):
     config.add_view('mist.io.views.stop_machine',
                     route_name='stop')
 
+    config.add_route('list_sizes', '/backends/{backend}/sizes/list')
+    config.add_view('mist.io.views.list_sizes',
+                    route_name='list_sizes')
+
+    config.add_route('list_images', '/backends/{backend}/images/list')
+    config.add_view('mist.io.views.list_images',
+                    route_name='list_images')
+
     return config.make_wsgi_app()
 

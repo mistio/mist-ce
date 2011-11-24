@@ -3,6 +3,7 @@
     <li id="delete"><a class="enabled">Delete</a></li>
 </ul>
 
+<tal:comment tal:replace="nothing">
 <div class="images">
     <div tal:repeat="image images">
         <div class="image" tal:attributes="id image.id">
@@ -12,3 +13,4 @@
         <hr />
     </div>
 </div>
+</tal:comment>

@@ -381,6 +381,11 @@ $(document).ready(function(){
         button.removeClass('backend-template');
         b.newAction(['list_machines']);
     });
+    //after getting the machines, get images and flavors
+    //backends.forEach(function(b, i){
+    //    //b.newAction(['list_images']);
+    //    //b.newAction(['list_sizes']);
+    //});
 });
 
 function update_machines_view(backend){

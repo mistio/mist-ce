@@ -157,7 +157,7 @@ def stop_machine(request):
 
     return Response(json.dumps(ret))
 
-def list_images(self):
+def list_images(request):
     ret = []
     found = False
     for b in BACKENDS:
@@ -183,5 +183,35 @@ def list_images(self):
     return Response(json.dumps(ret))
 
 # list sizes or flavors, may want to change the name depending on libcloud
-def list_sizes(self):
-    pass
+def list_sizes(request):
+    ret = []
+    found = False
+    for b in BACKENDS:
+        if request.matchdict['backend'] == b['id']:
+            found = True
+            try:
+                Driver = get_driver(b['provider'])
+                if 'host' in b.keys():
+                    conn = Driver(b['id'], b['secret'], False, host=b['host'], port=80)
+                else:
+                    conn = Driver(b['id'], b['secret'])
+                sizes = conn.list_sizes()
+                break
+            except Exception as e:
+                return Response(e, 500)
+
+    if not found:
+        return Response('Invalid backend', 404)
+
+    for i in sizes:
+        ret.append({'id'            : i.id,
+                    'bandwidth'         : i.bandwidth,
+                    'disk'         : i.disk,
+                    'driver'         : i.driver.name,
+                    'name'         : i.name,
+                    'price'         : i.price,
+                    'ram'         : i.ram})
+
+    return Response(json.dumps(ret))
+
+
