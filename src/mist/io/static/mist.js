@@ -81,6 +81,19 @@ function Backend(id, title, provider, interval, host){
                     }
                 });
                 break;
+            case 'start':
+                $.ajax({
+                    url: 'backends/'+this.id+'/machines/start',
+                    success: function(data) {
+                        backend.updateStatus('on');
+                        backend.processAction();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        backend.updateStatus('off');
+                        alert("backend " + backend.id + " is offline: " + errorThrown);
+                    }
+                });
+                break;
             case 'reboot':
                 $.ajax({
                     url: 'backends/'+this.id+'/machines/'+action[1]+'/reboot',

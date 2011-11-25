@@ -58,7 +58,7 @@
              <!-- backend -->
             <li class="required">
                 <label>
-                    <strong>0.</strong> Select Provider <br />
+                    <strong>0.</strong> Select provider <br />
                     <select name="image" class="backend">
                         <option value="">-- please select --</option>
                         <script>
@@ -133,6 +133,7 @@ $(".enabled#create").click(function(){
             $('select.sizes').append('<option value="loading">loading sizes, please wait</option>')
         } else {
             //FIXME: alphabetical order?
+            $('select.sizes').append('<option value="">-- please select --</option>');            
             $.each(backends[m].sizes, function(val, text) {            
             $('select.sizes').append($('<option value="' + backends[m].sizes[val].id + '">' + backends[m].sizes[val].name + '</option>'));
             });
@@ -143,6 +144,7 @@ $(".enabled#create").click(function(){
             $('select.images').append('<option value="loading">loading images, please wait</option>')
         } else {
             //FIXME: alphabetical order?
+            $('select.images').append('<option value="">-- please select --</option>');
             $.each(backends[m].images, function(val, text) {    
             $('select.images').append($('<option value="' + backends[m].images[val].id + '">' + backends[m].images[val].name + '</option>'));
             });
@@ -165,6 +167,7 @@ $(function() {
             // cancel seeking of the scrollable by returning false
             return false;
         } else {    // everything is good
+            backends[0].newAction(['start']); //send data for the start action
             alert('ok');
         }
     });

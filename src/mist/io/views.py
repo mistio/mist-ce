@@ -78,6 +78,19 @@ def list_machines(request):
                     })
     return Response(json.dumps(ret))
 
+def start_machine(request):
+    "Start a machine"
+    ret = []
+    BACKEND = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
+    if BACKEND:
+        BACKEND = BACKEND[0]
+        conn = make_connection(b)
+        print "start a machine call"
+    else:
+        return Response('Invalid backend', 404)
+
+    return Response(json.dumps(ret))
+
 def reboot_machine(request):
     "Reboot a machine, given the backend and machine id"
     ret = []
