@@ -132,6 +132,7 @@ $(".enabled#create").click(function(){
         if (backends[m].sizes && backends[m].sizes.length == 0) {
             $('select.sizes').append('<option value="loading">loading sizes, please wait</option>')
         } else {
+            //FIXME: alphabetical order?
             $.each(backends[m].sizes, function(val, text) {            
             $('select.sizes').append($('<option value="' + backends[m].sizes[val].id + '">' + backends[m].sizes[val].name + '</option>'));
             });
@@ -141,6 +142,7 @@ $(".enabled#create").click(function(){
         if (backends[m].images && backends[m].images.length == 0) {
             $('select.images').append('<option value="loading">loading images, please wait</option>')
         } else {
+            //FIXME: alphabetical order?
             $.each(backends[m].images, function(val, text) {    
             $('select.images').append($('<option value="' + backends[m].images[val].id + '">' + backends[m].images[val].name + '</option>'));
             });
