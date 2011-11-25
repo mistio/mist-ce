@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8"/>
-    <title>${project} - Down to earth cloud computing</title>
+    <title>${project} - down to earth cloud computing</title>
     <!-- include the Tools -->
     <script src="static/jquery.tools.min.js"></script>
     <link rel="stylesheet" type="text/css" href="static/main.css"/>

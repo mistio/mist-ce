@@ -99,7 +99,7 @@ html{
 }
 
 body {
-    background: url("../static/themist.jpg") repeat-x scroll center -300px transparent;
+    background: url("../static/themist.jpg") repeat-x scroll center bottom transparent;
 }
 
 #logo-container {
@@ -355,6 +355,18 @@ ul#button-header li:hover .select-widget {
     height: 20px;
 }
 
+.node .state0 {
+    background: url(../static/states/active.png) center no-repeat;
+    width: 26px;
+    height: 20px;
+}
+
+.node .state1 {
+    background: url(../static/states/pending.png) center no-repeat;
+    width: 26px;
+    height: 20px;
+}
+
 .node .extra {
     display:none;
 }
@@ -401,6 +413,8 @@ ul#button-header li:hover .select-widget {
     float: left;
     width: 715px;
     display: none;
+    overflow-y: scroll;
+    height: 300px;
 }
 
 ul.basic-info, ul.extra-info {
