@@ -2,15 +2,14 @@ from pyramid.config import Configurator
 from mist.io.resources import Root
 
 def main(global_config, **settings):
-    """ This function returns a Pyramid WSGI application.
-    """
+    """This function returns a Pyramid WSGI application"""
     config = Configurator(root_factory=Root, settings=settings)
 
     config.add_static_view('static', 'mist.io:static')
 
     config.add_route('home', '/')
-    config.add_view('mist.io.views.home', 
-                    route_name='home', 
+    config.add_view('mist.io.views.home',
+                    route_name='home',
                     renderer='templates/home.pt')
 
     config.add_route('machines', '/machines')
@@ -32,7 +31,7 @@ def main(global_config, **settings):
     config.add_view('mist.io.views.networks',
                     route_name='networks',
                     renderer='templates/network.pt')
-    
+
     config.add_route('backends', '/backends/{backend}/machines/list')
     config.add_view('mist.io.views.list_machines',
                     route_name='backends')
@@ -62,4 +61,3 @@ def main(global_config, **settings):
                     route_name='list_images')
 
     return config.make_wsgi_app()
-

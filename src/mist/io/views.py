@@ -1,4 +1,4 @@
-from libcloud.compute.types import Provider
+'''mist.io views'''
 from libcloud.compute.providers import get_driver
 from mist.io.config import BACKENDS
 from pyramid.response import Response
@@ -6,6 +6,7 @@ import json
 
 
 def home(request):
+    '''Fill in an object with backend data, taken from config.py'''
     backends = []
     for b in BACKENDS:
         backends.append({'id'           : b['id'],
@@ -18,18 +19,25 @@ def home(request):
 
 
 def machines(request):
+    '''Placeholder for machines listing, actualy list_machines (see below)
+    does all the heavy lifting. The latter is called from javascript in
+    machines.pt, as soon as the page loads.
+    '''
     return {}
 
 
 def disks(request):
+    '''Placeholder for machines listing'''
     return {}
 
 
 def images(request):
+    '''Placeholder for machines listing'''
     return {}
 
 
 def networks(request):
+    '''Placeholder for machines listing'''
     return {}
 
 def make_connection(b):
@@ -53,7 +61,7 @@ def make_connection(b):
 
 
 def list_machines(request):
-    '''list machines for a backend'''
+    '''List machines for a backend'''
     ret = []
     found = False
     for b in BACKENDS:
@@ -79,7 +87,7 @@ def list_machines(request):
     return Response(json.dumps(ret))
 
 def start_machine(request):
-    "Start a machine"
+    '''Start a machine'''
     ret = []
     BACKEND = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
     if BACKEND:
@@ -108,7 +116,7 @@ def reboot_machine(request):
     return Response(json.dumps(ret))
 
 def destroy_machine(request):
-    '''destroy a machine, given the backend and machine id'''
+    '''Destroy a machine, given the backend and machine id'''
     ret = []
     BACKEND = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
     if BACKEND:
@@ -125,7 +133,7 @@ def destroy_machine(request):
     return Response(json.dumps(ret))
 
 def stop_machine(request):
-    '''stop a machine, given the backend and machine id'''
+    '''Stop a machine, given the backend and machine id'''
     ret = []
     BACKEND = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
     if BACKEND:
@@ -135,7 +143,8 @@ def stop_machine(request):
         for machine in machines:
             if machine.id == request.matchdict['machine']:
                 #machine.stop()
-                #TODO: check which providers are stopped by libcloud, and inform the used
+                #TODO: check which providers are stopped by libcloud,
+                # and inform the user
                 print 'stoping machine', machine.id
     else:
         return Response('Invalid backend', 404)
@@ -143,6 +152,7 @@ def stop_machine(request):
     return Response(json.dumps(ret))
 
 def list_images(request):
+    '''List images from each backend'''
     ret = []
     found = False
     for b in BACKENDS:
@@ -163,7 +173,7 @@ def list_images(request):
     return Response(json.dumps(ret))
 
 def list_sizes(request):
-    '''list sizes or flavors, may want to change name depending on libcloud'''
+    '''List sizes (aka flavors) from each backend'''
     ret = []
     found = False
     for b in BACKENDS:
