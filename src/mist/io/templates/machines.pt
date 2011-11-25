@@ -55,6 +55,16 @@
             <strong>Create a new Virtual Machine</strong>
         </h2>
         <ul>
+             <!-- backend -->
+            <li class="required">
+                <label>
+                    <strong>0.</strong> Select Provider <br />
+                    <select name="image" class="backend">
+                        <option value="">-- please select --</option>
+                        <!--<option tal:repeat="backend backends" tal:attributes="id backend.id" tal:content="backend.title">Amazon EC2</option>-->
+                    </select>
+                </label>
+            </li>
             <!-- instance name -->
             <li class="required">
                 <label>
@@ -67,7 +77,7 @@
             <li class="required">
                 <label>
                     <strong>2.</strong> Select an image <br />
-                    <select name="image">
+                    <select name="image" class="images">
                         <option value="">-- please select --</option>
                         <!--option tal:repeat="image images" tal:attributes="id image.id" tal:content="image.name">Ubuntu 10.04 x86_64 server</option-->
                     </select>
@@ -77,7 +87,7 @@
             <li class="required">
                 <label>
                     <strong>3.</strong> Select VM size<br />
-                    <select name="size">
+                    <select name="size" class="sizes">
                         <option value="">-- please select --</option>
                         <!--option tal:repeat="size sizes" tal:attributes="id size.id" tal:content="size.name">small</option-->
                     </select>
@@ -95,7 +105,7 @@
 
 // create vm overlay
 $(function() {
-    $(".enabled#create a[rel]").overlay({
+    $(".enabled#create a[rel]").overlay({        
             top: 'center',
             mask: {
                 color: '#000',
@@ -104,6 +114,33 @@ $(function() {
             effect: 'apple'
         });
     });
+
+// intercept create wizard 
+$(".enabled#create").click(function(){
+//first check if we have images and sizes. If not quit the wizard
+//if we have images + sizes, populate the wizard window with the values. 
+//FIXME: proper handling of backends and values
+
+    for (var m in backends) {
+        if (backends[m].sizes.length == 0) {
+            alert("Haven't got the sizes yet for backend " + backends[m].title);
+        } 
+
+        if (backends[m].images.length == 0) {
+            alert("Haven't got the images yet for backend " + backends[m].title);
+        } 
+
+        //FIXME:clear the lists of values!!!
+        $.each(backends[m].sizes, function(val, text) {
+            $('select.sizes').append($('<option value="' + backends[m].sizes[val].id + '">' + backends[m].sizes[val].name + '</option>'));
+        });
+        $.each(backends[m].images, function(val, text) {
+            $('select.images').append($('<option value="' + backends[m].images[val].id + '">' + backends[m].images[val].name + '</option>'));
+        });
+       
+
+    }
+});
 
 // overlay logic
 $(function() {
