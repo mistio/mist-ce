@@ -52,7 +52,7 @@
 <form action="#">
     <div class="overlay" id="wizard">
         <h2>
-            <strong>Create a new Virtual Machine</strong>
+            <strong>Create new Virtual Machine</strong>
         </h2>
         <ul>
              <!-- backend -->
@@ -61,7 +61,11 @@
                     <strong>0.</strong> Select Provider <br />
                     <select name="image" class="backend">
                         <option value="">-- please select --</option>
-                        <!--<option tal:repeat="backend backends" tal:attributes="id backend.id" tal:content="backend.title">Amazon EC2</option>-->
+                        <script>
+                        for (var m in backends) {
+                            $('select.backend').append($('<option value="' + backends[m].id + '">' + backends[m].title + '</option>'));
+                        }
+                        </script>
                     </select>
                 </label>
             </li>
@@ -124,7 +128,6 @@ $(".enabled#create").click(function(){
 
 //    for (var m in backends) {
         var m = 1;
-        $('select.backend').empty().append($('<option value="' + backends[m].id + '">' + backends[m].title + '</option>'));
         $('select.sizes').empty();
         if (backends[m].sizes && backends[m].sizes.length == 0) {
             $('select.sizes').append('<option value="loading">loading sizes, please wait</option>')
