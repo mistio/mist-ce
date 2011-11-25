@@ -514,6 +514,7 @@ ul#button-header li:hover {
 ul#button-header li.active {
     background: #333;
     color: #ddd;
+	opacity: 1;
 }
 
 ul#button-header li.left {

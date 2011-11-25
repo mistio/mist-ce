@@ -406,19 +406,24 @@ $('#actions-list ul.actions li#shell').click(function() {
 
 // header button click
 $("ul#button-header li").click(function() {
+	
     var $this = $(this);
-    $this.addClass('active');
-    //Following events are applied to the subnav itself (moving subnav up and down)
-    $this.parent().find("ul.sub-menu").slideDown(200).show(); //Drop down the subnav on click
-
-    $this.parent().hover(function() {
-    }, function(){
-        $this.parent().find("ul.sub-menu").slideUp(200, function(){ $this.removeClass('active')});
-    });
-
+	if ($this.children('span.check').length) {
+		$this.addClass('active');
+	    //Following events are applied to the subnav itself (moving subnav up and down)
+	    $this.find("ul.sub-menu").slideDown(200).show(); //Drop down the subnav on click
+	}
     //Following events are applied to the trigger (Hover events for the trigger)
-}).hover(function() {
-    $this.addClass('active'); //On hover over, add class "subhover"
+}).mouseenter(function() {
+	var $this = $(this);
+	if ($this.children('span.check').length) {
+    	//$this.addClass('active'); //On hover over, add class "active"
+	}
+}).mouseleave(function() {
+	var $this = $(this);
+	if ($this.children('span.check').length) {
+		$this.find("ul.sub-menu").slideUp(200, function(){ $this.removeClass('active')});
+	}
 });
 
 
@@ -438,7 +443,7 @@ $(document).ready(function(){
 			// Should be opposite because of right float
 			if (!i) {
 				button.addClass('right').addClass('end');
-			} else if (i = buttonsAmount - 1) {
+			} else if (i == buttonsAmount - 1) {
 				button.addClass('left');
 			} else {
 				button.addClass('mid');
