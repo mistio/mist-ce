@@ -117,29 +117,32 @@ $(function() {
 
 // intercept create wizard 
 $(".enabled#create").click(function(){
-//first check if we have images and sizes. If not quit the wizard
+//first check if we have images and sizes
 //if we have images + sizes, populate the wizard window with the values. 
-//FIXME: proper handling of backends and values
 
-    for (var m in backends) {
-        if (backends[m].sizes.length == 0) {
-            alert("Haven't got the sizes yet for backend " + backends[m].title);
-        } 
+//FIXME: proper handling of backends and values. ATM only one backend is shown.
 
-        if (backends[m].images.length == 0) {
-            alert("Haven't got the images yet for backend " + backends[m].title);
-        } 
-
-        //FIXME:clear the lists of values!!!
-        $.each(backends[m].sizes, function(val, text) {
+//    for (var m in backends) {
+        var m = 1;
+        $('select.backend').empty().append($('<option value="' + backends[m].id + '">' + backends[m].title + '</option>'));
+        $('select.sizes').empty();
+        if (backends[m].sizes && backends[m].sizes.length == 0) {
+            $('select.sizes').append('<option value="loading">loading sizes, please wait</option>')
+        } else {
+            $.each(backends[m].sizes, function(val, text) {            
             $('select.sizes').append($('<option value="' + backends[m].sizes[val].id + '">' + backends[m].sizes[val].name + '</option>'));
-        });
-        $.each(backends[m].images, function(val, text) {
-            $('select.images').append($('<option value="' + backends[m].images[val].id + '">' + backends[m].images[val].name + '</option>'));
-        });
-       
+            });
+        }
 
-    }
+        $('select.images').empty();
+        if (backends[m].images && backends[m].images.length == 0) {
+            $('select.images').append('<option value="loading">loading images, please wait</option>')
+        } else {
+            $.each(backends[m].images, function(val, text) {    
+            $('select.images').append($('<option value="' + backends[m].images[val].id + '">' + backends[m].images[val].name + '</option>'));
+            });
+        }       
+
 });
 
 // overlay logic
