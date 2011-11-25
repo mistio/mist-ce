@@ -144,8 +144,9 @@ def list_images(request):
         return Response('Invalid backend', 404)
 
     for i in images:
-        ret.append({'id'            : i.id,
-                    'extra'         : i.extra,})
+        ret.append({'id' : i.id,
+                    'extra': i.extra,
+                    'name': i.name,})
     return Response(json.dumps(ret))
 
 # list sizes or flavors, may want to change the name depending on libcloud
