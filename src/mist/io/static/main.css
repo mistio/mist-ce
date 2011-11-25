@@ -640,6 +640,10 @@ ul#button-header li#selected-nodes-button {
     padding: 10px 15px;
 }
 
+#wizard .backend {
+     color: #000;
+}
+
 .wait {
     background: url("/static/spinner.gif") no-repeat scroll 12px 7px transparent !important;
 }
@@ -687,7 +691,7 @@ ul#button-header li#selected-nodes-button {
 #wizard li {
     list-style-type:none;
     list-style-image:none;
-    margin-bottom:25px;
+    margin-bottom:20px;
 }
 
 #wizard label {
@@ -742,7 +746,6 @@ ul#button-header li#selected-nodes-button {
 
 #wizard .clearfix {
     clear:left;
-    padding-top:10px;
 }
 
 #wizard .right {
