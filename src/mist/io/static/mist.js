@@ -7,6 +7,8 @@ function Backend(id, title, provider, interval, host){
     this.action_queue = [];
     this.status = 'unknown';
     this.machines = [];
+    this.sizes = [];
+    this.images = [];
 
     this.newAction = function(action){
         this.action_queue.push(action);
