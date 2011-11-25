@@ -104,8 +104,8 @@ body {
 
 #logo-container {
     background: url(../static/logo.png) 0 0 no-repeat;
-    width: 260px;
-    height: 96px;
+    width: 103px;
+    height: 131px;
     margin: 36px 0;
 }
 
@@ -514,6 +514,7 @@ ul#button-header li:hover {
 ul#button-header li.active {
     background: #333;
     color: #ddd;
+	opacity: 1;
 }
 
 ul#button-header li.left {
