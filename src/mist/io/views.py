@@ -33,7 +33,7 @@ def networks(request):
     return {}
 
 def make_connection(b):
-    "Establish connection with the credentials specified"
+    '''Establish connection with the credentials specified'''
     try:
         Driver = get_driver(b['provider'])
         if 'host' in b.keys():
@@ -53,7 +53,7 @@ def make_connection(b):
 
 
 def list_machines(request):
-    "list machines for a backend"
+    '''list machines for a backend'''
     ret = []
     found = False
     for b in BACKENDS:
@@ -92,14 +92,14 @@ def start_machine(request):
     return Response(json.dumps(ret))
 
 def reboot_machine(request):
-    "Reboot a machine, given the backend and machine id"
+    '''Reboot a machine, given the backend and machine id'''
     ret = []
     BACKEND = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
     if BACKEND:
         BACKEND = BACKEND[0]
         conn = make_connection(b)
         machines = conn.list_nodes()
-        for machine in machines:         
+        for machine in machines:
             if machine.id == request.matchdict['machine']:
                 machine.reboot()
     else:
@@ -108,14 +108,14 @@ def reboot_machine(request):
     return Response(json.dumps(ret))
 
 def destroy_machine(request):
-    "destroy a machine, given the backend and machine id"
+    '''destroy a machine, given the backend and machine id'''
     ret = []
     BACKEND = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
     if BACKEND:
         BACKEND = BACKEND[0]
         conn = make_connection(b)
         machines = conn.list_nodes()
-        for machine in machines:         
+        for machine in machines:
             if machine.id == request.matchdict['machine']:
                 #machine.destroy()
                 print 'destroying machine', machine.id
@@ -125,14 +125,14 @@ def destroy_machine(request):
     return Response(json.dumps(ret))
 
 def stop_machine(request):
-    "stop a machine, given the backend and machine id"
+    '''stop a machine, given the backend and machine id'''
     ret = []
     BACKEND = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
     if BACKEND:
         BACKEND = BACKEND[0]
         conn = make_connection(b)
         machines = conn.list_nodes()
-        for machine in machines:         
+        for machine in machines:
             if machine.id == request.matchdict['machine']:
                 #machine.stop()
                 #TODO: check which providers are stopped by libcloud, and inform the used
@@ -162,8 +162,8 @@ def list_images(request):
                     'name': i.name,})
     return Response(json.dumps(ret))
 
-# list sizes or flavors, may want to change the name depending on libcloud
 def list_sizes(request):
+    '''list sizes or flavors, may want to change name depending on libcloud'''
     ret = []
     found = False
     for b in BACKENDS:
@@ -186,5 +186,3 @@ def list_sizes(request):
                     'ram'         : i.ram})
 
     return Response(json.dumps(ret))
-
-
