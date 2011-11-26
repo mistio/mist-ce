@@ -11,7 +11,7 @@
 <ul id="button-header">
     <li class="head-button visible-in-list select-widget">
         <span class="check"></span>
-        <ul class="sub-menu rounded-right-bottom">
+        <ul class="sub-menu rounded-right-bottom drop-shadow">
             <li id="button-select-all">All</li>
             <li id="button-deselect-all">None</li>
         </ul>
@@ -120,6 +120,7 @@ $(function() {
 
 // intercept create wizard
 $(".enabled#create").click(function(){
+	$('li#create').addClass('pressed');
 //first check if we have images and sizes
 //if we have images + sizes, populate the wizard window with the values.
 
@@ -173,6 +174,10 @@ $(function() {
     $('.cancel').click(function() {
         $(".enabled#create a[rel]").overlay().close();
     });
+
+	$(document).delegate('#exposeMask, .close', 'click', function() {
+		$('li#create').removeClass('pressed');
+	});
 });
 
 // Clicking on node brings up the details pane

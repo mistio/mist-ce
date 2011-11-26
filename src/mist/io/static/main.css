@@ -448,6 +448,12 @@ ul.basic-info {
 #actions-list li.enabled {
     opacity: 1.0;
 }
+
+#actions-list li.pressed {
+	opacity: 1.0;
+	background: url(../static/bg-actions-side-dark.gif) 0 0 repeat-y;
+}
+
 #actions-list li a {
     padding: 15px 95px 15px 44px;
     cursor: default;
