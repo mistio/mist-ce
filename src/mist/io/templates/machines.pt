@@ -50,13 +50,13 @@
 </div>
 <!-- the form -->
 <form action="#">
-    <div class="overlay" id="wizard">
-        <h2>
-            <strong>Create new Virtual Machine</strong>
-        </h2>
+    <div class="overlay drop-shadow rounded" id="wizard">
+        <h3 class="rounded-top">
+            Create new Virtual Machine
+        </h3>
         <ul>
              <!-- backend -->
-            <li class="required">
+            <li class="required border-bottom">
                 <label>
                     <strong>0.</strong> Select provider <br />
                     <select name="image" class="backend">
@@ -70,7 +70,7 @@
                 </label>
             </li>
             <!-- instance name -->
-            <li class="required">
+            <li class="required border-bottom">
                 <label>
                     <strong>1.</strong> Instance name <em>e.g. My mail server.</em>
                     <br />
@@ -78,7 +78,7 @@
                 </label>
             </li>
             <!-- image -->
-            <li class="required">
+            <li class="required border-bottom">
                 <label>
                     <strong>2.</strong> Select an image <br />
                     <select name="image" class="images">
@@ -88,7 +88,7 @@
                 </label>
             </li>
             <!-- size -->
-            <li class="required">
+            <li class="required border-bottom">
                 <label>
                     <strong>3.</strong> Select VM size<br />
                     <select name="size" class="sizes">
@@ -97,7 +97,7 @@
                     </select>
                 </label>
             </li>
-            <li class="clearfix">
+            <li class="clearfix rounded-bottom">
                  <button type="button" class="start right">Start VM</button>
             </li>
 
@@ -114,8 +114,7 @@ $(function() {
         mask: {
             color: '#000',
             opacity: '.4'
-        },
-        effect: 'apple'
+        }
     });
 });
 
