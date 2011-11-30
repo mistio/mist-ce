@@ -539,17 +539,24 @@ function update_machines_view(backend){
     });
 }
 
-function update_backend_status(backend) {
+function update_backend_status(backend, action) {
     var button = $('.backend-button.provider'+backend.provider);
     if (backend.status == 'wait'){
         button.removeClass('on');
         button.addClass('wait');
+        button.attr('title', action);
     } else if (backend.status =='on'){
         button.addClass('on');
         button.removeClass('wait');
+        button.attr('title', backend.title);
     } else {
         button.removeClass('on');
         button.removeClass('wait');
+        button.attr('title','click to retry connection');
+    }
+    
+    if (typeof(action) == 'string'){
+        $('.actions #'+action).removeClass('pressed');
     }
 }
 
