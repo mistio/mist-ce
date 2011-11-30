@@ -770,10 +770,11 @@ ul#button-header li#selected-nodes-button {
 
 #wizard select {
     border:1px solid #ccc;
-    width:100%;
+    width:220px;
     padding:4px;
 	margin: 4px 0;
 	float: right;
+    max-width: 500px;
 }
 
 #wizard label span {

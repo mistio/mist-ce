@@ -59,7 +59,7 @@
             <li class="required border-bottom">
                 <label>
                     <strong>0.</strong> Select provider <br />
-                    <select name="image" class="backend">
+                    <select name="backend" class="backend">
                         <option value="">-- please select --</option>
                         <script>
                         for (var m in backends) {
@@ -83,7 +83,6 @@
                     <strong>2.</strong> Select an image <br />
                     <select name="image" class="images">
                         <option value="">-- please select --</option>
-                        <!--option tal:repeat="image images" tal:attributes="id image.id" tal:content="image.name">Ubuntu 10.04 x86_64 server</option-->
                     </select>
                 </label>
             </li>
@@ -121,34 +120,36 @@ $(function() {
 // intercept create wizard
 $(".enabled#create").click(function(){
 	$('li#create').addClass('pressed');
-//first check if we have images and sizes
-//if we have images + sizes, populate the wizard window with the values.
+/*
+    $.each(backends[m].sizes, function(val, text) {
+        $('select.sizes').append($('<option value="' + backends[m].sizes[val].id + '">' + backends[m].sizes[val].name + '</option>'));
+    });
+    $.each(backends[m].images, function(val, text) {
+        $('select.images').append($('<option value="' + backends[m].images[val].id + '">' + backends[m].images[val].name + '</option>'));
+    });
+*/
+});
 
-//FIXME: proper handling of backends and values. ATM only one backend is shown.
-
-//    for (var m in backends) {
-        var m = 1;
-        $('select.sizes').empty();
-        if (backends[m].sizes && backends[m].sizes.length == 0) {
-            $('select.sizes').append('<option value="loading">loading sizes, please wait</option>')
-        } else {
-            //FIXME: alphabetical order?
-            $('select.sizes').append('<option value="">-- please select --</option>');
-            $.each(backends[m].sizes, function(val, text) {
-            $('select.sizes').append($('<option value="' + backends[m].sizes[val].id + '">' + backends[m].sizes[val].name + '</option>'));
-            });
-        }
-
-        $('select.images').empty();
-        if (backends[m].images && backends[m].images.length == 0) {
-            $('select.images').append('<option value="loading">loading images, please wait</option>')
-        } else {
-            //FIXME: alphabetical order?
-            $('select.images').append('<option value="">-- please select --</option>');
-            $.each(backends[m].images, function(val, text) {
-            $('select.images').append($('<option value="' + backends[m].images[val].id + '">' + backends[m].images[val].name + '</option>'));
-            });
-        }
+$("select.backend").live('click', function(e){
+    var sizesHtml = '', imagesHtml='';
+    var sizesLabel = $('select.sizes').parent();
+    var imagesLabel = $('select.images').parent();
+    var i = $(this)[0].selectedIndex - 1;
+    
+    $('select.sizes').remove();
+    $('select.images').remove();    
+    if ( i > -1) {
+        $.each(backends[i].sizes, function(val, text) {
+            sizesHtml += '<option value="' + backends[i].sizes[val].id + '">' + backends[i].sizes[val].name + '</option>';
+        });
+        $.each(backends[i].images, function(val, text) {
+            imagesHtml += '<option value="' + backends[i].images[val].id + '">' + backends[i].images[val].name + '</option>';
+        });
+    }
+    sizesHtml = '<select name="sizes" class="sizes"><option value=""><b>-- please select --</b></option>' + sizesHtml + '</select>';
+    imagesHtml = '<select name="image" class="images"><option value="">-- please select --</option>' + imagesHtml + '</select>';
+    sizesLabel.append(sizesHtml);
+    imagesLabel.append(imagesHtml);    
 });
 
 // overlay logic
@@ -355,6 +356,7 @@ function update_actions() {
 
 // reboot action click
 $('#actions-list ul.actions li#reboot').click(function() {
+    $(this).addClass('pressed');
      if ($('#machines-list:visible').length == 0){ //single machine view
          var backend = backends[$('#machine-details span.backend').text()];
          backend.newAction(['reboot',$('#machine-details span.id').text()]);
