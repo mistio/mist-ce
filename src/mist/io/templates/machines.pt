@@ -371,11 +371,16 @@ $('#actions-list ul.actions li#reboot').click(function() {
 });
 
 $('#actions-list ul.actions li#destroy').click(function() {
-	$('#actions-list ul.actions li#destroy-confirm').slideDown(120);
+	var destroy = $(this);
+	if (destroy.hasClass('enabled')) {
+		$('#actions-list ul.actions li#destroy-confirm').slideDown(120);
+		destroy.addClass('pressed');
+	}
 });
 
 // destroy confirm action click
 $('#actions-list ul.actions li#destroy-confirm').click(function() {
+	var destroy = $('#actions-list ul.actions li#destroy');
      if ($('#machines-list:visible').length == 0){ //single machine view
          var backend = backends[$('#machine-details span.backend').text()];
          backend.newAction(['destroy',$('#machine-details span.id').text()]);
@@ -387,6 +392,7 @@ $('#actions-list ul.actions li#destroy-confirm').click(function() {
          });
      }
 	$(this).slideUp(120);
+	destroy.removeClass('pressed');
 });
 
 // Set a timeout to slide the confirmation up
@@ -395,9 +401,11 @@ $('#actions-list ul.actions li#destroy-confirm').click(function() {
 $('#actions-list ul.actions li#destroy')
 .add('#actions-list ul.actions li#destroy-confirm')
 .mouseleave(function() {
+	var destroy = $('#actions-list ul.actions li#destroy');
 	var confirm = $('#actions-list ul.actions li#destroy-confirm');
 	confirm.data("slideup", setTimeout(function() {
 	    confirm.slideUp(120);
+		destroy.removeClass('pressed');
 	},
 	400));
 });
