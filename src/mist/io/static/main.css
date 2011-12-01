@@ -107,11 +107,14 @@ body {
     width: 103px;
     height: 131px;
     margin: 36px 0;
+    position: fixed;
+    top: 15%;
+    left: 43%;
 }
 
 #wrapper {
     width: 896px;
-    margin: auto;
+    margin: 10px auto;
     color: rgb(60,60,60);
     -webkit-text-size-adjust: 100%; /* Stops Mobile Safari from auto-adjusting font-sizes */
 }

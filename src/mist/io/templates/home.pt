@@ -21,7 +21,6 @@
 <body lang="en">
     <div id="wrapper">
         <div id="header">
-            <a href="/"><div id="logo-container"></div></a>
         </div>
         <div id="backends"
         <!-- tabs -->

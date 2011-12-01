@@ -31,6 +31,7 @@
         <span class="state"></span>
         <span class="ip"></span>
     </div>
+    <a href="/"><div id="logo-container"></div></a>
 </div>
 
 <div id="machine-details">
@@ -512,6 +513,7 @@ $(document).ready(function(){
 });
 
 function update_machines_view(backend){
+    $('#logo-container').animate({opacity : 0.1});
     backend.machines.forEach(function(machine, index){
         var node = $('#machines-list > #' + machine.id);
         if (node.length == 1) {
