@@ -18,7 +18,7 @@
         </ul>
     </li>
     <li class="head-button backend-button backend-template"></li>
-    <li id="selected-nodes-button" class="head-button visible-in-list">0 / 0</li>
+    <li id="selected-nodes-button" class="head-button visible-in-list"><span id="selected-machines">0</span> / <span id="all-machines">0</span></li>
     <li id="button-back" class="head-button visible-in-details">Back</li>
 </ul>
 <div id="machines-list">
@@ -31,7 +31,6 @@
         <span class="state"></span>
         <span class="ip"></span>
     </div>
-    <a href="/"><div id="logo-container"></div></a>
 </div>
 
 <div id="machine-details">
@@ -46,6 +45,8 @@
     </ul>
     <ul class="extra-info"></ul>
 </div>
+
+    <a href="/"><div id="logo-container"></div></a>
 
 <div id="console">
     <iframe onload="this.contentWindow.focus()" />
@@ -315,6 +316,8 @@ function update_actions() {
     var enabled_actions = ['start', 'stop', 'destroy', 'reboot', 'shell' ];
     var selected_states = [];
 
+    update_selected_machines_count();
+
     $('#actions-list ul li').removeClass('enabled');
 
     if ($('#machines-list:visible').length == 0){
@@ -354,6 +357,7 @@ function update_actions() {
             $('#actions-list #shell').removeClass('enabled');
         }
     }
+    
 }
 
 // reboot action click
@@ -540,13 +544,15 @@ function update_machines_view(backend){
             node.find('.name').text(machine.name);
             node.find('.backend').text(backends.indexOf(backend));
             node.find('.backend').addClass('provider'+backend.provider);
-            node.find('.ip').text(machine.public_ips[0]);
+            node.find('.ip').text(machine.public_ips.concat(machine.private_ips).join(' - '));
             node.find('.state').addClass('state'+machine.state);
             node.find('.select')[0].id = 'chk-' + machine.id;
             node[0].id = machine.id;
             node.fadeIn(200);
         }
     });
+    
+    update_machines_count();
 }
 
 function update_backend_status(backend, action) {
@@ -568,6 +574,21 @@ function update_backend_status(backend, action) {
     if (typeof(action) == 'string'){
         $('.actions #'+action).removeClass('pressed');
     }
+}
+
+// update the machines counter
+function update_machines_count() {
+    var allMachines = 0;
+    for (var i = 0 ; i < backends.length; i++) {
+        allMachines += backends[i].machines.length;
+    }
+    
+    $('#all-machines').text(allMachines);    
+}
+
+// update the selected machines counter
+function update_selected_machines_count() {
+    $('#selected-machines').text($('#machines-list .selected').length+"");
 }
 
 //get machine, given backend and machineId
