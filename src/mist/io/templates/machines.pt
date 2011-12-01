@@ -230,7 +230,7 @@ $('.node').live('click', function() {
 });
 
 // Clicking on back button brings up the list again
-$('#button-back').click(function() {
+$('#button-back').live('click', function() {
     $('#machine-details, #console').fadeOut(200, function() {
         $('#machines-list').fadeIn(200, update_actions);
     });
@@ -238,6 +238,20 @@ $('#button-back').click(function() {
         $('.visible-in-list').fadeIn(200);
     });
     return false;
+});
+
+// Clicking on a backend button
+$('.backend-button').live('click', function(){
+    // Determine the backend index
+    b = $(".backend-button:visible").index($(this));
+    
+    if ($(this).hasClass('on') || $(this).hasClass('wait')){
+        alert(b);
+    } else {
+        // If backend is offline try to get it back online
+        backends[b].newAction(['list_machines']);
+    }
+    
 });
 
 // select all option

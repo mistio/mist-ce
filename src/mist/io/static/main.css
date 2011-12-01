@@ -654,6 +654,7 @@ ul#button-header li#selected-nodes-button {
     float: right;
     padding-left: 32px;
     background: url("/static/icons/machine.png") no-repeat scroll 12px 10px transparent;
+    border: none;
 }
 
 .provider1.on {
