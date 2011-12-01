@@ -135,6 +135,28 @@ function Backend(id, title, provider, interval, host){
                     }
                 });
                 break;
+            case 'create':
+                var payload = {
+                    "name": action[1],
+                    "size" : action[2],    
+                    "image": action[3],        
+                };
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(payload),
+                    url: 'backends/'+this.id+'/machines/create',
+                    success: function(data) {
+                        backend.updateStatus('on', 'create');
+                        backend.processAction();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        backend.updateStatus('off', 'start');
+                        alert("backend " + backend.id + " is offline: " + errorThrown);
+                    }
+                });
+                break;
             default:
                 alert('invalid action ' + action);
         }

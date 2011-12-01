@@ -148,14 +148,22 @@ def create_machine(request):
             found = True
             conn = connect(b)
             #FIXME: get values from form, 
-            name = name_from_form
+            name = request.json_body['name']
             try:
-                size = conn.list_sizes()[size_from_form]
+                sizes = conn.list_sizes()
+                for node_size in sizes:
+                    if node_size.id == request.json_body['size']:
+                        size = node_size
+                        break
             except:
                 return Response('Invalid size', 404)
 
             try:
-                image = conn.list_images()[image_from_form]
+                images = conn.list_images()
+                for node_image in images:
+                    if node_image.id == request.json_body['image']:
+                        image = node_image
+                        break
             except:
                 return Response('Invalid image', 404)
 
@@ -183,6 +191,7 @@ def start_machine(request):
             if machine.id == request.matchdict['machine']:
                 found = True
                 #machine.reboot()
+                break
         if not found:
             return Response('Invalid machine', 404)
     else:
@@ -204,6 +213,7 @@ def stop_machine(request):
             if machine.id == request.matchdict['machine']:
                 found = True
                 #machine.stop()
+                break
         if not found:
             return Response('Invalid machine', 404)
         else:
@@ -227,6 +237,7 @@ def reboot_machine(request):
             if machine.id == request.matchdict['machine']:
                 found = True
                 machine.reboot()
+                break
         if not found:
             return Response('Invalid machine', 404)
     else:
@@ -248,6 +259,7 @@ def destroy_machine(request):
             if machine.id == request.matchdict['machine']:
                 found = True
                 machine.destroy()
+                break
         if not found:
             return Response('Invalid machine', 404)
     else:

@@ -84,7 +84,7 @@
             <li class="required border-bottom">
                 <label>
                     <strong>2.</strong> Select an image <br />
-                    <select name="image" class="images">
+                    <select name="instance_image" class="images">
                         <option value="">-- please select --</option>
                     </select>
                 </label>
@@ -93,7 +93,7 @@
             <li class="required border-bottom">
                 <label>
                     <strong>3.</strong> Select VM size<br />
-                    <select name="size" class="sizes">
+                    <select name="instance_size" class="sizes">
                         <option value="">-- please select --</option>
                         <!--option tal:repeat="size sizes" tal:attributes="id size.id" tal:content="size.name">small</option-->
                     </select>
@@ -141,8 +141,8 @@ $("select.backend").live('click', function(e){
             imagesHtml += '<option value="' + backends[i].images[val].id + '">' + backends[i].images[val].name + '</option>';
         });
     }
-    sizesHtml = '<select name="sizes" class="sizes"><option value=""><b>-- please select --</b></option>' + sizesHtml + '</select>';
-    imagesHtml = '<select name="image" class="images"><option value="">-- please select --</option>' + imagesHtml + '</select>';
+    sizesHtml = '<select name="instance_size" class="sizes"><option value=""><b>-- please select --</b></option>' + sizesHtml + '</select>';
+    imagesHtml = '<select name="instance_image" class="images"><option value="">-- please select --</option>' + imagesHtml + '</select>';
     sizesLabel.append(sizesHtml);
     imagesLabel.append(imagesHtml);
 });
@@ -162,8 +162,11 @@ $(function() {
             // cancel seeking of the scrollable by returning false
             return false;
         } else {    // everything is good
-            backends[0].newAction(['start']); //send data for the start action
-            alert('ok');
+            var machineName = $('input[name=instance_name]')[0].value;
+            var size = $('select[name=instance_size]')[0].value;
+            var image = $('select[name=instance_image]')[0].value;
+            backends[0].newAction(['create', machineName, size, image]); //send data for the start action        
+            alert('ok');   
         }
     });
 
