@@ -123,14 +123,6 @@ $(function() {
 // intercept create wizard
 $(".enabled#create").click(function(){
     $('li#create').addClass('pressed');
-/*
-    $.each(backends[m].sizes, function(val, text) {
-        $('select.sizes').append($('<option value="' + backends[m].sizes[val].id + '">' + backends[m].sizes[val].name + '</option>'));
-    });
-    $.each(backends[m].images, function(val, text) {
-        $('select.images').append($('<option value="' + backends[m].images[val].id + '">' + backends[m].images[val].name + '</option>'));
-    });
-*/
 });
 
 $("select.backend").live('click', function(e){
@@ -228,7 +220,7 @@ $('.node').live('click', function() {
     $('#machines-list').fadeOut(200, function() {
         $('#machine-details').fadeIn(200, update_actions);
     });
-    $('.head-button:not(.visible-in-details)').fadeOut(200, function() {
+    $('.head-button:not(.visible-in-details)').fadeOut(0, function() {
         $('.visible-in-details').fadeIn(200);
     });
     return false;
@@ -239,7 +231,7 @@ $('#button-back').click(function() {
     $('#machine-details, #console').fadeOut(200, function() {
         $('#machines-list').fadeIn(200, update_actions);
     });
-    $('.head-button:not(.visible-in-list)').fadeOut(200, function() {
+    $('.head-button:not(.visible-in-list)').fadeOut(0, function() {
         $('.visible-in-list').fadeIn(200);
     });
     return false;
