@@ -147,13 +147,28 @@ def create_machine(request):
         if request.matchdict['backend'] == b['id']:
             found = True
             conn = connect(b)
-            sizes = conn.list_sizes()
+            #FIXME: get values from form, 
+            name = name_from_form
+            try:
+                size = conn.list_sizes()[size_from_form]
+            except:
+                return Response('Invalid size', 404)
+
+            try:
+                image = conn.list_images()[image_from_form]
+            except:
+                return Response('Invalid image', 404)
+
+            try:
+                node = conn.create_node(name=name, image=image, size=size)
+            except:
+                return Response('Something went wrong with the creation', 404)
             break
 
     if not found:
         return Response('Invalid backend', 404)
-        
-    import pdb;pdb.set_trace()
+
+    return Response(json.dumps(ret))        
 
 def start_machine(request):
     '''Start a machine, given the backend and machine id'''
@@ -162,7 +177,7 @@ def start_machine(request):
     backends = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
     if backends:
         backend = backends[0]
-        conn = connect(backend)
+        conn = connect(backend)                
         machines = conn.list_nodes()
         for machine in machines:
             if machine.id == request.matchdict['machine']:
