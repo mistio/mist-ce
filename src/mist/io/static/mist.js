@@ -138,8 +138,8 @@ function Backend(id, title, provider, interval, host){
             case 'create':
                 var payload = {
                     "name": action[1],
-                    "size" : action[2],    
-                    "image": action[3],        
+                    "size" : action[2],
+                    "image": action[3],
                 };
                 $.ajax({
                     type: "POST",
