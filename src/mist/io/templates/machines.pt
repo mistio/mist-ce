@@ -165,8 +165,7 @@ $(function() {
             var machineName = $('input[name=instance_name]')[0].value;
             var size = $('select[name=instance_size]')[0].value;
             var image = $('select[name=instance_image]')[0].value;
-            backends[0].newAction(['create', machineName, size, image]); //send data for the start action        
-            alert('ok');   
+            backends[0].newAction(['create', machineName, size, image]); //send data for the start action
         }
     });
 
@@ -355,7 +354,6 @@ function update_actions() {
 
 }
 
-var test1,test2;
 // reboot action click
 $('#actions-list ul.actions li#reboot').click(function() {
     $(this).addClass('pressed');
@@ -570,8 +568,14 @@ function update_backend_status(backend, action) {
         button.attr('title','click to retry connection');
     }
 
-    if (typeof(action) == 'string'){
+    if (typeof(action) == 'string') {
         $('.actions #'+action).removeClass('pressed');
+        if (action == 'create') {
+            $(".enabled#create a[rel]").overlay().close();
+            $("select.backend").val("");
+            $("#wizard input[name=instance_name]").val("");
+            $("select.backend").click();
+        }
     }
 }
 
