@@ -453,8 +453,8 @@ ul.basic-info {
 }
 
 #actions-list li.pressed {
-	opacity: 1.0;
-	background: url(../static/bg-actions-side-dark.gif) 0 0 repeat-y;
+    opacity: 1.0;
+    background: url(../static/bg-actions-side-dark.gif) 0 0 repeat-y;
 }
 
 #actions-list li a {
@@ -491,13 +491,13 @@ li#destroy {
 }
 
 li#destroy-confirm {
-	display: none;
-	font-weight: bold;
-	opacity: 1.0;
+    display: none;
+    font-weight: bold;
+    opacity: 1.0;
     background: #cc1100;
-	color: #fff;
-	padding-top: 5px;
-	padding-bottom: 5px;
+    color: #fff;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 li#destroy-confirm:hover {
@@ -505,8 +505,8 @@ li#destroy-confirm:hover {
 }
 
 li#destroy-confirm a {
-	cursor: pointer;
-	color: #fff;
+    cursor: pointer;
+    color: #fff;
 }
 
 li#shell {
@@ -539,7 +539,7 @@ ul#button-header li {
     float: left;
     position: relative; /*--Declare X and Y axis base for sub navigation--*/
     padding: 6px 10px;
-    margin: 0 30px 0 0;
+    margin: 0 10px 0 0;
     border: 1px solid #cfcfcf;
     border-radius: 4px;
     -webkit-border-radius: 4px;
@@ -551,7 +551,7 @@ ul#button-header li {
 
 ul#button-header li:hover {
     opacity: 1;
-	-moz-box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 1px 1px rgba(0,0,0,0.1);
     -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.1);
     box-shadow: 0 1px 1px rgba(0,0,0,0.1);
 }
@@ -559,7 +559,7 @@ ul#button-header li:hover {
 ul#button-header li.active {
     background: #333;
     color: #ddd;
-	opacity: 1;
+    opacity: 1;
 }
 
 ul#button-header li.left {
@@ -646,14 +646,14 @@ ul#button-header li ul.sub-menu li:hover {
 }
 
 ul#button-header li.backend-button {
-    float: right;
+    float: left;
     padding-left: 36px;
 }
 
 ul#button-header li#selected-nodes-button {
-    float: left;
+    float: right;
     padding-left: 32px;
-	background: url("/static/icons/machine.png") no-repeat scroll 12px 10px transparent;
+    background: url("/static/icons/machine.png") no-repeat scroll 12px 10px transparent;
 }
 
 .provider1.on {
@@ -738,27 +738,27 @@ ul#button-header li#selected-nodes-button {
 }
 
 #wizard h3 {
-	background: #333 url('../static/bg-tabs.gif') bottom left repeat-x;
+    background: #333 url('../static/bg-tabs.gif') bottom left repeat-x;
     font-size: 16px;
-	font-weight: normal;
-	color: #eee;
-	padding: 6px 14px;
-	margin: 0px;
+    font-weight: normal;
+    color: #eee;
+    padding: 6px 14px;
+    margin: 0px;
 }
 
 #wizard ul {
-	border-top: 1px solid #fff;
+    border-top: 1px solid #fff;
 }
 
 #wizard li {
-	overflow: auto; /* required to include floating elements in height calculation */
+    overflow: auto; /* required to include floating elements in height calculation */
     list-style-type:none;
     list-style-image:none;
     padding:24px;
 }
 
 #wizard li.border-bottom {
-	border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
 }
 
 #wizard label {
@@ -783,19 +783,19 @@ ul#button-header li#selected-nodes-button {
 #wizard .text {
     width:93.5%;
     padding:5px;
-	margin: 4px 0;
+    margin: 4px 0;
     border:1px solid #ccc;
     color:#456;
     letter-spacing:1px;
-	float: right;
+    float: right;
 }
 
 #wizard select {
     border:1px solid #ccc;
     width:220px;
     padding:4px;
-	margin: 4px 0;
-	float: right;
+    margin: 4px 0;
+    float: right;
     max-width: 500px;
 }
 
@@ -818,7 +818,7 @@ ul#button-header li#selected-nodes-button {
 
 #wizard .clearfix {
     clear:left;
-	overflow: auto; /* required to include floating elements in height calculation */
+    overflow: auto; /* required to include floating elements in height calculation */
 }
 
 #wizard .right {
