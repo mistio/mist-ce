@@ -248,7 +248,9 @@ $('.backend-button').live('click', function(){
         alert(b);
     } else {
         // If backend is offline try to get it back online
+        backends[b].clearQueue();
         backends[b].newAction(['list_machines']);
+        backends[b].processAction();
     }
 
 });

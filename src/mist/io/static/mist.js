@@ -23,6 +23,10 @@ function Backend(id, title, provider, interval, host){
         try { update_backend_status(this, action); } catch(err){}
     };
 
+    this.clearQueue = function() {
+        this.action_queue = [];
+    };
+
     this.processAction = function(){
         if (this.action_queue.length == 0){
             return;
