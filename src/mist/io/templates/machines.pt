@@ -46,7 +46,7 @@
     <ul class="extra-info"></ul>
 </div>
 
-    <a href="/"><div id="logo-container"></div></a>
+    <div id="logo-container"></div>
 
 <div id="console">
     <iframe onload="this.contentWindow.focus()" />
@@ -243,14 +243,14 @@ $('#button-back').live('click', function() {
 $('.backend-button').live('click', function(){
     // Determine the backend index
     b = $(".backend-button:visible").index($(this));
-    
+
     if ($(this).hasClass('on') || $(this).hasClass('wait')){
         alert(b);
     } else {
         // If backend is offline try to get it back online
         backends[b].newAction(['list_machines']);
     }
-    
+
 });
 
 // select all option
