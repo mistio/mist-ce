@@ -683,6 +683,7 @@ ul#button-header li#selected-nodes-button {
 .backend {
     color: transparent;
     padding: 10px 15px;
+    margin-left: 10px;
 }
 
 #wizard .backend {
