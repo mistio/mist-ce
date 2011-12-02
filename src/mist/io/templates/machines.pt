@@ -649,6 +649,7 @@ function truncate_names(truncateName, truncateCharacters ) { //truncate truncate
 
 function update_backend_status(backend, action) {
     var button = $('.backend-button.provider'+backend.provider);
+    log.newMessage(backend, action, action);
     if (backend.status == 'wait'){
         button.removeClass('on');
         button.addClass('wait');
@@ -677,13 +678,12 @@ function update_message_notifier(backend, action) {
 
 // update the messages counter
 function update_messages_count() {
-    allMessages +=1 ;
-    if (allMessages == 1) {
+    if (log.messages.length == 1) {
         messages = ' message';
     } else {
         messages =  ' messages';
     }
-    $('#notifier span.messages-count').text(allMessages + messages);
+    $('#notifier span.messages-count').text(log.messages.length + messages);
 }
 
 // update the machines counter
