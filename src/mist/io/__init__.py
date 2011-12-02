@@ -32,13 +32,29 @@ def main(global_config, **settings):
                     route_name='networks',
                     renderer='templates/network.pt')
 
-    config.add_route('backends', '/backends/{backend}/machines/list')
+    config.add_route('list_machines', '/backends/{backend}/machines/list')
     config.add_view('mist.io.views.list_machines',
-                    route_name='backends')
+                    route_name='list_machines')
+    
+    config.add_route('list_sizes', '/backends/{backend}/sizes/list')
+    config.add_view('mist.io.views.list_sizes',
+                    route_name='list_sizes')
 
-    config.add_route('start', '/backends/{backend}/machines/start')
+    config.add_route('list_images', '/backends/{backend}/images/list')
+    config.add_view('mist.io.views.list_images',
+                    route_name='list_images')    
+
+    config.add_route('create', '/backends/{backend}/machines/create')
+    config.add_view('mist.io.views.create_machine',
+                    route_name='create')
+
+    config.add_route('start', '/backends/{backend}/machines/{machine}/start')
     config.add_view('mist.io.views.start_machine',
                     route_name='start')
+    
+    config.add_route('stop', '/backends/{backend}/machines/{machine}/stop')
+    config.add_view('mist.io.views.stop_machine',
+                    route_name='stop')
 
     config.add_route('reboot', '/backends/{backend}/machines/{machine}/reboot')
     config.add_view('mist.io.views.reboot_machine',
@@ -47,17 +63,6 @@ def main(global_config, **settings):
     config.add_route('destroy', '/backends/{backend}/machines/{machine}/destroy')
     config.add_view('mist.io.views.destroy_machine',
                     route_name='destroy')
-
-    config.add_route('stop', '/backends/{backend}/machines/{machine}/stop')
-    config.add_view('mist.io.views.stop_machine',
-                    route_name='stop')
-
-    config.add_route('list_sizes', '/backends/{backend}/sizes/list')
-    config.add_view('mist.io.views.list_sizes',
-                    route_name='list_sizes')
-
-    config.add_route('list_images', '/backends/{backend}/images/list')
-    config.add_view('mist.io.views.list_images',
-                    route_name='list_images')
+    
 
     return config.make_wsgi_app()

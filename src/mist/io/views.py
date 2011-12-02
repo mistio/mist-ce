@@ -4,7 +4,6 @@ from mist.io.config import BACKENDS
 from pyramid.response import Response
 import json
 
-
 def home(request):
     '''Fill in an object with backend data, taken from config.py'''
     backends = []
@@ -40,23 +39,24 @@ def networks(request):
     '''Placeholder for machines listing'''
     return {}
 
-def make_connection(b):
-    '''Establish connection with the credentials specified'''
+
+def connect(backend):
+    '''Establish backend connection using the credentials specified'''
     try:
-        Driver = get_driver(b['provider'])
-        if 'host' in b.keys():
-            conn = Driver(b['id'],
-                          b['secret'],
+        Driver = get_driver(backend['provider'])
+        if 'host' in backend.keys():
+            conn = Driver(backend['id'],
+                          backend['secret'],
                           False,
-                          host=b['host'],
-                          ex_force_auth_url=b.get('auth_url',None),
-                          ex_force_auth_version=b.get('auth_version','1.0'),
+                          host=backend['host'],
+                          ex_force_auth_url=backend.get('auth_url',None),
+                          ex_force_auth_version=backend.get('auth_version','1.0'),
                           port=80)
         else:
-            conn = Driver(b['id'], b['secret'])
+            conn = Driver(backend['id'], backend['secret'])
         return conn
     except Exception as e:
-        #TODO: more proper error handling
+        #TODO: better error handling
         return 0
 
 
@@ -67,7 +67,7 @@ def list_machines(request):
     for b in BACKENDS:
         if request.matchdict['backend'] == b['id']:
             found = True
-            conn = make_connection(b)
+            conn = connect(b)
             try:
                 machines = conn.list_nodes()
             except AttributeError:
@@ -90,70 +90,6 @@ def list_machines(request):
                     })
     return Response(json.dumps(ret))
 
-def start_machine(request):
-    '''Start a machine'''
-    ret = []
-    BACKEND = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
-    if BACKEND:
-        BACKEND = BACKEND[0]
-        conn = make_connection(b)
-        print "start a machine call"
-    else:
-        return Response('Invalid backend', 404)
-
-    return Response(json.dumps(ret))
-
-def reboot_machine(request):
-    '''Reboot a machine, given the backend and machine id'''
-    ret = []
-    BACKEND = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
-    if BACKEND:
-        BACKEND = BACKEND[0]
-        conn = make_connection(b)
-        machines = conn.list_nodes()
-        for machine in machines:
-            if machine.id == request.matchdict['machine']:
-                machine.reboot()
-    else:
-        return Response('Invalid backend', 404)
-
-    return Response(json.dumps(ret))
-
-def destroy_machine(request):
-    '''Destroy a machine, given the backend and machine id'''
-    ret = []
-    BACKEND = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
-    if BACKEND:
-        BACKEND = BACKEND[0]
-        conn = make_connection(b)
-        machines = conn.list_nodes()
-        for machine in machines:
-            if machine.id == request.matchdict['machine']:
-                #machine.destroy()
-                print 'destroying machine', machine.id
-    else:
-        return Response('Invalid backend', 404)
-
-    return Response(json.dumps(ret))
-
-def stop_machine(request):
-    '''Stop a machine, given the backend and machine id'''
-    ret = []
-    BACKEND = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
-    if BACKEND:
-        BACKEND = BACKEND[0]
-        conn = make_connection(b)
-        machines = conn.list_nodes()
-        for machine in machines:
-            if machine.id == request.matchdict['machine']:
-                #machine.stop()
-                #TODO: check which providers are stopped by libcloud,
-                # and inform the user
-                print 'stoping machine', machine.id
-    else:
-        return Response('Invalid backend', 404)
-
-    return Response(json.dumps(ret))
 
 def list_images(request):
     '''List images from each backend'''
@@ -162,7 +98,7 @@ def list_images(request):
     for b in BACKENDS:
         if request.matchdict['backend'] == b['id']:
             found = True
-            conn = make_connection(b)
+            conn = connect(b)
             images = conn.list_images()
             #TODO: investigate case of far too many images (eg Amazon)
             break
@@ -176,6 +112,7 @@ def list_images(request):
                     'name': i.name,})
     return Response(json.dumps(ret))
 
+
 def list_sizes(request):
     '''List sizes (aka flavors) from each backend'''
     ret = []
@@ -183,7 +120,7 @@ def list_sizes(request):
     for b in BACKENDS:
         if request.matchdict['backend'] == b['id']:
             found = True
-            conn = make_connection(b)
+            conn = connect(b)
             sizes = conn.list_sizes()
             break
 
@@ -200,3 +137,133 @@ def list_sizes(request):
                     'ram'         : i.ram})
 
     return Response(json.dumps(ret))
+ 
+
+def create_machine(request):
+    '''Create a new virtual machine on the specified backend'''
+    ret = []
+    found = False
+    for b in BACKENDS:
+        if request.matchdict['backend'] == b['id']:
+            found = True
+            conn = connect(b)
+            #FIXME: get values from form, 
+            name = request.json_body['name']
+            try:
+                sizes = conn.list_sizes()
+                for node_size in sizes:
+                    if node_size.id == request.json_body['size']:
+                        size = node_size
+                        break
+            except:
+                return Response('Invalid size', 404)
+
+            try:
+                images = conn.list_images()
+                for node_image in images:
+                    if node_image.id == request.json_body['image']:
+                        image = node_image
+                        break
+            except:
+                return Response('Invalid image', 404)
+
+            try:
+                node = conn.create_node(name=name, image=image, size=size)
+            except:
+                return Response('Something went wrong with the creation', 404)
+            break
+
+    if not found:
+        return Response('Invalid backend', 404)
+
+    return Response(json.dumps(ret))        
+
+def start_machine(request):
+    '''Start a machine, given the backend and machine id'''
+    ret = []
+    found = False
+    backends = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
+    if backends:
+        backend = backends[0]
+        conn = connect(backend)                
+        machines = conn.list_nodes()
+        for machine in machines:
+            if machine.id == request.matchdict['machine']:
+                found = True
+                #machine.reboot()
+                break
+        if not found:
+            return Response('Invalid machine', 404)
+    else:
+        return Response('Invalid backend', 404)
+
+    return Response(json.dumps(ret))
+
+    
+def stop_machine(request):
+    '''Stop a machine, given the backend and machine id'''
+    ret = []
+    found = False
+    backends = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
+    if backends:
+        backend = backends[0]
+        conn = connect(backend)
+        machines = conn.list_nodes()
+        for machine in machines:
+            if machine.id == request.matchdict['machine']:
+                found = True
+                #machine.stop()
+                break
+        if not found:
+            return Response('Invalid machine', 404)
+        else:
+            return Response('Machine %s stopped' % machine.id, 200)
+    else:
+        return Response('Invalid backend', 404)
+
+    return Response(json.dumps(ret))    
+
+
+def reboot_machine(request):
+    '''Reboot a machine, given the backend and machine id'''
+    ret = []
+    found = False
+    backends = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
+    if backends:
+        backend = backends[0]
+        conn = connect(backend)
+        machines = conn.list_nodes()
+        for machine in machines:
+            if machine.id == request.matchdict['machine']:
+                found = True
+                machine.reboot()
+                break
+        if not found:
+            return Response('Invalid machine', 404)
+    else:
+        return Response('Invalid backend', 404)
+
+    return Response(json.dumps(ret))
+
+
+def destroy_machine(request):
+    '''Destroy a machine, given the backend and machine id'''
+    ret = []
+    found = False
+    backends = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
+    if backends:
+        backend = backends[0]
+        conn = connect(backend)
+        machines = conn.list_nodes()
+        for machine in machines:
+            if machine.id == request.matchdict['machine']:
+                found = True
+                machine.destroy()
+                break
+        if not found:
+            return Response('Invalid machine', 404)
+    else:
+        return Response('Invalid backend', 404)
+
+    return Response(json.dumps(ret))
+

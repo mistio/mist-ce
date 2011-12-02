@@ -5,7 +5,7 @@
         <li id="stop"><a>Stop</a></li>
         <li id="reboot"><a>Reboot</a></li>
         <li id="destroy"><a>Destroy</a></li>
-		<li id="destroy-confirm" class="inner-shadow"><a>Sure?</a></li>
+        <li id="destroy-confirm" class="inner-shadow"><a>Sure?</a></li>
         <li id="shell"><a>Console</a></li>
     </ul>
 </div>
@@ -17,8 +17,8 @@
             <li id="button-deselect-all">None</li>
         </ul>
     </li>
-    <li id="selected-nodes-button" class="head-button visible-in-list">0 / 0</li>
     <li class="head-button backend-button backend-template"></li>
+    <li id="selected-nodes-button" class="head-button visible-in-list"><span id="selected-machines">0</span> / <span id="all-machines">0</span></li>
     <li id="button-back" class="head-button visible-in-details">Back</li>
 </ul>
 <div id="machines-list">
@@ -45,6 +45,8 @@
     </ul>
     <ul class="extra-info"></ul>
 </div>
+
+    <div id="logo-container"></div>
 
 <div id="console">
     <iframe onload="this.contentWindow.focus()" />
@@ -82,7 +84,7 @@
             <li class="required border-bottom">
                 <label>
                     <strong>2.</strong> Select an image <br />
-                    <select name="image" class="images">
+                    <select name="instance_image" class="images">
                         <option value="">-- please select --</option>
                     </select>
                 </label>
@@ -91,7 +93,7 @@
             <li class="required border-bottom">
                 <label>
                     <strong>3.</strong> Select VM size<br />
-                    <select name="size" class="sizes">
+                    <select name="instance_size" class="sizes">
                         <option value="">-- please select --</option>
                         <!--option tal:repeat="size sizes" tal:attributes="id size.id" tal:content="size.name">small</option-->
                     </select>
@@ -120,15 +122,7 @@ $(function() {
 
 // intercept create wizard
 $(".enabled#create").click(function(){
-	$('li#create').addClass('pressed');
-/*
-    $.each(backends[m].sizes, function(val, text) {
-        $('select.sizes').append($('<option value="' + backends[m].sizes[val].id + '">' + backends[m].sizes[val].name + '</option>'));
-    });
-    $.each(backends[m].images, function(val, text) {
-        $('select.images').append($('<option value="' + backends[m].images[val].id + '">' + backends[m].images[val].name + '</option>'));
-    });
-*/
+    $('li#create').addClass('pressed');
 });
 
 $("select.backend").live('click', function(e){
@@ -136,9 +130,9 @@ $("select.backend").live('click', function(e){
     var sizesLabel = $('select.sizes').parent();
     var imagesLabel = $('select.images').parent();
     var i = $(this)[0].selectedIndex - 1;
-    
+
     $('select.sizes').remove();
-    $('select.images').remove();    
+    $('select.images').remove();
     if ( i > -1) {
         $.each(backends[i].sizes, function(val, text) {
             sizesHtml += '<option value="' + backends[i].sizes[val].id + '">' + backends[i].sizes[val].name + '</option>';
@@ -147,10 +141,10 @@ $("select.backend").live('click', function(e){
             imagesHtml += '<option value="' + backends[i].images[val].id + '">' + backends[i].images[val].name + '</option>';
         });
     }
-    sizesHtml = '<select name="sizes" class="sizes"><option value=""><b>-- please select --</b></option>' + sizesHtml + '</select>';
-    imagesHtml = '<select name="image" class="images"><option value="">-- please select --</option>' + imagesHtml + '</select>';
+    sizesHtml = '<select name="instance_size" class="sizes"><option value=""><b>-- please select --</b></option>' + sizesHtml + '</select>';
+    imagesHtml = '<select name="instance_image" class="images"><option value="">-- please select --</option>' + imagesHtml + '</select>';
     sizesLabel.append(sizesHtml);
-    imagesLabel.append(imagesHtml);    
+    imagesLabel.append(imagesHtml);
 });
 
 // overlay logic
@@ -168,8 +162,11 @@ $(function() {
             // cancel seeking of the scrollable by returning false
             return false;
         } else {    // everything is good
-            backends[0].newAction(['start']); //send data for the start action
-            alert('ok');
+            var machineName = $('input[name=instance_name]')[0].value;
+            var size = $('select[name=instance_size]')[0].value;
+            var image = $('select[name=instance_image]')[0].value;
+            backends[0].newAction(['create', machineName, size, image]); //send data for the start action        
+            alert('ok');   
         }
     });
 
@@ -177,9 +174,9 @@ $(function() {
         $(".enabled#create a[rel]").overlay().close();
     });
 
-	$(document).delegate('#exposeMask, .close', 'click', function() {
-		$('li#create').removeClass('pressed');
-	});
+    $(document).delegate('#exposeMask, .close', 'click', function() {
+        $('li#create').removeClass('pressed');
+    });
 });
 
 // Clicking on node brings up the details pane
@@ -226,7 +223,7 @@ $('.node').live('click', function() {
     $('#machines-list').fadeOut(200, function() {
         $('#machine-details').fadeIn(200, update_actions);
     });
-    $('.head-button:not(.visible-in-details)').fadeOut(200, function() {
+    $('.head-button:not(.visible-in-details)').fadeOut(0, function() {
         $('.visible-in-details').fadeIn(200);
     });
     return false;
@@ -234,15 +231,41 @@ $('.node').live('click', function() {
 
 //
 // Clicking on back button brings up the list again
-//
-$('#button-back').click(function() {
+$('#button-back').live('click', function() {
     $('#machine-details, #console').fadeOut(200, function() {
         $('#machines-list').fadeIn(200, update_actions);
     });
-    $('.head-button:not(.visible-in-list)').fadeOut(200, function() {
+    $('.head-button:not(.visible-in-list)').fadeOut(0, function() {
         $('.visible-in-list').fadeIn(200);
     });
     return false;
+});
+
+// Clicking on a backend button
+$('.backend-button').live('click', function(){
+    // Determine the backend index
+    b = $(".backend-button:visible").index($(this));
+
+    if ($(this).hasClass('on') || $(this).hasClass('wait')){
+        var ids = "";
+        for (m in backends[b].machines) {
+            if (ids.length > 0)
+                ids += ", ";
+            ids += "#" + backends[b].machines[m].id;
+        }
+        if ($(ids).filter('.selected').length == $(ids).length) {
+            $(ids).removeClass('selected');
+        } else {
+            $(ids).addClass('selected');
+        }
+        update_actions();
+    } else {
+        // If backend is offline try to get it back online
+        backends[b].clearQueue();
+        backends[b].newAction(['list_machines']);
+        backends[b].processAction();
+    }
+
 });
 
 // select all option
@@ -266,16 +289,6 @@ $('#button-deselect-all').click(function() {
 // node checkbox click updates the header checkbox and the actions
 $('.node a').live('click', function() {
     $(this).parent().toggleClass('selected');
-    if ($('.node.selected .check').length == $('.node .check').length){
-        $('#button-header .check').parent().addClass('selected');
-        $('#button-header .check').parent().removeClass('partial');
-    } else if ($('.node.selected .check').length == 0) {
-        $('#button-header .check').parent().removeClass('selected');
-        $('#button-header .check').parent().removeClass('partial');
-    } else {
-        $('#button-header .check').parent().addClass('partial');
-        $('#button-header .check').parent().removeClass('selected');
-    }
     update_actions();
     return false;
 });
@@ -316,6 +329,19 @@ function update_actions() {
     var enabled_actions = ['start', 'stop', 'destroy', 'reboot', 'shell' ];
     var selected_states = [];
 
+    update_selected_machines_count();
+
+    if ($('.node.selected .check').length == $('.node .check').length){
+        $('#button-header .check').parent().addClass('selected');
+        $('#button-header .check').parent().removeClass('partial');
+    } else if ($('.node.selected .check').length == 0) {
+        $('#button-header .check').parent().removeClass('selected');
+        $('#button-header .check').parent().removeClass('partial');
+    } else {
+        $('#button-header .check').parent().addClass('partial');
+        $('#button-header .check').parent().removeClass('selected');
+    }
+    
     $('#actions-list ul li').removeClass('enabled');
 
     if ($('#machines-list:visible').length == 0){
@@ -336,16 +362,14 @@ function update_actions() {
             selected_states.push(get_machine($(this).find('.backend').text(), $(this)[0].id).state);
         });
 
-        console.log(enabled_actions);
         for (stateIndex in selected_states){
             for (actionIndex in enabled_actions){
                  if (action_map[selected_states[stateIndex]].indexOf(enabled_actions[actionIndex]) < 0){
                     enabled_actions.splice(actionIndex,1);
-                    console.log('removing ' + enabled_actions[actionIndex] + ' because not in ' + action_map[selected_states[stateIndex]]);
                 }
             }
         }
-        console.log(enabled_actions);
+
         for (var action in enabled_actions){
             $('#actions-list #' + enabled_actions[action]).addClass('enabled');
         }
@@ -355,46 +379,49 @@ function update_actions() {
             $('#actions-list #shell').removeClass('enabled');
         }
     }
+
 }
 
 // reboot action click
 $('#actions-list ul.actions li#reboot').click(function() {
     $(this).addClass('pressed');
-     if ($('#machines-list:visible').length == 0){ //single machine view
+     if ($('#machines-list:visible').length == 0) { //single machine view
          var backend = backends[$('#machine-details span.backend').text()];
          backend.newAction(['reboot',$('#machine-details span.id').text()]);
      } else {
          //for machine in selected:
-         $('#machines-list .node.selected .check').each(function(){
-            var backend = backends[$(this).parent().parent().parent().children('span.backend').text()];
-            backend.newAction(['reboot', $(this).parent().parent().parent()[0].id]);
+         $('#machines-list .node.selected .check').each(function() {
+            var node = $(this).closest('.node.selected');
+            var backend = backends[node.children('span.backend').text()];
+            backend.newAction(['reboot', node[0].id]);
          });
      }
 });
 
 $('#actions-list ul.actions li#destroy').click(function() {
-	var destroy = $(this);
-	if (destroy.hasClass('enabled')) {
-		$('#actions-list ul.actions li#destroy-confirm').slideDown(120);
-		destroy.addClass('pressed');
-	}
+    var destroy = $(this);
+    if (destroy.hasClass('enabled')) {
+        $('#actions-list ul.actions li#destroy-confirm').slideDown(120);
+        destroy.addClass('pressed');
+    }
 });
 
 // destroy confirm action click
 $('#actions-list ul.actions li#destroy-confirm').click(function() {
-	var destroy = $('#actions-list ul.actions li#destroy');
-     if ($('#machines-list:visible').length == 0){ //single machine view
+    var destroy = $('#actions-list ul.actions li#destroy');
+     if ($('#machines-list:visible').length == 0) { //single machine view
          var backend = backends[$('#machine-details span.backend').text()];
          backend.newAction(['destroy',$('#machine-details span.id').text()]);
      } else {
          //for machine in selected:
-         $('#machines-list .node.selected .check').each(function(){
-            var backend = backends[$(this).parent().parent().parent().children('span.backend').text()];
-            backend.newAction(['destroy', $(this).parent().parent().parent()[0].id]);
+         $('#machines-list .node.selected .check').each(function() {
+            var node = $(this).closest('.node.selected');
+            var backend = backends[node.children('span.backend').text()];
+            backend.newAction(['destroy', node[0].id]);
          });
      }
-	$(this).slideUp(120);
-	destroy.removeClass('pressed');
+    $(this).slideUp(120);
+    destroy.removeClass('pressed');
 });
 
 // Set a timeout to slide the confirmation up
@@ -403,13 +430,13 @@ $('#actions-list ul.actions li#destroy-confirm').click(function() {
 $('#actions-list ul.actions li#destroy')
 .add('#actions-list ul.actions li#destroy-confirm')
 .mouseleave(function() {
-	var destroy = $('#actions-list ul.actions li#destroy');
-	var confirm = $('#actions-list ul.actions li#destroy-confirm');
-	confirm.data("slideup", setTimeout(function() {
-	    confirm.slideUp(120);
-		destroy.removeClass('pressed');
-	},
-	400));
+    var destroy = $('#actions-list ul.actions li#destroy');
+    var confirm = $('#actions-list ul.actions li#destroy-confirm');
+    confirm.data("slideup", setTimeout(function() {
+        confirm.slideUp(120);
+        destroy.removeClass('pressed');
+    },
+    400));
 });
 
 // Cancel the slideup timeout if entering either destroy
@@ -417,20 +444,21 @@ $('#actions-list ul.actions li#destroy')
 $('#actions-list ul.actions li#destroy-confirm')
 .add('#actions-list ul.actions li#destroy')
 .mouseenter(function() {
-	var confirm = $('#actions-list ul.actions li#destroy-confirm');
-	clearTimeout(confirm.data("slideup"));
+    var confirm = $('#actions-list ul.actions li#destroy-confirm');
+    clearTimeout(confirm.data("slideup"));
 })
 
 // stop action click
 $('#actions-list ul.actions li#stop').click(function() {
-     if ($('#machines-list:visible').length == 0){ //single machine view
+     if ($('#machines-list:visible').length == 0) { //single machine view
          var backend = backends[$('#machine-details span.backend').text()];
          backend.newAction(['stop',$('#machine-details span.id').text()]);
      } else {
          //for machine in selected:
-         $('#machines-list .node.selected .check').each(function(){
-            var backend = backends[$(this).parent().parent().parent().children('span.backend').text()];
-            backend.newAction(['stop', $(this).parent().parent().parent()[0].id]);
+         $('#machines-list .node.selected .check').each(function() {
+            var node = $(this).closest('.node.selected');
+            var backend = backends[node.children('span.backend').text()];
+            backend.newAction(['stop', node[0].id]);
          });
      }
 });
@@ -491,16 +519,16 @@ $(document).ready(function(){
         if (buttonsAmount > 1) {
             // Should be opposite because of right float
             if (!i) {
-                button.addClass('right').addClass('end');
-            } else if (i == buttonsAmount - 1) {
                 button.addClass('left');
+            } else if (i == buttonsAmount - 1) {
+                button.addClass('right').addClass('end');
             } else {
                 button.addClass('mid');
             }
         }
         button.addClass('provider'+b.provider);
         button.appendTo('#button-header');
-        button.text(b.title);
+        //button.text(b.title);
         button.fadeIn(200);
         button.removeClass('backend-template');
         b.newAction(['list_machines']);
@@ -514,6 +542,7 @@ $(document).ready(function(){
 });
 
 function update_machines_view(backend){
+    $('#logo-container').animate({opacity : 0.05});
     backend.machines.forEach(function(machine, index){
         var node = $('#machines-list > #' + machine.id);
         if (node.length == 1) {
@@ -540,27 +569,51 @@ function update_machines_view(backend){
             node.find('.name').text(machine.name);
             node.find('.backend').text(backends.indexOf(backend));
             node.find('.backend').addClass('provider'+backend.provider);
-            node.find('.ip').text(machine.public_ips[0]);
+            node.find('.ip').text(machine.public_ips.concat(machine.private_ips).join(' - '));
             node.find('.state').addClass('state'+machine.state);
             node.find('.select')[0].id = 'chk-' + machine.id;
             node[0].id = machine.id;
             node.fadeIn(200);
         }
     });
+
+    update_machines_count();
 }
 
-function update_backend_status(backend) {
+function update_backend_status(backend, action) {
     var button = $('.backend-button.provider'+backend.provider);
     if (backend.status == 'wait'){
         button.removeClass('on');
         button.addClass('wait');
+        button.attr('title', action);
     } else if (backend.status =='on'){
         button.addClass('on');
         button.removeClass('wait');
+        button.attr('title', backend.title);
     } else {
         button.removeClass('on');
         button.removeClass('wait');
+        button.attr('title','click to retry connection');
     }
+
+    if (typeof(action) == 'string'){
+        $('.actions #'+action).removeClass('pressed');
+    }
+}
+
+// update the machines counter
+function update_machines_count() {
+    var allMachines = 0;
+    for (var i = 0 ; i < backends.length; i++) {
+        allMachines += backends[i].machines.length;
+    }
+
+    $('#all-machines').text(allMachines);
+}
+
+// update the selected machines counter
+function update_selected_machines_count() {
+    $('#selected-machines').text($('#machines-list .selected').length+"");
 }
 
 //get machine, given backend and machineId

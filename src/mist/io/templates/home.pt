@@ -21,21 +21,21 @@
 <body lang="en">
     <div id="wrapper">
         <div id="header">
-            <a href="/"><div id="logo-container"></div></a>
         </div>
-        <div id="backends"
-        <!-- tabs -->
-        <ul class="css-tabs rounded-top drop-shadow">
-            <li><a href="machines" class="medium" title="Manage your virtual machines.">machines</a></li>
-            <li><a href="disks" class="medium" title="Manage your storage volumes.">disks</a></li>
-            <li><a href="images" class="medium" title="Manage boot images.">images</a></li>
-            <li><a href="networks" class="medium" title="Configure networking.">network</a></li>
-        </ul>
-        <div class="css-panes rounded-bottom drop-shadow">
-            <div id="machines-pane" style="display:block"></div>
-            <div id="disks-pane" style="display:block"></div>
-            <div id="images-pane" style="display:block"></div>
-            <div id="networks-pane" style="display:block"></div>
+        <div id="backends">
+            <!-- tabs -->
+            <ul class="css-tabs rounded-top drop-shadow">
+                <li><a href="machines" class="medium" title="Manage your virtual machines.">machines</a></li>
+                <li><a href="disks" class="medium" title="Manage your storage volumes.">disks</a></li>
+                <li><a href="images" class="medium" title="Manage boot images.">images</a></li>
+                <li><a href="networks" class="medium" title="Configure networking.">network</a></li>
+            </ul>
+            <div class="css-panes rounded-bottom drop-shadow">
+                <div id="machines-pane" style="display:block"></div>
+                <div id="disks-pane" style="display:block"></div>
+                <div id="images-pane" style="display:block"></div>
+                <div id="networks-pane" style="display:block"></div>
+            </div>
         </div>
 
     </div>
@@ -57,7 +57,7 @@
 
                     // This solves various transition issues, like misplaced
                     // elements. Don't ask me.
-                    panes.width(paneswrapper.width());
+                    //panes.width(paneswrapper.width());
 
                     // Explicitly set height
                     paneswrapper.height(paneswrapper.height());

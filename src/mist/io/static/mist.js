@@ -9,6 +9,7 @@ function Backend(id, title, provider, interval, host){
     this.machines = [];
     this.sizes = [];
     this.images = [];
+    this.currentAction = '';
 
     this.newAction = function(action){
         this.action_queue.push(action);
@@ -17,9 +18,13 @@ function Backend(id, title, provider, interval, host){
         }
     };
 
-    this.updateStatus = function(new_status) {
+    this.updateStatus = function(new_status, action) {
         this.status = new_status;
-        try { update_backend_status(this); } catch(err){}
+        try { update_backend_status(this, action); } catch(err){}
+    };
+
+    this.clearQueue = function() {
+        this.action_queue = [];
     };
 
     this.processAction = function(){
@@ -34,22 +39,23 @@ function Backend(id, title, provider, interval, host){
 
         action = this.action_queue.shift();
 
-        this.updateStatus('wait');
+        this.updateStatus('wait', action);
+        this.currentAction = action;
         var backend = this;
         switch(action[0]) {
             case 'list_machines':
                 $.ajax({
                     url: 'backends/'+this.id+'/machines/list',
                     success: function(data) {
-                        backend.updateStatus('on');
+                        backend.updateStatus('on', 'list_machines');
                         backend.machines = jQuery.parseJSON(data);
                         update_machines_view(backend);
                         backend.processAction();
                         try { refresh_machines(backend) } catch(err) {}
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off');
-                        alert("backend " + backend.id + " is offline\n " + jqXHR.statusText + ": " + jqXHR.responseText);
+                        backend.updateStatus('off', 'list_machines');
+                        alert("backend " + backend.id + " is offline\n "); // + jqXHR.statusText + ": " + jqXHR.responseText);
                     }
                 });
                 break;
@@ -57,13 +63,13 @@ function Backend(id, title, provider, interval, host){
                 $.ajax({
                     url: 'backends/'+this.id+'/images/list',
                     success: function(data) {
-                        backend.updateStatus('on');
+                        backend.updateStatus('on', 'list_images');
                         backend.images = jQuery.parseJSON(data);
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off');
-                        alert("backend " + backend.id + " is offline\n " + jqXHR.statusText + ": " + jqXHR.responseText);
+                        backend.updateStatus('off', 'list_images');
+                        alert("backend " + backend.id + " is offline\n "); // + jqXHR.statusText + ": " + jqXHR.responseText);
                     }
                 });
                 break;
@@ -71,13 +77,13 @@ function Backend(id, title, provider, interval, host){
                 $.ajax({
                     url: 'backends/'+this.id+'/sizes/list',
                     success: function(data) {
-                        backend.updateStatus('on');
+                        backend.updateStatus('on', 'list_sizes');
                         backend.sizes = jQuery.parseJSON(data);
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off');
-                        alert("backend " + backend.id + " is offline\n " + jqXHR.statusText + ": " + jqXHR.responseText);
+                        backend.updateStatus('off', 'list_sizes');
+                        alert("backend " + backend.id + " is offline\n ");// + jqXHR.statusText + ": " + jqXHR.responseText);
                     }
                 });
                 break;
@@ -85,11 +91,11 @@ function Backend(id, title, provider, interval, host){
                 $.ajax({
                     url: 'backends/'+this.id+'/machines/start',
                     success: function(data) {
-                        backend.updateStatus('on');
+                        backend.updateStatus('on', 'start');
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off');
+                        backend.updateStatus('off', 'start');
                         alert("backend " + backend.id + " is offline: " + errorThrown);
                     }
                 });
@@ -98,11 +104,11 @@ function Backend(id, title, provider, interval, host){
                 $.ajax({
                     url: 'backends/'+this.id+'/machines/'+action[1]+'/reboot',
                     success: function(data) {
-                        backend.updateStatus('on');
+                        backend.updateStatus('on', 'reboot');
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off');
+                        backend.updateStatus('off', 'reboot');
                         alert("backend " + backend.id + " is offline: " + errorThrown);
                     }
                 });
@@ -111,11 +117,11 @@ function Backend(id, title, provider, interval, host){
                 $.ajax({
                     url: 'backends/'+this.id+'/machines/'+action[1]+'/destroy',
                     success: function(data) {
-                        backend.updateStatus('on');
+                        backend.updateStatus('on', 'destroy');
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off');
+                        backend.updateStatus('off', 'destroy');
                         alert("backend " + backend.id + " is offline: " + errorThrown);
                     }
                 });
@@ -124,11 +130,33 @@ function Backend(id, title, provider, interval, host){
                 $.ajax({
                     url: 'backends/'+this.id+'/machines/'+action[1]+'/stop',
                     success: function(data) {
-                        backend.updateStatus('on');
+                        backend.updateStatus('on', 'stop');
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off');
+                        backend.updateStatus('off', 'stop');
+                        alert("backend " + backend.id + " is offline: " + errorThrown);
+                    }
+                });
+                break;
+            case 'create':
+                var payload = {
+                    "name": action[1],
+                    "size" : action[2],
+                    "image": action[3],
+                };
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(payload),
+                    url: 'backends/'+this.id+'/machines/create',
+                    success: function(data) {
+                        backend.updateStatus('on', 'create');
+                        backend.processAction();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        backend.updateStatus('off', 'start');
                         alert("backend " + backend.id + " is offline: " + errorThrown);
                     }
                 });
