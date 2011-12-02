@@ -232,7 +232,9 @@ $('.node').live('click', function() {
     return false;
 });
 
+//
 // Clicking on back button brings up the list again
+//
 $('#button-back').click(function() {
     $('#machine-details, #console').fadeOut(200, function() {
         $('#machines-list').fadeIn(200, update_actions);
