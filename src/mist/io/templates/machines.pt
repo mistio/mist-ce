@@ -622,6 +622,20 @@ function update_machines_view(backend){
         }
     });
 
+    //Make a list of all machine ids first, from all backends and check if machine
+    //is in DOM but not in list, then delete it from DOM. Example id: 2-18
+    var machines_list = [];
+    for (var i = 0 ; i < backends.length; i++) {
+        for (var m in backends[i].machines) {
+            machines_list.push(i + '-' + backends[i].machines[m].id);
+        }
+    }
+
+    $('#machines-list').find('.node').each(function (i) { 
+        if ($.inArray(this.id, machines_list) == -1) {
+            $('#' + this.id).remove();
+        }
+    });      
     update_machines_count();
 }
 
