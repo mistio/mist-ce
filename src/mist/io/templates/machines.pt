@@ -166,8 +166,10 @@ $(function() {
             var machineName = $('input[name=instance_name]')[0].value;
             var size = $('select[name=instance_size]')[0].value;
             var image = $('select[name=instance_image]')[0].value;
-            backends[0].newAction(['create', machineName, size, image]); //send data for the start action        
-            alert('ok');   
+            var backend_provider = $("select.backend")[0].selectedIndex -1;
+            backends[backend_provider].newAction(['create', machineName, size, image]); //send data for the start action        
+            //FIXME: show message to user regarding their node, close wizard and clear values
+            $(".enabled#create a[rel]").overlay().close(); 
         }
     });
 
