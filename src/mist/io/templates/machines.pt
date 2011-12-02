@@ -4,6 +4,7 @@
         <li id="start"><a>Start</a></li>
         <li id="stop"><a>Stop</a></li>
         <li id="reboot"><a>Reboot</a></li>
+        <li id="reboot-confirm" class="inner-shadow"><a>Sure?</a></li>
         <li id="destroy"><a>Destroy</a></li>
         <li id="destroy-confirm" class="inner-shadow"><a>Sure?</a></li>
         <li id="shell"><a>Console</a></li>
@@ -383,25 +384,31 @@ function update_actions() {
 
 // reboot action click
 $('#actions-list ul.actions li#reboot').click(function() {
-    $(this).addClass('pressed');
-     if ($('#machines-list:visible').length == 0) { //single machine view
-         var backend = backends[$('#machine-details span.backend').text()];
-         backend.newAction(['reboot',$('#machine-details span.id').text()]);
+    if ($(this).hasClass('enabled')) {
+        $('#actions-list ul.actions li#reboot-confirm').slideDown(120);    
+        $(this).addClass('pressed');
+    }
+});
+
+// reboot confirm action click
+$('#actions-list ul.actions li#reboot-confirm').click(function() {
+    if ($('#machines-list:visible').length == 0) { //single machine view
+        var backend = backends[$('#machine-details span.backend').text()];
+        backend.newAction(['reboot',$('#machine-details span.id').text()]);
      } else {
-         //for machine in selected:
-         $('#machines-list .node.selected .check').each(function() {
+        //for machine in selected:
+        $('#machines-list .node.selected .check').each(function() {
             var node = $(this).closest('.node.selected');
             var backend = backends[node.children('span.backend').text()];
             backend.newAction(['reboot', node[0].id]);
-         });
-     }
+        });
+    }    
 });
-
+    
 $('#actions-list ul.actions li#destroy').click(function() {
-    var destroy = $(this);
-    if (destroy.hasClass('enabled')) {
+    if ($(this).hasClass('enabled')) {    
         $('#actions-list ul.actions li#destroy-confirm').slideDown(120);
-        destroy.addClass('pressed');
+        $(this).addClass('pressed');
     }
 });
 
@@ -422,6 +429,31 @@ $('#actions-list ul.actions li#destroy-confirm').click(function() {
     $(this).slideUp(120);
     destroy.removeClass('pressed');
 });
+
+
+// Set a timeout to slide the confirmation up
+// after leaving either the destroy or
+// destroy-confirm
+$('#actions-list ul.actions li#reboot')
+.add('#actions-list ul.actions li#reboot-confirm')
+.mouseleave(function() {
+    var destroy = $('#actions-list ul.actions li#reboot');
+    var confirm = $('#actions-list ul.actions li#reboot-confirm');
+    confirm.data("slideup", setTimeout(function() {
+        confirm.slideUp(120);
+        destroy.removeClass('pressed');
+    },
+    400));
+});
+
+// Cancel the slideup timeout if entering either reboot
+// or reboot-confirm elements.
+$('#actions-list ul.actions li#reboot-confirm')
+.add('#actions-list ul.actions li#reboot')
+.mouseenter(function() {
+    var confirm = $('#actions-list ul.actions li#reboot-confirm');
+    clearTimeout(confirm.data("slideup"));
+})
 
 // Set a timeout to slide the confirmation up
 // after leaving either the destroy or

@@ -485,7 +485,7 @@ li#destroy {
     background: url(../static/icons/delete.png) 16px center no-repeat;
 }
 
-li#destroy-confirm {
+li#destroy-confirm, li#reboot-confirm {
     display: none;
     font-weight: bold;
     opacity: 1.0;
@@ -495,11 +495,11 @@ li#destroy-confirm {
     padding-bottom: 5px;
 }
 
-li#destroy-confirm:hover {
+li#destroy-confirm:hover,  li#reboot-confirm:hover {
     background: #aa1100;
 }
 
-li#destroy-confirm a {
+li#destroy-confirm a,  li#reboot-confirm a {
     cursor: pointer;
     color: #fff;
 }
