@@ -110,6 +110,7 @@
 
 <script>
 
+var NODE_NAME_CHARACTERS = 35;
 /*
 libcloud listing of state codes
     RUNNING = 0
@@ -593,7 +594,7 @@ function update_machines_view(backend){
                 node.find('.ip').text() != machine.public_ips[0]
                 ){
                 node.fadeOut(100);
-                node.find('.name').text(machine.name);
+                node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
                 node.find('.backend').text(backends.indexOf(backend));
                 node.find('.backend').addClass('provider'+backend.provider);
                 node.find('.ip').text(machine.public_ips[0]);
@@ -609,7 +610,7 @@ function update_machines_view(backend){
             node.removeClass('node-template');
             node.addClass('node');
             node.appendTo('#machines-list');
-            node.find('.name').text(machine.name);
+            node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
             node.find('.backend').text(backends.indexOf(backend));
             node.find('.backend').addClass('provider'+backend.provider);
             node.find('.ip').text(machine.public_ips.concat(machine.private_ips).join(' - '));
@@ -622,6 +623,14 @@ function update_machines_view(backend){
     });
 
     update_machines_count();
+}
+
+function truncate_names(truncateName, truncateCharacters ) { //truncate truncateName if bigger than truncateCharacters
+    if (truncateName.length > truncateCharacters) {
+        return truncateName.substring(0, NODE_NAME_CHARACTERS) + '...';
+    } else {
+        return truncateName;
+    }
 }
 
 function update_backend_status(backend, action) {
