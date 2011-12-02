@@ -668,6 +668,24 @@ function update_backend_status(backend, action) {
     }
 }
 
+//updates the messages notifier
+function update_message_notifier(backend, action) {
+    var now = new Date();
+    $('#notifier span.text').text(now + ': ' + backend.id + ': ' + action);
+    update_messages_count();
+}
+
+// update the messages counter
+function update_messages_count() {
+    allMessages +=1 ;
+    if (allMessages == 1) {
+        messages = ' message';
+    } else {
+        messages =  ' messages';
+    }
+    $('#notifier span.messages-count').text(allMessages + messages);
+}
+
 // update the machines counter
 function update_machines_count() {
     var allMachines = 0;
