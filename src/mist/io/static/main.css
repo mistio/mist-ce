@@ -108,13 +108,13 @@ body {
     height: 131px;
     margin: 36px 0;
     position: fixed;
-    top: 15%;
-    left: 43%;
+    top: 20%;
+    left: 45.5%;
 }
 
 #wrapper {
     width: 896px;
-    margin: 10px auto;
+    margin: 50px auto;
     color: rgb(60,60,60);
     -webkit-text-size-adjust: 100%; /* Stops Mobile Safari from auto-adjusting font-sizes */
 }
@@ -138,13 +138,6 @@ a:active {
 
 :focus {
   -moz-outline-style:none;
-}
-
-div.networks{
-    width:92%;
-    height:82%;
-    overflow-y: auto;
-    padding:30px 0;
 }
 
 /* validation error message */
@@ -214,20 +207,19 @@ div.networks{
 /* Machines Pane */
 
 #machines-pane {
-    width: 100%;
+    width: auto;
     overflow: auto;
     overflow-x: hidden;
     display: none;
-    background: url(../static/bg-actions-side.gif) right top repeat-y;
+    /*background: url(../static/bg-actions-side.gif) right top repeat-y;*/
 }
 
 /* Machines Pane : Machines List */
 
 #machines-list, #console {
-    float: left;
-    width: 715px;
-    height: 300px;
     overflow-y: scroll;
+    clear: none;
+    z-index: -1;
 }
 
 #console {
@@ -423,6 +415,7 @@ ul#button-header li:hover .select-widget {
 ul.basic-info, ul.extra-info {
     padding-left: 50px;
     list-style-type: none;
+    overflow: visible;
 }
 
 ul.basic-info {
@@ -433,7 +426,9 @@ ul.basic-info {
 
 #actions-list {
     float: right;
-    width: 181px;
+    width: 19%;
+    min-width: 120px;
+    max-width: 200px;
     border-left: 0px solid #dadada;
     background: url(../static/bg-actions-side.gif) 0 0 repeat-y;
 }
@@ -478,7 +473,7 @@ li#start {
 }
 
 li#stop {
-    display:none; /* until libcloud supports stop action*/
+    /*display:none; /* until libcloud supports stop action*/
     background: url(../static/icons/stop.png) 16px center no-repeat;
 }
 
@@ -693,10 +688,6 @@ ul#button-header li#selected-nodes-button {
 
 .wait {
     background: url("/static/spinner.gif") no-repeat scroll 12px 7px transparent !important;
-}
-
-.wait:hover {
-    background: url("/static/icons/stop.png") no-repeat scroll 11px 6px transparent !important;
 }
 
 /* tooltip styling. by default the element to be styled is .tooltip  */
@@ -977,7 +968,8 @@ px      68    160    252    344    436    */
 @media only screen and (min-width: 480px) and (max-width: 767px) {
 
     #wrapper {
-        width: 436px;
+        width: 100%;
+        height: 100%;
                 margin:auto;
     }
 

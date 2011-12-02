@@ -165,7 +165,8 @@ $(function() {
             var machineName = $('input[name=instance_name]')[0].value;
             var size = $('select[name=instance_size]')[0].value;
             var image = $('select[name=instance_image]')[0].value;
-            backends[0].newAction(['create', machineName, size, image]); //send data for the start action
+            backends[0].newAction(['create', machineName, size, image]); //send data for the start action        
+            alert('ok');   
         }
     });
 
@@ -245,7 +246,18 @@ $('.backend-button').live('click', function(){
     b = $(".backend-button:visible").index($(this));
 
     if ($(this).hasClass('on') || $(this).hasClass('wait')){
-        alert(b);
+        var ids = "";
+        for (m in backends[b].machines) {
+            if (ids.length > 0)
+                ids += ", ";
+            ids += "#" + backends[b].machines[m].id;
+        }
+        if ($(ids).filter('.selected').length == $(ids).length) {
+            $(ids).removeClass('selected');
+        } else {
+            $(ids).addClass('selected');
+        }
+        update_actions();
     } else {
         // If backend is offline try to get it back online
         backends[b].clearQueue();
@@ -276,16 +288,6 @@ $('#button-deselect-all').click(function() {
 // node checkbox click updates the header checkbox and the actions
 $('.node a').live('click', function() {
     $(this).parent().toggleClass('selected');
-    if ($('.node.selected .check').length == $('.node .check').length){
-        $('#button-header .check').parent().addClass('selected');
-        $('#button-header .check').parent().removeClass('partial');
-    } else if ($('.node.selected .check').length == 0) {
-        $('#button-header .check').parent().removeClass('selected');
-        $('#button-header .check').parent().removeClass('partial');
-    } else {
-        $('#button-header .check').parent().addClass('partial');
-        $('#button-header .check').parent().removeClass('selected');
-    }
     update_actions();
     return false;
 });
@@ -328,6 +330,17 @@ function update_actions() {
 
     update_selected_machines_count();
 
+    if ($('.node.selected .check').length == $('.node .check').length){
+        $('#button-header .check').parent().addClass('selected');
+        $('#button-header .check').parent().removeClass('partial');
+    } else if ($('.node.selected .check').length == 0) {
+        $('#button-header .check').parent().removeClass('selected');
+        $('#button-header .check').parent().removeClass('partial');
+    } else {
+        $('#button-header .check').parent().addClass('partial');
+        $('#button-header .check').parent().removeClass('selected');
+    }
+    
     $('#actions-list ul li').removeClass('enabled');
 
     if ($('#machines-list:visible').length == 0){
@@ -348,16 +361,14 @@ function update_actions() {
             selected_states.push(get_machine($(this).find('.backend').text(), $(this)[0].id).state);
         });
 
-        console.log(enabled_actions);
         for (stateIndex in selected_states){
             for (actionIndex in enabled_actions){
                  if (action_map[selected_states[stateIndex]].indexOf(enabled_actions[actionIndex]) < 0){
                     enabled_actions.splice(actionIndex,1);
-                    console.log('removing ' + enabled_actions[actionIndex] + ' because not in ' + action_map[selected_states[stateIndex]]);
                 }
             }
         }
-        console.log(enabled_actions);
+
         for (var action in enabled_actions){
             $('#actions-list #' + enabled_actions[action]).addClass('enabled');
         }
@@ -516,7 +527,7 @@ $(document).ready(function(){
         }
         button.addClass('provider'+b.provider);
         button.appendTo('#button-header');
-        button.text(b.title);
+        //button.text(b.title);
         button.fadeIn(200);
         button.removeClass('backend-template');
         b.newAction(['list_machines']);
@@ -530,7 +541,7 @@ $(document).ready(function(){
 });
 
 function update_machines_view(backend){
-    $('#logo-container').animate({opacity : 0.1});
+    $('#logo-container').animate({opacity : 0.05});
     backend.machines.forEach(function(machine, index){
         var node = $('#machines-list > #' + machine.id);
         if (node.length == 1) {
@@ -584,14 +595,8 @@ function update_backend_status(backend, action) {
         button.attr('title','click to retry connection');
     }
 
-    if (typeof(action) == 'string') {
+    if (typeof(action) == 'string'){
         $('.actions #'+action).removeClass('pressed');
-        if (action == 'create') {
-            $(".enabled#create a[rel]").overlay().close();
-            $("select.backend").val("");
-            $("#wizard input[name=instance_name]").val("");
-            $("select.backend").click();
-        }
     }
 }
 
