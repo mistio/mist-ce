@@ -112,6 +112,30 @@ body {
     left: 45.5%;
 }
 
+#notifier {
+    background-color: #c7c7c9;
+    border-bottom: 1px solid #979694;
+    color: #5f5f55;
+    font-size: 130%;
+    font-weight: bold;
+    height: 30px;
+    text-align: center;
+}
+
+#notifier span.messages-expand, #notifier span.messages-count {
+    background-color: #FAD163;
+    border: 2px solid #735005;
+    cursor: pointer;
+    display: block;
+    float: right;
+    margin-right: 20px;
+    padding-left: 4px;
+    padding-right: 4px;
+    margin-top: 4px;
+    text-decoration: none;
+    font-size: 90%;
+}
+
 #wrapper {
     width: 896px;
     margin: 50px auto;

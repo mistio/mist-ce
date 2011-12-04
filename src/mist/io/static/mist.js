@@ -1,3 +1,12 @@
+function MessageLog(){
+    this.messages = [];
+    
+    this.newMessage = function(backend, message, action){
+        this.messages.push(message);
+        try { update_message_notifier(backend, action) } catch(err) { alert('Failed to update message widget: ' + err); }
+    }
+}
+
 function Backend(id, title, provider, interval, host){
     this.title = title;
     this.provider = provider;
@@ -21,6 +30,11 @@ function Backend(id, title, provider, interval, host){
     this.updateStatus = function(new_status, action) {
         this.status = new_status;
         try { update_backend_status(this, action); } catch(err){}
+        //var wanted_messages = ['list_images', 'reboot', 'destroy', 'start', 'create', 'stop']; 
+        //list of messages we care to inform the user, on the notifier area
+        //if ($.inArray(action[0], wanted_messages) != -1) {
+        //    try { update_message_notifier(this, action); } catch(err){}
+        //}
     };
 
     this.clearQueue = function() {

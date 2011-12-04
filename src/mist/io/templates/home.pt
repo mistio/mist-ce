@@ -19,6 +19,15 @@
 </head>
 
 <body lang="en">
+    <div id="notifier">
+        <span class="messages-count">
+            <a title="expand messages">0 messages</a>
+        </span>
+        <span class="messages-expand">
+            <a title="expand messages">Show all</a>
+        </span>
+        <span class="text">Last message shown here</span>
+    </div><!-- notify-container -->
     <div id="wrapper">
         <div id="header">
         </div>
@@ -75,6 +84,7 @@
         });
         $("ul.css-tabs a").tooltip({effect: 'fade', predelay: 1000, delay: 2, position: 'top center', opacity: 0.8});
         var backends = [];
+        var log = new MessageLog();
     </script>
     <script tal:repeat="backend backends" tal:content="string:backends.push(new Backend('${backend['id']}','${backend['title']}',${backend['provider']},${backend['poll_interval']},${backend.host|'undefined'}));" />
     <div id="footer">created by <a href="https://unweb.me" title="state of the art information systems">unweb.me</a></div>

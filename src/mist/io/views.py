@@ -212,7 +212,7 @@ def stop_machine(request):
         for machine in machines:
             if machine.id == request.matchdict['machine']:
                 found = True
-                #machine.stop()
+                machine.stop()
                 break
         if not found:
             return Response('Invalid machine', 404)
