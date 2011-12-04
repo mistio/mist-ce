@@ -1,13 +1,24 @@
+var ERROR = 0, WARN = 1, ALERT = 2, INFO = 3, DEBUG = 4;
+var LOGLEVEL = 4;
+
 function MessageLog(){
     this.messages = [];
     
-    this.newMessage = function(backend, message, action){
-        this.messages.push(message);
-        try { update_message_notifier(backend, action) } catch(err) { alert('Failed to update message widget: ' + err); }
+    this.newMessage = function(message, level, backend){
+        var now = new Date();
+        if (typeof(level) == 'undefined') {
+            level = 0;
+        }
+        if (typeof(backend) != 'undefined') {
+            this.messages.push([level, now, backend.title, backend.currentAction, message]);
+        } else {
+            this.messages.push([level, now, '', '', message]);
+        }
+        try { update_message_notifier() } catch(err) { alert('Failed to update message widget: ' + err); }
     }
 }
 
-function Backend(id, title, provider, interval, host){
+function Backend(id, title, provider, interval, host, log){
     this.title = title;
     this.provider = provider;
     this.id = id;
@@ -19,6 +30,7 @@ function Backend(id, title, provider, interval, host){
     this.sizes = [];
     this.images = [];
     this.currentAction = '';
+    this.log = function(message, level){ try{log.newMessage(message, level, this)} catch(err){} };    
 
     this.newAction = function(action){
         this.action_queue.push(action);
@@ -30,11 +42,6 @@ function Backend(id, title, provider, interval, host){
     this.updateStatus = function(new_status, action) {
         this.status = new_status;
         try { update_backend_status(this, action); } catch(err){}
-        //var wanted_messages = ['list_images', 'reboot', 'destroy', 'start', 'create', 'stop']; 
-        //list of messages we care to inform the user, on the notifier area
-        //if ($.inArray(action[0], wanted_messages) != -1) {
-        //    try { update_message_notifier(this, action); } catch(err){}
-        //}
     };
 
     this.clearQueue = function() {
@@ -47,7 +54,7 @@ function Backend(id, title, provider, interval, host){
         }
 
         if (this.status == 'wait') {
-            alert('waiterror!');
+            this.log('cannot process action when in wait status!');
             return;
         }
 
@@ -58,22 +65,25 @@ function Backend(id, title, provider, interval, host){
         var backend = this;
         switch(action[0]) {
             case 'list_machines':
+                this.log('updating machines', DEBUG);
                 $.ajax({
                     url: 'backends/'+this.id+'/machines/list',
                     success: function(data) {
                         backend.updateStatus('on', 'list_machines');
                         backend.machines = jQuery.parseJSON(data);
                         update_machines_view(backend);
+                        backend.log('updated machines', DEBUG);
                         backend.processAction();
                         try { refresh_machines(backend) } catch(err) {}
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         backend.updateStatus('off', 'list_machines');
-                        alert("backend " + backend.id + " is offline\n "); // + jqXHR.statusText + ": " + jqXHR.responseText);
+                        backend.log("update machines failed - backend  offline", ERROR);
                     }
                 });
                 break;
             case 'list_images':
+                this.log('updating images', DEBUG);
                 $.ajax({
                     url: 'backends/'+this.id+'/images/list',
                     success: function(data) {
@@ -83,11 +93,12 @@ function Backend(id, title, provider, interval, host){
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         backend.updateStatus('off', 'list_images');
-                        alert("backend " + backend.id + " is offline\n "); // + jqXHR.statusText + ": " + jqXHR.responseText);
+                        backend.log("update images failed - backend  offline", ERROR);
                     }
                 });
                 break;
             case 'list_sizes':
+                this.log('updating sizes', DEBUG);
                 $.ajax({
                     url: 'backends/'+this.id+'/sizes/list',
                     success: function(data) {
@@ -97,24 +108,26 @@ function Backend(id, title, provider, interval, host){
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         backend.updateStatus('off', 'list_sizes');
-                        alert("backend " + backend.id + " is offline\n ");// + jqXHR.statusText + ": " + jqXHR.responseText);
+                        backend.log("update sizes failed - backend  offline", ERROR);
                     }
                 });
                 break;
             case 'start':
+                this.log('starting ' + action[1], INFO);
                 $.ajax({
-                    url: 'backends/'+this.id+'/machines/start',
+                    url: 'backends/'+this.id+'/machines/'+action[1]+'/start',
                     success: function(data) {
                         backend.updateStatus('on', 'start');
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         backend.updateStatus('off', 'start');
-                        alert("backend " + backend.id + " is offline: " + errorThrown);
+                        backend.log("start failed - backend  offline", ERROR);
                     }
                 });
                 break;
             case 'reboot':
+                this.log('rebooting ' + action[1], INFO);
                 $.ajax({
                     url: 'backends/'+this.id+'/machines/'+action[1]+'/reboot',
                     success: function(data) {
@@ -123,11 +136,12 @@ function Backend(id, title, provider, interval, host){
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         backend.updateStatus('off', 'reboot');
-                        alert("backend " + backend.id + " is offline: " + errorThrown);
+                        backend.log("reboot failed - backend  offline", ERROR);
                     }
                 });
                 break;
             case 'destroy':
+                this.log('destroying ' + action[1], INFO);
                 $.ajax({
                     url: 'backends/'+this.id+'/machines/'+action[1]+'/destroy',
                     success: function(data) {
@@ -136,28 +150,31 @@ function Backend(id, title, provider, interval, host){
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         backend.updateStatus('off', 'destroy');
-                        alert("backend " + backend.id + " is offline: " + errorThrown);
+                        backend.log("destroy failed - backend  offline\n ", ERROR);
                     }
                 });
                 break;
             case 'stop':
+                this.log('stopping ' + action[1], INFO);
                 $.ajax({
                     url: 'backends/'+this.id+'/machines/'+action[1]+'/stop',
                     success: function(data) {
                         backend.updateStatus('on', 'stop');
                         backend.processAction();
+                        backend.log('stop command sent', DEBUG)
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         backend.updateStatus('off', 'stop');
-                        alert("backend " + backend.id + " is offline: " + errorThrown);
+                        backend.log("stop failed - backend  offline", ERROR);
                     }
                 });
                 break;
             case 'create':
+                this.log('creating ' + action[1], INFO);
                 var payload = {
                     "name": action[1],
                     "size" : action[2],
-                    "image": action[3],
+                    "image": action[3]
                 };
                 $.ajax({
                     type: "POST",
@@ -168,15 +185,16 @@ function Backend(id, title, provider, interval, host){
                     success: function(data) {
                         backend.updateStatus('on', 'create');
                         backend.processAction();
+                        backend.log('create command sent', DEBUG);
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         backend.updateStatus('off', 'start');
-                        alert("backend " + backend.id + " is offline: " + errorThrown);
+                        backend.log("backend  offline", ERROR);
                     }
                 });
                 break;
             default:
-                alert('invalid action ' + action);
+                this.log("invalid action", ERROR);
         }
     }
 }

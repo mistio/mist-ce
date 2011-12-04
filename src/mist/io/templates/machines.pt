@@ -273,7 +273,7 @@ $('.backend-button').live('click', function(){
         for (m in backends[b].machines) {
             if (ids.length > 0)
                 ids += ", ";
-            ids += "#" + backends[b].machines[m].id;
+            ids += "#" + b + '-' + backends[b].machines[m].id;
         }
         if ($(ids).filter('.selected').length == $(ids).length) {
             $(ids).removeClass('selected');
@@ -590,7 +590,7 @@ function update_machines_view(backend){
     $('#logo-container').animate({opacity : 0.05});
     backend.machines.forEach(function(machine, index){
         var node = $('#machines-list > #' + backends.indexOf(backend) + '-' + machine.id);
-        if (node.length == 1) { //one machine with this id 
+        if (node.length == 1) { // there should be only one machine with this id in the DOM 
             if (node.find('.name').text() != machine.name ||
                 node.find('.ip').text() != machine.public_ips[0]
                 ){
@@ -598,12 +598,19 @@ function update_machines_view(backend){
                 node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
                 node.find('.backend').text(backends.indexOf(backend));
                 node.find('.backend').addClass('provider'+backend.provider);
-                node.find('.ip').text(machine.public_ips[0]);
+                var primary_ip = machine.public_ips[0] || machine.private_ips[0] || "";
+                var all_ips = machine.public_ips.concat(machine.private_ips);
+                if (all_ips.length > 1) {
+                    all_ips = " <span class='more'>&hellip;</span><span class='all-ips'>" + all_ips.join(' - ') + "</span>";
+                } else {
+                    all_ips = "<span class='more'></span><span class='all-ips'>" + primary_ip + "</span>";
+                }
+                node.find('.ip').html("<span class='primary'>"+primary_ip+"</span>"+all_ips);
                 node.find('.select')[0].id = 'chk-' + machine.id;
                 node.fadeIn(100);
             }
             node.find('.state').removeClass().addClass('state').addClass('state'+machine.state);
-        } else { //when update_machines_view is called for first time. 
+        } else { // if the machine does does exist in the DOM, then add it 
             if (node.length != 0){
                 console.log(node);
             }
@@ -614,7 +621,14 @@ function update_machines_view(backend){
             node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
             node.find('.backend').text(backends.indexOf(backend));
             node.find('.backend').addClass('provider'+backend.provider);
-            node.find('.ip').text(machine.public_ips.concat(machine.private_ips).join(' - '));
+            var primary_ip = machine.public_ips[0] || machine.private_ips[0] || "";
+            var all_ips = machine.public_ips.concat(machine.private_ips);
+            if (all_ips.length > 1) {
+                all_ips = " <span class='more'>&hellip;</span><span class='all-ips'>" + all_ips.join(' - ') + "</span>";
+            } else {
+                all_ips = "<span class='more'></span><span class='all-ips'>" + primary_ip + "</span>";
+            }
+            node.find('.ip').html("<span class='primary'>"+primary_ip+"</span>"+all_ips);
             node.find('.state').addClass('state'+machine.state);
             node.find('.state').attr('title', STATES[machine.state]);
             node.find('.select')[0].id = 'chk-' + machine.id;
@@ -650,7 +664,6 @@ function truncate_names(truncateName, truncateCharacters ) { //truncate truncate
 
 function update_backend_status(backend, action) {
     var button = $('.backend-button.provider'+backend.provider);
-    log.newMessage(backend, action, action);
     if (backend.status == 'wait'){
         button.removeClass('on');
         button.addClass('wait');
@@ -671,20 +684,23 @@ function update_backend_status(backend, action) {
 }
 
 //updates the messages notifier
-function update_message_notifier(backend, action) {
-    var now = new Date();
-    $('#notifier span.text').text(now + ': ' + backend.id + ': ' + action);
-    update_messages_count();
+function update_message_notifier() {
+    if (log.messages[log.messages.length-1][0] < LOGLEVEL){
+        var txt = log.messages[log.messages.length-1][1].toISOString() + " : " + log.messages[log.messages.length-1].slice(2).join(' - ');
+        $('#notifier span.text').text(txt);
+        update_messages_count();
+    }
 }
 
 // update the messages counter
 function update_messages_count() {
-    if (log.messages.length == 1) {
+    var message_count = log.messages.filter(function(el,i){return el[0] < LOGLEVEL}).length;
+    if (message_count == 1) {
         messages = ' message';
     } else {
         messages =  ' messages';
     }
-    $('#notifier span.messages-count').text(log.messages.length + messages);
+    $('#notifier span.messages-count').text(message_count + messages);
 }
 
 // update the machines counter

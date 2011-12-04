@@ -368,6 +368,26 @@ ul#button-header li:hover .select-widget {
     margin: 0 14px;
 }
 
+.node .ip .all-ips {
+    display: none;
+}
+
+.node .ip:hover .all-ips {
+    display: block;
+    margin-right: 10px;
+}
+
+.node .ip:hover .primary, .node .ip:hover .more {
+    display: none;
+}
+
+.node .ip .more {
+    float: right;
+    margin-right: -10px;
+    width: 10px;
+    margin-left: 10px;
+}
+
 .node .state {
     background: url(../static/states/inactive.png) center no-repeat;
     width: 48px;

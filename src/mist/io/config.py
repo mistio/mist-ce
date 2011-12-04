@@ -26,10 +26,4 @@ BACKENDS = [
      'secret' : 'fb68dcedaa4e7f36b5bad4dc7bc28bed',
      'poll_interval' : 10000,
      },
-    {'provider' : Provider.CLOUDSIGMA,
-     'title' : 'Cloudsigma Cloud',
-     'id' : '601eca7f-c1ca-4ed3-8f90-b62b2f5916a5',
-     'secret' : 'QxXMrZVHkJvwC2YpRPLyBE7cCVmm3UM43fPLWNtQ',
-     'poll_interval' : 10000,
-     },
     ]
