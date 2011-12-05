@@ -414,6 +414,18 @@ function update_actions() {
 
 }
 
+//Show all messages
+$('#notifier span.messages-expand').click(function() {
+    $('#notifier-in').slideToggle('slow', function() {
+    var messagesHtml = '';
+        for (var i = log.messages.length -1; i > -1; i--) {
+            messagesHtml += log.messages[i] + '<br>';
+        }
+        $('#notifier-in .messages').html(messagesHtml);       
+    });
+});
+
+
 // reboot action click
 $('#actions-list ul.actions li#reboot').click(function() {
     if ($(this).hasClass('enabled')) {

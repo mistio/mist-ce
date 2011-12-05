@@ -114,12 +114,25 @@ body {
 
 #notifier {
     background-color: #c7c7c9;
-    border-bottom: 1px solid #979694;
+    /* border-bottom: 1px solid #979694; */
     color: #5f5f55;
     font-size: 130%;
     font-weight: bold;
     height: 30px;
     text-align: center;
+}
+
+#notifier-in {
+    background-color: #c7c7c9;
+    border-bottom: 1px solid #979694;
+    color: #5f5f55;
+    height: 230px;
+}
+
+#notifier-in .messages {
+    height: 200px;
+    padding-left: 300px;
+    overflow-x: scroll;
 }
 
 #notifier span.messages-expand, #notifier span.messages-count {
