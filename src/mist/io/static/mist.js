@@ -3,6 +3,7 @@ var LOGLEVEL = 4;
 
 function MessageLog(){
     this.messages = [];
+    this.timeout = 0;
     
     this.newMessage = function(message, level, backend){
         var now = new Date();

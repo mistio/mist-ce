@@ -120,6 +120,9 @@ body {
     font-weight: bold;
     height: 30px;
     text-align: center;
+    position: fixed;
+    top: -30px;
+    width: 100%;
 }
 
 #notifier-in {

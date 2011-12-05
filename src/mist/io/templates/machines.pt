@@ -621,29 +621,32 @@ function update_machines_view(backend){
     $('#logo-container').animate({opacity : 0.05});
     backend.machines.forEach(function(machine, index){
         var node = $('#machines-list > #' + backends.indexOf(backend) + '-' + machine.id);
-        if (node.length == 1) { // there should be only one machine with this id in the DOM 
+        // Calculate ip_txt
+        var primary_ip = machine.public_ips[0] || machine.private_ips[0] || "";
+        var all_ips = machine.public_ips.concat(machine.private_ips);
+        if (all_ips.length > 1) {
+            all_ips = ' <span class="more">...</span><span class="all-ips">' + all_ips.join(' - ') + "</span>";
+        } else {
+            all_ips = '<span class="more"></span><span class="all-ips">' + primary_ip + "</span>";
+        }
+        var ip_txt = '<span class="primary">'+primary_ip+"</span>"+all_ips;
+        
+        if (node.length == 1) { // there should be only one machine with this id in the DOM
             if (node.find('.name').text() != machine.name ||
-                node.find('.ip').text() != machine.public_ips[0]
+                node.find('.ip').html() != ip_txt
                 ){
-                node.fadeOut(100);
+                node.fadeOut(100);                
                 node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
                 node.find('.backend').text(backends.indexOf(backend));
                 node.find('.backend').addClass('provider'+backend.provider);
-                var primary_ip = machine.public_ips[0] || machine.private_ips[0] || "";
-                var all_ips = machine.public_ips.concat(machine.private_ips);
-                if (all_ips.length > 1) {
-                    all_ips = " <span class='more'>&hellip;</span><span class='all-ips'>" + all_ips.join(' - ') + "</span>";
-                } else {
-                    all_ips = "<span class='more'></span><span class='all-ips'>" + primary_ip + "</span>";
-                }
-                node.find('.ip').html("<span class='primary'>"+primary_ip+"</span>"+all_ips);
+                node.find('.ip').html(ip_txt);
                 node.find('.select')[0].id = 'chk-' + machine.id;
                 node.fadeIn(100);
             }
             node.find('.state').removeClass().addClass('state').addClass('state'+machine.state);
         } else { // if the machine does does exist in the DOM, then add it 
             if (node.length != 0){
-                console.log(node);
+                log.newMessage(ERROR, 'DOM Error: ' + node);
             }
             node = $('.node-template').clone();
             node.removeClass('node-template');
@@ -652,14 +655,7 @@ function update_machines_view(backend){
             node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
             node.find('.backend').text(backends.indexOf(backend));
             node.find('.backend').addClass('provider'+backend.provider);
-            var primary_ip = machine.public_ips[0] || machine.private_ips[0] || "";
-            var all_ips = machine.public_ips.concat(machine.private_ips);
-            if (all_ips.length > 1) {
-                all_ips = " <span class='more'>&hellip;</span><span class='all-ips'>" + all_ips.join(' - ') + "</span>";
-            } else {
-                all_ips = "<span class='more'></span><span class='all-ips'>" + primary_ip + "</span>";
-            }
-            node.find('.ip').html("<span class='primary'>"+primary_ip+"</span>"+all_ips);
+            node.find('.ip').html(ip_txt);
             node.find('.state').addClass('state'+machine.state);
             node.find('.state').attr('title', STATES[machine.state]);
             node.find('.select')[0].id = 'chk-' + machine.id;
@@ -717,9 +713,14 @@ function update_backend_status(backend, action) {
 //updates the messages notifier
 function update_message_notifier() {
     if (log.messages[log.messages.length-1][0] < LOGLEVEL){
+        clearTimeout(log.timeout);
+        if ($('#notifier').css('top') != '0'){
+            $('#notifier').animate({top : 0}, 300);
+        }
         var txt = log.messages[log.messages.length-1][1].toISOString() + " : " + log.messages[log.messages.length-1].slice(2).join(' - ');
         $('#notifier span.text').text(txt);
         update_messages_count();
+        log.timeout = setTimeout("$('#notifier').animate({top:'-30px'},300)", 5000);
     }
 }
 
