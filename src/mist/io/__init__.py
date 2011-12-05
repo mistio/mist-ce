@@ -44,6 +44,10 @@ def main(global_config, **settings):
     config.add_view('mist.io.views.list_images',
                     route_name='list_images')    
 
+    config.add_route('list_locations', '/backends/{backend}/locations/list')
+    config.add_view('mist.io.views.list_locations',
+                    route_name='list_locations')    
+
     config.add_route('create', '/backends/{backend}/machines/create')
     config.add_view('mist.io.views.create_machine',
                     route_name='create')

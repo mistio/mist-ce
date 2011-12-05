@@ -791,7 +791,7 @@ ul#button-header li#selected-nodes-button {
     overflow: auto; /* required to include floating elements in height calculation */
     list-style-type:none;
     list-style-image:none;
-    padding:24px;
+    padding:20px;
 }
 
 #wizard li.border-bottom {

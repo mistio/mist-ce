@@ -138,6 +138,26 @@ def list_sizes(request):
 
     return Response(json.dumps(ret))
  
+def list_locations(request):
+    '''List locations from each backend'''
+    ret = []
+    found = False
+    for b in BACKENDS:
+        if request.matchdict['backend'] == b['id']:
+            found = True
+            conn = connect(b)
+            locations = conn.list_locations()
+            break
+
+    if not found:
+        return Response('Invalid backend', 404)
+
+    for i in locations:
+        ret.append({'id'            : i.id,
+                    'name'         : i.name,
+                    'country'         : i.country,})
+
+    return Response(json.dumps(ret))
 
 def create_machine(request):
     '''Create a new virtual machine on the specified backend'''
@@ -166,9 +186,16 @@ def create_machine(request):
                         break
             except:
                 return Response('Invalid image', 404)
-
             try:
-                node = conn.create_node(name=name, image=image, size=size)
+                locations = conn.list_locations()
+                for node_location in locations:
+                    if node_location.id == request.json_body['location']:
+                        location = node_location
+                        break
+            except:
+                return Response('Invalid image', 404)
+            try:
+                node = conn.create_node(name=name, image=image, size=size, location=location)
             except:
                 return Response('Something went wrong with the creation', 404)
             break

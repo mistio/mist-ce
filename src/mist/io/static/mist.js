@@ -29,6 +29,7 @@ function Backend(id, title, provider, interval, host, log){
     this.machines = [];
     this.sizes = [];
     this.images = [];
+    this.locations = [];
     this.currentAction = '';
     this.log = function(message, level){ try{log.newMessage(message, level, this)} catch(err){} };    
 
@@ -112,6 +113,21 @@ function Backend(id, title, provider, interval, host, log){
                     }
                 });
                 break;
+            case 'list_locations':
+                this.log('updating locations', DEBUG);
+                $.ajax({
+                    url: 'backends/'+this.id+'/locations/list',
+                    success: function(data) {
+                        backend.updateStatus('on', 'list_locations');
+                        backend.locations = jQuery.parseJSON(data);
+                        backend.processAction();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        backend.updateStatus('off', 'list_locations');
+                        backend.log("update locations failed - backend  offline", ERROR);
+                    }
+                });
+                break;
             case 'start':
                 this.log('starting ' + action[1], INFO);
                 $.ajax({
@@ -174,7 +190,8 @@ function Backend(id, title, provider, interval, host, log){
                 var payload = {
                     "name": action[1],
                     "size" : action[2],
-                    "image": action[3]
+                    "image": action[3],
+                    "location": action[4]
                 };
                 $.ajax({
                     type: "POST",

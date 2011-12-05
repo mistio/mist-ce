@@ -100,6 +100,15 @@
                     </select>
                 </label>
             </li>
+            <!-- location -->
+            <li class="required border-bottom">
+                <label>
+                    <strong>4.</strong> Select VM location<br />
+                    <select name="instance_location" class="locations">
+                        <option value="">-- please select --</option>
+                    </select>
+                </label>
+            </li>
             <li class="clearfix rounded-bottom">
                  <button type="button" class="start right">Start VM</button>
             </li>
@@ -146,13 +155,15 @@ $(".enabled#create").click(function(){
 });
 
 $("select.backend").live('click', function(e){
-    var sizesHtml = '', imagesHtml='';
+    var sizesHtml = '', imagesHtml='', locationsHtml = '';
     var sizesLabel = $('select.sizes').parent();
     var imagesLabel = $('select.images').parent();
+    var locationsLabel = $('select.locations').parent();
     var i = $(this)[0].selectedIndex - 1;
 
     $('select.sizes').remove();
     $('select.images').remove();
+    $('select.locations').remove();
     if ( i > -1) {
         $.each(backends[i].sizes, function(val, text) {
             sizesHtml += '<option value="' + backends[i].sizes[val].id + '">' + backends[i].sizes[val].name + '</option>';
@@ -160,14 +171,20 @@ $("select.backend").live('click', function(e){
         $.each(backends[i].images, function(val, text) {
             imagesHtml += '<option value="' + backends[i].images[val].id + '">' + backends[i].images[val].name + '</option>';
         });
+        $.each(backends[i].locations, function(val, text) {
+            locationsHtml += '<option value="' + backends[i].locations[val].id + '">' + backends[i].locations[val].name + '</option>';
+        });
     }
     sizesHtml = '<select name="instance_size" class="sizes"><option value=""><b>-- please select --</b></option>' + sizesHtml + '</select>';
     imagesHtml = '<select name="instance_image" class="images"><option value="">-- please select --</option>' + imagesHtml + '</select>';
+    locationsHtml = '<select name="instance_location" class="locations"><option value="">-- please select --</option>' + locationsHtml + '</select>';
     sizesLabel.append(sizesHtml);
     imagesLabel.append(imagesHtml);
+    locationsLabel.append(locationsHtml);
 });
 
 // overlay logic
+//intercept start VM click
 $(function() {
     // validation logic is done inside the onBeforeSeek callback
     $('.start').click(function() {
@@ -185,8 +202,9 @@ $(function() {
             var machineName = $('input[name=instance_name]')[0].value;
             var size = $('select[name=instance_size]')[0].value;
             var image = $('select[name=instance_image]')[0].value;
+            var location = $('select[name=instance_location]')[0].value;
             var backend_provider = $("select.backend")[0].selectedIndex -1;
-            backends[backend_provider].newAction(['create', machineName, size, image]); //send data for the start action        
+            backends[backend_provider].newAction(['create', machineName, size, image, location]); //send data for the start action        
             //FIXME: show message to user regarding their node, close wizard and clear values
             $(".enabled#create a[rel]").overlay().close(); 
         }
@@ -583,6 +601,7 @@ $(document).ready(function(){
     backends.forEach(function(b, i){
         b.newAction(['list_sizes']);
         b.newAction(['list_images']);
+        b.newAction(['list_locations']);
     });
 });
 
