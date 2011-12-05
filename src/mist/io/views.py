@@ -1,8 +1,11 @@
 '''mist.io views'''
-from libcloud.compute.providers import get_driver
-from mist.io.config import BACKENDS
-from pyramid.response import Response
 import json
+from pyramid.response import Response
+from libcloud.compute.providers import get_driver
+from libcloud.compute.base import NodeAuthSSHKey
+from libcloud.compute.deployment import MultiStepDeployment
+from mist.io.config import BACKENDS
+
 
 def home(request):
     '''Fill in an object with backend data, taken from config.py'''
@@ -196,6 +199,14 @@ def create_machine(request):
                 return Response('Invalid image', 404)
             try:
                 node = conn.create_node(name=name, image=image, size=size, location=location)
+                #conn.deploy_node will be used for transfering pub keys etc. deploy_node waits for 
+                #the node to be up with public ip, otherwise hangs. (default 60*10 sec)
+                #try:
+                    #key = NodeAuthSSHKey(BACKENDS[0]['public_key']) #read the key
+                    #msd = MultiStepDeployment([key])
+                    #node = conn.deploy_node(name=name, image=image, size=size, location=location, deploy=msd)
+                #except: 
+                    #problems with the key, and/or deployment
             except:
                 return Response('Something went wrong with the creation', 404)
             break
