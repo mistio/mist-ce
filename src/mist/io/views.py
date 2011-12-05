@@ -305,3 +305,28 @@ def destroy_machine(request):
 
     return Response(json.dumps(ret))
 
+def list_metadata(request):
+    '''Lists metadata for a machine, given the backend and machine id'''
+    ret = []
+    found = False
+    backends = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
+    if backends:
+        backend = backends[0]
+        conn = connect(backend)
+        machines = conn.list_nodes()
+        for machine in machines:
+            if machine.id == request.matchdict['machine']:
+                found = True
+                metadata = conn.ex_get_metadata(machine)
+                break
+    if not found:
+        return Response('Invalid machine', 404)
+       
+
+    return Response(json.dumps(metadata))
+
+def set_metadata(request):
+    '''Sets metadata for a machine, given the backend and machine id'''
+    pass
+    #example: conn.ex_set_metadata(nodes[0], {'name': 'ServerX', 'description': 'all the money'})
+    #Out[29]: {u'name': u'ServerX', u'description': u'all the money'}

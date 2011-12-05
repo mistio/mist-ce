@@ -64,6 +64,14 @@ def main(global_config, **settings):
     config.add_view('mist.io.views.reboot_machine',
                     route_name='reboot')
 
+    config.add_route('list_metadata', '/backends/{backend}/machines/{machine}/metadata')
+    config.add_view('mist.io.views.list_metadata',
+                    route_name='list_metadata')
+
+    config.add_route('set_metadata', '/backends/{backend}/machines/{machine}/metadata/set')
+    config.add_view('mist.io.views.set_metadata',
+                    route_name='set_metadata')
+
     config.add_route('destroy', '/backends/{backend}/machines/{machine}/destroy')
     config.add_view('mist.io.views.destroy_machine',
                     route_name='destroy')
