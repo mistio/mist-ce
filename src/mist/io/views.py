@@ -316,17 +316,52 @@ def list_metadata(request):
         machines = conn.list_nodes()
         for machine in machines:
             if machine.id == request.matchdict['machine']:
-                found = True
-                metadata = conn.ex_get_metadata(machine)
+                try:
+                    metadata = conn.ex_get_metadata(machine) #eg Openstack
+                    found = True
+                except: 
+                    try:
+                        metadata = conn.ex_describe_tags(machine) #eg EC2
+                        found = True
+                    except:
+                        return Response('Not implemented for this backend', 404)
                 break
     if not found:
-        return Response('Invalid machine', 404)
+        return Response('Invalid backend', 404)
        
 
     return Response(json.dumps(metadata))
 
 def set_metadata(request):
     '''Sets metadata for a machine, given the backend and machine id'''
-    pass
-    #example: conn.ex_set_metadata(nodes[0], {'name': 'ServerX', 'description': 'all the money'})
-    #Out[29]: {u'name': u'ServerX', u'description': u'all the money'}
+    ret = []
+    done = False
+    backends = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
+    if backends:
+        backend = backends[0]
+        conn = connect(backend)
+        machines = conn.list_nodes()
+        for machine in machines:
+            if machine.id == request.matchdict['machine']:
+                try:
+                    metadata = request.json_body
+                    #get metadata from request
+                except:
+                    return Response('Not proper format for metadata', 404)
+                try:
+                    metadata = conn.ex_set_metadata(machine, metadata) #eg Openstack
+                    done = True
+                except: 
+                    try:
+                        metadata = conn.ex_create_tags(machine, metadata) #eg EC2
+                        done = True
+                    except:
+                        return Response('Not implemented for this backend', 404)
+                break
+    if not done:
+        return Response('Invalid backend', 404)       
+
+    return Response(json.dumps(ret))
+
+    #example Openstack: conn.ex_set_metadata(machine, {'name': 'ServerX', 'description': 'all the money'})
+    #example EC2: conn2.ex_create_tags(machine, {'something': 'something_something'})

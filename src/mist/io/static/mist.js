@@ -210,6 +210,46 @@ function Backend(id, title, provider, interval, host, log){
                     }
                 });
                 break;
+            case 'list_metadata':
+                this.log('updating metadata', DEBUG);
+                $.ajax({
+                    url: 'backends/'+this.id+'/machines/'+action[1]+'/metadata',
+                    success: function(data) {
+                        backend.updateStatus('on', 'list_metadata');
+                        backend.processAction();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        backend.updateStatus('off', 'list_metadata');
+                        backend.log("list metadata failed - backend  offline", ERROR);
+                    }
+                });
+                break;
+            case 'set_metadata':
+                this.log('setting metadata ' + action[1], INFO);
+                //FIXME: get from form
+                var payload = {
+                    "var1": "something1",
+                    "var2": "something2",
+                    "var3": "something3",
+                    "var4": "something4",
+                };
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(payload),
+                    url: 'backends/'+this.id+'/machines/'+action[1]+'/metadata/set',
+                    success: function(data) {
+                        backend.updateStatus('on', 'create');
+                        backend.processAction();
+                        backend.log('set metadata command sent', DEBUG);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        backend.updateStatus('off', 'start');
+                        backend.log("backend  offline", ERROR);
+                    }
+                });
+                break;
             default:
                 this.log("invalid action", ERROR);
         }
