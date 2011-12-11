@@ -714,15 +714,22 @@ function update_backend_status(backend, action) {
 function update_message_notifier() {
     if (log.messages[log.messages.length-1][0] < LOGLEVEL){
         clearTimeout(log.timeout);
-        if ($('#notifier').css('top') != '0'){
-            $('#notifier').animate({top : 0}, 300);
+        if (!$('#notifier').is (':visible')){
+            $('#notifier').slideDown(300);
         }
         var txt = log.messages[log.messages.length-1][1].toISOString() + " : " + log.messages[log.messages.length-1].slice(2).join(' - ');
         $('#notifier span.text').text(txt);
         update_messages_count();
-        log.timeout = setTimeout("$('#notifier').animate({top:'-30px'},300)", 5000);
+        log.timeout = setTimeout("$('#notifier, #notifier-in').slideUp(300)", 5000);
     }
 }
+
+// Message notifier mouseenter and mouseleave events
+$('#notifier, #notifier-in').mouseenter(function() {
+	clearTimeout(log.timeout);
+}).mouseleave(function() {
+	log.timeout = setTimeout("$('#notifier, #notifier-in').slideUp(300)", 5000);
+});
 
 // update the messages counter
 function update_messages_count() {

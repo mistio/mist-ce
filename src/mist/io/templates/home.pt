@@ -19,7 +19,7 @@
 </head>
 
 <body lang="en">
-    <div id="notifier">
+    <div id="notifier" class="soft-shadow">
         <span class="messages-count">
             <a title="expand messages">0 messages</a>
         </span>

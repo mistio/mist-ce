@@ -113,48 +113,55 @@ body {
 }
 
 #notifier {
-    background-color: #c7c7c9;
-    /* border-bottom: 1px solid #979694; */
-    color: #5f5f55;
-    font-size: 130%;
-    font-weight: bold;
-    height: 30px;
-    text-align: center;
+    background: #f1f1f1;
+	display: none;
+    color: #444;
     position: fixed;
-    top: -30px;
-    width: 100%;
+    top: 0px;
+	left: 0px;
+	width: 100%;
+	padding: 0px;
+	margin: 0px;
+	z-index: 1000;
+}
+
+#notifier .text {
+	display: block;
+	float: left;
+	padding: 6px 12px;
 }
 
 #notifier-in {
-    background-color: #c7c7c9;
-    border-bottom: 1px solid #979694;
-    color: #5f5f55;
-    height: 230px;
+    background: #ebebeb url('../static/bg-vertical.gif') left 32px repeat-x;
+    color: #333;
+	border-bottom: 1px solid #f5f5f5;
+	opacity: 0.8;
 }
 
 #notifier-in .messages {
     height: 200px;
-    padding-left: 300px;
-    overflow-x: scroll;
+	padding: 6px 12px;
 }
 
 #notifier span.messages-expand, #notifier span.messages-count {
-    background-color: #FAD163;
-    border: 2px solid #735005;
+    background: #333 url('../static/bg-tabs.gif') bottom left repeat-x;
+	color: #ddd;
+	border-left: 1px solid #444;
     cursor: pointer;
     display: block;
     float: right;
-    margin-right: 20px;
-    padding-left: 4px;
-    padding-right: 4px;
-    margin-top: 4px;
+    padding: 6px 15px;
     text-decoration: none;
-    font-size: 90%;
+}
+
+#notifier span.messages-expand:hover {
+	color: #fff;
+	background: #000;
 }
 
 #wrapper {
     width: 896px;
-    margin: 50px auto;
+    margin: 80px auto;
     color: rgb(60,60,60);
     -webkit-text-size-adjust: 100%; /* Stops Mobile Safari from auto-adjusting font-sizes */
 }
@@ -524,24 +531,24 @@ ul.basic-info {
     color: #3C3C3C;
 }
 
-li#create {
+li#create a {
     background: url(../static/icons/add.png) 16px center no-repeat;
 }
 
-li#start {
+li#start a {
     background: url(../static/icons/start.png) 16px center no-repeat;
 }
 
-li#stop {
+li#stop a {
     /*display:none; /* until libcloud supports stop action*/
     background: url(../static/icons/stop.png) 16px center no-repeat;
 }
 
-li#reboot {
+li#reboot a {
     background: url(../static/icons/reboot.png) 16px center no-repeat;
 }
 
-li#destroy {
+li#destroy a {
     background: url(../static/icons/delete.png) 16px center no-repeat;
 }
 
@@ -978,6 +985,12 @@ ul#button-header li#selected-nodes-button {
     -moz-box-shadow: inset 0 3px 8px rgba(0,0,0,0.2);
     -webkit-box-shadow: inset 0 3px 8px rgba(0,0,0,0.2);
     box-shadow: inset 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.soft-shadow {
+    -moz-box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    -webkit-box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
 }
 
 /*        Tablet Layout: 768px.
