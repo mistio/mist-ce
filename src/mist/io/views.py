@@ -207,7 +207,7 @@ def create_machine(request):
                     #node = conn.deploy_node(name=name, image=image, size=size, location=location, deploy=msd)
                 #except: 
                     #problems with the key, and/or deployment
-            except:
+            except Exception as e:
                 return Response('Something went wrong with the creation', 404)
             break
 

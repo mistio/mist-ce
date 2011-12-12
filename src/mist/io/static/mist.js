@@ -207,7 +207,7 @@ function Backend(id, title, provider, interval, host, log){
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         backend.updateStatus('off', 'start');
-                        backend.log("backend  offline", ERROR);
+                        backend.log(jqXHR.responseText, ERROR);
                     }
                 });
                 break;
