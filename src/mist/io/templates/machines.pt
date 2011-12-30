@@ -416,18 +416,6 @@ function update_actions() {
 
 }
 
-//Show all messages
-$('#notifier span.messages-expand').click(function() {
-    $('#notifier-in').slideToggle('slow', function() {
-    var messagesHtml = '';
-        for (var i = log.messages.length -1; i > -1; i--) {
-            messagesHtml += log.messages[i] + '<br>';
-        }
-        $('#notifier-in .messages').html(messagesHtml);       
-    });
-});
-
-
 // reboot action click
 $('#actions-list ul.actions li#reboot').click(function() {
     if ($(this).hasClass('enabled')) {
@@ -712,37 +700,6 @@ function update_backend_status(backend, action) {
     }
 }
 
-//updates the messages notifier
-function update_message_notifier() {
-    if (log.messages[log.messages.length-1][0] < LOGLEVEL){
-        clearTimeout(log.timeout);
-        if (!$('#notifier').is (':visible')){
-            $('#notifier').slideDown(300);
-        }
-        var txt = log.messages[log.messages.length-1][1].toISOString() + " : " + log.messages[log.messages.length-1].slice(2).join(' - ');
-        $('#notifier span.text').text(txt);
-        update_messages_count();
-        log.timeout = setTimeout("$('#notifier, #notifier-in').slideUp(300)", 5000);
-    }
-}
-
-// Message notifier mouseenter and mouseleave events
-$('#notifier, #notifier-in').mouseenter(function() {
-	clearTimeout(log.timeout);
-}).mouseleave(function() {
-	log.timeout = setTimeout("$('#notifier, #notifier-in').slideUp(300)", 5000);
-});
-
-// update the messages counter
-function update_messages_count() {
-    var message_count = log.messages.filter(function(el,i){return el[0] < LOGLEVEL}).length;
-    if (message_count == 1) {
-        messages = ' message';
-    } else {
-        messages =  ' messages';
-    }
-    $('#notifier span.messages-count').text(message_count + messages);
-}
 
 // update the machines counter
 function update_machines_count() {

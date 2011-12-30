@@ -19,19 +19,28 @@
 </head>
 
 <body lang="en">
-    <div id="notifier" class="soft-shadow">
-        <span class="messages-count">
-            <a title="expand messages">0 messages</a>
-        </span>
-        <span class="messages-expand">
-            <a title="expand messages">Show all</a>
-        </span>
-        <span class="text"></span>
-    </div><!-- notifier -->
-    <div id="notifier-in" style="display:none;">
-    <div class="messages">        
+    <div id="notifier-wrapper" class="soft-shadow">
+        <div id="notifier" class="soft-shadow">
+            <span id="notifier-hide">
+                <span id="hide-icon"></span>
+            </span>
+            <span class="messages-count">
+                <a title="expand messages">0 messages</a>
+            </span>
+            <span class="messages-expand">
+                <a title="expand messages">Show all</a>
+            </span>
+            <span class="text"></span>
+        </div><!-- / notifier -->
+
+        <div id="notifier-in" style="display:none;">
+        </div><!-- / notifier-in -->
     </div>
-    </div><!-- notifier-in -->
+
+    <div id="notifier-show">
+        <div id="notifier-show-icon"></div>
+    </div>
+
     <div id="wrapper">
         <div id="header">
         </div>
@@ -89,6 +98,61 @@
         $("ul.css-tabs a").tooltip({effect: 'fade', predelay: 1000, delay: 2, position: 'top center', opacity: 0.8});
         var backends = [];
         var log = new MessageLog();
+
+        // Message Notifier
+        // _________________
+
+        //Show all messages
+        $('#notifier span.messages-expand').click(function() {
+            $('#notifier-in').slideToggle('slow', function() {
+            var messagesHtml = '<ul class="messages">';
+                for (var i = log.messages.length -1; i > -1; i--) {
+                    messagesHtml += '<li class="log-message">' + log.messages[i] + '</li>';
+                }
+                messagesHtml += '</ul>';
+                $('#notifier-in').html(messagesHtml);       
+            });
+        });
+
+        //updates the messages notifier
+        function update_message_notifier() {
+            if (log.messages[log.messages.length-1][0] < LOGLEVEL){
+                clearTimeout(log.timeout);
+                if (!$('#notifier-wrapper').is (':visible')){
+                    $('#notifier-wrapper').slideDown(300);
+                }
+                var txt = log.messages[log.messages.length-1][1].toISOString() + " : " + log.messages[log.messages.length-1].slice(2).join(' - ');
+                $('#notifier span.text').text(txt);
+                update_messages_count();
+                log.timeout = setTimeout("$('#notifier-wrapper').slideUp(300)", 5000);
+            }
+        }
+
+        // Message notifier mouseenter and mouseleave events
+        $('#notifier-wrapper').mouseenter(function() {
+            clearTimeout(log.timeout);
+        }).mouseleave(function() {
+            log.timeout = setTimeout("$('#notifier-wrapper').slideUp(300)", 5000);
+        });
+
+        // update the messages counter
+        function update_messages_count() {
+            var message_count = log.messages.filter(function(el,i){return el[0] < LOGLEVEL}).length;
+            if (message_count == 1) {
+                messages = ' message';
+            } else {
+                messages =  ' messages';
+            }
+            $('#notifier span.messages-count').text(message_count + messages);
+        }
+
+        $('#notifier-show').click(function() {
+            $('#notifier-wrapper').slideDown(300);
+        });
+
+        $('#notifier-hide').click(function() {
+            $('#notifier-wrapper').slideUp(300);
+        });
 
     </script>
     <script tal:repeat="backend backends" tal:content="string:backends.push(new Backend('${backend['id']}','${backend['title']}',${backend['provider']},${backend['poll_interval']},${backend.host|'undefined'}, log));" />

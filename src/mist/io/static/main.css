@@ -26,7 +26,14 @@ footer, header, nav, section, audio, video {
 
 a img {border: 0;}
 
+/* get rid of those system borders being generated for A tags */
+a:active {
+  outline:none;
+}
 
+:focus {
+  -moz-outline-style:none;
+}
 
 /*    Typography presets
     ------------------    */
@@ -112,52 +119,104 @@ body {
     left: 45.5%;
 }
 
-#notifier {
-    background: #f1f1f1;
-	display: none;
-    color: #444;
+/* Message Notifier */
+
+#notifier-wrapper {
     position: fixed;
     top: 0px;
-	left: 0px;
-	width: 100%;
-	padding: 0px;
-	margin: 0px;
-	z-index: 1000;
+    left: 0px;
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+    display: none;
+    z-index: 9999;
+}
+
+#notifier {
+    background: #f1f1f1;
+    color: #444;
+    overflow: auto;
 }
 
 #notifier .text {
 	display: block;
-	float: left;
 	padding: 6px 12px;
 }
 
+#notifier #hide-icon {
+    display: block;
+    background: url('../static/arrow_up.png') center no-repeat;
+    width: 10px;
+    height: 20px;
+}
+
 #notifier-in {
-    background: #ebebeb url('../static/bg-vertical.gif') left 32px repeat-x;
+    clear: both;
+    background: #e8e8e8 url('../static/bg-vertical.gif') left top repeat-x;
     color: #333;
 	border-bottom: 1px solid #f5f5f5;
-	opacity: 0.8;
 }
 
 #notifier-in .messages {
     height: 200px;
-	padding: 6px 12px;
+	padding: 0;
+    overflow-y: scroll;
 }
 
-#notifier span.messages-expand, #notifier span.messages-count {
+#notifier-in ul {
+    list-style: none;
+}
+
+#notifier-in ul li {
+    padding: 5px 12px;
+    border-bottom: 1px solid #ccc;
+}
+
+#notifier-in ul li:hover {
+    color: #222;
+    background: #eee;
+}
+
+#notifier span.messages-expand, #notifier span.messages-count, #notifier #notifier-hide {
     background: #333 url('../static/bg-tabs.gif') bottom left repeat-x;
 	color: #ddd;
 	border-left: 1px solid #444;
     cursor: pointer;
     display: block;
     float: right;
-    padding: 6px 15px;
+    padding: 6px 12px;
     text-decoration: none;
 }
 
-#notifier span.messages-expand:hover {
+#notifier-show {
+    background: #333 url('../static/bg-tabs.gif') bottom left repeat-x;
+    color: #ddd;
+    padding: 6px 12px;
+    position: fixed;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+    border-bottom-left-radius: 4px;
+    -webkit-border-bottom-left-radius: 4px;
+    -moz-border-radius-bottomleft: 4px;
+    -o-border-bottom-left-radius: 4px;
+    -khtml-border-bottom-left-radius: 4px;
+}
+
+#notifier-show-icon {
+    display: block;
+    background: url('../static/arrow_down.png') center no-repeat;
+    width: 10px;
+    height: 20px;
+}
+
+#notifier span.messages-expand:hover, #notifier-show:hover, #notifier #notifier-hide:hover {
 	color: #fff;
 	background: #000;
 }
+
+
+/* Main panel */
 
 #wrapper {
     width: 896px;
@@ -176,15 +235,6 @@ body {
 #footer a {
     color: #EBEBEB;
     text-decoration: none;
-}
-
-/* get rid of those system borders being generated for A tags */
-a:active {
-  outline:none;
-}
-
-:focus {
-  -moz-outline-style:none;
 }
 
 /* validation error message */
@@ -701,6 +751,9 @@ ul#button-header li ul.sub-menu li {
     color: #ddd;
     background: none;
     width: 100%;
+	-moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
 }
 
 ul#button-header li ul.sub-menu li:hover {
@@ -736,11 +789,11 @@ ul#button-header li#selected-nodes-button {
 }
 
 .provider3 {
-    background: url("/static/providers/p3_sm_off.png") no-repeat scroll 19px 5px transparent;
+    background: url("/static/providers/p3_sm_off.png") no-repeat scroll 17px 5px transparent;
 }
 
 .provider31 {
-    background: url("/static/providers/p31_sm_off.png") no-repeat scroll 19px 5px transparent;
+    background: url("/static/providers/p31_sm_off.png") no-repeat scroll 17px 5px transparent;
 }
 
 .backend {
