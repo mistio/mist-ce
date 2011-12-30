@@ -35,8 +35,9 @@
 </div>
 
 <div id="machine-details">
-    <ul class="basic-info">
-        <li class="name"></li>
+    <div class="single-view-title name"></div>
+    <div class="single-view-title collapsible-title">Basic Info</div>
+    <ul class="basic-info single-view-section">
         <li class="state"></li>
         <li class="backend"></li>
         <li class="image"></li>
@@ -44,7 +45,8 @@
         <li class="id"></li>
         <li class="ip"></li>
     </ul>
-    <ul class="extra-info"></ul>
+    <div class="single-view-title collapsible-title">Extended Info</div>
+    <ul class="extra-info single-view-section"></ul>
 </div>
 
     <div id="logo-container"></div>
@@ -229,7 +231,7 @@ $('.node').live('click', function() {
     */
     var backend_id = $(this).find('.backend').text();
     var machine_id = $(this)[0].id;
-    $('#machine-details li.name').text($(this).find('.name').text());
+    $('#machine-details div.name').text($(this).find('.name').text());
     $('#machine-details li.state').text($(this).find('.state').text());
     $('#machine-details li.backend').text(backend_id);
     $('#machine-details li.id').text(machine_id);
@@ -267,6 +269,13 @@ $('.node').live('click', function() {
         $('.visible-in-details').fadeIn(200);
     });
     return false;
+});
+
+// Clicking on Single-View title toggle-slides the subsequent ul.
+// Use delegation to take possible changes into account.
+
+$('#machine-details').delegate('.single-view-title', 'click', function() {
+    $(this).next('ul').slideToggle(300);
 });
 
 //

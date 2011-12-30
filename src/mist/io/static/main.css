@@ -519,24 +519,42 @@ ul#button-header li:hover .select-widget {
     width: 15px;
 }
 
-/* Machine Details Pane */
+/* Machine Details Pane (Single View) */
 
 #machine-details {
     float: left;
-    width: 715px;
+    width: 726px;
     display: none;
     overflow-y: scroll;
     height: 300px;
 }
 
-ul.basic-info, ul.extra-info {
-    padding-left: 50px;
-    list-style-type: none;
-    overflow: visible;
+#machine-details .single-view-title, #machine-details .collapsible-title {
+    border-top: 1px solid #fff;
+    border-bottom: 1px solid #ddd;
+    color: #333;
 }
 
-ul.basic-info {
-    padding-top: 20px;
+#machine-details .single-view-title {
+    padding: 20px;
+    font-size: 18px;
+}
+
+#machine-details .collapsible-title {
+    padding: 10px 40px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#machine-details .collapsible-title:hover {
+    background: #eee;
+}
+
+#machine-details .single-view-section {
+    padding: 18px 0 18px 60px;
+    list-style-type: none;
+    overflow: visible;
+    border-bottom: 1px solid #ddd;
 }
 
 /* Actions */
