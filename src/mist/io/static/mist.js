@@ -256,3 +256,22 @@ function Backend(id, title, provider, interval, host, log){
         }
     }
 }
+
+
+function to_ul(obj, prop) {
+    if (typeof(obj)=='string'){
+        var li = document.createElement("li");
+        var strong = document.createElement("strong");
+        strong.appendChild(document.createTextNode(prop + ': '));
+        li.appendChild(strong);
+        li.appendChild(document.createTextNode(obj));
+        return li;
+    } else {
+        var ul = document.createElement ("ul");
+        for (var prop in obj){
+            console.log('appending ' + prop);
+            ul.appendChild(to_ul(obj[prop],prop));
+        }
+        return ul;
+    }
+}

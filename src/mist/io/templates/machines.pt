@@ -240,7 +240,8 @@ $('.node').live('click', function() {
     // delete entries placed there earlier
     $('#machine-details .extra-info li').remove();
     var machine = get_machine(backend_id, machine_id);
-
+    $('#machine-details .extra-info').append(to_ul(machine));
+    
     var machine_size = get_size(backend_id, machine);
     var machine_image = get_image(backend_id, machine);
     //show machine size and image if we have them. otherwise can't be shown
@@ -256,11 +257,6 @@ $('.node').live('click', function() {
     if (machine_image) {
         $('#machine-details li.image').text('Machine image id:' + machine_image.id);
         $('#machine-details li.image').append(' image data:' + machine_image.extra);
-    }
-    var extra = machine.extra;
-    for (var key in extra) {
-        var entry = '<li class="'+ key +'">' + key + ': ' +extra[key] + '</li>';
-        $('#machine-details .extra-info').append(entry.toString());
     }
     $('#machines-list').fadeOut(200, function() {
         $('#machine-details').fadeIn(200, update_actions);
