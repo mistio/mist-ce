@@ -154,6 +154,7 @@ $(function() {
 // intercept create wizard
 $(".enabled#create").click(function(){
     $('li#create').addClass('pressed');
+    $('select.backend').val('').trigger('click');
 });
 
 $("select.backend").live('click', function(e){
