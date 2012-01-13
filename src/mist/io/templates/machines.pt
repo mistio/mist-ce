@@ -155,6 +155,7 @@ $(function() {
 $(".enabled#create").click(function(){
     $('li#create').addClass('pressed');
     $('select.backend').val('').trigger('click');
+    $('input[name=instance_name]')[0].value = "";
 });
 
 $("select.backend").live('click', function(e){
