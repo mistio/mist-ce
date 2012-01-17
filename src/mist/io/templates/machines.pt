@@ -137,7 +137,7 @@ var STATES = {
     '1' : 'Rebooting',
     '2' : 'Terminated',
     '3' : 'Pending',
-    '4' : 'Unknown',            
+    '4' : 'Unknown',
     };
 
 // create vm overlay
@@ -208,9 +208,9 @@ $(function() {
             var image = $('select[name=instance_image]')[0].value;
             var location = $('select[name=instance_location]')[0].value;
             var backend_provider = $("select.backend")[0].selectedIndex -1;
-            backends[backend_provider].newAction(['create', machineName, size, image, location]); //send data for the start action        
+            backends[backend_provider].newAction(['create', machineName, size, image, location]); //send data for the start action
             //FIXME: show message to user regarding their node, close wizard and clear values
-            $(".enabled#create a[rel]").overlay().close(); 
+            $(".enabled#create a[rel]").overlay().close();
         }
     });
 
@@ -243,7 +243,7 @@ $('.node').live('click', function() {
     $('#machine-details .extra-info li').remove();
     var machine = get_machine(backend_id, machine_id);
     $('#machine-details .extra-info').append(to_ul(machine));
-    
+
     var machine_size = get_size(backend_id, machine);
     var machine_image = get_image(backend_id, machine);
     //show machine size and image if we have them. otherwise can't be shown
@@ -382,7 +382,7 @@ function update_actions() {
         $('#button-header .check').parent().addClass('partial');
         $('#button-header .check').parent().removeClass('selected');
     }
-    
+
     $('#actions-list ul li').removeClass('enabled');
 
     if ($('#machines-list:visible').length == 0){
@@ -426,7 +426,7 @@ function update_actions() {
 // reboot action click
 $('#actions-list ul.actions li#reboot').click(function() {
     if ($(this).hasClass('enabled')) {
-        $('#actions-list ul.actions li#reboot-confirm').slideDown(120);    
+        $('#actions-list ul.actions li#reboot-confirm').slideDown(120);
         $(this).addClass('pressed');
     }
 });
@@ -443,11 +443,11 @@ $('#actions-list ul.actions li#reboot-confirm').click(function() {
             var backend = backends[node.children('span.backend').text()];
             backend.newAction(['reboot', node[0].id.replace(backends.indexOf(backend) + '-', '')]);
         });
-    }    
+    }
 });
-    
+
 $('#actions-list ul.actions li#destroy').click(function() {
-    if ($(this).hasClass('enabled')) {    
+    if ($(this).hasClass('enabled')) {
         $('#actions-list ul.actions li#destroy-confirm').slideDown(120);
         $(this).addClass('pressed');
     }
@@ -627,12 +627,12 @@ function update_machines_view(backend){
             all_ips = '<span class="more"></span><span class="all-ips">' + primary_ip + "</span>";
         }
         var ip_txt = '<span class="primary">'+primary_ip+"</span>"+all_ips;
-        
+
         if (node.length == 1) { // there should be only one machine with this id in the DOM
             if (node.find('.name').text() != machine.name ||
                 node.find('.ip').html() != ip_txt
                 ){
-                node.fadeOut(100);                
+                node.fadeOut(100);
                 node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
                 node.find('.backend').text(backends.indexOf(backend));
                 node.find('.backend').addClass('provider'+backend.provider);
@@ -641,7 +641,7 @@ function update_machines_view(backend){
                 node.fadeIn(100);
             }
             node.find('.state').removeClass().addClass('state').addClass('state'+machine.state);
-        } else { // if the machine does does exist in the DOM, then add it 
+        } else { // if the machine does does exist in the DOM, then add it
             if (node.length != 0){
                 log.newMessage(ERROR, 'DOM Error: ' + node);
             }
@@ -670,11 +670,11 @@ function update_machines_view(backend){
         }
     }
 
-    $('#machines-list').find('.node').each(function (i) { 
+    $('#machines-list').find('.node').each(function (i) {
         if ($.inArray(this.id, machines_list) == -1) {
             $('#' + this.id).remove();
         }
-    });      
+    });
     update_machines_count();
 }
 
@@ -723,38 +723,4 @@ function update_selected_machines_count() {
     $('#selected-machines').text($('#machines-list .selected').length+"");
 }
 
-//get machine, given backend and machineId
-function get_machine(backendIndex, machineId) {
-    //machineId is backendIndex-machineId, eg 2-28
-    machine_id = machineId.replace(backendIndex + '-', '');
-    for (var m in backends[backendIndex].machines){
-        if (backends[backendIndex].machines[m].id == machine_id) {
-            return backends[backendIndex].machines[m];
-        }
-    }
-}
-
-//get image, given backend and machine
-function get_image(backendIndex, machine) {
-    for (var m in backends[backendIndex].images){
-        if (backends[backendIndex].images[m].id == machine.extra.imageId) {
-            return backends[backendIndex].images[m];
-        }
-    }
-}
-
-//get size, given backend and machine
-function get_size(backendIndex, machine) {
-    for (var m in backends[backendIndex].sizes){
-        if (backends[backendIndex].sizes[m].id == machine.extra.flavorId) {
-            return backends[backendIndex].sizes[m];
-        }
-    }
-}
-
-// polling
-function refresh_machines(backend){
-    var i = backends.indexOf(backend);
-    setTimeout("backends[" + i + "].newAction(['list_machines'])", backend.interval);
-}
 </script>

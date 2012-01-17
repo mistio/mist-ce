@@ -257,7 +257,6 @@ function Backend(id, title, provider, interval, host, log){
     }
 }
 
-
 function to_ul(obj, prop) {
     if (typeof(obj)=='string'){
         var li = document.createElement("li");
@@ -274,4 +273,39 @@ function to_ul(obj, prop) {
         }
         return ul;
     }
+}
+
+//get machine, given backend and machineId
+function get_machine(backendIndex, machineId) {
+    //machineId is backendIndex-machineId, eg 2-28
+    machine_id = machineId.replace(backendIndex + '-', '');
+    for (var m in backends[backendIndex].machines){
+        if (backends[backendIndex].machines[m].id == machine_id) {
+            return backends[backendIndex].machines[m];
+        }
+    }
+}
+
+//get image, given backend and machine
+function get_image(backendIndex, machine) {
+    for (var m in backends[backendIndex].images){
+        if (backends[backendIndex].images[m].id == machine.extra.imageId) {
+            return backends[backendIndex].images[m];
+        }
+    }
+}
+
+//get size, given backend and machine
+function get_size(backendIndex, machine) {
+    for (var m in backends[backendIndex].sizes){
+        if (backends[backendIndex].sizes[m].id == machine.extra.flavorId) {
+            return backends[backendIndex].sizes[m];
+        }
+    }
+}
+
+// polling
+function refresh_machines(backend){
+    var i = backends.indexOf(backend);
+    setTimeout("backends[" + i + "].newAction(['list_machines'])", backend.interval);
 }
