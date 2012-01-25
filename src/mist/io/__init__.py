@@ -10,6 +10,7 @@ def main(global_config, **settings):
     config.add_route('home', '/')
     config.add_view('mist.io.views.home',
                     route_name='home',
+                    request_method='GET',
                     renderer='templates/home.pt')
 
     config.add_route('machines', '/machines')
@@ -66,5 +67,75 @@ def main(global_config, **settings):
     config.add_view('mist.io.views.destroy_machine',
                     route_name='destroy')
 
+    # delete the above and place these
+    '''
+    config.add_route('home', '/')
+    config.add_view('mist.io.views.home',
+                    route_name='home',
+                    request_method='GET',
+                    renderer='templates/home.pt')
+
+    config.add_route('machines', '/backends/{backend}/machines')
+    config.add_view('mist.io.views.machines',
+                    route_name='machines',
+                    request_method='GET',
+                    renderer='templates/machines.pt')
+
+    config.add_route('create_machine', '/backends/{backend}/machines')
+    config.add_view('mist.io.views.create_machine',
+                    route_name='create_machine',
+                    request_method='POST')
+
+    config.add_route('act_machine', '/backends/{backend}/machines/{machine}')
+    config.add_view('mist.io.views.act_machine',
+                    request_method='POST',
+                    route_name='act_machine')
+
+    config.add_route('list_metadata', '/backends/{backend}/machines/{machine}/metadata')
+    config.add_view('mist.io.views.list_metadata',
+                    request_method='GET',
+                    route_name='list_metadata')
+
+    config.add_route('set_metadata', '/backends/{backend}/machines/{machine}/metadata')
+    config.add_view('mist.io.views.set_metadata',
+                    request_method='POST',
+                    route_name='set_metadata')
+
+    config.add_route('list_alerts', '/backends/{backend}/machines/{machine}/alerts')
+    config.add_view('mist.io.views.list_alerts',
+                    request_method='GET',
+                    route_name='list_alerts')
+
+    config.add_route('send_alert', '/backends/{backend}/machines/{machine}/alerts')
+    config.add_view('mist.io.views.send_alert',
+                    request_method='POST',
+                    route_name='send_alert')
+
+    config.add_route('list_alert_settings', '/backends/{backend}/machines/{machine}/alerts/settings')
+    config.add_view('mist.io.views.list_alert_settings',
+                    request_method='GET',
+                    route_name='list_alert_settings')
+
+    config.add_route('update_alert', '/backends/{backend}/machines/{machine}/alerts/settings')
+    config.add_view('mist.io.views.update_alert',
+                    request_method='POST',
+                    route_name='update_alert')
+
+    config.add_route('images', '/backends/{backend}/images')
+    config.add_view('mist.io.views.images',
+                    route_name='images',
+                    request_method='GET',
+                    renderer='templates/images.pt')
+
+    config.add_route('list_sizes', '/backends/{backend}/sizes')
+    config.add_view('mist.io.views.list_sizes',
+                    request_method='GET',
+                    route_name='list_sizes')
+
+    config.add_route('list_locations', '/backends/{backend}/locations')
+    config.add_view('mist.io.views.list_locations',
+                    request_method='GET',
+                    route_name='list_locations')
+    '''
 
     return config.make_wsgi_app()
