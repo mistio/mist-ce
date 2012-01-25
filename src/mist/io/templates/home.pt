@@ -28,9 +28,7 @@
 
                 <ul data-role="listview" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
                     <li><a href="#machines">Machines</a></li>
-                    <li><a href="#disks">Disks</a></li>
-                    <li><a href="#volumes">Volumes</a></li>
-                    <li><a href="#network">Network</a></li>
+                    <li><a href="#images">Images</a></li>
                 </ul>
 
     </div><!-- /content -->
