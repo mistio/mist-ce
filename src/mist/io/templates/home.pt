@@ -48,9 +48,7 @@
             <!-- tabs -->
             <ul class="css-tabs rounded-top drop-shadow">
                 <li><a href="machines" class="medium" title="Manage your virtual machines.">machines</a></li>
-                <li><a href="disks" class="medium" title="Manage your storage volumes.">disks</a></li>
                 <li><a href="images" class="medium" title="Manage boot images.">images</a></li>
-                <li><a href="networks" class="medium" title="Configure networking.">network</a></li>
             </ul>
             <div class="css-panes rounded-bottom drop-shadow">
                 <div id="machines-pane" style="display:block"></div>
@@ -110,7 +108,7 @@
                     messagesHtml += '<li class="log-message">' + log.messages[i] + '</li>';
                 }
                 messagesHtml += '</ul>';
-                $('#notifier-in').html(messagesHtml);       
+                $('#notifier-in').html(messagesHtml);
             });
         });
 
