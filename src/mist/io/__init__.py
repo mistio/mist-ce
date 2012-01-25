@@ -13,68 +13,6 @@ def main(global_config, **settings):
                     request_method='GET',
                     renderer='templates/home.pt')
 
-    config.add_route('machines', '/machines')
-    config.add_view('mist.io.views.machines',
-                    route_name='machines',
-                    renderer='templates/machines.pt')
-
-    config.add_route('images', '/images')
-    config.add_view('mist.io.views.images',
-                    route_name='images',
-                    renderer='templates/images.pt')
-
-    config.add_route('list_machines', '/backends/{backend}/machines/list')
-    config.add_view('mist.io.views.list_machines',
-                    route_name='list_machines')
-
-    config.add_route('list_sizes', '/backends/{backend}/sizes/list')
-    config.add_view('mist.io.views.list_sizes',
-                    route_name='list_sizes')
-
-    config.add_route('list_images', '/backends/{backend}/images/list')
-    config.add_view('mist.io.views.list_images',
-                    route_name='list_images')
-
-    config.add_route('list_locations', '/backends/{backend}/locations/list')
-    config.add_view('mist.io.views.list_locations',
-                    route_name='list_locations')
-
-    config.add_route('create', '/backends/{backend}/machines/create')
-    config.add_view('mist.io.views.create_machine',
-                    route_name='create')
-
-    config.add_route('start', '/backends/{backend}/machines/{machine}/start')
-    config.add_view('mist.io.views.start_machine',
-                    route_name='start')
-
-    config.add_route('stop', '/backends/{backend}/machines/{machine}/stop')
-    config.add_view('mist.io.views.stop_machine',
-                    route_name='stop')
-
-    config.add_route('reboot', '/backends/{backend}/machines/{machine}/reboot')
-    config.add_view('mist.io.views.reboot_machine',
-                    route_name='reboot')
-
-    config.add_route('list_metadata', '/backends/{backend}/machines/{machine}/metadata')
-    config.add_view('mist.io.views.list_metadata',
-                    route_name='list_metadata')
-
-    config.add_route('set_metadata', '/backends/{backend}/machines/{machine}/metadata/set')
-    config.add_view('mist.io.views.set_metadata',
-                    route_name='set_metadata')
-
-    config.add_route('destroy', '/backends/{backend}/machines/{machine}/destroy')
-    config.add_view('mist.io.views.destroy_machine',
-                    route_name='destroy')
-
-    # delete the above and place these
-    '''
-    config.add_route('home', '/')
-    config.add_view('mist.io.views.home',
-                    route_name='home',
-                    request_method='GET',
-                    renderer='templates/home.pt')
-
     config.add_route('machines', '/backends/{backend}/machines')
     config.add_view('mist.io.views.machines',
                     route_name='machines',
@@ -136,6 +74,5 @@ def main(global_config, **settings):
     config.add_view('mist.io.views.list_locations',
                     request_method='GET',
                     route_name='list_locations')
-    '''
 
     return config.make_wsgi_app()
