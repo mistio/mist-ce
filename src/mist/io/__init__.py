@@ -13,21 +13,20 @@ def main(global_config, **settings):
                     request_method='GET',
                     renderer='templates/home.pt')
 
-    config.add_route('machines', '/backends/{backend}/machines')
-    config.add_view('mist.io.views.machines',
-                    route_name='machines',
-                    request_method='GET',
-                    renderer='templates/machines.pt')
+    config.add_route('list_machines', '/backends/{backend}/machines')
+    config.add_view('mist.io.views.list_machines',
+                    route_name='list_machines',
+                    request_method='GET')
 
     config.add_route('create_machine', '/backends/{backend}/machines')
     config.add_view('mist.io.views.create_machine',
                     route_name='create_machine',
                     request_method='POST')
 
-    config.add_route('act_machine', '/backends/{backend}/machines/{machine}')
-    config.add_view('mist.io.views.act_machine',
+    config.add_route('machine_action', '/backends/{backend}/machines/{machine}')
+    config.add_view('mist.io.views.machine_action',
                     request_method='POST',
-                    route_name='act_machine')
+                    route_name='machine_action')
 
     config.add_route('list_metadata', '/backends/{backend}/machines/{machine}/metadata')
     config.add_view('mist.io.views.list_metadata',
@@ -59,11 +58,10 @@ def main(global_config, **settings):
                     request_method='POST',
                     route_name='update_alert')
 
-    config.add_route('images', '/backends/{backend}/images')
-    config.add_view('mist.io.views.images',
-                    route_name='images',
-                    request_method='GET',
-                    renderer='templates/images.pt')
+    config.add_route('list_images', '/backends/{backend}/images')
+    config.add_view('mist.io.views.list_images',
+                    route_name='list_images',
+                    request_method='GET')
 
     config.add_route('list_sizes', '/backends/{backend}/sizes')
     config.add_view('mist.io.views.list_sizes',

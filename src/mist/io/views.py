@@ -20,29 +20,6 @@ def home(request):
     return {'project': 'mist.io', 'backends': backends}
 
 
-def machines(request):
-    '''Placeholder for machines listing, actualy list_machines (see below)
-    does all the heavy lifting. The latter is called from javascript in
-    machines.pt, as soon as the page loads.
-    '''
-    return {}
-
-
-def disks(request):
-    '''Placeholder for machines listing'''
-    return {}
-
-
-def images(request):
-    '''Placeholder for machines listing'''
-    return {}
-
-
-def networks(request):
-    '''Placeholder for machines listing'''
-    return {}
-
-
 def connect(backend):
     '''Establish backend connection using the credentials specified'''
     try:
@@ -140,7 +117,8 @@ def list_sizes(request):
                     'ram'         : i.ram})
 
     return Response(json.dumps(ret))
- 
+
+
 def list_locations(request):
     '''List locations from each backend'''
     ret = []
@@ -162,6 +140,7 @@ def list_locations(request):
 
     return Response(json.dumps(ret))
 
+
 def create_machine(request):
     '''Create a new virtual machine on the specified backend'''
     ret = []
@@ -170,7 +149,7 @@ def create_machine(request):
         if request.matchdict['backend'] == b['id']:
             found = True
             conn = connect(b)
-            #FIXME: get values from form, 
+            #FIXME: get values from form,
             name = request.json_body['name']
             try:
                 sizes = conn.list_sizes()
@@ -199,13 +178,13 @@ def create_machine(request):
                 return Response('Invalid image', 404)
             try:
                 node = conn.create_node(name=name, image=image, size=size, location=location)
-                #conn.deploy_node will be used for transfering pub keys etc. deploy_node waits for 
+                #conn.deploy_node will be used for transfering pub keys etc. deploy_node waits for
                 #the node to be up with public ip, otherwise hangs. (default 60*10 sec)
                 #try:
                     #key = NodeAuthSSHKey(BACKENDS[0]['public_key']) #read the key
                     #msd = MultiStepDeployment([key])
                     #node = conn.deploy_node(name=name, image=image, size=size, location=location, deploy=msd)
-                #except: 
+                #except:
                     #problems with the key, and/or deployment
             except Exception as e:
                 return Response('Something went wrong with the creation', 404)
@@ -214,7 +193,8 @@ def create_machine(request):
     if not found:
         return Response('Invalid backend', 404)
 
-    return Response(json.dumps(ret))        
+    return Response(json.dumps(ret))
+
 
 def start_machine(request):
     '''Start a machine, given the backend and machine id'''
@@ -223,7 +203,7 @@ def start_machine(request):
     backends = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
     if backends:
         backend = backends[0]
-        conn = connect(backend)                
+        conn = connect(backend)
         machines = conn.list_nodes()
         for machine in machines:
             if machine.id == request.matchdict['machine']:
@@ -237,7 +217,7 @@ def start_machine(request):
 
     return Response(json.dumps(ret))
 
-    
+
 def stop_machine(request):
     '''Stop a machine, given the backend and machine id'''
     ret = []
@@ -259,7 +239,7 @@ def stop_machine(request):
     else:
         return Response('Invalid backend', 404)
 
-    return Response(json.dumps(ret))    
+    return Response(json.dumps(ret))
 
 
 def reboot_machine(request):
@@ -305,6 +285,7 @@ def destroy_machine(request):
 
     return Response(json.dumps(ret))
 
+
 def list_metadata(request):
     '''Lists metadata for a machine, given the backend and machine id'''
     ret = []
@@ -319,7 +300,7 @@ def list_metadata(request):
                 try:
                     metadata = conn.ex_get_metadata(machine) #eg Openstack
                     found = True
-                except: 
+                except:
                     try:
                         metadata = conn.ex_describe_tags(machine) #eg EC2
                         found = True
@@ -328,9 +309,9 @@ def list_metadata(request):
                 break
     if not found:
         return Response('Invalid backend', 404)
-       
 
     return Response(json.dumps(metadata))
+
 
 def set_metadata(request):
     '''Sets metadata for a machine, given the backend and machine id'''
@@ -351,7 +332,7 @@ def set_metadata(request):
                 try:
                     metadata = conn.ex_set_metadata(machine, metadata) #eg Openstack
                     done = True
-                except: 
+                except:
                     try:
                         metadata = conn.ex_create_tags(machine, metadata) #eg EC2
                         done = True
@@ -359,7 +340,7 @@ def set_metadata(request):
                         return Response('Not implemented for this backend', 404)
                 break
     if not done:
-        return Response('Invalid backend', 404)       
+        return Response('Invalid backend', 404)
 
     return Response(json.dumps(ret))
 
