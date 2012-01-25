@@ -15,142 +15,156 @@
     <link rel="stylesheet" media="all" href=""/>
 </head>
 
-<body lang="en">
-    <div id="notifier-wrapper" class="soft-shadow">
-        <div id="notifier" class="soft-shadow">
-            <span id="notifier-hide">
-                <span id="hide-icon"></span>
-            </span>
-            <span class="messages-count">
-                <a title="expand messages">0 messages</a>
-            </span>
-            <span class="messages-expand">
-                <a title="expand messages">Show all</a>
-            </span>
-            <span class="text"></span>
-        </div><!-- / notifier -->
+<body>
 
-        <div id="notifier-in" style="display:none;">
-        </div><!-- / notifier-in -->
-    </div>
+<!-- Start of first page: #one -->
+<div data-role="page" id="one">
 
-    <div id="notifier-show">
-        <div id="notifier-show-icon"></div>
-    </div>
+    <div data-role="header">
+        <h1>mist.io</h1>
+    </div><!-- /header -->
 
-    <div id="wrapper">
-        <div id="header">
+    <div data-role="content">
+
+                <ul data-role="listview" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
+                    <li><a href="#machines">Machines</a></li>
+                    <li><a href="#disks">Disks</a></li>
+                    <li><a href="#volumes">Volumes</a></li>
+                    <li><a href="#network">Network</a></li>
+                </ul>
+
+    </div><!-- /content -->
+
+    <div data-role="footer" data-theme="d">
+        <a data-icon="check" class="ui-btn-right">prov1</a>
+        <a data-icon="check" class="ui-btn-right">prov2</a>
+        <a data-icon="check" class="ui-btn-right">prov3</a>
+        <a data-icon="check" class="ui-btn-right">prov4</a>
+    </div><!-- /footer -->
+</div><!-- /page one -->
+
+
+<!-- Start of second page: #two -->
+<div data-role="page" id="machines" data-theme="c" class="type-interior">
+
+    <div data-role="header">
+        <a href="#one" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
+        <h1>Machines</h1>
+    </div><!-- /header -->
+
+    <div data-role="content">
+
+        <div class="content-primary" >
+                <ul data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
+                    <li>
+                        <a href="#single-machine">
+                            <h3>Booklujas</h3>
+                            <p>Status?</p>
+                            <div><span class="ui-li-count">130.10.5.52</span></div>
+                        </a>
+                        <a data-icon="check">Select</a>
+                    </li>
+                    <li>
+                        <a href="#single-machine">
+                            <h3>Alan Koohue</h3>
+                            <p>Status?</p>
+                            <div><span class="ui-li-count">130.10.5.102</span></div>
+                        </a>
+                        <a data-icon="check">Select</a>
+                    </li>
+                    <li>
+                        <a href="#single-machine">
+                            <h3>Bit Pazar</h3>
+                            <p>Status?</p>
+                            <div><span class="ui-li-count">130.100.8.52</span></div>
+                        </a>
+                        <a data-icon="check">Select</a>
+                    </li>
+                    <li>
+                        <a href="#single-machine">
+                            <h3>Kalkanca</h3>
+                            <p>Status?</p>
+                            <div><span class="ui-li-count">13.10.5.52</span></div>
+                        </a>
+                        <a data-icon="check">Select</a>
+                    </li>
+                    <li>
+                        <a href="#single-machine">
+                            <h3>Dendropotamos</h3>
+                            <p>Status?</p>
+                            <div><span class="ui-li-count">50.55.120.1</span></div>
+                        </a>
+                        <a data-icon="check">Select</a>
+                    </li>
+                </ul>
+
+                <div data-role="controlgroup" data-type="horizontal" >
+                    <a data-role="button" data-icon="check">Select All</a>
+                    <a data-role="button" data-icon="delete">Select None</a>
+                </div>
+
         </div>
-        <div id="backends">
-            <!-- tabs -->
-            <ul class="css-tabs rounded-top drop-shadow">
-                <li><a href="machines" class="medium" title="Manage your virtual machines.">machines</a></li>
-                <li><a href="images" class="medium" title="Manage boot images.">images</a></li>
-            </ul>
-            <div class="css-panes rounded-bottom drop-shadow">
-                <div id="machines-pane" style="display:block"></div>
-                <div id="disks-pane" style="display:block"></div>
-                <div id="images-pane" style="display:block"></div>
-                <div id="networks-pane" style="display:block"></div>
-            </div>
+
+        <div class="content-secondary" >
+                <ul data-role="listview" data-theme="c" data-dividertheme="d">
+                    <li>Start</li>
+                    <li>Stop</li>
+                    <li>Create</li>
+                    <li>Reboot</li>
+                    <li>Destroy</li>
+                </ul>
         </div>
 
-    </div>
-    <!-- activate tabs with JavaScript -->
-    <script>
-        $(function() {
-            $("ul.css-tabs").tabs("div.css-panes div", {
-                effect: 'fade',
-                onBeforeClick: function(event, i) {
-                    var me = this,
-                        tab = me.getTabs().eq(i),
-                        paneswrapper = $('.css-panes'),
-                        panes = paneswrapper.children(),
-                        newpane = panes.eq(i),
-                        rest = panes.not(newpane).not($('.large-spinner'));
+    </div><!-- /content -->
 
-                    // Why??
-                    //panes.show().fadeOut(300);
+    <div data-role="footer" data-theme="d">
+        <a data-icon="check" class="ui-btn-right">prov1</a>
+        <a data-icon="check" class="ui-btn-right">prov2</a>
+        <a data-icon="check" class="ui-btn-right">prov3</a>
+        <a data-icon="check" class="ui-btn-right">prov4</a>
+    </div><!-- /footer -->
+</div><!-- /page two -->
 
-                    // This solves various transition issues, like misplaced
-                    // elements. Don't ask me.
-                    //panes.width(paneswrapper.width());
 
-                    // Explicitly set height
-                    paneswrapper.height(paneswrapper.height());
+<!-- Start of details page -->
+<div data-role="page" id="single-machine" data-theme="c" class="type-interior">
 
-                    //fetch content using ajax
-                    newpane.load(me.getTabs().eq(i).attr("href"), function(){
-                        paneswrapper.animate({height : newpane.outerHeight(true)}, 300, function() {
-                            paneswrapper.height('auto');
-                        });
-                        rest.html('');
-                        newpane.hide().fadeIn(300);
-                    });
-                }
-            });
-        });
-        $("ul.css-tabs a").tooltip({effect: 'fade', predelay: 1000, delay: 2, position: 'top center', opacity: 0.8});
-        var backends = [];
-        var log = new MessageLog();
+    <div data-role="header">
+        <a href="#machines" data-icon="arrow-l" data-direction="reverse" class="ui-btn-left">Machines</a>
+        <h1>Alan Koohue</h1>
+    </div><!-- /header -->
 
-        // Message Notifier
-        // _________________
+    <div data-role="content">
 
-        //Show all messages
-        $('#notifier span.messages-expand').click(function() {
-            $('#notifier-in').slideToggle('slow', function() {
-            var messagesHtml = '<ul class="messages">';
-                for (var i = log.messages.length -1; i > -1; i--) {
-                    messagesHtml += '<li class="log-message">' + log.messages[i] + '</li>';
-                }
-                messagesHtml += '</ul>';
-                $('#notifier-in').html(messagesHtml);
-            });
-        });
+        <div class="content-primary" >
+                <div data-role="collapsible">
+                    <h3>Basic Info</h3>
+                    Blah
+                </div>
+                <div data-role="collapsible">
+                    <h3>Advanced Info</h3>
+                    Info
+                </div>
+        </div>
 
-        //updates the messages notifier
-        function update_message_notifier() {
-            if (log.messages[log.messages.length-1][0] < LOGLEVEL){
-                clearTimeout(log.timeout);
-                if (!$('#notifier-wrapper').is (':visible')){
-                    $('#notifier-wrapper').slideDown(300);
-                }
-                var txt = log.messages[log.messages.length-1][1].toISOString() + " : " + log.messages[log.messages.length-1].slice(2).join(' - ');
-                $('#notifier span.text').text(txt);
-                update_messages_count();
-                log.timeout = setTimeout("$('#notifier-wrapper').slideUp(300)", 5000);
-            }
-        }
+        <div class="content-secondary" >
+                <ul data-role="listview" data-theme="c" data-dividertheme="d">
+                    <li>Start</li>
+                    <li>Stop</li>
+                    <li>Reboot</li>
+                    <li>Destroy</li>
+                </ul>
+        </div>
 
-        // Message notifier mouseenter and mouseleave events
-        $('#notifier-wrapper').mouseenter(function() {
-            clearTimeout(log.timeout);
-        }).mouseleave(function() {
-            log.timeout = setTimeout("$('#notifier-wrapper').slideUp(300)", 5000);
-        });
+    </div><!-- /content -->
 
-        // update the messages counter
-        function update_messages_count() {
-            var message_count = log.messages.filter(function(el,i){return el[0] < LOGLEVEL}).length;
-            if (message_count == 1) {
-                messages = ' message';
-            } else {
-                messages =  ' messages';
-            }
-            $('#notifier span.messages-count').text(message_count + messages);
-        }
+    <div data-role="footer" data-theme="d">
+        <a data-icon="check" class="ui-btn-right">prov1</a>
+        <a data-icon="check" class="ui-btn-right">prov2</a>
+        <a data-icon="check" class="ui-btn-right">prov3</a>
+        <a data-icon="check" class="ui-btn-right">prov4</a>
+    </div><!-- /footer -->
+</div><!-- /details page -->
 
-        $('#notifier-show').click(function() {
-            $('#notifier-wrapper').slideDown(300);
-        });
-
-        $('#notifier-hide').click(function() {
-            $('#notifier-wrapper').slideUp(300);
-        });
-
-    </script>
-    <script tal:repeat="backend backends" tal:content="string:backends.push(new Backend('${backend['id']}','${backend['title']}',${backend['provider']},${backend['poll_interval']},${backend.host|'undefined'}, log));" />
-    <div id="footer">created by <a href="https://unweb.me" title="state of the art information systems">unweb.me</a></div>
 </body>
 </html>
