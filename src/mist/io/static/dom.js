@@ -24,32 +24,17 @@ $(document).bind("mobileinit", function(){
 });
 
 
-function update_machines_view(backend){
-    return;
-    // TODO    
-    $('#logo-container').animate({opacity : 0.05});
+function update_machines_view(backend){ 
+    //$('#logo-container').animate({opacity : 0.05});
     backend.machines.forEach(function(machine, index){
         var node = $('#machines-list > #' + backends.indexOf(backend) + '-' + machine.id);
-        /*// Calculate ip_txt
-        var primary_ip = machine.public_ips[0] || machine.private_ips[0] || "";
-        var all_ips = machine.public_ips.concat(machine.private_ips);
-        if (all_ips.length > 1) {
-            all_ips = ' <span class="more">...</span><span class="all-ips">' + all_ips.join(' - ') + "</span>";
-        } else {
-            all_ips = '<span class="more"></span><span class="all-ips">' + primary_ip + "</span>";
-        }
-        var ip_txt = '<span class="primary">'+primary_ip+"</span>"+all_ips;*/
-        
         if (node.length == 1) { // there should be only one machine with this id in the DOM
-            if (node.find('.name').text() != machine.name
-                // || node.find('.ip').html() != ip_txt
-                ){
+            if (node.find('.name').text() != machine.name){
                 node.fadeOut(100);                
                 node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
                 node.find('.backend').text(backends.indexOf(backend));
                 node.find('.backend').addClass('provider'+backend.provider);
-                //node.find('.ip').html(ip_txt);
-                node.find('.select')[0].id = 'chk-' + machine.id;
+                //node.find('.select')[0].id = 'chk-' + machine.id;
                 node.fadeIn(100);
             }
             node.find('.state').removeClass().addClass('state').addClass('state'+machine.state);
@@ -63,15 +48,15 @@ function update_machines_view(backend){
             node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
             node.find('.backend').text(backends.indexOf(backend));
             node.find('.backend').addClass('provider'+backend.provider);
-            //node.find('.ip').html(ip_txt);
             node.find('.state').addClass('state'+machine.state);
             node.find('.state').attr('title', STATES[machine.state]);
-            node.find('.select')[0].id = 'chk-' + machine.id;
+            //node.find('.select')[0].id = 'chk-' + machine.id;
             node.find('label').attr('for', 'chk-' + machine.id);
             node[0].id = backends.indexOf(backend) + '-' + machine.id;
             node.appendTo('#machines-list');
             node.fadeIn(200);
         }
+        $('#machines-list').listview('refresh');
     });
 
     //Make a list of all machine ids first, from all backends and check if machine
@@ -138,4 +123,12 @@ function update_messages_count() {
         messages =  ' messages';
     }
     $('#notifier span.messages-count').text(message_count + messages);
+}
+
+function truncate_names(truncateName, truncateCharacters ) { //truncate truncateName if bigger than truncateCharacters
+    if (truncateName.length > truncateCharacters) {
+        return truncateName.substring(0, NODE_NAME_CHARACTERS) + '...';
+    } else {
+        return truncateName;
+    }
 }

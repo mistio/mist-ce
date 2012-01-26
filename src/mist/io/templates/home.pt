@@ -63,24 +63,25 @@
     <div data-role="content">
 
         <div class="content-primary" >
-            <ul data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
-                <li>
+                <li class="node-template" style="display:none">
                     <a href="#single-machine">
-                        <h3>Machine name</h3>
-                        <p>Status</p>
-                        <div>
-                            <span class="ui-li-count">xxx.xxx.xxx.xxx</span>
-                        </div>
+                        <h3 class="name"></h3>
+                        <p class="state"></p>
+                        <span class="backend"></span>
+                        <div><span class="ui-li-count">tag1</span> <span class="ui-li-count">tag2</span></div>
                     </a>
                     <a data-icon="check">Select</a>
                 </li>
+            <ul id="machines-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
+
             </ul>
 
             <div data-role="controlgroup" data-type="horizontal" >
                 <a data-role="button" data-icon="check">Select All</a>
                 <a data-role="button" data-icon="delete">Select None</a>
             </div>
-        </div><!-- /primary content -->
+
+        </div>
 
         <div class="content-secondary" >
             <ul data-role="listview" data-theme="c" data-dividertheme="d">
