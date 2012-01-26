@@ -45,7 +45,9 @@
     </div><!-- /content -->
 
     <div data-role="footer" data-theme="d">
-        <a data-icon="check" class="ui-btn-right">Provider</a>
+        <a data-icon="check" class="ui-btn-right">Amazon</a>
+        <a data-icon="check" class="ui-btn-right">Rackspace</a>
+        <a data-icon="check" class="ui-btn-right">Openstack</a>
     </div><!-- /footer -->
 
 </div><!-- /page one -->
@@ -93,7 +95,9 @@
     </div><!-- /content -->
 
     <div data-role="footer" data-theme="d">
-        <a data-icon="check" class="ui-btn-right">Provider</a>
+        <a data-icon="check" class="ui-btn-right">Amazon</a>
+        <a data-icon="check" class="ui-btn-right">Rackspace</a>
+        <a data-icon="check" class="ui-btn-right">Openstack</a>
     </div><!-- /footer -->
 
 </div><!-- /page two -->
@@ -131,8 +135,11 @@
     </div><!-- /content -->
 
     <div data-role="footer" data-theme="d">
-        <a data-icon="check" class="ui-btn-right">Provider</a>
+        <a data-icon="check" class="ui-btn-right">Amazon</a>
+        <a data-icon="check" class="ui-btn-right">Rackspace</a>
+        <a data-icon="check" class="ui-btn-right">Openstack</a>
     </div><!-- /footer -->
+
 </div><!-- /details page -->
 
 </body>
