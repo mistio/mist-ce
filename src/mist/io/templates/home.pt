@@ -14,7 +14,13 @@
         var backends = [];
         var log = new MessageLog();
     </script>
-    <script tal:repeat="backend backends" tal:content="string:backends.push(new Backend('${backend['id']}','${backend['title']}',${backend['provider']},${backend['poll_interval']},${backend.host|'undefined'}, log));" />
+    <script tal:repeat="backend backends"
+            tal:content="string:backends.push(new Backend('${backend['id']}',
+                                                          '${backend['title']}',
+                                                           ${backend['provider']},
+                                                           ${backend['poll_interval']},
+                                                           ${backend.host|'undefined'},
+                                                           log));" />
     <script src="static/dom.js"></script>    
     <script src="static/jquery.mobile-1.0.min.js"></script>
     <link rel="icon" href="static/favicon.ico" />
