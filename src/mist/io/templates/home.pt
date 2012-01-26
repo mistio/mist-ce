@@ -14,6 +14,7 @@
         var backends = [];
         var log = new MessageLog();
     </script>
+    <!--from the python variable backends generate javascript entries-->
     <script tal:repeat="backend backends"
             tal:content="string:backends.push(new Backend('${backend['id']}',
                                                           '${backend['title']}',
@@ -21,7 +22,7 @@
                                                            ${backend['poll_interval']},
                                                            ${backend.host|'undefined'},
                                                            log));" />
-    <script src="static/dom.js"></script>    
+    <script src="static/dom.js"></script>
     <script src="static/jquery.mobile-1.0.min.js"></script>
     <link rel="icon" href="static/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
@@ -37,22 +38,17 @@
     </div><!-- /header -->
 
     <div data-role="content">
-
-                <ul data-role="listview" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
-                    <li><a href="#machines">Machines</a></li>
-                    <li><a href="#images">Images</a></li>
-                </ul>
-
+        <ul data-role="listview" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
+            <li><a href="#machines">Machines</a></li>
+            <li><a href="#images">Images</a></li>
+        </ul>
     </div><!-- /content -->
 
     <div data-role="footer" data-theme="d">
-        <a data-icon="check" class="ui-btn-right">prov1</a>
-        <a data-icon="check" class="ui-btn-right">prov2</a>
-        <a data-icon="check" class="ui-btn-right">prov3</a>
-        <a data-icon="check" class="ui-btn-right">prov4</a>
+        <a data-icon="check" class="ui-btn-right">Provider</a>
     </div><!-- /footer -->
-</div><!-- /page one -->
 
+</div><!-- /page one -->
 
 <!-- Start of second page: #two -->
 <div data-role="page" id="machines" data-theme="c" class="type-interior">
@@ -65,83 +61,49 @@
     <div data-role="content">
 
         <div class="content-primary" >
-                <ul data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
-                    <li>
-                        <a href="#single-machine">
-                            <h3>Booklujas</h3>
-                            <p>Status?</p>
-                            <div><span class="ui-li-count">130.10.5.52</span></div>
-                        </a>
-                        <a data-icon="check">Select</a>
-                    </li>
-                    <li>
-                        <a href="#single-machine">
-                            <h3>Alan Koohue</h3>
-                            <p>Status?</p>
-                            <div><span class="ui-li-count">130.10.5.102</span></div>
-                        </a>
-                        <a data-icon="check">Select</a>
-                    </li>
-                    <li>
-                        <a href="#single-machine">
-                            <h3>Bit Pazar</h3>
-                            <p>Status?</p>
-                            <div><span class="ui-li-count">130.100.8.52</span></div>
-                        </a>
-                        <a data-icon="check">Select</a>
-                    </li>
-                    <li>
-                        <a href="#single-machine">
-                            <h3>Kalkanca</h3>
-                            <p>Status?</p>
-                            <div><span class="ui-li-count">13.10.5.52</span></div>
-                        </a>
-                        <a data-icon="check">Select</a>
-                    </li>
-                    <li>
-                        <a href="#single-machine">
-                            <h3>Dendropotamos</h3>
-                            <p>Status?</p>
-                            <div><span class="ui-li-count">50.55.120.1</span></div>
-                        </a>
-                        <a data-icon="check">Select</a>
-                    </li>
-                </ul>
+            <ul data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
+                <li>
+                    <a href="#single-machine">
+                        <h3>Machine name</h3>
+                        <p>Status</p>
+                        <div>
+                            <span class="ui-li-count">xxx.xxx.xxx.xxx</span>
+                        </div>
+                    </a>
+                    <a data-icon="check">Select</a>
+                </li>
+            </ul>
 
-                <div data-role="controlgroup" data-type="horizontal" >
-                    <a data-role="button" data-icon="check">Select All</a>
-                    <a data-role="button" data-icon="delete">Select None</a>
-                </div>
-
-        </div>
+            <div data-role="controlgroup" data-type="horizontal" >
+                <a data-role="button" data-icon="check">Select All</a>
+                <a data-role="button" data-icon="delete">Select None</a>
+            </div>
+        </div><!-- /primary content -->
 
         <div class="content-secondary" >
-                <ul data-role="listview" data-theme="c" data-dividertheme="d">
-                    <li>Start</li>
-                    <li>Stop</li>
-                    <li>Create</li>
-                    <li>Reboot</li>
-                    <li>Destroy</li>
-                </ul>
-        </div>
+            <ul data-role="listview" data-theme="c" data-dividertheme="d">
+                <li>Start</li>
+                <li>Stop</li>
+                <li>Create</li>
+                <li>Reboot</li>
+                <li>Destroy</li>
+            </ul>
+        </div><!-- /secondary content -->
 
     </div><!-- /content -->
 
     <div data-role="footer" data-theme="d">
-        <a data-icon="check" class="ui-btn-right">prov1</a>
-        <a data-icon="check" class="ui-btn-right">prov2</a>
-        <a data-icon="check" class="ui-btn-right">prov3</a>
-        <a data-icon="check" class="ui-btn-right">prov4</a>
+        <a data-icon="check" class="ui-btn-right">Provider</a>
     </div><!-- /footer -->
-</div><!-- /page two -->
 
+</div><!-- /page two -->
 
 <!-- Start of details page -->
 <div data-role="page" id="single-machine" data-theme="c" class="type-interior">
 
     <div data-role="header">
         <a href="#machines" data-icon="arrow-l" data-direction="reverse" class="ui-btn-left">Machines</a>
-        <h1>Alan Koohue</h1>
+        <h1>Machine name</h1>
     </div><!-- /header -->
 
     <div data-role="content">
@@ -149,13 +111,13 @@
         <div class="content-primary" >
                 <div data-role="collapsible">
                     <h3>Basic Info</h3>
-                    Blah
+                    Basic stuff
                 </div>
                 <div data-role="collapsible">
                     <h3>Advanced Info</h3>
-                    Info
+                    Advanced stuff
                 </div>
-        </div>
+        </div><!-- /primary content -->
 
         <div class="content-secondary" >
                 <ul data-role="listview" data-theme="c" data-dividertheme="d">
@@ -163,38 +125,16 @@
                     <li>Stop</li>
                     <li>Reboot</li>
                     <li>Destroy</li>
-                </ul>
+                </ul><!-- /secondary content -->
         </div>
 
     </div><!-- /content -->
 
     <div data-role="footer" data-theme="d">
-        <a data-icon="check" class="ui-btn-right">prov1</a>
-        <a data-icon="check" class="ui-btn-right">prov2</a>
-        <a data-icon="check" class="ui-btn-right">prov3</a>
-        <a data-icon="check" class="ui-btn-right">prov4</a>
+        <a data-icon="check" class="ui-btn-right">Provider</a>
     </div><!-- /footer -->
 </div><!-- /details page -->
 
 </body>
-
-<script>
-var NODE_NAME_CHARACTERS = 35;
-/*
-libcloud listing of state codes
-    RUNNING = 0
-    REBOOTING = 1
-    TERMINATED = 2
-    PENDING = 3
-    UNKNOWN = 4
-*/
-var STATES = {
-    '0' : 'Running',
-    '1' : 'Rebooting',
-    '2' : 'Terminated',
-    '3' : 'Pending',
-    '4' : 'Unknown',
-    };
-</script>
 
 </html>
