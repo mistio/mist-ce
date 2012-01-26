@@ -1,7 +1,7 @@
 /* jqm docs css
 
-Beware: lots of last-minute CSS going on in here 
-cobblers, shoes, 
+Beware: lots of last-minute CSS going on in here
+cobblers, shoes,
 */
 
 body { background: #dddddd; }
@@ -13,7 +13,7 @@ body { background: #dddddd; }
 .ui-mobile .jqm-themeswitcher { margin: 10px 25px 10px 10px;  }
 
 h2 { margin:1.2em 0 .4em 0; }
-p code { font-size:1.2em; font-weight:bold; } 
+p code { font-size:1.2em; font-weight:bold; }
 
 dt { font-weight: bold; margin: 2em 0 .5em; }
 dt code, dd code { font-size:1.3em; line-height:150%; }
@@ -75,36 +75,36 @@ p.intro strong {
 }
 /* new API additions */
 
-dt {  
-	margin: 35px 0 15px 0; 
-	background-color:#ddd; 
+dt {
+	margin: 35px 0 15px 0;
+	background-color:#ddd;
 	font-weight:normal;
 }
-dt code { 
-	display:inline-block; 
+dt code {
+	display:inline-block;
 	font-weight:bold;
-	color:#56A00E; 
-	padding:3px 7px; 
-	margin-right:10px; 
-	background-color:#fff; 
+	color:#56A00E;
+	padding:3px 7px;
+	margin-right:10px;
+	background-color:#fff;
 }
-dd { 
-	margin-bottom:10px; 
+dd {
+	margin-bottom:10px;
 }
 dd .default { font-weight:bold; }
-dd pre { 
-	margin:0 0 0 0; 
+dd pre {
+	margin:0 0 0 0;
 }
 dd code { font-weight: normal; }
-dd pre code { 
-	margin:0; 
-	border:none; 
-	font-weight:normal; 
-	font-size:100%; 
-	background-color:transparent; 
+dd pre code {
+	margin:0;
+	border:none;
+	font-weight:normal;
+	font-size:100%;
+	background-color:transparent;
 }
 dd h4 { margin:15px 0 0 0; }
-		
+
 .localnav {
 	margin:0 0 20px 0;
 	overflow:hidden;
@@ -112,9 +112,9 @@ dd h4 { margin:15px 0 0 0; }
 .localnav li {
 	float:left;
 }
-.localnav .ui-btn-inner { 
-	padding: .6em 10px; 
-	font-size:80%; 
+.localnav .ui-btn-inner {
+	padding: .6em 10px;
+	font-size:80%;
 }
 
 
@@ -125,13 +125,13 @@ dd h4 { margin:15px 0 0 0; }
 	background: 			#74b042;
 	color: 					#fff;
 	font-weight: bold;
-	text-shadow: 0 -1px 1px #234403;	
+	text-shadow: 0 -1px 1px #234403;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#74b042), to(#56A00E)); /* Saf4+, Chrome */
 	background-image: -webkit-linear-gradient(#74b042, #56A00E); /* Chrome 10+, Saf5.1+ */
 	background-image:    -moz-linear-gradient(#74b042, #56A00E); /* FF3.6 */
 	background-image:     -ms-linear-gradient(#74b042, #56A00E); /* IE10 */
 	background-image:      -o-linear-gradient(#74b042, #56A00E); /* Opera 11.10+ */
-	background-image:         linear-gradient(#74b042, #56A00E);		
+	background-image:         linear-gradient(#74b042, #56A00E);
 }
 .ui-bar-f,
 .ui-bar-f .ui-link-inherit {
@@ -205,7 +205,7 @@ dd h4 { margin:15px 0 0 0; }
 /* docs site layout */
 
 @media all and (min-width: 650px){
-	
+
 	.jqm-home {
 		position: absolute;
 		left: 10px;
@@ -300,7 +300,7 @@ dd h4 { margin:15px 0 0 0; }
 		margin: 0;
 		padding: 0;
 	}
-	
+
 }
 @media all and (min-width: 750px){
 	.type-home .ui-content,
@@ -313,7 +313,7 @@ dd h4 { margin:15px 0 0 0; }
 	.content-primary {
 		width: 56%;
 		padding-right: 1%;
-	}	
+	}
 	.type-interior .ui-content {
 		background-position: 34%;
 	}
