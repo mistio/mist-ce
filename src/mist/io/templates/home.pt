@@ -165,4 +165,24 @@
 </div><!-- /details page -->
 
 </body>
+
+<script>
+var NODE_NAME_CHARACTERS = 35;
+/*
+libcloud listing of state codes
+    RUNNING = 0
+    REBOOTING = 1
+    TERMINATED = 2
+    PENDING = 3
+    UNKNOWN = 4
+*/
+var STATES = {
+    '0' : 'Running',
+    '1' : 'Rebooting',
+    '2' : 'Terminated',
+    '3' : 'Pending',
+    '4' : 'Unknown',
+    };
+</script>
+
 </html>
