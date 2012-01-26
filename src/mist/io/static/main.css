@@ -202,6 +202,17 @@ dd h4 { margin:15px 0 0 0; }
 	padding: 10px;
 }
 
+#machines-list .ui-checkbox {
+    width:48px;
+    float:left;
+    padding: 14px;
+}
+
+#machines-list .ui-checkbox label {
+    border: none;
+    background-color: transparent;
+}
+
 /* docs site layout */
 
 @media all and (min-width: 650px){

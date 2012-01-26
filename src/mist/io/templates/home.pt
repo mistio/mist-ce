@@ -63,15 +63,17 @@
     <div data-role="content">
 
         <div class="content-primary" >
-                <li class="node-template" style="display:none">
-                    <a href="#single-machine">
-                        <h3 class="name"></h3>
-                        <p class="state"></p>
-                        <span class="backend"></span>
-                        <div><span class="ui-li-count">tag1</span> <span class="ui-li-count">tag2</span></div>
-                    </a>
-                    <a data-icon="check">Select</a>
-                </li>
+            <div id="logo-container"></div>
+            <li class="node-template" style="display:none">
+                <input type="checkbox" name="checkbox-1" id="checkbox-0" class="custom" />
+                <label for="checkbox-0"></label>                
+                <a href="#single-machine">
+                    <h3 class="name"></h3>
+                    <p class="state"></p>
+                    <span class="backend"></span>
+                    <div><span class="ui-li-count">tag1</span> <span class="ui-li-count">tag2</span></div>
+                </a>
+            </li>
             <ul id="machines-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
 
             </ul>

@@ -7,9 +7,10 @@ var STATES = {
     '4' : 'Unknown',            
     };
     
+/* on page init */
 $(document).bind("mobileinit", function(){
-    var buttonsAmount = backends.length;
 
+    // run list_machines action on each backend
     backends.forEach(function(b, i){
         // TODO: create provider widget
         b.newAction(['list_machines']);
@@ -24,8 +25,9 @@ $(document).bind("mobileinit", function(){
 });
 
 
+/* when the list_machines action returns, update the view */
 function update_machines_view(backend){ 
-    //$('#logo-container').animate({opacity : 0.05});
+    $('#logo-container').animate({opacity : 0.05});
     backend.machines.forEach(function(machine, index){
         var node = $('#machines-list > #' + backends.indexOf(backend) + '-' + machine.id);
         if (node.length == 1) { // there should be only one machine with this id in the DOM
@@ -49,14 +51,14 @@ function update_machines_view(backend){
             node.find('.backend').text(backends.indexOf(backend));
             node.find('.backend').addClass('provider'+backend.provider);
             node.find('.state').addClass('state'+machine.state);
-            node.find('.state').attr('title', STATES[machine.state]);
-            //node.find('.select')[0].id = 'chk-' + machine.id;
+            node.find('.state').text(STATES[machine.state]);
+            node.find('input')[0].id = 'chk-' + machine.id;
+            node.find('input')[0].name = 'chk-' + machine.id;
             node.find('label').attr('for', 'chk-' + machine.id);
             node[0].id = backends.indexOf(backend) + '-' + machine.id;
             node.appendTo('#machines-list');
             node.fadeIn(200);
         }
-        $('#machines-list').listview('refresh');
     });
 
     //Make a list of all machine ids first, from all backends and check if machine
@@ -72,7 +74,10 @@ function update_machines_view(backend){
         if ($.inArray(this.id, machines_list) == -1) {
             $('#' + this.id).remove();
         }
-    });      
+    });
+     
+    $('#machines-list').listview('refresh');
+    $("input[type='checkbox']").checkboxradio("refresh");
     update_machines_count();
 }
 
