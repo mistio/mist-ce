@@ -203,14 +203,35 @@ dd h4 { margin:15px 0 0 0; }
 }
 
 #machines-list .ui-checkbox {
-    width:48px;
+    width:80px;
     float:left;
-    padding: 14px;
+    padding: 8px;
 }
 
 #machines-list .ui-checkbox label {
     border: none;
     background-color: transparent;
+}
+
+#machines-list .ui-icon-checkbox-on, #machines-list .ui-icon-checkbox-off  {
+    left: 30px;    
+}
+
+#machines-list .node a {
+    color: #2F3E46;
+}
+
+#machines .content-primary .ui-select {
+    width: 100px;
+}
+
+#machines .ui-listview-filter-inset {
+    margin-left: 100px;
+    margin-top: -52px;
+}
+
+#machines .ui-input-search input.ui-input-text {
+    padding: .65em 0;
 }
 
 /* docs site layout */

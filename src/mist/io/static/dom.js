@@ -77,10 +77,12 @@ function update_machines_view(backend){
     });
      
     $('#machines-list').listview('refresh');
-    $("input[type='checkbox']").checkboxradio("refresh");
+    $("#machines-list input[type='checkbox']").checkboxradio();
+    //$("input[type='checkbox']").checkboxradio("refresh");
     update_machines_count();
 }
 
+$("input[type='checkbox']").bind( "change", function(event, ui) { alert('c');});
 // update the machines counter
 function update_machines_count() {
     return;
