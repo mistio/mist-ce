@@ -69,7 +69,7 @@ function Backend(id, title, provider, interval, host, log){
             case 'list_machines':
                 this.log('updating machines', DEBUG);
                 $.ajax({
-                    url: 'backends/'+this.id+'/machines/list',
+                    url: 'backends/'+this.id+'/machines',
                     success: function(data) {
                         backend.updateStatus('on', 'list_machines');
                         backend.machines = jQuery.parseJSON(data);
@@ -87,7 +87,7 @@ function Backend(id, title, provider, interval, host, log){
             case 'list_images':
                 this.log('updating images', DEBUG);
                 $.ajax({
-                    url: 'backends/'+this.id+'/images/list',
+                    url: 'backends/'+this.id+'/images',
                     success: function(data) {
                         backend.updateStatus('on', 'list_images');
                         backend.images = jQuery.parseJSON(data);
@@ -102,7 +102,7 @@ function Backend(id, title, provider, interval, host, log){
             case 'list_sizes':
                 this.log('updating sizes', DEBUG);
                 $.ajax({
-                    url: 'backends/'+this.id+'/sizes/list',
+                    url: 'backends/'+this.id+'/sizes',
                     success: function(data) {
                         backend.updateStatus('on', 'list_sizes');
                         backend.sizes = jQuery.parseJSON(data);
@@ -117,7 +117,7 @@ function Backend(id, title, provider, interval, host, log){
             case 'list_locations':
                 this.log('updating locations', DEBUG);
                 $.ajax({
-                    url: 'backends/'+this.id+'/locations/list',
+                    url: 'backends/'+this.id+'/locations',
                     success: function(data) {
                         backend.updateStatus('on', 'list_locations');
                         backend.locations = jQuery.parseJSON(data);
