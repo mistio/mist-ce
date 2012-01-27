@@ -83,11 +83,6 @@
 
             </ul>
 
-            <div data-role="controlgroup" data-type="horizontal" >
-                <a data-role="button" data-icon="check">Select All</a>
-                <a data-role="button" data-icon="delete">Select None</a>
-            </div>
-
         </div>
 
         <div class="content-secondary" >
@@ -103,9 +98,7 @@
     </div><!-- /content -->
 
     <div data-role="footer" data-theme="d">
-        <a data-icon="check" class="ui-btn-right">Amazon</a>
-        <a data-icon="check" class="ui-btn-right">Rackspace</a>
-        <a data-icon="check" class="ui-btn-right">Openstack</a>
+
     </div><!-- /footer -->
 
 </div><!-- /page two -->

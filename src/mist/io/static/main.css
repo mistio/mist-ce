@@ -198,14 +198,25 @@ dd h4 { margin:15px 0 0 0; }
 
 /* Custom unweb rules */
 
+#logo-container {
+    background: url(../static/logo.png) 0 0 no-repeat;
+    width: 103px;
+    height: 131px;
+    margin: 36px 0;
+    position: fixed;
+    top: 30%;
+    left: 40%;
+    z-index: 10000;
+}
+
 .ui-footer {
 	padding: 10px;
 }
 
 #machines-list .ui-checkbox {
-    width:80px;
+    width:70px;
     float:left;
-    padding: 8px;
+    padding: 4px 0;
 }
 
 #machines-list .ui-checkbox label {
@@ -222,16 +233,21 @@ dd h4 { margin:15px 0 0 0; }
 }
 
 #machines .content-primary .ui-select {
-    width: 100px;
+    width: 80px;
+}
+
+#machines .content-primary .ui-select .ui-btn {
+    margin: 0.5em 0;
+    outline: none;
 }
 
 #machines .ui-listview-filter-inset {
-    margin-left: 100px;
-    margin-top: -52px;
+    margin-left: 80px;
+    margin-top: -50px;
 }
 
 #machines .ui-input-search input.ui-input-text {
-    padding: .65em 0;
+    padding: .45em 0;
 }
 
 /* docs site layout */
