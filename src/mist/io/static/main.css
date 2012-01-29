@@ -88,6 +88,10 @@
 	border-left: 1px solid #ddd;
 }
 
+#machines-footer a {
+	width: 32.5%;
+}
+
 /* DIALOG */
 
 .ui-dialog .ui-header, 
