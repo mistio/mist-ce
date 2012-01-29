@@ -94,9 +94,8 @@
 
 /* DIALOG */
 
-.ui-dialog .ui-header, 
 .ui-dialog .ui-content, 
-.ui-dialog { 
+{ 
 	max-width: 500px; 
 	margin: 0 auto 15px auto; 
 }
