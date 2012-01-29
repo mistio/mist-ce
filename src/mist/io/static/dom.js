@@ -24,6 +24,15 @@ $(document).bind("mobileinit", function(){
     });
 });
 
+$('#mist-select-machines').change(function() 
+{
+   alert($(this).attr('value'));
+});
+// Selection control behavior.
+//$('#mist-select-machines-button').click(function() {
+//    console.log("CHANGE");
+//    $('#machines-list .ui-checkbox-off').removeClass('.ui-checkbox-off').addClass('ui-checkbox-on');
+//});
 
 /* when the list_machines action returns, update the view */
 function update_machines_view(backend){ 
