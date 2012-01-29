@@ -24,29 +24,30 @@ $(document).bind("mobileinit", function(){
     });
 });
 
+// Hide footer on machines page load.
 $( '#machines' ).live( 'pageinit',function(event){
     $('#machines-footer').hide();
 });
 
 // Selection control behavior.
+// Select according to control value. Show/hide footer accordingly.
 $('#mist-select-machines').live('change', function() {
     if ($(this).val() == 'all') {
-        $('#machines-list .ui-checkbox-off').removeClass('.ui-checkbox-off').addClass('ui-checkbox-on');
-        $('#machines-list .ui-icon-checkbox-off').removeClass('.ui-icon-checkbox-off').addClass('ui-icon-checkbox-on');
+        $('#machines-list input:checkbox').attr('checked',true).checkboxradio("refresh");
     } else {
-        $('#machines-list .ui-checkbox-on').removeClass('.ui-checkbox-on').addClass('ui-checkbox-off');
-        $('#machines-list .ui-icon-checkbox-on').removeClass('.ui-icon-checkbox-on').addClass('ui-icon-checkbox-off');
+        $('#machines-list input:checkbox').attr('checked',false).checkboxradio("refresh");
     }
-    if ($('.ui-checkbox-on').length) {
-        $('#machines-footer').fadeIn(300);
+    if ($('#machines-list input:checked').length) {
+        $('#machines-footer').fadeIn(160);
     } else {
         $('#machines-footer').fadeOut(300);
     }
 });
 
-$('#machines-list input').live('change', function() {
-    if ($('.ui-checkbox-on').length) {
-        $('#machines-footer').fadeIn(300);
+// Check for footer visibility when a checkbox is selected/deselected.
+$('#machines-list input:checkbox').live('change', function() {
+    if ($('#machines-list input:checked').length) {
+        $('#machines-footer').fadeIn(160);
     } else {
         $('#machines-footer').fadeOut(300);
     }

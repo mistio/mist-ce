@@ -102,55 +102,54 @@
 
     <div data-role="content">
 
-        <div class="content-primary" >
-                <div data-role="collapsible">
-                    <h3>Basic Info</h3>
-                    Basic stuff
-                </div>
-                <div data-role="collapsible">
-                    <h3>Advanced Info</h3>
-                    Advanced stuff
-                </div>
-        </div><!-- /primary content -->
-
-        <div class="content-secondary" >
-                <ul data-role="listview" data-theme="c" data-dividertheme="d">
-                    <li>Start</li>
-                    <li>Stop</li>
-                    <li>Reboot</li>
-                    <li>Destroy</li>
-                </ul><!-- /secondary content -->
+        <div data-role="collapsible">
+            <h3>Basic Info</h3>
+            Basic stuff
+        </div>
+        <div data-role="collapsible">
+            <h3>Advanced Info</h3>
+            Advanced stuff
         </div>
 
     </div><!-- /content -->
+
+    <div id="machines-footer" data-role="footer" data-theme="a">   
+        <div id="actions" data-role="controlgroup" data-type="horizontal">
+            <a data-role="button" data-icon="refresh">Reboot</a>
+            <a data-role="button" data-icon="delete">Destroy</a>
+            <a href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
+        </div>
+    </div><!-- /footer -->
 
 </div><!-- /details page -->
 
 <!-- Start of add dialog -->
 <div data-role="page" id="dialog-add" class="mist-dialog">
-    <div data-role="content" data-theme="a">
+    <div data-role="content" data-theme="c">
         <h3>Create</h3>
         <input type="text" id="new-machine-name" > </input>
-        <select name="select-choice-1" id="select-choice-1" data-theme="a" data-icon="check" data-native-menu="false">
+        <select name="select-choice-1" id="select-choice-1" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Provider</option>
             <option value="edit">Amazon</option>
             <option value="delete">Rackspace</option>
             <option value="delete">Openstack</option>
         </select> 
-        <select name="select-choice-1" id="select-choice-1" data-theme="a" data-icon="check" data-native-menu="false">
+        <select name="select-choice-1" id="select-choice-1" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Image</option>
-            <option value="edit">Amazon</option>
-            <option value="delete">Rackspace</option>
-            <option value="delete">Openstack</option>
+            <option value="edit">1</option>
+            <option value="delete">2</option>
+            <option value="delete">3</option>
         </select>       
-        <select name="select-choice-1" id="select-choice-1" data-theme="a" data-icon="check" data-native-menu="false">
+        <select name="select-choice-1" id="select-choice-1" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Size</option>
             <option value="edit">1</option>
             <option value="delete">2</option>
             <option value="delete">3</option>
         </select>       
-        <a href="index.html" data-role="button" data-rel="back" data-theme="a">OK</a>   
-        <a href="index.html" data-role="button" data-rel="back" data-theme="a">Cancel</a>    
+        <div id="create-ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <a href="index.html" id="create-ok" data-role="button" data-rel="back" data-theme="c">OK</a>   
+            <a href="index.html" id="create-cancel" data-role="button" data-rel="back" data-theme="c">Cancel</a>  
+        </div>  
     </div>
 </div><!-- /add dialog -->
 
