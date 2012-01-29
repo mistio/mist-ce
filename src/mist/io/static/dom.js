@@ -24,15 +24,16 @@ $(document).bind("mobileinit", function(){
     });
 });
 
-$('#mist-select-machines').change(function() 
-{
-   alert($(this).attr('value'));
-});
 // Selection control behavior.
-//$('#mist-select-machines-button').click(function() {
-//    console.log("CHANGE");
-//    $('#machines-list .ui-checkbox-off').removeClass('.ui-checkbox-off').addClass('ui-checkbox-on');
-//});
+$('#mist-select-machines').live('change', function() {
+    if ($(this).val() == 'all') {
+        $('#machines-list .ui-checkbox-off').removeClass('.ui-checkbox-off').addClass('ui-checkbox-on');
+        $('#machines-list .ui-icon-checkbox-off').removeClass('.ui-icon-checkbox-off').addClass('ui-icon-checkbox-on');
+    } else {
+        $('#machines-list .ui-checkbox-on').removeClass('.ui-checkbox-on').addClass('ui-checkbox-off');
+        $('#machines-list .ui-icon-checkbox-on').removeClass('.ui-icon-checkbox-on').addClass('ui-icon-checkbox-off');
+    }
+});
 
 /* when the list_machines action returns, update the view */
 function update_machines_view(backend){ 

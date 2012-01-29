@@ -81,13 +81,13 @@
 
     </div><!-- /content -->
 
-    <div data-role="footer" data-theme="d" data-position="fixed">   
-            <div id="actions" data-role="controlgroup" data-type="horizontal">
-                    <a data-role="button">Start</a>
-                    <a data-role="button">Stop</a>
-                    <a data-role="button">Reboot</a>
-                    <a data-role="button">Delete</a>
-                </div>
+    <div id="machines-footer" data-role="footer" data-theme="d">   
+        <div id="actions" data-role="controlgroup" data-type="horizontal">
+            <a data-role="button">Start</a>
+            <a data-role="button">Stop</a>
+            <a data-role="button">Reboot</a>
+            <a data-role="button">Delete</a>
+        </div>
     </div><!-- /footer -->
 
 </div><!-- /machines page -->
