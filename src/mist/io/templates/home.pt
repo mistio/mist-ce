@@ -81,12 +81,11 @@
 
     </div><!-- /content -->
 
-    <div id="machines-footer" data-role="footer" data-theme="d">   
+    <div id="machines-footer" data-role="footer" data-theme="a">   
         <div id="actions" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button">Start</a>
-            <a data-role="button">Stop</a>
-            <a data-role="button">Reboot</a>
-            <a data-role="button">Delete</a>
+            <a data-role="button" data-icon="refresh">Reboot</a>
+            <a data-role="button" data-icon="delete">Destroy</a>
+            <a href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
         </div>
     </div><!-- /footer -->
 
@@ -144,6 +143,14 @@
         <a href="index.html" data-role="button" data-rel="back" data-theme="a">Cancel</a>    
     </div>
 </div><!-- /add dialog -->
+
+<!-- Start of console dialog -->
+<div data-role="page" id="dialog-console" class="mist-dialog">
+    <div data-role="content" data-theme="a">
+        <h3>Console</h3>
+        <a href="index.html" data-role="button" data-rel="back" data-theme="a">Cancel</a>    
+    </div>
+</div><!-- /console dialog -->
 
 <!-- Start of providers dialog -->
 <div data-role="page" id="dialog-providers" class="mist-dialog">
