@@ -24,6 +24,10 @@ $(document).bind("mobileinit", function(){
     });
 });
 
+$( '#machines' ).live( 'pageinit',function(event){
+    $('#machines-footer').hide();
+});
+
 // Selection control behavior.
 $('#mist-select-machines').live('change', function() {
     if ($(this).val() == 'all') {
@@ -32,6 +36,19 @@ $('#mist-select-machines').live('change', function() {
     } else {
         $('#machines-list .ui-checkbox-on').removeClass('.ui-checkbox-on').addClass('ui-checkbox-off');
         $('#machines-list .ui-icon-checkbox-on').removeClass('.ui-icon-checkbox-on').addClass('ui-icon-checkbox-off');
+    }
+    if ($('.ui-checkbox-on').length) {
+        $('#machines-footer').fadeIn(300);
+    } else {
+        $('#machines-footer').fadeOut(300);
+    }
+});
+
+$('#machines-list input').live('change', function() {
+    if ($('.ui-checkbox-on').length) {
+        $('#machines-footer').fadeIn(300);
+    } else {
+        $('#machines-footer').fadeOut(300);
     }
 });
 

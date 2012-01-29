@@ -52,7 +52,7 @@
     <div data-role="header">
         <a href="#one" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
         <h1>Machines</h1>
-        <a href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="flip" data-icon="check" class="ui-btn-right">All Providers OK</a>
+        <a href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right">All Providers OK</a>
     </div><!-- /header -->
 
     <div data-role="content">
@@ -130,16 +130,26 @@
 <div data-role="page" id="dialog-add" class="mist-dialog">
     <div data-role="content" data-theme="a">
         <h3>Create</h3>
+        <input type="text" id="new-machine-name" > </input>
         <select name="select-choice-1" id="select-choice-1" data-theme="a" data-icon="check" data-native-menu="false">
             <option>Provider</option>
             <option value="edit">Amazon</option>
             <option value="delete">Rackspace</option>
             <option value="delete">Openstack</option>
         </select> 
-        <a href="dialog-success.html" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b">Upload to flickr</a>       
-        <a href="dialog-success.html" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b">Share on Facebook</a>      
-        <a href="dialog-success.html" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b">Tweet photo</a>       
-                  
+        <select name="select-choice-1" id="select-choice-1" data-theme="a" data-icon="check" data-native-menu="false">
+            <option>Image</option>
+            <option value="edit">Amazon</option>
+            <option value="delete">Rackspace</option>
+            <option value="delete">Openstack</option>
+        </select>       
+        <select name="select-choice-1" id="select-choice-1" data-theme="a" data-icon="check" data-native-menu="false">
+            <option>Size</option>
+            <option value="edit">1</option>
+            <option value="delete">2</option>
+            <option value="delete">3</option>
+        </select>       
+        <a href="index.html" data-role="button" data-rel="back" data-theme="a">OK</a>   
         <a href="index.html" data-role="button" data-rel="back" data-theme="a">Cancel</a>    
     </div>
 </div><!-- /add dialog -->
