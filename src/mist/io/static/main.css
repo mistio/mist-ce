@@ -11,6 +11,12 @@
     z-index: 10000;
 }
 
+/* Machines Pane */
+
+#machines .ui-content {
+	padding-top: 6px;
+}
+
 /* Select Button */
 
 #machines #mist-select-machines .ui-btn {
@@ -48,6 +54,10 @@
 }
 
 /* Machines List */
+
+#machines-list {
+	margin-top: 10px;
+}
 
 #machines-list .ui-checkbox {
     float:left;
