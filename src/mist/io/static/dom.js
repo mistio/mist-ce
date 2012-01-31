@@ -103,17 +103,19 @@ function update_machines_view(backend){
             $('#' + this.id).remove();
         }
     });
-     
-    $('#machines-list').listview('refresh');
-    $("#machines-list input[type='checkbox']").checkboxradio();
-    //$("input[type='checkbox']").checkboxradio("refresh");
+    
+    if ($.mobile.activePage.attr('id') == 'machines') {
+        $('#machines-list').listview('refresh');
+        $("#machines-list input[type='checkbox']").checkboxradio();
+        //$("input[type='checkbox']").checkboxradio("refresh");
+    }
     update_machines_count();
 }
 
 $("input[type='checkbox']").bind( "change", function(event, ui) { alert('c');});
 // update the machines counter
 function update_machines_count() {
-    return;
+    //return;
     // TODO    
     var allMachines = 0;
     for (var i = 0 ; i < backends.length; i++) {
@@ -121,6 +123,9 @@ function update_machines_count() {
     }
 
     $('#all-machines').text(allMachines);
+
+    // Also update machines count bubble in initial screen.
+    $('#one-li-machines .ui-li-count').text(allMachines);
 }
 
 //updates the messages notifier
