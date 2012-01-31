@@ -73,7 +73,7 @@
             <option value="all">all</option>
             <option value="none">none</option>
         </select>
-        <a href="#dialog-add" id="mist-create-machine" data-rel="dialog" data-theme="c" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus" >Create</a>
+        <a href="#dialog-add" id="mist-create-machine" data-rel="dialog" data-theme="c" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus" data-iconpos="notext"></a>
         <ul id="machines-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
 
         </ul>
