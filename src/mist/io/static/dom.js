@@ -30,7 +30,8 @@ $( '#machines' ).live( 'pageinit',function(event){
 });
 
 // Selection control behavior.
-// Select according to control value. Show/hide footer accordingly.
+// Select according to control value. Show/hide footer accordingly,
+// and reset selection in the end.
 $('#mist-select-machines').live('change', function() {
     var selectVal = $(this).val();
     if (selectVal == 'all') {
@@ -43,6 +44,7 @@ $('#mist-select-machines').live('change', function() {
     } else {
         $('#machines-footer').fadeOut(300);
     }
+    $(this).val('select').selectmenu('refresh');
 });
 
 // Check for footer visibility when a checkbox is selected/deselected.
