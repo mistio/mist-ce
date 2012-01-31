@@ -72,8 +72,8 @@
             <option>Select Machines</option>
             <option value="all">All</option>
             <option value="none">None</option>
-            <option value="none">Current Filter</option>
-            <optgroup label="By Provider">
+            <option value="filter">Current Filter</option>
+            <optgroup label="By Provider" id="optgroup-providers">
                 <option value="none">Amazon</option>
                 <option value="none">Rackspace</option>
                 <option value="none">OpenStack</option>
@@ -163,7 +163,7 @@
 <div data-role="page" id="dialog-console" class="mist-dialog">
     <div data-role="content" data-theme="a">
         <h3>Console</h3>
-        <a href="index.html" data-role="button" data-rel="back" data-theme="a">Cancel</a>    
+        <a href="index.html" data-role="button" data-rel="back" data-theme="a">Hide</a>    
     </div>
 </div><!-- /console dialog -->
 

@@ -32,9 +32,10 @@ $( '#machines' ).live( 'pageinit',function(event){
 // Selection control behavior.
 // Select according to control value. Show/hide footer accordingly.
 $('#mist-select-machines').live('change', function() {
-    if ($(this).val() == 'all') {
+    var selectVal = $(this).val();
+    if (selectVal == 'all') {
         $('#machines-list input:checkbox').attr('checked',true).checkboxradio("refresh");
-    } else {
+    } else if (selectVal == 'none') {
         $('#machines-list input:checkbox').attr('checked',false).checkboxradio("refresh");
     }
     if ($('#machines-list input:checked').length) {
@@ -110,9 +111,11 @@ function update_machines_view(backend){
         //$("input[type='checkbox']").checkboxradio("refresh");
     }
     update_machines_count();
+    update_select_providers();
 }
 
 $("input[type='checkbox']").bind( "change", function(event, ui) { alert('c');});
+
 // update the machines counter
 function update_machines_count() {
     //return;
@@ -163,6 +166,16 @@ function update_messages_count() {
         messages =  ' messages';
     }
     $('#notifier span.messages-count').text(message_count + messages);
+}
+
+// updates the optgroup in the select menu with the appropriate providers
+function update_select_providers() {
+    var optgroup = $('#optgroup-providers');
+    optgroup.empty();
+    backends.forEach(function(b, i) {
+        optgroup.append('<option value="prov-'+b.provider+'">'+b.title+'</option>');
+    });
+    $('#mist-select-machines').selectmenu('refresh');
 }
 
 function truncate_names(truncateName, truncateCharacters ) { //truncate truncateName if bigger than truncateCharacters
