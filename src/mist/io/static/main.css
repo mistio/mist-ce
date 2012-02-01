@@ -8,7 +8,7 @@
     position: fixed;
     top: 80px;
     left: 0;
-    z-index: 10000;
+    z-index: 0;
 }
 
 /* Machines Pane */

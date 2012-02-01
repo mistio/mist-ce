@@ -65,7 +65,8 @@ $('#machines-list input:checkbox').live('change', function() {
 
 /* when the list_machines action returns, update the view */
 function update_machines_view(backend){ 
-    $('#logo-container').animate({opacity : 0.04});
+    //$('#logo-container').animate({opacity : 0.04});
+    $('#machines .node').animate({opacity : 0.90});
     backend.machines.forEach(function(machine, index){
         var node = $('#machines-list > #' + backends.indexOf(backend) + '-' + machine.id);
         if (node.length == 1) { // there should be only one machine with this id in the DOM
