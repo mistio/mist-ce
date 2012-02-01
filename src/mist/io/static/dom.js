@@ -4,15 +4,14 @@ var STATES = {
     '1' : 'Rebooting',
     '2' : 'Terminated',
     '3' : 'Pending',
-    '4' : 'Unknown',            
+    '4' : 'Unknown'            
     };
-    
+  
 
 /* disable browser bar on android */
 if(navigator.userAgent.match(/Android/i)){
    window.scrollTo(0,1);
 }
-
     
 /* on page init */
 $(document).bind("mobileinit", function(){
@@ -31,15 +30,15 @@ $(document).bind("mobileinit", function(){
     });
 });
 
+// prepare single view on node click
+$('li.node a' ).live( 'click',function(event){
+    alert($(this).parent().parent().parent()[0].id);    
+});
+
 // Hide footer on machines page load.
 $( '#machines' ).live( 'pageinit',function(event){
     $('#machines-footer').hide();
     setTimeout(function() {$('#logo-container').fadeOut(500);}, 5000);
-});
-
-// Hide footer on machines page load.
-$( '#single-machine' ).live( 'pagebeforeshow',function(event){
-    alert($(this).id);
 });
 
 // Selection control behavior.
