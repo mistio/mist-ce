@@ -65,9 +65,9 @@
             <label></label>                
             <a href="#single-machine">
                 <h3 class="name"></h3>
-                <p class="state"></p>
-                <span class="ui-li-count">tag1</span> <span class="ui-li-count">tag2</span>
-                <span class="backend"></span>
+                <p class="description"><span class="tag">tag1</span><span class="tag">tag2</span></p>
+                <span class="ui-li-count state">tag1</span>
+                <span class="ui-li-count backend"></span>
             </a>
         </li>
         <select name="select-machines" id="mist-select-machines" data-native-menu="false">
@@ -94,6 +94,7 @@
             <a data-role="button" data-icon="refresh">Reboot</a>
             <a data-role="button" data-icon="delete">Destroy</a>
             <a href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
+            <a href="#dialog-tags" data-role="button" data-icon="grid" data-transition="slidedown">Tags</a>
         </div>
     </div><!-- /footer -->
 
@@ -105,7 +106,7 @@
     <div data-role="header">
         <a href="#machines" data-icon="arrow-l" data-direction="reverse" class="ui-btn-left">Machines</a>
         <h1>Machine name</h1>
-        <a href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="flip" data-icon="check" class="ui-btn-right">All Providers OK</a>
+        <a href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right">All Providers OK</a>
     </div><!-- /header -->
 
     <div data-role="content">
@@ -126,6 +127,7 @@
             <a data-role="button" data-icon="refresh">Reboot</a>
             <a data-role="button" data-icon="delete">Destroy</a>
             <a href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
+            <a href="#dialog-tags" data-role="button" data-icon="grid" data-transition="slidedown">Tags</a>
         </div>
     </div><!-- /footer -->
 
@@ -136,21 +138,27 @@
     <div data-role="content" data-theme="c">
         <h3>Create</h3>
         <input type="text" id="new-machine-name" > </input>
-        <select name="select-choice-1" id="select-choice-1" data-theme="c" data-icon="check" data-native-menu="false">
+        <select name="create-select-provider" id="create-select-provider" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Provider</option>
         </select> 
-        <select name="select-choice-1" id="select-choice-1" data-theme="c" data-icon="check" data-native-menu="false">
+        <select name="create-select-provider" id="create-select-image" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Image</option>
             <option value="edit">1</option>
             <option value="delete">2</option>
             <option value="delete">3</option>
         </select>       
-        <select name="select-choice-1" id="select-choice-1" data-theme="c" data-icon="check" data-native-menu="false">
+        <select name="create-select-provider" id="create-select-size" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Size</option>
             <option value="edit">1</option>
             <option value="delete">2</option>
             <option value="delete">3</option>
-        </select>       
+        </select>    
+        <select name="create-select-location" id="create-select-location" data-theme="c" data-icon="check" data-native-menu="false">
+            <option>Location</option>
+            <option value="edit">1</option>
+            <option value="delete">2</option>
+            <option value="delete">3</option>
+        </select>     
         <div id="create-ok-cancel" data-role="controlgroup" data-type="horizontal">
             <a href="index.html" id="create-ok" data-role="button" data-rel="back" data-theme="c">OK</a>   
             <a href="index.html" id="create-cancel" data-role="button" data-rel="back" data-theme="c">Cancel</a>  
@@ -178,6 +186,15 @@
     </div>
 </div><!-- /providers dialog -->
 
+<!-- Start of tags dialog -->
+<div data-role="page" id="dialog-tags" class="mist-dialog">
+    <div data-role="content" data-theme="a">
+        <h3>Manage Tags</h3>
+          
+        <a href="index.html" data-role="button" data-rel="back" data-transition="flip" data-theme="a">Back</a>    
+    </div>
+</div><!-- /providers dialog -->
+tags
 </body>
 
 </html>
