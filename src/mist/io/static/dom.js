@@ -37,6 +37,11 @@ $( '#machines' ).live( 'pageinit',function(event){
     setTimeout(function() {$('#logo-container').fadeOut(500);}, 5000);
 });
 
+// Hide footer on machines page load.
+$( '#single-machine' ).live( 'pagebeforeshow',function(event){
+    alert($(this).id);
+});
+
 // Selection control behavior.
 // Select according to control value. Show/hide footer accordingly,
 // and reset selection in the end.
