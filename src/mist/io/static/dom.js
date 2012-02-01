@@ -81,7 +81,8 @@ function update_machines_view(backend){
                 //node.find('.select')[0].id = 'chk-' + machine.id;
                 node.fadeIn(100);
             }
-            node.find('.state').removeClass().addClass('state').addClass('state'+machine.state);
+            // Remove classes and add the basic 'state' and 'ui-li'count' for tags
+            node.find('.state').removeClass().addClass('ui-li-count state state'+machine.state);
         } else { // if the machine does does exist in the DOM, then add it 
             if (node.length != 0){
                 log.newMessage(ERROR, 'DOM Error: ' + node);
