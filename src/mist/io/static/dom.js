@@ -66,7 +66,7 @@ $('#machines-list input:checkbox').live('change', function() {
 /* when the list_machines action returns, update the view */
 function update_machines_view(backend){ 
     //$('#logo-container').animate({opacity : 0.04});
-    $('#machines .node').animate({opacity : 0.90});
+    //$('#machines .node').animate({opacity : });
     backend.machines.forEach(function(machine, index){
         var node = $('#machines-list > #' + backends.indexOf(backend) + '-' + machine.id);
         if (node.length == 1) { // there should be only one machine with this id in the DOM
@@ -96,7 +96,7 @@ function update_machines_view(backend){
             node.find('label').attr('for', 'chk-' + machine.id);
             node[0].id = backends.indexOf(backend) + '-' + machine.id;
             node.appendTo('#machines-list');
-            node.fadeIn(200);
+            node.fadeTo(200, 0.90);
         }
     });
 
