@@ -1,13 +1,13 @@
 /* Custom unweb rules */
 
 #logo-container {
-    background: url(../static/logo.png) 0 0 no-repeat;
-    width: 103px;
+    background: url(../static/logo.png) center bottom no-repeat;
+    width: 100%;
     height: 131px;
     margin: 36px 0;
     position: fixed;
-    top: 30%;
-    left: 44%;
+    top: 80px;
+    left: 0;
     z-index: 10000;
 }
 
@@ -97,6 +97,19 @@
 
 #machines .ui-listview-filter-inset {
     margin: -50px 60px 0 60px;
+}
+
+#machines-list .ui-li-count {
+    float: right;
+    position: static;
+}
+
+#machines-list .backend {
+    display: none;
+}
+
+#machines .ui-select {
+    width: 60px;
 }
 
 #machines .ui-input-search input.ui-input-text {

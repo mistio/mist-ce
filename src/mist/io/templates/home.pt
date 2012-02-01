@@ -3,7 +3,9 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content='True' name='HandheldFriendly' />
+    <meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1.0; user-scalable=0;">
+    <meta name="viewport" content="width=device-width" />        
     <title>${project} - down to earth cloud computing</title>
     <!-- include the Tools -->
     <link rel="stylesheet" href="static/jquery.mobile-1.0.min.css" />
@@ -64,8 +66,8 @@
             <a href="#single-machine">
                 <h3 class="name"></h3>
                 <p class="state"></p>
+                <span class="ui-li-count">tag1</span> <span class="ui-li-count">tag2</span>
                 <span class="backend"></span>
-                <div><span class="ui-li-count">tag1</span> <span class="ui-li-count">tag2</span></div>
             </a>
         </li>
         <select name="select-machines" id="mist-select-machines" data-native-menu="false">

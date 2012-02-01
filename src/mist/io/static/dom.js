@@ -7,6 +7,13 @@ var STATES = {
     '4' : 'Unknown',            
     };
     
+
+/* disable browser bar on android */
+if(navigator.userAgent.match(/Android/i)){
+   window.scrollTo(0,1);
+}
+
+    
 /* on page init */
 $(document).bind("mobileinit", function(){
 
