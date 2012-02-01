@@ -136,9 +136,6 @@
         <input type="text" id="new-machine-name" > </input>
         <select name="select-choice-1" id="select-choice-1" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Provider</option>
-            <option value="edit">Amazon</option>
-            <option value="delete">Rackspace</option>
-            <option value="delete">Openstack</option>
         </select> 
         <select name="select-choice-1" id="select-choice-1" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Image</option>

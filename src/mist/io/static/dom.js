@@ -170,14 +170,21 @@ function update_messages_count() {
     $('#notifier span.messages-count').text(message_count + messages);
 }
 
-// updates the optgroup in the select menu with the appropriate providers
+// updates the optgroup in the select menu and the select in the create dialog
+// with the appropriate providers
 function update_select_providers() {
-    var optgroup = $('#optgroup-providers');
+    var optgroup = $('#optgroup-providers'),
+        addmenu = $('#dialog-add #select-choice-1');
     optgroup.empty();
+    addmenu.empty();
+    addmenu.append('<option>Select Provider</option>');
     backends.forEach(function(b, i) {
-        optgroup.append('<option value="prov-'+b.provider+'">'+b.title+'</option>');
+        var optionContent = '<option value="prov-'+b.provider+'">'+b.title+'</option>';
+        optgroup.append(optionContent);
+        addmenu.append(optionContent);
     });
     $('#mist-select-machines').selectmenu('refresh');
+    addmenu.selectmenu('refresh');
 }
 
 function truncate_names(truncateName, truncateCharacters ) { //truncate truncateName if bigger than truncateCharacters
