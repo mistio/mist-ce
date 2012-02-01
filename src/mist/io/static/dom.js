@@ -68,6 +68,16 @@ $('#machines-list input:checkbox').live('change', function() {
     }
 });
 
+// Update tags page when it opens
+$("#dialog-tags").live( "pagebeforeshow", function( e, data ) {
+    // TODO get tags and display them
+    //$('#machines-list .node').each(function(n, i) {
+    //    $(n).find('.tag').each(function() {
+
+    //    });
+    //});
+});
+
 /* when the list_machines action returns, update the view */
 function update_machines_view(backend){ 
     backend.machines.forEach(function(machine, index){

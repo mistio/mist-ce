@@ -65,8 +65,11 @@
             <label></label>                
             <a href="#single-machine">
                 <h3 class="name"></h3>
-                <p class="description"><span class="tag">tag1</span><span class="tag">tag2</span></p>
-                <span class="ui-li-count state">tag1</span>
+                <p class="description">
+                    <span class="tag">tag1</span>
+                    <span class="tag">tag2</span>
+                </p>
+                <span class="ui-li-count state tag-tag1">State</span>
                 <span class="ui-li-count backend"></span>
             </a>
         </li>
@@ -94,7 +97,7 @@
             <a data-role="button" data-icon="refresh">Reboot</a>
             <a data-role="button" data-icon="delete">Destroy</a>
             <a href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
-            <a href="#dialog-tags" data-role="button" data-icon="grid" data-transition="slidedown">Tags</a>
+            <a href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tags</a>
         </div>
     </div><!-- /footer -->
 
@@ -127,7 +130,7 @@
             <a data-role="button" data-icon="refresh">Reboot</a>
             <a data-role="button" data-icon="delete">Destroy</a>
             <a href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
-            <a href="#dialog-tags" data-role="button" data-icon="grid" data-transition="slidedown">Tags</a>
+            <a href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tags</a>
         </div>
     </div><!-- /footer -->
 
@@ -188,9 +191,14 @@
 
 <!-- Start of tags dialog -->
 <div data-role="page" id="dialog-tags" class="mist-dialog">
-    <div data-role="content" data-theme="a">
+    <div data-role="content" data-theme="c">
         <h3>Manage Tags</h3>
-          
+        <div id="tags-container">
+            <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag1</a>
+            <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag2</a>
+            <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag3</a>
+            <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag4</a>
+        </div>
         <a href="index.html" data-role="button" data-rel="back" data-transition="flip" data-theme="a">Back</a>    
     </div>
 </div><!-- /providers dialog -->

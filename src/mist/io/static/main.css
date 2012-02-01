@@ -53,14 +53,25 @@
 	z-index: 1000;
 }
 
+/* Lists */
+
+.ui-li-count {
+	font-size: 13px !important;
+}
+
 /* Machines List */
 
 #machines-list {
 	margin-top: 10px;
 }
 
+#machines-list .node {
+	clear: left;
+}
+
 #machines-list .ui-checkbox {
     float:left;
+    margin-bottom: 0px !important;
 }
 
 #machines-list .ui-checkbox input {
@@ -81,13 +92,13 @@
     z-index: 1000;    
 }
 
-#machines .ui-btn-text .ui-checkbox {
+#machines-list .ui-btn-text .ui-checkbox {
 	width: 56px;
 }
 
 #machines-list .ui-checkbox .ui-btn-inner {
-	top: 20px;
-	left: 4px;
+	top: 14px;
+	left: 5px;
 	height: 40px;
     border-top: none;
 }
@@ -96,8 +107,8 @@
     color: #2F3E46;
 }
 
-.ui-li-count {
-	font-size: 13px !important;
+#machines-list .description {
+	float: left;
 }
 
 #machines .ui-listview-filter-inset {
@@ -106,7 +117,6 @@
 
 #machines-list .ui-li-count {
     float: right;
-    position: static;
 }
 
 #machines-list .backend {
