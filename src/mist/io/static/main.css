@@ -95,6 +95,10 @@
     color: #2F3E46;
 }
 
+.ui-li-count {
+	font-size: 13px !important;
+}
+
 #machines .ui-listview-filter-inset {
     margin: -50px 60px 0 60px;
 }
