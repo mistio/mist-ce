@@ -48,6 +48,7 @@
 
 </div><!-- /page one -->
 
+
 <!-- Start of machines page: #machines -->
 <div data-role="page" id="machines" data-theme="c">
 
@@ -104,6 +105,7 @@
 
 </div><!-- /machines page -->
 
+
 <!-- Start of details page -->
 <div data-role="page" id="single-machine" data-theme="c" class="type-interior">
 
@@ -128,14 +130,15 @@
 
     <div id="machines-footer" data-role="footer" data-theme="a">   
         <div id="actions" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" data-icon="refresh">Reboot</a>
-            <a data-role="button" data-icon="delete">Destroy</a>
-            <a href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
-            <a href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tags</a>
+            <a id="footer-single-reboot" data-role="button" data-icon="refresh">Reboot</a>
+            <a id="footer-single-destroy" data-role="button" data-icon="delete">Destroy</a>
+            <a id="footer-single-console" href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
+            <a id="footer-single-tags" href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tags</a>
         </div>
     </div><!-- /footer -->
 
 </div><!-- /details page -->
+
 
 <!-- Start of add dialog -->
 <div data-role="page" id="dialog-add" class="mist-dialog">
@@ -168,6 +171,7 @@
     </div>
 </div><!-- /add dialog -->
 
+
 <!-- Start of console dialog -->
 <div data-role="page" id="dialog-console" class="mist-dialog">
     <div data-role="content" data-theme="a">
@@ -187,6 +191,7 @@
         <a href="index.html" data-role="button" data-rel="back" data-transition="flip" data-theme="a">Back</a>    
     </div>
 </div><!-- /providers dialog -->
+
 
 <!-- Start of tags dialog -->
 <div data-role="page" id="dialog-tags" class="mist-dialog">
