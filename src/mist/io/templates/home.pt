@@ -79,7 +79,6 @@
             <option>Select Machines</option>
             <option value="all">All</option>
             <option value="none">None</option>
-            <option value="filter">Current Filter</option>
             <optgroup label="By Provider" id="optgroup-providers">
                 <option value="none">Amazon</option>
                 <option value="none">Rackspace</option>
@@ -87,7 +86,7 @@
             </optgroup>
         </select>
         <a href="#dialog-add" id="mist-create-machine" data-rel="dialog" data-theme="c" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus" data-iconpos="notext"></a>
-        <ul id="machines-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
+        <ul id="machines-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" data-filter-placeholder="Filter machines.." class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
 
         </ul>
 

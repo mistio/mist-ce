@@ -35,6 +35,9 @@ $(document).bind("mobileinit", function(){
         b.newAction(['list_images']);
         b.newAction(['list_locations']);
     });
+
+    // Change default machines list callback
+    $.mobile.listview.prototype.options.filterCallback = customMachinesFilter;
 });
 
 // prepare single view on node click
@@ -51,35 +54,43 @@ $( '#machines' ).live( 'pageinit',function(event){
 // Selection control behavior.
 // Select according to control value. Show/hide footer accordingly,
 // and reset selection in the end.
+// Note that change event should be triggered manually! Why?
 $('#mist-select-machines').live('change', function() {
     var selectVal = $(this).val();
+    $('#machines-list .node input:checkbox').attr('checked',false);
     if (selectVal == 'all') {
-        $('#machines-list input:checkbox').attr('checked',true).checkboxradio("refresh");
-    } else if (selectVal == 'none') {
-        $('#machines-list input:checkbox').attr('checked',false).checkboxradio("refresh");
+        $('#machines-list .node:visible input:checkbox').attr('checked',true);
+    } else if (selectVal != 'none') {
+        $('#machines-list .node').each( function() {
+            if ($(this).find('span.'+selectVal).length > 0) {
+                $(this).find('input:checkbox').attr('checked',true);
+            }
+        });
     }
-    if ($('#machines-list input:checked').length) {
-        $('#machines-footer').fadeIn(160);
-    } else {
-        $('#machines-footer').fadeOut(300);
-    }
+    $('#machines-list .node input:checkbox').trigger('change').checkboxradio("refresh");
+    updateFooterVisibility();
     $(this).val('select').selectmenu('refresh');
 });
 
-// Check for footer visibility when a checkbox is selected/deselected.
-$('#machines-list input:checkbox').live('change', function() {
-    if ($('#machines-list input:checked').length) {
-        $('#machines-footer').fadeIn(160);
+// Event listener for node checkbox change.
+// Adds a hidden text value to the node to affect
+// node display while filtering.
+$('#machines-list .node input:checkbox').live('change', function(event){
+    var $this = $(this);
+    if ($this.is(':checked')) {
+        $this.closest('.node').append('<span class="mist-node-selected" style="display:none">mist-node-selected</span>');
     } else {
-        $('#machines-footer').fadeOut(300);
+        $this.closest('.node').find('.mist-node-selected').remove();
     }
 });
+
+// Check for footer visibility when a checkbox is selected/deselected.
+$('#machines-list input:checkbox').live('change', updateFooterVisibility);
 
 // Update tags page when it opens
 $("#dialog-tags").live( "pagebeforeshow", function( e, data ) {
     // TODO get tags from machine object and display them
     $('#dialog-tags #tags-container').empty();
-
 });
 
 /* when the list_machines action returns, update the view */
@@ -91,7 +102,7 @@ function update_machines_view(backend){
                 node.fadeOut(100);                
                 node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
                 node.find('.backend').text(backend.title);
-                node.find('.backend').addClass('provider'+backend.provider);
+                node.find('.backend').addClass('prov-'+backend.provider);
                 //node.find('.select')[0].id = 'chk-' + machine.id;
                 node.fadeIn(100);
             }
@@ -106,7 +117,7 @@ function update_machines_view(backend){
             node.addClass('node');
             node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
             node.find('.backend').text(backend.title);
-            node.find('.backend').addClass('provider'+backend.provider);
+            node.find('.backend').addClass('prov-'+backend.provider);
             //node.find('.state').addClass('state'+machine.state);
             //node.find('.state').text(STATES[machine.state]);
             node.find('.state-icon').addClass('ui-icon ui-icon-'+STATEICONS[machine.state]);
@@ -143,7 +154,25 @@ function update_machines_view(backend){
     update_select_providers();
 }
 
-$("input[type='checkbox']").bind( "change", function(event, ui) { alert('c');});
+// Update footer visibility
+function updateFooterVisibility() {
+    if ($('#machines-list input:checked').length) {
+        $('#machines-footer').fadeIn(160);
+    } else {
+        $('#machines-footer').fadeOut(300);
+    }
+}
+
+// Custom machines filtering function.
+// Relies on the presence of a hidden span
+// which contains the text "mist-node-selected" only
+// if the node is selected.
+// This is to overcome jQuery mobile filtering lameness
+// which only passed li text as a parameter.
+function customMachinesFilter( text, searchValue ){
+    var textL = text.toLowerCase();
+  return !(textL.indexOf( searchValue ) >= 0 || textL.indexOf( 'mist-node-selected' ) >= 0);
+};
 
 // update the machines counter
 function update_machines_count() {
