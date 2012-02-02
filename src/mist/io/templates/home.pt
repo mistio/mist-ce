@@ -172,8 +172,8 @@
 <div data-role="page" id="dialog-confirm" class="mist-dialog">
     <div data-role="content" data-theme="a">
         <h3>Are you sure?</h3>
-        <a href="index.html" data-role="button" data-rel="back" data-theme="a">No</a>
-        <a href="index.html" data-role="button" data-rel="back" data-theme="a">Yes</a>
+        <a href="index.html" id="confirm-no" data-role="button" data-rel="back" data-theme="a">No</a>
+        <a href="index.html" id="confirm-yes" data-role="button" data-rel="back" data-theme="a">Yes</a>
     </div>
 </div><!-- /confirm dialog -->
 
