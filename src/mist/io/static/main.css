@@ -53,6 +53,12 @@
 	z-index: 1000;
 }
 
+/* Provider Icons */
+
+.state-providers .ui-icon-check {
+	background-color: #22aa22;
+}
+
 /* Lists */
 
 .ui-li-count {
@@ -125,6 +131,10 @@
     top: 26px;
     height: 20px;
     padding-top: 1px;
+}
+
+#machines-list .state-icon.ui-icon-check {
+	background-color: #33dd44;
 }
 
 #machines-list .ui-li-count {

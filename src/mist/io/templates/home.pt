@@ -54,7 +54,7 @@
     <div data-role="header">
         <a href="#one" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
         <h1>Machines</h1>
-        <a href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right">All Providers OK</a>
+        <a class="state-providers" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right">All Providers OK</a>
     </div><!-- /header -->
 
     <div data-role="content">
@@ -95,10 +95,10 @@
 
     <div id="machines-footer" data-role="footer" data-theme="a">   
         <div id="actions" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" data-icon="refresh">Reboot</a>
-            <a data-role="button" data-icon="delete">Destroy</a>
-            <a href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
-            <a href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tags</a>
+            <a id="footer-reboot" data-role="button" data-icon="refresh">Reboot</a>
+            <a id="footer-destroy" data-role="button" data-icon="delete">Destroy</a>
+            <a id="footer-console" href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
+            <a id="footer-tags" href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tags</a>
         </div>
     </div><!-- /footer -->
 
@@ -110,7 +110,7 @@
     <div data-role="header">
         <a href="#machines" data-icon="arrow-l" data-direction="reverse" class="ui-btn-left">Machines</a>
         <h1>Machine name</h1>
-        <a href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right">All Providers OK</a>
+        <a class="state-providers" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right">All Providers OK</a>
     </div><!-- /header -->
 
     <div data-role="content">

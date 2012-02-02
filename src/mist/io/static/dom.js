@@ -84,7 +84,8 @@ $('#machines-list .node input:checkbox').live('change', function(event){
     }
 });
 
-// Check for footer visibility when a checkbox is selected/deselected.
+// Check for footer visibility and button enabling
+// when a checkbox is selected/deselected.
 $('#machines-list input:checkbox').live('change', updateFooterVisibility);
 
 // Update tags page when it opens
@@ -156,10 +157,15 @@ function update_machines_view(backend){
 
 // Update footer visibility
 function updateFooterVisibility() {
-    if ($('#machines-list input:checked').length) {
-        $('#machines-footer').fadeIn(160);
+    var len = $('#machines-list input:checked').length;
+    if (len > 1) {
+        $('#machines-footer').fadeIn(140);
+        $('#machines #footer-console').addClass('ui-disabled');
+    } else if (len > 0) {
+        $('#machines-footer').fadeIn(140);
+        $('#machines #footer-console').removeClass('ui-disabled');
     } else {
-        $('#machines-footer').fadeOut(300);
+        $('#machines-footer').fadeOut(200);
     }
 }
 
