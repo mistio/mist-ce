@@ -267,9 +267,9 @@ function to_ul(obj, prop) {
         return li;
     } else {
         var ul = document.createElement ("ul");
-        for (var prop in obj){
+        for (var prop in obj) {
             console.log('appending ' + prop);
-            ul.appendChild(to_ul(obj[prop],prop));
+            ul.appendChild(to_ul(obj[prop], prop));
         }
         return ul;
     }
@@ -277,10 +277,8 @@ function to_ul(obj, prop) {
 
 //get machine, given backend and machineId
 function get_machine(backendIndex, machineId) {
-    //machineId is backendIndex-machineId, eg 2-28
-    machine_id = machineId.replace(backendIndex + '-', '');
     for (var m in backends[backendIndex].machines){
-        if (backends[backendIndex].machines[m].id == machine_id) {
+        if (backends[backendIndex].machines[m].id == machineId) {
             return backends[backendIndex].machines[m];
         }
     }

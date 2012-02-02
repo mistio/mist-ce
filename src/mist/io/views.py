@@ -48,11 +48,7 @@ def list_machines(request):
         if request.matchdict['backend'] == b['id']:
             found = True
             conn = connect(b)
-            try:
-                machines = conn.list_nodes()
-            except AttributeError:
-                print "Connection lost!"
-                return Response(json.dumps([]))
+            machines = conn.list_nodes()
             break
     if not found:
         return Response('Invalid backend', 404)
