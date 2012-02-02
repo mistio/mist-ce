@@ -194,6 +194,10 @@ a#mist-select-machines-button {
 	width: 49%;
 }
 
+#new-machine-name {
+	margin: 12px 0;
+}
+
 .mist-li-selected {
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#AFD5FF), to(#98BBED)); /* Saf4+, Chrome */
 	background-image: -webkit-linear-gradient(#AFD5FF, #98BBED); /* Chrome 10+, Saf5.1+ */

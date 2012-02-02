@@ -142,31 +142,29 @@
 <div data-role="page" id="dialog-add" class="mist-dialog">
     <div data-role="content" data-theme="c">
         <h3>Create</h3>
-        <input type="text" id="new-machine-name" > </input>
+        <label for="create-machine-name" class="select">1. Name:</label>
+        <input name="create-machine-name" type="text" id="new-machine-name" > </input>
+        <label for="create-select-provider" class="select">2. Provider:</label>
         <select name="create-select-provider" id="create-select-provider" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Provider</option>
         </select> 
+        <label for="create-select-image" class="select">3. Image:</label>
         <select name="create-select-image" id="create-select-image" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Image</option>
             <option value="edit">1</option>
             <option value="delete">2</option>
             <option value="delete">3</option>
-        </select>       
+        </select>
+        <label for="create-select-size" class="select">4. Size:</label>
         <select name="create-select-size" id="create-select-size" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Size</option>
             <option value="edit">1</option>
             <option value="delete">2</option>
             <option value="delete">3</option>
-        </select>    
-        <select name="create-select-location" id="create-select-location" data-theme="c" data-icon="check" data-native-menu="false">
-            <option>Location</option>
-            <option value="edit">1</option>
-            <option value="delete">2</option>
-            <option value="delete">3</option>
-        </select>     
-        <div id="create-ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a href="index.html" id="create-ok" data-role="button" data-rel="back" data-theme="c">OK</a>   
-            <a href="index.html" id="create-cancel" data-role="button" data-rel="back" data-theme="c">Cancel</a>  
+        </select>        
+        <div id="create-ok-cancel" data-role="controlgroup" data-type="horizontal">   
+            <a href="index.html" id="create-cancel" data-role="button" data-rel="back" data-theme="c">Back</a>  
+            <a href="index.html" id="create-ok" data-role="button" data-rel="back" data-theme="b">Launch!</a>
         </div>  
     </div>
 </div><!-- /add dialog -->
