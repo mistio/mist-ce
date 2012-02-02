@@ -115,12 +115,26 @@
     margin: -50px 60px 0 60px;
 }
 
-#machines-list .ui-li-count {
+#machines-list .bubble-container {
     float: right;
+    display: block;
+    overflow: hidden;
+    height: 20px;
+    position: absolute;
+    right: 40px;
+    top: 26px;
+    height: 20px;
+    padding-top: 1px;
 }
 
-#machines-list .backend {
-    display: none;
+#machines-list .ui-li-count {
+	position: static;
+}
+
+#machines-list .state-icon {
+	padding: 2px 9px;
+	border: none;
+	margin-right: 5px;
 }
 
 #machines .ui-select {

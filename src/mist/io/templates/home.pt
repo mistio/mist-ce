@@ -69,8 +69,10 @@
                     <span class="tag">tag1</span>
                     <span class="tag">tag2</span>
                 </p>
-                <span class="ui-li-count state tag-tag1">State</span>
-                <span class="ui-li-count backend"></span>
+                <span class="bubble-container">
+                    <span class="ui-li-count backend"></span>
+                    <span class="ui-li-count state-icon"></span>
+                </span>
             </a>
         </li>
         <select name="select-machines" id="mist-select-machines" data-native-menu="false">
@@ -144,13 +146,13 @@
         <select name="create-select-provider" id="create-select-provider" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Provider</option>
         </select> 
-        <select name="create-select-provider" id="create-select-image" data-theme="c" data-icon="check" data-native-menu="false">
+        <select name="create-select-image" id="create-select-image" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Image</option>
             <option value="edit">1</option>
             <option value="delete">2</option>
             <option value="delete">3</option>
         </select>       
-        <select name="create-select-provider" id="create-select-size" data-theme="c" data-icon="check" data-native-menu="false">
+        <select name="create-select-size" id="create-select-size" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Size</option>
             <option value="edit">1</option>
             <option value="delete">2</option>

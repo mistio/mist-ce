@@ -6,6 +6,13 @@ var STATES = {
     '3' : 'Pending',
     '4' : 'Unknown'            
     };
+var STATEICONS = {
+    '0' : 'check',
+    '1' : 'refresh',
+    '2' : 'delete',
+    '3' : 'gear',
+    '4' : 'alert'            
+    };
   
 
 /* disable browser bar on android */
@@ -70,12 +77,9 @@ $('#machines-list input:checkbox').live('change', function() {
 
 // Update tags page when it opens
 $("#dialog-tags").live( "pagebeforeshow", function( e, data ) {
-    // TODO get tags and display them
-    //$('#machines-list .node').each(function(n, i) {
-    //    $(n).find('.tag').each(function() {
+    // TODO get tags from machine object and display them
+    $('#dialog-tags #tags-container').empty();
 
-    //    });
-    //});
 });
 
 /* when the list_machines action returns, update the view */
@@ -86,7 +90,7 @@ function update_machines_view(backend){
             if (node.find('.name').text() != machine.name){
                 node.fadeOut(100);                
                 node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
-                node.find('.backend').text(backends.indexOf(backend));
+                node.find('.backend').text(backend.title);
                 node.find('.backend').addClass('provider'+backend.provider);
                 //node.find('.select')[0].id = 'chk-' + machine.id;
                 node.fadeIn(100);
@@ -101,10 +105,11 @@ function update_machines_view(backend){
             node.removeClass('node-template');
             node.addClass('node');
             node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
-            node.find('.backend').text(backends.indexOf(backend));
+            node.find('.backend').text(backend.title);
             node.find('.backend').addClass('provider'+backend.provider);
-            node.find('.state').addClass('state'+machine.state);
-            node.find('.state').text(STATES[machine.state]);
+            //node.find('.state').addClass('state'+machine.state);
+            //node.find('.state').text(STATES[machine.state]);
+            node.find('.state-icon').addClass('ui-icon ui-icon-'+STATEICONS[machine.state]);
             node.find('input')[0].id = 'chk-' + machine.id;
             node.find('input')[0].name = 'chk-' + machine.id;
             node.find('label').attr('for', 'chk-' + machine.id);
@@ -194,16 +199,24 @@ function update_messages_count() {
 
 // updates the optgroup in the select menu and the select in the create dialog
 // with the appropriate providers
+// Note that for the create dialog, locations become separate list items for
+// each provider.
 function update_select_providers() {
     var optgroup = $('#optgroup-providers'),
-        addmenu = $('#dialog-add #select-choice-1');
+        addmenu = $('#dialog-add #create-select-provider');
     optgroup.empty();
     addmenu.empty();
     addmenu.append('<option>Select Provider</option>');
     backends.forEach(function(b, i) {
         var optionContent = '<option value="prov-'+b.provider+'">'+b.title+'</option>';
         optgroup.append(optionContent);
-        addmenu.append(optionContent);
+        if (b.locations.length < 1) {
+            addmenu.append(optionContent);
+        } else {
+            b.locations.forEach(function(l, j) {
+                addmenu.append('<option value="prov-'+b.provider+' loc-'+l.id+'">'+b.title+' - '+l.name+'</option>');
+            });
+        }
     });
     $('#mist-select-machines').selectmenu('refresh');
     addmenu.selectmenu('refresh');
