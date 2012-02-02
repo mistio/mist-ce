@@ -98,7 +98,7 @@
             <a id="footer-reboot" data-role="button" data-icon="refresh">Reboot</a>
             <a id="footer-destroy" href="#dialog-confirm" data-role="button" data-icon="delete" data-transition="slidedown">Destroy</a>
             <a id="footer-console" href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
-            <a id="footer-tags" href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tags</a>
+            <a id="footer-tags" href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tag</a>
         </div>
     </div><!-- /footer -->
 
@@ -115,7 +115,7 @@
 
     <div data-role="content">
 
-        <div data-role="collapsible">
+        <div>
             <h3>Basic Info</h3>
             Basic stuff
         </div>

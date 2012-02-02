@@ -42,7 +42,11 @@ $(document).bind("mobileinit", function(){
 
 // prepare single view on node click
 $('li.node a' ).live( 'click',function(event){
-    alert($(this).parent().parent().parent()[0].id);    
+    var domId = $(this).parent().parent().parent()[0].id;
+    var backendId = domId.split('-')[0];
+    var machineId = domId.split('-').splice(1).join('-');
+    var machine = get_machine(backendId, machineId);
+    $('#single-machine .ui-header h1').text(machine.name || machine.id);
 });
 
 // Hide footer on machines page load.
@@ -147,7 +151,9 @@ function update_machines_view(backend){
     });
     
     if ($.mobile.activePage.attr('id') == 'machines') {
-        $('#machines-list').listview('refresh');
+        try {
+            $('#machines-list').listview('refresh');
+        } catch(err) {}
         $("#machines-list input[type='checkbox']").checkboxradio();
         //$("input[type='checkbox']").checkboxradio("refresh");
     }
@@ -218,6 +224,12 @@ $('#notifier, #notifier-in').mouseenter(function() {
     // TODO: fix selectors
     log.timeout = setTimeout("$('#notifier, #notifier-in').slideUp(300)", 5000);
 });
+
+// Update the status of a backend
+function update_backend_status(backend, action) {
+    
+}
+
 
 // update the messages counter
 function update_messages_count() {
