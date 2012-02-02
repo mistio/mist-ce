@@ -131,7 +131,7 @@
             <a data-role="button" data-icon="refresh">Reboot</a>
             <a data-role="button" data-icon="delete">Destroy</a>
             <a href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
-            <a href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tags</a>
+            <a href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tag</a>
         </div>
     </div><!-- /footer -->
 
