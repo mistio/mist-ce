@@ -114,7 +114,7 @@
 
     <div data-role="header">
         <a href="#machines" data-icon="arrow-l" data-direction="reverse" class="ui-btn-left">Machines</a>
-        <h1>Machine name</h1>
+        <h1 id="single-machine-name">Machine name</h1>
         <a class="state-providers" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right">All Providers OK</a>
     </div><!-- /header -->
 

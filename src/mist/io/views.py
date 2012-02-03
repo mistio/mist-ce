@@ -54,14 +54,20 @@ def list_machines(request):
         return Response('Invalid backend', 404)
 
     for m in machines:
+        # for rackspace get the tags stored in extra.metadata.tags attr, for amazon get extra.tags.tags attr
+        tags = m.extra.get('tags',None) or m.extra.get('metadata',None)
+        tags = tags and tags.get('tags', None) or []
         ret.append({'id'            : m.id,
                     'uuid'          : m.get_uuid(),
                     'name'          : m.name,
-                    'image'         : m.image,
-                    'size'          : m.size,
+                    # both rackspace and amazon have the image in the imageId extra attr,
+                    'image'         : m.image or m.extra.get('imageId', None),
+                    # for rackspace get flavorId extra attr, for amazon the instancetype extra attr
+                    'size'          : m.size or m.extra.get('flavorId', None) or m.extra.get('instancetype', None), 
                     'state'         : m.state,
                     'private_ips'   : m.private_ips,
                     'public_ips'    : m.public_ips,
+                    'tags'          : tags,
                     'extra'         : m.extra,
                     })
     return Response(json.dumps(ret))

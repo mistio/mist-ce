@@ -28,15 +28,15 @@ def main(global_config, **settings):
                     request_method='POST',
                     route_name='machine_action')
 
-    config.add_route('list_metadata', '/backends/{backend}/machines/{machine}/metadata')
-    config.add_view('mist.io.views.list_metadata',
-                    request_method='GET',
-                    route_name='list_metadata')
-
     config.add_route('set_metadata', '/backends/{backend}/machines/{machine}/metadata')
     config.add_view('mist.io.views.set_metadata',
                     request_method='POST',
                     route_name='set_metadata')
+    
+    config.add_route('list_metadata', '/backends/{backend}/machines/{machine}/metadata')
+    config.add_view('mist.io.views.list_metadata',
+                    request_method='GET',
+                    route_name='list_metadata')
 
     config.add_route('list_alerts', '/backends/{backend}/machines/{machine}/alerts')
     config.add_view('mist.io.views.list_alerts',

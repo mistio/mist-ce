@@ -62,7 +62,9 @@ function Backend(id, title, provider, interval, host, log){
 
         action = this.action_queue.shift();
 
-        this.updateStatus('wait', action);
+        if (this.status != 'unknown') {
+            this.updateStatus('wait', action);
+        }
         this.currentAction = action;
         var backend = this;
         switch(action[0]) {
@@ -226,20 +228,17 @@ function Backend(id, title, provider, interval, host, log){
                 });
                 break;
             case 'set_metadata':
-                this.log('setting metadata ' + action[1], INFO);
+                console.log('setting metadata ' + action[1], INFO);
                 //FIXME: get from form
                 var payload = {
-                    "var1": "something1",
-                    "var2": "something2",
-                    "var3": "something3",
-                    "var4": "something4",
+                    "tags": {"something1" : 0, "something2" : 0}
                 };
                 $.ajax({
                     type: "POST",
                     contentType: "application/json",
                     dataType: "json",
                     data: JSON.stringify(payload),
-                    url: 'backends/'+this.id+'/machines/'+action[1]+'/metadata/set',
+                    url: 'backends/'+this.id+'/machines/'+action[1]+'/metadata',
                     success: function(data) {
                         backend.updateStatus('on', 'create');
                         backend.processAction();
@@ -287,7 +286,7 @@ function get_machine(backendIndex, machineId) {
 //get image, given backend and machine
 function get_image(backendIndex, machine) {
     for (var m in backends[backendIndex].images){
-        if (backends[backendIndex].images[m].id == machine.extra.imageId) {
+        if (backends[backendIndex].images[m].id == machine.imageId) {
             return backends[backendIndex].images[m];
         }
     }

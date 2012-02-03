@@ -9,7 +9,7 @@ PUBLIC_KEYS['user'] = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDM4ptvXl9/+15Tq4grt
 
 BACKENDS = [
     {'provider' : Provider.OPENSTACK,
-     'title' : 'MOP OpenStack',
+     'title' : 'OpenStack',
      'id' : 'novaadmin',
      'host': '147.102.2.156',
      'auth_url': 'http://147.102.2.156:8774/v1.1',
@@ -20,7 +20,7 @@ BACKENDS = [
      },
 
     {'provider' : Provider.EC2,
-     'title' : 'Amazon EC2',
+     'title' : 'EC2',
      'id' : 'AKIAIHIF64EDA6VJDISQ',
      'secret' : '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',
      'poll_interval' : 10000,
@@ -28,7 +28,7 @@ BACKENDS = [
      },
 
     {'provider' : Provider.RACKSPACE,
-     'title' : 'RackSpace Cloud',
+     'title' : 'RackSpace',
      'id' : 'unwebme',
      'secret' : 'fb68dcedaa4e7f36b5bad4dc7bc28bed',
      'poll_interval' : 10000,
