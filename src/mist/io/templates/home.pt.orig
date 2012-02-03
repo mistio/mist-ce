@@ -67,15 +67,12 @@
             <a href="#single-machine">
                 <h3 class="name"></h3>
                 <p class="description">
-                    <span class="tag backend ui-btn-up-c ui-btn-corner-all">backend</span>
-                    <span class="tag ui-btn-up-c ui-btn-corner-all">tag1</span>
-                    <span class="tag ui-btn-up-c ui-btn-corner-all">tag2</span>
+                    <span class="tag">tag1</span>
+                    <span class="tag">tag2</span>
                 </p>
                 <span class="bubble-container">
-                    <span class="ui-li-count node-icon state-icon"></span>
-                    <span class="ui-li-count node-icon key-icon"></span>
-                    <span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
-                    <span class="ui-li-count node-icon ping-icon"></span>
+                    <span class="ui-li-count backend"></span>
+                    <span class="ui-li-count state-icon"></span>
                 </span>
             </a>
         </li>
@@ -133,10 +130,17 @@
 
     <div id="machines-footer" data-role="footer" data-theme="a">
         <div id="actions" data-role="controlgroup" data-type="horizontal">
+<<<<<<< HEAD
+            <a id="footer-single-reboot" data-role="button" data-icon="refresh">Reboot</a>
+            <a id="footer-single-destroy" data-role="button" data-icon="delete">Destroy</a>
+            <a id="footer-single-console" href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
+            <a id="footer-single-tags" href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tags</a>
+=======
             <a data-role="button" data-icon="refresh">Reboot</a>
             <a href="#dialog-confirm" data-role="button" data-icon="delete" data-transition="slidedown">Destroy</a>
             <a href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
             <a href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tag</a>
+>>>>>>> 565592c3fa399612b245aba5147ae7471ba409ae
         </div>
     </div><!-- /footer -->
 
@@ -174,6 +178,8 @@
     </div>
 </div><!-- /add dialog -->
 
+<<<<<<< HEAD
+=======
 <!-- Start of confirm dialog -->
 <div data-role="page" id="dialog-confirm" class="mist-dialog">
     <div data-role="content" data-theme="a">
@@ -182,6 +188,7 @@
         <a href="index.html" id="confirm-yes" data-role="button" data-rel="back" data-theme="a">Yes</a>
     </div>
 </div><!-- /confirm dialog -->
+>>>>>>> 565592c3fa399612b245aba5147ae7471ba409ae
 
 <!-- Start of console dialog -->
 <div data-role="page" id="dialog-console" class="mist-dialog">

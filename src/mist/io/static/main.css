@@ -121,14 +121,24 @@
     margin: -50px 60px 0 60px;
 }
 
+#machines-list .node .tag {
+	border: 1px solid #bfbfbf;
+	color: #555 !important;
+	font-weight: normal !important;
+	display: block;
+	float: left;
+	padding: 1px 7px;
+	margin: 0 3px 0 0;
+}
+
 #machines-list .bubble-container {
     float: right;
     display: block;
     overflow: hidden;
     height: 20px;
     position: absolute;
-    right: 40px;
-    top: 26px;
+    right: 48px;
+    top: 37%;
     height: 20px;
     padding-top: 1px;
 }
@@ -137,11 +147,25 @@
 	background-color: #33dd44;
 }
 
+#machines-list .key-icon {
+	background-image: url("icons/key.png?skato=0");
+	background-color: #333;
+}
+
+#machines-list .alert-icon {
+	background-color: #f93;
+}
+
+#machines-list .ping-icon {
+	background-image: url("icons/ping.png?skato=0");
+	background-color: #3399cc;
+}
+
 #machines-list .ui-li-count {
 	position: static;
 }
 
-#machines-list .state-icon {
+#machines-list .node-icon {
 	padding: 2px 9px;
 	border: none;
 	margin-right: 5px;
