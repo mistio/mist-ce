@@ -46,13 +46,18 @@ $('li.node a' ).live( 'click',function(event){
     var backendId = domId.split('-')[0];
     var machineId = domId.split('-').splice(1).join('-');
     var machine = get_machine(backendId, machineId);
-    $('#single-machine .ui-header h1').text(machine.name || machine.id);
+    $('#single-machine h1#single-machine-name').text(machine.name || machine.id);
 });
 
 // Hide footer on machines page load.
 $( '#machines' ).live( 'pageinit',function(event){
     $('#machines-footer').hide();
     setTimeout(function() {$('#logo-container').fadeOut(500);}, 5000);
+});
+
+// make sure the listview is not broken when displaying machines list
+$('#machines').live('pagebeforeshow', function(){
+    $('#machines-list').listview('refresh'); 
 });
 
 // Selection control behavior.
@@ -265,8 +270,12 @@ function update_select_providers() {
             });
         }
     });
-    $('#mist-select-machines').selectmenu('refresh');
-    addmenu.selectmenu('refresh');
+    try {
+        $('#mist-select-machines').selectmenu('refresh');
+        addmenu.selectmenu('refresh');
+    } catch(err) {
+    
+    }
 }
 
 function truncate_names(truncateName, truncateCharacters ) { //truncate truncateName if bigger than truncateCharacters
