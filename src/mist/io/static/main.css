@@ -64,6 +64,12 @@
 	background-image: url("icons/loader.gif?f=0");
 }
 
+.state {
+    font-weight: normal;
+    font-size: 12px;
+    margin-right: 10px;
+}
+
 /* Lists */
 
 .ui-li-count {
@@ -119,7 +125,8 @@
 }
 
 #machines-list .description {
-	float: left;
+	float: right;
+    margin-top: -35px;
 }
 
 #machines .ui-listview-filter-inset {
@@ -141,8 +148,8 @@
     display: block;
     overflow: hidden;
     height: 20px;
-    position: absolute;
     right: 48px;
+    position: absolute;
     top: 37%;
     height: 20px;
     padding-top: 1px;

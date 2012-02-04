@@ -183,8 +183,8 @@ function update_machines_view(backend){
                 //node.find('.select')[0].id = 'chk-' + machine.id;
                 node.fadeIn(100);
             }
-            // Remove classes and add the basic 'state' and 'ui-li'count' for tags
-            node.find('.state').removeClass().addClass('ui-li-count state state'+machine.state);
+            node.find('.state').removeClass().addClass('state').addClass('state'+machine.state);
+            node.find('.state').text(STATES[machine.state]);
         } else { // if the machine does does exist in the DOM, then add it 
             if (node.length != 0){
                 log.newMessage(ERROR, 'DOM Error: ' + node);
@@ -195,9 +195,9 @@ function update_machines_view(backend){
             node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
             node.find('.backend').text(backend.title);
             node.find('.backend').addClass('prov-'+backend.provider);
-            //node.find('.state').addClass('state'+machine.state);
-            //node.find('.state').text(STATES[machine.state]);
-            node.find('.state-icon').addClass('ui-icon ui-icon-'+STATEICONS[machine.state]);
+            node.find('.state').addClass('state'+machine.state);
+            node.find('.state').text(STATES[machine.state]);
+            //node.find('.state-icon').addClass('ui-icon ui-icon-'+STATEICONS[machine.state]);
             node.find('input')[0].id = 'chk-' + machine.id;
             node.find('input')[0].name = 'chk-' + machine.id;
             node.find('label').attr('for', 'chk-' + machine.id);
