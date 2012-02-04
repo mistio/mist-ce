@@ -55,22 +55,65 @@
 
 /* Provider Icons */
 
-.state-providers.state-ok .ui-icon {
-	background-color: #22aa22;
-}
-
-.state-providers.state-waiting .ui-icon {
+.state-providers .ui-icon, .state-providers.state-wait .ui-icon {
 	background-color: #222;
 	width: 18px;
 	height: 18px;
 	background-image: url(icons/loader.gif);
-	background-position: center !important;
+	background-position: center;
+}
+
+.state-providers.state-on .ui-icon {
+	background-color: #22aa22;
+	background-image: url(images/icons-18-white.png);
+	background-position:  -252px 0;
+}
+
+.state-providers.state-error .ui-icon {
+	background-color: #222;
+	background-image: url(images/icons-18-white.png);
+	background-position:  -72px 0;
 }
 
 .state {
     font-weight: normal;
     font-size: 12px;
     margin-right: 10px;
+}
+
+/* Provider status dialog */
+
+#providers-status-list li {
+	padding-left: 42px;
+}
+#providers-status-list .provider-state-icon {
+	width: 16px;
+	height: 16px;
+	display: block;
+	position: absolute;
+	left: 16px;
+	background-color: #234;
+}
+
+#providers-status-list .state-on .provider-state-icon{
+	background-image: url(images/icons-18-white.png);
+	background-position:  -253px 0;
+	background-repeat: no-repeat;
+	overflow: hidden;
+}
+
+#providers-status-list .state-off .provider-state-icon{
+	background-image: url(icons/loader.gif);
+	background-position: center !important;
+	background-repeat: no-repeat;
+	overflow: hidden;
+}
+
+#providers-status-list .state-wait .provider-state-icon{
+	background-image: url(images/icons-18-white.png);
+	background-position:  -73px 0;
+	background-repeat: no-repeat;
+	overflow: hidden;
 }
 
 /* Lists */

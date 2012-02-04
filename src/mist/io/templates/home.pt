@@ -55,7 +55,7 @@
     <div data-role="header">
         <a href="#one" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
         <h1>Machines</h1>
-        <a class="state-providers state-waiting" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right">All Providers OK</a>
+        <a class="state-providers" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right"></a>
     </div><!-- /header -->
 
     <div data-role="content">
@@ -88,7 +88,7 @@
             </optgroup>
         </select>
         <a href="#dialog-add" id="mist-create-machine" data-rel="dialog" data-theme="c" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus" data-iconpos="notext"></a>
-        <ul id="machines-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" data-filter-placeholder="Filter machines.." class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
+        <ul id="machines-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" data-filter-placeholder="Filter machines..">
 
         </ul>
 
@@ -113,7 +113,7 @@
     <div data-role="header">
         <a href="#machines" data-icon="arrow-l" data-direction="reverse" class="ui-btn-left">Machines</a>
         <h1 id="single-machine-name">Machine name</h1>
-        <a class="state-providers state-waiting" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" class="ui-btn-right">All Providers OK</a>
+        <a class="state-providers" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right"></a>
     </div><!-- /header -->
 
     <div data-role="content">
@@ -194,13 +194,11 @@
 
 <!-- Start of providers dialog -->
 <div data-role="dialog" id="dialog-providers" class="mist-dialog">
-    <div data-role="content" data-theme="a">
+    <div data-role="content" data-theme="c">
         <h3>Provider Status</h3>
-        <a data-icon="check" href="dialog-success.html" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b">Amazon</a>
-        <a data-icon="check" href="dialog-success.html" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b">Openstack</a>
-        <a data-icon="check" href="dialog-success.html" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b">Rackspace</a>
-
-        <a href="index.html" data-role="button" data-rel="back" data-transition="flip" data-theme="a">Back</a>
+        <ul id="providers-status-list" data-role="listview" data-inset="true" data-theme="c" data-dividertheme="d">
+        </ul>
+        <a href="index.html" data-role="button" data-icon="arrow-l" data-rel="back" data-transition="slidedown" data-theme="b">Back</a>
     </div>
 </div><!-- /providers dialog -->
 

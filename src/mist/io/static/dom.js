@@ -46,6 +46,11 @@ $("#dialog-tags").live( "pagebeforeshow", function( e, data ) {
     $('#dialog-tags #tags-container').empty();
 });
 
+// Update providers page when it opens
+$("#dialog-providers").live( "pagebeforeshow", function( e, data ) {
+    $('#providers-status-list').listview('refresh');
+});
+
 // Hide footer on machines page load.
 $( '#machines' ).live( 'pageinit',function(event){
     $('#machines-footer').hide();
@@ -231,6 +236,7 @@ function update_machines_view(backend){
     }
     update_machines_count();
     update_select_providers();
+    updateBackendStatus(backend);
 }
 
 // Update footer visibility
@@ -244,6 +250,32 @@ function updateFooterVisibility() {
         $('#machines #footer-console').removeClass('ui-disabled');
     } else {
         $('#machines-footer').fadeOut(200);
+    }
+}
+
+// Update the status of backends
+// Affects both backends dialog and
+// status indicator
+function updateBackendStatus(backend) {
+    var $backend = $('#providers-status-list #provider-'+backend.id);
+    if ($backend.length > 0) {
+        $backend.removeClass('state-on state-off state-wait state-unknown').addClass('state-'+backend.status);
+    } else {
+        $('#providers-status-list').append(
+            '<li id="provider-'+backend.id+'" class="state-'+backend.status+'"><span class="provider-state-icon ui-btn-corner-all"></span>'+backend.title+'</li>'
+        );
+    }
+    if ($.mobile.activePage.attr('id') == 'dialog-providers') {
+        $('#providers-status-list').listview('refresh');
+    }
+    // Update the status icon according to general provider status
+    $('.state-providers').removeClass('state-on state-error state-wait');
+    if ($('#providers-status-list .state-off').length > 0 || $('#providers-status-list .state-unknown').length > 0) {
+        $('.state-providers').addClass('state-error');
+    } else if ($('#providers-status-list .state-wait').length > 0) {
+        $('.state-providers').addClass('state-wait');
+    } else if ($('#providers-status-list .state-on').length == $('#providers-status-list li').length) {
+        $('.state-providers').addClass('state-on');
     }
 }
 
@@ -287,11 +319,6 @@ function update_message_notifier() {
         update_messages_count();
         log.timeout = setTimeout("$('#notifier, #notifier-in').slideUp(300)", 5000);
     }
-}
-
-// Update the status of a backend
-function update_backend_status(backend, action) {
-    
 }
 
 // Wrapper function for displaying a confirmation dialog with
