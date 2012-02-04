@@ -55,8 +55,13 @@
 
 /* Provider Icons */
 
-.state-providers .ui-icon-check {
+.state-providers.state-ok .ui-icon-check {
 	background-color: #22aa22;
+}
+
+.state-providers.state-waiting .ui-icon-check {
+	background-color: #333;
+	background-image: url("icons/loader.gif?f=0");
 }
 
 /* Lists */
@@ -148,7 +153,7 @@
 }
 
 #machines-list .key-icon {
-	background-image: url("icons/key.png?skato=0");
+	background-image: url("icons/key.png?f=0");
 	background-color: #333;
 }
 
@@ -157,7 +162,7 @@
 }
 
 #machines-list .ping-icon {
-	background-image: url("icons/ping.png?skato=0");
+	background-image: url("icons/ping.png?f=0");
 	background-color: #3399cc;
 }
 

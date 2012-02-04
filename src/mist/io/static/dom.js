@@ -40,13 +40,10 @@ $(document).bind("mobileinit", function(){
     $.mobile.listview.prototype.options.filterCallback = customMachinesFilter;
 });
 
-// prepare single view on node click
-$('li.node a' ).live( 'click',function(event){
-    var domId = $(this).parent().parent().parent()[0].id;
-    var backendId = domId.split('-')[0];
-    var machineId = domId.split('-').splice(1).join('-');
-    var machine = get_machine(backendId, machineId);
-    $('#single-machine h1#single-machine-name').text(machine.name || machine.id);
+// Update tags page when it opens
+$("#dialog-tags").live( "pagebeforeshow", function( e, data ) {
+    // TODO get tags from machine object and display them
+    $('#dialog-tags #tags-container').empty();
 });
 
 // Hide footer on machines page load.
@@ -59,6 +56,77 @@ $( '#machines' ).live( 'pageinit',function(event){
 $('#machines').live('pagebeforeshow', function(){
     $('#machines-list').listview('refresh'); 
 });
+
+//
+// MOUSE EVENTS
+//
+
+// prepare single view on node click
+$('li.node a' ).live( 'click',function(event){
+    var domId = $(this).parent().parent().parent()[0].id;
+    var backendId = domId.split('-')[0];
+    var machineId = domId.split('-').splice(1).join('-');
+    var machine = get_machine(backendId, machineId);
+    $('#single-machine h1#single-machine-name').text(machine.name || machine.id);
+});
+
+// Message notifier mouseenter and mouseleave events
+$('#notifier, #notifier-in').mouseenter(function() {
+    clearTimeout(log.timeout);
+}).mouseleave(function() {
+    // TODO: fix selectors
+    log.timeout = setTimeout("$('#notifier, #notifier-in').slideUp(300)", 5000);
+});
+
+// Footer reboot button / Machines view
+$('#machines-button-reboot').live('click', function() {
+    var machinesSelected = $('#machines .node input:checked').length;
+    if (machinesSelected > 1) {
+        var titl = 'Reboot Machines',
+            msg = 'Are you sure you want to reboot '+machinesSelected+' machines?';
+        displayConfirmation(titl, msg, function() {alert('Reboot is in order!!');});
+    } else if (machinesSelected == 1) {
+        var mName = $('#machines .node input:checked').closest('.node').find('.name').text();
+            titl = 'Reboot '+mName,
+            msg = 'Are you sure you want to reboot '+mName+'?';
+        displayConfirmation(titl, msg, function() {alert('Reboot is in order!!');});
+    }
+});
+
+// Footer reboot button / Single view
+$('#single-button-reboot').live('click', function() {
+    var mName = $('#single-machine-name').text();
+        titl = 'Reboot '+mName,
+        msg = 'Are you sure you want to reboot '+mName+'?';
+    displayConfirmation(titl, msg, function() {alert('Reboot is in order!!');});
+});
+
+// Footer reboot button / Machines view
+$('#machines-button-destroy').live('click', function() {
+    var machinesSelected = $('#machines .node input:checked').length;
+    if (machinesSelected > 1) {
+        var titl = 'Destroy Machines',
+            msg = 'Are you sure you want to destroy '+machinesSelected+' machines?';
+        displayConfirmation(titl, msg, function() {alert('Reboot is in order!!');});
+    } else if (machinesSelected == 1) {
+        var mName = $('#machines .node input:checked').closest('.node').find('.name').text();
+            titl = 'Destroy '+mName,
+            msg = 'Are you sure you want to destroy '+mName+'?';
+        displayConfirmation(titl, msg, function() {alert('Destroy is in order!!');});
+    }
+});
+
+// Footer reboot button / Single view
+$('#single-button-destroy').live('click', function() {
+    var mName = $('#single-machine-name').text();
+        titl = 'Destroy '+mName,
+        msg = 'Are you sure you want to destroy '+mName+'?';
+    displayConfirmation(titl, msg, function() {alert('Destroy is in order!!');});
+});
+
+//
+// CHANGE EVENTS
+//
 
 // Selection control behavior.
 // Select according to control value. Show/hide footer accordingly,
@@ -97,11 +165,10 @@ $('#machines-list .node input:checkbox').live('change', function(event){
 // when a checkbox is selected/deselected.
 $('#machines-list input:checkbox').live('change', updateFooterVisibility);
 
-// Update tags page when it opens
-$("#dialog-tags").live( "pagebeforeshow", function( e, data ) {
-    // TODO get tags from machine object and display them
-    $('#dialog-tags #tags-container').empty();
-});
+
+//
+// MIST.IO FUNCTIONS
+//
 
 /* when the list_machines action returns, update the view */
 function update_machines_view(backend){ 
@@ -185,7 +252,7 @@ function updateFooterVisibility() {
 // which contains the text "mist-node-selected" only
 // if the node is selected.
 // This is to overcome jQuery mobile filtering lameness
-// which only passed li text as a parameter.
+// which only passes li text as a parameter.
 function customMachinesFilter( text, searchValue ){
     var textL = text.toLowerCase();
   return !(textL.indexOf( searchValue ) >= 0 || textL.indexOf( 'mist-node-selected' ) >= 0);
@@ -222,19 +289,19 @@ function update_message_notifier() {
     }
 }
 
-// Message notifier mouseenter and mouseleave events
-$('#notifier, #notifier-in').mouseenter(function() {
-    clearTimeout(log.timeout);
-}).mouseleave(function() {
-    // TODO: fix selectors
-    log.timeout = setTimeout("$('#notifier, #notifier-in').slideUp(300)", 5000);
-});
-
 // Update the status of a backend
 function update_backend_status(backend, action) {
     
 }
 
+// Wrapper function for displaying a confirmation dialog with
+// title, message and callback
+function displayConfirmation(titl, msg, callbk) {
+    $('#dialog-confirm-title').text(titl);
+    $('#dialog-confirm-message').text(msg);
+    $('#dialog-confirm-yes').one('click', function() {callbk();});
+    $.mobile.changePage('#dialog-confirm');
+}
 
 // update the messages counter
 function update_messages_count() {

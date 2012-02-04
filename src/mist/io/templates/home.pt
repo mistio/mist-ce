@@ -55,7 +55,7 @@
     <div data-role="header">
         <a href="#one" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
         <h1>Machines</h1>
-        <a class="state-providers" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right">All Providers OK</a>
+        <a class="state-providers state-waiting" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right">All Providers OK</a>
     </div><!-- /header -->
 
     <div data-role="content">
@@ -99,10 +99,10 @@
 
     <div id="machines-footer" data-role="footer" data-theme="a">
         <div id="actions" data-role="controlgroup" data-type="horizontal">
-            <a id="footer-reboot" data-role="button" data-icon="refresh">Reboot</a>
-            <a id="footer-destroy" href="#dialog-confirm" data-role="button" data-icon="delete" data-transition="slidedown">Destroy</a>
-            <a id="footer-console" href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
-            <a id="footer-tags" href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tag</a>
+            <a data-role="button" id="machines-button-reboot" data-icon="refresh">Reboot</a>
+            <a data-role="button" id="machines-button-destroy" data-icon="delete">Destroy</a>
+            <a id="machines-button-console" href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
+            <a id="machines-button-tags" href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tags</a>
         </div>
     </div><!-- /footer -->
 
@@ -115,7 +115,7 @@
     <div data-role="header">
         <a href="#machines" data-icon="arrow-l" data-direction="reverse" class="ui-btn-left">Machines</a>
         <h1 id="single-machine-name">Machine name</h1>
-        <a class="state-providers" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right">All Providers OK</a>
+        <a class="state-providers state-waiting" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" class="ui-btn-right">All Providers OK</a>
     </div><!-- /header -->
 
     <div data-role="content">
@@ -133,10 +133,10 @@
 
     <div id="machines-footer" data-role="footer" data-theme="a">
         <div id="actions" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" data-icon="refresh">Reboot</a>
-            <a href="#dialog-confirm" data-role="button" data-icon="delete" data-transition="slidedown">Destroy</a>
-            <a href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
-            <a href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tag</a>
+            <a data-role="button" id="single-button-reboot" data-icon="refresh">Reboot</a>
+            <a data-role="button" id="single-button-destroy" data-icon="delete" data-transition="slidedown">Destroy</a>
+            <a href="#dialog-console" data-role="button" id="single-button-console" data-icon="gear" data-transition="slidedown">Console</a>
+            <a href="#dialog-tags" data-role="button" id="single-button-tags" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tags</a>
         </div>
     </div><!-- /footer -->
 
@@ -175,16 +175,19 @@
 </div><!-- /add dialog -->
 
 <!-- Start of confirm dialog -->
-<div data-role="page" id="dialog-confirm" class="mist-dialog">
-    <div data-role="content" data-theme="a">
-        <h3>Are you sure?</h3>
-        <a href="index.html" id="confirm-no" data-role="button" data-rel="back" data-theme="a">No</a>
-        <a href="index.html" id="confirm-yes" data-role="button" data-rel="back" data-theme="a">Yes</a>
+<div data-role="dialog" id="dialog-confirm" data-transition="pop" class="mist-dialog">
+    <div data-role="header" data-theme="d" data-position="inline">
+        <h1 id="dialog-confirm-title"></h1>
+    </div>
+    <div data-role="content" data-theme="c">
+        <p id="dialog-confirm-message"></p>
+        <a id="dialog-confirm-no" data-role="button" data-rel="back" data-theme="a">No</a>
+        <a id="dialog-confirm-yes" data-role="button" data-rel="back" data-theme="a">Yes</a>
     </div>
 </div><!-- /confirm dialog -->
 
 <!-- Start of console dialog -->
-<div data-role="page" id="dialog-console" class="mist-dialog">
+<div data-role="dialog" id="dialog-console" class="mist-dialog">
     <div data-role="content" data-theme="a">
         <h3>Console</h3>
         <a href="index.html" data-role="button" data-rel="back" data-theme="a">Hide</a>
@@ -192,7 +195,7 @@
 </div><!-- /console dialog -->
 
 <!-- Start of providers dialog -->
-<div data-role="page" id="dialog-providers" class="mist-dialog">
+<div data-role="dialog" id="dialog-providers" class="mist-dialog">
     <div data-role="content" data-theme="a">
         <h3>Provider Status</h3>
         <a data-icon="check" href="dialog-success.html" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="b">Amazon</a>
@@ -203,9 +206,8 @@
     </div>
 </div><!-- /providers dialog -->
 
-
 <!-- Start of tags dialog -->
-<div data-role="page" id="dialog-tags" class="mist-dialog">
+<div data-role="dialog" id="dialog-tags" class="mist-dialog">
     <div data-role="content" data-theme="c">
         <h3>Manage Tags</h3>
         <div id="tags-container">
