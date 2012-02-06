@@ -290,13 +290,13 @@ a#mist-select-machines-button {
 
 /* Create Dialog */
 
-#create-ok-cancel {
+.btn-full {
 	width: 100%; 
 	text-align: center;
 	margin-top: 2em;
 }
 
-#create-ok, #create-cancel {
+.btn-left-full, .btn-right-full {
 	width: 49%;
 }
 

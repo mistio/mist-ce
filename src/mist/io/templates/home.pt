@@ -167,9 +167,9 @@
             <option value="delete">2</option>
             <option value="delete">3</option>
         </select>
-        <div id="create-ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a href="index.html" id="create-cancel" data-role="button" data-rel="back" data-theme="c">Back</a>
-            <a href="index.html" id="create-ok" data-role="button" data-rel="back" data-theme="b">Launch!</a>
+        <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
+            <a href="index.html" id="create-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Back</a>
+            <a href="index.html" id="create-ok" class="btn-right-full" data-role="button" data-rel="back" data-theme="b">Launch!</a>
         </div>
     </div>
 </div><!-- /add dialog -->
@@ -181,9 +181,9 @@
     </div>
     <div data-role="content" data-theme="c">
         <p id="dialog-confirm-message"></p>
-        <div data-role="controlgroup" data-type="horizontal">
-        <a id="dialog-confirm-no" data-role="button" data-rel="back" data-theme="b">No</a>
-        <a id="dialog-confirm-yes" data-role="button" data-rel="back" data-theme="a">Yes</a>
+        <div data-role="controlgroup" class="btn-full" data-type="horizontal">
+        <a id="dialog-confirm-no" class="btn-left-full" data-role="button" data-rel="back" data-theme="b">No</a>
+        <a id="dialog-confirm-yes" class="btn-right-full" data-role="button" data-rel="back" data-theme="a">Yes</a>
         </div>
     </div>
 </div><!-- /confirm dialog -->
