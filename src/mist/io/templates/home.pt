@@ -66,7 +66,9 @@
             <label></label>
             <a href="#single-machine">
                 <h3 class="name"></h3>
-                <span class="state"></span><span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
+                <span class="caption-wrapper ui-btn-corner-all ui-shadow">
+                    <span class="state"></span><span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
+                </span>
                 <p class="description">
                     <span class="tag backend ui-btn-up-c ui-btn-corner-all">backend</span>
                     <span class="tag ui-btn-up-c ui-btn-corner-all">tag1</span>
@@ -179,8 +181,10 @@
     </div>
     <div data-role="content" data-theme="c">
         <p id="dialog-confirm-message"></p>
-        <a id="dialog-confirm-no" data-role="button" data-rel="back" data-theme="a">No</a>
+        <div data-role="controlgroup" data-type="horizontal">
+        <a id="dialog-confirm-no" data-role="button" data-rel="back" data-theme="b">No</a>
         <a id="dialog-confirm-yes" data-role="button" data-rel="back" data-theme="a">Yes</a>
+        </div>
     </div>
 </div><!-- /confirm dialog -->
 
@@ -194,11 +198,13 @@
 
 <!-- Start of providers dialog -->
 <div data-role="dialog" id="dialog-providers" class="mist-dialog">
+    <div data-role="header" data-theme="d" data-position="inline">
+        <h1>Provider Status</h1>
+    </div>
     <div data-role="content" data-theme="c">
-        <h3>Provider Status</h3>
         <ul id="providers-status-list" data-role="listview" data-inset="true" data-theme="c" data-dividertheme="d">
         </ul>
-        <a href="index.html" data-role="button" data-icon="arrow-l" data-rel="back" data-transition="slidedown" data-theme="b">Back</a>
+        <a href="index.html" data-role="button" data-icon="arrow-l" data-rel="back" data-transition="slidedown" data-theme="c">Back</a>
     </div>
 </div><!-- /providers dialog -->
 
