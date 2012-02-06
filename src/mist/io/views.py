@@ -63,7 +63,7 @@ def list_machines(request):
                     # both rackspace and amazon have the image in the imageId extra attr,
                     'image'         : m.image or m.extra.get('imageId', None),
                     # for rackspace get flavorId extra attr, for amazon the instancetype extra attr
-                    'size'          : m.size or m.extra.get('flavorId', None) or m.extra.get('instancetype', None), 
+                    'size'          : m.size or m.extra.get('flavorId', None) or m.extra.get('instancetype', None),
                     'state'         : m.state,
                     'private_ips'   : m.private_ips,
                     'public_ips'    : m.public_ips,
@@ -124,8 +124,7 @@ def create_machine(request):
     if not found:
         return Response('Invalid backend', 404)
 
-# cpsaltis: all the following must be replaced by machine_action(request)
-'''
+
 def start_machine(request):
     ret = []
     found = False
@@ -210,15 +209,6 @@ def destroy_machine(request):
         return Response('Invalid backend', 404)
 
     return Response(json.dumps(ret))
-'''
-
-def machine_action(request):
-    '''
-    Parses all machine action related REST calls (start/stop/restart/destroy)
-    and makes the appropriate libcloud calls
-    '''
-    #TODO: populate this
-    return True
 
 
 def list_metadata(request):

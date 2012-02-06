@@ -30,6 +30,14 @@ def main(global_config, **settings):
                     request_method='POST',
                     request_param='action=destroy',
                     route_name='machine')
+    config.add_view('mist.io.views.start_machine',
+                    request_method='POST',
+                    request_param='action=start',
+                    route_name='machine')
+    config.add_view('mist.io.views.stop_machine',
+                    request_method='POST',
+                    request_param='action=stop',
+                    route_name='machine')
 
     config.add_route('metadata', '/backends/{backend}/machines/{machine}/metadata')
     config.add_view('mist.io.views.set_metadata',
