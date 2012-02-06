@@ -102,7 +102,7 @@
             <a data-role="button" id="machines-button-reboot" data-icon="refresh">Reboot</a>
             <a data-role="button" id="machines-button-destroy" data-icon="delete">Destroy</a>
             <a id="machines-button-console" href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
-            <a id="machines-button-tags" href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tags</a>
+            <a id="machines-button-tags" href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tag</a>
         </div>
     </div><!-- /footer -->
 
@@ -136,7 +136,7 @@
             <a data-role="button" id="single-button-reboot" data-icon="refresh">Reboot</a>
             <a data-role="button" id="single-button-destroy" data-icon="delete" data-transition="slidedown">Destroy</a>
             <a href="#dialog-console" data-role="button" id="single-button-console" data-icon="gear" data-transition="slidedown">Console</a>
-            <a href="#dialog-tags" data-role="button" id="single-button-tags" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tags</a>
+            <a href="#dialog-tags" data-role="button" id="single-button-tags" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tag</a>
         </div>
     </div><!-- /footer -->
 
