@@ -299,13 +299,13 @@ def list_sizes(request):
         return Response('Invalid backend', 404)
 
     for i in sizes:
-        ret.append({'id'            : i.id,
-                    'bandwidth'         : i.bandwidth,
-                    'disk'         : i.disk,
-                    'driver'         : i.driver.name,
-                    'name'         : i.name,
-                    'price'         : i.price,
-                    'ram'         : i.ram})
+        ret.append({'id'        : i.id,
+                    'bandwidth' : i.bandwidth,
+                    'disk'      : i.disk,
+                    'driver'    : i.driver.name,
+                    'name'      : i.name,
+                    'price'     : i.price,
+                    'ram'       : i.ram})
 
     return Response(json.dumps(ret))
 
