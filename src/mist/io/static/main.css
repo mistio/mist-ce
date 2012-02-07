@@ -17,6 +17,10 @@
 	padding-top: 6px;
 }
 
+#machines-list .node .ui-icon-arrow-r {
+	right: 18px;
+}
+
 /* Select Button */
 
 #machines #mist-select-machines .ui-btn {
@@ -100,6 +104,7 @@
 	background-position:  -253px 0;
 	background-repeat: no-repeat;
 	overflow: hidden;
+	background-color: #22aa22;
 }
 
 #providers-status-list .state-off .provider-state-icon{
@@ -107,6 +112,7 @@
 	background-position: center !important;
 	background-repeat: no-repeat;
 	overflow: hidden;
+	background-color: #aa2222;
 }
 
 #providers-status-list .state-wait .provider-state-icon{
@@ -114,6 +120,7 @@
 	background-position:  -73px 0;
 	background-repeat: no-repeat;
 	overflow: hidden;
+	background-color: #234;
 }
 
 /* Lists */
@@ -160,7 +167,7 @@
 }
 
 #machines-list .ui-checkbox .ui-btn-inner {
-	top: 14px;
+	top: 19px;
 	left: 5px;
 	height: 40px;
     border-top: none;
@@ -171,22 +178,13 @@
 }
 
 #machines-list .description {
-	float: right;
-    margin-top: -35px;
+	position: absolute;
+	right: 76px;
+	top: 36px;
 }
 
 #machines .ui-listview-filter-inset {
     margin: -50px 60px 0 60px;
-}
-
-#machines-list .node .tag {
-	border: 1px solid #bfbfbf;
-	color: #555 !important;
-	font-weight: normal !important;
-	display: block;
-	float: left;
-	padding: 1px 7px;
-	margin: 0 3px 0 0;
 }
 
 #machines-list .bubble-container {
@@ -222,11 +220,27 @@
 #machines-list .ui-li-count {
 	position: static;
 }
+#machines-list .node .caption-wrapper {
+	border: 1px solid #bbb;
+	padding: 0 0 1px 9px;
+	-moz-box-shadow: 0 2px 5px rgba(0,0,0,0.2) inset;
+    -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.2) inset;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2) inset;
+}
 
 #machines-list .node-icon {
 	padding: 2px 9px;
 	border: none;
-	margin-right: 5px;
+}
+
+#machines-list .node .tag {
+	border: 1px solid #bfbfbf;
+	color: #555 !important;
+	font-weight: normal !important;
+	display: block;
+	float: right;
+	padding: 1px 7px;
+	margin: 0 3px 9px 0;
 }
 
 #machines .ui-select {
@@ -276,13 +290,13 @@ a#mist-select-machines-button {
 
 /* Create Dialog */
 
-#create-ok-cancel {
+.btn-full {
 	width: 100%; 
 	text-align: center;
 	margin-top: 2em;
 }
 
-#create-ok, #create-cancel {
+.btn-left-full, .btn-right-full {
 	width: 49%;
 }
 
@@ -297,4 +311,16 @@ a#mist-select-machines-button {
 	background-image:     -ms-linear-gradient(#AFD5FF, #98BBED); /* IE10 */
 	background-image:      -o-linear-gradient(#AFD5FF, #98BBED); /* Opera 11.10+ */
 	background-image:         linear-gradient(#AFD5FF, #98BBED);
+}
+
+/* Conditional for < 480px */
+@media only screen and (max-width: 480px) {
+
+	#machines-list .description {
+		position: absolute;
+		right: 76px;
+		top: 26px;
+		width: 130px;
+	}
+
 }
