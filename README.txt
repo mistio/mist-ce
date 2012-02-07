@@ -1,5 +1,6 @@
 Introduction
 ============
+mist.io is a mobile friendly web app that helps you manage and monitor your virtual machines, across a multitude of public and private computing cloud providers
 
     $ python bootstrap.py
     Downloading http://pypi.python.org/packages/source/d/distribute/distribute-0.6.14.tar.gz

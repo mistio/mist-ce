@@ -20,8 +20,8 @@ setup(name='mist.io',
         ],
       author='unweb.me',
       author_email='we@unweb.me',
-      url='http://mist.io',
-      keywords='web pyramid pylons',
+      url='https://mist.io',
+      keywords='web cloud mobile libcloud pyramid amazon rackspace openstack slicehost linode',
       packages=find_packages('src'),
       package_dir = {'':'src'},
       namespace_packages=['mist'],
@@ -34,6 +34,5 @@ setup(name='mist.io',
       [paste.app_factory]
       main = mist.io:main
       """,
-      paster_plugins=['pyramid'],
       )
 
