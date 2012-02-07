@@ -34,8 +34,8 @@ def home(request):
         backend_list = request.environ['beaker.session']['backends']
     except:
         backend_list = BACKENDS
-        
-    backends = []    
+
+    backends = []
     for b in backend_list:
         backends.append({'id'           : b['id'],
                          'title'        : b['title'],
@@ -222,34 +222,6 @@ def destroy_machine(request):
         return Response('Invalid backend', 404)
 
     return Response(json.dumps(ret))
-
-
-@view_config(route_name='metadata', request_method='GET')
-def list_metadata(request):
-    '''Lists metadata for a machine, given the backend and machine id'''
-    ret = []
-    found = False
-    backends = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
-    if backends:
-        backend = backends[0]
-        conn = connect(backend)
-        machines = conn.list_nodes()
-        for machine in machines:
-            if machine.id == request.matchdict['machine']:
-                try:
-                    metadata = conn.ex_get_metadata(machine) #eg Openstack
-                    found = True
-                except:
-                    try:
-                        metadata = conn.ex_describe_tags(machine) #eg EC2
-                        found = True
-                    except:
-                        return Response('Not implemented for this backend', 404)
-                break
-    if not found:
-        return Response('Invalid backend', 404)
-
-    return Response(json.dumps(metadata))
 
 
 @view_config(route_name='metadata', request_method='POST')
