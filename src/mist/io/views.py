@@ -5,7 +5,7 @@ from libcloud.compute.providers import get_driver
 from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.deployment import MultiStepDeployment
 from mist.io.config import BACKENDS
-
+from pyramid.view import view_config
 
 def connect(backend):
     '''Establish backend connection using the credentials specified'''
@@ -30,7 +30,12 @@ def connect(backend):
 @view_config(route_name='home', request_method='GET', renderer='templates/home.pt')
 def home(request):
     '''Fill in an object with backend data, taken from config.py'''
-    backends = []
+    try:
+        backend_list = request.environ['beaker.session']['backends']
+    except:
+        backend_list = BACKENDS
+        
+    backends = []    
     for b in BACKENDS:
         backends.append({'id'           : b['id'],
                          'title'        : b['title'],
