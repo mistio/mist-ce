@@ -125,8 +125,8 @@
             Basic stuff
         </div>
         <div data-role="collapsible">
-            <h3>Advanced Info</h3>
-            Advanced stuff
+            <h3>Full metadata list</h3>
+            <div id="machine-metadata"></div>
         </div>
 
     </div><!-- /content -->

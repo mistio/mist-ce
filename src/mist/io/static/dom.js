@@ -4,22 +4,22 @@ var STATES = {
     '1' : 'Rebooting',
     '2' : 'Terminated',
     '3' : 'Pending',
-    '4' : 'Unknown'            
+    '4' : 'Unknown'
     };
 var STATEICONS = {
     '0' : 'check',
     '1' : 'refresh',
     '2' : 'delete',
     '3' : 'gear',
-    '4' : 'alert'            
+    '4' : 'alert'
     };
-  
+
 
 /* disable browser bar on android */
 if(navigator.userAgent.match(/Android/i)){
    window.scrollTo(0,1);
 }
-    
+
 /* on page init */
 $(document).bind("mobileinit", function(){
 
@@ -59,7 +59,7 @@ $( '#machines' ).live( 'pageinit',function(event){
 
 // make sure the listview is not broken when displaying machines list
 $('#machines').live('pagebeforeshow', function(){
-    $('#machines-list').listview('refresh'); 
+    $('#machines-list').listview('refresh');
 });
 
 //
@@ -73,6 +73,7 @@ $('li.node a' ).live( 'click',function(event){
     var machineId = domId.split('-').splice(1).join('-');
     var machine = get_machine(backendId, machineId);
     $('#single-machine h1#single-machine-name').text(machine.name || machine.id);
+    $('#machine-metadata').html(to_ul(machine.extra));
 });
 
 // Message notifier mouseenter and mouseleave events
@@ -176,12 +177,12 @@ $('#machines-list input:checkbox').live('change', updateFooterVisibility);
 //
 
 /* when the list_machines action returns, update the view */
-function update_machines_view(backend){ 
+function update_machines_view(backend){
     backend.machines.forEach(function(machine, index){
         var node = $('#machines-list > #' + backends.indexOf(backend) + '-' + machine.id);
         if (node.length == 1) { // there should be only one machine with this id in the DOM
             if (node.find('.name').text() != machine.name){
-                node.fadeOut(100);                
+                node.fadeOut(100);
                 node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
                 node.find('.backend').text(backend.title);
                 node.find('.backend').addClass('prov-'+backend.provider);
@@ -190,7 +191,7 @@ function update_machines_view(backend){
             }
             node.find('.state').removeClass().addClass('state').addClass('state'+machine.state);
             node.find('.state').text(STATES[machine.state]);
-        } else { // if the machine does does exist in the DOM, then add it 
+        } else { // if the machine does does exist in the DOM, then add it
             if (node.length != 0){
                 log.newMessage(ERROR, 'DOM Error: ' + node);
             }
@@ -221,12 +222,12 @@ function update_machines_view(backend){
         }
     }
 
-    $('#machines-list').find('.node').each(function (i) { 
+    $('#machines-list').find('.node').each(function (i) {
         if ($.inArray(this.id, machines_list) == -1) {
             $('#' + this.id).remove();
         }
     });
-    
+
     if ($.mobile.activePage.attr('id') == 'machines') {
         try {
             $('#machines-list').listview('refresh');
@@ -293,7 +294,7 @@ function customMachinesFilter( text, searchValue ){
 // update the machines counter
 function update_machines_count() {
     //return;
-    // TODO    
+    // TODO
     var allMachines = 0;
     for (var i = 0 ; i < backends.length; i++) {
         allMachines += backends[i].machines.length;
@@ -368,7 +369,7 @@ function update_select_providers() {
         $('#mist-select-machines').selectmenu('refresh');
         addmenu.selectmenu('refresh');
     } catch(err) {
-    
+
     }
 }
 
