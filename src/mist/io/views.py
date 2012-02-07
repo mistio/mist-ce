@@ -36,7 +36,7 @@ def home(request):
         backend_list = BACKENDS
         
     backends = []    
-    for b in BACKENDS:
+    for b in backend_list:
         backends.append({'id'           : b['id'],
                          'title'        : b['title'],
                          'provider'     : b['provider'],
