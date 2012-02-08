@@ -21,7 +21,7 @@ if(navigator.userAgent.match(/Android/i)){
 }
 
 /* on page init */
-$(document).bind("mobileinit", function(){
+$(document).on('mobileinit', function(){
 
     // run list_machines action on each backend
     backends.forEach(function(b, i){
@@ -41,28 +41,28 @@ $(document).bind("mobileinit", function(){
 });
 
 // Update tags page when it opens
-$("#dialog-tags").live( "pagebeforeshow", function( e, data ) {
+$(document).on( 'pagebeforeshow', '#dialog-tags', function( e, data ) {
     // TODO get tags from machine object and display them
     $('#dialog-tags #tags-container').empty();
 });
 
 // Update providers page when it opens
-$("#dialog-providers").live( "pagebeforeshow", function( e, data ) {
+$(document).on( 'pagebeforeshow', '#dialog-providers', function( e, data ) {
     $('#providers-status-list').listview('refresh');
 });
 
 // Hide footer on machines page load.
-$( '#machines' ).live( 'pageinit',function(event){
+$(document).on( 'pageinit', '#machines', function(event){
     $('#machines-footer').hide();
     setTimeout(function() {$('#logo-container').fadeOut(500);}, 5000);
 });
 
 // make sure the listview is not broken when displaying machines list
-$('#machines').live('pagebeforeshow', function(){
+$(document).on( 'pagebeforeshow', '#machines', function(){
     $('#machines-list').listview('refresh');
 });
 
-$('#dialog-add').live('pageinit', function() {
+$(document).on( 'pageinit', '#dialog-add', function() {
     updateCreateFields();
 });
 
@@ -71,7 +71,7 @@ $('#dialog-add').live('pageinit', function() {
 //
 
 // prepare single view on node click
-$('li.node a' ).live( 'click',function(event){
+$(document).on( 'click', 'li.node a', function(event){
     var domId = $(this).parent().parent().parent()[0].id;
     var backendId = domId.split('-')[0];
     var machineId = domId.split('-').splice(1).join('-');
@@ -81,7 +81,7 @@ $('li.node a' ).live( 'click',function(event){
 });
 
 // Message notifier mouseenter and mouseleave events
-$('#notifier, #notifier-in').mouseenter(function() {
+$(document).on( 'mouseenter', '#notifier, #notifier-in', function() {
     clearTimeout(log.timeout);
 }).mouseleave(function() {
     // TODO: fix selectors
@@ -89,7 +89,7 @@ $('#notifier, #notifier-in').mouseenter(function() {
 });
 
 // Footer reboot button / Machines view
-$('#machines-button-reboot').live('click', function() {
+$(document).on( 'click', '#machines-button-reboot', function() {
     var machinesSelected = $('#machines .node input:checked').length;
     if (machinesSelected > 1) {
         var titl = 'Reboot Machines',
@@ -114,15 +114,15 @@ $('#machines-button-reboot').live('click', function() {
 });
 
 // Footer reboot button / Single view
-$('#single-button-reboot').live('click', function() {
+$(document).on( 'click', '#single-button-reboot', function() {
     var mName = $('#single-machine-name').text();
         titl = 'Reboot '+mName,
         msg = 'Are you sure you want to reboot '+mName+'?';
     displayConfirmation(titl, msg, function() {alert('Reboot is in order!!');});
 });
 
-// Footer reboot button / Machines view
-$('#machines-button-destroy').live('click', function() {
+// Footer destroy button / Machines view
+$(document).on( 'click', '#machines-button-destroy', function() {
     var machinesSelected = $('#machines .node input:checked').length;
     if (machinesSelected > 1) {
         var titl = 'Destroy Machines',
@@ -146,8 +146,8 @@ $('#machines-button-destroy').live('click', function() {
     }
 });
 
-// Footer reboot button / Single view
-$('#single-button-destroy').live('click', function() {
+// Footer destroy button / Single view
+$(document).on( 'click', '#single-button-destroy', function() {
     var mName = $('#single-machine-name').text();
         titl = 'Destroy '+mName,
         msg = 'Are you sure you want to destroy '+mName+'?';
@@ -162,7 +162,7 @@ $('#single-button-destroy').live('click', function() {
 // Select according to control value. Show/hide footer accordingly,
 // and reset selection in the end.
 // Note that change event should be triggered manually! Why?
-$('#mist-select-machines').live('change', function() {
+$(document).on( 'change', '#mist-select-machines', function() {
     var selectVal = $(this).val();
     $('#machines-list .node input:checkbox').attr('checked',false);
     if (selectVal == 'all') {
@@ -182,7 +182,7 @@ $('#mist-select-machines').live('change', function() {
 // Event listener for node checkbox change.
 // Adds a hidden text value to the node to affect
 // node display while filtering.
-$('#machines-list .node input:checkbox').live('change', function(event){
+$(document).on( 'change', '#machines-list .node input:checkbox', function(event){
     var $this = $(this);
     if ($this.is(':checked')) {
         $this.closest('.node').append('<span class="mist-node-selected" style="display:none">mist-node-selected</span>');
@@ -193,10 +193,14 @@ $('#machines-list .node input:checkbox').live('change', function(event){
 
 // Check for footer visibility and button enabling
 // when a checkbox is selected/deselected.
-$('#machines-list input:checkbox').live('change', updateFooterVisibility);
+$(document).on( 'change', '#machines-list input:checkbox', updateFooterVisibility);
 
 // Check for change event in the select boxes of the create dialog.
-$('.create-select').live('change', function() {
+$(document).on( 'change', '.create-select', function() {
+    updateCreateFields();
+});
+
+$(document).on( 'change keyup', '#new-machine-name', function() {
     updateCreateFields();
 });
 
@@ -420,11 +424,10 @@ function updateCreateFields() {
     $('.create-select').selectmenu('enable');
     if (image.val() == 'Select Image') {
         size.selectmenu('disable');
-    } else return;
-    if (provider.val() == 'Select Provider') {
-        image.selectmenu('disable');
-    }
-    console.log(createSelectionComplete());
+        if (provider.val() == 'Select Provider') {
+            image.selectmenu('disable');
+        }
+    } 
     if (createSelectionComplete()) {
         $('#create-ok').removeClass('ui-disabled');
     } else {
@@ -436,24 +439,22 @@ function updateCreateFields() {
 // the elements in the create dialog have
 // non-default values.
 function createSelectionComplete() {
-    var name = $('#create-machine-name'),
+    var name = $('#new-machine-name').val(),
         provider = $('#create-select-provider'),
         image = $('#create-select-image'),
-        size = $('#create-select-size'),
-        ret = (provider.val() != 'Select Provider' && image.val() != 'Select Image' && size.val() != 'Select Size');
-    return ret;
+        size = $('#create-select-size');
+    return name != '' && provider.val() != 'Select Provider' && image.val() != 'Select Image' && size.val() != 'Select Size';
 }
 
 // returns whether all of the
-// the elements in the create dialog have a
+// the elements in the create dialog have
 // default values.
 function createSelectionDefault() {
-    var name = $('#create-machine-name'),
+    var name = $('#new-machine-name').val(),
         provider = $('#create-select-provider'),
         image = $('#create-select-image'),
-        size = $('#create-select-size'),
-        ret = (provider.val() != 'Select Provider' && image.val() != 'Select Image' && size.val() != 'Select Size');
-    return ret;
+        size = $('#create-select-size');
+    return name == '' && provider.val() == 'Select Provider' && image.val() == 'Select Image' && size.val() == 'Select Size';
 }
 
 function truncate_names(truncateName, truncateCharacters ) { //truncate truncateName if bigger than truncateCharacters

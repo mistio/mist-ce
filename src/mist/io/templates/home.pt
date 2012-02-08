@@ -10,7 +10,7 @@
     <!-- include the Tools -->
     <link rel="stylesheet" href="static/jquery.mobile-1.0.min.css" />
     <link rel="stylesheet" href="static/main.css" />
-    <script src="static/jquery-1.6.4.js"></script>
+    <script src="static/jquery-1.7.1.min.js"></script>
     <script src="static/mist.js"></script>
     <script>
         var backends = [];
@@ -131,7 +131,7 @@
 
     </div><!-- /content -->
 
-    <div id="machines-footer" data-role="footer" data-theme="a">
+    <div id="single-footer" data-role="footer" data-theme="a">
         <div id="actions" data-role="controlgroup" data-type="horizontal">
             <a data-role="button" id="single-button-reboot" data-icon="refresh">Reboot</a>
             <a data-role="button" id="single-button-destroy" data-icon="delete" data-transition="slidedown">Destroy</a>
@@ -148,7 +148,7 @@
     <div data-role="content" data-theme="c">
         <h3>Create machine</h3>
         <label for="create-machine-name">1. Name:</label>
-        <input name="create-machine-name" type="text" id="new-machine-name" > </input>
+        <input name="create-machine-name" type="text" id="new-machine-name" ></input>
         <label for="create-select-provider">2. Provider:</label>
         <select name="create-select-provider" id="create-select-provider" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Select Provider</option>
