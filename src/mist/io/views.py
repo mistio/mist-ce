@@ -192,7 +192,8 @@ def reboot_machine(request):
         for machine in machines:
             if machine.id == request.matchdict['machine']:
                 found = True
-                machine.reboot()
+                #machine.reboot()
+                print 'rebooted', machine.id
                 break
         if not found:
             return Response('Invalid machine', 404)
@@ -214,7 +215,8 @@ def destroy_machine(request):
         for machine in machines:
             if machine.id == request.matchdict['machine']:
                 found = True
-                machine.destroy()
+                #machine.destroy()
+                print 'destroyed', machine.id
                 break
         if not found:
             return Response('Invalid machine', 404)

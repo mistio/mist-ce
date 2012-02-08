@@ -134,7 +134,9 @@ function Backend(id, title, provider, interval, host, log){
             case 'start':
                 this.log('starting ' + action[1], INFO);
                 $.ajax({
-                    url: 'backends/'+this.id+'/machines/'+action[1]+'/start',
+                    type: 'POST',
+                    data: 'action=start', 
+                    url: 'backends/'+this.id+'/machines/'+action[1],
                     success: function(data) {
                         backend.updateStatus('on', 'start');
                         backend.processAction();
@@ -148,7 +150,9 @@ function Backend(id, title, provider, interval, host, log){
             case 'reboot':
                 this.log('rebooting ' + action[1], INFO);
                 $.ajax({
-                    url: 'backends/'+this.id+'/machines/'+action[1]+'/reboot',
+                    type: 'POST',
+                    data: 'action=reboot', 
+                    url: 'backends/'+this.id+'/machines/'+action[1],
                     success: function(data) {
                         backend.updateStatus('on', 'reboot');
                         backend.processAction();
@@ -162,7 +166,9 @@ function Backend(id, title, provider, interval, host, log){
             case 'destroy':
                 this.log('destroying ' + action[1], INFO);
                 $.ajax({
-                    url: 'backends/'+this.id+'/machines/'+action[1]+'/destroy',
+                    type: 'POST',
+                    data: 'action=destroy', 
+                    url: 'backends/'+this.id+'/machines/'+action[1],
                     success: function(data) {
                         backend.updateStatus('on', 'destroy');
                         backend.processAction();
@@ -176,7 +182,9 @@ function Backend(id, title, provider, interval, host, log){
             case 'stop':
                 this.log('stopping ' + action[1], INFO);
                 $.ajax({
-                    url: 'backends/'+this.id+'/machines/'+action[1]+'/stop',
+                    type: 'POST',
+                    data: 'action=stop', 
+                    url: 'backends/'+this.id+'/machines/'+action[1],
                     success: function(data) {
                         backend.updateStatus('on', 'stop');
                         backend.processAction();

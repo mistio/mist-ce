@@ -90,7 +90,13 @@ $('#machines-button-reboot').live('click', function() {
     if (machinesSelected > 1) {
         var titl = 'Reboot Machines',
             msg = 'Are you sure you want to reboot '+machinesSelected+' machines?';
-        displayConfirmation(titl, msg, function() {alert('Reboot is in order!!');});
+        displayConfirmation(titl, msg, function() {
+            $('#machines .node input:checked').each(function() {
+                var node = $(this).closest('.node');
+                var backend = backends[node[0].id.split('-')[0]];
+                backend.newAction(['reboot', node[0].id.split('-').splice(1).join('-')]);
+            });        
+        });
     } else if (machinesSelected == 1) {
         var mName = $('#machines .node input:checked').closest('.node').find('.name').text();
             titl = 'Reboot '+mName,
@@ -113,7 +119,13 @@ $('#machines-button-destroy').live('click', function() {
     if (machinesSelected > 1) {
         var titl = 'Destroy Machines',
             msg = 'Are you sure you want to destroy '+machinesSelected+' machines?';
-        displayConfirmation(titl, msg, function() {alert('Reboot is in order!!');});
+        displayConfirmation(titl, msg, function() {
+            $('#machines .node input:checked').each(function() {
+                var node = $(this).closest('.node');
+                var backend = backends[node[0].id.split('-')[0]];
+                backend.newAction(['destroy', node[0].id.split('-').splice(1).join('-')]);
+            });        
+        });
     } else if (machinesSelected == 1) {
         var mName = $('#machines .node input:checked').closest('.node').find('.name').text();
             titl = 'Destroy '+mName,
