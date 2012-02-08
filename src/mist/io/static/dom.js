@@ -62,6 +62,10 @@ $('#machines').live('pagebeforeshow', function(){
     $('#machines-list').listview('refresh'); 
 });
 
+$('#dialog-add').live('pageinit', function() {
+    updateCreateFields();
+});
+
 //
 // MOUSE EVENTS
 //
@@ -170,6 +174,10 @@ $('#machines-list .node input:checkbox').live('change', function(event){
 // when a checkbox is selected/deselected.
 $('#machines-list input:checkbox').live('change', updateFooterVisibility);
 
+// Check for change event in the select boxes of the create dialog.
+$('.create-select').live('change', function() {
+    updateCreateFields();
+});
 
 //
 // MIST.IO FUNCTIONS
@@ -369,6 +377,21 @@ function update_select_providers() {
         addmenu.selectmenu('refresh');
     } catch(err) {
     
+    }
+}
+
+function updateCreateFields() {
+    var provider = $('#create-select-provider'),
+        image = $('#create-select-image'),
+        size = $('#create-select-size');
+    
+    $('.create-select').selectmenu();
+    $('.create-select').selectmenu('enable');
+    if (image.val() == 'Select Image') {
+        size.selectmenu('disable');
+    } else return;
+    if (provider.val() == 'Select Provider') {
+        image.selectmenu('disable');
     }
 }
 

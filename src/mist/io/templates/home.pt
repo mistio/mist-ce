@@ -146,27 +146,29 @@
 <!-- Start of add dialog -->
 <div data-role="page" id="dialog-add" class="mist-dialog">
     <div data-role="content" data-theme="c">
-        <h3>Create</h3>
-        <label for="create-machine-name" class="select">1. Name:</label>
+        <h3>Create machine</h3>
+        <label for="create-machine-name">1. Name:</label>
         <input name="create-machine-name" type="text" id="new-machine-name" > </input>
-        <label for="create-select-provider" class="select">2. Provider:</label>
-        <select name="create-select-provider" id="create-select-provider" data-theme="c" data-icon="check" data-native-menu="false">
-            <option>Provider</option>
+        <label for="create-select-provider">2. Provider:</label>
+        <select name="create-select-provider" id="create-select-provider" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
+            <option>Select Provider</option>
         </select>
-        <label for="create-select-image" class="select">3. Image:</label>
-        <select name="create-select-image" id="create-select-image" data-theme="c" data-icon="check" data-native-menu="false">
-            <option>Image</option>
+        <label for="create-select-image">3. Image:</label>
+        <select name="create-select-image" id="create-select-image" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
+            <option>Select Image</option>
             <option value="edit">1</option>
             <option value="delete">2</option>
             <option value="delete">3</option>
         </select>
-        <label for="create-select-size" class="select">4. Size:</label>
-        <select name="create-select-size" id="create-select-size" data-theme="c" data-icon="check" data-native-menu="false">
-            <option>Size</option>
+        <label for="create-select-size">4. Size:</label>
+        <select name="create-select-size" id="create-select-size" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
+            <option>Select Size</option>
             <option value="edit">1</option>
             <option value="delete">2</option>
             <option value="delete">3</option>
         </select>
+        <label for="create-machine-cost" class="select">Cost:</label>
+        <input name="create-machine-cost" type="text" id="new-machine-name" class="ui-disabled" > </input>
         <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
             <a href="index.html" id="create-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Back</a>
             <a href="index.html" id="create-ok" class="btn-right-full" data-role="button" data-rel="back" data-theme="b">Launch!</a>
