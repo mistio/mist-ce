@@ -101,7 +101,11 @@ $('#machines-button-reboot').live('click', function() {
         var mName = $('#machines .node input:checked').closest('.node').find('.name').text();
             titl = 'Reboot '+mName,
             msg = 'Are you sure you want to reboot '+mName+'?';
-        displayConfirmation(titl, msg, function() {alert('Reboot is in order!!');});
+        displayConfirmation(titl, msg, function() {
+            var node = $('#machines .node input:checked').closest('.node');
+            var backend = backends[node[0].id.split('-')[0]];
+            backend.newAction(['reboot', node[0].id.split('-').splice(1).join('-')]);
+        });
     }
 });
 
@@ -130,7 +134,11 @@ $('#machines-button-destroy').live('click', function() {
         var mName = $('#machines .node input:checked').closest('.node').find('.name').text();
             titl = 'Destroy '+mName,
             msg = 'Are you sure you want to destroy '+mName+'?';
-        displayConfirmation(titl, msg, function() {alert('Destroy is in order!!');});
+        displayConfirmation(titl, msg, function() {
+            var node = $('#machines .node input:checked').closest('.node');
+            var backend = backends[node[0].id.split('-')[0]];
+            backend.newAction(['destroy', node[0].id.split('-').splice(1).join('-')]);
+        });
     }
 });
 
