@@ -288,6 +288,10 @@ a#mist-select-machines-button {
 	margin: 0 auto 15px auto; 
 }
 
+.ui-dialog .ui-header .ui-btn-left {
+	display: none;
+}
+
 /* Create Dialog */
 
 .btn-full {

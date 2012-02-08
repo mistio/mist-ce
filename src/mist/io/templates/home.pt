@@ -171,7 +171,7 @@
         <input name="create-machine-cost" type="text" id="new-machine-name" class="ui-disabled" > </input>
         <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
             <a href="index.html" id="create-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Back</a>
-            <a href="index.html" id="create-ok" class="btn-right-full" data-role="button" data-rel="back" data-theme="b">Launch!</a>
+            <a href="index.html" id="create-ok" class="btn-right-full ui-disabled" data-role="button" data-rel="back" data-theme="b">Launch!</a>
         </div>
     </div>
 </div><!-- /add dialog -->

@@ -379,12 +379,19 @@ function update_messages_count() {
 function update_select_providers() {
     var optgroup = $('#optgroup-providers'),
         addmenu = $('#dialog-add #create-select-provider');
+
     optgroup.empty();
-    addmenu.empty();
-    addmenu.append('<option>Select Provider</option>');
     backends.forEach(function(b, i) {
         var optionContent = '<option value="prov-'+b.provider+'">'+b.title+'</option>';
         optgroup.append(optionContent);
+    });
+
+    // Only update create dialog if nothing yet selected
+    if (createSelectionDefault()) {
+        addmenu.empty();
+        addmenu.append('<option>Select Provider</option>');
+        backends.forEach(function(b, i) {
+        var optionContent = '<option value="prov-'+b.provider+'">'+b.title+'</option>';
         if (b.locations.length < 1) {
             addmenu.append(optionContent);
         } else {
@@ -393,6 +400,8 @@ function update_select_providers() {
             });
         }
     });
+    }
+    
     try {
         $('#mist-select-machines').selectmenu('refresh');
         addmenu.selectmenu('refresh');
@@ -402,7 +411,8 @@ function update_select_providers() {
 }
 
 function updateCreateFields() {
-    var provider = $('#create-select-provider'),
+    var name = $('#create-machine-name'),
+        provider = $('#create-select-provider'),
         image = $('#create-select-image'),
         size = $('#create-select-size');
     
@@ -414,6 +424,36 @@ function updateCreateFields() {
     if (provider.val() == 'Select Provider') {
         image.selectmenu('disable');
     }
+    console.log(createSelectionComplete());
+    if (createSelectionComplete()) {
+        $('#create-ok').removeClass('ui-disabled');
+    } else {
+        $('#create-ok').addClass('ui-disabled');
+    }
+}
+
+// returns whether all of the
+// the elements in the create dialog have
+// non-default values.
+function createSelectionComplete() {
+    var name = $('#create-machine-name'),
+        provider = $('#create-select-provider'),
+        image = $('#create-select-image'),
+        size = $('#create-select-size'),
+        ret = (provider.val() != 'Select Provider' && image.val() != 'Select Image' && size.val() != 'Select Size');
+    return ret;
+}
+
+// returns whether all of the
+// the elements in the create dialog have a
+// default values.
+function createSelectionDefault() {
+    var name = $('#create-machine-name'),
+        provider = $('#create-select-provider'),
+        image = $('#create-select-image'),
+        size = $('#create-select-size'),
+        ret = (provider.val() != 'Select Provider' && image.val() != 'Select Image' && size.val() != 'Select Size');
+    return ret;
 }
 
 function truncate_names(truncateName, truncateCharacters ) { //truncate truncateName if bigger than truncateCharacters
