@@ -5,21 +5,8 @@ from libcloud.compute.providers import get_driver
 from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.deployment import MultiStepDeployment
 from mist.io.config import BACKENDS
+from pyramid.view import view_config
 
-
-def home(request):
-    '''Fill in an object with backend data, taken from config.py'''
-    backends = []
-    for b in BACKENDS:
-        backends.append({'id'           : b['id'],
-                         'title'        : b['title'],
-                         'provider'     : b['provider'],
-                         'poll_interval': b['poll_interval'],
-                         'status'       : 'off',
-                        })
-    return {'project': 'mist.io', 'backends': backends}
-
-# cpsaltis: is this used somewhere?
 def connect(backend):
     '''Establish backend connection using the credentials specified'''
     try:
@@ -40,6 +27,26 @@ def connect(backend):
         return 0
 
 
+@view_config(route_name='home', request_method='GET', renderer='templates/home.pt')
+def home(request):
+    '''Fill in an object with backend data, taken from config.py'''
+    try:
+        backend_list = request.environ['beaker.session']['backends']
+    except:
+        backend_list = BACKENDS
+
+    backends = []
+    for b in backend_list:
+        backends.append({'id'           : b['id'],
+                         'title'        : b['title'],
+                         'provider'     : b['provider'],
+                         'poll_interval': b['poll_interval'],
+                         'status'       : 'off',
+                        })
+    return {'project': 'mist.io', 'backends': backends}
+
+
+@view_config(route_name='machines', request_method='GET')
 def list_machines(request):
     '''List machines for a backend'''
     ret = []
@@ -72,6 +79,8 @@ def list_machines(request):
                     })
     return Response(json.dumps(ret))
 
+
+@view_config(route_name='machines', request_method='POST')
 def create_machine(request):
     '''Create a new virtual machine on the specified backend'''
     ret = []
@@ -125,6 +134,7 @@ def create_machine(request):
         return Response('Invalid backend', 404)
 
 
+@view_config(route_name='machine', request_method='POST', request_param='action=start')
 def start_machine(request):
     ret = []
     found = False
@@ -146,6 +156,7 @@ def start_machine(request):
     return Response(json.dumps(ret))
 
 
+@view_config(route_name='machine', request_method='POST', request_param='action=stop')
 def stop_machine(request):
     ret = []
     found = False
@@ -169,6 +180,7 @@ def stop_machine(request):
     return Response(json.dumps(ret))
 
 
+@view_config(route_name='machine', request_method='POST', request_param='action=reboot')
 def reboot_machine(request):
     ret = []
     found = False
@@ -180,7 +192,8 @@ def reboot_machine(request):
         for machine in machines:
             if machine.id == request.matchdict['machine']:
                 found = True
-                machine.reboot()
+                #machine.reboot()
+                print 'rebooted', machine.id
                 break
         if not found:
             return Response('Invalid machine', 404)
@@ -190,6 +203,7 @@ def reboot_machine(request):
     return Response(json.dumps(ret))
 
 
+@view_config(route_name='machine', request_method='POST', request_param='action=destroy')
 def destroy_machine(request):
     ret = []
     found = False
@@ -201,7 +215,8 @@ def destroy_machine(request):
         for machine in machines:
             if machine.id == request.matchdict['machine']:
                 found = True
-                machine.destroy()
+                #machine.destroy()
+                print 'destroyed', machine.id
                 break
         if not found:
             return Response('Invalid machine', 404)
@@ -211,33 +226,7 @@ def destroy_machine(request):
     return Response(json.dumps(ret))
 
 
-def list_metadata(request):
-    '''Lists metadata for a machine, given the backend and machine id'''
-    ret = []
-    found = False
-    backends = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
-    if backends:
-        backend = backends[0]
-        conn = connect(backend)
-        machines = conn.list_nodes()
-        for machine in machines:
-            if machine.id == request.matchdict['machine']:
-                try:
-                    metadata = conn.ex_get_metadata(machine) #eg Openstack
-                    found = True
-                except:
-                    try:
-                        metadata = conn.ex_describe_tags(machine) #eg EC2
-                        found = True
-                    except:
-                        return Response('Not implemented for this backend', 404)
-                break
-    if not found:
-        return Response('Invalid backend', 404)
-
-    return Response(json.dumps(metadata))
-
-
+@view_config(route_name='metadata', request_method='POST')
 def set_metadata(request):
     '''Sets metadata for a machine, given the backend and machine id'''
     ret = []
@@ -273,30 +262,7 @@ def set_metadata(request):
     #example EC2: conn2.ex_create_tags(machine, {'something': 'something_something'})
 
 
-def list_alerts(request):
-    '''View alert history'''
-    #TODO: populate this
-    return True
-
-
-def send_alert(request):
-    '''Forwards an alert event'''
-    #TODO: populate this
-    return True
-
-
-def list_alert_settings(request):
-    '''List all the alert rules'''
-    #TODO: populate this
-    return True
-
-
-def update_alert(request):
-    '''Update/set and alert rule'''
-    #TODO: populate this
-    return True
-
-
+@view_config(route_name='images', request_method='GET')
 def list_images(request):
     '''List images from each backend'''
     ret = []
@@ -319,6 +285,7 @@ def list_images(request):
     return Response(json.dumps(ret))
 
 
+@view_config(route_name='sizes', request_method='GET')
 def list_sizes(request):
     '''List sizes (aka flavors) from each backend'''
     ret = []
@@ -334,17 +301,18 @@ def list_sizes(request):
         return Response('Invalid backend', 404)
 
     for i in sizes:
-        ret.append({'id'            : i.id,
-                    'bandwidth'         : i.bandwidth,
-                    'disk'         : i.disk,
-                    'driver'         : i.driver.name,
-                    'name'         : i.name,
-                    'price'         : i.price,
-                    'ram'         : i.ram})
+        ret.append({'id'        : i.id,
+                    'bandwidth' : i.bandwidth,
+                    'disk'      : i.disk,
+                    'driver'    : i.driver.name,
+                    'name'      : i.name,
+                    'price'     : i.price,
+                    'ram'       : i.ram})
 
     return Response(json.dumps(ret))
 
 
+@view_config(route_name='locations', request_method='GET')
 def list_locations(request):
     '''List locations from each backend'''
     ret = []
