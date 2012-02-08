@@ -77,7 +77,7 @@ def list_machines(request):
                     'tags'          : tags,
                     'extra'         : m.extra,
                     })
-    return Response(json.dumps(ret))
+    return Response(json.dumps(ret), 200)
 
 
 @view_config(route_name='machines', request_method='POST')
@@ -153,7 +153,7 @@ def start_machine(request):
     else:
         return Response('Invalid backend', 404)
 
-    return Response(json.dumps(ret))
+    return Response(json.dumps(ret), 200)
 
 
 @view_config(route_name='machine', request_method='POST', request_param='action=stop')
@@ -177,7 +177,7 @@ def stop_machine(request):
     else:
         return Response('Invalid backend', 404)
 
-    return Response(json.dumps(ret))
+    return Response(json.dumps(ret), 200)
 
 
 @view_config(route_name='machine', request_method='POST', request_param='action=reboot')
@@ -200,7 +200,7 @@ def reboot_machine(request):
     else:
         return Response('Invalid backend', 404)
 
-    return Response(json.dumps(ret))
+    return Response(json.dumps(ret), 200)
 
 
 @view_config(route_name='machine', request_method='POST', request_param='action=destroy')
@@ -223,7 +223,7 @@ def destroy_machine(request):
     else:
         return Response('Invalid backend', 404)
 
-    return Response(json.dumps(ret))
+    return Response(json.dumps(ret), 200)
 
 
 @view_config(route_name='metadata', request_method='POST')
@@ -309,7 +309,7 @@ def list_sizes(request):
                     'price'     : i.price,
                     'ram'       : i.ram})
 
-    return Response(json.dumps(ret))
+    return Response(json.dumps(ret), 200)
 
 
 @view_config(route_name='locations', request_method='GET')
@@ -332,4 +332,4 @@ def list_locations(request):
                     'name'         : i.name,
                     'country'         : i.country,})
 
-    return Response(json.dumps(ret))
+    return Response(json.dumps(ret), 200)
