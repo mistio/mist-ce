@@ -74,7 +74,7 @@ function Backend(id, title, provider, interval, host, log){
                     url: 'backends/'+this.id+'/machines',
                     success: function(data) {
                         backend.updateStatus('on', 'list_machines');
-                        backend.machines = jQuery.parseJSON(data);
+                        backend.machines = data;
                         update_machines_view(backend);
                         backend.log('updated machines', DEBUG);
                         backend.processAction();
@@ -92,7 +92,7 @@ function Backend(id, title, provider, interval, host, log){
                     url: 'backends/'+this.id+'/images',
                     success: function(data) {
                         backend.updateStatus('on', 'list_images');
-                        backend.images = jQuery.parseJSON(data);
+                        backend.images = data;
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
@@ -107,7 +107,7 @@ function Backend(id, title, provider, interval, host, log){
                     url: 'backends/'+this.id+'/sizes',
                     success: function(data) {
                         backend.updateStatus('on', 'list_sizes');
-                        backend.sizes = jQuery.parseJSON(data);
+                        backend.sizes = data;
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
@@ -122,7 +122,7 @@ function Backend(id, title, provider, interval, host, log){
                     url: 'backends/'+this.id+'/locations',
                     success: function(data) {
                         backend.updateStatus('on', 'list_locations');
-                        backend.locations = jQuery.parseJSON(data);
+                        backend.locations = data;
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
