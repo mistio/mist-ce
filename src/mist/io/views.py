@@ -46,7 +46,7 @@ def home(request):
     return {'project': 'mist.io', 'backends': backends}
 
 
-@view_config(route_name='machines', request_method='GET')
+@view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
     '''List machines for a backend'''
     ret = []
@@ -77,7 +77,7 @@ def list_machines(request):
                     'tags'          : tags,
                     'extra'         : m.extra,
                     })
-    return Response(json.dumps(ret), 200)
+    return ret
 
 
 @view_config(route_name='machines', request_method='POST')
@@ -192,7 +192,7 @@ def reboot_machine(request):
         for machine in machines:
             if machine.id == request.matchdict['machine']:
                 found = True
-                #machine.reboot()
+                machine.reboot()
                 print 'rebooted', machine.id
                 break
         if not found:
@@ -215,7 +215,7 @@ def destroy_machine(request):
         for machine in machines:
             if machine.id == request.matchdict['machine']:
                 found = True
-                #machine.destroy()
+                machine.destroy()
                 print 'destroyed', machine.id
                 break
         if not found:
@@ -262,7 +262,7 @@ def set_metadata(request):
     #example EC2: conn2.ex_create_tags(machine, {'something': 'something_something'})
 
 
-@view_config(route_name='images', request_method='GET')
+@view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
     '''List images from each backend'''
     ret = []
@@ -278,14 +278,14 @@ def list_images(request):
     if not found:
         return Response('Invalid backend', 404)
 
-    for i in images:
+    for i in images[:100]:
         ret.append({'id' : i.id,
                     'extra': i.extra,
                     'name': i.name,})
-    return Response(json.dumps(ret))
+    return ret
 
 
-@view_config(route_name='sizes', request_method='GET')
+@view_config(route_name='sizes', request_method='GET', renderer='json')
 def list_sizes(request):
     '''List sizes (aka flavors) from each backend'''
     ret = []
@@ -309,10 +309,10 @@ def list_sizes(request):
                     'price'     : i.price,
                     'ram'       : i.ram})
 
-    return Response(json.dumps(ret), 200)
+    return ret
 
 
-@view_config(route_name='locations', request_method='GET')
+@view_config(route_name='locations', request_method='GET', renderer='json')
 def list_locations(request):
     '''List locations from each backend'''
     ret = []
@@ -332,4 +332,4 @@ def list_locations(request):
                     'name'         : i.name,
                     'country'         : i.country,})
 
-    return Response(json.dumps(ret), 200)
+    return ret
