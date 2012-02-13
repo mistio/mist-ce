@@ -280,6 +280,28 @@ a#mist-select-machines-button {
 	width: 24.1%;
 }
 
+/* Single View */
+
+#machine-metadata ul {
+	list-style: none;
+	padding: 0px;
+	border-top: 1px solid #ccc;
+}
+
+#machine-metadata ul ul {
+	border-top: none;
+	padding-left: 30px;
+	background: #666;
+}
+
+#machine-metadata li {
+	padding: 10px;
+	background: #fff;
+	border-bottom: 1px solid #ccc;
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+}
+
 /* DIALOG */
 
 .ui-dialog .ui-content, 
