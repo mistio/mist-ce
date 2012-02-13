@@ -268,6 +268,7 @@ function update_machines_view(backend){
         //$("input[type='checkbox']").checkboxradio("refresh");
     }
     update_machines_count();
+    update_images_count();
     update_select_providers();
     updateBackendStatus(backend);
 }
@@ -337,6 +338,22 @@ function update_machines_count() {
     // Also update machines count bubble in initial screen.
     $('#one-li-machines .ui-li-count').text(allMachines);
 }
+
+// update the images counter
+function update_images_count() {
+    //return;
+    // TODO
+    var allImages = 0;
+    for (var i = 0 ; i < backends.length; i++) {
+        allImages += backends[i].images.length;
+    }
+
+    $('#all-images').text(allImages);
+
+    // Also update machines count bubble in initial screen.
+    $('#one-li-images .ui-li-count').text(allImages);
+}
+
 
 //updates the messages notifier
 function update_message_notifier() {
@@ -463,4 +480,11 @@ function truncate_names(truncateName, truncateCharacters ) { //truncate truncate
     } else {
         return truncateName;
     }
+}
+
+
+
+/* when the list_machines action returns, update the view */
+function update_images_view(backend){
+   
 }

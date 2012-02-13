@@ -224,6 +224,16 @@
     </div>
 </div><!-- /providers dialog -->
 tags
+
+<!-- Start of images page: #images -->
+<div data-role="page" id="images" data-theme="c">
+    <div data-role="header">
+        <a href="#one" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
+        <h1>Machines</h1>
+        <a class="state-providers" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right"></a>
+    </div><!-- /header -->
+</div><!-- /images page -->
+
 </body>
 
 </html>
