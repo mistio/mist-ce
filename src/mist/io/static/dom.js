@@ -93,8 +93,8 @@ $(document).on( 'click', '#create-ok', function() {
             var backend = backends[$('#create-select-provider option:selected')[0].value.split('-loc')[0]];
             var location = $('#create-select-provider option:selected')[0].value.split('-loc')[1];
             var name = $('#new-machine-name').val();
-            var image = $('#create-select-image-button span.ui-btn-text').text();
-            var size = $('#create-select-size-button span.ui-btn-text').text();
+            var image = $('#create-select-image option:selected')[0].value
+            var size = $('#create-select-size option:selected')[0].value
             backend.newAction(['create', name, location, image, size]);
 });
 // Footer reboot button / Machines view

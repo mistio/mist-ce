@@ -156,16 +156,14 @@
         <label for="create-select-image">3. Image:</label>
         <select name="create-select-image" id="create-select-image" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Select Image</option>
-            <option value="edit">1</option>
-            <option value="delete">2</option>
-            <option value="delete">3</option>
+            <option value="ami-31814f58">working in ec2</option>
+            <option value="104">working in rack</option>
         </select>
         <label for="create-select-size">4. Size:</label>
         <select name="create-select-size" id="create-select-size" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Select Size</option>
-            <option value="edit">1</option>
-            <option value="delete">2</option>
-            <option value="delete">3</option>
+            <option value="t1.micro">working in ec2</option>
+            <option value="1">working in rack</option>
         </select>
         <label for="create-machine-cost" class="select">Cost:</label>
         <input name="create-machine-cost" type="text" id="new-machine-name" class="ui-disabled" > </input>
