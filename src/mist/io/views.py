@@ -1,7 +1,7 @@
 '''mist.io views'''
 import json
 from pyramid.response import Response
-from libcloud.compute.base import Node
+from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.deployment import MultiStepDeployment
@@ -94,39 +94,19 @@ def create_machine(request):
         return Response('Backend not found', 404)
 
     try:
-        name = request.json_body['name']
-        location = request.json_body['location']
-        imageId = request.json_body['image']
-        size = request.json_body['size']
+        machine_name = request.json_body['name']
+        location_id = request.json_body['location']
+        image_id = request.json_body['image']
+        size_id = request.json_body['size']
     except Exception as e:
         return Response('Invalid payload', 400)
 
-    try:
-        sizes = conn.list_sizes()
-        for node_size in sizes:
-            if node_size.id == size:
-                size = node_size
-                break
-    except:
-        return Response('Invalid size', 400)
+    size = NodeSize(size_id, name='', ram='', disk='', bandwidth='', price='', driver=conn)
+    image = NodeImage(image_id, name='', driver=conn)
+    location = NodeLocation(location_id, name='', country='', driver=conn)
 
     try:
-        image = NodeImage(imageId, imageId, b["provider"])
-    except:
-        import pdb; pdb.set_trace()
-        return Response('Invalid image', 400)
-    try:
-        locations = conn.list_locations()
-        for node_location in locations:
-            if node_location.id == location:
-                location = node_location
-                break
-    except:
-        return Response('Invalid location', 400)
-
-    try:
-        import pdb; pdb.set_trace()
-        node = conn.create_node(name=name, image=image, size=size, location=location)
+        node = conn.create_node(name=machine_name, image=image, size=size, location=location)
         #conn.deploy_node will be used for transfering pub keys etc. deploy_node waits for
         #the node to be up with public ip, otherwise hangs. (default 60*10 sec)
         #try:
@@ -142,50 +122,30 @@ def create_machine(request):
 
 @view_config(route_name='machine', request_method='POST', request_param='action=start', renderer='json')
 def start_machine(request):
+    #TODO: in which providers could this work?
     try:
         conn = connect(request)
     except:
         return Response('Backend not found', 404)
 
-    try:
-        machines = conn.list_nodes()
-    except:
-        return Response('Backend unavailable', 503)
-
-    found = False
-    for machine in machines:
-        if machine.id == request.matchdict['machine']:
-            found = True
-            #machine.start()
-            break
-
-    if not found:
-        return Response('Invalid machine', 400)
+    machine_id = request.matchdict['machine']
+    machine = Node(machine_id, name=machine_id, state=0, public_ips=[], private_ips=[], driver=conn)
+    #machine.start()
 
     return []
 
 
 @view_config(route_name='machine', request_method='POST', request_param='action=stop', renderer='json')
 def stop_machine(request):
+    #TODO: in which providers could this work?
     try:
         conn = connect(request)
     except:
         return Response('Backend not found', 404)
 
-    try:
-        machines = conn.list_nodes()
-    except:
-        return Response('Backend unavailable', 503)
-
-    found = False
-    for machine in machines:
-        if machine.id == request.matchdict['machine']:
-            found = True
-            #machine.stop()
-            break
-
-    if not found:
-        return Response('Invalid machine', 400)
+    machine_id = request.matchdict['machine']
+    machine = Node(machine_id, name=machine_id, state=0, public_ips=[], private_ips=[], driver=conn)
+    #machine.stop()
 
     return []
 
@@ -210,20 +170,9 @@ def destroy_machine(request):
     except:
         return Response('Backend not found', 404)
 
-    try:
-        machines = conn.list_nodes()
-    except:
-        return Response('Backend unavailable', 503)
-
-    found = False
-    for machine in machines:
-        if machine.id == request.matchdict['machine']:
-            found = True
-            machine.destroy()
-            break
-
-    if not found:
-        return Response('Invalid machine', 400)
+    machine_id = request.matchdict['machine']
+    machine = Node(machine_id, name=machine_id, state=0, public_ips=[], private_ips=[], driver=conn)
+    machine.destroy()
 
     return []
 
