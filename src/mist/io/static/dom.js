@@ -88,14 +88,14 @@ $(document).on( 'mouseenter', '#notifier, #notifier-in', function() {
     log.timeout = setTimeout("$('#notifier, #notifier-in').slideUp(300)", 5000);
 });
 
-// Create machine 
-$(document).on( 'click', '#create-ok', function() { 
+// Create machine
+$(document).on( 'click', '#create-ok', function() {
             var backend = backends[$('#create-select-provider option:selected')[0].value.split('-loc')[0]];
             var location = $('#create-select-provider option:selected')[0].value.split('-loc')[1];
             var name = $('#new-machine-name').val();
-            var image = $('#create-select-image-button span.ui-btn-text').text(); 
-            var size = $('#create-select-size-button span.ui-btn-text').text(); 
-            backend.newAction(['create', name, location, image, size]);          
+            var image = $('#create-select-image-button span.ui-btn-text').text();
+            var size = $('#create-select-size-button span.ui-btn-text').text();
+            backend.newAction(['create', name, location, image, size]);
 });
 // Footer reboot button / Machines view
 $(document).on( 'click', '#machines-button-reboot', function() {
@@ -108,7 +108,7 @@ $(document).on( 'click', '#machines-button-reboot', function() {
                 var node = $(this).closest('.node');
                 var backend = backends[node[0].id.split('-')[0]];
                 backend.newAction(['reboot', node[0].id.split('-').splice(1).join('-')]);
-            });        
+            });
         });
     } else if (machinesSelected == 1) {
         var mName = $('#machines .node input:checked').closest('.node').find('.name').text();
@@ -141,7 +141,7 @@ $(document).on( 'click', '#machines-button-destroy', function() {
                 var node = $(this).closest('.node');
                 var backend = backends[node[0].id.split('-')[0]];
                 backend.newAction(['destroy', node[0].id.split('-').splice(1).join('-')]);
-            });        
+            });
         });
     } else if (machinesSelected == 1) {
         var mName = $('#machines .node input:checked').closest('.node').find('.name').text();
@@ -413,7 +413,7 @@ function update_select_providers() {
     optgroup.empty();
     backends.forEach(function(b, i) {
         var optionContent = '<option value="'+b.provider+'">'+b.title+'</option>';
-        optgroup.append(optionContent);        
+        optgroup.append(optionContent);
     });
 
     // Only update create dialog if nothing yet selected
@@ -426,12 +426,12 @@ function update_select_providers() {
                 addmenu.append(optionContent);
             } else {
                 b.locations.forEach(function(l, j) {
-                    addmenu.append('<option value="'+i+'-loc'+l.id+'">'+b.title+' - '+l.name+'</option>');
+                addmenu.append('<option value="'+i+'-loc'+l.id+'">'+b.title+' - '+l.name+'</option>');
                 });
             }
         });
     }
-    
+
     try {
         $('#mist-select-machines').selectmenu('refresh');
         addmenu.selectmenu('refresh');
@@ -445,7 +445,7 @@ function updateCreateFields() {
         provider = $('#create-select-provider'),
         image = $('#create-select-image'),
         size = $('#create-select-size');
-    
+
     $('.create-select').selectmenu();
     $('.create-select').selectmenu('enable');
     if (image.val() == 'Select Image') {
@@ -453,7 +453,7 @@ function updateCreateFields() {
         if (provider.val() == 'Select Provider') {
             image.selectmenu('disable');
         }
-    } 
+    }
     if (createSelectionComplete()) {
         $('#create-ok').removeClass('ui-disabled');
     } else {
@@ -491,9 +491,7 @@ function truncate_names(truncateName, truncateCharacters ) { //truncate truncate
     }
 }
 
-
-
 /* when the list_machines action returns, update the view */
 function update_images_view(backend){
-   
+
 }
