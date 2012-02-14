@@ -4,7 +4,7 @@ var LOGLEVEL = 4;
 function MessageLog(){
     this.messages = [];
     this.timeout = 0;
-    
+
     this.newMessage = function(message, level, backend){
         var now = new Date();
         if (typeof(level) == 'undefined') {
@@ -32,7 +32,7 @@ function Backend(id, title, provider, interval, host, log){
     this.images = [];
     this.locations = [];
     this.currentAction = '';
-    this.log = function(message, level){ try{log.newMessage(message, level, this)} catch(err){} };    
+    this.log = function(message, level){ try{log.newMessage(message, level, this)} catch(err){} };
 
     this.newAction = function(action){
         this.action_queue.push(action);
@@ -65,13 +65,16 @@ function Backend(id, title, provider, interval, host, log){
         if (this.status != 'unknown') {
             this.updateStatus('wait', action);
         }
+
         this.currentAction = action;
-        var backend = this;
+        var backend = this
+        var backendIndex = backends.indexOf(backend);
+
         switch(action[0]) {
             case 'list_machines':
                 this.log('updating machines', DEBUG);
                 $.ajax({
-                    url: 'backends/'+this.id+'/machines',
+                    url: 'backends/' + backendIndex + '/machines',
                     success: function(data) {
                         backend.updateStatus('on', 'list_machines');
                         backend.machines = data;
@@ -89,7 +92,7 @@ function Backend(id, title, provider, interval, host, log){
             case 'list_images':
                 this.log('updating images', DEBUG);
                 $.ajax({
-                    url: 'backends/'+this.id+'/images',
+                    url: 'backends/' + backendIndex + '/images',
                     success: function(data) {
                         backend.updateStatus('on', 'list_images');
                         backend.images = data;
@@ -104,7 +107,7 @@ function Backend(id, title, provider, interval, host, log){
             case 'list_sizes':
                 this.log('updating sizes', DEBUG);
                 $.ajax({
-                    url: 'backends/'+this.id+'/sizes',
+                    url: 'backends/' + backendIndex + '/sizes',
                     success: function(data) {
                         backend.updateStatus('on', 'list_sizes');
                         backend.sizes = data;
@@ -119,7 +122,7 @@ function Backend(id, title, provider, interval, host, log){
             case 'list_locations':
                 this.log('updating locations', DEBUG);
                 $.ajax({
-                    url: 'backends/'+this.id+'/locations',
+                    url: 'backends/' + backendIndex + '/locations',
                     success: function(data) {
                         backend.updateStatus('on', 'list_locations');
                         backend.locations = data;
@@ -135,8 +138,8 @@ function Backend(id, title, provider, interval, host, log){
                 this.log('starting ' + action[1], INFO);
                 $.ajax({
                     type: 'POST',
-                    data: 'action=start', 
-                    url: 'backends/'+this.id+'/machines/'+action[1],
+                    data: 'action=start',
+                    url: 'backends/' + backendIndex + '/machines/'+action[1],
                     success: function(data) {
                         backend.updateStatus('on', 'start');
                         backend.processAction();
@@ -151,8 +154,8 @@ function Backend(id, title, provider, interval, host, log){
                 this.log('rebooting ' + action[1], INFO);
                 $.ajax({
                     type: 'POST',
-                    data: 'action=reboot', 
-                    url: 'backends/'+this.id+'/machines/'+action[1],
+                    data: 'action=reboot',
+                    url: 'backends/' + backendIndex + '/machines/'+action[1],
                     success: function(data) {
                         backend.updateStatus('on', 'reboot');
                         backend.processAction();
@@ -167,8 +170,8 @@ function Backend(id, title, provider, interval, host, log){
                 this.log('destroying ' + action[1], INFO);
                 $.ajax({
                     type: 'POST',
-                    data: 'action=destroy', 
-                    url: 'backends/'+this.id+'/machines/'+action[1],
+                    data: 'action=destroy',
+                    url: 'backends/' + backendIndex + '/machines/'+action[1],
                     success: function(data) {
                         backend.updateStatus('on', 'destroy');
                         backend.processAction();
@@ -183,8 +186,8 @@ function Backend(id, title, provider, interval, host, log){
                 this.log('stopping ' + action[1], INFO);
                 $.ajax({
                     type: 'POST',
-                    data: 'action=stop', 
-                    url: 'backends/'+this.id+'/machines/'+action[1],
+                    data: 'action=stop',
+                    url: 'backends/' + backendIndex + '/machines/'+action[1],
                     success: function(data) {
                         backend.updateStatus('on', 'stop');
                         backend.processAction();
@@ -209,7 +212,7 @@ function Backend(id, title, provider, interval, host, log){
                     contentType: "application/json",
                     dataType: "json",
                     data: JSON.stringify(payload),
-                    url: 'backends/'+this.id+'/machines',
+                    url: 'backends/' + backendIndex + '/machines',
                     success: function(data) {
                         backend.updateStatus('on', 'create');
                         backend.processAction();
@@ -224,7 +227,7 @@ function Backend(id, title, provider, interval, host, log){
             case 'list_metadata':
                 this.log('updating metadata', DEBUG);
                 $.ajax({
-                    url: 'backends/'+this.id+'/machines/'+action[1]+'/metadata',
+                    url: 'backends/' + backendIndex + '/machines/' + action[1] + '/metadata',
                     success: function(data) {
                         backend.updateStatus('on', 'list_metadata');
                         backend.processAction();
@@ -246,7 +249,7 @@ function Backend(id, title, provider, interval, host, log){
                     contentType: "application/json",
                     dataType: "json",
                     data: JSON.stringify(payload),
-                    url: 'backends/'+this.id+'/machines/'+action[1]+'/metadata',
+                    url: 'backends/' + backendIndex + '/machines/' + action[1] + '/metadata',
                     success: function(data) {
                         backend.updateStatus('on', 'create');
                         backend.processAction();
@@ -275,7 +278,6 @@ function to_ul(obj, prop) {
     } else {
         var ul = document.createElement ("ul");
         for (var prop in obj) {
-            console.log('appending ' + prop);
             ul.appendChild(to_ul(obj[prop], prop));
         }
         return ul;
