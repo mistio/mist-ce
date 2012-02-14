@@ -88,6 +88,15 @@ $(document).on( 'mouseenter', '#notifier, #notifier-in', function() {
     log.timeout = setTimeout("$('#notifier, #notifier-in').slideUp(300)", 5000);
 });
 
+// Create machine 
+$(document).on( 'click', '#create-ok', function() { 
+            var backend = backends[$('#create-select-provider option:selected')[0].value.split('-loc')[0]];
+            var location = $('#create-select-provider option:selected')[0].value.split('-loc')[1];
+            var name = $('#new-machine-name').val();
+            var image = $('#create-select-image-button span.ui-btn-text').text(); 
+            var size = $('#create-select-size-button span.ui-btn-text').text(); 
+            backend.newAction(['create', name, location, image, size]);          
+});
 // Footer reboot button / Machines view
 $(document).on( 'click', '#machines-button-reboot', function() {
     var machinesSelected = $('#machines .node input:checked').length;
@@ -403,8 +412,8 @@ function update_select_providers() {
 
     optgroup.empty();
     backends.forEach(function(b, i) {
-        var optionContent = '<option value="prov-'+b.provider+'">'+b.title+'</option>';
-        optgroup.append(optionContent);
+        var optionContent = '<option value="'+b.provider+'">'+b.title+'</option>';
+        optgroup.append(optionContent);        
     });
 
     // Only update create dialog if nothing yet selected
@@ -412,15 +421,15 @@ function update_select_providers() {
         addmenu.empty();
         addmenu.append('<option>Select Provider</option>');
         backends.forEach(function(b, i) {
-        var optionContent = '<option value="prov-'+b.provider+'">'+b.title+'</option>';
-        if (b.locations.length < 1) {
-            addmenu.append(optionContent);
-        } else {
-            b.locations.forEach(function(l, j) {
-                addmenu.append('<option value="prov-'+b.provider+' loc-'+l.id+'">'+b.title+' - '+l.name+'</option>');
-            });
-        }
-    });
+            var optionContent = '<option value="'+b.provider+'">'+b.title+'</option>';
+            if (b.locations.length < 1) {
+                addmenu.append(optionContent);
+            } else {
+                b.locations.forEach(function(l, j) {
+                    addmenu.append('<option value="'+i+'-loc'+l.id+'">'+b.title+' - '+l.name+'</option>');
+                });
+            }
+        });
     }
     
     try {

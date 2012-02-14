@@ -200,16 +200,16 @@ function Backend(id, title, provider, interval, host, log){
                 this.log('creating ' + action[1], INFO);
                 var payload = {
                     "name": action[1],
-                    "size" : action[2],
+                    "location" : action[2],
                     "image": action[3],
-                    "location": action[4]
+                    "size": action[4]
                 };
                 $.ajax({
                     type: "POST",
                     contentType: "application/json",
                     dataType: "json",
                     data: JSON.stringify(payload),
-                    url: 'backends/'+this.id+'/machines/create',
+                    url: 'backends/'+this.id+'/machines',
                     success: function(data) {
                         backend.updateStatus('on', 'create');
                         backend.processAction();

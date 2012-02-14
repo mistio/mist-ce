@@ -80,6 +80,7 @@ def list_machines(request):
     return ret
 
 
+
 @view_config(route_name='machines', request_method='POST')
 def create_machine(request):
     '''Create a new virtual machine on the specified backend'''
@@ -89,12 +90,18 @@ def create_machine(request):
         if request.matchdict['backend'] == b['id']:
             found = True
             conn = connect(b)
-            #FIXME: get values from form,
-            name = request.json_body['name']
+            try:
+                name = request.json_body['name']
+                location = request.json_body['location']
+                image = request.json_body['image']
+                size = request.json_body['size']
+            except Exception as e:
+                return Response('Something went wrong with the creation', 404)            
+            import pdb; pdb.set_trace()
             try:
                 sizes = conn.list_sizes()
                 for node_size in sizes:
-                    if node_size.id == request.json_body['size']:
+                    if node_size.id == size:
                         size = node_size
                         break
             except:
@@ -103,7 +110,7 @@ def create_machine(request):
             try:
                 images = conn.list_images()
                 for node_image in images:
-                    if node_image.id == request.json_body['image']:
+                    if node_image.id == image:
                         image = node_image
                         break
             except:
@@ -111,11 +118,11 @@ def create_machine(request):
             try:
                 locations = conn.list_locations()
                 for node_location in locations:
-                    if node_location.id == request.json_body['location']:
+                    if node_location.id == location:
                         location = node_location
                         break
             except:
-                return Response('Invalid image', 404)
+                return Response('Invalid location', 404)
             try:
                 node = conn.create_node(name=name, image=image, size=size, location=location)
                 #conn.deploy_node will be used for transfering pub keys etc. deploy_node waits for
