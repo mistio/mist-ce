@@ -1,6 +1,7 @@
 '''mist.io views'''
 import json
 from pyramid.response import Response
+from libcloud.compute.base import Node
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.deployment import MultiStepDeployment
@@ -196,21 +197,9 @@ def reboot_machine(request):
     except:
         return Response('Backend not found', 404)
 
-    try:
-        machines = conn.list_nodes()
-    except:
-        return Response('Backend unavailable', 503)
-
-    found = False
-    for machine in machines:
-        if machine.id == request.matchdict['machine']:
-            found = True
-            machine.reboot()
-            break
-
-    if not found:
-        return Response('Invalid machine', 400)
-
+    machine_id = request.matchdict['machine']
+    machine = Node(machine_id, name=machine_id, state=0, public_ips=[], private_ips=[], driver=conn)
+    machine.reboot()
     return []
 
 
