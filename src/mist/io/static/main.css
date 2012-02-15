@@ -339,6 +339,10 @@ a#mist-select-machines-button {
 	background-image:         linear-gradient(#AFD5FF, #98BBED);
 }
 
+.add-button {
+    float: right;
+}
+
 /* Conditional for < 480px */
 @media only screen and (max-width: 480px) {
 
