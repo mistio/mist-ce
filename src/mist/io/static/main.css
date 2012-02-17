@@ -347,6 +347,10 @@ a#mist-select-machines-button {
     height: 42px;
 }
 
+#home-menu {
+    display: none;
+}
+
 /* Conditional for < 480px */
 @media only screen and (max-width: 480px) {
 

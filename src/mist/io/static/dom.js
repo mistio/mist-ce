@@ -31,22 +31,27 @@ $(document).on('mobileinit', function(){
     //after getting the machines, get images and sizes
     backends.forEach(function(b, i){
         b.newAction(['list_sizes']);
-        b.newAction(['list_images']);
         b.newAction(['list_locations']);
+        b.newAction(['list_images']);
     });
 
     // Change default machines list callback
     $.mobile.listview.prototype.options.filterCallback = customMachinesFilter;
 });
 
-$(document).on( 'pageinit', '', function() {
+$(document).on( 'pageinit', '', update_backends);
+
+function update_backends() {
     // run list_machines action on each backend
     $('#backend-buttons').html('');
     backends.forEach(function(b, i){
         $('#backend-buttons').append("<a data-corners='false' data-shadow='false' data-icon='check' href='#backend-" + i + "' data-role='button' data-theme='c'>" + b.title + "</a>");
     });
-    $('#backend-buttons a').button();
-});
+    if (backends.length) {
+        $('#home-menu').show();
+        $('#backend-buttons a').button();
+    }
+}
 
 // Update tags page when it opens
 $(document).on( 'pagebeforeshow', '#dialog-tags', function( e, data ) {

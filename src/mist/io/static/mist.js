@@ -268,8 +268,6 @@ function Backend(id, title, provider, interval, host, log){
 }
 
 function add_backend(provider, apikey, apisecret){
-    console.log('adding backend ' + provider);
-
     var payload = {
         "provider": provider,
         "apikey": apikey,
@@ -284,11 +282,17 @@ function add_backend(provider, apikey, apisecret){
         url: 'backends',
         success: function(data) {
             //FIXME: better handling
-            console.log('added backend ' + provider)
+            b = new Backend(data['id'], data['title'], data['provider'], data['poll_interval'], '', log)
+            backends.push(b);
+            b.newAction(['list_machines']);
+            b.newAction(['list_sizes']);
+            b.newAction(['list_locations']);
+            b.newAction(['list_images']);
+            try { update_backends(); } catch(err) { alert(err); }
         },
         error: function(jqXHR, textStatus, errorThrown) {
             //FIXME: better handling
-            console.log("service  offline");
+            alert("service  offline");
         }
     });
 

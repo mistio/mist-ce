@@ -18,7 +18,7 @@ def connect(request):
     backendIndex = int(request.matchdict['backend'])
     backend = backend_list[backendIndex]
 
-    Driver = get_driver(backend['provider'])
+    Driver = get_driver(int(backend['provider']))
     if 'host' in backend.keys():
         conn = Driver(backend['id'],
                       backend['secret'],
