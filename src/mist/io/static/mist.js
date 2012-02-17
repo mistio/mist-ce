@@ -251,12 +251,37 @@ function Backend(id, title, provider, interval, host, log){
                     data: JSON.stringify(payload),
                     url: 'backends/' + backendIndex + '/machines/' + action[1] + '/metadata',
                     success: function(data) {
-                        backend.updateStatus('on', 'create');
+                        backend.updateStatus('on', 'set_metadata');
                         backend.processAction();
                         backend.log('set metadata command sent', DEBUG);
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off', 'start');
+                        backend.updateStatus('off', 'set_metadata');
+                        backend.log("backend  offline", ERROR);
+                    }
+                });
+                break;
+            case 'add_backend':
+                console.log('adding backend ' + action[1], INFO);
+                //FIXME: get from form
+                var payload = {
+                    "provider": action[1],
+                    "apikey": action[2],
+                    "apisecret": action[3]
+                };
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(payload),
+                    url: 'backends/',
+                    success: function(data) {
+                        backend.updateStatus('on', 'add_backend');
+                        backend.processAction();
+                        backend.log('add backend command sent', DEBUG);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        backend.updateStatus('off', 's');
                         backend.log("backend  offline", ERROR);
                     }
                 });
