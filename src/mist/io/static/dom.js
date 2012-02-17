@@ -25,10 +25,9 @@ $(document).on('mobileinit', function(){
 
     // run list_machines action on each backend
     backends.forEach(function(b, i){
-        // TODO: create provider widget
         b.newAction(['list_machines']);
     });
-
+    
     //after getting the machines, get images and sizes
     backends.forEach(function(b, i){
         b.newAction(['list_sizes']);
@@ -38,6 +37,14 @@ $(document).on('mobileinit', function(){
 
     // Change default machines list callback
     $.mobile.listview.prototype.options.filterCallback = customMachinesFilter;
+});
+
+$(document).on( 'pageinit', '', function() {
+    // run list_machines action on each backend
+    backends.forEach(function(b, i){
+        $('#backend-buttons').append("<a data-corners='false' data-shadow='false' data-icon='check' href='#backend-" + i + "' data-role='button' data-theme='c'>" + b.title + "</a>");
+    });
+    $('#backend-buttons a').button();
 });
 
 // Update tags page when it opens

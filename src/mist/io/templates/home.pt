@@ -42,9 +42,8 @@
     <div data-role="content">
         <a href="#add-backend" class="add-button" data-rel="dialog" data-theme="b" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus">Add backend</a>
 
-        <div data-role="controlgroup" data-type="horizontal">
-            <a data-icon="check" href="#ec2" data-role="button" data-theme="c">EC2</a>
-            <a data-icon="check" href="#rackspace" data-role="button" data-theme="c">Rackspace</a>
+        <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
+ 
         </div>
 
         <ul data-role="listview" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
