@@ -281,7 +281,7 @@ function add_backend(provider, apikey, apisecret){
         contentType: "application/json",
         dataType: "json",
         data: JSON.stringify(payload),
-        url: 'backends/',
+        url: 'backends',
         success: function(data) {
             //FIXME: better handling
             console.log('added backend ' + provider)
