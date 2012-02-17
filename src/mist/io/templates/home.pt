@@ -129,7 +129,9 @@
 
         <div>
             <h3>Basic Info</h3>
-            Basic stuff
+
+            <span class="machine-basic-stuff"></span>
+            
         </div>
         <div data-role="collapsible">
             <h3>Full metadata list</h3>

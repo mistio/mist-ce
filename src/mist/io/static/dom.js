@@ -71,11 +71,24 @@ $(document).on( 'pageinit', '#dialog-add', function() {
 //
 
 // prepare single view on node click
-$(document).on( 'click', 'li.node a', function(event){
+$(document).on( 'click', 'li.node a', function(event){ 
     var domId = $(this).parent().parent().parent()[0].id;
     var backendId = domId.split('-')[0];
     var machineId = domId.split('-').splice(1).join('-');
     var machine = get_machine(backendId, machineId);
+
+//STUB!
+    var name = 'Name: ' + machine.name || machine.id;
+    var status = 'Status:' + machine.extra.status;
+    var public_ips = 'Public IPs:' + machine.public_ips;
+    var private_ips = 'Private IPs:' + machine.private_ips;  
+    var image = 'Image:' + machine.image;  
+    var dns_name = 'Dns name:' + machine.extra.dns_name;  
+    var launchdatetime = 'Launchdatetime:' + machine.extra.launchdatetime;  
+    var basic_stuff= name + '<br>' + status + '<br>' + public_ips + '<br>' + private_ips + '<br>' + image + '<br>' + dns_name + '<br>' + launchdatetime + '<br>' ;
+    //also show any of the following if found: keyname,availability,flavorId,uri,hostId';
+    $('#single-machine span.machine-basic-stuff').html(basic_stuff);
+
     $('#single-machine h1#single-machine-name').text(machine.name || machine.id);
     $('#machine-metadata').html(to_ul(machine.extra));
 });
