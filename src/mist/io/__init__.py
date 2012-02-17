@@ -3,8 +3,10 @@ from mist.io.resources import Root
 
 def main(global_config, **settings):
     """This function returns a Pyramid WSGI application"""
+    if not settings.keys():
+        settings=global_config
+        
     config = Configurator(root_factory=Root, settings=settings)
-
     config.add_static_view('static', 'mist.io:static')
     config.add_route('home', '/')
     config.add_route('machines', '/backends/{backend}/machines')

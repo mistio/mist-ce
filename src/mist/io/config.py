@@ -9,8 +9,8 @@ PUBLIC_KEYS = {}
 BACKENDS = [
 #    {'provider' : Provider.EC2,
 #     'title' : 'EC2',
-#     'id' : 'AKIAIHIF3412AD89FISQ',
-#     'secret' : 'mIApa25luad1qvVvscX+spm4knQfmXlcK2oPi/hC',
+#     'id' : 'userid',
+#     'secret' : 'secret',
 #     'poll_interval' : 10000,
 #     'public_key': PUBLIC_KEYS['user'],
 #     },
