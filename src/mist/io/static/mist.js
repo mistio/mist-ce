@@ -282,7 +282,7 @@ function Backend(id, title, provider, interval, host, log){
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         backend.updateStatus('off', 's');
-                        backend.log("backend  offline", ERROR);
+                        backend.log("service  offline", ERROR);
                     }
                 });
                 break;
