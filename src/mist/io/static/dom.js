@@ -41,6 +41,7 @@ $(document).on('mobileinit', function(){
 
 $(document).on( 'pageinit', '', function() {
     // run list_machines action on each backend
+    $('#backend-buttons').html('');
     backends.forEach(function(b, i){
         $('#backend-buttons').append("<a data-corners='false' data-shadow='false' data-icon='check' href='#backend-" + i + "' data-role='button' data-theme='c'>" + b.title + "</a>");
     });
