@@ -62,15 +62,15 @@
         <label for="select-backend">1. Provider:</label>
         <select name="select-backend" id="new-backend" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Select Provider</option>
-            <option value="amazon-us-east-virginia">Amazon EC2 US East (Virginia)</option>
-            <option value="amazon-us-west-oregon">Amazon EC2 US West (Oregon)</option>
-            <option value="amazon-us-west-california">Amazon EC2 US West (N. California)</option>
-            <option value="amazon-eu-west-ireland">Amazon EC2 EU West (Ireland)</option>
-            <option value="amazon-asia-pacific-singapore">Amazon EC2 Asia Pacific (Singapore)</option>
-            <option value="amazon-asia-pacific-tokio">Amazon EC2 Asia Pacific (Tokio)</option>
-            <option value="amazon-south-america-saopaulo">Amazon EC2 South America (Sao Paulo)</option>
-            <option value="rackspace-us">Rackspace US (DFW/ORD)</option>
-            <option value="rackspace-uk">Rackspace UK (LON)</option>
+            <option value="1">Amazon EC2 US East (Virginia)</option>
+            <option value="36">Amazon EC2 US West (Oregon)</option>
+            <option value="10">Amazon EC2 US West (N. California)</option>
+            <option value="2">Amazon EC2 EU West (Ireland)</option>
+            <option value="22">Amazon EC2 Asia Pacific (Singapore)</option>
+            <option value="26">Amazon EC2 Asia Pacific (Tokio)</option>
+            <option value="39">Amazon EC2 South America (Sao Paulo)</option>
+            <option value="3">Rackspace US (DFW/ORD)</option>
+            <option value="23">Rackspace UK (LON)</option>
         </select>
         <label for="apikey">2. API Key:</label>
         <input name="apikey" type="text" id="new-apikey" ></input>
