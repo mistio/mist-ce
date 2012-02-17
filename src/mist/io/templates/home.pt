@@ -40,11 +40,11 @@
     </div><!-- /header -->
 
     <div data-role="content">
-        <a href="#add-backend" data-theme="b" data-role="button" data-icon="plus" data-inline="true" class="add-button">Add backend</a>        
-        
+        <a href="#add-backend" class="add-button" data-rel="dialog" data-theme="b" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus">Add backend</a>
+
         <div data-role="controlgroup" data-type="horizontal">
             <a data-icon="check" href="#ec2" data-role="button" data-theme="c">EC2</a>
-            <a data-icon="check" href="#rackspace" data-role="button" data-theme="c">Rackspace</a>            
+            <a data-icon="check" href="#rackspace" data-role="button" data-theme="c">Rackspace</a>
         </div>
 
         <ul data-role="listview" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow">
@@ -54,6 +54,26 @@
     </div><!-- /content -->
 
 </div><!-- /page one -->
+
+
+<!-- Start of add provider dialog -->
+<div data-role="page" id="add-backend" class="mist-dialog">
+    <div data-role="content" data-theme="c">
+        <h3>Add backend</h3>
+        <label for="create-select-provider">1. Provider:</label>
+        <select name="create-select-provider" id="create-select-provider" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
+            <option>Select Provider</option>
+        </select>
+        <label for="create-machine-name">2. API Key:</label>
+        <input name="create-machine-name" type="text" id="new-machine-name" ></input>
+        <label for="create-machine-name">3. API Secret:</label>
+        <input name="create-machine-name" type="text" id="new-machine-name" ></input>
+        <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
+            <a id="create-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Back</a>
+            <a id="create-ok" class="btn-right-full ui-disabled" data-role="button" data-rel="back" data-theme="b">Add</a>
+        </div>
+    </div>
+</div><!-- /add backend dialog -->
 
 
 <!-- Start of machines page: #machines -->
@@ -98,7 +118,6 @@
         </select>
         <a href="#dialog-add" id="mist-create-machine" data-rel="dialog" data-theme="c" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus" data-iconpos="notext"></a>
         <ul id="machines-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" data-filter-placeholder="Filter machines..">
-
         </ul>
 
 
