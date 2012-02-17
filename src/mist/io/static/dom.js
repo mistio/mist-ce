@@ -79,7 +79,7 @@ $(document).on( 'pageinit', '#dialog-add', function() {
 //
 
 // prepare single view on node click
-$(document).on( 'click', 'li.node a', function(event){ 
+$(document).on( 'click', 'li.node a', function(event){
     var domId = $(this).parent().parent().parent()[0].id;
     var backendId = domId.split('-')[0];
     var machineId = domId.split('-').splice(1).join('-');
@@ -89,10 +89,10 @@ $(document).on( 'click', 'li.node a', function(event){
     var name = 'Name: ' + machine.name || machine.id;
     var status = 'Status:' + machine.extra.status;
     var public_ips = 'Public IPs:' + machine.public_ips;
-    var private_ips = 'Private IPs:' + machine.private_ips;  
-    var image = 'Image:' + machine.image;  
-    var dns_name = 'Dns name:' + machine.extra.dns_name;  
-    var launchdatetime = 'Launchdatetime:' + machine.extra.launchdatetime;  
+    var private_ips = 'Private IPs:' + machine.private_ips;
+    var image = 'Image:' + machine.image;
+    var dns_name = 'Dns name:' + machine.extra.dns_name;
+    var launchdatetime = 'Launchdatetime:' + machine.extra.launchdatetime;
     var basic_stuff= name + '<br>' + status + '<br>' + public_ips + '<br>' + private_ips + '<br>' + image + '<br>' + dns_name + '<br>' + launchdatetime + '<br>' ;
     //also show any of the following if found: keyname,availability,flavorId,uri,hostId';
     $('#single-machine span.machine-basic-stuff').html(basic_stuff);
@@ -109,6 +109,14 @@ $(document).on( 'mouseenter', '#notifier, #notifier-in', function() {
     log.timeout = setTimeout("$('#notifier, #notifier-in').slideUp(300)", 5000);
 });
 
+// Add backend
+$(document).on( 'click', '#create-backend-ok', function() {
+            var provider = $('#new-backend').val();
+            var apikey = $('#new-apikey').val();
+            var apisecret = $('#new-apisecret').val();
+            add_backend(provider, apikey, apisecret);
+});
+
 // Create machine
 $(document).on( 'click', '#create-ok', function() {
             var backend = backends[$('#create-select-provider option:selected')[0].value.split('-loc')[0]];
@@ -118,6 +126,7 @@ $(document).on( 'click', '#create-ok', function() {
             var size = $('#create-select-size option:selected')[0].value
             backend.newAction(['create', name, location, image, size]);
 });
+
 // Footer reboot button / Machines view
 $(document).on( 'click', '#machines-button-reboot', function() {
     var machinesSelected = $('#machines .node input:checked').length;

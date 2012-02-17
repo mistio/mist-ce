@@ -261,35 +261,37 @@ function Backend(id, title, provider, interval, host, log){
                     }
                 });
                 break;
-            case 'add_backend':
-                console.log('adding backend ' + action[1], INFO);
-                //FIXME: get from form
-                var payload = {
-                    "provider": action[1],
-                    "apikey": action[2],
-                    "apisecret": action[3]
-                };
-                $.ajax({
-                    type: "POST",
-                    contentType: "application/json",
-                    dataType: "json",
-                    data: JSON.stringify(payload),
-                    url: 'backends/',
-                    success: function(data) {
-                        backend.updateStatus('on', 'add_backend');
-                        backend.processAction();
-                        backend.log('add backend command sent', DEBUG);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off', 's');
-                        backend.log("service  offline", ERROR);
-                    }
-                });
-                break;
             default:
                 this.log("invalid action", ERROR);
         }
     }
+}
+
+function add_backend(provider, apikey, apisecret){
+    console.log('adding backend ' + provider);
+
+    var payload = {
+        "provider": provider,
+        "apikey": apikey,
+        "apisecret": apisecret
+    };
+
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify(payload),
+        url: 'backends/',
+        success: function(data) {
+            //FIXME: better handling
+            console.log('added backend ' + provider)
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            //FIXME: better handling
+            console.log("service  offline");
+        }
+    });
+
 }
 
 function to_ul(obj, prop) {

@@ -59,8 +59,8 @@
 <div data-role="page" id="add-backend" class="mist-dialog">
     <div data-role="content" data-theme="c">
         <h3>Add backend</h3>
-        <label for="create-select-provider">1. Provider:</label>
-        <select name="create-select-provider" id="create-select-provider" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
+        <label for="select-backend">1. Provider:</label>
+        <select name="select-backend" id="new-backend" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Select Provider</option>
             <option value="amazon-us-east-virginia">Amazon EC2 US East (Virginia)</option>
             <option value="amazon-us-west-oregon">Amazon EC2 US West (Oregon)</option>
@@ -72,13 +72,13 @@
             <option value="rackspace-us">Rackspace US (DFW/ORD)</option>
             <option value="rackspace-uk">Rackspace UK (LON)</option>
         </select>
-        <label for="create-machine-name">2. API Key:</label>
-        <input name="create-machine-name" type="text" id="new-machine-name" ></input>
-        <label for="create-machine-name">3. API Secret:</label>
-        <input name="create-machine-name" type="text" id="new-machine-name" ></input>
-        <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-            <a id="create-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Back</a>
-            <a id="create-ok" class="btn-right-full ui-disabled" data-role="button" data-rel="back" data-theme="b">Add</a>
+        <label for="apikey">2. API Key:</label>
+        <input name="apikey" type="text" id="new-apikey" ></input>
+        <label for="apisecret">3. API Secret:</label>
+        <input name="apisecret" type="text" id="new-apisecret" ></input>
+        <div id="create-backend-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
+            <a id="create-backend-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Back</a>
+            <a id="create-backend-ok" class="btn-right-full" data-role="button" data-rel="back" data-theme="b">Add</a>
         </div>
     </div>
 </div><!-- /add backend dialog -->
