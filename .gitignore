@@ -9,5 +9,6 @@ lib
 *.pyc
 *.pyo
 *.egg-info
+docs/build
 src/libcloud
 .DS_Store
