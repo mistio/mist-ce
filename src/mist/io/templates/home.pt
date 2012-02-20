@@ -105,13 +105,13 @@
             <label></label>
             <a href="#single-machine">
                 <h3 class="name"></h3>
-                <span class="caption-wrapper ui-btn-corner-all ui-shadow">
-                    <span class="state"></span><span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
+                <span class="caption-wrapper">
+                    <h3 class="state"></h3><span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
                 </span>
                 <p class="description">
-                    <span class="tag backend ui-btn-up-c ui-btn-corner-all">backend</span>
-                    <span class="tag ui-btn-up-c ui-btn-corner-all">tag1</span>
-                    <span class="tag ui-btn-up-c ui-btn-corner-all">tag2</span>
+                    <span class="tag backend ui-btn-corner-all">backend</span>
+                    <span class="tag ui-btn-corner-all">tag1</span>
+                    <span class="tag ui-btn-corner-all">tag2</span>
                 </p>
                 <span class="bubble-container">
                     <span class="ui-li-count node-icon key-icon"></span>

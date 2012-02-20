@@ -79,12 +79,6 @@
 	background-position:  -72px 0;
 }
 
-.state {
-    font-weight: normal;
-    font-size: 12px;
-    margin-right: 10px;
-}
-
 /* Provider status dialog */
 
 #providers-status-list li {
@@ -167,7 +161,7 @@
 }
 
 #machines-list .ui-checkbox .ui-btn-inner {
-	top: 19px;
+	top: 11px;
 	left: 5px;
 	height: 40px;
     border-top: none;
@@ -180,7 +174,7 @@
 #machines-list .description {
 	position: absolute;
 	right: 76px;
-	top: 36px;
+	top: 30px;
 }
 
 #machines .ui-listview-filter-inset {
@@ -194,14 +188,14 @@
     height: 20px;
     right: 48px;
     position: absolute;
-    top: 37%;
-    height: 20px;
-    padding-top: 1px;
+    top: 23px;
 }
 
 #machines-list .state-icon.ui-icon-check {
 	background-color: #33dd44;
 }
+
+/* Machines Icons and their colors. */
 
 #machines-list .key-icon {
 	background-image: url("icons/key.png");
@@ -209,7 +203,7 @@
 }
 
 #machines-list .alert-icon {
-	background-color: #f93;
+	background-color: #f61;
 }
 
 #machines-list .ping-icon {
@@ -220,18 +214,13 @@
 #machines-list .ui-li-count {
 	position: static;
 }
-#machines-list .node .caption-wrapper {
-	border: 1px solid #bbb;
-	padding: 0 0 1px 9px;
-	-moz-box-shadow: 0 2px 5px rgba(0,0,0,0.2) inset;
-    -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.2) inset;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2) inset;
-}
 
 #machines-list .node-icon {
 	padding: 2px 9px;
 	border: none;
 }
+
+/* Machines tags */
 
 #machines-list .node .tag {
 	border: 1px solid #bfbfbf;
@@ -241,6 +230,12 @@
 	float: right;
 	padding: 1px 7px;
 	margin: 0 3px 9px 0;
+}
+
+/* Machines states colors. */
+
+#machines-list .state0 {
+	color: #e50;
 }
 
 #machines .ui-select {
@@ -253,10 +248,39 @@
 
 #machines .ui-link {
 	border-left: 1px solid #ddd;
+	padding: 8px;
 }
 
 a#mist-select-machines-button {
     outline: none;
+}
+
+/**/
+
+.ui-li-heading {
+	display: block;
+	float: left;
+	padding: 6px 0;
+}
+
+.caption-wrapper {
+	display: block;
+	position: absolute;
+	left: 250px;
+
+}
+
+.caption-wrapper h3 {
+	font-weight: normal;
+	font-size: 16px;
+}
+
+#machines-list .alert-icon {
+	display: block;
+	padding: 0px;
+	position: relative;
+	top: 26px;
+	left: -26px;
 }
 
 /* FOOTER */
@@ -351,14 +375,69 @@ a#mist-select-machines-button {
     display: none;
 }
 
-/* Conditional for < 480px */
-@media only screen and (max-width: 480px) {
+/* Conditional for < 720px */
+@media only screen and (max-width: 720px) {
 
 	#machines-list .description {
 		position: absolute;
 		right: 76px;
-		top: 26px;
-		width: 130px;
+		top: 21px;
+		width: 100px;
+		line-height: 12px;
 	}
+
+	#machines-list .description .tag {
+		margin-bottom: 6px;
+	}
+
+	.caption-wrapper {
+		left: 200px;
+	}
+}
+
+/* Conditional for < 480px */
+@media only screen and (max-width: 480px) {
+
+	.ui-li-heading {
+		display: block;
+		float: left;
+		padding: 0;
+		margin: 4px 0 2px 0;
+	}
+
+	.caption-wrapper {
+		display: block;
+		position: static;
+		padding: 0px;
+		margin: 0px;
+		clear: both;
+	}
+
+	.caption-wrapper h3 {
+		font-size: 16px;
+	}
+
+	#machines-list .alert-icon {
+		display: block;
+		float: left;
+		position: relative;
+		left: 8px;
+		top: 14px;
+	}
+
+	/* In mobile view the arrow disappears
+	and the key/tags stick to the right. */
+
+	#machines-list .node .ui-icon-arrow-r {
+		display: none;
+	}
+
+	#machines-list .description {
+		right: 48px;
+	}
+
+	#machines-list .bubble-container {
+    right: 18px;
+}
 
 }
