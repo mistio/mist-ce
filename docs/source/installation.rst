@@ -1,5 +1,5 @@
 Installation
-============
+************
 
 Installation is done via buildout and it is recommended to install in a virtual python environement.
 

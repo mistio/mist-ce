@@ -1,5 +1,5 @@
 Deployment
-==========
+**********
 
 Mist.io comes with waitress as its web server. To bring it up with do::
 
