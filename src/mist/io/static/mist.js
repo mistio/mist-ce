@@ -43,7 +43,9 @@ function Backend(id, title, provider, interval, host, log){
 
     this.updateStatus = function(new_status, action) {
         this.status = new_status;
-        try { update_backend_status(this, action); } catch(err){}
+        try { 
+            update_backend_status(this, action); 
+        } catch(err){}
     };
 
     this.clearQueue = function() {
@@ -96,6 +98,8 @@ function Backend(id, title, provider, interval, host, log){
                     success: function(data) {
                         backend.updateStatus('on', 'list_images');
                         backend.images = data;
+                        update_images_view(backend);
+                        backend.log('updated images', DEBUG);
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
