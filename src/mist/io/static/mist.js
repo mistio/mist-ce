@@ -78,7 +78,7 @@ function Backend(id, title, provider, interval, host, log){
                 $.ajax({
                     url: 'backends/' + backendIndex + '/machines',
                     success: function(data) {
-                        backend.updateStatus('on', 'list_machines');
+                        backend.updateStatus('online', 'list_machines');
                         backend.machines = data;
                         update_machines_view(backend);
                         backend.log('updated machines', DEBUG);
@@ -86,7 +86,7 @@ function Backend(id, title, provider, interval, host, log){
                         try { refresh_machines(backend) } catch(err) {}
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off', 'list_machines');
+                        backend.updateStatus('offline', 'list_machines');
                         backend.log("update machines failed - backend  offline", ERROR);
                     }
                 });
@@ -96,14 +96,14 @@ function Backend(id, title, provider, interval, host, log){
                 $.ajax({
                     url: 'backends/' + backendIndex + '/images',
                     success: function(data) {
-                        backend.updateStatus('on', 'list_images');
+                        backend.updateStatus('online', 'list_images');
                         backend.images = data;
                         update_images_view(backend);
                         backend.log('updated images', DEBUG);
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off', 'list_images');
+                        backend.updateStatus('offline', 'list_images');
                         backend.log("update images failed - backend  offline", ERROR);
                     }
                 });
@@ -113,12 +113,12 @@ function Backend(id, title, provider, interval, host, log){
                 $.ajax({
                     url: 'backends/' + backendIndex + '/sizes',
                     success: function(data) {
-                        backend.updateStatus('on', 'list_sizes');
+                        backend.updateStatus('online', 'list_sizes');
                         backend.sizes = data;
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off', 'list_sizes');
+                        backend.updateStatus('offline', 'list_sizes');
                         backend.log("update sizes failed - backend  offline", ERROR);
                     }
                 });
@@ -128,12 +128,12 @@ function Backend(id, title, provider, interval, host, log){
                 $.ajax({
                     url: 'backends/' + backendIndex + '/locations',
                     success: function(data) {
-                        backend.updateStatus('on', 'list_locations');
+                        backend.updateStatus('online', 'list_locations');
                         backend.locations = data;
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off', 'list_locations');
+                        backend.updateStatus('offline', 'list_locations');
                         backend.log("update locations failed - backend  offline", ERROR);
                     }
                 });
@@ -145,11 +145,11 @@ function Backend(id, title, provider, interval, host, log){
                     data: 'action=start',
                     url: 'backends/' + backendIndex + '/machines/'+action[1],
                     success: function(data) {
-                        backend.updateStatus('on', 'start');
+                        backend.updateStatus('online', 'start');
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off', 'start');
+                        backend.updateStatus('offline', 'start');
                         backend.log("start failed - backend  offline", ERROR);
                     }
                 });
@@ -161,11 +161,11 @@ function Backend(id, title, provider, interval, host, log){
                     data: 'action=reboot',
                     url: 'backends/' + backendIndex + '/machines/'+action[1],
                     success: function(data) {
-                        backend.updateStatus('on', 'reboot');
+                        backend.updateStatus('online', 'reboot');
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off', 'reboot');
+                        backend.updateStatus('offline', 'reboot');
                         backend.log("reboot failed - backend  offline", ERROR);
                     }
                 });
@@ -177,11 +177,11 @@ function Backend(id, title, provider, interval, host, log){
                     data: 'action=destroy',
                     url: 'backends/' + backendIndex + '/machines/'+action[1],
                     success: function(data) {
-                        backend.updateStatus('on', 'destroy');
+                        backend.updateStatus('online', 'destroy');
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off', 'destroy');
+                        backend.updateStatus('offline', 'destroy');
                         backend.log("destroy failed - backend  offline\n ", ERROR);
                     }
                 });
@@ -193,12 +193,12 @@ function Backend(id, title, provider, interval, host, log){
                     data: 'action=stop',
                     url: 'backends/' + backendIndex + '/machines/'+action[1],
                     success: function(data) {
-                        backend.updateStatus('on', 'stop');
+                        backend.updateStatus('online', 'stop');
                         backend.processAction();
                         backend.log('stop command sent', DEBUG)
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off', 'stop');
+                        backend.updateStatus('offline', 'stop');
                         backend.log("stop failed - backend  offline", ERROR);
                     }
                 });
@@ -218,12 +218,12 @@ function Backend(id, title, provider, interval, host, log){
                     data: JSON.stringify(payload),
                     url: 'backends/' + backendIndex + '/machines',
                     success: function(data) {
-                        backend.updateStatus('on', 'create');
+                        backend.updateStatus('online', 'create');
                         backend.processAction();
                         backend.log('create command sent', DEBUG);
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off', 'start');
+                        backend.updateStatus('offline', 'start');
                         backend.log(jqXHR.responseText, ERROR);
                     }
                 });
@@ -233,11 +233,11 @@ function Backend(id, title, provider, interval, host, log){
                 $.ajax({
                     url: 'backends/' + backendIndex + '/machines/' + action[1] + '/metadata',
                     success: function(data) {
-                        backend.updateStatus('on', 'list_metadata');
+                        backend.updateStatus('online', 'list_metadata');
                         backend.processAction();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off', 'list_metadata');
+                        backend.updateStatus('offline', 'list_metadata');
                         backend.log("list metadata failed - backend  offline", ERROR);
                     }
                 });
@@ -255,12 +255,12 @@ function Backend(id, title, provider, interval, host, log){
                     data: JSON.stringify(payload),
                     url: 'backends/' + backendIndex + '/machines/' + action[1] + '/metadata',
                     success: function(data) {
-                        backend.updateStatus('on', 'set_metadata');
+                        backend.updateStatus('online', 'set_metadata');
                         backend.processAction();
                         backend.log('set metadata command sent', DEBUG);
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        backend.updateStatus('off', 'set_metadata');
+                        backend.updateStatus('offline', 'set_metadata');
                         backend.log("backend  offline", ERROR);
                     }
                 });

@@ -39,17 +39,29 @@ $(document).on('mobileinit', function(){
     $.mobile.listview.prototype.options.filterCallback = customMachinesFilter;
 });
 
-$(document).on( 'pageinit', '', update_backends);
+$(document).on( 'ready', '', update_backends);
 
 function update_backends() {
     // run list_machines action on each backend
     $('#backend-buttons').html('');
     backends.forEach(function(b, i){
-        $('#backend-buttons').append("<a data-corners='false' data-shadow='false' data-icon='check' href='#backend-" + i + "' data-role='button' data-theme='c'>" + b.title + "</a>");
+
+        $('#backend-buttons').append('<select name="backend-' +i +'"\
+                                     id="backend-' + i + '" data-theme="c" \
+                                     data-icon="check" data-corners="false" \
+                                     data-shadow="false" \
+                                     data-native-menu="false">\
+                                       <option>'+ b.title + '</option>\
+                                       <optgroup label="unknown">\
+                                       <option value="delete">delete</option>\
+                                       </optgroup>\
+                                     </select>');
+        
     });
     if (backends.length) {
         $('#home-menu').show();
-        $('#backend-buttons a').button();
+        $('#backend-buttons select').selectmenu();
+        
     }
 }
 
@@ -337,7 +349,15 @@ function updateFooterVisibility() {
 // Update the status of backends
 // Affects both backends dialog and
 // status indicator
-function update_backend_status(backend) {
+function update_backend_status(backend, action) {
+    var i = backends.indexOf(backend);
+    $('#backend-' + i + '-menu li.ui-li-divider').text(backend.status);
+    if (backend.status != 'online') {        
+        $('#backend-'+i+'-button .ui-icon').removeClass('ui-icon-check').addClass('ui-icon-alert');
+    } else {
+        $('#backend-'+i+'-button .ui-icon').removeClass('ui-icon-alert').addClass('ui-icon-check');
+    }
+
 /*
     var $backend = $('#providers-status-list #provider-'+backend.id);
     if ($backend.length > 0) {
