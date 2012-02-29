@@ -158,9 +158,15 @@
 
     <div data-role="content">
 
-        <div>
-            <h3>Basic Info</h3>
+        <div id="single-view-header">
+            <h3 id="single-view-name">Machine Name</h3>
+            <span id="single-view-provider-icon"></span>
+            <span id="single-view-image-icon"></span>
+            <h3 id="single-view-status">Machine Status</h3>
 
+        </div>
+        <div data-role="collapsible" data-collapsed="false">
+            <h3>Basic Info</h3>
             <span class="machine-basic-stuff"></span>
 
         </div>

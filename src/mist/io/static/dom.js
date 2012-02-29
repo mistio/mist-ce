@@ -91,16 +91,28 @@ $(document).on( 'click', 'li.node a', function(event){
     var machine = get_machine(backendId, machineId);
 
 //STUB!
-    var name = 'Name: ' + machine.name || machine.id;
-    var status = 'Status:' + machine.extra.status;
-    var public_ips = 'Public IPs:' + machine.public_ips;
-    var private_ips = 'Private IPs:' + machine.private_ips;
-    var image = 'Image:' + machine.image;
-    var dns_name = 'Dns name:' + machine.extra.dns_name;
-    var launchdatetime = 'Launchdatetime:' + machine.extra.launchdatetime;
-    var basic_stuff= name + '<br>' + status + '<br>' + public_ips + '<br>' + private_ips + '<br>' + image + '<br>' + dns_name + '<br>' + launchdatetime + '<br>' ;
+    var name = machine.name || machine.id;
+    var status = machine.extra.status;
+    var basicvars = {
+        public_ips : ['Public IPs', machine.public_ips],
+        private_ips : ['Private IPs', machine.private_ips],
+        image : ['Image', machine.image],
+        dns_name : ['DNS Name', machine.extra.dns_name],
+        launchdatetime : ['Launch Date', machine.extra.launchdatetime]
+    }
+
+    $('#single-machine #single-view-name').text(name);
+    $('#single-machine #single-view-provider-icon').removeClass().addClass('provider-'+backendId);
+    $('#single-machine #single-view-status').text(status);
     //also show any of the following if found: keyname,availability,flavorId,uri,hostId';
-    $('#single-machine span.machine-basic-stuff').html(basic_stuff);
+    // Create a table for the basic info.
+    $('#single-machine span.machine-basic-stuff').html('<table id="machine-basic-table"></table>');
+    $.each(basicvars, function(i, v) {
+        var row = $('<tr></tr>');
+        row.append('<td class="key">'+v[0]+'</td>');
+        row.append('<td class="value">'+v[1]+'</td>');
+        $('#machine-basic-table').append(row);
+    });
 
     $('#single-machine h1#single-machine-name').text(machine.name || machine.id);
     $('#machine-metadata').html(to_ul(machine.extra));
@@ -493,6 +505,24 @@ function updateCreateFields() {
         $('#create-ok').removeClass('ui-disabled');
     } else {
         $('#create-ok').addClass('ui-disabled');
+    }
+}
+
+// Create a <ul> from a Javascript object
+function to_ul(obj, prop) {
+    if (typeof(obj)=='string'){
+        var li = document.createElement("li");
+        var strong = document.createElement("strong");
+        strong.appendChild(document.createTextNode(prop + ': '));
+        li.appendChild(strong);
+        li.appendChild(document.createTextNode(obj));
+        return li;
+    } else {
+        var ul = document.createElement ("ul");
+        for (var prop in obj) {
+            ul.appendChild(to_ul(obj[prop], prop));
+        }
+        return ul;
     }
 }
 

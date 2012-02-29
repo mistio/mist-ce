@@ -306,7 +306,67 @@ a#mist-select-machines-button {
 
 /* Single View */
 
+#single-view-header {
+	overflow: auto;
+}
+
+#single-view-name {
+	float: left;
+	margin: 30px 0;
+}
+
+#single-view-status {
+	float: right;
+	margin: 30px 10px;
+}
+
+#single-view-provider-icon, #single-view-image-icon {
+	float: right;
+	margin: 30px 0 30px 12px;
+	background: #444;
+	width: 20px;
+	height: 20px;
+	padding: 2px;
+	border-radius: 12px;
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 12px;
+    -o-border-radius: 12px;
+    -khtml-border-radius: 12px;
+  	-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+}
+
+#single-view-provider-icon.provider-0 {
+	background-image: url(images/p1_sm.png) center no-repeat;
+}
+
+#machine-basic-table {
+	border-collapse:collapse;
+	width: 100%;
+	margin-top: 10px;
+}
+
+#machine-basic-table tr {
+	border: 1px solid #ccc;
+}
+
+#machine-basic-table td {
+	font-size: 14px;
+	padding: 10px;
+	background: #fff;
+	margin: 0;
+	border: none;
+}
+
+#machine-basic-table .key {
+	font-weight: 300;
+}
+
+#machine-basic-table .value {
+	font-weight: bold;
+}
+
 #machine-metadata ul {
+	font-size: 14px;
 	list-style: none;
 	padding: 0px;
 	border-top: 1px solid #ccc;
