@@ -54,6 +54,7 @@ def home(request):
 @view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
     '''List machines for a backend'''
+    
     try:
         conn = connect(request)
     except:

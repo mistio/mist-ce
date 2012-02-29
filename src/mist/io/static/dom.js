@@ -39,17 +39,29 @@ $(document).on('mobileinit', function(){
     $.mobile.listview.prototype.options.filterCallback = customMachinesFilter;
 });
 
-$(document).on( 'pageinit', '', update_backends);
+$(document).on( 'ready', '', update_backends);
 
 function update_backends() {
     // run list_machines action on each backend
     $('#backend-buttons').html('');
     backends.forEach(function(b, i){
-        $('#backend-buttons').append("<a data-corners='false' data-shadow='false' data-icon='check' href='#backend-" + i + "' data-role='button' data-theme='c'>" + b.title + "</a>");
+
+        $('#backend-buttons').append('<select name="backend-' +i +'"\
+                                     id="backend-' + i + '" data-theme="c" \
+                                     data-icon="check" data-corners="false" \
+                                     data-shadow="false" \
+                                     data-native-menu="false">\
+                                       <option>'+ b.title + '</option>\
+                                       <optgroup label="unknown">\
+                                       <option value="delete">delete</option>\
+                                       </optgroup>\
+                                     </select>');
+        
     });
     if (backends.length) {
         $('#home-menu').show();
-        $('#backend-buttons a').button();
+        $('#backend-buttons select').selectmenu();
+        
     }
 }
 
@@ -324,9 +336,12 @@ function update_machines_view(backend){
         //$("input[type='checkbox']").checkboxradio("refresh");
     }
     update_machines_count();
-    update_images_count();
     update_select_providers();
-    updateBackendStatus(backend);
+}
+
+/* when the list_images action returns, update the view */
+function update_images_view(backend){
+    update_images_count();
 }
 
 // Update footer visibility
@@ -346,7 +361,16 @@ function updateFooterVisibility() {
 // Update the status of backends
 // Affects both backends dialog and
 // status indicator
-function updateBackendStatus(backend) {
+function update_backend_status(backend, action) {
+    var i = backends.indexOf(backend);
+    $('#backend-' + i + '-menu li.ui-li-divider').text(backend.status);
+    if (backend.status != 'online') {        
+        $('#backend-'+i+'-button .ui-icon').removeClass('ui-icon-check').addClass('ui-icon-alert');
+    } else {
+        $('#backend-'+i+'-button .ui-icon').removeClass('ui-icon-alert').addClass('ui-icon-check');
+    }
+
+/*
     var $backend = $('#providers-status-list #provider-'+backend.id);
     if ($backend.length > 0) {
         $backend.removeClass('state-on state-off state-wait state-unknown').addClass('state-'+backend.status);
@@ -367,6 +391,7 @@ function updateBackendStatus(backend) {
     } else if ($('#providers-status-list .state-on').length == $('#providers-status-list li').length) {
         $('.state-providers').addClass('state-on');
     }
+*/
 }
 
 // Custom machines filtering function.
@@ -382,14 +407,10 @@ function customMachinesFilter( text, searchValue ){
 
 // update the machines counter
 function update_machines_count() {
-    //return;
-    // TODO
     var allMachines = 0;
     for (var i = 0 ; i < backends.length; i++) {
         allMachines += backends[i].machines.length;
     }
-
-    $('#all-machines').text(allMachines);
 
     // Also update machines count bubble in initial screen.
     $('#one-li-machines .ui-li-count').text(allMachines);
@@ -397,14 +418,10 @@ function update_machines_count() {
 
 // update the images counter
 function update_images_count() {
-    //return;
-    // TODO
     var allImages = 0;
     for (var i = 0 ; i < backends.length; i++) {
         allImages += backends[i].images.length;
     }
-
-    $('#all-images').text(allImages);
 
     // Also update machines count bubble in initial screen.
     $('#one-li-images .ui-li-count').text(allImages);
@@ -554,9 +571,4 @@ function truncate_names(truncateName, truncateCharacters ) { //truncate truncate
     } else {
         return truncateName;
     }
-}
-
-/* when the list_machines action returns, update the view */
-function update_images_view(backend){
-
 }
