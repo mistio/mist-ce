@@ -327,20 +327,28 @@ a#mist-select-machines-button {
 #single-view-provider-icon, #single-view-image-icon {
 	float: right;
 	margin: 30px 0 30px 12px;
-	background: #444;
-	width: 20px;
-	height: 20px;
-	padding: 2px;
-	border-radius: 12px;
-    -webkit-border-radius: 12px;
-    -moz-border-radius: 12px;
-    -o-border-radius: 12px;
-    -khtml-border-radius: 12px;
+	background: #fff;
+	background-position: center;
+	background-repeat: no-repeat;
+	border: 1px solid #aaa;
+	width: 22px;
+	height: 22px;
+	padding: 6px;
+	position: relative;
+	top: -6px;
+	border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -o-border-radius: 20px;
+    -khtml-border-radius: 20px;
   	-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+  	-moz-box-shadow: 0 1px 0 rgba(255, 255, 255, .6);
+	-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, .6);
+	box-shadow: 0 1px 0 rgba(255, 255, 255, .6);
 }
 
 #single-view-provider-icon.provider-0 {
-	background-image: url(images/p1_sm.png) center no-repeat;
+	background-image: url(images/p1_sm.png);
 }
 
 #machine-basic-table {
