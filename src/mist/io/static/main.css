@@ -291,20 +291,17 @@ a#mist-select-machines-button {
 
 .ui-footer {
 	padding: 0 10px;
-}
-
-#machines-footer {
-	position: fixed;
+	position: fixed !important;
 	left: 0px;
 	bottom: 0px;
 	z-index: 2000;
 }
 
-#machines-footer #actions {
+.ui-footer #actions {
 	margin: 0.5em 0;
 }
 
-#machines-footer a {
+.ui-footer a {
 	width: 24.1%;
 }
 
@@ -326,7 +323,7 @@ a#mist-select-machines-button {
 
 #single-view-provider-icon, #single-view-image-icon {
 	float: right;
-	margin: 30px 0 30px 12px;
+	margin: 30px 0 20px 12px;
 	background: #fff;
 	background-position: center;
 	background-repeat: no-repeat;
