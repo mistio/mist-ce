@@ -160,11 +160,12 @@
 
         <div id="single-view-header">
             <h3 id="single-view-name">Machine Name</h3>
-            <span id="single-view-provider-icon"></span>
-            <span id="single-view-image-icon"></span>
+            <span class="single-view-icon-wrapper"><span id="single-view-provider-icon"></span></span>
+            <span class="single-view-icon-wrapper"><span id="single-view-image-icon"></span></span>
             <h3 id="single-view-status">Machine Status</h3>
 
         </div>
+        <div id="inform-monitoring">Monitoring is currently disabled for this machine. <a id="enable-monitoring">Enable monitoring</a></div>
         <div data-role="collapsible" data-collapsed="false">
             <h3>Basic Info</h3>
             <span class="machine-basic-stuff"></span>
