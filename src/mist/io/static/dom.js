@@ -451,8 +451,9 @@ function displayConfirmation(titl, msg, callbk) {
     $('#dialog-confirm-message').text(msg);
     $('#dialog-confirm-yes').one('click', function() {
         callbk();
-        $('#machines-list input:checked').attr('checked',false);
-        $("#machines-list input").checkboxradio("refresh");
+        // clear selected checkboxes and hide the actions
+        $('#machines-list li.node input:checked').attr('checked',false);
+        $("#machines-list li.node input").checkboxradio("refresh");
         $("#machines-footer").hide();
     });
     $.mobile.changePage('#dialog-confirm');
