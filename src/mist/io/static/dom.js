@@ -449,7 +449,12 @@ function update_message_notifier() {
 function displayConfirmation(titl, msg, callbk) {
     $('#dialog-confirm-title').text(titl);
     $('#dialog-confirm-message').text(msg);
-    $('#dialog-confirm-yes').one('click', function() {callbk();});
+    $('#dialog-confirm-yes').one('click', function() {
+        callbk();
+        $('#machines-list input:checked').attr('checked',false);
+        $("#machines-list input").checkboxradio("refresh");
+        $("#machines-footer").hide();
+    });
     $.mobile.changePage('#dialog-confirm');
 }
 
