@@ -237,7 +237,7 @@ $(document).on( 'change', '#mist-select-machines', function() {
         $('#machines-list .node:visible input:checkbox').attr('checked',true);
     } else if (selectVal != 'none') {
         $('#machines-list .node').each( function() {
-            if ($(this).find('span.'+selectVal).length > 0) {
+            if ($(this).find('.prov-'+selectVal).length > 0) {
                 $(this).find('input:checkbox').attr('checked',true);
             }
         });
@@ -286,6 +286,7 @@ function update_machines_view(backend){
                 node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
                 node.find('.backend').text(backend.title);
                 node.find('.backend').addClass('prov-'+backend.provider);
+                node.addClass('prov-'+backend.provider);
                 //node.find('.select')[0].id = 'chk-' + machine.id;
                 node.fadeIn(100);
             }
@@ -301,6 +302,7 @@ function update_machines_view(backend){
             node.find('.name').text(truncate_names(machine.name, NODE_NAME_CHARACTERS));
             node.find('.backend').text(backend.title);
             node.find('.backend').addClass('prov-'+backend.provider);
+            node.addClass('prov-'+backend.provider);
             node.find('.state').addClass('state'+machine.state);
             node.find('.state').text(STATES[machine.state]);
             //node.find('.state-icon').addClass('ui-icon ui-icon-'+STATEICONS[machine.state]);
