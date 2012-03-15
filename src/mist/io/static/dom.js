@@ -372,6 +372,7 @@ function update_backend_status(backend, action) {
         $('#backend-'+i+'-button .ui-icon').removeClass('ui-icon-alert').addClass('ui-icon-check');
     }
 
+
 /*
     var $backend = $('#providers-status-list #provider-'+backend.id);
     if ($backend.length > 0) {
