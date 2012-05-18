@@ -37,8 +37,10 @@ def home(request):
     '''Fill in an object with backend data, taken from config.py'''
     try:
         backend_list = request.environ['beaker.session']['backends']
+        session = True
     except:
         backend_list = BACKENDS
+        session = False
 
     backends = []
     for b in backend_list:
@@ -48,7 +50,10 @@ def home(request):
                          'poll_interval': b['poll_interval'],
                          'status'       : 'off',
                         })
-    return {'project': 'mist.io', 'backends': backends}
+
+    return {'project': 'mist.io', 
+            'backends': backends, 
+            'session': session}
 
 
 @view_config(route_name='machines', request_method='GET', renderer='json')
