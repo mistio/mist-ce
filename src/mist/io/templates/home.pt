@@ -58,8 +58,10 @@
 
 <!-- Start of add provider dialog -->
 <div data-role="page" id="add-backend" class="mist-dialog">
+    <div data-role="header">
+        <h1>Add Backend</h1>
+    </div>
     <div data-role="content" data-theme="c">
-        <h3>Add backend</h3>
         <label for="select-backend">1. Provider:</label>
         <select name="select-backend" id="new-backend" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
             <option>Select Provider</option>
@@ -301,7 +303,7 @@
         <input id="backend-delete" type="button" value="Delete" />
         </div>
         <div id="create-backend-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-            <a id="edit-backend-ok" class="btn-right-full" data-role="button" data-rel="back" data-theme="b">Close</a>
+            <a id="edit-backend-ok" class="btn-full" data-role="button" data-rel="back" data-theme="b">Close</a>
         </div>
     </div>
 </div><!-- /edit backend dialog -->

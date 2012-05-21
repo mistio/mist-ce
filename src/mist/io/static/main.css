@@ -11,6 +11,13 @@
     z-index: 0;
 }
 
+/* Home Page */
+
+/* Add backend button top margin */
+#one a#add-backend-button {
+	margin: 0px !important;
+}
+
 #one .ui-content {
     overflow-y: hidden;
 }
@@ -23,13 +30,6 @@
 
 #machines-list .node .ui-icon-arrow-r {
 	right: 18px;
-}
-
-/* Home Page */
-
-/* Add backend top margin */
-#one a#add-backend-button {
-	margin: 0px !important;
 }
 
 /* Select Button */
@@ -494,7 +494,7 @@ a#mist-select-machines-button span.ui-btn-text {}
 
 #edit-backend .content-header {
 	overflow: auto;
-	padding: 20px 0;
+	padding: 20px 6px;
 	border-bottom: 1px solid #ddd;
 	margin-bottom: 8px;
 }
@@ -521,6 +521,7 @@ a#mist-select-machines-button span.ui-btn-text {}
 
 #edit-backend #backend-enable-label {
 	margin-top: 12px;
+	margin-left: 6px;
 }
 
 #edit-backend .ui-slider-switch {
@@ -536,6 +537,12 @@ a#mist-select-machines-button span.ui-btn-text {}
 
 #edit-backend .ui-field-contain .ui-btn-inner {
 	padding: 8px 18px;
+}
+
+/* Add backend dialog */
+#add-backend label {
+	display: block;
+	margin: 14px 0 4px 0;
 }
 
 /* Conditional for < 720px */
