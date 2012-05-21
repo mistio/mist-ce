@@ -270,17 +270,24 @@ $(document).on( 'change', '#mist-select-machines', function() {
 // node display while filtering.
 $(document).on( 'click', '#machines-list .node input:checkbox', function(event){
     var $this = $(this);
-    if ($this.is(':checked')) {
+    var checked = $this.is(':checked')
+    if (checked) {
         $this.closest('.node').append('<span class="mist-node-selected" style="display:none">mist-node-selected</span>');
     } else {
         $this.closest('.node').find('.mist-node-selected').remove();
     }
-    return false;
+    $(this).checkboxradio("refresh")
+});
+
+$(document).on( 'click', '#machines-list li a', function(event){
+    if(e.srcElement.tagName != 'A'){
+    	e.stopPropagation();
+    }
 });
 
 // Check for footer visibility and button enabling
 // when a checkbox is selected/deselected.
-$(document).on( 'click', '#machines-list input:checkbox', updateFooterVisibility);
+$(document).on( 'change', '#machines-list input:checkbox', updateFooterVisibility);
 
 // Check for change event in the select boxes of the create dialog.
 $(document).on( 'change', '.create-select', function() {
