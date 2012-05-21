@@ -40,9 +40,7 @@
     </div><!-- /header -->
 
     <div data-role="content">
-        <a href="#add-backend" class="add-button" data-rel="dialog" 
-            data-theme="b" data-inline="true" data-transition="slidedown" 
-            data-role="button" data-icon="plus"
+        <a id="add-backend-button" href="#add-backend" class="add-button" data-rel="dialog" data-theme="b" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus"
              tal:condition="session">Add backend</a>
 
         <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">

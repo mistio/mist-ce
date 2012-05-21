@@ -25,6 +25,13 @@
 	right: 18px;
 }
 
+/* Home Page */
+
+/* Add backend top margin */
+#one a#add-backend-button {
+	margin: 0px !important;
+}
+
 /* Select Button */
 
 #machines #mist-select-machines .ui-btn {
@@ -477,7 +484,7 @@ a#mist-select-machines-button {
 	overflow: auto;
 	padding: 20px 0;
 	border-bottom: 1px solid #ddd;
-	margin-bottom: 14px;
+	margin-bottom: 8px;
 }
 
 #edit-backend .status {
@@ -495,18 +502,28 @@ a#mist-select-machines-button {
 
 #edit-backend .ui-field-contain {
 	overflow: visible;
-	height: 44px;
+	height: 50px;
+	border-bottom: 1px solid #ddd;
 	margin: 6px 0;
 }
 
 #edit-backend #backend-enable-label {
-	margin-top: 10px;
+	margin-top: 12px;
 }
 
 #edit-backend .ui-slider-switch {
 	float: right;
 	margin-right: 4px;
-	margin-bottom: 5px;
+	margin-top: 0;
+}
+
+#edit-backend .ui-field-contain .ui-btn-block {
+	float: right;
+	margin-top: 3px;
+}
+
+#edit-backend .ui-field-contain .ui-btn-inner {
+	padding: 8px 18px;
 }
 
 /* Conditional for < 720px */
