@@ -47,7 +47,7 @@
 	width: 40px;
 	padding: 6px;
 	float: right;
-	top: -54px;
+	top: -48px;
 	right: -3px;
 }
 
@@ -162,6 +162,7 @@
 
 #machines-list .ui-btn-text .ui-checkbox {
 	width: 56px;
+	margin-top: -8px;
 }
 
 #machines-list .ui-checkbox .ui-btn-inner {
@@ -169,6 +170,14 @@
 	left: 5px;
 	height: 40px;
     border-top: none;
+}
+
+#machines-list .ui-checkbox .ui-btn-text {
+    display: none;
+}
+
+#machines-list li.node .ui-btn-text {
+    padding-right: 0;
 }
 
 #machines-list .node a {
@@ -182,7 +191,7 @@
 }
 
 #machines .ui-listview-filter-inset {
-    margin: -50px 60px 0 60px;
+    margin: -43px 60px 0 60px;
 }
 
 #machines-list .bubble-container {
@@ -192,7 +201,7 @@
     height: 20px;
     right: 48px;
     position: absolute;
-    top: 23px;
+    top: 26px;
 }
 
 #machines-list .state-icon.ui-icon-check {
@@ -233,7 +242,7 @@
 	display: block;
 	float: right;
 	padding: 1px 7px;
-	margin: 0 3px 9px 0;
+	margin: 3px 3px 9px 0;
 }
 
 /* Machines states colors. */
@@ -259,6 +268,7 @@ a#mist-select-machines-button {
     outline: none;
 }
 
+a#mist-select-machines-button span.ui-btn-text {}
 /**/
 
 .ui-li-heading {
@@ -295,6 +305,7 @@ a#mist-select-machines-button {
 	left: 0px;
 	bottom: 0px;
 	z-index: 2000;
+	width: 100%;
 }
 
 .ui-footer #actions {
@@ -302,7 +313,7 @@ a#mist-select-machines-button {
 }
 
 .ui-footer a {
-	width: 24.1%;
+	width: 24.65%;
 }
 
 /* Single View */
