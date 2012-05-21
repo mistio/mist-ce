@@ -1,6 +1,15 @@
 var ERROR = 0, WARN = 1, ALERT = 2, INFO = 3, DEBUG = 4;
 var LOGLEVEL = 4;
 
+
+var BACKENDSTATEICONS = {
+		offline: 'delete',
+		online: 'check',
+		wait: 'gear',
+};
+
+var BACKENDSTATES = [];
+
 function MessageLog(){
     this.messages = [];
     this.timeout = 0;
@@ -43,8 +52,9 @@ function Backend(id, title, provider, interval, host, log){
 
     this.updateStatus = function(new_status, action) {
         this.status = new_status;
+        update_backends();
         try { 
-            update_backend_status(this, action); 
+            //update_backend_status(this, action); 
         } catch(err){}
     };
 
@@ -53,7 +63,7 @@ function Backend(id, title, provider, interval, host, log){
     };
     
     this.disable = function(){
-    	this.updateStatus('off', null);
+    	this.updateStatus('offline', null);
     	this.machines = [];
     	update_machines_view(this);
         this.images = [];
@@ -64,7 +74,7 @@ function Backend(id, title, provider, interval, host, log){
     }
     
     this.enable = function(){
-    	this.updateStatus('on', 'list_machines');
+    	this.updateStatus('online', 'list_machines');
         this.newAction(['list_sizes']);
         this.newAction(['list_locations']);
         this.newAction(['list_images']);
@@ -355,4 +365,12 @@ function get_size(backendIndex, machine) {
 function refresh_machines(backend){
     var i = backends.indexOf(backend);
     setTimeout("backends[" + i + "].newAction(['list_machines'])", backend.interval);
+}
+
+//Close modals on escape
+function close_on_escape(e) {
+    if (e.keyCode == 27) {
+        var target = $(e.currentTarget).closest('.mist-dialog');
+        target.dialog('close');
+    }
 }

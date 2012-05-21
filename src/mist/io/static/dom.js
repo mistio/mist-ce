@@ -14,7 +14,6 @@ var STATEICONS = {
     '4' : 'alert'
     };
 
-
 /* disable browser bar on android */
 if(navigator.userAgent.match(/Android/i)){
    window.scrollTo(0,1);
@@ -46,7 +45,7 @@ $(document).delegate('#edit-backend', 'pagebeforeshow', function(){
 	
 	$(this).find('.status').text(backend.status);
 	
-	if(backend.status != 'off'){
+	if(backend.status != 'offline'){
 		$("#backend-enable").val('on');
 	} else {
 		$("#backend-enable").val('off');
@@ -68,35 +67,19 @@ $(document).delegate("#backend-enable", "change", function(event, ui) {
 
 function update_backends() {
     // run list_machines action on each backend
-    $('#backend-buttons').html('');
+    $('#backend-buttons').empty();
     backends.forEach(function(b, i){
-    	
-    	$('#backend-buttons').append($('<a href="#edit-backend" data-rel="dialog" data-icon="check" ' + 
+    	$('#backend-buttons').append($('<a href="#edit-backend" data-rel="dialog" ' + 
     			'data-theme="c" data-inline="true" data-transition="slidedown" ' +
     			'data-corners="false" data-shadow="false" ' +
-    			'data-role="button" data-icon="check">' + b.title + '</a>')
-    			.on('click', function(){ $('#edit-backend').data('backend', b) }));
-    	
-    	
-/*
-        $('#backend-buttons').append('<select name="backend-' +i +'"\
-                                     id="backend-' + i + '" data-theme="c" \
-                                     data-icon="check" data-corners="false" \
-                                     data-shadow="false" \
-                                     data-native-menu="false">\
-                                       <option>'+ b.title + '</option>\
-                                       <optgroup label="unknown">\
-                                       <option value="enable">' + (b.enabled ? "Disable" : "Enable") + '</option>\
-                                       <option value="delete">Delete</option>\
-                                       </optgroup>\
-                                     </select>');
-*/        
+    			'data-role="button" data-icon="' + BACKENDSTATEICONS[b.status] +
+    			'">' + b.title + '</a>')
+    			.on('click', function(){ $('#edit-backend').data('backend', b) }));   
     });
     if (backends.length) {
-        $('#home-menu').show();
-        //$('#backend-buttons select').selectmenu();
-        
+        $('#home-menu').show(); 
     }
+    
     $('#backend-buttons').trigger('create');
 }
 
@@ -285,12 +268,20 @@ $(document).on( 'change', '#mist-select-machines', function() {
 // Event listener for node checkbox change.
 // Adds a hidden text value to the node to affect
 // node display while filtering.
-$(document).on( 'change', '#machines-list .node input:checkbox', function(event){
+$(document).on( 'click', '#machines-list .node input:checkbox', function(event){
     var $this = $(this);
-    if ($this.is(':checked')) {
+    var checked = $this.is(':checked')
+    if (checked) {
         $this.closest('.node').append('<span class="mist-node-selected" style="display:none">mist-node-selected</span>');
     } else {
         $this.closest('.node').find('.mist-node-selected').remove();
+    }
+    $(this).checkboxradio("refresh")
+});
+
+$(document).on( 'click', '#machines-list li a', function(event){
+    if(e.srcElement.tagName != 'A'){
+    	e.stopPropagation();
     }
 });
 
@@ -366,11 +357,8 @@ function update_machines_view(backend){
     });
 
     if ($.mobile.activePage.attr('id') == 'machines') {
-        try {
-            $('#machines-list').listview('refresh');
-        } catch(err) {}
+        $('#machines-list').listview('refresh');
         $("#machines-list input[type='checkbox']").checkboxradio();
-        //$("input[type='checkbox']").checkboxradio("refresh");
     }
     update_machines_count();
     update_select_providers();
@@ -382,7 +370,7 @@ function update_images_view(backend){
 }
 
 // Update footer visibility
-function updateFooterVisibility() {
+function updateFooterVisibility(e) {
     var len = $('#machines-list input:checked').length;
     if (len > 1) {
         $('#machines-footer').fadeIn(140);
@@ -393,6 +381,8 @@ function updateFooterVisibility() {
     } else {
         $('#machines-footer').fadeOut(200);
     }
+
+    return false;
 }
 
 // Update the status of backends
@@ -616,3 +606,5 @@ function truncate_names(truncateName, truncateCharacters ) { //truncate truncate
         return truncateName;
     }
 }
+
+$(document).delegate('.mist-dialog', 'keyup keydown keypress', close_on_escape);

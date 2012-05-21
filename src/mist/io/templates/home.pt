@@ -102,9 +102,9 @@
 
         <div id="logo-container"></div>
         <li class="node-template" style="display:none">
-            <input type="checkbox" class="custom" />
-            <label></label>
             <a href="#single-machine">
+            	<input name='custom' type="checkbox" class="custom" />
+            	<label></label>
                 <h3 class="name"></h3>
                 <span class="caption-wrapper">
                     <h3 class="state"></h3><span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
@@ -300,10 +300,9 @@
         <div data-role="fieldcontain">
         <input id="backend-delete" type="button" value="Delete" />
         </div>
-        <!--<div id="create-backend-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-            <a id="edit-backend-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Back</a>
-            <a id="edit-backend-ok" class="btn-right-full" data-role="button" data-rel="back" data-theme="b">Done</a>
-        </div>-->
+        <div id="create-backend-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
+            <a id="edit-backend-ok" class="btn-right-full" data-role="button" data-rel="back" data-theme="b">Close</a>
+        </div>
     </div>
 </div><!-- /edit backend dialog -->
 
