@@ -282,10 +282,15 @@
 </div><!-- /images page -->
 
 <div data-role="page" id="edit-backend" class="mist-dialog">
+    <div data-role="header">
+        <h1>Edit backend</h1>
+    </div>
     <div data-role="content" data-theme="c">
-        <h3>Edit backend</h3>
         
-        <p class='status'>Unknown</p>
+        <div class="content-header">
+            <span class='name'>Name</span>
+            <span class='status'>Unknown</span>
+        </div>
         
         <div data-role="fieldcontain">
         <label for="backend-enable">Enabled:</label>
