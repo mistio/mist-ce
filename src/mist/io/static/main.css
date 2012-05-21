@@ -471,6 +471,44 @@ a#mist-select-machines-button {
     display: none;
 }
 
+/* Provider (backend) status dialog */
+
+#edit-backend .content-header {
+	overflow: auto;
+	padding: 20px 0;
+	border-bottom: 1px solid #ddd;
+	margin-bottom: 14px;
+}
+
+#edit-backend .status {
+	display: block;
+	float: right;
+	font-size: 22px;
+}
+
+#edit-backend .name {
+	display: block;
+	float: left;
+	font-size: 22px;
+	font-weight: 600;
+}
+
+#edit-backend .ui-field-contain {
+	overflow: visible;
+	height: 44px;
+	margin: 6px 0;
+}
+
+#edit-backend #backend-enable-label {
+	margin-top: 10px;
+}
+
+#edit-backend .ui-slider-switch {
+	float: right;
+	margin-right: 4px;
+	margin-bottom: 5px;
+}
+
 /* Conditional for < 720px */
 @media only screen and (max-width: 720px) {
 
