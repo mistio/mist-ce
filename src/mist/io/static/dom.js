@@ -280,8 +280,8 @@ $(document).on( 'click', '#machines-list .node input:checkbox', function(event){
 });
 
 $(document).on( 'click', '#machines-list li a', function(event){
-    if(e.srcElement.tagName != 'A'){
-    	e.stopPropagation();
+    if(event.target.tagName != 'A'){
+    	event.stopPropagation();
     }
 });
 
