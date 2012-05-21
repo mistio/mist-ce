@@ -300,10 +300,10 @@
         <div data-role="fieldcontain">
         <input id="backend-delete" type="button" value="Delete" />
         </div>
-        <div id="create-backend-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
+        <!--<div id="create-backend-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
             <a id="edit-backend-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Back</a>
             <a id="edit-backend-ok" class="btn-right-full" data-role="button" data-rel="back" data-theme="b">Done</a>
-        </div>
+        </div>-->
     </div>
 </div><!-- /edit backend dialog -->
 
