@@ -41,11 +41,44 @@ $(document).on('mobileinit', function(){
 
 $(document).on( 'ready', '', update_backends);
 
+$(document).delegate('#edit-backend', 'pagebeforeshow', function(){
+	var backend = $(this).data('backend');
+	
+	$(this).find('.status').text(backend.status);
+	
+	if(backend.status != 'off'){
+		$("#backend-enable").val('on');
+	} else {
+		$("#backend-enable").val('off');
+	}
+	
+	$("#backend-enable").slider('refresh');
+	$("#backend-enable").data('backend', backend);	
+});
+
+$(document).delegate("#backend-enable", "change", function(event, ui) {
+	var backend = $(this).data('backend');
+	
+	if($(this).val() == 'on'){
+		backend.enable();
+	} else {
+		backend.disable();
+	}
+});
+
 function update_backends() {
     // run list_machines action on each backend
     $('#backend-buttons').html('');
     backends.forEach(function(b, i){
-
+    	
+    	$('#backend-buttons').append($('<a href="#edit-backend" data-rel="dialog" data-icon="check" ' + 
+    			'data-theme="c" data-inline="true" data-transition="slidedown" ' +
+    			'data-corners="false" data-shadow="false" ' +
+    			'data-role="button" data-icon="check">' + b.title + '</a>')
+    			.on('click', function(){ $('#edit-backend').data('backend', b) }));
+    	
+    	
+/*
         $('#backend-buttons').append('<select name="backend-' +i +'"\
                                      id="backend-' + i + '" data-theme="c" \
                                      data-icon="check" data-corners="false" \
@@ -53,16 +86,18 @@ function update_backends() {
                                      data-native-menu="false">\
                                        <option>'+ b.title + '</option>\
                                        <optgroup label="unknown">\
-                                       <option value="delete">delete</option>\
+                                       <option value="enable">' + (b.enabled ? "Disable" : "Enable") + '</option>\
+                                       <option value="delete">Delete</option>\
                                        </optgroup>\
                                      </select>');
-        
+*/        
     });
     if (backends.length) {
         $('#home-menu').show();
-        $('#backend-buttons select').selectmenu();
+        //$('#backend-buttons select').selectmenu();
         
     }
+    $('#backend-buttons').trigger('create');
 }
 
 // Update tags page when it opens

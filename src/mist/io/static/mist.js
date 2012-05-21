@@ -51,6 +51,24 @@ function Backend(id, title, provider, interval, host, log){
     this.clearQueue = function() {
         this.action_queue = [];
     };
+    
+    this.disable = function(){
+    	this.updateStatus('off', null);
+    	this.machines = [];
+    	update_machines_view(this);
+        this.images = [];
+        update_images_view(this);
+        this.sizes = [];
+        this.locations = [];
+        this.processAction();
+    }
+    
+    this.enable = function(){
+    	this.updateStatus('on', 'list_machines');
+        this.newAction(['list_sizes']);
+        this.newAction(['list_locations']);
+        this.newAction(['list_images']);
+    }
 
     this.processAction = function(){
         if (this.action_queue.length == 0){
@@ -59,6 +77,10 @@ function Backend(id, title, provider, interval, host, log){
 
         if (this.status == 'wait') {
             this.log('cannot process action when in wait status!');
+            return;
+        }
+        
+        if (this.status == 'off') {
             return;
         }
 
