@@ -543,8 +543,6 @@ function updateCreateFields() {
         provider = $('#create-select-provider'),
         image = $('#create-select-image'),
         size = $('#create-select-size');
-    
-    console.log(provider.val());
 
     if (image.val() == 'Select Image') {
         size.selectmenu('disable');
