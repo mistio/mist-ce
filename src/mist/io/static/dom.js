@@ -260,7 +260,7 @@ $(document).on( 'change', '#mist-select-machines', function() {
             }
         });
     }
-    $('#machines-list .node input:checkbox').trigger('change').checkboxradio("refresh");
+    $('#machines-list .node:visible input:checkbox').trigger('change').checkboxradio("refresh");
     updateFooterVisibility();
     $(this).val('select').selectmenu('refresh');
 });
