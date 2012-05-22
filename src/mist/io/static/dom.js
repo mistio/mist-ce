@@ -173,12 +173,13 @@ $(document).on( 'click', '#create-backend-ok', function() {
 
 // Create machine
 $(document).on( 'click', '#create-ok', function() {
-            var backend = backends[$('#create-select-provider option:selected')[0].value.split('-loc')[0]];
-            var location = $('#create-select-provider option:selected')[0].value.split('-loc')[1];
-            var name = $('#new-machine-name').val();
-            var image = $('#create-select-image option:selected')[0].value
-            var size = $('#create-select-size option:selected')[0].value
-            backend.newAction(['create', name, location, image, size]);
+    var backend = backends[$('#create-select-provider option:selected')[0].value.split('-loc')[0]];
+    var location = $('#create-select-provider option:selected')[0].value.split('-loc')[1];
+    var name = $('#new-machine-name').val();
+    var image = $('#create-select-image option:selected')[0].value
+    var size = $('#create-select-size option:selected')[0].value
+    backend.newAction(['create', name, location, image, size]);
+    history.back();
 });
 
 // Footer reboot button / Machines view
@@ -545,17 +546,27 @@ function update_select_providers() {
     }
 }
 
+// TODO split in 3
 function updateCreateFields() {
     var name = $('#create-machine-name'),
         provider = $('#create-select-provider'),
         image = $('#create-select-image'),
         size = $('#create-select-size');
 
+    var loc = provider.val();
+    
     if (image.val() == 'Select Image') {
         size.selectmenu('disable');
-        if (provider.val() == 'Select Provider') {
+        if (loc == 'Select Provider') {
             image.selectmenu('disable');
         } else {
+        	var backend = backends[loc.split('-')[0]];
+        	image.empty();
+        	image.append($("<option>​Select Image</option>"));
+        	$.each(backend.images, function(index, value){
+        		image.append($('<option value=​"' + value.id + '">' + value.name + '​</option>'));
+        	});
+        	image.selectmenu('refresh');
         	image.selectmenu('enable');
         }
     } else {
@@ -618,4 +629,4 @@ function truncate_names(truncateName, truncateCharacters ) { //truncate truncate
 
 $(document).delegate('.mist-dialog', 'keyup keydown keypress', close_on_escape);
 
-$(document).delegate('#create-ok-cancel button', 'click', function(){history.back()});
+$(document).delegate('#create-cancel', 'click', function(){history.back()});

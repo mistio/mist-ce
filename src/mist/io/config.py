@@ -43,5 +43,11 @@ BACKENDS = [
 #     },
 #    ]
 
-
-
+# Base AMIs for us-east AMAZON
+BASE_EC2_AMIS = {
+    'ami-e565ba8c': "Amazon Linux",
+    'ami-41d00528': 'RedHat Enterprise Linux',
+    'ami-ca32efa3': 'SUSE Linux',
+    'ami-a29943cb': 'Ubuntu',
+    'ami-a6ba1ecf': 'Microsoft Windows Server 2008 Base'
+}

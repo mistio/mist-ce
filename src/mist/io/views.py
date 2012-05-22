@@ -5,8 +5,10 @@ from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.deployment import MultiStepDeployment
-from mist.io.config import BACKENDS
+from libcloud.compute.types import Provider
+from mist.io.config import BACKENDS, BASE_EC2_AMIS
 from pyramid.view import view_config
+
 
 def connect(request):
     '''Establish backend connection using the credentials specified'''
@@ -229,12 +231,21 @@ def list_images(request):
         return Response('Backend not found', 404)
 
     try:
-        images = conn.list_images()
+        try:
+            backend_list = request.environ['beaker.session']['backends']
+        except:
+            backend_list = BACKENDS
+        backendIndex = int(request.matchdict['backend'])
+        backend = backend_list[backendIndex]
+        if backend['provider'] == Provider.EC2:
+            images = conn.list_images(None, BASE_EC2_AMIS.keys())
+        else:
+            images = conn.list_images()
     except:
         return Response('Backend unavailable', 503)
 
     ret = []
-    for i in images[:100]:
+    for i in images:
         ret.append({'id'    : i.id,
                     'extra' : i.extra,
                     'name'  : i.name,})

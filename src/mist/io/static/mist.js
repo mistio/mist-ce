@@ -66,7 +66,7 @@ function Backend(id, title, provider, interval, host, log){
 
     this.newAction = function(action){
         this.action_queue.push(action);
-        if (this.status == 'on' || this.status == 'unknown') {
+        if (this.status == 'online' || this.status == 'unknown') {
             this.processAction();
         }
     };
