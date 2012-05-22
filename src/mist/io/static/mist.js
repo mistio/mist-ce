@@ -1,14 +1,35 @@
 var ERROR = 0, WARN = 1, ALERT = 2, INFO = 3, DEBUG = 4;
 var LOGLEVEL = 4;
 
-
 var BACKENDSTATEICONS = {
 		offline: 'delete',
 		online: 'check',
 		wait: 'gear',
 };
 
-var BACKENDSTATES = [];
+var BACKENDSTATES = ['offline', 'online', 'wait']; //TODO add more states
+
+/*
+ * Image types
+ * 
+ * "generic" if not found
+ */
+var IMAGETYPES = {
+		rhel: "RedHat Enterprise Linux",
+		ubuntu: "Ubuntu",
+		ibm: "IBM",
+		canonical: "Canonical",
+		sles: "SUSE Linux Enterprise Server",
+		oracle_linux: "Oracle Linux",
+		karmic: "Karmic",
+		opensolaris: "Open Solaris",
+		windows: "Windows",
+		gentoo: "Gentoo",
+		opensuse: "openSUSE",
+		fedora: "Fedora",
+		centos: "CentOS",
+		debian: "Debian",		
+}
 
 function MessageLog(){
     this.messages = [];
@@ -373,4 +394,25 @@ function close_on_escape(e) {
         var target = $(e.currentTarget).closest('.mist-dialog');
         target.dialog('close');
     }
+}
+
+function get_image_type(imageId){
+	var name = "generic";
+	
+	$.each(backends, function(index, value){
+		$.each(value.images, function(idx, image){
+			if(image.id == imageId){
+				name = image.name;
+				return false;
+			}
+		})
+	})
+	
+	for(type in IMAGETYPES){
+		if(name.toLowerCase().search(type) != -1){
+			return type;
+		}
+	}
+
+	return "generic";
 }

@@ -23,12 +23,12 @@ if(navigator.userAgent.match(/Android/i)){
 $(document).on('mobileinit', function(){
 
     // run list_machines action on each backend
-    backends.forEach(function(b, i){
+    $.each(backends, function(i, b){
         b.newAction(['list_machines']);
     });
     
     //after getting the machines, get images and sizes
-    backends.forEach(function(b, i){
+    $.each(backends, function(i, b){
         b.newAction(['list_sizes']);
         b.newAction(['list_locations']);
         b.newAction(['list_images']);
@@ -68,7 +68,7 @@ $(document).delegate("#backend-enable", "change", function(event, ui) {
 function update_backends() {
     // run list_machines action on each backend
     $('#backend-buttons').empty();
-    backends.forEach(function(b, i){
+    $.each(backends, function(i, b){
     	$('#backend-buttons').append($('<a href="#edit-backend" data-rel="dialog" ' + 
     			'data-theme="c" data-inline="true" data-transition="slidedown" ' +
     			'data-corners="false" data-shadow="false" ' +
@@ -136,7 +136,10 @@ $(document).on( 'click', 'li.node a', function(event){
 
     $('#single-machine #single-view-name').text(name);
     $('#single-machine #single-view-provider-icon').removeClass().addClass('provider-'+backendId);
-    console.log(status);
+    
+    var imagetype = get_image_type(machine.image);
+    
+    $('#single-machine #single-view-image-icon').removeClass().addClass('image-' + imagetype);
     $('#single-machine #single-view-status').removeClass().addClass(status.toLowerCase()).empty().text(status);
     //also show any of the following if found: keyname,availability,flavorId,uri,hostId';
     // Create a table for the basic info.
@@ -314,7 +317,7 @@ $(document).on( 'change keyup', '#new-machine-name', function() {
 
 /* when the list_machines action returns, update the view */
 function update_machines_view(backend){
-    backend.machines.forEach(function(machine, index){
+    $.each(backend.machines, function(index, machine){
         var node = $('#machines-list > #' + backends.indexOf(backend) + '-' + machine.id);
         if (node.length == 1) { // there should be only one machine with this id in the DOM
             if (node.find('.name').text() != machine.name){
@@ -519,7 +522,7 @@ function update_select_providers() {
         addmenu = $('#dialog-add #create-select-provider');
 
     optgroup.empty();
-    backends.forEach(function(b, i) {
+    $.each(backends, function(i, b) {
         var optionContent = '<option value="'+b.provider+'">'+b.title+'</option>';
         optgroup.append(optionContent);
     });
@@ -528,13 +531,13 @@ function update_select_providers() {
     if (createSelectionDefault()) {
         addmenu.empty();
         addmenu.append('<option>Select Provider</option>');
-        backends.forEach(function(b, i) {
+        $.each(backends, function(i, b) {
             var optionContent = '<option value="'+b.provider+'">'+b.title+'</option>';
             if (b.locations.length < 1) {
                 addmenu.append(optionContent);
             } else {
-                b.locations.forEach(function(l, j) {
-                addmenu.append('<option value="'+i+'-loc'+l.id+'">'+b.title+' - '+l.name+'</option>');
+                $.each(b.locations, function(j, l) {
+                	addmenu.append('<option value="'+i+'-loc'+l.id+'">'+b.title+' - '+l.name+'</option>');
                 });
             }
         });
