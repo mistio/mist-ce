@@ -610,3 +610,5 @@ function truncate_names(truncateName, truncateCharacters ) { //truncate truncate
 }
 
 $(document).delegate('.mist-dialog', 'keyup keydown keypress', close_on_escape);
+
+$(document).delegate('#create-ok-cancel button', 'click', function(){history.back()});
