@@ -543,17 +543,23 @@ function updateCreateFields() {
         provider = $('#create-select-provider'),
         image = $('#create-select-image'),
         size = $('#create-select-size');
+    
+    console.log(provider.val());
 
     if (image.val() == 'Select Image') {
         size.selectmenu('disable');
         if (provider.val() == 'Select Provider') {
             image.selectmenu('disable');
+        } else {
+        	image.selectmenu('enable');
         }
+    } else {
+    	size.selectmenu('enable');
     }
     if (createSelectionComplete()) {
-        $('#create-ok').removeClass('ui-disabled');
+    	$('#create-ok').button("enable");
     } else {
-        $('#create-ok').addClass('ui-disabled');
+    	$('#create-ok').button('disable');
     }
 }
 

@@ -218,8 +218,8 @@
         <label for="create-machine-cost" class="select">Cost:</label>
         <input name="create-machine-cost" type="text" id="new-machine-name" class="ui-disabled" > </input>
         <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-            <a id="create-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Back</a>
-            <a id="create-ok" class="btn-right-full ui-disabled" data-role="button" data-rel="back" data-theme="b">Launch!</a>
+            <button id="create-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Back</button>
+            <button id="create-ok" class="btn-right-full ui-disabled" data-role="button" data-rel="back" data-theme="b">Launch!</button>
         </div>
     </div>
 </div><!-- /add dialog -->
