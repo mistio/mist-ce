@@ -174,7 +174,7 @@
 
 #machines-list .ui-checkbox .ui-btn-inner {
 	top: 11px;
-	left: 5px;
+	left: -11px;
 	height: 40px;
     border-top: none;
 }
@@ -198,7 +198,7 @@
 }
 
 #machines .ui-listview-filter-inset {
-    margin: -43px 60px 0 60px;
+    margin: -41px 60px 0 60px;
 }
 
 #machines-list .bubble-container {
@@ -275,7 +275,10 @@ a#mist-select-machines-button {
     outline: none;
 }
 
-a#mist-select-machines-button span.ui-btn-text {}
+a#mist-select-machines-button span.ui-btn-text {
+    color: #fff;
+    z-index: 0;
+}
 /**/
 
 .ui-li-heading {
