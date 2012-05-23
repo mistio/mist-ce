@@ -248,6 +248,12 @@ $(document).on( 'click', '#single-button-destroy', function() {
     displayConfirmation(titl, msg, function() {alert('Destroy is in order!!');});
 });
 
+// DIALOG MOUSE EVENTS
+
+$(document).on('click', '#backend-delete', function() {
+    $('#backend-delete-confirm').slideDown(200);
+});
+
 //
 // CHANGE EVENTS
 //
