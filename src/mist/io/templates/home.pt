@@ -131,7 +131,7 @@
                 <option value="none">OpenStack</option>
             </optgroup>
         </select>
-        <a href="#dialog-add" id="mist-create-machine" data-rel="dialog" data-theme="c" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus" data-iconpos="notext"></a>
+        <a href="#dialog-add" id="mist-create-machine" data-rel="dialog" data-theme="b" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus" data-iconpos="notext"></a>
         <ul id="machines-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" data-filter-placeholder="Filter machines..">
         </ul>
 
