@@ -70,25 +70,41 @@
 
 /* Provider Icons */
 
-.state-providers .ui-icon, .state-providers.state-wait .ui-icon {
+.state-providers .ui-icon {
 	background-color: #222;
 	width: 18px;
 	height: 18px;
-	background-image: url(icons/loader.gif);
 	background-position: center;
 }
 
-.state-providers.state-on .ui-icon {
-	background-color: #22aa22;
-	background-image: url(images/icons-18-white.png);
-	background-position:  -252px 0;
+.state-providers.state-wait .ui-icon {
+	background-image: url(states/load-white.gif);
+}
+
+.state-providers.state-wait-ok .ui-icon {
+	background-image: url(states/load-green.gif);
+}
+
+.state-providers.state-wait-error .ui-icon {
+	background-image: url(states/load-yellow.gif);
+}
+
+.state-providers.state-wait-down .ui-icon {
+	background-image: url(states/load-red.gif);
+}
+
+.state-providers.state-ok .ui-icon {
+	background-image: url(states/state-green.png);
 }
 
 .state-providers.state-error .ui-icon {
-	background-color: #222;
-	background-image: url(images/icons-18-white.png);
-	background-position:  -72px 0;
+	background-image: url(states/state-yellow.png);
 }
+
+.state-providers.state-down .ui-icon {
+	background-image: url(states/state-red.png);
+}
+
 
 /* Provider status dialog */
 
@@ -224,11 +240,6 @@
 
 #machines-list .alert-icon {
 	background-color: #f61;
-}
-
-#machines-list .ping-icon {
-	background-image: url("icons/ping.png");
-	background-color: #3399cc;
 }
 
 #machines-list .ui-li-count {
