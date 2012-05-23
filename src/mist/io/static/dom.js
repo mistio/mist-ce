@@ -261,8 +261,14 @@ $(document).on( 'click', '#single-button-destroy', function() {
 
 // DIALOG MOUSE EVENTS
 
+// DIALOG MOUSE EVENTS
+
 $(document).on('click', '#backend-delete', function() {
     $('#backend-delete-confirm').slideDown(200);
+});
+
+$(document).on('click', '#backend-delete-no', function() {
+    $('#backend-delete-confirm').slideUp(200);
 });
 
 //

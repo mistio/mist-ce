@@ -549,6 +549,10 @@ a#mist-select-machines-button span.ui-btn-text {
 	padding: 8px 18px;
 }
 
+#edit-backend #backend-delete-confirm {
+	display: none;
+}
+
 /* Add backend dialog */
 #add-backend label {
 	display: block;
