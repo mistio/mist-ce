@@ -99,7 +99,25 @@ function Backend(id, title, provider, interval, host, log){
         this.newAction(['list_sizes']);
         this.newAction(['list_locations']);
         this.newAction(['list_images']);
-    }
+    };
+    
+    this.getImage = function(id, callback){
+    	retImage = false;
+    	
+    	$.each(this.images, function(idx, image){
+			if(image.id == id){
+				retImage = image;
+				return false;
+			}
+		});
+    	
+    	if(retImage){
+    		callback(retImage);
+    	} else {
+    		this.newAction(['get_image', id, callback]);
+    	}
+    	
+    };
 
     this.processAction = function(){
         if (this.action_queue.length == 0){
@@ -122,7 +140,7 @@ function Backend(id, title, provider, interval, host, log){
         }
 
         this.currentAction = action;
-        var backend = this
+        var backend = this;
         var backendIndex = backends.indexOf(backend);
 
         switch(action[0]) {
@@ -318,10 +336,24 @@ function Backend(id, title, provider, interval, host, log){
                     }
                 });
                 break;
+            case 'get_image':
+                this.log('getting image details', DEBUG);
+                $.ajax({
+                    url: 'backends/' + backendIndex + '/image_details',
+                    data: {id: action[1]},
+                    success: function(data) {
+                    	backend.images.push(data);
+                        action[2](data);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        backend.log("get image details failed for image: " + action[1], ERROR);
+                    }
+                });
+                break;
             default:
                 this.log("invalid action", ERROR);
         }
-    }
+    };
 }
 
 function add_backend(provider, apikey, apisecret){
@@ -396,23 +428,13 @@ function close_on_escape(e) {
     }
 }
 
-function get_image_type(imageId){
-	var name = "generic";
-	
-	$.each(backends, function(index, value){
-		$.each(value.images, function(idx, image){
-			if(image.id == imageId){
-				name = image.name;
-				return false;
+function get_image_type(backendId, imageId, callback){
+	backends[backendId].getImage(imageId, function(image){
+		for(type in IMAGETYPES){
+			if(image.name.toLowerCase().search(type) != -1){
+				callback(type);
+				return;
 			}
-		})
-	})
-	
-	for(type in IMAGETYPES){
-		if(name.toLowerCase().search(type) != -1){
-			return type;
 		}
-	}
-
-	return "generic";
+	});
 }

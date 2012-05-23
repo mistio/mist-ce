@@ -146,9 +146,11 @@ $(document).on( 'click', 'li.node a', function(event){
     $('#single-machine #single-view-name').text(name);
     $('#single-machine #single-view-provider-icon').removeClass().addClass('provider-'+backendId);
     
-    var imagetype = get_image_type(machine.image);
     
-    $('#single-machine #single-view-image-icon').removeClass().addClass('image-' + imagetype);
+    get_image_type(backendId, machine.image, function(imagetype){
+    	$('#single-machine #single-view-image-icon').removeClass().addClass('image-' + imagetype);	
+    });
+    
     $('#single-machine #single-view-status').removeClass().addClass(status.toLowerCase()).empty().text(status);
     //also show any of the following if found: keyname,availability,flavorId,uri,hostId';
     // Create a table for the basic info.

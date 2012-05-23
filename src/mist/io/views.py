@@ -298,3 +298,22 @@ def list_locations(request):
                     'country'   : i.country,})
 
     return ret
+
+@view_config(route_name='image_details', request_method='GET', renderer='json')
+def get_image_details(request):
+    '''get_image_details'''
+    try:
+        conn = connect(request)
+    except:
+        return Response('Backend not found', 404)
+
+    try:
+        image = conn.get_image(request.params['id'])
+    except:
+        return Response('Backend unavailable', 503)
+
+    ret = {'id'    : image.id,
+                'extra' : image.extra,
+                'name'  : image.name,}
+    return ret
+
