@@ -65,6 +65,9 @@ $(document).delegate("#backend-enable", "change", function(event, ui) {
 	}
 });
 
+$(document).delegate('.mist-dialog', 'keyup keydown keypress', close_on_escape);
+$(document).delegate('#create-cancel', 'click', function(){history.back()});
+
 function update_backends() {
     // run list_machines action on each backend
     $('#backend-buttons').empty();
@@ -105,8 +108,14 @@ $(document).on( 'pagebeforeshow', '#machines', function(){
     $('#machines-list').listview('refresh');
 });
 
-$(document).on( 'pageinit', '#dialog-add', function() {
-    updateCreateFields();
+$(document).on('pagebeforeshow', '#dialog-add', function(e, data){
+	if(data.prevPage[0].id){
+		$('input[name=create-machine-name]').val(null);
+		$('#create-select-provider').val(null).selectmenu('refresh');
+		$('#create-select-image').val(null).selectmenu('refresh').selectmenu('disable');
+		$('#create-select-size').val(null).selectmenu('refresh').selectmenu('disable');
+		$('#create-ok').button('disable');
+	}
 });
 
 //
@@ -304,9 +313,9 @@ $(document).on( 'click', '#machines-list li a', function(event){
 $(document).on( 'change', '#machines-list input:checkbox', updateFooterVisibility);
 
 // Check for change event in the select boxes of the create dialog.
-$(document).on( 'change', '.create-select', function() {
-    updateCreateFields();
-});
+$(document).on( 'change', '#create-select-provider', onMachineCreateProviderChange);
+$(document).on( 'change', '#create-select-image', onMachineCreateImageChange);
+$(document).on( 'change', '#create-select-size', onMachineCreateSizeChange);
 
 $(document).on( 'change keyup', '#new-machine-name', function() {
     updateCreateFields();
@@ -552,38 +561,60 @@ function update_select_providers() {
     }
 }
 
-// TODO split in 3
 function updateCreateFields() {
-    var name = $('#create-machine-name'),
-        provider = $('#create-select-provider'),
-        image = $('#create-select-image'),
-        size = $('#create-select-size');
-
-    var loc = provider.val();
-    
-    if (image.val() == 'Select Image') {
-        size.selectmenu('disable');
-        if (loc == 'Select Provider') {
-            image.selectmenu('disable');
-        } else {
-        	var backend = backends[loc.split('-')[0]];
-        	image.empty();
-        	image.append($("<option>​Select Image</option>"));
-        	$.each(backend.images, function(index, value){
-        		image.append($('<option value=​"' + value.id + '">' + value.name + '​</option>'));
-        	});
-        	image.selectmenu('refresh');
-        	image.selectmenu('enable');
-        }
-    } else {
-    	size.selectmenu('enable');
-    }
-    if (createSelectionComplete()) {
+    if (createSelectionComplete() && $("#new-machine-name").val()) {
     	$('#create-ok').button("enable");
     } else {
     	$('#create-ok').button('disable');
     }
 }
+
+function onMachineCreateProviderChange() {
+    var image = $('#create-select-image'),
+        size = $('#create-select-size');
+
+    var loc = $(this).val();
+    
+    size.selectmenu('disable');
+    
+    if (loc == 'Select Provider') {
+        image.selectmenu('disable');
+    } else {
+       	var backend = backends[loc.split('-')[0]];
+        image.empty();
+        image.append($("<option>​Select Image</option>"));
+        $.each(backend.images, function(index, value){
+        	image.append($('<option>', { value : value.id })
+         	          .text(value.name));
+        });
+        image.selectmenu('refresh');
+        image.selectmenu('enable');
+        
+        size.empty();
+        size.append($("<option>​Select Size</option>"));
+        backend.sizes.sort(compareSizes);
+        $.each(backend.sizes, function(index, value){
+       		size.append($('<option>', { value : value.id })
+       	          .text(value.name)); 
+        });
+        size.selectmenu('refresh');
+    }
+}
+
+function onMachineCreateImageChange() {
+    var size = $('#create-select-size');
+    
+    if($(this).val() == 'Select Image'){
+        size.selectmenu('disable');
+    } else {
+    	size.selectmenu('enable');
+    }
+}
+
+function onMachineCreateSizeChange() {
+	updateCreateFields();
+}
+
 
 // Create a <ul> from a Javascript object
 function to_ul(obj, prop) {
@@ -633,6 +664,10 @@ function truncate_names(truncateName, truncateCharacters ) { //truncate truncate
     }
 }
 
-$(document).delegate('.mist-dialog', 'keyup keydown keypress', close_on_escape);
-
-$(document).delegate('#create-cancel', 'click', function(){history.back()});
+function compareSizes(a,b) {
+	if (a.disk < b.disk)
+	     return -1;
+	if (a.disk > b.disk)
+        return 1;
+    return 0;
+}
