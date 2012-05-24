@@ -256,11 +256,6 @@
     <div data-role="content">
         <ul id="providers-status-list" data-role="listview" data-inset="true" data-theme="c" data-dividertheme="d">
         </ul>
-        <div id="backend-delete-confirm" class="btn-full" data-role="controlgroup" data-type="horizontal">
-            <div class="label">Confirm backend removal?</div>
-            <a id="backend-delete-yes" class="btn-left-full" data-role="button" data-theme="c">Yes</a>
-            <a id="backend-delete-no" class="btn-right-full" data-role="button" data-theme="b">No</a>
-        </div>
         <a href="index.html" data-role="button" data-icon="arrow-l" data-rel="back" data-transition="slidedown" data-theme="c">Back</a>
     </div>
 </div><!-- /provider status dialog -->
