@@ -347,16 +347,26 @@ a#mist-select-machines-button span.ui-btn-text {
 
 #single-view-header {
 	overflow: auto;
+	padding: 0 15px;
+	background: #e6e6e7;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#e8e9e9), to(#e0e1e1)); /* Saf4+, Chrome */
+	background-image: -webkit-linear-gradient(#e8e9e9, #e0e1e1); /* Chrome 10+, Saf5.1+ */
+	background-image:    -moz-linear-gradient(#e8e9e9, #e0e1e1); /* FF3.6 */
+	background-image:     -ms-linear-gradient(#e8e9e9, #e0e1e1); /* IE10 */
+	background-image:      -o-linear-gradient(#e8e9e9, #e0e1e1); /* Opera 11.10+ */
+	background-image:         linear-gradient(#e8e9e9, #e0e1e1);
+	border-bottom: #fff;
 }
 
 #single-view-name {
 	float: left;
-	margin: 30px 0;
+	margin: 30px 0 0 10px;
 }
 
 #single-view-status {
+	font-weight: normal;
 	float: right;
-	margin: 30px 10px;
+	margin: 30px 10px 0 10px;
 }
 
 #single-view-status.running {
@@ -365,13 +375,8 @@ a#mist-select-machines-button span.ui-btn-text {
 
 .single-view-icon-wrapper {
 	float: right;
-	margin: 30px 0 20px 10px;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#F9F9FB), to(#E4E4E6)); /* Saf4+, Chrome */
-	background-image: -webkit-linear-gradient(#F9F9FB, #E4E4E6); /* Chrome 10+, Saf5.1+ */
-	background-image:    -moz-linear-gradient(#F9F9FB, #E4E4E6); /* FF3.6 */
-	background-image:     -ms-linear-gradient(#F9F9FB, #E4E4E6); /* IE10 */
-	background-image:      -o-linear-gradient(#F9F9FB, #E4E4E6); /* Opera 11.10+ */
-	background-image:         linear-gradient(#F9F9FB, #E4E4E6);
+	margin: 28px 0 18px 10px;
+
 	background-position: center;
 	background-repeat: no-repeat;
 	border: 1px solid #aaa;
@@ -384,9 +389,7 @@ a#mist-select-machines-button span.ui-btn-text {
     -o-border-radius: 20px;
     -khtml-border-radius: 20px;
   	-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
-  	-moz-box-shadow: 0 1px 0 rgba(255, 255, 255, .6);
-	-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, .6);
-	box-shadow: 0 1px 0 rgba(255, 255, 255, .6);
+
 }
 
 #single-view-provider-icon, #single-view-image-icon {
@@ -401,7 +404,7 @@ a#mist-select-machines-button span.ui-btn-text {
 
 #inform-monitoring {
 	padding: 10px;
-	margin: 0 -8px 20px -8px;
+	margin: 0 -8px 14px -8px;
 	background: #C9E0F0;
 	border: 1px dashed rgba(0, 0, 0, 0.2);
 	-webkit-border-radius: 9px;
@@ -627,7 +630,22 @@ a#mist-select-machines-button span.ui-btn-text {
 	}
 
 	#machines-list .bubble-container {
-    right: 18px;
+    	right: 18px;
+	}
+    /* Single View */
+
+    #single-view-name {
+    	font-size: 18px;
+    }
+
+    #single-view-status {
+    	font-size: 18px;
+    	margin-right: 3px;
+    }
+
+    .single-view-icon-wrapper {
+    	margin-left: 8px;
+    }
 }
 
 }

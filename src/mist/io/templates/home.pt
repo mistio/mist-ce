@@ -159,15 +159,15 @@
         <a class="state-providers" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right"></a>
     </div><!-- /header -->
 
+    <div id="single-view-header">
+        <h3 id="single-view-name">Machine Name</h3>
+        <span class="single-view-icon-wrapper"><span id="single-view-provider-icon"></span></span>
+        <span class="single-view-icon-wrapper"><span id="single-view-image-icon"></span></span>
+        <h3 id="single-view-status">Machine Status</h3>
+    </div>
+
     <div data-role="content">
 
-        <div id="single-view-header">
-            <h3 id="single-view-name">Machine Name</h3>
-            <span class="single-view-icon-wrapper"><span id="single-view-provider-icon"></span></span>
-            <span class="single-view-icon-wrapper"><span id="single-view-image-icon"></span></span>
-            <h3 id="single-view-status">Machine Status</h3>
-
-        </div>
         <div id="inform-monitoring" tal:condition="session">Monitoring is currently disabled for this machine. <a id="enable-monitoring">Enable monitoring</a></div>
         <div data-role="collapsible" data-collapsed="false">
             <h3>Basic Info</h3>
