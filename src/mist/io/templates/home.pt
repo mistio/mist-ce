@@ -195,8 +195,10 @@
 
 <!-- Start of add dialog -->
 <div data-role="page" id="dialog-add" class="mist-dialog">
+    <div data-role="header">
+        <h1>Create Machine</h1>
+    </div>
     <div data-role="content" data-theme="c">
-        <h3>Create machine</h3>
         <label for="create-machine-name">1. Name:</label>
         <input name="create-machine-name" type="text" id="new-machine-name" ></input>
         <label for="create-select-provider">2. Provider:</label>
@@ -246,9 +248,9 @@
     </div>
 </div><!-- /console dialog -->
 
-<!-- Start of providers dialog -->
+<!-- Start of provider status dialog -->
 <div data-role="dialog" id="dialog-providers" class="mist-dialog">
-    <div data-role="header" data-theme="d" data-position="inline">
+    <div data-role="header">
         <h1>Provider Status</h1>
     </div>
     <div data-role="content" data-theme="c">
@@ -256,7 +258,7 @@
         </ul>
         <a href="index.html" data-role="button" data-icon="arrow-l" data-rel="back" data-transition="slidedown" data-theme="c">Back</a>
     </div>
-</div><!-- /providers dialog -->
+</div><!-- /provider status dialog -->
 
 <!-- Start of tags dialog -->
 <div data-role="dialog" id="dialog-tags" class="mist-dialog">

@@ -491,6 +491,10 @@ a#mist-select-machines-button span.ui-btn-text {
 #new-machine-name {
 	margin: 12px 0;
 }
+#dialog-add label, #dialog-add .select {
+	display: block;
+	margin-top: 12px;
+}
 
 .mist-li-selected {
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#AFD5FF), to(#98BBED)); /* Saf4+, Chrome */
