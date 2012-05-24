@@ -152,7 +152,7 @@ $(document).on( 'click', 'li.node a', function(event){
     	$('#single-machine #single-view-image-icon').removeClass().addClass('image-' + imagetype);	
     });
     
-    $('#single-machine #single-view-status').removeClass().addClass(status.toLowerCase()).empty().text(status);
+    $('#single-machine #single-view-status').removeClass().addClass(status.toLowerCase()).empty().text(status.toLowerCase());
     //also show any of the following if found: keyname,availability,flavorId,uri,hostId';
     // Create a table for the basic info.
     $('#single-machine span.machine-basic-stuff').html('<table id="machine-basic-table"></table>');
