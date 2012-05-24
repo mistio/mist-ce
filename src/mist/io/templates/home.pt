@@ -228,14 +228,14 @@
 
 <!-- Start of confirm dialog -->
 <div data-role="dialog" id="dialog-confirm" data-transition="pop" class="mist-dialog">
-    <div data-role="header" data-theme="d" data-position="inline">
+    <div data-role="header">
         <h1 id="dialog-confirm-title"></h1>
     </div>
     <div data-role="content" data-theme="c">
         <p id="dialog-confirm-message"></p>
         <div data-role="controlgroup" class="btn-full" data-type="horizontal">
         <a id="dialog-confirm-no" class="btn-left-full" data-role="button" data-rel="back" data-theme="b">No</a>
-        <a id="dialog-confirm-yes" class="btn-right-full" data-role="button" data-rel="back" data-theme="a">Yes</a>
+        <a id="dialog-confirm-yes" class="btn-right-full" data-role="button" data-rel="back">Yes</a>
         </div>
     </div>
 </div><!-- /confirm dialog -->
