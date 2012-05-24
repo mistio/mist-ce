@@ -53,6 +53,7 @@ $(document).delegate('#edit-backend', 'pagebeforeshow', function(){
 	
 	$("#backend-enable").slider('refresh');
 	$("#backend-enable").data('backend', backend);	
+	$("#edit-backend .content-header .name").text(backend.title);
 });
 
 $(document).delegate("#backend-enable", "change", function(event, ui) {
