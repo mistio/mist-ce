@@ -467,7 +467,7 @@ a#mist-select-machines-button span.ui-btn-text {
 	border-right: 1px solid #ccc;
 }
 
-/* DIALOG */
+/* DIALOGS */
 
 .ui-dialog .ui-content, 
 { 
@@ -486,6 +486,10 @@ a#mist-select-machines-button span.ui-btn-text {
 	width: 100%; 
 	text-align: center;
 	margin-top: 2em;
+}
+
+.btn-left-full, .btn-right-full {
+	width: 49%;
 }
 
 #new-machine-name {
@@ -570,6 +574,20 @@ a#mist-select-machines-button span.ui-btn-text {
 #add-backend label {
 	display: block;
 	margin: 14px 0 4px 0;
+}
+
+/* Tags Dialog */
+
+#dialog-tags label {
+	margin-top: 20px;
+}
+
+#dialog-tags label {
+	margin-top: 20px;
+}
+
+#dialog-tags #tag-input {
+	display: none;
 }
 
 /* Conditional for < 720px */

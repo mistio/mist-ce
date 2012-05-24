@@ -253,24 +253,38 @@
     <div data-role="header">
         <h1>Provider Status</h1>
     </div>
-    <div data-role="content" data-theme="c">
+    <div data-role="content">
         <ul id="providers-status-list" data-role="listview" data-inset="true" data-theme="c" data-dividertheme="d">
         </ul>
+        <div id="backend-delete-confirm" class="btn-full" data-role="controlgroup" data-type="horizontal">
+            <div class="label">Confirm backend removal?</div>
+            <a id="backend-delete-yes" class="btn-left-full" data-role="button" data-theme="c">Yes</a>
+            <a id="backend-delete-no" class="btn-right-full" data-role="button" data-theme="b">No</a>
+        </div>
         <a href="index.html" data-role="button" data-icon="arrow-l" data-rel="back" data-transition="slidedown" data-theme="c">Back</a>
     </div>
 </div><!-- /provider status dialog -->
 
 <!-- Start of tags dialog -->
 <div data-role="dialog" id="dialog-tags" class="mist-dialog">
+    <div data-role="header">
+        <h1>Manage Tags</h1>
+    </div>
     <div data-role="content" data-theme="c">
-        <h3>Manage Tags</h3>
         <div id="tags-container">
             <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag1</a>
             <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag2</a>
             <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag3</a>
             <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag4</a>
         </div>
-        <a href="index.html" data-role="button" data-rel="back" data-transition="flip" data-theme="a">Back</a>
+        <div id="tag-input">
+            <label for="add-tag-name">New Tag:</label>
+            <input name="add-tag-name" type="text" id="add-tag-name" ></input>
+        </div>
+        <div id="tag-buttons" class="btn-full" data-role="controlgroup" data-type="horizontal">
+            <a id="tag-add" class="btn-left-full" data-role="button" data-theme="c">Add</a>
+            <a id="tag-back" data-rel="back" class="btn-right-full" data-role="button" data-transition="flip" data-theme="b">Back</a>
+        </div>
     </div>
 </div><!-- /providers dialog -->
 
