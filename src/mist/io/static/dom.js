@@ -76,7 +76,7 @@ function update_backends() {
     	$('#backend-buttons').append($('<a href="#edit-backend" data-rel="dialog" ' + 
     			'data-theme="c" data-inline="true" data-transition="slidedown" ' +
     			'data-corners="false" data-shadow="false" ' +
-    			'data-role="button" data-icon="' + BACKENDSTATEICONS[b.status] +
+    			'data-role="button" class="backend-state-' + b.status +
     			'">' + b.title + '</a>')
     			.on('click', function(){ $('#edit-backend').data('backend', b) }));   
     });
