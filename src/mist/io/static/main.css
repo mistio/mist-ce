@@ -383,11 +383,11 @@ a#mist-select-machines-button span.ui-btn-text {
 	padding: 6px;
 	position: relative;
 	top: -4px;
-	border-radius: 20px;
     -webkit-border-radius: 20px;
-    -moz-border-radius: 20px;
-    -o-border-radius: 20px;
-    -khtml-border-radius: 20px;
+     -khtml-border-radius: 20px;
+       -moz-border-radius: 20px;
+    	 -o-border-radius: 20px;
+			border-radius: 20px;
   	-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
 
 }
@@ -584,6 +584,16 @@ a#mist-select-machines-button span.ui-btn-text {
 
 #dialog-tags label {
 	margin-top: 20px;
+}
+
+#dialog-tags #tags-container {
+	padding: 10px;
+	-webkit-border-radius: 8px;
+     -khtml-border-radius: 8px;
+       -moz-border-radius: 8px;
+    	 -o-border-radius: 8px;
+			border-radius: 8px;
+	background: #e7e8e8;
 }
 
 #dialog-tags #tag-input {
