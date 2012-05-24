@@ -132,10 +132,8 @@ $(document).on( 'click', 'li.node a', function(event){
 
 //STUB!
     var name = machine.name || machine.id;
-    var status = machine.extra.status;
-    if(!status){
-    	status = STATES[machine.state];
-    }
+    var status =  STATES[machine.state];
+
     var basicvars = {
         public_ips : ['Public IPs', machine.public_ips],
         private_ips : ['Private IPs', machine.private_ips],
