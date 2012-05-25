@@ -347,7 +347,7 @@ a#mist-select-machines-button span.ui-btn-text {
 
 #single-view-header {
 	overflow: auto;
-	padding: 0 15px;
+	padding: 0 0 0 15px;
 	background: #e6e6e7;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#e8e9e9), to(#e0e1e1)); /* Saf4+, Chrome */
 	background-image: -webkit-linear-gradient(#e8e9e9, #e0e1e1); /* Chrome 10+, Saf5.1+ */
@@ -365,8 +365,9 @@ a#mist-select-machines-button span.ui-btn-text {
 
 #single-view-status {
 	font-weight: normal;
-	float: right;
-	margin: 30px 10px 0 10px;
+	float: left;
+	margin: 30px 20px 0 10px;
+	text-shadow: none;
 }
 
 #single-view-status.running {
@@ -375,31 +376,74 @@ a#mist-select-machines-button span.ui-btn-text {
 
 .single-view-icon-wrapper {
 	float: right;
-	margin: 28px 0 18px 10px;
+	padding: 16px 20px;
 
 	background-position: center;
 	background-repeat: no-repeat;
-	border: 1px solid #aaa;
-	padding: 6px;
+	border-left: 1px solid #ccc;
 	position: relative;
-	top: -4px;
-    -webkit-border-radius: 20px;
-     -khtml-border-radius: 20px;
-       -moz-border-radius: 20px;
-    	 -o-border-radius: 20px;
-			border-radius: 20px;
   	-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
 
 }
 
 #single-view-provider-icon, #single-view-image-icon {
 	display: block;
-	width: 20px;
-	height: 20px;
+	width: 48px;
+	height: 48px;
+	background-position: center center;
+	background-repeat: no-repeat;
 }
 
 #single-view-provider-icon.provider-0 {
 	background-image: url(images/p1_sm.png);
+}
+
+#single-view-provider-icon.provider-1 {
+	background-image: url(images/p3_sm.png);
+}
+
+#single-view-provider-icon.provider-2 {
+	background-image: url(images/p31_sm.png);
+}
+
+#single-view-image-icon.image-windows {
+	background-image: url(images/image-windows.png);
+}
+
+#single-view-image-icon.image-oracle {
+	background-image: url(images/image-oracle.png);
+}
+
+#single-view-image-icon.image-canonical {
+	background-image: url(images/image-canonical.png);
+}
+
+#single-view-image-icon.image-ibm {
+	background-image: url(images/image-ibm.png);
+}
+
+#single-view-image-icon.image-debian {
+	background-image: url(images/image-debian.png);
+}
+
+#single-view-image-icon.image-gentoo {
+	background-image: url(images/image-gentoo.png);
+}
+
+#single-view-image-icon.image-ubuntu {
+	background-image: url(images/image-ubuntu.png);
+}
+
+#single-view-image-icon.image-suse {
+	background-image: url(images/image-suse.png);
+}
+
+#single-view-image-icon.image-opensolaris {
+	background-image: url(images/image-opensolaris.png);
+}
+
+#single-view-image-icon.image-fedora {
+	background-image: url(images/image-fedora.png);
 }
 
 #inform-monitoring {
@@ -417,7 +461,6 @@ a#mist-select-machines-button span.ui-btn-text {
 
 .machine-basic-stuff {
 	display: block;
-	margin: 0 -14px;
 }
 
 #machine-basic-table {
