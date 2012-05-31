@@ -67,7 +67,7 @@ $(document).delegate("#backend-enable", "change", function(event, ui) {
 });
 
 $(document).delegate('.mist-dialog', 'keyup keydown keypress', close_on_escape);
-$(document).delegate('#create-cancel', 'click', function(){history.back()});
+$(document).delegate('#create-cancel', 'click', function(){history.back();});
 
 function update_backends() {
     // run list_machines action on each backend
@@ -78,7 +78,7 @@ function update_backends() {
     			'data-corners="false" data-shadow="false" ' +
     			'data-role="button" class="backend-state-' + b.status +
     			'">' + b.title + '</a>')
-    			.on('click', function(){ $('#edit-backend').data('backend', b) }));   
+    			.on('click', function(){ $('#edit-backend').data('backend', b); }));   
     });
     if (backends.length) {
         $('#home-menu').show(); 
@@ -140,7 +140,7 @@ $(document).on( 'click', 'li.node a', function(event){
         image : ['Image', machine.image],
         dns_name : ['DNS Name', machine.extra.dns_name],
         launchdatetime : ['Launch Date', machine.extra.launchdatetime]
-    }
+    };
 
     $('#single-machine #single-view-name').text(name);
     $('#single-machine #single-view-provider-icon').removeClass().addClass('provider-'+backendId);
@@ -186,8 +186,8 @@ $(document).on( 'click', '#create-ok', function() {
     var backend = backends[$('#create-select-provider option:selected')[0].value.split('-loc')[0]];
     var location = $('#create-select-provider option:selected')[0].value.split('-loc')[1];
     var name = $('#new-machine-name').val();
-    var image = $('#create-select-image option:selected')[0].value
-    var size = $('#create-select-size option:selected')[0].value
+    var image = $('#create-select-image option:selected')[0].value;
+    var size = $('#create-select-size option:selected')[0].value;
     backend.newAction(['create', name, location, image, size]);
     history.back();
 });
@@ -312,13 +312,13 @@ $(document).on( 'change', '#mist-select-machines', function() {
 // node display while filtering.
 $(document).on( 'click', '#machines-list .node input:checkbox', function(event){
     var $this = $(this);
-    var checked = $this.is(':checked')
+    var checked = $this.is(':checked');
     if (checked) {
         $this.closest('.node').append('<span class="mist-node-selected" style="display:none">mist-node-selected</span>');
     } else {
         $this.closest('.node').find('.mist-node-selected').remove();
     }
-    $(this).checkboxradio("refresh")
+    $(this).checkboxradio("refresh");
 });
 
 $(document).on( 'click', '#machines-list li a', function(event){
@@ -533,7 +533,7 @@ function displayConfirmation(titl, msg, callbk) {
 function update_messages_count() {
     return;
     // TODO: fix selectors
-    var message_count = log.messages.filter(function(el,i){return el[0] < LOGLEVEL}).length;
+    var message_count = log.messages.filter(function(el,i){return el[0] < LOGLEVEL;}).length;
     if (message_count == 1) {
         messages = ' message';
     } else {

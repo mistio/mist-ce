@@ -1,12 +1,6 @@
 var ERROR = 0, WARN = 1, ALERT = 2, INFO = 3, DEBUG = 4;
 var LOGLEVEL = 4;
 
-var BACKENDSTATEICONS = {
-		offline: 'delete',
-		online: 'check',
-		wait: 'gear',
-};
-
 var BACKENDSTATES = ['offline', 'online', 'wait']; //TODO add more states
 
 /*
@@ -29,7 +23,7 @@ var IMAGETYPES = {
 		fedora: "Fedora",
 		centos: "CentOS",
 		debian: "Debian",		
-}
+};
 
 function MessageLog(){
     this.messages = [];
@@ -45,8 +39,8 @@ function MessageLog(){
         } else {
             this.messages.push([level, now, '', '', message]);
         }
-        try { update_message_notifier() } catch(err) { alert('Failed to update message widget: ' + err); }
-    }
+        try { update_message_notifier(); } catch(err) { alert('Failed to update message widget: ' + err); }
+    };
 }
 
 function Backend(id, title, provider, interval, host, log){
@@ -62,7 +56,7 @@ function Backend(id, title, provider, interval, host, log){
     this.images = [];
     this.locations = [];
     this.currentAction = '';
-    this.log = function(message, level){ try{log.newMessage(message, level, this)} catch(err){} };
+    this.log = function(message, level){ try{log.newMessage(message, level, this);} catch(err){} };
 
     this.newAction = function(action){
         this.action_queue.push(action);
@@ -92,7 +86,7 @@ function Backend(id, title, provider, interval, host, log){
         this.sizes = [];
         this.locations = [];
         this.processAction();
-    }
+    };
     
     this.enable = function(){
     	this.updateStatus('online', 'list_machines');
@@ -154,7 +148,7 @@ function Backend(id, title, provider, interval, host, log){
                         update_machines_view(backend);
                         backend.log('updated machines', DEBUG);
                         backend.processAction();
-                        try { refresh_machines(backend) } catch(err) {}
+                        try { refresh_machines(backend); } catch(err) {}
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         backend.updateStatus('offline', 'list_machines');
@@ -266,7 +260,7 @@ function Backend(id, title, provider, interval, host, log){
                     success: function(data) {
                         backend.updateStatus('online', 'stop');
                         backend.processAction();
-                        backend.log('stop command sent', DEBUG)
+                        backend.log('stop command sent', DEBUG);
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         backend.updateStatus('offline', 'stop');
@@ -371,7 +365,7 @@ function add_backend(provider, apikey, apisecret){
         url: 'backends',
         success: function(data) {
             //FIXME: better handling
-            b = new Backend(data['id'], data['title'], data['provider'], data['poll_interval'], '', log)
+            b = new Backend(data['id'], data['title'], data['provider'], data['poll_interval'], '', log);
             backends.push(b);
             b.newAction(['list_machines']);
             b.newAction(['list_sizes']);
