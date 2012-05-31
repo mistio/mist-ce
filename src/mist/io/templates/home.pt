@@ -159,15 +159,15 @@
         <a class="state-providers" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right"></a>
     </div><!-- /header -->
 
+    <div id="single-view-header">
+        <h3 id="single-view-name">Machine Name</h3>
+        <span class="single-view-icon-wrapper"><span id="single-view-provider-icon"></span></span>
+        <span class="single-view-icon-wrapper"><span id="single-view-image-icon"></span></span>
+        <h3 id="single-view-status">Machine Status</h3>
+    </div>
+
     <div data-role="content">
 
-        <div id="single-view-header">
-            <h3 id="single-view-name">Machine Name</h3>
-            <span class="single-view-icon-wrapper"><span id="single-view-provider-icon"></span></span>
-            <span class="single-view-icon-wrapper"><span id="single-view-image-icon"></span></span>
-            <h3 id="single-view-status">Machine Status</h3>
-
-        </div>
         <div id="inform-monitoring" tal:condition="session">Monitoring is currently disabled for this machine. <a id="enable-monitoring">Enable monitoring</a></div>
         <div data-role="collapsible" data-collapsed="false">
             <h3>Basic Info</h3>
@@ -195,8 +195,10 @@
 
 <!-- Start of add dialog -->
 <div data-role="page" id="dialog-add" class="mist-dialog">
+    <div data-role="header">
+        <h1>Create Machine</h1>
+    </div>
     <div data-role="content" data-theme="c">
-        <h3>Create machine</h3>
         <label for="create-machine-name">1. Name:</label>
         <input name="create-machine-name" type="text" id="new-machine-name" ></input>
         <label for="create-select-provider">2. Provider:</label>
@@ -226,14 +228,14 @@
 
 <!-- Start of confirm dialog -->
 <div data-role="dialog" id="dialog-confirm" data-transition="pop" class="mist-dialog">
-    <div data-role="header" data-theme="d" data-position="inline">
+    <div data-role="header">
         <h1 id="dialog-confirm-title"></h1>
     </div>
     <div data-role="content" data-theme="c">
         <p id="dialog-confirm-message"></p>
         <div data-role="controlgroup" class="btn-full" data-type="horizontal">
         <a id="dialog-confirm-no" class="btn-left-full" data-role="button" data-rel="back" data-theme="b">No</a>
-        <a id="dialog-confirm-yes" class="btn-right-full" data-role="button" data-rel="back" data-theme="a">Yes</a>
+        <a id="dialog-confirm-yes" class="btn-right-full" data-role="button" data-rel="back">Yes</a>
         </div>
     </div>
 </div><!-- /confirm dialog -->
@@ -246,29 +248,38 @@
     </div>
 </div><!-- /console dialog -->
 
-<!-- Start of providers dialog -->
+<!-- Start of provider status dialog -->
 <div data-role="dialog" id="dialog-providers" class="mist-dialog">
-    <div data-role="header" data-theme="d" data-position="inline">
+    <div data-role="header">
         <h1>Provider Status</h1>
     </div>
-    <div data-role="content" data-theme="c">
+    <div data-role="content">
         <ul id="providers-status-list" data-role="listview" data-inset="true" data-theme="c" data-dividertheme="d">
         </ul>
         <a href="index.html" data-role="button" data-icon="arrow-l" data-rel="back" data-transition="slidedown" data-theme="c">Back</a>
     </div>
-</div><!-- /providers dialog -->
+</div><!-- /provider status dialog -->
 
 <!-- Start of tags dialog -->
 <div data-role="dialog" id="dialog-tags" class="mist-dialog">
+    <div data-role="header">
+        <h1>Manage Tags</h1>
+    </div>
     <div data-role="content" data-theme="c">
-        <h3>Manage Tags</h3>
         <div id="tags-container">
             <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag1</a>
             <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag2</a>
             <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag3</a>
             <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag4</a>
         </div>
-        <a href="index.html" data-role="button" data-rel="back" data-transition="flip" data-theme="a">Back</a>
+        <div id="tag-input">
+            <label for="add-tag-name">New Tag:</label>
+            <input name="add-tag-name" type="text" id="add-tag-name" ></input>
+        </div>
+        <div id="tag-buttons" class="btn-full" data-role="controlgroup" data-type="horizontal">
+            <a id="tag-add" class="btn-left-full" data-role="button" data-theme="c">Add</a>
+            <a id="tag-back" data-rel="back" class="btn-right-full" data-role="button" data-transition="flip" data-theme="b">Back</a>
+        </div>
     </div>
 </div><!-- /providers dialog -->
 

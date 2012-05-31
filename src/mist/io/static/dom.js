@@ -90,7 +90,7 @@ function update_backends() {
 // Update tags page when it opens
 $(document).on( 'pagebeforeshow', '#dialog-tags', function( e, data ) {
     // TODO get tags from machine object and display them
-    $('#dialog-tags #tags-container').empty();
+    //$('#dialog-tags #tags-container').empty();
 });
 
 // Update providers page when it opens
@@ -258,9 +258,11 @@ $(document).on( 'click', '#single-button-destroy', function() {
     displayConfirmation(titl, msg, function() {alert('Destroy is in order!!');});
 });
 
+//
 // DIALOG MOUSE EVENTS
+//
 
-// DIALOG MOUSE EVENTS
+// Edit backend dialog
 
 $(document).on('click', '#backend-delete', function() {
     $('#backend-delete-confirm').slideDown(200);
@@ -268,6 +270,16 @@ $(document).on('click', '#backend-delete', function() {
 
 $(document).on('click', '#backend-delete-no', function() {
     $('#backend-delete-confirm').slideUp(200);
+});
+
+// Edit tags dialog
+
+$(document).on('click', '#tag-add', function() {
+    $('#tag-input').slideDown(200);
+});
+
+$(document).on('click', '#tag-back', function() {
+    $('#tag-input').hide();
 });
 
 //
