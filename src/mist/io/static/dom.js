@@ -85,6 +85,35 @@ function update_backends() {
     }
     
     $('#backend-buttons').trigger('create');
+    
+    $(".state-providers").removeClass('state-wait');
+    $(".state-providers").removeClass('state-wait-ok');
+    $(".state-providers").removeClass('state-wait-error');
+    $(".state-providers").removeClass('state-wait-down');
+    $(".state-providers").removeClass('state-ok');
+    $(".state-providers").removeClass('state-error');
+    $(".state-providers").removeClass('state-down');
+    
+    var state = 'ok';
+    var waiting = false;
+    
+    $.each(backends, function(index, backend){
+    	if(backend.status == 'wait'){
+    		waiting = true;
+    	} else if(backend.status == 'offline'){
+    		state = 'error';
+    	} else if(backend.status == 'off'){
+    		state = 'down';
+    	}
+    });
+    
+    if(waiting){
+    	state = 'state-wait-' + state;
+    } else {
+    	state = 'state-' + state;
+    }
+    
+    $(".state-providers").addClass(state);
 }
 
 // Update tags page when it opens
