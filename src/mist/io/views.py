@@ -34,7 +34,7 @@ def connect(request):
     return conn
 
 
-@view_config(route_name='home', request_method='GET', renderer='templates/home.pt')
+@view_config(route_name='home', request_method='GET', renderer='templates/mist.pt')
 def home(request):
     '''Fill in an object with backend data, taken from config.py'''
     try:
@@ -317,3 +317,21 @@ def get_image_details(request):
                 'name'  : image.name,}
     return ret
 
+@view_config(route_name='backends', request_method='GET', renderer='json')
+def get_backends(request):
+    '''get_backends'''
+    try:
+        backend_list = request.environ['beaker.session']['backends']
+    except:
+        backend_list = BACKENDS
+
+    backends = []
+    for b in backend_list:
+        backends.append({'id'           : b['id'],
+                         'title'        : b['title'],
+                         'provider'     : b['provider'],
+                         'poll_interval': b['poll_interval'],
+                         'status'       : 'off',
+                        })
+
+    return backends

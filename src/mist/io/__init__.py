@@ -16,5 +16,6 @@ def main(global_config, **settings):
     config.add_route('sizes', '/backends/{backend}/sizes')
     config.add_route('locations', '/backends/{backend}/locations')
     config.add_route('image_details', '/backends/{backend}/image_details')
+    config.add_route('backends', '/backends')
     config.scan()
     return config.make_wsgi_app()
