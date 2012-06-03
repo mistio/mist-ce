@@ -197,7 +197,7 @@
 }
 
 #machines-list .ui-checkbox .ui-btn-inner {
-    top: 11px;
+    top: 3px;
     left: -11px;
     height: 40px;
     border-top: none;
@@ -300,6 +300,8 @@ a#mist-select-machines-button span.ui-btn-text {
     display: block;
     float: left;
     padding: 6px 0;
+    margin-top: 11px;
+    margin-bottom: 0px;
 }
 
 .caption-wrapper {
@@ -683,6 +685,7 @@ a#mist-select-machines-button span.ui-btn-text {
     .ui-li-heading {
         display: block;
         float: left;
+        clear: right;
         padding: 0;
         margin: 4px 0 2px 0;
     }
@@ -691,8 +694,8 @@ a#mist-select-machines-button span.ui-btn-text {
         display: block;
         position: static;
         padding: 0px;
-        margin: 0px;
-        clear: both;
+        margin-top: 25px;
+        margin-left: 50px;
     }
 
     .caption-wrapper h3 {
@@ -704,7 +707,7 @@ a#mist-select-machines-button span.ui-btn-text {
         float: left;
         position: relative;
         left: 8px;
-        top: 14px;
+        top: 12px;
     }
 
     /* In mobile view the arrow disappears
