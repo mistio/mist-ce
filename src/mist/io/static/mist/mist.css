@@ -50,23 +50,25 @@
     left: 20px;
 }
 
+/* Search field */
+#machines .ui-listview-filter-inset {
+    margin: -41px 124px 0 60px;
+}
 
 /* Create machine button */
 
 #machines #mist-create-machine {
-    width: 40px;
-    padding: 6px 5px;
+    width: 120px;
+
     float: right;
-    top: -45px;
+    top: -44px;
+    right: -6px;
 }
 
-#machines #mist-create-machine .ui-btn-inner {
-    height: 24px;
-}
 
 #machines #mist-create-machine .ui-icon {
     position: absolute;
-    left: 8px;
+    left: 17px;
     z-index: 1000;
 }
 
@@ -217,10 +219,6 @@
     position: absolute;
     right: 76px;
     top: 30px;
-}
-
-#machines .ui-listview-filter-inset {
-    margin: -41px 60px 0 60px;
 }
 
 #machines-list .bubble-container {
@@ -518,11 +516,6 @@ a#mist-select-machines-button span.ui-btn-text {
     margin: 0 auto 15px auto; 
 }
 
-/* Hide closing button on dialog headers */
-/*.ui-dialog .ui-header .ui-btn-left {
-    display: none;
-}*/
-
 /* Create Dialog */
 
 .btn-full {
@@ -660,6 +653,27 @@ a#mist-select-machines-button span.ui-btn-text {
 
     .caption-wrapper {
         left: 200px;
+    }
+
+    /* Create machine button */
+
+    #machines #mist-create-machine {
+        width: 60px;
+        right: -6px;
+        padding: 9px 0;
+    }
+
+    #machines #mist-create-machine .ui-icon {
+        left: 21px;
+    }
+
+    #machines #mist-create-machine .ui-btn-text {
+        display: none;
+    }
+
+    /* Search field */
+    #machines .ui-listview-filter-inset {
+        margin-right: 64px;
     }
 }
 
