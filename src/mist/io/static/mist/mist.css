@@ -617,25 +617,42 @@ a#mist-select-machines-button span.ui-btn-text {
 /* Tags Dialog */
 
 #dialog-tags label {
-    margin-top: 20px;
-}
-
-#dialog-tags label {
-    margin-top: 20px;
-}
-
-#dialog-tags #tags-container {
-    padding: 10px;
-    -webkit-border-radius: 8px;
-     -khtml-border-radius: 8px;
-       -moz-border-radius: 8px;
-         -o-border-radius: 8px;
-            border-radius: 8px;
-    background: #e7e8e8;
+    margin: 10px 0;
 }
 
 #dialog-tags #tag-input {
-    display: none;
+    overflow: auto;
+    width: 100%;
+    clear: both;
+    margin-top: 0px;
+
+}
+
+#dialog-tags #tags-list {
+    list-style: none;
+    padding-left: 0px;
+    overflow: auto;
+}
+
+#dialog-tags #tags-list li {
+    float: left;
+    padding: 0 14px 0 6px;
+    margin: 0 8px 8px 0;
+    background: #ddd;
+    -webkit-border-radius: 9px;
+    -moz-border-radius: 9px;
+    border-radius: 9px;
+}
+
+#add-tag-name {
+    width: 70%;
+    float: left;
+}
+
+a#tag-add {
+    margin-top: 0px;
+    width: 22%;
+    float: right;
 }
 
 /* Conditional for < 720px */
