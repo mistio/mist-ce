@@ -326,12 +326,15 @@ def get_backends(request):
         backend_list = BACKENDS
 
     backends = []
+    i = 0;
     for b in backend_list:
-        backends.append({'id'           : b['id'],
+        backends.append({'index'        : i,
+                         'id'           : b['id'],
                          'title'        : b['title'],
                          'provider'     : b['provider'],
                          'poll_interval': b['poll_interval'],
                          'status'       : 'off',
                         })
+        i = i + 1
 
     return backends

@@ -551,10 +551,6 @@ a#mist-select-machines-button span.ui-btn-text {
     float: right;
 }
 
-#home-menu {
-    display: none;
-}
-
 /* Provider (backend) status dialog */
 
 #edit-backend .content-header {

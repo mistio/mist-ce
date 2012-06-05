@@ -34,9 +34,7 @@ define('app/controllers/backends', [
 			        console.log('backend buttons changed');
 			        var that = this;
 			        Em.run.next(function() {
-			            that.$().trigger('create');
-			            console.log(that.$());
-			            $('#backend-buttons').trigger('create');
+			            that.$().trigger('create'); //FIXME
 			        });
 			    }.observes('content.length')
             }),
