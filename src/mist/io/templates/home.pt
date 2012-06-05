@@ -131,7 +131,9 @@
                 <option value="none">OpenStack</option>
             </optgroup>
         </select>
-        <a href="#dialog-add" id="mist-create-machine" data-rel="dialog" data-theme="b" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus" data-iconpos="notext"></a>
+        <a href="#dialog-add" id="mist-create-machine" data-rel="dialog" data-theme="b" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus">
+        Create
+        </a>
         <ul id="machines-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" data-filter-placeholder="Filter machines..">
         </ul>
 
@@ -267,21 +269,20 @@
     </div>
     <div data-role="content" data-theme="c">
         <div id="tags-container">
-            <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag1</a>
-            <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag2</a>
-            <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag3</a>
-            <a data-role="button" data-theme="c" data-icon="delete" data-inline="true">tag4</a>
+            <div id="tag-input">
+                <input name="add-tag-name" type="text" id="add-tag-name" ></input>
+                <a id="tag-add" data-role="button" data-theme="c">Add</a>
+            </div>
+            <ul id="tags-list">
+                <li><a data-role="button" data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>tag1</li>
+                <li><a data-role="button" data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>tag2</li>
+                <li><a data-role="button" data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>tag3</li>
+                <li><a data-role="button" data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>tag4</li>
         </div>
-        <div id="tag-input">
-            <label for="add-tag-name">New Tag:</label>
-            <input name="add-tag-name" type="text" id="add-tag-name" ></input>
-        </div>
-        <div id="tag-buttons" class="btn-full" data-role="controlgroup" data-type="horizontal">
-            <a id="tag-add" class="btn-left-full" data-role="button" data-theme="c">Add</a>
-            <a id="tag-back" data-rel="back" class="btn-right-full" data-role="button" data-transition="flip" data-theme="b">Back</a>
-        </div>
+            <a id="tag-back" data-rel="back" data-role="button" data-transition="flip" data-theme="b">Back</a>
     </div>
 </div><!-- /providers dialog -->
+
 
 <!-- Start of images page: #images -->
 <div data-role="page" id="images" data-theme="c">

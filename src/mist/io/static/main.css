@@ -15,7 +15,7 @@
 
 /* Add backend button top margin */
 #one a#add-backend-button {
-	margin: 0px !important;
+    margin: 0px !important;
 }
 
 #one .ui-content {
@@ -25,11 +25,11 @@
 /* Machines Pane */
 
 #machines .ui-content {
-	padding-top: 6px;
+    padding-top: 6px;
 }
 
 #machines-list .node .ui-icon-arrow-r {
-	right: 18px;
+    right: 18px;
 }
 
 /* Select Button */
@@ -46,124 +46,126 @@
 }
 
 #machines .ui-select .ui-icon {
-	position: absolute;
-	left: 20px;
+    position: absolute;
+    left: 20px;
 }
 
+/* Search field */
+#machines .ui-listview-filter-inset {
+    margin: -41px 124px 0 60px;
+}
 
 /* Create machine button */
 
 #machines #mist-create-machine {
-	width: 40px;
-	padding: 6px 5px;
-	float: right;
-	top: -45px;
+    width: 120px;
+
+    float: right;
+    top: -44px;
+    right: -6px;
 }
 
-#machines #mist-create-machine .ui-btn-inner {
-	height: 24px;
-}
 
 #machines #mist-create-machine .ui-icon {
-	position: absolute;
-	left: 8px;
-	z-index: 1000;
+    position: absolute;
+    left: 17px;
+    z-index: 1000;
 }
 
 #machines #mist-create-machine .ui-btn-inner {
-	border: none !important;
+    border: none !important;
 }
 
 /* Provider Icons */
 
 .state-providers .ui-icon {
-	background-color: #222;
-	width: 18px;
-	height: 18px;
-	background-position: center;
+    background-color: #222;
+    width: 18px;
+    height: 18px;
+    background-position: center;
 }
 
 .state-providers.state-wait .ui-icon {
-	background-image: url(states/load-white.gif);
+    background-image: url(states/load-white.gif);
 }
 
 .state-providers.state-wait-ok .ui-icon {
-	background-image: url(states/load-green.gif);
+    background-image: url(states/load-green.gif);
 }
 
 .state-providers.state-wait-error .ui-icon {
-	background-image: url(states/load-yellow.gif);
+    background-image: url(states/load-yellow.gif);
 }
 
 .state-providers.state-wait-down .ui-icon {
-	background-image: url(states/load-red.gif);
+    background-image: url(states/load-red.gif);
 }
 
 .state-providers.state-ok .ui-icon {
-	background-image: url(states/state-green.png);
+    background-image: url(states/state-green.png);
 }
 
 .state-providers.state-error .ui-icon {
-	background-image: url(states/state-yellow.png);
+    background-image: url(states/state-yellow.png);
 }
 
 .state-providers.state-down .ui-icon {
-	background-image: url(states/state-red.png);
+    background-image: url(states/state-red.png);
 }
 
 
 /* Provider status dialog */
 
 #providers-status-list li {
-	padding-left: 42px;
+    padding-left: 42px;
 }
 #providers-status-list .provider-state-icon {
-	width: 16px;
-	height: 16px;
-	display: block;
-	position: absolute;
-	left: 16px;
-	background-color: #234;
+    width: 16px;
+    height: 16px;
+    display: block;
+    position: absolute;
+    left: 16px;
+    background-color: #234;
 }
 
 #providers-status-list .state-on .provider-state-icon{
-	background-image: url(images/icons-18-white.png);
-	background-position:  -253px 0;
-	background-repeat: no-repeat;
-	overflow: hidden;
-	background-color: #22aa22;
+    background-image: url(images/icons-18-white.png);
+    background-position:  -253px 0;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    background-color: #22aa22;
 }
 
 #providers-status-list .state-off .provider-state-icon{
-	background-image: url(icons/loader.gif);
-	background-position: center !important;
-	background-repeat: no-repeat;
-	overflow: hidden;
-	background-color: #aa2222;
+    background-image: url(icons/loader.gif);
+    background-position: center !important;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    background-color: #aa2222;
 }
 
 #providers-status-list .state-wait .provider-state-icon{
-	background-image: url(images/icons-18-white.png);
-	background-position:  -73px 0;
-	background-repeat: no-repeat;
-	overflow: hidden;
-	background-color: #234;
+    background-image: url(images/icons-18-white.png);
+    background-position:  -73px 0;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    background-color: #234;
 }
 
 /* Lists */
 
 .ui-li-count {
-	font-size: 13px !important;
+    font-size: 13px !important;
 }
 
 /* Machines List */
 
 #machines-list {
-	margin-top: 10px;
+    margin-top: 10px;
 }
 
 #machines-list .node {
-	clear: left;
+    clear: left;
 }
 
 #machines-list .ui-checkbox {
@@ -172,12 +174,12 @@
 }
 
 #machines-list .ui-checkbox input {
-	display: none;
+    display: none;
 }
 
 #machines-list .ui-btn-icon-left {
-	background: none;
-	background-image: none;
+    background: none;
+    background-image: none;
 }
 
 #machines-list .ui-checkbox label {
@@ -190,14 +192,14 @@
 }
 
 #machines-list .ui-btn-text .ui-checkbox {
-	width: 56px;
-	margin-top: -8px;
+    width: 56px;
+    margin-top: -8px;
 }
 
 #machines-list .ui-checkbox .ui-btn-inner {
-	top: 11px;
-	left: -11px;
-	height: 40px;
+    top: 3px;
+    left: -11px;
+    height: 40px;
     border-top: none;
 }
 
@@ -214,13 +216,9 @@
 }
 
 #machines-list .description {
-	position: absolute;
-	right: 76px;
-	top: 30px;
-}
-
-#machines .ui-listview-filter-inset {
-    margin: -41px 60px 0 60px;
+    position: absolute;
+    right: 76px;
+    top: 30px;
 }
 
 #machines-list .bubble-container {
@@ -234,45 +232,45 @@
 }
 
 #machines-list .state-icon.ui-icon-check {
-	background-color: #33dd44;
+    background-color: #33dd44;
 }
 
 /* Machines Icons and their colors. */
 
 #machines-list .key-icon {
-	background-image: url("icons/key.png");
-	background-color: #333;
+    background-image: url("icons/key.png");
+    background-color: #333;
 }
 
 #machines-list .alert-icon {
-	background-color: #f61;
+    background-color: #f61;
 }
 
 #machines-list .ui-li-count {
-	position: static;
+    position: static;
 }
 
 #machines-list .node-icon {
-	padding: 2px 9px;
-	border: none;
+    padding: 2px 9px;
+    border: none;
 }
 
 /* Machines tags */
 
 #machines-list .node .tag {
-	border: 1px solid #bfbfbf;
-	color: #555 !important;
-	font-weight: normal !important;
-	display: block;
-	float: right;
-	padding: 1px 7px;
-	margin: 3px 3px 9px 0;
+    border: 1px solid #bfbfbf;
+    color: #555 !important;
+    font-weight: normal !important;
+    display: block;
+    float: right;
+    padding: 1px 7px;
+    margin: 3px 3px 9px 0;
 }
 
 /* Machines states colors. */
 
 #machines-list .state0 {
-	color: #e50;
+    color: #e50;
 }
 
 #machines .ui-select {
@@ -284,8 +282,8 @@
 }
 
 #machines .ui-link {
-	border-left: 1px solid #ddd;
-	padding: 8px;
+    border-left: 1px solid #ddd;
+    padding: 8px;
 }
 
 a#mist-select-machines-button {
@@ -299,257 +297,254 @@ a#mist-select-machines-button span.ui-btn-text {
 /**/
 
 .ui-li-heading {
-	display: block;
-	float: left;
-	padding: 6px 0;
+    display: block;
+    float: left;
+    padding: 6px 0;
+    margin-top: 11px;
+    margin-bottom: 0px;
 }
 
 .caption-wrapper {
-	display: block;
-	position: absolute;
-	left: 250px;
+    display: block;
+    position: absolute;
+    left: 250px;
 
 }
 
 .caption-wrapper h3 {
-	font-weight: normal;
-	font-size: 16px;
+    font-weight: normal;
+    font-size: 16px;
 }
 
 #machines-list .alert-icon {
-	display: block;
-	padding: 0px;
-	position: relative;
-	top: 26px;
-	left: -26px;
+    display: block;
+    padding: 0px;
+    position: relative;
+    top: 26px;
+    left: -26px;
 }
 
 /* FOOTER */
 
 .ui-footer {
-	padding: 0 10px;
-	position: fixed !important;
-	left: 0px;
-	bottom: 0px;
-	z-index: 2000;
-	width: 100%;
+    padding: 0 10px;
+    position: fixed !important;
+    left: 0px;
+    bottom: 0px;
+    z-index: 2000;
+    width: 100%;
 }
 
 .ui-footer #actions {
-	margin: 0.5em 0;
+    margin: 0.5em 0;
 }
 
 .ui-footer a {
-	width: 24.65%;
+    width: 24.65%;
 }
 
 /* Single View */
 
 #single-view-header {
-	overflow: auto;
-	padding: 0 0 0 15px;
-	background: #e6e6e7;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#e8e9e9), to(#e0e1e1)); /* Saf4+, Chrome */
-	background-image: -webkit-linear-gradient(#e8e9e9, #e0e1e1); /* Chrome 10+, Saf5.1+ */
-	background-image:    -moz-linear-gradient(#e8e9e9, #e0e1e1); /* FF3.6 */
-	background-image:     -ms-linear-gradient(#e8e9e9, #e0e1e1); /* IE10 */
-	background-image:      -o-linear-gradient(#e8e9e9, #e0e1e1); /* Opera 11.10+ */
-	background-image:         linear-gradient(#e8e9e9, #e0e1e1);
-	border-bottom: #fff;
+    overflow: auto;
+    padding: 0 0 0 15px;
+    background: #e6e6e7;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#e8e9e9), to(#e0e1e1)); /* Saf4+, Chrome */
+    background-image: -webkit-linear-gradient(#e8e9e9, #e0e1e1); /* Chrome 10+, Saf5.1+ */
+    background-image:    -moz-linear-gradient(#e8e9e9, #e0e1e1); /* FF3.6 */
+    background-image:     -ms-linear-gradient(#e8e9e9, #e0e1e1); /* IE10 */
+    background-image:      -o-linear-gradient(#e8e9e9, #e0e1e1); /* Opera 11.10+ */
+    background-image:         linear-gradient(#e8e9e9, #e0e1e1);
+    border-bottom: #fff;
 }
 
 #single-view-name {
-	float: left;
-	margin: 30px 0 0 10px;
+    float: left;
+    margin: 30px 0 0 10px;
 }
 
 #single-view-status {
-	font-weight: normal;
-	float: left;
-	margin: 30px 20px 0 10px;
-	text-shadow: none;
+    font-weight: normal;
+    float: left;
+    margin: 30px 20px 0 10px;
+    text-shadow: none;
 }
 
 #single-view-status.running {
-	color: #13B754;
+    color: #13B754;
 }
 
 .single-view-icon-wrapper {
-	float: right;
-	padding: 16px 20px;
+    float: right;
+    padding: 16px 20px;
 
-	background-position: center;
-	background-repeat: no-repeat;
-	border-left: 1px solid #ccc;
-	position: relative;
-  	-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-left: 1px solid #ccc;
+    position: relative;
+    -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
 
 }
 
 #single-view-provider-icon, #single-view-image-icon {
-	display: block;
-	width: 48px;
-	height: 48px;
-	background-position: center center;
-	background-repeat: no-repeat;
+    display: block;
+    width: 48px;
+    height: 48px;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 #single-view-provider-icon.provider-0 {
-	background-image: url(images/p1_sm.png);
+    background-image: url(images/p1_sm.png);
 }
 
 #single-view-provider-icon.provider-1 {
-	background-image: url(images/p3_sm.png);
+    background-image: url(images/p3_sm.png);
 }
 
 #single-view-provider-icon.provider-2 {
-	background-image: url(images/p31_sm.png);
+    background-image: url(images/p31_sm.png);
 }
 
 #single-view-image-icon.image-windows {
-	background-image: url(images/image-windows.png);
+    background-image: url(images/image-windows.png);
 }
 
 #single-view-image-icon.image-oracle {
-	background-image: url(images/image-oracle.png);
+    background-image: url(images/image-oracle.png);
 }
 
 #single-view-image-icon.image-canonical {
-	background-image: url(images/image-canonical.png);
+    background-image: url(images/image-canonical.png);
 }
 
 #single-view-image-icon.image-ibm {
-	background-image: url(images/image-ibm.png);
+    background-image: url(images/image-ibm.png);
 }
 
 #single-view-image-icon.image-debian {
-	background-image: url(images/image-debian.png);
+    background-image: url(images/image-debian.png);
 }
 
 #single-view-image-icon.image-gentoo {
-	background-image: url(images/image-gentoo.png);
+    background-image: url(images/image-gentoo.png);
 }
 
 #single-view-image-icon.image-ubuntu {
-	background-image: url(images/image-ubuntu.png);
+    background-image: url(images/image-ubuntu.png);
 }
 
 #single-view-image-icon.image-suse {
-	background-image: url(images/image-suse.png);
+    background-image: url(images/image-suse.png);
 }
 
 #single-view-image-icon.image-opensolaris {
-	background-image: url(images/image-opensolaris.png);
+    background-image: url(images/image-opensolaris.png);
 }
 
 #single-view-image-icon.image-fedora {
-	background-image: url(images/image-fedora.png);
+    background-image: url(images/image-fedora.png);
 }
 
 #inform-monitoring {
-	padding: 10px;
-	margin: 0 -8px 14px -8px;
-	background: #C9E0F0;
-	border: 1px dashed rgba(0, 0, 0, 0.2);
-	-webkit-border-radius: 9px;
-	-moz-border-radius: 9px;
-	border-radius: 9px;
-	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.09);
-	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.09);
-	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.09);
+    padding: 10px;
+    margin: 0 -8px 14px -8px;
+    background: #C9E0F0;
+    border: 1px dashed rgba(0, 0, 0, 0.2);
+    -webkit-border-radius: 9px;
+    -moz-border-radius: 9px;
+    border-radius: 9px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.09);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.09);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.09);
 }
 
 .machine-basic-stuff {
-	display: block;
+    display: block;
 }
 
 #machine-basic-table {
-	border-collapse:collapse;
-	width: 100%;
-	margin-top: 10px;
+    border-collapse:collapse;
+    width: 100%;
+    margin-top: 10px;
 }
 
 #machine-basic-table tr {
-	border: 1px solid #ccc;
+    border: 1px solid #ccc;
 }
 
 #machine-basic-table td {
-	font-size: 14px;
-	padding: 10px 12px;
-	background: #fff;
-	margin: 0;
-	border: none;
+    font-size: 14px;
+    padding: 10px 12px;
+    background: #fff;
+    margin: 0;
+    border: none;
 }
 
 #machine-basic-table .key {
-	font-weight: 300;
+    font-weight: 300;
 }
 
 #machine-basic-table .value {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 #machine-metadata ul {
-	font-size: 14px;
-	list-style: none;
-	padding: 0px;
-	border-top: 1px solid #ccc;
+    font-size: 14px;
+    list-style: none;
+    padding: 0px;
+    border-top: 1px solid #ccc;
 }
 
 #machine-metadata ul ul {
-	border-top: none;
-	padding-left: 30px;
-	background: #666;
+    border-top: none;
+    padding-left: 30px;
+    background: #666;
 }
 
 #machine-metadata li {
-	padding: 10px;
-	background: #fff;
-	border-bottom: 1px solid #ccc;
-	border-left: 1px solid #ccc;
-	border-right: 1px solid #ccc;
+    padding: 10px;
+    background: #fff;
+    border-bottom: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
 }
 
 /* DIALOGS */
 
 .ui-dialog .ui-content, 
 { 
-	max-width: 500px; 
-	margin: 0 auto 15px auto; 
+    max-width: 500px; 
+    margin: 0 auto 15px auto; 
 }
-
-/* Hide closing button on dialog headers */
-/*.ui-dialog .ui-header .ui-btn-left {
-	display: none;
-}*/
 
 /* Create Dialog */
 
 .btn-full {
-	width: 100%; 
-	text-align: center;
-	margin-top: 2em;
+    width: 100%; 
+    text-align: center;
+    margin-top: 2em;
 }
 
 .btn-left-full, .btn-right-full {
-	width: 49%;
+    width: 49%;
 }
 
 #new-machine-name {
-	margin: 12px 0;
+    margin: 12px 0;
 }
 #dialog-add label, #dialog-add .select {
-	display: block;
-	margin-top: 12px;
+    display: block;
+    margin-top: 12px;
 }
 
 .mist-li-selected {
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#AFD5FF), to(#98BBED)); /* Saf4+, Chrome */
-	background-image: -webkit-linear-gradient(#AFD5FF, #98BBED); /* Chrome 10+, Saf5.1+ */
-	background-image:    -moz-linear-gradient(#AFD5FF, #98BBED); /* FF3.6 */
-	background-image:     -ms-linear-gradient(#AFD5FF, #98BBED); /* IE10 */
-	background-image:      -o-linear-gradient(#AFD5FF, #98BBED); /* Opera 11.10+ */
-	background-image:         linear-gradient(#AFD5FF, #98BBED);
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#AFD5FF), to(#98BBED)); /* Saf4+, Chrome */
+    background-image: -webkit-linear-gradient(#AFD5FF, #98BBED); /* Chrome 10+, Saf5.1+ */
+    background-image:    -moz-linear-gradient(#AFD5FF, #98BBED); /* FF3.6 */
+    background-image:     -ms-linear-gradient(#AFD5FF, #98BBED); /* IE10 */
+    background-image:      -o-linear-gradient(#AFD5FF, #98BBED); /* Opera 11.10+ */
+    background-image:         linear-gradient(#AFD5FF, #98BBED);
 }
 
 .add-button {
@@ -563,163 +558,202 @@ a#mist-select-machines-button span.ui-btn-text {
 /* Provider (backend) status dialog */
 
 #edit-backend .content-header {
-	overflow: auto;
-	padding: 20px 6px;
-	border-bottom: 1px solid #ddd;
-	margin-bottom: 8px;
+    overflow: auto;
+    padding: 20px 6px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 8px;
 }
 
 #edit-backend .status {
-	display: block;
-	float: right;
-	font-size: 22px;
+    display: block;
+    float: right;
+    font-size: 22px;
 }
 
 #edit-backend .name {
-	display: block;
-	float: left;
-	font-size: 22px;
-	font-weight: 600;
+    display: block;
+    float: left;
+    font-size: 22px;
+    font-weight: 600;
 }
 
 #edit-backend .ui-field-contain {
-	overflow: visible;
-	height: 50px;
-	border-bottom: 1px solid #ddd;
-	margin: 6px 0;
+    overflow: visible;
+    height: 50px;
+    border-bottom: 1px solid #ddd;
+    margin: 6px 0;
 }
 
 #edit-backend #backend-enable-label {
-	margin-top: 12px;
-	margin-left: 6px;
+    margin-top: 12px;
+    margin-left: 6px;
 }
 
 #edit-backend .ui-slider-switch {
-	float: right;
-	margin-right: 4px;
-	margin-top: 0;
+    float: right;
+    margin-right: 4px;
+    margin-top: 0;
 }
 
 #edit-backend .ui-field-contain .ui-btn-block {
-	float: right;
-	margin-top: 3px;
+    float: right;
+    margin-top: 3px;
 }
 
 #edit-backend .ui-field-contain .ui-btn-inner {
-	padding: 8px 18px;
+    padding: 8px 18px;
 }
 
 #edit-backend #backend-delete-confirm {
-	display: none;
+    display: none;
 }
 
 /* Add backend dialog */
 #add-backend label {
-	display: block;
-	margin: 14px 0 4px 0;
+    display: block;
+    margin: 14px 0 4px 0;
 }
 
 /* Tags Dialog */
 
 #dialog-tags label {
-	margin-top: 20px;
-}
-
-#dialog-tags label {
-	margin-top: 20px;
-}
-
-#dialog-tags #tags-container {
-	padding: 10px;
-	-webkit-border-radius: 8px;
-     -khtml-border-radius: 8px;
-       -moz-border-radius: 8px;
-    	 -o-border-radius: 8px;
-			border-radius: 8px;
-	background: #e7e8e8;
+    margin: 10px 0;
 }
 
 #dialog-tags #tag-input {
-	display: none;
+    overflow: auto;
+    width: 100%;
+    clear: both;
+    margin-top: 0px;
+
+}
+
+#dialog-tags #tags-list {
+    list-style: none;
+    padding-left: 0px;
+    overflow: auto;
+}
+
+#dialog-tags #tags-list li {
+    float: left;
+    padding: 0 14px 0 6px;
+    margin: 0 8px 8px 0;
+    background: #ddd;
+    -webkit-border-radius: 9px;
+    -moz-border-radius: 9px;
+    border-radius: 9px;
+}
+
+#add-tag-name {
+    width: 70%;
+    float: left;
+}
+
+a#tag-add {
+    margin-top: 0px;
+    width: 22%;
+    float: right;
 }
 
 /* Conditional for < 720px */
 @media only screen and (max-width: 720px) {
 
-	#machines-list .description {
-		position: absolute;
-		right: 76px;
-		top: 21px;
-		width: 100px;
-		line-height: 12px;
-	}
+    #machines-list .description {
+        position: absolute;
+        right: 76px;
+        top: 21px;
+        width: 100px;
+        line-height: 12px;
+    }
 
-	#machines-list .description .tag {
-		margin-bottom: 6px;
-	}
+    #machines-list .description .tag {
+        margin-bottom: 6px;
+    }
 
-	.caption-wrapper {
-		left: 200px;
-	}
+    .caption-wrapper {
+        left: 200px;
+    }
+
+    /* Create machine button */
+
+    #machines #mist-create-machine {
+        width: 60px;
+        right: -6px;
+        padding: 9px 0;
+    }
+
+    #machines #mist-create-machine .ui-icon {
+        left: 21px;
+    }
+
+    #machines #mist-create-machine .ui-btn-text {
+        display: none;
+    }
+
+    /* Search field */
+    #machines .ui-listview-filter-inset {
+        margin-right: 64px;
+    }
 }
 
 /* Conditional for < 480px */
 @media only screen and (max-width: 480px) {
 
-	.ui-li-heading {
-		display: block;
-		float: left;
-		padding: 0;
-		margin: 4px 0 2px 0;
-	}
+    .ui-li-heading {
+        display: block;
+        float: left;
+        clear: right;
+        padding: 0;
+        margin: 4px 0 2px 0;
+    }
 
-	.caption-wrapper {
-		display: block;
-		position: static;
-		padding: 0px;
-		margin: 0px;
-		clear: both;
-	}
+    .caption-wrapper {
+        display: block;
+        position: static;
+        padding: 0px;
+        margin-top: 25px;
+        margin-left: 50px;
+    }
 
-	.caption-wrapper h3 {
-		font-size: 16px;
-	}
+    .caption-wrapper h3 {
+        font-size: 16px;
+    }
 
-	#machines-list .alert-icon {
-		display: block;
-		float: left;
-		position: relative;
-		left: 8px;
-		top: 14px;
-	}
+    #machines-list .alert-icon {
+        display: block;
+        float: left;
+        position: relative;
+        left: 8px;
+        top: 12px;
+    }
 
-	/* In mobile view the arrow disappears
-	and the key/tags stick to the right. */
+    /* In mobile view the arrow disappears
+    and the key/tags stick to the right. */
 
-	#machines-list .node .ui-icon-arrow-r {
-		display: none;
-	}
+    #machines-list .node .ui-icon-arrow-r {
+        display: none;
+    }
 
-	#machines-list .description {
-		right: 48px;
-	}
+    #machines-list .description {
+        right: 48px;
+    }
 
-	#machines-list .bubble-container {
-    	right: 18px;
-	}
+    #machines-list .bubble-container {
+        right: 18px;
+    }
     /* Single View */
 
     #single-view-name {
-    	font-size: 18px;
+        font-size: 18px;
     }
 
     #single-view-status {
-    	font-size: 18px;
-    	margin-right: 3px;
+        font-size: 18px;
+        margin-right: 3px;
     }
 
     .single-view-icon-wrapper {
-    	margin-left: 8px;
+        margin-left: 8px;
     }
 }
 

@@ -34,7 +34,7 @@ def connect(request):
     return conn
 
 
-@view_config(route_name='home', request_method='GET', renderer='templates/mist.pt')
+@view_config(route_name='home', request_method='GET', renderer='templates/home.pt')
 def home(request):
     '''Fill in an object with backend data, taken from config.py'''
     try:
