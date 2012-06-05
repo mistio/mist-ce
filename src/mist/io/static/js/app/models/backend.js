@@ -14,19 +14,15 @@ define('app/models/backend', [
 		    interval: null,
 		    host: null,
 		    status: 'unknown',
-		    machines: MachinesController.create(),
+		    machines: null,
 		    sizes: [],
 		    images: [],
 		    locations: [],
 		    
 		    init: function() {
 				this._super();
-				this.listMachines();
+				this.machines = MachinesController.create({backend: this});
 			},
-			
-			listMachines: function(){
-				this.machines.refresh(this.index);
-			}		
 		
 		});
 	}

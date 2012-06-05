@@ -10,10 +10,13 @@ define('app/controllers/machines', [
 	function(Machine) {
 		return Ember.ArrayController.extend({
 			content: [],
+			backend: null,
 			
-			refresh: function(index) {
+			init: function() {
+				this._super();
+			
 				var that = this;
-				$.getJSON('/backends/' + index + '/machines', function(data) {
+				$.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
 					data.forEach(function(item){
 						that.pushObject(Machine.create(item));
 					});
