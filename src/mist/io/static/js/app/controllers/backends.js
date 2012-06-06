@@ -35,7 +35,8 @@ define('app/controllers/backends', [
 			    contentBinding:Ember.Binding.oneWay('Mist.backendsController.content'),
             }),
             
-            machinesCount: 0,
+            machineCount: 0,
+            imageCount: 0,
 
 			init: function() {
 				this._super();
@@ -53,6 +54,13 @@ define('app/controllers/backends', [
 								count = count + item.machines.get('length');
 							});
 							that.set('machineCount', count);
+						});
+						item.images.addObserver('length', function() {
+							var count = 0;
+							that.content.forEach(function(item){
+								count = count + item.images.get('length');
+							});
+							that.set('imageCount', count);
 						});
 					});
 				});

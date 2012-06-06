@@ -35,7 +35,7 @@
 
         <ul data-role="listview" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow" id="home-menu">
             <li id="one-li-machines"><a id="machines-count" href="#machines">Machines </a></li>
-            <li id="one-li-images"><a href="#images">Images<span class="ui-li-count">0</span></a></li>
+            <li id="one-li-images"><a id="images-count" href="#images">Images </a></li>
         </ul>
     </div><!-- /content -->
 
