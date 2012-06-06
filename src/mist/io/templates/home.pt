@@ -30,12 +30,40 @@
              tal:condition="session">Add backend</a>
 
         <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
+<script type="text/x-handlebars">
+{{#each Mist.backendsController}}
+    {{#view Mist.BackendButtonView backendBinding="this" }}
+<a href="#edit-backend"
+    data-rel="dialog"
+    data-theme="c"
+    data-inline="true"
+    data-transition="slidedown"
+    data-corners="false"
+    data-shadow="false"
+    data-role="button"
+    {{action "openDialog" on="click"}}
+    class="backend-status-{{unbound backend.status}}">{{backend.title}}  
+    {{/view}}
+{{/each}}
+</script>
 
         </div>
 
         <ul data-role="listview" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow" id="home-menu">
-            <li id="one-li-machines"><a id="machines-count" href="#machines">Machines </a></li>
-            <li id="one-li-images"><a id="images-count" href="#images">Images </a></li>
+            <li id="one-li-machines"><a id="machines-count" href="#machines">Machines 
+            <script type="text/x-handlebars">
+            {{#view Mist.CountView numberBinding="Mist.backendsController.machineCount" tagName="span" class="ui-li-count"}}
+            {{number}}
+            {{/view}}
+            </script>
+            </a></li>
+            <li id="one-li-images"><a id="images-count" href="#images">Images
+            <script type="text/x-handlebars">
+            {{#view Mist.CountView numberBinding="Mist.backendsController.imageCount" tagName="span" class="ui-li-count"}}
+            {{number}}
+            {{/view}}
+            </script> 
+            </a></li>
         </ul>
     </div><!-- /content -->
 

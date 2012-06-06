@@ -15,11 +15,11 @@ require.config({
 define( 'app', [
 	'jquery',
     'app/controllers/backends',
-    'app/views/machines_number_view',
-    'app/views/images_number_view',
+    'app/views/count_view',
+    'app/views/backend_button',
 	'ember',
 	'mobile',
-	], function($, BackendsController, MachinesNumberView, ImagesNumberView) {
+	], function($, BackendsController, CountView, BackendButton) {
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',
@@ -53,11 +53,7 @@ define( 'app', [
 				this.set(
 					'backendsController',
 					BackendsController.create()
-				);
-				
-				MachinesNumberView.create({app: this});
-				ImagesNumberView.create({app: this});
-					
+				);					
 
 				// Run specs if asked
 				if ( location.hash.match( /specs/ ) ) {
@@ -65,7 +61,8 @@ define( 'app', [
 				}
 			}
 		});
-
+		App.CountView = CountView;
+		App.BackendButtonView = BackendButton;
 		// Expose the application globally
 		return window.Mist = App;
 	}

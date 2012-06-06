@@ -1,26 +1,13 @@
 define('app/controllers/backends', [
-    'app/models/backend',
-    'text!app/views/backend_button.html'],
+    'app/models/backend'],
 	/**
 	 * Backends controller
 	 *
 	 * @returns Class
 	 */
-	function(Backend, backend_button_html) {
+	function(Backend) {
 		return Ember.ArrayController.extend({
 			content: [],
-			// Compile and render the Backends buttons view
-			backendsButtonsView: Ember.CollectionView.create({
-			    contentBinding:Ember.Binding.oneWay('Mist.backendsController.content'),
-			    itemViewClass: Ember.View.extend({
-                    tagName:false,
-                    template: Ember.Handlebars.compile(backend_button_html),
-                    didInsertElement: function(e){
-                      $("#backend-buttons").trigger('create');
-                    }
-			    }),
-            }),
-
             machineCount: 0,
             imageCount: 0,
 
@@ -50,8 +37,6 @@ define('app/controllers/backends', [
 						});
 					});
 				});
-
-				this.get('backendsButtonsView').appendTo('#backend-buttons');
 			}
 		});
 	}
