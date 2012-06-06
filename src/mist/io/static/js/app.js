@@ -15,11 +15,12 @@ require.config({
 define( 'app', [
 	'jquery',
     'app/controllers/backends',
-    'app/views/count_view',
+    'app/views/count',
     'app/views/backend_button',
+    'app/views/edit_backend',
 	'ember',
 	'mobile',
-	], function($, BackendsController, CountView, BackendButton) {
+	], function($, BackendsController, Count, BackendButton, EditBackend) {
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',
@@ -61,8 +62,9 @@ define( 'app', [
 				}
 			}
 		});
-		App.CountView = CountView;
+		App.CountView = Count;
 		App.BackendButtonView = BackendButton;
+		App.EditBackendView = EditBackend;
 		// Expose the application globally
 		return window.Mist = App;
 	}

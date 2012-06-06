@@ -1,4 +1,4 @@
-define('app/views/count_view', ['ember'],
+define('app/views/count', ['ember'],
 	/**
 	 *
 	 * Count on home page

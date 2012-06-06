@@ -11,7 +11,7 @@ define('app/views/backend_button', ['ember'],
                 $("#backend-buttons").trigger('create');
             },
             openDialog: function(event){
-                this.get('backend');
+            	Mist.set('backend', this.get('backend'));
             }
 	    });
 	}

@@ -311,11 +311,13 @@
     <div data-role="header">
         <h1>Edit backend</h1>
     </div>
+    <script type="text/x-handlebars">
+    {{#view Mist.EditBackendView backendBinding="Mist.backend" }}
     <div data-role="content" data-theme="c">
         
         <div class="content-header">
-            <span class='name'>Name</span>
-            <span class='status'>Unknown</span>
+            <span class='name'>{{backend.title}}</span>
+            <span class='status'>{{backend.status}}</span>
         </div>
         
         <div data-role="fieldcontain">
@@ -337,6 +339,9 @@
             <a id="edit-backend-ok" class="btn-full" data-role="button" data-rel="back" data-theme="b">Close</a>
         </div>
     </div>
+    {{/view}}
+    </script>
+
 </div><!-- /edit backend dialog -->
 
 
