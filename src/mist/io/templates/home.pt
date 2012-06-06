@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="static/main.css" />
     <link rel="icon" href="static/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
+    <script data-main="static/js/app.js" src="static/js/lib/require/require.js"></script>
+
 </head>
 
 <body>
@@ -309,7 +311,6 @@
     </div>
 </div><!-- /edit backend dialog -->
 
-    <script data-main="static/js/app.js" src="static/js/lib/require/require.js"></script>
 
 </body>
 
