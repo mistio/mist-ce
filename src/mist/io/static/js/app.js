@@ -15,9 +15,10 @@ require.config({
 define( 'app', [
 	'jquery',
     'app/controllers/backends',
+    'app/views/machines_number_view',
 	'ember',
 	'mobile',
-	], function($, BackendsController) {
+	], function($, BackendsController, MachinesNumberView) {
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',
@@ -52,6 +53,12 @@ define( 'app', [
 					'backendsController',
 					BackendsController.create()
 				);
+				
+				this.set(
+						'machinesNumberView',
+						MachinesNumberView.create({app: this})
+					);
+					
 
 				// Run specs if asked
 				if ( location.hash.match( /specs/ ) ) {

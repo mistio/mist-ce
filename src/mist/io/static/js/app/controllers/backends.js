@@ -29,13 +29,13 @@ define('app/controllers/backends', [
 			      tagName: 'a',	
 			      template: Ember.Handlebars.compile('{{content.title}}'),
 			      didInsertElement: function(e){
-			    	  console.log('did insert');
-			    	  console.log(this);
 			    	  $("#backend-buttons").trigger('create');
 			      }
 			    }),
 			    contentBinding:Ember.Binding.oneWay('Mist.backendsController.content'),
             }),
+            
+            machinesCount: 0,
 
 			init: function() {
 				this._super();
@@ -44,6 +44,16 @@ define('app/controllers/backends', [
 				$.getJSON('/backends', function(data) {
 					data.forEach(function(item){
 						that.pushObject(Backend.create(item));
+					});
+					
+					that.content.forEach(function(item){
+						item.machines.addObserver('length', function() {
+							var count = 0;
+							that.content.forEach(function(item){
+								count = count + item.machines.get('length');
+							});
+							that.set('machineCount', count);
+						});
 					});
 				});
 
