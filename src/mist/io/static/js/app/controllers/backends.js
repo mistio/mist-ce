@@ -27,16 +27,14 @@ define('app/controllers/backends', [
 			        'data-role': "button",
 			        //class="backend-state-{{content.status}}"
 			      tagName: 'a',	
-			      template: Ember.Handlebars.compile('{{content.title}}')
+			      template: Ember.Handlebars.compile('{{content.title}}'),
+			      didInsertElement: function(e){
+			    	  console.log('did insert');
+			    	  console.log(this);
+			    	  $("#backend-buttons").trigger('create');
+			      }
 			    }),
 			    contentBinding:Ember.Binding.oneWay('Mist.backendsController.content'),
-			    contentLengthDidChange: function(){
-			        console.log('backend buttons changed');
-			        var that = this;
-			        Em.run.next(function() {
-			            that.$().trigger('create'); //FIXME
-			        });
-			    }.observes('content.length')
             }),
 
 			init: function() {
