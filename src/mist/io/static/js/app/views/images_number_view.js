@@ -1,14 +1,14 @@
-define('app/views/machines_number_view', ['ember'],
+define('app/views/images_number_view', ['ember'],
 	/**
 	 *
-	 * Machine count on home page
+	 * Image count on home page
 	 *
 	 * @returns Class
 	 */
 	function() {
 		return Ember.View.extend({
 			app: null,
-			numberBinding: 'Mist.backendsController.machineCount',
+			numberBinding: 'Mist.backendsController.imageCount',
 			tagName: 'span',
 			classNames: 'ui-li-count',
 		    template: Ember.Handlebars.compile('{{number}}'),
@@ -20,7 +20,7 @@ define('app/views/machines_number_view', ['ember'],
 			
 			init: function() {
 				this._super();
-				this.appendTo('#machines-count');
+				this.appendTo('#images-count');
 			}
 		});
 	}

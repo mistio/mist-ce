@@ -16,9 +16,10 @@ define( 'app', [
 	'jquery',
     'app/controllers/backends',
     'app/views/machines_number_view',
+    'app/views/images_number_view',
 	'ember',
 	'mobile',
-	], function($, BackendsController, MachinesNumberView) {
+	], function($, BackendsController, MachinesNumberView, ImagesNumberView) {
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',
@@ -54,10 +55,8 @@ define( 'app', [
 					BackendsController.create()
 				);
 				
-				this.set(
-						'machinesNumberView',
-						MachinesNumberView.create({app: this})
-					);
+				MachinesNumberView.create({app: this});
+				ImagesNumberView.create({app: this});
 					
 
 				// Run specs if asked
