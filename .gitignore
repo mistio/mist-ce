@@ -3,7 +3,7 @@ parts
 develop-eggs
 eggs
 include
-./lib
+/lib
 .mr.developer.cfg
 .installed.cfg
 *.pyc
