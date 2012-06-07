@@ -1,15 +1,30 @@
-define('app/views/machine_list', [
-    'text!app/views/machine_list_item.html',
-	'ember'],
+define('app/views/machine_list', ['ember'],
 	/**
 	 *
 	 * Machine List View
 	 *
 	 * @returns Class
 	 */
-	function(machine_list_item_html) {
+	function() {
 		return Ember.View.extend({
 				tagName:false,
+				didInsertElement: function(e){
+			    	
+			    	Em.run.next(function() {
+			    		console.log('inserted');
+				    	console.log($('#machines-list'));
+
+			    		try {
+			    			$('#machines-list').listview('refresh');
+			    		} catch(e) {
+			    			try {
+				    			$('#machines-list').listview();
+				    		} catch(e) {
+				    			
+				    		}	
+			    		}
+			        });
+			    },
 	    });
 			
 	}

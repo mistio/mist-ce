@@ -63,6 +63,11 @@ define( 'app', [
 				}
 			}
 		});
+		
+		$(document).on( 'pagebeforeshow', '#machines', function(){
+		    $('#machines-list').listview('refresh');
+		});
+		
 		App.CountView = Count;
 		App.BackendButtonView = BackendButton;
 		App.EditBackendView = EditBackend;
