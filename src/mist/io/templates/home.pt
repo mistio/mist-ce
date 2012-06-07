@@ -135,13 +135,13 @@
         
         <ul id="machines-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" data-filter-placeholder="Filter machines..">
         {{#each Mist.backendsController}}        
-        {{#view Mist.MachineListView contentBinding="this"}}
-        {{#each content.machines}}
-        <li class="node-template">
+        {{#each this.machines}}
+        {{#view Mist.MachineListView machineBinding="this"}}
+        <li>
             <a href="#single-machine">
                 <input name='custom' type="checkbox" class="custom" />
                 <label></label>
-                <h3 class="name">{{this.name}}</h3>
+                <h3 class="name">{{machine.name}}</h3>
                 <span class="caption-wrapper">
                     <h3 class="state"></h3><span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
                 </span>
@@ -155,8 +155,8 @@
                 </span>
             </a>
         </li>
-        {{/each}}
         {{/view}}
+        {{/each}}
         {{/each}}
         </ul>
         </script>
