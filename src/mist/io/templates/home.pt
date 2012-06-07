@@ -146,7 +146,7 @@
                     <h3 class="state"></h3><span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
                 </span>
                 <p class="description">
-                    <span class="tag backend ui-btn-corner-all">{{backend.title}}</span>
+                    <span class="tag backend ui-btn-corner-all">{{machine.backend.title}}</span>
                     <span class="tag ui-btn-corner-all">tag1</span>
                     <span class="tag ui-btn-corner-all">tag2</span>
                 </p>

@@ -8,7 +8,8 @@ define('app/models/machine', ['ember'],
 		return Ember.Object.extend({
 			id: null,
 			image: null,
-			name: null
+			name: null,
+			backend: null,
 		});
 	}
 );

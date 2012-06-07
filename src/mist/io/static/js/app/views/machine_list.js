@@ -11,9 +11,6 @@ define('app/views/machine_list', ['ember'],
 				didInsertElement: function(e){
 			    	
 			    	Em.run.next(function() {
-			    		console.log('inserted');
-				    	console.log($('#machines-list'));
-
 			    		try {
 			    			$('#machines-list').listview('refresh');
 			    		} catch(e) {

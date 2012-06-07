@@ -18,7 +18,10 @@ define('app/controllers/machines', [
 				$.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
 					var content = [];
 					data.forEach(function(item){
-						content.push(Machine.create(item));
+						var machine = Machine.create(item);
+						machine.set('backend', that.backend); //maybe bind this property
+						content.push(machine);
+						
 					});
 					that.set('content', content);
 				});
