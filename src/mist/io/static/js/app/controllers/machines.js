@@ -9,7 +9,6 @@ define('app/controllers/machines', [
 	 */
 	function(Machine) {
 		return Ember.ArrayController.extend({
-			content: [],
 			backend: null,
 			
 			init: function() {
@@ -17,9 +16,11 @@ define('app/controllers/machines', [
 			
 				var that = this;
 				$.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
+					var content = [];
 					data.forEach(function(item){
-						that.pushObject(Machine.create(item));
+						content.push(Machine.create(item));
 					});
+					that.set('content', content);
 				});
 			}
 		});

@@ -18,9 +18,10 @@ define( 'app', [
     'app/views/count',
     'app/views/backend_button',
     'app/views/edit_backend',
+    'app/views/machine_list',
 	'ember',
 	'mobile',
-	], function($, BackendsController, Count, BackendButton, EditBackend) {
+	], function($, BackendsController, Count, BackendButton, EditBackend, MachineList) {
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',
@@ -65,6 +66,7 @@ define( 'app', [
 		App.CountView = Count;
 		App.BackendButtonView = BackendButton;
 		App.EditBackendView = EditBackend;
+		App.MachineListView = MachineList;
 		// Expose the application globally
 		return window.Mist = App;
 	}

@@ -8,7 +8,6 @@ define('app/controllers/images', [
 	 */
 	function(Image) {
 		return Ember.ArrayController.extend({
-			content: [],
 			backend: null,
 			
 			init: function() {
@@ -16,9 +15,11 @@ define('app/controllers/images', [
 			
 				var that = this;
 				$.getJSON('/backends/' + this.backend.index + '/images', function(data) {
+					var content = [];
 					data.forEach(function(item){
-						that.pushObject(Image.create(item));
+						content.push(Image.create(item));
 					});
+					that.set('content', content);
 				});
 			}
 		});

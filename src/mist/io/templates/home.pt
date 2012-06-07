@@ -117,24 +117,7 @@
     <div data-role="content">
 
         <div id="logo-container"></div>
-        <li class="node-template" style="display:none">
-            <a href="#single-machine">
-            	<input name='custom' type="checkbox" class="custom" />
-            	<label></label>
-                <h3 class="name"></h3>
-                <span class="caption-wrapper">
-                    <h3 class="state"></h3><span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
-                </span>
-                <p class="description">
-                    <span class="tag backend ui-btn-corner-all">backend</span>
-                    <span class="tag ui-btn-corner-all">tag1</span>
-                    <span class="tag ui-btn-corner-all">tag2</span>
-                </p>
-                <span class="bubble-container">
-                    <span class="ui-li-count node-icon key-icon"></span>
-                </span>
-            </a>
-        </li>
+        
         <select name="select-machines" id="mist-select-machines" data-native-menu="false">
             <option>Select Machines</option>
             <option value="all">All</option>
@@ -148,9 +131,35 @@
         <a href="#dialog-add" id="mist-create-machine" data-rel="dialog" data-theme="b" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus">
         Create
         </a>
+        <script type="text/x-handlebars">
+        
         <ul id="machines-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" data-filter-placeholder="Filter machines..">
+        {{#each Mist.backendsController}}        
+        {{#view Mist.MachineListView contentBinding="this"}}
+        {{#each content.machines}}
+        <li class="node-template">
+            <a href="#single-machine">
+                <input name='custom' type="checkbox" class="custom" />
+                <label></label>
+                <h3 class="name">{{this.name}}</h3>
+                <span class="caption-wrapper">
+                    <h3 class="state"></h3><span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
+                </span>
+                <p class="description">
+                    <span class="tag backend ui-btn-corner-all">{{backend.title}}</span>
+                    <span class="tag ui-btn-corner-all">tag1</span>
+                    <span class="tag ui-btn-corner-all">tag2</span>
+                </p>
+                <span class="bubble-container">
+                    <span class="ui-li-count node-icon key-icon"></span>
+                </span>
+            </a>
+        </li>
+        {{/each}}
+        {{/view}}
+        {{/each}}
         </ul>
-
+        </script>
 
     </div><!-- /content -->
 
