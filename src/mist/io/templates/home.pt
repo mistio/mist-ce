@@ -137,24 +137,7 @@
         {{#each Mist.backendsController}}        
         {{#each this.machines}}
         {{#view Mist.MachineListView machineBinding="this"}}
-        <li>
-            <a href="#single-machine">
-                <input name='custom' type="checkbox" class="custom" />
-                <label></label>
-                <h3 class="name">{{machine.name}}</h3>
-                <span class="caption-wrapper">
-                    <h3 class="state"></h3><span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
-                </span>
-                <p class="description">
-                    <span class="tag backend ui-btn-corner-all">{{machine.backend.title}}</span>
-                    <span class="tag ui-btn-corner-all">tag1</span>
-                    <span class="tag ui-btn-corner-all">tag2</span>
-                </p>
-                <span class="bubble-container">
-                    <span class="ui-li-count node-icon key-icon"></span>
-                </span>
-            </a>
-        </li>
+
         {{/view}}
         {{/each}}
         {{/each}}
