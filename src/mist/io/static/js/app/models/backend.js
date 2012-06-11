@@ -12,7 +12,7 @@ define('app/models/backend', [
 			id: null,
 			title: null,
 		    provider: null,
-		    interval: null,
+		    poll_interval: null,
 		    host: null,
 		    status: 'unknown',
 		    machines: null,

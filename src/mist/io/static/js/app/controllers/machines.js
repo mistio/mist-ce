@@ -13,7 +13,13 @@ define('app/controllers/machines', [
 			
 			init: function() {
 				this._super();
+				this.refresh();
+			},
 			
+
+			refresh: function(){
+				console.log("refreshing machines");
+				
 				var that = this;
 				$.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
 					var content = [];
@@ -24,8 +30,13 @@ define('app/controllers/machines', [
 						
 					});
 					that.set('content', content);
+					Ember.run.later(that, function(){
+						this.refresh();
+				    }, that.backend.poll_interval);
 				});
+				
 			}
+		
 		});
 	}
 );
