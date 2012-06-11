@@ -111,7 +111,11 @@
     <div data-role="header">
         <a href="#one" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
         <h1>Machines</h1>
-        <a class="state-providers" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right"></a>
+        <script type="text/x-handlebars">
+        <a href="#dialog-providers" 
+        data-rel="dialog" data-role="button" data-iconpos="notext" data-transition="slidedown" data-icon="check" 
+        {{bindAttr class="Mist.backendsController.status :state-providers "}} >
+        </script>
     </div><!-- /header -->
 
     <div data-role="content">
