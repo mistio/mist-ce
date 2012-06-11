@@ -16,11 +16,17 @@ define('app/controllers/machines', [
 				this.refresh();
 			},
 			
-
 			refresh: function(){
 				console.log("refreshing machines");
 				
+				if(this.backend.status == "offline"){
+					this.clear();
+					return;
+				}
+				
 				var that = this;
+				
+				//TODO notify in case of error
 				$.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
 					var content = [];
 					data.forEach(function(item){

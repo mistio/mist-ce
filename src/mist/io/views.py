@@ -333,7 +333,7 @@ def get_backends(request):
                          'title'        : b['title'],
                          'provider'     : b['provider'],
                          'poll_interval': b['poll_interval'],
-                         'status'       : 'off',
+                         'status'       : 'online',
                         })
         i = i + 1
 
