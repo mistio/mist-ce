@@ -9,10 +9,26 @@ define('app/views/edit_backend', [
 	 */
 	function(edit_backend_dialog_html) {
 		return Ember.View.extend({
+			attributeBindings:['data-role', 'data-theme'],
 			
-			tagName:false,
+			'data-role': 'content',
+			'data-theme': 'c',
 			
 		    //TODO add event handlers for each element on the dialog
+			
+			deleteButtonClick: function(){
+				$('#backend-delete-confirm').slideDown();
+			},
+			
+			deleteCancelButtonClick: function(){
+				$('#backend-delete-confirm').slideUp();
+			},
+			
+			deleteConfirmButtonClick: function(){
+				Mist.backendsController.removeObject(this.backend);
+				history.back();
+				// refresh backend buttons
+			},
 		    
 		    init: function() {
 				this._super();
