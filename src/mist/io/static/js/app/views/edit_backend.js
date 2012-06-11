@@ -27,6 +27,7 @@ define('app/views/edit_backend', [
 			deleteConfirmButtonClick: function(){
 				Mist.backendsController.removeObject(this.backend);
 				history.back();
+				$('#backend-delete-confirm').hide();
 				// refresh backend buttons
 			},
 		    
