@@ -161,49 +161,6 @@
 
 </div><!-- /machines page -->
 
-
-<!-- Start of details page -->
-<div data-role="page" id="single-machine" data-theme="c" class="type-interior">
-
-    <div data-role="header">
-        <a href="#machines" data-icon="arrow-l" data-direction="reverse" class="ui-btn-left">Machines</a>
-        <h1 id="single-machine-name">Machine name</h1>
-        <a class="state-providers" href="#dialog-providers" data-rel="dialog" data-iconpos="notext" data-transition="slidedown" data-icon="check" class="ui-btn-right"></a>
-    </div><!-- /header -->
-
-    <div id="single-view-header">
-        <h3 id="single-view-name">Machine Name</h3>
-        <span class="single-view-icon-wrapper"><span id="single-view-provider-icon"></span></span>
-        <span class="single-view-icon-wrapper"><span id="single-view-image-icon"></span></span>
-        <h3 id="single-view-status">Machine Status</h3>
-    </div>
-
-    <div data-role="content">
-
-        <div id="inform-monitoring" tal:condition="session">Monitoring is currently disabled for this machine. <a id="enable-monitoring">Enable monitoring</a></div>
-        <div data-role="collapsible" data-collapsed="false">
-            <h3>Basic Info</h3>
-            <span class="machine-basic-stuff"></span>
-
-        </div>
-        <div data-role="collapsible">
-            <h3>Full metadata list</h3>
-            <div id="machine-metadata"></div>
-        </div>
-
-    </div><!-- /content -->
-
-    <div id="single-footer" data-role="footer" data-theme="a">
-        <div id="actions" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" id="single-button-reboot" data-icon="refresh">Reboot</a>
-            <a data-role="button" id="single-button-destroy" data-icon="delete" data-transition="slidedown">Destroy</a>
-            <a href="#dialog-console" data-role="button" id="single-button-console" data-icon="gear" data-transition="slidedown">Console</a>
-            <a href="#dialog-tags" data-role="button" id="single-button-tags" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tag</a>
-        </div>
-    </div><!-- /footer -->
-
-</div><!-- /details page -->
-
 <!-- Start of confirm dialog -->
 <div data-role="dialog" id="dialog-confirm" data-transition="pop" class="mist-dialog">
     <div data-role="header">
@@ -274,8 +231,7 @@
         <h1>Edit backend</h1>
     </div>
     <script type="text/x-handlebars">
-    {{#view Mist.EditBackendView backendBinding="Mist.backend" }}
-    {{/view}}
+    {{view Mist.EditBackendView backendBinding="Mist.backend" }}
     </script>
 
 </div><!-- /edit backend dialog -->

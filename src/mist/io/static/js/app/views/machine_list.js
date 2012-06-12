@@ -14,8 +14,6 @@ define('app/views/machine_list', [
 			    	
 					var that = this;
 					
-					
-					
 			    	Em.run.next(function() {
 			    		
 			    		try {
@@ -44,6 +42,8 @@ define('app/views/machine_list', [
 			        		}
 			        		$this.checkboxradio("refresh");
 			        	}
+			        } else {
+			        	Mist.set('machine', this.machine);
 			        }
 			    },
 			    

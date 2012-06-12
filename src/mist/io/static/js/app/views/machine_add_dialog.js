@@ -9,7 +9,6 @@ define('app/views/machine_add_dialog', [
 	function(machine_add_dialog_html) {
 		return Ember.View.extend({
 			tagName: false,
-			templateName:'dialog-add',
 			
 			clear: function(){
 				console.log('clear');

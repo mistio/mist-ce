@@ -21,10 +21,11 @@ define( 'app', [
     'app/views/machine_list',
     'app/views/enable_backend_button',
     'app/views/machine_add_dialog',
+    'app/views/machine',
 	'ember',
 	'mobile',
 	], function($, BackendsController, Count, BackendButton, EditBackend, MachineList,
-			EnableBackendButton, MachineAddDialog) {
+			EnableBackendButton, MachineAddDialog, MachineView) {
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',
@@ -89,6 +90,9 @@ define( 'app', [
 		
 		var addDialog = MachineAddDialog.create();
 		addDialog.append();
+		
+		var machineView = MachineView.create();
+		machineView.append();
 		
 		// Expose the application globally
 		return window.Mist = App;
