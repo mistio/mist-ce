@@ -41,6 +41,26 @@ define('app/controllers/machines', [
 				    }, that.backend.poll_interval);
 				});
 				
+			},
+			
+			newMachine: function(name, image, size){
+				var payload = {
+	                    "name": name,
+	                    "location" : this.backend.id,
+	                    "image": image.id,
+	                    "size": size.id
+	            };
+				$.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(payload),
+                    url: 'backends/' + this.backend.index + '/machines',
+                    success: function(data) {
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                    }
+                });
 			}
 		
 		});

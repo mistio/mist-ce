@@ -14,6 +14,10 @@ define('app/controllers/backends', [
             
             newMachine: function(){
             	console.log("new machine");
+            	this.get('newMachineBackend').machines.newMachine(
+            			this.get('newMachineName'),
+            			this.get('newMachineImage'),
+            			this.get('newMachineSize'));
             },
             
             newMachineClear: function(){
