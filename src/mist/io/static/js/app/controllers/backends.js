@@ -11,7 +11,20 @@ define('app/controllers/backends', [
             machineCount: 0,
             imageCount: 0,
             status: "wait", // TODO make this property dynamic according to all backends statuses
-
+            
+            newMachine: function(){
+            	console.log("new machine");
+            },
+            
+            newMachineClear: function(){
+            	this.set('newMachineName', null);
+				this.set('newMachineBackend', null);				
+				this.set('newMachineImage', null);
+				this.set('newMachineSize', null);
+				this.set('newMachineCost', null);
+				this.set('newMachineReady', false);
+            },
+            
 			init: function() {
 				this._super();
 

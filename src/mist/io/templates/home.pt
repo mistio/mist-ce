@@ -71,7 +71,7 @@
 
 
 <!-- Start of add provider dialog -->
-<div data-role="page" id="add-backend" class="mist-dialog">
+<div data-role="page" id="add-backend" class="mist-dialog" tal:condition="session">
     <div data-role="header">
         <h1>Add Backend</h1>
     </div>
@@ -203,40 +203,6 @@
     </div><!-- /footer -->
 
 </div><!-- /details page -->
-
-
-<!-- Start of add dialog -->
-<div data-role="page" id="dialog-add" class="mist-dialog">
-    <div data-role="header">
-        <h1>Create Machine</h1>
-    </div>
-    <div data-role="content" data-theme="c">
-        <label for="create-machine-name">1. Name:</label>
-        <input name="create-machine-name" type="text" id="new-machine-name" ></input>
-        <label for="create-select-provider">2. Provider:</label>
-        <select name="create-select-provider" id="create-select-provider" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
-            <option>Select Provider</option>
-        </select>
-        <label for="create-select-image">3. Image:</label>
-        <select name="create-select-image" id="create-select-image" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
-            <option>Select Image</option>
-            <option value="ami-31814f58">working in ec2</option>
-            <option value="104">working in rack</option>
-        </select>
-        <label for="create-select-size">4. Size:</label>
-        <select name="create-select-size" id="create-select-size" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
-            <option>Select Size</option>
-            <option value="t1.micro">working in ec2</option>
-            <option value="1">working in rack</option>
-        </select>
-        <label for="create-machine-cost" class="select">Cost:</label>
-        <input name="create-machine-cost" type="text" id="new-machine-name" class="ui-disabled" > </input>
-        <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-            <button id="create-cancel" class="btn-left-full" data-theme="c">Back</button>
-            <button disabled="disabled" id="create-ok" class="btn-right-full" data-theme="b">Launch!</button>
-        </div>
-    </div>
-</div><!-- /add dialog -->
 
 <!-- Start of confirm dialog -->
 <div data-role="dialog" id="dialog-confirm" data-transition="pop" class="mist-dialog">

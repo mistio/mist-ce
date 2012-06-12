@@ -20,10 +20,11 @@ define( 'app', [
     'app/views/edit_backend',
     'app/views/machine_list',
     'app/views/enable_backend_button',
+    'app/views/machine_add_dialog',
 	'ember',
 	'mobile',
 	], function($, BackendsController, Count, BackendButton, EditBackend, MachineList,
-			EnableBackendButton) {
+			EnableBackendButton, MachineAddDialog) {
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',
@@ -70,12 +71,25 @@ define( 'app', [
 		    $('#machines-list').listview('refresh');
 		});
 		
+		App.Select = Ember.Select.extend({
+		    attributeBindings: ['name', "data-theme", "data-icon",
+                "data-native-menu"]
+		});
+		
+		App.TextField = Ember.TextField.extend({
+		    attributeBindings: ['name', "data-theme"]
+		});
+		
 		App.CountView = Count;
 		App.BackendButtonView = BackendButton;
 		App.EditBackendView = EditBackend;
 		App.MachineListView = MachineList;
 		App.EnableBackendButtonView = EnableBackendButton;
 		App.onOff = ['on', 'off'];
+		
+		var addDialog = MachineAddDialog.create();
+		addDialog.append();
+		
 		// Expose the application globally
 		return window.Mist = App;
 	}

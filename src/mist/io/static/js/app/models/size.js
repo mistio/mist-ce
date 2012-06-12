@@ -8,11 +8,9 @@ define('app/models/size', ['ember'],
 		return Ember.Object.extend({
 			id: null,
 			name: null,
-			id: null,
             bandwidth: null,
             disk: null,
             driver: null,
-            name: null,
             price: null,
             ram: null,
 		});
