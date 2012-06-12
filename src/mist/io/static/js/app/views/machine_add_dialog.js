@@ -29,6 +29,7 @@ define('app/views/machine_add_dialog', [
 		    },
 		    
 		    newMachineClicked: function(){
+		    	//FIXME there should be a way to bind the action directly to the controller
 		    	Mist.backendsController.newMachine();
 		    },
 

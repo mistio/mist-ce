@@ -25,6 +25,18 @@ define('app/controllers/backends', [
 				this.set('newMachineReady', false);
             },
             
+            updateNewMachineReady: function(){
+            	if(this.get('newMachineName') &&
+            			this.get('newMachineBackend') &&
+            			this.get('newMachineImage') &&
+            			this.get('newMachineSize') &&
+            			this.get('newMachineCost')){
+            		this.set('newMachineReady', true);
+            	} else {
+            		this.set('newMachineReady', false);
+            	}
+            },
+            
 			init: function() {
 				this._super();
 
@@ -74,6 +86,12 @@ define('app/controllers/backends', [
 						});
 					});
 				});
+				
+				this.addObserver('newMachineName', this, this.updateNewMachineReady);
+				this.addObserver('newMachineBackend', this, this.updateNewMachineReady);				
+				this.addObserver('newMachineImage', this, this.updateNewMachineReady);
+				this.addObserver('newMachineSize', this, this.updateNewMachineReady);
+				this.addObserver('newMachineCost', this, this.updateNewMachineReady);
 			}
 		});
 	}
