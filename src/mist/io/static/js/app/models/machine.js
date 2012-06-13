@@ -10,6 +10,16 @@ define('app/models/machine', ['ember'],
 			image: null,
 			name: null,
 			backend: null,
+			
+			reboot: function(){
+				console.log('reboot');
+				alert("Not implemented");
+			},
+			
+			destroy: function(){
+				console.log('destroy');
+				alert("Not implemented");
+			}
 		});
 	}
 );

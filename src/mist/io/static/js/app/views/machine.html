@@ -17,19 +17,13 @@
 			id="single-view-provider-icon"></span></span> <span
 			class="single-view-icon-wrapper"><span
 			id="single-view-image-icon"></span></span>
-		<h3 id="single-view-status">Machine Status</h3>
+		<h3 id="single-view-status">{{machine.state}}</h3>
 	</div>
 
 	<div data-role="content">
-
-		<div id="inform-monitoring" tal:condition="session">
-			Monitoring is currently disabled for this machine. <a
-				id="enable-monitoring">Enable monitoring</a>
-		</div>
 		<div data-role="collapsible" data-collapsed="false">
 			<h3>Basic Info</h3>
 			<span class="machine-basic-stuff"></span>
-
 		</div>
 		<div data-role="collapsible">
 			<h3>Full metadata list</h3>
@@ -41,11 +35,15 @@
 
 	<div id="single-footer" data-role="footer" data-theme="a">
 		<div id="actions" data-role="controlgroup" data-type="horizontal">
-			<a data-role="button" id="single-button-reboot" data-icon="refresh">Reboot</a>
+			<a data-role="button" id="single-button-reboot" data-icon="refresh"
+			{{action "reboot"}}>Reboot</a>
 			<a data-role="button" id="single-button-destroy" data-icon="delete"
-				data-transition="slidedown">Destroy</a> <a href="#dialog-console"
+				data-transition="slidedown"
+				{{action destroy}}>Destroy</a>
+			<a href="#dialog-console"
 				data-role="button" id="single-button-console" data-icon="gear"
-				data-transition="slidedown">Console</a> <a href="#dialog-tags"
+				data-transition="slidedown">Console</a> 
+			<a href="#dialog-tags"
 				data-role="button" id="single-button-tags" data-icon="grid"
 				data-rel="dialog" data-transition="slidedown">Tag</a>
 		</div>

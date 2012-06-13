@@ -15,6 +15,7 @@ require.config({
 define( 'app', [
 	'jquery',
     'app/controllers/backends',
+    'app/controllers/confirmation',
     'app/views/count',
     'app/views/backend_button',
     'app/views/edit_backend',
@@ -22,10 +23,11 @@ define( 'app', [
     'app/views/enable_backend_button',
     'app/views/machine_add_dialog',
     'app/views/machine',
+    'app/views/confirmation_dialog',
 	'ember',
 	'mobile',
-	], function($, BackendsController, Count, BackendButton, EditBackend, MachineList,
-			EnableBackendButton, MachineAddDialog, MachineView) {
+	], function($, BackendsController, ConfirmationController, Count, BackendButton, EditBackend, MachineList,
+			EnableBackendButton, MachineAddDialog, MachineView, ConfirmationDialog) {
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',
@@ -59,7 +61,12 @@ define( 'app', [
 				this.set(
 					'backendsController',
 					BackendsController.create()
-				);					
+				);
+				
+				this.set(
+						'confirmationController',
+						ConfirmationController.create()
+					);
 
 				// Run specs if asked
 				if ( location.hash.match( /specs/ ) ) {
@@ -93,6 +100,9 @@ define( 'app', [
 		
 		var machineView = MachineView.create();
 		machineView.append();
+		
+		var confirmationDialog = ConfirmationDialog.create();
+		confirmationDialog.append();
 		
 		// Expose the application globally
 		return window.Mist = App;
