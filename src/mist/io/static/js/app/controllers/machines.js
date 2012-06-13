@@ -30,6 +30,10 @@ define('app/controllers/machines', [
 				$.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
 					var content = [];
 					data.forEach(function(item){
+						
+						//FIXME don't replace content, update the machines instead with
+						// machine.set(item);
+						
 						var machine = Machine.create(item);
 						machine.set('backend', that.backend); //maybe bind this property
 						content.push(machine);

@@ -15,7 +15,25 @@ define('app/models/machine', ['ember'],
 				    },
 			
 			id: null,
-			image: null,
+			
+			imageId: null,
+			
+			image: Ember.computed(function(key, value) {
+			    // getter
+			    if (arguments.length === 1) {
+			    	if(!this.imageId){
+						return null;
+					}
+					var that = this;
+					return this.backend.images.getImage(this.imageId, function(image){
+						that.set('image', image);
+					});
+			    // setter
+			    } else {
+			      return value;
+			    }
+			  }).property('imageId'), 
+				
 			name: null,
 			backend: null,
 			
@@ -27,7 +45,8 @@ define('app/models/machine', ['ember'],
 			destroy: function(){
 				console.log('destroy');
 				alert("Not implemented");
-			}
+			},
+
 		});
 	}
 );

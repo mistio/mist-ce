@@ -81,7 +81,7 @@ def list_machines(request):
                     'uuid'          : m.get_uuid(),
                     'name'          : m.name,
                     # both rackspace and amazon have the image in the imageId extra attr,
-                    'image'         : m.image or m.extra.get('imageId', None),
+                    'imageId'         : m.image or m.extra.get('imageId', None),
                     # for rackspace get flavorId extra attr, for amazon the instancetype extra attr
                     'size'          : m.size or m.extra.get('flavorId', None) or m.extra.get('instancetype', None),
                     'state'         : m.state,

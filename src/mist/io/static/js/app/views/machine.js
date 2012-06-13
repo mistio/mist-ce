@@ -94,15 +94,6 @@ define('app/views/machine', [
 				
 				return 'provider-' + this.machine.backend.id;
 			}.property("machine"),
-			
-			imageTypeClass: function(){
-				if(!this.machine){
-					return "";
-				}
-				
-				//return 'image-' + this.machine.backend.id;
-				return "";//TODO
-			}.property("machine"),
 		    
 		    init: function() {
 				this._super();
