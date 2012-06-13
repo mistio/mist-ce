@@ -33,6 +33,77 @@ define('app/views/machine', [
 				Mist.confirmationController.show();
 			},
 			
+			metadata: function(){
+				if(!this.machine || !this.machine.extra){
+					return [];
+				}
+				var ret = [];
+				
+				$.each(this.machine.extra, function(key, value){
+					if (typeof(value) == 'string'){
+						ret.push({key:key, value: value});
+					}
+				});
+				return ret;
+			}.property("machine"),
+			
+			basicvars: function(){
+				if(!this.machine){
+					return [];
+				}
+		    
+				var basicvars = {
+						'Public IPs': this.machine.public_ips,
+						'Private IPs': this.machine.private_ips,
+						'Image': this.machine.image,
+						'DNS Name': this.machine.extra.dns_name,
+						'Launch Date': this.machine.extra.launchdatetime
+				};
+				
+				var ret = [];
+				
+				$.each(basicvars, function(key, value){
+					if (typeof(value) == 'string'){
+						ret.push({key:key, value: value});
+					}
+				});
+				
+				return ret;
+		    
+			}.property("machine"),
+			
+			name: function(){
+				if(!this.machine){
+					return "";
+				}
+				return this.machine.name || this.machine.id;
+			}.property("machine"),
+			
+			status: function(){
+				if(!this.machine){
+					return "";
+				}
+				
+				return this.machine.STATES[this.machine.state].toLowerCase();
+			}.property("machine"),
+			
+			providerIconClass: function(){
+				if(!this.machine){
+					return "";
+				}
+				
+				return 'provider-' + this.machine.backend.id;
+			}.property("machine"),
+			
+			imageTypeClass: function(){
+				if(!this.machine){
+					return "";
+				}
+				
+				//return 'image-' + this.machine.backend.id;
+				return "";//TODO
+			}.property("machine"),
+		    
 		    init: function() {
 				this._super();
 				// cannot have template in home.pt as pt complains

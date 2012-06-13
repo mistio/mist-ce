@@ -6,6 +6,14 @@ define('app/models/machine', ['ember'],
 	 */
 	function() {
 		return Ember.Object.extend({
+			STATES: {
+				    '0' : 'Running',
+				    '1' : 'Rebooting',
+				    '2' : 'Terminated',
+				    '3' : 'Pending',
+				    '4' : 'Unknown'
+				    },
+			
 			id: null,
 			image: null,
 			name: null,

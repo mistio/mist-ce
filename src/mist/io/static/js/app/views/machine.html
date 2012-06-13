@@ -4,7 +4,7 @@
 	<div data-role="header">
 		<a href="#machines" data-icon="arrow-l" data-direction="reverse"
 			class="ui-btn-left">Machines</a>
-		<h1 id="single-machine-name">{{machine.name}}</h1>
+		<h1 id="single-machine-name">{{name}}</h1>
 		<a class="state-providers" href="#dialog-providers" data-rel="dialog"
 			data-iconpos="notext" data-transition="slidedown" data-icon="check"
 			class="ui-btn-right"></a>
@@ -12,22 +12,40 @@
 	<!-- /header -->
 
 	<div id="single-view-header">
-		<h3 id="single-view-name">{{machine.name}}</h3>
-		<span class="single-view-icon-wrapper"><span
-			id="single-view-provider-icon"></span></span> <span
+		<h3 id="single-view-name">{{name}}</h3>
+		<span class="single-view-icon-wrapper" ><span
+			id="single-view-provider-icon" {{bindAttr class="providerIconClass"}}></span>
+			</span>
+			
+			<span
 			class="single-view-icon-wrapper"><span
-			id="single-view-image-icon"></span></span>
-		<h3 id="single-view-status">{{machine.state}}</h3>
+			id="single-view-image-icon" {{bindAttr class="imageTypeClass"}}></span></span>
+		<h3 id="single-view-status" {{bindAttr class="status"}}>{{status}}</h3>
 	</div>
 
 	<div data-role="content">
 		<div data-role="collapsible" data-collapsed="false">
 			<h3>Basic Info</h3>
-			<span class="machine-basic-stuff"></span>
+			<span class="machine-basic-stuff">
+			<table id="machine-basic-table">
+			{{#each basicvars}}
+			<tr>
+			 <td class="key">{{key}}</td>
+			 <td class="value">{{value}}</td>
+			</tr>
+			{{/each}}
+			</table>
+			</span>
 		</div>
 		<div data-role="collapsible">
 			<h3>Full metadata list</h3>
-			<div id="machine-metadata"></div>
+			<div id="machine-metadata">
+			<ul>
+			{{#each metadata}}
+			<li><strong>{{key}}</strong> {{value}}</li>
+			{{/each}}
+			</ul>
+			</div>
 		</div>
 
 	</div>
