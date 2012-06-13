@@ -42,8 +42,9 @@ define('app/controllers/images', [
 	                    url: 'backends/' + this.backend.index + '/image_details',
 	                    data: {id: id},
 	                    success: function(data) {
-	                    	that.content.push(Image.create(data));
-	                        callback(data);
+	                    	var image = Image.create(data);
+	                    	that.content.push(image);
+	                        callback(image);
 	                    },
 	                    error: function(jqXHR, textStatus, errorThrown) {
 	                    	//TODO notify globally

@@ -36,6 +36,7 @@ define('app/models/image', ['ember'],
 							return type;
 						}
 					}
+					return "generic";
 			}.property("id")
 		});
 	}
