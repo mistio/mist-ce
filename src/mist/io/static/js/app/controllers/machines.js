@@ -33,9 +33,8 @@ define('app/controllers/machines', [
 						
 						//FIXME don't replace content, update the machines instead with
 						// machine.set(item);
-						
+						item.backend = that.backend;
 						var machine = Machine.create(item);
-						machine.set('backend', that.backend); //maybe bind this property
 						content.push(machine);
 						
 					});

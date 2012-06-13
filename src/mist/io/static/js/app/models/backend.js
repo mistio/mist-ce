@@ -40,8 +40,8 @@ define('app/models/backend', [
 		    
 		    init: function() {
 				this._super();
-				this.machines = MachinesController.create({backend: this});
 				this.images = ImagesController.create({backend: this});
+				this.machines = MachinesController.create({backend: this});
 				this.sizes = SizesController.create({backend: this});
 				this.locations = LocationsController.create({backend: this});
 			},
