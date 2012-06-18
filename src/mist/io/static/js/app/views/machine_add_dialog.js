@@ -32,6 +32,10 @@ define('app/views/machine_add_dialog', [
 		    	Mist.backendsController.newMachine();
 		    	history.back();
 		    },
+		    
+		    backClicked: function(){
+		    	history.back();
+		    },
 
 		    init: function() {
 				this._super();

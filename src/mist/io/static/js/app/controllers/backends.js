@@ -33,8 +33,7 @@ define('app/controllers/backends', [
             	if(this.get('newMachineName') &&
             			this.get('newMachineBackend') &&
             			this.get('newMachineImage') &&
-            			this.get('newMachineSize') &&
-            			this.get('newMachineCost')){
+            			this.get('newMachineSize')){
             		this.set('newMachineReady', true);
             	} else {
             		this.set('newMachineReady', false);

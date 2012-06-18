@@ -51,7 +51,8 @@
         
 	   <div id="create-ok-cancel" class="btn-full" data-role="controlgroup"
 			data-type="horizontal">
-			<button id="create-cancel" class="btn-left-full" data-theme="c">Back</button>
+			<button id="create-cancel" class="btn-left-full" data-theme="c"
+			{{action "backClicked" }}>Back</button>
 			<button id="create-ok" class="btn-right-full"
 				data-theme="b" {{action "newMachineClicked" }} disabled="disabled">Launch!</button>
 		</div>

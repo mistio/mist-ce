@@ -526,10 +526,6 @@ a#mist-select-machines-button span.ui-btn-text {
     margin-top: 2em;
 }
 
-.btn-left-full, .btn-right-full {
-    width: 49%;
-}
-
 #new-machine-name {
     margin: 12px 0;
 }
