@@ -136,13 +136,10 @@
         Create
         </a>
         <script type="text/x-handlebars">
-        
         <ul id="machines-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" data-filter-placeholder="Filter machines..">
         {{#each Mist.backendsController}}        
         {{#each this.machines}}
-        {{#view Mist.MachineListView machineBinding="this"}}
-
-        {{/view}}
+        {{view Mist.MachineListView machineBinding="this"}}
         {{/each}}
         {{/each}}
         </ul>

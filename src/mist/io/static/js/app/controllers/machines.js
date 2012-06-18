@@ -11,6 +11,8 @@ define('app/controllers/machines', [
 		return Ember.ArrayController.extend({
 			backend: null,
 			
+			content: [],
+			
 			init: function() {
 				this._super();
 				this.refresh();
@@ -31,14 +33,46 @@ define('app/controllers/machines', [
 					var content = [];
 					data.forEach(function(item){
 						
+						/*
+						
+						var found = false;
+						if(that.content == null){
+							that.set("content", []);
+						}
+						
+						console.log("item id: " + item.id);
+						
+						that.content.forEach(function(machine){
+							console.log("machine id: " + machine.id);
+							
+							if(machine.id == item.id){
+								found = true;
+								console.log("found");
+								machine.set(item);
+								return false;
+							}
+						});
+						
+						if(!found){
+							console.log("not found, adding");
+							item.backend = that.backend;
+							var machine = Machine.create(item);
+							that.content.push(machine);
+							that.contentDidChange();
+						}
+						
 						//FIXME don't replace content, update the machines instead with
 						// machine.set(item);
+						*/
 						item.backend = that.backend;
 						var machine = Machine.create(item);
 						content.push(machine);
 						
 					});
 					that.set('content', content);
+					
+					// TODO handle deletion from server
+					
 					Ember.run.later(that, function(){
 						this.refresh();
 				    }, that.backend.poll_interval);

@@ -41,6 +41,17 @@ define('app/views/machine_list', [
 			        			$this.closest('.node').find('.mist-node-selected').remove();
 			        		}
 			        		$this.checkboxradio("refresh");
+			        		
+			        		var len = $('#machines-list input:checked').length; //FIXME don't use IDs
+			        	    if (len > 1) {
+			        	        $('#machines-footer').fadeIn(140);
+			        	        $('#machines #footer-console').addClass('ui-disabled');
+			        	    } else if (len > 0) {
+			        	        $('#machines-footer').fadeIn(140);
+			        	        $('#machines #footer-console').removeClass('ui-disabled');
+			        	    } else {
+			        	        $('#machines-footer').fadeOut(200);
+			        	    }
 			        	}
 			        } else {
 			        	Mist.set('machine', this.machine);

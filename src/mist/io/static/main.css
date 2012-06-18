@@ -692,6 +692,10 @@ a#tag-add {
     }
 }
 
+#machines-footer {
+	display: none;
+}
+
 /* Conditional for < 480px */
 @media only screen and (max-width: 480px) {
 
