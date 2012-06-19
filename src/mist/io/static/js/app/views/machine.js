@@ -1,5 +1,5 @@
 define('app/views/machine', [
-	'text!app/views/machine.html','ember'],
+	'text!app/templates/machine.html','ember'],
 	/**
 	 *
 	 * Machine page

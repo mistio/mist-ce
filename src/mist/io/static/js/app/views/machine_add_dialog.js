@@ -1,5 +1,5 @@
 define('app/views/machine_add_dialog', [
-	'text!app/views/machine_add_dialog.html','ember'],
+	'text!app/templates/machine_add_dialog.html','ember'],
 	/**
 	 *
 	 * Machine Add Dialog page

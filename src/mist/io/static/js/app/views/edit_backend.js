@@ -1,5 +1,5 @@
 define('app/views/edit_backend', [
-	'text!app/views/edit_backend_dialog.html',
+	'text!app/templates/edit_backend_dialog.html',
 	'ember'],
 	/**
 	 *

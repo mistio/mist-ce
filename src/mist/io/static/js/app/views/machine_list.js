@@ -1,5 +1,5 @@
 define('app/views/machine_list', [
-	'text!app/views/machine_list_item.html','ember'],
+	'text!app/templates/machine_list_item.html','ember'],
 	/**
 	 *
 	 * Machine List View

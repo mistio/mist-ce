@@ -1,5 +1,5 @@
 define('app/views/confirmation_dialog', [
-	'text!app/views/confirmation_dialog.html','ember'],
+	'text!app/templates/confirmation_dialog.html','ember'],
 	/**
 	 *
 	 * Confirmation Dialog
