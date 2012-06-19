@@ -413,43 +413,43 @@ a#mist-select-machines-button span.ui-btn-text {
     background-image: url(images/p31_sm.png);
 }
 
-#single-view-image-icon.image-windows {
+#single-view-image-icon.windows {
     background-image: url(images/image-windows.png);
 }
 
-#single-view-image-icon.image-oracle {
+#single-view-image-icon.oracle {
     background-image: url(images/image-oracle.png);
 }
 
-#single-view-image-icon.image-canonical {
+#single-view-image-icon.canonical {
     background-image: url(images/image-canonical.png);
 }
 
-#single-view-image-icon.image-ibm {
+#single-view-image-icon.ibm {
     background-image: url(images/image-ibm.png);
 }
 
-#single-view-image-icon.image-debian {
+#single-view-image-icon.debian {
     background-image: url(images/image-debian.png);
 }
 
-#single-view-image-icon.image-gentoo {
+#single-view-image-icon.gentoo {
     background-image: url(images/image-gentoo.png);
 }
 
-#single-view-image-icon.image-ubuntu {
+#single-view-image-icon.ubuntu {
     background-image: url(images/image-ubuntu.png);
 }
 
-#single-view-image-icon.image-suse {
+#single-view-image-icon.suse {
     background-image: url(images/image-suse.png);
 }
 
-#single-view-image-icon.image-opensolaris {
+#single-view-image-icon.opensolaris {
     background-image: url(images/image-opensolaris.png);
 }
 
-#single-view-image-icon.image-fedora {
+#single-view-image-icon.fedora {
     background-image: url(images/image-fedora.png);
 }
 
