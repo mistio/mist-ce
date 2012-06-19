@@ -35,7 +35,6 @@ define( 'app', [
 			// Sets up mocha to run some integration tests
 			specsRunner: function( chai ) {
 				// Create placeholder for mocha output
-				// TODO: Make this shit look better and inside body
 				$( document.body ).before( '<div id="mocha"></div>' );
 
 				// Setup mocha and expose chai matchers
@@ -44,11 +43,9 @@ define( 'app', [
 
 				// Load testsuite
 				require([
-					'app/specs/models/store',
-					'app/specs/views/basic_acceptance',
-					'app/specs/controllers/todos'
+					'app/specs/templates/basic_acceptance'
 				], function() {
-						mocha.run().globals( [ '$', 'Ember', 'Todos' ] );
+						mocha.run().globals( [ '$', 'Ember', 'Mist' ] );
 					}
 				);
 			},
