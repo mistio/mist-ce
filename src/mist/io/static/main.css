@@ -394,15 +394,22 @@ a#mist-select-machines-button span.ui-btn-text {
     background-repeat: no-repeat;
 }
 
-#single-view-provider-icon.provider-0 {
+
+/* indices do not help here, let's use types as defined in
+ libcloud.compute.types.Provider (we will use numbers, match in the Python) */
+
+/* EC2 */
+#single-view-provider-icon.provider-1 {
     background-image: url(images/p1_sm.png);
 }
 
-#single-view-provider-icon.provider-1 {
+/* RackSpace */
+#single-view-provider-icon.provider-3 {
     background-image: url(images/p3_sm.png);
 }
 
-#single-view-provider-icon.provider-2 {
+/* OpenStack */
+#single-view-provider-icon.provider-31 {
     background-image: url(images/p31_sm.png);
 }
 

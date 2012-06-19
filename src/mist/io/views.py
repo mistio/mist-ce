@@ -312,7 +312,10 @@ def get_image_details(request):
     except:
         return Response('Backend unavailable', 503)
 
-    ret = {'id'    : image.id,
+    if image is None:
+        ret = {}
+    else:
+        ret = {'id'    : image.id,
                 'extra' : image.extra,
                 'name'  : image.name,}
     return ret

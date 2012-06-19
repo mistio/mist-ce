@@ -92,7 +92,7 @@ define('app/views/machine', [
 					return "";
 				}
 				
-				return 'provider-' + this.machine.backend.id;
+				return 'provider-' + this.machine.backend.provider;
 			}.property("machine"),
 		    
 		    init: function() {
