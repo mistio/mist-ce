@@ -32,6 +32,10 @@ define('app/models/machine', ['ember'],
 				alert("Not implemented");
 			},
 			
+			stateString: function(){
+				return this.STATES[this.state].toLowerCase();
+			}.property("state"),
+			
 			init: function(){
 				this._super();
 				var that = this;

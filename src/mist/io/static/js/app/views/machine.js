@@ -79,14 +79,6 @@ define('app/views/machine', [
 				return this.machine.name || this.machine.id;
 			}.property("machine"),
 			
-			status: function(){
-				if(!this.machine){
-					return "";
-				}
-				
-				return this.machine.STATES[this.machine.state].toLowerCase();
-			}.property("machine"),
-			
 			providerIconClass: function(){
 				if(!this.machine){
 					return "";

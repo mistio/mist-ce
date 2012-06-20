@@ -32,7 +32,7 @@ define('app/models/image', ['ember'],
 			
 			type: function(){
 					for(type in this.TYPES){
-						if(this.name.toLowerCase().search(type) != -1){
+						if(this.name != null && this.name.toLowerCase().search(type) != -1){
 							return type;
 						}
 					}
