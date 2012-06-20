@@ -20,6 +20,8 @@ define('app/controllers/locations', [
 						content.push(Location.create(item));
 					});
 					that.set('content', content);
+				}).error(function() {
+					Mist.notificationController.notify("Error loading locations for backend: " + that.backend.title);
 				});
 			}
 		});

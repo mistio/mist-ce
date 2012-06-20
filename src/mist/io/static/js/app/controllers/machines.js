@@ -68,7 +68,7 @@ define('app/controllers/machines', [
 						var machine = Machine.create(item);
 						content.push(machine);
 						
-					});
+					})
 					that.set('content', content);
 					
 					// TODO handle deletion from server
@@ -76,6 +76,8 @@ define('app/controllers/machines', [
 					Ember.run.later(that, function(){
 						this.refresh();
 				    }, that.backend.poll_interval);
+				}).error(function() {
+					Mist.notificationController.notify("Error loading machines for backend: " + that.backend.title);
 				});
 				
 			},

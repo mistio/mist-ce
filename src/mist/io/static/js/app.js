@@ -16,6 +16,7 @@ define( 'app', [
 	'jquery',
     'app/controllers/backends',
     'app/controllers/confirmation',
+    'app/controllers/notification',
     'app/views/count',
     'app/views/backend_button',
     'app/views/edit_backend',
@@ -26,7 +27,8 @@ define( 'app', [
     'app/views/confirmation_dialog',
 	'ember',
 	'mobile',
-	], function($, BackendsController, ConfirmationController, Count, BackendButton, EditBackend, MachineList,
+	], function($, BackendsController, ConfirmationController, 
+			NotificationController, Count, BackendButton, EditBackend, MachineList,
 			EnableBackendButton, MachineAddDialog, MachineView, ConfirmationDialog) {
 		var App = Ember.Application.create({
 
@@ -63,6 +65,11 @@ define( 'app', [
 				this.set(
 						'confirmationController',
 						ConfirmationController.create()
+					);
+				
+				this.set(
+						'notificationController',
+						NotificationController.create()
 					);
 
 				// Run specs if asked

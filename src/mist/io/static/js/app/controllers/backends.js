@@ -88,6 +88,8 @@ define('app/controllers/backends', [
 						    that.set('status', state);
 						});
 					});
+				}).error(function() {
+					Mist.notificationController.notify("Error loading backends");
 				});
 				
 				this.addObserver('newMachineName', this, this.updateNewMachineReady);

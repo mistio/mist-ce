@@ -47,8 +47,8 @@ define('app/controllers/images', [
 	                        callback(image);
 	                    },
 	                    error: function(jqXHR, textStatus, errorThrown) {
-	                    	//TODO notify globally
-	                        console.error("get image details failed for image: " + id);
+	        				Mist.notificationController.notify("Error loading image id:" + id);
+	        				
 	                    }
 	                });
 		    	}
@@ -64,6 +64,8 @@ define('app/controllers/images', [
 						content.push(Image.create(item));
 					});
 					that.set('content', content);
+				}).error(function() {
+					Mist.notificationController.notify("Error loading images for backend: " + that.backend.title);
 				});
 			}
 		});
