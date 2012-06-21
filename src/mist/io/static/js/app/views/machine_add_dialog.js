@@ -68,6 +68,68 @@ define('app/views/machine_add_dialog', [
 							}
 						});
 					});
+					
+					Mist.backendsController.addObserver('newMachineNameReady', function(sender, machineReady, value, rev) {
+						Ember.run.next(function(){
+							try {
+								if(value){
+									$('#create-select-provider').selectmenu('enable');
+									$('#create-select-image').selectmenu('disable');
+									$('#create-select-size').selectmenu('disable');
+								} else {
+									$('#create-select-provider').selectmenu('disable');
+									$('#create-select-image').selectmenu('disable');
+									$('#create-select-size').selectmenu('disable');
+								}
+							} catch (e){
+								
+							}
+						});
+					});
+					
+					Mist.backendsController.addObserver('newMachineBackendReady', function(sender, machineReady, value, rev) {
+						Ember.run.next(function(){
+							try {
+								if(value){
+									$('#create-select-image').selectmenu('enable');
+									$('#create-select-size').selectmenu('disable');
+								} else {
+									$('#create-select-image').selectmenu('disable');
+									$('#create-select-size').selectmenu('disable');
+								}
+							} catch (e){
+								
+							}
+						});
+					});
+					
+					Mist.backendsController.addObserver('newMachineImageReady', function(sender, machineReady, value, rev) {
+						Ember.run.next(function(){
+							try {
+								if(value){
+									$('#create-select-size').selectmenu('enable');
+								} else {
+									$('#create-select-size').selectmenu('disable');
+								}
+							} catch (e){
+								
+							}
+						});
+					});
+					
+					Mist.backendsController.addObserver('newMachineSizeReady', function(sender, machineReady, value, rev) {
+						Ember.run.next(function(){
+							try {
+								if(value){
+									$('#create-ok').button('enable');
+								} else {
+									$('#create-ok').button('disable');
+								}
+							} catch (e){
+								
+							}
+						});
+					});
 				});
 			},
 		});

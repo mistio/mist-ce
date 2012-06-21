@@ -26,7 +26,6 @@ define('app/controllers/backends', [
 				this.set('newMachineImage', null);
 				this.set('newMachineSize', null);
 				this.set('newMachineCost', null);
-				this.set('newMachineReady', false);
             },
             
             updateNewMachineReady: function(){
@@ -38,6 +37,11 @@ define('app/controllers/backends', [
             	} else {
             		this.set('newMachineReady', false);
             	}
+            	
+            	this.set('newMachineNameReady', !!this.get('newMachineName'));
+            	this.set('newMachineBackendReady', !!this.get('newMachineBackend'));
+            	this.set('newMachineImageReady', !!this.get('newMachineImage'));
+            	this.get('newMachineSizeReady', !!this.get('newMachineSize'));
             },
             
 			init: function() {

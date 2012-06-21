@@ -85,7 +85,7 @@ define( 'app', [
 		
 		App.Select = Ember.Select.extend({
 		    attributeBindings: ['name', "data-theme", "data-icon",
-                "data-native-menu"]
+                "data-native-menu", 'disabled']
 		});
 		
 		App.TextField = Ember.TextField.extend({
