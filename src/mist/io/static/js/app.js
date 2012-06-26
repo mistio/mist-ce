@@ -17,6 +17,7 @@ define( 'app', [
     'app/controllers/backends',
     'app/controllers/confirmation',
     'app/controllers/notification',
+    'app/controllers/machine_add',
     'app/views/count',
     'app/views/backend_button',
     'app/views/edit_backend',
@@ -28,7 +29,8 @@ define( 'app', [
 	'ember',
 	'mobile',
 	], function($, BackendsController, ConfirmationController, 
-			NotificationController, Count, BackendButton, EditBackend, MachineList,
+			NotificationController, MachineAddController,
+			Count, BackendButton, EditBackend, MachineList,
 			EnableBackendButton, MachineAddDialog, MachineView, ConfirmationDialog) {
 		var App = Ember.Application.create({
 
@@ -56,7 +58,6 @@ define( 'app', [
 			init: function() {
 				this._super();
 
-				// Initiate main controller
 				this.set(
 					'backendsController',
 					BackendsController.create()
@@ -72,6 +73,11 @@ define( 'app', [
 						NotificationController.create()
 					);
 
+				this.set(
+						'machineAddController',
+						MachineAddController.create()
+					);
+				
 				// Run specs if asked
 				if ( location.hash.match( /specs/ ) ) {
 					require( [ 'chai', 'mocha' ], this.specsRunner );

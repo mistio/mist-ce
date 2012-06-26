@@ -12,7 +12,7 @@ define('app/views/machine_add_dialog', [
 			
 			clear: function(){
 				console.log('clear');
-				Mist.backendsController.newMachineClear();
+				Mist.machineAddController.newMachineClear();
 			},
 			
 			didInsertElement: function() {
@@ -29,7 +29,7 @@ define('app/views/machine_add_dialog', [
 		    
 		    newMachineClicked: function(){
 		    	//FIXME there should be a way to bind the action directly to the controller
-		    	Mist.backendsController.newMachine();
+		    	Mist.machineAddController.newMachine();
 		    	history.back();
 		    },
 		    
@@ -43,7 +43,7 @@ define('app/views/machine_add_dialog', [
 				this.set('template', Ember.Handlebars.compile(machine_add_dialog_html));
 				
 				Ember.run.next(function(){
-					Mist.backendsController.addObserver('newMachineBackend', function() {
+					Mist.machineAddController.addObserver('newMachineBackend', function() {
 						Ember.run.next(function(){
 							try {
 								$('#create-select-provider').selectmenu('refresh');
@@ -55,7 +55,7 @@ define('app/views/machine_add_dialog', [
 						});
 					});
 					
-					Mist.backendsController.addObserver('newMachineReady', function(sender, machineReady, value, rev) {
+					Mist.machineAddController.addObserver('newMachineReady', function(sender, machineReady, value, rev) {
 						Ember.run.next(function(){
 							try {
 								if(value){
@@ -69,7 +69,7 @@ define('app/views/machine_add_dialog', [
 						});
 					});
 					
-					Mist.backendsController.addObserver('newMachineNameReady', function(sender, machineReady, value, rev) {
+					Mist.machineAddController.addObserver('newMachineNameReady', function(sender, machineReady, value, rev) {
 						Ember.run.next(function(){
 							try {
 								if(value){
@@ -87,7 +87,7 @@ define('app/views/machine_add_dialog', [
 						});
 					});
 					
-					Mist.backendsController.addObserver('newMachineBackendReady', function(sender, machineReady, value, rev) {
+					Mist.machineAddController.addObserver('newMachineBackendReady', function(sender, machineReady, value, rev) {
 						Ember.run.next(function(){
 							try {
 								if(value){
@@ -103,7 +103,7 @@ define('app/views/machine_add_dialog', [
 						});
 					});
 					
-					Mist.backendsController.addObserver('newMachineImageReady', function(sender, machineReady, value, rev) {
+					Mist.machineAddController.addObserver('newMachineImageReady', function(sender, machineReady, value, rev) {
 						Ember.run.next(function(){
 							try {
 								if(value){
@@ -117,7 +117,7 @@ define('app/views/machine_add_dialog', [
 						});
 					});
 					
-					Mist.backendsController.addObserver('newMachineSizeReady', function(sender, machineReady, value, rev) {
+					Mist.machineAddController.addObserver('newMachineSizeReady', function(sender, machineReady, value, rev) {
 						Ember.run.next(function(){
 							try {
 								if(value){

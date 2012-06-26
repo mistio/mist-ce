@@ -4,7 +4,7 @@
 	</div>
 	<div data-role="content" data-theme="c">
 		<label for="create-machine-name">1. Name:</label>
-		{{view Mist.TextField valueBinding="Mist.backendsController.newMachineName" 
+		{{view Mist.TextField valueBinding="Mist.machineAddController.newMachineName" 
 		name="create-machine-name" id="create-machine-name"}}
 		
 		<label for="create-select-provider">2. Provider:</label>
@@ -13,7 +13,7 @@
                           optionLabelPath="content.title"
                           optionValuePath="content.provider"
                           prompt="Select Provider"
-                          selectionBinding="Mist.backendsController.newMachineBackend"
+                          selectionBinding="Mist.machineAddController.newMachineBackend"
                           class="create-select" data-theme="c" data-icon="check"
                           data-native-menu="false" id="create-select-provider"
                           name="create-select-provider"
@@ -22,11 +22,11 @@
 		
 		<label for="create-select-image">3. Image:</label> 
 		
-		{{view Mist.Select contentBinding="Mist.backendsController.newMachineBackend.images"
+		{{view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.images"
                           optionLabelPath="content.name"
                           optionValuePath="content.id"
                           prompt="Select Image"
-                          selectionBinding="Mist.backendsController.newMachineImage"
+                          selectionBinding="Mist.machineAddController.newMachineImage"
                           class="create-select" data-theme="c" data-icon="check"
                           data-native-menu="false" id="create-select-image"
                           name="create-select-image"
@@ -35,11 +35,11 @@
 		
 		<label for="create-select-size">4. Size:</label>
 
-		{{view Mist.Select contentBinding="Mist.backendsController.newMachineBackend.sizes"
+		{{view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.sizes"
                           optionLabelPath="content.name"
                           optionValuePath="content.id"
                           prompt="Select Size"
-                          selectionBinding="Mist.backendsController.newMachineSize"
+                          selectionBinding="Mist.machineAddController.newMachineSize"
                           class="create-select" data-theme="c" data-icon="check"
                           data-native-menu="false" id="create-select-size"
                           name="create-select-size"
@@ -49,7 +49,7 @@
 
        <label for="create-machine-cost" class="select">Cost:</label>
        
-       {{view Mist.TextField valueBinding="Mist.backendsController.newMachineCost" 
+       {{view Mist.TextField valueBinding="Mist.machineAddController.newMachineCost" 
         name="create-machine-cost" id="create-machine-cost"}}
         
 	   <div id="create-ok-cancel" class="btn-full" data-role="controlgroup"
