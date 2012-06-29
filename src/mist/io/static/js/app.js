@@ -18,6 +18,7 @@ define( 'app', [
     'app/controllers/confirmation',
     'app/controllers/notification',
     'app/controllers/machine_add',
+    'app/controllers/select_machines',
     'app/views/count',
     'app/views/backend_button',
     'app/views/edit_backend',
@@ -30,6 +31,7 @@ define( 'app', [
 	'mobile',
 	], function($, BackendsController, ConfirmationController, 
 			NotificationController, MachineAddController,
+			SelectMachinesController,
 			Count, BackendButton, EditBackend, MachineList,
 			EnableBackendButton, MachineAddDialog, MachineView, ConfirmationDialog) {
 		var App = Ember.Application.create({
@@ -76,6 +78,11 @@ define( 'app', [
 				this.set(
 						'machineAddController',
 						MachineAddController.create()
+					);
+				
+				this.set(
+						'selectMachinesController',
+						SelectMachinesController.create()
 					);
 				
 				// Run specs if asked
