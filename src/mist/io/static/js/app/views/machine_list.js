@@ -25,11 +25,13 @@ define('app/views/machine_list', [
 				    			
 				    		}	
 			    		}
-			    		that.get('parentView').$().find("input[type='checkbox']").checkboxradio();
 			        });
 			    },
 			    
 			    checkBoxClick: function(event, el){
+			    	
+			    	console.log('machine clicked');
+			    	
 			    	if(event.target.tagName != 'A'){
 			        	event.stopPropagation();
 			        	if(event.target.tagName == 'INPUT'){
@@ -69,7 +71,19 @@ define('app/views/machine_list', [
 			    		} catch (e) {
 			    			that.get('parentView').$().find("input[type='checkbox']").checkboxradio();
 			    		}
+			    		
+		        		var len = $('#machines-list input:checked').length; //FIXME use data instead of DOM
+		        	    if (len > 1) {
+		        	        $('#machines-footer').fadeIn(140);
+		        	        $('#machines #footer-console').addClass('ui-disabled');
+		        	    } else if (len > 0) {
+		        	        $('#machines-footer').fadeIn(140);
+		        	        $('#machines #footer-console').removeClass('ui-disabled');
+		        	    } else {
+		        	        $('#machines-footer').fadeOut(200);
+		        	    }
 			    	});
+			    	
 			    }.observes('machine.selected'),
 			    
 			    init: function() {
