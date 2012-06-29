@@ -11,10 +11,11 @@ define('app/controllers/machines', [
 		return Ember.ArrayController.extend({
 			backend: null,
 			
-			content: [],
+			content: null,
 			
 			init: function() {
 				this._super();
+				this.set('content', []),
 				this.refresh();
 			},
 			
@@ -30,15 +31,13 @@ define('app/controllers/machines', [
 				
 				//TODO notify in case of error
 				$.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
-					var content = [];
+					
+					console.log("machines for " + that.backend.title);
+					console.log(data.length);
+					
 					data.forEach(function(item){
 						
-						/*
-						
 						var found = false;
-						if(that.content == null){
-							that.set("content", []);
-						}
 						
 						console.log("item id: " + item.id);
 						
@@ -63,13 +62,7 @@ define('app/controllers/machines', [
 						
 						//FIXME don't replace content, update the machines instead with
 						// machine.set(item);
-						*/
-						item.backend = that.backend;
-						var machine = Machine.create(item);
-						content.push(machine);
-						
 					})
-					that.set('content', content);
 					
 					// TODO handle deletion from server
 					
