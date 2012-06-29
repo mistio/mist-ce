@@ -59,12 +59,17 @@ define('app/views/machine_list', [
 			    },
 			    
 			    machineSelected: function(){
-			    	console.log('selected changed')
-			    	try { 
-			    		this.get('parentView').$().find("input[type='checkbox']").checkboxradio('refresh');
-			    	} catch (e) {
-			    		this.get('parentView').$().find("input[type='checkbox']").checkboxradio();
-			    	}
+			    	console.log('selected changed');
+
+			    	var that = this;
+			    	
+			    	Em.run.next(function() {
+			    		try { 
+			    			that.get('parentView').$().find("input[type='checkbox']").checkboxradio('refresh');
+			    		} catch (e) {
+			    			that.get('parentView').$().find("input[type='checkbox']").checkboxradio();
+			    		}
+			    	});
 			    }.observes('machine.selected'),
 			    
 			    init: function() {
