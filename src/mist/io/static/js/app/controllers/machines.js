@@ -35,6 +35,8 @@ define('app/controllers/machines', [
 					console.log("machines for " + that.backend.title);
 					console.log(data.length);
 					
+					var contentDidChange = false;
+					
 					data.forEach(function(item){
 						
 						var found = false;
@@ -57,12 +59,13 @@ define('app/controllers/machines', [
 							item.backend = that.backend;
 							var machine = Machine.create(item);
 							that.content.push(machine);
-							that.contentDidChange();
+							contentDidChange = true;
 						}
-						
-						//FIXME don't replace content, update the machines instead with
-						// machine.set(item);
 					})
+					
+					if(contentDidChange){
+						that.contentDidChange();
+					}
 					
 					// TODO handle deletion from server
 					
