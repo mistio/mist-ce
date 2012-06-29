@@ -105,6 +105,10 @@ define( 'app', [
 		    attributeBindings: ['name', "data-theme"]
 		});
 		
+		App.Checkbox = Ember.Checkbox.extend({
+		    attributeBindings: ['name', "id"]
+		});
+		
 		App.CountView = Count;
 		App.BackendButtonView = BackendButton;
 		App.EditBackendView = EditBackend;

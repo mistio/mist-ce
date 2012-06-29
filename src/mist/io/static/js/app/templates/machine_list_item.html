@@ -1,7 +1,8 @@
 <li class="node prov-{{unbound content.backend.provider}}"><a
-    href="#single-machine" {{action "checkBoxClick" on="click"}}> <input 
-        type="checkbox" class="custom" {{bindAttr id="machine.id"}} {{bindAttr name="machine.id"}} /> <label
-        {{bindAttr for="machine.id"}} ></label>
+    href="#single-machine" {{action "checkBoxClick" on="click"}}> 
+    
+    {{view Mist.Checkbox checkedBinding="machine.selected" title="machine.name"}}
+        
         <h3 class="name">{{machine.name}}</h3> <span class="caption-wrapper">
             <h3 {{bindAttr class="machine.stateString :state"}}>{{machine.stateString}}</h3>
             <span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
