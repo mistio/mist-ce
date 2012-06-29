@@ -47,6 +47,11 @@ define('app/controllers/select_machines', ['ember'],
 								console.log('selecting machine: ' + machine.name);
 								machine.set('selected', true);							
 							});
+						} else {
+							backend.machines.forEach(function(machine){
+								console.log('selecting machine: ' + machine.name);
+								machine.set('selected', false);							
+							});
 						}
 					});
 				}
