@@ -58,6 +58,15 @@ define('app/views/machine_list', [
 			        }
 			    },
 			    
+			    machineSelected: function(){
+			    	console.log('selected changed')
+			    	try { 
+			    		this.get('parentView').$().find("input[type='checkbox']").checkboxradio('refresh');
+			    	} catch (e) {
+			    		this.get('parentView').$().find("input[type='checkbox']").checkboxradio();
+			    	}
+			    }.observes('machine.selected'),
+			    
 			    init: function() {
 					this._super();
 					// cannot have template in home.pt as pt complains
