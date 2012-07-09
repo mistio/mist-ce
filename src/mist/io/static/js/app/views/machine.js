@@ -52,10 +52,31 @@ define('app/views/machine', [
 					return [];
 				}
 		    
+				var publicIps = null;
+				
+				if($.isArray(this.machine.public_ips)){
+					publicIps = this.machine.public_ips.join();
+				} else if(typeof this.machine.public_ips === 'string'){
+					publicIps = this.machine.public_ips;
+				}
+				
+				var privateIps = null;
+				
+				if($.isArray(this.machine.private_ips)){
+					privateIps = this.machine.private_ips.join();
+				} else if(typeof this.machine.private_ips === 'string'){
+					privateIps = this.machine.private_ips;
+				}
+				
+				var imageName = null;
+				if('image' in this.machine && 'name' in this.machine.image){
+					imageName = this.machine.image.name;
+				}
+				
 				var basicvars = {
-						'Public IPs': this.machine.public_ips,
-						'Private IPs': this.machine.private_ips,
-						'Image': this.machine.image,
+						'Public IPs': publicIps,
+						'Private IPs': privateIps,
+						'Image': imageName,
 						'DNS Name': this.machine.extra.dns_name,
 						'Launch Date': this.machine.extra.launchdatetime
 				};

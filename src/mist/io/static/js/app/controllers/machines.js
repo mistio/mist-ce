@@ -63,11 +63,13 @@ define('app/controllers/machines', [
 						}
 					})
 					
+					// TODO handle deletion from server
+					
 					if(contentDidChange){
 						that.contentDidChange();
 					}
 					
-					// TODO handle deletion from server
+					
 					
 					Ember.run.later(that, function(){
 						this.refresh();
