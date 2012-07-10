@@ -20,7 +20,7 @@ define('app/controllers/machine_add', ['ember'],
 				this.set('newMachineBackend', null);				
 				this.set('newMachineImage', null);
 				this.set('newMachineSize', null);
-				this.set('newMachineCost', null);
+				this.set('newMachineCost', 0);
             },
             
             updateNewMachineReady: function(){
