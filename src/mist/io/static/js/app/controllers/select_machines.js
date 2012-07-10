@@ -75,15 +75,14 @@ define('app/controllers/select_machines', ['ember'],
 					var o = Ember.Object.create({
 					    arrayWillChange: Ember.K,
 					    arrayDidChange: function(array, start, removeCount, addCount) {
-							var content = [];
+							var c = that._content;
 							if(array == null){
 								return;
 							}
 							array.forEach(function(item){
-								content.push({name: item.title, id: item.id});
+								c.push({name: item.title, id: item.id});
 							});
-								
-							that.set('content', content);
+							that.set('content', c);
 					    },
 					});
 					Mist.backendsController.addArrayObserver(o);
