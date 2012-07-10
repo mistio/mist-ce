@@ -56,7 +56,7 @@ define('app/controllers/select_machines', ['ember'],
 					});
 				}
 			}.observes('selection'),
-			          
+			         
 			init: function() {
 				this._super();
 				
@@ -72,18 +72,21 @@ define('app/controllers/select_machines', ['ember'],
 					
 					that.set('content', content);
 					
-					// FIXME, race condition here
-					// Perhaps it'd be better as a property?
-					Mist.backendsController.addObserver('content', function(sender, machineReady, value, rev) {
-						
-						var content = that._content;
-						
-						value.forEach(function(item){
-							content.push({name: item.title, id: item.id});
-						});
-						
-						that.set('content', content);
+					var o = Ember.Object.create({
+					    arrayWillChange: Ember.K,
+					    arrayDidChange: function(array, start, removeCount, addCount) {
+							var content = [];
+							if(array == null){
+								return;
+							}
+							array.forEach(function(item){
+								content.push({name: item.title, id: item.id});
+							});
+								
+							that.set('content', content);
+					    },
 					});
+					Mist.backendsController.addArrayObserver(o);
 				});
 				
 			}
