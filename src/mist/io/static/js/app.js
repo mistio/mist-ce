@@ -89,6 +89,9 @@ define( 'app', [
 				if ( location.hash.match( /specs/ ) ) {
 					require( [ 'chai', 'mocha' ], this.specsRunner );
 				}
+				
+				$('#splash').fadeOut();
+				$('#main').show();
 			}
 		});
 		
@@ -117,13 +120,13 @@ define( 'app', [
 		App.onOff = ['on', 'off'];
 		
 		var addDialog = MachineAddDialog.create();
-		addDialog.append();
+		addDialog.appendTo("#main");
 		
 		var machineView = MachineView.create();
-		machineView.append();
+		machineView.appendTo("#main");
 		
 		var confirmationDialog = ConfirmationDialog.create();
-		confirmationDialog.append();
+		confirmationDialog.appendTo("#main");
 		
 		// Expose the application globally
 		return window.Mist = App;
