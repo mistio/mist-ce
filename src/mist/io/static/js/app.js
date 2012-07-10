@@ -89,6 +89,9 @@ define( 'app', [
 				if ( location.hash.match( /specs/ ) ) {
 					require( [ 'chai', 'mocha' ], this.specsRunner );
 				}
+				
+				$('#splash').fadeOut();
+				$('#main').show();
 			}
 		});
 		
