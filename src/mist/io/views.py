@@ -1,5 +1,7 @@
 '''mist.io views'''
 import json
+import logging
+
 from pyramid.response import Response
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
 from libcloud.compute.providers import get_driver
@@ -9,6 +11,7 @@ from libcloud.compute.types import Provider
 from mist.io.config import BACKENDS, BASE_EC2_AMIS
 from pyramid.view import view_config
 
+log = logging.getLogger('mist.io')
 
 def connect(request):
     '''Establish backend connection using the credentials specified'''
