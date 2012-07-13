@@ -120,13 +120,13 @@ define( 'app', [
 		App.onOff = ['on', 'off'];
 		
 		var addDialog = MachineAddDialog.create();
-		addDialog.appendTo("#main");
+		addDialog.append();
 		
 		var machineView = MachineView.create();
-		machineView.appendTo("#main");
+		machineView.append();
 		
 		var confirmationDialog = ConfirmationDialog.create();
-		confirmationDialog.appendTo("#main");
+		confirmationDialog.append();
 		
 		// Expose the application globally
 		return window.Mist = App;

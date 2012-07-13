@@ -760,4 +760,8 @@ a#tag-add {
     }
 }
 
+[data-role="page"], [data-role="dialog"] {
+    display: none;
+}
+
 }
