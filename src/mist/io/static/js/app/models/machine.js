@@ -22,6 +22,7 @@ define('app/models/machine', ['ember'],
 			name: null,
 			backend: null,
 			selected: false,
+			hasKey: false,
 			
 			reboot: function(){
 				console.log('reboot');
