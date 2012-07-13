@@ -22,7 +22,6 @@
 Loading...
 </div>
 
-<div id="main" style="display: none">
 <!-- Start of first page: #one -->
 <div data-role="page" id="one">
 
@@ -223,7 +222,6 @@ Loading...
 
 </div><!-- /edit backend dialog -->
 
-</div>
 </body>
 
 </html>
