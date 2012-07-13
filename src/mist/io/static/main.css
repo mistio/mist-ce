@@ -764,4 +764,11 @@ a#tag-add {
     display: none;
 }
 
+div#machines div.ui-header div {
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	right: 6px;
+}
+
 }
