@@ -31,33 +31,7 @@ define('app/views/machine_list', [
 			    checkBoxClick: function(event, el){
 			    	
 			    	console.log('machine clicked');
-			    	
-			    	if(event.target.tagName != 'A'){
-			        	event.stopPropagation();
-			        	if(event.target.tagName == 'INPUT'){
-			        		var $this = $(event.target);
-			        		var checked = $this.is(':checked');
-			        		if (checked) {
-			        			$this.closest('.node').append('<span class="mist-node-selected" style="display:none">mist-node-selected</span>');
-			        		} else {
-			        			$this.closest('.node').find('.mist-node-selected').remove();
-			        		}
-			        		$this.checkboxradio("refresh");
-			        		
-			        		var len = $('#machines-list input:checked').length; //FIXME don't use IDs
-			        	    if (len > 1) {
-			        	        $('#machines-footer').fadeIn(140);
-			        	        $('#machines #footer-console').addClass('ui-disabled');
-			        	    } else if (len > 0) {
-			        	        $('#machines-footer').fadeIn(140);
-			        	        $('#machines #footer-console').removeClass('ui-disabled');
-			        	    } else {
-			        	        $('#machines-footer').fadeOut(200);
-			        	    }
-			        	}
-			        } else {
-			        	Mist.set('machine', this.machine);
-			        }
+			    	Mist.set('machine', this.machine);
 			    },
 			    
 			    machineSelected: function(){
