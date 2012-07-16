@@ -26,7 +26,6 @@
 	<div data-role="content">
 		<div data-role="collapsible" data-collapsed="false">
 			<h3>Basic Info</h3>
-			<span class="machine-basic-stuff">
 			<table id="machine-basic-table">
 			{{#each basicvars}}
 			<tr>
@@ -35,17 +34,17 @@
 			</tr>
 			{{/each}}
 			</table>
-			</span>
 		</div>
 		<div data-role="collapsible">
 			<h3>Full metadata list</h3>
-			<div id="machine-metadata">
-			<ul>
+			<table id="machine-metadata">
 			{{#each metadata}}
-			<li><strong>{{key}}</strong> {{value}}</li>
+			<tr>
+			 <td class="key">{{key}}</td>
+			 <td class="value">{{value}}</td>
+			</tr>
 			{{/each}}
-			</ul>
-			</div>
+			</table>
 		</div>
 
 	</div>

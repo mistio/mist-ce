@@ -470,21 +470,17 @@ a#mist-select-machines-button span.ui-btn-text {
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.09);
 }
 
-.machine-basic-stuff {
-    display: block;
-}
-
-#machine-basic-table {
+#machine-basic-table, #machine-metadata {
     border-collapse:collapse;
     width: 100%;
     margin-top: 10px;
 }
 
-#machine-basic-table tr {
+#machine-basic-table tr, #machine-metadata tr {
     border: 1px solid #ccc;
 }
 
-#machine-basic-table td {
+#machine-basic-table td, #machine-metadata td {
     font-size: 14px;
     padding: 10px 12px;
     background: #fff;
@@ -492,33 +488,13 @@ a#mist-select-machines-button span.ui-btn-text {
     border: none;
 }
 
-#machine-basic-table .key {
+#machine-basic-table .key, #machine-metadata .key {
     font-weight: 300;
+    width: 40%;
 }
 
-#machine-basic-table .value {
+#machine-basic-table .value, #machine-metadata .value {
     font-weight: bold;
-}
-
-#machine-metadata ul {
-    font-size: 14px;
-    list-style: none;
-    padding: 0px;
-    border-top: 1px solid #ccc;
-}
-
-#machine-metadata ul ul {
-    border-top: none;
-    padding-left: 30px;
-    background: #666;
-}
-
-#machine-metadata li {
-    padding: 10px;
-    background: #fff;
-    border-bottom: 1px solid #ccc;
-    border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
 }
 
 /* DIALOGS */
