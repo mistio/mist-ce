@@ -154,6 +154,11 @@ Loading...
 <div data-role="dialog" id="dialog-console" class="mist-dialog">
     <div data-role="content" data-theme="a">
         <h3>Console</h3>
+        
+        <input type="text" name="name" id="console-input" value=""  />
+        <button>Submit</button>
+        <p id="console-return"></p>
+        
         <a href="index.html" data-role="button" data-rel="back" data-theme="a">Hide</a>
     </div>
 </div><!-- /console dialog -->
