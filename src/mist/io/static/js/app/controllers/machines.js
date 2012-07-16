@@ -29,7 +29,8 @@ define('app/controllers/machines', [
 				
 				var that = this;
 				
-				//TODO notify in case of error
+				this.backend.set('status', 'wait');
+				
 				$.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
 					
 					console.log("machines for " + that.backend.title);
@@ -69,13 +70,14 @@ define('app/controllers/machines', [
 						that.contentDidChange();
 					}
 					
-					
+					that.backend.set('status', 'online');
 					
 					Ember.run.later(that, function(){
 						this.refresh();
 				    }, that.backend.poll_interval);
 				}).error(function() {
 					Mist.notificationController.notify("Error loading machines for backend: " + that.backend.title);
+					that.backend.set('status', 'offline');
 				});
 				
 			},
