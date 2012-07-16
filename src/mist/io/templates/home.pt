@@ -36,18 +36,7 @@ Loading...
         <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
 <script type="text/x-handlebars">
 {{#each Mist.backendsController}}
-    {{#view Mist.BackendButtonView backendBinding="this" }}
-<a href="#edit-backend"
-    data-rel="dialog"
-    data-theme="c"
-    data-inline="true"
-    data-transition="slidedown"
-    data-corners="false"
-    data-shadow="false"
-    data-role="button"
-    {{action "openDialog" on="click"}}
-    class="backend-status-{{unbound backend.status}}">{{backend.title}}  
-    {{/view}}
+    {{view Mist.BackendButtonView backendBinding="this" }}
 {{/each}}
 </script>
 
