@@ -23,6 +23,7 @@ define( 'app', [
     'app/views/backend_button',
     'app/views/edit_backend',
     'app/views/machine_list',
+    'app/views/image_list',
     'app/views/enable_backend_button',
     'app/views/machine_add_dialog',
     'app/views/machine',
@@ -32,7 +33,7 @@ define( 'app', [
 	], function($, BackendsController, ConfirmationController, 
 			NotificationController, MachineAddController,
 			SelectMachinesController,
-			Count, BackendButton, EditBackend, MachineList,
+			Count, BackendButton, EditBackend, MachineList, ImageList,
 			EnableBackendButton, MachineAddDialog, MachineView, ConfirmationDialog) {
 		var App = Ember.Application.create({
 
@@ -116,6 +117,7 @@ define( 'app', [
 		App.BackendButtonView = BackendButton;
 		App.EditBackendView = EditBackend;
 		App.MachineListView = MachineList;
+		App.ImageListView = ImageList;
 		App.EnableBackendButtonView = EnableBackendButton;
 		App.onOff = ['on', 'off'];
 		
