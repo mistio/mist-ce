@@ -19,7 +19,7 @@
 <body>
 
 <div id="splash">
-Loading...
+    <div class="mist-logo"></div>
 </div>
 
 <!-- Start of first page: #one -->

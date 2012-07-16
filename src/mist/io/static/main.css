@@ -11,6 +11,28 @@
     z-index: 0;
 }
 
+/* Splash (loading) page */
+
+div#splash {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    background: #c2c3c4 url('images/bg_splash.gif') top left repeat;
+}
+
+div#splash div.mist-logo {
+    width: 280px;
+    height: 280px;
+    background: url('logo_splash.png') center no-repeat;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -140px;
+    margin-top: -140px;
+}
+
 /* Home Page */
 
 /* Add backend button top margin */
