@@ -527,6 +527,12 @@ a#mist-select-machines-button span.ui-btn-text {
     margin: 0 auto 15px auto; 
 }
 
+/* Hiding of X */
+
+.ui-dialog .ui-header .ui-btn-left {
+    display: none;
+}
+
 /* Create Dialog */
 
 .btn-full {
