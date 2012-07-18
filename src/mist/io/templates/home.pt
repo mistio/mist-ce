@@ -91,7 +91,7 @@
         <label for="apisecret">3. API Secret:</label>
         <input name="apisecret" type="text" id="new-apisecret" ></input>
         <div id="create-backend-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-            <a id="create-backend-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Back</a>
+            <a id="create-backend-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Close</a>
             <a id="create-backend-ok" class="btn-right-full" data-role="button" data-rel="back" data-theme="b">Add</a>
         </div>
     </div>
@@ -171,7 +171,7 @@
     <div data-role="content">
         <ul id="providers-status-list" data-role="listview" data-inset="true" data-theme="c" data-dividertheme="d">
         </ul>
-        <a href="index.html" data-role="button" data-icon="arrow-l" data-rel="back" data-transition="slidedown" data-theme="c">Back</a>
+        <a href="index.html" data-role="button" data-icon="arrow-l" data-rel="back" data-transition="slidedown" data-theme="c">Close</a>
     </div>
 </div><!-- /provider status dialog -->
 
@@ -192,7 +192,7 @@
                 <li><a data-role="button" data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>tag3</li>
                 <li><a data-role="button" data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>tag4</li>
         </div>
-            <a id="tag-back" data-rel="back" data-role="button" data-transition="flip" data-theme="b">Back</a>
+            <a id="tag-back" data-rel="back" data-role="button" data-transition="flip" data-theme="b">Close</a>
     </div>
 </div><!-- /providers dialog -->
 
