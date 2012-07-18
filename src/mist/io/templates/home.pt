@@ -19,7 +19,7 @@
 <body>
 
 <div id="splash">
-Loading...
+    <div class="mist-logo"></div>
 </div>
 
 <!-- Start of first page: #one -->
@@ -36,18 +36,7 @@ Loading...
         <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
 <script type="text/x-handlebars">
 {{#each Mist.backendsController}}
-    {{#view Mist.BackendButtonView backendBinding="this" }}
-<a href="#edit-backend"
-    data-rel="dialog"
-    data-theme="c"
-    data-inline="true"
-    data-transition="slidedown"
-    data-corners="false"
-    data-shadow="false"
-    data-role="button"
-    {{action "openDialog" on="click"}}
-    class="backend-status-{{unbound backend.status}}">{{backend.title}}  
-    {{/view}}
+    {{view Mist.BackendButtonView backendBinding="this" }}
 {{/each}}
 </script>
 
@@ -165,6 +154,11 @@ Loading...
 <div data-role="dialog" id="dialog-console" class="mist-dialog">
     <div data-role="content" data-theme="a">
         <h3>Console</h3>
+        
+        <input type="text" name="name" id="console-input" value=""  />
+        <button>Submit</button>
+        <p id="console-return"></p>
+        
         <a href="index.html" data-role="button" data-rel="back" data-theme="a">Hide</a>
     </div>
 </div><!-- /console dialog -->
@@ -221,6 +215,42 @@ Loading...
     </script>
 
 </div><!-- /edit backend dialog -->
+
+<!-- Start of images page: #images -->
+<div data-role="page" id="images" data-theme="c">
+
+    <div data-role="header">
+        <a href="#one" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
+        <h1>Images</h1>
+    </div><!-- /header -->
+
+    <div data-role="content">
+
+        <div id="logo-container"></div>
+        
+        <script type="text/x-handlebars">
+        <ul id="images-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" data-filter-placeholder="Filter images..">
+        {{#each Mist.backendsController}}        
+        {{#each this.images}}
+        {{view Mist.ImageListView imageBinding="this"}}
+        {{/each}}
+        {{/each}}
+        </ul>
+        </script>
+
+    </div><!-- /content -->
+
+    <div id="machines-footer" data-role="footer" data-theme="a">
+        <div id="actions" data-role="controlgroup" data-type="horizontal">
+            <a data-role="button" id="machines-button-reboot" data-icon="refresh">Reboot</a>
+            <a data-role="button" id="machines-button-destroy" data-icon="delete">Destroy</a>
+            <a id="machines-button-console" href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
+            <a id="machines-button-tags" href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tag</a>
+        </div>
+    </div><!-- /footer -->
+
+</div><!-- /images page -->
+
 
 </body>
 
