@@ -141,14 +141,47 @@
 
     <div id="machines-footer" data-role="footer" data-theme="a">
         <div id="actions" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" id="machines-button-reboot" data-icon="refresh">Reboot</a>
-            <a data-role="button" id="machines-button-destroy" data-icon="delete">Destroy</a>
-            <a id="machines-button-console" href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
-            <a id="machines-button-tags" href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tag</a>
+            <a href="#dialog-actions" 
+                id="machines-button-actions" 
+                data-role="button" 
+                data-icon="mist-actions"
+                data-rel="dialog"
+                data-transition="slidedown">
+                Actions
+            </a>
+            <a href="#dialog-console" 
+                id="machines-button-console" 
+                data-role="button" 
+                data-icon="gear" 
+                data-rel="dialog" 
+                data-transition="slidedown">
+                Console
+            </a>
+            <a href="#dialog-tags" 
+                id="machines-button-tags" 
+                data-role="button" 
+                data-icon="grid" 
+                data-rel="dialog" 
+                data-transition="slidedown">
+                Tag
+            </a>
         </div>
     </div><!-- /footer -->
 
 </div><!-- /machines page -->
+
+<!-- Start of machines list actions dialog -->
+<div data-role="dialog" id="dialog-actions" class="mist-dialog">
+    <div data-role="header">
+        <h1>Actions</h1>
+    </div>
+    <div data-role="content">
+        <a data-role="button">Reboot</a>
+        <a data-role="button">Shutdown</a>
+        <a data-role="button">Destroy</a>
+        <a data-role="button" data-rel="back" data-theme="b">Close</a>
+    </div>
+</div><!-- /machines list actions dialog -->
 
 <!-- Start of console dialog -->
 <div data-role="dialog" id="dialog-console" class="mist-dialog">

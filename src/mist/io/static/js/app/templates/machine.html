@@ -52,19 +52,45 @@
 
 	<div id="single-footer" data-role="footer" data-theme="a">
 		<div id="actions" data-role="controlgroup" data-type="horizontal">
-			<a data-role="button" id="single-button-reboot" data-icon="refresh"
-			{{action "reboot"}}>Reboot</a>
-			<a data-role="button" id="single-button-destroy" data-icon="delete"
-				data-transition="slidedown"
-				{{action destroy}}>Destroy</a>
+			<a href="#dialog-single-actions" 
+				data-role="button" 
+				id="single-button-actions" 
+				data-icon="mist-actions"
+				data-rel="dialog" 
+				data-transition="slidedown">
+				Actions
+			</a>
 			<a href="#dialog-console"
-				data-role="button" id="single-button-console" data-icon="gear"
-				data-transition="slidedown">Console</a> 
+				data-role="button" 
+				id="single-button-console" 
+				data-icon="gear"
+				data-rel="dialog" 
+				data-transition="slidedown">
+				Console
+			</a> 
 			<a href="#dialog-tags"
-				data-role="button" id="single-button-tags" data-icon="grid"
-				data-rel="dialog" data-transition="slidedown">Tag</a>
+				data-role="button" 
+				id="single-button-tags" 
+				data-icon="grid"
+				data-rel="dialog" 
+				data-transition="slidedown">
+				Tag
+			</a>
 		</div>
 	</div>
 	<!-- /footer -->
 
 </div>
+
+<!-- Start of single view actions dialog -->
+<div data-role="dialog" id="dialog-single-actions" class="mist-dialog">
+    <div data-role="header">
+        <h1>Actions</h1>
+    </div>
+    <div data-role="content">
+        <a data-role="button" {{action "reboot"}}>Reboot</a>
+        <a data-role="button">Shutdown</a>
+        <a data-role="button" {{action destroy}}>Destroy</a>
+        <a data-role="button" data-rel="back" data-theme="b">Close</a>
+    </div>
+</div><!-- /single view actions dialog -->

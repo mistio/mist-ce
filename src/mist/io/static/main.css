@@ -362,7 +362,15 @@ a#mist-select-machines-button span.ui-btn-text {
 }
 
 .ui-footer a {
-    width: 24.65%;
+    width: 32.65%;
+}
+
+.ui-icon-mist-power {
+    background-image: url("images/power.png");
+}
+
+.ui-icon-mist-actions {
+    background-image: url("images/zap.png");
 }
 
 /* Single View */
