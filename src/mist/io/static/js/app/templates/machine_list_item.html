@@ -5,7 +5,9 @@
     <a href="#single-machine" {{action "checkBoxClick" on="click"}}>
         <h3 class="name">{{machine.name}}</h3> <span class="caption-wrapper">
             <h3 {{bindAttr class="machine.stateString :state"}}>{{machine.stateString}}</h3>
+            {{#if machine.hasAlert}}
             <span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
+            {{/if}}
     </span>
         <p class="description">
             <span class="tag backend ui-btn-corner-all prov-{{unbound backend.provider}}">{{machine.backend.title}}</span>

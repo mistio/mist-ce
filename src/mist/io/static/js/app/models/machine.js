@@ -38,6 +38,11 @@ define('app/models/machine', ['ember'],
 				return this.STATES[this.state].toLowerCase();
 			}.property("state"),
 			
+			hasAlert : function(){
+				//TODO when we have alerts
+				return false;
+			},
+			
 			init: function(){
 				this._super();
 				var that = this;

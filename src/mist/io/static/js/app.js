@@ -91,9 +91,13 @@ define( 'app', [
 					require( [ 'chai', 'mocha' ], this.specsRunner );
 				}
 				
-				$('#splash').fadeOut();
+				//$('#splash').fadeOut();
 				//$('#main').show();
 			}
+		});
+		
+		$(document).on( 'pageshow', '#one', function(){
+			$('#splash').fadeOut();
 		});
 		
 		$(document).on( 'pagebeforeshow', '#machines', function(){

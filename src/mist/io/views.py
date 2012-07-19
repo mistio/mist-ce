@@ -353,20 +353,8 @@ def get_backends(request):
 @view_config(route_name='machine_has_key', request_method='GET', renderer='json')
 def machine_has_key(request):
     '''has an ssh key been set for this machine'''
-    try:
-        conn = connect(request)
-    except:
-        return Response('Backend not found', 404)
-
-    try:
-        machine = conn.get_node(request.params['id'])
-    except:
-        return Response('Backend unavailable', 503)
-
-    if machine is None:
-        return Response('Machine not found', 404)
-    else:
-        env.host_name = machine.public_ips[0]
+    machine_ip = request.params['ip']
+    env.host_name = machine_ip
         
         #TODO setup ssh here
         
