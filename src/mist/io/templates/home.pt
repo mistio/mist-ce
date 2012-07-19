@@ -140,8 +140,9 @@
     </div><!-- /content -->
 
     <div id="machines-footer" data-role="footer" data-theme="a">
-        <div id="actions" data-role="controlgroup" data-type="horizontal">
-            <a href="#dialog-actions" 
+        <table id="actions" data-role="controlgroup" data-type="horizontal">
+            <tr>
+            <td><a href="#dialog-actions" 
                 id="machines-button-actions" 
                 data-role="button" 
                 data-icon="mist-actions"
@@ -149,7 +150,8 @@
                 data-transition="slidedown">
                 Actions
             </a>
-            <a href="#dialog-console" 
+            </td>
+            <td><a href="#dialog-console" 
                 id="machines-button-console" 
                 data-role="button" 
                 data-icon="gear" 
@@ -157,7 +159,8 @@
                 data-transition="slidedown">
                 Console
             </a>
-            <a href="#dialog-tags" 
+            </td>
+            <td><a href="#dialog-tags" 
                 id="machines-button-tags" 
                 data-role="button" 
                 data-icon="grid" 
@@ -165,7 +168,9 @@
                 data-transition="slidedown">
                 Tag
             </a>
-        </div>
+            </td>
+            </tr>
+        </table>
     </div><!-- /footer -->
 
 </div><!-- /machines page -->

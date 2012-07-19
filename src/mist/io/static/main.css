@@ -349,7 +349,6 @@ a#mist-select-machines-button span.ui-btn-text {
 /* FOOTER */
 
 .ui-footer {
-    padding: 0 10px;
     position: fixed !important;
     left: 0px;
     bottom: 0px;
@@ -357,12 +356,19 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 100%;
 }
 
-.ui-footer #actions {
-    margin: 0.5em 0;
+.ui-footer table#actions {
+    margin: 0.4em 0;
+    width: 99.9%;
 }
 
-.ui-footer a {
-    width: 32.65%;
+.ui-footer table#actions td {
+    border: 0px;
+    margin: 0px;
+    padding: 0px;
+}
+
+.ui-footer table#actions td a {
+    width: 100%;
 }
 
 .ui-icon-mist-power {

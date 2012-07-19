@@ -51,32 +51,37 @@
 	<!-- /content -->
 
 	<div id="single-footer" data-role="footer" data-theme="a">
-		<div id="actions" data-role="controlgroup" data-type="horizontal">
-			<a href="#dialog-single-actions" 
-				data-role="button" 
-				id="single-button-actions" 
-				data-icon="mist-actions"
-				data-rel="dialog" 
-				data-transition="slidedown">
-				Actions
-			</a>
-			<a href="#dialog-console"
-				data-role="button" 
-				id="single-button-console" 
-				data-icon="gear"
-				data-rel="dialog" 
-				data-transition="slidedown">
-				Console
-			</a> 
-			<a href="#dialog-tags"
-				data-role="button" 
-				id="single-button-tags" 
-				data-icon="grid"
-				data-rel="dialog" 
-				data-transition="slidedown">
-				Tag
-			</a>
-		</div>
+		<table id="actions" data-role="controlgroup" data-type="horizontal">
+			<tr>
+            <td><a href="#dialog-singleactions" 
+                id="machines-button-actions" 
+                data-role="button" 
+                data-icon="mist-actions"
+                data-rel="dialog"
+                data-transition="slidedown">
+                Actions
+            </a>
+            </td>
+            <td><a href="#dialog-console" 
+                id="machines-button-console" 
+                data-role="button" 
+                data-icon="gear" 
+                data-rel="dialog" 
+                data-transition="slidedown">
+                Console
+            </a>
+            </td>
+            <td><a href="#dialog-tags" 
+                id="machines-button-tags" 
+                data-role="button" 
+                data-icon="grid" 
+                data-rel="dialog" 
+                data-transition="slidedown">
+                Tag
+            </a>
+            </td>
+            </tr>
+		</table>
 	</div>
 	<!-- /footer -->
 
