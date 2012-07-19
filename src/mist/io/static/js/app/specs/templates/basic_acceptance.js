@@ -4,6 +4,14 @@
 
 describe( 'views/*', function() {
 
+	it( 'should validate backend button template', function( done ) {
+		require( [ 'text!app/templates/backend_button.html' ], function( html ) {
+			expect( html ).to.be.a( 'string' );
+			expect(function(){ Em.Handlebars.compile( html ) }).to.not.throw( Error );
+			done();
+		});
+	});
+	
 	it( 'should validate confirmation dialog template', function( done ) {
 		require( [ 'text!app/templates/confirmation_dialog.html' ], function( html ){
 			expect( html ).to.be.a( 'string' );
@@ -14,6 +22,14 @@ describe( 'views/*', function() {
 
 	it( 'should validate edit backend dialog template', function( done ) {
 		require( [ 'text!app/templates/edit_backend_dialog.html' ], function( html ) {
+			expect( html ).to.be.a( 'string' );
+			expect(function(){ Em.Handlebars.compile( html ) }).to.not.throw( Error );
+			done();
+		});
+	});
+	
+	it( 'should validate image list item template', function( done ) {
+		require( [ 'text!app/templates/image_list_item.html' ], function( html ) {
 			expect( html ).to.be.a( 'string' );
 			expect(function(){ Em.Handlebars.compile( html ) }).to.not.throw( Error );
 			done();
@@ -39,6 +55,15 @@ describe( 'views/*', function() {
 	
 	it( 'should validate machine template', function( done ) {
 		require( [ 'text!app/templates/machine.html' ], function( html ) {
+			expect( html ).to.be.a( 'string' );
+			expect(function(){ Em.Handlebars.compile( html ) }).to.not.throw( Error );
+			done();
+		});
+	});
+	
+	
+	it( 'should validate select machines template', function( done ) {
+		require( [ 'text!app/templates/select_machines.html' ], function( html ) {
 			expect( html ).to.be.a( 'string' );
 			expect(function(){ Em.Handlebars.compile( html ) }).to.not.throw( Error );
 			done();
