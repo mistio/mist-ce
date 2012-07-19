@@ -61,6 +61,25 @@ define('app/controllers/machines', [
 							var machine = Machine.create(item);
 							that.content.push(machine);
 							contentDidChange = true;
+							
+							$.ajax({
+			                    url: '/backends/' + that.backend.index + '/machine_has_key',
+			                    data: {id: machine.id},
+			                    success: function(data) {
+			                    	console.log("machine has key? ");
+			                    	console.log(data);
+			                    	if('has_key' in data){
+			                    		machine.set('hasKey', data.has_key);
+			                    	} else {
+			                    		machine.set('hasKey', false);
+			                    	}
+			                    }
+							}).error(function(e) {
+								console.log('error querying for machine key for machine id: ' + machine.id);
+								console.log(e.status + " " + e.statusText);
+								machine.set('hasKey', false);
+							});
+							
 						}
 					})
 					
@@ -78,6 +97,8 @@ define('app/controllers/machines', [
 				}).error(function() {
 					Mist.notificationController.notify("Error loading machines for backend: " + that.backend.title);
 					that.backend.set('status', 'offline');
+					onsole.log("Error loading machines for backend: " + that.backend.title)
+					console.log(e.status + " " + e.statusText);
 				});
 				
 			},

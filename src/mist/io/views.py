@@ -10,6 +10,8 @@ from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment, S
 from libcloud.compute.types import Provider
 from mist.io.config import BACKENDS, BASE_EC2_AMIS
 from pyramid.view import view_config
+from fabric.state import env
+from fabric.api import run
 
 log = logging.getLogger('mist.io')
 
@@ -347,3 +349,27 @@ def get_backends(request):
         i = i + 1
 
     return backends
+
+@view_config(route_name='machine_has_key', request_method='GET', renderer='json')
+def machine_has_key(request):
+    '''has an ssh key been set for this machine'''
+    try:
+        conn = connect(request)
+    except:
+        return Response('Backend not found', 404)
+
+    try:
+        machine = conn.get_node(request.params['id'])
+    except:
+        return Response('Backend unavailable', 503)
+
+    if machine is None:
+        return Response('Machine not found', 404)
+    else:
+        env.host_name = machine.public_ips[0]
+        
+        #TODO setup ssh here
+        
+        if run('uptime').failed:
+            ret = {'has_key': False} 
+    return ret
