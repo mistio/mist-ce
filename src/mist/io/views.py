@@ -353,6 +353,7 @@ def get_backends(request):
 @view_config(route_name='machine_has_key', request_method='GET', renderer='json')
 def machine_has_key(request):
     '''has an ssh key been set for this machine'''
+    '''
     machine_ip = request.params['ip']
     env.host_name = machine_ip
         
@@ -361,3 +362,5 @@ def machine_has_key(request):
     if run('uptime').failed:
         ret = {'has_key': False} 
     return ret
+    '''
+    return False
