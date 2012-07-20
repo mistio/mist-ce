@@ -270,7 +270,8 @@
         
         <script type="text/x-handlebars">
         <ul id="images-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" data-filter-placeholder="Filter images..">
-        {{#each Mist.backendsController}}        
+        {{#each Mist.backendsController}}
+        <li data-role="list-divider">{{this.title}}</li>        
         {{#each this.images}}
         {{view Mist.ImageListView imageBinding="this"}}
         {{/each}}
