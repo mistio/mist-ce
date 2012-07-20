@@ -29,7 +29,7 @@ define('app/views/image_list', [
 			    },
 			    
 			    createMachine: function(){
-			    	
+			    	$.mobile.changePage('#dialog-add', 'pop', true, true);
 			    },
 			    			    
 			    init: function() {
