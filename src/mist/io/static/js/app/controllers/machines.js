@@ -63,8 +63,8 @@ define('app/controllers/machines', [
 							contentDidChange = true;
 							
 							$.ajax({
-			                    url: '/backends/' + that.backend.index + '/machine_has_key',
-			                    data: {id: machine.id},
+			                    url: '/machine_has_key',
+			                    data: {ip: machine.public_ips[0]},
 			                    success: function(data) {
 			                    	console.log("machine has key? ");
 			                    	console.log(data);
@@ -97,7 +97,7 @@ define('app/controllers/machines', [
 				}).error(function() {
 					Mist.notificationController.notify("Error loading machines for backend: " + that.backend.title);
 					that.backend.set('status', 'offline');
-					onsole.log("Error loading machines for backend: " + that.backend.title)
+					console.log("Error loading machines for backend: " + that.backend.title)
 					console.log(e.status + " " + e.statusText);
 				});
 				
