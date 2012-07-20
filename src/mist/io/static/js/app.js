@@ -90,15 +90,18 @@ define( 'app', [
 				if ( location.hash.match( /specs/ ) ) {
 					require( [ 'chai', 'mocha' ], this.specsRunner );
 				}
-				
-				//$('#splash').fadeOut();
-				//$('#main').show();
+
+				setTimeout(function(){
+					if($('.ui-page-active').attr('id') == 'splash'){
+						$.mobile.changePage('#one', {
+							transition: 'fade',
+						});
+					}
+				}, 2000);
 			}
 		});
 		
-		$(document).on( 'pageshow', '#one', function(){
-			$('#splash').fadeOut();
-		});
+		
 		
 		$(document).on( 'pagebeforeshow', '#machines', function(){
 		    $('#machines-list').listview('refresh');

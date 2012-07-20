@@ -18,7 +18,7 @@
 
 <body>
 
-<div id="splash">
+<div data-role="page" id="splash">
     <div class="mist-logo"></div>
 </div>
 
