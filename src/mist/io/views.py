@@ -356,8 +356,8 @@ def machine_has_key(request):
     machine_ip = request.params['ip']
     env.host_name = machine_ip
         
-        #TODO setup ssh here
+    #TODO setup ssh here
         
-        if run('uptime').failed:
-            ret = {'has_key': False} 
+    if run('uptime').failed:
+        ret = {'has_key': False} 
     return ret
