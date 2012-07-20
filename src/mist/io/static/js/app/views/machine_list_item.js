@@ -19,10 +19,14 @@ define('app/views/machine_list_item', [
 			    		try {
 			    			that.get('parentView').$().find("ul").listview('refresh');
 			    		} catch(e) {
+			    			
 			    			try {
-			    				that.get('parentView').$().find("ul").listview();
+			    				if($('.ui-page-active').attr('id') == 'machines'){
+			    					that.get('parentView').$().find("ul").listview();
+			    				}
 				    		} catch(e) {
-				    			
+				    			console.error('could not create listview');
+				    			console.error(e);
 				    		}	
 			    		}
 			        });

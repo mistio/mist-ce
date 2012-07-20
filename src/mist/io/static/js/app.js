@@ -22,7 +22,7 @@ define( 'app', [
     'app/views/count',
     'app/views/backend_button',
     'app/views/edit_backend',
-    'app/views/machine_list',
+    'app/views/machine_list_item',
     'app/views/image_list',
     'app/views/enable_backend_button',
     'app/views/machine_add_dialog',
@@ -97,7 +97,11 @@ define( 'app', [
 							transition: 'fade',
 						});
 					}
+					
+					
 				}, 2000);
+				
+				
 			}
 		});
 		
@@ -109,7 +113,16 @@ define( 'app', [
 		
 		App.Select = Ember.Select.extend({
 		    attributeBindings: ['name', "data-theme", "data-icon",
-                "data-native-menu", 'disabled']
+                "data-native-menu", 'disabled'],
+		
+            didInsertElement: function(){
+	    	
+			    var that = this;
+			
+	    	    Em.run.next(function() {		
+	    		    that.get('parentView').$().trigger('create');	    	
+	    		});
+	        },
 		});
 		
 		App.TextField = Ember.TextField.extend({
