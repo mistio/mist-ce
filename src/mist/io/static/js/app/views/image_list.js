@@ -27,6 +27,10 @@ define('app/views/image_list', [
 			    		}
 			        });
 			    },
+			    
+			    createMachine: function(){
+			    	
+			    },
 			    			    
 			    init: function() {
 					this._super();
