@@ -34,6 +34,27 @@ define('app/models/machine', ['ember'],
 				alert("Not implemented");
 			},
 			
+			start: function(){
+				console.log('start');
+				
+				var that = this;
+				
+				$.ajax({
+                    url: 'backends/'+ this.backend.id + '/machines/'+this.id,
+                    data: 'action=start',
+                    type: 'post',
+                    success: function(data) {
+                        console.log('machine starting')
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                    	Mist.notificationController.notify("Error starting machine: " +
+                    			that.name);
+    					console.log("Error starting machine: " + that.name)
+    					console.log(textStatus + " " + errorThrown);
+                    }
+                });
+			},
+			
 			stateString: function(){
 				return this.STATES[this.state].toLowerCase();
 			}.property("state"),

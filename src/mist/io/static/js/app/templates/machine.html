@@ -53,7 +53,7 @@
 	<div id="single-footer" data-role="footer" data-theme="a">
 		<table id="actions" data-role="controlgroup" data-type="horizontal">
 			<tr>
-            <td><a href="#dialog-singleactions" 
+            <td><a href="#dialog-single-actions" 
                 id="machines-button-actions" 
                 data-role="button" 
                 data-icon="mist-actions"
@@ -86,16 +86,3 @@
 	<!-- /footer -->
 
 </div>
-
-<!-- Start of single view actions dialog -->
-<div data-role="dialog" id="dialog-single-actions" class="mist-dialog">
-    <div data-role="header">
-        <h1>Actions</h1>
-    </div>
-    <div data-role="content">
-        <a data-role="button" {{action "reboot"}}>Reboot</a>
-        <a data-role="button">Shutdown</a>
-        <a data-role="button" {{action destroy}}>Destroy</a>
-        <a data-role="button" data-rel="back" data-theme="b">Close</a>
-    </div>
-</div><!-- /single view actions dialog -->
