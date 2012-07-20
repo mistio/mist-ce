@@ -11,28 +11,6 @@ define('app/views/machine', [
 			tagName: false,
 			machineBinding: 'Mist.machine',
 			
-			reboot: function(){
-				var machine = this.machine;
-				Mist.confirmationController.set("title", 'Reboot Machine');
-				Mist.confirmationController.set("text", 'Are you sure you want to reboot ' +
-						machine.name +' ?');
-				Mist.confirmationController.set("callback", function(){
-					machine.reboot();
-				});
-				Mist.confirmationController.show();
-			},
-			
-			destroy: function(){
-				var machine = this.machine;
-				Mist.confirmationController.set("title", 'Destroy Machine');
-				Mist.confirmationController.set("text", 'Are you sure you want to destroy ' +
-						machine.name +' ?');
-				Mist.confirmationController.set("callback", function(){
-					machine.destroy();
-				});
-				Mist.confirmationController.show();
-			},
-			
 			metadata: function(){
 				if(!this.machine || !this.machine.extra){
 					return [];

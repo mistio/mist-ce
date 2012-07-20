@@ -40,7 +40,7 @@ define('app/models/machine', ['ember'],
 				var that = this;
 				
 				$.ajax({
-                    url: 'backends/'+ this.backend.id + '/machines/'+this.id,
+                    url: 'backends/'+ this.backend.index + '/machines/'+this.id,
                     data: 'action=start',
                     type: 'post',
                     success: function(data) {
@@ -50,6 +50,27 @@ define('app/models/machine', ['ember'],
                     	Mist.notificationController.notify("Error starting machine: " +
                     			that.name);
     					console.log("Error starting machine: " + that.name)
+    					console.log(textStatus + " " + errorThrown);
+                    }
+                });
+			},
+			
+			shutdown: function(){
+				console.log('shutting down');
+				
+				var that = this;
+				
+				$.ajax({
+                    url: 'backends/'+ this.backend.index + '/machines/'+this.id,
+                    data: 'action=stop',
+                    type: 'post',
+                    success: function(data) {
+                        console.log('machine being shut down')
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                    	Mist.notificationController.notify("Error shutting down machine: " +
+                    			that.name);
+    					console.log("Error shutting down machine: " + that.name)
     					console.log(textStatus + " " + errorThrown);
                     }
                 });

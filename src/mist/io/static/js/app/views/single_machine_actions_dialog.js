@@ -33,6 +33,17 @@ define('app/views/single_machine_actions_dialog', [
 				Mist.confirmationController.show();
 			},
 			
+			shutdown: function(){
+				var machine = this.machine;
+				Mist.confirmationController.set("title", 'Shutdown Machine');
+				Mist.confirmationController.set("text", 'Are you sure you want to shutdown ' +
+						machine.name +' ?');
+				Mist.confirmationController.set("callback", function(){
+					machine.shutdown();
+				});
+				Mist.confirmationController.show();
+			},
+			
 			start: function(){
 				this.machine.start();
 			},
