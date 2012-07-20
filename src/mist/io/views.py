@@ -12,6 +12,7 @@ from mist.io.config import BACKENDS, BASE_EC2_AMIS
 from pyramid.view import view_config
 from fabric.state import env
 from fabric.api import run
+from machinecaps import get_machine_actions
 
 log = logging.getLogger('mist.io')
 
@@ -82,7 +83,7 @@ def list_machines(request):
         # for rackspace get the tags stored in extra.metadata.tags attr, for amazon get extra.tags.tags attr
         tags = m.extra.get('tags',None) or m.extra.get('metadata',None)
         tags = tags and tags.get('tags', None) or []
-        ret.append({'id'            : m.id,
+        machine ={'id'            : m.id,
                     'uuid'          : m.get_uuid(),
                     'name'          : m.name,
                     # both rackspace and amazon have the image in the imageId extra attr,
@@ -94,7 +95,9 @@ def list_machines(request):
                     'public_ips'    : m.public_ips,
                     'tags'          : tags,
                     'extra'         : m.extra,
-                    })
+                    }
+        machine.update(get_machine_actions(m, conn))
+        ret.append(machine)
     return ret
 
 
