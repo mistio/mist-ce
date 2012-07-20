@@ -34,6 +34,11 @@ define('app/models/machine', ['ember'],
 				alert("Not implemented");
 			},
 			
+			shutdown: function(){
+				console.log('shutdown');
+				alert("Not implemented");
+			},
+			
 			stateString: function(){
 				return this.STATES[this.state].toLowerCase();
 			}.property("state"),

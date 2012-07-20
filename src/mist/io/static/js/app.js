@@ -28,13 +28,15 @@ define( 'app', [
     'app/views/machine_add_dialog',
     'app/views/machine',
     'app/views/confirmation_dialog',
+    'app/views/machine_actions_dialog',
 	'ember',
 	'mobile',
 	], function($, BackendsController, ConfirmationController, 
 			NotificationController, MachineAddController,
 			SelectMachinesController,
 			Count, BackendButton, EditBackend, MachineList, ImageList,
-			EnableBackendButton, MachineAddDialog, MachineView, ConfirmationDialog) {
+			EnableBackendButton, MachineAddDialog, MachineView, ConfirmationDialog,
+			MachineActionsDialog) {
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',
@@ -149,6 +151,9 @@ define( 'app', [
 		
 		var confirmationDialog = ConfirmationDialog.create();
 		confirmationDialog.append();
+		
+		var machineActionsDialog = MachineActionsDialog.create();
+		machineActionsDialog.append();
 		
 		// Expose the application globally
 		return window.Mist = App;
