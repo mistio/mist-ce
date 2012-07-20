@@ -41,7 +41,7 @@ define('app/models/machine', ['ember'],
 			hasAlert : function(){
 				//TODO when we have alerts
 				return false;
-			},
+			}.property('hasAlert'),
 			
 			init: function(){
 				this._super();
