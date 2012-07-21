@@ -126,7 +126,7 @@ def create_machine(request):
         # try to deploy node with ssh key installed
         sd = SSHKeyDeployment(request.registry.settings['keypairs'][0][0])
         try:
-            node = conn.deploy_node(name='test', image=image, size=size, 
+            node = conn.deploy_node(name=machine_name, image=image, size=size, 
                                     location=location, deploy=sd)
             return []
         except:
@@ -357,7 +357,7 @@ def get_backends(request):
 def machine_has_key(request):
     '''has an ssh key been set for this machine'''
     '''
-    machine_ip = request.params['ip']
+    machine_ip = request.params.get('ip', None)
     env.host_name = machine_ip
         
     #TODO setup ssh here
