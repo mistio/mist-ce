@@ -343,8 +343,8 @@ a#mist-select-machines-button span.ui-btn-text {
 #machines-list .alert-icon {
     display: block;
     padding: 0px;
-    position: relative;
-    top: 26px;
+    position: absolute;
+    top: 2px;
     left: -26px;
 }
 
@@ -729,7 +729,7 @@ a#mist-select-machines-button span.ui-btn-text {
 @media only screen and (max-width: 480px) {
 
     .ui-li-heading {
-        left: 60px;
+        left: 64px;
         top: 20px;
     }
 
@@ -746,7 +746,7 @@ a#mist-select-machines-button span.ui-btn-text {
         display: block;
         float: left;
         position: relative;
-        left: 8px;
+        left: 40px;
         top: 12px;
     }
 
