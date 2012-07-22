@@ -648,17 +648,26 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 100%;
     clear: both;
     margin-top: 0px;
-
 }
 
-#dialog-tags #tags-list {
+#dialog-tags div#tags-wrapper {
+    float: right;
+    position: relative;
+    left: -50%;
+    text-align: left;
+}
+
+#dialog-tags div#tags-wrapper ul#tags-list{
     list-style: none;
-    padding-left: 0px;
+    position: relative;
+    left: 50%;
     overflow: auto;
 }
 
-#dialog-tags #tags-list li {
+#dialog-tags ul#tags-list li {
+    display: list-item;
     float: left;
+    position: relative;
     padding: 0 16px 0 3px;
     margin: 0 6px 8px 0;
     background: #ddd;
