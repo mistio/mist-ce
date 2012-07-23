@@ -123,9 +123,10 @@ define( 'app', [
 	    	
 			    var that = this;
 			
-	    	    Em.run.next(function() {		
-	    		    that.get('parentView').$().trigger('create');	    	
-	    		});
+	    	    //Em.run.next(function() {
+	    	    //		that.get('parentView').$().trigger('create');	
+	    	    
+	    		//});
 	        },
 		});
 		
@@ -158,6 +159,10 @@ define( 'app', [
 		machineActionsDialog.append();
 		var dialog = SingleMachineActionsDialog.create();
 		dialog.append();
+		
+		$(document).on( 'pagebeforeshow', '#dialog-add', function(){
+		    $('#dialog-add').trigger('create');
+		});
 		
 		// Expose the application globally
 		return window.Mist = App;
