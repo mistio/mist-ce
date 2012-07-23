@@ -22,14 +22,14 @@ define('app/controllers/machines', [
 			refresh: function(){
 				console.log("refreshing machines");
 				
-				if(this.backend.status == "offline"){
+				if(this.backend.state == "offline"){
 					this.clear();
 					return;
 				}
 				
 				var that = this;
 				
-				this.backend.set('status', 'wait');
+				this.backend.set('state', 'wait');
 				
 				$.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
 					
@@ -76,7 +76,7 @@ define('app/controllers/machines', [
 			                    }
 							}).error(function(e) {
 								console.log('error querying for machine key for machine id: ' + machine.id);
-								console.log(e.status + " " + e.statusText);
+								console.log(e.state + " " + e.stateText);
 								machine.set('hasKey', false);
 							});
 							
@@ -89,16 +89,16 @@ define('app/controllers/machines', [
 						that.contentDidChange();
 					}
 					
-					that.backend.set('status', 'online');
+					that.backend.set('state', 'online');
 					
 					Ember.run.later(that, function(){
 						this.refresh();
 				    }, that.backend.poll_interval);
 				}).error(function() {
 					Mist.notificationController.notify("Error loading machines for backend: " + that.backend.title);
-					that.backend.set('status', 'offline');
+					that.backend.set('state', 'offline');
 					console.log("Error loading machines for backend: " + that.backend.title)
-					console.log(e.status + " " + e.statusText);
+					console.log(e.state + " " + e.stateText);
 				});
 				
 			},
@@ -118,7 +118,7 @@ define('app/controllers/machines', [
                     url: 'backends/' + this.backend.index + '/machines',
                     success: function(data) {
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function(jqXHR, textstate, errorThrown) {
                     }
                 });
 			}

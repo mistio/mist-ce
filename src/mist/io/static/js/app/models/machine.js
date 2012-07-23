@@ -40,7 +40,7 @@ define('app/models/machine', ['ember'],
 				}).error(function(e) {
 					Mist.notificationController.notify("Error rebooting machine: " + that.name);
 					console.error("Error rebooting machine: " + that.name);
-					console.error(e.status + " " + e.statusText);
+					console.error(e.state + " " + e.stateText);
 				});
 			},
 			
@@ -57,7 +57,7 @@ define('app/models/machine', ['ember'],
 				}).error(function(e) {
 					Mist.notificationController.notify("Error destroying machine: " + that.name);
 					console.error("Error destroying machine: " + that.name);
-					console.error(e.status + " " + e.statusText);
+					console.error(e.state + " " + e.stateText);
 				});
 			},
 			
@@ -74,7 +74,7 @@ define('app/models/machine', ['ember'],
 				}).error(function(e) {
 					Mist.notificationController.notify("Error shutting down machine: " + that.name);
 					console.error("Error shutting down machine: " + that.name);
-					console.error(e.status + " " + e.statusText);
+					console.error(e.state + " " + e.stateText);
 				});
 			},
 			
@@ -90,11 +90,11 @@ define('app/models/machine', ['ember'],
                     success: function(data) {
                         console.log('machine starting')
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function(jqXHR, textstate, errorThrown) {
                     	Mist.notificationController.notify("Error starting machine: " +
                     			that.name);
     					console.log("Error starting machine: " + that.name)
-    					console.log(textStatus + " " + errorThrown);
+    					console.log(textstate + " " + errorThrown);
                     }
                 });
 			},
@@ -111,11 +111,11 @@ define('app/models/machine', ['ember'],
                     success: function(data) {
                         console.log('machine being shut down')
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function(jqXHR, textstate, errorThrown) {
                     	Mist.notificationController.notify("Error shutting down machine: " +
                     			that.name);
     					console.log("Error shutting down machine: " + that.name)
-    					console.log(textStatus + " " + errorThrown);
+    					console.log(textstate + " " + errorThrown);
                     }
                 });
 			},

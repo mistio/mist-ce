@@ -20,14 +20,14 @@ define('app/models/backend', [
 		    provider: null,
 		    poll_interval: null,
 		    host: null,
-		    status: 'unknown',
+		    state: 'unknown',
 		    machines: null,
 		    sizes: [],
 		    images: null,
 		    locations: [],
 		    
 		    isOn: function(){
-		    	if(this.status == "offline"){
+		    	if(this.state == "offline"){
 		    		return false;
 		    	} else {
 		    		return true;
@@ -47,7 +47,7 @@ define('app/models/backend', [
 			},
 			
 			disable: function(){
-				this.status = "offline";
+				this.state = "offline";
 				this.machines.clear();
 				this.images.clear();
 		        this.sizes.clear();

@@ -34,12 +34,11 @@
              tal:condition="session">Add backend</a>
 
         <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
-<script type="text/x-handlebars">
-{{#each Mist.backendsController}}
-    {{view Mist.BackendButtonView backendBinding="this" }}
-{{/each}}
-</script>
-
+            <script type="text/x-handlebars">
+            {{#each Mist.backendsController}}
+                {{view Mist.BackendButtonView backendBinding="this" }}
+            {{/each}}
+            </script>
         </div>
 
         <ul data-role="listview" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow" id="home-menu">
@@ -107,7 +106,7 @@
         <script type="text/x-handlebars">
         <a href="#dialog-providers" 
         data-rel="dialog" data-role="button" data-iconpos="notext" data-transition="slidedown" data-icon="check" 
-        {{bindAttr class="Mist.backendsController.status :state-providers "}} >
+        {{bindAttr class="Mist.backendsController.state :state-providers "}} >
         </script>
     </div><!-- /header -->
 
@@ -188,17 +187,17 @@
     </div>
 </div><!-- /console dialog -->
 
-<!-- Start of provider status dialog -->
+<!-- Start of provider state dialog -->
 <div data-role="dialog" id="dialog-providers" class="mist-dialog">
     <div data-role="header">
-        <h1>Provider Status</h1>
+        <h1>Provider State</h1>
     </div>
     <div data-role="content">
-        <ul id="providers-status-list" data-role="listview" data-inset="true" data-theme="c" data-dividertheme="d">
+        <ul id="providers-state-list" data-role="listview" data-inset="true" data-theme="c" data-dividertheme="d">
         </ul>
         <a href="index.html" data-role="button" data-icon="arrow-l" data-rel="back" data-transition="slidedown" data-theme="c">Close</a>
     </div>
-</div><!-- /provider status dialog -->
+</div><!-- /provider state dialog -->
 
 <!-- Start of tags dialog -->
 <div data-role="dialog" id="dialog-tags" class="mist-dialog">
@@ -241,7 +240,7 @@
 
 <div data-role="page" id="edit-backend" class="mist-dialog">
     <div data-role="header">
-        <h1>Edit backend</h1>
+        <h1>Edit provider</h1>
     </div>
     <script type="text/x-handlebars">
     {{view Mist.EditBackendView backendBinding="Mist.backend" }}

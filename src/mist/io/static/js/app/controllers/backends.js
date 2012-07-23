@@ -10,7 +10,7 @@ define('app/controllers/backends', [
 			content: [],
             machineCount: 0,
             imageCount: 0,
-            status: "wait", // TODO make this property dynamic according to all backends statuses
+            state: "wait", // TODO make this property dynamic according to all backends states
             
 			init: function() {
 				this._super();
@@ -37,16 +37,16 @@ define('app/controllers/backends', [
 							that.set('imageCount', count);
 						});
 						
-						item.addObserver('status', function(){
+						item.addObserver('state', function(){
 							var waiting = false;
 							var state = "ok";
 						    
 							that.content.forEach(function(backend){
-						    	if(backend.status == 'wait'){
+						    	if(backend.state == 'wait'){
 						    		waiting = true;
-						    	} else if(backend.status == 'offline'){
+						    	} else if(backend.state == 'offline'){
 						    		state = 'error';
-						    	} else if(backend.status == 'off'){
+						    	} else if(backend.state == 'off'){
 						    		state = 'down';
 						    	}
 						    });
@@ -56,8 +56,8 @@ define('app/controllers/backends', [
 						    } else {
 						    	state = 'state-' + state;
 						    }
-						    console.log('setting backends status: ' + state);
-						    that.set('status', state);
+						    console.log('setting backends state: ' + state);
+						    that.set('state', state);
 						});
 					});
 				}).error(function() {

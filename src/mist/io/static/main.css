@@ -136,12 +136,12 @@ div#splash div.mist-logo {
 }
 
 
-/* Provider status dialog */
+/* Provider state dialog */
 
-#providers-status-list li {
+#providers-state-list li {
     padding-left: 42px;
 }
-#providers-status-list .provider-state-icon {
+#providers-state-list .provider-state-icon {
     width: 16px;
     height: 16px;
     display: block;
@@ -150,7 +150,7 @@ div#splash div.mist-logo {
     background-color: #234;
 }
 
-#providers-status-list .state-on .provider-state-icon{
+#providers-state-list .state-on .provider-state-icon{
     background-image: url(images/icons-18-white.png);
     background-position:  -253px 0;
     background-repeat: no-repeat;
@@ -158,7 +158,7 @@ div#splash div.mist-logo {
     background-color: #22aa22;
 }
 
-#providers-status-list .state-off .provider-state-icon{
+#providers-state-list .state-off .provider-state-icon{
     background-image: url(icons/loader.gif);
     background-position: center !important;
     background-repeat: no-repeat;
@@ -166,7 +166,7 @@ div#splash div.mist-logo {
     background-color: #aa2222;
 }
 
-#providers-status-list .state-wait .provider-state-icon{
+#providers-state-list .state-wait .provider-state-icon{
     background-image: url(images/icons-18-white.png);
     background-position:  -73px 0;
     background-repeat: no-repeat;
@@ -401,14 +401,14 @@ a#mist-select-machines-button span.ui-btn-text {
     margin: 30px 0 0 10px;
 }
 
-#single-view-status {
+#single-view-state {
     font-weight: normal;
     float: left;
     margin: 30px 20px 0 10px;
     text-shadow: none;
 }
 
-#single-view-status.running {
+#single-view-state.running {
     color: #13B754;
 }
 
@@ -578,7 +578,7 @@ a#mist-select-machines-button span.ui-btn-text {
     float: right;
 }
 
-/* Provider (backend) status dialog */
+/* Provider (backend) state dialog */
 
 #edit-backend .content-header {
     overflow: auto;
@@ -587,7 +587,7 @@ a#mist-select-machines-button span.ui-btn-text {
     margin-bottom: 8px;
 }
 
-#edit-backend .status {
+#edit-backend .state {
     display: block;
     float: right;
     font-size: 22px;
@@ -774,7 +774,7 @@ a#mist-select-machines-button span.ui-btn-text {
         font-size: 18px;
     }
 
-    #single-view-status {
+    #single-view-state {
         font-size: 18px;
         margin-right: 3px;
     }
