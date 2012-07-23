@@ -219,7 +219,7 @@ div#splash div.mist-logo {
 }
 
 #machines-list .ui-checkbox .ui-btn-inner {
-    top: 3px;
+    top: 0;
     left: -11px;
     height: 40px;
     border-top: none;
@@ -234,13 +234,15 @@ div#splash div.mist-logo {
 }
 
 #machines-list .node a {
+    height: 40px;
     color: #2F3E46;
 }
 
 #machines-list .description {
     position: absolute;
     right: 76px;
-    top: 30px;
+    top: 50%;
+    margin-top: -11px;
 }
 
 #machines-list .bubble-container {
@@ -320,17 +322,17 @@ a#mist-select-machines-button span.ui-btn-text {
 
 .ui-li-heading {
     display: block;
-    float: left;
-    padding: 6px 0;
-    margin-top: 11px;
-    margin-bottom: 0px;
+    position: absolute;
+    top: 50%;
+    margin-top: -7px;
 }
 
 .caption-wrapper {
     display: block;
     position: absolute;
     left: 250px;
-
+    top: 50%;
+    margin-top: 0px;
 }
 
 .caption-wrapper h3 {
@@ -341,8 +343,8 @@ a#mist-select-machines-button span.ui-btn-text {
 #machines-list .alert-icon {
     display: block;
     padding: 0px;
-    position: relative;
-    top: 26px;
+    position: absolute;
+    top: 2px;
     left: -26px;
 }
 
@@ -646,17 +648,21 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 100%;
     clear: both;
     margin-top: 0px;
-
 }
 
-#dialog-tags #tags-list {
+#dialog-tags div#tags-wrapper {
+}
+
+#dialog-tags div#tags-wrapper ul#tags-list{
     list-style: none;
-    padding-left: 0px;
     overflow: auto;
+    padding: 0;
 }
 
-#dialog-tags #tags-list li {
+#dialog-tags ul#tags-list li {
+    display: block;
     float: left;
+    position: relative;
     padding: 0 16px 0 3px;
     margin: 0 6px 8px 0;
     background: #ddd;
@@ -684,13 +690,13 @@ a#mist-select-machines-button span.ui-btn-text {
     #machines-list .description {
         position: absolute;
         right: 76px;
-        top: 21px;
+        top: 22px;
         width: 100px;
         line-height: 12px;
     }
 
     #machines-list .description .tag {
-        margin-bottom: 6px;
+        margin-bottom: 2px;
     }
 
     .caption-wrapper {
@@ -727,19 +733,13 @@ a#mist-select-machines-button span.ui-btn-text {
 @media only screen and (max-width: 480px) {
 
     .ui-li-heading {
-        display: block;
-        float: left;
-        clear: right;
-        padding: 0;
-        margin: 4px 0 2px 0;
+        left: 64px;
+        top: 20px;
     }
 
     .caption-wrapper {
-        display: block;
-        position: static;
-        padding: 0px;
-        margin-top: 25px;
-        margin-left: 50px;
+        left: 0px;
+        top: 20px;
     }
 
     .caption-wrapper h3 {
@@ -750,7 +750,7 @@ a#mist-select-machines-button span.ui-btn-text {
         display: block;
         float: left;
         position: relative;
-        left: 8px;
+        left: 40px;
         top: 12px;
     }
 
@@ -762,11 +762,11 @@ a#mist-select-machines-button span.ui-btn-text {
     }
 
     #machines-list .description {
-        right: 48px;
+        right: 10px;
     }
 
     #machines-list .bubble-container {
-        right: 18px;
+        right: 8px;
     }
     /* Single View */
 

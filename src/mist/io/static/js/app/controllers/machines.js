@@ -68,8 +68,8 @@ define('app/controllers/machines', [
 			                    success: function(data) {
 			                    	console.log("machine has key? ");
 			                    	console.log(data);
-			                    	if('has_key' in data){
-			                    		machine.set('hasKey', data.has_key);
+			                    	if(data){
+			                    		machine.set('hasKey', data);
 			                    	} else {
 			                    		machine.set('hasKey', false);
 			                    	}
