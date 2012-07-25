@@ -96,7 +96,7 @@ define( 'app', [
 				}
 				
 				
-				
+				location.hash = '#splash';
 				
 
 				setTimeout(function(){
@@ -104,17 +104,8 @@ define( 'app', [
 						$.mobile.changePage('#one', {
 							transition: 'fade',
 						});
-					} else {
-						$.mobile.changePage('#splash', {
-							transition: 'fade',
-						});
-						setTimeout(function(){
-							$.mobile.changePage('#one', {
-									transition: 'fade',
-							});
-						}, 2000);
 					}
-				}, 1000);
+				}, 2000);
 				
 				
 			}
