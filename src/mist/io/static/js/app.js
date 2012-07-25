@@ -94,16 +94,27 @@ define( 'app', [
 				if ( location.hash.match( /specs/ ) ) {
 					require( [ 'chai', 'mocha' ], this.specsRunner );
 				}
+				
+				
+				
+				
 
 				setTimeout(function(){
 					if($('.ui-page-active').attr('id') == 'splash'){
 						$.mobile.changePage('#one', {
 							transition: 'fade',
 						});
+					} else {
+						$.mobile.changePage('#splash', {
+							transition: 'fade',
+						});
+						setTimeout(function(){
+							$.mobile.changePage('#one', {
+									transition: 'fade',
+							});
+						}, 2000);
 					}
-					
-					
-				}, 2000);
+				}, 1000);
 				
 				
 			}
