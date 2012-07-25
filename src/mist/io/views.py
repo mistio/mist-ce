@@ -1,6 +1,8 @@
 """mist.io views"""
-import json
+import os
 import logging
+import json
+import tempfile
 
 from pyramid.response import Response
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
@@ -11,12 +13,11 @@ from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider
 from mist.io.config import BACKENDS, BASE_EC2_AMIS
 from pyramid.view import view_config
-#from fabric.state import env
-#from fabric.api import run
+from fabric.api import run, env
 from mist.io.machinecaps import get_machine_actions
 
 
-LOG = logging.getLogger('mist.io')
+log = logging.getLogger('mist.io')
 
 
 def connect(request):
@@ -138,7 +139,7 @@ def create_machine(request):
                              deploy=ssh_key)
             return []
         except:
-            LOG.warn('Failed to deploy node with ssh key. Trying to create simple node')
+            log.warn('Failed to deploy node with ssh key. Trying to create simple node')
 
     try:
         conn.create_node(name=machine_name,
@@ -416,17 +417,39 @@ def get_backends(request):
 
 @view_config(route_name='machine_has_key', request_method='GET', renderer='json')
 def machine_has_key(request):
-    """has an ssh key been set for this machine"""
+    """Check if the machine has a key pair deployed
+
+    To do that we try to connect to the machine using fabric. The problem is
+    that fabric does not support passing the private key as a string, but only
+    as a file. To solve this we use a temporary file. After the connection is
+    closed we erase it.
+    """
+
     machine_ip = request.params.get('ip', None)
+    private_key = request.registry.settings['keypairs'][0][1]
 
-    """ Text code
-    env.host_name = machine_ip
+    if not machine_ip or not private_key:
+        log.info('IP or private key missing. Skipped checking.')
+        return False
 
-    #TODO setup ssh here
+    #import pdb; pdb.set_trace()
+
+    env.host_string = machine_ip
+    env.user = 'root'
+    #env.connection_attempts - defaults to 1
+    #env.timeout - e.g. 20 in secs defaults to 10
+
+    (tmp_key, tmp_path) = tempfile.mkstemp()
+    key_fd = os.fdopen(tmp_key, 'w+b')
+    key_fd.write(private_key)
+    key_fd.close()
+    env.key_filename = [tmp_path]
 
     if run('uptime').failed:
         ret = {'has_key': False}
-    return ret
-    """
+    else:
+        ret = {'has_key': True}
 
-    return False
+    os.remove(tmp_path)
+
+    return ret
