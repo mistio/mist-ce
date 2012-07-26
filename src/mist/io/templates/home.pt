@@ -21,8 +21,8 @@
     <div class="mist-logo"></div>
 </div>
 
-<!-- Start of first page: #one -->
-<div data-role="page" id="one">
+<!-- Start of first page: #home -->
+<div data-role="page" id="home">
 
     <div data-role="header">
         <h1>mist.io</h1>
@@ -41,14 +41,14 @@
         </div>
 
         <ul data-role="listview" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow" id="home-menu">
-            <li id="one-li-machines"><a id="machines-count" href="#machines">Machines
+            <li><a id="machines-count" href="#machines">Machines
             <script type="text/x-handlebars">
             {{#view Mist.CountView numberBinding="Mist.backendsController.machineCount" tagName="span" class="ui-li-count"}}
             {{number}}
             {{/view}}
             </script>
             </a></li>
-            <li id="one-li-images"><a id="images-count" href="#images">Images
+            <li><a id="images-count" href="#images">Images
             <script type="text/x-handlebars">
             {{#view Mist.CountView numberBinding="Mist.backendsController.imageCount" tagName="span" class="ui-li-count"}}
             {{number}}
@@ -58,7 +58,7 @@
         </ul>
     </div><!-- /content -->
 
-</div><!-- /page one -->
+</div><!-- /page home -->
 
 
 <!-- Start of add provider dialog -->
@@ -100,7 +100,7 @@
 <div data-role="page" id="machines" data-theme="c">
 
     <div data-role="header">
-        <a href="#one" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
+        <a href="#home" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
         <h1>Machines</h1>
         <script type="text/x-handlebars">
         <a href="#dialog-providers"
@@ -217,7 +217,7 @@
 <div data-role="page" id="images" data-theme="c">
 
     <div data-role="header">
-        <a href="#one" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
+        <a href="#home" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
         <h1>Images</h1>
     </div><!-- /header -->
 

@@ -102,7 +102,7 @@ define( 'app', [
 
 				setTimeout(function(){
 					if($('.ui-page-active').attr('id') == 'splash'){
-						$.mobile.changePage('#one', {
+						$.mobile.changePage('#home', {
 							transition: 'fade',
 						});
 					}

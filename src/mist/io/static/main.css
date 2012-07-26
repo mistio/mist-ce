@@ -26,11 +26,11 @@ div#splash div.mist-logo {
 /* Home Page */
 
 /* Add backend button top margin */
-#one a#add-backend-button {
+#home a#add-backend-button {
     margin: 0px !important;
 }
 
-#one .ui-content {
+#home .ui-content {
     overflow-y: hidden;
 }
 
