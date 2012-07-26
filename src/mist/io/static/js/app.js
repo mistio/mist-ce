@@ -30,15 +30,16 @@ define( 'app', [
     'app/views/confirmation_dialog',
     'app/views/machine_actions_dialog',
     'app/views/single_machine_actions_dialog',
+    'app/views/shell',
 	'ember',
 	'mobile',
-	], function($, BackendsController, ConfirmationController, 
+	], function($, BackendsController, ConfirmationController,
 			NotificationController, MachineAddController,
 			SelectMachinesController,
 			Count, BackendButton, EditBackend, MachineList, ImageList,
 			EnableBackendButton, MachineAddDialog, MachineView, ConfirmationDialog,
 			MachineActionsDialog,
-			SingleMachineActionsDialog) {
+			SingleMachineActionsDialog, Shell) {
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',
@@ -69,12 +70,12 @@ define( 'app', [
 					'backendsController',
 					BackendsController.create()
 				);
-				
+
 				this.set(
 						'confirmationController',
 						ConfirmationController.create()
 					);
-				
+
 				this.set(
 						'notificationController',
 						NotificationController.create()
@@ -84,20 +85,20 @@ define( 'app', [
 						'machineAddController',
 						MachineAddController.create()
 					);
-				
+
 				this.set(
 						'selectMachinesController',
 						SelectMachinesController.create()
 					);
-				
+
 				// Run specs if asked
 				if ( location.hash.match( /specs/ ) ) {
 					require( [ 'chai', 'mocha' ], this.specsRunner );
 				}
-				
-				
+
+
 				location.hash = '#splash';
-				
+
 
 				setTimeout(function(){
 					if($('.ui-page-active').attr('id') == 'splash'){
@@ -106,40 +107,40 @@ define( 'app', [
 						});
 					}
 				}, 2000);
-				
-				
+
+
 			}
 		});
-		
-		
-		
+
+
+
 		$(document).on( 'pagebeforeshow', '#machines', function(){
 		    $('#machines-list').listview('refresh');
 		});
-		
+
 		App.Select = Ember.Select.extend({
 		    attributeBindings: ['name', "data-theme", "data-icon",
                 "data-native-menu", 'disabled'],
-		
+
             didInsertElement: function(){
-	    	
+
 			    var that = this;
-			
+
 	    	    //Em.run.next(function() {
-	    	    //		that.get('parentView').$().trigger('create');	
-	    	    
+	    	    //		that.get('parentView').$().trigger('create');
+
 	    		//});
 	        },
 		});
-		
+
 		App.TextField = Ember.TextField.extend({
 		    attributeBindings: ['name', "data-theme"]
 		});
-		
+
 		App.Checkbox = Ember.Checkbox.extend({
 		    attributeBindings: ['name', "id"]
 		});
-		
+
 		App.CountView = Count;
 		App.BackendButtonView = BackendButton;
 		App.EditBackendView = EditBackend;
@@ -147,25 +148,27 @@ define( 'app', [
 		App.ImageListView = ImageList;
 		App.EnableBackendButtonView = EnableBackendButton;
 		App.onOff = ['on', 'off'];
-		
+
 		var addDialog = MachineAddDialog.create();
 		addDialog.append();
-		
+
 		var machineView = MachineView.create();
 		machineView.append();
-		
+
 		var confirmationDialog = ConfirmationDialog.create();
 		confirmationDialog.append();
-		
+
 		var machineActionsDialog = MachineActionsDialog.create();
 		machineActionsDialog.append();
 		var dialog = SingleMachineActionsDialog.create();
 		dialog.append();
-		
+		var shellDialog = Shell.create();
+		shellDialog.append();
+
 		$(document).on( 'pagebeforeshow', '#dialog-add', function(){
 		    $('#dialog-add').trigger('create');
 		});
-		
+
 		// Expose the application globally
 		return window.Mist = App;
 	}
