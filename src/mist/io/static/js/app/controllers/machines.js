@@ -94,7 +94,7 @@ define('app/controllers/machines', [
 					Ember.run.later(that, function(){
 						this.refresh();
 				    }, that.backend.poll_interval);
-				}).error(function() {
+				}).error(function(e) {
 					Mist.notificationController.notify("Error loading machines for backend: " + that.backend.title);
 					that.backend.set('state', 'offline');
 					console.log("Error loading machines for backend: " + that.backend.title)

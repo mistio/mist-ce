@@ -11,38 +11,21 @@ define('app/views/machine', [
 			tagName: false,
 			machineBinding: 'Mist.machine',
 			
-			reboot: function(){
-				var machine = this.machine;
-				Mist.confirmationController.set("title", 'Reboot Machine');
-				Mist.confirmationController.set("text", 'Are you sure you want to reboot ' +
-						machine.name +' ?');
-				Mist.confirmationController.set("callback", function(){
-					machine.reboot();
-				});
-				Mist.confirmationController.show();
-			},
-			
-			destroy: function(){
-				var machine = this.machine;
-				Mist.confirmationController.set("title", 'Destroy Machine');
-				Mist.confirmationController.set("text", 'Are you sure you want to destroy ' +
-						machine.name +' ?');
-				Mist.confirmationController.set("callback", function(){
-					machine.destroy();
-				});
-				Mist.confirmationController.show();
-			},
-			
-			shutdown: function(){
-				var machine = this.machine;
-				Mist.confirmationController.set("title", 'Shutdown Machine');
-				Mist.confirmationController.set("text", 'Are you sure you want to shutdown ' +
-						machine.name +' ?');
-				Mist.confirmationController.set("callback", function(){
-					machine.shutdown();
-				});
-				Mist.confirmationController.show();
-			},
+			didInsertElement: function(){
+		    	if(!this.machine){
+		    		return;
+		    	}
+				
+				var that = this;
+				
+		    	Em.run.next(function() {
+		    		if(that.machine.hasKey){
+		    			$('#machines-button-shell').button('enable');
+		    		} else {
+		    			$('#machines-button-shell').button('disable');
+		    		}
+		        });
+		    },
 			
 			metadata: function(){
 				if(!this.machine || !this.machine.extra){
