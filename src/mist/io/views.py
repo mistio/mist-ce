@@ -414,27 +414,19 @@ def get_backends(request):
 
     return backends
 
+def config_fabric_ssh(ip, private_key):
+    """Configures the ssh connection used by fabric.
 
-@view_config(route_name='machine_has_key', request_method='GET', renderer='json')
-def machine_has_key(request):
-    """Check if the machine has a key pair deployed
-
-    To do that we try to connect to the machine using fabric. The problem is
-    that fabric does not support passing the private key as a string, but only
-    as a file. To solve this we use a temporary file. After the connection is
-    closed we erase it.
+    The problem is that fabric does not support passing the private key as a
+    string, but only as a file. To solve this we use a temporary file. After
+    the connection is closed you should erase this file. That's why this
+    function returns the path of the temporary file.
     """
-
-    machine_ip = request.params.get('ip', None)
-    private_key = request.registry.settings['keypairs'][0][1]
-
-    if not machine_ip or not private_key:
-        log.info('IP or private key missing. Skipped checking.')
+    if not ip or not private_key:
+        log.info('IP or private key missing. SSH configuration failed.')
         return False
 
-    #import pdb; pdb.set_trace()
-
-    env.host_string = machine_ip
+    env.host_string = ip
     env.user = 'root'
     #env.connection_attempts - defaults to 1
     #env.timeout - e.g. 20 in secs defaults to 10
@@ -445,6 +437,15 @@ def machine_has_key(request):
     key_fd.close()
     env.key_filename = [tmp_path]
 
+    return tmp_path
+
+
+@view_config(route_name='machine_has_key', request_method='GET', renderer='json')
+def machine_has_key(request):
+    """Check if the machine has a key pair deployed"""
+    tmp_path = config_fabric_ssh(request.params.get('ip', None),
+                                 request.registry.settings['keypairs'][0][1])
+
     if run('uptime').failed:
         ret = {'has_key': False}
     else:
@@ -453,3 +454,16 @@ def machine_has_key(request):
     os.remove(tmp_path)
 
     return ret
+
+@view_config(route_name='shell_command', request_method='POST', renderer='json')
+def shell_command(request):
+    """Send a shell command to a machine over ssh"""
+
+    tmp_path = config_fabric_ssh(request.params.get('ip', None),
+                                 request.registry.settings['keypairs'][0][1])
+
+    cmd_output = run(request.params.get('command', None))
+
+    os.remove(tmp_path)
+
+    return cmd_output
