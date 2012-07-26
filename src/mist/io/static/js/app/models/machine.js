@@ -30,9 +30,9 @@ define('app/models/machine', ['ember'],
 				var that = this;
 				
 				$.ajax({
-                    url: '/backends/' + this.backend.id + '/machines/' + this.id,
+                    url: '/backends/' + this.backend.index + '/machines/' + this.id,
                     type: 'POST',
-                    data: {action: 'reboot',},
+                    data: "action=reboot",
                     success: function(data) {
                     	console.log("machine rebooting");
                     }
@@ -47,9 +47,9 @@ define('app/models/machine', ['ember'],
 			destroy: function(){
 				console.log('destroy');
 				$.ajax({
-                    url: '/backends/' + this.backend.id + '/machines/' + this.id,
+                    url: '/backends/' + this.backend.index + '/machines/' + this.id,
                     type: 'POST',
-                    data: {action: 'destroy',},
+                    data: "action=destroy",
                     success: function(data) {
                     	console.log("machine being destroyed");
                     }
@@ -57,23 +57,6 @@ define('app/models/machine', ['ember'],
 				}).error(function(e) {
 					Mist.notificationController.notify("Error destroying machine: " + that.name);
 					console.error("Error destroying machine: " + that.name);
-					console.error(e.state + " " + e.stateText);
-				});
-			},
-			
-			shutdown: function(){
-				console.log('shutdown');
-				$.ajax({
-                    url: '/backends/' + this.backend.id + '/machines/' + this.id,
-                    type: 'POST',
-                    data: {action: 'shutdown',},
-                    success: function(data) {
-                    	console.log("machine shutting down");
-                    }
-				
-				}).error(function(e) {
-					Mist.notificationController.notify("Error shutting down machine: " + that.name);
-					console.error("Error shutting down machine: " + that.name);
 					console.error(e.state + " " + e.stateText);
 				});
 			},
