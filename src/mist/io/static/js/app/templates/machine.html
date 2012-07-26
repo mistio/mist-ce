@@ -13,13 +13,12 @@
 
 	<div id="single-view-header">
 		<h3 id="single-view-name">{{name}}</h3>
-		<span class="single-view-icon-wrapper" ><span
-			id="single-view-provider-icon" {{bindAttr class="providerIconClass"}}></span>
-			</span>
-			
-			<span
-			class="single-view-icon-wrapper" {{bindAttr class="machine.image.type"}}><span
-			id="single-view-image-icon" ></span></span>
+		<span class="single-view-icon-wrapper">
+            <span id="single-view-provider-icon" {{bindAttr class="providerIconClass"}}></span>
+		</span>
+		<span class="single-view-icon-wrapper" {{bindAttr class="machine.image.type"}}>
+            <span id="single-view-image-icon" ></span>
+        </span>
 		<h3 id="single-view-state" {{bindAttr class="machine.stateString"}}>{{machine.stateString}}</h3>
 	</div>
 
@@ -53,29 +52,29 @@
 	<div id="single-footer" data-role="footer" data-theme="a">
 		<table id="actions" data-role="controlgroup" data-type="horizontal">
 			<tr>
-            <td><a href="#dialog-single-actions" 
-                id="machines-button-actions" 
-                data-role="button" 
+            <td><a href="#dialog-single-actions"
+                id="machines-button-actions"
+                data-role="button"
                 data-icon="mist-actions"
                 data-rel="dialog"
                 data-transition="slidedown">
                 Actions
             </a>
             </td>
-            <td><a href="#dialog-console" 
-                id="machines-button-console" 
-                data-role="button" 
-                data-icon="gear" 
-                data-rel="dialog" 
+            <td><a href="#dialog-console"
+                id="machines-button-console"
+                data-role="button"
+                data-icon="gear"
+                data-rel="dialog"
                 data-transition="slidedown">
                 Console
             </a>
             </td>
-            <td><a href="#dialog-tags" 
-                id="machines-button-tags" 
-                data-role="button" 
-                data-icon="grid" 
-                data-rel="dialog" 
+            <td><a href="#dialog-tags"
+                id="machines-button-tags"
+                data-role="button"
+                data-icon="grid"
+                data-rel="dialog"
                 data-transition="slidedown">
                 Tag
             </a>
