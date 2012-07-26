@@ -111,7 +111,6 @@
 
     <div data-role="content">
 
-        <div id="logo-container"></div>
         <script type="text/x-handlebars">
         {{view Mist.Select data-native-menu="false" name="select-machines" id="mist-select-machines"
             contentBinding="Mist.selectMachinesController"

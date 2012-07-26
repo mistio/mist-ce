@@ -1,15 +1,5 @@
 /* Custom unweb rules */
 
-#logo-container {
-    background: url(../static/logo.png) center bottom no-repeat;
-    width: 100%;
-    height: 131px;
-    margin: 36px 0;
-    position: fixed;
-    top: 80px;
-    left: 0;
-    z-index: 0;
-}
 
 /* Splash (loading) page */
 
