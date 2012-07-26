@@ -5,7 +5,7 @@
     <div data-role="content" data-theme="b">
         {{view Ember.TextField valueBinding="command"}}
         <a data-role="button" {{action shell}}>Send</a>
-        <p id="shell-return">{{shellOutput}}</p>
+        <p id="shell-return">{{machine.shellOutput}}</p>
         <a data-role="button" data-rel="back" data-theme="a">Back</a>
     </div>
 </div>
