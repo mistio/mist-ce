@@ -140,15 +140,6 @@
     <div id="machines-footer" data-role="footer" data-theme="a">
         <table id="actions" data-role="controlgroup" data-type="horizontal">
             <tr>
-            <td><a href="#dialog-actions"
-                id="machines-button-actions"
-                data-role="button"
-                data-icon="mist-actions"
-                data-rel="dialog"
-                data-transition="slidedown">
-                Actions
-            </a>
-            </td>
             <td><a href="#dialog-shell"
                 id="machines-button-shell"
                 data-role="button"
@@ -165,6 +156,15 @@
                 data-rel="dialog"
                 data-transition="slidedown">
                 Tag
+            </a>
+            </td>
+            <td><a href="#dialog-power"
+                id="machines-button-power"
+                data-role="button"
+                data-icon="mist-power"
+                data-rel="dialog"
+                data-transition="slidedown">
+                Power
             </a>
             </td>
             </tr>

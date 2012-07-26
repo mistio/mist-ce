@@ -210,7 +210,7 @@ div#splash div.mist-logo {
 }
 
 #machines-list .ui-icon-checkbox-on, #machines-list .ui-icon-checkbox-off  {
-    z-index: 1000;    
+    z-index: 1000;
 }
 
 #machines-list .ui-btn-text .ui-checkbox {
@@ -374,10 +374,6 @@ a#mist-select-machines-button span.ui-btn-text {
 }
 
 .ui-icon-mist-power {
-    background-image: url("images/power.png");
-}
-
-.ui-icon-mist-actions {
     background-image: url("images/zap.png");
 }
 
@@ -537,10 +533,10 @@ a#mist-select-machines-button span.ui-btn-text {
 
 /* DIALOGS */
 
-.ui-dialog .ui-content, 
-{ 
-    max-width: 500px; 
-    margin: 0 auto 15px auto; 
+.ui-dialog .ui-content,
+{
+    max-width: 500px;
+    margin: 0 auto 15px auto;
 }
 
 /* Hiding of X */
@@ -552,7 +548,7 @@ a#mist-select-machines-button span.ui-btn-text {
 /* Create Dialog */
 
 .btn-full {
-    width: 100%; 
+    width: 100%;
     text-align: center;
     margin-top: 2em;
 }
