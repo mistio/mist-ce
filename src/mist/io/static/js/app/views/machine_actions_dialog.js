@@ -96,6 +96,51 @@ define('app/views/machine_actions_dialog', [
 				Mist.confirmationController.show();
 			},
 			
+			canReboot: function(){
+				ret = false;
+				this.getSelectedMachines().some(function(machine){
+					if(machine.can_reboot){
+						ret = true;
+						return true;
+					}
+				});
+				return ret;
+			}.property("Mist.backendsController.selectedMachineCount"),
+			
+			canShutdown: function(){
+				ret = false;
+				this.getSelectedMachines().some(function(machine){
+					console.log(machine.can_shutdown);
+					if(machine.can_stop){
+						ret = true;
+						return true;
+					}
+				});
+				return ret;
+			}.property("Mist.backendsController.selectedMachineCount"),
+			
+			canDestroy: function(){
+				ret = false;
+				this.getSelectedMachines().some(function(machine){
+					if(machine.can_destroy){
+						ret = true;
+						return true;
+					}
+				});
+				return ret;
+			}.property("Mist.backendsController.selectedMachineCount"),
+			
+			canStart: function(){
+				ret = false;
+				this.getSelectedMachines().some(function(machine){
+					if(machine.can_start){
+						ret = true;
+						return true;
+					}
+				});
+				return ret;
+			}.property("Mist.backendsController.selectedMachineCount"),
+			
 			getSelectedMachines: function(){
 				var machines = [];
 			    

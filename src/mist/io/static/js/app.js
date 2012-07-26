@@ -117,6 +117,14 @@ define( 'app', [
 		$(document).on( 'pagebeforeshow', '#machines', function(){
 		    $('#machines-list').listview('refresh');
 		});
+		
+		$(document).on( 'pagebeforeshow', '#dialog-power', function(){
+			$("#dialog-power a").button();
+		});
+		
+		$(document).on( 'pagebeforeshow', '#dialog-single-power', function(){
+			$("#dialog-single-power a").button();
+		});
 
 		App.Select = Ember.Select.extend({
 		    attributeBindings: ['name', "data-theme", "data-icon",

@@ -30,6 +30,16 @@ define('app/controllers/backends', [
 							});
 							that.set('machineCount', count);
 						});
+						
+						item.machines.addObserver('@each.selected', function() {
+							var count = 0;
+							that.content.forEach(function(item){
+								count = count + item.machines.filterProperty('selected', true).get('length');
+							});
+							that.set('selectedMachineCount', count); 
+						    	
+						});
+						
 						item.images.addObserver('length', function() {
 							var count = 0;
 							that.content.forEach(function(item){

@@ -3,9 +3,20 @@
         <h1>Actions</h1>
     </div>
     <div data-role="content">
+        {{#if canReboot}}
         <a data-role="button" {{action reboot}}>Reboot</a>
+        {{/if}}
+        
+        {{#if canShutdown}}
         <a data-role="button" {{action shutdown}}>Shutdown</a>
+        {{/if}}
+        {{#if canDestroy}}
         <a data-role="button" {{action destroy}}>Destroy</a>
+        {{/if}}
+        {{#if canStart}}
+        <a data-role="button" {{action start}}>Start</a>
+        {{/if}}
         <a data-role="button" data-rel="back" data-theme="b">Close</a>
+        
     </div>
 </div>
