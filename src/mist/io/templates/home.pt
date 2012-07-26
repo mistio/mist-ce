@@ -42,7 +42,7 @@
         </div>
 
         <ul data-role="listview" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow" id="home-menu">
-            <li id="one-li-machines"><a id="machines-count" href="#machines">Machines 
+            <li id="one-li-machines"><a id="machines-count" href="#machines">Machines
             <script type="text/x-handlebars">
             {{#view Mist.CountView numberBinding="Mist.backendsController.machineCount" tagName="span" class="ui-li-count"}}
             {{number}}
@@ -54,7 +54,7 @@
             {{#view Mist.CountView numberBinding="Mist.backendsController.imageCount" tagName="span" class="ui-li-count"}}
             {{number}}
             {{/view}}
-            </script> 
+            </script>
             </a></li>
         </ul>
     </div><!-- /content -->
@@ -104,8 +104,8 @@
         <a href="#one" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
         <h1>Machines</h1>
         <script type="text/x-handlebars">
-        <a href="#dialog-providers" 
-        data-rel="dialog" data-role="button" data-iconpos="notext" data-transition="slidedown" data-icon="check" 
+        <a href="#dialog-providers"
+        data-rel="dialog" data-role="button" data-iconpos="notext" data-transition="slidedown" data-icon="check"
         {{bindAttr class="Mist.backendsController.state :state-providers "}} >
         </script>
     </div><!-- /header -->
@@ -122,13 +122,13 @@
             prompt="Select Machines"
         }}
         </script>
-        
+
         <a href="#dialog-add" id="mist-create-machine" data-rel="dialog" data-theme="b" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus">
         Create
         </a>
         <script type="text/x-handlebars">
         <ul id="machines-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" data-filter-placeholder="Filter machines..">
-        {{#each Mist.backendsController}}        
+        {{#each Mist.backendsController}}
         {{#each this.machines}}
         {{view Mist.MachineListView machineBinding="this"}}
         {{/each}}
@@ -141,29 +141,29 @@
     <div id="machines-footer" data-role="footer" data-theme="a">
         <table id="actions" data-role="controlgroup" data-type="horizontal">
             <tr>
-            <td><a href="#dialog-actions" 
-                id="machines-button-actions" 
-                data-role="button" 
+            <td><a href="#dialog-actions"
+                id="machines-button-actions"
+                data-role="button"
                 data-icon="mist-actions"
                 data-rel="dialog"
                 data-transition="slidedown">
                 Actions
             </a>
             </td>
-            <td><a href="#dialog-console" 
-                id="machines-button-console" 
-                data-role="button" 
-                data-icon="gear" 
-                data-rel="dialog" 
+            <td><a href="#dialog-console"
+                id="machines-button-console"
+                data-role="button"
+                data-icon="gear"
+                data-rel="dialog"
                 data-transition="slidedown">
                 Console
             </a>
             </td>
-            <td><a href="#dialog-tags" 
-                id="machines-button-tags" 
-                data-role="button" 
-                data-icon="grid" 
-                data-rel="dialog" 
+            <td><a href="#dialog-tags"
+                id="machines-button-tags"
+                data-role="button"
+                data-icon="grid"
+                data-rel="dialog"
                 data-transition="slidedown">
                 Tag
             </a>
@@ -178,11 +178,11 @@
 <div data-role="dialog" id="dialog-console" class="mist-dialog">
     <div data-role="content" data-theme="a">
         <h3>Console</h3>
-        
+
         <input type="text" name="name" id="console-input" value=""  />
         <button>Submit</button>
         <p id="console-return"></p>
-        
+
         <a href="index.html" data-role="button" data-rel="back" data-theme="a">Hide</a>
     </div>
 </div><!-- /console dialog -->
@@ -259,11 +259,11 @@
     <div data-role="content">
 
         <div id="logo-container"></div>
-        
+
         <script type="text/x-handlebars">
         <ul id="images-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" data-filter-placeholder="Filter images..">
         {{#each Mist.backendsController}}
-        <li data-role="list-divider">{{this.title}}</li>        
+        <li data-role="list-divider">{{this.title}}</li>
         {{#each this.images}}
         {{view Mist.ImageListView imageBinding="this"}}
         {{/each}}
@@ -272,15 +272,6 @@
         </script>
 
     </div><!-- /content -->
-
-    <div id="machines-footer" data-role="footer" data-theme="a">
-        <div id="actions" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" id="machines-button-reboot" data-icon="refresh">Reboot</a>
-            <a data-role="button" id="machines-button-destroy" data-icon="delete">Destroy</a>
-            <a id="machines-button-console" href="#dialog-console" data-role="button" data-icon="gear" data-transition="slidedown">Console</a>
-            <a id="machines-button-tags" href="#dialog-tags" data-role="button" data-icon="grid" data-rel="dialog" data-transition="slidedown">Tag</a>
-        </div>
-    </div><!-- /footer -->
 
 </div><!-- /images page -->
 
