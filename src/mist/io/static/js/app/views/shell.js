@@ -12,8 +12,8 @@ define('app/views/shell', [
 			machineBinding: 'Mist.machine',
 
 			shell: function(){
-            	alert('shell view');
-                //machine.shell();
+                alert('this machine')
+                this.machine.shell();
 			},
 
 		    init: function() {
