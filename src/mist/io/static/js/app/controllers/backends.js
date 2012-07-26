@@ -16,6 +16,7 @@ define('app/controllers/backends', [
 				this._super();
 
 				var that = this;
+				Ember.run.next(function(){
 				$.getJSON('/backends', function(data) {
 					data.forEach(function(item){
 						that.pushObject(Backend.create(item));
@@ -62,6 +63,7 @@ define('app/controllers/backends', [
 					});
 				}).error(function() {
 					Mist.notificationController.notify("Error loading backends");
+				});
 				});
 			}
 		});

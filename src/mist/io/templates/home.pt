@@ -113,7 +113,7 @@
 
         <script type="text/x-handlebars">
         {{view Mist.Select data-native-menu="false" name="select-machines" id="mist-select-machines"
-            contentBinding="Mist.selectMachinesController"
+            contentBinding="Mist.selectMachinesController.content"
             selectionBinding="Mist.selectMachinesController.selection"
             optionLabelPath="content.name"
             optionValuePath="content.id"

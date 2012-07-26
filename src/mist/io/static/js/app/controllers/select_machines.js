@@ -9,16 +9,28 @@ define('app/controllers/select_machines', ['ember'],
 			_content: [{name: 'All', id: 'all'},
 			          { name: 'None', id: 'none'}],
 			selection: null,
-
+			
 			//if only this would work...
 			backendsChanged: function(){
-				var content = this._content;
+				console.log("backends changed");
+				var content = new Array();
 							
+				this._content.forEach(function(item){
+					content.push({name: item.name, id: item.id});
+				});
+				
 				Mist.backendsController.forEach(function(item){
 					content.push({name: item.title, id: item.id});
 				});
-							
+				
+				content.forEach(function(item){
+					console.log(item.name);
+				});
+				
+				this.contentWillChange();
 				this.set('content', content);
+				this.contentDidChange();
+				
 							
 			}.observes('Mist.backendsController.@each'),
 			
@@ -59,35 +71,6 @@ define('app/controllers/select_machines', ['ember'],
 			         
 			init: function() {
 				this._super();
-				
-				var that = this;
-				
-				Ember.run.next(function(){
-					
-					var content = that._content;
-					
-					Mist.backendsController.forEach(function(item){
-						content.push({name: item.title, id: item.id});
-					});
-					
-					that.set('content', content);
-					
-					var o = Ember.Object.create({
-					    arrayWillChange: Ember.K,
-					    arrayDidChange: function(array, start, removeCount, addCount) {
-							var c = that._content;
-							if(array == null){
-								return;
-							}
-							array.forEach(function(item){
-								c.push({name: item.title, id: item.id});
-							});
-							that.set('content', c);
-					    },
-					});
-					Mist.backendsController.addArrayObserver(o);
-				});
-				
 			}
 		});
 	}
