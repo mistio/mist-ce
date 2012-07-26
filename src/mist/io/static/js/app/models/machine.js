@@ -69,7 +69,7 @@ define('app/models/machine', ['ember'],
 				$.ajax({
                     url: 'backends/'+ this.backend.index + '/machines/'+this.id,
                     data: 'action=start',
-                    type: 'post',
+                    type: 'POST',
                     success: function(data) {
                         console.log('machine starting')
                     },
@@ -90,7 +90,7 @@ define('app/models/machine', ['ember'],
 				$.ajax({
                     url: 'backends/'+ this.backend.index + '/machines/'+this.id,
                     data: 'action=stop',
-                    type: 'post',
+                    type: 'POST',
                     success: function(data) {
                         console.log('machine being shut down')
                     },
@@ -103,8 +103,32 @@ define('app/models/machine', ['ember'],
                 });
 			},
 
-			shell: function(){
-				alert('action shell');
+			shell: function(shell_command){
+
+				var that = this;
+
+                console.log('Sending ' + shell_command + ' to machine: ' + that.name);
+
+				$.ajax({
+                    url: 'shell_command',
+                    data: {ip: this.public_ips[0],
+                           command: shell_command
+                           },
+                    type: 'POST',
+                    success: function(data) {
+                        console.log("Shell command sent.Result: " + data)
+                        if (data){
+                            that.set('shellOutput', data);
+                        }
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                    	Mist.notificationController.notify("Error sending command " + shell_command + " to machine: " +
+                    			that.name);
+    					console.log("Error sending shell command to machine: " + that.name)
+    					console.log(textstate + " " + errorThrown);
+                    }
+                });
+
 			},
 
 			stateString: function(){

@@ -10,10 +10,10 @@ define('app/views/shell', [
 		return Ember.View.extend({
 			tagName: false,
 			machineBinding: 'Mist.machine',
+            shellOutput:'',
 
 			shell: function(){
-                alert('this machine');
-                this.machine.shell();
+                this.shellOutput = this.machine.shell(this.command);
 			},
 
 		    init: function() {

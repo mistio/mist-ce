@@ -3,9 +3,9 @@
         <h1>Shell</h1>
     </div>
     <div data-role="content" data-theme="b">
-        <input type="text" name="name" id="shell-input" value=""/>
-        <a data-role="button" {{action shell}}>Send</button>
-        <p id="shell-return"></p>
+        {{view Ember.TextField valueBinding="command"}}
+        <a data-role="button" {{action shell}}>Send</a>
+        <p id="shell-return">{{shellOutput}}</p>
         <a data-role="button" data-rel="back" data-theme="a">Back</a>
     </div>
 </div>
