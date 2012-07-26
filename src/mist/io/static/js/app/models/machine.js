@@ -7,11 +7,11 @@ define('app/models/machine', ['ember'],
 	function() {
 		return Ember.Object.extend({
 			STATES: {
-				    '0' : 'Running',
-				    '1' : 'Rebooting',
-				    '2' : 'Terminated',
-				    '3' : 'Pending',
-				    '4' : 'Unknown'
+				    '0' : 'running',
+				    '1' : 'rebooting',
+				    '2' : 'terminated',
+				    '3' : 'pending',
+				    '4' : 'unknown'
 				    },
 
 			id: null,
@@ -132,7 +132,7 @@ define('app/models/machine', ['ember'],
 			},
 
 			stateString: function(){
-				return this.STATES[this.state].toLowerCase();
+				return this.STATES[this.state];
 			}.property("state"),
 
 			hasAlert : function(){
