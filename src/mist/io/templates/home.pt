@@ -61,7 +61,7 @@
 </div><!-- /page home -->
 
 
-<!-- Start of add provider dialog -->
+<!-- Start of add backend dialog -->
 <div data-role="page" id="add-backend" class="mist-dialog" tal:condition="session">
     <div data-role="header">
         <h1>Add Backend</h1>
@@ -94,6 +94,17 @@
         </div>
     </div>
 </div><!-- /add backend dialog -->
+
+
+<!-- Start of edit backend dialog -->
+<div data-role="page" id="edit-backend" class="mist-dialog">
+    <div data-role="header">
+        <h1>Edit provider</h1>
+    </div>
+    <script type="text/x-handlebars">
+    {{view Mist.EditBackendView backendBinding="Mist.backend" }}
+    </script>
+</div><!-- /edit backend dialog -->
 
 
 <!-- Start of machines page: #machines -->
