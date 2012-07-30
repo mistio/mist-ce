@@ -283,8 +283,8 @@ div#splash div.mist-logo {
 
 /* Machines states colors. */
 
-#machines-list .state0 {
-    color: #e50;
+#machines-list .running.state {
+    color: #13B754;
 }
 
 #machines .ui-select {
