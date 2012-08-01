@@ -467,3 +467,15 @@ def shell_command(request):
     os.remove(tmp_path)
 
     return cmd_output
+
+@view_config(route_name='machine_uptime', request_method='GET', renderer='json')
+def machine_uptime(request):
+    """Check if the machine has a key pair deployed"""
+    tmp_path = config_fabric_ssh(request.params.get('ip', None),
+                                 request.registry.settings['keypairs'][0][1])
+
+    uptime =  run('cat /proc/uptime')
+    if uptime:
+        uptime = float(uptime.split()[0]) * 1000
+
+    return {'uptime': uptime }

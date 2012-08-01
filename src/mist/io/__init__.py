@@ -25,6 +25,7 @@ def main(global_config, **settings):
     config.add_route('backends', '/backends')
     config.add_route('machine_has_key', '/machine_has_key')
     config.add_route('shell_command', '/shell_command')
+    config.add_route('machine_uptime', '/machine_uptime')
 
     config.scan()
 
