@@ -125,6 +125,10 @@ define( 'app', [
 		$(document).on( 'pagebeforeshow', '#dialog-single-power', function(){
 			$("#dialog-single-power a").button();
 		});
+		
+		$(document).on( 'pagebeforeshow', '#images', function(){
+			$("#images-list").listview('refresh');
+		});
 
 		App.Select = Ember.Select.extend({
 		    attributeBindings: ['name', "data-theme", "data-icon",
