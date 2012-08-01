@@ -27,6 +27,7 @@ define( 'app', [
     'app/views/enable_backend_button',
     'app/views/machine_add_dialog',
     'app/views/machine',
+    'app/views/machine_list',
     'app/views/confirmation_dialog',
     'app/views/machine_actions_dialog',
     'app/views/single_machine_actions_dialog',
@@ -37,7 +38,7 @@ define( 'app', [
 			NotificationController, MachineAddController,
 			SelectMachinesController,
 			Count, BackendButton, EditBackend, MachineList, ImageList,
-			EnableBackendButton, MachineAddDialog, MachineView, ConfirmationDialog,
+			EnableBackendButton, MachineAddDialog, MachineView, MachineListView, ConfirmationDialog,
 			MachineActionsDialog,
 			SingleMachineActionsDialog, Shell) {
 		var App = Ember.Application.create({
@@ -176,6 +177,8 @@ define( 'app', [
 		dialog.append();
 		var shellDialog = Shell.create();
 		shellDialog.append();
+		var machineListView = MachineListView.create();
+		machineListView.append();
 
 		$(document).on( 'pagebeforeshow', '#dialog-add', function(){
 		    $('#dialog-add').trigger('create');

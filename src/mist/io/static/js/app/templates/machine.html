@@ -59,12 +59,14 @@
 	<div id="single-footer" data-role="footer" data-theme="a">
 		<table id="actions" data-role="controlgroup" data-type="horizontal">
 			<tr>
-            <td><a href="#dialog-shell"
+            <td>
+            <a href="#dialog-shell"
                 id="machines-button-shell"
                 data-role="button"
                 data-icon="gear"
                 data-rel="dialog"
-                data-transition="slidedown">
+                data-transition="slidedown"
+                {{bindAttr class="disabledClass"}}>
                 Shell
             </a>
             </td>

@@ -779,13 +779,6 @@ a#mist-select-machines-button span.ui-btn-text {
 	display: none;
 }
 
-div#machines div.ui-header div {
-	display: inline-block;
-	position: absolute;
-	top: 0;
-	right: 6px;
-}
-
 div#machines fieldset.machine-list-item {
     float: left;
     padding-top: 12px;

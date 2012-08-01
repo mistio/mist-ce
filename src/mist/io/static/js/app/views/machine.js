@@ -11,21 +11,13 @@ define('app/views/machine', [
 			tagName: false,
 			machineBinding: 'Mist.machine',
 			
-			didInsertElement: function(){
-		    	if(!this.machine){
-		    		return;
+		    disabledClass: function(){
+		    	if(this.machine && this.machine.hasKey){
+			    	return '';
+		    	} else {
+		    		return 'ui-disabled';
 		    	}
-				
-				var that = this;
-				
-		    	Em.run.next(function() {
-		    		if(that.machine.hasKey){
-		    			$('#machines-button-shell').button('enable');
-		    		} else {
-		    			$('#machines-button-shell').button('disable');
-		    		}
-		        });
-		    },
+		    }.property('machine.hasKey'),
 			
 			metadata: function(){
 				if(!this.machine || !this.machine.extra){
