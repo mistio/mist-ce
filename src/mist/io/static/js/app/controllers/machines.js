@@ -49,8 +49,14 @@ define('app/controllers/machines', [
 							
 							if(machine.id == item.id){
 								found = true;
-								console.log("found");
-								machine.set(item);
+								machine.set(item); //FIXME this does not change anything;
+								
+								machine.set('state', item.state);
+								machine.set('can_stop', item.can_stop);
+								machine.set('can_start', item.can_start);
+								machine.set('can_destroy', item.can_destroy);
+								machine.set('can_reboot', item.can_reboot);
+								
 								return false;
 							}
 						});
@@ -74,14 +80,16 @@ define('app/controllers/machines', [
 			                    		machine.set('hasKey', false);
 			                    	}
 			                    }
-							}).error(function(e) {
+							}).error(function(jqXHR, textStatus, errorThrown) {
 								console.log('error querying for machine key for machine id: ' + machine.id);
-								console.log(e.state + " " + e.stateText);
+								console.log(textStatus + " " + errorThrown);
 								machine.set('hasKey', false);
 							});
 							
 						}
-					})
+						
+						
+					});
 					
 					// TODO handle deletion from server
 					

@@ -12,6 +12,9 @@ define('app/controllers/confirmation', ['ember'],
 			
 			confirm: function(){
 				this.callback();
+				setTimeout(function(){
+					$('.ui-dialog').dialog ('close');
+				}, 500);
 			}
 		});
 	}
