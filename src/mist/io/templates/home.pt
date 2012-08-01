@@ -15,7 +15,7 @@
     <script data-main="static/js/app.js" src="static/js/lib/require/require.js"></script>
 </head>
 
-<body>
+<body style="background-color: #c2c3c4">
 
 <div data-role="page" id="splash">
     <div class="mist-logo"></div>

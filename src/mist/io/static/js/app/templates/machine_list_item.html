@@ -14,9 +14,13 @@
             <span class="tag ui-btn-corner-all">tag1</span> <span
                 class="tag ui-btn-corner-all">tag2</span>
         </p> 
+        <span class="bubble-container">
         {{#if machine.hasKey}}
-            <span class="bubble-container"> <span
+             <span
             class="ui-li-count node-icon key-icon"></span>
-            </span>
+        {{else}}
+         <span
+            class="ui-li-count node-icon no-key-icon"></span>
         {{/if}}
+        </span>
 </a></li>

@@ -256,6 +256,11 @@ div#splash div.mist-logo {
     background-color: #333;
 }
 
+#machines-list .no-key-icon {
+    background-image: url("icons/key.png");
+    background-color: #999;
+}
+
 #machines-list .alert-icon {
     background-color: #f61;
 }
