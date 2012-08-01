@@ -12,6 +12,10 @@ define('app/views/machine_list', [
 			
 		    disabledClass: function(){
 		    	var machines = [];
+		    	
+		    	if(Mist.backendsController.selectedMachineCount > 1){
+		    		return 'ui-disabled';
+		    	}
 				    
 				Mist.backendsController.forEach(function(backend){
 					backend.machines.forEach(function(machine){
@@ -21,7 +25,7 @@ define('app/views/machine_list', [
 					});
 				});        
 				
-		    	if(machines.length > 0){
+		    	if(machines.length == 1){
 			    	return '';
 		    	} else {
 		    		return 'ui-disabled';
