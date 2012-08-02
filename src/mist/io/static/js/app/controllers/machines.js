@@ -120,6 +120,7 @@ define('app/controllers/machines', [
 							console.log("machine uptime");
 							if('uptime' in data){
 								machine.set('upsince', new Date(Date.now() - data.uptime));
+								machine.set('uptime', data.uptime);
 								console.log(machine.upsince);
 							}
 						}

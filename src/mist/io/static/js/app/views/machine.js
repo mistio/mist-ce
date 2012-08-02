@@ -86,6 +86,39 @@ define('app/views/machine', [
 				return this.machine.name || this.machine.id;
 			}.property("machine"),
 			
+			upFor: function(){
+				if(this.machine && this.machine.uptime){
+					var ret = "";
+					var x = Math.floor(this.machine.uptime / 1000);
+					var seconds = x % 60;
+					x = Math.floor(x / 60);
+					var minutes = x % 60;
+					x = Math.floor(x / 60);
+					var hours = x % 24;
+					x = Math.floor(x / 24);
+					var days = x;
+					if(days){
+						ret = ret + days + " days, ";
+					}
+					
+					if(hours){
+						ret = ret + hours + " hours, ";
+					}
+					
+					if(hours){
+						ret = ret + minutes + " minutes, ";
+					}
+					
+					if(seconds){
+						ret = ret + seconds + " seconds";
+					}
+					
+					return ret;
+				} else {
+					return '';
+				}
+			}.property("machine"),
+			
 			providerIconClass: function(){
 				if(!this.machine){
 					return "";

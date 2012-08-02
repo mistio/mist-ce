@@ -32,6 +32,13 @@
              <td class="value">{{machine.upsince}}</td>
             </tr>
             {{/if}}
+            
+            {{#if machine.uptime}}
+            <tr>
+             <td class="key">Up and running for</td>
+             <td class="value">{{upFor}}</td>
+            </tr>
+            {{/if}}
 			
 			{{#each basicvars}}
 			<tr>

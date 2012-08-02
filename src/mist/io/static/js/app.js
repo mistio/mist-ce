@@ -134,16 +134,6 @@ define( 'app', [
 		App.Select = Ember.Select.extend({
 		    attributeBindings: ['name', "data-theme", "data-icon",
                 "data-native-menu", 'disabled'],
-
-            didInsertElement: function(){
-
-			    var that = this;
-
-	    	    //Em.run.next(function() {
-	    	    //		that.get('parentView').$().trigger('create');
-
-	    		//});
-	        },
 		});
 
 		App.TextField = Ember.TextField.extend({
