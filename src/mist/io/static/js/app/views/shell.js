@@ -24,10 +24,13 @@ define('app/views/shell', [
 					}); 
 				}
 				this.set('machine', machine);
-				this.machine.shell(this.command);
+				var that = this;
+				this.machine.shell(this.command, function(output){
+					that.set('shellOutput', output);
+				});
 				this.clear();
 			},
-			
+						
 			clear: function(){
 				this.set('command', '');
 			},

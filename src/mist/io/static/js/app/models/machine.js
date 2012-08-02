@@ -104,7 +104,7 @@ define('app/models/machine', ['ember'],
                 });
 			},
 
-			shell: function(shell_command){
+			shell: function(shell_command, callback){
 
 				var that = this;
 
@@ -119,7 +119,7 @@ define('app/models/machine', ['ember'],
                     success: function(data) {
                         console.log("Shell command sent.Result: " + data);
                         if (data){
-                            that.set('shellOutput', data);
+                            callback(data);
                         }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
