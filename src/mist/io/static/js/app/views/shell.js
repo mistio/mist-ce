@@ -33,12 +33,19 @@ define('app/views/shell', [
 				var command = this.command;
 				
 				this.machine.shell(command, function(output){
+					var previousOutput = '';
+					
 					if(that.shellOutput){
-						var previousOutput = that.shellOutput + "\n$" + command + "\n" + output;	
+						previousOutput = that.shellOutput + "\n$" + command + "\n" + output;	
 					} else {
-						var previousOutput = "$" + command + "\n" + output;
+						previousOutput = "$" + command + "\n" + output;
 					}
-					that.set('shellOutput', previousOutput);
+					
+					that.set('shellOutput', previousOutput.replace(/\n/g, '<br />'));
+					Em.run.next(function(){
+						var animation = {scrollTop: $("#shell-return").prop("scrollHeight")};
+					    $('#shell-return').animate(animation, 'slow', 'swing');
+					});
 				});
 				this.clear();
 			},

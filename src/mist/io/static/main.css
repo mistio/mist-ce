@@ -790,3 +790,12 @@ div#machines fieldset.machine-list-item {
 .ui-icon-shell-return {
     background-image: url("need-icon.png");
 }
+
+#shell-return {
+	width:80ex;
+	overflow: scroll;
+	height: 60ex;
+	font-family:monospace;
+	font-size: 11px;
+}
+}

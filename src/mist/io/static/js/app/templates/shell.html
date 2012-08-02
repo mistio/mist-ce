@@ -8,7 +8,7 @@
         <a id="shell-send" data-icon="shell-return"
          data-role="button" data-inline="true" {{action submit}} {{bindAttr class="disabledClass"}}>Send</a>
         </div>
-        <pre style="width:80ex; overflow: scroll ; max-height: 600px" id="shell-return">{{shellOutput}}</pre>
+        <div id="shell-return">{{{shellOutput}}}</div>
         <a data-role="button" data-rel="back" data-theme="a" {{action clear}}>Back</a>
     </div>
 </div>
