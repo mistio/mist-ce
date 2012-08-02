@@ -51,9 +51,14 @@
 
 		<div data-role="collapsible">
 			<h3>Monitoring</h3>
-			<div id="cpu-chart"></div>
-			<div id="ram-chart"></div>
-			<div id="load-chart"></div>
+			{{#if machine.monitoring}}
+                <div id="cpu-chart"></div>
+                <div id="ram-chart"></div>
+                <div id="load-chart"></div>
+            {{else}}
+                <div>Enable monitoring!!!</div>
+            {{/if}}
+
 		</div>
 		
 		<div data-role="collapsible">
