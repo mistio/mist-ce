@@ -12,3 +12,4 @@ include
 docs/build
 src/libcloud
 .DS_Store
+.Python
