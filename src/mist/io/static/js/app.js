@@ -142,7 +142,7 @@ define( 'app', [
 		
 		App.ShellTextField = Ember.TextField.extend({
 		    attributeBindings: ['name', "data-theme"],
-		    
+
 		    insertNewline: function() {
 		        this.controller.submit();
 		    }
