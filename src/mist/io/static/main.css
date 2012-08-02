@@ -786,3 +786,7 @@ div#machines fieldset.machine-list-item {
 }
 
 }
+
+.ui-icon-shell-return {
+    background-image: url("need-icon.png");
+}

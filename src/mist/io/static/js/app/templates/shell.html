@@ -5,9 +5,10 @@
     <div data-role="content" data-theme="b">
         <div data-role="fieldcontain">
         {{view Mist.ShellTextField valueBinding="command" controllerBinding="this"}}
-        <a id="shell-send" data-role="button" data-inline="true" {{action submit}} {{bindAttr class="disabledClass"}}>Send</a>
+        <a id="shell-send" data-icon="shell-return"
+         data-role="button" data-inline="true" {{action submit}} {{bindAttr class="disabledClass"}}>Send</a>
         </div>
-        <pre id="shell-return">{{shellOutput}}</pre>
+        <pre style="width:80ex; overflow: scroll ; max-height: 600px" id="shell-return">{{shellOutput}}</pre>
         <a data-role="button" data-rel="back" data-theme="a" {{action clear}}>Back</a>
     </div>
 </div>

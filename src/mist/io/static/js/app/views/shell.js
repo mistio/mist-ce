@@ -29,8 +29,16 @@ define('app/views/shell', [
 				
 				this.set('machine', machine);
 				var that = this;
-				this.machine.shell(this.command, function(output){
-					that.set('shellOutput', output);
+				
+				var command = this.command;
+				
+				this.machine.shell(command, function(output){
+					if(that.shellOutput){
+						var previousOutput = that.shellOutput + "\n$" + command + "\n" + output;	
+					} else {
+						var previousOutput = "$" + command + "\n" + output;
+					}
+					that.set('shellOutput', previousOutput);
 				});
 				this.clear();
 			},
