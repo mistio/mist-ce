@@ -110,7 +110,6 @@ define('app/views/machine_actions_dialog', [
 			canShutdown: function(){
 				ret = false;
 				this.getSelectedMachines().some(function(machine){
-					console.log(machine.can_shutdown);
 					if(machine.can_stop){
 						ret = true;
 						return true;

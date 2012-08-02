@@ -139,6 +139,14 @@ define( 'app', [
 		App.TextField = Ember.TextField.extend({
 		    attributeBindings: ['name', "data-theme"]
 		});
+		
+		App.ShellTextField = Ember.TextField.extend({
+		    attributeBindings: ['name', "data-theme"],
+		    
+		    insertNewline: function() {
+		        this.controller.submit();
+		    }
+		});
 
 		App.Checkbox = Ember.Checkbox.extend({
 		    attributeBindings: ['name', "id"]

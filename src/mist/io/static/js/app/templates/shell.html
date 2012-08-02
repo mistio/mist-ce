@@ -3,8 +3,8 @@
         <h1>Shell</h1>
     </div>
     <div data-role="content" data-theme="b">
-        {{view Ember.TextField valueBinding="command"}}
-        <a id="shell-send" data-role="button" {{action shell}} {{bindAttr class="disabledClass"}}>Send</a>
+        {{view Mist.ShellTextField valueBinding="command" controllerBinding="this"}}
+        <a id="shell-send" data-role="button" {{action submit}} {{bindAttr class="disabledClass"}}>Send</a>
         <pre id="shell-return">{{shellOutput}}</pre>
         <a data-role="button" data-rel="back" data-theme="a" {{action clear}}>Back</a>
     </div>

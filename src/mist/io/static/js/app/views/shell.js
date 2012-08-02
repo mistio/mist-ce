@@ -11,7 +11,7 @@ define('app/views/shell', [
 			tagName: false,
 			machineBinding: 'Mist.machine',
 
-			shell: function(){
+			submit: function(){
 				var machine = this.machine;
 				if(!machine){
 					Mist.backendsController.forEach(function(backend){
@@ -23,6 +23,10 @@ define('app/views/shell', [
 						});
 					}); 
 				}
+				if(!machine || !this.command){
+					return;
+				}
+				
 				this.set('machine', machine);
 				var that = this;
 				this.machine.shell(this.command, function(output){
