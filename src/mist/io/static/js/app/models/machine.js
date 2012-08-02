@@ -23,6 +23,7 @@ define('app/models/machine', ['ember'],
 			backend: null,
 			selected: false,
 			hasKey: false,
+            hasMonitoring: false,
 			state: '4',
 
 			reboot: function(){
