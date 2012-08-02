@@ -7,7 +7,12 @@ require.config({
         mobile: 'lib/jquery.mobile-1.1.0.min',
 		text: 'lib/require/text',
 		mocha: 'lib/mocha',
-		chai: 'lib/chai'
+		chai: 'lib/chai',
+        jqplot: 'lib/jquery.jqplot.min',
+        jqpCursor: 'lib/jqplot.cursor.min',
+        jpqDateAxis: 'lib/jqplot.dateAxisRenderer.min',
+        jpqHighlighter: 'lib/jqplot.highlighter.min',
+        jqpJson2: 'lib/jqplot.json2.min'
 	}
 });
 
@@ -34,13 +39,26 @@ define( 'app', [
     'app/views/shell',
 	'ember',
 	'mobile',
-	], function($, BackendsController, ConfirmationController,
-			NotificationController, MachineAddController,
-			SelectMachinesController,
-			Count, BackendButton, EditBackend, MachineList, ImageList,
-			EnableBackendButton, MachineAddDialog, MachineView, MachineListView, ConfirmationDialog,
-			MachineActionsDialog,
-			SingleMachineActionsDialog, Shell) {
+    'jqplot',
+	], function($,
+                BackendsController,
+                ConfirmationController,
+                NotificationController,
+                MachineAddController,
+                SelectMachinesController,
+                Count,
+                BackendButton,
+                EditBackend,
+                MachineList,
+                ImageList,
+                EnableBackendButton,
+                MachineAddDialog,
+                MachineView,
+                MachineListView,
+                ConfirmationDialog,
+                MachineActionsDialog,
+                SingleMachineActionsDialog,
+                Shell) {
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',
