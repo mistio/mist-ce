@@ -26,7 +26,7 @@ define('app/views/machine_actions_dialog', [
 				
 				machines.forEach(function(machine){
 					names = names + ' ' + machine.name;
-				})
+				});
 				
 				Mist.confirmationController.set("text", 'Are you sure you want to reboot' +
 						names +'?');
@@ -54,7 +54,7 @@ define('app/views/machine_actions_dialog', [
 				
 				machines.forEach(function(machine){
 					names = names + ' ' + machine.name;
-				})
+				});
 				
 				Mist.confirmationController.set("text", 'Are you sure you want to destroy' +
 						names +'?');
@@ -83,7 +83,7 @@ define('app/views/machine_actions_dialog', [
 				
 				machines.forEach(function(machine){
 					names = names + ' ' + machine.name;
-				})
+				});
 				
 				Mist.confirmationController.set("text", 'Are you sure you want to shutdown' +
 						names +'?');
@@ -142,7 +142,7 @@ define('app/views/machine_actions_dialog', [
 			}.property("Mist.backendsController.selectedMachineCount"),
 			
 			getSelectedMachines: function(){
-				var machines = [];
+				var machines = new Array();
 			    
 				Mist.backendsController.forEach(function(backend){
 					backend.machines.forEach(function(machine){

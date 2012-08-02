@@ -15,7 +15,7 @@ define('app/controllers/sizes', [
 			
 				var that = this;
 				$.getJSON('/backends/' + this.backend.index + '/sizes', function(data) {
-					var content = [];
+					var content = new Array();
 					data.forEach(function(item){
 						content.push(Size.create(item));
 					});

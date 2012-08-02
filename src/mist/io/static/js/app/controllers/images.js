@@ -59,7 +59,7 @@ define('app/controllers/images', [
 			
 				var that = this;
 				$.getJSON('/backends/' + this.backend.index + '/images', function(data) {
-					var content = [];
+					var content = new Array();
 					data.forEach(function(item){
 						content.push(Image.create(item));
 					});

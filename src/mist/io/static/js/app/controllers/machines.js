@@ -105,7 +105,7 @@ define('app/controllers/machines', [
 				}).error(function(e) {
 					Mist.notificationController.notify("Error loading machines for backend: " + that.backend.title);
 					that.backend.set('state', 'offline');
-					console.log("Error loading machines for backend: " + that.backend.title)
+					console.log("Error loading machines for backend: " + that.backend.title);
 					console.log(e.state + " " + e.stateText);
 				});
 				

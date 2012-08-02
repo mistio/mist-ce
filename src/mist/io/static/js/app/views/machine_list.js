@@ -11,7 +11,7 @@ define('app/views/machine_list', [
 			tagName: false,
 			
 		    disabledClass: function(){
-		    	var machines = [];
+		    	var machines = new Array();
 		    	
 		    	if(Mist.backendsController.selectedMachineCount > 1){
 		    		return 'ui-disabled';

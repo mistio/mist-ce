@@ -23,7 +23,7 @@ define('app/views/machine', [
 				if(!this.machine || !this.machine.extra){
 					return [];
 				}
-				var ret = [];
+				var ret = new Array();
 				
 				$.each(this.machine.extra, function(key, value){
 					if (typeof(value) == 'string'){
@@ -67,7 +67,7 @@ define('app/views/machine', [
 						'Launch Date': this.machine.extra.launchdatetime
 				};
 				
-				var ret = [];
+				var ret = new Array();
 				
 				$.each(basicvars, function(key, value){
 					if (typeof(value) == 'string'){

@@ -72,12 +72,12 @@ define('app/models/machine', ['ember'],
                     data: 'action=start',
                     type: 'POST',
                     success: function(data) {
-                        console.log('machine starting')
+                        console.log('machine starting');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                     	Mist.notificationController.notify("Error starting machine: " +
                     			that.name);
-    					console.log("Error starting machine: " + that.name)
+    					console.log("Error starting machine: " + that.name);
     					console.log(textstate + " " + errorThrown);
                     }
                 });
@@ -93,12 +93,12 @@ define('app/models/machine', ['ember'],
                     data: 'action=stop',
                     type: 'POST',
                     success: function(data) {
-                        console.log('machine being shut down')
+                        console.log('machine being shut down');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                     	Mist.notificationController.notify("Error shutting down machine: " +
                     			that.name);
-    					console.log("Error shutting down machine: " + that.name)
+    					console.log("Error shutting down machine: " + that.name);
     					console.log(textstate + " " + errorThrown);
                     }
                 });
@@ -117,7 +117,7 @@ define('app/models/machine', ['ember'],
                            },
                     type: 'POST',
                     success: function(data) {
-                        console.log("Shell command sent.Result: " + data)
+                        console.log("Shell command sent.Result: " + data);
                         if (data){
                             that.set('shellOutput', data);
                         }
@@ -125,7 +125,7 @@ define('app/models/machine', ['ember'],
                     error: function(jqXHR, textstate, errorThrown) {
                     	Mist.notificationController.notify("Error sending command " + shell_command + " to machine: " +
                     			that.name);
-    					console.log("Error sending shell command to machine: " + that.name)
+    					console.log("Error sending shell command to machine: " + that.name);
     					console.log(textstate + " " + errorThrown);
                     }
                 });

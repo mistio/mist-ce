@@ -15,7 +15,7 @@ define('app/controllers/locations', [
 			
 				var that = this;
 				$.getJSON('/backends/' + this.backend.index + '/locations', function(data) {
-					var content = [];
+					var content = new Array();
 					data.forEach(function(item){
 						content.push(Location.create(item));
 					});
