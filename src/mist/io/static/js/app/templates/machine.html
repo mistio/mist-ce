@@ -53,8 +53,11 @@
 			<h3>Monitoring</h3>
 			{{#if machine.monitoring}}
                 <div id="cpu-chart"></div>
+                <a class="reset cpu" data-role="button" data-icon="refresh" data-mini="true">Reset zoom</a>
                 <div id="ram-chart"></div>
+                <a class="reset ram" data-role="button" data-icon="refresh" data-mini="true">Reset zoom</a>
                 <div id="load-chart"></div>
+                <a class="reset load" data-role="button" data-icon="refresh" data-mini="true">Reset zoom</a>   
             {{else}}
                 <div>Enable monitoring!!!</div>
             {{/if}}
