@@ -194,7 +194,8 @@ def stop_machine(request):
                    public_ips=[],
                    private_ips=[],
                    driver=conn)
-    #machine.stop()
+    #if conn.has('ex_stop'):
+    conn.ex_stop(machine)
 
     return []
 
@@ -462,7 +463,10 @@ def shell_command(request):
     tmp_path = config_fabric_ssh(request.params.get('ip', None),
                                  request.registry.settings['keypairs'][0][1])
 
-    cmd_output = run(request.params.get('command', None))
+    try:
+        cmd_output = run(request.params.get('command', None))
+    except:
+        cmd_output = ''; # FIXME grab the UNIX error
 
     os.remove(tmp_path)
 
