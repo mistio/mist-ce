@@ -12,7 +12,8 @@ require.config({
         jqpCursor: 'lib/jqplot.cursor.min',
         jpqDateAxis: 'lib/jqplot.dateAxisRenderer.min',
         jpqHighlighter: 'lib/jqplot.highlighter.min',
-        jqpJson2: 'lib/jqplot.json2.min'
+        jqpJson2: 'lib/jqplot.json2.min',
+        jqueryUi: "lib/jquery-ui-1.8.22.custom.min"
 	}
 });
 
@@ -40,6 +41,7 @@ define( 'app', [
 	'ember',
 	'mobile',
     'jqplot',
+    'jqueryUi',
 	], function($,
                 BackendsController,
                 ConfirmationController,
