@@ -9,6 +9,7 @@ function(shell_html) {
 	return Ember.View.extend({
 		tagName : false,
 		machineBinding : 'Mist.machine',
+		shellOutputItems: Ember.ArrayController.create(),
 		
 		availableCommands: [ "dmesg", "uptime", "uname",
 		      					"ls", "reboot", "whoami", "ifconfig" ],
@@ -56,18 +57,19 @@ function(shell_html) {
 			var command = this.command;
 
 			this.machine.shell(command, function(output) {
-				var previousOutput = '';
-
-				if (that.shellOutput) {
-					previousOutput = that.shellOutput + "\n$" + command + "\n"
-							+ output;
-				} else {
-					previousOutput = "$" + command + "\n" + output;
+				
+				if(!that.shellOutputItems.content){
+					that.shellOutputItems.set('content', new Array());
 				}
+				
+				that.shellOutputItems.arrayContentWillChange(that.shellOutputItems.content.length -  1, 0, 1);
+				
+				that.shellOutputItems.content.push({
+					command: "$" + command,
+					output: output.replace(/\n/g, '<br />')
+				});
+				that.shellOutputItems.arrayContentDidChange(that.shellOutputItems.content.length -  1, 0, 1);
 
-				that
-						.set('shellOutput', previousOutput.replace(/\n/g,
-								'<br />'));
 				Em.run.next(function() {
 					var animation = {
 						scrollTop : $("#shell-return").prop("scrollHeight")
