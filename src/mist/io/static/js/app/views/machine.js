@@ -117,7 +117,7 @@ define('app/views/machine', [
 				} else {
 					return '';
 				}
-			}.property("machine"),
+			}.property("machine.uptime"),
 			
 			providerIconClass: function(){
 				if(!this.machine){
