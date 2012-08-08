@@ -37,7 +37,6 @@ define( 'app', [
     'app/views/shell',
 	'ember',
 	'mobile',
-    'jqplot',
     'jqueryUi',
     'd3',
     'cubism'
