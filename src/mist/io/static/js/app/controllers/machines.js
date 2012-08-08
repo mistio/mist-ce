@@ -75,7 +75,6 @@ define('app/controllers/machines', [
 			                    	console.log(data);
 			                    	if(data){
 			                    		machine.set('hasKey', data);
-			                    		machine.checkUptime(machine);
 			                    		machine.checkUptime();
 			                    	} else {
 			                    		machine.set('hasKey', false);
