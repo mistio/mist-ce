@@ -13,7 +13,9 @@ require.config({
         jpqDateAxis: 'lib/jqplot.dateAxisRenderer.min',
         jpqHighlighter: 'lib/jqplot.highlighter.min',
         jqpJson2: 'lib/jqplot.json2.min',
-        jqueryUi: "lib/jquery-ui-1.8.22.custom.min"
+        jqueryUi: "lib/jquery-ui-1.8.22.custom.min",
+        d3: "lib/d3.v2",
+        cubism: "lib/cubism.v1"
 	}
 });
 
@@ -42,6 +44,8 @@ define( 'app', [
 	'mobile',
     'jqplot',
     'jqueryUi',
+    'd3',
+    'cubism'
 	], function($,
                 BackendsController,
                 ConfirmationController,
@@ -60,7 +64,13 @@ define( 'app', [
                 ConfirmationDialog,
                 MachineActionsDialog,
                 SingleMachineActionsDialog,
-                Shell) {
+                Shell,
+                mber,
+                Mobile,
+                JQPlot,
+                jQueryUI,
+                d3,
+                cubism) {
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',

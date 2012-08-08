@@ -43,8 +43,11 @@
 			</table>
 		</div>
 
-		<div data-role="collapsible">
+		<div data-role="collapsible" data-collapsed="false">
 			<h3>Monitoring</h3>
+			
+			<div id="machineGraph" style="min-height: 155px;"></div>
+			
 			{{#if machine.hasMonitoring}}
                 <div id="cpu-chart"></div>
                 <a class="reset cpu" data-role="button" data-icon="refresh" data-mini="true">Reset zoom</a>

@@ -76,6 +76,7 @@ define('app/controllers/machines', [
 			                    	if(data){
 			                    		machine.set('hasKey', data);
 			                    		machine.checkUptime(machine);
+			                    		machine.checkUptime();
 			                    	} else {
 			                    		machine.set('hasKey', false);
 			                    	}
