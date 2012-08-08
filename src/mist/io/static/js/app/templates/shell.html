@@ -10,8 +10,8 @@
         </div>
         <div id="shell-return">
         {{#each shellOutputItems}}
-            <div>{{command}}</div>
-            <div>{{{output}}}</div>
+            <div class="command">{{command}}</div>
+            <div class="output">{{{output}}}</div>
         {{/each}}
         </div>
         <a data-role="button" data-rel="back" data-theme="a" {{action clear}}>Back</a>
