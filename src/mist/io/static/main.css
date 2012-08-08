@@ -688,9 +688,6 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 100%;
     clear: both;
     margin-top: 0px;
-    background-image: url("return.png");
-    background-position: 5px 5px;
-    background-repeat: no-repeat;
 }
 
 #dialog-shell #shell-input input {
@@ -700,10 +697,14 @@ a#mist-select-machines-button span.ui-btn-text {
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     -webkit-box-sizing: border-box;
+    background-image: url("images/prompt.png");
+    background-position: 12px 9px;
+    background-repeat: no-repeat;
 }
 
 #dialog-shell #shell-send {
     margin: .5em 0;
+    padding: 5px 27px;
 }
 
 #dialog-shell .ui-icon-shell-return {
@@ -740,6 +741,18 @@ a#mist-select-machines-button span.ui-btn-text {
 
 #dialog-shell #shell-return div.output {
     background: #ccddee;
+}
+
+.ui-autocomplete {
+    -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    -moz-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+}
+
+.ui-autocomplete .ui-menu-item a {
+    padding: .2em .4em .2em 1.6em;
+    font-size: 16px;
 }
 
 /* Conditional for < 720px */
