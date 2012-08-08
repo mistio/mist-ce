@@ -4,9 +4,14 @@
     </div>
     <div data-role="content" data-theme="b">
         <div data-role="fieldcontain">
-        {{view Mist.ShellTextField valueBinding="command" controllerBinding="this"}}
-        <a id="shell-send" data-icon="shell-return"
-         data-role="button" data-inline="true" {{action submit}} {{bindAttr class="disabledClass"}}>Send</a>
+            <table id="shell-input">
+                <tr>
+                    <td>{{view Mist.ShellTextField valueBinding="command" controllerBinding="this"}}</td>
+                    <td id="shell-send-wrapper">
+                        <a id="shell-send" data-icon="shell-return" data-role="button" {{action submit}} {{bindAttr class="disabledClass"}}></a>
+                    </td>
+                </tr>
+            </table>
         </div>
         <div id="shell-return">
         {{#each shellOutputItems}}

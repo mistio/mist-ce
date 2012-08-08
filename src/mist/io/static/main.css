@@ -678,11 +678,44 @@ a#mist-select-machines-button span.ui-btn-text {
 
 /* Shell Dialog */
 
-.ui-icon-shell-return {
-    background-image: url("need-icon.png");
+#dialog-shell div.ui-field-contain {
+    margin: 0px;
+    margin-top: 0.5em;
 }
 
-#shell-return {
+#dialog-shell #shell-input {
+    overflow: auto;
+    width: 100%;
+    clear: both;
+    margin-top: 0px;
+    background-image: url("return.png");
+    background-position: 5px 5px;
+    background-repeat: no-repeat;
+}
+
+#dialog-shell #shell-input input {
+    width: 97%;
+    padding-left: 28px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+#dialog-shell #shell-send {
+    margin: .5em 0;
+}
+
+#dialog-shell .ui-icon-shell-return {
+    background-image: url("images/return.png");
+}
+
+#dialog-shell  #shell-send-wrapper {
+    width: 80px;
+    padding-left: 2px;
+}
+
+#dialog-shell  #shell-return {
     width: 100%;
     overflow-x: hidden;
     overflow-y: scroll;
@@ -697,15 +730,15 @@ a#mist-select-machines-button span.ui-btn-text {
     background: #dfe1e2;
 }
 
-#shell-return div {
+#dialog-shell #shell-return div {
     min-width: 80ex;
 }
 
-#shell-return div.command {
+#dialog-shell #shell-return div.command {
     background: #cceedd;
 }
 
-#shell-return div.output {
+#dialog-shell #shell-return div.output {
     background: #ccddee;
 }
 
