@@ -240,9 +240,10 @@ div#splash div.mist-logo {
     display: block;
     overflow: hidden;
     height: 20px;
-    right: 48px;
+    margin-top: -10px;
     position: absolute;
-    top: 26px;
+    right: 48px;
+    top: 50%;
 }
 
 #machines-list .state-icon.ui-icon-check {
@@ -257,8 +258,8 @@ div#splash div.mist-logo {
 }
 
 #machines-list .no-key-icon {
-    background-image: url("images/key.png");
-    background-color: #999;
+    background-image: url("images/no-key.png");
+    background-color: #aaa;
 }
 
 #machines-list .alert-icon {
@@ -272,6 +273,12 @@ div#splash div.mist-logo {
 #machines-list .node-icon {
     padding: 2px 9px;
     border: none;
+}
+
+#machines-list .node .bubble-container .node-icon {
+    -moz-border-radius: 1em;
+    -webkit-border-radius: 1em;
+    border-radius: 1em;
 }
 
 /* Machines tags */
