@@ -59,7 +59,7 @@ define( 'app', [
                 MachineActionsDialog,
                 SingleMachineActionsDialog,
                 Shell,
-                Ember,
+                mber,
                 Mobile,
                 jQueryUI,
                 d3,
