@@ -669,6 +669,7 @@ a#mist-select-machines-button span.ui-btn-text {
 
 #tag-add-wrapper {
     width: 120px;
+    padding-left: 10px;
 }
 
 #tag-add-wrapper .ui-btn {
