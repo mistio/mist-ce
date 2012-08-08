@@ -24,6 +24,19 @@
 
 	<div data-role="content">
 		<div data-role="collapsible" data-collapsed="false">
+			<h3>Monitoring</h3>		
+                <div class="notice">Disable monitoring</div>
+                <div class="notice important">Enable monitoring!</div>	
+                <div id="machineGraph" style="min-height: 155px;"></div>
+			{{#if machine.hasMonitoring}}
+                <div class="notice">Disable monitoring</div>
+                <div id="machineGraph" style="min-height: 155px;"></div>
+            {{else}}
+                <div class="notice important">Enable monitoring!</div>
+            {{/if}}
+		</div>
+
+		<div data-role="collapsible" data-collapsed="false">
 			<h3>Basic Info</h3>
 			<table id="machine-basic-table">
             
@@ -41,24 +54,6 @@
 			</tr>
 			{{/each}}
 			</table>
-		</div>
-
-		<div data-role="collapsible" data-collapsed="false">
-			<h3>Monitoring</h3>
-			
-			<div id="machineGraph" style="min-height: 155px;"></div>
-			
-			{{#if machine.hasMonitoring}}
-                <div id="cpu-chart"></div>
-                <a class="reset cpu" data-role="button" data-icon="refresh" data-mini="true">Reset zoom</a>
-                <div id="ram-chart"></div>
-                <a class="reset ram" data-role="button" data-icon="refresh" data-mini="true">Reset zoom</a>
-                <div id="load-chart"></div>
-                <a class="reset load" data-role="button" data-icon="refresh" data-mini="true">Reset zoom</a>   
-            {{else}}
-                <div>Enable monitoring!!!</div>
-            {{/if}}
-
 		</div>
 		
 		<div data-role="collapsible">
