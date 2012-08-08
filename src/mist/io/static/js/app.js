@@ -8,11 +8,6 @@ require.config({
 		text: 'lib/require/text',
 		mocha: 'lib/mocha',
 		chai: 'lib/chai',
-        jqplot: 'lib/jquery.jqplot.min',
-        jqpCursor: 'lib/jqplot.cursor.min',
-        jpqDateAxis: 'lib/jqplot.dateAxisRenderer.min',
-        jpqHighlighter: 'lib/jqplot.highlighter.min',
-        jqpJson2: 'lib/jqplot.json2.min',
         jqueryUi: "lib/jquery-ui-1.8.22.custom.min",
         d3: "lib/d3.v2",
         cubism: "lib/cubism.v1"
@@ -65,9 +60,8 @@ define( 'app', [
                 MachineActionsDialog,
                 SingleMachineActionsDialog,
                 Shell,
-                mber,
+                Ember,
                 Mobile,
-                JQPlot,
                 jQueryUI,
                 d3,
                 cubism) {
