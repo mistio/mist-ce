@@ -56,7 +56,6 @@ define('app/controllers/machines', [
 								machine.set('can_start', item.can_start);
 								machine.set('can_destroy', item.can_destroy);
 								machine.set('can_reboot', item.can_reboot);
-								that.checkUptime(machine);
 								return false;
 							}
 						});
@@ -76,6 +75,7 @@ define('app/controllers/machines', [
 			                    	console.log(data);
 			                    	if(data){
 			                    		machine.set('hasKey', data);
+			                    		machine.checkUptime();
 			                    	} else {
 			                    		machine.set('hasKey', false);
 			                    	}
@@ -85,7 +85,6 @@ define('app/controllers/machines', [
 								console.log(textStatus + " " + errorThrown);
 								machine.set('hasKey', false);
 							});
-							that.checkUptime(machine);
 						}
 						
 						
@@ -109,26 +108,6 @@ define('app/controllers/machines', [
 					console.log(e.state + " " + e.stateText);
 				});
 				
-			},
-			
-			checkUptime: function(machine){
-				if(machine.hasKey){
-					$.ajax({
-						url: '/machine_uptime',
-						data: {ip: machine.public_ips[0]},
-						success: function(data) {
-							console.log("machine uptime");
-							if('uptime' in data){
-								machine.set('upsince', new Date(Date.now() - data.uptime));
-								machine.set('uptime', data.uptime);
-								console.log(machine.upsince);
-							}
-						}
-					}).error(function(jqXHR, textStatus, errorThrown) {
-						console.log('error querying for machine uptime for machine id: ' + machine.id);
-						console.log(textStatus + " " + errorThrown);
-					});
-				}
 			},
 			
 			newMachine: function(name, image, size){

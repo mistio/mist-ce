@@ -669,10 +669,90 @@ a#mist-select-machines-button span.ui-btn-text {
 
 #tag-add-wrapper {
     width: 120px;
+    padding-left: 10px;
 }
 
 #tag-add-wrapper .ui-btn {
     margin-top: 6px;
+}
+
+/* Shell Dialog */
+
+#dialog-shell div.ui-field-contain {
+    margin: 0px;
+    margin-top: 0.5em;
+}
+
+#dialog-shell #shell-input {
+    overflow: auto;
+    width: 100%;
+    clear: both;
+    margin-top: 0px;
+}
+
+#dialog-shell #shell-input input {
+    width: 97%;
+    padding-left: 28px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    background-image: url("images/prompt.png");
+    background-position: 12px 9px;
+    background-repeat: no-repeat;
+}
+
+#dialog-shell #shell-send {
+    margin: .5em 0;
+    padding: 5px 27px;
+}
+
+#dialog-shell .ui-icon-shell-return {
+    background-image: url("images/return.png");
+}
+
+#dialog-shell  #shell-send-wrapper {
+    width: 80px;
+    padding-left: 2px;
+}
+
+#dialog-shell  #shell-return {
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    border: 1px solid #AAA;
+    height: 60ex;
+    font-family: monospace;
+    font-size: 11px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    background: #dfe1e2;
+}
+
+#dialog-shell #shell-return div {
+    min-width: 80ex;
+}
+
+#dialog-shell #shell-return div.command {
+    background: #cceedd;
+}
+
+#dialog-shell #shell-return div.output {
+    background: #ccddee;
+}
+
+.ui-autocomplete {
+    -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    -moz-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+}
+
+.ui-autocomplete .ui-menu-item a {
+    padding: .2em .4em .2em 1.6em;
+    font-size: 16px;
 }
 
 /* Conditional for < 720px */
@@ -773,6 +853,10 @@ a#mist-select-machines-button span.ui-btn-text {
     .single-view-icon-wrapper {
         margin-left: 8px;
     }
+
+    #shell-return {
+        overflow-x: scroll;
+    }
 }
 
 [data-role="page"], [data-role="dialog"] {
@@ -785,17 +869,4 @@ div#machines fieldset.machine-list-item {
     padding-left: 12px;
 }
 
-}
-
-.ui-icon-shell-return {
-    background-image: url("need-icon.png");
-}
-
-#shell-return {
-	width:80ex;
-	overflow: scroll;
-	height: 60ex;
-	font-family:monospace;
-	font-size: 11px;
-}
 }

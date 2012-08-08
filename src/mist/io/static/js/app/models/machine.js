@@ -142,12 +142,56 @@ define('app/models/machine', ['ember'],
 				return false;
 			}.property('hasAlert'),
 
+			startUptimeTimer: function(){
+				var that = this;
+				setInterval(function(){
+					if(that.get('state' != 0) || !that.get('uptime') || !that.get('uptimeChecked')){
+						return;
+					} else {
+						that.set('uptime', that.get('uptime') + Date.now() - that.get('uptimeChecked'));
+					}
+					
+				},5000);
+			},
+
+			checkUptime: function(){
+				if(this.hasKey){
+					var that = this;
+					
+					$.ajax({
+						url: '/machine_uptime',
+						data: {ip: this.public_ips[0]},
+						success: function(data) {
+							console.log("machine uptime");
+							if('uptime' in data){
+								that.set('uptimeChecked', Date.now());
+								that.set('uptime', data.uptime);
+							}
+						}
+					}).error(function(jqXHR, textStatus, errorThrown) {
+						console.log('error querying for machine uptime for machine id: ' + that.id);
+						console.log(textStatus + " " + errorThrown);
+					});
+				}
+			},
+			
+			resetUptime: function(){
+				if(this.state != 0){
+					this.set('uptime', 0);
+				} else {
+					if(this.get('uptime') == 0){
+						this.checkUptime();
+					}
+				}
+			}.observes('state'),
+			
 			init: function(){
 				this._super();
 				var that = this;
 				this.backend.images.getImage(this.imageId, function(image){
 					that.set('image', image);
 				});
+				this.startUptimeTimer();
 			}
 
 		});
