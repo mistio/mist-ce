@@ -66,25 +66,6 @@ define('app/controllers/machines', [
 							var machine = Machine.create(item);
 							that.content.push(machine);
 							contentDidChange = true;
-							
-							$.ajax({
-			                    url: '/machine_has_key',
-			                    data: {ip: machine.public_ips[0]},
-			                    success: function(data) {
-			                    	console.log("machine has key? ");
-			                    	console.log(data);
-			                    	if(data){
-			                    		machine.set('hasKey', data);
-			                    		machine.checkUptime();
-			                    	} else {
-			                    		machine.set('hasKey', false);
-			                    	}
-			                    }
-							}).error(function(jqXHR, textStatus, errorThrown) {
-								console.log('error querying for machine key for machine id: ' + machine.id);
-								console.log(textStatus + " " + errorThrown);
-								machine.set('hasKey', false);
-							});
 						}
 						
 						

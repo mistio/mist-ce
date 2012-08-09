@@ -163,6 +163,7 @@ define('app/models/machine', ['ember'],
 						data: {ip: this.public_ips[0]},
 						success: function(data) {
 							console.log("machine uptime");
+							console.log(data);
 							if('uptime' in data){
 								that.set('uptimeChecked', Date.now());
 								that.set('uptime', data.uptime);
@@ -173,6 +174,48 @@ define('app/models/machine', ['ember'],
 						console.log(textStatus + " " + errorThrown);
 					});
 				}
+			},
+			
+			checkHasMonitoring: function(){
+				var that = this;
+					
+					$.ajax({
+						url: 'backends/'+ this.backend.index + '/machines/'+this.id + '/monitoring',
+						success: function(data) {
+							console.log("machine has monitoring");
+							console.log(data);
+							if('monitoring' in data){
+								that.set('hasMonitoring', data.monitoring);
+							}
+						}
+					}).error(function(jqXHR, textStatus, errorThrown) {
+						console.log('error querying for machine monitoring for machine id: ' + that.id);
+						console.log(textStatus + " " + errorThrown);
+					});
+			},
+			
+			checkHasKey: function(){
+				var that = this;
+				
+				$.ajax({
+                    url: '/machine_has_key',
+                    data: {ip: this.public_ips[0]},
+                    success: function(data) {
+                    	console.log("machine has key? ");
+                    	console.log(data);
+                    	if(data){
+                    		that.set('hasKey', data);
+                    		that.checkUptime();
+                    	} else {
+                    		that.set('hasKey', false);
+                    	}
+                    }
+				}).error(function(jqXHR, textStatus, errorThrown) {
+					console.log('error querying for machine key for machine id: ' + machine.id);
+					console.log(textStatus + " " + errorThrown);
+					machine.set('hasKey', false);
+				});
+				
 			},
 			
 			resetUptime: function(){
@@ -192,6 +235,8 @@ define('app/models/machine', ['ember'],
 					that.set('image', image);
 				});
 				this.startUptimeTimer();
+				this.checkHasKey();
+				this.checkHasMonitoring();
 			}
 
 		});
