@@ -13,6 +13,7 @@
 
 	<div id="single-view-header">
 		<h3 id="single-view-name">{{name}}</h3>
+        {{view Mist.Checkbox checkedBinding="machine.hasMonitoring" title="Monitoring"}}
 		<span class="single-view-icon-wrapper">
             <span id="single-view-provider-icon" {{bindAttr class="providerIconClass"}}></span>
 		</span>
