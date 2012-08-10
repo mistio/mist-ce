@@ -171,7 +171,7 @@ define( 'app', [
 		});
 
 		App.Checkbox = Ember.Checkbox.extend({
-		    attributeBindings: ['name', "id"]
+		    attributeBindings: ['name', "id", "data-inline"]
 		});
 
 		App.CountView = Count;

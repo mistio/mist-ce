@@ -128,6 +128,12 @@ define('app/views/machine', [
 			}.property("machine"),
 			
 			setGraph: function(){
+				if(!this.machine || !this.machine.hasMonitoring){
+					return;
+				}
+				
+				
+				Em.run.next(function(){
 				var context = cubism.context()
 			    .serverDelay(0)
 			    .clientDelay(0)
@@ -177,7 +183,10 @@ define('app/views/machine', [
 					context.on("focus", function(i) {
 					  d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
 					});
-			}.observes('machine'),
+					
+				});
+				
+			}.observes('machine.hasMonitoring'),
 		    
 		    init: function() {
 				this._super();

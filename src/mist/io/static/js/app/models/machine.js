@@ -228,6 +228,11 @@ define('app/models/machine', ['ember'],
 				}
 			}.observes('state'),
 			
+			monitoringChanged: function(){
+				//Enable / Disable monitoring on server
+				
+			}.observes('hasMonitoring'),
+			
 			init: function(){
 				this._super();
 				var that = this;

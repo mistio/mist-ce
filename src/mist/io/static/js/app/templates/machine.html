@@ -12,8 +12,9 @@
 	<!-- /header -->
 
 	<div id="single-view-header">
-		<h3 id="single-view-name">{{name}}</h3>
-        {{view Mist.Checkbox checkedBinding="machine.hasMonitoring" title="Monitoring"}}
+		<h3 id="single-view-name">{{name}}
+        {{view Mist.Checkbox checkedBinding="machine.hasMonitoring" title="Monitoring" data-inline="true"}}
+        </h3>
 		<span class="single-view-icon-wrapper">
             <span id="single-view-provider-icon" {{bindAttr class="providerIconClass"}}></span>
 		</span>
