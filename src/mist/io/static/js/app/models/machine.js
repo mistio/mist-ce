@@ -229,7 +229,29 @@ define('app/models/machine', ['ember'],
 			}.observes('state'),
 			
 			monitoringChanged: function(){
+				var oldValue = !this.hasMonitoring;
+				console.log("monitoring:  " + oldValue);
+				
+				var that = this;
+				
 				//Enable / Disable monitoring on server
+				var payload = {
+	                    "monitoring": this.hasMonitoring,
+	            };
+				
+				$.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(payload),
+                    url: 'backends/'+ this.backend.index + '/machines/'+this.id + '/monitoring',
+                    success: function(data) {
+                    	
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                    	that.set('hasMonitoring', oldValue);
+                    }
+                });
 				
 			}.observes('hasMonitoring'),
 			
