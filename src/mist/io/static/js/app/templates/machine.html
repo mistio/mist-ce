@@ -12,8 +12,8 @@
 	<!-- /header -->
 
 	<div id="single-view-header">
-		<h3 id="single-view-name">{{name}}
-        {{view Mist.Checkbox checkedBinding="machine.hasMonitoring" title="Monitoring" data-inline="true"}}
+		<h3 id="single-view-name">
+			{{name}}
         </h3>
 		<span class="single-view-icon-wrapper">
             <span id="single-view-provider-icon" {{bindAttr class="providerIconClass"}}></span>
@@ -31,7 +31,7 @@
                 <div class="notice">Disable monitoring</div>
                 <div id="machineGraph" style="min-height: 155px;"></div>
             {{else}}
-                <div class="notice important">Enable monitoring!</div>
+                {{view Mist.Checkbox checkedBinding="machine.hasMonitoring" title="Enable Monitoring!" id="enableMonitoring"}}
             {{/if}}
 		</div>
 
