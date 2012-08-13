@@ -281,6 +281,12 @@ div#splash div.mist-logo {
     border-radius: 1em;
 }
 
+/* Needed to allow some extra scrolling space to compensate
+   for the statically positioned footer */
+.bottom-padding {
+    height: 46px;
+}
+
 /* Machines tags */
 
 #machines-list .node .tag {
