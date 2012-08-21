@@ -16,8 +16,26 @@ dependency is build automatically via zc.buildout. Although we use zc.buildout
 it is recommended to install mist.io in a virtualenv to avoid conflicts with
 eggs in the system's Python.
 
-The steps are simple. Clone the repository, create a virtualenv and run
-buildout:
+To install the basic requirements in a Debian based distro do:
+
+	sudo aptitude install python-dev build-essential git
+
+If you wish to install it in a virtual environment you'll also need:
+
+	sudo aptitude install python-virtualenv
+
+In MacOSX you have to install Xcode and its command line tools. For virtualenv
+you simply run:
+
+	sudo easy_install virtualenv
+
+In MacOSX there might be some problems with certificates resulting to mist.io
+getting 404 errors from server side. To solve the issue donwlad a pem from
+http://curl.haxx.se/docs/caextract.html rename it to curl-ca-bundle.crt and save
+it to opt/local/share/curl/
+
+Supposing you have all the above, the steps are simple. Clone the repository,
+create a virtualenv and run buildout:
 
 	git clone gitosis@git.unweb.me:mist.io.git
 	cd mist.io
