@@ -28,8 +28,7 @@
 		<div data-role="collapsible" data-collapsed="false">
 			<h3>Monitoring</h3>		
 			{{#if machine.hasMonitoring}}
-                <div class="notice">Disable monitoring</div>
-                <div id="machineGraph" style="min-height: 155px;"></div>
+				{{view Mist.Checkbox checkedBinding="machine.hasMonitoring" title="Disable Monitoring" id="enableMonitoring" class="notice"}}
             {{else}}
                 {{view Mist.Checkbox checkedBinding="machine.hasMonitoring" title="Enable Monitoring!" id="enableMonitoring"}}
             {{/if}}
