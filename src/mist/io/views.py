@@ -31,14 +31,11 @@ def connect(request):
     backend = backend_list[backend_index]
 
     driver = get_driver(int(backend['provider']))
-    if 'host' in backend.keys():
+    if 'auth_url' in backend.keys():
         conn = driver(backend['id'],
                       backend['secret'],
-                      False,
-                      host=backend['host'],
                       ex_force_auth_url=backend.get('auth_url', None),
-                      ex_force_auth_version=backend.get('auth_version', '1.0'),
-                      port=80)
+                      ex_force_auth_version=backend.get('auth_version', '1.0'))
     else:
         conn = driver(backend['id'], backend['secret'])
     return conn
