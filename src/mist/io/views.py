@@ -441,8 +441,8 @@ def config_fabric_ssh(ip, private_key):
     return tmp_path
 
 
-@view_config(route_name='machine_has_key', request_method='GET', renderer='json')
-def machine_has_key(request):
+@view_config(route_name='machine_key', request_method='GET', renderer='json')
+def machine_key(request):
     """Check if the machine has a key pair deployed"""
     tmp_path = config_fabric_ssh(request.params.get('ip', None),
                                  request.registry.settings['keypairs'][0][1])

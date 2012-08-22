@@ -23,7 +23,7 @@ def main(global_config, **settings):
     config.add_route('locations', '/backends/{backend}/locations')
     config.add_route('image_details', '/backends/{backend}/image_details')
     config.add_route('backends', '/backends')
-    config.add_route('machine_has_key', '/machine_has_key')
+    config.add_route('machine_key', '/backends/{backend}/machines/{machine}/key')
     config.add_route('shell_command', '/shell_command')
     config.add_route('machine_uptime', '/machine_uptime')
 

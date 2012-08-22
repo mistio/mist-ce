@@ -148,6 +148,7 @@ define('app/models/machine', ['ember'],
 					if(that.get('state' != 0) || !that.get('uptime') || !that.get('uptimeChecked')){
 						return;
 					} else {
+						console.log(that.uptime);
 						that.set('uptime', that.get('uptime') + Date.now() - that.get('uptimeChecked'));
 					}
 					
@@ -198,7 +199,7 @@ define('app/models/machine', ['ember'],
 				var that = this;
 				
 				$.ajax({
-                    url: '/machine_has_key',
+                    url: '/backends/'+ this.backend.index + '/machines/' + this.id + '/key',
                     data: {ip: this.public_ips[0]},
                     success: function(data) {
                     	console.log("machine has key? ");
