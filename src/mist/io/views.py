@@ -453,7 +453,7 @@ def machine_key(request):
 
     return ret
 
-@view_config(route_name='shell_command', request_method='POST', renderer='json')
+@view_config(route_name='machine_shell', request_method='POST', renderer='json')
 def shell_command(request):
     """Send a shell command to a machine over ssh"""
 

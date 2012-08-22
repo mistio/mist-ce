@@ -24,8 +24,8 @@ def main(global_config, **settings):
     config.add_route('image_details', '/backends/{backend}/image_details')
     config.add_route('backends', '/backends')
     config.add_route('machine_key', '/backends/{backend}/machines/{machine}/key')
-    config.add_route('shell_command', '/shell_command')
-    config.add_route('machine_uptime', '/machine_uptime')
+    config.add_route('machine_shell', '/backends/{backend}/machines/{machine}/shell')
+    config.add_route('machine_uptime', '/backends/{backend}/machines/{machine}/uptime')
 
     config.scan()
 

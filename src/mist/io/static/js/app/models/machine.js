@@ -69,7 +69,7 @@ define('app/models/machine', ['ember'],
 				var that = this;
 
 				$.ajax({
-                    url: 'backends/'+ this.backend.index + '/machines/'+this.id,
+                    url: 'backends/' + this.backend.index + '/machines/' + this.id,
                     data: 'action=start',
                     type: 'POST',
                     success: function(data) {
@@ -90,7 +90,7 @@ define('app/models/machine', ['ember'],
 				var that = this;
 
 				$.ajax({
-                    url: 'backends/'+ this.backend.index + '/machines/'+this.id,
+                    url: 'backends/' + this.backend.index + '/machines/' + this.id,
                     data: 'action=stop',
                     type: 'POST',
                     success: function(data) {
@@ -112,7 +112,7 @@ define('app/models/machine', ['ember'],
                 console.log('Sending ' + shell_command + ' to machine: ' + that.name);
 
 				$.ajax({
-                    url: 'shell_command',
+                    url: '/backends/' + this.backend.index + '/machines/' + this.id + '/shell',
                     data: {ip: this.public_ips[0],
                            command: shell_command
                            },
@@ -160,7 +160,7 @@ define('app/models/machine', ['ember'],
 					var that = this;
 					
 					$.ajax({
-						url: '/machine_uptime',
+						url: '/backends/' + this.backend.index + '/machines/' + this.id + '/uptime',
 						data: {ip: this.public_ips[0]},
 						success: function(data) {
 							console.log("machine uptime");
@@ -181,7 +181,7 @@ define('app/models/machine', ['ember'],
 				var that = this;
 					
 					$.ajax({
-						url: 'backends/'+ this.backend.index + '/machines/'+this.id + '/monitoring',
+						url: 'backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
 						success: function(data) {
 							console.log("machine has monitoring");
 							console.log(data);
@@ -199,7 +199,7 @@ define('app/models/machine', ['ember'],
 				var that = this;
 				
 				$.ajax({
-                    url: '/backends/'+ this.backend.index + '/machines/' + this.id + '/key',
+                    url: '/backends/' + this.backend.index + '/machines/' + this.id + '/key',
                     data: {ip: this.public_ips[0]},
                     success: function(data) {
                     	console.log("machine has key? ");
@@ -245,7 +245,7 @@ define('app/models/machine', ['ember'],
                     contentType: "application/json",
                     dataType: "json",
                     data: JSON.stringify(payload),
-                    url: 'backends/'+ this.backend.index + '/machines/'+this.id + '/monitoring',
+                    url: 'backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
                     success: function(data) {
                     	
                     },
