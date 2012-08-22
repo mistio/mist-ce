@@ -29,6 +29,7 @@
 			<h3>Monitoring</h3>		
 			{{#if machine.hasMonitoring}}
 				{{view Mist.Checkbox checkedBinding="machine.hasMonitoring" title="Disable Monitoring" id="enableMonitoring" class="notice"}}
+				<div id="machineGraph"></div>
             {{else}}
                 {{view Mist.Checkbox checkedBinding="machine.hasMonitoring" title="Enable Monitoring!" id="enableMonitoring"}}
             {{/if}}
