@@ -212,7 +212,7 @@ define('app/models/machine', ['ember'],
                     	}
                     }
 				}).error(function(jqXHR, textStatus, errorThrown) {
-					console.log('error querying for machine key for machine id: ' + machine.id);
+					console.log('error querying for machine key for machine id: ' + that.id);
 					console.log(textStatus + " " + errorThrown);
 					machine.set('hasKey', false);
 				});
