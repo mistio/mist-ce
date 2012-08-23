@@ -130,23 +130,56 @@ define('app/views/machine', [
 			}.property("machine"),
 			
 			setGraph: function(){
+				
 				if(!this.machine || !this.machine.hasMonitoring){
 					return;
 				}
 				
+
+				 var machine = this.machine;
 				
 				Em.run.next(function(){
-				var context = cubism.context()
-			    .serverDelay(0)
-			    .clientDelay(0)
-			    .step(1e3)
-			    .size(960);
+					var context = cubism.context()
+						.serverDelay(0)
+						.clientDelay(0)
+						.step(5000)
+						.size(960);
 				
-				function random(name) {
+					var changes_since = 0;
+				
+					function poll(){
+						if(!Mist.graphPolling){
+							return;
+						}
+					
+						data = {};
+						if(changes_since){
+							data.changes_since = changes_since;
+						}
+					
+					changes_since = Date.now();
+					
+					$.ajax({
+						url: '/backends/' + machine.backend.index + '/machines/' + machine.id + '/stats',
+						data: data,
+						success: function(data) {
+							console.log("machine stats");
+							console.log(data);
+							setTimeout(poll, 5000);
+						}
+					}).error(function(jqXHR, textStatus, errorThrown) {
+						console.log('error querying for machine stats for machine id: ' + machine.id);
+						console.log(textStatus + " " + errorThrown);
+						setTimeout(poll, 5000);
+					});
+				}
+				
+				function draw(name) {
 					  var value = 0,
 					      values = [],
 					      i = 0,
 					      last;
+					  
 					  return context.metric(function(start, stop, step, callback) {
 					    start = +start, stop = +stop;
 					    if (isNaN(last)) last = start;
@@ -161,8 +194,10 @@ define('app/views/machine', [
 
 					
 
-					var foo = random("foo"),
-					    bar = random("bar");
+					var cpu = draw("cpu"),
+					    memory = draw("memory"),
+					    disk = draw("disk"),
+					    load = draw("load");
 
 					d3.select("#machineGraph").call(function(div) {
 
@@ -171,7 +206,7 @@ define('app/views/machine', [
 					      .call(context.axis().orient("top"));
 
 					  div.selectAll(".horizon")
-					      .data([foo, bar, foo.add(bar), foo.subtract(bar)])
+					      .data([cpu, memory, disk, load])
 					    .enter().append("div")
 					      .attr("class", "horizon")
 					      .call(context.horizon().extent([-20, 20]));
@@ -185,6 +220,8 @@ define('app/views/machine', [
 					context.on("focus", function(i) {
 					  d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
 					});
+					
+					poll();
 					
 				});
 				

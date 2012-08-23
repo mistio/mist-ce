@@ -152,6 +152,18 @@ define( 'app', [
 		$(document).on( 'pagebeforeshow', '#images', function(){
 			$("#images-list").listview('refresh');
 		});
+		
+		$(document).on( 'pagebeforeshow', '#single-machine', function(){
+			Mist.graphPolling = true;
+		});
+		
+		$(document).on( 'pagebeforeshow', '#single-machine', function(){
+			Mist.graphPolling = true;
+		});
+		
+		$(document).on( 'pagebeforehide', '#single-machine', function(){
+			Mist.graphPolling = false;
+		});
 
 		App.Select = Ember.Select.extend({
 		    attributeBindings: ['name', "data-theme", "data-icon",
