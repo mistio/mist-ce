@@ -144,15 +144,15 @@ define('app/models/machine', ['ember'],
 
 			startUptimeTimer: function(){
 				var that = this;
+				
 				setInterval(function(){
-					if(that.get('state' != 0) || !that.get('uptime') || !that.get('uptimeChecked')){
+					if(that.get('state' != 0) || !that.get('uptimeFromServer') || !that.get('uptimeChecked')){
 						return;
 					} else {
-						console.log(that.uptime);
-						that.set('uptime', that.get('uptime') + Date.now() - that.get('uptimeChecked'));
+						that.set('uptime', that.get('uptimeFromServer') + (Date.now() - that.get('uptimeChecked')));
 					}
 					
-				},5000);
+				},1000);
 			},
 
 			checkUptime: function(){
@@ -167,7 +167,7 @@ define('app/models/machine', ['ember'],
 							console.log(data);
 							if('uptime' in data){
 								that.set('uptimeChecked', Date.now());
-								that.set('uptime', data.uptime);
+								that.set('uptimeFromServer', data.uptime);
 							}
 						}
 					}).error(function(jqXHR, textStatus, errorThrown) {
@@ -214,7 +214,7 @@ define('app/models/machine', ['ember'],
 				}).error(function(jqXHR, textStatus, errorThrown) {
 					console.log('error querying for machine key for machine id: ' + that.id);
 					console.log(textStatus + " " + errorThrown);
-					machine.set('hasKey', false);
+					that.set('hasKey', false);
 				});
 				
 			},
@@ -222,6 +222,7 @@ define('app/models/machine', ['ember'],
 			resetUptime: function(){
 				if(this.state != 0){
 					this.set('uptime', 0);
+					this.uptimeTimer = false;
 				} else {
 					if(this.get('uptime') == 0){
 						this.checkUptime();

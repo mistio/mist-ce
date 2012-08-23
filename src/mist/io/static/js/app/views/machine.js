@@ -105,12 +105,14 @@ define('app/views/machine', [
 						ret = ret + hours + " hours, ";
 					}
 					
-					if(hours){
+					if(minutes){
 						ret = ret + minutes + " minutes, ";
 					}
 					
 					if(seconds){
 						ret = ret + seconds + " seconds";
+					} else {
+						ret = ret + "0 seconds";
 					}
 					
 					return ret;
