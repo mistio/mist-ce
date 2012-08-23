@@ -62,20 +62,13 @@ function(shell_html) {
 					that.shellOutputItems.set('content', new Array());
 				}
 				
-				that.shellOutputItems.arrayContentWillChange(that.shellOutputItems.content.length -  1, 0, 1);
+				that.shellOutputItems.arrayContentWillChange(0, 0, 1);
 				
-				that.shellOutputItems.content.push({
+				that.shellOutputItems.content.unshift({
 					command: "$" + command,
 					output: output.replace(/\n/g, '<br />')
 				});
-				that.shellOutputItems.arrayContentDidChange(that.shellOutputItems.content.length -  1, 0, 1);
-
-				Em.run.next(function() {
-					var animation = {
-						scrollTop : $("#shell-return").prop("scrollHeight")
-					};
-					$('#shell-return').animate(animation, 'slow', 'swing');
-				});
+				that.shellOutputItems.arrayContentDidChange(0, 0, 1);
 			});
 			this.clear();
 			
