@@ -31,12 +31,19 @@ def connect(request):
     backend = backend_list[backend_index]
 
     driver = get_driver(int(backend['provider']))
+    
+    # TODO: better checks for this    
     if 'auth_url' in backend.keys():
+        # openstack
         conn = driver(backend['id'],
                       backend['secret'],
                       ex_force_auth_url=backend.get('auth_url', None),
                       ex_force_auth_version=backend.get('auth_version', '1.0'))
+    elif backend['title'] in 'Linode':
+        # linode
+        conn = driver(backend['secret'])
     else:
+        # ec2, rackspace
         conn = driver(backend['id'], backend['secret'])
     return conn
 

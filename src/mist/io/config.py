@@ -17,6 +17,13 @@ BACKENDS = [
      'poll_interval': 10000,
      'enabled': True,
     },
+    {'provider': Provider.LINODE,
+     'title': 'Linode',
+     'id': 'unwebme',
+     'secret': 'RLps91fmdjkOj8x7bFjJO2lycZggNPhcS2hzmoU3H97YhjED6Crk8056F3FEoaNB',
+     'poll_interval': 10000,
+     'enabled': True,
+    },
 ]
 
 
