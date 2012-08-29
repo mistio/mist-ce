@@ -38,14 +38,12 @@ def connect(request):
 
     driver = get_driver(int(backend['provider']))
 
-    if 'auth_url' in backend.keys():
-        # openstack
+    if backend['provider'] == Provider.OPENSTACK:
         conn = driver(backend['id'],
                       backend['secret'],
                       ex_force_auth_url=backend.get('auth_url', None),
                       ex_force_auth_version=backend.get('auth_version', '1.0'))
-    elif backend['title'] in 'Linode':
-        # linode
+    elif backend['provider'] == Provider.LINODE:
         conn = driver(backend['secret'])
     else:
         # ec2, rackspace
@@ -457,10 +455,11 @@ def machine_key(request):
     tmp_path = config_fabric_ssh(request.params.get('ip', None),
                                  request.registry.settings['keypairs'][0][1])
 
-    if run('uptime').failed:
-        ret = {'has_key': False}
-    else:
-        ret = {'has_key': True}
+    # if run('uptime').failed:
+    #     ret = {'has_key': False}
+    # else:
+    #     ret = {'has_key': True}
+    ret = {'has_key': False}
 
     os.remove(tmp_path)
 
@@ -474,10 +473,11 @@ def shell_command(request):
     tmp_path = config_fabric_ssh(request.params.get('ip', None),
                                  request.registry.settings['keypairs'][0][1])
 
-    try:
-        cmd_output = run(request.params.get('command', None))
-    except:
-        cmd_output = ''; # FIXME grab the UNIX error
+    # try:
+    #     cmd_output = run(request.params.get('command', None))
+    # except:
+    #     cmd_output = ''; # FIXME grab the UNIX error
+    cmd_output = ''
 
     os.remove(tmp_path)
 
@@ -490,7 +490,9 @@ def machine_uptime(request):
     tmp_path = config_fabric_ssh(request.params.get('ip', None),
                                  request.registry.settings['keypairs'][0][1])
 
-    uptime =  run('cat /proc/uptime')
+    #uptime =  run('cat /proc/uptime')
+    uptime = None
+
     if uptime:
         uptime = float(uptime.split()[0]) * 1000
 
