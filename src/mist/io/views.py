@@ -5,15 +5,21 @@ import json
 import tempfile
 
 from pyramid.response import Response
-from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
+from pyramid.view import view_config
+
+from libcloud.compute.base import Node
+from libcloud.compute.base import NodeSize
+from libcloud.compute.base import NodeImage
+from libcloud.compute.base import NodeLocation
 from libcloud.compute.providers import get_driver
-#from libcloud.compute.base import NodeAuthSSHKey
-#from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
 from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider
-from mist.io.config import BACKENDS, BASE_EC2_AMIS
-from pyramid.view import view_config
-from fabric.api import run, env
+
+from fabric.api import run
+from fabric.api import env
+
+from mist.io.config import BACKENDS
+from mist.io.config import BASE_EC2_AMIS
 from mist.io.machinecaps import get_machine_actions
 
 
@@ -31,8 +37,8 @@ def connect(request):
     backend = backend_list[backend_index]
 
     driver = get_driver(int(backend['provider']))
-    
-    # TODO: better checks for this    
+
+    # TODO: better checks for this
     if 'auth_url' in backend.keys():
         # openstack
         conn = driver(backend['id'],
