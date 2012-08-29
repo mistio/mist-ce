@@ -38,7 +38,6 @@ def connect(request):
 
     driver = get_driver(int(backend['provider']))
 
-    # TODO: better checks for this
     if 'auth_url' in backend.keys():
         # openstack
         conn = driver(backend['id'],
@@ -425,6 +424,7 @@ def get_backends(request):
 
     return backends
 
+
 def config_fabric_ssh(ip, private_key):
     """Configures the ssh connection used by fabric.
 
@@ -466,6 +466,7 @@ def machine_key(request):
 
     return ret
 
+
 @view_config(route_name='machine_shell', request_method='POST', renderer='json')
 def shell_command(request):
     """Send a shell command to a machine over ssh"""
@@ -481,6 +482,7 @@ def shell_command(request):
     os.remove(tmp_path)
 
     return cmd_output
+
 
 @view_config(route_name='machine_uptime', request_method='GET', renderer='json')
 def machine_uptime(request):

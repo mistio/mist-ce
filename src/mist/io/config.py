@@ -26,8 +26,7 @@ BACKENDS = [
      'auth_url': 'https://nova-api.trystack.org:5443/v2.0',
      'auth_version' : '2.0_password',
      'poll_interval' : 10000,
-     'public_key': PUBLIC_KEYS['user'],
-     'enabled': False,
+     'enabled': True,
      },
 
     {'provider': Provider.LINODE,
