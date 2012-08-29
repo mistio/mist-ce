@@ -9,21 +9,34 @@ BACKENDS = [
      'secret': 'mIAa25lukad1SqQvScX+spm4knQfmXbcKyoPi/hC',
      'poll_interval': 10000,
      'enabled': True,
-    },
+     },
+
     {'provider': Provider.RACKSPACE,
      'title': 'RackSpace',
      'id': 'unwebme',
      'secret': 'fb68dcedaa4e7f36b5bad4dc7bc28bed',
      'poll_interval': 10000,
      'enabled': True,
-    },
+     },
+
+    {'provider' : Provider.OPENSTACK,
+     'title' : 'Trystack',
+     'id' : 'facebook624567501',
+     'secret' : 'j2dq5nhr',
+     'auth_url': 'https://nova-api.trystack.org:5443/v2.0',
+     'auth_version' : '2.0_password',
+     'poll_interval' : 10000,
+     'public_key': PUBLIC_KEYS['user'],
+     'enabled': False,
+     },
+
     {'provider': Provider.LINODE,
      'title': 'Linode',
      'id': 'unwebme',
      'secret': 'RLps91fmdjkOj8x7bFjJO2lycZggNPhcS2hzmoU3H97YhjED6Crk8056F3FEoaNB',
      'poll_interval': 10000,
      'enabled': True,
-    },
+     },
 ]
 
 
