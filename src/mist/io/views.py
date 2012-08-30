@@ -6,7 +6,6 @@ TODO: why do we always check for the session, the try should be refactored
 import os
 import logging
 import json
-import tempfile
 
 from pyramid.response import Response
 from pyramid.view import view_config
@@ -15,58 +14,19 @@ from libcloud.compute.base import Node
 from libcloud.compute.base import NodeSize
 from libcloud.compute.base import NodeImage
 from libcloud.compute.base import NodeLocation
-from libcloud.compute.providers import get_driver
 from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider
 
 from fabric.api import run
-from fabric.api import env
 
 from mist.io.config import BACKENDS
 from mist.io.config import BASE_EC2_AMIS
-from mist.io.machinecaps import get_machine_actions
+from mist.io.helpers import connect
+from mist.io.helpers import get_machine_actions
+from mist.io.helpers import config_fabric
 
 
 log = logging.getLogger('mist.io')
-
-
-def connect(request):
-    """Establishes backend connection using the credentials specified.
-
-    It has been tested with:
-
-        * EC2, but not alternative providers like EC2_EU,
-        * Rackspace, only the old style and not the openstack powered one,
-        * Openstack Diablo through Trystack, should also try Essex,
-        * Linode
-
-    TODO: needs testing with more providers
-    TODO: why do we always connect before doing something and not connect
-          once and for all?
-
-    """
-    try:
-        backend_list = request.environ['beaker.session']['backends']
-    except:
-        backend_list = BACKENDS
-
-    backend_index = int(request.matchdict['backend'])
-    backend = backend_list[backend_index]
-
-    driver = get_driver(int(backend['provider']))
-
-    if backend['provider'] == Provider.OPENSTACK:
-        conn = driver(backend['id'],
-                      backend['secret'],
-                      ex_force_auth_url=backend.get('auth_url', None),
-                      ex_force_auth_version=backend.get('auth_version',
-                                                        '2.0_password'))
-    elif backend['provider'] == Provider.LINODE:
-        conn = driver(backend['secret'])
-    else:
-        # ec2, rackspace
-        conn = driver(backend['id'], backend['secret'])
-    return conn
 
 
 @view_config(route_name='home',
@@ -102,7 +62,7 @@ def home(request):
 
 @view_config(route_name='backends', request_method='GET', renderer='json')
 def list_backends(request):
-    """Lists the available backends.
+    """Gets the available backends.
 
     .. note:: Currently, this is only used by the backends controller in js.
 
@@ -131,7 +91,23 @@ def list_backends(request):
 
 @view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
-    """List machines for a backend"""
+    """Gets machines and their metadata for a backend.
+
+    Because each provider stores metadata in different places several checks
+    are needed.
+
+    The folowing are considered:
+
+        * For tags, Rackspace stores them in extra.metadata.tags while EC2 in
+          extra.tags.tags.
+        * For images, both EC2 and Rackpace have an image and an etra.imageId
+          attribute
+        * For flavors, EC2 has an extra.instancetype attribute while Rackspace
+          an extra.flavorId. however we also expect to get size attribute.
+
+    TODO: why the tags = tags and tags.get('tags', None) or [] ???
+    TODO: we get imageId and size, should the last be sizeId?
+    """
     try:
         conn = connect(request)
     except:
@@ -144,21 +120,21 @@ def list_machines(request):
 
     ret = []
     for m in machines:
-        # for rackspace get the tags stored in extra.metadata.tags attr, for amazon get extra.tags.tags attr
         tags = m.extra.get('tags', None) or m.extra.get('metadata', None)
         tags = tags and tags.get('tags', None) or []
+        imageId = m.image or m.extra.get('imageId', None)
+        size = m.size or m.extra.get('flavorId', None)
+        size = size or m.extra.get('instancetype', None)
         machine = {'id'           : m.id,
-                  'uuid'          : m.get_uuid(),
-                  'name'          : m.name,
-                  # both rackspace and amazon have the image in the imageId extra attr,
-                  'imageId'       : m.image or m.extra.get('imageId', None),
-                  # for rackspace get flavorId extra attr, for amazon the instancetype extra attr
-                  'size'          : m.size or m.extra.get('flavorId', None) or m.extra.get('instancetype', None),
-                  'state'         : m.state,
-                  'private_ips'   : m.private_ips,
-                  'public_ips'    : m.public_ips,
-                  'tags'          : tags,
-                  'extra'         : m.extra,
+                   'uuid'          : m.get_uuid(),
+                   'name'          : m.name,
+                   'imageId'       : imageId,
+                   'size'          : size,
+                   'state'         : m.state,
+                   'private_ips'   : m.private_ips,
+                   'public_ips'    : m.public_ips,
+                   'tags'          : tags,
+                   'extra'         : m.extra,
                   }
         machine.update(get_machine_actions(m, conn))
         ret.append(machine)
@@ -457,40 +433,11 @@ def get_image_details(request):
     return ret
 
 
-
-
-
-def config_fabric_ssh(ip, private_key):
-    """Configures the ssh connection used by fabric.
-
-    The problem is that fabric does not support passing the private key as a
-    string, but only as a file. To solve this we use a temporary file. After
-    the connection is closed you should erase this file. That's why this
-    function returns the path of the temporary file.
-    """
-    if not ip or not private_key:
-        log.info('IP or private key missing. SSH configuration failed.')
-        return False
-
-    env.host_string = ip
-    env.user = 'root'
-    #env.connection_attempts - defaults to 1
-    #env.timeout - e.g. 20 in secs defaults to 10
-
-    (tmp_key, tmp_path) = tempfile.mkstemp()
-    key_fd = os.fdopen(tmp_key, 'w+b')
-    key_fd.write(private_key)
-    key_fd.close()
-    env.key_filename = [tmp_path]
-
-    return tmp_path
-
-
 @view_config(route_name='machine_key', request_method='GET', renderer='json')
 def machine_key(request):
     """Check if the machine has a key pair deployed"""
-    tmp_path = config_fabric_ssh(request.params.get('ip', None),
-                                 request.registry.settings['keypairs'][0][1])
+    tmp_path = config_fabric(request.params.get('ip', None),
+                             request.registry.settings['keypairs'][0][1])
 
     # if run('uptime').failed:
     #     ret = {'has_key': False}
@@ -507,8 +454,8 @@ def machine_key(request):
 def shell_command(request):
     """Send a shell command to a machine over ssh"""
 
-    tmp_path = config_fabric_ssh(request.params.get('ip', None),
-                                 request.registry.settings['keypairs'][0][1])
+    tmp_path = config_fabric(request.params.get('ip', None),
+                             request.registry.settings['keypairs'][0][1])
 
     # try:
     #     cmd_output = run(request.params.get('command', None))
@@ -524,8 +471,8 @@ def shell_command(request):
 @view_config(route_name='machine_uptime', request_method='GET', renderer='json')
 def machine_uptime(request):
     """Check if the machine has a key pair deployed"""
-    tmp_path = config_fabric_ssh(request.params.get('ip', None),
-                                 request.registry.settings['keypairs'][0][1])
+    tmp_path = config_fabric(request.params.get('ip', None),
+                             request.registry.settings['keypairs'][0][1])
 
     #uptime =  run('cat /proc/uptime')
     uptime = None
