@@ -2,6 +2,11 @@
 
 TODO: why do we always check for the session, the try should be refactored
       to a single function, it is used almost everywhere.
+TODO: Besides returning error responses should we also log the error? This
+      could be helpful especially in case that the call fails because the
+      backend does not support an action e.g. start/stop machine.
+TODO: Are we going to support rebuild, resize actions for Rackspace, Openstack
+      and Linode?
 """
 import os
 import logging
@@ -143,7 +148,16 @@ def list_machines(request):
 
 @view_config(route_name='machines', request_method='POST', renderer='json')
 def create_machine(request):
-    """Create a new virtual machine on the specified backend"""
+    """Creates a new virtual machine on the specified backend.
+
+    If the backend is Rackspace it attempts to deploy the node with an ssh key
+    provided in config.
+
+    TODO: test ssh deploy with EC2, keep in mind the conn.ex_import_keypair
+    TODO: test simple and ssh deploy with Openstack
+    TODO: test simple and ssh deploy with Linode
+    TODO: we automatically select a key, the user should decide
+    """
     try:
         conn = connect(request)
     except:
@@ -162,18 +176,18 @@ def create_machine(request):
     image = NodeImage(image_id, name='', driver=conn)
     location = NodeLocation(location_id, name='', country='', driver=conn)
 
-    if conn.type == Provider.RACKSPACE and len(request.registry.settings['keypairs']):
-        # try to deploy node with ssh key installed
-        ssh_key = SSHKeyDeployment(request.registry.settings['keypairs'][0][0])
+    has_key = len(request.registry.settings['keypairs'])
+    if conn.type == Provider.RACKSPACE and has_key:
+        key = SSHKeyDeployment(request.registry.settings['keypairs'][0][0])
         try:
             conn.deploy_node(name=machine_name,
                              image=image,
                              size=size,
                              location=location,
-                             deploy=ssh_key)
+                             deploy=key)
             return []
         except:
-            log.warn('Failed to deploy node with ssh key. Trying to create simple node')
+            log.warn('Failed to deploy node with ssh key, attempting without')
 
     try:
         conn.create_node(name=machine_name,
@@ -182,7 +196,7 @@ def create_machine(request):
                          location=location)
         return []
     except Exception as e:
-        return Response('Something went wrong with the creation', 500)
+        return Response('Something went wrong with node creation', 500)
 
 
 @view_config(route_name='machine',
@@ -190,8 +204,18 @@ def create_machine(request):
              request_param='action=start',
              renderer='json')
 def start_machine(request):
-    """Starts a machine on backends that supported start/stop"""
-    #TODO: in which providers could this work?
+    """Starts a machine on backends that support it.
+
+    Currently only EC2 supports that.
+
+    .. note:: Normally try won't get an AttributeError exception because this
+              action is not allowed for machines that don't support it. Check
+              helpers.get_machine_actions.
+
+    TODO: does Linode support it?
+    TODO: should try return a 503 when it is not possible to communicate with
+          the backend?
+    """
     try:
         conn = connect(request)
     except:
@@ -204,9 +228,13 @@ def start_machine(request):
                    public_ips=[],
                    private_ips=[],
                    driver=conn)
-    #machine.start()
-
-    return []
+    try:
+        # In liblcoud it is not possible to call this with machine.start()
+        conn.ex_start_node(machine)
+    except AttributeError:
+        return Response('Action not supported for this machine', 404)
+    except:
+        return []
 
 
 @view_config(route_name='machine',
@@ -214,8 +242,18 @@ def start_machine(request):
              request_param='action=stop',
              renderer='json')
 def stop_machine(request):
-    """Stops a machine on backends that supported start/stop"""
-    #TODO: in which providers could this work?
+    """Stops a machine on backends that support it.
+
+    Currently only EC2 supports that.
+
+    .. note:: Normally try won't get an AttributeError exception because this
+              action is not allowed for machines that don't support it. Check
+              helpers.get_machine_actions.
+
+    TODO: does Linode support it?
+    TODO: should try return a 503 when it is not possible to communicate with
+          the backend?
+    """
     try:
         conn = connect(request)
     except:
@@ -228,10 +266,14 @@ def stop_machine(request):
                    public_ips=[],
                    private_ips=[],
                    driver=conn)
-    #if conn.has('ex_stop'):
-    conn.ex_stop(machine)
 
-    return []
+    try:
+        # In libcloud it is not possible to call this with machine.stop()
+        conn.ex_stop_node(machine)
+    except AttributeError:
+        return Response('Action not supported for this machine', 404)
+    except:
+        return []
 
 
 @view_config(route_name='machine',
@@ -239,7 +281,7 @@ def stop_machine(request):
              request_param='action=reboot',
              renderer='json')
 def reboot_machine(request):
-    """Reboots a machine on a certain backend"""
+    """Reboots a machine on a certain backend."""
     try:
         conn = connect(request)
     except:
