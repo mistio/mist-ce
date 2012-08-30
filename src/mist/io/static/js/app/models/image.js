@@ -8,7 +8,7 @@ define('app/models/image', ['ember'],
 		return Ember.Object.extend({
 			/*
 			 * Image types
-			 * 
+			 *
 			 * "generic" if not found
 			 */
 			TYPES: {
@@ -25,12 +25,12 @@ define('app/models/image', ['ember'],
 					opensuse: "openSUSE",
 					fedora: "Fedora",
 					centos: "CentOS",
-					debian: "Debian",	
+					debian: "Debian",
 					amazon: "Amazon"
 			},
 			id: null,
 			name: null,
-			
+
 			type: function(){
 					for(type in this.TYPES){
 						if(this.name != null && this.name.toLowerCase().search(type) != -1){

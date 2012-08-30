@@ -34,8 +34,7 @@ from mist.io.helpers import config_fabric
 log = logging.getLogger('mist.io')
 
 
-@view_config(route_name='home',
-             request_method='GET',
+@view_config(route_name='home', request_method='GET',
              renderer='templates/home.pt')
 def home(request):
     """Gets all the basic data for backends, project name and session status.
@@ -199,10 +198,8 @@ def create_machine(request):
         return Response('Something went wrong with node creation', 500)
 
 
-@view_config(route_name='machine',
-             request_method='POST',
-             request_param='action=start',
-             renderer='json')
+@view_config(route_name='machine', request_method='POST',
+             request_param='action=start', renderer='json')
 def start_machine(request):
     """Starts a machine on backends that support it.
 
@@ -237,10 +234,8 @@ def start_machine(request):
         return []
 
 
-@view_config(route_name='machine',
-             request_method='POST',
-             request_param='action=stop',
-             renderer='json')
+@view_config(route_name='machine', request_method='POST',
+             request_param='action=stop', renderer='json')
 def stop_machine(request):
     """Stops a machine on backends that support it.
 
@@ -276,10 +271,8 @@ def stop_machine(request):
         return []
 
 
-@view_config(route_name='machine',
-             request_method='POST',
-             request_param='action=reboot',
-             renderer='json')
+@view_config(route_name='machine', request_method='POST',
+             request_param='action=reboot', renderer='json')
 def reboot_machine(request):
     """Reboots a machine on a certain backend.
 
@@ -307,10 +300,8 @@ def reboot_machine(request):
     return []
 
 
-@view_config(route_name='machine',
-             request_method='POST',
-             request_param='action=destroy',
-             renderer='json')
+@view_config(route_name='machine', request_method='POST',
+             request_param='action=destroy', renderer='json')
 def destroy_machine(request):
     """Destroys a machine on a certain backend.
 
@@ -337,8 +328,8 @@ def destroy_machine(request):
     return []
 
 
-@view_config(route_name='metadata', request_method='POST')
-def set_metadata(request):
+@view_config(route_name='machine_metadata', request_method='POST')
+def set_machine_metadata(request):
     """Sets metadata for a machine, given the backend and machine id.
 
 
@@ -384,6 +375,63 @@ def set_metadata(request):
 
     return Response(json.dumps(ret))
 
+@view_config(route_name='machine_key', request_method='GET', renderer='json')
+def machine_key(request):
+    """Check if the machine has a key pair deployed.
+
+    TODO: .failed doesn't work
+    TODO: what happens when machine has root password authentication?
+    TODO: results should be stored somewhere in server side also, to avoid
+          making calls to machines that will fail
+    """
+    tmp_path = config_fabric(request.params.get('ip', None),
+                             request.registry.settings['keypairs'][0][1])
+
+    # if run('uptime').failed:
+    #     ret = {'has_key': False}
+    # else:
+    #     ret = {'has_key': True}
+    ret = {'has_key': False}
+
+    os.remove(tmp_path)
+
+    return ret
+
+
+@view_config(route_name='machine_shell', request_method='POST',
+             renderer='json')
+def shell_command(request):
+    """Send a shell command to a machine over ssh."""
+
+    tmp_path = config_fabric(request.params.get('ip', None),
+                             request.registry.settings['keypairs'][0][1])
+
+    # try:
+    #     cmd_output = run(request.params.get('command', None))
+    # except:
+    #     cmd_output = ''; # FIXME grab the UNIX error
+    cmd_output = ''
+
+    os.remove(tmp_path)
+
+    return cmd_output
+
+
+@view_config(route_name='machine_uptime', request_method='GET',
+             renderer='json')
+def machine_uptime(request):
+    """Check if the machine has a key pair deployed"""
+    tmp_path = config_fabric(request.params.get('ip', None),
+                             request.registry.settings['keypairs'][0][1])
+
+    #uptime =  run('cat /proc/uptime')
+    uptime = None
+
+    if uptime:
+        uptime = float(uptime.split()[0]) * 1000
+
+    return {'uptime': uptime }
+
 
 @view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
@@ -419,6 +467,37 @@ def list_images(request):
                     'extra' : image.extra,
                     'name'  : image.name,
                     })
+    return ret
+
+
+@view_config(route_name='image_metadata', request_method='GET',
+             renderer='json')
+def get_image_metadata(request):
+    """Gets image metadata based on image id.
+
+    Right now (libcloud 0.11.0) get_image() is supported for EC2 and not for
+    RACKSPACE, LINODE and OPENSTACK.
+    """
+    try:
+        conn = connect(request)
+    except:
+        return Response('Backend not found', 404)
+
+    try:
+        image_id = request.matchdict['image']
+        image = conn.get_image(image_id)
+    except NotImplementedError:
+        return Response('Action not supported for this backend', 404)
+    except:
+        return Response('Backend unavailable', 503)
+
+    if image is None:
+        ret = {}
+    else:
+        ret = {'id'    : image.id,
+               'extra' : image.extra,
+               'name'  : image.name,
+               }
     return ret
 
 
@@ -481,88 +560,3 @@ def list_locations(request):
                     })
 
     return ret
-
-
-@view_config(route_name='image_details', request_method='GET', renderer='json')
-def get_image_details(request):
-    """Gets image metadata based on image id.
-
-    Right now (libcloud 0.11.0) get_image() is supported for EC2 and not for
-    RACKSPACE, LINODE and OPENSTACK.
-    """
-    try:
-        conn = connect(request)
-    except:
-        return Response('Backend not found', 404)
-
-    try:
-        image = conn.get_image(request.params['id'])
-    except NotImplementedError:
-        return Response('Action not supported for this backend', 404)
-    except:
-        return Response('Backend unavailable', 503)
-
-    if image is None:
-        ret = {}
-    else:
-        ret = {'id'    : image.id,
-               'extra' : image.extra,
-               'name'  : image.name,
-               }
-    return ret
-
-
-@view_config(route_name='machine_key', request_method='GET', renderer='json')
-def machine_key(request):
-    """Check if the machine has a key pair deployed.
-
-    TODO: .failed doesn't work
-    TODO: what happens when machine has root password authentication?
-    TODO: results should be stored somewhere in server side also, to avoid
-          making calls to machines that will fail
-    """
-    tmp_path = config_fabric(request.params.get('ip', None),
-                             request.registry.settings['keypairs'][0][1])
-
-    # if run('uptime').failed:
-    #     ret = {'has_key': False}
-    # else:
-    #     ret = {'has_key': True}
-    ret = {'has_key': False}
-
-    os.remove(tmp_path)
-
-    return ret
-
-
-@view_config(route_name='machine_shell', request_method='POST', renderer='json')
-def shell_command(request):
-    """Send a shell command to a machine over ssh."""
-
-    tmp_path = config_fabric(request.params.get('ip', None),
-                             request.registry.settings['keypairs'][0][1])
-
-    # try:
-    #     cmd_output = run(request.params.get('command', None))
-    # except:
-    #     cmd_output = ''; # FIXME grab the UNIX error
-    cmd_output = ''
-
-    os.remove(tmp_path)
-
-    return cmd_output
-
-
-@view_config(route_name='machine_uptime', request_method='GET', renderer='json')
-def machine_uptime(request):
-    """Check if the machine has a key pair deployed"""
-    tmp_path = config_fabric(request.params.get('ip', None),
-                             request.registry.settings['keypairs'][0][1])
-
-    #uptime =  run('cat /proc/uptime')
-    uptime = None
-
-    if uptime:
-        uptime = float(uptime.split()[0]) * 1000
-
-    return {'uptime': uptime }

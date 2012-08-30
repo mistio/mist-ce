@@ -40,9 +40,7 @@ define('app/controllers/images', [
 		    		var that = this;
 
 		    		$.ajax({
-	                    url: 'backends/' + this.backend.index + '/image_details',
-	                    // TODO: shouldn't this be 'id':id?
-	                    data: {id: id},
+	                    url: 'backends/' + this.backend.index + '/images/' + id + '/metadata',
 	                    success: function(data) {
 	                    	var image = Image.create(data);
 	                    	that.content.push(image);
