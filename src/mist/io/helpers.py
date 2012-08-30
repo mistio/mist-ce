@@ -1,4 +1,5 @@
 """Map actions to backends"""
+import os
 import tempfile
 
 from libcloud.compute.types import Provider
