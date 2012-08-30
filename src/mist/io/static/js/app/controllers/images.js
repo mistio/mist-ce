@@ -9,10 +9,10 @@ define('app/controllers/images', [
 	function(Image) {
 		return Ember.ArrayController.extend({
 			backend: null,
-			
+
 			getImageType: function(imageId, callback){
 				var that = this;
-				
+
 				this.getImage(imageId, function(image){
 					for(type in that.TYPES){
 						if(image.name.toLowerCase().search(type) != -1){
@@ -22,24 +22,26 @@ define('app/controllers/images', [
 					}
 				});
 			},
-			
-			getImage: function(id, callback){
+
+			getImage: function(id, callback) {
+				// TODO: why linode passes id==null here?
 		    	retImage = false;
-		    	
+		    	// TODO: why idx?
 		    	$.each(this.content, function(idx, image){
 					if(image.id == id){
 						retImage = image;
 						return false;
 					}
 				});
-		    	
+
 		    	if(retImage){
 		    		callback(retImage);
 		    	} else {
 		    		var that = this;
-		    		
+
 		    		$.ajax({
 	                    url: 'backends/' + this.backend.index + '/image_details',
+	                    // TODO: shouldn't this be 'id':id?
 	                    data: {id: id},
 	                    success: function(data) {
 	                    	var image = Image.create(data);
@@ -48,15 +50,15 @@ define('app/controllers/images', [
 	                    },
 	                    error: function(jqXHR, textStatus, errorThrown) {
 	        				Mist.notificationController.notify("Error loading image id:" + id);
-	        				
+
 	                    }
 	                });
 		    	}
 		    },
-			
+
 			init: function() {
 				this._super();
-			
+
 				var that = this;
 				$.getJSON('/backends/' + this.backend.index + '/images', function(data) {
 					var content = new Array();
