@@ -379,7 +379,11 @@ def list_locations(request):
 
 @view_config(route_name='image_details', request_method='GET', renderer='json')
 def get_image_details(request):
-    """get_image_details"""
+    """Gets image metadata based on image id.
+
+    Right now (libcloud 0.11.0) get_image() is supported for EC2 and not for
+    RACKSPACE, LINODE and OPENSTACK.
+    """
     try:
         conn = connect(request)
     except:
@@ -387,13 +391,15 @@ def get_image_details(request):
 
     try:
         image = conn.get_image(request.params['id'])
+    except NotImplementedError:
+        return Response('Action not supported for this backend', 404)
     except:
         return Response('Backend unavailable', 503)
 
     if image is None:
         ret = {}
     else:
-        ret = {'id'     : image.id,
+        ret = {'id'    : image.id,
                'extra' : image.extra,
                'name'  : image.name,
                }
