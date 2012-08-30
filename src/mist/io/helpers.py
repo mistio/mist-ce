@@ -3,7 +3,6 @@ import tempfile
 
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
-from libcloud.compute.drivers.rackspace import RackspaceNodeDriver
 from libcloud.compute.drivers.ec2 import EC2NodeDriver
 
 from fabric.api import env
@@ -50,27 +49,49 @@ def connect(request):
 
 
 def get_machine_actions(machine, backend):
-    """Return available machine actions
+    """Returns available machine actions based on backend type.
 
-    This depends on the backend driver
+    Rackspace, Linode and openstack support the same options, but EC2 also
+    supports start/stop.
+
+    The available actions are updates based on the machine state. The state
+    codes mist.io supports are:
+
+        * 0 = running
+        * 1 = rebooting
+        * 2 = stopped
+        * 3 = pending
+        * 4 = unknown
+
+    The mapping takes place in js/app/models/machine.js
+
+    TODO: Every backend has different state codes, check out different drivers
+          in libcloud/libcloud/compute/drivers/. We do not transalte these and
+          as a result we get wrong codes. e.g. EC2 returns state 4 for stopped
+          machines but we interpret this as unknown.
+    TODO: Linode has a shutdown feature that needs investigation. Is it the
+          same as EC2's start/stop?
     """
-    can_start = True
-    can_stop = True
+    can_start = False
+    can_stop = False
     can_destroy = True
     can_reboot = True
 
-    if type(backend) is RackspaceNodeDriver:
-        can_start = False
-        can_stop = False
+    if type(backend) is EC2NodeDriver:
+        can_start = True
+        can_stop = True
 
     if machine.state == 1:
+        # rebooting
         can_start = False
         can_stop = False
         can_reboot = False
     elif machine.state == 2:
+        # stopped
         can_stop = False
         can_reboot = False
     elif machine.state in (3, 4) :
+        # 3 - pending, 4 - unkown
         can_start = False
         can_destroy = False
         can_stop = False
@@ -85,10 +106,23 @@ def get_machine_actions(machine, backend):
 def config_fabric(ip, private_key):
     """Configures the ssh connection used by fabric.
 
-    The problem is that fabric does not support passing the private key as a
-    string, but only as a file. To solve this we use a temporary file. After
-    the connection is closed you should erase this file. That's why this
-    function returns the path of the temporary file.
+    Fabric does not support passing the private key as a string, but only as a
+    file. To solve this, a temporary file with the private key is created and
+    its path is returned.
+
+    .. warning:: Each function calling this one should delete the temporary
+                 file after closing the connection.
+
+    A few useful parameters for fabric configuration that are not currently
+    used:
+
+        * env.connection_attempts, defaults to 1
+        * env.timeout - e.g. 20 in secs defaults to 10
+
+    TODO: By default EC2 lets you connect only with username ec2-user and not
+          root.
+    TODO: In EC2, if you don't have an elastic ip it is possible to connect
+          using an automatically provided hostname.
     """
     if not ip or not private_key:
         log.info('IP or private key missing. SSH configuration failed.')
@@ -96,8 +130,6 @@ def config_fabric(ip, private_key):
 
     env.host_string = ip
     env.user = 'root'
-    #env.connection_attempts - defaults to 1
-    #env.timeout - e.g. 20 in secs defaults to 10
 
     (tmp_key, tmp_path) = tempfile.mkstemp()
     key_fd = os.fdopen(tmp_key, 'w+b')
