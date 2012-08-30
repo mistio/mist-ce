@@ -1,4 +1,8 @@
-"""mist.io views"""
+"""mist.io views
+
+TODO: why do we always check for the session, the try should be refactored
+      to a single function, it is used almost everywhere.
+"""
 import os
 import logging
 import json
@@ -27,7 +31,20 @@ log = logging.getLogger('mist.io')
 
 
 def connect(request):
-    """Establish backend connection using the credentials specified"""
+    """Establishes backend connection using the credentials specified.
+
+    It has been tested with:
+
+        * EC2, but not alternative providers like EC2_EU,
+        * Rackspace, only the old style and not the openstack powered one,
+        * Openstack Diablo through Trystack, should also try Essex,
+        * Linode
+
+    TODO: needs testing with more providers
+    TODO: why do we always connect before doing something and not connect
+          once and for all?
+
+    """
     try:
         backend_list = request.environ['beaker.session']['backends']
     except:
@@ -42,7 +59,8 @@ def connect(request):
         conn = driver(backend['id'],
                       backend['secret'],
                       ex_force_auth_url=backend.get('auth_url', None),
-                      ex_force_auth_version=backend.get('auth_version', '1.0'))
+                      ex_force_auth_version=backend.get('auth_version',
+                                                        '2.0_password'))
     elif backend['provider'] == Provider.LINODE:
         conn = driver(backend['secret'])
     else:
@@ -55,7 +73,12 @@ def connect(request):
              request_method='GET',
              renderer='templates/home.pt')
 def home(request):
-    """Fill in an object with backend data, taken from config.py"""
+    """Gets all the basic data for backends, project name and session status.
+
+    TODO: here we set status to off while in list_backends we set it to online
+          Which one is the default after all?
+    TODO: For status we should either use off/on or offline/online
+    """
     try:
         backend_list = request.environ['beaker.session']['backends']
         session = True
@@ -77,10 +100,38 @@ def home(request):
             'session': session}
 
 
+@view_config(route_name='backends', request_method='GET', renderer='json')
+def list_backends(request):
+    """Lists the available backends.
+
+    .. note:: Currently, this is only used by the backends controller in js.
+
+    TODO: why do we always set status to online, what if enabled if false in
+          config?
+    """
+    try:
+        backend_list = request.environ['beaker.session']['backends']
+    except:
+        backend_list = BACKENDS
+
+    backends = []
+    index = 0
+    for backend in backend_list:
+        backends.append({'index'        : index,
+                         'id'           : backend['id'],
+                         'title'        : backend['title'],
+                         'provider'     : backend['provider'],
+                         'poll_interval': backend['poll_interval'],
+                         'status'       : 'online',
+                         })
+        index = index + 1
+
+    return backends
+
+
 @view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
     """List machines for a backend"""
-
     try:
         conn = connect(request)
     except:
@@ -406,27 +457,7 @@ def get_image_details(request):
     return ret
 
 
-@view_config(route_name='backends', request_method='GET', renderer='json')
-def get_backends(request):
-    """get_backends"""
-    try:
-        backend_list = request.environ['beaker.session']['backends']
-    except:
-        backend_list = BACKENDS
 
-    backends = []
-    index = 0
-    for backend in backend_list:
-        backends.append({'index'        : index,
-                         'id'           : backend['id'],
-                         'title'        : backend['title'],
-                         'provider'     : backend['provider'],
-                         'poll_interval': backend['poll_interval'],
-                         'status'       : 'online',
-                         })
-        index = index + 1
-
-    return backends
 
 
 def config_fabric_ssh(ip, private_key):
