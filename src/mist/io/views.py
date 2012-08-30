@@ -281,7 +281,14 @@ def stop_machine(request):
              request_param='action=reboot',
              renderer='json')
 def reboot_machine(request):
-    """Reboots a machine on a certain backend."""
+    """Reboots a machine on a certain backend.
+
+    TODO: machine.reboot requires a try to catch possible exceptions
+    TODO: test this in Linode
+    TODO: test this in Openstack
+    TODO: figure out what to do with backends that don't return a reboot state
+          code
+    """
     try:
         conn = connect(request)
     except:
@@ -294,7 +301,9 @@ def reboot_machine(request):
                    public_ips=[],
                    private_ips=[],
                    driver=conn)
+
     machine.reboot()
+
     return []
 
 
@@ -303,7 +312,13 @@ def reboot_machine(request):
              request_param='action=destroy',
              renderer='json')
 def destroy_machine(request):
-    """Destroys a machine on a certain backend"""
+    """Destroys a machine on a certain backend.
+
+    TODO: machine.destroy requires a try to catch possible exceptions
+    TODO: test this in Linode
+    TODO: test this in Openstack
+    TODO: does destroy set a proper state code in all backends?
+    """
     try:
         conn = connect(request)
     except:
@@ -316,6 +331,7 @@ def destroy_machine(request):
                    public_ips=[],
                    private_ips=[],
                    driver=conn)
+
     machine.destroy()
 
     return []
@@ -323,9 +339,13 @@ def destroy_machine(request):
 
 @view_config(route_name='metadata', request_method='POST')
 def set_metadata(request):
-    """Sets metadata for a machine, given the backend and machine id"""
-    #TODO: the following are not working
-    """Examples
+    """Sets metadata for a machine, given the backend and machine id.
+
+
+    TODO: stange list comprehension why doesn't it get backend and machine Id
+          from request?
+    TODO: test if this works in all providers. Keep in mind that
+
     Openstack:
         conn.ex_set_metadata(machine,
                             {'name': 'ServerX',
@@ -367,7 +387,13 @@ def set_metadata(request):
 
 @view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
-    """List images from each backend"""
+    """List images from each backend.
+
+    TODO: decide which images we'll get for every backend, check how we
+          do it for EC2, here and in config
+    TODO: send the patch stephane did for filtering upstream, there is a
+          relevant pull request https://github.com/apache/libcloud/pull/37
+    """
     try:
         conn = connect(request)
     except:
@@ -398,7 +424,10 @@ def list_images(request):
 
 @view_config(route_name='sizes', request_method='GET', renderer='json')
 def list_sizes(request):
-    """List sizes (aka flavors) from each backend"""
+    """List sizes (aka flavors) from each backend.
+
+    TODO: check if this works in all backends
+    """
     try:
         conn = connect(request)
     except:
@@ -425,7 +454,15 @@ def list_sizes(request):
 
 @view_config(route_name='locations', request_method='GET', renderer='json')
 def list_locations(request):
-    """List locations from each backend"""
+    """List locations from each backend.
+
+    Locations mean different things in each backend. e.g. EC2 uses it as a
+    datacenter in a given availability zone, whereas Linode lists availability
+    zones, in EC2 lingo. However all responses share id, name and country
+    eventhough in some cases might be empty, e.g. Openstack.
+
+    TODO: Handle the different meaning of a location in every backend.
+    """
     try:
         conn = connect(request)
     except:
@@ -477,7 +514,13 @@ def get_image_details(request):
 
 @view_config(route_name='machine_key', request_method='GET', renderer='json')
 def machine_key(request):
-    """Check if the machine has a key pair deployed"""
+    """Check if the machine has a key pair deployed.
+
+    TODO: .failed doesn't work
+    TODO: what happens when machine has root password authentication?
+    TODO: results should be stored somewhere in server side also, to avoid
+          making calls to machines that will fail
+    """
     tmp_path = config_fabric(request.params.get('ip', None),
                              request.registry.settings['keypairs'][0][1])
 
@@ -494,7 +537,7 @@ def machine_key(request):
 
 @view_config(route_name='machine_shell', request_method='POST', renderer='json')
 def shell_command(request):
-    """Send a shell command to a machine over ssh"""
+    """Send a shell command to a machine over ssh."""
 
     tmp_path = config_fabric(request.params.get('ip', None),
                              request.registry.settings['keypairs'][0][1])
