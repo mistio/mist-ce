@@ -1,6 +1,7 @@
 """Map actions to backends"""
 import os
 import tempfile
+import logging
 
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
@@ -9,6 +10,9 @@ from libcloud.compute.drivers.ec2 import EC2NodeDriver
 from fabric.api import env
 
 from mist.io.config import BACKENDS
+
+
+log = logging.getLogger('mist.io')
 
 
 def connect(request):
@@ -69,7 +73,8 @@ def get_machine_actions(machine, backend):
     TODO: Every backend has different state codes, check out different drivers
           in libcloud/libcloud/compute/drivers/. We do not transalte these and
           as a result we get wrong codes. e.g. EC2 returns state 4 for stopped
-          machines but we interpret this as unknown.
+          machines but we interpret this as unknown. In the elif below I set
+          can_start to True for states 3, 4 just for testing.
     TODO: Linode has a shutdown feature that needs investigation. Is it the
           same as EC2's start/stop?
     """
@@ -93,7 +98,7 @@ def get_machine_actions(machine, backend):
         can_reboot = False
     elif machine.state in (3, 4) :
         # 3 - pending, 4 - unkown
-        can_start = False
+        can_start = True # FIXME: change this to false after corecting states
         can_destroy = False
         can_stop = False
         can_reboot = False

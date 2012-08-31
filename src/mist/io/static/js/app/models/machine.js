@@ -144,21 +144,21 @@ define('app/models/machine', ['ember'],
 
 			startUptimeTimer: function(){
 				var that = this;
-				
+
 				setInterval(function(){
 					if(that.get('state' != 0) || !that.get('uptimeFromServer') || !that.get('uptimeChecked')){
 						return;
 					} else {
 						that.set('uptime', that.get('uptimeFromServer') + (Date.now() - that.get('uptimeChecked')));
 					}
-					
+
 				},1000);
 			},
 
 			checkUptime: function(){
 				if(this.hasKey){
 					var that = this;
-					
+
 					$.ajax({
 						url: '/backends/' + this.backend.index + '/machines/' + this.id + '/uptime',
 						data: {ip: this.public_ips[0]},
@@ -176,10 +176,10 @@ define('app/models/machine', ['ember'],
 					});
 				}
 			},
-			
+
 			checkHasMonitoring: function(){
 				var that = this;
-					
+
 					$.ajax({
 						url: 'backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
 						success: function(data) {
@@ -194,10 +194,10 @@ define('app/models/machine', ['ember'],
 						console.log(textStatus + " " + errorThrown);
 					});
 			},
-			
+
 			checkHasKey: function(){
 				var that = this;
-				
+
 				$.ajax({
                     url: '/backends/' + this.backend.index + '/machines/' + this.id + '/key',
                     data: {ip: this.public_ips[0]},
@@ -216,9 +216,9 @@ define('app/models/machine', ['ember'],
 					console.log(textStatus + " " + errorThrown);
 					that.set('hasKey', false);
 				});
-				
+
 			},
-			
+
 			resetUptime: function(){
 				if(this.state != 0){
 					this.set('uptime', 0);
@@ -229,18 +229,18 @@ define('app/models/machine', ['ember'],
 					}
 				}
 			}.observes('state'),
-			
+
 			monitoringChanged: function(){
 				var oldValue = !this.hasMonitoring;
 				console.log("monitoring:  " + oldValue);
-				
+
 				var that = this;
-				
+
 				//Enable / Disable monitoring on server
 				var payload = {
 	                    "monitoring": this.hasMonitoring,
 	            };
-				
+
 				$.ajax({
                     type: "POST",
                     contentType: "application/json",
@@ -248,15 +248,15 @@ define('app/models/machine', ['ember'],
                     data: JSON.stringify(payload),
                     url: 'backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
                     success: function(data) {
-                    	
+
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                     	that.set('hasMonitoring', oldValue);
                     }
                 });
-				
+
 			}.observes('hasMonitoring'),
-			
+
 			init: function(){
 				this._super();
 				var that = this;
