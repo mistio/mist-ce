@@ -154,7 +154,12 @@ def create_machine(request):
 
     TODO: test ssh deploy with EC2, keep in mind the conn.ex_import_keypair
     TODO: test simple and ssh deploy with Openstack
-    TODO: test simple and ssh deploy with Linode
+    TODO: In Linode, you must pass image with image.extra, size with size.disk
+          and auth which is either a libcloud.compute.base.NodeAuthSSHKey or
+          an NodeAuthPassword. The good news is that key deployment works, the
+          bad news is that you should have a password field and you must get
+          more information about sizes and images.
+          DON'T TRY THIS AT HOME BECAUSE IT KEEPS CHARGING AND CREDITING.
     TODO: we automatically select a key, the user should decide
     """
     try:
@@ -277,7 +282,6 @@ def reboot_machine(request):
     """Reboots a machine on a certain backend.
 
     TODO: machine.reboot requires a try to catch possible exceptions
-    TODO: test this in Linode
     TODO: test this in Openstack
     TODO: figure out what to do with backends that don't return a reboot state
           code
