@@ -24,10 +24,6 @@ def connect(request):
         * Rackspace, only the old style and not the openstack powered one,
         * Openstack Diablo through Trystack, should also try Essex,
         * Linode
-
-    TODO: needs testing with more providers
-    TODO: why do we always connect before doing something and not connect
-          once and for all?
     """
     try:
         backend_list = request.environ['beaker.session']['backends']
@@ -69,14 +65,6 @@ def get_machine_actions(machine, backend):
         * 4 = unknown
 
     The mapping takes place in js/app/models/machine.js
-
-    TODO: Every backend has different state codes, check out different drivers
-          in libcloud/libcloud/compute/drivers/. We do not transalte these and
-          as a result we get wrong codes. e.g. EC2 returns state 4 for stopped
-          machines but we interpret this as unknown. In the elif below I set
-          can_start to True for states 3, 4 just for testing.
-    TODO: Linode has a shutdown feature that needs investigation. Is it the
-          same as EC2's start/stop?
     """
     can_start = False
     can_stop = False
@@ -124,11 +112,6 @@ def config_fabric(ip, private_key):
 
         * env.connection_attempts, defaults to 1
         * env.timeout - e.g. 20 in secs defaults to 10
-
-    TODO: By default EC2 lets you connect only with username ec2-user and not
-          root.
-    TODO: In EC2, if you don't have an elastic ip it is possible to connect
-          using an automatically provided hostname.
     """
     if not ip or not private_key:
         log.info('IP or private key missing. SSH configuration failed.')

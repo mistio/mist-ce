@@ -1,13 +1,4 @@
-"""mist.io views
-
-TODO: why do we always check for the session, the try should be refactored
-      to a single function, it is used almost everywhere.
-TODO: Besides returning error responses should we also log the error? This
-      could be helpful especially in case that the call fails because the
-      backend does not support an action e.g. start/stop machine.
-TODO: Are we going to support rebuild, resize actions for Rackspace, Openstack
-      and Linode?
-"""
+"""mist.io views"""
 import os
 import logging
 import json
@@ -38,10 +29,6 @@ log = logging.getLogger('mist.io')
              renderer='templates/home.pt')
 def home(request):
     """Gets all the basic data for backends, project name and session status.
-
-    TODO: here we set status to off while in list_backends we set it to online
-          Which one is the default after all?
-    TODO: For status we should either use off/on or offline/online
     """
     try:
         request.environ['beaker.session']['backends']
@@ -58,9 +45,6 @@ def list_backends(request):
     """Gets the available backends.
 
     .. note:: Currently, this is only used by the backends controller in js.
-
-    TODO: why do we always set status to online, what if enabled if false in
-          config?
     """
     try:
         backend_list = request.environ['beaker.session']['backends']
@@ -97,9 +81,6 @@ def list_machines(request):
           attribute
         * For flavors, EC2 has an extra.instancetype attribute while Rackspace
           an extra.flavorId. however we also expect to get size attribute.
-
-    TODO: why the tags = tags and tags.get('tags', None) or [] ???
-    TODO: we get imageId and size, should the last be sizeId?
     """
     try:
         conn = connect(request)
@@ -140,16 +121,6 @@ def create_machine(request):
 
     If the backend is Rackspace it attempts to deploy the node with an ssh key
     provided in config.
-
-    TODO: test ssh deploy with EC2, keep in mind the conn.ex_import_keypair
-    TODO: test simple and ssh deploy with Openstack
-    TODO: In Linode, you must pass image with image.extra, size with size.disk
-          and auth which is either a libcloud.compute.base.NodeAuthSSHKey or
-          an NodeAuthPassword. The good news is that key deployment works, the
-          bad news is that you should have a password field and you must get
-          more information about sizes and images.
-          DON'T TRY THIS AT HOME BECAUSE IT KEEPS CHARGING AND CREDITING.
-    TODO: we automatically select a key, the user should decide
     """
     try:
         conn = connect(request)
@@ -202,10 +173,6 @@ def start_machine(request):
     .. note:: Normally try won't get an AttributeError exception because this
               action is not allowed for machines that don't support it. Check
               helpers.get_machine_actions.
-
-    TODO: does Linode support it?
-    TODO: should try return a 503 when it is not possible to communicate with
-          the backend?
     """
     try:
         conn = connect(request)
@@ -238,10 +205,6 @@ def stop_machine(request):
     .. note:: Normally try won't get an AttributeError exception because this
               action is not allowed for machines that don't support it. Check
               helpers.get_machine_actions.
-
-    TODO: does Linode support it?
-    TODO: should try return a 503 when it is not possible to communicate with
-          the backend?
     """
     try:
         conn = connect(request)
@@ -268,13 +231,7 @@ def stop_machine(request):
 @view_config(route_name='machine', request_method='POST',
              request_param='action=reboot', renderer='json')
 def reboot_machine(request):
-    """Reboots a machine on a certain backend.
-
-    TODO: machine.reboot requires a try to catch possible exceptions
-    TODO: test this in Openstack
-    TODO: figure out what to do with backends that don't return a reboot state
-          code
-    """
+    """Reboots a machine on a certain backend."""
     try:
         conn = connect(request)
     except:
@@ -296,13 +253,7 @@ def reboot_machine(request):
 @view_config(route_name='machine', request_method='POST',
              request_param='action=destroy', renderer='json')
 def destroy_machine(request):
-    """Destroys a machine on a certain backend.
-
-    TODO: machine.destroy requires a try to catch possible exceptions
-    TODO: test this in Linode
-    TODO: test this in Openstack
-    TODO: does destroy set a proper state code in all backends?
-    """
+    """Destroys a machine on a certain backend."""
     try:
         conn = connect(request)
     except:
@@ -370,13 +321,7 @@ def set_machine_metadata(request):
 
 @view_config(route_name='machine_key', request_method='GET', renderer='json')
 def machine_key(request):
-    """Check if the machine has a key pair deployed.
-
-    TODO: .failed doesn't work
-    TODO: what happens when machine has root password authentication?
-    TODO: results should be stored somewhere in server side also, to avoid
-          making calls to machines that will fail
-    """
+    """Check if the machine has a key pair deployed."""
     tmp_path = config_fabric(request.params.get('ip', None),
                              request.registry.settings['keypairs'][0][1])
 
@@ -395,7 +340,6 @@ def machine_key(request):
              renderer='json')
 def shell_command(request):
     """Send a shell command to a machine over ssh."""
-
     tmp_path = config_fabric(request.params.get('ip', None),
                              request.registry.settings['keypairs'][0][1])
 
@@ -428,13 +372,7 @@ def machine_uptime(request):
 
 @view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
-    """List images from each backend.
-
-    TODO: decide which images we'll get for every backend, check how we
-          do it for EC2, here and in config
-    TODO: send the patch stephane did for filtering upstream, there is a
-          relevant pull request https://github.com/apache/libcloud/pull/37
-    """
+    """List images from each backend."""
     try:
         conn = connect(request)
     except:
@@ -496,10 +434,7 @@ def get_image_metadata(request):
 
 @view_config(route_name='sizes', request_method='GET', renderer='json')
 def list_sizes(request):
-    """List sizes (aka flavors) from each backend.
-
-    TODO: check if this works in all backends
-    """
+    """List sizes (aka flavors) from each backend."""
     try:
         conn = connect(request)
     except:
