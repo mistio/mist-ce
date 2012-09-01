@@ -44,23 +44,12 @@ def home(request):
     TODO: For status we should either use off/on or offline/online
     """
     try:
-        backend_list = request.environ['beaker.session']['backends']
+        request.environ['beaker.session']['backends']
         session = True
     except:
-        backend_list = BACKENDS
         session = False
 
-    backends = []
-    for backend in backend_list:
-        backends.append({'id'           : backend['id'],
-                         'title'        : backend['title'],
-                         'provider'     : backend['provider'],
-                         'poll_interval': backend['poll_interval'],
-                         'status'       : 'off',
-                         })
-
     return {'project': 'mist.io',
-            'backends': backends,
             'session': session}
 
 
