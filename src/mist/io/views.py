@@ -96,7 +96,7 @@ def list_machines(request):
     ret = []
     for m in machines:
         tags = m.extra.get('tags', None) or m.extra.get('metadata', None)
-        tags = tags and tags.get('tags', None) or []
+        tags = tags or []
         imageId = m.image or m.extra.get('imageId', None)
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
