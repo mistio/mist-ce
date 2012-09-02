@@ -30,7 +30,7 @@ define('app/models/machine', ['ember'],
                     data: "action=reboot",
                     success: function(data) {
                     	console.log("machine rebooting");
-                        this.set('state', 'rebooting');
+                        that.set('state', 'rebooting');
                     }
 
 				}).error(function(e) {
@@ -48,8 +48,8 @@ define('app/models/machine', ['ember'],
                     data: "action=destroy",
                     success: function(data) {
                     	console.log("machine being destroyed");
+                        that.set('state', 'pending');
                     }
-
 				}).error(function(e) {
 					Mist.notificationController.notify("Error destroying machine: " + that.name);
 					console.error("Error destroying machine: " + that.name);
@@ -68,6 +68,7 @@ define('app/models/machine', ['ember'],
                     type: 'POST',
                     success: function(data) {
                         console.log('machine starting');
+                        that.set('state', 'pending');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                     	Mist.notificationController.notify("Error starting machine: " +
@@ -89,6 +90,7 @@ define('app/models/machine', ['ember'],
                     type: 'POST',
                     success: function(data) {
                         console.log('machine being shut down');
+                        that.set('state', 'stopped');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                     	Mist.notificationController.notify("Error shutting down machine: " +

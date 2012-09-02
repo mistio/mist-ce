@@ -8,7 +8,8 @@ STATES = {
     NodeState.REBOOTING: 'rebooting',
     NodeState.TERMINATED: 'terminated',
     NodeState.PENDING: 'pending',
-    NodeState.UNKNOWN: 'unknown'
+    # we assume unknown means stopped, especially for the EC2 case
+    NodeState.UNKNOWN: 'stopped'
 }
 
 

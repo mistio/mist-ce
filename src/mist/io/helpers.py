@@ -75,11 +75,16 @@ def get_machine_actions(machine, backend):
     elif machine.state is NodeState.TERMINATED:
         can_stop = False
         can_reboot = False
-    elif machine.state in (NodeState.PENDING, NodeState.UNKNOWN) :
-        can_start = True # FIXME: change this to false after corecting states
+    elif machine.state is NodeState.UNKNOWN and \
+         backend.type in ALL_EC2_PROVIDERS:
+        # We assume uknown state in EC2 mean stopped
+        can_start = True
+    elif machine.state in (NodeState.PENDING, NodeState.UNKNOWN):
+        can_start = False
         can_destroy = False
         can_stop = False
         can_reboot = False
+
 
     return {'can_stop': can_stop,
             'can_start': can_start,
