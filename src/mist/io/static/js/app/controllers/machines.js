@@ -36,8 +36,6 @@ define('app/controllers/machines', [
 					console.log("machines for " + that.backend.title);
 					console.log(data.length);
 					
-					var contentDidChange = false;
-					
 					data.forEach(function(item){
 						
 						var found = false;
@@ -64,18 +62,40 @@ define('app/controllers/machines', [
 							console.log("not found, adding");
 							item.backend = that.backend;
 							var machine = Machine.create(item);
+							that.contentWillChange();
 							that.content.push(machine);
-							contentDidChange = true;
+							that.contentDidChange();
+							Mist.backendsController.contentWillChange();
+							Mist.backendsController.contentDidChange();
 						}
 						
 						
 					});
 					
-					// TODO handle deletion from server
+					that.content.forEach(function(item){
+						
+						var found = false;
+						
+						data.forEach(function(machine){
+							console.log("machine id: " + machine.id);
+							
+							if(machine.id == item.id){
+								found = true;
+								return false;
+							}
+						});
+						
+						if(!found){
+							console.log("not found, deleting");
+							that.contentWillChange();
+							that.removeObject(item);
+							that.contentDidChange();
+							Mist.backendsController.contentWillChange();
+							Mist.backendsController.contentDidChange();
+						}
+					});
 					
-					if(contentDidChange){
-						that.contentDidChange();
-					}
+					// TODO handle deletion from server
 					
 					that.backend.set('state', 'online');
 					
