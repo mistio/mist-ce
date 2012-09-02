@@ -2,18 +2,11 @@ define('app/models/machine', ['ember'],
 	/**
 	 * Machine model
 	 *
+     * Also check state mapping in config.py
 	 * @returns Class
 	 */
 	function() {
 		return Ember.Object.extend({
-			STATES: {
-				    '0' : 'running',
-				    '1' : 'rebooting',
-				    '2' : 'terminated',
-				    '3' : 'pending',
-				    '4' : 'unknown'
-				    },
-
 			id: null,
 
 			imageId: null,
@@ -24,7 +17,7 @@ define('app/models/machine', ['ember'],
 			selected: false,
 			hasKey: false,
             hasMonitoring: false,
-			state: '4',
+			state: 'unknown',
 
 			reboot: function(){
 				console.log('reboot');
@@ -37,6 +30,7 @@ define('app/models/machine', ['ember'],
                     data: "action=reboot",
                     success: function(data) {
                     	console.log("machine rebooting");
+                        this.set('state', 'rebooting');
                     }
 
 				}).error(function(e) {
@@ -132,10 +126,6 @@ define('app/models/machine', ['ember'],
                 });
 
 			},
-
-			stateString: function(){
-				return this.STATES[this.state];
-			}.property("state"),
 
 			hasAlert : function(){
 				//TODO when we have alerts

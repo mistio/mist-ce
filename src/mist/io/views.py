@@ -15,6 +15,7 @@ from libcloud.compute.types import Provider
 
 from fabric.api import run
 
+from mist.io.config import STATES
 from mist.io.config import BACKENDS
 from mist.io.config import BASE_EC2_AMIS
 from mist.io.helpers import connect
@@ -104,7 +105,7 @@ def list_machines(request):
                    'name'          : m.name,
                    'imageId'       : imageId,
                    'size'          : size,
-                   'state'         : m.state,
+                   'state'         : STATES[m.state],
                    'private_ips'   : m.private_ips,
                    'public_ips'    : m.public_ips,
                    'tags'          : tags,

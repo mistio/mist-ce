@@ -1,6 +1,14 @@
 """Configure which backends you will use here"""
 from libcloud.compute.types import Provider
+from libcloud.compute.types import NodeState
 
+STATES = {
+    NodeState.RUNNING: 'running',
+    NodeState.REBOOTING: 'rebooting',
+    NodeState.TERMINATED: 'terminated',
+    NodeState.PENDING: 'pending',
+    NodeState.UNKNOWN: 'unknown'
+}
 
 BACKENDS = [
     {'provider': Provider.EC2,
