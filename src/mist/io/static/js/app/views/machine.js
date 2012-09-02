@@ -135,8 +135,9 @@ define('app/views/machine', [
 					return;
 				}
 				
-
-				 var machine = this.machine;
+				var machine = this.machine;
+				 
+				var stats = {};
 				
 				Em.run.next(function(){
 					var context = cubism.context()
@@ -165,6 +166,7 @@ define('app/views/machine', [
 						success: function(data) {
 							console.log("machine stats");
 							console.log(data);
+							stats = data;
 							setTimeout(poll, 5000);
 						}
 					}).error(function(jqXHR, textStatus, errorThrown) {
@@ -185,7 +187,7 @@ define('app/views/machine', [
 					    if (isNaN(last)) last = start;
 					    while (last < stop) {
 					      last += step;
-					      value = Math.max(-10, Math.min(10, value + .8 * Math.random() - .4 + .2 * Math.cos(i += .2)));
+					      value = stats[name];
 					      values.push(value);
 					    }
 					    callback(null, values = values.slice((start - stop) / step));
@@ -209,7 +211,7 @@ define('app/views/machine', [
 					      .data([cpu, memory, disk, load])
 					    .enter().append("div")
 					      .attr("class", "horizon")
-					      .call(context.horizon().extent([-20, 20]));
+					      .call(context.horizon().extent([-200, 200]));
 
 					  div.append("div")
 					      .attr("class", "rule")
