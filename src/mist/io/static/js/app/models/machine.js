@@ -17,7 +17,7 @@ define('app/models/machine', ['ember'],
 			selected: false,
 			hasKey: false,
             hasMonitoring: false,
-			state: 'unknown',
+			state: 'stopped',
 
 			reboot: function(){
 				console.log('reboot');
