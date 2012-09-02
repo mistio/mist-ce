@@ -166,8 +166,8 @@ define( 'app', [
 			Mist.graphPolling = true;
 		});
 		
-		$(document).on( 'pagebeforeshow', '#single-machine', function(){
-			Mist.graphPolling = true;
+		$(document).on( 'pageshow', '#single-machine', function(){
+			$('input[type=checkbox]').checkboxradio("refresh");
 		});
 		
 		$(document).on( 'pagebeforehide', '#single-machine', function(){
@@ -192,7 +192,7 @@ define( 'app', [
 		});
 
 		App.Checkbox = Ember.Checkbox.extend({
-		    attributeBindings: ['name', "id", "data-inline"]
+		    attributeBindings: ['name', "id", "data-inline"],
 		});
 
 		App.CountView = Count;
