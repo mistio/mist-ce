@@ -54,6 +54,7 @@ define('app/controllers/machines', [
 								machine.set('can_start', item.can_start);
 								machine.set('can_destroy', item.can_destroy);
 								machine.set('can_reboot', item.can_reboot);
+								machine.set('tags', item.tags);
 								return false;
 							}
 						});
