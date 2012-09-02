@@ -19,6 +19,7 @@ define('app/views/single_machine_actions_dialog', [
 				Mist.confirmationController.set("callback", function(){
 					machine.reboot();
 				});
+				Mist.confirmationController.set("fromDialog", true);
 				Mist.confirmationController.show();
 			},
 			
@@ -30,6 +31,7 @@ define('app/views/single_machine_actions_dialog', [
 				Mist.confirmationController.set("callback", function(){
 					machine.destroy();
 				});
+				Mist.confirmationController.set("fromDialog", true);
 				Mist.confirmationController.show();
 			},
 			
@@ -41,6 +43,7 @@ define('app/views/single_machine_actions_dialog', [
 				Mist.confirmationController.set("callback", function(){
 					machine.shutdown();
 				});
+				Mist.confirmationController.set("fromDialog", true);
 				Mist.confirmationController.show();
 			},
 			

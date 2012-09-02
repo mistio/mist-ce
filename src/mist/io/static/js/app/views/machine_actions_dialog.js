@@ -35,6 +35,7 @@ define('app/views/machine_actions_dialog', [
 						machine.reboot();
 					});
 				});
+				Mist.confirmationController.set("fromDialog", true);
 				Mist.confirmationController.show();
 			},
 
@@ -63,7 +64,7 @@ define('app/views/machine_actions_dialog', [
 						machine.destroy();
 					});
 				});
-
+				Mist.confirmationController.set("fromDialog", true);
 				Mist.confirmationController.show();
 			},
 
@@ -92,7 +93,7 @@ define('app/views/machine_actions_dialog', [
                         machine.start();
                     });
                 });
-
+                Mist.confirmationController.set("fromDialog", true);
                 Mist.confirmationController.show();
             },
 
@@ -121,7 +122,7 @@ define('app/views/machine_actions_dialog', [
 						machine.shutdown();
 					});
 				});
-
+				Mist.confirmationController.set("fromDialog", true);
 				Mist.confirmationController.show();
 			},
 
