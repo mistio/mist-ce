@@ -4,8 +4,8 @@ import tempfile
 import logging
 
 from libcloud.compute.types import Provider
+from libcloud.compute.types import NodeState
 from libcloud.compute.providers import get_driver
-from libcloud.compute.drivers.ec2 import EC2NodeDriver
 
 from fabric.api import env
 
@@ -66,34 +66,43 @@ def get_machine_actions(machine, backend):
 
     The mapping takes place in js/app/models/machine.js
     """
+    EC2 = (Provider.EC2,
+           Provider.EC2_EU,
+           Provider.EC2_US_EAST,
+           Provider.EC2_AP_NORTHEAST,
+           Provider.EC2_EU_WEST,
+           Provider.EC2_US_WEST,
+           Provider.EC2_AP_SOUTHEAST,
+           Provider.EC2_SA_EAST,
+           Provider.EC2_US_WEST_OREGON
+           )
+
+    # defaults for running state
     can_start = False
     can_stop = False
     can_destroy = True
     can_reboot = True
-
-    if type(backend) is EC2NodeDriver:
+    if backend.type in EC2:
         can_start = True
         can_stop = True
 
-    if machine.state == 1:
-        # rebooting
+    # for other states
+    if machine.state is NodeState.REBOOTING:
         can_start = False
         can_stop = False
         can_reboot = False
-    elif machine.state == 2:
-        # stopped
+    elif machine.state is NodeState.TERMINATED:
         can_stop = False
         can_reboot = False
-    elif machine.state in (3, 4) :
-        # 3 - pending, 4 - unkown
+    elif machine.state in (NodeState.PENDING, NodeState.UNKNOWN) :
         can_start = True # FIXME: change this to false after corecting states
         can_destroy = False
         can_stop = False
         can_reboot = False
 
-    return {'can_stop': can_stop, \
-            'can_start': can_start, \
-            'can_destroy': can_destroy, \
+    return {'can_stop': can_stop,
+            'can_start': can_start,
+            'can_destroy': can_destroy,
             'can_reboot': can_reboot}
 
 
