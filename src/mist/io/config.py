@@ -1,5 +1,15 @@
 """Configure which backends you will use here"""
 from libcloud.compute.types import Provider
+from libcloud.compute.types import NodeState
+
+
+STATES = {
+    NodeState.RUNNING: 'running',
+    NodeState.REBOOTING: 'rebooting',
+    NodeState.TERMINATED: 'terminated',
+    NodeState.PENDING: 'pending',
+    NodeState.UNKNOWN: 'unknown'
+}
 
 
 BACKENDS = [
@@ -37,6 +47,19 @@ BACKENDS = [
      'enabled': True,
      },
 ]
+
+
+ALL_EC2_PROVIDERS = (
+    Provider.EC2,
+    Provider.EC2_EU,
+    Provider.EC2_US_EAST,
+    Provider.EC2_AP_NORTHEAST,
+    Provider.EC2_EU_WEST,
+    Provider.EC2_US_WEST,
+    Provider.EC2_AP_SOUTHEAST,
+    Provider.EC2_SA_EAST,
+    Provider.EC2_US_WEST_OREGON
+)
 
 
 # Base AMIs for us-east AMAZON
@@ -78,4 +101,4 @@ KEYPAIRS = [
         0pROU5zeZkNATRwXyD0F3NnxW8TJcvW0xtaaqiHpSWiItqqIDY6ySb2aC4k43Dyy
         0HfyGamX7rJIdcyxEzXChiG7nypZAgr6qFpsilcuChMj3kIov6c0
         -----END RSA PRIVATE KEY-----"""),
-        ]
+]

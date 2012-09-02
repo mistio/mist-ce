@@ -4,7 +4,7 @@
     </fieldset>
     <a href="#single-machine" {{action "checkBoxClick" on="click"}}>
         <h3 class="name">{{machine.name}}</h3> <span class="caption-wrapper">
-            <h3 {{bindAttr class="machine.stateString :state"}}>{{machine.stateString}}</h3>
+            <h3 {{bindAttr class="machine.state :state"}}>{{machine.state}}</h3>
             {{#if machine.hasAlert}}
             <span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
             {{/if}}
