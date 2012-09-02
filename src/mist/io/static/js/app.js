@@ -2,21 +2,22 @@
 require.config({
 	baseUrl: 'static/js/',
 	paths: {
-		jquery: 'lib/jquery-1.7.1.min',
+		jquery: 'lib/jquery-1.7.2.min',
+        d3: "lib/d3.v2",
         ember: 'lib/ember-0.9.8.1.min',
         mobile: 'lib/jquery.mobile-1.1.0.min',
 		text: 'lib/require/text',
 		mocha: 'lib/mocha',
 		chai: 'lib/chai',
         jqueryUi: "lib/jquery-ui-1.8.22.custom.min",
-        d3: "lib/d3.v2",
-        cubism: "lib/cubism.v1"
+        cubism: "lib/cubism.v1",
 	}
 });
 
 // Load our app
 define( 'app', [
 	'jquery',
+    'd3',	
     'app/controllers/backends',
     'app/controllers/confirmation',
     'app/controllers/notification',
@@ -37,10 +38,10 @@ define( 'app', [
     'app/views/shell',
 	'mobile',
     'jqueryUi',
-    'd3',
     'cubism',
     'ember',
 	], function($,
+                d3,
                 BackendsController,
                 ConfirmationController,
                 NotificationController,
@@ -61,8 +62,16 @@ define( 'app', [
                 Shell,
                 Mobile,
                 jQueryUI,
-                d3,
                 cubism) {
+        // Preload images plugin
+        $.fn.preload = function() {
+            this.each(function(){
+                $('<img/>')[0].src = this;
+            });
+        }
+        
+        //$(['img1.jpg','img2.jpg','img3.jpg']).preload();
+                    
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',

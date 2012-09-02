@@ -8,6 +8,7 @@ define('app/views/edit_backend', [
 	 * @returns Class
 	 */
 	function(edit_backend_dialog_html) {
+	    
 		return Ember.View.extend({
 			attributeBindings:['data-role', 'data-theme'],
 			
@@ -25,17 +26,22 @@ define('app/views/edit_backend', [
 			},
 			
 			deleteConfirmButtonClick: function(){
+			    var that = this;
 			    $.ajax({
                     url: '/backends/' + this.backend.index,
                     type: 'DELETE',
                     success: function(result) {
                         history.back();
                         $('#backend-delete-confirm').hide();
+                        var i = Mist.backendsController.content.indexOf(that.backend);
+                        // refresh backend buttons
+                        Mist.backendsController.arrayContentWillChange();
+                        Mist.backendsController.removeObject(that.backend);
+                        Mist.backendsController.arrayContentDidChange();
+                        // update indexes of remaining backends
+                        Mist.backendsController.content.forEach(function(obj,i){obj.index=i})
                     }
                 });
-                // refresh backend buttons
-                // TODO we should do this on DELETE success
-                Mist.backendsController.removeObject(this.backend);
 			},
 		    
 		    init: function() {
