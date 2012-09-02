@@ -10,7 +10,7 @@ from libcloud.compute.providers import get_driver
 from fabric.api import env
 
 from mist.io.config import BACKENDS
-
+from mist.io.config import ALL_EC2_PROVIDERS
 
 log = logging.getLogger('mist.io')
 
@@ -55,34 +55,15 @@ def get_machine_actions(machine, backend):
     Rackspace, Linode and openstack support the same options, but EC2 also
     supports start/stop.
 
-    The available actions are updates based on the machine state. The state
-    codes mist.io supports are:
-
-        * 0 = running
-        * 1 = rebooting
-        * 2 = stopped
-        * 3 = pending
-        * 4 = unknown
-
-    The mapping takes place in js/app/models/machine.js
+    The available actions are based on the machine state. The state
+    codes supported by mist.io are those of libcloud, check config.py.
     """
-    EC2 = (Provider.EC2,
-           Provider.EC2_EU,
-           Provider.EC2_US_EAST,
-           Provider.EC2_AP_NORTHEAST,
-           Provider.EC2_EU_WEST,
-           Provider.EC2_US_WEST,
-           Provider.EC2_AP_SOUTHEAST,
-           Provider.EC2_SA_EAST,
-           Provider.EC2_US_WEST_OREGON
-           )
-
     # defaults for running state
     can_start = False
     can_stop = False
     can_destroy = True
     can_reboot = True
-    if backend.type in EC2:
+    if backend.type in ALL_EC2_PROVIDERS:
         can_start = True
         can_stop = True
 
