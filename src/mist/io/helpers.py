@@ -154,7 +154,7 @@ def create_security_group(conn, info):
         return False
 
 
-def config_fabric(ip, private_key):
+def config_fabric(host, provider, private_key):
     """Configures the ssh connection used by fabric.
 
     Fabric does not support passing the private key as a string, but only as a
@@ -169,13 +169,20 @@ def config_fabric(ip, private_key):
 
         * env.connection_attempts, defaults to 1
         * env.timeout - e.g. 20 in secs defaults to 10
+
+    In ec2 we always favor the provided dns_name and set the user name to the
+    default ec2-user. IP or dns_name come from the js machine model.
     """
-    if not ip or not private_key:
-        log.info('IP or private key missing. SSH configuration failed.')
+    if not host or not provider or not private_key:
+        log.error('Host or private key missing. SSH configuration failed.')
         return False
 
-    env.host_string = ip
-    env.user = 'root'
+    env.host_string = host
+
+    if int(provider) in EC2_PROVIDERS:
+        env.user = 'ec2-user'
+    else:
+        env.user = 'root'
 
     (tmp_key, tmp_path) = tempfile.mkstemp()
     key_fd = os.fdopen(tmp_key, 'w+b')

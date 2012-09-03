@@ -107,11 +107,20 @@ define('app/models/machine', ['ember'],
 
                 console.log('Sending ' + shell_command + ' to machine: ' + that.name);
 
+                var host;
+                if (this.extra.dns_name) {
+                    // it is ec2 machine
+                    host = this.extra.dns_name;
+                } else {
+                    // if not ec2 it should have a public ip
+                    host = this.public_ips[0];
+                }
+
 				$.ajax({
                     url: '/backends/' + this.backend.index + '/machines/' + this.id + '/shell',
-                    data: {ip: this.public_ips[0],
-                           command: shell_command
-                           },
+                    data: {'host': host,
+                           'provider': this.backend.provider,
+                           'command': shell_command},
                     type: 'POST',
                     success: function(data) {
                         console.log("Shell command sent.Result: " + data);
@@ -148,12 +157,21 @@ define('app/models/machine', ['ember'],
 			},
 
 			checkUptime: function(){
-				if(this.hasKey){
+				if (this.hasKey) {
 					var that = this;
 
+                    var host;
+                    if (this.extra.dns_name) {
+                        // it is ec2 machine
+                        host = this.extra.dns_name;
+                    } else {
+                        // if not ec2 it should have a public ip
+                        host = this.public_ips[0];
+                    }
 					$.ajax({
 						url: '/backends/' + this.backend.index + '/machines/' + this.id + '/uptime',
-						data: {ip: this.public_ips[0]},
+						data: {'host': host,
+                               'provider': this.backend.provider},
 						success: function(data) {
 							console.log("machine uptime");
 							console.log(data);
@@ -172,27 +190,37 @@ define('app/models/machine', ['ember'],
 			checkHasMonitoring: function(){
 				var that = this;
 
-					$.ajax({
-						url: 'backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
-						success: function(data) {
-							console.log("machine has monitoring");
-							console.log(data);
-							if('monitoring' in data){
-								that.set('hasMonitoring', data.monitoring);
-							}
+				$.ajax({
+					url: 'backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
+					success: function(data) {
+						console.log("machine has monitoring");
+						console.log(data);
+						if('monitoring' in data){
+							that.set('hasMonitoring', data.monitoring);
 						}
-					}).error(function(jqXHR, textStatus, errorThrown) {
-						console.log('error querying for machine monitoring for machine id: ' + that.id);
-						console.log(textStatus + " " + errorThrown);
-					});
+					}
+				}).error(function(jqXHR, textStatus, errorThrown) {
+					console.log('error querying for machine monitoring for machine id: ' + that.id);
+					console.log(textStatus + " " + errorThrown);
+				});
 			},
 
 			checkHasKey: function(){
 				var that = this;
 
+                var host;
+                if (this.extra.dns_name) {
+                    // it is ec2 machine
+                    host = this.extra.dns_name;
+                } else {
+                    // if not ec2 it should have a public ip
+                    host = this.public_ips[0];
+                }
+
 				$.ajax({
                     url: '/backends/' + this.backend.index + '/machines/' + this.id + '/key',
-                    data: {ip: this.public_ips[0]},
+                    data: {'host': host,
+                           'provider': this.backend.provider},
                     success: function(data) {
                     	console.log("machine has key? ");
                     	console.log(data);

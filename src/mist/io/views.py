@@ -347,14 +347,15 @@ def set_machine_metadata(request):
 @view_config(route_name='machine_key', request_method='GET', renderer='json')
 def machine_key(request):
     """Check if the machine has a key pair deployed."""
-    tmp_path = config_fabric(request.params.get('ip', None),
+    tmp_path = config_fabric(request.params.get('host', None),
+                             request.params.get('provider', None),
                              request.registry.settings['keypairs'][0][1])
 
     # if run('uptime').failed:
     #     ret = {'has_key': False}
     # else:
     #     ret = {'has_key': True}
-    ret = {'has_key': False}
+    ret = {'has_key': True}
 
     os.remove(tmp_path)
 
@@ -364,15 +365,20 @@ def machine_key(request):
 @view_config(route_name='machine_shell', request_method='POST',
              renderer='json')
 def shell_command(request):
-    """Send a shell command to a machine over ssh."""
-    tmp_path = config_fabric(request.params.get('ip', None),
+    """Send a shell command to a machine over ssh.
+
+    TODO: grab unix errors
+    TODO: don't let commands like dmesg, vi, etc to go through
+    """
+    tmp_path = config_fabric(request.params.get('host', None),
+                             request.params.get('provider', None),
                              request.registry.settings['keypairs'][0][1])
 
-    # try:
-    #     cmd_output = run(request.params.get('command', None))
-    # except:
-    #     cmd_output = ''; # FIXME grab the UNIX error
-    cmd_output = ''
+    try:
+         cmd_output = run(request.params.get('command', None))
+    except:
+        cmd_output = ''; # FIXME grab the UNIX error
+    #cmd_output = ''
 
     os.remove(tmp_path)
 
@@ -383,7 +389,8 @@ def shell_command(request):
              renderer='json')
 def machine_uptime(request):
     """Check if the machine has a key pair deployed"""
-    tmp_path = config_fabric(request.params.get('ip', None),
+    tmp_path = config_fabric(request.params.get('host', None),
+                             request.params.get('provider', None),
                              request.registry.settings['keypairs'][0][1])
 
     #uptime =  run('cat /proc/uptime')
@@ -391,6 +398,8 @@ def machine_uptime(request):
 
     if uptime:
         uptime = float(uptime.split()[0]) * 1000
+
+    os.remove(tmp_path)
 
     return {'uptime': uptime }
 
