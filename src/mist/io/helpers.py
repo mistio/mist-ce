@@ -10,7 +10,9 @@ from libcloud.compute.providers import get_driver
 from fabric.api import env
 
 from mist.io.config import BACKENDS
-from mist.io.config import ALL_EC2_PROVIDERS
+from mist.io.config import EC2_PROVIDERS
+from mist.io.config import EC2_KEY_NAME
+from mist.io.config import EC2_SECURITYGROUP_NAME
 
 log = logging.getLogger('mist.io')
 
@@ -63,7 +65,7 @@ def get_machine_actions(machine, backend):
     can_stop = False
     can_destroy = True
     can_reboot = True
-    if backend.type in ALL_EC2_PROVIDERS:
+    if backend.type in EC2_PROVIDERS:
         can_start = True
         can_stop = True
 
@@ -76,7 +78,7 @@ def get_machine_actions(machine, backend):
         can_stop = False
         can_reboot = False
     elif machine.state is NodeState.UNKNOWN and \
-         backend.type in ALL_EC2_PROVIDERS:
+         backend.type in EC2_PROVIDERS:
         # We assume uknown state in EC2 mean stopped
         can_start = True
     elif machine.state in (NodeState.PENDING, NodeState.UNKNOWN):

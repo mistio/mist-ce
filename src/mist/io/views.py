@@ -17,7 +17,8 @@ from fabric.api import run
 
 from mist.io.config import STATES
 from mist.io.config import BACKENDS
-from mist.io.config import BASE_EC2_AMIS
+from mist.io.config import EC2_IMAGES
+from mist.io.config import EC2_PROVIDERS
 from mist.io.helpers import connect
 from mist.io.helpers import get_machine_actions
 from mist.io.helpers import config_fabric
@@ -121,7 +122,10 @@ def create_machine(request):
     """Creates a new virtual machine on the specified backend.
 
     If the backend is Rackspace it attempts to deploy the node with an ssh key
-    provided in config.
+    provided in config. the method used is the only one working in the old
+    Rackspace backend. create_node(), from libcloud.compute.base, with 'auth'
+    kwarg doesn't do the trick. Didn't test if you can upload some ssh related
+    files using the 'ex_files' kwarg from openstack 1.0 driver.
     """
     try:
         conn = connect(request)
@@ -153,6 +157,7 @@ def create_machine(request):
             return []
         except:
             log.warn('Failed to deploy node with ssh key, attempting without')
+    elif conn.type in
 
     try:
         conn.create_node(name=machine_name,
@@ -387,7 +392,7 @@ def list_images(request):
         backend_index = int(request.matchdict['backend'])
         backend = backend_list[backend_index]
         if backend['provider'] == Provider.EC2:
-            images = conn.list_images(None, BASE_EC2_AMIS.keys())
+            images = conn.list_images(None, EC2_IMAGES.keys())
         else:
             images = conn.list_images()
     except:

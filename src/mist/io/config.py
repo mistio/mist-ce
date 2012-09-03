@@ -50,7 +50,7 @@ BACKENDS = [
 ]
 
 
-ALL_EC2_PROVIDERS = (
+EC2_PROVIDERS = (
     Provider.EC2,
     Provider.EC2_EU,
     Provider.EC2_US_EAST,
@@ -64,13 +64,19 @@ ALL_EC2_PROVIDERS = (
 
 
 # Base AMIs for us-east AMAZON
-BASE_EC2_AMIS = {
-    'ami-e565ba8c': "Amazon Linux",
+EC2_IMAGES = {
+    'ami-e565ba8c': 'Amazon Linux',
     'ami-41d00528': 'RedHat Enterprise Linux',
     'ami-ca32efa3': 'SUSE Linux',
     'ami-a29943cb': 'Ubuntu',
     'ami-a6ba1ecf': 'Microsoft Windows Server 2008 Base'
 }
+
+
+EC2_KEY_NAME = 'mistio'
+
+
+EC2_SECURITYGROUP_NAME = 'mistio'
 
 
 KEYPAIRS = [
