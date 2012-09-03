@@ -11,8 +11,6 @@ from fabric.api import env
 
 from mist.io.config import BACKENDS
 from mist.io.config import EC2_PROVIDERS
-from mist.io.config import EC2_KEY_NAME
-from mist.io.config import EC2_SECURITYGROUP_NAME
 
 log = logging.getLogger('mist.io')
 
@@ -87,11 +85,73 @@ def get_machine_actions(machine, backend):
         can_stop = False
         can_reboot = False
 
-
     return {'can_stop': can_stop,
             'can_start': can_start,
             'can_destroy': can_destroy,
             'can_reboot': can_reboot}
+
+
+def import_key(conn, public_key, name):
+    """Imports a public ssh key to a machine.
+
+    If a key with a the selected name already exists it leaves it as is and
+    considers it a success.
+
+    This is supported only for EC2 at the moment.
+
+    TODO: Where are the exceptions for ec2 errors? Using and ugly if for now.
+    """
+    if conn.type in EC2_PROVIDERS:
+        (tmp_key, tmp_path) = tempfile.mkstemp()
+        key_fd = os.fdopen(tmp_key, 'w+b')
+        key_fd.write(public_key)
+        key_fd.close()
+        try:
+            conn.ex_import_keypair(name=name, keyfile=tmp_path)
+            os.remove(tmp_path)
+            return True
+        except Exception as exc:
+            if 'Duplicate' in exc.message:
+                log.warn('Key already exists, not importing anything.')
+                os.remove(tmp_path)
+                return True
+            else:
+                log.error('Failed to import key.')
+                os.remove(tmp_path)
+                return False
+    else:
+        log.warn('This provider does not support key importing.')
+        return False
+
+
+def create_security_group(conn, info):
+    """Creates a security group based on the info dictionary provided.
+
+    This is supported only for EC2 at the moment. Info should be a dictionary
+    with 'name' and 'description' keys.
+
+    TODO: Where are the exceptions for ec2 errors? Using and ugly if for now.
+    TODO: This sets very permissive option to the group, might have to tweak
+          liblcoud in this, not sure if it is supported by the ec2 API.
+    """
+    name = info.get('name', None)
+    description = info.get('description', None)
+
+    if conn.type in EC2_PROVIDERS and name and description:
+        try:
+            conn.ex_create_security_group(name=name, description=description)
+            conn.ex_authorize_security_group_permissive(name=name)
+            return True
+        except Exception as exc:
+            if 'Duplicate' in exc.message:
+                log.warn('Security group already exists, not doing anything.')
+                return True
+            else:
+                log.error('Create and configure security group.')
+                return False
+    else:
+        log.warn('This provider does not support security group creation.')
+        return False
 
 
 def config_fabric(ip, private_key):

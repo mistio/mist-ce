@@ -19,8 +19,13 @@ from mist.io.config import STATES
 from mist.io.config import BACKENDS
 from mist.io.config import EC2_IMAGES
 from mist.io.config import EC2_PROVIDERS
+from mist.io.config import EC2_KEY_NAME
+from mist.io.config import EC2_SECURITYGROUP
+
 from mist.io.helpers import connect
 from mist.io.helpers import get_machine_actions
+from mist.io.helpers import import_key
+from mist.io.helpers import create_security_group
 from mist.io.helpers import config_fabric
 
 
@@ -156,8 +161,22 @@ def create_machine(request):
                              deploy=key)
             return []
         except:
-            log.warn('Failed to deploy node with ssh key, attempting without')
-    elif conn.type in
+            log.warn('Failed to deploy node with ssh key, attempt without')
+    elif conn.type in EC2_PROVIDERS and has_key:
+        key = request.registry.settings['keypairs'][0][0]
+        imported_key = import_key(conn, key, EC2_KEY_NAME)
+        created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
+        if imported_key and created_security_group:
+            try:
+                conn.create_node(name=machine_name,
+                                image=image,
+                                size=size,
+                                location=location,
+                                ex_keyname=EC2_KEY_NAME,
+                                ex_securitygroup=EC2_SECURITYGROUP['name'])
+                return []
+            except:
+                log.warn('Failed to deploy node with ssh key, attempt without')
 
     try:
         conn.create_node(name=machine_name,
