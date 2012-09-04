@@ -351,11 +351,10 @@ def machine_key(request):
                              request.params.get('provider', None),
                              request.registry.settings['keypairs'][0][1])
 
-    # if run('uptime').failed:
-    #     ret = {'has_key': False}
-    # else:
-    #     ret = {'has_key': True}
-    ret = {'has_key': True}
+    if run('cat /proc/uptime').failed:
+        ret = {'has_key': False}
+    else:
+        ret = {'has_key': True}
 
     os.remove(tmp_path)
 
@@ -375,10 +374,9 @@ def shell_command(request):
                              request.registry.settings['keypairs'][0][1])
 
     try:
-         cmd_output = run(request.params.get('command', None))
+        cmd_output = run(request.params.get('command', None))
     except:
         cmd_output = ''; # FIXME grab the UNIX error
-    #cmd_output = ''
 
     os.remove(tmp_path)
 
@@ -393,8 +391,10 @@ def machine_uptime(request):
                              request.params.get('provider', None),
                              request.registry.settings['keypairs'][0][1])
 
-    #uptime =  run('cat /proc/uptime')
-    uptime = None
+    try:
+        uptime =  run('cat /proc/uptime')
+    except:
+        uptime = None
 
     if uptime:
         uptime = float(uptime.split()[0]) * 1000
