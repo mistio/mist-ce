@@ -63,11 +63,12 @@ define('app/controllers/machines', [
 							console.log("not found, adding");
 							item.backend = that.backend;
 							var machine = Machine.create(item);
-							that.contentWillChange();
+							that.contentWillChange(that.content.length - 1, 0, 1);
 							that.content.push(machine);
-							that.contentDidChange();
-							Mist.backendsController.contentWillChange();
-							Mist.backendsController.contentDidChange();
+							that.contentDidChange(that.content.length - 1, 0, 1);
+							var idx = Mist.backendsController.content.indexOf(that.backend); 
+							Mist.backendsController.contentWillChange(idx, 0, 0);
+							Mist.backendsController.contentDidChange(idx, 0, 0);
 						}
 						
 						
@@ -91,8 +92,9 @@ define('app/controllers/machines', [
 							that.contentWillChange();
 							that.removeObject(item);
 							that.contentDidChange();
-							Mist.backendsController.contentWillChange();
-							Mist.backendsController.contentDidChange();
+							var idx = Mist.backendsController.content.indexOf(that.backend); 
+							Mist.backendsController.contentWillChange(idx, 0, 0);
+							Mist.backendsController.contentDidChange(idx, 0, 0);
 						}
 					});
 					
