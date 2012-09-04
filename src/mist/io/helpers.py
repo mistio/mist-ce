@@ -162,13 +162,18 @@ def config_fabric(host, provider, private_key):
     its path is returned.
 
     .. warning:: Each function calling this one should delete the temporary
-                 file after closing the connection.
+                 file after closing the connection with os.remove(tmp_path).
 
     A few useful parameters for fabric configuration that are not currently
     used:
 
         * env.connection_attempts, defaults to 1
         * env.timeout - e.g. 20 in secs defaults to 10
+
+    env.abort_on_prompts is set to True to avoid going into interactive mode
+    and asking for passwords if key authentication fails.
+
+    env.always_use_pty is set to False to avoid running commands like htop.
 
     In ec2 we always favor the provided dns_name and set the user name to the
     default ec2-user. IP or dns_name come from the js machine model.
@@ -177,6 +182,8 @@ def config_fabric(host, provider, private_key):
         log.error('Host or private key missing. SSH configuration failed.')
         return False
 
+    env.abort_on_prompts = True
+    env.always_use_pty = False
     env.host_string = host
 
     if int(provider) in EC2_PROVIDERS:
@@ -188,6 +195,7 @@ def config_fabric(host, provider, private_key):
     key_fd = os.fdopen(tmp_key, 'w+b')
     key_fd.write(private_key)
     key_fd.close()
+
     env.key_filename = [tmp_path]
 
     return tmp_path
