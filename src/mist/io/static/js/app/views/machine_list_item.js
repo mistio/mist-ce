@@ -32,11 +32,13 @@ define('app/views/machine_list_item', [
 			        });
 			    },
 
-                            tags : function(){ 
-                                var ret = new Array(); 
-                                for(key in this.machine.tags){ 
-                                    ret.push(this.machine.tags[key]) } 
-                                return ret }.property('machine.tags.@each'),
+                tags : function(){ 
+                	var ret = new Array(); 
+                    for(key in this.machine.tags){ 
+                    	ret.push(this.machine.tags[key])
+                    } 
+                    return ret;
+                }.property('machine.tags.@each'),
 			    
 			    checkBoxClick: function(event, el){
 			    	
