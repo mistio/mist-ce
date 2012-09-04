@@ -256,18 +256,28 @@ define('app/models/machine', ['ember'],
 
 				var that = this;
 
-				//Enable / Disable monitoring on server
+                var host;
+                if (this.extra.dns_name) {
+                    // it is ec2 machine
+                    host = this.extra.dns_name;
+                } else {
+                    // if not ec2 it should have a public ip
+                    host = this.public_ips[0];
+                }
+
 				var payload = {
-	                    "monitoring": this.hasMonitoring,
+	               'monitoring': this.hasMonitoring,
+                   'host': host,
+                   'provider': this.backend.provider
 	            };
 
 				$.ajax({
-                    type: "POST",
-                    contentType: "application/json",
-                    dataType: "json",
-                    data: JSON.stringify(payload),
                     // TODO: this should point to https://mist.io/....
                     url: 'backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: JSON.stringify(payload),
                     success: function(data) {
 
                     },
