@@ -63,13 +63,17 @@ EC2_PROVIDERS = (
 )
 
 
-# Base AMIs for us-east AMAZON
+# Base AMIs for us-east AMAZON, using 64bit versions
 EC2_IMAGES = {
-    'ami-e565ba8c': 'Amazon Linux',
-    'ami-41d00528': 'RedHat Enterprise Linux',
-    'ami-ca32efa3': 'SUSE Linux',
-    'ami-a29943cb': 'Ubuntu',
-    'ami-a6ba1ecf': 'Microsoft Windows Server 2008 Base'
+    'ami-aecd60c7': 'Amazon Linux 2012.03',
+    'ami-cc5af9a5': 'RedHat Enterprise Linux 6.3',
+    'ami-ca32efa3': 'SUSE Linux Enterprise Server 11',
+    'ami-82fa58eb': 'Ubuntu Server 12.04 LTS',
+    'ami-d99e37b0': 'Ubuntu Server 11.10',
+    'ami-eccf6285': 'Cluster GPU Amazon Linux AMI 2012.03',
+    'ami-a8cd60c1': 'Cluster Compute Amazon Linux AMI 2012.03',
+    'ami-98fa58f1': 'Ubuntu Server 12.04 LTS for Cluster Instances',
+    'ami-db9e37b2': 'Ubuntu Server 11.10 for Cluster Instances'
 }
 
 
@@ -79,6 +83,31 @@ EC2_KEY_NAME = 'mistio'
 EC2_SECURITYGROUP= {
     'name': 'mistio',
     'description': 'Security group created by mist.io'
+}
+
+
+# Base images for Rackspace
+RACKSPACE_IMAGES = {
+ '118': 'CentOS 6.0',
+ '125': 'Ubuntu 12.04 LTS',
+ '104': 'Debian 6',
+ '107': 'FreeBSD 9.0',
+ '127': 'CentOS 6.3',
+ '109': 'openSUSE 12',
+ '110': 'Red Hat Enterprise Linux 5.5',
+ '114': 'CentOS 5.6',
+ '112': 'Ubuntu 10.04 LTS',
+ '103': 'Debian 5',
+ '122': 'CentOS 6.2',
+ '100': 'Arch 2012.08',
+ '111': 'Red Hat Enterprise Linux 6',
+ '120': 'Fedora 16',
+ '115': 'Ubuntu 11.04',
+ '116': 'Fedora 15',
+ '108': 'Gentoo 12.3',
+ '126': 'Fedora 17',
+ '121': 'CentOS 5.8',
+ '119': 'Ubuntu 11.10'
 }
 
 
