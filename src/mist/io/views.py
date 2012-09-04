@@ -347,7 +347,12 @@ def set_machine_metadata(request):
 
 @view_config(route_name='machine_key', request_method='GET', renderer='json')
 def machine_key(request):
-    """Check if the machine has a key pair deployed."""
+    """Check if the machine has a key pair deployed.
+
+    TODO: this seems to happen to fast for newlty created machines, so it
+          fails and never tries again, leaving the machine with an inactive
+          key icon until you refresh.
+    """
     tmp_path = config_fabric(request.params.get('host', None),
                              request.params.get('provider', None),
                              request.registry.settings['keypairs'][0][1])
@@ -387,7 +392,10 @@ def shell_command(request):
 @view_config(route_name='machine_uptime', request_method='GET',
              renderer='json')
 def machine_uptime(request):
-    """Check if the machine has a key pair deployed"""
+    """Check if the machine has a key pair deployed.
+
+    TODO: why do we have this and machine_key??
+    """
     tmp_path = config_fabric(request.params.get('host', None),
                              request.params.get('provider', None),
                              request.registry.settings['keypairs'][0][1])
