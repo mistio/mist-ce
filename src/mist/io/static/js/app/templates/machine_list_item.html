@@ -11,8 +11,8 @@
     </span>
         <p class="description">
             <span class="tag backend ui-btn-corner-all prov-{{unbound backend.provider}}">{{machine.backend.title}}</span>
-            {{#each tags}}
-                <span class="tag ui-btn-corner-all">{{item}}</span>
+            {{#each machine.tags}}
+                <span class="tag ui-btn-corner-all">{{this}}</span>
             {{/each}}
         </p> 
         <span class="bubble-container">

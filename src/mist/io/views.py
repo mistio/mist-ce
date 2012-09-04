@@ -102,7 +102,7 @@ def list_machines(request):
     ret = []
     for m in machines:
         tags = m.extra.get('tags', None) or m.extra.get('metadata', None)
-        tags = tags or []
+        tags = tags or {}
         imageId = m.image or m.extra.get('imageId', None)
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
@@ -114,7 +114,7 @@ def list_machines(request):
                    'state'         : STATES[m.state],
                    'private_ips'   : m.private_ips,
                    'public_ips'    : m.public_ips,
-                   'tags'          : tags,
+                   'tags'          : [v for k, v in tags.iteritems() if k != "Name"],
                    'extra'         : m.extra,
                   }
         machine.update(get_machine_actions(m, conn))
