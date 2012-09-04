@@ -27,7 +27,7 @@ define( 'app', [
     'app/views/backend_button',
     'app/views/edit_backend',
     'app/views/machine_list_item',
-    'app/views/image_list',
+    'app/views/image_list_item',
     'app/views/enable_backend_button',
     'app/views/machine_add_dialog',
     'app/views/machine',
@@ -36,6 +36,7 @@ define( 'app', [
     'app/views/machine_actions_dialog',
     'app/views/single_machine_actions_dialog',
     'app/views/shell',
+    'app/views/image_list',
 	'mobile',
     'jqueryUi',
     'cubism',
@@ -60,6 +61,7 @@ define( 'app', [
                 MachineActionsDialog,
                 SingleMachineActionsDialog,
                 Shell,
+                ImageListView,
                 Mobile,
                 jQueryUI,
                 cubism) {
@@ -220,7 +222,9 @@ define( 'app', [
 		shellDialog.append();
 		var machineListView = MachineListView.create();
 		machineListView.append();
-
+		var imageListView = ImageListView.create();
+		imageListView.append();
+		
 		$(document).on( 'pagebeforeshow', '#dialog-add', function(){
 		    $('#dialog-add').trigger('create');
 		});

@@ -148,31 +148,6 @@
     </div>
 </div><!-- /providers dialog -->
 
-<!-- Start of images page: #images -->
-<div data-role="page" id="images" data-theme="c">
-
-    <div data-role="header">
-        <a href="#home" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
-        <h1>Images</h1>
-    </div><!-- /header -->
-
-    <div data-role="content">
-
-        <script type="text/x-handlebars">
-        <ul id="images-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-dividertheme="d" data-filter-placeholder="Filter images..">
-        {{#each Mist.backendsController}}
-        <li data-role="list-divider">{{this.title}}</li>
-        {{#each this.images}}
-        {{view Mist.ImageListView imageBinding="this"}}
-        {{/each}}
-        {{/each}}
-        </ul>
-        </script>
-
-    </div><!-- /content -->
-
-</div><!-- /images page -->
-
 </body>
 
 </html>

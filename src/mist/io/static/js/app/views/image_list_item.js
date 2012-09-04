@@ -1,8 +1,8 @@
-define('app/views/image_list', [
+define('app/views/image_list_item', [
 	'text!app/templates/image_list_item.html','ember'],
 	/**
 	 *
-	 * Image List View
+	 * Image List Item View
 	 *
 	 * @returns Class
 	 */
