@@ -455,6 +455,10 @@ a#mist-select-machines-button span.ui-btn-text {
     background-image: url(images/p31_sm.png);
 }
 
+.single-view-icon-wrapper.amazon #single-view-image-icon {
+    background-image: url(images/p1_sm.png);
+}
+
 .single-view-icon-wrapper.windows #single-view-image-icon {
     background-image: url(images/image-windows.png);
 }
