@@ -344,6 +344,7 @@ def set_machine_metadata(request):
 
     return Response(json.dumps(ret))
 
+
 @view_config(route_name='machine_key', request_method='GET', renderer='json')
 def machine_key(request):
     """Check if the machine has a key pair deployed."""
