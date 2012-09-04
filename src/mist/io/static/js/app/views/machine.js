@@ -120,7 +120,15 @@ define('app/views/machine', [
 					return '';
 				}
 			}.property("machine.uptime"),
-			
+		
+                       tagsFor: function(){
+                                if(this.machine){
+                                    var ret = new Array();
+                                    for(key in machine.tags){
+                                        ret.push(machine.tags[key])}
+                                return ret; }
+			}.property("machine.tags"),
+
 			providerIconClass: function(){
 				if(!this.machine){
 					return "";
