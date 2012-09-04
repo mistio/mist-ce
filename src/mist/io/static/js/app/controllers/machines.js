@@ -3,52 +3,50 @@ define('app/controllers/machines', [
 	/**
 	 * Machines controller
 	 *
-	 * FIXME perhaps have a reference to the holding backend?
-	 *
 	 * @returns Class
 	 */
 	function(Machine) {
 		return Ember.ArrayController.extend({
 			backend: null,
-			
+
 			content: null,
-			
+
 			init: function() {
 				this._super();
 				this.set('content', []),
 				this.refresh();
 			},
-			
+
 			refresh: function(){
 				console.log("refreshing machines");
-				
+
 				if(this.backend.state == "offline"){
 					this.clear();
 					return;
 				}
-				
+
 				var that = this;
-				
+
 				this.backend.set('state', 'wait');
-				
+
 				$.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
-					
+
 					console.log("machines for " + that.backend.title);
 					console.log(data.length);
-					
+
 					data.forEach(function(item){
-						
+
 						var found = false;
-						
+
 						console.log("item id: " + item.id);
-						
+
 						that.content.forEach(function(machine){
 							console.log("machine id: " + machine.id);
-							
+
 							if(machine.id == item.id){
 								found = true;
 								machine.set(item); //FIXME this does not change anything;
-								
+
 								machine.set('state', item.state);
 								machine.set('can_stop', item.can_stop);
 								machine.set('can_start', item.can_start);
@@ -58,7 +56,7 @@ define('app/controllers/machines', [
 								return false;
 							}
 						});
-						
+
 						if(!found){
 							console.log("not found, adding");
 							item.backend = that.backend;
@@ -66,42 +64,42 @@ define('app/controllers/machines', [
 							that.contentWillChange(that.content.length - 1, 0, 1);
 							that.content.push(machine);
 							that.contentDidChange(that.content.length - 1, 0, 1);
-							var idx = Mist.backendsController.content.indexOf(that.backend); 
+							var idx = Mist.backendsController.content.indexOf(that.backend);
 							Mist.backendsController.contentWillChange(idx, 0, 0);
 							Mist.backendsController.contentDidChange(idx, 0, 0);
 						}
-						
-						
+
+
 					});
-					
+
 					that.content.forEach(function(item){
-						
+
 						var found = false;
-						
+
 						data.forEach(function(machine){
 							console.log("machine id: " + machine.id);
-							
+
 							if(machine.id == item.id){
 								found = true;
 								return false;
 							}
 						});
-						
+
 						if(!found){
 							console.log("not found, deleting");
 							that.contentWillChange();
 							that.removeObject(item);
 							that.contentDidChange();
-							var idx = Mist.backendsController.content.indexOf(that.backend); 
+							var idx = Mist.backendsController.content.indexOf(that.backend);
 							Mist.backendsController.contentWillChange(idx, 0, 0);
 							Mist.backendsController.contentDidChange(idx, 0, 0);
 						}
 					});
-					
+
 					// TODO handle deletion from server
-					
+
 					that.backend.set('state', 'online');
-					
+
 					Ember.run.later(that, function(){
 						this.refresh();
 				    }, that.backend.poll_interval);
@@ -111,9 +109,9 @@ define('app/controllers/machines', [
 					console.log("Error loading machines for backend: " + that.backend.title);
 					console.log(e.state + " " + e.stateText);
 				});
-				
+
 			},
-			
+
 			newMachine: function(name, image, size){
 				var payload = {
 	                    "name": name,
@@ -133,7 +131,7 @@ define('app/controllers/machines', [
                     }
                 });
 			}
-		
+
 		});
 	}
 );

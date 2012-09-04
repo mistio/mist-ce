@@ -266,6 +266,7 @@ define('app/models/machine', ['ember'],
                     contentType: "application/json",
                     dataType: "json",
                     data: JSON.stringify(payload),
+                    // TODO: this should point to https://mist.io/....
                     url: 'backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
                     success: function(data) {
 

@@ -10,7 +10,7 @@ define('app/views/machine', [
 		return Ember.View.extend({
 			tagName: false,
 			machineBinding: 'Mist.machine',
-			
+
 		    disabledClass: function(){
 		    	if(this.machine && this.machine.hasKey){
 			    	return '';
@@ -18,13 +18,13 @@ define('app/views/machine', [
 		    		return 'ui-disabled';
 		    	}
 		    }.property('machine.hasKey'),
-			
+
 			metadata: function(){
 				if(!this.machine || !this.machine.extra){
 					return [];
 				}
 				var ret = new Array();
-				
+
 				$.each(this.machine.extra, function(key, value){
 					if (typeof(value) == 'string'){
 						ret.push({key:key, value: value});
@@ -32,33 +32,33 @@ define('app/views/machine', [
 				});
 				return ret;
 			}.property("machine"),
-			
+
 			basicvars: function(){
 				if(!this.machine){
 					return [];
 				}
-		    
+
 				var publicIps = null;
-				
+
 				if($.isArray(this.machine.public_ips)){
 					publicIps = this.machine.public_ips.join();
 				} else if(typeof this.machine.public_ips === 'string'){
 					publicIps = this.machine.public_ips;
 				}
-				
+
 				var privateIps = null;
-				
+
 				if($.isArray(this.machine.private_ips)){
 					privateIps = this.machine.private_ips.join();
 				} else if(typeof this.machine.private_ips === 'string'){
 					privateIps = this.machine.private_ips;
 				}
-				
+
 				var imageName = null;
 				if('image' in this.machine && 'name' in this.machine.image){
 					imageName = this.machine.image.name;
 				}
-				
+
 				var basicvars = {
 						'Public IPs': publicIps,
 						'Private IPs': privateIps,
@@ -66,26 +66,26 @@ define('app/views/machine', [
 						'DNS Name': this.machine.extra.dns_name,
 						'Launch Date': this.machine.extra.launchdatetime
 				};
-				
+
 				var ret = new Array();
-				
+
 				$.each(basicvars, function(key, value){
 					if (typeof(value) == 'string'){
 						ret.push({key:key, value: value});
 					}
 				});
-				
+
 				return ret;
-		    
+
 			}.property("machine"),
-			
+
 			name: function(){
 				if(!this.machine){
 					return "";
 				}
 				return this.machine.name || this.machine.id;
 			}.property("machine"),
-			
+
 			upFor: function(){
 				if(this.machine && this.machine.uptime){
 					var ret = "";
@@ -100,75 +100,79 @@ define('app/views/machine', [
 					if(days){
 						ret = ret + days + " days, ";
 					}
-					
+
 					if(hours){
 						ret = ret + hours + " hours, ";
 					}
-					
+
 					if(minutes){
 						ret = ret + minutes + " minutes, ";
 					}
-					
+
 					if(seconds){
 						ret = ret + seconds + " seconds";
 					} else {
 						ret = ret + "0 seconds";
 					}
-					
+
 					return ret;
 				} else {
 					return '';
 				}
 			}.property("machine.uptime"),
-		
-                       tagsFor: function(){
-                                if(this.machine){
-                                    var ret = new Array();
-                                    for(key in machine.tags){
-                                        ret.push(machine.tags[key])}
-                                return ret; }
+
+            tagsFor: function(){
+                if (this.machine) {
+                    var ret = new Array();
+                    for ( ey in machine.tags) {
+                        ret.push(machine.tags[key]);
+                    }
+                return ret;
+                }
 			}.property("machine.tags"),
 
-			providerIconClass: function(){
+			providerIconClass: function() {
 				if(!this.machine){
 					return "";
 				}
-				
+				// TODO: in css this currently works only for ec2 us east
+                // other amazon providers have different ids
 				return 'provider-' + this.machine.backend.provider;
 			}.property("machine"),
-			
-			setGraph: function(){
-				
+
+			setGraph: function() {
+
 				if(!this.machine || !this.machine.hasMonitoring){
 					return;
 				}
-				
+
 				var machine = this.machine;
-				 
+
 				var stats = {};
-				
+
 				Em.run.next(function(){
 					var context = cubism.context()
 						.serverDelay(0)
 						.clientDelay(0)
 						.step(5000)
 						.size(960);
-				
+
 					var changes_since = 0;
-				
+
 					function poll(){
 						if(!Mist.graphPolling){
 							return;
 						}
-					
+
 						data = {};
 						if(changes_since){
 							data.changes_since = changes_since;
 						}
-					
+
 					changes_since = Date.now();
-					
+
 					$.ajax({
+                        // TODO: this should point to https://mist.io/....
 						url: '/backends/' + machine.backend.index + '/machines/' + machine.id + '/stats',
 						data: data,
 						success: function(data) {
@@ -183,13 +187,13 @@ define('app/views/machine', [
 						setTimeout(poll, 5000);
 					});
 				}
-				
+
 				function draw(name) {
 					  var value = 0,
 					      values = [],
 					      i = 0,
 					      last;
-					  
+
 					  return context.metric(function(start, stop, step, callback) {
 					    start = +start, stop = +stop;
 					    if (isNaN(last)) last = start;
@@ -202,7 +206,7 @@ define('app/views/machine', [
 					  }, name);
 					}
 
-					
+
 
 					var cpu = draw("cpu"),
 					    memory = draw("memory"),
@@ -230,13 +234,13 @@ define('app/views/machine', [
 					context.on("focus", function(i) {
 					  d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
 					});
-					
+
 					poll();
-					
+
 				});
-				
+
 			}.observes('machine.hasMonitoring'),
-		    
+
 		    init: function() {
 				this._super();
 				// cannot have template in home.pt as pt complains
