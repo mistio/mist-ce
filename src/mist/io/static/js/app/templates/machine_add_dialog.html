@@ -1,15 +1,15 @@
 <div data-role="dialog" id="dialog-add" class="mist-dialog">
-	<div data-role="header">
-		<h1>Create Machine</h1>
-	</div>
-	<div data-role="content" data-theme="c">
-		<label for="create-machine-name">1. Name:</label>
-		{{view Mist.TextField valueBinding="Mist.machineAddController.newMachineName" 
-		name="create-machine-name" id="create-machine-name"}}
-		
-		<label for="create-select-provider">2. Provider:</label>
-		
-		{{view Mist.Select contentBinding="Mist.backendsController"
+  <div data-role="header">
+    <h1>Create Machine</h1>
+  </div>
+  <div data-role="content" data-theme="c">
+    <label for="create-machine-name">1. Name:</label>
+    {{view Mist.TextField valueBinding="Mist.machineAddController.newMachineName" 
+    name="create-machine-name" id="create-machine-name"}}
+    
+    <label for="create-select-provider">2. Provider:</label>
+    
+    {{view Mist.Select contentBinding="Mist.backendsController"
                           optionLabelPath="content.title"
                           optionValuePath="content.provider"
                           prompt="Select Provider"
@@ -18,11 +18,11 @@
                           data-native-menu="false" id="create-select-provider"
                           name="create-select-provider"
                           disabled="disabled"
-        }}
-		
-		<label for="create-select-image">3. Image:</label> 
-		
-		{{view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.images"
+    }}
+    
+    <label for="create-select-image">3. Image:</label> 
+    
+    {{view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.images"
                           optionLabelPath="content.name"
                           optionValuePath="content.id"
                           prompt="Select Image"
@@ -31,11 +31,11 @@
                           data-native-menu="false" id="create-select-image"
                           name="create-select-image"
                           disabled="disabled"
-        }}
-		
-		<label for="create-select-size">4. Size:</label>
+    }}
+    
+    <label for="create-select-size">4. Size:</label>
 
-		{{view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.sizes"
+    {{view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.sizes"
                           optionLabelPath="content.name"
                           optionValuePath="content.id"
                           prompt="Select Size"
@@ -44,17 +44,16 @@
                           data-native-menu="false" id="create-select-size"
                           name="create-select-size"
                           disabled="disabled"
-        }}
-		
+    }}
 
-       <p>Cost: <strong>{{Mist.machineAddController.newMachineCost}}</strong></p>
+    <div class="cost">Cost: {{Mist.machineAddController.newMachineCost}}</div>
         
-	   <div id="create-ok-cancel" class="btn-full" data-role="controlgroup"
-			data-type="horizontal">
-			<button id="create-cancel" class="btn-left-full" data-theme="c"
-			{{action "backClicked" }}>Back</button>
-			<button id="create-ok" class="btn-right-full"
-				data-theme="b" {{action "newMachineClicked" }} disabled="disabled">Launch!</button>
-		</div>
-	</div>
+     <div id="create-ok-cancel" class="btn-full" data-role="controlgroup"
+      data-type="horizontal">
+      <button id="create-cancel" class="btn-left-full" data-theme="c"
+      {{action "backClicked" }}>Back</button>
+      <button id="create-ok" class="btn-right-full"
+        data-theme="b" {{action "newMachineClicked" }} disabled="disabled">Launch!</button>
+    </div>
+  </div>
 </div>

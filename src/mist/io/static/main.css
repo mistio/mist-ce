@@ -606,6 +606,10 @@ a#mist-select-machines-button span.ui-btn-text {
     float: right;
 }
 
+div.cost {
+    display: none;
+}
+
 /* Provider (backend) state dialog */
 
 #edit-backend .content-header {
