@@ -184,6 +184,8 @@ def config_fabric(host, provider, private_key):
 
     env.abort_on_prompts = True
     env.always_use_pty = False
+    env.no_keys = True
+    env.no_agent = True
     env.host_string = host
 
     if int(provider) in EC2_PROVIDERS:
