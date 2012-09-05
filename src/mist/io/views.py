@@ -301,9 +301,6 @@ def destroy_machine(request):
 def set_machine_metadata(request):
     """Sets metadata for a machine, given the backend and machine id.
 
-
-    TODO: stange list comprehension why doesn't it get backend and machine Id
-          from request?
     TODO: test if this works in all providers. Keep in mind that
 
     Openstack:
