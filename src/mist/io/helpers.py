@@ -187,6 +187,7 @@ def config_fabric(host, provider, private_key):
     env.no_keys = True
     env.no_agent = True
     env.host_string = host
+    #env.combine_stderr = False
 
     if int(provider) in EC2_PROVIDERS:
         env.user = 'ec2-user'

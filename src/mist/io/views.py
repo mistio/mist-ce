@@ -313,36 +313,33 @@ def set_machine_metadata(request):
     EC2:
         conn2.ex_create_tags(machine, {'something': 'something_something'})
     """
-    ret = []
-    done = False
-    backends = [b for b in BACKENDS if b['id'] == request.matchdict['backend']]
-    if backends:
-        backend = backends[0]
-        conn = connect(backend)
-        machines = conn.list_nodes()
-        for machine in machines:
-            if machine.id == request.matchdict['machine']:
-                try:
-                    metadata = request.json_body
-                    #get metadata from request
-                except:
-                    return Response('Not proper format for metadata', 404)
-                try:
-                    #e.g. Openstack
-                    metadata = conn.ex_set_metadata(machine, metadata)
-                    done = True
-                except:
-                    try:
-                        #e.g. EC2
-                        metadata = conn.ex_create_tags(machine, metadata)
-                        done = True
-                    except:
-                        return Response('Not implemented for this backend', 404)
-                break
-    if not done:
-        return Response('Invalid backend', 404)
+    try:
+        conn = connect(request)
+    except:
+        return Response('Backend not found', 404)
 
-    return Response(json.dumps(ret))
+    backend = request.matchdict['backend']
+    machine = request.matchdict['machine']
+
+    try:
+        metadata = request.json_body
+        #get metadata from request
+    except:
+        return Response('Not proper format for metadata', 404)
+
+    if backend in EC2_PROVIDERS:
+        try:
+            metadata = conn.ex_create_tags(machine, metadata)
+        except:
+            return Response('Server side problem for metadata in EC2', 503)
+    else:
+        #e.g. Openstack
+        try:
+            metadata = conn.ex_set_metadata(machine, metadata)
+        except:
+            return Response('Server side problem for metadata', 503)
+
+    return Response('Success', 200)
 
 
 @view_config(route_name='machine_key', request_method='GET', renderer='json')
@@ -357,10 +354,13 @@ def machine_key(request):
                              request.params.get('provider', None),
                              request.registry.settings['keypairs'][0][1])
 
-    if run('cat /proc/uptime').failed:
-        ret = {'has_key': False}
-    else:
+    ret = {'has_key': False}
+    try:
+        run('uptime')
         ret = {'has_key': True}
+    except:
+        log.error('Exception in running uptime for host ' +
+                  request.params.get('host', None))
 
     os.remove(tmp_path)
 
