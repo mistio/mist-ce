@@ -26,10 +26,9 @@
 
 	<div data-role="content">
 
-            Tags:
-            {{#if machine.tags}}
-                {{machine.tags}}
-            {{/if}}
+        {{#if machine.tags}}
+        	<div class="tags">Tags: {{machine.tags}}</div>
+        {{/if}}
 
 		<div data-role="collapsible" data-collapsed="false">
 			<h3>Monitoring</h3>		
