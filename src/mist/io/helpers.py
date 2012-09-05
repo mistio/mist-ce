@@ -165,15 +165,16 @@ def config_fabric(host, provider, private_key):
                  file after closing the connection with os.remove(tmp_path).
 
     A few useful parameters for fabric configuration that are not currently
-    used:
+    used::
 
         * env.connection_attempts, defaults to 1
         * env.timeout - e.g. 20 in secs defaults to 10
+        * env.always_use_pty = False to avoid running commands like htop.
+          However this might cause problems. Check fabric's docs.
 
     env.abort_on_prompts is set to True to avoid going into interactive mode
     and asking for passwords if key authentication fails.
 
-    env.always_use_pty is set to False to avoid running commands like htop.
 
     In ec2 we always favor the provided dns_name and set the user name to the
     default ec2-user. IP or dns_name come from the js machine model.
@@ -183,7 +184,6 @@ def config_fabric(host, provider, private_key):
         return False
 
     env.abort_on_prompts = True
-    env.always_use_pty = False
     env.no_keys = True
     env.no_agent = True
     env.host_string = host

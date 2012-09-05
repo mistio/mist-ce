@@ -406,6 +406,7 @@ def machine_uptime(request):
         uptime = None
 
     if uptime:
+        # if env.always_use_pty = False this might have additional content
         uptime = float(uptime.split()[0]) * 1000
 
     os.remove(tmp_path)
