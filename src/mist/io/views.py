@@ -80,7 +80,7 @@ def list_machines(request):
     Because each provider stores metadata in different places several checks
     are needed.
 
-    The folowing are considered:
+    The folowing are considered:::
 
         * For tags, Rackspace stores them in extra.metadata.tags while EC2 in
           extra.tags.tags.
@@ -106,6 +106,7 @@ def list_machines(request):
         imageId = m.image or m.extra.get('imageId', None)
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
+        tags = [value for key, value in tags.iteritems() if key != "Name"]
         machine = {'id'           : m.id,
                    'uuid'          : m.get_uuid(),
                    'name'          : m.name,
@@ -114,7 +115,7 @@ def list_machines(request):
                    'state'         : STATES[m.state],
                    'private_ips'   : m.private_ips,
                    'public_ips'    : m.public_ips,
-                   'tags'          : [v for k, v in tags.iteritems() if k != "Name"],
+                   'tags'          : tags,
                    'extra'         : m.extra,
                   }
         machine.update(get_machine_actions(m, conn))
@@ -338,13 +339,16 @@ def set_machine_metadata(request):
 
     return Response('Success', 200)
 
+
 @view_config(route_name='machine_metadata', request_method='DELETE')
 def delete_machine_metadata(request):
-    """Delete metadata for a machine, given the backend and machine id plus metadata
+    """Delete metadata for a machine, given the backend and machine id plus
+    metadata
 
     Openstack:
         ex_get_metadata and ex_set_metadata functions only
-        Delete the requested metadata from the dictionary and then update the metadata set with the same dictionnary 
+        Delete the requested metadata from the dictionary and then update the
+        metadata set with the same dictionnary
 
     EC2:
         ex_create_tags, ex_delete_tags, ex_describe_tags
@@ -373,12 +377,14 @@ def delete_machine_metadata(request):
     else:
         try:
             #e.g. Openstack
-            #gets current metadata dictionary. Delete requested metadata from dictionary and set the dictionary
+            # gets current metadata dictionary. Delete requested metadata
+            # from dictionary and set the dictionary
             metadata = conn.ex_set_metadata(machine, metadata)
         except:
             return Response('Server side problem for metadata', 503)
 
     return Response('Success', 200)
+
 
 @view_config(route_name='machine_key', request_method='GET', renderer='json')
 def machine_key(request):
