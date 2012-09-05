@@ -338,6 +338,47 @@ def set_machine_metadata(request):
 
     return Response('Success', 200)
 
+@view_config(route_name='machine_metadata', request_method='DELETE')
+def delete_machine_metadata(request):
+    """Delete metadata for a machine, given the backend and machine id plus metadata
+
+    Openstack:
+        ex_get_metadata and ex_set_metadata functions only
+        Delete the requested metadata from the dictionary and then update the metadata set with the same dictionnary 
+
+    EC2:
+        ex_create_tags, ex_delete_tags, ex_describe_tags
+        Delete the requested metadata only
+
+    """
+    try:
+        conn = connect(request)
+    except:
+        return Response('Backend not found', 404)
+
+    backend = request.matchdict['backend']
+    machine = request.matchdict['machine']
+
+    try:
+        metadata = request.json_body
+        #get metadata from request
+    except:
+        return Response('Not proper format for metadata', 404)
+
+    if backend in EC2_PROVIDERS:
+        try:
+            metadata = conn.ex_delete_tags(machine, metadata)
+        except:
+            return Response('Server side problem for metadata in EC2', 503)
+    else:
+        try:
+            #e.g. Openstack
+            #gets current metadata dictionary. Delete requested metadata from dictionary and set the dictionary
+            metadata = conn.ex_set_metadata(machine, metadata)
+        except:
+            return Response('Server side problem for metadata', 503)
+
+    return Response('Success', 200)
 
 @view_config(route_name='machine_key', request_method='GET', renderer='json')
 def machine_key(request):
