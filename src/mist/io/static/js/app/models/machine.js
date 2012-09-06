@@ -115,13 +115,8 @@ define('app/models/machine', ['ember'],
                     host = this.public_ips[0];
                 }
 
-                var ssh_user;
-                if (this.extra.ssh_user) {
-                    // in case of ec2 there might be a username stored to metadata by mist.io
-                    ssh_user = this.extra.ssh_user;
-                } else {
-                    ssh_user = 'root';
-                }
+                // In case of ec2, mist.io could have set this. Server can handle empty string.
+                var ssh_user = this.extra.ssh_user;
 
                 var that = this;
                 $.ajax({
@@ -179,13 +174,8 @@ define('app/models/machine', ['ember'],
                         host = this.public_ips[0];
                     }
 
-                    var ssh_user;
-                    if (this.extra.ssh_user) {
-                        // in case of ec2 there might be a username stored to metadata by mist.io
-                        ssh_user = this.extra.ssh_user;
-                    } else {
-                        ssh_user = 'root';
-                    }
+                    // In case of ec2, mist.io could have set this. Server can handle empty string.
+                    var ssh_user = this.extra.ssh_user;
 
                     var that = this;
                     $.ajax({
@@ -239,13 +229,8 @@ define('app/models/machine', ['ember'],
                     host = this.public_ips[0];
                 }
 
-                var ssh_user;
-                if (this.extra.ssh_user) {
-                    // in case of ec2 there might be a username stored to metadata by mist.io
-                    ssh_user = this.extra.ssh_user;
-                } else {
-                    ssh_user = 'root';
-                }
+                // In case of ec2, mist.io could have set this. Server can handle empty string.
+                var ssh_user = this.extra.ssh_user;
 
                 var that = this;
                 $.ajax({
