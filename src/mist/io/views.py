@@ -427,7 +427,7 @@ def shell_command(request):
 
     if not host:
         log.error('Host not provided, exiting.')
-        return ''
+        return Response('Host not set', 503)
 
     if not command:
         log.warn('No command was passed, returning empty.')
@@ -454,7 +454,23 @@ def shell_command(request):
     try:
         cmd_output = run(request.params.get('command', None))
         if 'Please login as the user' in cmd_output:
-            return Response('Try another username', 503)
+            # TODO: supposes the answer from EC2 will be always like:
+            #  Please login as the user "ec2-user" rather than the user "root"
+            username = cmd_output.split()[5].strip('"')
+            conn = connect(request)
+            machine_id = request.matchdict['machine']
+            machine = Node(machine_id,
+                           name=machine_id,
+                           state=0,
+                           public_ips=[],
+                           private_ips=[],
+                           driver=conn)
+            conn.ex_create_tags(machine, {'ssh_user': username})
+            env.user = username
+            try:
+                cmd_output = run(request.params.get('command', None))
+            except:
+                return Response('Exception while executing command', 503)
     except:
         log.error('Exception while executing command')
         return Response('Exception while executing command', 503)
