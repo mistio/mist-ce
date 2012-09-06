@@ -116,10 +116,12 @@ define('app/models/machine', ['ember'],
                     host = this.public_ips[0];
                 }
 
+                var ssh_user = 'root';
+
 				$.ajax({
                     url: '/backends/' + this.backend.index + '/machines/' + this.id + '/shell',
                     data: {'host': host,
-                           'provider': this.backend.provider,
+                           'ssh_user': ssh_user,
                            'command': shell_command},
                     type: 'POST',
                     success: function(data) {
@@ -147,7 +149,7 @@ define('app/models/machine', ['ember'],
 				var that = this;
 
 				setInterval(function(){
-					if(that.get('state' != 0) || !that.get('uptimeFromServer') || !that.get('uptimeChecked')){
+					if (that.get('state' != 'stopped') || !that.get('uptimeFromServer') || !that.get('uptimeChecked')) {
 						return;
 					} else {
 						that.set('uptime', that.get('uptimeFromServer') + (Date.now() - that.get('uptimeChecked')));
@@ -168,17 +170,24 @@ define('app/models/machine', ['ember'],
                         // if not ec2 it should have a public ip
                         host = this.public_ips[0];
                     }
+
+                    var ssh_user = 'root';
+
 					$.ajax({
-						url: '/backends/' + this.backend.index + '/machines/' + this.id + '/uptime',
+						url: '/backends/' + this.backend.index + '/machines/' + this.id + '/shell',
 						data: {'host': host,
-                               'provider': this.backend.provider},
+                               'ssh_user': ssh_user,
+                               'command': 'cat /proc/uptime'},
+                        type: 'POST',
 						success: function(data) {
 							console.log("machine uptime");
 							console.log(data);
-							if('uptime' in data){
-								that.set('uptimeChecked', Date.now());
-								that.set('uptimeFromServer', data.uptime);
-							}
+                            var resp = data.split(' ');
+                            if (resp.length == 2) {
+                                var uptime = parseFloat(resp[0]) * 1000;
+                                that.set('uptimeChecked', Date.now());
+                                that.set('uptimeFromServer', uptime);
+                            }
 						}
 					}).error(function(jqXHR, textStatus, errorThrown) {
 						console.log('error querying for machine uptime for machine id: ' + that.id);
@@ -217,10 +226,14 @@ define('app/models/machine', ['ember'],
                     host = this.public_ips[0];
                 }
 
+                var ssh_user = 'root';
+
 				$.ajax({
-                    url: '/backends/' + this.backend.index + '/machines/' + this.id + '/key',
+                    url: '/backends/' + this.backend.index + '/machines/' + this.id + '/shell',
+                    type: 'POST',
                     data: {'host': host,
-                           'provider': this.backend.provider},
+                            'ssh_user': ssh_user,
+                            'command': 'uptime'},
                     success: function(data) {
                     	console.log("machine has key? ");
                     	console.log(data);

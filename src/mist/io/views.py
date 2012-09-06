@@ -2,6 +2,7 @@
 import os
 import logging
 import json
+import tempfile
 
 from pyramid.response import Response
 from pyramid.view import view_config
@@ -410,21 +411,29 @@ def shell_command(request):
     TODO: grab unix errors
     TODO: don't let commands like vi, etc to go through or timeout
     """
+    host = request.params.get('host', None)
+    ssh_user = request.params.get('ssh_user', None)
+    command = request.params.get('command', None)
+    private_key = request.registry.settings['keypairs'][0][1]
 
-    if not host or not provider or not private_key:
-        log.error('Host or private key missing. SSH configuration failed.')
-        return False
+    if not host:
+        log.error('Host not provided, exiting.')
+        return ''
+
+    if not command:
+        log.warn('No command was passed, returning empty.')
+        return ''
+
+    if ssh_user:
+        env.user = ssh_user
+    else:
+        env.user = 'root'
 
     env.abort_on_prompts = True
     env.no_keys = True
     env.no_agent = True
     env.host_string = host
     #env.combine_stderr = False
-
-    if int(provider) in EC2_PROVIDERS:
-        env.user = 'ec2-user'
-    else:
-        env.user = 'root'
 
     (tmp_key, tmp_path) = tempfile.mkstemp()
     key_fd = os.fdopen(tmp_key, 'w+b')
@@ -435,7 +444,6 @@ def shell_command(request):
 
     try:
         cmd_output = run(request.params.get('command', None))
-        uptime = float(uptime.split()[0]) * 1000
     except:
         cmd_output = ''; # FIXME grab the UNIX error
 
