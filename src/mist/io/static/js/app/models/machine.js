@@ -1,68 +1,68 @@
 define('app/models/machine', ['ember'],
-	/**
-	 * Machine model
-	 *
+    /**
+     * Machine model
+     *
      * Also check state mapping in config.py
-	 * @returns Class
-	 */
-	function() {
-		return Ember.Object.extend({
-			id: null,
+     * @returns Class
+     */
+    function() {
+        return Ember.Object.extend({
+            id: null,
 
-			imageId: null,
+            imageId: null,
 
-			image: null,
-			name: null,
-			backend: null,
-			selected: false,
-			hasKey: false,
+            image: null,
+            name: null,
+            backend: null,
+            selected: false,
+            hasKey: false,
             hasMonitoring: false,
-			state: 'stopped',
+            state: 'stopped',
 
-			reboot: function(){
-				console.log('reboot');
+            reboot: function(){
+                console.log('reboot');
 
-				var that = this;
+                var that = this;
 
-				$.ajax({
+                $.ajax({
                     url: '/backends/' + this.backend.index + '/machines/' + this.id,
                     type: 'POST',
                     data: "action=reboot",
                     success: function(data) {
-                    	console.log("machine rebooting");
+                        console.log("machine rebooting");
                         that.set('state', 'rebooting');
                     }
 
-				}).error(function(e) {
-					Mist.notificationController.notify("Error rebooting machine: " + that.name);
-					console.error("Error rebooting machine: " + that.name);
-					console.error(e.state + " " + e.stateText);
-				});
-			},
+                }).error(function(e) {
+                    Mist.notificationController.notify("Error rebooting machine: " + that.name);
+                    console.error("Error rebooting machine: " + that.name);
+                    console.error(e.state + " " + e.stateText);
+                });
+            },
 
-			destroy: function(){
-				console.log('destroy');
-				$.ajax({
+            destroy: function(){
+                console.log('destroy');
+                $.ajax({
                     url: '/backends/' + this.backend.index + '/machines/' + this.id,
                     type: 'POST',
                     data: "action=destroy",
                     success: function(data) {
-                    	console.log("machine being destroyed");
+                        console.log("machine being destroyed");
                         that.set('state', 'pending');
                     }
-				}).error(function(e) {
-					Mist.notificationController.notify("Error destroying machine: " + that.name);
-					console.error("Error destroying machine: " + that.name);
-					console.error(e.state + " " + e.stateText);
-				});
-			},
+                }).error(function(e) {
+                    Mist.notificationController.notify("Error destroying machine: " + that.name);
+                    console.error("Error destroying machine: " + that.name);
+                    console.error(e.state + " " + e.stateText);
+                });
+            },
 
-			start: function(){
-				console.log('start');
+            start: function(){
+                console.log('start');
 
-				var that = this;
+                var that = this;
 
-				$.ajax({
+                $.ajax({
                     url: 'backends/' + this.backend.index + '/machines/' + this.id,
                     data: 'action=start',
                     type: 'POST',
@@ -71,20 +71,20 @@ define('app/models/machine', ['ember'],
                         that.set('state', 'pending');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                    	Mist.notificationController.notify("Error starting machine: " +
-                    			that.name);
-    					console.log("Error starting machine: " + that.name);
-    					console.log(textstate + " " + errorThrown);
+                        Mist.notificationController.notify("Error starting machine: " +
+                                that.name);
+                        console.log("Error starting machine: " + that.name);
+                        console.log(textstate + " " + errorThrown);
                     }
                 });
-			},
+            },
 
-			shutdown: function(){
-				console.log('shutting down');
+            shutdown: function(){
+                console.log('shutting down');
 
-				var that = this;
+                var that = this;
 
-				$.ajax({
+                $.ajax({
                     url: 'backends/' + this.backend.index + '/machines/' + this.id,
                     data: 'action=stop',
                     type: 'POST',
@@ -93,74 +93,77 @@ define('app/models/machine', ['ember'],
                         that.set('state', 'stopped');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                    	Mist.notificationController.notify("Error shutting down machine: " +
-                    			that.name);
-    					console.log("Error shutting down machine: " + that.name);
-    					console.log(textstate + " " + errorThrown);
+                        Mist.notificationController.notify("Error shutting down machine: " +
+                                that.name);
+                        console.log("Error shutting down machine: " + that.name);
+                        console.log(textstate + " " + errorThrown);
                     }
                 });
-			},
+            },
 
-			shell: function(shell_command, callback){
+            shell: function(shell_command, callback){
 
-				var that = this;
-
-                console.log('Sending ' + shell_command + ' to machine: ' + that.name);
+                console.log('Sending', shell_command, 'to machine', this.name);
 
                 var host;
                 if (this.extra.dns_name) {
-                    // it is ec2 machine
+                    // it is an ec2 machine so it has dns_name
                     host = this.extra.dns_name;
                 } else {
-                    // if not ec2 it should have a public ip
+                    // if not in ec2, it should have a public ip
                     host = this.public_ips[0];
                 }
 
                 var ssh_user = 'root';
 
-				$.ajax({
+                var that = this;
+
+                $.ajax({
                     url: '/backends/' + this.backend.index + '/machines/' + this.id + '/shell',
+                    type: 'POST',
                     data: {'host': host,
                            'ssh_user': ssh_user,
                            'command': shell_command},
-                    type: 'POST',
                     success: function(data) {
-                        console.log("Shell command sent.Result: " + data);
                         if (data){
                             callback(data);
                         }
+                        console.info('Successfully sent shell command', shell_command, 'to machine',
+                                that.name, 'with result:\n', data);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                    	Mist.notificationController.notify("Error sending command " + shell_command + " to machine: " +
-                    			that.name);
-    					console.log("Error sending shell command to machine: " + that.name);
-    					console.log(textstate + " " + errorThrown);
+                        Mist.notificationController.notify('Error sending shell command',
+                                shell_command, 'to machine', that.name);
+                        console.error('Error', textstate, errorThrown, 'when sending shell command',
+                                shell_command, 'to machine', that.name);
                     }
                 });
 
-			},
+            },
 
-			hasAlert : function(){
-				//TODO when we have alerts
-				return false;
-			}.property('hasAlert'),
+            hasAlert : function(){
+                //TODO when we have alerts
+                return false;
+            }.property('hasAlert'),
 
-			startUptimeTimer: function(){
-				var that = this;
+            startUptimeTimer: function() {
+                var that = this;
 
-				setInterval(function(){
-					if (that.get('state' != 'stopped') || !that.get('uptimeFromServer') || !that.get('uptimeChecked')) {
-						return;
-					} else {
-						that.set('uptime', that.get('uptimeFromServer') + (Date.now() - that.get('uptimeChecked')));
-					}
+                setInterval(function() {
+                    if (that.get('state' != 'stopped') || !that.get('uptimeFromServer') ||
+                        !that.get('uptimeChecked')) {
 
-				},1000);
-			},
+                        return;
 
-			checkUptime: function(){
-				if (this.hasKey) {
-					var that = this;
+                    } else {
+                        that.set('uptime', that.get('uptimeFromServer') + (Date.now()
+                                           - that.get('uptimeChecked')));
+                    }
+                }, 1000);
+            },
+
+            checkUptime: function(){
+                if (this.hasKey) {
 
                     var host;
                     if (this.extra.dns_name) {
@@ -173,49 +176,51 @@ define('app/models/machine', ['ember'],
 
                     var ssh_user = 'root';
 
-					$.ajax({
-						url: '/backends/' + this.backend.index + '/machines/' + this.id + '/shell',
-						data: {'host': host,
+                    var that = this;
+
+                    $.ajax({
+                        url: '/backends/' + this.backend.index + '/machines/' + this.id + '/shell',
+                        type: 'POST',
+                        data: {'host': host,
                                'ssh_user': ssh_user,
                                'command': 'cat /proc/uptime'},
-                        type: 'POST',
-						success: function(data) {
-							console.log("machine uptime");
-							console.log(data);
+                        success: function(data) {
                             var resp = data.split(' ');
                             if (resp.length == 2) {
                                 var uptime = parseFloat(resp[0]) * 1000;
                                 that.set('uptimeChecked', Date.now());
                                 that.set('uptimeFromServer', uptime);
                             }
-						}
-					}).error(function(jqXHR, textStatus, errorThrown) {
-						console.log('error querying for machine uptime for machine id: ' + that.id);
-						console.log(textStatus + " " + errorThrown);
-					});
-				}
-			},
+                            console.info('Successfully got uptime', data, 'from machine', that.name);
+                        }
+                    }).error(function(jqXHR, textStatus, errorThrown) {
+                            Mist.notificationController.notify('Error getting uptime from machine',
+                                    that.name);
+                            console.error('Error', textStatus, errorThrown,
+                                    'when getting uptime from machine', that.name);
+                    });
+                }
+            },
 
-			checkHasMonitoring: function(){
-				var that = this;
+            checkHasMonitoring: function(){
+                var that = this;
 
-				$.ajax({
-					url: 'backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
-					success: function(data) {
-						console.log("machine has monitoring");
-						console.log(data);
-						if('monitoring' in data){
-							that.set('hasMonitoring', data.monitoring);
-						}
-					}
-				}).error(function(jqXHR, textStatus, errorThrown) {
-					console.log('error querying for machine monitoring for machine id: ' + that.id);
-					console.log(textStatus + " " + errorThrown);
-				});
-			},
+                $.ajax({
+                    url: 'backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
+                    success: function(data) {
+                        console.log("machine has monitoring");
+                        console.log(data);
+                        if('monitoring' in data){
+                            that.set('hasMonitoring', data.monitoring);
+                        }
+                    }
+                }).error(function(jqXHR, textStatus, errorThrown) {
+                    console.log('error querying for machine monitoring for machine id: ' + that.id);
+                    console.log(textStatus + " " + errorThrown);
+                });
+            },
 
-			checkHasKey: function(){
-				var that = this;
+            checkHasKey: function(){
 
                 var host;
                 if (this.extra.dns_name) {
@@ -228,46 +233,56 @@ define('app/models/machine', ['ember'],
 
                 var ssh_user = 'root';
 
-				$.ajax({
+                var that = this;
+
+                $.ajax({
                     url: '/backends/' + this.backend.index + '/machines/' + this.id + '/shell',
                     type: 'POST',
                     data: {'host': host,
-                            'ssh_user': ssh_user,
-                            'command': 'uptime'},
+                           'ssh_user': ssh_user,
+                           'command': 'cat /proc/uptime'},
                     success: function(data) {
-                    	console.log("machine has key? ");
-                    	console.log(data);
-                    	if(data){
-                    		that.set('hasKey', data);
-                    		that.checkUptime();
-                    	} else {
-                    		that.set('hasKey', false);
-                    	}
+                        if (data) {
+                            that.set('hasKey', data);
+                            // TODO: since we got it let's use it, checkUptime does the same.
+                            var resp = data.split(' ');
+                            if (resp.length == 2) {
+                                var uptime = parseFloat(resp[0]) * 1000;
+                                that.set('uptimeChecked', Date.now());
+                                that.set('uptimeFromServer', uptime);
+                            }
+                            console.info('We have key for machine', that.name);
+                        } else {
+                            that.set('hasKey', false);
+                            console.warn('No key for machine', that.name);
+                        }
                     }
-				}).error(function(jqXHR, textStatus, errorThrown) {
-					console.log('error querying for machine key for machine id: ' + that.id);
-					console.log(textStatus + " " + errorThrown);
-					that.set('hasKey', false);
-				});
+                }).error(function(jqXHR, textStatus, errorThrown) {
+                        that.set('hasKey', false);
+                        Mist.notificationController.notify('Error while checking key of machine',
+                                that.name);
+                        console.error('Error', textStatus, errorThrown, 'while checking key of machine',
+                                that.name);
+                });
+            },
 
-			},
+            resetUptime: function(){
+                if(this.state != 'stopped'){
+                    this.set('uptime', 0);
+                    this.uptimeTimer = false;
+                } else {
+                    if(this.get('uptime') == 0) {
+                        // TODO: This is used only here, can we skip checkUptime?
+                        this.checkUptime();
+                    }
+                }
+            }.observes('state'),
 
-			resetUptime: function(){
-				if(this.state != 0){
-					this.set('uptime', 0);
-					this.uptimeTimer = false;
-				} else {
-					if(this.get('uptime') == 0){
-						this.checkUptime();
-					}
-				}
-			}.observes('state'),
+            monitoringChanged: function(){
+                var oldValue = !this.hasMonitoring;
+                console.log("monitoring:  " + oldValue);
 
-			monitoringChanged: function(){
-				var oldValue = !this.hasMonitoring;
-				console.log("monitoring:  " + oldValue);
-
-				var that = this;
+                var that = this;
 
                 var host;
                 if (this.extra.dns_name) {
@@ -278,13 +293,13 @@ define('app/models/machine', ['ember'],
                     host = this.public_ips[0];
                 }
 
-				var payload = {
-	               'monitoring': this.hasMonitoring,
+                var payload = {
+                   'monitoring': this.hasMonitoring,
                    'host': host,
                    'provider': this.backend.provider
-	            };
+                };
 
-				$.ajax({
+                $.ajax({
                     // TODO: this should point to https://mist.io/....
                     url: 'backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
                     type: 'POST',
@@ -295,23 +310,23 @@ define('app/models/machine', ['ember'],
 
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                    	that.set('hasMonitoring', oldValue);
+                        that.set('hasMonitoring', oldValue);
                     }
                 });
 
-			}.observes('hasMonitoring'),
+            }.observes('hasMonitoring'),
 
-			init: function(){
-				this._super();
-				var that = this;
-				this.backend.images.getImage(this.imageId, function(image){
-					that.set('image', image);
-				});
-				this.startUptimeTimer();
-				this.checkHasKey();
-				this.checkHasMonitoring();
-			}
+            init: function(){
+                this._super();
+                var that = this;
+                this.backend.images.getImage(this.imageId, function(image){
+                    that.set('image', image);
+                });
+                this.startUptimeTimer();
+                this.checkHasKey();
+                this.checkHasMonitoring();
+            }
 
-		});
-	}
+        });
+    }
 );
