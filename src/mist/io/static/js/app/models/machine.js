@@ -32,7 +32,7 @@ define('app/models/machine', ['ember'],
                         console.info('Succesfully sent reboot to machine', that.name);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error when sending reboot to machine',
+                        Mist.notificationController.notify('Error when sending reboot to machine ' +
                                 that.name);
                         console.error('Error', textstate, errorThrown, 'when sending reboot to machine',
                                 that.name);
@@ -53,7 +53,7 @@ define('app/models/machine', ['ember'],
                         console.info('Successfully sent destroy to machine', that.name);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error when sending destroy to machine',
+                        Mist.notificationController.notify('Error when sending destroy to machine ' +
                                 that.name);
                         console.error('Error', textstate, errorThrown, 'when sending destroy to machine',
                                 that.name);
@@ -74,7 +74,7 @@ define('app/models/machine', ['ember'],
                         console.info('Successfully sent start to machine', that.name);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error when sending start to machine',
+                        Mist.notificationController.notify('Error when sending start to machine ' +
                                 that.name);
                         console.error('Error', textstate, errorThrown, 'when sending start to machine',
                                 that.name);
@@ -95,7 +95,7 @@ define('app/models/machine', ['ember'],
                         console.info('Successfully sent stop to machine', that.name);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error when sending stop to machine',
+                        Mist.notificationController.notify('Error when sending stop to machine ' +
                                 that.name);
                         console.error('Error', textstate, errorThrown, 'when sending stop to machine',
                                 that.name);
@@ -133,8 +133,8 @@ define('app/models/machine', ['ember'],
                                 that.name, 'with result:\n', data);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error sending shell command',
-                                shell_command, 'to machine', that.name);
+                        Mist.notificationController.notify('Error sending shell command ' +
+                                shell_command + ' to machine ' + that.name);
                         console.error('Error', textstate, errorThrown, 'when sending shell command',
                                 shell_command, 'to machine', that.name);
                     }
@@ -194,7 +194,7 @@ define('app/models/machine', ['ember'],
                             console.info('Successfully got uptime', data, 'from machine', that.name);
                         },
                         error: function(jqXHR, textstate, errorThrown) {
-                            Mist.notificationController.notify('Error getting uptime from machine',
+                            Mist.notificationController.notify('Error getting uptime from machine ' +
                                     that.name);
                             console.error('Error', textstate, errorThrown,
                                     'when getting uptime from machine', that.name);
@@ -215,7 +215,7 @@ define('app/models/machine', ['ember'],
                         }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                            Mist.notificationController.notify('Error checking monitoring of machine',
+                            Mist.notificationController.notify('Error checking monitoring of machine ' +
                                     that.name);
                             console.error('Error', textstate, errorThrown,
                                     'while checking monitoring of machine', that.name);
@@ -256,7 +256,7 @@ define('app/models/machine', ['ember'],
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         that.set('hasKey', false);
-                        Mist.notificationController.notify('Error while checking key of machine',
+                        Mist.notificationController.notify('Error while checking key of machine ' +
                                 that.name);
                         console.error('Error', textstate, errorThrown, 'while checking key of machine',
                                 that.name);
