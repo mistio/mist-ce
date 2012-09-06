@@ -408,6 +408,15 @@ def shell_command(request):
         * env.always_use_pty = False to avoid running commands like htop.
           However this might cause problems. Check fabric's docs.
 
+    .. warning::
+
+        EC2 machines have default usernames other than root. However when
+        attempting to connect with root@... it doesn't return an error but a
+        message (e.g. Please login as the user "ec2-user" rather than the user
+        "root"). This misleads fabric to believe that everything went fine. To
+        deal with this we check if the returned output contains a fragment
+        of this message.
+
     TODO: grab unix errors
     TODO: don't let commands like vi, etc to go through or timeout
     """
@@ -444,8 +453,11 @@ def shell_command(request):
 
     try:
         cmd_output = run(request.params.get('command', None))
+        if 'Please login as the user' in cmd_output:
+            return Response('Try another username', 503)
     except:
-        cmd_output = ''; # FIXME grab the UNIX error
+        log.error('Exception while executing command')
+        return Response('Exception while executing command', 503)
 
     os.remove(tmp_path)
 
