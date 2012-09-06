@@ -34,7 +34,7 @@ define('app/models/machine', ['ember'],
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error when sending reboot to machine',
                                 that.name);
-                        console.error('Error', textState, errorThrown, 'when sending reboot to machine',
+                        console.error('Error', textstate, errorThrown, 'when sending reboot to machine',
                                 that.name);
                     }
                 });
@@ -55,7 +55,7 @@ define('app/models/machine', ['ember'],
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error when sending destroy to machine',
                                 that.name);
-                        console.error('Error', textState, errorThrown, 'when sending destroy to machine',
+                        console.error('Error', textstate, errorThrown, 'when sending destroy to machine',
                                 that.name);
                     }
                 });
@@ -76,7 +76,7 @@ define('app/models/machine', ['ember'],
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error when sending start to machine',
                                 that.name);
-                        console.error('Error', textState, errorThrown, 'when sending start to machine',
+                        console.error('Error', textstate, errorThrown, 'when sending start to machine',
                                 that.name);
                     }
                 });
@@ -97,7 +97,7 @@ define('app/models/machine', ['ember'],
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error when sending stop to machine',
                                 that.name);
-                        console.error('Error', textState, errorThrown, 'when sending stop to machine',
+                        console.error('Error', textstate, errorThrown, 'when sending stop to machine',
                                 that.name);
                     }
                 });
@@ -192,12 +192,13 @@ define('app/models/machine', ['ember'],
                                 that.set('uptimeFromServer', uptime);
                             }
                             console.info('Successfully got uptime', data, 'from machine', that.name);
-                        }
-                    }).error(function(jqXHR, textStatus, errorThrown) {
+                        },
+                        error: function(jqXHR, textstate, errorThrown) {
                             Mist.notificationController.notify('Error getting uptime from machine',
                                     that.name);
-                            console.error('Error', textStatus, errorThrown,
+                            console.error('Error', textstate, errorThrown,
                                     'when getting uptime from machine', that.name);
+                        }
                     });
                 }
             },
@@ -212,10 +213,13 @@ define('app/models/machine', ['ember'],
                         if('monitoring' in data){
                             that.set('hasMonitoring', data.monitoring);
                         }
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                            Mist.notificationController.notify('Error checking monitoring of machine',
+                                    that.name);
+                            console.error('Error', textstate, errorThrown,
+                                    'while checking monitoring of machine', that.name);
                     }
-                }).error(function(jqXHR, textStatus, errorThrown) {
-                    console.log('error querying for machine monitoring for machine id: ' + that.id);
-                    console.log(textStatus + " " + errorThrown);
                 });
             },
 
@@ -240,27 +244,23 @@ define('app/models/machine', ['ember'],
                            'ssh_user': ssh_user,
                            'command': 'cat /proc/uptime'},
                     success: function(data) {
-                        if (data) {
-                            that.set('hasKey', data);
-                            // TODO: since we got it let's use it, checkUptime does the same.
-                            var resp = data.split(' ');
-                            if (resp.length == 2) {
-                                var uptime = parseFloat(resp[0]) * 1000;
-                                that.set('uptimeChecked', Date.now());
-                                that.set('uptimeFromServer', uptime);
-                            }
-                            console.info('We have key for machine', that.name);
-                        } else {
-                            that.set('hasKey', false);
-                            console.warn('No key for machine', that.name);
+                        that.set('hasKey', true);
+                        // TODO: since we got it let's use it, checkUptime does the same.
+                        var resp = data.split(' ');
+                        if (resp.length == 2) {
+                            var uptime = parseFloat(resp[0]) * 1000;
+                            that.set('uptimeChecked', Date.now());
+                            that.set('uptimeFromServer', uptime);
                         }
-                    }
-                }).error(function(jqXHR, textStatus, errorThrown) {
+                        console.info('We have key for machine', that.name);
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
                         that.set('hasKey', false);
                         Mist.notificationController.notify('Error while checking key of machine',
                                 that.name);
-                        console.error('Error', textStatus, errorThrown, 'while checking key of machine',
+                        console.error('Error', textstate, errorThrown, 'while checking key of machine',
                                 that.name);
+                    }
                 });
             },
 
