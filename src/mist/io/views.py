@@ -13,7 +13,9 @@ from libcloud.compute.base import NodeLocation
 from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider
 
+from fabric.api import env
 from fabric.api import run
+from fabric.api import sudo
 
 from mist.io.config import STATES
 from mist.io.config import BACKENDS
@@ -26,7 +28,6 @@ from mist.io.helpers import connect
 from mist.io.helpers import get_machine_actions
 from mist.io.helpers import import_key
 from mist.io.helpers import create_security_group
-from mist.io.helpers import config_fabric
 
 
 log = logging.getLogger('mist.io')
@@ -386,76 +387,61 @@ def delete_machine_metadata(request):
     return Response('Success', 200)
 
 
-@view_config(route_name='machine_key', request_method='GET', renderer='json')
-def machine_key(request):
-    """Check if the machine has a key pair deployed.
-
-    TODO: this seems to happen to fast for newlty created machines, so it
-          fails and never tries again, leaving the machine with an inactive
-          key icon until you refresh.
-    """
-    tmp_path = config_fabric(request.params.get('host', None),
-                             request.params.get('provider', None),
-                             request.registry.settings['keypairs'][0][1])
-
-    ret = {'has_key': False}
-    try:
-        run('uptime')
-        ret = {'has_key': True}
-    except:
-        log.error('Exception in running uptime for host ' +
-                  request.params.get('host', None))
-
-    os.remove(tmp_path)
-
-    return ret
-
-
 @view_config(route_name='machine_shell', request_method='POST',
              renderer='json')
 def shell_command(request):
-    """Send a shell command to a machine over ssh.
+    """Send a shell command to a machine over ssh, using fabric.
+
+    Fabric does not support passing the private key as a string, but only as a
+    file. To solve this, a temporary file with the private key is created and
+    its path is returned.
+
+    In ec2 we always favor the provided dns_name and set the user name to the
+    default ec2-user. IP or dns_name come from the js machine model.
+
+    A few useful parameters for fabric configuration that are not currently
+    used::
+
+        * env.connection_attempts, defaults to 1
+        * env.timeout - e.g. 20 in secs defaults to 10
+        * env.always_use_pty = False to avoid running commands like htop.
+          However this might cause problems. Check fabric's docs.
 
     TODO: grab unix errors
-    TODO: don't let commands like dmesg, vi, etc to go through
+    TODO: don't let commands like vi, etc to go through or timeout
     """
-    tmp_path = config_fabric(request.params.get('host', None),
-                             request.params.get('provider', None),
-                             request.registry.settings['keypairs'][0][1])
+
+    if not host or not provider or not private_key:
+        log.error('Host or private key missing. SSH configuration failed.')
+        return False
+
+    env.abort_on_prompts = True
+    env.no_keys = True
+    env.no_agent = True
+    env.host_string = host
+    #env.combine_stderr = False
+
+    if int(provider) in EC2_PROVIDERS:
+        env.user = 'ec2-user'
+    else:
+        env.user = 'root'
+
+    (tmp_key, tmp_path) = tempfile.mkstemp()
+    key_fd = os.fdopen(tmp_key, 'w+b')
+    key_fd.write(private_key)
+    key_fd.close()
+
+    env.key_filename = [tmp_path]
 
     try:
         cmd_output = run(request.params.get('command', None))
+        uptime = float(uptime.split()[0]) * 1000
     except:
         cmd_output = ''; # FIXME grab the UNIX error
 
     os.remove(tmp_path)
 
     return cmd_output
-
-
-@view_config(route_name='machine_uptime', request_method='GET',
-             renderer='json')
-def machine_uptime(request):
-    """Check if the machine has a key pair deployed.
-
-    TODO: why do we have this and machine_key??
-    """
-    tmp_path = config_fabric(request.params.get('host', None),
-                             request.params.get('provider', None),
-                             request.registry.settings['keypairs'][0][1])
-
-    try:
-        uptime =  run('cat /proc/uptime')
-    except:
-        uptime = None
-
-    if uptime:
-        # if env.always_use_pty = False this might have additional content
-        uptime = float(uptime.split()[0]) * 1000
-
-    os.remove(tmp_path)
-
-    return {'uptime': uptime }
 
 
 @view_config(route_name='images', request_method='GET', renderer='json')

@@ -7,8 +7,6 @@ from libcloud.compute.types import Provider
 from libcloud.compute.types import NodeState
 from libcloud.compute.providers import get_driver
 
-from fabric.api import env
-
 from mist.io.config import BACKENDS
 from mist.io.config import EC2_PROVIDERS
 
@@ -152,53 +150,3 @@ def create_security_group(conn, info):
     else:
         log.warn('This provider does not support security group creation.')
         return False
-
-
-def config_fabric(host, provider, private_key):
-    """Configures the ssh connection used by fabric.
-
-    Fabric does not support passing the private key as a string, but only as a
-    file. To solve this, a temporary file with the private key is created and
-    its path is returned.
-
-    .. warning:: Each function calling this one should delete the temporary
-                 file after closing the connection with os.remove(tmp_path).
-
-    A few useful parameters for fabric configuration that are not currently
-    used::
-
-        * env.connection_attempts, defaults to 1
-        * env.timeout - e.g. 20 in secs defaults to 10
-        * env.always_use_pty = False to avoid running commands like htop.
-          However this might cause problems. Check fabric's docs.
-
-    env.abort_on_prompts is set to True to avoid going into interactive mode
-    and asking for passwords if key authentication fails.
-
-
-    In ec2 we always favor the provided dns_name and set the user name to the
-    default ec2-user. IP or dns_name come from the js machine model.
-    """
-    if not host or not provider or not private_key:
-        log.error('Host or private key missing. SSH configuration failed.')
-        return False
-
-    env.abort_on_prompts = True
-    env.no_keys = True
-    env.no_agent = True
-    env.host_string = host
-    #env.combine_stderr = False
-
-    if int(provider) in EC2_PROVIDERS:
-        env.user = 'ec2-user'
-    else:
-        env.user = 'root'
-
-    (tmp_key, tmp_path) = tempfile.mkstemp()
-    key_fd = os.fdopen(tmp_key, 'w+b')
-    key_fd.write(private_key)
-    key_fd.close()
-
-    env.key_filename = [tmp_path]
-
-    return tmp_path

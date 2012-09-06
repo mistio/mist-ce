@@ -21,12 +21,8 @@ def main(global_config, **settings):
     config.add_route('machine', '/backends/{backend}/machines/{machine}')
     config.add_route('machine_metadata',
                      '/backends/{backend}/machines/{machine}/metadata')
-    config.add_route('machine_key',
-                     '/backends/{backend}/machines/{machine}/key')
     config.add_route('machine_shell',
                      '/backends/{backend}/machines/{machine}/shell')
-    config.add_route('machine_uptime',
-                     '/backends/{backend}/machines/{machine}/uptime')
 
     config.add_route('images', '/backends/{backend}/images')
     config.add_route('image_metadata',
