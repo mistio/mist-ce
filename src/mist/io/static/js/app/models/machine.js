@@ -316,8 +316,8 @@ define('app/models/machine', ['ember'],
                     url: 'backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
                     type: 'POST',
                     contentType: 'application/json',
-                    dataType: 'json',
                     data: JSON.stringify(payload),
+                    dataType: 'json',
                     success: function(data) {
 
                     },
