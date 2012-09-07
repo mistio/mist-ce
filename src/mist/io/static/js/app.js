@@ -25,6 +25,7 @@ define( 'app', [
     'app/controllers/select_machines',
     'app/views/count',
     'app/views/backend_button',
+    'app/views/add_backend',
     'app/views/edit_backend',
     'app/views/machine_list_item',
     'app/views/image_list_item',
@@ -50,6 +51,7 @@ define( 'app', [
                 SelectMachinesController,
                 Count,
                 BackendButton,
+                AddBackend,
                 EditBackend,
                 MachineList,
                 ImageList,
@@ -199,6 +201,7 @@ define( 'app', [
 
 		App.CountView = Count;
 		App.BackendButtonView = BackendButton;
+		App.AddBackendView = AddBackend;
 		App.EditBackendView = EditBackend;
 		App.MachineListView = MachineList;
 		App.ImageListView = ImageList;

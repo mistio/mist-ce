@@ -40,23 +40,22 @@
             {{/each}}
             </script>
         </div>
-
+        <script type="text/x-handlebars">
+        {{#if Mist.backendsController.content.length}}
         <ul data-role="listview" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow" id="home-menu">
             <li><a id="machines-count" href="#machines">Machines
-            <script type="text/x-handlebars">
             {{#view Mist.CountView numberBinding="Mist.backendsController.machineCount" tagName="span" class="ui-li-count"}}
             {{number}}
             {{/view}}
-            </script>
             </a></li>
             <li><a id="images-count" href="#images">Images
-            <script type="text/x-handlebars">
             {{#view Mist.CountView numberBinding="Mist.backendsController.imageCount" tagName="span" class="ui-li-count"}}
             {{number}}
             {{/view}}
-            </script>
             </a></li>
         </ul>
+        {{/if}}
+        </script>
     </div><!-- /content -->
 
 </div><!-- /page home -->
@@ -67,33 +66,10 @@
     <div data-role="header">
         <h1>Add Backend</h1>
     </div>
-    <div data-role="content" data-theme="c">
-        <label for="select-backend">1. Provider:</label>
-        <select name="select-backend" id="new-backend" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
-            <option>Select Provider</option>
-            <optgroup label="Amazon EC2">
-                <option value="1">US East - Virginia</option>
-                <option value="36">US West - Oregon</option>
-                <option value="10">US West - N. California</option>
-                <option value="2">EU West - Ireland</option>
-                <option value="22">Asia Pacific - Singapore</option>
-                <option value="26">Asia Pacific - Tokio</option>
-                <option value="39">South America - Sao Paulo</option>
-            </optgroup>
-            <optgroup label="Rackspace">
-                <option value="3">US - DFW/ORD</option>
-                <option value="23">UK - LON</option>
-            </optgroup>
-        </select>
-        <label for="apikey">2. API Key:</label>
-        <input name="apikey" type="text" id="new-apikey" ></input>
-        <label for="apisecret">3. API Secret:</label>
-        <input name="apisecret" type="text" id="new-apisecret" ></input>
-        <div id="create-backend-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-            <a id="create-backend-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Close</a>
-            <a id="create-backend-ok" class="btn-right-full" data-role="button" data-rel="back" data-theme="b">Add</a>
-        </div>
-    </div>
+    <script type="text/x-handlebars">
+    {{view Mist.AddBackendView backendBinding="Mist.backend" }}
+    </script>    
+
 </div><!-- /add backend dialog -->
 
 
