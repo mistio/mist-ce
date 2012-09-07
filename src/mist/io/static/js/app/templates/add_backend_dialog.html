@@ -1,0 +1,35 @@
+<div data-role="content" data-theme="c">
+    <label for="select-backend">1. Provider:</label>
+    <select name="select-backend" id="new-backend" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
+        <option>Select Provider</option>
+        <optgroup label="Amazon EC2">
+            <option value="1">US East - Virginia</option>
+            <option value="36">US West - Oregon</option>
+            <option value="10">US West - N. California</option>
+            <option value="2">EU West - Ireland</option>
+            <option value="22">Asia Pacific - Singapore</option>
+            <option value="26">Asia Pacific - Tokio</option>
+            <option value="39">South America - Sao Paulo</option>
+        </optgroup>
+        <optgroup label="Rackspace">
+            <option value="3">US - DFW/ORD</option>
+            <option value="23">UK - LON</option>
+        </optgroup>
+        <optgroup label="Linode">
+            <option value="2">Dallas, TX, USA</option>
+            <option value="3">Fremont, CA, USA</option>
+            <option value="4">Atlanta, GA, USA</option>
+            <option value="6">Newark, NJ, USA</option>
+            <option value="7">London, England, UK</option>
+            <option value="8">Tokyo, JP</option>
+        </optgroup>
+    </select>
+    <label for="apikey">2. API Key:</label>
+    <input name="apikey" type="text" id="new-apikey" ></input>
+    <label for="apisecret">3. API Secret:</label>
+    <input name="apisecret" type="text" id="new-apisecret" ></input>
+    <div id="create-backend-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
+        <a id="create-backend-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Close</a>
+        <a id="create-backend-ok" class="btn-right-full" data-role="button" data-rel="back" data-theme="b" {{action "addButtonClick" on="click" }}>Add</a>
+    </div>
+</div>
