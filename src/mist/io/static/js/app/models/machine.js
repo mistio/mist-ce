@@ -34,7 +34,7 @@ define('app/models/machine', ['ember'],
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error when sending reboot to machine ' +
                                 that.name);
-                        console.error('Error', textstate, errorThrown, 'when sending reboot to machine',
+                        console.error(textstate, errorThrown, 'when sending reboot to machine',
                                 that.name);
                     }
                 });
@@ -55,7 +55,7 @@ define('app/models/machine', ['ember'],
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error when sending destroy to machine ' +
                                 that.name);
-                        console.error('Error', textstate, errorThrown, 'when sending destroy to machine',
+                        console.error(textstate, errorThrown, 'when sending destroy to machine',
                                 that.name);
                     }
                 });
@@ -76,7 +76,7 @@ define('app/models/machine', ['ember'],
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error when sending start to machine ' +
                                 that.name);
-                        console.error('Error', textstate, errorThrown, 'when sending start to machine',
+                        console.error(textstate, errorThrown, 'when sending start to machine',
                                 that.name);
                     }
                 });
@@ -97,7 +97,7 @@ define('app/models/machine', ['ember'],
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error when sending stop to machine ' +
                                 that.name);
-                        console.error('Error', textstate, errorThrown, 'when sending stop to machine',
+                        console.error(textstate, errorThrown, 'when sending stop to machine',
                                 that.name);
                     }
                 });
@@ -116,7 +116,12 @@ define('app/models/machine', ['ember'],
                 }
 
                 // In case of ec2, mist.io could have set this. Server can handle empty string.
-                var ssh_user = this.extra.ssh_user;
+                var ssh_user;
+                try {
+                    ssh_user = this.extra.tags.ssh_user;
+                } catch (error) {
+                    ssh_user = 'root';
+                }
 
                 var that = this;
                 $.ajax({
@@ -135,7 +140,7 @@ define('app/models/machine', ['ember'],
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error sending shell command ' +
                                 shell_command + ' to machine ' + that.name);
-                        console.error('Error', textstate, errorThrown, 'when sending shell command',
+                        console.error(textstate, errorThrown, 'when sending shell command',
                                 shell_command, 'to machine', that.name);
                     }
                 });
@@ -175,7 +180,12 @@ define('app/models/machine', ['ember'],
                     }
 
                     // In case of ec2, mist.io could have set this. Server can handle empty string.
-                    var ssh_user = this.extra.ssh_user;
+                    var ssh_user;
+                    try {
+                        ssh_user = this.extra.tags.ssh_user;
+                    } catch (error) {
+                        ssh_user = 'root';
+                    }
 
                     var that = this;
                     $.ajax({
@@ -196,8 +206,8 @@ define('app/models/machine', ['ember'],
                         error: function(jqXHR, textstate, errorThrown) {
                             Mist.notificationController.notify('Error getting uptime from machine ' +
                                     that.name);
-                            console.error('Error', textstate, errorThrown,
-                                    'when getting uptime from machine', that.name);
+                            console.error(textstate, errorThrown, 'when getting uptime from machine',
+                                    that.name);
                         }
                     });
                 }
@@ -217,8 +227,8 @@ define('app/models/machine', ['ember'],
                     error: function(jqXHR, textstate, errorThrown) {
                             Mist.notificationController.notify('Error checking monitoring of machine ' +
                                     that.name);
-                            console.error('Error', textstate, errorThrown,
-                                    'while checking monitoring of machine', that.name);
+                            console.error(textstate, errorThrown, 'while checking monitoring of machine',
+                                    that.name);
                     }
                 });
             },
@@ -234,7 +244,12 @@ define('app/models/machine', ['ember'],
                 }
 
                 // In case of ec2, mist.io could have set this. Server can handle empty string.
-                var ssh_user = this.extra.ssh_user;
+                var ssh_user;
+                try {
+                    ssh_user = this.extra.tags.ssh_user;
+                } catch (error) {
+                    ssh_user = 'root';
+                }
 
                 var that = this;
                 $.ajax({
@@ -258,8 +273,7 @@ define('app/models/machine', ['ember'],
                         that.set('hasKey', false);
                         Mist.notificationController.notify('Error while checking key of machine ' +
                                 that.name);
-                        console.error('Error', textstate, errorThrown, 'while checking key of machine',
-                                that.name);
+                        console.error(textstate, errorThrown, 'while checking key of machine', that.name);
                     }
                 });
             },
