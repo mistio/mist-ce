@@ -112,22 +112,34 @@ define('app/controllers/machines', [
 
 			},
 
-			newMachine: function(name, image, size){
+			newMachine: function(name, image, size) {
+                console.log('Creating machine', this.name, 'to backend', this.backend.title);
+
 				var payload = {
-	                    "name": name,
-	                    "location" : this.backend.id,
-	                    "image": image.id,
-	                    "size": size.id
+	                    'name': name,
+                        // TODO: this should get a location and not the backend id
+	                    'location' : this.backend.id,
+	                    'image': image.id,
+	                    'size': size.id,
+                        // this is needed for Linode only
+                        'disk': size.disk
 	            };
+
+                var that = this;
 				$.ajax({
-                    type: "POST",
-                    contentType: "application/json",
-                    dataType: "json",
-                    data: JSON.stringify(payload),
                     url: 'backends/' + this.backend.index + '/machines',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    dataType: 'json',
                     success: function(data) {
+                        console.info('Successfully sent create machine', name, 'to backend',
+                                    that.backend.title);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while sending create machine' +
+                                name + ' to backend ' + that.backend.title);
+                        console.error(textstate, errorThrown, 'while checking key of machine', that.name);
                     }
                 });
 			}

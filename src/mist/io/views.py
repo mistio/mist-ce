@@ -11,6 +11,7 @@ from libcloud.compute.base import Node
 from libcloud.compute.base import NodeSize
 from libcloud.compute.base import NodeImage
 from libcloud.compute.base import NodeLocation
+from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider
 
@@ -134,6 +135,19 @@ def create_machine(request):
     Rackspace backend. create_node(), from libcloud.compute.base, with 'auth'
     kwarg doesn't do the trick. Didn't test if you can upload some ssh related
     files using the 'ex_files' kwarg from openstack 1.0 driver.
+
+    In Linode creation is a bit different. There you can pass the key file
+    directly during creation. The Linode API also requires to set a disk size
+    and doesn't get it from size.id. So, send size.disk from the client and
+    use it in all cases just to avoid provider checking. Finally, Linode API
+    does not support association between a machine and the image it came from.
+    We could set this, at least for machines created through mist.io in
+    ex_comment, lroot or lconfig. lroot seems more appropriate. However,
+    liblcoud doesn't support linode.config.list at the moment, so no way to
+    get them. Also, it will create inconsistencies for machines created
+    through mist.io and those from the Linode interface.
+
+    TODO: test the new rackspace backend
     """
     try:
         conn = connect(request)
@@ -145,16 +159,20 @@ def create_machine(request):
         location_id = request.json_body['location']
         image_id = request.json_body['image']
         size_id = request.json_body['size']
+        # required only for Linode
+        disk = request.json_body['disk']
     except Exception as e:
         return Response('Invalid payload', 400)
 
-    size = NodeSize(size_id, name='', ram='', disk='', bandwidth='', price='',
-                    driver=conn)
+    size = NodeSize(size_id, name='', ram='', disk=disk, bandwidth='',
+                    price='', driver=conn)
     image = NodeImage(image_id, name='', driver=conn)
     location = NodeLocation(location_id, name='', country='', driver=conn)
 
+    import pdb;pdb.set_trace()
+
     has_key = len(request.registry.settings['keypairs'])
-    if conn.type == Provider.RACKSPACE and has_key:
+    if conn.type is Provider.RACKSPACE and has_key:
         key = SSHKeyDeployment(request.registry.settings['keypairs'][0][0])
         try:
             conn.deploy_node(name=machine_name,
@@ -172,14 +190,26 @@ def create_machine(request):
         if imported_key and created_security_group:
             try:
                 conn.create_node(name=machine_name,
-                                image=image,
-                                size=size,
-                                location=location,
-                                ex_keyname=EC2_KEY_NAME,
-                                ex_securitygroup=EC2_SECURITYGROUP['name'])
+                                 image=image,
+                                 size=size,
+                                 location=location,
+                                 ex_keyname=EC2_KEY_NAME,
+                                 ex_securitygroup=EC2_SECURITYGROUP['name'])
                 return []
             except:
                 log.warn('Failed to deploy node with ssh key, attempt without')
+    elif conn.type is Provider.LINODE and has_key:
+        key = request.registry.settings['keypairs'][0][0]
+        auth = NodeAuthSSHKey(key)
+        try:
+            conn.create_node(name=machine_name,
+                             image=image,
+                             size=size,
+                             location=location,
+                             auth=auth)
+            return []
+        except:
+            log.warn('Failed to deploy node with ssh key, attempt without')
 
     try:
         conn.create_node(name=machine_name,
