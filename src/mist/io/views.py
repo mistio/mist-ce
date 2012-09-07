@@ -15,10 +15,6 @@ from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider
 
-from fabric.api import env
-from fabric.api import run
-from fabric.api import sudo
-
 from mist.io.config import STATES
 from mist.io.config import BACKENDS
 from mist.io.config import EC2_IMAGES
@@ -30,7 +26,7 @@ from mist.io.helpers import connect
 from mist.io.helpers import get_machine_actions
 from mist.io.helpers import import_key
 from mist.io.helpers import create_security_group
-
+from mist.io.helpers import run_command
 
 log = logging.getLogger('mist.io')
 
@@ -448,64 +444,19 @@ def shell_command(request):
     TODO: grab unix errors
     TODO: don't let commands like vi, etc to go through or timeout
     """
+    backend_index = int(request.matchdict['backend'])
+
     host = request.params.get('host', None)
     ssh_user = request.params.get('ssh_user', None)
     command = request.params.get('command', None)
-    private_key = request.registry.settings['keypairs'][0][1]
-
-    if not host:
-        log.error('Host not provided, exiting.')
-        return Response('Host not set', 503)
-
-    if not command:
-        log.warn('No command was passed, returning empty.')
-        return ''
-
-    if ssh_user:
-        env.user = ssh_user
-    else:
-        env.user = 'root'
-
-    env.abort_on_prompts = True
-    env.no_keys = True
-    env.no_agent = True
-    env.host_string = host
-    #env.combine_stderr = False
-
-    (tmp_key, tmp_path) = tempfile.mkstemp()
-    key_fd = os.fdopen(tmp_key, 'w+b')
-    key_fd.write(private_key)
-    key_fd.close()
-
-    env.key_filename = [tmp_path]
 
     try:
-        cmd_output = run(request.params.get('command', None))
-        if 'Please login as the user' in cmd_output:
-            # TODO: supposes the answer from EC2 will be always like:
-            #  Please login as the user "ec2-user" rather than the user "root"
-            username = cmd_output.split()[5].strip('"')
-            conn = connect(request)
-            machine_id = request.matchdict['machine']
-            machine = Node(machine_id,
-                           name=machine_id,
-                           state=0,
-                           public_ips=[],
-                           private_ips=[],
-                           driver=conn)
-            conn.ex_create_tags(machine, {'ssh_user': username})
-            env.user = username
-            try:
-                cmd_output = run(request.params.get('command', None))
-            except:
-                return Response('Exception while executing command', 503)
-    except:
-        log.error('Exception while executing command')
-        return Response('Exception while executing command', 503)
+        private_key = request['beaker.session']['backends'][backend_index]['private_key']
+    except KeyError:
+        private_key = request.registry.settings['keypairs'][0][1]
+        
+    return run_command(command, host, ssh_user, private_key)
 
-    os.remove(tmp_path)
-
-    return cmd_output
 
 
 @view_config(route_name='images', request_method='GET', renderer='json')

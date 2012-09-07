@@ -7,6 +7,10 @@ from libcloud.compute.types import Provider
 from libcloud.compute.types import NodeState
 from libcloud.compute.providers import get_driver
 
+from fabric.api import env
+from fabric.api import run
+from fabric.api import sudo
+
 from mist.io.config import BACKENDS
 from mist.io.config import EC2_PROVIDERS
 
@@ -150,3 +154,59 @@ def create_security_group(conn, info):
     else:
         log.warn('This provider does not support security group creation.')
         return False
+
+
+def run_command(command, host, ssh_user, private_key):
+    if not host:
+        log.error('Host not provided, exiting.')
+        return Response('Host not set', 503)
+
+    if not command:
+        log.warn('No command was passed, returning empty.')
+        return ''
+
+    if ssh_user:
+        env.user = ssh_user
+    else:
+        env.user = 'root'
+
+    env.abort_on_prompts = True
+    env.no_keys = True
+    env.no_agent = True
+    env.host_string = host
+    #env.combine_stderr = False
+
+    (tmp_key, tmp_path) = tempfile.mkstemp()
+    key_fd = os.fdopen(tmp_key, 'w+b')
+    key_fd.write(private_key)
+    key_fd.close()
+
+    env.key_filename = [tmp_path]
+
+    try:
+        cmd_output = run(command)
+        if 'Please login as the user' in cmd_output:
+            # TODO: supposes the answer from EC2 will be always like:
+            #  Please login as the user "ec2-user" rather than the user "root"
+            username = cmd_output.split()[5].strip('"')
+            conn = connect(request)
+            machine_id = request.matchdict['machine']
+            machine = Node(machine_id,
+                           name=machine_id,
+                           state=0,
+                           public_ips=[],
+                           private_ips=[],
+                           driver=conn)
+            conn.ex_create_tags(machine, {'ssh_user': username})
+            env.user = username
+            try:
+                cmd_output = run(request.params.get('command', None))
+            except:
+                return Response('Exception while executing command', 503)
+    except:
+        log.error('Exception while executing command')
+        return Response('Exception while executing command', 503)
+
+    os.remove(tmp_path)
+
+    return cmd_output
