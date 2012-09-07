@@ -169,8 +169,6 @@ def create_machine(request):
     image = NodeImage(image_id, name='', driver=conn)
     location = NodeLocation(location_id, name='', country='', driver=conn)
 
-    import pdb;pdb.set_trace()
-
     has_key = len(request.registry.settings['keypairs'])
     if conn.type is Provider.RACKSPACE and has_key:
         key = SSHKeyDeployment(request.registry.settings['keypairs'][0][0])
