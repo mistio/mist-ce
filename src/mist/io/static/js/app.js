@@ -38,7 +38,8 @@ define( 'app', [
     'app/views/single_machine_actions_dialog',
     'app/views/shell',
     'app/views/image_list',
-	'mobile',
+    'app/views/machine_tags_dialog',
+    'mobile',
     'jqueryUi',
     'cubism',
     'ember',
@@ -64,6 +65,7 @@ define( 'app', [
                 SingleMachineActionsDialog,
                 Shell,
                 ImageListView,
+                MachineTagsDialog,
                 Mobile,
                 jQueryUI,
                 cubism) {
@@ -227,6 +229,9 @@ define( 'app', [
 		machineListView.append();
 		var imageListView = ImageListView.create();
 		imageListView.append();
+                var machineTagsDialog = MachineTagsDialog.create();
+                machineTagsDialog.append();
+
 		
 		$(document).on( 'pagebeforeshow', '#dialog-add', function(){
 		    $('#dialog-add').trigger('create');

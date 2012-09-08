@@ -95,35 +95,6 @@
     </div>
 </div><!-- /provider state dialog -->
 
-<!-- Start of tags dialog -->
-<div data-role="dialog" id="dialog-tags" class="mist-dialog">
-    <div data-role="header">
-        <h1>Manage Tags</h1>
-    </div>
-    <div data-role="content" data-theme="c">
-        <div id="tags-container">
-            <table id="tag-input">
-                <tr>
-                <td><input name="add-tag-name" type="text" id="add-tag-name" ></input></td>
-                <td id="tag-add-wrapper"><a id="tag-add" data-role="button" data-theme="c">Add</a></td>
-                </tr>
-            </table>
-            <div id="tags-wrapper">
-                <ul id="tags-list">
-                    <li><a data-role="button" data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>tag1</li>
-                    <li><a data-role="button" data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>tag2</li>
-                    <li><a data-role="button" data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>tag3</li>
-                    <li><a data-role="button" data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>Some tag</li>
-                    <li><a data-role="button" data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>Some other tag</li>
-                    <li><a data-role="button" data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>tag6</li>
-                    <li><a data-role="button" data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>A long tag</li>
-                </ul>
-            </div>
-        </div>
-            <a id="tag-back" data-rel="back" data-role="button" data-transition="flip" data-theme="b">Close</a>
-    </div>
-</div><!-- /providers dialog -->
-
 </body>
 
 </html>
