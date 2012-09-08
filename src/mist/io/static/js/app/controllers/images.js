@@ -42,6 +42,7 @@ define('app/controllers/images', [
 		    		$.ajax({
 	                    url: 'backends/' + this.backend.index + '/images/' + id + '/metadata',
 	                    success: function(data) {
+	                    	data.backend = that.backend;
 	                    	var image = Image.create(data);
 	                    	that.content.push(image);
 	                        callback(image);
@@ -61,6 +62,7 @@ define('app/controllers/images', [
 				$.getJSON('/backends/' + this.backend.index + '/images', function(data) {
 					var content = new Array();
 					data.forEach(function(item){
+						item.backend = that.backend;
 						content.push(Image.create(item));
 					});
 					that.set('content', content);

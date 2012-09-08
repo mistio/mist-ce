@@ -219,23 +219,23 @@ div#splash div.mist-logo {
     display: none;
 }
 
-#machines-list li.node .ui-btn-text {
+#machines-list li.node .ui-btn-text, #images-list li.node .ui-btn-text {
     padding-right: 0;
 }
 
-#machines-list .node a {
+#machines-list .node a, #images-list .node a {
     height: 40px;
     color: #2F3E46;
 }
 
-#machines-list .description {
+#machines-list .description, #images-list .description {
     position: absolute;
     right: 76px;
     top: 50%;
     margin-top: -11px;
 }
 
-#machines-list .bubble-container {
+#machines-list .bubble-container, #images-list .bubble-container {
     float: right;
     display: block;
     overflow: hidden;
@@ -289,7 +289,7 @@ div#splash div.mist-logo {
 
 /* Machines tags */
 
-#machines-list .node .tag {
+#machines-list .node .tag, #images-list .node .tag {
     border: 1px solid #bfbfbf;
     color: #555 !important;
     font-weight: normal !important;

@@ -23,6 +23,7 @@ define( 'app', [
     'app/controllers/notification',
     'app/controllers/machine_add',
     'app/controllers/select_machines',
+    'app/controllers/select_images',
     'app/views/count',
     'app/views/backend_button',
     'app/views/add_backend',
@@ -50,6 +51,7 @@ define( 'app', [
                 NotificationController,
                 MachineAddController,
                 SelectMachinesController,
+                SelectImagesController,
                 Count,
                 BackendButton,
                 AddBackend,
@@ -127,6 +129,10 @@ define( 'app', [
 				this.set(
 						'selectMachinesController',
 						SelectMachinesController.create()
+					);
+				this.set(
+						'selectImagesController',
+						SelectImagesController.create()
 					);
 
 				// Run specs if asked
@@ -229,8 +235,8 @@ define( 'app', [
 		machineListView.append();
 		var imageListView = ImageListView.create();
 		imageListView.append();
-                var machineTagsDialog = MachineTagsDialog.create();
-                machineTagsDialog.append();
+		var machineTagsDialog = MachineTagsDialog.create();
+		machineTagsDialog.append();
 
 		
 		$(document).on( 'pagebeforeshow', '#dialog-add', function(){

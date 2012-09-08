@@ -18,7 +18,6 @@ define('app/controllers/machines', [
 			},
 
 			refresh: function(){
-				console.log("refreshing machines");
 
 				if(this.backend.state == "offline"){
 					this.clear();
@@ -30,10 +29,6 @@ define('app/controllers/machines', [
 				this.backend.set('state', 'wait');
 
 				$.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
-
-					console.log("machines for " + that.backend.title);
-					console.log(data.length);
-
 					data.forEach(function(item){
 
 						var found = false;
@@ -41,7 +36,6 @@ define('app/controllers/machines', [
 						console.log("item id: " + item.id);
 
 						that.content.forEach(function(machine){
-							console.log("machine id: " + machine.id);
 
 							if(machine.id == item.id){
 								found = true;
@@ -58,7 +52,6 @@ define('app/controllers/machines', [
 						});
 
 						if(!found){
-							console.log("not found, adding");
 							item.backend = that.backend;
 							var machine = Machine.create(item);
 							that.contentWillChange(that.content.length - 1, 0, 1);
