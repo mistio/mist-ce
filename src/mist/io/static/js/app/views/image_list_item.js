@@ -30,6 +30,9 @@ define('app/views/image_list_item', [
 			    
 			    createMachine: function(){
 			    	$.mobile.changePage('#dialog-add', 'pop', true, true);
+			    	Mist.machineAddController.set("newMachineBackend", this.image.backend);
+			    	Mist.machineAddController.set("newMachineImage", this.image);
+			    	
 			    },
 			    			    
 			    init: function() {

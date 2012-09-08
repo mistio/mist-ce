@@ -33,7 +33,7 @@ define('app/controllers/machine_add', ['ember'],
             		this.set('newMachineReady', false);
             	}
             	
-            	this.set('newMachineNameReady', !!this.get('newMachineName'));
+            	this.set('newMachineNameReady', !!this.get('newMachineName') || !!this.get('newMachineBackend'));
             	this.set('newMachineBackendReady', !!this.get('newMachineBackend'));
             	this.set('newMachineImageReady', !!this.get('newMachineImage'));
             	this.get('newMachineSizeReady', !!this.get('newMachineSize'));
