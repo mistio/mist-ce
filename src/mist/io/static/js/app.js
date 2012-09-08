@@ -190,7 +190,7 @@ define( 'app', [
 		});
 		
 		App.ShellTextField = Ember.TextField.extend({
-		    attributeBindings: ['name', "data-theme"],
+		    attributeBindings: ['name', "data-theme", "autocapitalize"],
 
 		    insertNewline: function() {
 		        this.controller.submit();
