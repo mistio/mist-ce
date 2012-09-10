@@ -46,6 +46,19 @@
                           disabled="disabled"
     }}
 
+    <label for="create-select-location">5. Location:</label>
+
+    {{view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.locations"
+                          optionLabelPath="content.name"
+                          optionValuePath="content.id"
+                          prompt="Select Location"
+                          selectionBinding="Mist.machineAddController.newMachineLocation"
+                          class="create-select" data-theme="c" data-icon="check"
+                          data-native-menu="false" id="create-select-location"
+                          name="create-select-location"
+                          disabled="disabled"
+    }}
+
     <div class="cost">Cost: {{Mist.machineAddController.newMachineCost}}</div>
         
      <div id="create-ok-cancel" class="btn-full" data-role="controlgroup"
