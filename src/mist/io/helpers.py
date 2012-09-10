@@ -3,6 +3,8 @@ import os
 import tempfile
 import logging
 
+from pyramid.response import Response
+
 from libcloud.compute.types import Provider
 from libcloud.compute.types import NodeState
 from libcloud.compute.providers import get_driver
