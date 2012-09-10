@@ -29,7 +29,7 @@ define('app/controllers/machine_add', ['ember'],
             	if (this.get('newMachineName') &&
                     this.get('newMachineBackend') &&
                     this.get('newMachineImage') &&
-                    this.get('newMachineSize')) &&
+                    this.get('newMachineSize') &&
                     this.get('newMachineLocation')) {
 
                         this.set('newMachineReady', true);
