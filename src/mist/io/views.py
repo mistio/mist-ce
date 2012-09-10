@@ -454,7 +454,7 @@ def shell_command(request):
         private_key = request['beaker.session']['backends'][backend_index]['private_key']
     except KeyError:
         private_key = request.registry.settings['keypairs'][0][1]
-        
+
     return run_command(command, host, ssh_user, private_key)
 
 
@@ -554,10 +554,11 @@ def list_locations(request):
 
     Locations mean different things in each backend. e.g. EC2 uses it as a
     datacenter in a given availability zone, whereas Linode lists availability
-    zones, in EC2 lingo. However all responses share id, name and country
-    eventhough in some cases might be empty, e.g. Openstack.
+    zones. However all responses share id, name and country eventhough in some
+    cases might be empty, e.g. Openstack.
 
-    TODO: Handle the different meaning of a location in every backend.
+    In EC2 all locations by a provider have the same name, so the availability
+    zones are listed instead of name.
     """
     try:
         conn = connect(request)
@@ -569,10 +570,17 @@ def list_locations(request):
     except:
         return Response('Backend unavailable', 503)
 
+    backend = request.matchdict['backend']
     ret = []
+
     for location in locations:
+        if backend in EC2_PROVIDERS:
+            name = location.availability_zone.name
+        else:
+            name = location.name
+
         ret.append({'id'        : location.id,
-                    'name'      : location.name,
+                    'name'      : name,
                     'country'   : location.country,
                     })
 
