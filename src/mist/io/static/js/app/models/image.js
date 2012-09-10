@@ -30,6 +30,7 @@ define('app/models/image', ['ember'],
 			},
 			id: null,
 			name: null,
+            extra: null,
 
 			type: function(){
 					for(type in this.TYPES){

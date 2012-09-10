@@ -102,10 +102,10 @@ def list_machines(request):
     for m in machines:
         tags = m.extra.get('tags', None) or m.extra.get('metadata', None)
         tags = tags or {}
+        tags = [value for key, value in tags.iteritems() if key != 'Name' and key != 'ssh_user']
         imageId = m.image or m.extra.get('imageId', None)
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
-        tags = [value for key, value in tags.iteritems() if key != "Name"]
         machine = {'id'           : m.id,
                    'uuid'          : m.get_uuid(),
                    'name'          : m.name,
@@ -155,14 +155,15 @@ def create_machine(request):
         location_id = request.json_body['location']
         image_id = request.json_body['image']
         size_id = request.json_body['size']
-        # required only for Linode
+        # these are required only for Linode, passing them anyway
+        image_extra = request.json_body['image_extra']
         disk = request.json_body['disk']
     except Exception as e:
         return Response('Invalid payload', 400)
 
     size = NodeSize(size_id, name='', ram='', disk=disk, bandwidth='',
                     price='', driver=conn)
-    image = NodeImage(image_id, name='', driver=conn)
+    image = NodeImage(image_id, name='', extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name='', country='', driver=conn)
 
     has_key = len(request.registry.settings['keypairs'])
