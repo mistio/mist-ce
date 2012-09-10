@@ -108,13 +108,17 @@ define('app/controllers/machines', [
 			newMachine: function(name, image, size, location) {
                 console.log('Creating machine', this.name, 'to backend', this.backend.title);
 
+                // TODO: find a way to pass ember objects to JSON, so the
+                // following will seem less messy. It will also be helpful for tags.
+                // http://stackoverflow.com/questions/8669340/ember-model-to-json
 				var payload = {
 	                    'name': name,
-	                    'location' : location.id,
 	                    'image': image.id,
+                        'image_extra': image.extra,
 	                    'size': size.id,
-                        // this is needed for Linode only
-                        'disk': size.disk
+                        // these are only usefull for Linode
+                        'disk': size.disk,
+                        'location' : location.id
 	            };
 
                 var that = this;

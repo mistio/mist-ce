@@ -155,17 +155,16 @@ def create_machine(request):
         location_id = request.json_body['location']
         image_id = request.json_body['image']
         size_id = request.json_body['size']
-        # required only for Linode
+        # these are required only for Linode, passing them anyway
+        image_extra = request.json_body['image_extra']
         disk = request.json_body['disk']
     except Exception as e:
         return Response('Invalid payload', 400)
 
     size = NodeSize(size_id, name='', ram='', disk=disk, bandwidth='',
                     price='', driver=conn)
-    image = NodeImage(image_id, name='', driver=conn)
+    image = NodeImage(image_id, name='', extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name='', country='', driver=conn)
-
-    import pdb;pdb.set_trace()
 
     has_key = len(request.registry.settings['keypairs'])
     if conn.type is Provider.RACKSPACE and has_key:
