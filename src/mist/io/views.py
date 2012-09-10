@@ -102,10 +102,10 @@ def list_machines(request):
     for m in machines:
         tags = m.extra.get('tags', None) or m.extra.get('metadata', None)
         tags = tags or {}
+        tags = [value for key, value in tags.iteritems() if key != 'Name' and key != 'ssh_user']
         imageId = m.image or m.extra.get('imageId', None)
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
-        tags = [value for key, value in tags.iteritems() if key != "Name"]
         machine = {'id'           : m.id,
                    'uuid'          : m.get_uuid(),
                    'name'          : m.name,
@@ -164,6 +164,8 @@ def create_machine(request):
                     price='', driver=conn)
     image = NodeImage(image_id, name='', driver=conn)
     location = NodeLocation(location_id, name='', country='', driver=conn)
+
+    import pdb;pdb.set_trace()
 
     has_key = len(request.registry.settings['keypairs'])
     if conn.type is Provider.RACKSPACE and has_key:
