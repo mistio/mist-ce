@@ -342,7 +342,6 @@ def set_machine_metadata(request):
     except:
         return Response('Backend not found', 404)
 
-    backend = request.matchdict['backend']
     machine = request.matchdict['machine']
 
     try:
@@ -351,7 +350,7 @@ def set_machine_metadata(request):
     except:
         return Response('Not proper format for metadata', 404)
 
-    if backend in EC2_PROVIDERS:
+    if conn.type in EC2_PROVIDERS:
         try:
             metadata = conn.ex_create_tags(machine, metadata)
         except:
@@ -386,7 +385,6 @@ def delete_machine_metadata(request):
     except:
         return Response('Backend not found', 404)
 
-    backend = request.matchdict['backend']
     machine = request.matchdict['machine']
 
     try:
@@ -395,7 +393,7 @@ def delete_machine_metadata(request):
     except:
         return Response('Not proper format for metadata', 404)
 
-    if backend in EC2_PROVIDERS:
+    if conn.type in EC2_PROVIDERS:
         try:
             metadata = conn.ex_delete_tags(machine, metadata)
         except:
@@ -468,13 +466,7 @@ def list_images(request):
         return Response('Backend not found', 404)
 
     try:
-        try:
-            backend_list = request.environ['beaker.session']['backends']
-        except:
-            backend_list = BACKENDS
-        backend_index = int(request.matchdict['backend'])
-        backend = backend_list[backend_index]
-        if backend['provider'] == Provider.EC2:
+        if conn.type in EC2_PROVIDERS:
             images = conn.list_images(None, EC2_IMAGES.keys())
         else:
             images = conn.list_images()
@@ -570,11 +562,9 @@ def list_locations(request):
     except:
         return Response('Backend unavailable', 503)
 
-    backend = request.matchdict['backend']
     ret = []
-
     for location in locations:
-        if backend in EC2_PROVIDERS:
+        if conn.type in EC2_PROVIDERS:
             name = location.availability_zone.name
         else:
             name = location.name
