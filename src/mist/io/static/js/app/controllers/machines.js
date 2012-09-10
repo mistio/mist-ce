@@ -105,13 +105,12 @@ define('app/controllers/machines', [
 
 			},
 
-			newMachine: function(name, image, size) {
+			newMachine: function(name, image, size, location) {
                 console.log('Creating machine', this.name, 'to backend', this.backend.title);
 
 				var payload = {
 	                    'name': name,
-                        // TODO: this should get a location and not the backend id
-	                    'location' : this.backend.id,
+	                    'location' : location.id,
 	                    'image': image.id,
 	                    'size': size.id,
                         // this is needed for Linode only
