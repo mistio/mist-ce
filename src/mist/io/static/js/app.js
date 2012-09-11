@@ -2,7 +2,7 @@
 require.config({
 	baseUrl: 'static/js/',
 	paths: {
-		jquery: 'lib/jquery-1.7.2.min',
+		jquery: 'lib/jquery-1.8.1.min',
         d3: "lib/d3.v2",
         ember: 'lib/ember-0.9.8.1.min',
         mobile: 'lib/jquery.mobile-1.1.0.min',
