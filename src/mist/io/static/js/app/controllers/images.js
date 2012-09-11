@@ -23,16 +23,21 @@ define('app/controllers/images', [
 				});
 			},
 
-			getImage: function(id, callback) {
-				// TODO: why linode passes id==null here?
+            getImage: function(id, callback) {
+                // Linode will pass null, so dont bother
+                if (id == null){
+                    return false;
+                }
+                			    
 		    	retImage = false;
-		    	// TODO: why idx?
-		    	$.each(this.content, function(idx, image){
-					if(image.id == id){
-						retImage = image;
-						return false;
-					}
-				});
+		    	if (this.content) {		    	
+    		    	$.each(this.content, function(idx, image){
+    					if(image.id == id){
+    						retImage = image;
+    						return false;
+    					}
+    				});
+				}
 
 		    	if(retImage){
 		    		callback(retImage);

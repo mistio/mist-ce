@@ -26,7 +26,7 @@ define('app/views/machine', [
 				var ret = new Array();
 
 				$.each(this.machine.extra, function(key, value){
-					if (typeof(value) == 'string'){
+					if (typeof(value) == 'string' || typeof(value) == 'number'){
 						ret.push({key:key, value: value});
 					}
 				});
@@ -54,18 +54,17 @@ define('app/views/machine', [
 					privateIps = this.machine.private_ips;
 				}
 
-				var imageName = null;
-				if('image' in this.machine && 'name' in this.machine.image){
-					imageName = this.machine.image.name;
-				}
-
-				var basicvars = {
-						'Public IPs': publicIps,
-						'Private IPs': privateIps,
-						'Image': imageName,
-						'DNS Name': this.machine.extra.dns_name,
-						'Launch Date': this.machine.extra.launchdatetime
-				};
+                var basicvars = {
+                        'Public IPs': publicIps,
+                        'Private IPs': privateIps,
+                        'DNS Name': this.machine.extra.dns_name,
+                        'Launch Date': this.machine.extra.launchdatetime
+                };
+                
+				if(this.machine.image && 'image' in this.machine && 
+				        'name' in this.machine.image){
+                    basicvars['Image'] = this.machine.image.name;
+				} 
 
 				var ret = new Array();
 
