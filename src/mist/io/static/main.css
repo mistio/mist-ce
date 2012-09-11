@@ -333,6 +333,8 @@ a#mist-select-machines-button span.ui-btn-text {
     position: absolute;
     top: 50%;
     margin-top: -7px;
+    max-width: 160px;
+    overflow: hidden;
 }
 
 .caption-wrapper {
@@ -809,6 +811,8 @@ div.cost {
         top: 22px;
         width: 100px;
         line-height: 12px;
+        max-height: 45px;
+        overflow: hidden;
     }
 
     #machines-list .description .tag {
@@ -817,6 +821,10 @@ div.cost {
 
     .caption-wrapper {
         left: 200px;
+    }
+
+    .ui-li-heading {
+        max-width: 120px;
     }
 
     /* Create machine button */
