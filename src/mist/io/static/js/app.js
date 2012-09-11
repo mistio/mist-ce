@@ -239,3 +239,37 @@ define( 'app', [
 		return window.Mist = App;
 	}
 );
+
+var LOGLEVEL = 3;
+
+function log() {
+    try {
+        if (LOGLEVEL > 3) {
+            return console.log.apply(this, arguments);
+        } 
+    } catch(err) {}
+}
+
+function info() {
+    try {
+        if (LOGLEVEL > 2) {
+            return console.info.apply(this, arguments);
+        } 
+    } catch(err) {}
+}
+
+function warn() {
+    try {
+        if (LOGLEVEL > 1) {
+            return console.warn.apply(this, arguments);
+        } 
+    } catch(err) {}
+}
+
+function error() {
+    try {
+        if (LOGLEVEL > 0) {
+            return console.error.apply(this, arguments);
+        } 
+    } catch(err) {}
+}

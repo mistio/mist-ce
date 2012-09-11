@@ -12,7 +12,7 @@ define('app/controllers/select_machines', ['ember'],
 			
 			//if only this would work...
 			backendsChanged: function(){
-				console.log("backends changed");
+				log("backends changed");
 				var content = new Array();
 							
 				this._content.forEach(function(item){
@@ -24,7 +24,7 @@ define('app/controllers/select_machines', ['ember'],
 				});
 				
 				content.forEach(function(item){
-					console.log(item.name);
+					log(item.name);
 				});
 				
 				this.contentWillChange();
@@ -41,14 +41,14 @@ define('app/controllers/select_machines', ['ember'],
 				if(selection == 'none'){
 					Mist.backendsController.forEach(function(backend){
 						backend.machines.forEach(function(machine){
-							console.log('deselecting machine: ' + machine.name);
+							log('deselecting machine: ' + machine.name);
 							machine.set('selected', false);							
 						});
 					});
 				} else if(selection == 'all'){
 					Mist.backendsController.forEach(function(backend){
 						backend.machines.forEach(function(machine){
-							console.log('selecting machine: ' + machine.name);
+							log('selecting machine: ' + machine.name);
 							machine.set('selected', true);							
 						});
 					});
@@ -56,12 +56,12 @@ define('app/controllers/select_machines', ['ember'],
 					Mist.backendsController.forEach(function(backend){
 						if(backend.id == selection){
 							backend.machines.forEach(function(machine){
-								console.log('selecting machine: ' + machine.name);
+								log('selecting machine: ' + machine.name);
 								machine.set('selected', true);							
 							});
 						} else {
 							backend.machines.forEach(function(machine){
-								console.log('deselecting machine: ' + machine.name);
+								log('deselecting machine: ' + machine.name);
 								machine.set('selected', false);							
 							});
 						}

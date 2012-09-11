@@ -41,7 +41,7 @@ function(shell_html) {
 				Mist.backendsController.forEach(function(backend) {
 					backend.machines.forEach(function(m) {
 						if (m.selected && m.hasKey) {
-							console.log('machine selected');
+							log('machine selected');
 							machine = m;
 						}
 					});

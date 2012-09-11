@@ -8,7 +8,7 @@ define('app/controllers/machine_add', ['ember'],
         return Ember.Object.extend({
 
             newMachine: function() {
-                console.log("new machine");
+                log("new machine");
                 this.get('newMachineBackend').machines.newMachine(
                                             this.get('newMachineName'),
                                             this.get('newMachineImage'),

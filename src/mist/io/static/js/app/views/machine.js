@@ -165,14 +165,14 @@ define('app/views/machine', [
 						url: '/backends/' + machine.backend.index + '/machines/' + machine.id + '/stats',
 						data: data,
 						success: function(data) {
-							console.log("machine stats");
-							console.log(data);
+							log("machine stats");
+							log(data);
 							stats = data;
 							setTimeout(poll, 5000);
 						}
 					}).error(function(jqXHR, textStatus, errorThrown) {
-						console.log('error querying for machine stats for machine id: ' + machine.id);
-						console.log(textStatus + " " + errorThrown);
+						log('error querying for machine stats for machine id: ' + machine.id);
+						log(textStatus + " " + errorThrown);
 						setTimeout(poll, 5000);
 					});
 				}

@@ -11,7 +11,7 @@ define('app/views/machine_add_dialog', [
             tagName: false,
 
             clear: function(){
-                console.log('clear');
+                log('clear');
                 Mist.machineAddController.newMachineClear();
             },
 

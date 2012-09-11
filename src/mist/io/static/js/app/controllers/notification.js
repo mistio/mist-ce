@@ -13,7 +13,7 @@ define('app/controllers/notification', ['ember'],
 				if(this.timeout){
 					clearTimeout(this.timeout);
 				}
-				console.log("notification: " + message);
+				log("notification: " + message);
 				jQuery.mobile.showPageLoadingMsg(
 						jQuery.mobile.pageLoadErrorMessageTheme,
 						message, true);

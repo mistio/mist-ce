@@ -84,7 +84,7 @@ define('app/controllers/backends', [
 						    } else {
 						    	state = 'state-' + state;
 						    }
-						    console.log('setting backends state: ' + state);
+						    log('setting backends state: ' + state);
 						    that.set('state', state);
 						});
 					});
