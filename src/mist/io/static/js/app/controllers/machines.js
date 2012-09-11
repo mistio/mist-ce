@@ -114,11 +114,11 @@ define('app/controllers/machines', [
 				var payload = {
 	                    'name': name,
 	                    'image': image.id,
-                        'image_extra': image.extra,
 	                    'size': size.id,
                         // these are only usefull for Linode
+                        'image_extra': image.extra,
                         'disk': size.disk,
-                        'location' : location.id
+                        'location': location.id
 	            };
 
                 var that = this;
