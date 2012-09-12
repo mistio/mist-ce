@@ -20,7 +20,7 @@ define('app/controllers/notification', ['ember'],
                             textonly: true,
                             theme: $.mobile.pageLoadErrorMessageTheme
                 });
-                this.timeout = setTimeout($.mobile.loading( 'hide' ), 1500);
+                this.timeout = setTimeout("$.mobile.loading( 'hide' )", 1500);
             }
         });
     }

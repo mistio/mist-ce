@@ -1,5 +1,5 @@
 define('app/views/machine', [
-	'text!app/templates/machine.html','ember', 'd3', 'cubism'],
+	'text!app/templates/machine.html','ember', 'd3'],
 	/**
 	 *
 	 * Machine page
