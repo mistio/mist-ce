@@ -15,7 +15,7 @@
         </div>
         <div id="shell-return">
         {{#each shellOutputItems}}
-            <div {{bindAttr id="cmdIndex"}}>
+            <div class="command-output" {{bindAttr id="cmdIndex"}}>
                 <div class="command">{{command}}</div>
                 <div class="output">{{{output}}}</div>
             </div>

@@ -5,7 +5,7 @@ require.config({
 		jquery: 'lib/jquery-1.8.1.min',
         d3: "lib/d3.v2",
         ember: 'lib/ember-0.9.8.1.min',
-        mobile: 'lib/jquery.mobile-1.2.0-beta.1',
+        mobile: 'lib/jquery.mobile-1.2.0-beta.1.min',
 		text: 'lib/require/text',
 		mocha: 'lib/mocha',
 		chai: 'lib/chai',
@@ -196,6 +196,24 @@ define( 'app', [
 
 		$(document).on( 'pagebeforehide', '#single-machine', function(){
 			Mist.graphPolling = false;
+		});
+
+		// Console toggle behavior
+		$(document).ready(function() {
+			$('#shell-return').on('click', '.command', function() 
+			{
+				var out = $(this).next('.output');
+				if (out.is(':visible'))
+				{
+					out.slideUp(300);
+					$(this).parent().addClass('contracted').removeClass('expanded');
+				}
+				else
+				{
+					out.slideDown(200);
+					$(this).parent().removeClass('contracted').addClass('expanded');
+				}
+			});
 		});
 
 		App.Select = Ember.Select.extend({

@@ -787,12 +787,33 @@ div.cost {
     min-width: 80ex;
 }
 
-#dialog-shell #shell-return div.command {
-    background: #cceedd;
+#dialog-shell #shell-return div.command-output.contracted .command,
+#dialog-shell #shell-return .command {
+    background: #efeff1 url("images/arrow-down.png") right center no-repeat;
+    cursor: pointer;
+    padding: 6px;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+}
+
+#dialog-shell #shell-return div.command-output.expanded .command,
+#dialog-shell #shell-return .command-output:nth-of-type(1) .command {
+    background: #efeff1 url("images/arrow-up.png") right center no-repeat;
 }
 
 #dialog-shell #shell-return div.output {
-    background: #ccddee;
+    background: #444;
+    color: #efeff1;
+    padding: 6px;
+    text-shadow: none;
+}
+
+#dialog-shell #shell-return .command-output div.output {
+    display: none;
+}
+
+#dialog-shell #shell-return .command-output:nth-of-type(1) div.output {
+    display: block;
 }
 
 .ui-autocomplete {
