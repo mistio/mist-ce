@@ -5,7 +5,7 @@ require.config({
 		jquery: 'lib/jquery-1.8.1.min',
         d3: "lib/d3.v2",
         ember: 'lib/ember-0.9.8.1.min',
-        mobile: 'lib/jquery.mobile-1.1.0.min',
+        mobile: 'lib/jquery.mobile-1.2.0-beta.1.min',
 		text: 'lib/require/text',
 		mocha: 'lib/mocha',
 		chai: 'lib/chai',
@@ -17,7 +17,7 @@ require.config({
 // Load our app
 define( 'app', [
 	'jquery',
-    'd3',	
+    'd3',
     'app/controllers/backends',
     'app/controllers/confirmation',
     'app/controllers/notification',
@@ -71,7 +71,7 @@ define( 'app', [
                 Mobile,
                 jQueryUI,
                 cubism) {
-                    
+
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',
@@ -153,27 +153,27 @@ define( 'app', [
 		$(document).on( 'pagebeforeshow', '#machines', function(){
 		    $('#machines-list').listview('refresh');
 		});
-		
+
 		$(document).on( 'pagebeforeshow', '#dialog-power', function(){
 			$("#dialog-power a").button();
 		});
-		
+
 		$(document).on( 'pagebeforeshow', '#dialog-single-power', function(){
 			$("#dialog-single-power a").button();
 		});
-		
+
 		$(document).on( 'pagebeforeshow', '#images', function(){
 			$("#images-list").listview('refresh');
 		});
-		
+
 		$(document).on( 'pagebeforeshow', '#single-machine', function(){
 			Mist.graphPolling = true;
 		});
-		
+
 		$(document).on( 'pageshow', '#single-machine', function(){
 			$('input[type=checkbox]').checkboxradio("refresh");
 		});
-		
+
 		$(document).on( 'pagebeforehide', '#single-machine', function(){
 			Mist.graphPolling = false;
 		});
@@ -186,7 +186,7 @@ define( 'app', [
 		App.TextField = Ember.TextField.extend({
 		    attributeBindings: ['name', "data-theme"]
 		});
-		
+
 		App.ShellTextField = Ember.TextField.extend({
 		    attributeBindings: ['name', "data-theme", "autocapitalize"],
 
@@ -230,7 +230,7 @@ define( 'app', [
 		var machineTagsDialog = MachineTagsDialog.create();
 		machineTagsDialog.append();
 
-		
+
 		$(document).on( 'pagebeforeshow', '#dialog-add', function(){
 		    $('#dialog-add').trigger('create');
 		});
@@ -246,7 +246,7 @@ function log() {
     try {
         if (LOGLEVEL > 3) {
             return console.log.apply(this, arguments);
-        } 
+        }
     } catch(err) {}
 }
 
@@ -254,7 +254,7 @@ function info() {
     try {
         if (LOGLEVEL > 2) {
             return console.info.apply(this, arguments);
-        } 
+        }
     } catch(err) {}
 }
 
@@ -262,7 +262,7 @@ function warn() {
     try {
         if (LOGLEVEL > 1) {
             return console.warn.apply(this, arguments);
-        } 
+        }
     } catch(err) {}
 }
 
@@ -270,6 +270,6 @@ function error() {
     try {
         if (LOGLEVEL > 0) {
             return console.error.apply(this, arguments);
-        } 
+        }
     } catch(err) {}
 }
