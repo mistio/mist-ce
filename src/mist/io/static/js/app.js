@@ -40,8 +40,8 @@ define( 'app', [
     'app/views/shell',
     'app/views/image_list',
     'app/views/machine_tags_dialog',
-    'mobile',
     'jqueryUi',
+    'mobile',
 //    'cubism',
     'ember',
 	], function($,
@@ -68,8 +68,9 @@ define( 'app', [
                 Shell,
                 ImageListView,
                 MachineTagsDialog,
-                Mobile,
-                jQueryUI) {
+                jQueryUI,
+                Mobile
+                ) {
 
 		var App = Ember.Application.create({
 
