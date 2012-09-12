@@ -1,30 +1,36 @@
 // Define libraries
 require.config({
 	baseUrl: 'static/js/',
-	shim: {
-	    'mobile':{
-	       deps: [
-	       'jqueryUi'
-	       ] 
-	    },
-	    'jqueryUi':{
-	        deps: ['jquery']
-	    },
-	    'cubism':{
-	        deps: ['d3','mobile']
-	    }
-	},
 	paths: {
 		jquery: 'lib/jquery-1.8.1.min',
         d3: "lib/d3.v2",
         ember: 'lib/ember-0.9.8.1.min',
-        mobile: 'lib/jquery.mobile-1.2.0-beta.1.min',
+        mobile: 'lib/jquery.mobile-1.2.0-beta.1',
 		text: 'lib/require/text',
 		mocha: 'lib/mocha',
 		chai: 'lib/chai',
         jqueryUi: "lib/jquery-ui-1.8.22.custom.min",
         cubism: "lib/cubism.v1",
-	}
+	},
+    shim: {
+        'mobile':{
+           deps: [
+           'jqueryUi'
+           ] 
+        },
+        'jqueryUi':{
+            deps: ['jquery']
+        },
+        'cubism':{
+            deps: ['d3','mobile']
+        },
+        'app/controllers/notification' : {
+            deps: ['mobile']
+        },
+        'app/views/shell' : {
+            deps: ['jqueryUi']
+        }
+    }	
 });
 
 // Load our app
