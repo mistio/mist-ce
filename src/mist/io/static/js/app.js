@@ -17,6 +17,7 @@ require.config({
 // Load our app
 define( 'app', [
 	'jquery',
+    'jqueryUi',	
     'd3',
     'app/controllers/backends',
     'app/controllers/confirmation',
@@ -40,11 +41,11 @@ define( 'app', [
     'app/views/shell',
     'app/views/image_list',
     'app/views/machine_tags_dialog',
-    'jqueryUi',
     'mobile',
 //    'cubism',
     'ember',
 	], function($,
+                jQueryUI,
                 d3,
                 BackendsController,
                 ConfirmationController,
@@ -68,7 +69,6 @@ define( 'app', [
                 Shell,
                 ImageListView,
                 MachineTagsDialog,
-                jQueryUI,
                 Mobile
                 ) {
 
