@@ -447,6 +447,11 @@ a#mist-select-machines-button span.ui-btn-text {
     background-image: url(images/p1_sm.png);
 }
 
+/* Linode */
+#single-view-provider-icon.provider-7  {
+    background-image: url(images/p7_sm.png);
+}
+
 /* RackSpace */
 #single-view-provider-icon.provider-3 {
     background-image: url(images/p3_sm.png);
