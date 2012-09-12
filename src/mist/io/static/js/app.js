@@ -1,6 +1,19 @@
 // Define libraries
 require.config({
 	baseUrl: 'static/js/',
+	shim: {
+	    'mobile':{
+	       deps: [
+	       'jqueryUi'
+	       ] 
+	    },
+	    'jqueryUi':{
+	        deps: ['jquery']
+	    },
+	    'cubism':{
+	        deps: ['d3','mobile']
+	    }
+	},
 	paths: {
 		jquery: 'lib/jquery-1.8.1.min',
         d3: "lib/d3.v2",
@@ -42,7 +55,7 @@ define( 'app', [
     'app/views/image_list',
     'app/views/machine_tags_dialog',
     'mobile',
-//    'cubism',
+    'cubism',
     'ember',
 	], function($,
                 jQueryUI,
@@ -69,7 +82,8 @@ define( 'app', [
                 Shell,
                 ImageListView,
                 MachineTagsDialog,
-                Mobile
+                Mobile,
+                cubism
                 ) {
 
 		var App = Ember.Application.create({
