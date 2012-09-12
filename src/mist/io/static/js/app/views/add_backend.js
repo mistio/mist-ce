@@ -18,14 +18,14 @@ define('app/views/add_backend', [
             addButtonClick: function(){
                 var that = this;
                 var payload = {
-                        "provider": 3,
+                        "provider": "3",
                         "id" : 'unwebme',
                         "title": 'rack',
                         "secret": 'fb68dcedaa4e7f36b5bad4dc7bc28bed'
                 };
                 $.ajax({
-                    url: '/backends',
-                    type: "POST",
+                    url: '/backends/' + Mist.backendsController.content.length,
+                    type: "PUT",
                     contentType: "application/json",
                     dataType: "json",
                     data: JSON.stringify(payload),

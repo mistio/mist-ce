@@ -30,13 +30,11 @@ define('app/controllers/machines', [
 
 				$.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
 					data.forEach(function(item){
-
 						var found = false;
 
 						log("item id: " + item.id);
 
 						that.content.forEach(function(machine){
-
 							if(machine.id == item.id){
 								found = true;
 								machine.set(item); //FIXME this does not change anything;
@@ -61,12 +59,9 @@ define('app/controllers/machines', [
 							Mist.backendsController.contentWillChange(idx, 0, 0);
 							Mist.backendsController.contentDidChange(idx, 0, 0);
 						}
-
-
 					});
 
 					that.content.forEach(function(item){
-
 						var found = false;
 
 						data.forEach(function(machine){
@@ -129,7 +124,7 @@ define('app/controllers/machines', [
                     data: JSON.stringify(payload),
                     dataType: 'json',
                     success: function(data) {
-                        log('Successfully sent create machine', name, 'to backend',
+                        info('Successfully sent create machine', name, 'to backend',
                                     that.backend.title);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
