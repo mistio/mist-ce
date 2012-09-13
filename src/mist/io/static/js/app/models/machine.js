@@ -156,7 +156,7 @@ define('app/models/machine', ['ember'],
                 var that = this;
 
                 setInterval(function() {
-                    if (that.get('state' == 'running') && that.get('uptimeFromServer') &&
+                    if (that.get('state') == 'running' && that.get('uptimeFromServer') &&
                         that.get('uptimeChecked')) {
 
                         that.set('uptime', that.get('uptimeFromServer') + (Date.now()
@@ -206,6 +206,7 @@ define('app/models/machine', ['ember'],
                         },
                         error: function(jqXHR, textstate, errorThrown) {
                             that.set('hasKey', false);
+                            error(textstate);
                             Mist.notificationController.notify('Error getting uptime from machine ' +
                                     that.name);
                             error(textstate, errorThrown, 'when getting uptime from machine',
@@ -236,7 +237,7 @@ define('app/models/machine', ['ember'],
             },
 
             resetUptime: function() {
-                if (this.state == 'running') {
+                if (this.get('state') == 'running') {
                     this.startUptimeTimer();
                     this.checkUptime();
                 } else {
