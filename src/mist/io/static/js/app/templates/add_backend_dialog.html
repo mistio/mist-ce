@@ -1,31 +1,21 @@
 <div data-role="content" data-theme="c">
     <label for="select-backend">1. Provider:</label>
-    <select name="select-backend" id="new-backend" class="create-select" data-theme="c" data-icon="check" data-native-menu="false">
-        <option>Select Provider</option>
-        <optgroup label="Amazon EC2">
-            <option value="1">US East - Virginia</option>
-            <option value="36">US West - Oregon</option>
-            <option value="10">US West - N. California</option>
-            <option value="2">EU West - Ireland</option>
-            <option value="22">Asia Pacific - Singapore</option>
-            <option value="26">Asia Pacific - Tokio</option>
-            <option value="39">South America - Sao Paulo</option>
-        </optgroup>
-        <optgroup label="Rackspace">
-            <option value="3">US - DFW/ORD</option>
-            <option value="23">UK - LON</option>
-        </optgroup>
-        <optgroup label="Linode">
-            <option value="7">Linode</option>
-        </optgroup>
-        <optgroup label="OpenStack">
-            <option value="31">OpenStack</option>
-        </optgroup>            
-    </select>
+    {{view Mist.Select contentBinding="Mist.backendsController"
+                          optionLabelPath="content.title"
+                          optionValuePath="content.provider"
+                          prompt="Select Provider"
+                          selectionBinding="Mist.backendAddController.newBackend"
+                          class="create-select" data-theme="c" data-icon="check"
+                          data-native-menu="false" id="create-select-provider"
+                          name="create-select-provider"
+                          disabled="disabled"
+    }}    
     <label for="apikey">2. API Key:</label>
-    <input name="apikey" type="text" id="new-apikey" ></input>
+    {{view Mist.TextField valueBinding="Mist.backendAddController.newBackendKey" 
+    name="create-backend-key" id="create-backend-key"}}
     <label for="apisecret">3. API Secret:</label>
-    <input name="apisecret" type="text" id="new-apisecret" ></input>
+    {{view Mist.TextField valueBinding="Mist.backendAddController.newBackendSecret" 
+    name="create-backend-secret" id="create-backend-secret"}}
     <div id="create-backend-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
         <a id="create-backend-cancel" class="btn-left-full" data-role="button" data-rel="back" data-theme="c">Close</a>
         <a id="create-backend-ok" class="btn-right-full" data-role="button" data-rel="back" data-theme="b" {{action "addButtonClick" on="click" }}>Add</a>

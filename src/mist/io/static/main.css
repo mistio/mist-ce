@@ -770,8 +770,7 @@ div.cost {
 
 #dialog-shell  #shell-return {
     width: 100%;
-    overflow-x: hidden;
-    overflow-y: scroll;
+    overflow: hidden;
     border: 1px solid #AAA;
     height: 60ex;
     font-family: monospace;
@@ -814,6 +813,8 @@ div.cost {
 
 #dialog-shell #shell-return .command-output:nth-of-type(1) div.output {
     display: block;
+    max-height: 160px;
+    overflow: auto;
 }
 
 .ui-autocomplete {

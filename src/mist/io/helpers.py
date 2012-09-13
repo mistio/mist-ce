@@ -176,7 +176,8 @@ def run_command(command, host, ssh_user, private_key):
     env.no_keys = True
     env.no_agent = True
     env.host_string = host
-    #env.combine_stderr = False
+    env.warn_only = True
+    env.combine_stderr = True
 
     (tmp_key, tmp_path) = tempfile.mkstemp()
     key_fd = os.fdopen(tmp_key, 'w+b')
@@ -203,11 +204,11 @@ def run_command(command, host, ssh_user, private_key):
             env.user = username
             try:
                 cmd_output = run(request.params.get('command', None))
-            except:
-                return Response('Exception while executing command', 503)
-    except:
-        log.error('Exception while executing command')
-        return Response('Exception while executing command', 503)
+            except Exception as e:
+                return Response('Exception while executing command: %s' % e, 503)
+    except Exception as e:
+        log.error('Exception while executing command: %s' % e)
+        return Response('Exception while executing command: %s' % e, 503)
 
     os.remove(tmp_path)
 
