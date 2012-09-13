@@ -21,6 +21,7 @@ define('app/models/backend', [
 		    poll_interval: null,
 		    host: null,
 		    state: 'unknown',
+		    enabled: null,
 		    machines: null,
 		    sizes: [],
 		    images: null,

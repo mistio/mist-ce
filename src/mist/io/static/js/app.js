@@ -1,3 +1,5 @@
+location.hash = '#splash';
+
 // Define libraries
 require.config({
 	baseUrl: 'static/js/',
@@ -9,10 +11,13 @@ require.config({
 		text: 'lib/require/text',
 		mocha: 'lib/mocha',
 		chai: 'lib/chai',
-        jqueryUi: "lib/jquery-ui-1.8.22.custom.min",
+        jqueryUi: "lib/jquery-ui-1.8.23.custom.min",
         cubism: "lib/cubism.v1",
 	},
     shim: {
+        'app' : {
+           deps: ['mobile'],
+        },
         'mobile':{
            deps: [
            'jqueryUi'
@@ -151,16 +156,12 @@ define( 'app', [
 				if ( location.hash.match( /specs/ ) ) {
 					require( [ 'chai', 'mocha' ], this.specsRunner );
 				}
-
-
-				location.hash = '#splash';
-
-
+                
 				setTimeout(function(){
-					if($('.ui-page-active').attr('id') == 'splash'){
-						$.mobile.changePage('#home', {
-							transition: 'fade',
-						});
+				    if($('.ui-page-active').attr('id') == 'splash'){
+    					$.mobile.changePage('#home', {
+    						transition: 'fade',
+    					});
 					}
 				}, 2000);
 
@@ -311,3 +312,5 @@ function error() {
         }
     } catch(err) {}
 }
+;
+define("../app", function(){});

@@ -13,11 +13,21 @@
     <link rel="stylesheet" href="static/main.css" />
     <link rel="icon" href="static/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
-    <script data-main="static/js/app.js" src="static/js/lib/require/require.js"></script>
+    <script src="static/js/lib/require/require.js"></script>
+    <script>
+    require.config({
+        paths: {
+            //Comment out this line to go back to loading
+            //the non-optimized app.js source file.
+            //"static/js/app": "static/build/mist"
+        }
+    });
+    require(["static/js/app"]);
+    </script>    
 </head>
 
 <body style="background-color: #c2c3c4">
-
+    
 <div data-role="page" id="splash">
     <div class="mist-logo"></div>
 </div>

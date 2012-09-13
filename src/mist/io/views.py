@@ -66,7 +66,8 @@ def list_backends(request):
                          'title'        : backend['title'],
                          'provider'     : backend['provider'],
                          'poll_interval': backend['poll_interval'],
-                         'status'       : 'online',
+                         'enabled'      : backend['enabled'],
+                         'state'        : 'wait',
                          })
         index = index + 1
 

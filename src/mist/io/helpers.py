@@ -210,6 +210,9 @@ def run_command(command, host, ssh_user, private_key):
     except Exception as e:
         log.error('Exception while executing command: %s' % e)
         return Response('Exception while executing command: %s' % e, 503)
+    except SystemExit as e:
+        log.warn('Got SystemExit: %s' % e)
+        return Response('SystemExit: %s' % e, 204)
 
     os.remove(tmp_path)
 
