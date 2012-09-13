@@ -19,9 +19,9 @@ define('app/views/backend_add', ['app/models/backend',
                 var that = this;
                 var payload = {
                         "provider": "3",
-                        "apikey" : 'unwebme',
-                        "title": 'rack',
-                        "apisecret": 'fb68dcedaa4e7f36b5bad4dc7bc28bed'
+                        "apikey" : this.newBackendKey,
+                        "title": 'Rack',
+                        "apisecret": this.newBackendSecret
                 };
                 var index = Mist.backendsController.content.length;
                 $.ajax({
@@ -32,6 +32,7 @@ define('app/views/backend_add', ['app/models/backend',
                     data: JSON.stringify(payload),
                     success: function(result) {
                         Mist.backendsController.pushObject(Backend.create(result));
+                        
                         info('added backend ' + index);
                     }
                 });            
@@ -42,6 +43,10 @@ define('app/views/backend_add', ['app/models/backend',
                 // cannot have template in home.pt as pt complains
                 this.set('template', Ember.Handlebars.compile(add_backend_dialog_html));
             },
+            
+            providerList: function() {
+                return [{'title': 'Rackspace', 'provider': '3'}];
+            }.property('providerList')
         });
     }
 );
