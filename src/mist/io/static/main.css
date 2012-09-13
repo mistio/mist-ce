@@ -301,23 +301,28 @@ div#splash div.mist-logo {
 
 /* Machines states colors. */
 
-#machines-list .running.state {
-    color: #00ab24;
+#machines-list .running.state,
+#single-view-state.running {
+    color: #13B754;
 }
 
-#machines-list .rebooting.state {
+#machines-list .rebooting.state,
+#single-view-state.rebooting {
     color: #4e68bb;
 }
 
-#machines-list .terminated.state {
+#machines-list .terminated.state,
+#single-view-state.terminated {
     color: #aaa;
 }
 
-#machines-list .pending.state {
+#machines-list .pending.state,
+#single-view-state.pending {
     color: #e09400;
 }
 
-#machines-list .stopped.state {
+#machines-list .stopped.state,
+#single-view-state.stopped {
     color: #777;
 }
 
@@ -428,10 +433,6 @@ a#mist-select-machines-button span.ui-btn-text {
     float: left;
     margin: 30px 20px 0 10px;
     text-shadow: none;
-}
-
-#single-view-state.running {
-    color: #13B754;
 }
 
 .single-view-icon-wrapper {
