@@ -156,14 +156,13 @@ define('app/models/machine', ['ember'],
                 var that = this;
 
                 setInterval(function() {
-                    if (that.get('state' != 'stopped') || !that.get('uptimeFromServer') ||
-                        !that.get('uptimeChecked')) {
+                    if (that.get('state' == 'running') && that.get('uptimeFromServer') &&
+                        that.get('uptimeChecked')) {
 
-                        return;
-
-                    } else {
                         that.set('uptime', that.get('uptimeFromServer') + (Date.now()
                                            - that.get('uptimeChecked')));
+                    } else {
+                        return;
                     }
                 }, 1000);
             },
@@ -237,13 +236,12 @@ define('app/models/machine', ['ember'],
             },
 
             resetUptime: function() {
-                if (this.state == 'stopped') {
+                if (this.state == 'running') {
+                    this.startUptimeTimer();
+                    this.checkUptime();
+                } else {
                     this.set('uptime', 0);
                     this.uptimeTimer = false;
-                } else {
-                    if (this.get('uptime') == 0) {
-                        this.checkUptime();
-                    }
                 }
             }.observes('state'),
 
