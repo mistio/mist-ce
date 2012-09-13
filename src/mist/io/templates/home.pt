@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width" />
     <title>${project} - down to earth cloud computing</title>
     <!-- include the Tools -->
-    <link rel="stylesheet" href="static/jquery.mobile-1.1.0.min.css" />
+    <link rel="stylesheet" href="static/jquery.mobile-1.2.0-beta.1.css" />
     <link type="text/css" href="static/ui-lightness/jquery-ui-1.8.22.custom.css" rel="stylesheet" />
     <link rel="stylesheet" href="static/main.css" />
     <link rel="icon" href="static/favicon.ico" />
@@ -19,7 +19,7 @@
         paths: {
             //Comment out this line to go back to loading
             //the non-optimized app.js source file.
-            //"static/js/app": "static/build/mist"
+            "static/js/app": "static/build/mist"
         }
     });
     require(["static/js/app"]);
