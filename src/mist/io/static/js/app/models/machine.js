@@ -169,7 +169,7 @@ define('app/models/machine', ['ember'],
             },
 
             checkUptime: function(){
-                if (this.hasKey) {
+                if (this.state == 'running') {
                     var host;
                     if (this.extra.dns_name) {
                         // it is ec2 machine
@@ -206,6 +206,7 @@ define('app/models/machine', ['ember'],
                             info('Successfully got uptime', data, 'from machine', that.name);
                         },
                         error: function(jqXHR, textstate, errorThrown) {
+                            that.set('hasKey', false);
                             Mist.notificationController.notify('Error getting uptime from machine ' +
                                     that.name);
                             error(textstate, errorThrown, 'when getting uptime from machine',
@@ -236,7 +237,7 @@ define('app/models/machine', ['ember'],
             },
 
             resetUptime: function() {
-                if (this.state != 'stopped') {
+                if (this.state == 'stopped') {
                     this.set('uptime', 0);
                     this.uptimeTimer = false;
                 } else {
