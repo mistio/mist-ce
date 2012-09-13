@@ -302,7 +302,23 @@ div#splash div.mist-logo {
 /* Machines states colors. */
 
 #machines-list .running.state {
-    color: #13B754;
+    color: #00ab24;
+}
+
+#machines-list .rebooting.state {
+    color: #4e68bb;
+}
+
+#machines-list .terminated.state {
+    color: #aaa;
+}
+
+#machines-list .pending.state {
+    color: #e09400;
+}
+
+#machines-list .stopped.state {
+    color: #777;
 }
 
 #machines .ui-select {
