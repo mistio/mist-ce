@@ -156,20 +156,19 @@ define('app/models/machine', ['ember'],
                 var that = this;
 
                 setInterval(function() {
-                    if (that.get('state' != 'stopped') || !that.get('uptimeFromServer') ||
-                        !that.get('uptimeChecked')) {
+                    if (that.get('state') == 'running' && that.get('uptimeFromServer') &&
+                        that.get('uptimeChecked')) {
 
-                        return;
-
-                    } else {
                         that.set('uptime', that.get('uptimeFromServer') + (Date.now()
                                            - that.get('uptimeChecked')));
+                    } else {
+                        return;
                     }
                 }, 1000);
             },
 
             checkUptime: function(){
-                if (this.hasKey) {
+                if (this.state == 'running') {
                     var host;
                     if (this.extra.dns_name) {
                         // it is ec2 machine
@@ -195,6 +194,8 @@ define('app/models/machine', ['ember'],
                                'ssh_user': ssh_user,
                                'command': 'cat /proc/uptime'},
                         success: function(data) {
+                            // also means in has a key
+                            that.set('hasKey', true);
                             var resp = data.split(' ');
                             if (resp.length == 2) {
                                 var uptime = parseFloat(resp[0]) * 1000;
@@ -204,6 +205,8 @@ define('app/models/machine', ['ember'],
                             info('Successfully got uptime', data, 'from machine', that.name);
                         },
                         error: function(jqXHR, textstate, errorThrown) {
+                            that.set('hasKey', false);
+                            error(textstate);
                             Mist.notificationController.notify('Error getting uptime from machine ' +
                                     that.name);
                             error(textstate, errorThrown, 'when getting uptime from machine',
@@ -233,60 +236,13 @@ define('app/models/machine', ['ember'],
                 });
             },
 
-            checkHasKey: function(){
-                var host;
-                if (this.extra.dns_name) {
-                    // it is ec2 machine
-                    host = this.extra.dns_name;
+            resetUptime: function() {
+                if (this.get('state') == 'running') {
+                    this.startUptimeTimer();
+                    this.checkUptime();
                 } else {
-                    // if not ec2 it should have a public ip
-                    host = this.public_ips[0];
-                }
-
-                // In case of ec2, mist.io could have set this. Server can handle empty string.
-                var ssh_user;
-                try {
-                    ssh_user = this.extra.tags.ssh_user;
-                } catch (error) {
-                    ssh_user = 'root';
-                }
-
-                var that = this;
-                $.ajax({
-                    url: '/backends/' + this.backend.index + '/machines/' + this.id + '/shell',
-                    type: 'POST',
-                    data: {'host': host,
-                           'ssh_user': ssh_user,
-                           'command': 'cat /proc/uptime'},
-                    success: function(data) {
-                        that.set('hasKey', true);
-                        // TODO: since we got it let's use it, checkUptime does the same.
-                        var resp = data.split(' ');
-                        if (resp.length == 2) {
-                            var uptime = parseFloat(resp[0]) * 1000;
-                            that.set('uptimeChecked', Date.now());
-                            that.set('uptimeFromServer', uptime);
-                        }
-                        info('We have key for machine', that.name);
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        that.set('hasKey', false);
-                        Mist.notificationController.notify('Error while checking key of machine ' +
-                                that.name);
-                        error(textstate, errorThrown, 'while checking key of machine', that.name);
-                    }
-                });
-            },
-
-            resetUptime: function(){
-                if (this.state != 'stopped') {
                     this.set('uptime', 0);
                     this.uptimeTimer = false;
-                } else {
-                    if (this.get('uptime') == 0) {
-                        // TODO: This is used only here, can we skip checkUptime?
-                        this.checkUptime();
-                    }
                 }
             }.observes('state'),
 
@@ -334,7 +290,7 @@ define('app/models/machine', ['ember'],
                     that.set('image', image);
                 });
                 this.startUptimeTimer();
-                this.checkHasKey();
+                this.checkUptime();
                 this.checkHasMonitoring();
             }
 
