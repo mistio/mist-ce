@@ -4,15 +4,15 @@ location.hash = '#splash';
 require.config({
 	baseUrl: 'static/js/',
 	paths: {
+        mocha: 'lib/mocha-1.4.2',
+        chai: 'lib/chai-1.2.0',
 		jquery: 'lib/jquery-1.8.1',
-        d3: "lib/d3.v2",
-        ember: 'lib/ember-0.9.8.1.min',
+        jqueryUi: 'lib/jquery-ui-1.8.23.custom',
+        text: 'lib/require/text',
+        ember: 'lib/ember-0.9.8.1',
         mobile: 'lib/jquery.mobile-1.2.0-beta.1',
-		text: 'lib/require/text',
-		mocha: 'lib/mocha',
-		chai: 'lib/chai',
-        jqueryUi: "lib/jquery-ui-1.8.23.custom.min",
-        cubism: "lib/cubism.v1",
+        d3: 'lib/d3-2.10.1',
+        cubism: 'lib/cubism-1.2.2'
 	},
     shim: {
         'app' : {
@@ -21,7 +21,7 @@ require.config({
         'mobile':{
            deps: [
            'jqueryUi'
-           ] 
+           ]
         },
         'jqueryUi':{
             deps: ['jquery']
@@ -35,13 +35,13 @@ require.config({
         'app/views/shell' : {
             deps: ['jqueryUi']
         }
-    }	
+    }
 });
 
 // Load our app
 define( 'app', [
 	'jquery',
-    'jqueryUi',	
+    'jqueryUi',
     'd3',
     'app/controllers/backends',
     'app/controllers/confirmation',
@@ -67,7 +67,7 @@ define( 'app', [
     'app/views/machine_tags_dialog',
     'mobile',
     'cubism',
-    'ember',
+    'ember'
 	], function($,
                 jQueryUI,
                 d3,
@@ -156,7 +156,7 @@ define( 'app', [
 				if ( location.hash.match( /specs/ ) ) {
 					require( [ 'chai', 'mocha' ], this.specsRunner );
 				}
-                
+
 				setTimeout(function(){
 				    if($('.ui-page-active').attr('id') == 'splash'){
     					$.mobile.changePage('#home', {
@@ -201,7 +201,7 @@ define( 'app', [
 
 		// Console toggle behavior
 		$(document).ready(function() {
-			$('#shell-return').on('click', '.command', function() 
+			$('#shell-return').on('click', '.command', function()
 			{
 				var out = $(this).next('.output');
 				if (out.is(':visible'))
