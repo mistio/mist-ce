@@ -68,7 +68,6 @@ def get_machine_actions(machine, backend):
     can_destroy = True
     can_reboot = True
     if backend.type in EC2_PROVIDERS:
-        can_start = True
         can_stop = True
 
     # for other states
@@ -82,7 +81,9 @@ def get_machine_actions(machine, backend):
     elif machine.state is NodeState.UNKNOWN and \
          backend.type in EC2_PROVIDERS:
         # We assume uknown state in EC2 mean stopped
+        can_stop = False
         can_start = True
+        can_reboot = False
     elif machine.state in (NodeState.PENDING, NodeState.UNKNOWN):
         can_start = False
         can_destroy = False
