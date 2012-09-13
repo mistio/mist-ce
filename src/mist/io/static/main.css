@@ -289,7 +289,8 @@ div#splash div.mist-logo {
 
 /* Machines tags */
 
-#machines-list .node .tag, #images-list .node .tag {
+#machines-list .node .tag, 
+#images-list .node .tag {
     border: 1px solid #bfbfbf;
     color: #555 !important;
     font-weight: normal !important;
@@ -598,6 +599,19 @@ a#mist-select-machines-button span.ui-btn-text {
 
 #machine-basic-table .value, #machine-metadata .value {
     font-weight: bold;
+}
+
+#machine-basic-table .tag {
+    border: 1px solid #c3c3c4;
+    color: #555 !important;
+    font-weight: normal !important;
+    display: block;
+    float: left;
+    padding: 2px 7px;
+    margin-right: 6px;
+    -webkit-border-radius: 14px;
+    -moz-border-radius: 14px;
+    border-radius: 14px;
 }
 
 /* DIALOGS */

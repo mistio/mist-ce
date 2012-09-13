@@ -44,7 +44,11 @@
             {{#if machine.tags}}
        		<tr>
     		 <td class="key">Tags</td>
-    		 <td class="value">{{machine.tags}}</td>
+    		 <td class="value">
+    		 	{{#each machine.tags}}
+    		 		<span class="tag">{{this}}</span>
+    		 	{{/each}}
+    		 </td>
     		</tr>
         	{{/if}}
 
