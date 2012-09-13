@@ -21,6 +21,7 @@ from mist.io.config import EC2_IMAGES
 from mist.io.config import EC2_PROVIDERS
 from mist.io.config import EC2_KEY_NAME
 from mist.io.config import EC2_SECURITYGROUP
+from mist.io.config import LINODE_DATACENTERS
 
 from mist.io.helpers import connect
 from mist.io.helpers import get_machine_actions
@@ -105,12 +106,19 @@ def list_machines(request):
         tags = [value for key, value in tags.iteritems() \
                 if (key != 'Name' and key != 'ssh_user')]
 
+        if m.extra.get('availability', None):
+            # for EC2
+            tags.append(m.extra['availability'])
+        elif m.extra.get('DATACENTERID', None):
+            # for Linode
+            tags.append(LINODE_DATACENTERS[m.extra['DATACENTERID']])
+
         imageId = m.image or m.extra.get('imageId', None)
 
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
 
-        machine = {'id'           : m.id,
+        machine = {'id'            : m.id,
                    'uuid'          : m.get_uuid(),
                    'name'          : m.name,
                    'imageId'       : imageId,
