@@ -1,5 +1,5 @@
-define('app/views/add_backend', [
-    'text!app/templates/add_backend_dialog.html',
+define('app/views/backend_add', ['app/models/backend', 
+    'text!app/templates/backend_add_dialog.html',
     'ember'],
     /**
      *
@@ -7,7 +7,7 @@ define('app/views/add_backend', [
      *
      * @returns Class
      */
-    function(add_backend_dialog_html) {
+    function(Backend, add_backend_dialog_html) {
         
         return Ember.View.extend({
             attributeBindings:['data-role', 'data-theme'],
@@ -19,18 +19,20 @@ define('app/views/add_backend', [
                 var that = this;
                 var payload = {
                         "provider": "3",
-                        "id" : 'unwebme',
+                        "apikey" : 'unwebme',
                         "title": 'rack',
-                        "secret": 'fb68dcedaa4e7f36b5bad4dc7bc28bed'
+                        "apisecret": 'fb68dcedaa4e7f36b5bad4dc7bc28bed'
                 };
+                var index = Mist.backendsController.content.length;
                 $.ajax({
-                    url: '/backends/' + Mist.backendsController.content.length,
+                    url: '/backends/' + index,
                     type: "PUT",
                     contentType: "application/json",
                     dataType: "json",
                     data: JSON.stringify(payload),
                     success: function(result) {
-                        alert('yay!');
+                        Mist.backendsController.pushObject(Backend.create(result));
+                        info('added backend ' + index);
                     }
                 });            
             },
