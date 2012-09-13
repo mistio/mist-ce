@@ -443,7 +443,13 @@ a#mist-select-machines-button span.ui-btn-text {
  libcloud.compute.types.Provider (we will use numbers, match in the Python) */
 
 /* EC2 */
-#single-view-provider-icon.provider-1  {
+#single-view-provider-icon.provider-1,
+#single-view-provider-icon.provider-2,
+#single-view-provider-icon.provider-10,
+#single-view-provider-icon.provider-22,
+#single-view-provider-icon.provider-26,
+#single-view-provider-icon.provider-36,
+#single-view-provider-icon.provider-39 {
     background-image: url(images/p1_sm.png);
 }
 
@@ -453,7 +459,10 @@ a#mist-select-machines-button span.ui-btn-text {
 }
 
 /* RackSpace */
-#single-view-provider-icon.provider-3 {
+#single-view-provider-icon.provider-3,
+#single-view-provider-icon.provider-23,
+#single-view-provider-icon.provider-40,
+#single-view-provider-icon.provider-41 {
     background-image: url(images/p3_sm.png);
 }
 
