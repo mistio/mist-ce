@@ -104,8 +104,7 @@ def list_machines(request):
     for m in machines:
         tags = m.extra.get('tags', None) or m.extra.get('metadata', None)
         tags = tags or {}
-        tags = [value for key, value in tags.iteritems() \
-                if (key != 'Name' and key != 'ssh_user')]
+        tags = [value for key, value in tags.iteritems() if key != 'Name']
 
         if m.extra.get('availability', None):
             # for EC2
