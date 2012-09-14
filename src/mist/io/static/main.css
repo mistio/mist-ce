@@ -185,6 +185,11 @@ div#splash div.mist-logo {
     margin-bottom: 0px !important;
 }
 
+#machines-list .ui-checkbox label {
+
+    margin: 0 !important;
+}
+
 #machines-list .ui-checkbox input {
     display: none;
 }
@@ -578,16 +583,24 @@ a#mist-select-machines-button span.ui-btn-text {
     border-collapse:collapse;
     width: 100%;
     margin-top: 10px;
+    background: #fff;
 }
 
 #monitoring-rules-table tr, #machine-basic-table tr, #machine-metadata tr {
     border: 1px solid #ccc;
 }
 
+.monitoring-rules-title {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 12px;
+    display: block;
+    margin: 0;
+}
+
 #monitoring-rules-table td, #machine-basic-table td, #machine-metadata td {
     font-size: 14px;
     padding: 10px 12px;
-    background: #fff;
     margin: 0;
     border: none;
 }
@@ -602,6 +615,10 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 30%;
 }
 
+#machine-basic-table .value, #machine-metadata .value {
+    font-weight: bold;
+}
+
 #monitoring-rules-table input {
     border: 1px solid #ddd;
     max-width: 48px;
@@ -612,10 +629,6 @@ a#mist-select-machines-button span.ui-btn-text {
     -moz-border-radius: 3px;
     border-radius: 3px;
 } 
-
-#machine-basic-table .value, #machine-metadata .value {
-    font-weight: bold;
-}
 
 #machine-basic-table .tag {
     border: 1px solid #c3c3c4;

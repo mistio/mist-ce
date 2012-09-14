@@ -27,13 +27,12 @@
 	<div data-role="content">
 
         
+		{{view Mist.Checkbox checkedBinding="machine.hasMonitoring" title="Monitoring" id="enableMonitoring"}}
 
-		<div data-role="collapsible" data-collapsed="false">
-			<h3>Monitoring</h3>		
-			{{view Mist.Checkbox checkedBinding="machine.hasMonitoring" title="Monitoring" id="enableMonitoring"}}
-			
-			{{#if machine.hasMonitoring}}
+		{{#if machine.hasMonitoring}}	
+			<div id="monitoring-wrapper" class="ui-btn-inner ui-corner-top ui-corner-bottom">
 				<div id="machineGraph"></div>
+				<h4 class="monitoring-rules-title">Monitoring Rules</h4>
 				<table id="monitoring-rules-table">
 		       		<tr>
 		    		 <td class="key">Load Average (15 min)</td>
@@ -81,8 +80,8 @@
 		    		 </td>
 		    		</tr>
 	    		</table>
-            {{/if}}
-		</div>
+	    	</div>
+        {{/if}}
 
 		<div data-role="collapsible" data-collapsed="false">
 			<h3>Basic Info</h3>
