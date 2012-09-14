@@ -231,7 +231,7 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
             conn.ex_create_tags(machine, {'ssh_user': username})
             env.user = username
             try:
-                cmd_output = run(request.params.get('command', None))
+                cmd_output = run(command)
             except Exception as e:
                 return Response('Exception while executing command: %s' % e, 503)
     except Exception as e:
