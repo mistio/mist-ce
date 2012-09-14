@@ -1,32 +1,51 @@
 <div data-role="page" id="images" data-theme="c">
 
     <div data-role="header">
+
         <a href="#home" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
+        
         <h1>Images</h1>
+        
         <a href="#dialog-providers"
-        data-rel="dialog" data-role="button" data-iconpos="notext" data-transition="slidedown" data-icon="check"
-        {{bindAttr class="Mist.backendsController.state :state-providers "}} >Providers</a>
+        data-rel="dialog"
+        data-role="button"
+        data-iconpos="notext"
+        data-transition="slidedown"
+        data-icon="check"
+        {{bindAttr class="Mist.backendsController.state :state-providers"}}>Providers</a>
+
     </div>
 
     <div data-role="content">
-        {{view Mist.Select data-native-menu="false" name="select-images" id="mist-select-images"
+
+        {{view Mist.Select
+            data-native-menu="false"
+            name="select-images"
+            id="mist-select-images"
             contentBinding="Mist.selectImagesController.content"
             selectionBinding="Mist.selectImagesController.selection"
             optionLabelPath="content.name"
             optionValuePath="content.id"
             prompt="Show Images"
         }}
-        <ul id="images-list" data-role="listview" data-filter="true" data-inset="true" data-theme="c" data-filter-placeholder="Filter images..">
-        {{#each Mist.backendsController}}
-        {{#each this.images}}
-            {{#unless hidden}}
-                {{view Mist.ImageListView imageBinding="this"}}
-            {{/unless}}
-        {{/each}}
-        {{/each}}
+
+        <ul id="images-list"
+        data-role="listview"
+        data-filter="true"
+        data-inset="true"
+        data-theme="c" 
+        data-filter-placeholder="Filter images...">
+            {{#each Mist.backendsController}}
+                {{#each this.images}}
+                    {{#unless hidden}}
+                        {{view Mist.ImageListView imageBinding="this"}}
+                    {{/unless}}
+                {{/each}}
+            {{/each}}
         </ul>
         
         <div class="bottom-padding"></div>
+
     </div>
 
 </div>
