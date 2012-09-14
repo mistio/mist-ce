@@ -8,6 +8,7 @@ from pyramid.response import Response
 from libcloud.compute.types import Provider
 from libcloud.compute.types import NodeState
 from libcloud.compute.providers import get_driver
+from libcloud.compute.base import Node
 
 from fabric.api import env
 from fabric.api import run
@@ -159,7 +160,36 @@ def create_security_group(conn, info):
         return False
 
 
-def run_command(command, host, ssh_user, private_key):
+def run_command(conn, machine_id, host, ssh_user, private_key, command):
+    """Runs a command over Fabric.
+
+    Fabric does not support passing the private key as a string, but only as a
+    file. To solve this, a temporary file with the private key is created and
+    its path is returned.
+
+    In ec2 we always favor the provided dns_name and set the user name to the
+    default ec2-user. IP or dns_name come from the js machine model.
+
+    A few useful parameters for fabric configuration that are not currently
+    used::
+
+        * env.connection_attempts, defaults to 1
+        * env.timeout - e.g. 20 in secs defaults to 10
+        * env.always_use_pty = False to avoid running commands like htop.
+          However this might cause problems. Check fabric's docs.
+
+    .. warning::
+
+        EC2 machines have default usernames other than root. However when
+        attempting to connect with root@... it doesn't return an error but a
+        message (e.g. Please login as the ec2-user rather than the user
+        root). This misleads fabric to believe that everything went fine. To
+        deal with this we check if the returned output contains a fragment
+        of this message.
+
+    TODO: grab unix errors
+    TODO: don't let commands like vi, etc to go through or timeout
+    """
     if not host:
         log.error('Host not provided, exiting.')
         return Response('Host not set', 503)
@@ -168,11 +198,16 @@ def run_command(command, host, ssh_user, private_key):
         log.warn('No command was passed, returning empty.')
         return ''
 
+    (tmp_key, tmp_path) = tempfile.mkstemp()
+    key_fd = os.fdopen(tmp_key, 'w+b')
+    key_fd.write(private_key)
+    key_fd.close()
+
+    env.key_filename = [tmp_path]
     if ssh_user:
         env.user = ssh_user
     else:
         env.user = 'root'
-
     env.abort_on_prompts = True
     env.no_keys = True
     env.no_agent = True
@@ -180,21 +215,13 @@ def run_command(command, host, ssh_user, private_key):
     env.warn_only = True
     env.combine_stderr = True
 
-    (tmp_key, tmp_path) = tempfile.mkstemp()
-    key_fd = os.fdopen(tmp_key, 'w+b')
-    key_fd.write(private_key)
-    key_fd.close()
-
-    env.key_filename = [tmp_path]
-
     try:
         cmd_output = run(command)
-        if 'Please login as the user' in cmd_output:
-            # TODO: supposes the answer from EC2 will be always like:
-            #  Please login as the user "ec2-user" rather than the user "root"
-            username = cmd_output.split()[5].strip('"')
-            conn = connect(request)
-            machine_id = request.matchdict['machine']
+        if 'Please login as the' in cmd_output:
+            # for EC2 Amazon Linux machines, usually with ec2-user
+            username = cmd_output.split()[4].strip('"')
+            if 'Please login as the user ' in cmd_output:
+                username = cmd_output.split()[5].strip('"')
             machine = Node(machine_id,
                            name=machine_id,
                            state=0,

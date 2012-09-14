@@ -391,7 +391,6 @@ def delete_machine_metadata(request):
     EC2:
         ex_create_tags, ex_delete_tags, ex_describe_tags
         Delete the requested metadata only
-
     """
     try:
         conn = connect(request)
@@ -426,48 +425,22 @@ def delete_machine_metadata(request):
 @view_config(route_name='machine_shell', request_method='POST',
              renderer='json')
 def shell_command(request):
-    """Send a shell command to a machine over ssh, using fabric.
-
-    Fabric does not support passing the private key as a string, but only as a
-    file. To solve this, a temporary file with the private key is created and
-    its path is returned.
-
-    In ec2 we always favor the provided dns_name and set the user name to the
-    default ec2-user. IP or dns_name come from the js machine model.
-
-    A few useful parameters for fabric configuration that are not currently
-    used::
-
-        * env.connection_attempts, defaults to 1
-        * env.timeout - e.g. 20 in secs defaults to 10
-        * env.always_use_pty = False to avoid running commands like htop.
-          However this might cause problems. Check fabric's docs.
-
-    .. warning::
-
-        EC2 machines have default usernames other than root. However when
-        attempting to connect with root@... it doesn't return an error but a
-        message (e.g. Please login as the user "ec2-user" rather than the user
-        "root"). This misleads fabric to believe that everything went fine. To
-        deal with this we check if the returned output contains a fragment
-        of this message.
-
-    TODO: grab unix errors
-    TODO: don't let commands like vi, etc to go through or timeout
-    """
-    backend_index = int(request.matchdict['backend'])
-
+    """Send a shell command to a machine over ssh, using fabric."""
+    conn = connect(request)
+    machine_id = request.matchdict['machine']
     host = request.params.get('host', None)
     ssh_user = request.params.get('ssh_user', None)
     command = request.params.get('command', None)
 
+    backend_index = int(request.matchdict['backend'])
     try:
-        private_key = request['beaker.session']['backends'][backend_index]['private_key']
+        private_key = request['beaker.session']['backends'][backend_index]\
+                             ['private_key']
     except KeyError:
         private_key = request.registry.settings['keypairs'][0][1]
 
-    return run_command(command, host, ssh_user, private_key)
-
+    return run_command(conn, machine_id, host, ssh_user, private_key,
+                      command)
 
 
 @view_config(route_name='images', request_method='GET', renderer='json')
