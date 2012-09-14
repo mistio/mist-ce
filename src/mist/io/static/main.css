@@ -574,17 +574,17 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 26ex;
 }
 
-#machine-basic-table, #machine-metadata {
+#monitoring-rules-table, #machine-basic-table, #machine-metadata {
     border-collapse:collapse;
     width: 100%;
     margin-top: 10px;
 }
 
-#machine-basic-table tr, #machine-metadata tr {
+#monitoring-rules-table tr, #machine-basic-table tr, #machine-metadata tr {
     border: 1px solid #ccc;
 }
 
-#machine-basic-table td, #machine-metadata td {
+#monitoring-rules-table td, #machine-basic-table td, #machine-metadata td {
     font-size: 14px;
     padding: 10px 12px;
     background: #fff;
@@ -596,6 +596,22 @@ a#mist-select-machines-button span.ui-btn-text {
     font-weight: 300;
     width: 40%;
 }
+
+#monitoring-rules-table .key {
+    font-weight: 300;
+    width: 30%;
+}
+
+#monitoring-rules-table input {
+    border: 1px solid #ddd;
+    max-width: 48px;
+    text-align: right;
+    padding: 2px 5px;
+    margin-left: 0.5em;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+} 
 
 #machine-basic-table .value, #machine-metadata .value {
     font-weight: bold;

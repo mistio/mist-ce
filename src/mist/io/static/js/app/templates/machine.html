@@ -34,6 +34,53 @@
 			
 			{{#if machine.hasMonitoring}}
 				<div id="machineGraph"></div>
+				<table id="monitoring-rules-table">
+		       		<tr>
+		    		 <td class="key">Load Average (15 min)</td>
+		    		 <td class="value">
+		    		 	If greater than 
+		    		 	<input type="text" value="15" class="rule-input">% 
+		    		 	<input type="text" value="15" class="rule-input"> 
+		    		 	time(s) within 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	cycle(s) then alert, else if succeeded 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	time(s) within 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	cycle(s) then alert.
+		    		 </td>
+		    		</tr>
+		    		<tr>
+		    		 <td class="key">Load Average (5 min)</td>
+		    		 <td class="value">
+		    		 	If greater than 
+		    		 	<input type="text" value="15" class="rule-input">% 
+		    		 	<input type="text" value="15" class="rule-input"> 
+		    		 	time(s) within 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	cycle(s) then alert, else if succeeded 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	time(s) within 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	cycle(s) then alert.
+		    		 </td>
+		    		</tr>
+		    		<tr>
+		    		 <td class="key">Load Average (1 min)</td>
+		    		 <td class="value">
+		    		 	If greater than 
+		    		 	<input type="text" value="15" class="rule-input">% 
+		    		 	<input type="text" value="15" class="rule-input"> 
+		    		 	time(s) within 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	cycle(s) then alert, else if succeeded 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	time(s) within 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	cycle(s) then alert.
+		    		 </td>
+		    		</tr>
+	    		</table>
             {{/if}}
 		</div>
 
