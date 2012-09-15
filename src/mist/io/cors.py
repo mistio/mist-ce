@@ -2,7 +2,7 @@ class CORSMiddleware(object):
     """ Middleware that allows Cross-origin resource sharing
     """
 
-    def __init__(self, app = None, origin='https://mist.io'):
+    def __init__(self, app=None, origin='https://mist.io'):
         self.app = app
         self.origin = origin
         self.routes_mapper = app.routes_mapper
@@ -12,4 +12,4 @@ class CORSMiddleware(object):
             headers.append(
                     ('Access-Control-Allow-Origin', self.origin))
             return start_response(status, headers, exc_info)
-        return app(environ, new_start_response)
+        return self.app(environ, new_start_response)
