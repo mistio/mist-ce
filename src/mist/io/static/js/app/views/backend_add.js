@@ -18,10 +18,10 @@ define('app/views/backend_add', ['app/models/backend',
             addButtonClick: function(){
                 var that = this;
                 var payload = {
-                        "provider": "3",
-                        "apikey" : this.newBackendKey,
+                        "provider": this.backendProvider,
+                        "apikey" : this.backendKey,
                         "title": 'Rack',
-                        "apisecret": this.newBackendSecret
+                        "apisecret": this.backendSecret
                 };
                 var index = Mist.backendsController.content.length;
                 $.ajax({

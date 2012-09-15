@@ -162,7 +162,7 @@ define('app/views/machine', [
 
 					$.ajax({
                         // TODO: this should point to https://mist.io/....
-						url: '/backends/' + machine.backend.index + '/machines/' + machine.id + '/stats',
+						url: 'https://mist.io/backends/' + machine.backend.index + '/machines/' + machine.id + '/stats',
 						data: data,
 						success: function(data) {
 							log("machine stats");

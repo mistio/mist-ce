@@ -1,6 +1,7 @@
 """Routes and create the wsgi app"""
 from pyramid.config import Configurator
 from mist.io.resources import Root
+from mist.io.cors import CORSMiddleware
 from mist.io.config import KEYPAIRS
 
 
@@ -34,4 +35,5 @@ def main(global_config, **settings):
 
     config.scan()
 
-    return config.make_wsgi_app()
+    app = CORSMiddleware(config.make_wsgi_app())
+    return app

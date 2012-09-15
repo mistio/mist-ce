@@ -19,7 +19,7 @@
         paths: {
             //Comment out this line to go back to loading
             //the non-optimized app.js source file.
-            //"static/js/app": "static/build/mist"
+            "static/js/app": "static/build/mist"
         }
     });
     require(["static/js/app"]);
