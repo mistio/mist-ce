@@ -49,7 +49,7 @@ div#splash div.mist-logo {
 #machines #mist-select-machines-button {
     outline: none;
     position: relative;
-    top: 1px;
+    top: 10px;
     left: -3px;
 }
 
@@ -73,7 +73,7 @@ div#splash div.mist-logo {
     width: 120px;
 
     float: right;
-    top: -44px;
+    top: -46px;
     right: -6px;
 }
 
@@ -185,6 +185,11 @@ div#splash div.mist-logo {
     margin-bottom: 0px !important;
 }
 
+#machines-list .ui-checkbox label {
+
+    margin: 0 !important;
+}
+
 #machines-list .ui-checkbox input {
     display: none;
 }
@@ -289,7 +294,8 @@ div#splash div.mist-logo {
 
 /* Machines tags */
 
-#machines-list .node .tag, #images-list .node .tag {
+#machines-list .node .tag, 
+#images-list .node .tag {
     border: 1px solid #bfbfbf;
     color: #555 !important;
     font-weight: normal !important;
@@ -301,8 +307,29 @@ div#splash div.mist-logo {
 
 /* Machines states colors. */
 
-#machines-list .running.state {
+#machines-list .running.state,
+#single-view-state.running {
     color: #13B754;
+}
+
+#machines-list .rebooting.state,
+#single-view-state.rebooting {
+    color: #4e68bb;
+}
+
+#machines-list .terminated.state,
+#single-view-state.terminated {
+    color: #aaa;
+}
+
+#machines-list .pending.state,
+#single-view-state.pending {
+    color: #e09400;
+}
+
+#machines-list .stopped.state,
+#single-view-state.stopped {
+    color: #777;
 }
 
 #machines .ui-select {
@@ -333,6 +360,8 @@ a#mist-select-machines-button span.ui-btn-text {
     position: absolute;
     top: 50%;
     margin-top: -7px;
+    max-width: 160px;
+    overflow: hidden;
 }
 
 .caption-wrapper {
@@ -412,10 +441,6 @@ a#mist-select-machines-button span.ui-btn-text {
     text-shadow: none;
 }
 
-#single-view-state.running {
-    color: #13B754;
-}
-
 .single-view-icon-wrapper {
     float: right;
     padding: 16px 20px;
@@ -441,12 +466,26 @@ a#mist-select-machines-button span.ui-btn-text {
  libcloud.compute.types.Provider (we will use numbers, match in the Python) */
 
 /* EC2 */
-#single-view-provider-icon.provider-1  {
+#single-view-provider-icon.provider-1,
+#single-view-provider-icon.provider-2,
+#single-view-provider-icon.provider-10,
+#single-view-provider-icon.provider-22,
+#single-view-provider-icon.provider-26,
+#single-view-provider-icon.provider-36,
+#single-view-provider-icon.provider-39 {
     background-image: url(images/p1_sm.png);
 }
 
+/* Linode */
+#single-view-provider-icon.provider-7  {
+    background-image: url(images/p7_sm.png);
+}
+
 /* RackSpace */
-#single-view-provider-icon.provider-3 {
+#single-view-provider-icon.provider-3,
+#single-view-provider-icon.provider-23,
+#single-view-provider-icon.provider-40,
+#single-view-provider-icon.provider-41 {
     background-image: url(images/p3_sm.png);
 }
 
@@ -540,20 +579,28 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 26ex;
 }
 
-#machine-basic-table, #machine-metadata {
+#monitoring-rules-table, #machine-basic-table, #machine-metadata {
     border-collapse:collapse;
     width: 100%;
     margin-top: 10px;
+    background: #fff;
 }
 
-#machine-basic-table tr, #machine-metadata tr {
+#monitoring-rules-table tr, #machine-basic-table tr, #machine-metadata tr {
     border: 1px solid #ccc;
 }
 
-#machine-basic-table td, #machine-metadata td {
+.monitoring-rules-title {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 12px;
+    display: block;
+    margin: 0;
+}
+
+#monitoring-rules-table td, #machine-basic-table td, #machine-metadata td {
     font-size: 14px;
     padding: 10px 12px;
-    background: #fff;
     margin: 0;
     border: none;
 }
@@ -563,8 +610,37 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 40%;
 }
 
+#monitoring-rules-table .key {
+    font-weight: 300;
+    width: 30%;
+}
+
 #machine-basic-table .value, #machine-metadata .value {
     font-weight: bold;
+}
+
+#monitoring-rules-table input {
+    border: 1px solid #ddd;
+    max-width: 48px;
+    text-align: right;
+    padding: 2px 5px;
+    margin-left: 0.5em;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+} 
+
+#machine-basic-table .tag {
+    border: 1px solid #c3c3c4;
+    color: #555 !important;
+    font-weight: normal !important;
+    display: block;
+    float: left;
+    padding: 2px 7px;
+    margin-right: 6px;
+    -webkit-border-radius: 14px;
+    -moz-border-radius: 14px;
+    border-radius: 14px;
 }
 
 /* DIALOGS */
@@ -763,8 +839,7 @@ div.cost {
 
 #dialog-shell  #shell-return {
     width: 100%;
-    overflow-x: hidden;
-    overflow-y: scroll;
+    overflow: hidden;
     border: 1px solid #AAA;
     height: 60ex;
     font-family: monospace;
@@ -780,12 +855,35 @@ div.cost {
     min-width: 80ex;
 }
 
-#dialog-shell #shell-return div.command {
-    background: #cceedd;
+#dialog-shell #shell-return div.command-output.contracted .command,
+#dialog-shell #shell-return .command {
+    background: #efeff1 url("images/arrow-down.png") right center no-repeat;
+    cursor: pointer;
+    padding: 6px;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+}
+
+#dialog-shell #shell-return div.command-output.expanded .command,
+#dialog-shell #shell-return .command-output:nth-of-type(1) .command {
+    background: #efeff1 url("images/arrow-up.png") right center no-repeat;
 }
 
 #dialog-shell #shell-return div.output {
-    background: #ccddee;
+    background: #444;
+    color: #efeff1;
+    padding: 6px;
+    text-shadow: none;
+}
+
+#dialog-shell #shell-return .command-output div.output {
+    display: none;
+}
+
+#dialog-shell #shell-return .command-output:nth-of-type(1) div.output {
+    display: block;
+    max-height: 160px;
+    overflow: auto;
 }
 
 .ui-autocomplete {
@@ -809,6 +907,8 @@ div.cost {
         top: 22px;
         width: 100px;
         line-height: 12px;
+        max-height: 45px;
+        overflow: hidden;
     }
 
     #machines-list .description .tag {
@@ -817,6 +917,10 @@ div.cost {
 
     .caption-wrapper {
         left: 200px;
+    }
+
+    .ui-li-heading {
+        max-width: 120px;
     }
 
     /* Create machine button */
@@ -878,7 +982,7 @@ div.cost {
     }
 
     #machines-list .description {
-        right: 10px;
+        right: 28px;
     }
 
     #machines-list .bubble-container {

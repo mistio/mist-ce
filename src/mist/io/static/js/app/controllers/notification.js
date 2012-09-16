@@ -1,25 +1,27 @@
 define('app/controllers/notification', ['ember'],
-	/**
-	 * Notification controller
-	 *
-	 * @returns Class
-	 */
-	function() {
-		return Ember.Object.extend({
-			
-			timeout: false,
+    /**
+     * Notification controller
+     *
+     * @returns Class
+     */
+    function() {
+        return Ember.Object.extend({
 
-			notify: function(message){
-				if(this.timeout){
-					clearTimeout(this.timeout);
-				}
-				console.log("notification: " + message);
-				jQuery.mobile.showPageLoadingMsg(
-						jQuery.mobile.pageLoadErrorMessageTheme,
-						message, true);
-				this.timeout = setTimeout(jQuery.mobile.hidePageLoadingMsg, 1500);
-			}
-			
-		});
-	}
+            timeout: false,
+
+            notify: function(message){
+                if(this.timeout){
+                    clearTimeout(this.timeout);
+                }
+                log("notification: " + message);
+                $.mobile.loading( 'show', {
+                            text: message,
+                            textVisible: true,
+                            textonly: true,
+                            theme: $.mobile.pageLoadErrorMessageTheme
+                });
+                this.timeout = setTimeout("$.mobile.loading( 'hide' )", 1500);
+            }
+        });
+    }
 );

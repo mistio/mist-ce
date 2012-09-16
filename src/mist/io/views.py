@@ -21,6 +21,7 @@ from mist.io.config import EC2_IMAGES
 from mist.io.config import EC2_PROVIDERS
 from mist.io.config import EC2_KEY_NAME
 from mist.io.config import EC2_SECURITYGROUP
+from mist.io.config import LINODE_DATACENTERS
 
 from mist.io.helpers import connect
 from mist.io.helpers import get_machine_actions
@@ -65,7 +66,8 @@ def list_backends(request):
                          'title'        : backend['title'],
                          'provider'     : backend['provider'],
                          'poll_interval': backend['poll_interval'],
-                         'status'       : 'online',
+                         'enabled'      : backend['enabled'],
+                         'state'        : 'wait',
                          })
         index = index + 1
 
@@ -102,11 +104,21 @@ def list_machines(request):
     for m in machines:
         tags = m.extra.get('tags', None) or m.extra.get('metadata', None)
         tags = tags or {}
+        tags = [value for key, value in tags.iteritems() if key != 'Name']
+
+        if m.extra.get('availability', None):
+            # for EC2
+            tags.append(m.extra['availability'])
+        elif m.extra.get('DATACENTERID', None):
+            # for Linode
+            tags.append(LINODE_DATACENTERS[m.extra['DATACENTERID']])
+
         imageId = m.image or m.extra.get('imageId', None)
+
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
-        tags = [value for key, value in tags.iteritems() if key != "Name"]
-        machine = {'id'           : m.id,
+
+        machine = {'id'            : m.id,
                    'uuid'          : m.get_uuid(),
                    'name'          : m.name,
                    'imageId'       : imageId,
@@ -155,14 +167,15 @@ def create_machine(request):
         location_id = request.json_body['location']
         image_id = request.json_body['image']
         size_id = request.json_body['size']
-        # required only for Linode
+        # these are required only for Linode, passing them anyway
+        image_extra = request.json_body['image_extra']
         disk = request.json_body['disk']
     except Exception as e:
         return Response('Invalid payload', 400)
 
     size = NodeSize(size_id, name='', ram='', disk=disk, bandwidth='',
                     price='', driver=conn)
-    image = NodeImage(image_id, name='', driver=conn)
+    image = NodeImage(image_id, name='', extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name='', country='', driver=conn)
 
     has_key = len(request.registry.settings['keypairs'])
@@ -342,7 +355,6 @@ def set_machine_metadata(request):
     except:
         return Response('Backend not found', 404)
 
-    backend = request.matchdict['backend']
     machine = request.matchdict['machine']
 
     try:
@@ -351,7 +363,7 @@ def set_machine_metadata(request):
     except:
         return Response('Not proper format for metadata', 404)
 
-    if backend in EC2_PROVIDERS:
+    if conn.type in EC2_PROVIDERS:
         try:
             metadata = conn.ex_create_tags(machine, metadata)
         except:
@@ -379,14 +391,12 @@ def delete_machine_metadata(request):
     EC2:
         ex_create_tags, ex_delete_tags, ex_describe_tags
         Delete the requested metadata only
-
     """
     try:
         conn = connect(request)
     except:
         return Response('Backend not found', 404)
 
-    backend = request.matchdict['backend']
     machine = request.matchdict['machine']
 
     try:
@@ -395,7 +405,7 @@ def delete_machine_metadata(request):
     except:
         return Response('Not proper format for metadata', 404)
 
-    if backend in EC2_PROVIDERS:
+    if conn.type in EC2_PROVIDERS:
         try:
             metadata = conn.ex_delete_tags(machine, metadata)
         except:
@@ -415,48 +425,22 @@ def delete_machine_metadata(request):
 @view_config(route_name='machine_shell', request_method='POST',
              renderer='json')
 def shell_command(request):
-    """Send a shell command to a machine over ssh, using fabric.
-
-    Fabric does not support passing the private key as a string, but only as a
-    file. To solve this, a temporary file with the private key is created and
-    its path is returned.
-
-    In ec2 we always favor the provided dns_name and set the user name to the
-    default ec2-user. IP or dns_name come from the js machine model.
-
-    A few useful parameters for fabric configuration that are not currently
-    used::
-
-        * env.connection_attempts, defaults to 1
-        * env.timeout - e.g. 20 in secs defaults to 10
-        * env.always_use_pty = False to avoid running commands like htop.
-          However this might cause problems. Check fabric's docs.
-
-    .. warning::
-
-        EC2 machines have default usernames other than root. However when
-        attempting to connect with root@... it doesn't return an error but a
-        message (e.g. Please login as the user "ec2-user" rather than the user
-        "root"). This misleads fabric to believe that everything went fine. To
-        deal with this we check if the returned output contains a fragment
-        of this message.
-
-    TODO: grab unix errors
-    TODO: don't let commands like vi, etc to go through or timeout
-    """
-    backend_index = int(request.matchdict['backend'])
-
+    """Send a shell command to a machine over ssh, using fabric."""
+    conn = connect(request)
+    machine_id = request.matchdict['machine']
     host = request.params.get('host', None)
     ssh_user = request.params.get('ssh_user', None)
     command = request.params.get('command', None)
 
+    backend_index = int(request.matchdict['backend'])
     try:
-        private_key = request['beaker.session']['backends'][backend_index]['private_key']
+        private_key = request['beaker.session']['backends'][backend_index]\
+                             ['private_key']
     except KeyError:
         private_key = request.registry.settings['keypairs'][0][1]
-        
-    return run_command(command, host, ssh_user, private_key)
 
+    return run_command(conn, machine_id, host, ssh_user, private_key,
+                      command)
 
 
 @view_config(route_name='images', request_method='GET', renderer='json')
@@ -468,13 +452,7 @@ def list_images(request):
         return Response('Backend not found', 404)
 
     try:
-        try:
-            backend_list = request.environ['beaker.session']['backends']
-        except:
-            backend_list = BACKENDS
-        backend_index = int(request.matchdict['backend'])
-        backend = backend_list[backend_index]
-        if backend['provider'] == Provider.EC2:
+        if conn.type in EC2_PROVIDERS:
             images = conn.list_images(None, EC2_IMAGES.keys())
         else:
             images = conn.list_images()
@@ -554,10 +532,11 @@ def list_locations(request):
 
     Locations mean different things in each backend. e.g. EC2 uses it as a
     datacenter in a given availability zone, whereas Linode lists availability
-    zones, in EC2 lingo. However all responses share id, name and country
-    eventhough in some cases might be empty, e.g. Openstack.
+    zones. However all responses share id, name and country eventhough in some
+    cases might be empty, e.g. Openstack.
 
-    TODO: Handle the different meaning of a location in every backend.
+    In EC2 all locations by a provider have the same name, so the availability
+    zones are listed instead of name.
     """
     try:
         conn = connect(request)
@@ -571,8 +550,13 @@ def list_locations(request):
 
     ret = []
     for location in locations:
+        if conn.type in EC2_PROVIDERS:
+            name = location.availability_zone.name
+        else:
+            name = location.name
+
         ret.append({'id'        : location.id,
-                    'name'      : location.name,
+                    'name'      : name,
                     'country'   : location.country,
                     })
 

@@ -110,6 +110,16 @@ RACKSPACE_IMAGES = {
  '119': 'Ubuntu 11.10'
 }
 
+# Linode datacenter ids/names mapping
+LINODE_DATACENTERS = {
+    2: 'Dallas, TX, USA',
+    3: 'Fremont, CA, USA',
+    4: 'Atlanta, GA, USA',
+    6: 'Newark, NJ, USA',
+    7: 'London, UK',
+    8: 'Tokyo, JP'
+}
+
 
 KEYPAIRS = [
     ("""ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA7qHnqOLy9hWcP5W+iADJmkIK9n5veATDf1hU2TEHyr5/gRP2Ykto7Am7iHJdtf0ym+Y5q5fzzOdQS9AJ8mTPouHM8dXWhIkZxfrK4Ylawr/P3jBXA6Aq2EbxYmFFTPQ5PAAEwWb9ihCt+nt1EuVbEAYgSy27KYaXJPd+mv4gmcmw24CG0RIRPjl4t90ccf2i3FRP2Qn0SKwr3RafV7yH7xNjrT0Z49G32SBuQqhBHPUsFvxGeoHn4LeuXs0RsPY04isQ6OxbCZw8oQp3vU7hUvJxLaIUIbL4L1jVDZ0l4Dm8ba1BOF+VXI9ZVSEpEWVwx1TXyt0hqnknCz2nZjwVeQ== dimo@dimos-MacBook-Pro.local""",

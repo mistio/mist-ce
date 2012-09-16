@@ -30,13 +30,11 @@ define('app/controllers/machines', [
 
 				$.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
 					data.forEach(function(item){
-
 						var found = false;
 
-						console.log("item id: " + item.id);
+						log("item id: " + item.id);
 
 						that.content.forEach(function(machine){
-
 							if(machine.id == item.id){
 								found = true;
 								machine.set(item); //FIXME this does not change anything;
@@ -58,16 +56,13 @@ define('app/controllers/machines', [
 							that.content.push(machine);
 							that.contentDidChange(that.content.length - 1, 0, 1);
 						}
-
-
 					});
 
 					that.content.forEach(function(item){
-
 						var found = false;
 
 						data.forEach(function(machine){
-							console.log("machine id: " + machine.id);
+							log("machine id: " + machine.id);
 
 							if(machine.id == item.id){
 								found = true;
@@ -76,7 +71,7 @@ define('app/controllers/machines', [
 						});
 
 						if(!found){
-							console.log("not found, deleting");
+							log("not found, deleting");
 							that.contentWillChange();
 							that.removeObject(item);
 							that.contentDidChange();
@@ -93,23 +88,26 @@ define('app/controllers/machines', [
 				}).error(function(e) {
 					Mist.notificationController.notify("Error loading machines for backend: " + that.backend.title);
 					that.backend.set('state', 'offline');
-					console.log("Error loading machines for backend: " + that.backend.title);
-					console.log(e.state + " " + e.stateText);
+					log("Error loading machines for backend: " + that.backend.title);
+					log(e.state + " " + e.stateText);
 				});
 
 			},
 
-			newMachine: function(name, image, size) {
-                console.log('Creating machine', this.name, 'to backend', this.backend.title);
+			newMachine: function(name, image, size, location) {
+                log('Creating machine', this.name, 'to backend', this.backend.title);
 
+                // TODO: find a way to pass ember objects to JSON, so the
+                // following will seem less messy. It will also be helpful for tags.
+                // http://stackoverflow.com/questions/8669340/ember-model-to-json
 				var payload = {
 	                    'name': name,
-                        // TODO: this should get a location and not the backend id
-	                    'location' : this.backend.id,
 	                    'image': image.id,
 	                    'size': size.id,
-                        // this is needed for Linode only
-                        'disk': size.disk
+                        // these are only usefull for Linode
+                        'image_extra': image.extra,
+                        'disk': size.disk,
+                        'location': location.id
 	            };
 
                 var that = this;
@@ -120,13 +118,13 @@ define('app/controllers/machines', [
                     data: JSON.stringify(payload),
                     dataType: 'json',
                     success: function(data) {
-                        console.info('Successfully sent create machine', name, 'to backend',
+                        info('Successfully sent create machine', name, 'to backend',
                                     that.backend.title);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while sending create machine' +
                                 name + ' to backend ' + that.backend.title);
-                        console.error(textstate, errorThrown, 'while checking key of machine', that.name);
+                        error(textstate, errorThrown, 'while checking key of machine', that.name);
                     }
                 });
 			}

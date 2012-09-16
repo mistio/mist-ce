@@ -25,8 +25,8 @@ define('app/views/machine_list_item', [
 			    					that.get('parentView').$().find("ul").listview();
 			    				}
 				    		} catch(e) {
-				    			console.error('could not create listview');
-				    			console.error(e);
+				    			error('could not create listview');
+				    			error(e);
 				    		}	
 			    		}
 			        });
@@ -34,7 +34,7 @@ define('app/views/machine_list_item', [
 			    
 			    checkBoxClick: function(event, el){
 			    	
-			    	console.log('machine clicked');
+			    	log('machine clicked');
 			    	
 			    	if(event.target.tagName != 'A'){
 			        	event.stopPropagation();
@@ -65,7 +65,7 @@ define('app/views/machine_list_item', [
 			    },
 			    
 			    machineSelected: function(){
-			    	console.log('selected changed');
+			    	log('selected changed');
 
 			    	var that = this;
 			    	
@@ -73,14 +73,16 @@ define('app/views/machine_list_item', [
 			    		try { 
 			    			that.get('parentView').$().find("input[type='checkbox']").checkboxradio('refresh');
 			    		} catch (e) {
-			    			that.get('parentView').$().find("input[type='checkbox']").checkboxradio();
+			    		    if (that.get('parentView') != null) {
+			    			  that.get('parentView').$().find("input[type='checkbox']").checkboxradio();
+			    		    } 
 			    		}
 			    		
 		        		var len = $('#machines-list input:checked').length; //FIXME use data instead of DOM
 		        	    if (len > 1) {
 		        	        $('#machines-footer').fadeIn(140);
 		        	        $('#machines #footer-console').addClass('ui-disabled');
-		        	    } else if (len > 0) {
+		        	    } else if (len == 1) {
 		        	        $('#machines-footer').fadeIn(140);
 		        	        $('#machines #footer-console').removeClass('ui-disabled');
 		        	    } else {

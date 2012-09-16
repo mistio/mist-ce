@@ -21,28 +21,83 @@
 		<span class="single-view-icon-wrapper" {{bindAttr class="machine.image.type"}}>
             <span id="single-view-image-icon" ></span>
         </span>
-		<h3 id="single-view-state" {{bindAttr class="machine.stateString"}}>{{machine.stateString}}</h3>
+		<h3 id="single-view-state" {{bindAttr class="machine.state"}}>{{machine.state}}</h3>
 	</div>
 
 	<div data-role="content">
 
-        {{#if machine.tags}}
-        	<div class="tags">Tags: {{machine.tags}}</div>
-        {{/if}}
+        
+		{{view Mist.Checkbox checkedBinding="machine.hasMonitoring" title="Monitoring" id="enableMonitoring"}}
 
-		<div data-role="collapsible" data-collapsed="false">
-			<h3>Monitoring</h3>		
-			{{view Mist.Checkbox checkedBinding="machine.hasMonitoring" title="Monitoring" id="enableMonitoring"}}
-			
-			{{#if machine.hasMonitoring}}
+		{{#if machine.hasMonitoring}}	
+			<div id="monitoring-wrapper" class="ui-btn-inner ui-corner-top ui-corner-bottom">
 				<div id="machineGraph"></div>
-            {{/if}}
-		</div>
+				<h4 class="monitoring-rules-title">Monitoring Rules</h4>
+				<table id="monitoring-rules-table">
+		       		<tr>
+		    		 <td class="key">Load Average (15 min)</td>
+		    		 <td class="value">
+		    		 	If greater than 
+		    		 	<input type="text" value="15" class="rule-input">% 
+		    		 	<input type="text" value="15" class="rule-input"> 
+		    		 	time(s) within 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	cycle(s) then alert, else if succeeded 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	time(s) within 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	cycle(s) then alert.
+		    		 </td>
+		    		</tr>
+		    		<tr>
+		    		 <td class="key">Load Average (5 min)</td>
+		    		 <td class="value">
+		    		 	If greater than 
+		    		 	<input type="text" value="15" class="rule-input">% 
+		    		 	<input type="text" value="15" class="rule-input"> 
+		    		 	time(s) within 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	cycle(s) then alert, else if succeeded 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	time(s) within 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	cycle(s) then alert.
+		    		 </td>
+		    		</tr>
+		    		<tr>
+		    		 <td class="key">Load Average (1 min)</td>
+		    		 <td class="value">
+		    		 	If greater than 
+		    		 	<input type="text" value="15" class="rule-input">% 
+		    		 	<input type="text" value="15" class="rule-input"> 
+		    		 	time(s) within 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	cycle(s) then alert, else if succeeded 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	time(s) within 
+		    		 	<input type="text" value="1" class="rule-input"> 
+		    		 	cycle(s) then alert.
+		    		 </td>
+		    		</tr>
+	    		</table>
+	    	</div>
+        {{/if}}
 
 		<div data-role="collapsible" data-collapsed="false">
 			<h3>Basic Info</h3>
 			<table id="machine-basic-table">
            
+            {{#if machine.tags}}
+       		<tr>
+    		 <td class="key">Tags</td>
+    		 <td class="value">
+    		 	{{#each machine.tags}}
+    		 		<span class="tag">{{this}}</span>
+    		 	{{/each}}
+    		 </td>
+    		</tr>
+        	{{/if}}
+
             {{#if machine.uptime}}
             <tr>
              <td class="key">Up and running for</td>

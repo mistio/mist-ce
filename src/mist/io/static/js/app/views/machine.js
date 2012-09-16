@@ -26,7 +26,7 @@ define('app/views/machine', [
 				var ret = new Array();
 
 				$.each(this.machine.extra, function(key, value){
-					if (typeof(value) == 'string'){
+					if (typeof(value) == 'string' || typeof(value) == 'number'){
 						ret.push({key:key, value: value});
 					}
 				});
@@ -54,18 +54,17 @@ define('app/views/machine', [
 					privateIps = this.machine.private_ips;
 				}
 
-				var imageName = null;
-				if('image' in this.machine && 'name' in this.machine.image){
-					imageName = this.machine.image.name;
-				}
-
-				var basicvars = {
-						'Public IPs': publicIps,
-						'Private IPs': privateIps,
-						'Image': imageName,
-						'DNS Name': this.machine.extra.dns_name,
-						'Launch Date': this.machine.extra.launchdatetime
-				};
+                var basicvars = {
+                        'Public IPs': publicIps,
+                        'Private IPs': privateIps,
+                        'DNS Name': this.machine.extra.dns_name,
+                        'Launch Date': this.machine.extra.launchdatetime
+                };
+                
+				if(this.machine.image && 'image' in this.machine && 
+				        'name' in this.machine.image){
+                    basicvars['Image'] = this.machine.image.name;
+				} 
 
 				var ret = new Array();
 
@@ -163,17 +162,17 @@ define('app/views/machine', [
 
 					$.ajax({
                         // TODO: this should point to https://mist.io/....
-						url: '/backends/' + machine.backend.index + '/machines/' + machine.id + '/stats',
+						url: 'https://mist.io/backends/' + machine.backend.index + '/machines/' + machine.id + '/stats',
 						data: data,
 						success: function(data) {
-							console.log("machine stats");
-							console.log(data);
+							log("machine stats");
+							log(data);
 							stats = data;
 							setTimeout(poll, 5000);
 						}
 					}).error(function(jqXHR, textStatus, errorThrown) {
-						console.log('error querying for machine stats for machine id: ' + machine.id);
-						console.log(textStatus + " " + errorThrown);
+						log('error querying for machine stats for machine id: ' + machine.id);
+						log(textStatus + " " + errorThrown);
 						setTimeout(poll, 5000);
 					});
 				}

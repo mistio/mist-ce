@@ -1,23 +1,48 @@
+location.hash = '#splash';
+
 // Define libraries
 require.config({
 	baseUrl: 'static/js/',
 	paths: {
-		jquery: 'lib/jquery-1.7.2.min',
-        d3: "lib/d3.v2",
-        ember: 'lib/ember-0.9.8.1.min',
-        mobile: 'lib/jquery.mobile-1.1.0.min',
-		text: 'lib/require/text',
-		mocha: 'lib/mocha',
-		chai: 'lib/chai',
-        jqueryUi: "lib/jquery-ui-1.8.22.custom.min",
-        cubism: "lib/cubism.v1",
-	}
+        mocha: 'lib/mocha-1.4.2',
+        chai: 'lib/chai-1.2.0',
+		jquery: 'lib/jquery-1.8.1',
+        jqueryUi: 'lib/jquery-ui-1.8.23.custom',
+        text: 'lib/require/text',
+        ember: 'lib/ember-0.9.8.1',
+        mobile: 'lib/jquery.mobile-1.2.0-beta.1',
+        d3: 'lib/d3-2.10.1',
+        cubism: 'lib/cubism-1.2.2'
+	},
+    shim: {
+        'app' : {
+           deps: ['mobile'],
+        },
+        'mobile':{
+           deps: [
+           'jqueryUi'
+           ]
+        },
+        'jqueryUi':{
+            deps: ['jquery']
+        },
+        'cubism':{
+            deps: ['d3','mobile']
+        },
+        'app/controllers/notification' : {
+            deps: ['mobile']
+        },
+        'app/views/shell' : {
+            deps: ['jqueryUi']
+        }
+    }
 });
 
 // Load our app
 define( 'app', [
 	'jquery',
-    'd3',	
+    'jqueryUi',
+    'd3',
     'app/controllers/backends',
     'app/controllers/confirmation',
     'app/controllers/notification',
@@ -26,8 +51,8 @@ define( 'app', [
     'app/controllers/select_images',
     'app/views/count',
     'app/views/backend_button',
-    'app/views/add_backend',
-    'app/views/edit_backend',
+    'app/views/backend_add',
+    'app/views/backend_edit',
     'app/views/machine_list_item',
     'app/views/image_list_item',
     'app/views/enable_backend_button',
@@ -41,10 +66,10 @@ define( 'app', [
     'app/views/image_list',
     'app/views/machine_tags_dialog',
     'mobile',
-    'jqueryUi',
     'cubism',
-    'ember',
+    'ember'
 	], function($,
+                jQueryUI,
                 d3,
                 BackendsController,
                 ConfirmationController,
@@ -69,17 +94,9 @@ define( 'app', [
                 ImageListView,
                 MachineTagsDialog,
                 Mobile,
-                jQueryUI,
-                cubism) {
-        // Preload images plugin
-        $.fn.preload = function() {
-            this.each(function(){
-                $('<img/>')[0].src = this;
-            });
-        }
-        
-        //$(['img1.jpg','img2.jpg','img3.jpg']).preload();
-                    
+                cubism
+                ) {
+
 		var App = Ember.Application.create({
 
 			VERSION: '0.3-ember',
@@ -140,15 +157,11 @@ define( 'app', [
 					require( [ 'chai', 'mocha' ], this.specsRunner );
 				}
 
-
-				location.hash = '#splash';
-
-
 				setTimeout(function(){
-					if($('.ui-page-active').attr('id') == 'splash'){
-						$.mobile.changePage('#home', {
-							transition: 'fade',
-						});
+				    if($('.ui-page-active').attr('id') == 'splash'){
+    					$.mobile.changePage('#home', {
+    						transition: 'fade',
+    					});
 					}
 				}, 2000);
 
@@ -161,29 +174,47 @@ define( 'app', [
 		$(document).on( 'pagebeforeshow', '#machines', function(){
 		    $('#machines-list').listview('refresh');
 		});
-		
+
 		$(document).on( 'pagebeforeshow', '#dialog-power', function(){
 			$("#dialog-power a").button();
 		});
-		
+
 		$(document).on( 'pagebeforeshow', '#dialog-single-power', function(){
 			$("#dialog-single-power a").button();
 		});
-		
+
 		$(document).on( 'pagebeforeshow', '#images', function(){
 			$("#images-list").listview('refresh');
 		});
-		
+
 		$(document).on( 'pagebeforeshow', '#single-machine', function(){
 			Mist.graphPolling = true;
 		});
-		
+
 		$(document).on( 'pageshow', '#single-machine', function(){
 			$('input[type=checkbox]').checkboxradio("refresh");
 		});
-		
+
 		$(document).on( 'pagebeforehide', '#single-machine', function(){
 			Mist.graphPolling = false;
+		});
+
+		// Console toggle behavior
+		$(document).ready(function() {
+			$('#shell-return').on('click', '.command', function()
+			{
+				var out = $(this).next('.output');
+				if (out.is(':visible'))
+				{
+					out.slideUp(300);
+					$(this).parent().addClass('contracted').removeClass('expanded');
+				}
+				else
+				{
+					out.slideDown(200);
+					$(this).parent().removeClass('contracted').addClass('expanded');
+				}
+			});
 		});
 
 		App.Select = Ember.Select.extend({
@@ -194,7 +225,7 @@ define( 'app', [
 		App.TextField = Ember.TextField.extend({
 		    attributeBindings: ['name', "data-theme"]
 		});
-		
+
 		App.ShellTextField = Ember.TextField.extend({
 		    attributeBindings: ['name', "data-theme", "autocapitalize"],
 
@@ -238,7 +269,7 @@ define( 'app', [
 		var machineTagsDialog = MachineTagsDialog.create();
 		machineTagsDialog.append();
 
-		
+
 		$(document).on( 'pagebeforeshow', '#dialog-add', function(){
 		    $('#dialog-add').trigger('create');
 		});
@@ -247,3 +278,39 @@ define( 'app', [
 		return window.Mist = App;
 	}
 );
+
+var LOGLEVEL = 3;
+
+function log() {
+    try {
+        if (LOGLEVEL > 3) {
+            return console.log.apply(this, arguments);
+        }
+    } catch(err) {}
+}
+
+function info() {
+    try {
+        if (LOGLEVEL > 2) {
+            return console.info.apply(this, arguments);
+        }
+    } catch(err) {}
+}
+
+function warn() {
+    try {
+        if (LOGLEVEL > 1) {
+            return console.warn.apply(this, arguments);
+        }
+    } catch(err) {}
+}
+
+function error() {
+    try {
+        if (LOGLEVEL > 0) {
+            return console.error.apply(this, arguments);
+        }
+    } catch(err) {}
+}
+;
+define("../app", function(){});

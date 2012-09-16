@@ -41,7 +41,7 @@ function(shell_html) {
 				Mist.backendsController.forEach(function(backend) {
 					backend.machines.forEach(function(m) {
 						if (m.selected && m.hasKey) {
-							console.log('machine selected');
+							log('machine selected');
 							machine = m;
 						}
 					});
@@ -65,8 +65,9 @@ function(shell_html) {
 				that.shellOutputItems.arrayContentWillChange(0, 0, 1);
 				
 				that.shellOutputItems.content.unshift({
-					command: "$" + command,
-					output: output.replace(/\n/g, '<br />')
+					command: "# " + command,
+					output: output.replace(/\n/g, '<br />'),
+					cmdIndex: "cmd-" + that.shellOutputItems.content.length
 				});
 				that.shellOutputItems.arrayContentDidChange(0, 0, 1);
 			});

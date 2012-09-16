@@ -12,7 +12,7 @@ define('app/views/machine_tags_dialog', [
 	
 		addTag: function(){
 			var tag = this.tag;
-			console.log("tag to add: " + tag);
+			log("tag to add: " + tag);
 		},
 			
                     deleteTag: function() {
