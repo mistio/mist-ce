@@ -1,4 +1,4 @@
-define('app/views/shell', [ 'text!app/templates/shell.html', 'ember' ],
+define('app/views/shell', [ 'text!app/templates/shell.html', 'ember', 'jqueryUi' ],
 /**
  * 
  * Shell dialog

@@ -1,4 +1,4 @@
-define('app/controllers/notification', ['ember'],
+define('app/controllers/notification', ['ember','mobile'],
     /**
      * Notification controller
      *

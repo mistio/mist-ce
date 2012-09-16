@@ -13,17 +13,9 @@
     <link rel="stylesheet" href="static/main.css" />
     <link rel="icon" href="static/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
-    <script src="static/js/lib/require/require.js"></script>
-    <script>
-    require.config({
-        paths: {
-            //Comment out this line to go back to loading
-            //the non-optimized app.js source file.
-            //"static/js/app": "static/build/mist"
-        }
-    });
-    require(["static/js/app"]);
-    </script>    
+    <script src="static/js/lib/require/require.js" data-main="static/js/app"></script>    
+    <!--script src="static/js/lib/require/require.js" data-main="static/build/mist"></script-->
+   
 </head>
 
 <body style="background-color: #c2c3c4">

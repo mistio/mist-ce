@@ -28,12 +28,6 @@ require.config({
         },
         'cubism':{
             deps: ['d3','mobile']
-        },
-        'app/controllers/notification' : {
-            deps: ['mobile']
-        },
-        'app/views/shell' : {
-            deps: ['jqueryUi']
         }
     }
 });
@@ -312,5 +306,4 @@ function error() {
         }
     } catch(err) {}
 }
-;
-define("../app", function(){});
+
