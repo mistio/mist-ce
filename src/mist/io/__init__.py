@@ -35,5 +35,6 @@ def main(global_config, **settings):
 
     config.scan()
 
-    app = CORSMiddleware(config.make_wsgi_app())
+    #app = CORSMiddleware(config.make_wsgi_app())
+    app = config.make_wsgi_app()
     return app
