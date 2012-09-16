@@ -45,48 +45,60 @@ define('app/views/machine_add_dialog', [
                 Ember.run.next(function(){
                     Mist.machineAddController.addObserver('newMachineBackend', function() {
                         Ember.run.next(function() {
-                            try {
-                                $('#create-select-provider').selectmenu('refresh');
-                                $('#create-select-image').selectmenu('refresh');
-                                $('#create-select-size').selectmenu('refresh');
-                                $('#create-select-location').selectmenu('refresh');
-                            } catch (e) {
-
-                            }
+                            //try {
+                                $('#createmachine-select-provider').selectmenu('refresh');
+                            //} catch (e) {
+                            //	console.error(e);
+                            //}
+                            //try{
+                                $('#createmachine-select-image').selectmenu('refresh');
+                            //} catch (e) {
+                            //	console.error(e);
+                            //}
+                            //try {
+                                $('#createmachine-select-size').selectmenu('refresh');
+                            //} catch (e) {
+                            //	console.error(e);
+                            //}
+                            //try {
+                                $('#createmachine-select-location').selectmenu('refresh');
+                            //} catch (e) {
+                            //	console.error(e);
+                            //}
                         });
                     });
 
                     Mist.machineAddController.addObserver('newMachineReady', function(sender, machineReady, value, rev) {
                         Ember.run.next(function() {
-                            try {
+                            //try {
                                 if (value) {
                                     $('#create-ok').button('enable');
                                 } else {
                                     $('#create-ok').button('disable');
                                 }
-                            } catch (e) {
+                            //} catch (e) {
 
-                            }
+                            //}
                         });
                     });
 
                     Mist.machineAddController.addObserver('newMachineNameReady', function(sender, machineReady, value, rev) {
                         Ember.run.next(function(){
-                            try {
+                            //try {
                                 if (value) {
-                                    $('#create-select-provider').selectmenu('enable');
-                                    $('#create-select-image').selectmenu('disable');
-                                    $('#create-select-size').selectmenu('disable');
-                                    $('#create-select-location').selectmenu('disable');
+                                    $('#createmachine-select-provider').selectmenu('enable');
+                                    $('#createmachine-select-image').selectmenu('disable');
+                                    $('#createmachine-select-size').selectmenu('disable');
+                                    $('#createmachine-select-location').selectmenu('disable');
                                 } else {
-                                    $('#create-select-provider').selectmenu('disable');
-                                    $('#create-select-image').selectmenu('disable');
-                                    $('#create-select-size').selectmenu('disable');
-                                    $('#create-select-location').selectmenu('disable');
+                                    $('#createmachine-select-provider').selectmenu('disable');
+                                    $('#createmachine-select-image').selectmenu('disable');
+                                    $('#createmachine-select-size').selectmenu('disable');
+                                    $('#createmachine-select-location').selectmenu('disable');
                                 }
-                            } catch (e) {
-
-                            }
+                            //} catch (e) {
+                            //	console.error(e);
+                            //}
                         });
                     });
 
@@ -94,13 +106,13 @@ define('app/views/machine_add_dialog', [
                         Ember.run.next(function(){
                             try {
                                 if (value) {
-                                    $('#create-select-image').selectmenu('enable');
-                                    $('#create-select-size').selectmenu('disable');
-                                    $('#create-select-location').selectmenu('disable');
+                                    $('#createmachine-select-image').selectmenu('enable');
+                                    $('#createmachine-select-size').selectmenu('disable');
+                                    $('#createmachine-select-location').selectmenu('disable');
                                 } else {
-                                    $('#create-select-image').selectmenu('disable');
-                                    $('#create-select-size').selectmenu('disable');
-                                    $('#create-select-location').selectmenu('disable');
+                                    $('#createmachine-select-image').selectmenu('disable');
+                                    $('#createmachine-select-size').selectmenu('disable');
+                                    $('#createmachine-select-location').selectmenu('disable');
                                 }
                             } catch (e) {
 
@@ -112,11 +124,11 @@ define('app/views/machine_add_dialog', [
                         Ember.run.next(function(){
                             try {
                                 if (value) {
-                                    $('#create-select-size').selectmenu('enable');
-                                    $('#create-select-location').selectmenu('disable');
+                                    $('#createmachine-select-size').selectmenu('enable');
+                                    $('#createmachine-select-location').selectmenu('disable');
                                 } else {
-                                    $('#create-select-size').selectmenu('disable');
-                                    $('#create-select-location').selectmenu('disable');
+                                    $('#createmachine-select-size').selectmenu('disable');
+                                    $('#createmachine-select-location').selectmenu('disable');
                                 }
                             } catch (e) {
 
@@ -128,9 +140,9 @@ define('app/views/machine_add_dialog', [
                         Ember.run.next(function(){
                             try {
                                 if (value) {
-                                    $('#create-select-location').selectmenu('enable');
+                                    $('#createmachine-select-location').selectmenu('enable');
                                 } else {
-                                    $('#create-select-location').selectmenu('disable');
+                                    $('#createmachine-select-location').selectmenu('disable');
                                 }
                             } catch (e) {
 

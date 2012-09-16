@@ -7,7 +7,7 @@
     {{view Mist.TextField valueBinding="Mist.machineAddController.newMachineName" 
     name="create-machine-name" id="create-machine-name"}}
     
-    <label for="create-select-provider">2. Provider:</label>
+    <label for="createmachine-select-provider">2. Provider:</label>
     
     {{view Mist.Select contentBinding="Mist.backendsController"
                           optionLabelPath="content.title"
@@ -15,12 +15,12 @@
                           prompt="Select Provider"
                           selectionBinding="Mist.machineAddController.newMachineBackend"
                           class="create-select" data-theme="c" data-icon="check"
-                          data-native-menu="false" id="create-select-provider"
-                          name="create-select-provider"
+                          id="createmachine-select-provider"
+                          name="createmachine-select-provider"
                           disabled="disabled"
     }}
     
-    <label for="create-select-image">3. Image:</label> 
+    <label for="createmachine-select-image">3. Image:</label> 
     
     {{view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.images"
                           optionLabelPath="content.name"
@@ -28,12 +28,12 @@
                           prompt="Select Image"
                           selectionBinding="Mist.machineAddController.newMachineImage"
                           class="create-select" data-theme="c" data-icon="check"
-                          data-native-menu="false" id="create-select-image"
-                          name="create-select-image"
+                          id="createmachine-select-image"
+                          name="createmachine-select-image"
                           disabled="disabled"
     }}
     
-    <label for="create-select-size">4. Size:</label>
+    <label for="createmachine-select-size">4. Size:</label>
 
     {{view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.sizes"
                           optionLabelPath="content.name"
@@ -41,12 +41,12 @@
                           prompt="Select Size"
                           selectionBinding="Mist.machineAddController.newMachineSize"
                           class="create-select" data-theme="c" data-icon="check"
-                          data-native-menu="false" id="create-select-size"
-                          name="create-select-size"
+                          id="createmachine-select-size"
+                          name="createmachine-select-size"
                           disabled="disabled"
     }}
 
-    <label for="create-select-location">5. Location:</label>
+    <label for="createmachine-select-location">5. Location:</label>
 
     {{view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.locations"
                           optionLabelPath="content.name"
@@ -54,8 +54,8 @@
                           prompt="Select Location"
                           selectionBinding="Mist.machineAddController.newMachineLocation"
                           class="create-select" data-theme="c" data-icon="check"
-                          data-native-menu="false" id="create-select-location"
-                          name="create-select-location"
+                          id="createmachine-select-location"
+                          name="createmachine-select-location"
                           disabled="disabled"
     }}
 
