@@ -57,9 +57,6 @@ define('app/controllers/machines', [
 							that.contentWillChange(that.content.length - 1, 0, 1);
 							that.content.push(machine);
 							that.contentDidChange(that.content.length - 1, 0, 1);
-							var idx = Mist.backendsController.content.indexOf(that.backend);
-							Mist.backendsController.contentWillChange(idx, 0, 0);
-							Mist.backendsController.contentDidChange(idx, 0, 0);
 						}
 
 
@@ -83,9 +80,6 @@ define('app/controllers/machines', [
 							that.contentWillChange();
 							that.removeObject(item);
 							that.contentDidChange();
-							var idx = Mist.backendsController.content.indexOf(that.backend);
-							Mist.backendsController.contentWillChange(idx, 0, 0);
-							Mist.backendsController.contentDidChange(idx, 0, 0);
 						}
 					});
 
