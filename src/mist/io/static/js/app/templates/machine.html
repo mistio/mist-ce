@@ -26,9 +26,10 @@
 
 	<div data-role="content">
 
-        
-		{{view Mist.Checkbox checkedBinding="machine.hasMonitoring" title="Monitoring" id="enableMonitoring"}}
-
+        <label>
+		{{view Mist.Checkbox checkedBinding="machine.hasMonitoring" id="enableMonitoring"}}
+		Monitoring
+        </label>
 		{{#if machine.hasMonitoring}}	
 			<div id="monitoring-wrapper" class="ui-btn-inner ui-corner-top ui-corner-bottom">
 				<div id="machineGraph"></div>

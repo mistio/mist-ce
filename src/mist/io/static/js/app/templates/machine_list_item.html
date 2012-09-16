@@ -1,6 +1,8 @@
 <li class="node prov-{{unbound machine.backend.provider}}"> 
     <fieldset class="machine-list-item">
-    {{view Mist.Checkbox checkedBinding="machine.selected" title="machine.name"}}
+    <label>
+    {{view Mist.Checkbox checkedBinding="machine.selected"}}
+    </label>
     </fieldset>
     <a href="#single-machine" {{action "checkBoxClick" on="click"}}>
         <h3 class="name">{{machine.name}}</h3> <span class="caption-wrapper">
