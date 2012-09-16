@@ -15,19 +15,17 @@ require.config({
         cubism: 'lib/cubism-1.2.2'
 	},
     shim: {
-        'app' : {
-           deps: ['mobile'],
+        'jqueryUi': {
+            deps: ['jquery']
         },
-        'mobile':{
-           deps: [
-           'jqueryUi'
-           ]
+        'mobile': {
+           deps: ['jquery']
         },
-        'jqueryUi':{
+        'd3': {
             deps: ['jquery']
         },
         'cubism':{
-            deps: ['d3','mobile']
+            deps: ['d3']
         }
     }
 });
@@ -152,7 +150,7 @@ define( 'app', [
 				}
 
 				setTimeout(function(){
-				    if($('.ui-page-active').attr('id') == 'splash'){
+				    if($('.ui-page-active').attr('id') == 'splash') {
     					$.mobile.changePage('#home', {
     						transition: 'fade',
     					});
