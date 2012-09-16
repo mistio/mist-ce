@@ -158,21 +158,21 @@ define('app/views/machine', [
 							data.changes_since = changes_since;
 						}
 
-					changes_since = Date.now();
-
 					$.ajax({
                         // TODO: this should point to https://mist.io/....
 						url: 'https://mist.io/backends/' + machine.backend.index + '/machines/' + machine.id + '/stats',
 						data: data,
+						dataType: 'jsonp',
 						success: function(data) {
-							log("machine stats");
-							log(data);
+							info("machine stats");
+							info(data);
 							stats = data;
+							changes_since=data['timestamp'],
 							setTimeout(poll, 5000);
 						}
 					}).error(function(jqXHR, textStatus, errorThrown) {
-						log('error querying for machine stats for machine id: ' + machine.id);
-						log(textStatus + " " + errorThrown);
+						info('error querying for machine stats for machine id: ' + machine.id);
+						info(textStatus + " " + errorThrown);
 						setTimeout(poll, 5000);
 					});
 				}

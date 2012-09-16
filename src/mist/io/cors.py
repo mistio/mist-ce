@@ -11,5 +11,7 @@ class CORSMiddleware(object):
         def new_start_response(status, headers, exc_info=None):
             headers.append(
                     ('Access-Control-Allow-Origin', self.origin))
+            headers.append(
+                    ('Access-Control-Allow-Headers', 'x-requested-with, x-requested-by'))
             return start_response(status, headers, exc_info)
         return self.app(environ, new_start_response)

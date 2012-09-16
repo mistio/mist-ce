@@ -219,7 +219,8 @@ define('app/models/machine', ['ember'],
             checkHasMonitoring: function(){
                 var that = this;
                 $.ajax({
-                    url: 'backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
+                    url: 'https://mist.io/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
+                    dataType: 'jsonp',
                     success: function(data) {
                         log("machine has monitoring");
                         log(data);
@@ -268,12 +269,11 @@ define('app/models/machine', ['ember'],
                 };
 
                 $.ajax({
-                    // TODO: this should point to https://mist.io/....
-                    url: 'backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
+                    url: 'https://mist.io/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
-                    dataType: 'json',
+                    dataType: 'jsonp',
                     success: function(data) {
 
                     },
