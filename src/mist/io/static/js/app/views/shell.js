@@ -86,7 +86,7 @@ function(shell_html) {
 				}
 			}
 			this.availableCommands.push(command);
-			this.$("input[type=text]").autocomplete("destroy");
+			this.$("input[type=text]").autocomplete("close");
 			this.$("input[type=text]").autocomplete({
 				source : this.availableCommands
 			});
