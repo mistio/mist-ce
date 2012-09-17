@@ -116,29 +116,24 @@ EC2_IMAGES = {
         'ami-3a22ad0a': 'Microsoft Windows 2008 R2 SP1 with SQL Server for Cluster Instances 64bit',
         'ami-cada54fa': 'Ubuntu Server 12.04.1 LTS for Cluster Instances',
     },
-#us-west-1
-   Provider.EC2_US_WEST_1: {
-        'ami-7d4c6938': 'Amazon Linux AMI 2012.03 32bit',
-        'ami-734c6936': 'Amazon Linux AMI 2012.03 64bit',
-        'ami-53f4ae16': 'Red Hat Enterprise Linux 6.3 32bit',
-        'ami-51f4ae14': 'Red Hat Enterprise Linux 6.3 64bit',
-        'ami-37144c72': 'SUSE Linux Enterprise Server 11 SP2 32bit',
-        'ami-c7144c82': 'SUSE Linux Enterprise Server 11 SP2 64bit',
-        'ami-d50c2890': 'Ubuntu Server 12.04.1 LTS 32bit',
-        'ami-d70c2892': 'Ubuntu Server 12.04.1 LTS 64bit',
-        'ami-c9d0f58c': 'Ubuntu Server 11.10 32bit',
-        'ami-cbd0f58e': 'Ubuntu Server 11.10 64bit',
-
-
-        'ami-5d5d7918': 'Microsoft Windows 2008 R1 SP2 Base 32bit',
-        'ami-315d7974': 'Microsoft Windows 2008 R1 SP2 Base 64bit',
-        'ami-635d7926': 'Microsoft Windows 2008 R2 SP1 Base 64bit',
-
-
-        'ami-7d5d7938': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Express and IIS 64bit',
-        'ami-3b5d797e': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Web 64bit',
-        'ami-fb5d79be': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Standard',
-    },
+#   Provider.EC2_US_WEST_1: {
+#        'ami-7d4c6938': 'Amazon Linux AMI 2012.03 32bit',
+#        'ami-734c6936': 'Amazon Linux AMI 2012.03 64bit',
+#        'ami-53f4ae16': 'Red Hat Enterprise Linux 6.3 32bit',
+#        'ami-51f4ae14': 'Red Hat Enterprise Linux 6.3 64bit',
+#        'ami-37144c72': 'SUSE Linux Enterprise Server 11 SP2 32bit',
+#        'ami-c7144c82': 'SUSE Linux Enterprise Server 11 SP2 64bit',
+#        'ami-d50c2890': 'Ubuntu Server 12.04.1 LTS 32bit',
+#        'ami-d70c2892': 'Ubuntu Server 12.04.1 LTS 64bit',
+#        'ami-c9d0f58c': 'Ubuntu Server 11.10 32bit',
+#        'ami-cbd0f58e': 'Ubuntu Server 11.10 64bit',
+#        'ami-5d5d7918': 'Microsoft Windows 2008 R1 SP2 Base 32bit',
+#        'ami-315d7974': 'Microsoft Windows 2008 R1 SP2 Base 64bit',
+#        'ami-635d7926': 'Microsoft Windows 2008 R2 SP1 Base 64bit',
+#        'ami-7d5d7938': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Express and IIS 64bit',
+#        'ami-3b5d797e': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Web 64bit',
+#        'ami-fb5d79be': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Standard',
+#    },
     Provider.EC2_AP_SOUTHEAST: {
         'ami-220b4a70': 'Amazon Linux AMI 2012.03 32bit',
         'ami-3c0b4a6e': 'Amazon Linux AMI 2012.03 64bit',
