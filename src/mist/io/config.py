@@ -64,18 +64,36 @@ EC2_PROVIDERS = (
 
 
 # Base AMIs for us-east AMAZON, using 64bit versions
-EC2_IMAGES = {
-    'ami-aecd60c7': 'Amazon Linux 2012.03',
-    'ami-cc5af9a5': 'RedHat Enterprise Linux 6.3',
-    'ami-ca32efa3': 'SUSE Linux Enterprise Server 11',
-    'ami-82fa58eb': 'Ubuntu Server 12.04 LTS',
-    'ami-d99e37b0': 'Ubuntu Server 11.10',
-    'ami-eccf6285': 'Cluster GPU Amazon Linux AMI 2012.03',
-    'ami-a8cd60c1': 'Cluster Compute Amazon Linux AMI 2012.03',
-    'ami-98fa58f1': 'Ubuntu Server 12.04 LTS for Cluster Instances',
-    'ami-db9e37b2': 'Ubuntu Server 11.10 for Cluster Instances'
-}
+#ec2 == ec2_us_east 
+#ec2_eu == ec2_eu_west
 
+EC2_IMAGES = {
+    Provider.EC2: {
+        'ami-a0cd60c9': 'Amazon Linux AMI 2012.03 32bit',
+        'ami-aecd60c7': 'Amazon Linux AMI 2012.03 64bit',
+        'ami-d258fbbb': 'Red Hat Enterprise Linux 6.3 32bit',
+        'ami-cc5af9a5': 'Red Hat Enterprise Linux 6.3 64bit',
+        'ami-0c32ef65': 'SUSE Linux Enterprise Server 11 SP2 32bit',
+        'ami-ca32efa3': 'SUSE Linux Enterprise Server 11 SP2 64bit',
+        'ami-057bcf6c': 'Ubuntu Server 12.04.1 LTS 32bit',
+        'ami-82fa58eb': 'Ubuntu Server 12.04.1 LTS 64bit',
+        'ami-c19e37a8': 'Ubuntu Server 11.10 32bit',
+        'ami-d99e37b0': 'Ubuntu Server 11.10 64bit',
+        'ami-e9ca7f80': 'Microsoft Windows 2008 R1 SP2 Base 32bit',
+        'ami-71b50018': 'Microsoft Windows 2008 R1 SP2 Base 64bit',
+        'ami-cbc87da2': 'Microsoft Windows 2008 R2 SP1 Base 64bit',
+        'ami-4fcb7e26': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Express and IIS',
+        'ami-b5c87ddc': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Web',
+        'ami-83c87dea': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Standard',
+        'ami-c02df0a9': 'Cluster Instances HVM SUSE Linux Enterprise 11 SP2',
+        'ami-eccf6285': 'Cluster GPU Amazon Linux AMI 2012.03',
+        'ami-a8cd60c1': 'Cluster Compute Amazon Linux AMI 2012.03',
+        'ami-91c97cf8': 'Microsoft Windows 2008 R2 SP1 for Cluster Instances',
+        'ami-a3c87dca': 'Microsoft Windows 2008 R2 SP1 with SQL Server for Cluster Instances',
+        'ami-98fa58f1': 'Ubuntu Server 12.04.1 LTS for Cluster Instances',
+        'ami-db9e37b2': 'Ubuntu Server 11.10 for Cluster Instances'
+    },
+}
 
 EC2_KEY_NAME = 'mistio'
 
