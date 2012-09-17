@@ -131,10 +131,9 @@
 	<!-- /content -->
 
 	<div id="single-footer" data-role="footer" data-theme="a">
-		<table id="actions" data-role="controlgroup" data-type="horizontal">
-			<tr>
-            <td>
+		<div id="actions" data-role="controlgroup" data-type="horizontal">
             <a href="#dialog-shell"
+                class="action-links"
                 id="machines-button-shell"
                 data-role="button"
                 data-icon="gear"
@@ -143,8 +142,8 @@
                 {{bindAttr class="disabledClass"}}>
                 Shell
             </a>
-            </td>
-            <td><a href="#dialog-tags"
+            <a href="#dialog-tags"
+                class="action-links"
                 id="machines-button-tags"
                 data-role="button"
                 data-icon="grid"
@@ -152,8 +151,8 @@
                 data-transition="slidedown">
                 Tag
             </a>
-            </td>
-            <td><a href="#dialog-single-power"
+            <a href="#dialog-single-power"
+                class="action-links"
                 id="machines-button-power"
                 data-role="button"
                 data-icon="mist-power"
@@ -161,8 +160,6 @@
                 data-transition="slidedown">
                 Power
             </a>
-            </td>
-            </tr>
 		</table>
 	</div>
 	<!-- /footer -->

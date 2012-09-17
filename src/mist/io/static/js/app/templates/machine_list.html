@@ -61,36 +61,31 @@
 
     <div id="machines-footer" data-role="footer" data-theme="a">
 
-        <table id="actions" data-role="controlgroup" data-type="horizontal">
-            <tr>
-                <td>
-                    <a href="#dialog-shell"
-                    id="machines-button-shell"
-                    data-role="button"
-                    data-icon="gear"
-                    data-rel="dialog"
-                    data-transition="slidedown"
-                    {{bindAttr class="disabledClass"}}>Shell</a>
-                </td>
-                <td>
-                    <a href="#dialog-tags"
-                    id="machines-button-tags"
-                    data-role="button"
-                    data-icon="grid"
-                    data-rel="dialog"
-                    data-transition="slidedown">Tag</a>
-                </td>
-                <td>
-                    <a href="#dialog-power"
-                    id="machines-button-power"
-                    data-role="button"
-                    data-icon="mist-power"
-                    data-rel="dialog"
-                    data-transition="slidedown">Power</a>
-                </td>
-            </tr>
-        </table>
+        <div id="actions" data-role="controlgroup" data-type="horizontal">
+            <a href="#dialog-shell"
+            class="action-links"
+            id="machines-button-shell"
+            data-role="button"
+            data-icon="gear"
+            data-rel="dialog"
+            data-transition="slidedown"
+            {{bindAttr class="disabledClass"}}>Shell</a>
 
-    </div><!-- /footer -->
+            <a href="#dialog-tags"
+            class="action-links"
+            id="machines-button-tags"
+            data-role="button"
+            data-icon="grid"
+            data-rel="dialog"
+            data-transition="slidedown">Tag</a>
+
+            <a href="#dialog-power"
+            class="action-links"
+            id="machines-button-power"
+            data-role="button"
+            data-icon="mist-power"
+            data-rel="dialog"
+            data-transition="slidedown">Power</a>
+        </div>
 
 </div>
