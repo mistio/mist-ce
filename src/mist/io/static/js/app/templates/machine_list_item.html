@@ -1,27 +1,37 @@
 <li class="node prov-{{unbound machine.backend.provider}}"> 
+
     <fieldset class="machine-list-item">
-    <label>
-    {{view Mist.Checkbox checkedBinding="machine.selected"}}
-    </label>
+        <label>
+            {{view Mist.Checkbox checkedBinding="machine.selected"}}
+        </label>
     </fieldset>
+
     <a href="#single-machine" {{action "checkBoxClick" on="click"}}>
-        <h3 class="name">{{machine.name}}</h3> <span class="caption-wrapper">
+
+        <h3 class="name">{{machine.name}}</h3>
+
+        <span class="caption-wrapper">
             <h3 {{bindAttr class="machine.state :state"}}>{{machine.state}}</h3>
             {{#if machine.hasAlert}}
             <span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
             {{/if}}
-    </span>
+        </span>
+
         <p class="description">
             <span class="tag backend ui-btn-corner-all prov-{{unbound backend.provider}}">{{machine.backend.title}}</span>
             {{#each machine.tags}}
-                <span class="tag ui-btn-corner-all">{{this}}</span>
+            <span class="tag ui-btn-corner-all">{{this}}</span>
             {{/each}}
-        </p> 
+        </p>
+
         <span class="bubble-container">
-        {{#if machine.hasKey}}
-             <span class="ui-li-count node-icon key-icon ui-btn-corner-all"></span>
-        {{else}}
-         <span class="ui-li-count node-icon no-key-icon ui-btn-corner-all"></span>
-        {{/if}}
+            {{#if machine.hasKey}}
+            <span class="ui-li-count node-icon key-icon ui-btn-corner-all"></span>
+            {{else}}
+            <span class="ui-li-count node-icon no-key-icon ui-btn-corner-all"></span>
+            {{/if}}
         </span>
-</a></li>
+
+    </a>
+
+</li>

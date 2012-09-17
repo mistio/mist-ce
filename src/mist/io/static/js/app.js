@@ -164,31 +164,31 @@ define( 'app', [
 
 
 
-		$(document).on( 'pagebeforeshow', '#machines', function(){
+		$(document).on( 'pagebeforeshow', '#machines', function() {
 		    $('#machines-list').listview('refresh');
 		});
 
-		$(document).on( 'pagebeforeshow', '#dialog-power', function(){
+		$(document).on( 'pagebeforeshow', '#dialog-power', function() {
 			$("#dialog-power a").button();
 		});
 
-		$(document).on( 'pagebeforeshow', '#dialog-single-power', function(){
+		$(document).on( 'pagebeforeshow', '#dialog-single-power', function() {
 			$("#dialog-single-power a").button();
 		});
 
-		$(document).on( 'pagebeforeshow', '#images', function(){
+		$(document).on( 'pagebeforeshow', '#images', function() {
 			$("#images-list").listview('refresh');
 		});
 
-		$(document).on( 'pagebeforeshow', '#single-machine', function(){
+		$(document).on( 'pagebeforeshow', '#single-machine', function() {
 			Mist.graphPolling = true;
 		});
 
-		$(document).on( 'pageshow', '#single-machine', function(){
+		$(document).on( 'pageshow', '#single-machine', function() {
 			$('input[type=checkbox]').checkboxradio("refresh");
 		});
 
-		$(document).on( 'pagebeforehide', '#single-machine', function(){
+		$(document).on( 'pagebeforehide', '#single-machine', function() {
 			Mist.graphPolling = false;
 		});
 

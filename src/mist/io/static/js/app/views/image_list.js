@@ -9,7 +9,7 @@ define('app/views/image_list', [
 	function(image_list_html) {
 		return Ember.View.extend({
 			tagName: false,
-			
+
 		    init: function() {
 				this._super();
 				this.set('template', Ember.Handlebars.compile(image_list_html));
