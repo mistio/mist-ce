@@ -2,7 +2,10 @@
 
     <div data-role="header">
 
-        <a href="#home" data-icon="home" data-direction="reverse" class="ui-btn-left">Home</a>
+        <a href="#home"
+        data-icon="home"
+        data-direction="reverse"
+        class="ui-btn-left">Home</a>
         
         <h1>Images</h1>
         
@@ -19,6 +22,7 @@
     <div data-role="content">
 
         {{view Mist.Select
+            data-native-menu="false"
             name="select-images"
             id="mist-select-images"
             contentBinding="Mist.selectImagesController.content"
@@ -32,13 +36,11 @@
         data-role="listview"
         data-filter="true"
         data-inset="true"
-        data-theme="c" 
+        data-theme="c"
         data-filter-placeholder="Filter images...">
             {{#each Mist.backendsController}}
                 {{#each this.images}}
-                    {{#unless hidden}}
-                        {{view Mist.ImageListView imageBinding="this"}}
-                    {{/unless}}
+                    {{view Mist.ImageListView imageBinding="this"}}
                 {{/each}}
             {{/each}}
         </ul>

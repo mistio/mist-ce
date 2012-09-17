@@ -17,7 +17,7 @@
         data-icon="check"
         {{bindAttr class="Mist.backendsController.state :state-providers"}}>Providers</a>
 
-    </div><!-- /header -->
+    </div>
 
     <div data-role="content">
 
@@ -46,7 +46,6 @@
         data-filter="true"
         data-inset="true"
         data-theme="c"
-        data-dividertheme="d"
         data-filter-placeholder="Filter machines...">
             {{#each Mist.backendsController}}
                 {{#each this.machines}}
@@ -57,7 +56,7 @@
 
         <div class="bottom-padding"></div>
 
-    </div><!-- /content -->
+    </div>
 
     <div id="machines-footer" data-role="footer" data-theme="a">
 

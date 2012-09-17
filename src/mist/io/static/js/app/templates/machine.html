@@ -1,137 +1,163 @@
 <div data-role="page" id="single-machine" data-theme="c"
-	class="type-interior">
+    class="type-interior">
 
-	<div data-role="header">
-		<a href="#machines" data-icon="arrow-l" data-direction="reverse"
-			class="ui-btn-left">Machines</a>
-		<h1 id="single-machine-name">{{name}}</h1>
-		<a class="state-providers" href="#dialog-providers" data-rel="dialog"
-			data-iconpos="notext" data-transition="slidedown" data-icon="check"
-			class="ui-btn-right"></a>
-	</div>
-	<!-- /header -->
+    <div data-role="header">
 
-	<div id="single-view-header">
-		<h3 id="single-view-name">
-			{{name}}
-        </h3>
-		<span class="single-view-icon-wrapper">
+        <a href="#machines"
+        data-icon="arrow-l"
+        data-direction="reverse"
+        class="ui-btn-left">Machines</a>
+
+        <h1 id="single-machine-name">{{name}}</h1>
+
+        <a href="#dialog-providers"
+        data-rel="dialog"
+        data-role="button"
+        data-iconpos="notext"
+        data-transition="slidedown"
+        data-icon="check"
+        {{bindAttr class="Mist.backendsController.state :state-providers"}}>Providers</a>
+
+    </div>
+
+    <div id="single-view-header">
+
+        <h3 id="single-view-name">{{name}}</h3>
+
+        <span class="single-view-icon-wrapper">
             <span id="single-view-provider-icon" {{bindAttr class="providerIconClass"}}></span>
-		</span>
-		<span class="single-view-icon-wrapper" {{bindAttr class="machine.image.type"}}>
-            <span id="single-view-image-icon" ></span>
         </span>
-		<h3 id="single-view-state" {{bindAttr class="machine.state"}}>{{machine.state}}</h3>
-	</div>
 
-	<div data-role="content">
+        <span class="single-view-icon-wrapper" {{bindAttr class="machine.image.type"}}>
+            <span id="single-view-image-icon"></span>
+        </span>
+
+        <h3 id="single-view-state" {{bindAttr class="machine.state"}}>{{machine.state}}</h3>
+
+    </div>
+
+    <div data-role="content">
 
         <label>
-		{{view Mist.Checkbox checkedBinding="machine.hasMonitoring" id="enableMonitoring"}}
-		Monitoring
+        {{view Mist.Checkbox
+            checkedBinding="machine.hasMonitoring"
+            id="enableMonitoring"
+        }}
+        Monitoring
         </label>
-		{{#if machine.hasMonitoring}}	
-			<div id="monitoring-wrapper" class="ui-btn-inner ui-corner-top ui-corner-bottom">
-				<div id="machineGraph"></div>
-				<h4 class="monitoring-rules-title">Monitoring Rules</h4>
-				<table id="monitoring-rules-table">
-		       		<tr>
-		    		 <td class="key">Load Average (15 min)</td>
-		    		 <td class="value">
-		    		 	If greater than 
-		    		 	<input type="text" value="15" class="rule-input">% 
-		    		 	<input type="text" value="15" class="rule-input"> 
-		    		 	time(s) within 
-		    		 	<input type="text" value="1" class="rule-input"> 
-		    		 	cycle(s) then alert, else if succeeded 
-		    		 	<input type="text" value="1" class="rule-input"> 
-		    		 	time(s) within 
-		    		 	<input type="text" value="1" class="rule-input"> 
-		    		 	cycle(s) then alert.
-		    		 </td>
-		    		</tr>
-		    		<tr>
-		    		 <td class="key">Load Average (5 min)</td>
-		    		 <td class="value">
-		    		 	If greater than 
-		    		 	<input type="text" value="15" class="rule-input">% 
-		    		 	<input type="text" value="15" class="rule-input"> 
-		    		 	time(s) within 
-		    		 	<input type="text" value="1" class="rule-input"> 
-		    		 	cycle(s) then alert, else if succeeded 
-		    		 	<input type="text" value="1" class="rule-input"> 
-		    		 	time(s) within 
-		    		 	<input type="text" value="1" class="rule-input"> 
-		    		 	cycle(s) then alert.
-		    		 </td>
-		    		</tr>
-		    		<tr>
-		    		 <td class="key">Load Average (1 min)</td>
-		    		 <td class="value">
-		    		 	If greater than 
-		    		 	<input type="text" value="15" class="rule-input">% 
-		    		 	<input type="text" value="15" class="rule-input"> 
-		    		 	time(s) within 
-		    		 	<input type="text" value="1" class="rule-input"> 
-		    		 	cycle(s) then alert, else if succeeded 
-		    		 	<input type="text" value="1" class="rule-input"> 
-		    		 	time(s) within 
-		    		 	<input type="text" value="1" class="rule-input"> 
-		    		 	cycle(s) then alert.
-		    		 </td>
-		    		</tr>
-	    		</table>
-	    	</div>
+
+        {{#if machine.hasMonitoring}}   
+        <div id="monitoring-wrapper" class="ui-btn-inner ui-corner-top ui-corner-bottom">
+            <div id="machineGraph"></div>
+            <h4 class="monitoring-rules-title">Monitoring Rules</h4>
+            <table id="monitoring-rules-table">
+                <tr>
+                    <td class="key">Load Average (15 min)</td>
+                    <td class="value">
+                        If greater than 
+                        <input type="text" value="15" class="rule-input">% 
+                        <input type="text" value="15" class="rule-input"> 
+                        time(s) within 
+                        <input type="text" value="1" class="rule-input"> 
+                        cycle(s) then alert, else if succeeded 
+                        <input type="text" value="1" class="rule-input"> 
+                        time(s) within 
+                        <input type="text" value="1" class="rule-input"> 
+                        cycle(s) then alert.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="key">Load Average (5 min)</td>
+                    <td class="value">
+                        If greater than 
+                        <input type="text" value="15" class="rule-input">% 
+                        <input type="text" value="15" class="rule-input"> 
+                        time(s) within 
+                        <input type="text" value="1" class="rule-input"> 
+                        cycle(s) then alert, else if succeeded 
+                        <input type="text" value="1" class="rule-input"> 
+                        time(s) within 
+                        <input type="text" value="1" class="rule-input"> 
+                        cycle(s) then alert.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="key">Load Average (1 min)</td>
+                    <td class="value">
+                        If greater than 
+                        <input type="text" value="15" class="rule-input">% 
+                        <input type="text" value="15" class="rule-input"> 
+                        time(s) within 
+                        <input type="text" value="1" class="rule-input"> 
+                        cycle(s) then alert, else if succeeded 
+                        <input type="text" value="1" class="rule-input"> 
+                        time(s) within 
+                        <input type="text" value="1" class="rule-input"> 
+                        cycle(s) then alert.
+                    </td>
+                </tr>
+            </table>
+        </div>
         {{/if}}
 
-		<div data-role="collapsible" data-collapsed="false">
-			<h3>Basic Info</h3>
-			<table id="machine-basic-table">
+        <div data-role="collapsible" data-collapsed="false">
+
+            <h3>Basic Info</h3>
+
+            <table id="machine-basic-table">
            
-            {{#if machine.tags}}
-       		<tr>
-    		 <td class="key">Tags</td>
-    		 <td class="value">
-    		 	{{#each machine.tags}}
-    		 		<span class="tag">{{this}}</span>
-    		 	{{/each}}
-    		 </td>
-    		</tr>
-        	{{/if}}
+                {{#if machine.tags}}
+                <tr>
+                    <td class="key">Tags</td>
+                    <td class="value">
+                        {{#each machine.tags}}
+                        <span class="tag">{{this}}</span>
+                        {{/each}}
+                    </td>
+                </tr>
+                {{/if}}
 
-            {{#if machine.uptime}}
-            <tr>
-             <td class="key">Up and running for</td>
-             <td class="value">{{upFor}}</td>
-            </tr>
-            {{/if}}
-			
-			{{#each basicvars}}
-			<tr>
-			 <td class="key">{{key}}</td>
-			 <td class="value">{{value}}</td>
-			</tr>
-			{{/each}}
-			</table>
-		</div>
-		
-		<div data-role="collapsible">
-			<h3>Full metadata list</h3>
-			<table id="machine-metadata">
-			{{#each metadata}}
-			<tr>
-			 <td class="key">{{key}}</td>
-			 <td class="value">{{value}}</td>
-			</tr>
-			{{/each}}
-			</table>
-		</div>
-		<div class="bottom-padding"></div>
-	</div>
-	<!-- /content -->
+                {{#if machine.uptime}}
+                <tr>
+                   <td class="key">Up and running for</td>
+                   <td class="value">{{upFor}}</td>
+                </tr>
+                {{/if}}
+                
+                {{#each basicvars}}
+                <tr>
+                   <td class="key">{{key}}</td>
+                   <td class="value">{{value}}</td>
+                </tr>
+                {{/each}}
 
-	<div id="single-footer" data-role="footer" data-theme="a">
-		<div id="actions" data-role="controlgroup" data-type="horizontal">
+            </table>
+
+        </div>
+        
+        <div data-role="collapsible">
+
+            <h3>Full metadata list</h3>
+
+            <table id="machine-metadata">
+                {{#each metadata}}
+                <tr>
+                   <td class="key">{{key}}</td>
+                   <td class="value">{{value}}</td>
+                </tr>
+                {{/each}}
+            </table>
+
+        </div>
+
+        <div class="bottom-padding"></div>
+
+    </div>
+
+    <div id="single-footer" data-role="footer" data-theme="a">
+
+        <div id="actions" data-role="controlgroup" data-type="horizontal">
+
             <a href="#dialog-shell"
                 class="action-links"
                 id="machines-button-shell"
@@ -139,29 +165,24 @@
                 data-icon="gear"
                 data-rel="dialog"
                 data-transition="slidedown"
-                {{bindAttr class="disabledClass"}}>
-                Shell
-            </a>
+                {{bindAttr class="disabledClass"}}>Shell</a>
+
             <a href="#dialog-tags"
                 class="action-links"
                 id="machines-button-tags"
                 data-role="button"
                 data-icon="grid"
                 data-rel="dialog"
-                data-transition="slidedown">
-                Tag
-            </a>
+                data-transition="slidedown">Tag</a>
+
             <a href="#dialog-single-power"
                 class="action-links"
                 id="machines-button-power"
                 data-role="button"
                 data-icon="mist-power"
                 data-rel="dialog"
-                data-transition="slidedown">
-                Power
-            </a>
-		</table>
-	</div>
-	<!-- /footer -->
+                data-transition="slidedown">Power</a>
+        </table>
+    </div>
 
 </div>
