@@ -10,27 +10,37 @@ define('app/views/machine_tags_dialog', [
 		return Ember.View.extend({
 			tagName: false,
 	
-            addTag: function(){
+            submit: function(){
 			    var tag = this.tag;
 			    
 			    var machine = Mist.machine;
+			    machine.tags.addObject(tag);
 			    
 			    log("tag to add: " + tag);
 			    $.ajax({
                     url: 'backends/' + machine.backend.index + '/machines/' + machine.id + '/metadata',
                     type: 'POST',
-                    data: 'metadata='  + tag,
+                    data: tag,
                     success: function(data) {
                         info('Successfully added tag to machine', machine.name);
-                        machine.tags.addObject(tag);
+                        
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while adding tag to machine ' +
                                 machine.name);
                         error(textstate, errorThrown, 'while adding tag to machine machine', machine.name);
+                        machine.tags.removeObject(tag);
                     }
                 });
 		    },
+		    
+		    disabledClass : function() {
+				if (this.tag && this.tag.length > 0) {
+					return '';
+				} else {
+					return 'ui-disabled';
+				}
+			}.property('tag'),
 
 		    init: function() {
 				this._super();
