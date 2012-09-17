@@ -14,7 +14,9 @@
             <div id="tags-wrapper">
                 <ul id="tags-list">
                 {{#each Mist.machine.tags}}
-                    <li><a data-role="button" {{action deleteTag}} data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>{{this}}</li>
+                    {{#view Mist.DeleteTagView tagBinding="this" machineBinding="Mist.machine"}}
+                    <li><a data-role="button" class="tagButton" {{action deleteTag}} data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>{{this.tag}}</li>
+                    {{/view}}
                 {{/each}}
                 </ul>
             </div>

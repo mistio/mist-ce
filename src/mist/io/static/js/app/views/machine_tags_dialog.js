@@ -10,20 +10,14 @@ define('app/views/machine_tags_dialog', [
 		return Ember.View.extend({
 			tagName: false,
 	
-		addTag: function(){
-			var tag = this.tag;
-			log("tag to add: " + tag);
-		},
-			
-                    deleteTag: function() {
-
-                    },
+            addTag: function(){
+			    var tag = this.tag;
+			    log("tag to add: " + tag);
+		    },
 
 		    init: function() {
 				this._super();
-				// cannot have template in home.pt as pt complains
 				this.set('template', Ember.Handlebars.compile(machine_tags_dialog_html));
-				
 		    }
 		});
 	}

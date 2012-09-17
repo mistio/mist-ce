@@ -44,7 +44,8 @@ define('app/controllers/machines', [
 								machine.set('can_start', item.can_start);
 								machine.set('can_destroy', item.can_destroy);
 								machine.set('can_reboot', item.can_reboot);
-								machine.set('tags', item.tags);
+								//FIXME check for changes
+								machine.tags.set('content', item.tags)
 								return false;
 							}
 						});
@@ -52,6 +53,8 @@ define('app/controllers/machines', [
 						if(!found){
 							item.backend = that.backend;
 							var machine = Machine.create(item);
+							machine.tags = Ember.ArrayController.create();
+							machine.tags.set('content', item.tags)
 							that.contentWillChange(that.content.length - 1, 0, 1);
 							that.content.push(machine);
 							that.contentDidChange(that.content.length - 1, 0, 1);

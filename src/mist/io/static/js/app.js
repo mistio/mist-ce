@@ -56,6 +56,7 @@ define( 'app', [
     'app/views/single_machine_actions_dialog',
     'app/views/shell',
     'app/views/image_list',
+    'app/views/delete_tag',
     'app/views/machine_tags_dialog',
     'mobile',
     'cubism',
@@ -84,6 +85,7 @@ define( 'app', [
                 SingleMachineActionsDialog,
                 Shell,
                 ImageListView,
+                DeleteTagView,
                 MachineTagsDialog,
                 Mobile,
                 cubism
@@ -235,6 +237,7 @@ define( 'app', [
 		App.MachineListView = MachineList;
 		App.ImageListView = ImageList;
 		App.EnableBackendButtonView = EnableBackendButton;
+		App.DeleteTagView = DeleteTagView;
 		App.onOff = ['on', 'off'];
 
 		var addDialog = MachineAddDialog.create();
