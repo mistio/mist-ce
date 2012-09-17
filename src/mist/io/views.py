@@ -3,6 +3,7 @@ import os
 import logging
 import json
 import tempfile
+import datetime
 
 from pyramid.response import Response
 from pyramid.view import view_config
@@ -350,6 +351,7 @@ def set_machine_metadata(request):
     EC2:
         conn2.ex_create_tags(machine, {'something': 'something_something'})
     """
+
     try:
         conn = connect(request)
     except:
@@ -357,9 +359,18 @@ def set_machine_metadata(request):
 
     machine = request.matchdict['machine']
 
+    machine = Node(machine,
+                   name=machine,
+                   state=0,
+                   public_ips=[],
+                   private_ips=[],
+                   driver=conn)
     try:
-        metadata = request.json_body
-        #get metadata from request
+        metadata_value = request.json_body
+        key = datetime.datetime.now().isoformat()
+        metadata = {key:metadata_value}
+        #get metadata from request as string, and create a dict
+        #eg: metadata = {'one metadata':'value etc'}
     except:
         return Response('Not proper format for metadata', 404)
 
@@ -392,30 +403,47 @@ def delete_machine_metadata(request):
         ex_create_tags, ex_delete_tags, ex_describe_tags
         Delete the requested metadata only
     """
+
     try:
         conn = connect(request)
     except:
         return Response('Backend not found', 404)
 
-    machine = request.matchdict['machine']
-
     try:
-        metadata = request.json_body
-        #get metadata from request
+        metadata_value = request.json_body
+        #get metadata from request as string
     except:
         return Response('Not proper format for metadata', 404)
 
+    machine_id = request.matchdict['machine']
+    nodes = conn.list_nodes()
+
+    try:
+        machine = [machine for machine in nodes if machine.id == machine_id][0]
+        machine_tags = machine.extra.get('tags', None) or machine.extra.get('metadata', None)
+        machine_tags = machine_tags or {}
+    except:
+        return Response('Not found machine', 404)
+
+    try:
+        for mkey, mdata in machine_tags.iteritems():
+            if metadata_value == mdata:
+                metadata_to_remove = {mkey:mdata}
+                new_machine_metadata = machine_tags.pop(mkey)
+                break
+    except:
+        return Response('Not found metadata', 404)
+
     if conn.type in EC2_PROVIDERS:
         try:
-            metadata = conn.ex_delete_tags(machine, metadata)
+            metadata = conn.ex_delete_tags(machine, metadata_to_remove)
         except:
             return Response('Server side problem for metadata in EC2', 503)
     else:
         try:
             #e.g. Openstack
-            # gets current metadata dictionary. Delete requested metadata
-            # from dictionary and set the dictionary
-            metadata = conn.ex_set_metadata(machine, metadata)
+            # set the dictionary of metadata
+            metadata = conn.ex_set_metadata(machine, new_machine_metadata)
         except:
             return Response('Server side problem for metadata', 503)
 
