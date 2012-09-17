@@ -10,12 +10,14 @@ requires = ['pyramid', 'apache-libcloud', 'PasteScript', 'fabric']
 
 setup(name='mist.io',
       version='0.1',
+      license = 'GNU Affero General Public License version 3 (AGPLv3)',
       description='cloud management web app',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Programming Language :: Python",
         "Framework :: Pylons",
         "Topic :: Internet :: WWW/HTTP",
+        "License :: OSI Approved :: GNU Affero General Public License v3",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
       author='unweb.me',
