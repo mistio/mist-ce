@@ -481,7 +481,9 @@ def list_images(request):
 
     try:
         if conn.type in EC2_PROVIDERS:
-            images = conn.list_images(None, EC2_IMAGES.keys())
+            images = conn.list_images(None, EC2_IMAGES[conn.type].keys())
+            for image in images:
+                image.name = EC2_IMAGES[conn.type][image.id]
         else:
             images = conn.list_images()
     except:
