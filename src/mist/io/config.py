@@ -152,6 +152,24 @@ EC2_IMAGES = {
         'ami-6a89346b': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Web 64bit',
         'ami-e68835e7': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Standard 64bit',
     },
+    Provider.EC2_SA_EAST: {
+        'ami-f836e8e5': 'Amazon Linux AMI 2012.03 32bit',
+        'ami-fe36e8e3': 'Amazon Linux AMI 2012.03 64bit',
+        'ami-4e07d953': 'Red Hat Enterprise Linux 6.3 32bit',
+        'ami-4807d955': 'Red Hat Enterprise Linux 6.3 64bit',
+        'ami-d261becf': 'SUSE Linux Enterprise Server 11 SP2 32bit',
+        'ami-ca61bed7': 'SUSE Linux Enterprise Server 11 SP2 64bit',
+        'ami-32845d2f': 'Ubuntu Server 12.04.1 LTS 32bit',
+        'ami-2e845d33': 'Ubuntu Server 12.04.1 LTS 64bit',
+        'ami-6a4b9577': 'Ubuntu Server 11.10 32bit',
+        'ami-644b9579': 'Ubuntu Server 11.10 64bit',
+        'ami-6090497d': 'Microsoft Windows 2008 R1 SP2 Base 32bit',
+        'ami-cc9049d1': 'Microsoft Windows 2008 R1 SP2 Base 64bit',
+        'ami-a89049b5': 'Microsoft Windows 2008 R2 SP1 Base 64bit',
+        'ami-c69049db': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Express and IIS 64bit',
+        'ami-fa9049e7': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Web 64bit',
+        'ami-0c934a11': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Standard 64bit',
+    },
 }
 
 EC2_KEY_NAME = 'mistio'
