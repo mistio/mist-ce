@@ -12,7 +12,24 @@ define('app/views/machine_tags_dialog', [
 	
             addTag: function(){
 			    var tag = this.tag;
+			    
+			    var machine = Mist.machine;
+			    
 			    log("tag to add: " + tag);
+			    $.ajax({
+                    url: 'backends/' + machine.backend.index + '/machines/' + machine.id + '/metadata',
+                    type: 'POST',
+                    data: 'metadata='  + tag,
+                    success: function(data) {
+                        info('Successfully added tag to machine', machine.name);
+                        machine.tags.addObject(tag);
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while adding tag to machine ' +
+                                machine.name);
+                        error(textstate, errorThrown, 'while adding tag to machine machine', machine.name);
+                    }
+                });
 		    },
 
 		    init: function() {
