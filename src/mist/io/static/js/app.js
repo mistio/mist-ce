@@ -118,33 +118,34 @@ define( 'app', [
 				this._super();
 
 				this.set(
-					'backendsController',
-					BackendsController.create()
+    				'backendsController',
+    				BackendsController.create()
 				);
 
 				this.set(
-						'confirmationController',
-						ConfirmationController.create()
-					);
+					'confirmationController',
+					ConfirmationController.create()
+				);
 
 				this.set(
-						'notificationController',
-						NotificationController.create()
-					);
+		    		'notificationController',
+				   	NotificationController.create()
+				);
 
 				this.set(
-						'machineAddController',
-						MachineAddController.create()
-					);
+					'machineAddController',
+					MachineAddController.create()
+				);
 
 				this.set(
-						'selectMachinesController',
-						SelectMachinesController.create()
-					);
-				this.set(
-						'selectImagesController',
-						SelectImagesController.create()
-					);
+					'selectMachinesController',
+					SelectMachinesController.create()
+				);
+
+            	this.set(
+					'selectImagesController',
+					SelectImagesController.create()
+				);
 
 				// Run specs if asked
 				if ( location.hash.match( /specs/ ) ) {
@@ -193,16 +194,12 @@ define( 'app', [
 
 		// Console toggle behavior
 		$(document).ready(function() {
-			$('#shell-return').on('click', '.command', function()
-			{
+			$('#shell-return').on('click', '.command', function() {
 				var out = $(this).next('.output');
-				if (out.is(':visible'))
-				{
+				if (out.is(':visible')) {
 					out.slideUp(300);
 					$(this).parent().addClass('contracted').removeClass('expanded');
-				}
-				else
-				{
+				} else {
 					out.slideDown(200);
 					$(this).parent().removeClass('contracted').addClass('expanded');
 				}
@@ -210,16 +207,28 @@ define( 'app', [
 		});
 
 		App.Select = Ember.Select.extend({
-		    attributeBindings: ['name', "data-theme", "data-icon",
-                "data-native-menu", 'disabled'],
+		    attributeBindings: [
+                'name',
+                'data-theme',
+                'data-icon',
+                'data-native-menu',
+                'disabled'
+            ],
 		});
 
 		App.TextField = Ember.TextField.extend({
-		    attributeBindings: ['name', "data-theme"]
+		    attributeBindings: [
+                'name',
+                'data-theme'
+            ]
 		});
 
 		App.ShellTextField = Ember.TextField.extend({
-		    attributeBindings: ['name', "data-theme", "autocapitalize"],
+		    attributeBindings: [
+                'name',
+                'data-theme',
+                'autocapitalize'
+            ],
 
 		    insertNewline: function() {
 		        this.controller.submit();
@@ -227,7 +236,11 @@ define( 'app', [
 		});
 
 		App.Checkbox = Ember.Checkbox.extend({
-		    attributeBindings: ['name', "id", "data-inline"],
+		    attributeBindings: [
+                'name',
+                'id',
+                'data-inline'
+            ],
 		});
 
 		App.CountView = Count;
