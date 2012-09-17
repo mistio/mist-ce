@@ -86,30 +86,6 @@ EC2_SECURITYGROUP= {
 }
 
 
-# Base images for Rackspace
-RACKSPACE_IMAGES = {
- '118': 'CentOS 6.0',
- '125': 'Ubuntu 12.04 LTS',
- '104': 'Debian 6',
- '107': 'FreeBSD 9.0',
- '127': 'CentOS 6.3',
- '109': 'openSUSE 12',
- '110': 'Red Hat Enterprise Linux 5.5',
- '114': 'CentOS 5.6',
- '112': 'Ubuntu 10.04 LTS',
- '103': 'Debian 5',
- '122': 'CentOS 6.2',
- '100': 'Arch 2012.08',
- '111': 'Red Hat Enterprise Linux 6',
- '120': 'Fedora 16',
- '115': 'Ubuntu 11.04',
- '116': 'Fedora 15',
- '108': 'Gentoo 12.3',
- '126': 'Fedora 17',
- '121': 'CentOS 5.8',
- '119': 'Ubuntu 11.10'
-}
-
 # Linode datacenter ids/names mapping
 LINODE_DATACENTERS = {
     2: 'Dallas, TX, USA',
