@@ -37,8 +37,8 @@ define('app/views/machine_list_item', [
 			    	log('machine clicked');
 			    	
 			    	if(event.target.tagName != 'A'){
-			        	event.stopPropagation();
 			        	if(event.target.tagName == 'INPUT'){
+				        	event.stopPropagation();
 			        		var $this = $(event.target);
 			        		var checked = $this.is(':checked');
 			        		if (checked) {
@@ -58,10 +58,10 @@ define('app/views/machine_list_item', [
 			        	    } else {
 			        	        $('#machines-footer').fadeOut(200);
 			        	    }
+			        	    return;
 			        	}
-			        } else {
-			        	Mist.set('machine', this.machine);
 			        }
+			    	Mist.set('machine', this.machine);
 			    },
 			    
 			    machineSelected: function(){
