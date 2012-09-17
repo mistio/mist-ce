@@ -93,7 +93,7 @@ EC2_IMAGES = {
         'ami-98fa58f1': 'Ubuntu Server 12.04.1 LTS for Cluster Instances',
         'ami-db9e37b2': 'Ubuntu Server 11.10 for Cluster Instances'
     },
-#OREGON
+#OREGON, us-west-2
     Provider.EC2_US_WEST: {
         'ami-46da5576': 'Amazon Linux AMI 2012.03 32bit',
         'ami-48da5578': 'Amazon Linux AMI 2012.03 64bit',
@@ -115,6 +115,29 @@ EC2_IMAGES = {
         'ami-1a23ac2a': 'Microsoft Windows 2008 R2 SP1 for Cluster Instances 64bit',
         'ami-3a22ad0a': 'Microsoft Windows 2008 R2 SP1 with SQL Server for Cluster Instances 64bit',
         'ami-cada54fa': 'Ubuntu Server 12.04.1 LTS for Cluster Instances',
+    },
+#us-west-1
+   Provider.EC2_US_WEST_1: {
+        'ami-7d4c6938': 'Amazon Linux AMI 2012.03 32bit',
+        'ami-734c6936': 'Amazon Linux AMI 2012.03 64bit',
+        'ami-53f4ae16': 'Red Hat Enterprise Linux 6.3 32bit',
+        'ami-51f4ae14': 'Red Hat Enterprise Linux 6.3 64bit',
+        'ami-37144c72': 'SUSE Linux Enterprise Server 11 SP2 32bit',
+        'ami-c7144c82': 'SUSE Linux Enterprise Server 11 SP2 64bit',
+        'ami-d50c2890': 'Ubuntu Server 12.04.1 LTS 32bit',
+        'ami-d70c2892': 'Ubuntu Server 12.04.1 LTS 64bit',
+        'ami-c9d0f58c': 'Ubuntu Server 11.10 32bit',
+        'ami-cbd0f58e': 'Ubuntu Server 11.10 64bit',
+
+
+        'ami-5d5d7918': 'Microsoft Windows 2008 R1 SP2 Base 32bit',
+        'ami-315d7974': 'Microsoft Windows 2008 R1 SP2 Base 64bit',
+        'ami-635d7926': 'Microsoft Windows 2008 R2 SP1 Base 64bit',
+
+
+        'ami-7d5d7938': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Express and IIS 64bit',
+        'ami-3b5d797e': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Web 64bit',
+        'ami-fb5d79be': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Standard',
     },
     Provider.EC2_AP_SOUTHEAST: {
         'ami-220b4a70': 'Amazon Linux AMI 2012.03 32bit',
@@ -169,6 +192,29 @@ EC2_IMAGES = {
         'ami-c69049db': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Express and IIS 64bit',
         'ami-fa9049e7': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Web 64bit',
         'ami-0c934a11': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Standard 64bit',
+    },
+    Provider.EC2_EU_WEST: {
+        'ami-61555115': 'Amazon Linux AMI 2012.03 32bit',
+        'ami-6d555119': 'Amazon Linux AMI 2012.03 64bit',
+        'ami-8ff2f7fb': 'Red Hat Enterprise Linux 6.3 32bit',
+        'ami-8bf2f7ff': 'Red Hat Enterprise Linux 6.3 64bit',
+        'ami-edd1e899': 'SUSE Linux Enterprise Server 11 SP2 32bit',
+        'ami-a1d1e8d5': 'SUSE Linux Enterprise Server 11 SP2 64bit',
+        'ami-d1595fa5': 'Ubuntu Server 12.04.1 LTS 32bit',
+        'ami-db595faf': 'Ubuntu Server 12.04.1 LTS 64bit',
+        'ami-9bbfbbef': 'Ubuntu Server 11.10 32bit',
+        'ami-85bfbbf1': 'Ubuntu Server 11.10 64bit',
+        'ami-d19691a5': 'Microsoft Windows 2008 R1 SP2 Base 32bit',
+        'ami-0f95927b': 'Microsoft Windows 2008 R1 SP2 Base 64bit',
+        'ami-6995921d': 'Microsoft Windows 2008 R2 SP1 Base 64bit',
+        'ami-51959225': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Express and IIS',
+        'ami-b19592c5': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Web',
+        'ami-cb9493bf': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Standard',
+        'ami-39f8fe4d': 'Cluster GPU Amazon Linux AMI 2012.03 64bit',
+        'ami-67555113': 'Cluster Compute Amazon Linux AMI 2012.03',
+        'ami-879691f3': 'Microsoft Windows 2008 R2 SP1 for Cluster Instances',
+        'ami-23959257': 'Microsoft Windows 2008 R2 SP1 with SQL Server for Cluster Instances',
+        'ami-c5595fb1': 'Ubuntu Server 12.04.1 LTS for Cluster Instances 64bit',
     },
 }
 
