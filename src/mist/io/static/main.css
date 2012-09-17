@@ -255,6 +255,11 @@ div#splash div.mist-logo {
     background-color: #33dd44;
 }
 
+div#actions div.ui-controlgroup-controls {
+    display:inline !important;
+    width: 100%;
+}
+
 a.action-links {
     width: 33%;
 }
