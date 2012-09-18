@@ -180,7 +180,7 @@ def create_machine(request):
     location = NodeLocation(location_id, name='', country='', driver=conn)
 
     has_key = len(request.registry.settings['keypairs'])
-    if conn.type is Provider.RACKSPACE and has_key:
+    if conn.type in RACKSPACE_PROVIDERS and has_key:
         key = SSHKeyDeployment(request.registry.settings['keypairs'][0][0])
         try:
             conn.deploy_node(name=machine_name,
@@ -338,114 +338,109 @@ def destroy_machine(request):
     return []
 
 
-@view_config(route_name='machine_metadata', request_method='POST')
+@view_config(route_name='machine_metadata', request_method='POST',
+             renderer='json')
 def set_machine_metadata(request):
     """Sets metadata for a machine, given the backend and machine id.
 
-    TODO: test if this works in all providers. Keep in mind that
-
-    Openstack:
-        conn.ex_set_metadata(machine,
-                            {'name': 'ServerX',
-                             'description': 'all the money'})
-    EC2:
-        conn2.ex_create_tags(machine, {'something': 'something_something'})
+    Libcloud handles this differently for each provider. Especially
+    Linode doesn't support any metadata actions.
     """
-
     try:
         conn = connect(request)
     except:
         return Response('Backend not found', 404)
 
-    machine = request.matchdict['machine']
+    if conn.type is Provider.LINODE:
+        return Response('Metadata actions are not supported for Linode', 501)
 
-    machine = Node(machine,
+    machine_id = request.matchdict['machine']
+    machine = Node(machine_id,
                    name=machine,
                    state=0,
                    public_ips=[],
                    private_ips=[],
                    driver=conn)
     try:
-        metadata_value = request.json_body
-        key = datetime.datetime.now().isoformat()
-        metadata = {key:metadata_value}
-        #get metadata from request as string, and create a dict
-        #eg: metadata = {'one metadata':'value etc'}
+        tag = request.json_body['tag']
+        pair = {'tag': tag}
     except:
-        return Response('Not proper format for metadata', 404)
+        return Response('Malformed metadata format', 400)
 
     if conn.type in EC2_PROVIDERS:
         try:
-            metadata = conn.ex_create_tags(machine, metadata)
+            conn.ex_create_tags(machine, pair)
         except:
-            return Response('Server side problem for metadata in EC2', 503)
+            return Response('Error while setting metadata in EC2', 503)
     else:
-        #e.g. Openstack
         try:
-            metadata = conn.ex_set_metadata(machine, metadata)
+            conn.ex_set_metadata(machine, pair)
         except:
-            return Response('Server side problem for metadata', 503)
+            return Response('Error while setting metadata', 503)
 
     return Response('Success', 200)
 
 
-@view_config(route_name='machine_metadata', request_method='DELETE')
+@view_config(route_name='machine_metadata', request_method='DELETE',
+             renderer='json')
 def delete_machine_metadata(request):
-    """Delete metadata for a machine, given the backend and machine id plus
-    metadata
+    """Delete metadata for a machine, given the machine id and the tag to be
+    deleted.
 
-    Openstack:
-        ex_get_metadata and ex_set_metadata functions only
-        Delete the requested metadata from the dictionary and then update the
-        metadata set with the same dictionnary
-
-    EC2:
-        ex_create_tags, ex_delete_tags, ex_describe_tags
-        Delete the requested metadata only
+    Libcloud handles this differently for each provider. Linode doesn't
+    support it. In EC2 you can delete just the tag you like. In Openstack/
+    Rackspace you can only set a new list and not delete from the existing.
     """
-
     try:
         conn = connect(request)
     except:
         return Response('Backend not found', 404)
 
+    if conn.type is Provider.LINODE:
+        return Response('Metadata actions are not supported for Linode', 501)
+
     try:
-        metadata_value = request.json_body
-        #get metadata from request as string
+        tag = request.json_body['tag']
     except:
-        return Response('Not proper format for metadata', 404)
+        return Response('Malformed metadata format', 400)
 
     machine_id = request.matchdict['machine']
-    nodes = conn.list_nodes()
-
-    try:
-        machine = [machine for machine in nodes if machine.id == machine_id][0]
-        machine_tags = machine.extra.get('tags', None) or machine.extra.get('metadata', None)
-        machine_tags = machine_tags or {}
-    except:
-        return Response('Not found machine', 404)
-
-    try:
-        for mkey, mdata in machine_tags.iteritems():
-            if metadata_value == mdata:
-                metadata_to_remove = {mkey:mdata}
-                new_machine_metadata = machine_tags.pop(mkey)
-                break
-    except:
-        return Response('Not found metadata', 404)
+    machine = Node(machine_id,
+                   name=machine,
+                   state=0,
+                   public_ips=[],
+                   private_ips=[],
+                   driver=conn)
 
     if conn.type in EC2_PROVIDERS:
         try:
-            metadata = conn.ex_delete_tags(machine, metadata_to_remove)
+            metadata = conn.ex_delete_tags(machine, {'tag': tag})
         except:
-            return Response('Server side problem for metadata in EC2', 503)
+            return Response('Error while deleting metadata in EC2', 503)
     else:
         try:
-            #e.g. Openstack
-            # set the dictionary of metadata
-            metadata = conn.ex_set_metadata(machine, new_machine_metadata)
+            nodes = conn.list_nodes()
+            for node in nodes:
+                if node.id is machine_id:
+                    machine = node
+                    break
         except:
-            return Response('Server side problem for metadata', 503)
+            return Response('Not found machine', 404)
+
+        # this exists only in Openstack/Rackspace machines
+        tags = machine.extra.get('metadata', None)
+        try:
+            for mkey, mdata in tags.iteritems():
+                if tag is mdata:
+                    updated_metadata = tags.pop(mkey)
+                    break
+        except:
+            return Response('Tag does not exist', 404)
+
+        try:
+            conn.ex_set_metadata(machine, updated_metadata)
+        except:
+            return Response('Error while setting metadata', 503)
 
     return Response('Success', 200)
 
