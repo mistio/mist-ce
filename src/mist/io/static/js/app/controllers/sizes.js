@@ -1,5 +1,8 @@
 define('app/controllers/sizes', [
-    'app/models/size'],
+    'app/models/size',
+    'ember',
+    'jquery'
+    ],
 	/**
 	 * Sizes controller
 	 *
@@ -9,10 +12,10 @@ define('app/controllers/sizes', [
 	function(Size) {
 		return Ember.ArrayController.extend({
 			backend: null,
-			
+
 			init: function() {
 				this._super();
-			
+
 				var that = this;
 				$.getJSON('/backends/' + this.backend.index + '/sizes', function(data) {
 					var content = new Array();

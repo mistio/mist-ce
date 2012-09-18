@@ -1,5 +1,8 @@
 define('app/controllers/locations', [
-    'app/models/location'],
+    'app/models/location',
+    'ember',
+    'jquery'
+    ],
     /**
      * Locations controller
      *
@@ -21,7 +24,8 @@ define('app/controllers/locations', [
                     });
                     that.set('content', content);
                 }).error(function() {
-                    Mist.notificationController.notify("Error loading locations for backend: " + that.backend.title);
+                    Mist.notificationController.notify("Error loading locations for backend: " +
+                                                        that.backend.title);
                 });
             }
         });

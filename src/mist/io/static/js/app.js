@@ -153,16 +153,12 @@ define( 'app', [
 				}
 
 				setTimeout(function(){
-					$.mobile.changePage('#home', {
-						transition: 'fade',
-					});
+					$.mobile.changePage('#home', { transition: 'fade' });
 				}, 2000);
 
 
 			}
 		});
-
-
 
 		$(document).on( 'pagebeforeshow', '#machines', function() {
 		    $('#machines-list').listview('refresh');

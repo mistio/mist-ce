@@ -1,4 +1,6 @@
-define('app/controllers/machine_add', ['ember'],
+define('app/controllers/machine_add', [
+    'ember'
+    ],
     /**
      * Machine add controller
      *
@@ -43,7 +45,6 @@ define('app/controllers/machine_add', ['ember'],
                 this.set('newMachineImageReady', !!this.get('newMachineImage'));
                 this.set('newMachineSizeReady', !!this.get('newMachineSize'));
                 this.set('newMachineLocationReady', !!this.get('newMachineLocation'));
-
             },
 
             init: function() {
