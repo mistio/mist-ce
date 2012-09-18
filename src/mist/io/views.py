@@ -356,14 +356,15 @@ def set_machine_metadata(request):
 
     machine_id = request.matchdict['machine']
     machine = Node(machine_id,
-                   name=machine,
+                   name='',
                    state=0,
                    public_ips=[],
                    private_ips=[],
                    driver=conn)
     try:
         tag = request.json_body['tag']
-        pair = {'tag': tag}
+        unique_key = 'mist.io_tag-' + datetime.datetime.now().isoformat()
+        pair = {unique_key: tag}
     except:
         return Response('Malformed metadata format', 400)
 
