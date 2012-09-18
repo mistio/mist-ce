@@ -133,7 +133,6 @@ define('app/controllers/machines', [
                     }
                 });
             }
-
         });
     }
 );
