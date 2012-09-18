@@ -156,8 +156,6 @@ def create_machine(request):
     liblcoud doesn't support linode.config.list at the moment, so no way to
     get them. Also, it will create inconsistencies for machines created
     through mist.io and those from the Linode interface.
-
-    TODO: test the new rackspace backend
     """
     try:
         conn = connect(request)
@@ -178,7 +176,15 @@ def create_machine(request):
     size = NodeSize(size_id, name='', ram='', disk=disk, bandwidth='',
                     price='', driver=conn)
     image = NodeImage(image_id, name='', extra=image_extra, driver=conn)
-    location = NodeLocation(location_id, name='', country='', driver=conn)
+
+    if conn.type in EC2_PROVIDERS:
+        locations = conn.list_locations()
+        for loc in locations:
+            if loc.id == location_id:
+                location = loc
+                break
+    else:
+        location = NodeLocation(location_id, name='', country='', driver=conn)
 
     has_key = len(request.registry.settings['keypairs'])
     if conn.type in RACKSPACE_PROVIDERS and has_key:
@@ -189,7 +195,7 @@ def create_machine(request):
                              size=size,
                              location=location,
                              deploy=key)
-            return []
+            return Response('Success', 200)
         except:
             log.warn('Failed to deploy node with ssh key, attempt without')
     elif conn.type in EC2_PROVIDERS and has_key:
@@ -204,7 +210,7 @@ def create_machine(request):
                                  location=location,
                                  ex_keyname=EC2_KEY_NAME,
                                  ex_securitygroup=EC2_SECURITYGROUP['name'])
-                return []
+                return Response('Success', 200)
             except:
                 log.warn('Failed to deploy node with ssh key, attempt without')
     elif conn.type is Provider.LINODE and has_key:
@@ -216,7 +222,7 @@ def create_machine(request):
                              size=size,
                              location=location,
                              auth=auth)
-            return []
+            return Response('Success', 200)
         except:
             log.warn('Failed to deploy node with ssh key, attempt without')
 
@@ -225,7 +231,7 @@ def create_machine(request):
                          image=image,
                          size=size,
                          location=location)
-        return []
+        return Response('Success', 200)
     except Exception as e:
         return Response('Something went wrong with node creation', 500)
 
@@ -256,6 +262,7 @@ def start_machine(request):
     try:
         # In liblcoud it is not possible to call this with machine.start()
         conn.ex_start_node(machine)
+        Response('Success', 200)
     except AttributeError:
         return Response('Action not supported for this machine', 404)
     except:
@@ -289,6 +296,7 @@ def stop_machine(request):
     try:
         # In libcloud it is not possible to call this with machine.stop()
         conn.ex_stop_node(machine)
+        Response('Success', 200)
     except AttributeError:
         return Response('Action not supported for this machine', 404)
     except:
@@ -314,7 +322,7 @@ def reboot_machine(request):
 
     machine.reboot()
 
-    return []
+    return Response('Success', 200)
 
 
 @view_config(route_name='machine', request_method='POST',
@@ -336,7 +344,7 @@ def destroy_machine(request):
 
     machine.destroy()
 
-    return []
+    return Response('Success', 200)
 
 
 @view_config(route_name='machine_metadata', request_method='POST',
@@ -349,7 +357,6 @@ def set_machine_metadata(request):
 
     machine_id comes as u'...' but the rest are plain strings so use == when
     comparing in ifs. u'f' is 'f' returns false and 'in' is too broad.
-
     """
     try:
         conn = connect(request)
