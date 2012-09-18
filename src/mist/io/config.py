@@ -50,6 +50,7 @@ BACKENDS = [
 ]
 
 
+# All EC2 providers, useful for type checking
 EC2_PROVIDERS = (
     Provider.EC2,
     Provider.EC2_EU,
@@ -64,7 +65,7 @@ EC2_PROVIDERS = (
 
 
 # Base AMIs for us-east AMAZON, using 64bit versions
-#ec2 == ec2_us_east 
+#ec2 == ec2_us_east
 #ec2_eu == ec2_eu_west
 
 EC2_IMAGES = {
@@ -222,6 +223,15 @@ EC2_SECURITYGROUP= {
     'name': 'mistio',
     'description': 'Security group created by mist.io'
 }
+
+
+# All Rackspace providers, old and new, useful for type checking
+RACKSPACE_PROVIDERS = (
+    Provider.RACKSPACE,
+    Provider.RACKSPACE_UK,
+    Provider.RACKSPACE_NOVA_BETA,
+    Provider.RACKSPACE_NOVA_DFW
+)
 
 
 # Linode datacenter ids/names mapping
