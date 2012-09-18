@@ -1,4 +1,6 @@
-define('app/models/machine', ['ember'],
+define('app/models/machine', [
+    'ember'
+    ],
     /**
      * Machine model
      *
@@ -19,7 +21,7 @@ define('app/models/machine', ['ember'],
             hasMonitoring: false,
             state: 'stopped',
 
-            reboot: function(){
+            reboot: function() {
                 log('Rebooting machine', this.name);
 
                 var that = this;
@@ -40,7 +42,7 @@ define('app/models/machine', ['ember'],
                 });
             },
 
-            destroy: function(){
+            destroy: function() {
                 log('Destroying machine', this.name);
 
                 var that = this
@@ -61,7 +63,7 @@ define('app/models/machine', ['ember'],
                 });
             },
 
-            start: function(){
+            start: function() {
                 log('Starting machine', this.name);
 
                 var that = this;
@@ -82,7 +84,7 @@ define('app/models/machine', ['ember'],
                 });
             },
 
-            shutdown: function(){
+            shutdown: function() {
                 log('Stopping machine', this.name);
 
                 var that = this;
@@ -103,7 +105,7 @@ define('app/models/machine', ['ember'],
                 });
             },
 
-            shell: function(shell_command, callback){
+            shell: function(shell_command, callback) {
                 log('Sending', shell_command, 'to machine', this.name);
 
                 var host;
@@ -147,7 +149,7 @@ define('app/models/machine', ['ember'],
 
             },
 
-            hasAlert : function(){
+            hasAlert : function() {
                 //TODO when we have alerts
                 return false;
             }.property('hasAlert'),
@@ -167,7 +169,7 @@ define('app/models/machine', ['ember'],
                 }, 1000);
             },
 
-            checkUptime: function(){
+            checkUptime: function() {
                 if (this.state == 'running') {
                     var host;
                     if (this.extra.dns_name) {
@@ -216,7 +218,7 @@ define('app/models/machine', ['ember'],
                 }
             },
 
-            checkHasMonitoring: function(){
+            checkHasMonitoring: function() {
                 var that = this;
                 $.ajax({
                     url: 'https://mist.io/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
@@ -247,7 +249,7 @@ define('app/models/machine', ['ember'],
                 }
             }.observes('state'),
 
-            monitoringChanged: function(){
+            monitoringChanged: function() {
                 var oldValue = !this.hasMonitoring;
                 log("monitoring:  " + oldValue);
 
@@ -293,7 +295,6 @@ define('app/models/machine', ['ember'],
                 this.checkUptime();
                 this.checkHasMonitoring();
             }
-
         });
     }
 );
