@@ -68,6 +68,7 @@ EC2_PROVIDERS = (
 #ec2_eu == ec2_eu_west
 
 EC2_IMAGES = {
+#virginia
     Provider.EC2: {
         'ami-a0cd60c9': 'Amazon Linux AMI 2012.03 32bit',
         'ami-aecd60c7': 'Amazon Linux AMI 2012.03 64bit',
@@ -116,6 +117,7 @@ EC2_IMAGES = {
         'ami-3a22ad0a': 'Microsoft Windows 2008 R2 SP1 with SQL Server for Cluster Instances 64bit',
         'ami-cada54fa': 'Ubuntu Server 12.04.1 LTS for Cluster Instances',
     },
+#california
 #   Provider.EC2_US_WEST_1: {
 #        'ami-7d4c6938': 'Amazon Linux AMI 2012.03 32bit',
 #        'ami-734c6936': 'Amazon Linux AMI 2012.03 64bit',
