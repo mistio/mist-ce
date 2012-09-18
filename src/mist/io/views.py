@@ -22,6 +22,7 @@ from mist.io.config import EC2_IMAGES
 from mist.io.config import EC2_PROVIDERS
 from mist.io.config import EC2_KEY_NAME
 from mist.io.config import EC2_SECURITYGROUP
+from mist.io.config import RACKSPACE_PROVIDERS
 from mist.io.config import LINODE_DATACENTERS
 
 from mist.io.helpers import connect
@@ -343,24 +344,24 @@ def destroy_machine(request):
 def set_machine_metadata(request):
     """Sets metadata for a machine, given the backend and machine id.
 
-    Libcloud handles this differently for each provider. Especially
-    Linode doesn't support any metadata actions.
+    Libcloud handles this differently for each provider. Linode and Rackspace,
+    at least the old Rackspace providers, don't support metadata adding.
+
+    machine_id comes as u'...' but the rest are plain strings so use == when
+    comparing in ifs. u'f' is 'f' returns false and 'in' is too broad.
+
     """
     try:
         conn = connect(request)
     except:
         return Response('Backend not found', 404)
 
-    if conn.type is Provider.LINODE:
-        return Response('Metadata actions are not supported for Linode', 501)
+    if conn.type is Provider.LINODE or conn.type in RACKSPACE_PROVIDERS:
+        return Response('Adding metadata is not supported in this provider',
+                        501)
 
     machine_id = request.matchdict['machine']
-    machine = Node(machine_id,
-                   name='',
-                   state=0,
-                   public_ips=[],
-                   private_ips=[],
-                   driver=conn)
+
     try:
         tag = request.json_body['tag']
         unique_key = 'mist.io_tag-' + datetime.datetime.now().isoformat()
@@ -370,14 +371,30 @@ def set_machine_metadata(request):
 
     if conn.type in EC2_PROVIDERS:
         try:
+            machine = Node(machine_id,
+                           name='',
+                           state=0,
+                           public_ips=[],
+                           private_ips=[],
+                           driver=conn)
             conn.ex_create_tags(machine, pair)
         except:
-            return Response('Error while setting metadata in EC2', 503)
+            return Response('Error while creating tag in EC2', 503)
     else:
         try:
+            nodes = conn.list_nodes()
+            for node in nodes:
+                if node.id == machine_id:
+                    machine = node
+                    break
+        except:
+            return Response('Machine not found', 404)
+
+        try:
+            machine.extra['metadata'].update(pair)
             conn.ex_set_metadata(machine, pair)
         except:
-            return Response('Error while setting metadata', 503)
+            return Response('Error while creating tag', 503)
 
     return Response('Success', 200)
 
@@ -388,17 +405,25 @@ def delete_machine_metadata(request):
     """Delete metadata for a machine, given the machine id and the tag to be
     deleted.
 
-    Libcloud handles this differently for each provider. Linode doesn't
-    support it. In EC2 you can delete just the tag you like. In Openstack/
-    Rackspace you can only set a new list and not delete from the existing.
+    Libcloud handles this differently for each provider. Linode and Rackspace,
+    at least the old Rackspace providers, don't support metadata updating. In
+    EC2 you can delete just the tag you like. In Openstack you can only set a
+    new list and not delete from the existing.
+
+    Mist.io client knows only the value of the tag and not it's key so it
+    has to loop through the machine list in order to find it.
+
+    Don't forget to check string encoding before using them in ifs.
+    u'f' is 'f' returns false.
     """
     try:
         conn = connect(request)
     except:
         return Response('Backend not found', 404)
 
-    if conn.type is Provider.LINODE:
-        return Response('Metadata actions are not supported for Linode', 501)
+    if conn.type is Provider.LINODE or conn.type in RACKSPACE_PROVIDERS:
+        return Response('Updating metadata is not supported in this provider',
+                        501)
 
     try:
         tag = request.json_body['tag']
@@ -406,42 +431,44 @@ def delete_machine_metadata(request):
         return Response('Malformed metadata format', 400)
 
     machine_id = request.matchdict['machine']
-    machine = Node(machine_id,
-                   name=machine,
-                   state=0,
-                   public_ips=[],
-                   private_ips=[],
-                   driver=conn)
+
+    try:
+        nodes = conn.list_nodes()
+        for node in nodes:
+            if node.id == machine_id:
+                machine = node
+                break
+    except:
+        return Response('Machine not found', 404)
 
     if conn.type in EC2_PROVIDERS:
+        tags = machine.extra.get('tags', None)
         try:
-            metadata = conn.ex_delete_tags(machine, {'tag': tag})
+            for mkey, mdata in tags.iteritems():
+                if tag == mdata:
+                    pair = {mkey: tag}
+                    break
+        except:
+            return Response('Tag not found', 404)
+
+        try:
+            metadata = conn.ex_delete_tags(machine, pair)
         except:
             return Response('Error while deleting metadata in EC2', 503)
     else:
-        try:
-            nodes = conn.list_nodes()
-            for node in nodes:
-                if node.id is machine_id:
-                    machine = node
-                    break
-        except:
-            return Response('Not found machine', 404)
-
-        # this exists only in Openstack/Rackspace machines
         tags = machine.extra.get('metadata', None)
         try:
             for mkey, mdata in tags.iteritems():
-                if tag is mdata:
-                    updated_metadata = tags.pop(mkey)
+                if tag == mdata:
+                    tags.pop(mkey)
                     break
         except:
-            return Response('Tag does not exist', 404)
+            return Response('Tag not found', 404)
 
         try:
-            conn.ex_set_metadata(machine, updated_metadata)
+            conn.ex_set_metadata(machine, tags)
         except:
-            return Response('Error while setting metadata', 503)
+            return Response('Error while updating metadata', 503)
 
     return Response('Success', 200)
 
