@@ -60,11 +60,11 @@ define('app/views/machine', [
                         'DNS Name': this.machine.extra.dns_name,
                         'Launch Date': this.machine.extra.launchdatetime
                 };
-                
-				if(this.machine.image && 'image' in this.machine && 
+
+				if(this.machine.image && 'image' in this.machine &&
 				        'name' in this.machine.image){
                     basicvars['Image'] = this.machine.image.name;
-				} 
+				}
 
 				var ret = new Array();
 
@@ -194,8 +194,6 @@ define('app/views/machine', [
 					    callback(null, values = values.slice((start - stop) / step));
 					  }, name);
 					}
-
-
 
 					var cpu = draw("cpu"),
 					    memory = draw("memory"),
