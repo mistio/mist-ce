@@ -1,4 +1,4 @@
-"""Map actions to backends"""
+"""Helper functions used in views"""
 import os
 import tempfile
 import logging
@@ -69,10 +69,10 @@ def get_machine_actions(machine, backend):
     can_destroy = True
     can_reboot = True
     can_tag = True
-    
+
     if backend.type in EC2_PROVIDERS:
         can_stop = True
-        
+
     if backend.type in RACKSPACE_PROVIDERS or \
         backend.type == Provider.LINODE:
         can_tag = False

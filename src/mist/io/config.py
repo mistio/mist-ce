@@ -1,4 +1,4 @@
-"""Configure which backends you will use here"""
+"""Basic configuration and mappings"""
 from libcloud.compute.types import Provider
 from libcloud.compute.types import NodeState
 
