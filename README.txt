@@ -44,10 +44,10 @@ create a virtualenv and run buildout:
 
 Configuration
 =============
-You can configure the cloud backends and your keys in settings.py using Python 
-syntax. The BACKENDS global is an array of dictionaries, each dictionary 
-describing a backend. For example to configure a single EC2 backend you would 
-have:
+First copy settings.py.dist in the same path and name it settings.py In settings.py
+you can configure the cloud backends and your keys using Python syntax. 
+The BACKENDS global is an array of dictionaries, each dictionary describing a 
+backend. For example to configure a single EC2 backend you would have:
 
 BACKENDS = [
     {'title': 'EC2',
