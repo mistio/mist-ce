@@ -14,7 +14,6 @@ from fabric.api import env
 from fabric.api import run
 from fabric.api import sudo
 
-from mist.io.config import BACKENDS
 from mist.io.config import EC2_PROVIDERS
 
 log = logging.getLogger('mist.io')
@@ -33,7 +32,7 @@ def connect(request):
     try:
         backend_list = request.environ['beaker.session']['backends']
     except:
-        backend_list = BACKENDS
+        backend_list = request.registry.settings['backends']
 
     backend_index = int(request.matchdict['backend'])
     backend = backend_list[backend_index]

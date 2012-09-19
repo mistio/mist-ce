@@ -1,8 +1,10 @@
 """Routes and create the wsgi app"""
+from libcloud.compute.types import Provider
+
 from pyramid.config import Configurator
+
 from mist.io.resources import Root
 from mist.io.cors import CORSMiddleware
-from mist.io.config import KEYPAIRS
 
 
 def main(global_config, **settings):
@@ -10,7 +12,13 @@ def main(global_config, **settings):
     if not settings.keys():
         settings = global_config
 
-    settings['keypairs'] = KEYPAIRS
+    # import BACKENDS and KEYPAIRS from config
+    user_config = {}
+    execfile(global_config['here'] + '/config.py', {'Provider':Provider}, user_config)
+    
+    settings['keypairs'] = user_config['KEYPAIRS']
+    settings['backends'] = user_config['BACKENDS']
+    
     config = Configurator(root_factory=Root, settings=settings)
 
     config.add_static_view('static', 'mist.io:static')

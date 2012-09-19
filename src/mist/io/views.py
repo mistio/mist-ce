@@ -17,7 +17,6 @@ from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider
 
 from mist.io.config import STATES
-from mist.io.config import BACKENDS
 from mist.io.config import EC2_IMAGES
 from mist.io.config import EC2_PROVIDERS
 from mist.io.config import EC2_KEY_NAME
@@ -58,7 +57,7 @@ def list_backends(request):
     try:
         backend_list = request.environ['beaker.session']['backends']
     except:
-        backend_list = BACKENDS
+        backend_list = request.registry.settings['backends']
 
     backends = []
     index = 0
@@ -68,7 +67,6 @@ def list_backends(request):
                          'title'        : backend['title'],
                          'provider'     : backend['provider'],
                          'poll_interval': backend['poll_interval'],
-                         'enabled'      : backend['enabled'],
                          'state'        : 'wait',
                          })
         index = index + 1
@@ -188,7 +186,7 @@ def create_machine(request):
 
     has_key = len(request.registry.settings['keypairs'])
     if conn.type in RACKSPACE_PROVIDERS and has_key:
-        key = SSHKeyDeployment(request.registry.settings['keypairs'][0][0])
+        key = SSHKeyDeployment(request.registry.settings['keypairs']['default'][0])
         try:
             conn.deploy_node(name=machine_name,
                              image=image,
@@ -199,7 +197,7 @@ def create_machine(request):
         except:
             log.warn('Failed to deploy node with ssh key, attempt without')
     elif conn.type in EC2_PROVIDERS and has_key:
-        key = request.registry.settings['keypairs'][0][0]
+        key = request.registry.settings['keypairs']['default'][0]
         imported_key = import_key(conn, key, EC2_KEY_NAME)
         created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
         if imported_key and created_security_group:
@@ -214,7 +212,7 @@ def create_machine(request):
             except:
                 log.warn('Failed to deploy node with ssh key, attempt without')
     elif conn.type is Provider.LINODE and has_key:
-        key = request.registry.settings['keypairs'][0][0]
+        key = request.registry.settings['keypairs']['default'][0]
         auth = NodeAuthSSHKey(key)
         try:
             conn.create_node(name=machine_name,
@@ -495,7 +493,7 @@ def shell_command(request):
         private_key = request['beaker.session']['backends'][backend_index]\
                              ['private_key']
     except KeyError:
-        private_key = request.registry.settings['keypairs'][0][1]
+        private_key = request.registry.settings['keypairs']['default'][1]
 
     return run_command(conn, machine_id, host, ssh_user, private_key,
                       command)
