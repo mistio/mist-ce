@@ -113,8 +113,13 @@ define('app/models/machine', [
                     // it is an ec2 machine so it has dns_name
                     host = this.extra.dns_name;
                 } else {
-                    // if not in ec2, it should have a public ip
-                    host = this.public_ips[0];
+                    // if not ec2 it should have a public ip
+                    try {
+                        host = this.public_ips[0];
+                    } catch (error) {
+                        // no ip or dns_name so nowhere to check, can't test the key
+                        this.set('hasKey', false);
+                    }
                 }
 
                 // In case of ec2, mist.io could have set this. Server can handle empty string.
@@ -177,7 +182,12 @@ define('app/models/machine', [
                         host = this.extra.dns_name;
                     } else {
                         // if not ec2 it should have a public ip
-                        host = this.public_ips[0];
+                        try {
+                            host = this.public_ips[0];
+                        } catch (error) {
+                            // no ip or dns_name so nowhere to check, can't test the key
+                            this.set('hasKey', false);
+                        }
                     }
 
                     // In case of ec2, mist.io could have set this. Server can handle empty string.
@@ -261,7 +271,12 @@ define('app/models/machine', [
                     host = this.extra.dns_name;
                 } else {
                     // if not ec2 it should have a public ip
-                    host = this.public_ips[0];
+                    try {
+                        host = this.public_ips[0];
+                    } catch (error) {
+                        // no ip or dns_name so nowhere to check, can't test the key
+                        this.set('hasKey', false);
+                    }
                 }
 
                 var payload = {
@@ -290,7 +305,7 @@ define('app/models/machine', [
                 var that = this;
 
                 this.tags = Ember.ArrayController.create();
-                
+
                 this.backend.images.getImage(this.imageId, function(image) {
                     that.set('image', image);
                 });

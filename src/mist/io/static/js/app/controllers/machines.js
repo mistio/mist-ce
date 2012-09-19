@@ -39,7 +39,7 @@ define('app/controllers/machines', [
                         log("item id: " + item.id);
 
                         that.content.forEach(function(machine){
-                            if(machine.id == item.id || (machine.id == -1 && machine.name == item.name)){
+                            if (machine.id == item.id || (machine.id == -1 && machine.name == item.name)) {
                                 found = true;
                                 // machine.set(item); //FIXME this does not change anything;
                                 if (machine.id == -1) {
@@ -57,7 +57,7 @@ define('app/controllers/machines', [
                             }
                         });
 
-                        if(!found){
+                        if (!found) {
                             item.backend = that.backend;
                             var machine = Machine.create(item);
                             machine.tags.set('content', item.tags)
