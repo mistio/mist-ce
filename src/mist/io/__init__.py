@@ -1,10 +1,13 @@
 """Routes and create the wsgi app"""
+from logging import getLogger
 from libcloud.compute.types import Provider
 
 from pyramid.config import Configurator
 
 from mist.io.resources import Root
 from mist.io.cors import CORSMiddleware
+
+log = getLogger('mist.core')
 
 
 def main(global_config, **settings):
@@ -13,13 +16,16 @@ def main(global_config, **settings):
         settings = global_config
 
     # import BACKENDS and KEYPAIRS from config
-    user_config = {}
-    execfile(global_config['here'] + '/settings.py',
-            {'Provider':Provider},
-            user_config)
+    try:
+        user_config = {}
+        execfile(global_config['here'] + '/settings.py',
+                {'Provider':Provider},
+                user_config)
 
-    settings['keypairs'] = user_config['KEYPAIRS']
-    settings['backends'] = user_config['BACKENDS']
+        settings['keypairs'] = user_config['KEYPAIRS']
+        settings['backends'] = user_config['BACKENDS']
+    except:
+        log.warn('local settings.py not available')
 
     config = Configurator(root_factory=Root, settings=settings)
 

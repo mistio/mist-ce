@@ -9,8 +9,8 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 requires = ['pyramid', 'apache-libcloud', 'PasteScript', 'fabric']
 
 setup(name='mist.io',
-      version='0.1',
-      license = 'GNU Affero General Public License version 3 (AGPLv3)',
+      version='0.8',
+      license = 'AGPLv3',
       description='cloud management web app',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
