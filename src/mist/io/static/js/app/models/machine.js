@@ -172,7 +172,7 @@ define('app/models/machine', [
             checkUptime: function() {
                 if (this.state == 'running') {
                     var host;
-                    if (this.extra.dns_name) {
+                    if (this.extra && this.extra.dns_name) {
                         // it is ec2 machine
                         host = this.extra.dns_name;
                     } else {

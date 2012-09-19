@@ -21,6 +21,7 @@ define('app/controllers/machines', [
             },
 
             refresh: function(){
+                console.log('length before refresh: ' + this.content.length);
 
                 if(this.backend.state == "offline"){
                     this.clear();
@@ -32,13 +33,16 @@ define('app/controllers/machines', [
                 this.backend.set('state', 'wait');
 
                 $.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
+                    console.log('length before refresh JSON: ' + that.content.length);
+                    console.log('length of reply: ' + data.length);
+
                     data.forEach(function(item){
                         var found = false;
 
                         log("item id: " + item.id);
 
                         that.content.forEach(function(machine){
-                            if(machine.id == item.id){
+                            if(machine.id == item.id || (machine.id == -1 && machine.name == item.name)){
                                 found = true;
                                 machine.set(item); //FIXME this does not change anything;
 
@@ -76,7 +80,7 @@ define('app/controllers/machines', [
                             }
                         });
 
-                        if(!found){
+                        if(!found && item.id != -1){
                             log("not found, deleting");
                             that.contentWillChange();
                             that.removeObject(item);
@@ -85,6 +89,8 @@ define('app/controllers/machines', [
                     });
 
                     that.backend.set('state', 'online');
+                    
+                    console.log('length after refresh JSON: ' + that.content.length);
 
                     Ember.run.later(that, function(){
                         this.refresh();
@@ -97,6 +103,7 @@ define('app/controllers/machines', [
                     log(e.state + " " + e.stateText);
                 });
 
+                console.log('length after refresh: ' + this.content.length);
             },
 
             newMachine: function(name, image, size, location) {
