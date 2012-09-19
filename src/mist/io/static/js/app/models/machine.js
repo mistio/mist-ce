@@ -288,6 +288,9 @@ define('app/models/machine', [
             init: function() {
                 this._super();
                 var that = this;
+
+                this.tags = Ember.ArrayController.create();
+                
                 this.backend.images.getImage(this.imageId, function(image) {
                     that.set('image', image);
                 });
