@@ -14,7 +14,7 @@ def main(global_config, **settings):
 
     # import BACKENDS and KEYPAIRS from config
     user_config = {}
-    execfile(global_config['here'] + '/config.py',
+    execfile(global_config['here'] + '/settings.py',
             {'Provider':Provider},
             user_config)
 
