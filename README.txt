@@ -39,7 +39,7 @@ create a virtualenv and run buildout:
 	git clone gitosis@git.unweb.me:mist.io.git
 	cd mist.io
 	virtualenv --no-site-packages .
-	./bin bootstrap.py
+	./bin/python bootstrap.py
 	./bin/buildout -v
 
 Configuration
