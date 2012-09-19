@@ -17,16 +17,16 @@ eggs in the system's Python.
 
 To install the basic requirements in a Debian based distro do:
 
-	sudo aptitude install python-dev build-essential git
+    sudo aptitude install python-dev build-essential git
 
 If you wish to install it in a virtual environment you'll also need:
 
-	sudo aptitude install python-virtualenv
+    sudo aptitude install python-virtualenv
 
 In MacOSX you have to install Xcode and its command line tools. For virtualenv
 you simply run:
 
-	sudo easy_install virtualenv
+    sudo easy_install virtualenv
 
 In MacOSX there might be some problems with certificates resulting to mist.io
 getting 404 errors from server side. To solve the issue donwlad a pem from
@@ -36,11 +36,11 @@ it to /opt/local/share/curl/
 Supposing you have all the above, the steps are simple. Clone the repository,
 create a virtualenv and run buildout:
 
-	git clone gitosis@git.unweb.me:mist.io.git
-	cd mist.io
-	virtualenv --no-site-packages .
-	./bin/python bootstrap.py
-	./bin/buildout -v
+    git clone gitosis@git.unweb.me:mist.io.git
+    cd mist.io
+    virtualenv --no-site-packages .
+    ./bin/python bootstrap.py
+    ./bin/buildout -v
 
 Configuration
 =============
@@ -83,11 +83,11 @@ environments and one for develompent.
 
 To get it up and running for production:
 
-	./bin/paster serve production.ini
+    ./bin/paster serve production.ini
 
 For development mode:
 
-	./bin/paster serve development.ini --reload
+    ./bin/paster serve development.ini --reload
 
 With the --reload flag, whenever there are changes in Python code and templates
 the server will automatically restart to load the new version. Changes in css

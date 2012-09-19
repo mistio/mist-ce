@@ -3,28 +3,28 @@ define('app/controllers/sizes', [
     'ember',
     'jquery'
     ],
-	/**
-	 * Sizes controller
-	 *
-	 *
-	 * @returns Class
-	 */
-	function(Size) {
-		return Ember.ArrayController.extend({
-			backend: null,
+    /**
+     * Sizes controller
+     *
+     *
+     * @returns Class
+     */
+    function(Size) {
+        return Ember.ArrayController.extend({
+            backend: null,
 
-			init: function() {
-				this._super();
+            init: function() {
+                this._super();
 
-				var that = this;
-				$.getJSON('/backends/' + this.backend.index + '/sizes', function(data) {
-					var content = new Array();
-					data.forEach(function(item){
-						content.push(Size.create(item));
-					});
-					that.set('content', content);
-				});
-			}
-		});
-	}
+                var that = this;
+                $.getJSON('/backends/' + this.backend.index + '/sizes', function(data) {
+                    var content = new Array();
+                    data.forEach(function(item){
+                        content.push(Size.create(item));
+                    });
+                    that.set('content', content);
+                });
+            }
+        });
+    }
 );
