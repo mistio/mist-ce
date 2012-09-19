@@ -9,12 +9,14 @@ from libcloud.compute.types import Provider
 from libcloud.compute.types import NodeState
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node
+from libcloud.compute.types import Provider
 
 from fabric.api import env
 from fabric.api import run
 from fabric.api import sudo
 
-from mist.io.config import EC2_PROVIDERS
+from mist.io.config import EC2_PROVIDERS, RACKSPACE_PROVIDERS
+
 
 log = logging.getLogger('mist.io')
 
@@ -67,8 +69,14 @@ def get_machine_actions(machine, backend):
     can_stop = False
     can_destroy = True
     can_reboot = True
+    can_tag = True
+    
     if backend.type in EC2_PROVIDERS:
         can_stop = True
+        
+    if backend.type in RACKSPACE_PROVIDERS or \
+        backend.type == Provider.LINODE:
+        can_tag = False
 
     # for other states
     if machine.state is NodeState.REBOOTING:
@@ -93,7 +101,8 @@ def get_machine_actions(machine, backend):
     return {'can_stop': can_stop,
             'can_start': can_start,
             'can_destroy': can_destroy,
-            'can_reboot': can_reboot}
+            'can_reboot': can_reboot,
+            'can_tag': can_tag}
 
 
 def import_key(conn, public_key, name):

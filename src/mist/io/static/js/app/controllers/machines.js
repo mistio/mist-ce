@@ -47,6 +47,7 @@ define('app/controllers/machines', [
                                 machine.set('can_start', item.can_start);
                                 machine.set('can_destroy', item.can_destroy);
                                 machine.set('can_reboot', item.can_reboot);
+                                machine.set('can_tag', item.can_tag);
                                 //FIXME check for changes
                                 machine.tags.set('content', item.tags)
                                 return false;
