@@ -58,6 +58,8 @@ BACKENDS = [
      },
 ]
 
+The 'title' field is used to name your backend anyway you like.
+
 The KEYPAIRS global is a single dictionary with an key Id and a tuple containing
 the public and private key as strings. e.g.:
 
