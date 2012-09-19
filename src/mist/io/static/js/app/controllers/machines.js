@@ -41,7 +41,6 @@ define('app/controllers/machines', [
                         that.content.forEach(function(machine){
                             if(machine.id == item.id || (machine.id == -1 && machine.name == item.name)){
                                 found = true;
-                                console.warn(machine.name, machine.id, item.id, item);
                                 // machine.set(item); //FIXME this does not change anything;
                                 if (machine.id == -1) {
                                     machine.set('id', item.id);
@@ -140,7 +139,6 @@ define('app/controllers/machines', [
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
-                    dataType: 'json',
                     success: function(data) {
                         info('Successfully sent create machine', name, 'to backend',
                                     that.backend.title);
