@@ -1,8 +1,5 @@
 """mist.io views"""
-import os
 import logging
-import json
-import tempfile
 import datetime
 
 from pyramid.response import Response
@@ -113,7 +110,7 @@ def list_machines(request):
             # for Linode
             tags.append(LINODE_DATACENTERS[m.extra['DATACENTERID']])
 
-        imageId = m.image or m.extra.get('imageId', None)
+        image_id = m.image or m.extra.get('imageId', None)
 
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
@@ -121,7 +118,7 @@ def list_machines(request):
         machine = {'id'            : m.id,
                    'uuid'          : m.get_uuid(),
                    'name'          : m.name,
-                   'imageId'       : imageId,
+                   'imageId'       : image_id,
                    'size'          : size,
                    'state'         : STATES[m.state],
                    'private_ips'   : m.private_ips,
@@ -457,7 +454,7 @@ def delete_machine_metadata(request):
             return Response('Tag not found', 404)
 
         try:
-            metadata = conn.ex_delete_tags(machine, pair)
+            conn.ex_delete_tags(machine, pair)
         except:
             return Response('Error while deleting metadata in EC2', 503)
     else:
