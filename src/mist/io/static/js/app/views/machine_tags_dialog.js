@@ -13,10 +13,41 @@ define('app/views/machine_tags_dialog', [
         return Ember.View.extend({
             tagName: false,
 
+            machine: function(){
+                 var machine = Mist.machine;
+			if (!machine) {
+				Mist.backendsController.forEach(function(backend) {
+					backend.machines.forEach(function(m) {
+						if (m.selected) {
+							log('machine selected');
+							return m;
+						}
+					});
+				});
+			}
+                  return machine;
+		
+            }.property("Mist.backendsController.@each.machines.@each.selected"),
+
             submit: function(){
                 var tag = this.tag;
 
                 var machine = Mist.machine;
+			if (!machine) {
+				Mist.backendsController.forEach(function(backend) {
+					backend.machines.forEach(function(m) {
+						if (m.selected && m.hasKey) {
+							log('machine selected');
+							machine = m;
+						}
+					});
+				});
+			}
+			if (!machine || !this.tag) {
+				return;
+			}
+
+
                 machine.tags.addObject(tag);
 
                 log("tag to add: " + tag);
