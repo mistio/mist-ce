@@ -47,6 +47,7 @@ define('app/controllers/machines', [
                                 machine.set('can_start', item.can_start);
                                 machine.set('can_destroy', item.can_destroy);
                                 machine.set('can_reboot', item.can_reboot);
+                                machine.set('can_tag', item.can_tag);
                                 //FIXME check for changes
                                 machine.tags.set('content', item.tags)
                                 return false;
@@ -56,7 +57,6 @@ define('app/controllers/machines', [
                         if(!found){
                             item.backend = that.backend;
                             var machine = Machine.create(item);
-                            machine.tags = Ember.ArrayController.create();
                             machine.tags.set('content', item.tags)
                             that.contentWillChange(that.content.length - 1, 0, 1);
                             that.content.push(machine);
@@ -114,8 +114,24 @@ define('app/controllers/machines', [
                         'disk': size.disk,
                         'location': location.id
                 };
-
+                
+                var item = {};
+                item.state = 'pending';
+                item.can_stop = false;
+                item.can_start = false;
+                item.can_destroy = false;
+                item.can_reboot = false;
+                item.can_tag = false;
+                item.backend = this.backend;
+                item.name = name;
+                item.image = image;
+                item.id = -1;
+            
+                var machine = Machine.create(item);
+                this.addObject(machine);
+                
                 var that = this;
+                
                 $.ajax({
                     url: 'backends/' + this.backend.index + '/machines',
                     type: 'POST',
@@ -130,6 +146,7 @@ define('app/controllers/machines', [
                         Mist.notificationController.notify('Error while sending create machine' +
                                 name + ' to backend ' + that.backend.title);
                         error(textstate, errorThrown, 'while checking key of machine', that.name);
+                        that.removeObject(machine);
                     }
                 });
             }

@@ -12,6 +12,7 @@ STATES = {
     NodeState.UNKNOWN: 'stopped'
 }
 
+
 # All EC2 providers, useful for type checking
 EC2_PROVIDERS = (
     Provider.EC2,
@@ -26,12 +27,9 @@ EC2_PROVIDERS = (
 )
 
 
-# Base AMIs for us-east AMAZON, using 64bit versions
-#ec2 == ec2_us_east
-#ec2_eu == ec2_eu_west
-
+# Base AMIs
 EC2_IMAGES = {
-#virginia
+    # EC2_US_EAST == EC2_US
     Provider.EC2_US_EAST: {
         'ami-a0cd60c9': 'Amazon Linux AMI 2012.03 32bit',
         'ami-aecd60c7': 'Amazon Linux AMI 2012.03 64bit',
@@ -57,12 +55,11 @@ EC2_IMAGES = {
         'ami-98fa58f1': 'Ubuntu Server 12.04.1 LTS for Cluster Instances',
         'ami-db9e37b2': 'Ubuntu Server 11.10 for Cluster Instances'
     },
-#OREGON, us-west-2
     Provider.EC2_US_WEST_OREGON: {
         'ami-46da5576': 'Amazon Linux AMI 2012.03 32bit',
         'ami-48da5578': 'Amazon Linux AMI 2012.03 64bit',
         'ami-8625a9b6': 'Red Hat Enterprise Linux 6.3 32bit',
-        'ami-46da5576': 'Red Hat Enterprise Linux 6.3 64bit',
+        'ami-8a25a9ba': 'Red Hat Enterprise Linux 6.3 64bit',
         'ami-fe2da0ce': 'SUSE Linux Enterprise Server 11 SP2 32bit',
         'ami-e42da0d4': 'SUSE Linux Enterprise Server 11 SP2 64bit',
         'ami-1add532a': 'Ubuntu Server 12.04.1 LTS 32bit',
@@ -80,8 +77,8 @@ EC2_IMAGES = {
         'ami-3a22ad0a': 'Microsoft Windows 2008 R2 SP1 with SQL Server for Cluster Instances 64bit',
         'ami-cada54fa': 'Ubuntu Server 12.04.1 LTS for Cluster Instances',
     },
-#california
-   Provider.EC2_US_WEST: {
+    # California
+    Provider.EC2_US_WEST: {
         'ami-7d4c6938': 'Amazon Linux AMI 2012.03 32bit',
         'ami-734c6936': 'Amazon Linux AMI 2012.03 64bit',
         'ami-53f4ae16': 'Red Hat Enterprise Linux 6.3 32bit',
@@ -153,6 +150,7 @@ EC2_IMAGES = {
         'ami-fa9049e7': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Web 64bit',
         'ami-0c934a11': 'Microsoft Windows Server 2008 R2 SP1 with SQL Server Standard 64bit',
     },
+    # EC2_EU_WEST == EC2_EU
     Provider.EC2_EU_WEST: {
         'ami-61555115': 'Amazon Linux AMI 2012.03 32bit',
         'ami-6d555119': 'Amazon Linux AMI 2012.03 64bit',
@@ -178,12 +176,15 @@ EC2_IMAGES = {
     },
 }
 
+
 EC2_KEY_NAME = 'mistio'
 
-EC2_SECURITYGROUP= {
+
+EC2_SECURITYGROUP = {
     'name': 'mistio',
     'description': 'Security group created by mist.io'
 }
+
 
 # All Rackspace providers, old and new, useful for type checking
 RACKSPACE_PROVIDERS = (
@@ -192,6 +193,7 @@ RACKSPACE_PROVIDERS = (
     Provider.RACKSPACE_NOVA_BETA,
     Provider.RACKSPACE_NOVA_DFW
 )
+
 
 # Linode datacenter ids/names mapping
 LINODE_DATACENTERS = {

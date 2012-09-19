@@ -9,12 +9,13 @@ from libcloud.compute.types import Provider
 from libcloud.compute.types import NodeState
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node
+from libcloud.compute.types import Provider
 
 from fabric.api import env
 from fabric.api import run
-from fabric.api import sudo
 
-from mist.io.config import EC2_PROVIDERS
+from mist.io.config import EC2_PROVIDERS, RACKSPACE_PROVIDERS
+
 
 log = logging.getLogger('mist.io')
 
@@ -67,8 +68,14 @@ def get_machine_actions(machine, backend):
     can_stop = False
     can_destroy = True
     can_reboot = True
+    can_tag = True
+    
     if backend.type in EC2_PROVIDERS:
         can_stop = True
+        
+    if backend.type in RACKSPACE_PROVIDERS or \
+        backend.type == Provider.LINODE:
+        can_tag = False
 
     # for other states
     if machine.state is NodeState.REBOOTING:
@@ -93,7 +100,8 @@ def get_machine_actions(machine, backend):
     return {'can_stop': can_stop,
             'can_start': can_start,
             'can_destroy': can_destroy,
-            'can_reboot': can_reboot}
+            'can_reboot': can_reboot,
+            'can_tag': can_tag}
 
 
 def import_key(conn, public_key, name):
@@ -103,8 +111,6 @@ def import_key(conn, public_key, name):
     considers it a success.
 
     This is supported only for EC2 at the moment.
-
-    TODO: Where are the exceptions for ec2 errors? Using and ugly if for now.
     """
     if conn.type in EC2_PROVIDERS:
         (tmp_key, tmp_path) = tempfile.mkstemp()
@@ -134,10 +140,6 @@ def create_security_group(conn, info):
 
     This is supported only for EC2 at the moment. Info should be a dictionary
     with 'name' and 'description' keys.
-
-    TODO: Where are the exceptions for ec2 errors? Using and ugly if for now.
-    TODO: This sets very permissive option to the group, might have to tweak
-          liblcoud in this, not sure if it is supported by the ec2 API.
     """
     name = info.get('name', None)
     description = info.get('description', None)
@@ -185,9 +187,6 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
         root). This misleads fabric to believe that everything went fine. To
         deal with this we check if the returned output contains a fragment
         of this message.
-
-    TODO: grab unix errors
-    TODO: don't let commands like vi, etc to go through or timeout
     """
     if not host:
         log.error('Host not provided, exiting.')
@@ -232,7 +231,8 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
             try:
                 cmd_output = run(command)
             except Exception as e:
-                return Response('Exception while executing command: %s' % e, 503)
+                return Response('Exception while executing command: %s' % e,
+                                503)
     except Exception as e:
         log.error('Exception while executing command: %s' % e)
         return Response('Exception while executing command: %s' % e, 503)

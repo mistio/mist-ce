@@ -18,6 +18,14 @@ define('app/views/machine', [
 		    		return 'ui-disabled';
 		    	}
 		    }.property('machine.hasKey'),
+		    
+		    disabledTagClass: function(){
+		    	if(this.machine && this.machine.can_tag){
+			    	return '';
+		    	} else {
+		    		return 'ui-disabled';
+		    	}
+		    }.property('machine.can_tag'),
 
 			metadata: function(){
 				if(!this.machine || !this.machine.extra){
