@@ -9,7 +9,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 requires = ['pyramid', 'apache-libcloud', 'PasteScript', 'fabric']
 
 setup(name='mist.io',
-      version='0.8',
+      version='0.9.0',
       license = 'AGPLv3',
       description='cloud management web app',
       long_description=README + '\n\n' +  CHANGES,
