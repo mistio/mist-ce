@@ -10,7 +10,7 @@ Welcome to mist.io's documentation!
 :Author: unweb.me
 :Source: https://github.com/unweb/mist.io
 :License: GNU AGPL v3
-:Keywords: python, cloud computing, jquery mobile
+:Keywords: web cloud mobile libcloud pyramid amazon rackspace openstack linode
 
 Mist.io helps you manage and monitor your virtual machines, across different
 clouds, using any device that can access the web. Check out the freemium service
