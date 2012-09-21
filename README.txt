@@ -95,4 +95,4 @@ With the --reload flag, whenever there are changes in Python code and templates
 the server will automatically restart to load the new version. Changes in css
 and javascript don't need a restart to show up. To stop it, simply press CTRL+C.  
 
-Point your (mobile) browser to http://127.0.0.1:6543 and you are ready to roll!
+Point your browser to http://127.0.0.1:6543 and you are ready to roll!
