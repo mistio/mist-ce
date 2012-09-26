@@ -11,14 +11,14 @@ define('app/views/machine', [
             tagName: false,
             machineBinding: 'Mist.machine',
 
-            disabledClass: function(){
+            disabledShellClass: function(){
                 if(this.machine && this.machine.hasKey){
                     return '';
                 } else {
                     return 'ui-disabled';
                 }
             }.property('machine.hasKey'),
-            
+
             disabledTagClass: function(){
                 if(this.machine && this.machine.can_tag){
                     return '';
@@ -27,6 +27,14 @@ define('app/views/machine', [
                 }
             }.property('machine.can_tag'),
 
+            disabledPowerClass: function(){
+                if(this.machine && this.machine.state === 'terminated') {
+                    return 'ui-disabled';
+                } else {
+                    return '';
+                }
+            }.property('machine.state'),
+
             metadata: function(){
                 if(!this.machine || !this.machine.extra){
                     return [];
@@ -34,7 +42,7 @@ define('app/views/machine', [
                 var ret = new Array();
 
                 $.each(this.machine.extra, function(key, value){
-                    if (typeof(value) == 'string' || typeof(value) == 'number'){
+                    if (typeof(value) == 'string' || typeof(value) == 'number') {
                         ret.push({key:key, value: value});
                     }
                 });
