@@ -316,8 +316,9 @@ def reboot_machine(request):
                    driver=conn)
 
     machine.reboot()
-
-    return Response('Success', 200)
+    response = Response('Success', 200)
+    response._content_type__set('application/json')
+    return response
 
 
 @view_config(route_name='machine', request_method='POST',
