@@ -157,6 +157,8 @@ def create_machine(request):
     except:
         return Response('Backend not found', 404)
 
+    backend_index = int(request.matchdict['backend'])
+
     try:
         machine_name = request.json_body['name']
         location_id = request.json_body['location']
@@ -181,9 +183,18 @@ def create_machine(request):
     else:
         location = NodeLocation(location_id, name='', country='', driver=conn)
 
-    has_key = len(request.registry.settings['keypairs'])
+    try:
+        private_key = request['beaker.session']['backends'][backend_index]\
+                             ['private_key']
+        has_key = True
+    except KeyError:
+        has_key = False
+
     if conn.type in RACKSPACE_PROVIDERS and has_key:
-        key = SSHKeyDeployment(request.registry.settings['keypairs']['default'][0])
+        try:
+            key = SSHKeyDeployment(str(request['beaker.session']['backends'][backend_index]['public_key']))
+        except KeyError:
+            key = SSHKeyDeployment(str(request.registry.settings['keypairs']['default'][0]))
         try:
             conn.deploy_node(name=machine_name,
                              image=image,
@@ -194,7 +205,12 @@ def create_machine(request):
         except:
             log.warn('Failed to deploy node with ssh key, attempt without')
     elif conn.type in EC2_PROVIDERS and has_key:
-        key = request.registry.settings['keypairs']['default'][0]
+        try:
+            key = request['beaker.session']['backends'][backend_index]\
+                                 ['public_key']
+        except KeyError:
+            key = request.registry.settings['keypairs']['default'][0]
+
         imported_key = import_key(conn, key, EC2_KEY_NAME)
         created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
         if imported_key and created_security_group:
@@ -209,7 +225,11 @@ def create_machine(request):
             except:
                 log.warn('Failed to deploy node with ssh key, attempt without')
     elif conn.type is Provider.LINODE and has_key:
-        key = request.registry.settings['keypairs']['default'][0]
+        try:
+            key = request['beaker.session']['backends'][backend_index]\
+                                 ['public_key']
+        except KeyError:
+            key = request.registry.settings['keypairs']['default'][0]
         auth = NodeAuthSSHKey(key)
         try:
             conn.create_node(name=machine_name,
