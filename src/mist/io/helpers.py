@@ -74,28 +74,26 @@ def get_machine_actions(machine, backend):
         can_stop = True
 
     if backend.type in RACKSPACE_PROVIDERS or \
-        backend.type == Provider.LINODE:
+                       backend.type == Provider.LINODE:
         can_tag = False
 
     # for other states
-    if machine.state is NodeState.REBOOTING:
+    if machine.state in (NodeState.REBOOTING, NodeState.PENDING):
         can_start = False
         can_stop = False
         can_reboot = False
-    elif machine.state is NodeState.TERMINATED:
-        can_stop = False
-        can_reboot = False
     elif machine.state is NodeState.UNKNOWN and \
-         backend.type in EC2_PROVIDERS:
+                          backend.type in EC2_PROVIDERS:
         # We assume uknown state in EC2 mean stopped
         can_stop = False
         can_start = True
         can_reboot = False
-    elif machine.state in (NodeState.PENDING, NodeState.UNKNOWN):
+    elif machine.state in (NodeState.TERMINATED, NodeState.UNKNOWN):
         can_start = False
         can_destroy = False
         can_stop = False
         can_reboot = False
+        can_tag = False
 
     return {'can_stop': can_stop,
             'can_start': can_start,
