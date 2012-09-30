@@ -507,8 +507,7 @@ def shell_command(request):
 
     backend_index = int(request.matchdict['backend'])
     try:
-        private_key = request['beaker.session']['backends'][backend_index]\
-                             ['private_key']
+        private_key = request['beaker.session']['keypairs']['default'][1]
     except KeyError:
         private_key = request.registry.settings['keypairs']['default'][1]
 
