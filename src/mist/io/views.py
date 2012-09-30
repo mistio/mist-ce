@@ -184,17 +184,14 @@ def create_machine(request):
         location = NodeLocation(location_id, name='', country='', driver=conn)
 
     try:
-        private_key = request['beaker.session']['backends'][backend_index]\
-                             ['private_key']
-        has_key = True
+        private_key = request['beaker.session']['keypairs']['default'][1]
+        public_key = request['beaker.session']['keypairs']['default'][0]
     except KeyError:
-        has_key = False
+        private_key = request.registry.settings['keypairs']['default'][1]
+        public_key = request['beaker.session']['keypairs']['default'][0]
 
-    if conn.type in RACKSPACE_PROVIDERS and has_key:
-        try:
-            key = SSHKeyDeployment(str(request['beaker.session']['backends'][backend_index]['public_key']))
-        except KeyError:
-            key = SSHKeyDeployment(str(request.registry.settings['keypairs']['default'][0]))
+    if conn.type in RACKSPACE_PROVIDERS and public_key:
+        key = SSHKeyDeployment(public_key)
         try:
             conn.deploy_node(name=machine_name,
                              image=image,
@@ -204,14 +201,8 @@ def create_machine(request):
             return Response('Success', 200)
         except:
             log.warn('Failed to deploy node with ssh key, attempt without')
-    elif conn.type in EC2_PROVIDERS and has_key:
-        try:
-            key = request['beaker.session']['backends'][backend_index]\
-                                 ['public_key']
-        except KeyError:
-            key = request.registry.settings['keypairs']['default'][0]
-
-        imported_key = import_key(conn, key, EC2_KEY_NAME)
+    elif conn.type in EC2_PROVIDERS and public_key:
+        imported_key = import_key(conn, public_key, EC2_KEY_NAME)
         created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
         if imported_key and created_security_group:
             try:
@@ -224,13 +215,8 @@ def create_machine(request):
                 return Response('Success', 200)
             except:
                 log.warn('Failed to deploy node with ssh key, attempt without')
-    elif conn.type is Provider.LINODE and has_key:
-        try:
-            key = request['beaker.session']['backends'][backend_index]\
-                                 ['public_key']
-        except KeyError:
-            key = request.registry.settings['keypairs']['default'][0]
-        auth = NodeAuthSSHKey(key)
+    elif conn.type is Provider.LINODE and public_key:
+        auth = NodeAuthSSHKey(public_key)
         try:
             conn.create_node(name=machine_name,
                              image=image,

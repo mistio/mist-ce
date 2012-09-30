@@ -295,7 +295,7 @@ define('app/models/machine', [
 
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        that.set('hasMonitoring', oldValue);
+                        // that.set('hasMonitoring', oldValue);
                     }
                 });
             }.observes('hasMonitoring'),
