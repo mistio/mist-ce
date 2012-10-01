@@ -165,7 +165,7 @@ define('app/views/machine', [
                     var changes_since = 0;
 
                     function poll(){
-                        if(!Mist.graphPolling){
+                        if(!Mist.graphPolling || !machine.hasMonitoring){
                             return;
                         }
 
@@ -176,7 +176,7 @@ define('app/views/machine', [
 
                     $.ajax({
                         // TODO: this should point to https://mist.io/....
-                        url: 'https://mist.io/backends/' + machine.backend.index + '/machines/' + machine.id + '/stats',
+                        url: URL_PREFIX + '/backends/' + machine.backend.index + '/machines/' + machine.id + '/stats',
                         data: data,
                         dataType: 'jsonp',
                         success: function(data) {

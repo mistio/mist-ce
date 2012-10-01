@@ -282,6 +282,7 @@ define( 'app', [
 );
 
 var LOGLEVEL = 3;
+var URL_PREFIX = 'https://mist.io';
 
 function log() {
     try {

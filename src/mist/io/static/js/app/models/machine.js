@@ -18,7 +18,8 @@ define('app/models/machine', [
             backend: null,
             selected: false,
             hasKey: false,
-            hasMonitoring: false,
+            hasMonitoring: null,
+            checkedMonitoring: false,
             state: 'stopped',
 
             reboot: function() {
@@ -231,7 +232,7 @@ define('app/models/machine', [
             checkHasMonitoring: function() {
                 var that = this;
                 $.ajax({
-                    url: 'https://mist.io/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
+                    url: URL_PREFIX + '/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
                     dataType: 'jsonp',
                     success: function(data) {
                         log("machine has monitoring");
@@ -260,8 +261,13 @@ define('app/models/machine', [
             }.observes('state'),
 
             monitoringChanged: function() {
+                if (!this.checkedMonitoring) {
+                    this.checkedMonitoring = true;
+                    return false;
+                }
+                
                 var oldValue = !this.hasMonitoring;
-                log("monitoring:  " + oldValue);
+                warn("monitoring:  " + oldValue);
 
                 var that = this;
 
@@ -286,7 +292,7 @@ define('app/models/machine', [
                 };
 
                 $.ajax({
-                    url: 'https://mist.io/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
+                    url: URL_PREFIX + '/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
