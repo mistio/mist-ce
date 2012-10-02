@@ -180,6 +180,8 @@ define( 'app', [
 
         $(document).on( 'pagebeforeshow', '#single-machine', function() {
             Mist.graphPolling = true;
+            $("#enable-monitoring-button").button();
+            $("#disable-monitoring-button").button();
         });
 
         $(document).on( 'pageshow', '#single-machine', function() {
