@@ -86,19 +86,20 @@
                     class="monitoring-button"
                     id="disable-monitoring-button"
                     data-role="button"
-                    data-icon="gear"
+                    data-icon="delete"
                     data-rel="dialog"
+                    data-theme="a"
                     data-transition="slidedown">Disable Monitoring</a>
 
                 {{else}}
-
-                <span>Monitoring is currently disabled, push the button below to enable it</span>
+                <span class="monitoring-info">Monitoring is currently disabled</span>
                 <a href="#monitoring-dialog"
                     class="monitoring-button"
                     id="enable-monitoring-button"
                     data-role="button"
-                    data-icon="gear"
+                    data-icon="star"
                     data-rel="dialog"
+                    data-theme="b"
                     data-transition="slidedown">Enable Monitoring</a>
 
                 {{/if}}
