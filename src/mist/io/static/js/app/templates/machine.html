@@ -42,55 +42,69 @@
 
             <h3>Monitoring</h3>
 
-            {{#if machine.hasMonitoring}}
-            <div id="monitoring-wrapper" class="ui-btn-inner ui-corner-top ui-corner-bottom">
-                <div id="machineGraph"></div>
-                <h4 class="monitoring-rules-title">Monitoring Rules</h4>
-                <table id="monitoring-rules-table">
-                    <tr>
-                        <td class="key">Load Average (15 min)</td>
-                        <td class="value">
-                            Alert if greater than 
-                            <input type="text" value="15" class="rule-input">% 
-                            <input type="text" value="15" class="rule-input"> 
-                            time(s) within 
-                            <input type="text" value="1" class="rule-input"> 
-                            cycle(s)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="key">Load Average (5 min)</td>
-                        <td class="value">
-                            Alert if greater than 
-                            <input type="text" value="15" class="rule-input">% 
-                            <input type="text" value="15" class="rule-input"> 
-                            time(s) within 
-                            <input type="text" value="1" class="rule-input"> 
-                            cycle(s)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="key">Load Average (1 min)</td>
-                        <td class="value">
-                            Alert if greater than 
-                            <input type="text" value="15" class="rule-input">% 
-                            <input type="text" value="15" class="rule-input"> 
-                            time(s) within 
-                            <input type="text" value="1" class="rule-input"> 
-                            cycle(s)
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            {{/if}}
+                {{#if machine.hasMonitoring}}
+                <div id="monitoring-wrapper" class="ui-btn-inner ui-corner-top ui-corner-bottom">
+                    <div id="machineGraph"></div>
+                    <h4 class="monitoring-rules-title">Monitoring Rules</h4>
+                    <table id="monitoring-rules-table">
+                        <tr>
+                            <td class="key">Load Average (15 min)</td>
+                            <td class="value">
+                                Alert if greater than
+                                <input type="text" value="15" class="rule-input">%
+                                <input type="text" value="15" class="rule-input">
+                                time(s) within
+                                <input type="text" value="1" class="rule-input">
+                                cycle(s)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="key">Load Average (5 min)</td>
+                            <td class="value">
+                                Alert if greater than
+                                <input type="text" value="15" class="rule-input">%
+                                <input type="text" value="15" class="rule-input">
+                                time(s) within
+                                <input type="text" value="1" class="rule-input">
+                                cycle(s)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="key">Load Average (1 min)</td>
+                            <td class="value">
+                                Alert if greater than
+                                <input type="text" value="15" class="rule-input">%
+                                <input type="text" value="15" class="rule-input">
+                                time(s) within
+                                <input type="text" value="1" class="rule-input">
+                                cycle(s)
+                            </td>
+                        </tr>
+                    </table>
+                </div>
 
-            <label>
-            {{view Mist.Checkbox
-                checkedBinding="machine.hasMonitoring"
-                id="enableMonitoring"
-            }}
-            Enable Monitoring
-            </label>
+                <a href="#monitoring-dialog"
+                    class="monitoring-button"
+                    id="disable-monitoring-button"
+                    data-role="button"
+                    data-icon="gear"
+                    data-rel="dialog"
+                    data-transition="slidedown">Disable Monitoring</a>
+
+                {{else}}
+
+                <div class="enable-monitoring-info">
+                    <span>Monitoring is currently disabled, push the button below to enable it</span>
+                    <a href="#monitoring-dialog"
+                        class="monitoring-button"
+                        id="enable-monitoring-button"
+                        data-role="button"
+                        data-icon="gear"
+                        data-rel="dialog"
+                        data-transition="slidedown">Enable Monitoring</a>
+                </div>
+                {{/if}}
+
         </div>
 
         <div data-role="collapsible" data-collapsed="false">
@@ -98,7 +112,7 @@
             <h3>Basic Info</h3>
 
             <table id="machine-basic-table">
-           
+
                 {{#if machine.tags}}
                 <tr>
                     <td class="key">Tags</td>
@@ -116,7 +130,7 @@
                    <td class="value">{{upFor}}</td>
                 </tr>
                 {{/if}}
-                
+
                 {{#each basicvars}}
                 <tr>
                    <td class="key">{{key}}</td>
@@ -127,7 +141,7 @@
             </table>
 
         </div>
-        
+
         <div data-role="collapsible">
 
             <h3>Full metadata list</h3>

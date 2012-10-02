@@ -58,6 +58,7 @@ define( 'app', [
     'app/views/image_list',
     'app/views/delete_tag',
     'app/views/machine_tags_dialog',
+    'app/views/machine_monitoring_dialog',
     'mobile',
     'cubism',
     'ember'
@@ -87,6 +88,7 @@ define( 'app', [
                 ImageListView,
                 DeleteTagView,
                 MachineTagsDialog,
+                MachineMonitoringDialog,
                 Mobile,
                 cubism
                 ) {
@@ -188,6 +190,11 @@ define( 'app', [
             Mist.graphPolling = false;
         });
 
+        $(document).on( 'pagebeforehide', '#monitoring-dialog', function() {
+            $("#enable-monitoring-button").button();
+            $("#disable-monitoring-button").button();
+        });
+
         // Console toggle behavior
         $(document).ready(function() {
             $('#shell-return').on('click', '.command', function() {
@@ -270,7 +277,8 @@ define( 'app', [
         imageListView.append();
         var machineTagsDialog = MachineTagsDialog.create();
         machineTagsDialog.append();
-
+        var machineMonitoringDialog = MachineMonitoringDialog.create();
+        machineMonitoringDialog.append();
 
         $(document).on( 'pagebeforeshow', '#dialog-add', function(){
             $('#dialog-add').trigger('create');
@@ -315,4 +323,3 @@ function error() {
         }
     } catch(err) {}
 }
-

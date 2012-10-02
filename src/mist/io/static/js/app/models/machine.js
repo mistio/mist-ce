@@ -260,12 +260,12 @@ define('app/models/machine', [
                 }
             }.observes('state'),
 
-            monitoringChanged: function() {
+            changeMonitoring: function() {
                 if (!this.checkedMonitoring) {
                     this.checkedMonitoring = true;
                     return false;
                 }
-                
+
                 var oldValue = !this.hasMonitoring;
                 warn("monitoring:  " + oldValue);
 
@@ -291,6 +291,8 @@ define('app/models/machine', [
                    'provider': this.backend.provider
                 };
 
+                that.set('pendingMonitoring', true);
+
                 $.ajax({
                     url: URL_PREFIX + '/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
                     type: 'POST',
@@ -298,13 +300,17 @@ define('app/models/machine', [
                     data: JSON.stringify(payload),
                     dataType: 'jsonp',
                     success: function(data) {
-
+                        if ('monitoring' in data) {
+                            that.set('hasMonitoring', data.monitoring);
+                            that.set('pendingMonitoring', false);
+                        }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        // that.set('hasMonitoring', oldValue);
+                        that.set('hasMonitoring', oldValue);
+                        that.set('pendingMonitoring', false);
                     }
                 });
-            }.observes('hasMonitoring'),
+            },
 
             init: function() {
                 this._super();
