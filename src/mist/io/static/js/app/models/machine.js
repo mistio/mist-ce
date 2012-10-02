@@ -263,7 +263,7 @@ define('app/models/machine', [
             }.observes('state'),
 
             changeMonitoring: function() {
-                warn("monitoring now:  " + this.hasMonitoring);
+                warn("Setting monitoring to:  " + !this.hasMonitoring);
 
                 var that = this;
 
@@ -282,7 +282,7 @@ define('app/models/machine', [
                 }
 
                 var payload = {
-                   'monitoring': this.hasMonitoring,
+                   'monitoring': !this.hasMonitoring,
                    'host': host,
                    'provider': this.backend.provider
                 };
