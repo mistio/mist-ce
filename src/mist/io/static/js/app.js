@@ -180,21 +180,14 @@ define( 'app', [
 
         $(document).on( 'pagebeforeshow', '#single-machine', function() {
             Mist.graphPolling = true;
-            $("#enable-monitoring-button").button();
-            $("#disable-monitoring-button").button();
         });
 
         $(document).on( 'pageshow', '#single-machine', function() {
-            $('input[type=checkbox]').checkboxradio("refresh");
+            $(".monitoring-button").button();
         });
 
         $(document).on( 'pagebeforehide', '#single-machine', function() {
             Mist.graphPolling = false;
-        });
-
-        $(document).on( 'pagebeforehide', '#monitoring-dialog', function() {
-            $("#enable-monitoring-button").button();
-            $("#disable-monitoring-button").button();
         });
 
         // Console toggle behavior
