@@ -574,12 +574,9 @@ a#mist-select-machines-button span.ui-btn-text {
     background: #C9E0F0;
 }
 
-#monitoring-wrapper {
-    text-align: center;
-}
-
 .monitoring-info {
     color: grey;
+    text-align: center;
 }
 
 .pending-monitoring {
