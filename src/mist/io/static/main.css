@@ -1,8 +1,10 @@
 /* Custom unweb rules */
 
 
-svg {
+#machineGraph span {
     font-size: 12px;
+    vertical-align: middle;
+    margin:5px;
 }
 
 /* Splash (loading) page */
