@@ -35,6 +35,14 @@ define('app/views/machine', [
                 }
             }.property('machine.state'),
 
+            pendingMonitoringClass: function() {
+                if (this.machine && this.machine.pendingMonitoring) {
+                    return 'pending-monitoring';
+                } else {
+                    return '';
+                }
+            }.property('machine.pendingMonitoring'),
+
             metadata: function(){
                 if(!this.machine || !this.machine.extra){
                     return [];

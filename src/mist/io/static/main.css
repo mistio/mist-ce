@@ -304,7 +304,7 @@ a.action-links {
 
 /* Machines tags */
 
-#machines-list .node .tag, 
+#machines-list .node .tag,
 #images-list .node .tag {
     border: 1px solid #bfbfbf;
     color: #555 !important;
@@ -570,8 +570,8 @@ a#mist-select-machines-button span.ui-btn-text {
     background: #C9E0F0;
 }
 
-.enable-monitoring-info {
-
+.pending-monitoring {
+    background: url("images/ajax-loader.png") center center no-repeat;
 }
 
 .monitoring-button {
@@ -591,7 +591,7 @@ a#mist-select-machines-button span.ui-btn-text {
 }
 
 #disable-monitoring-button {
- 
+
 }
 
 #monitoring-rules-table, #machine-basic-table, #machine-metadata {
@@ -643,7 +643,7 @@ a#mist-select-machines-button span.ui-btn-text {
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
-} 
+}
 
 #machine-basic-table .tag {
     border: 1px solid #c3c3c4;

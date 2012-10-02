@@ -12,12 +12,12 @@ define('app/views/machine_monitoring_dialog', [
             tagName: false,
             machineBinding: 'Mist.machine',
 
-            changeMonitoringClicked: function(){
+            changeMonitoringClicked: function() {
                 this.machine.changeMonitoring();
                 history.back();
             },
 
-            backClicked: function(){
+            backClicked: function() {
                 history.back();
             },
 
