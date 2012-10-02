@@ -19,7 +19,7 @@ define('app/models/machine', [
             selected: false,
             hasKey: false,
             hasMonitoring: null,
-            checkedMonitoring: false,
+            pendingMonitoring: false,
             state: 'stopped',
 
             reboot: function() {
@@ -261,11 +261,6 @@ define('app/models/machine', [
             }.observes('state'),
 
             changeMonitoring: function() {
-                if (!this.checkedMonitoring) {
-                    this.checkedMonitoring = true;
-                    return false;
-                }
-
                 var oldValue = !this.hasMonitoring;
                 warn("monitoring:  " + oldValue);
 
@@ -291,7 +286,7 @@ define('app/models/machine', [
                    'provider': this.backend.provider
                 };
 
-                that.set('pendingMonitoring', true);
+                this.set('pendingMonitoring', true);
 
                 $.ajax({
                     url: URL_PREFIX + '/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
