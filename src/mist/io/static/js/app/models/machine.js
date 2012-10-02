@@ -261,7 +261,6 @@ define('app/models/machine', [
             }.observes('state'),
 
             changeMonitoring: function() {
-                var oldValue = !this.hasMonitoring;
                 warn("monitoring:  " + oldValue);
 
                 var that = this;
@@ -301,7 +300,6 @@ define('app/models/machine', [
                         }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        that.set('hasMonitoring', oldValue);
                         that.set('pendingMonitoring', false);
                     }
                 });
