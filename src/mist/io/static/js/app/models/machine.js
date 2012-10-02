@@ -263,7 +263,7 @@ define('app/models/machine', [
             }.observes('state'),
 
             changeMonitoring: function() {
-                warn("monitoring:  " + oldValue);
+                warn("monitoring now:  " + this.hasMonitoring);
 
                 var that = this;
 
