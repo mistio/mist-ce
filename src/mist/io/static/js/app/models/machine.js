@@ -21,6 +21,8 @@ define('app/models/machine', [
             hasMonitoring: null,
             pendingMonitoring: false,
             state: 'stopped',
+            stats:{ 'cpu': [], 'load': [], 'disk': []},
+            graphdata: {},
 
             reboot: function() {
                 log('Rebooting machine', this.name);

@@ -1,6 +1,10 @@
 /* Custom unweb rules */
 
 
+svg {
+    font-size: 12px;
+}
+
 /* Splash (loading) page */
 
 div#splash {

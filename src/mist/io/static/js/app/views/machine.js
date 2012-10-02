@@ -164,14 +164,100 @@ define('app/views/machine', [
                 var stats = {};
 
                 Em.run.next(function(){
-                    var context = cubism.context()
-                        .serverDelay(0)
-                        .clientDelay(0)
-                        .step(5000)
-                        .size(960);
-
                     var changes_since = 0;
-
+                    function createGraph(type) {
+                        var n = 1000,
+                            duration = 500,
+                            now = new Date(Date.now() - duration),
+                            count = 0,
+                            graphdata = d3.range(n).map(function() { return 0; });
+                                               
+                        var margin = {top: 0, right: 0, bottom: 20, left: 0},
+                            width = 960 - margin.right,
+                            height = 120 - margin.top - margin.bottom;
+                        
+                        var x = d3.time.scale()
+                            .domain([now - (n - 2) * duration, now - duration])
+                            .range([0, width]);
+                        
+                        var y = d3.scale.linear()
+                            .range([height, 0]);
+                        
+                        var line = d3.svg.line()
+                            .interpolate("basis")
+                            .x(function(d, i) { return x(now - (n - 1 - i) * duration); })
+                            .y(function(d, i) { return y(d); });
+                        
+                        var svg = d3.select("#machineGraph ." + type).append("svg")
+                            .attr("width", width + margin.left + margin.right)
+                            .attr("height", height + margin.top + margin.bottom)
+                            .style("margin-left", -margin.left + "px")
+                          .append("g")
+                            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                        
+                        svg.append("defs").append("clipPath")
+                            .attr("id", "clip")
+                          .append("rect")
+                            .attr("width", width)
+                            .attr("height", height);
+                            
+                        svg.append("g")
+                              .attr("class", "y axis")
+                              .call(d3.svg.axis().scale(y).ticks(5).orient("left"));
+                              
+                        var axis = svg.append("g")
+                            .attr("class", "x axis")
+                            .attr("transform", "translate(0," + height + ")")
+                            .call(x.axis = d3.svg.axis().scale(x).orient("bottom"));
+                        
+                        var path = svg.append("g")
+                            .attr("clip-path", "url(#clip)")
+                          .append("path")
+                            .data([graphdata])
+                            .attr("class", "line");
+                        
+                        tick();
+                        
+                        d3.select(window)
+                            .on("scroll", function() { ++count; });
+                        
+                        function tick() {
+                          if(!Mist.graphPolling || !machine.hasMonitoring){
+                            return;
+                          }
+                          // update the domains
+                          now = new Date();
+                          x.domain([now - (n - 2) * duration, now - duration]);
+                          y.domain([0, d3.max(graphdata)]);
+                        
+                          // push the accumulated count onto the back, and reset the count
+                          graphdata.push(count);
+                          count = 0;
+                        
+                          // redraw the line
+                          svg.select(".line")
+                              .attr("d", line)
+                              .attr("transform", null);
+                        
+                          // slide the x-axis left
+                          axis.transition()
+                              .duration(duration)
+                              .ease("linear")
+                              .call(x.axis);
+                        
+                          // slide the line left
+                          path.transition()
+                              .duration(duration)
+                              .ease("linear")
+                              .attr("transform", "translate(" + x(now - (n - 1) * duration) + ")")
+                              .each("end", tick);
+                        
+                          // pop the old data point off the front
+                          graphdata.shift();
+                        
+                        }         
+                    }
+                    
                     function poll(){
                         if(!Mist.graphPolling || !machine.hasMonitoring){
                             return;
@@ -182,71 +268,29 @@ define('app/views/machine', [
                             data.changes_since = changes_since;
                         }
 
-                    $.ajax({
-                        // TODO: this should point to https://mist.io/....
-                        url: URL_PREFIX + '/backends/' + machine.backend.index + '/machines/' + machine.id + '/stats',
-                        data: data,
-                        dataType: 'jsonp',
-                        success: function(data) {
-                            info("machine stats");
-                            info(data);
-                            stats = data;
-                            changes_since=data['timestamp'],
-                            setTimeout(poll, 5000);
-                        }
-                    }).error(function(jqXHR, textStatus, errorThrown) {
-                        info('error querying for machine stats for machine id: ' + machine.id);
-                        info(textStatus + " " + errorThrown);
-                        setTimeout(poll, 5000);
-                    });
-                }
-
-                function draw(name) {
-                      var value = 0,
-                          values = [],
-                          i = 0,
-                          last;
-
-                      return context.metric(function(start, stop, step, callback) {
-                        start = +start, stop = +stop;
-                        if (isNaN(last)) last = start;
-                        while (last < stop) {
-                          last += step;
-                          value = stats[name];
-                          values.push(value);
-                        }
-                        callback(null, values = values.slice((start - stop) / step));
-                      }, name);
+                        $.ajax({
+                            url: URL_PREFIX + '/backends/' + machine.backend.index + '/machines/' + machine.id + '/stats',
+                            data: data,
+                            dataType: 'jsonp',
+                            success: function(data) {
+                                info("machine stats");
+                                info(data);
+                                machine.stats = data;
+                                changes_since=data['timestamp'],
+                                setTimeout(poll, 10000);
+                            }
+                        }).error(function(jqXHR, textStatus, errorThrown) {
+                            info('error querying for machine stats for machine id: ' + machine.id);
+                            info(textStatus + " " + errorThrown);
+                            setTimeout(poll, 10000);
+                        });
                     }
 
-                    var cpu = draw("cpu"),
-                        memory = draw("memory"),
-                        disk = draw("disk"),
-                        load = draw("load");
 
-                    d3.select("#machineGraph").call(function(div) {
-
-                      div.append("div")
-                          .attr("class", "axis")
-                          .call(context.axis().orient("top"));
-
-                      div.selectAll(".horizon")
-                          .data([cpu, memory, disk, load])
-                        .enter().append("div")
-                          .attr("class", "horizon")
-                          .call(context.horizon().extent([-200, 200]));
-
-                      div.append("div")
-                          .attr("class", "rule")
-                          .call(context.rule());
-
-                    });
-                    // On mousemove, reposition the chart values to match the rule.
-                    context.on("focus", function(i) {
-                      d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
-                    });
 
                     poll();
+                    createGraph('cpu');
+                    createGraph('load');
 
                 });
 
