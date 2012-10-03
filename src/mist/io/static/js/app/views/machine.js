@@ -174,31 +174,37 @@ define('app/views/machine', [
                               last;
                           return context.metric(function(start, stop, step, callback) {
                             var values = [];
-
+                            
                             // convert start & stop to milliseconds
                             start = +start;
                             stop = +stop;
-                        
-                            while (start < stop) {
-                              start += step;
-                              try{values.push(machine.stats[x][y][z]);}
-                              catch(e){}                              
-                            }
-                        
-                            callback(null, values);
+                                                        
+                            var uri = URL_PREFIX + '/backends/' + 
+                                    machine.backend.index + '/machines/' + 
+                                    machine.id + '/stats' + "?expression=" + x +
+                                    "&start=" + start/1000 + "&stop=" + stop/1000 + 
+                                    "&step=" + step;
+                                    
+                            d3.json(uri, function(data) {
+                                if (!data) return callback(new Error("unable to load data"));
+                                console.warn(data[x][y]);
+     
+                                callback(null, data[x][y].map(function(d) { return d*100}));
+                            });
+
                         });
                         }
                                                 
                         var context = cubism.context()
                             .serverDelay(0)
                             .clientDelay(0)
-                            .step(60*1000)
+                            .step(5*1000)
                             .size($(window).width()-180);
                         
-                        var load_avg1 = stat('load','v',0);
-                        var cpu_user = stat('cpu','user',0);
+                        //var load_avg1 = stat('load','v',0);
+                        var cpu_user = stat('cpu','util',0);
                         
-                        d3.select("#machineGraph").call(function(div) {
+                        /*d3.select("#machineGraph").call(function(div) {
                           div.datum(load_avg1);
                         
                           div.append("div")
@@ -209,7 +215,7 @@ define('app/views/machine', [
                                 .title("LOAD ")
                                 .extent([0, 1]));
                         
-                        });
+                        });*/
                                                 
                         d3.select("#machineGraph").call(function(div) {
                           div.datum(cpu_user);
@@ -220,9 +226,14 @@ define('app/views/machine', [
                                 .height(30)
                                 .colors(["#08519c","#3182bd","#6baed6","#bdd7e7","#bae4b3","#74c476","#31a354","#006d2c"])
                                 .title("CPU ")
-                                .extent([-10, 10]));
+                                .extent([0, 100]));
                         
                         });
+
+                        d3.select("#machineGraph").append("g")
+                              .call(d3.svg.axis()
+                                .scale(d3.time.scale())
+                                .orient("bottom"));
                         
                         
                         // On mousemove, reposition the chart values to match the rule.
@@ -230,42 +241,7 @@ define('app/views/machine', [
                           d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
                         });
                     }
-                    
-                    function poll(){
-                        if(!Mist.graphPolling || !machine.hasMonitoring){
-                            return;
-                        }
 
-                        data = {};
-                        if(changes_since){
-                        //    data.changes_since = changes_since;
-                        }
-
-                        $.ajax({
-                            url: URL_PREFIX + '/backends/' + machine.backend.index + '/machines/' + machine.id + '/stats',
-                            data: data,
-                            dataType: 'jsonp',
-                            success: function(data) {
-                                if (data) {
-                                    info("machine stats");
-                                    info(data);
-                                    machine.stats = data;
-                                    changes_since = data['timestamp'],
-                                    setTimeout(poll, 58000);
-                                } else {
-                                    warn('no stats received for ' + machine.id);
-                                }
-                            }
-                        }).error(function(jqXHR, textStatus, errorThrown) {
-                            info('error querying for machine stats for machine id: ' + machine.id);
-                            info(textStatus + " " + errorThrown);
-                            setTimeout(poll, 10000);
-                        });
-                    }
-
-
-
-                    poll();
                     createGraphs();
 
                 });
