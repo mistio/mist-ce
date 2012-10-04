@@ -19,7 +19,7 @@ require.config({
             deps: ['jquery']
         },
         'mobile': {
-           deps: ['jquery']
+           deps: ['jquery','ember']
         },
         'd3': {
             deps: ['jquery']
