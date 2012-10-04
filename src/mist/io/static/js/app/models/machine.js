@@ -296,7 +296,7 @@ define('app/models/machine', [
                     data: JSON.stringify(payload),
                     dataType: 'jsonp',
                     success: function(data) {
-                        if ('monitoring' in data) {
+                        if (data.deployed_collectd) {
                             that.set('hasMonitoring', data.monitoring);
                             that.set('pendingMonitoring', false);
                         }
