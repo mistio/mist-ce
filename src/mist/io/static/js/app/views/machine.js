@@ -216,7 +216,8 @@ define('app/views/machine', [
                                 .extent([0, 1]));
                         
                         });*/
-                                                
+                                
+                        $('#machineGraph *').remove();                
                         d3.select("#machineGraph").call(function(div) {
                           div.datum(cpu_user);
                         
