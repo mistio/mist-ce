@@ -15,11 +15,14 @@ require.config({
         cubism: 'lib/cubism-1.2.2'
     },
     shim: {
+        'ember': {
+            deps: ['jquery']
+        },
         'jqueryUi': {
             deps: ['jquery']
         },
         'mobile': {
-           deps: ['jquery','ember']
+           deps: ['ember']
         },
         'd3': {
             deps: ['jquery']
