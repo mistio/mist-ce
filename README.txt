@@ -44,6 +44,7 @@ create a virtualenv and run buildout:
 
 Configuration
 =============
+
 First copy settings.py.dist in the same path and name it settings.py In settings.py
 you can configure the cloud backends and your keys using Python syntax. 
 The BACKENDS global is an array of dictionaries, each dictionary describing a 
