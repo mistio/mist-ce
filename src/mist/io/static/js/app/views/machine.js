@@ -174,39 +174,39 @@ define('app/views/machine', [
                               last;
                           return context.metric(function(start, stop, step, callback) {
                             var values = [];
-                            
+
                             // convert start & stop to milliseconds
                             start = +start;
                             stop = +stop;
-                                                        
-                            var uri = URL_PREFIX + '/backends/' + 
-                                    machine.backend.index + '/machines/' + 
+
+                            var uri = URL_PREFIX + '/backends/' +
+                                    machine.backend.index + '/machines/' +
                                     machine.id + '/stats' + "?expression=" + x +
-                                    "&start=" + start/1000 + "&stop=" + stop/1000 + 
+                                    "&start=" + start/1000 + "&stop=" + stop/1000 +
                                     "&step=" + step;
-                                    
+
                             d3.json(uri, function(data) {
                                 if (!data) return callback(new Error("unable to load data"));
                                 console.warn(data[x][y]);
-     
+
                                 callback(null, data[x][y].map(function(d) { return d*100}));
                             });
 
                         });
                         }
-                                                
+
                         var context = cubism.context()
                             .serverDelay(0)
                             .clientDelay(0)
                             .step(5*1000)
                             .size($(window).width()-180);
-                        
+
                         //var load_avg1 = stat('load','v',0);
-                        var cpu_user = stat('cpu','util',0);
-                        
+                        var cpu_user = stat('cpu', 'utilization', 0);
+
                         /*d3.select("#machineGraph").call(function(div) {
                           div.datum(load_avg1);
-                        
+
                           div.append("div")
                               .attr("class", "horizon")
                               .call(context.horizon()
@@ -214,13 +214,13 @@ define('app/views/machine', [
                                 .colors(["#08519c","#3182bd","#6baed6","#bdd7e7","#bae4b3","#74c476","#31a354","#006d2c"])
                                 .title("LOAD ")
                                 .extent([0, 1]));
-                        
+
                         });*/
-                                
-                        $('#machineGraph *').remove();                
+
+                        $('#machineGraph *').remove();
                         d3.select("#machineGraph").call(function(div) {
                           div.datum(cpu_user);
-                        
+
                           div.append("div")
                               .attr("class", "horizon")
                               .call(context.horizon()
@@ -228,15 +228,15 @@ define('app/views/machine', [
                                 .colors(["#08519c","#3182bd","#6baed6","#bdd7e7","#bae4b3","#74c476","#31a354","#006d2c"])
                                 .title("CPU ")
                                 .extent([0, 100]));
-                        
+
                         });
 
                         d3.select("#machineGraph").append("g")
                               .call(d3.svg.axis()
                                 .scale(d3.time.scale())
                                 .orient("bottom"));
-                        
-                        
+
+
                         // On mousemove, reposition the chart values to match the rule.
                         context.on("focus", function(i) {
                           d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
