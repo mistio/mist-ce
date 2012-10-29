@@ -44,7 +44,12 @@
                 <div {{bindAttr class="pendingMonitoringClass"}}></div>
                 <div id="monitoring-wrapper" class="ui-btn-inner ui-corner-top ui-corner-bottom">
                 {{#if machine.hasMonitoring}}
-                <div id="machineGraph"></div>
+                <div id="cpuGraph"></div>
+                <div id="loadGraph"></div>
+                <div id="networkGraph"></div>
+                <div id="diskGraph"></div>
+                <div id="memoryGraph"></div>
+                
                 <h4 class="monitoring-rules-title">Monitoring Rules</h4>
                 <table id="monitoring-rules-table">
                     <tr>
