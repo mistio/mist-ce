@@ -154,14 +154,25 @@ define('app/views/machine', [
             }.property("machine"),
 
             setGraph: function() {
+
+                Em.run.next(function(){
+                    $('.monitoring-button').button();
+                });
                 
                 if(!this.machine || !this.machine.hasMonitoring){
+                    if(this.context){
+                        this.context.stop();
+                        $('#cpuGraph').empty();
+                        $('#memoryGraph').empty();
+                        $('#diskGraph').empty();
+                        $('#networkGraph').empty();
+                        $('#loadGraph').empty();
+                    }
                     return;
                 }
 
                 var machine = this.machine;
-
-                var stats = {};
+                var that = this;
 
                 Em.run.next(function(){
                 
@@ -179,6 +190,8 @@ define('app/views/machine', [
                     */
     
                     var context = cubism.context().serverDelay(0).clientDelay(0).step(5000).size(960);
+                    that.context = context;
+                    
                     var localData = null;   
                     var cores = null;
                     var networkInterfaces = null;
@@ -190,38 +203,44 @@ define('app/views/machine', [
                         return context.metric(function(start, stop, step, callback) {
                             start = +start;
                             stop = +stop;
+                            
+                            if(machine.hasMonitoring){
 
                             $.getJSON(URL_PREFIX + '/backends/0/machines/'+ machine.id + '/stats?&start=' +
                                 (start / 1000) + '&stop=' + (stop / 1000) + '&step=' + step + '&callback=?',
                                 function(data) {
-                                    if (!data){
+                                    if (!data || !('cpu' in data)){
                                         return callback(new Error("unable to load data"));
                                     } else {
                                         localData = data;
                        
-                                    if(!cores){
-                                        cores = data['cpu']['cores'];
-                                    }
-                                    if(!networkInterfaces){
-                                        configureNetworkGraphs();
-                                    }
+                                        if(!cores){
+                                            cores = data['cpu']['cores'];
+                                        }
+                                        if(!networkInterfaces){
+                                            configureNetworkGraphs();
+                                        }
                        
-                                    if(!disks){
-                                        configureDiskGraphs();
-                                    }
+                                        if(!disks){
+                                            configureDiskGraphs();
+                                        }
                        
-                                    return callback(null, data['cpu']['utilization'].map(function(d) { return (d / cores) * 100;}));
-                                }
+                                        return callback(null, data['cpu']['utilization'].map(function(d) { return (d / cores) * 100;}));
+                                    }
                             }).error(function(jqXHR, textStatus, errorThrown) {
                                 return callback(new Error("unable to load data"));
                             });    
+                            
+                            } else {
+                                return callback(new Error("monitoring disabled"));
+                            }
                         }, 'Cpu: ');    
                     }
     
                     function drawMemory() {
 
                         return context.metric(function(start, stop, step, callback) {
-                            if(localData){
+                            if(localData && machine.hasMonitoring && 'memory' in localData){
                                 if(!memoryTotal){
                                     memoryTotal = localData["memory"]["total"];
                                 }
@@ -236,7 +255,10 @@ define('app/views/machine', [
         
                         return context.metric(function(start, stop, step, callback) {
             
-                            if(localData){
+                            if(localData && machine.hasMonitoring && 
+                                    ('disk' in localData) && (ioMethod in localData.disk) &&
+                                    (disk in localData.disk[ioMethod]) &&
+                                    ("disk_ops" in localData.disk[ioMethod][disk])){
                                 return callback(null, localData["disk"][ioMethod][disk]["disk_ops"].map(function(d) { return d;}));
                             } else {
                                 return callback(new Error("unable to load data"));
@@ -247,7 +269,7 @@ define('app/views/machine', [
                     function drawLoad() {
     
                         return context.metric(function(start, stop, step, callback) {
-                            if(localData){
+                            if(localData && machine.hasMonitoring && ('load' in localData)){
                                 return callback(null, localData["load"].map(function(d) { return d;}));
                             } else {
                                 return callback(new Error("unable to load data"));
@@ -259,7 +281,8 @@ define('app/views/machine', [
     
                         return context.metric(function(start, stop, step, callback) {
             
-                            if(localData){
+                            if(localData && machine.hasMonitoring && ('network' in localData) &&
+                                    (iface in localData.network) && (stream in localData.network[iface])){
                                 return callback(null, localData['network'][iface][stream].map(function(d) { return d;}));
                             } else {
                                 return callback(new Error("unable to load data"));
@@ -324,6 +347,16 @@ define('app/views/machine', [
                 });
 
             }.observes('machine.hasMonitoring'),
+            
+            handlePendingMonitoring: function(){
+                if(this.machine.pendingMonitoring){
+                    $('.monitoring-button').addClass('ui-disabled')
+                    $('.monitoring-spinner').show('slow');
+                } else {
+                    $('.monitoring-button').removeClass('ui-disabled')
+                    $('.monitoring-spinner').hide();
+                }
+            }.observes('machine.pendingMonitoring'),
 
             init: function() {
                 this._super();

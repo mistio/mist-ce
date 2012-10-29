@@ -288,6 +288,10 @@ define('app/models/machine', [
                 };
 
                 this.set('pendingMonitoring', true);
+                
+                if(this.hasMonitoring){
+                    this.set('hasMonitoring', false);
+                }
 
                 $.ajax({
                     url: URL_PREFIX + '/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
@@ -297,7 +301,10 @@ define('app/models/machine', [
                     dataType: 'jsonp',
                     success: function(data) {
                         if (data.deployed_collectd) {
-                            that.set('hasMonitoring', data.monitoring);
+                            that.set('hasMonitoring', true);
+                            that.set('pendingMonitoring', false);
+                        } else {
+                            that.set('hasMonitoring', false);
                             that.set('pendingMonitoring', false);
                         }
                     },
