@@ -51,6 +51,8 @@ def connect(request):
     else:
         # ec2, rackspace
         conn = driver(backend['id'], backend['secret'])
+        # Account for sub-provider regions (EC2_US_WEST, EC2_US_EAST etc.)
+        conn.type = backend['provider']
     return conn
 
 
