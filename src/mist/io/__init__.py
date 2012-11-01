@@ -24,10 +24,11 @@ def main(global_config, **settings):
 
         settings['keypairs'] = user_config['KEYPAIRS']
         settings['backends'] = user_config['BACKENDS']
-        settings['monitoring_url'] = user_config['MONITORING_URL']
-        settings['js_log_level'] = user_config['JS_LOG_LEVEL']
+        settings['monitoring_url'] = user_config.get('MONITORING_URL',
+                                                     'https://mist.io')
+        settings['js_log_level'] = user_config.get('JS_LOG_LEVEL', 3)
     except:
-        log.warn('local settings.py not available')
+        log.warn('Local settings.py not available or missing settings')
 
     config = Configurator(root_factory=Root, settings=settings)
 

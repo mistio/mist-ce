@@ -41,12 +41,8 @@ def home(request):
     except:
         session = False
 
-    try:
-        monitoring_url = request.environ['beaker.session']['monitoring_url']
-        js_log_level = request.environ['beaker.session']['js_log_level']
-    except:
-        monitoring_url = request.registry.settings['monitoring_url']
-        js_log_level = request.registry.settings['js_log_level']
+    monitoring_url = request.registry.settings['monitoring_url']
+    js_log_level = request.registry.settings['js_log_level']
 
     return {'project': 'mist.io',
             'session': session,
