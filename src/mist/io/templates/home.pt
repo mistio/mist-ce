@@ -22,7 +22,7 @@
                 paths: {
                     //Comment out this line to go back to loading
                     //the non-optimized main.js source file.
-                    "app": "../build/mist"
+                    //"app": "../build/mist"
                 }
             });
             require(["app"]);
