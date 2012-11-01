@@ -4,6 +4,9 @@ Copy this to the same path renaming it to settings.py. Check out the README
 for instructions on how to populate it.
 """
 
+MONITORING_URL = 'https://mist.io'
+
+JS_LOG_LEVEL = 3
 
 BACKENDS = [
 

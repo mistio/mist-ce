@@ -15,7 +15,7 @@ def main(global_config, **settings):
     if not settings.keys():
         settings = global_config
 
-    # import BACKENDS and KEYPAIRS from config
+    # import settings from settings.py
     try:
         user_config = {}
         execfile(global_config['here'] + '/settings.py',
@@ -24,6 +24,8 @@ def main(global_config, **settings):
 
         settings['keypairs'] = user_config['KEYPAIRS']
         settings['backends'] = user_config['BACKENDS']
+        settings['monitoring_url'] = user_config['MONITORING_URL']
+        settings['js_log_level'] = user_config['JS_LOG_LEVEL']
     except:
         log.warn('local settings.py not available')
 

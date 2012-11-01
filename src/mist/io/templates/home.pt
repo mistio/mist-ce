@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="static/main.css" />
     <link rel="icon" href="static/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
+    <script tal:content="string: var URL_PREFIX=${monitoring_url}" />
+    <script tal:content="string: var LOGLEVEL=${js_log_level}" />
     <script src="static/js/lib/require/require.js"></script>    
     <script>
             require.config({
@@ -24,7 +26,7 @@
                 }
             });
             require(["app"]);
-        </script>
+    </script>
 </head>
 
 <body style="background-color: #c2c3c4">
