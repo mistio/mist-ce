@@ -5,7 +5,6 @@ from libcloud.compute.types import Provider
 from pyramid.config import Configurator
 
 from mist.io.resources import Root
-from mist.io.cors import CORSMiddleware
 
 log = getLogger('mist.core')
 
@@ -55,6 +54,5 @@ def main(global_config, **settings):
 
     config.scan()
 
-    #app = CORSMiddleware(config.make_wsgi_app())
     app = config.make_wsgi_app()
     return app
