@@ -20,15 +20,16 @@ def main(global_config, **settings):
         execfile(global_config['here'] + '/settings.py',
                 {'Provider':Provider},
                 user_config)
-
         settings['keypairs'] = user_config['KEYPAIRS']
         settings['backends'] = user_config['BACKENDS']
-        settings['monitoring_url'] = user_config.get('MONITORING_URL',
-                                                     'https://mist.io')
-        settings['js_build'] = user_config.get('JS_BUILD', False)
-        settings['js_log_level'] = user_config.get('JS_LOG_LEVEL', 3)
     except:
-        log.warn('Local settings.py not available or missing settings')
+        log.error('Local settings.py not available or missing values.')
+        raise TypeError
+
+    settings['monitoring_url'] = user_config.get('MONITORING_URL',
+                                                 'https://mist.io')
+    settings['js_build'] = user_config.get('JS_BUILD', False)
+    settings['js_log_level'] = user_config.get('JS_LOG_LEVEL', 3)
 
     config = Configurator(root_factory=Root, settings=settings)
 
