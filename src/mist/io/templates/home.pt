@@ -13,19 +13,19 @@
     <link rel="stylesheet" href="static/main.css" />
     <link rel="icon" href="static/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
-    <script tal:content="string: var URL_PREFIX=${monitoring_url}" />
+    <script tal:content="string: var URL_PREFIX='${monitoring_url}'" />
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
     <script src="static/js/lib/require/require.js"></script>    
     <script>
-            require.config({
-                baseUrl: 'static/js/',
-                paths: {
-                    //Comment out this line to go back to loading
-                    //the non-optimized main.js source file.
-                    //"app": "../build/mist"
-                }
-            });
-            require(["app"]);
+        require.config({
+            baseUrl: 'static/js/',
+            paths: {
+                //Comment out this line to go back to loading
+                //the non-optimized main.js source file.
+                //"app": "../build/mist"
+            }
+        });
+        require(["app"]);
     </script>
 </head>
 
