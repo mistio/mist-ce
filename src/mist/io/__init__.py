@@ -14,23 +14,20 @@ def main(global_config, **settings):
     if not settings.keys():
         settings = global_config
 
-    # Import settings from settings.py.
+    # Import settings using sensible defaults where applicable
     try:
         user_config = {}
         execfile(global_config['here'] + '/settings.py',
                 {'Provider':Provider},
                 user_config)
+        settings['keypairs'] = user_config['KEYPAIRS']
+        settings['backends'] = user_config['BACKENDS']
+        settings['monitoring_url'] = user_config.get('MONITORING_URL',
+                                                     'https://mist.io')
+        settings['js_build'] = user_config.get('JS_BUILD', False)
+        settings['js_log_level'] = user_config.get('JS_LOG_LEVEL', 3)
     except:
-        log.error('Local settings.py not available.')
-        raise IOError
-
-    # Getting the settings using sensible defaults where applicable
-    settings['keypairs'] = user_config['KEYPAIRS']
-    settings['backends'] = user_config['BACKENDS']
-    settings['monitoring_url'] = user_config.get('MONITORING_URL',
-                                                 'https://mist.io')
-    settings['js_build'] = user_config.get('JS_BUILD', False)
-    settings['js_log_level'] = user_config.get('JS_LOG_LEVEL', 3)
+        log.warn('Local settings.py not available.')
 
     config = Configurator(root_factory=Root, settings=settings)
 
