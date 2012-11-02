@@ -14,7 +14,8 @@ def main(global_config, **settings):
     if not settings.keys():
         settings = global_config
 
-    # import settings from settings.py
+    # Import settings from settings.py. Things definetely needed are inside
+    # the try. Settings you can safely set to a proper value are outside.
     try:
         user_config = {}
         execfile(global_config['here'] + '/settings.py',
