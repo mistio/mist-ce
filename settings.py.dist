@@ -6,6 +6,8 @@ for instructions on how to populate it.
 
 MONITORING_URL = 'https://mist.io'
 
+JS_BUILD = False
+
 JS_LOG_LEVEL = 3
 
 BACKENDS = [

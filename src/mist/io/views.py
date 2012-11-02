@@ -42,11 +42,13 @@ def home(request):
         session = False
 
     monitoring_url = request.registry.settings['monitoring_url']
+    js_build = request.registry.settings['js_build']
     js_log_level = request.registry.settings['js_log_level']
 
     return {'project': 'mist.io',
             'session': session,
             'monitoring_url': monitoring_url,
+            'js_build': js_build,
             'js_log_level': js_log_level}
 
 
