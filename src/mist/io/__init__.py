@@ -6,7 +6,7 @@ from pyramid.config import Configurator
 
 from mist.io.resources import Root
 
-log = getLogger('mist.core')
+log = getLogger('mist.io')
 
 
 def main(global_config, **settings):
