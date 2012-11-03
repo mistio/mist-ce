@@ -22,7 +22,7 @@ def main(global_config, **settings):
                 user_config)
         settings['keypairs'] = user_config['KEYPAIRS']
         settings['backends'] = user_config['BACKENDS']
-        settings['monitoring_url'] = user_config.get('MONITORING_URL',
+        settings['core_uri'] = user_config.get('CORE_URI',
                                                      'https://mist.io')
         settings['js_build'] = user_config.get('JS_BUILD', False)
         settings['js_log_level'] = user_config.get('JS_LOG_LEVEL', 3)

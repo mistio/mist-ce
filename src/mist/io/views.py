@@ -41,13 +41,13 @@ def home(request):
     except:
         session = False
 
-    monitoring_url = request.registry.settings['monitoring_url']
+    core_uri = request.registry.settings['core_uri']
     js_build = request.registry.settings['js_build']
     js_log_level = request.registry.settings['js_log_level']
 
     return {'project': 'mist.io',
             'session': session,
-            'monitoring_url': monitoring_url,
+            'core_uri': core_uri,
             'js_build': js_build,
             'js_log_level': js_log_level}
 
