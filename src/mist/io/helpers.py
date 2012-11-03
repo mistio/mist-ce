@@ -40,7 +40,7 @@ def connect(request):
 
     driver = get_driver(int(backend['provider']))
 
-    if backend['provider'] == Provider.OPENSTACK:
+    if backend['provider'] in [Provider.OPENSTACK, Provider.RACKPSACE_NOVA_DFW]:
         conn = driver(backend['id'],
                       backend['secret'],
                       ex_force_auth_url=backend.get('auth_url', None),
