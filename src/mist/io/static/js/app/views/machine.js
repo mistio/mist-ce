@@ -207,7 +207,7 @@ define('app/views/machine', [
                             if (machine.hasMonitoring) {
 
                                 var url = URL_PREFIX +
-                                          '/backends/'
+                                          '/backends/' +
                                           machine.backend.index +
                                           '/machines/' +
                                           machine.id +
