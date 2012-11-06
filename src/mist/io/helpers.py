@@ -44,8 +44,7 @@ def connect(request):
         conn = driver(backend['id'],
                       backend['secret'],
                       ex_force_auth_url=backend.get('auth_url', None),
-                      ex_force_auth_version=backend.get('auth_version',
-                                                        '2.0_password'))
+                      ex_force_auth_version=backend.get('auth_version', '2.0'))
     elif backend['provider'] == Provider.LINODE:
         conn = driver(backend['secret'])
     else:
