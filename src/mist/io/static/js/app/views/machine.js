@@ -158,7 +158,7 @@ define('app/views/machine', [
                 Em.run.next(function(){
                     $('.monitoring-button').button();
                 });
-                
+
                 if(!this.machine || !this.machine.hasMonitoring){
                     if(this.context){
                         this.context.stop();
@@ -175,68 +175,81 @@ define('app/views/machine', [
                 var that = this;
 
                 Em.run.next(function(){
-                
+
                     // log in first perhaps
                     //cant POST in jsonp
-    
+
                     /*
                     $.ajax({
                         url: "https://" + HOST + "/login?callback=?",
                         type: "POST",
                         dataType: 'jsonp',
                         data: {email : USER, password: PASSWORD},
-                        async: false         
-                    }).done(function() { console.log("logged in"); }); 
+                        async: false
+                    }).done(function() { console.log("logged in"); });
                     */
-    
+
                     var context = cubism.context().serverDelay(0).clientDelay(0).step(5000).size(960);
                     that.context = context;
-                    
-                    var localData = null;   
+
+                    var localData = null;
                     var cores = null;
                     var networkInterfaces = null;
                     var disks = null;
                     var memoryTotal = false;
-    
+
                     function drawCpu() {
-        
                         return context.metric(function(start, stop, step, callback) {
                             start = +start;
                             stop = +stop;
-                            
-                            if(machine.hasMonitoring){
 
-                            $.getJSON(URL_PREFIX + '/backends/0/machines/'+ machine.id + '/stats?&start=' +
-                                (start / 1000) + '&stop=' + (stop / 1000) + '&step=' + step + '&callback=?',
-                                function(data) {
-                                    if (!data || !('cpu' in data)){
-                                        return callback(new Error("unable to load data"));
-                                    } else {
-                                        localData = data;
-                       
-                                        if(!cores){
-                                            cores = data['cpu']['cores'];
+                            if (machine.hasMonitoring) {
+
+                                var url = URL_PREFIX +
+                                          '/backends/'
+                                          machine.backend.index +
+                                          '/machines/' +
+                                          machine.id +
+                                          '/stats?&start=' +
+                                          (start / 1000) +
+                                          '&stop=' +
+                                          (stop / 1000) +
+                                          '&step=' +
+                                          step +
+                                          '&callback=?';
+
+                                $.getJSON(url, function(data) {
+                                        if (!data || !('cpu' in data)) {
+                                            return callback(new Error("unable to load data"));
+                                        } else {
+                                            localData = data;
+
+                                            if (!cores) {
+                                                cores = data['cpu']['cores'];
+                                            }
+
+                                            if (!networkInterfaces) {
+                                                configureNetworkGraphs();
+                                            }
+
+                                            if (!disks) {
+                                                configureDiskGraphs();
+                                            }
+
+                                            return callback(null, data['cpu']['utilization'].map(function(d) {
+                                                return (d / cores) * 100;
+                                            }));
                                         }
-                                        if(!networkInterfaces){
-                                            configureNetworkGraphs();
-                                        }
-                       
-                                        if(!disks){
-                                            configureDiskGraphs();
-                                        }
-                       
-                                        return callback(null, data['cpu']['utilization'].map(function(d) { return (d / cores) * 100;}));
-                                    }
-                            }).error(function(jqXHR, textStatus, errorThrown) {
-                                return callback(new Error("unable to load data"));
-                            });    
-                            
+                                }).error(function(jqXHR, textStatus, errorThrown) {
+                                    return callback(new Error("unable to load data"));
+                                });
+
                             } else {
                                 return callback(new Error("monitoring disabled"));
                             }
-                        }, 'Cpu: ');    
+                        }, 'Cpu: ');
                     }
-    
+
                     function drawMemory() {
 
                         return context.metric(function(start, stop, step, callback) {
@@ -248,14 +261,14 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error("unable to load data"));
                             }
-                        }, 'Memory: ');    
+                        }, 'Memory: ');
                     }
-    
+
                     function drawDisk(disk, ioMethod) {
-        
+
                         return context.metric(function(start, stop, step, callback) {
-            
-                            if(localData && machine.hasMonitoring && 
+
+                            if(localData && machine.hasMonitoring &&
                                     ('disk' in localData) && (ioMethod in localData.disk) &&
                                     (disk in localData.disk[ioMethod]) &&
                                     ("disk_ops" in localData.disk[ioMethod][disk])){
@@ -263,33 +276,33 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error("unable to load data"));
                             }
-                        }, 'Disk ' + disk + ' ' + ioMethod + ': ');    
+                        }, 'Disk ' + disk + ' ' + ioMethod + ': ');
                     }
 
                     function drawLoad() {
-    
+
                         return context.metric(function(start, stop, step, callback) {
                             if(localData && machine.hasMonitoring && ('load' in localData)){
                                 return callback(null, localData["load"].map(function(d) { return d;}));
                             } else {
                                 return callback(new Error("unable to load data"));
                             }
-                        }, 'Load: ');    
+                        }, 'Load: ');
                     }
 
                     function drawNetwork(iface, stream) {
-    
+
                         return context.metric(function(start, stop, step, callback) {
-            
+
                             if(localData && machine.hasMonitoring && ('network' in localData) &&
                                     (iface in localData.network) && (stream in localData.network[iface])){
                                 return callback(null, localData['network'][iface][stream].map(function(d) { return d;}));
                             } else {
                                 return callback(new Error("unable to load data"));
                             }
-                        }, 'Network (' + iface + ', ' + stream  + '), : ');    
+                        }, 'Network (' + iface + ', ' + stream  + '), : ');
                     }
-    
+
                     function configureNetworkGraphs(){
                         networkInterfaces = [];
                         var data = [];
@@ -298,23 +311,23 @@ define('app/views/machine', [
                             data.push(drawNetwork(iface, 'tx'));
                             data.push(drawNetwork(iface, 'rx'));
                         }
-        
+
                         d3.select("#networkGraph").call(function(div) {
                             div.selectAll(".horizon").data(data).enter().append("div").attr("class", "horizon").call(context.horizon().extent([0, 100]));
                             div.append("div").attr("class", "rule").call(context.rule());
                         });
                     }
-    
+
                     function configureDiskGraphs(){
                         disks = [];
                         data = [];
-        
+
                         for(disk in localData["disk"]["read"]){
                             disks.push(disk);
                             data.push(drawDisk(disk, 'read'));
                             data.push(drawDisk(disk, 'write'));
                         }
-    
+
                         d3.select("#diskGraph").call(function(div) {
                             div.selectAll(".horizon").data(data).enter().append("div").attr("class", "horizon").call(context.horizon().extent([0, 100]));
                             div.append("div").attr("class", "rule").call(context.rule());
@@ -330,24 +343,24 @@ define('app/views/machine', [
                         div.selectAll(".horizon").data([cpu]).enter().append("div").attr("class", "horizon").call(context.horizon().extent([0, 100]));
                         div.append("div").attr("class", "rule").call(context.rule());
                     });
-    
+
                     d3.select("#memoryGraph").call(function(div) {
                         div.selectAll(".horizon").data([memory]).enter().append("div").attr("class", "horizon").call(context.horizon().extent([0, 100]));
                         div.append("div").attr("class", "rule").call(context.rule());
                     });
-    
+
                     d3.select("#loadGraph").call(function(div) {
-                        div.selectAll(".horizon").data([load]).enter().append("div").attr("class", "horizon").call(context.horizon().extent([0, 100]));    
+                        div.selectAll(".horizon").data([load]).enter().append("div").attr("class", "horizon").call(context.horizon().extent([0, 100]));
                         div.append("div").attr("class", "rule").call(context.rule());
                     });
-    
+
                     context.on("focus", function(i) {
                         d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
                     });
                 });
 
             }.observes('machine.hasMonitoring'),
-            
+
             handlePendingMonitoring: function(){
                 if(this.machine.pendingMonitoring){
                     $('.monitoring-button').addClass('ui-disabled')
