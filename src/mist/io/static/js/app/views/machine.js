@@ -190,7 +190,7 @@ define('app/views/machine', [
                     }).done(function() { console.log('logged in'); });
                     */
 
-                    var context = cubism.context().serverDelay(0).clientDelay(0).step(5000).size($(window).width()-180);
+                    var context = cubism.context().serverDelay(0).clientDelay(0).step(5000).size($(window).width()-260);
                     that.context = context;
 
                     var localData = null;
