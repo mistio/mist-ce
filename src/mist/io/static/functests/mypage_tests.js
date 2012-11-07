@@ -8,6 +8,27 @@ module("MistIoLocal", {
 
 
 test("Home page loaded", function(){
-  ok( S("#home-menu li").size() == 2, "loaded home page")
+  ok( S("#home-menu li").size() == 2, "loaded home page");
+
+  var num = S("#backend-buttons a").size();
+
+  for(var i =0; i < num; i++){
+    S("#backend-buttons a:eq("+i+")").visible().click();
+    S('#edit-backend-ok').visible().click(); 
+  }
+
+  S('#machines-count').visible().click(); 
+
+  var num = S("#machines-list a").size();
+  for(var i =0; i < num; i++){
+    S("#machines-list a:eq("+i+")").visible().click();
+    S("#single-machine a[data-direction=reverse]").visible().click();
+  }
+
+  S("#machines a[data-icon=home]").visible().click();
+  
+  S('#images-count').visible().click(); 
+  S("#images a[data-icon=home]").visible().click();
+  
 });
 
