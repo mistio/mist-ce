@@ -10,7 +10,7 @@ require.config({
         jqueryUi: 'lib/jquery-ui-1.8.23.custom',
         text: 'lib/require/text',
         ember: 'lib/ember-0.9.8.1',
-        mobile: 'lib/jquery.mobile-1.2.0-rc.2',
+        mobile: 'lib/jquery.mobile-1.2.0',
         d3: 'lib/d3-2.10.1',
         cubism: 'lib/cubism-1.2.2'
     },

@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width" />
     <title>${project} - down to earth cloud computing</title>
     <!-- include the Tools -->
-    <link rel="stylesheet" href="static/jquery.mobile-1.2.0-rc.2.css" />
+    <link rel="stylesheet" href="static/jquery.mobile-1.2.0.css" />
     <link type="text/css" href="static/ui-lightness/jquery-ui-1.8.22.custom.css" rel="stylesheet" />
     <link rel="stylesheet" href="static/main.css" />
     <link rel="icon" href="static/favicon.ico" />
@@ -40,6 +40,7 @@
 <div data-role="page" id="splash">
     <div class="mist-logo"></div>
 </div>
+
 
 <!-- Start of first page: #home -->
 <div data-role="page" id="home">
@@ -76,7 +77,6 @@
         {{/if}}
         </script>
     </div><!-- /content -->
-
 </div><!-- /page home -->
 
 
@@ -88,7 +88,6 @@
     <script type="text/x-handlebars">
     {{view Mist.AddBackendView backendBinding="Mist.backend" }}
     </script>    
-
 </div><!-- /add backend dialog -->
 
 
@@ -101,6 +100,7 @@
     {{view Mist.EditBackendView backendBinding="Mist.backend" }}
     </script>
 </div><!-- /edit backend dialog -->
+
 
 <!-- Start of provider state dialog -->
 <div data-role="dialog" id="dialog-providers" class="mist-dialog">
