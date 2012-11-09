@@ -19,11 +19,11 @@ test("Home page loaded", function(){
 
   S('#machines-count').visible().click(); 
 
-  var num = S("#machines-list a").size();
-  for(var i =0; i < num; i++){
-    S("#machines-list a:eq("+i+")").visible().click();
+//  var num = S("#machines-list a").visible().size(1).size();
+  //for(var i =0; i < num; i++){
+    S("#machines-list a:eq("+0+")").visible().click();
     S("#single-machine a[data-direction=reverse]").visible().click();
-  }
+  //}
 
   S("#machines a[data-icon=home]").visible().click();
   
