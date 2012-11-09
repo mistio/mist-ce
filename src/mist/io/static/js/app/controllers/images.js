@@ -23,15 +23,13 @@ define('app/controllers/images', [
                 if (this.content) {
                     $.each(this.content, function(idx, image) {
                         if (image.id == id) {
-                            foundImage = true;
-                            return image;
+                            foundImage = image;
+                            return false;
                         }
                     });
                 }
 
-                if (!foundImage) {
-                    return false
-                }
+                return foundImage;
             },
 
             init: function() {
