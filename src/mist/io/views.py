@@ -18,7 +18,6 @@ from mist.io.config import EC2_IMAGES
 from mist.io.config import EC2_PROVIDERS
 from mist.io.config import EC2_KEY_NAME
 from mist.io.config import EC2_SECURITYGROUP
-from mist.io.config import RACKSPACE_PROVIDERS
 from mist.io.config import LINODE_DATACENTERS
 
 from mist.io.helpers import connect
@@ -66,12 +65,16 @@ def list_backends(request):
     backends = []
     index = 0
     for backend in backend_list:
-        backends.append({'index'        : index,
-                         'id'           : backend['id'],
-                         'title'        : backend['title'],
-                         'provider'     : backend['provider'],
+        backends.append({'index': index,
+                         'id': backend['id'],
+                         'title': backend['title'],
+                         'provider': backend['provider'],
                          'poll_interval': backend['poll_interval'],
-                         'state'        : 'wait',
+                         'state': 'wait',
+                         # for Provider.RACKSPACE_FIRST_GEN
+                         'region': backend.get('region', None),
+                         # for Provider.RACKSPACE (the new Nova provider)
+                         'datacenter': backend.get('datacenter', None)
                          })
         index = index + 1
 
@@ -194,9 +197,10 @@ def create_machine(request):
         public_key = request['beaker.session']['keypairs']['default'][0]
     except KeyError:
         private_key = request.registry.settings['keypairs']['default'][1]
-        public_key = request['beaker.session']['keypairs']['default'][0]
+        public_key = request.registry.settings['keypairs']['default'][0]
 
-    if conn.type in RACKSPACE_PROVIDERS and public_key:
+    if conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE] and\
+    public_key:
         key = SSHKeyDeployment(str(public_key))
         try:
             conn.deploy_node(name=machine_name,

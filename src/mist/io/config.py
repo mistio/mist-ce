@@ -186,15 +186,6 @@ EC2_SECURITYGROUP = {
 }
 
 
-# All Rackspace providers, old and new, useful for type checking
-RACKSPACE_PROVIDERS = (
-    Provider.RACKSPACE,
-    Provider.RACKSPACE_UK,
-    Provider.RACKSPACE_NOVA_BETA,
-    Provider.RACKSPACE_NOVA_DFW
-)
-
-
 # Linode datacenter ids/names mapping
 LINODE_DATACENTERS = {
     2: 'Dallas, TX, USA',

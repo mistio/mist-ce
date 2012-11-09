@@ -14,7 +14,7 @@ from libcloud.compute.types import Provider
 from fabric.api import env
 from fabric.api import run
 
-from mist.io.config import EC2_PROVIDERS, RACKSPACE_PROVIDERS
+from mist.io.config import EC2_PROVIDERS
 
 
 log = logging.getLogger('mist.io')
@@ -25,8 +25,8 @@ def connect(request):
 
     It has been tested with:
 
-        * EC2, but not alternative providers like EC2_EU,
-        * Rackspace, only the old style and not the openstack powered one,
+        * EC2, and the alternative providers like EC2_EU,
+        * Rackspace, old style and the new Nova powered one,
         * Openstack Diablo through Trystack, should also try Essex,
         * Linode
     """
@@ -40,15 +40,21 @@ def connect(request):
 
     driver = get_driver(int(backend['provider']))
 
-    if backend['provider'] in [Provider.OPENSTACK, Provider.RACKSPACE_NOVA_DFW]:
+    if backend['provider'] == Provider.OPENSTACK:
         conn = driver(backend['id'],
                       backend['secret'],
                       ex_force_auth_url=backend.get('auth_url', None),
                       ex_force_auth_version=backend.get('auth_version', '2.0'))
     elif backend['provider'] == Provider.LINODE:
         conn = driver(backend['secret'])
+    elif backend['provider'] == Provider.RACKSPACE_FIRST_GEN:
+        conn = driver(backend['id'], backend['secret'],
+                      region=backend['region'])
+    elif backend['provider'] == Provider.RACKSPACE:
+        conn = driver(backend['id'], backend['secret'],
+                      datacenter=backend['datacenter'])
     else:
-        # ec2, rackspace
+        # ec2
         conn = driver(backend['id'], backend['secret'])
         # Account for sub-provider regions (EC2_US_WEST, EC2_US_EAST etc.)
         conn.type = backend['provider']
@@ -74,7 +80,7 @@ def get_machine_actions(machine, backend):
     if backend.type in EC2_PROVIDERS:
         can_stop = True
 
-    if backend.type in RACKSPACE_PROVIDERS or \
+    if backend.type == Provider.RACKSPACE_FIRST_GEN or \
                        backend.type == Provider.LINODE:
         can_tag = False
 
