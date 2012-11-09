@@ -13,19 +13,6 @@ define('app/controllers/images', [
         return Ember.ArrayController.extend({
             backend: null,
 
-            getImageType: function(imageId, callback){
-                var that = this;
-
-                this.getImage(imageId, function(image){
-                    for(type in that.TYPES){
-                        if(image.name.toLowerCase().search(type) != -1){
-                            callback(type);
-                            return;
-                        }
-                    }
-                });
-            },
-
             getImage: function(id, callback) {
                 // Linode will pass null, so dont bother
                 if (id == null){
@@ -56,7 +43,7 @@ define('app/controllers/images', [
                             callback(image);
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
-                            Mist.notificationController.notify("Error loading image id:" + id);
+                            Mist.notificationntroller.notify("Error loading image id:" + id);
 
                         }
                     });
