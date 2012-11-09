@@ -43,11 +43,7 @@ def main(global_config, **settings):
                      '/backends/{backend}/machines/{machine}/shell')
 
     config.add_route('images', '/backends/{backend}/images')
-    config.add_route('image_metadata',
-                     '/backends/{backend}/images/{image}/metadata')
-
     config.add_route('sizes', '/backends/{backend}/sizes')
-
     config.add_route('locations', '/backends/{backend}/locations')
 
     config.scan()

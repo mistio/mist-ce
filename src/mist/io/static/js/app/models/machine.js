@@ -10,10 +10,7 @@ define('app/models/machine', [
     function() {
         return Ember.Object.extend({
             id: null,
-
             imageId: null,
-
-            image: null,
             name: null,
             backend: null,
             selected: false,
@@ -23,6 +20,10 @@ define('app/models/machine', [
             state: 'stopped',
             stats:{ 'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
+
+            image: function() {
+                return this.backend.images.getImage(this.imageId);
+            }.property('image'),
 
             reboot: function() {
                 log('Rebooting machine', this.name);
@@ -288,7 +289,7 @@ define('app/models/machine', [
                 };
 
                 this.set('pendingMonitoring', true);
-                
+
                 if(this.hasMonitoring){
                     this.set('hasMonitoring', false);
                 }
@@ -316,13 +317,9 @@ define('app/models/machine', [
 
             init: function() {
                 this._super();
-                var that = this;
 
                 this.tags = Ember.ArrayController.create();
 
-                this.backend.images.getImage(this.imageId, function(image) {
-                    that.set('image', image);
-                });
                 this.startUptimeTimer();
                 this.checkUptime();
                 this.checkHasMonitoring();

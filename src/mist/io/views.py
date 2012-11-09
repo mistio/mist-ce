@@ -534,37 +534,6 @@ def list_images(request):
     return ret
 
 
-@view_config(route_name='image_metadata', request_method='GET',
-             renderer='json')
-def get_image_metadata(request):
-    """Gets image metadata based on image id.
-
-    Right now (libcloud 0.11.0) get_image() is supported for EC2 and not for
-    RACKSPACE, LINODE and OPENSTACK.
-    """
-    try:
-        conn = connect(request)
-    except:
-        return Response('Backend not found', 404)
-
-    try:
-        image_id = request.matchdict['image']
-        image = conn.get_image(image_id)
-    except NotImplementedError:
-        return Response('Action not supported for this backend', 404)
-    except:
-        return Response('Backend unavailable', 503)
-
-    if image is None:
-        ret = {}
-    else:
-        ret = {'id'    : image.id,
-               'extra' : image.extra,
-               'name'  : image.name,
-               }
-    return ret
-
-
 @view_config(route_name='sizes', request_method='GET', renderer='json')
 def list_sizes(request):
     """List sizes (aka flavors) from each backend."""

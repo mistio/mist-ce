@@ -14,39 +14,23 @@ define('app/controllers/images', [
             backend: null,
 
             getImage: function(id, callback) {
-                // Linode will pass null, so dont bother
+                // Linode will pass null, so don't bother
                 if (id == null){
                     return false;
                 }
 
-                retImage = false;
+                var foundImage = false;
                 if (this.content) {
-                    $.each(this.content, function(idx, image){
-                        if(image.id == id){
-                            retImage = image;
-                            return false;
+                    $.each(this.content, function(idx, image) {
+                        if (image.id == id) {
+                            foundImage = true;
+                            return image;
                         }
                     });
                 }
 
-                if(retImage){
-                    callback(retImage);
-                } else {
-                    var that = this;
-
-                    $.ajax({
-                        url: 'backends/' + this.backend.index + '/images/' + id + '/metadata',
-                        success: function(data) {
-                            data.backend = that.backend;
-                            var image = Image.create(data);
-                            that.content.push(image);
-                            callback(image);
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            Mist.notificationntroller.notify("Error loading image id:" + id);
-
-                        }
-                    });
+                if (!foundImage) {
+                    return false
                 }
             },
 
