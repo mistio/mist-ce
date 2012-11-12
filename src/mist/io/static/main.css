@@ -501,7 +501,10 @@ a#mist-select-machines-button span.ui-btn-text {
 #single-view-provider-icon.provider-3,
 #single-view-provider-icon.provider-23,
 #single-view-provider-icon.provider-40,
-#single-view-provider-icon.provider-41 {
+#single-view-provider-icon.provider-41,
+#single-view-provider-icon.provider-48,
+#single-view-provider-icon.provider-50,
+#single-view-provider-icon.provider-51 {
     background-image: url(images/p3_sm.png);
 }
 
