@@ -374,7 +374,7 @@ def set_machine_metadata(request):
     except:
         return Response('Backend not found', 404)
 
-    if conn.type is Provider.LINODE or conn.type in RACKSPACE_PROVIDERS:
+    if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
         return Response('Adding metadata is not supported in this provider',
                         501)
 
@@ -439,7 +439,7 @@ def delete_machine_metadata(request):
     except:
         return Response('Backend not found', 404)
 
-    if conn.type is Provider.LINODE or conn.type in RACKSPACE_PROVIDERS:
+    if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
         return Response('Updating metadata is not supported in this provider',
                         501)
 
