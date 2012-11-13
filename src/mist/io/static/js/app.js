@@ -177,7 +177,7 @@ define( 'app', [
                 $('#machines-list').listview('refresh');
             });
 
-            $(document).on( 'pagebeforeshow', '#dialog-power', function() {
+            $(document).on( 'popupbeforeposition', '#dialog-power', function() {
                 $("#dialog-power a").button();
             });
 
@@ -268,20 +268,27 @@ define( 'app', [
             var confirmationDialog = ConfirmationDialog.create();
             confirmationDialog.append();
 
-            var machineActionsDialog = MachineActionsDialog.create();
-            machineActionsDialog.append();
             var dialog = SingleMachineActionsDialog.create();
             dialog.appendTo("#single-machine");
             var shellDialog = Shell.create();
             shellDialog.appendTo("#single-machine");
+            var machineTagsDialog = MachineTagsDialog.create();
+            machineTagsDialog.appendTo("#single-machine");
+            
             var machineListView = MachineListView.create();
             machineListView.append();
             var addDialog = MachineAddDialog.create();
             addDialog.appendTo("#machines");
+            shellDialog = Shell.create();
+            shellDialog.appendTo("#machines");
+            var machineActionsDialog = MachineActionsDialog.create();
+            machineActionsDialog.appendTo("#machines");
+            machineTagsDialog = MachineTagsDialog.create();
+            machineTagsDialog.appendTo("#machines");
+            
             var imageListView = ImageListView.create();
             imageListView.append();
-            var machineTagsDialog = MachineTagsDialog.create();
-            machineTagsDialog.appendTo("#single-machine");
+
             var machineMonitoringDialog = MachineMonitoringDialog.create();
             machineMonitoringDialog.append();
 

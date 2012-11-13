@@ -204,7 +204,7 @@ define('app/views/machine', [
                             start = +start;
                             stop = +stop;
 
-                            if (machine.hasMonitoring) {
+                            if (machine.hasMonitoring && Mist['graphPolling']) {
 
                                 var url = URL_PREFIX +
                                           '/backends/' +
