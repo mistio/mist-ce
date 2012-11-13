@@ -290,7 +290,7 @@ define( 'app', [
             imageListView.append();
 
             var machineMonitoringDialog = MachineMonitoringDialog.create();
-            machineMonitoringDialog.append();
+            machineMonitoringDialog.appendTo("#single-machine");
 
             $(document).on( 'pagebeforeshow', '#dialog-add', function(){
                 $('#dialog-add').trigger('create');

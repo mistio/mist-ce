@@ -687,6 +687,10 @@ a#mist-select-machines-button span.ui-btn-text {
     margin-top: 12px;
 }
 
+#dialog-add .ui-select {
+    width: 100%;
+}
+
 .mist-li-selected {
     background-image: -webkit-gradient(linear, left top, left bottom, from(#AFD5FF), to(#98BBED)); /* Saf4+, Chrome */
     background-image: -webkit-linear-gradient(#AFD5FF, #98BBED); /* Chrome 10+, Saf5.1+ */
