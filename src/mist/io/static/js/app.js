@@ -181,7 +181,7 @@ define( 'app', [
                 $("#dialog-power a").button();
             });
 
-            $(document).on( 'pagebeforeshow', '#dialog-single-power', function() {
+            $(document).on( 'popupbeforeposition', '#dialog-single-power', function() {
                 $("#dialog-single-power a").button();
             });
 
@@ -271,7 +271,7 @@ define( 'app', [
             var machineActionsDialog = MachineActionsDialog.create();
             machineActionsDialog.append();
             var dialog = SingleMachineActionsDialog.create();
-            dialog.append();
+            dialog.appendTo("#single-machine");
             var shellDialog = Shell.create();
             shellDialog.appendTo("#single-machine");
             var machineListView = MachineListView.create();
@@ -281,7 +281,7 @@ define( 'app', [
             var imageListView = ImageListView.create();
             imageListView.append();
             var machineTagsDialog = MachineTagsDialog.create();
-            machineTagsDialog.append();
+            machineTagsDialog.appendTo("#single-machine");
             var machineMonitoringDialog = MachineMonitoringDialog.create();
             machineMonitoringDialog.append();
 
