@@ -262,9 +262,6 @@ define( 'app', [
             App.DeleteTagView = DeleteTagView;
             App.onOff = ['on', 'off'];
 
-            var addDialog = MachineAddDialog.create();
-            addDialog.append();
-
             var machineView = MachineView.create();
             machineView.append();
 
@@ -279,6 +276,8 @@ define( 'app', [
             shellDialog.append();
             var machineListView = MachineListView.create();
             machineListView.append();
+            var addDialog = MachineAddDialog.create();
+            addDialog.appendTo("#machines");
             var imageListView = ImageListView.create();
             imageListView.append();
             var machineTagsDialog = MachineTagsDialog.create();
