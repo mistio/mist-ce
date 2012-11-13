@@ -76,6 +76,17 @@
         </ul>
         {{/if}}
         </script>
+        
+        <!-- Start of edit backend dialog -->
+        <div data-role="popup" id="edit-backend" class="mist-dialog" data-overlay-theme="a" style="width: 400px; max-width:400px;">
+            <div data-role="header">
+                <h1>Edit provider</h1>
+            </div>
+            <script type="text/x-handlebars">
+            {{view Mist.EditBackendView backendBinding="Mist.backend" }}
+            </script>
+        </div><!-- /edit backend dialog -->
+        
     </div><!-- /content -->
 </div><!-- /page home -->
 
@@ -89,18 +100,6 @@
     {{view Mist.AddBackendView backendBinding="Mist.backend" }}
     </script>    
 </div><!-- /add backend dialog -->
-
-
-<!-- Start of edit backend dialog -->
-<div data-role="page" id="edit-backend" class="mist-dialog">
-    <div data-role="header">
-        <h1>Edit provider</h1>
-    </div>
-    <script type="text/x-handlebars">
-    {{view Mist.EditBackendView backendBinding="Mist.backend" }}
-    </script>
-</div><!-- /edit backend dialog -->
-
 
 <!-- Start of provider state dialog -->
 <div data-role="dialog" id="dialog-providers" class="mist-dialog">
