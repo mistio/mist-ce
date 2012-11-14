@@ -123,6 +123,7 @@ define('app/models/machine', [
                     } catch (error) {
                         // no ip or dns_name so nowhere to check, can't test the key
                         this.set('hasKey', false);
+                        return;
                     }
                 }
 
@@ -179,63 +180,73 @@ define('app/models/machine', [
             },
 
             checkUptime: function() {
-                if (this.state == 'running') {
-                    var host;
-                    if (this.extra && this.extra.dns_name) {
-                        // it is ec2 machine
-                        host = this.extra.dns_name;
-                    } else {
-                        // if not ec2 it should have a public ip
-                        try {
-                            host = this.public_ips[0];
-                        } catch (error) {
-                            // no ip or dns_name so nowhere to check, can't test the key
-                            this.set('hasKey', false);
+                
+                var that = this;
+                function uptimeTimeout(){
+                
+                    if (that.state == 'running') {
+                        var host;
+                        if (that.extra && that.extra.dns_name) {
+                            // it is ec2 machine
+                            host = that.extra.dns_name;
+                        } else {
+                            // if not ec2 it should have a public ip
+                            try {
+                                host = that.public_ips[0];
+                            } catch (error) {
+                                // no ip or dns_name so nowhere to check, can't test the key
+                                that.set('hasKey', false);
+                            }
                         }
-                    }
 
-                    // In case of ec2, mist.io could have set this. Server can handle empty string.
-                    var ssh_user;
-                    try {
-                        ssh_user = this.extra.tags.ssh_user;
-                    } catch (error) {
-                        ssh_user = 'root';
-                    }
+                        // In case of ec2, mist.io could have set this. Server can handle empty string.
+                        var ssh_user;
+                        try {
+                            ssh_user = that.extra.tags.ssh_user;
+                        } catch (error) {
+                            ssh_user = 'root';
+                        }
 
-                    var that = this;
-                    $.ajax({
-                        url: '/backends/' + this.backend.index + '/machines/' + this.id + '/shell',
-                        type: 'POST',
-                        data: {'host': host,
+                        $.ajax({
+                            url: '/backends/' + that.backend.index + '/machines/' + that.id + '/shell',
+                            type: 'POST',
+                            data: {'host': host,
                                'ssh_user': ssh_user,
                                'command': 'cat /proc/uptime'},
-                        success: function(data, textStatus, jqXHR) {
-                            // got it fine, also means it has a key
-                            if (jqXHR.status === 200) {
-                                that.set('hasKey', true);
-                                var resp = data.split(' ');
-                                if (resp.length == 2) {
-                                    var uptime = parseFloat(resp[0]) * 1000;
-                                    that.set('uptimeChecked', Date.now());
-                                    that.set('uptimeFromServer', uptime);
+                            success: function(data, textStatus, jqXHR) {
+                                   // got it fine, also means it has a key
+                                if (jqXHR.status === 200) {
+                                    that.set('hasKey', true);
+                                    var resp = data.split(' ');
+                                    if (resp.length == 2) {
+                                        var uptime = parseFloat(resp[0]) * 1000;
+                                        that.set('uptimeChecked', Date.now());
+                                        that.set('uptimeFromServer', uptime);
+                                    }
+                                    info('Successfully got uptime', data, 'from machine', that.name);
+                                } else {
+                                    // in every other case there is a problem
+                                    that.set('hasKey', false);
+                                    info('Got response other than 200 while getting uptime from machine', that.name);
+                                    setTimeout(uptimeTimeout, 10000);
                                 }
-                                info('Successfully got uptime', data, 'from machine', that.name);
-                            } else {
-                                // in every other case there is a problem
+                            },
+                            
+                            error: function(jqXHR, textstate, errorThrown) {
                                 that.set('hasKey', false);
-                                info('Got response other than 200 while getting uptime from machine', that.name);
+                                error(textstate);
+                                Mist.notificationController.notify('Error getting uptime from machine ' +
+                                    that.name);
+                                error(textstate, errorThrown, 'when getting uptime from machine',
+                                    that.name);
+                                setTimeout(uptimeTimeout, 10000);
                             }
-                        },
-                        error: function(jqXHR, textstate, errorThrown) {
-                            that.set('hasKey', false);
-                            error(textstate);
-                            Mist.notificationController.notify('Error getting uptime from machine ' +
-                                    that.name);
-                            error(textstate, errorThrown, 'when getting uptime from machine',
-                                    that.name);
-                        }
-                    });
-                }
+                        });
+                    }
+                
+                };
+                
+                setTimeout(uptimeTimeout, 10000);
             },
 
             checkHasMonitoring: function() {
