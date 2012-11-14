@@ -237,14 +237,19 @@ define('app/views/machine', [
                                                 configureDiskGraphs();
                                             }
 
-                                            return callback(null, data['cpu']['utilization'].map(function(d) {
-                                                return (d / cores) * 100;
-                                            }));
                                         }
                                 }).error(function(jqXHR, textStatus, errorThrown) {
-                                    return callback(new Error('unable to load data'));
+                                    error('could not load monitoring data');
                                 });
-
+                                
+                                if (localData && machine.hasMonitoring && cores) {
+                                    return callback(null, data['cpu']['utilization'].map(function(d) {
+                                        return (d / cores) * 100;
+                                    }));
+                                } else {
+                                    return callback(new Error('unable to load data'));
+                                }
+                                
                             } else {
                                 return callback(new Error('monitoring disabled'));
                             }
