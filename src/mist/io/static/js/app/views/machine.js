@@ -316,7 +316,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('unable to load data'));
                             }
-                        }, 'Network (' + iface + ', ' + stream  + '), : ');
+                        }, 'Network (' + iface + ', ' + stream  + '): ');
                     }
 
                     function configureNetworkGraphs() {
