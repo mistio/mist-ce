@@ -243,7 +243,7 @@ define('app/views/machine', [
                                 });
                                 
                                 if (localData && machine.hasMonitoring && cores) {
-                                    return callback(null, data['cpu']['utilization'].map(function(d) {
+                                    return callback(null, localData['cpu']['utilization'].map(function(d) {
                                         return (d / cores) * 100;
                                     }));
                                 } else {
