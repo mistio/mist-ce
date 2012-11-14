@@ -234,9 +234,8 @@ define('app/models/machine', [
                             
                             error: function(jqXHR, textstate, errorThrown) {
                                 that.set('hasKey', false);
-                                error(textstate);
-                                Mist.notificationController.notify('Error getting uptime from machine ' +
-                                    that.name);
+                                //Mist.notificationController.notify('Error getting uptime from machine ' +
+                                //    that.name);
                                 error(textstate, errorThrown, 'when getting uptime from machine',
                                     that.name);
                                 setTimeout(uptimeTimeout, 10000);
