@@ -199,6 +199,7 @@ define( 'app', [
 
             $(document).on( 'pagebeforehide', '#single-machine', function() {
                 Mist.set('graphPolling', false);
+                Mist.set('machine', null);
             });
 
             // Console toggle behavior

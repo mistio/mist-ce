@@ -37,21 +37,10 @@ function(shell_html) {
 
         submit : function() {
             var machine = this.machine;
-            if (!machine) {
-                Mist.backendsController.forEach(function(backend) {
-                    backend.machines.forEach(function(m) {
-                        if (m.selected && m.hasKey) {
-                            log('machine selected');
-                            machine = m;
-                        }
-                    });
-                });
-            }
-            if (!machine || !this.command) {
+            
+            if (!machine || !machine.hasKey || !this.command) {
                 return;
             }
-
-            this.set('machine', machine);
             var that = this;
 
             var command = this.command;

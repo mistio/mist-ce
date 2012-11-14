@@ -388,7 +388,7 @@ define('app/views/machine', [
             }.observes('Mist.graphPolling'),
 
             handlePendingMonitoring: function() {
-                if (this.machine.pendingMonitoring) {
+                if (this.machine && this.machine.pendingMonitoring) {
                     $('.monitoring-button').addClass('ui-disabled')
                     $('.monitoring-spinner').show('slow');
                 } else {

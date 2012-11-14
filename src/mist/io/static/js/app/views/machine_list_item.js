@@ -47,6 +47,7 @@ define('app/views/machine_list_item', [
 
                             if (len > 0) {
                                 $('#machines-footer').fadeIn(140);
+                                
                             } else {
                                 $('#machines-footer').fadeOut(200);
                             }
@@ -74,11 +75,24 @@ define('app/views/machine_list_item', [
                         if (len > 1) {
                             $('#machines-footer').fadeIn(140);
                             $('#machines #footer-console').addClass('ui-disabled');
+                            Mist.set('machine', null);
                         } else if (len == 1) {
                             $('#machines-footer').fadeIn(140);
                             $('#machines #footer-console').removeClass('ui-disabled');
+                            if(len == 1){
+                                var machines = new Array();
+                                Mist.backendsController.forEach(function(backend) {
+                                    backend.machines.forEach(function(machine) {
+                                        if (machine.selected) {
+                                            machines.push(machine);
+                                        }
+                                    });
+                                });
+                                Mist.set('machine', machines[0]);
+                            }
                         } else {
                             $('#machines-footer').fadeOut(200);
+                            Mist.set('machine', null);
                         }
                     });
 
