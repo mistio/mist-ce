@@ -209,16 +209,22 @@ define('app/models/machine', [
                         data: {'host': host,
                                'ssh_user': ssh_user,
                                'command': 'cat /proc/uptime'},
-                        success: function(data) {
-                            // also means in has a key
-                            that.set('hasKey', true);
-                            var resp = data.split(' ');
-                            if (resp.length == 2) {
-                                var uptime = parseFloat(resp[0]) * 1000;
-                                that.set('uptimeChecked', Date.now());
-                                that.set('uptimeFromServer', uptime);
+                        success: function(data, textStatus, jqXHR) {
+                            // got it fine, also means it has a key
+                            if (jqXHR.status === 200) {
+                                that.set('hasKey', true);
+                                var resp = data.split(' ');
+                                if (resp.length == 2) {
+                                    var uptime = parseFloat(resp[0]) * 1000;
+                                    that.set('uptimeChecked', Date.now());
+                                    that.set('uptimeFromServer', uptime);
+                                }
+                                info('Successfully got uptime', data, 'from machine', that.name);
+                            } else {
+                                // in every other case there is a problem
+                                that.set('hasKey', false);
+                                info('Got response other than 200 while getting uptime from machine', that.name);
                             }
-                            info('Successfully got uptime', data, 'from machine', that.name);
                         },
                         error: function(jqXHR, textstate, errorThrown) {
                             that.set('hasKey', false);
