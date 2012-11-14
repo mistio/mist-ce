@@ -106,8 +106,10 @@
                     data-transition="slidedown"
                     data-position-to="window">Enable Monitoring</a>
                     
-                <p class='monitoring-spinner' style='display: none'>Enabling...</p>
-
+                <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
+                    <span class="ui-icon ui-icon-loading"></span>
+                    <h1>Enabling monitoring</h1>
+                </div>
                 {{/if}}
             </div>
         </div>

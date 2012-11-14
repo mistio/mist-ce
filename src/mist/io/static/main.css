@@ -584,8 +584,9 @@ a#mist-select-machines-button span.ui-btn-text {
     text-align: center;
 }
 
-.pending-monitoring {
-    background: url("images/ajax-loader.png") center center no-repeat;
+div.pending-monitoring {
+    position: relative;
+    margin-top: 20px;
 }
 
 .monitoring-button {

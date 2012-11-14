@@ -35,14 +35,6 @@ define('app/views/machine', [
                 }
             }.property('machine.state'),
 
-            pendingMonitoringClass: function() {
-                if (this.machine && this.machine.pendingMonitoring) {
-                    return 'pending-monitoring';
-                } else {
-                    return '';
-                }
-            }.property('machine.pendingMonitoring'),
-
             metadata: function() {
                 if (!this.machine || !this.machine.extra) {
                     return [];
@@ -241,7 +233,7 @@ define('app/views/machine', [
                                 }).error(function(jqXHR, textStatus, errorThrown) {
                                     error('could not load monitoring data');
                                 });
-                                
+
                                 if (localData && machine.hasMonitoring && cores) {
                                     return callback(null, localData['cpu']['utilization'].map(function(d) {
                                         return (d / cores) * 100;
@@ -249,7 +241,7 @@ define('app/views/machine', [
                                 } else {
                                     return callback(new Error('unable to load data'));
                                 }
-                                
+
                             } else {
                                 return callback(new Error('monitoring disabled'));
                             }
@@ -376,7 +368,7 @@ define('app/views/machine', [
                 });
 
             }.observes('machine.hasMonitoring'),
-            
+
             startStopContext: function(){
                 if('context' in this){
                     if(Mist.graphPolling){
@@ -389,11 +381,11 @@ define('app/views/machine', [
 
             handlePendingMonitoring: function() {
                 if (this.machine && this.machine.pendingMonitoring) {
-                    $('.monitoring-button').addClass('ui-disabled')
-                    $('.monitoring-spinner').show('slow');
+                    $('.pending-monitoring').show();
+                    $('.monitoring-button').hide();
                 } else {
-                    $('.monitoring-button').removeClass('ui-disabled')
-                    $('.monitoring-spinner').hide();
+                    $('.monitoring-button').show();
+                    $('.pending-monitoring').hide();
                 }
             }.observes('machine.pendingMonitoring'),
 
