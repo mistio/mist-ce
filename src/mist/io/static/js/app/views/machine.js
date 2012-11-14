@@ -12,7 +12,7 @@ define('app/views/machine', [
             machineBinding: 'Mist.machine',
 
             disabledShellClass: function() {
-                if (this.machine && this.machine.hasKey) {
+                if (this.machine && this.machine.hasKey && this.machine.state == 'running') {
                     return '';
                 } else {
                     return 'ui-disabled';

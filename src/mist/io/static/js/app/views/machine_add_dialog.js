@@ -21,12 +21,8 @@ define('app/views/machine_add_dialog', [
             didInsertElement: function() {
                 var that = this;
 
-                // FIXME better to bind this straight in the template but it
-                // does not seem to work
-                this.$().bind('pagebeforeshow', function(e, data){
-                    if(data.prevPage[0].id){
-                        that.clear.apply(that);
-                    }
+                this.$().bind('popupbeforeposition', function(e, data){
+                    that.clear();                    
                 });
             },
 

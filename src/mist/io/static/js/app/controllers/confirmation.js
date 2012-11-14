@@ -16,11 +16,8 @@ define('app/controllers/confirmation', [
 
             confirm: function(){
                 this.callback();
-                if(this.get('fromDialog')){
-                    window.history.go(-2);
-                } else {
-                    window.history.go(-1);
-                }
+                window.history.go(-1);
+                
                 this.set("callback", function(){});
             }
         });
