@@ -190,7 +190,7 @@ define( 'app', [
             });
 
             $(document).on( 'pagebeforeshow', '#single-machine', function() {
-                Mist.graphPolling = true;
+                Mist.set('graphPolling', true);
             });
 
             $(document).on( 'pageshow', '#single-machine', function() {
@@ -198,7 +198,7 @@ define( 'app', [
             });
 
             $(document).on( 'pagebeforehide', '#single-machine', function() {
-                Mist.graphPolling = false;
+                Mist.set('graphPolling', false);
             });
 
             // Console toggle behavior

@@ -204,7 +204,7 @@ define('app/views/machine', [
                             start = +start;
                             stop = +stop;
 
-                            if (machine.hasMonitoring && Mist['graphPolling']) {
+                            if (machine.hasMonitoring) {
 
                                 var url = URL_PREFIX +
                                           '/backends/' +
@@ -376,6 +376,16 @@ define('app/views/machine', [
                 });
 
             }.observes('machine.hasMonitoring'),
+            
+            startStopContext: function(){
+                if('context' in this){
+                    if(Mist.graphPolling){
+                        this.context.start();
+                    } else {
+                        this.context.stop();
+                    }
+                }
+            }.observes('Mist.graphPolling'),
 
             handlePendingMonitoring: function() {
                 if (this.machine.pendingMonitoring) {
