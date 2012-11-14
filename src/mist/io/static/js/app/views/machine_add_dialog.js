@@ -22,7 +22,7 @@ define('app/views/machine_add_dialog', [
                 var that = this;
 
                 this.$().bind('popupbeforeposition', function(e, data){
-                    that.clear();                    
+                    that.clear();
                 });
             },
 
@@ -55,7 +55,7 @@ define('app/views/machine_add_dialog', [
                                 $('#create-ok').button('enable');
                             } else {
                                 $('#create-ok').button('disable');
-                            }    
+                            }
                         });
                     });
 
@@ -114,7 +114,7 @@ define('app/views/machine_add_dialog', [
                                 $('#createmachine-select-location').selectmenu('enable');
                             } else {
                                 $('#createmachine-select-location').selectmenu('disable');
-                            }    
+                            }
                             $('#dialog-add select').selectmenu('refresh');
                         });
                     });

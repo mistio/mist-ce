@@ -109,54 +109,67 @@ define('app/models/machine', [
                 });
             },
 
-            shell: function(shell_command, callback) {
-                log('Sending', shell_command, 'to machine', this.name);
-
-                var host;
+            getHost: function() {
                 if (this.extra.dns_name) {
                     // it is an ec2 machine so it has dns_name
-                    host = this.extra.dns_name;
+                    return this.extra.dns_name;
                 } else {
                     // if not ec2 it should have a public ip
                     try {
-                        host = this.public_ips[0];
+                        var ips_v4 = [];
+                        this.public_ips.forEach(function(ip) {
+                            if (ip.search(':') == -1) {
+                                // this is not an IPv6, so it is supported
+                                ips_v4.push(ip);
+                            }
+                        });
+                        return ips_v4[0];
                     } catch (error) {
-                        // no ip or dns_name so nowhere to check, can't test the key
-                        this.set('hasKey', false);
-                        return;
+                        Mist.notificationController.notify('No host available for machine ' + this.name);
+                        error('No host available for machine ' + this.name);
+                        return false;
                     }
                 }
+            },
 
+            getUser: function() {
                 // In case of ec2, mist.io could have set this. Server can handle empty string.
-                var ssh_user;
                 try {
-                    ssh_user = this.extra.tags.ssh_user;
+                    return this.extra.tags.ssh_user;
                 } catch (error) {
-                    ssh_user = 'root';
+                    return 'root';
                 }
+            },
+
+            shell: function(shell_command, callback) {
+                log('Sending', shell_command, 'to machine', this.name);
+
+                var ssh_user = this.getUser();
+                var host = this.getHost();
 
                 var that = this;
-                $.ajax({
-                    url: '/backends/' + this.backend.index + '/machines/' + this.id + '/shell',
-                    type: 'POST',
-                    data: {'host': host,
-                           'ssh_user': ssh_user,
-                           'command': shell_command},
-                    success: function(data) {
-                        if (data){
-                            callback(data);
+                if (host) {
+                    $.ajax({
+                        url: '/backends/' + this.backend.index + '/machines/' + this.id + '/shell',
+                        type: 'POST',
+                        data: {'host': host,
+                               'ssh_user': ssh_user,
+                               'command': shell_command},
+                        success: function(data) {
+                            if (data){
+                                callback(data);
+                            }
+                            info('Successfully sent shell command', shell_command, 'to machine',
+                                    that.name, 'with result:\n', data);
+                        },
+                        error: function(jqXHR, textstate, errorThrown) {
+                            Mist.notificationController.notify('Error sending shell command ' +
+                                    shell_command + ' to machine ' + that.name);
+                            error(textstate, errorThrown, 'when sending shell command',
+                                    shell_command, 'to machine', that.name);
                         }
-                        info('Successfully sent shell command', shell_command, 'to machine',
-                                that.name, 'with result:\n', data);
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error sending shell command ' +
-                                shell_command + ' to machine ' + that.name);
-                        error(textstate, errorThrown, 'when sending shell command',
-                                shell_command, 'to machine', that.name);
-                    }
-                });
-
+                    });
+                }
             },
 
             hasAlert : function() {
@@ -180,71 +193,50 @@ define('app/models/machine', [
             },
 
             checkUptime: function() {
-                
                 var that = this;
-                function uptimeTimeout(){
-                
+
+                function uptimeTimeout() {
                     if (that.state == 'running') {
-                        var host;
-                        if (that.extra && that.extra.dns_name) {
-                            // it is ec2 machine
-                            host = that.extra.dns_name;
-                        } else {
-                            // if not ec2 it should have a public ip
-                            try {
-                                host = that.public_ips[0];
-                            } catch (error) {
-                                // no ip or dns_name so nowhere to check, can't test the key
-                                that.set('hasKey', false);
-                            }
-                        }
+                        var host = that.getHost();
+                        if (host) {
+                            var ssh_user = that.getUser();
 
-                        // In case of ec2, mist.io could have set this. Server can handle empty string.
-                        var ssh_user;
-                        try {
-                            ssh_user = that.extra.tags.ssh_user;
-                        } catch (error) {
-                            ssh_user = 'root';
-                        }
-
-                        $.ajax({
-                            url: '/backends/' + that.backend.index + '/machines/' + that.id + '/shell',
-                            type: 'POST',
-                            data: {'host': host,
-                               'ssh_user': ssh_user,
-                               'command': 'cat /proc/uptime'},
-                            success: function(data, textStatus, jqXHR) {
-                                   // got it fine, also means it has a key
-                                if (jqXHR.status === 200) {
-                                    that.set('hasKey', true);
-                                    var resp = data.split(' ');
-                                    if (resp.length == 2) {
-                                        var uptime = parseFloat(resp[0]) * 1000;
-                                        that.set('uptimeChecked', Date.now());
-                                        that.set('uptimeFromServer', uptime);
+                            $.ajax({
+                                url: '/backends/' + that.backend.index + '/machines/' + that.id + '/shell',
+                                type: 'POST',
+                                data: {'host': host,
+                                   'ssh_user': ssh_user,
+                                   'command': 'cat /proc/uptime'},
+                                success: function(data, textStatus, jqXHR) {
+                                       // got it fine, also means it has a key
+                                    if (jqXHR.status === 200) {
+                                        that.set('hasKey', true);
+                                        var resp = data.split(' ');
+                                        if (resp.length == 2) {
+                                            var uptime = parseFloat(resp[0]) * 1000;
+                                            that.set('uptimeChecked', Date.now());
+                                            that.set('uptimeFromServer', uptime);
+                                        }
+                                        info('Successfully got uptime', data, 'from machine', that.name);
+                                    } else {
+                                        // in every other case there is a problem
+                                        that.set('hasKey', false);
+                                        info('Got response other than 200 while getting uptime from machine', that.name);
+                                        setTimeout(uptimeTimeout, 10000);
                                     }
-                                    info('Successfully got uptime', data, 'from machine', that.name);
-                                } else {
-                                    // in every other case there is a problem
+                                },
+                                error: function(jqXHR, textstate, errorThrown) {
                                     that.set('hasKey', false);
-                                    info('Got response other than 200 while getting uptime from machine', that.name);
+                                    //Mist.notificationController.notify('Error getting uptime from machine ' +
+                                    //    that.name);
+                                    error(textstate, errorThrown, 'when getting uptime from machine',
+                                        that.name);
                                     setTimeout(uptimeTimeout, 10000);
                                 }
-                            },
-                            
-                            error: function(jqXHR, textstate, errorThrown) {
-                                that.set('hasKey', false);
-                                //Mist.notificationController.notify('Error getting uptime from machine ' +
-                                //    that.name);
-                                error(textstate, errorThrown, 'when getting uptime from machine',
-                                    that.name);
-                                setTimeout(uptimeTimeout, 10000);
-                            }
-                        });
+                            });
+                        }
                     }
-                
                 };
-                
                 setTimeout(uptimeTimeout, 10000);
             },
 
@@ -261,10 +253,10 @@ define('app/models/machine', [
                         }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                            Mist.notificationController.notify('Error checking monitoring of machine ' +
-                                    that.name);
-                            error(textstate, errorThrown, 'while checking monitoring of machine',
-                                    that.name);
+                        Mist.notificationController.notify('Error checking monitoring of machine ' +
+                                that.name);
+                        error(textstate, errorThrown, 'while checking monitoring of machine',
+                                that.name);
                     }
                 });
             },
@@ -282,53 +274,43 @@ define('app/models/machine', [
             changeMonitoring: function() {
                 warn("Setting monitoring to:  " + !this.hasMonitoring);
 
-                var that = this;
-
-                var host;
-                if (this.extra.dns_name) {
-                    // it is ec2 machine
-                    host = this.extra.dns_name;
-                } else {
-                    // if not ec2 it should have a public ip
-                    try {
-                        host = this.public_ips[0];
-                    } catch (error) {
-                        // no ip or dns_name so nowhere to check, can't test the key
-                        this.set('hasKey', false);
-                    }
-                }
-
-                var payload = {
-                   'monitoring': !this.hasMonitoring,
-                   'host': host,
-                   'provider': this.backend.provider
-                };
-
                 this.set('pendingMonitoring', true);
 
-                if(this.hasMonitoring){
-                    this.set('hasMonitoring', false);
-                }
+                var host = this.getHost();
+                if (host) {
+                    var payload = {
+                       'monitoring': !this.hasMonitoring,
+                       'host': host,
+                       'provider': this.backend.provider
+                    };
 
-                $.ajax({
-                    url: URL_PREFIX + '/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    dataType: 'jsonp',
-                    success: function(data) {
-                        if (data.deployed_collectd) {
-                            that.set('hasMonitoring', true);
-                            that.set('pendingMonitoring', false);
-                        } else {
-                            that.set('hasMonitoring', false);
+                    if (this.hasMonitoring) {
+                        this.set('hasMonitoring', false);
+                    }
+
+                    var that = this;
+                    $.ajax({
+                        url: URL_PREFIX + '/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(payload),
+                        dataType: 'jsonp',
+                        success: function(data) {
+                            if (data.deployed_collectd) {
+                                that.set('hasMonitoring', true);
+                                that.set('pendingMonitoring', false);
+                            } else {
+                                that.set('hasMonitoring', false);
+                                that.set('pendingMonitoring', false);
+                            }
+                        },
+                        error: function(jqXHR, textstate, errorThrown) {
                             that.set('pendingMonitoring', false);
                         }
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        that.set('pendingMonitoring', false);
-                    }
-                });
+                    });
+                } else {
+                    that.set('pendingMonitoring', false);
+                }
             },
 
             init: function() {

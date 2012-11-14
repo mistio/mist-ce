@@ -17,7 +17,7 @@ define('app/controllers/confirmation', [
             confirm: function(){
                 this.callback();
                 window.history.go(-1);
-                
+
                 this.set("callback", function(){});
             }
         });
