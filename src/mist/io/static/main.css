@@ -856,7 +856,7 @@ div.cost {
     padding-left: 2px;
 }
 
-.dialog-shell  .shell-return {
+.dialog-shell .shell-return {
     width: 100%;
     overflow: hidden;
     border: 1px solid #AAA;
@@ -874,20 +874,19 @@ div.cost {
     min-width: 80ex;
 }
 
-.dialog-shell .shell-return div.command-output.contracted .command,
 .dialog-shell .shell-return .command {
-    background: #efeff1 url("images/arrow-down.png") right center no-repeat;
+    background: #efeff1;
     cursor: pointer;
     padding: 6px;
     font-weight: bold;
-    border-bottom: 1px solid #ccc;
+    color: #222;
 }
-
+/*
 .dialog-shell .shell-return div.command-output.expanded .command,
 .dialog-shell .shell-return .command-output:nth-of-type(1) .command {
     background: #efeff1 url("images/arrow-up.png") right center no-repeat;
 }
-
+*/
 .dialog-shell .shell-return div.output {
     background: #444;
     color: #efeff1;
@@ -895,21 +894,20 @@ div.cost {
     text-shadow: none;
 }
 
-.dialog-shell .shell-return .command-output div.output {
-    display: none;
+/* Shell dialog jQueryUI overrides */
+.dialog-shell .ui-accordion .ui-accordion-header .ui-accordion-header-icon {
+    left: 93%;
+    background-color: #EFEFF1;
 }
 
-.dialog-shell .shell-return .command-output:nth-of-type(1) div.output {
-    display: block;
-    max-height: 160px;
-    overflow: auto;
+.dialog-shell .ui-state-active .ui-icon {
+    background-image: url(images/ui-icons_222222_256x240.png);
 }
 
 .ui-autocomplete {
     -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     -moz-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-
 }
 
 .ui-autocomplete .ui-menu-item a {

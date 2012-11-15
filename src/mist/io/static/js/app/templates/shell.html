@@ -1,4 +1,4 @@
-<div data-role="popup" id="dialog-shell" class="dialog-shell mist-dialog" data-overlay-theme="a" style="width: 400px; max-width:400px;">
+<div data-role="popup" id="dialog-shell" class="dialog-shell mist-dialog" data-overlay-theme="a" style="width: 500px; max-width:500px;">
     <div data-role="header">
         <h1>Shell</h1>
     </div>
@@ -15,8 +15,8 @@
         </div>
         <div class="shell-return">
         {{#each shellOutputItems}}
-            <h3>{{command}}</h3>
-            <div>{{{output}}}</div>
+            <h3 class="command">{{command}}</h3>
+            <div class="output">{{{output}}}</div>
         {{/each}}
         </div>
         <a data-role="button" data-rel="back" data-theme="a" {{action clear}}>Back</a>
