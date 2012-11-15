@@ -1,24 +1,22 @@
-<div data-role="popup" id="dialog-shell" class="mist-dialog" data-overlay-theme="a" style="width: 400px; max-width:400px;">
+<div data-role="popup" id="dialog-shell" class="dialog-shell mist-dialog" data-overlay-theme="a" style="width: 400px; max-width:400px;">
     <div data-role="header">
         <h1>Shell</h1>
     </div>
     <div data-role="content" data-theme="b">
         <div data-role="fieldcontain">
-            <table id="shell-input">
+            <table class="shell-input">
                 <tr>
                     <td>{{view Mist.ShellTextField autocapitalize="off" valueBinding="command" controllerBinding="this"}}</td>
-                    <td id="shell-send-wrapper">
-                        <a id="shell-send" data-icon="shell-return" data-role="button" data-iconpos="notext" {{action submit}} {{bindAttr class="disabledClass"}}></a>
+                    <td class="shell-send-wrapper">
+                        <a  data-icon="shell-return" data-role="button" data-iconpos="notext" {{action submit}} {{bindAttr class=":shell-send disabledClass"}}></a>
                     </td>
                 </tr>
             </table>
         </div>
-        <div id="shell-return">
+        <div class="shell-return">
         {{#each shellOutputItems}}
-            <div class="command-output" {{bindAttr id="cmdIndex"}}>
-                <div class="command">{{command}}</div>
-                <div class="output">{{{output}}}</div>
-            </div>
+            <h3>{{command}}</h3>
+            <div>{{{output}}}</div>
         {{/each}}
         </div>
         <a data-role="button" data-rel="back" data-theme="a" {{action clear}}>Back</a>

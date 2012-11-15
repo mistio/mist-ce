@@ -9,7 +9,7 @@
     <title>${project} - down to earth cloud computing</title>
     <!-- include the Tools -->
     <link rel="stylesheet" href="static/jquery.mobile-1.2.0.css" />
-    <link type="text/css" href="static/ui-lightness/jquery-ui-1.8.22.custom.css" rel="stylesheet" />
+    <link type="text/css" href="static/ui-lightness/jquery-ui-1.9.1.custom.css" rel="stylesheet" />
     <link rel="stylesheet" href="static/main.css" />
     <link rel="icon" href="static/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>

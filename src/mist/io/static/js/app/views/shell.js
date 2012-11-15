@@ -59,6 +59,14 @@ function(shell_html) {
                     cmdIndex: "cmd-" + that.shellOutputItems.content.length
                 });
                 that.shellOutputItems.arrayContentDidChange(0, 0, 1);
+                Em.run.next(function() {
+                    try {
+                         $(".shell-return").accordion("destroy").accordion({ header: "h3", collapsible: true });
+                    } catch(e) {
+                         $(".shell-return").accordion({ header: "h3", collapsible: true });
+                    } 
+                    
+                });
             });
             this.clear();
             

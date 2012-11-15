@@ -818,19 +818,19 @@ div.cost {
 
 /* Shell Dialog */
 
-#dialog-shell div.ui-field-contain {
+.dialog-shell div.ui-field-contain {
     margin: 0px;
     margin-top: 0.5em;
 }
 
-#dialog-shell #shell-input {
+.dialog-shell .shell-input {
     overflow: auto;
     width: 100%;
     clear: both;
     margin-top: 0px;
 }
 
-#dialog-shell #shell-input input {
+.dialog-shell .shell-input input {
     width: 97%;
     padding-left: 28px;
     box-sizing: border-box;
@@ -842,21 +842,21 @@ div.cost {
     background-repeat: no-repeat;
 }
 
-#dialog-shell #shell-send {
+.dialog-shell .shell-send {
     margin: .5em 0;
     padding: 5px 27px;
 }
 
-#dialog-shell .ui-icon-shell-return {
+.dialog-shell .ui-icon-shell-return {
     background-image: url("images/return.png");
 }
 
-#dialog-shell  #shell-send-wrapper {
+.dialog-shell  .shell-send-wrapper {
     width: 80px;
     padding-left: 2px;
 }
 
-#dialog-shell  #shell-return {
+.dialog-shell  .shell-return {
     width: 100%;
     overflow: hidden;
     border: 1px solid #AAA;
@@ -870,12 +870,12 @@ div.cost {
     background: #dfe1e2;
 }
 
-#dialog-shell #shell-return div {
+.dialog-shell .shell-return div {
     min-width: 80ex;
 }
 
-#dialog-shell #shell-return div.command-output.contracted .command,
-#dialog-shell #shell-return .command {
+.dialog-shell .shell-return div.command-output.contracted .command,
+.dialog-shell .shell-return .command {
     background: #efeff1 url("images/arrow-down.png") right center no-repeat;
     cursor: pointer;
     padding: 6px;
@@ -883,23 +883,23 @@ div.cost {
     border-bottom: 1px solid #ccc;
 }
 
-#dialog-shell #shell-return div.command-output.expanded .command,
-#dialog-shell #shell-return .command-output:nth-of-type(1) .command {
+.dialog-shell .shell-return div.command-output.expanded .command,
+.dialog-shell .shell-return .command-output:nth-of-type(1) .command {
     background: #efeff1 url("images/arrow-up.png") right center no-repeat;
 }
 
-#dialog-shell #shell-return div.output {
+.dialog-shell .shell-return div.output {
     background: #444;
     color: #efeff1;
     padding: 6px;
     text-shadow: none;
 }
 
-#dialog-shell #shell-return .command-output div.output {
+.dialog-shell .shell-return .command-output div.output {
     display: none;
 }
 
-#dialog-shell #shell-return .command-output:nth-of-type(1) div.output {
+.dialog-shell .shell-return .command-output:nth-of-type(1) div.output {
     display: block;
     max-height: 160px;
     overflow: auto;
