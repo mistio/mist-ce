@@ -380,8 +380,8 @@ a#mist-select-machines-button span.ui-btn-text {
     overflow: hidden;
 }
 
-#images-list .ul-li-heading {
-    max-width: 400px;
+#images-list .ui-li-heading {
+    max-width: 500px;
 }
 
 .caption-wrapper {
@@ -939,7 +939,7 @@ div.cost {
         max-width: 120px;
     }
 
-    #images-list .ul-li-heading {
+    #images-list .ui-li-heading {
         max-width: 400px;
     }
 
@@ -977,10 +977,10 @@ div.cost {
         top: 20px;
     }
 
-    #images-list .ul-li-heading {
-        left:0px;
+    #images-list .ui-li-heading {
+        left: 0px;
         top: 0px;
-        max-width: 400px;
+        max-width: 200px;
     }
 
     .caption-wrapper {
