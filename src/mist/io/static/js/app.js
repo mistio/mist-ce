@@ -184,6 +184,10 @@ define( 'app', [
             $(document).on( 'popupbeforeposition', '#dialog-single-power', function() {
                 $("#dialog-single-power a").button();
             });
+            
+            $(document).on( 'popupbeforeposition', '#monitoring-dialog', function() {
+                $("#single-machine").trigger('pagecreate'); 
+            });
 
             $(document).on( 'pagebeforeshow', '#images', function() {
                 $("#images-list").listview('refresh');
