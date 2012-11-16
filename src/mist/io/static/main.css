@@ -361,6 +361,15 @@ a.action-links {
     padding: 8px;
 }
 
+.dialog-add label, .dialog-add .select {
+    display: block;
+    margin-top: 12px;
+}
+
+#machines .dialog-add .ui-select, #images .dialog-add .ui-select {
+    width: 100%;
+}
+
 a#mist-select-machines-button {
     outline: none;
 }
@@ -686,14 +695,6 @@ div.pending-monitoring {
 
 #new-machine-name {
     margin: 12px 0;
-}
-#dialog-add label, #dialog-add .select {
-    display: block;
-    margin-top: 12px;
-}
-
-#dialog-add .ui-select {
-    width: 100%;
 }
 
 .mist-li-selected {

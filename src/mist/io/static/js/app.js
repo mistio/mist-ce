@@ -283,7 +283,7 @@ define( 'app', [
             var machineListView = MachineListView.create();
             machineListView.append();
             var addDialog = MachineAddDialog.create();
-            addDialog.appendTo("#machines");
+            addDialog.append();
             shellDialog = Shell.create();
             shellDialog.appendTo("#machines");
             var machineActionsDialog = MachineActionsDialog.create();
