@@ -311,31 +311,31 @@ define( 'app', [
 function log() {
     try {
         if (LOGLEVEL > 3) {
-            return console.log.apply(this, arguments);
+            return console.log.apply(console, arguments);
         }
-    } catch(err) {}
+    } catch(err) {console.log(err);}
 }
 
 function info() {
     try {
         if (LOGLEVEL > 2) {
-            return console.info.apply(this, arguments);
+            return console.info.apply(console, arguments);
         }
-    } catch(err) {}
+    } catch(err) {console.log(err);}
 }
 
 function warn() {
     try {
         if (LOGLEVEL > 1) {
-            return console.warn.apply(this, arguments);
+            return console.warn.apply(console, arguments);
         }
-    } catch(err) {}
+    } catch(err) {console.log(err);}
 }
 
 function error() {
     try {
         if (LOGLEVEL > 0) {
-            return console.error.apply(this, arguments);
+            return console.error.apply(console, arguments);
         }
-    } catch(err) {}
+    } catch(err) {console.log(err);}
 }
