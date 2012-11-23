@@ -298,14 +298,20 @@ define('app/models/machine', [
                         success: function(data) {
                             if (data.deployed_collectd) {
                                 that.set('hasMonitoring', true);
-                                that.set('pendingMonitoring', false);
+                            } else if (data.disabled_collectd) {
+                                that.set('hasMonitoring', false);
                             } else {
                                 that.set('hasMonitoring', false);
-                                that.set('pendingMonitoring', false);
+                                error(data.output);
                             }
+                            that.set('pendingMonitoring', false);
                         },
                         error: function(jqXHR, textstate, errorThrown) {
                             that.set('pendingMonitoring', false);
+                            Mist.notificationController.notify('Error when changing monitoring to ' +
+                                that.name);
+                            error(textstate, errorThrown, 'when changing monitoring to machine',
+                                that.name);
                         }
                     });
                 } else {
