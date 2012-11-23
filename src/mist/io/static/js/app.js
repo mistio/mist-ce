@@ -6,7 +6,7 @@ require.config({
     paths: {
         mocha: 'lib/mocha-1.4.2',
         chai: 'lib/chai-1.2.0',
-        jquery: 'lib/jquery-1.8.1',
+        jquery: 'lib/jquery-1.8.3',
         jqueryUi: 'lib/jquery-ui-1.9.1.custom',
         text: 'lib/require/text',
         ember: 'lib/ember-0.9.8.1',
@@ -184,9 +184,9 @@ define( 'app', [
             $(document).on( 'popupbeforeposition', '#dialog-single-power', function() {
                 $("#dialog-single-power a").button();
             });
-            
+
             $(document).on( 'popupbeforeposition', '#monitoring-dialog', function() {
-                $("#single-machine").trigger('pagecreate'); 
+                $("#single-machine").trigger('pagecreate');
             });
 
             $(document).on( 'pagebeforeshow', '#images', function() {
@@ -279,7 +279,7 @@ define( 'app', [
             shellDialog.appendTo("#single-machine");
             var machineTagsDialog = MachineTagsDialog.create();
             machineTagsDialog.appendTo("#single-machine");
-            
+
             var machineListView = MachineListView.create();
             machineListView.append();
             var addDialog = MachineAddDialog.create();
@@ -290,7 +290,7 @@ define( 'app', [
             machineActionsDialog.appendTo("#machines");
             machineTagsDialog = MachineTagsDialog.create();
             machineTagsDialog.appendTo("#machines");
-            
+
             var imageListView = ImageListView.create();
             imageListView.append();
 
