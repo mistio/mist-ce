@@ -301,8 +301,16 @@ define('app/models/machine', [
                             } else if (data.disabled_collectd) {
                                 that.set('hasMonitoring', false);
                             } else {
-                                that.set('hasMonitoring', false);
+                                var action;
+                                if (this.hasMonitoring) {
+                                    action = 'disabling';
+                                } else {
+                                    action = 'enabling';
+                                }
+                                Mist.notificationController.notify('Error ' + action + ' monitoring for ' +
+                                    that.name);
                                 error(data.output);
+                                that.set('hasMonitoring', false);
                             }
                             that.set('pendingMonitoring', false);
                         },
