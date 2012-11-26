@@ -64,6 +64,7 @@ define( 'app', [
     'app/views/machine_tags_dialog',
     'app/views/machine_monitoring_dialog',
     'app/views/key_list',
+    'app/views/key',
     'mobile',
     'cubism',
     'ember'
@@ -96,6 +97,7 @@ define( 'app', [
                 MachineTagsDialog,
                 MachineMonitoringDialog,
                 KeyListView,
+                KeyView,
                 Mobile,
                 cubism
                 ) {
@@ -316,6 +318,9 @@ define( 'app', [
             
             var keyListView = KeyListView.create();
             keyListView.append();
+            
+            var keyView = KeyView.create();
+            keyView.append();
 
             // Expose the application globally
             return window.Mist = App;
