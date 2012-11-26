@@ -73,6 +73,11 @@
             {{number}}
             {{/view}}
             </a></li>
+            <li><a id="keys-count" href="#keys">Keys
+            {{#view Mist.CountView numberBinding="Mist.keysController.keyCount" tagName="span" class="ui-li-count"}}
+            {{number}}
+            {{/view}}
+            </a></li>
         </ul>
         {{/if}}
         </script>

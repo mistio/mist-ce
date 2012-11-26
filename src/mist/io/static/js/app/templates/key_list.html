@@ -1,0 +1,44 @@
+<div data-role="page" id="keys" data-theme="c">
+
+    <div data-role="header">
+
+        <a href="#home"
+        data-icon="home"
+        data-direction="reverse"
+        class="ui-btn-left">Home</a>
+        
+        <h1>Keys</h1>
+        
+        <a href="#dialog-providers"
+        data-rel="dialog"
+        data-role="button"
+        data-iconpos="notext"
+        data-transition="slidedown"
+        data-icon="check"
+        {{bindAttr class="Mist.backendsController.state :state-providers"}}>Providers</a>
+
+    </div>
+
+    <div data-role="content">
+    
+        <a href="#dialog-add-key" 
+        id="mist-create-key"
+        data-rel="dialog"
+        data-theme="b"
+        data-inline="true"
+        data-transition="slidedown"
+        data-role="button"
+        data-icon="plus" >Create</a>
+    
+        <ul id="keys-list"
+        data-role="listview"
+        data-inset="true"
+        data-theme="c">
+            
+        </ul>
+        
+        <div class="bottom-padding"></div>
+
+    </div>
+
+</div>

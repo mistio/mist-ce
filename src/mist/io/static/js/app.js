@@ -44,6 +44,7 @@ define( 'app', [
     'app/controllers/machine_add',
     'app/controllers/select_machines',
     'app/controllers/select_images',
+    'app/controllers/keys',
     'app/views/count',
     'app/views/backend_button',
     'app/views/backend_add',
@@ -62,6 +63,7 @@ define( 'app', [
     'app/views/delete_tag',
     'app/views/machine_tags_dialog',
     'app/views/machine_monitoring_dialog',
+    'app/views/key_list',
     'mobile',
     'cubism',
     'ember'
@@ -74,6 +76,7 @@ define( 'app', [
                 MachineAddController,
                 SelectMachinesController,
                 SelectImagesController,
+                KeysController,
                 Count,
                 BackendButton,
                 AddBackend,
@@ -92,6 +95,7 @@ define( 'app', [
                 DeleteTagView,
                 MachineTagsDialog,
                 MachineMonitoringDialog,
+                KeyListView,
                 Mobile,
                 cubism
                 ) {
@@ -159,6 +163,11 @@ define( 'app', [
                         'selectImagesController',
                         SelectImagesController.create()
                     );
+                    
+                    this.set(
+                            'keysController',
+                            KeysController.create()
+                        );
 
                     // Run specs if asked
                     if ( location.hash.match( /specs/ ) ) {
@@ -287,7 +296,7 @@ define( 'app', [
             shellDialog = Shell.create();
             shellDialog.appendTo("#machines");
             var machineActionsDialog = MachineActionsDialog.create();
-            machineActionsDialog.appendTo("#machines");
+            machineActionsDialog.append();
             machineTagsDialog = MachineTagsDialog.create();
             machineTagsDialog.appendTo("#machines");
 
@@ -300,6 +309,9 @@ define( 'app', [
             $(document).on( 'pagebeforeshow', '#dialog-add', function(){
                 $('#dialog-add').trigger('create');
             });
+            
+            var keyListView = KeyListView.create();
+            keyListView.append();
 
             // Expose the application globally
             return window.Mist = App;
