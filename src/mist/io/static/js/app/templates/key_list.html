@@ -35,7 +35,11 @@
         data-role="listview"
         data-inset="true"
         data-theme="c">
-            
+            {{#each Mist.keysController}}
+            <li class="node"> 
+                <a {{action "createMachine"}}>{{this.name}}</a>
+            </li>
+            {{/each}}
         </ul>
         
         <div class="bottom-padding"></div>
@@ -53,11 +57,17 @@
         data-icon="gear"
         {{action "generateClicked" }} >Generate</button>
         
-        <label for="textarea-public-key">Public Key:</label>
-        <textarea name="textarea-public-key" id="textarea-public-key" placeholder="Paste your public key here"></textarea>
-        <label for="textarea-private-key">Private Key:</label>
-        <textarea name="textarea-private-key" id="textarea-private-key" placeholder="Paste your private key here"></textarea>
+        <label for="create-key-name">Name:</label>
+        {{view Mist.TextField valueBinding="Mist.keysController.newKeyName" 
+        name="create-key-name" id="create-key-name"}}
         
+        <label for="textarea-public-key">Public Key:</label>
+        {{view Ember.TextArea valueBinding="Mist.keysController.newKeyPublicKey" 
+            name="textarea-public-key" id="textarea-public-key" placeholder="Paste your public key here"}}
+        <label for="textarea-private-key">Private Key:</label>
+        {{view Ember.TextArea valueBinding="Mist.keysController.newKeyPrivateKey" 
+            name="textarea-private-key" id="textarea-private-key" placeholder="Paste your private key here"}}
+
         <div class="btn-full" data-role="controlgroup"
             data-type="horizontal">
             <button class="btn-left-full" data-theme="c"

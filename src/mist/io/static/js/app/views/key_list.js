@@ -9,6 +9,18 @@ define('app/views/key_list', [
     function(key_list_html) {
         return Ember.View.extend({
             tagName: false,
+            
+            backClicked: function(){
+                history.back();
+            },
+            
+            generateClicked: function(){
+                //TODO
+            },
+            
+            newKeyClicked: function(){
+                //TODO
+            },
 
             init: function() {
                 this._super();

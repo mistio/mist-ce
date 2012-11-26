@@ -600,3 +600,15 @@ def list_locations(request):
                     })
 
     return ret
+
+@view_config(route_name='keys', request_method='GET', renderer='json')
+def list_keys(request):
+    """List keys.
+
+    List all key pairs that are configured on this server
+
+    """
+    
+    ret = []
+    #TODO
+    return ret

@@ -265,6 +265,10 @@ define( 'app', [
                     'data-inline'
                 ],
             });
+            
+            Ember.TextArea.reopen({
+                attributeBindings: ["name", "placeholder", "id"]
+              });
 
             App.CountView = Count;
             App.BackendButtonView = BackendButton;

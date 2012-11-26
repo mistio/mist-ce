@@ -1,5 +1,5 @@
 define('app/controllers/keys', [
-    //'app/models/key',
+    'app/models/key',
     'ember',
     'jquery'
     ],
@@ -16,19 +16,19 @@ define('app/controllers/keys', [
             
             init: function() {
                 this._super();
-/* TODO load keys
+                
                 var that = this;
-                $.getJSON('/backends/' + this.backend.index + '/images', function(data) {
+
+                $.getJSON('/keys', function(data) {
                     var content = new Array();
                     data.forEach(function(item){
-                        item.backend = that.backend;
-                        content.push(Image.create(item));
+                        content.push(Key.create(item));
                     });
                     that.set('content', content);
                 }).error(function() {
-                    Mist.notificationController.notify("Error loading images for backend: " + that.backend.title);
+                    Mist.notificationController.notify("Error loading keys");
                 });
-*/
+
             }
         });
     }
