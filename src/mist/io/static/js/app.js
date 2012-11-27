@@ -302,7 +302,7 @@ define( 'app', [
             shellDialog = Shell.create();
             shellDialog.appendTo("#machines");
             var machineActionsDialog = MachineActionsDialog.create();
-            machineActionsDialog.append();
+            machineActionsDialog.appendTo("#machines");
             machineTagsDialog = MachineTagsDialog.create();
             machineTagsDialog.appendTo("#machines");
 
