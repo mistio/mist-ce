@@ -95,10 +95,17 @@ def add_backend(request, renderer='json'):
         pass
 
     params = request.json_body
-    backend = {'provider': params.get('provider', '0')['provider'],
+    provider = params.get('provider', '0')['provider']
+    region = ''
+    if ':' in provider:
+        region = provider.split(':')[1]
+        provider = provider.split(':')[0]
+        
+    backend = {'provider': provider,
                'title': params.get('provider', '0')['title'],
                'id': params.get('apikey', ''),
                'secret': params.get('apisecret', ''),
+               'region': region,
                'poll_interval': request.registry.settings['default_poll_interval'],
                'enabled': True,
               }
@@ -111,6 +118,7 @@ def add_backend(request, renderer='json'):
            'title'        : backend['title'],
            'provider'     : backend['provider'],
            'poll_interval': backend['poll_interval'],
+           'region'       : backend['region'],
            'status'       : 'off',
           }
     return ret

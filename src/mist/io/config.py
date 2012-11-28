@@ -198,25 +198,25 @@ LINODE_DATACENTERS = {
 SUPPORTED_PROVIDERS = [
                        # EC2
                        {'title': 'EC2_AP_NORTHEAST',
-                        'provider' : Provider.EC2_AP_NORTHEAST,
+                        'provider': Provider.EC2_AP_NORTHEAST,
                         },
                        {'title': 'EC2_AP_SOUTHEAST',
-                        'provider' : Provider.EC2_AP_SOUTHEAST,
+                        'provider': Provider.EC2_AP_SOUTHEAST,
                         },
                        {'title': 'EC2_EU_WEST',
-                        'provider' : Provider.EC2_EU_WEST,
+                        'provider': Provider.EC2_EU_WEST,
                         },
                        {'title': 'EC2_SA_EAST',
-                        'provider' : Provider.EC2_SA_EAST,
+                        'provider': Provider.EC2_SA_EAST,
                         },                       
                        {'title': 'EC2_US_EAST',
-                        'provider' : Provider.EC2_US_EAST,
+                        'provider': Provider.EC2_US_EAST,
                         },
                        {'title': 'EC2_US_WEST',
-                        'provider' : Provider.EC2_US_WEST,
+                        'provider': Provider.EC2_US_WEST,
                         },
                        {'title': 'EC2_US_WEST_OREGON',
-                        'provider' : Provider.EC2_US_WEST_OREGON,
+                        'provider': Provider.EC2_US_WEST_OREGON,
                         },
 
                        # Linode
@@ -229,11 +229,19 @@ SUPPORTED_PROVIDERS = [
                         },
                        
                        # RackSpace
-                       {'title': 'RackSpace',
-                        'provider' : Provider.RACKSPACE,
+                       {'title': 'RackSpace DFW',
+                        'provider': "%s:%s" % (Provider.RACKSPACE,'dfw')
                         },
-                       {'title': 'Rackspace First Gen',
-                        'provider' : Provider.RACKSPACE_FIRST_GEN,
+                       {'title': 'RackSpace ORD',
+                        'provider' : "%s:%s" % (Provider.RACKSPACE,'ord')
                         },
-                       
+                       {'title': 'RackSpace LON',
+                        'provider' : "%s:%s" % (Provider.RACKSPACE,'lon')
+                        },
+                       {'title': 'Rackspace Legacy US',
+                        'provider' : "%s:%s" % (Provider.RACKSPACE_FIRST_GEN,'us')
+                        },
+                       {'title': 'Rackspace Legacy UK',
+                        'provider' : "%s:%s" % (Provider.RACKSPACE_FIRST_GEN,'uk')
+                        },
                        ]
