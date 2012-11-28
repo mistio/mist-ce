@@ -120,7 +120,7 @@ def connect(request):
                       region=backend['region'])
     elif backend['provider'] == Provider.RACKSPACE:
         conn = driver(backend['id'], backend['secret'],
-                      datacenter=backend['datacenter'])
+                      datacenter=backend['region'])
     else:
         # ec2
         conn = driver(backend['id'], backend['secret'])
