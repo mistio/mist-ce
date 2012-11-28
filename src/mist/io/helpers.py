@@ -48,6 +48,8 @@ def load_settings(settings):
     settings['backends'] = user_config.get('backends', [])
     settings['js_build'] = user_config.get('js_build', False)
     settings['js_log_level'] = user_config.get('js_log_level', 3)
+    settings['default_poll_interval'] = user_config.get('default_poll_interval',
+                                                         10000)
     if not 'core_uri' in settings:
         settings['core_uri'] = user_config.get('core_uri', 'https://mist.io')
 
