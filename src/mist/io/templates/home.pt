@@ -4,10 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta content='True' name='HandheldFriendly' />
-    <meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1.0; user-scalable=0;">
+    <meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1.0; user-scalable=0;"/>
     <meta name="viewport" content="width=device-width" />
     <title>${project} - down to earth cloud computing</title>
-    <!-- include the Tools -->
     <link type="text/css" href="static/ui-smoothness/jquery-ui-1.9.1.custom.css" rel="stylesheet" />
     <link rel="stylesheet" href="static/jquery.mobile-1.2.0.css" />
     <link rel="stylesheet" href="static/main.css" />
@@ -15,7 +14,7 @@
     <link rel="stylesheet" media="all" href=""/>
     <script tal:content="string: var URL_PREFIX='${core_uri}'" />
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
-    <script src="static/js/lib/require/require.js"></script>    
+    <script src="static/js/lib/require/require.js"></script>
     <script tal:condition="js_build">
         require.config({
             baseUrl: 'static/js/',
@@ -36,83 +35,121 @@
 </head>
 
 <body style="background-color: #c2c3c4">
-    
+
 <div data-role="page" id="splash">
     <div class="mist-logo"></div>
 </div>
-
 
 <!-- Start of first page: #home -->
 <div data-role="page" id="home">
 
     <div data-role="header">
         <h1>mist.io</h1>
-    </div><!-- /header -->
+    </div>
 
     <div data-role="content">
-        <a id="add-backend-button" href="#add-backend" class="add-button" data-rel="popup" data-theme="b" data-inline="true" data-transition="slidedown" data-role="button" data-icon="plus">Add backend</a>
 
-        <!-- Start of add backend dialog -->
+        <a id="add-backend-button"
+            href="#add-backend"
+            class="add-button"
+            data-rel="popup"
+            data-theme="b"
+            data-inline="true"
+            data-transition="slidedown"
+            data-role="button"
+            data-icon="plus">Add backend</a>
+
         <div data-role="popup" id="add-backend" class="mist-dialog">
             <div data-role="header">
                 <h1>Add Backend</h1>
             </div>
             <script type="text/x-handlebars">
-            {{view Mist.AddBackendView backendBinding="Mist.backend" }}
+                {{view Mist.AddBackendView backendBinding="Mist.backend"}}
             </script>
-        </div><!-- /add backend dialog -->
+        </div>
 
         <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
             <script type="text/x-handlebars">
-            {{#each Mist.backendsController}}
-                {{view Mist.BackendButtonView backendBinding="this"}}
-            {{/each}}
+                {{#each Mist.backendsController}}
+                    {{view Mist.BackendButtonView backendBinding="this"}}
+                {{/each}}
             </script>
         </div>
-        <script type="text/x-handlebars">
-        {{#if Mist.backendsController.content.length}}
-        <ul data-role="listview" data-theme="c" data-dividertheme="d" class="ui-listview ui-listview-inset ui-corner-all ui-shadow" id="home-menu">
-            <li><a id="machines-count" href="#machines">Machines
-            {{#view Mist.CountView numberBinding="Mist.backendsController.machineCount" tagName="span" class="ui-li-count"}}
-            {{number}}
-            {{/view}}
-            </a></li>
-            <li><a id="images-count" href="#images">Images
-            {{#view Mist.CountView numberBinding="Mist.backendsController.imageCount" tagName="span" class="ui-li-count"}}
-            {{number}}
-            {{/view}}
-            </a></li>
-            <li><a id="keys-count" href="#keys">Keys
-            {{#view Mist.CountView numberBinding="Mist.keysController.keyCount" tagName="span" class="ui-li-count"}}
-            {{number}}
-            {{/view}}
-            </a></li>
-        </ul>
-        {{/if}}
-        </script>
-        
-        <!-- Start of edit backend dialog -->
-        <div data-role="popup" id="edit-backend" class="mist-dialog" data-overlay-theme="a" style="width: 400px; max-width:400px;">
+
+        <div data-role="popup" id="edit-backend" class="mist-dialog" data-overlay-theme="a">
             <div data-role="header">
                 <h1>Edit provider</h1>
             </div>
             <script type="text/x-handlebars">
-            {{view Mist.EditBackendView backendBinding="Mist.backend" }}
+                {{view Mist.EditBackendView backendBinding="Mist.backend"}}
             </script>
-        </div><!-- /edit backend dialog -->
-        
-    </div><!-- /content -->
+        </div>
+
+        <script type="text/x-handlebars">
+            {{#if Mist.backendsController.content.length}}
+            <ul data-role="listview"
+                data-theme="c"
+                data-dividertheme="d"
+                class="ui-listview ui-listview-inset ui-corner-all ui-shadow"
+                id="home-menu">
+                <li>
+                    <a id="machines-count" href="#machines">Machines
+                        {{#view Mist.CountView
+                            numberBinding="Mist.backendsController.machineCount"
+                            tagName="span"
+                            class="ui-li-count"}}
+                            {{number}}
+                        {{/view}}
+                    </a>
+                </li>
+                <li>
+                    <a id="images-count" href="#images">Images
+                        {{#view Mist.CountView
+                            numberBinding="Mist.backendsController.imageCount"
+                            tagName="span"
+                            class="ui-li-count"}}
+                            {{number}}
+                        {{/view}}
+                    </a>
+                </li>
+                <li>
+                    <a id="keys-count" href="#keys">Keys
+                        {{#view Mist.CountView
+                            numberBinding="Mist.keysController.keyCount"
+                            tagName="span"
+                            class="ui-li-count"}}
+                            {{number}}
+                        {{/view}}
+                    </a>
+                </li>
+            </ul>
+        {{/if}}
+        </script>
+    </div>
 </div><!-- /page home -->
 
 <!-- Start of provider state dialog -->
-<div data-role="dialog" id="dialog-providers" class="mist-dialog">
+<div data-role="dialog"
+    id="dialog-providers"
+    class="mist-dialog">
+
     <div data-role="header">
         <h1>Provider State</h1>
     </div>
+
     <div data-role="content">
-        <ul id="providers-state-list" data-role="listview" data-inset="true" data-theme="c" data-dividertheme="d">
-        </ul>
-        <a href="index.html" data-role="button" data-icon="arrow-l" data-rel="back" data-transition="slidedown" data-theme="c">Close</a>
+
+        <ul id="providers-state-list"
+            data-role="listview"
+            data-inset="true"
+            data-theme="c"
+            data-dividertheme="d"></ul>
+
+        <a data-role="button"
+            data-icon="arrow-l"
+            data-rel="back"
+            data-transition="slidedown"
+            data-theme="c">Close</a>
     </div>
 </div><!-- /provider state dialog -->
 
