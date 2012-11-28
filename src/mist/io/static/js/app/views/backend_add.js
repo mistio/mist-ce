@@ -28,10 +28,8 @@ define('app/views/backend_add', ['app/models/backend',
                     data: JSON.stringify(payload),
                     success: function(result) {
                         Mist.backendsController.pushObject(Backend.create(result));
-                        setTimeout("$('#home-menu').listview()", 100);
-                        setTimeout("$('#backend-buttons').controlgroup('refresh')",100);
-                        Mist.backendsController.getMachineCount()
-                        Mist.backendsController.getImageCount()
+                        setTimeout("$('#home-menu').listview()", 300);
+                        setTimeout("$('#backend-buttons').controlgroup('refresh')", 300);
                         info('added backend ' + index);
                     }
                 });

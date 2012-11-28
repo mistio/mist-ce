@@ -43,6 +43,7 @@ define('app/controllers/images', [
                         content.push(Image.create(item));
                     });
                     that.set('content', content);
+                    Mist.backendsController.getImageCount();
                 }).error(function() {
                     Mist.notificationController.notify("Error loading images for backend: " + that.backend.title);
                 });
