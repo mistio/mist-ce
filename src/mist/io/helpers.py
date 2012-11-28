@@ -36,7 +36,7 @@ def load_settings(settings):
         config_file = open('settings.yaml', 'r')
 
     try:
-        user_config = yaml.load(config_file)
+        user_config = yaml.load(config_file) or {}
         config_file.close()
     except:
         log.error('Error parsing settings.yaml')

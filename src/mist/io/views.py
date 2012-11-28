@@ -85,6 +85,12 @@ def list_backends(request):
 @view_config(route_name='backend_action', request_method='PUT', renderer='json')
 def add_backend(request, renderer='json'):
 
+    try:
+        from mist.core.views import add_backend
+        return add_backend(request)
+    except:
+        pass
+    
     params = request.json_body
     backend = {'provider': params.get('provider', '0')['provider'],
                'title': params.get('provider', '0')['title'],
@@ -109,7 +115,12 @@ def add_backend(request, renderer='json'):
 
 @view_config(route_name='backend_action', request_method='DELETE', renderer='json')
 def delete_backend(request, renderer='json'):
-
+    try:
+        from mist.core.views import delete_backend
+        return delete_backend(request)
+    except:
+        pass
+    
     settings = request.registry.settings
     settings['backends'].remove(settings['backends'][int(request.matchdict['backend'])])
 
