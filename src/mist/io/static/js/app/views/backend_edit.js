@@ -8,23 +8,19 @@ define('app/views/backend_edit', [
      * @returns Class
      */
     function(edit_backend_dialog_html) {
-        
+
         return Ember.View.extend({
-            attributeBindings:['data-role', 'data-theme'],
-            
-            'data-role': 'content',
-            'data-theme': 'c',
-            
+
             //TODO add event handlers for each element on the dialog
-            
+
             deleteButtonClick: function(){
                 $('#backend-delete-confirm').slideDown();
             },
-            
+
             deleteCancelButtonClick: function(){
                 $('#backend-delete-confirm').slideUp();
             },
-            
+
             deleteConfirmButtonClick: function(){
                 var that = this;
                 $.ajax({
@@ -43,7 +39,7 @@ define('app/views/backend_edit', [
                     }
                 });
             },
-            
+
             init: function() {
                 this._super();
                 // cannot have template in home.pt as pt complains
