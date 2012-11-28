@@ -24,6 +24,7 @@ def main(global_config, **settings):
 
     config.add_route('home', '/')
     config.add_route('backends', '/backends')
+    config.add_route('backend_action', '/backends/{backend}')
 
     config.add_route('machines', '/backends/{backend}/machines')
     config.add_route('machine', '/backends/{backend}/machines/{machine}')

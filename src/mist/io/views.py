@@ -25,6 +25,7 @@ from mist.io.helpers import get_machine_actions
 from mist.io.helpers import import_key
 from mist.io.helpers import create_security_group
 from mist.io.helpers import run_command
+from mist.io.helpers import save_settings
 
 log = logging.getLogger('mist.io')
 
@@ -79,6 +80,42 @@ def list_backends(request):
         index = index + 1
 
     return backends
+
+
+@view_config(route_name='backend_action', request_method='PUT', renderer='json')
+def add_backend(request, renderer='json'):
+
+    params = request.json_body
+    backend = {'provider': params.get('provider', '0')['provider'],
+               'title': params.get('provider', '0')['title'],
+               'id': params.get('apikey', ''),
+               'secret': params.get('apisecret', ''),
+               'poll_interval': request.registry.settings['default_poll_interval'],
+               'enabled': True,
+              }
+
+    request.registry.settings['backends'].append(backend)
+    save_settings(request.registry.settings)
+
+    ret = {'index'        : len(user['backends']) - 1,
+           'id'           : backend['id'],
+           'title'        : backend['title'],
+           'provider'     : backend['provider'],
+           'poll_interval': backend['poll_interval'],
+           'status'       : 'off',
+          }
+    return ret
+
+
+@view_config(route_name='backend_action', request_method='DELETE', renderer='json')
+def delete_backend(request, renderer='json'):
+
+    settings = request.registry.settings
+    settings['backends'].remove(settings['backends'][int(request.matchdict['backend'])])
+
+    save_settings(settings)
+
+    return Response('OK', 200)
 
 
 @view_config(route_name='machines', request_method='GET', renderer='json')
