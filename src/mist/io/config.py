@@ -197,25 +197,25 @@ LINODE_DATACENTERS = {
     
 SUPPORTED_PROVIDERS = [
                        # EC2
-                       {'title': 'EC2_AP_NORTHEAST',
+                       {'title': 'EC2 AP NORTHEAST',
                         'provider': Provider.EC2_AP_NORTHEAST,
                         },
-                       {'title': 'EC2_AP_SOUTHEAST',
+                       {'title': 'EC2 AP SOUTHEAST',
                         'provider': Provider.EC2_AP_SOUTHEAST,
                         },
-                       {'title': 'EC2_EU_WEST',
+                       {'title': 'EC2 EU WEST',
                         'provider': Provider.EC2_EU_WEST,
                         },
-                       {'title': 'EC2_SA_EAST',
+                       {'title': 'EC2 SA EAST',
                         'provider': Provider.EC2_SA_EAST,
                         },                       
-                       {'title': 'EC2_US_EAST',
+                       {'title': 'EC2 US EAST',
                         'provider': Provider.EC2_US_EAST,
                         },
-                       {'title': 'EC2_US_WEST',
+                       {'title': 'EC2 US WEST',
                         'provider': Provider.EC2_US_WEST,
                         },
-                       {'title': 'EC2_US_WEST_OREGON',
+                       {'title': 'EC2 US WEST OREGON',
                         'provider': Provider.EC2_US_WEST_OREGON,
                         },
 
@@ -238,10 +238,10 @@ SUPPORTED_PROVIDERS = [
                        {'title': 'RackSpace LON',
                         'provider' : "%s:%s" % (Provider.RACKSPACE,'lon')
                         },
-                       {'title': 'Rackspace Legacy US',
+                       {'title': 'RackSpace US (OLD)',
                         'provider' : "%s:%s" % (Provider.RACKSPACE_FIRST_GEN,'us')
                         },
-                       {'title': 'Rackspace Legacy UK',
+                       {'title': 'RackSpace UK (OLD)',
                         'provider' : "%s:%s" % (Provider.RACKSPACE_FIRST_GEN,'uk')
                         },
                        ]
