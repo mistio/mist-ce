@@ -12,7 +12,8 @@ requires = [
     'PasteScript',
     'fabric',
     'paramiko',
-    'pyyaml'
+    'pyyaml',
+    'pycrypto',
 ]
 
 setup(name='mist.io',

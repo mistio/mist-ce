@@ -15,7 +15,16 @@ define('app/views/key_list', [
             },
             
             generateClicked: function(){
-                //TODO
+                $.ajax({
+                    url: '/keys',
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function(result) {
+                        Mist.keysController.set('newKeyPublicKey', result.public);
+                        Mist.keysController.set('newKeyPrivateKey', result.private);
+                    }
+                });
             },
             
             newKeyClicked: function(){

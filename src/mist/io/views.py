@@ -1,6 +1,9 @@
 """mist.io views"""
+import os
 import logging
 import datetime
+
+from Crypto.PublicKey import RSA
 
 from pyramid.response import Response
 from pyramid.view import view_config
@@ -667,7 +670,12 @@ def list_keys(request):
     List all key pairs that are configured on this server
 
     """
-
-    ret = []
-    #TODO
+    keypairs = request.registry.settings.get('keypairs',[])
+    ret = [key['id'] for key in keypairs ]
     return ret
+
+@view_config(route_name='keys', request_method='POST', renderer='json')
+def generate_keypair(request):    
+    key = RSA.generate(2048, os.urandom)
+    return {'public' : key.exportKey('OpenSSH'),
+            'private' : key.exportKey()}
