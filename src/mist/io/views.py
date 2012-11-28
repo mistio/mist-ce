@@ -106,7 +106,7 @@ def add_backend(request, renderer='json'):
     request.registry.settings['backends'].append(backend)
     save_settings(request.registry.settings)
 
-    ret = {'index'        : len(user['backends']) - 1,
+    ret = {'index'        : len(request.registry.settings['backends']) - 1,
            'id'           : backend['id'],
            'title'        : backend['title'],
            'provider'     : backend['provider'],
