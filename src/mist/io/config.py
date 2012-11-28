@@ -15,8 +15,6 @@ STATES = {
 
 # All EC2 providers, useful for type checking
 EC2_PROVIDERS = (
-    Provider.EC2,
-    Provider.EC2_EU,
     Provider.EC2_US_EAST,
     Provider.EC2_AP_NORTHEAST,
     Provider.EC2_EU_WEST,
@@ -195,3 +193,47 @@ LINODE_DATACENTERS = {
     7: 'London, UK',
     8: 'Tokyo, JP'
 }
+
+    
+SUPPORTED_PROVIDERS = [
+                       # EC2
+                       {'title': 'EC2_AP_NORTHEAST',
+                        'provider' : Provider.EC2_AP_NORTHEAST,
+                        },
+                       {'title': 'EC2_AP_SOUTHEAST',
+                        'provider' : Provider.EC2_AP_SOUTHEAST,
+                        },
+                       {'title': 'EC2_EU_WEST',
+                        'provider' : Provider.EC2_EU_WEST,
+                        },
+                       {'title': 'EC2_SA_EAST',
+                        'provider' : Provider.EC2_SA_EAST,
+                        },                       
+                       {'title': 'EC2_US_EAST',
+                        'provider' : Provider.EC2_US_EAST,
+                        },
+                       {'title': 'EC2_US_WEST',
+                        'provider' : Provider.EC2_US_WEST,
+                        },
+                       {'title': 'EC2_US_WEST_OREGON',
+                        'provider' : Provider.EC2_US_WEST_OREGON,
+                        },
+
+                       # Linode
+                       {'title': 'Linode',
+                        'provider' : Provider.LINODE},
+
+                       # OpenStack
+                       {'title': 'OpenStack',
+                        'provider': Provider.OPENSTACK,
+                        },
+                       
+                       # RackSpace
+                       {'title': 'RackSpace',
+                        'provider' : Provider.RACKSPACE,
+                        },
+                       {'title': 'Rackspace First Gen',
+                        'provider' : Provider.RACKSPACE_FIRST_GEN,
+                        },
+                       
+                       ]

@@ -19,6 +19,7 @@ from mist.io.config import EC2_PROVIDERS
 from mist.io.config import EC2_KEY_NAME
 from mist.io.config import EC2_SECURITYGROUP
 from mist.io.config import LINODE_DATACENTERS
+from mist.io.config import SUPPORTED_PROVIDERS
 
 from mist.io.helpers import connect
 from mist.io.helpers import get_machine_actions
@@ -47,6 +48,7 @@ def home(request):
 
     return {'project': 'mist.io',
             'session': session,
+            'supported_providers': SUPPORTED_PROVIDERS,
             'core_uri': core_uri,
             'js_build': js_build,
             'js_log_level': js_log_level}

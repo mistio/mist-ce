@@ -41,7 +41,7 @@ define('app/views/backend_add', ['app/models/backend',
             },
 
             providerList: function() {
-                return [{'title': 'Rackspace', 'provider': '3'}];
+                return SUPPORTED_PROVIDERS;
             }.property('providerList')
         });
     }

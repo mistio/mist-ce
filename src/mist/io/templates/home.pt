@@ -4,8 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta content='True' name='HandheldFriendly' />
-    <meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1.0; user-scalable=0;"/>
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1.0; user-scalable=0;" />
     <title>${project} - down to earth cloud computing</title>
     <link type="text/css" href="static/ui-smoothness/jquery-ui-1.9.1.custom.css" rel="stylesheet" />
     <link rel="stylesheet" href="static/jquery.mobile-1.2.0.css" />
@@ -13,6 +12,7 @@
     <link rel="icon" href="static/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
     <script tal:content="string: var URL_PREFIX='${core_uri}'" />
+    <script tal:content="string: var SUPPORTED_PROVIDERS=${supported_providers}" />    
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
     <script src="static/js/lib/require/require.js"></script>
     <script tal:condition="js_build">
