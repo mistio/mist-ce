@@ -36,6 +36,7 @@ define('app/views/backend_edit', [
                         Mist.backendsController.arrayContentDidChange();
                         // update indexes of remaining backends
                         Mist.backendsController.content.forEach(function(obj,i){obj.index=i})
+                        setTimeout("$('#backend-buttons').controlgroup('refresh')",200);
                     }
                 });
             },
