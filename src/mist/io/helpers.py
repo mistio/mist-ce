@@ -45,10 +45,10 @@ def load_settings(settings):
 
     settings['keypairs'] = user_config.get('keypairs', {})
     settings['backends'] = user_config.get('backends', [])
-    settings['core_uri'] = user_config.get('core_uri', 'https://mist.io')
     settings['js_build'] = user_config.get('js_build', False)
     settings['js_log_level'] = user_config.get('js_log_level', 3)
-
+    if not settings.has_key('core_uri'):
+        settings['core_uri'] = user_config.get('core_uri', 'https://mist.io')
 
 def save_settings(settings):
     """
