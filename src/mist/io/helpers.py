@@ -2,6 +2,7 @@
 import os
 import tempfile
 import logging
+import yaml
 
 from pyramid.response import Response
 
@@ -18,6 +19,63 @@ from mist.io.config import EC2_PROVIDERS
 
 
 log = logging.getLogger('mist.io')
+
+
+def load_settings(settings):
+    """Get settings from settings.yaml local file.
+
+    The settings argument gets updated. It is the global_config of pyramid. If
+    no file is there it sets some sensible defaults.
+    """
+    try:
+        config_file = open('settings.yaml', 'r')
+    except IOError:
+        log.warn('settings.yaml does not exist.')
+        config_file = open('settings.yaml', 'w')
+        config_file.close()
+        config_file = open('settings.yaml', 'r')
+
+    try:
+        user_config = yaml.load(config_file)
+        config_file.close()
+    except:
+        log.error('Error parsing settings.yaml')
+        config_file.close()
+        raise
+
+    settings['keypairs'] = user_config.get('keypairs', {})
+    settings['backends'] = user_config.get('backends', [])
+    settings['core_uri'] = user_config.get('core_uri', 'https://mist.io')
+    settings['js_build'] = user_config.get('js_build', False)
+    settings['js_log_level'] = user_config.get('js_log_level', 3)
+
+
+def save_settings(settings):
+    """
+    """
+    class literal_unicode(unicode): pass
+
+    def literal_unicode_representer(dumper, data):
+        return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='|')
+
+    yaml.add_representer(literal_unicode, literal_unicode_representer)
+
+    config_file = open('settings.yaml', 'w')
+
+    keypairs = {}
+    for key in settings['keypairs'].keys():
+        keypairs[key] = {'public': literal_unicode(settings['keypairs'][key]['public']),
+                         'private': literal_unicode(settings['keypairs'][key]['private']),
+                         }
+    yaml.dump({
+        'keypairs': keypairs,
+        'backends': settings['backends'],
+        'core_uri': settings['core_uri'],
+        'js_build': settings['js_build'],
+        'js_log_level': settings['js_log_level'],
+        }, config_file)
+
+    config_file.close()
 
 
 def connect(request):

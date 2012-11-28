@@ -6,7 +6,14 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-requires = ['pyramid', 'apache-libcloud', 'PasteScript', 'fabric', 'paramiko']
+requires = [
+    'pyramid',
+    'apache-libcloud',
+    'PasteScript',
+    'fabric',
+    'paramiko',
+    'pyyaml'
+]
 
 setup(name='mist.io',
       version='0.9.0',

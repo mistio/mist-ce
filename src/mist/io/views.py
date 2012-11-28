@@ -193,11 +193,11 @@ def create_machine(request):
         location = NodeLocation(location_id, name='', country='', driver=conn)
 
     try:
-        private_key = request['beaker.session']['keypairs']['default'][1]
-        public_key = request['beaker.session']['keypairs']['default'][0]
+        private_key = request['beaker.session']['keypairs']['default']['private']
+        public_key = request['beaker.session']['keypairs']['default']['public']
     except KeyError:
-        private_key = request.registry.settings['keypairs']['default'][1]
-        public_key = request.registry.settings['keypairs']['default'][0]
+        private_key = request.registry.settings['keypairs']['default']['private']
+        public_key = request.registry.settings['keypairs']['default']['public']
 
     if conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE] and\
     public_key:
@@ -503,9 +503,9 @@ def shell_command(request):
 
     backend_index = int(request.matchdict['backend'])
     try:
-        private_key = request['beaker.session']['keypairs']['default'][1]
+        private_key = request['beaker.session']['keypairs']['default']['private']
     except KeyError:
-        private_key = request.registry.settings['keypairs']['default'][1]
+        private_key = request.registry.settings['keypairs']['default']['private']
 
     return run_command(conn, machine_id, host, ssh_user, private_key,
                       command)
@@ -608,7 +608,7 @@ def list_keys(request):
     List all key pairs that are configured on this server
 
     """
-    
+
     ret = []
     #TODO
     return ret
