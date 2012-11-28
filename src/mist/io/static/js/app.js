@@ -6,20 +6,23 @@ require.config({
     paths: {
         mocha: 'lib/mocha-1.4.2',
         chai: 'lib/chai-1.2.0',
-        jquery: 'lib/jquery-1.8.1',
-        jqueryUi: 'lib/jquery-ui-1.8.23.custom',
+        jquery: 'lib/jquery-1.8.3',
+        jqueryUi: 'lib/jquery-ui-1.9.1.custom',
         text: 'lib/require/text',
         ember: 'lib/ember-0.9.8.1',
-        mobile: 'lib/jquery.mobile-1.2.0-rc.1',
+        mobile: 'lib/jquery.mobile-1.2.0',
         d3: 'lib/d3-2.10.1',
         cubism: 'lib/cubism-1.2.2'
     },
     shim: {
+        'ember': {
+            deps: ['jquery']
+        },
         'jqueryUi': {
             deps: ['jquery']
         },
         'mobile': {
-           deps: ['jquery']
+           deps: ['ember']
         },
         'd3': {
             deps: ['jquery']
@@ -41,6 +44,7 @@ define( 'app', [
     'app/controllers/machine_add',
     'app/controllers/select_machines',
     'app/controllers/select_images',
+    'app/controllers/keys',
     'app/views/count',
     'app/views/backend_button',
     'app/views/backend_add',
@@ -58,6 +62,9 @@ define( 'app', [
     'app/views/image_list',
     'app/views/delete_tag',
     'app/views/machine_tags_dialog',
+    'app/views/machine_monitoring_dialog',
+    'app/views/key_list',
+    'app/views/key',
     'mobile',
     'cubism',
     'ember'
@@ -70,6 +77,7 @@ define( 'app', [
                 MachineAddController,
                 SelectMachinesController,
                 SelectImagesController,
+                KeysController,
                 Count,
                 BackendButton,
                 AddBackend,
@@ -87,231 +95,268 @@ define( 'app', [
                 ImageListView,
                 DeleteTagView,
                 MachineTagsDialog,
+                MachineMonitoringDialog,
+                KeyListView,
+                KeyView,
                 Mobile,
                 cubism
                 ) {
 
-        var App = Ember.Application.create({
-
-            VERSION: '0.3-ember',
-
-            // Sets up mocha to run some integration tests
-            specsRunner: function( chai ) {
-                // Create placeholder for mocha output
-                $( document.body ).before( '<div id="mocha"></div>' );
-
-                // Setup mocha and expose chai matchers
-                window.expect = chai.expect;
-                mocha.setup('bdd');
-
-                // Load testsuite
-                require([
-                    'app/specs/templates/basic_acceptance'
-                ], function() {
-                        mocha.run().globals( [ '$', 'Ember', 'Mist' ] );
-                    }
-                );
-            },
-
-            // Constructor
-            init: function() {
-                this._super();
-
-                this.set(
-                    'backendsController',
-                    BackendsController.create()
-                );
-
-                this.set(
-                    'confirmationController',
-                    ConfirmationController.create()
-                );
-
-                this.set(
-                    'notificationController',
-                       NotificationController.create()
-                );
-
-                this.set(
-                    'machineAddController',
-                    MachineAddController.create()
-                );
-
-                this.set(
-                    'selectMachinesController',
-                    SelectMachinesController.create()
-                );
-
-                this.set(
-                    'selectImagesController',
-                    SelectImagesController.create()
-                );
-
-                // Run specs if asked
-                if ( location.hash.match( /specs/ ) ) {
-                    require( [ 'chai', 'mocha' ], this.specsRunner );
-                }
-
-                setTimeout(function(){
-                    $.mobile.changePage('#home', { transition: 'fade' });
-                }, 2000);
-
-
+        var mobileinit = false;
+        $(document).bind('pageinit', function() {
+            if (mobileinit){
+                return
             }
-        });
 
-        $(document).on( 'pagebeforeshow', '#machines', function() {
-            $('#machines-list').listview('refresh');
-        });
+            mobileinit = true;
 
-        $(document).on( 'pagebeforeshow', '#dialog-power', function() {
-            $("#dialog-power a").button();
-        });
+            var App = Ember.Application.create({
 
-        $(document).on( 'pagebeforeshow', '#dialog-single-power', function() {
-            $("#dialog-single-power a").button();
-        });
+                VERSION: '0.3-ember',
 
-        $(document).on( 'pagebeforeshow', '#images', function() {
-            $("#images-list").listview('refresh');
-        });
+                // Sets up mocha to run some integration tests
+                specsRunner: function( chai ) {
+                    // Create placeholder for mocha output
+                    $( document.body ).before( '<div id="mocha"></div>' );
 
-        $(document).on( 'pagebeforeshow', '#single-machine', function() {
-            Mist.graphPolling = true;
-        });
+                    // Setup mocha and expose chai matchers
+                    window.expect = chai.expect;
+                    mocha.setup('bdd');
 
-        $(document).on( 'pageshow', '#single-machine', function() {
-            $('input[type=checkbox]').checkboxradio("refresh");
-        });
+                    // Load testsuite
+                    require([
+                        'app/specs/templates/basic_acceptance'
+                    ], function() {
+                            mocha.run().globals( [ '$', 'Ember', 'Mist' ] );
+                        }
+                    );
+                },
 
-        $(document).on( 'pagebeforehide', '#single-machine', function() {
-            Mist.graphPolling = false;
-        });
+                // Constructor
+                init: function() {
+                    this._super();
 
-        // Console toggle behavior
-        $(document).ready(function() {
-            $('#shell-return').on('click', '.command', function() {
-                var out = $(this).next('.output');
-                if (out.is(':visible')) {
-                    out.slideUp(300);
-                    $(this).parent().addClass('contracted').removeClass('expanded');
-                } else {
-                    out.slideDown(200);
-                    $(this).parent().removeClass('contracted').addClass('expanded');
+                    this.set(
+                        'backendsController',
+                        BackendsController.create()
+                    );
+
+                    this.set(
+                        'confirmationController',
+                        ConfirmationController.create()
+                    );
+
+                    this.set(
+                        'notificationController',
+                           NotificationController.create()
+                    );
+
+                    this.set(
+                        'machineAddController',
+                        MachineAddController.create()
+                    );
+
+                    this.set(
+                        'selectMachinesController',
+                        SelectMachinesController.create()
+                    );
+
+                    this.set(
+                        'selectImagesController',
+                        SelectImagesController.create()
+                    );
+                    
+                    this.set(
+                            'keysController',
+                            KeysController.create()
+                        );
+
+                    // Run specs if asked
+                    if ( location.hash.match( /specs/ ) ) {
+                        require( [ 'chai', 'mocha' ], this.specsRunner );
+                    }
+
+                    setTimeout(function(){
+                        $.mobile.changePage('#home', { transition: 'fade' });
+                    }, 2000);
+
+
                 }
             });
+
+            $(document).on( 'pagebeforeshow', '#machines', function() {
+                $('#machines-list').listview('refresh');
+            });
+
+            $(document).on( 'popupbeforeposition', '#dialog-power', function() {
+                $("#dialog-power a").button();
+            });
+
+            $(document).on( 'popupbeforeposition', '#dialog-single-power', function() {
+                $("#dialog-single-power a").button();
+            });
+
+            $(document).on( 'popupbeforeposition', '#monitoring-dialog', function() {
+                $("#single-machine").trigger('pagecreate');
+            });
+
+            $(document).on( 'pagebeforeshow', '#images', function() {
+                $("#images-list").listview('refresh');
+            });
+
+            $(document).on( 'pagebeforeshow', '#single-machine', function() {
+                Mist.set('graphPolling', true);
+            });
+
+            $(document).on( 'pageshow', '#single-machine', function() {
+                $(".monitoring-button").button();
+            });
+
+            $(document).on( 'pagebeforehide', '#single-machine', function() {
+                Mist.set('graphPolling', false);
+                Mist.set('machine', null);
+            });
+
+            // Console toggle behavior
+            $(document).ready(function() {
+                $('#shell-return').on('click', '.command', function() {
+                    var out = $(this).next('.output');
+                    if (out.is(':visible')) {
+                        out.slideUp(300);
+                        $(this).parent().addClass('contracted').removeClass('expanded');
+                    } else {
+                        out.slideDown(200);
+                        $(this).parent().removeClass('contracted').addClass('expanded');
+                    }
+                });
+            });
+
+            App.Select = Ember.Select.extend({
+                attributeBindings: [
+                    'name',
+                    'data-theme',
+                    'data-icon',
+                    'data-native-menu',
+                    'disabled'
+                ],
+            });
+
+            App.TextField = Ember.TextField.extend({
+                attributeBindings: [
+                    'name',
+                    'data-theme'
+                ]
+            });
+
+            App.ShellTextField = Ember.TextField.extend({
+                attributeBindings: [
+                    'name',
+                    'data-theme',
+                    'autocapitalize'
+                ],
+
+                insertNewline: function() {
+                    this.controller.submit();
+                }
+            });
+
+            App.Checkbox = Ember.Checkbox.extend({
+                attributeBindings: [
+                    'name',
+                    'id',
+                    'data-inline'
+                ],
+            });
+            
+            Ember.TextArea.reopen({
+                attributeBindings: ["name", "placeholder", "id"]
+              });
+
+            App.CountView = Count;
+            App.BackendButtonView = BackendButton;
+            App.AddBackendView = AddBackend;
+            App.EditBackendView = EditBackend;
+            App.MachineListView = MachineList;
+            App.ImageListView = ImageList;
+            App.EnableBackendButtonView = EnableBackendButton;
+            App.DeleteTagView = DeleteTagView;
+            App.onOff = ['on', 'off'];
+
+            var machineView = MachineView.create();
+            machineView.append();
+
+            var confirmationDialog = ConfirmationDialog.create();
+            confirmationDialog.append();
+
+            var dialog = SingleMachineActionsDialog.create();
+            dialog.appendTo("#single-machine");
+            var shellDialog = Shell.create();
+            shellDialog.appendTo("#single-machine");
+            var machineTagsDialog = MachineTagsDialog.create();
+            machineTagsDialog.appendTo("#single-machine");
+
+            var machineListView = MachineListView.create();
+            machineListView.append();
+            var addDialog = MachineAddDialog.create();
+            addDialog.append();
+            shellDialog = Shell.create();
+            shellDialog.appendTo("#machines");
+            var machineActionsDialog = MachineActionsDialog.create();
+            machineActionsDialog.appendTo("#machines");
+            machineTagsDialog = MachineTagsDialog.create();
+            machineTagsDialog.appendTo("#machines");
+
+            var imageListView = ImageListView.create();
+            imageListView.append();
+
+            var machineMonitoringDialog = MachineMonitoringDialog.create();
+            machineMonitoringDialog.appendTo("#single-machine");
+
+            $(document).on( 'pagebeforeshow', '#dialog-add', function(){
+                $('#dialog-add').trigger('create');
+            });
+            
+            var keyListView = KeyListView.create();
+            keyListView.append();
+            
+            var keyView = KeyView.create();
+            keyView.append();
+
+            // Expose the application globally
+            return window.Mist = App;
         });
-
-        App.Select = Ember.Select.extend({
-            attributeBindings: [
-                'name',
-                'data-theme',
-                'data-icon',
-                'data-native-menu',
-                'disabled'
-            ],
-        });
-
-        App.TextField = Ember.TextField.extend({
-            attributeBindings: [
-                'name',
-                'data-theme'
-            ]
-        });
-
-        App.ShellTextField = Ember.TextField.extend({
-            attributeBindings: [
-                'name',
-                'data-theme',
-                'autocapitalize'
-            ],
-
-            insertNewline: function() {
-                this.controller.submit();
-            }
-        });
-
-        App.Checkbox = Ember.Checkbox.extend({
-            attributeBindings: [
-                'name',
-                'id',
-                'data-inline'
-            ],
-        });
-
-        App.CountView = Count;
-        App.BackendButtonView = BackendButton;
-        App.AddBackendView = AddBackend;
-        App.EditBackendView = EditBackend;
-        App.MachineListView = MachineList;
-        App.ImageListView = ImageList;
-        App.EnableBackendButtonView = EnableBackendButton;
-        App.DeleteTagView = DeleteTagView;
-        App.onOff = ['on', 'off'];
-
-        var addDialog = MachineAddDialog.create();
-        addDialog.append();
-
-        var machineView = MachineView.create();
-        machineView.append();
-
-        var confirmationDialog = ConfirmationDialog.create();
-        confirmationDialog.append();
-
-        var machineActionsDialog = MachineActionsDialog.create();
-        machineActionsDialog.append();
-        var dialog = SingleMachineActionsDialog.create();
-        dialog.append();
-        var shellDialog = Shell.create();
-        shellDialog.append();
-        var machineListView = MachineListView.create();
-        machineListView.append();
-        var imageListView = ImageListView.create();
-        imageListView.append();
-        var machineTagsDialog = MachineTagsDialog.create();
-        machineTagsDialog.append();
-
-
-        $(document).on( 'pagebeforeshow', '#dialog-add', function(){
-            $('#dialog-add').trigger('create');
-        });
-
-        // Expose the application globally
-        return window.Mist = App;
     }
 );
 
-var LOGLEVEL = 3;
-
+//LOGLEVEL comes from home python view and home.pt
 function log() {
     try {
         if (LOGLEVEL > 3) {
-            return console.log.apply(this, arguments);
+            return console.log.apply(console, arguments);
         }
-    } catch(err) {}
+    } catch(err) {console.log(err);}
 }
 
 function info() {
     try {
         if (LOGLEVEL > 2) {
-            return console.info.apply(this, arguments);
+            return console.info.apply(console, arguments);
         }
-    } catch(err) {}
+    } catch(err) {console.log(err);}
 }
 
 function warn() {
     try {
         if (LOGLEVEL > 1) {
-            return console.warn.apply(this, arguments);
+            return console.warn.apply(console, arguments);
         }
-    } catch(err) {}
+    } catch(err) {console.log(err);}
 }
 
 function error() {
     try {
         if (LOGLEVEL > 0) {
-            return console.error.apply(this, arguments);
+            return console.error.apply(console, arguments);
         }
-    } catch(err) {}
+    } catch(err) {console.log(err);}
 }
-

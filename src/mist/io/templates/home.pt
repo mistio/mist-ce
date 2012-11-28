@@ -8,14 +8,31 @@
     <meta name="viewport" content="width=device-width" />
     <title>${project} - down to earth cloud computing</title>
     <!-- include the Tools -->
-    <link rel="stylesheet" href="static/jquery.mobile-1.2.0-rc.1.css" />
-    <link type="text/css" href="static/ui-lightness/jquery-ui-1.8.22.custom.css" rel="stylesheet" />
+    <link type="text/css" href="static/ui-smoothness/jquery-ui-1.9.1.custom.css" rel="stylesheet" />
+    <link rel="stylesheet" href="static/jquery.mobile-1.2.0.css" />
     <link rel="stylesheet" href="static/main.css" />
     <link rel="icon" href="static/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
-    <script src="static/js/lib/require/require.js" data-main="static/js/app"></script>    
-    <!--script src="static/js/lib/require/require.js" data-main="static/build/mist"></script-->
-   
+    <script tal:content="string: var URL_PREFIX='${core_uri}'" />
+    <script tal:content="string: var LOGLEVEL=${js_log_level}" />
+    <script src="static/js/lib/require/require.js"></script>    
+    <script tal:condition="js_build">
+        require.config({
+            baseUrl: 'static/js/',
+            paths: {
+                //the optimized mist.js source file.
+                "app": "../build/mist"
+            }
+        });
+        require(["app"]);
+    </script>
+    <script tal:condition="not:js_build">
+        require.config({
+            // not optimized js, usefull for bedugging
+            baseUrl: 'static/js/'
+        });
+        require(["app"]);
+    </script>
 </head>
 
 <body style="background-color: #c2c3c4">
@@ -23,6 +40,7 @@
 <div data-role="page" id="splash">
     <div class="mist-logo"></div>
 </div>
+
 
 <!-- Start of first page: #home -->
 <div data-role="page" id="home">
@@ -55,11 +73,26 @@
             {{number}}
             {{/view}}
             </a></li>
+            <li><a id="keys-count" href="#keys">Keys
+            {{#view Mist.CountView numberBinding="Mist.keysController.keyCount" tagName="span" class="ui-li-count"}}
+            {{number}}
+            {{/view}}
+            </a></li>
         </ul>
         {{/if}}
         </script>
+        
+        <!-- Start of edit backend dialog -->
+        <div data-role="popup" id="edit-backend" class="mist-dialog" data-overlay-theme="a" style="width: 400px; max-width:400px;">
+            <div data-role="header">
+                <h1>Edit provider</h1>
+            </div>
+            <script type="text/x-handlebars">
+            {{view Mist.EditBackendView backendBinding="Mist.backend" }}
+            </script>
+        </div><!-- /edit backend dialog -->
+        
     </div><!-- /content -->
-
 </div><!-- /page home -->
 
 
@@ -71,19 +104,7 @@
     <script type="text/x-handlebars">
     {{view Mist.AddBackendView backendBinding="Mist.backend" }}
     </script>    
-
 </div><!-- /add backend dialog -->
-
-
-<!-- Start of edit backend dialog -->
-<div data-role="page" id="edit-backend" class="mist-dialog">
-    <div data-role="header">
-        <h1>Edit provider</h1>
-    </div>
-    <script type="text/x-handlebars">
-    {{view Mist.EditBackendView backendBinding="Mist.backend" }}
-    </script>
-</div><!-- /edit backend dialog -->
 
 <!-- Start of provider state dialog -->
 <div data-role="dialog" id="dialog-providers" class="mist-dialog">

@@ -53,6 +53,8 @@ define('app/controllers/machines', [
                                 machine.set('can_tag', item.can_tag);
                                 //FIXME check for changes
                                 machine.tags.set('content', item.tags)
+                                machine.set('public_ips', item.public_ips);
+                                machine.set('extra', item.extra);
                                 return false;
                             }
                         });

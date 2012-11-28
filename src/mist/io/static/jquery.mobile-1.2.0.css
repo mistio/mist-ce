@@ -1,5 +1,5 @@
 /*
-* jQuery Mobile Framework Git Build: SHA1: f47fa3a8d13429fbb7500f22103856cd546b5724 <> Date: Fri Sep 14 18:08:17 2012 -0400
+* jQuery Mobile Framework Git Build: SHA1: b49cc06499abf8f987cf90f35349cfac0918c939 <> Date: Tue Oct 2 11:22:34 2012 -0700
 * http://jquerymobile.com
 *
 * Copyright 2012 jQuery Foundation and other contributors
@@ -1177,18 +1177,14 @@ div.ui-mobile-viewport { overflow-x: hidden; }
 	opacity: 0;
 }
 .in {
-	-webkit-animation-fill-mode: both;
 	-webkit-animation-timing-function: ease-out;
 	-webkit-animation-duration: 350ms;
-	-moz-animation-fill-mode: both;
 	-moz-animation-timing-function: ease-out;
 	-moz-animation-duration: 350ms;
 }
 .out {
-	-webkit-animation-fill-mode: both;
 	-webkit-animation-timing-function: ease-in;
 	-webkit-animation-duration: 225ms;
-	-moz-animation-fill-mode: both;
 	-moz-animation-timing-function: ease-in;
 	-moz-animation-duration: 225ms;
 }
@@ -1776,7 +1772,9 @@ div.ui-mobile-viewport { overflow-x: hidden; }
 }
 .ui-navbar { max-width: 100%; }
 .ui-navbar.ui-mini { margin: 0; }
-.ui-navbar ul { list-style:none; margin: 0; padding: 0; position: relative; display: block; border: 0; max-width: 100%; overflow: visible; }
+.ui-navbar ul:before, .ui-navbar ul:after { content: " "; display: table; }
+.ui-navbar ul:after { clear: both; }
+.ui-navbar ul { list-style:none; margin: 0; padding: 0; position: relative; display: block; border: 0; max-width: 100%; overflow: visible; zoom: 1; }
 .ui-navbar li .ui-btn { display: block; text-align: center; margin: 0 -1px 0 0; border-right-width: 0; }
 .ui-navbar li .ui-btn-icon-right .ui-icon { right: 6px; }
 /* add border if not in header/footer (full width) */
@@ -1988,7 +1986,7 @@ label.ui-submit { font-size: 16px; line-height: 1.4; font-weight: normal; margin
 	position: absolute !important; 	/* See line #553 of popup.js */
 }
 .ui-popup-screen {
-	background-image: url(data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==); /* Necessary to set some form of background to ensure element is clickable in IE6/7. While legacy IE won’t understand the data-URI’d image, it ensures no additional requests occur in all other browsers with little overhead. */
+	background-image: url(data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==); /* Necessary to set some form of background to ensure element is clickable in IE6/7. While legacy IE won't understand the data-URI'd image, it ensures no additional requests occur in all other browsers with little overhead. */
 	top: 0px;
 	left: 0px;
 	right: 0px;
@@ -2012,6 +2010,9 @@ label.ui-submit { font-size: 16px; line-height: 1.4; font-weight: normal; margin
 	position: absolute;
 	padding: 0;
 	outline: 0;
+}
+.ui-popup {
+	position: relative;
 }
 .ui-popup.ui-content,
 .ui-popup .ui-content {

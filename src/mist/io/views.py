@@ -18,7 +18,6 @@ from mist.io.config import EC2_IMAGES
 from mist.io.config import EC2_PROVIDERS
 from mist.io.config import EC2_KEY_NAME
 from mist.io.config import EC2_SECURITYGROUP
-from mist.io.config import RACKSPACE_PROVIDERS
 from mist.io.config import LINODE_DATACENTERS
 
 from mist.io.helpers import connect
@@ -41,8 +40,15 @@ def home(request):
     except:
         session = False
 
+    core_uri = request.registry.settings['core_uri']
+    js_build = request.registry.settings['js_build']
+    js_log_level = request.registry.settings['js_log_level']
+
     return {'project': 'mist.io',
-            'session': session}
+            'session': session,
+            'core_uri': core_uri,
+            'js_build': js_build,
+            'js_log_level': js_log_level}
 
 
 @view_config(route_name='backends', request_method='GET', renderer='json')
@@ -59,12 +65,16 @@ def list_backends(request):
     backends = []
     index = 0
     for backend in backend_list:
-        backends.append({'index'        : index,
-                         'id'           : backend['id'],
-                         'title'        : backend['title'],
-                         'provider'     : backend['provider'],
+        backends.append({'index': index,
+                         'id': backend['id'],
+                         'title': backend['title'],
+                         'provider': backend['provider'],
                          'poll_interval': backend['poll_interval'],
-                         'state'        : 'wait',
+                         'state': 'wait',
+                         # for Provider.RACKSPACE_FIRST_GEN
+                         'region': backend.get('region', None),
+                         # for Provider.RACKSPACE (the new Nova provider)
+                         'datacenter': backend.get('datacenter', None)
                          })
         index = index + 1
 
@@ -157,6 +167,7 @@ def create_machine(request):
     except:
         return Response('Backend not found', 404)
 
+    backend_index = int(request.matchdict['backend'])
     try:
         machine_name = request.json_body['name']
         location_id = request.json_body['location']
@@ -181,9 +192,16 @@ def create_machine(request):
     else:
         location = NodeLocation(location_id, name='', country='', driver=conn)
 
-    has_key = len(request.registry.settings['keypairs'])
-    if conn.type in RACKSPACE_PROVIDERS and has_key:
-        key = SSHKeyDeployment(request.registry.settings['keypairs']['default'][0])
+    try:
+        private_key = request['beaker.session']['keypairs']['default'][1]
+        public_key = request['beaker.session']['keypairs']['default'][0]
+    except KeyError:
+        private_key = request.registry.settings['keypairs']['default'][1]
+        public_key = request.registry.settings['keypairs']['default'][0]
+
+    if conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE] and\
+    public_key:
+        key = SSHKeyDeployment(str(public_key))
         try:
             conn.deploy_node(name=machine_name,
                              image=image,
@@ -193,9 +211,8 @@ def create_machine(request):
             return Response('Success', 200)
         except:
             log.warn('Failed to deploy node with ssh key, attempt without')
-    elif conn.type in EC2_PROVIDERS and has_key:
-        key = request.registry.settings['keypairs']['default'][0]
-        imported_key = import_key(conn, key, EC2_KEY_NAME)
+    elif conn.type in EC2_PROVIDERS and public_key:
+        imported_key = import_key(conn, public_key, EC2_KEY_NAME)
         created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
         if imported_key and created_security_group:
             try:
@@ -208,9 +225,8 @@ def create_machine(request):
                 return Response('Success', 200)
             except:
                 log.warn('Failed to deploy node with ssh key, attempt without')
-    elif conn.type is Provider.LINODE and has_key:
-        key = request.registry.settings['keypairs']['default'][0]
-        auth = NodeAuthSSHKey(key)
+    elif conn.type is Provider.LINODE and public_key:
+        auth = NodeAuthSSHKey(public_key)
         try:
             conn.create_node(name=machine_name,
                              image=image,
@@ -358,7 +374,7 @@ def set_machine_metadata(request):
     except:
         return Response('Backend not found', 404)
 
-    if conn.type is Provider.LINODE or conn.type in RACKSPACE_PROVIDERS:
+    if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
         return Response('Adding metadata is not supported in this provider',
                         501)
 
@@ -423,7 +439,7 @@ def delete_machine_metadata(request):
     except:
         return Response('Backend not found', 404)
 
-    if conn.type is Provider.LINODE or conn.type in RACKSPACE_PROVIDERS:
+    if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
         return Response('Updating metadata is not supported in this provider',
                         501)
 
@@ -487,8 +503,7 @@ def shell_command(request):
 
     backend_index = int(request.matchdict['backend'])
     try:
-        private_key = request['beaker.session']['backends'][backend_index]\
-                             ['private_key']
+        private_key = request['beaker.session']['keypairs']['default'][1]
     except KeyError:
         private_key = request.registry.settings['keypairs']['default'][1]
 
@@ -520,37 +535,6 @@ def list_images(request):
                     'extra' : image.extra,
                     'name'  : image.name,
                     })
-    return ret
-
-
-@view_config(route_name='image_metadata', request_method='GET',
-             renderer='json')
-def get_image_metadata(request):
-    """Gets image metadata based on image id.
-
-    Right now (libcloud 0.11.0) get_image() is supported for EC2 and not for
-    RACKSPACE, LINODE and OPENSTACK.
-    """
-    try:
-        conn = connect(request)
-    except:
-        return Response('Backend not found', 404)
-
-    try:
-        image_id = request.matchdict['image']
-        image = conn.get_image(image_id)
-    except NotImplementedError:
-        return Response('Action not supported for this backend', 404)
-    except:
-        return Response('Backend unavailable', 503)
-
-    if image is None:
-        ret = {}
-    else:
-        ret = {'id'    : image.id,
-               'extra' : image.extra,
-               'name'  : image.name,
-               }
     return ret
 
 
@@ -615,4 +599,16 @@ def list_locations(request):
                     'country'   : location.country,
                     })
 
+    return ret
+
+@view_config(route_name='keys', request_method='GET', renderer='json')
+def list_keys(request):
+    """List keys.
+
+    List all key pairs that are configured on this server
+
+    """
+    
+    ret = []
+    #TODO
     return ret

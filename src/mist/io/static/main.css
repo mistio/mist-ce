@@ -1,6 +1,12 @@
 /* Custom unweb rules */
 
 
+#machineGraph span {
+    font-size: 12px;
+    vertical-align: middle;
+    margin:5px;
+}
+
 /* Splash (loading) page */
 
 div#splash {
@@ -304,7 +310,7 @@ a.action-links {
 
 /* Machines tags */
 
-#machines-list .node .tag, 
+#machines-list .node .tag,
 #images-list .node .tag {
     border: 1px solid #bfbfbf;
     color: #555 !important;
@@ -355,6 +361,15 @@ a.action-links {
     padding: 8px;
 }
 
+.dialog-add label, .dialog-add .select {
+    display: block;
+    margin-top: 12px;
+}
+
+#machines .dialog-add .ui-select, #images .dialog-add .ui-select {
+    width: 100%;
+}
+
 a#mist-select-machines-button {
     outline: none;
 }
@@ -372,6 +387,10 @@ a#mist-select-machines-button span.ui-btn-text {
     margin-top: -7px;
     max-width: 160px;
     overflow: hidden;
+}
+
+#images-list .ui-li-heading {
+    max-width: 500px;
 }
 
 .caption-wrapper {
@@ -495,7 +514,10 @@ a#mist-select-machines-button span.ui-btn-text {
 #single-view-provider-icon.provider-3,
 #single-view-provider-icon.provider-23,
 #single-view-provider-icon.provider-40,
-#single-view-provider-icon.provider-41 {
+#single-view-provider-icon.provider-41,
+#single-view-provider-icon.provider-48,
+#single-view-provider-icon.provider-50,
+#single-view-provider-icon.provider-51 {
     background-image: url(images/p3_sm.png);
 }
 
@@ -570,23 +592,19 @@ a#mist-select-machines-button span.ui-btn-text {
     background: #C9E0F0;
 }
 
-#enableMonitoring label {
-    background-image: -webkit-gradient(linear,left top,left bottom,from(#5F9CC5),to(#396B9E));
-    background-image: -webkit-linear-gradient(#5F9CC5,#396B9E);
-    background-image: -moz-linear-gradient(#5F9CC5,#396B9E);
-    background-image: -ms-linear-gradient(#5F9CC5,#396B9E);
-    background-image: -o-linear-gradient(#5F9CC5,#396B9E);
-    background-image: linear-gradient(#5F9CC5,#396B9E);
-    border: 1px solid #333;
+.monitoring-info {
+    color: grey;
+    text-align: center;
 }
 
-#enableMonitoring label .ui-btn-text {
-    color: #f5f5f7;
-    text-shadow: 0 1px #333;
+div.pending-monitoring {
+    position: relative;
+    margin-top: 20px;
 }
 
-#enable-monitoring .ember-checkbox {
+.monitoring-button {
     width: 26ex;
+    margin: 20px auto 0;
 }
 
 #monitoring-rules-table, #machine-basic-table, #machine-metadata {
@@ -638,7 +656,7 @@ a#mist-select-machines-button span.ui-btn-text {
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
-} 
+}
 
 #machine-basic-table .tag {
     border: 1px solid #c3c3c4;
@@ -677,10 +695,6 @@ a#mist-select-machines-button span.ui-btn-text {
 
 #new-machine-name {
     margin: 12px 0;
-}
-#dialog-add label, #dialog-add .select {
-    display: block;
-    margin-top: 12px;
 }
 
 .mist-li-selected {
@@ -809,19 +823,19 @@ div.cost {
 
 /* Shell Dialog */
 
-#dialog-shell div.ui-field-contain {
+#dialog-shell.dialog-shell div.ui-field-contain {
     margin: 0px;
     margin-top: 0.5em;
 }
 
-#dialog-shell #shell-input {
+#dialog-shell.dialog-shell .shell-input {
     overflow: auto;
     width: 100%;
     clear: both;
     margin-top: 0px;
 }
 
-#dialog-shell #shell-input input {
+#dialog-shell.dialog-shell .shell-input input {
     width: 97%;
     padding-left: 28px;
     box-sizing: border-box;
@@ -833,21 +847,22 @@ div.cost {
     background-repeat: no-repeat;
 }
 
-#dialog-shell #shell-send {
+#dialog-shell.dialog-shell .shell-send {
     margin: .5em 0;
     padding: 5px 27px;
 }
 
-#dialog-shell .ui-icon-shell-return {
+#dialog-shell.dialog-shell .ui-icon-shell-return {
     background-image: url("images/return.png");
+    padding: 1px;
 }
 
-#dialog-shell  #shell-send-wrapper {
+#dialog-shell.dialog-shell  .shell-send-wrapper {
     width: 80px;
     padding-left: 2px;
 }
 
-#dialog-shell  #shell-return {
+#dialog-shell.dialog-shell .shell-return {
     width: 100%;
     overflow: hidden;
     border: 1px solid #AAA;
@@ -861,46 +876,36 @@ div.cost {
     background: #dfe1e2;
 }
 
-#dialog-shell #shell-return div {
+#dialog-shell.dialog-shell .shell-return div {
     min-width: 80ex;
 }
 
-#dialog-shell #shell-return div.command-output.contracted .command,
-#dialog-shell #shell-return .command {
-    background: #efeff1 url("images/arrow-down.png") right center no-repeat;
+#dialog-shell.dialog-shell .shell-return .command {
+    background: #efeff1;
     cursor: pointer;
     padding: 6px;
     font-weight: bold;
-    border-bottom: 1px solid #ccc;
+    color: #222;
 }
 
-#dialog-shell #shell-return div.command-output.expanded .command,
-#dialog-shell #shell-return .command-output:nth-of-type(1) .command {
-    background: #efeff1 url("images/arrow-up.png") right center no-repeat;
-}
-
-#dialog-shell #shell-return div.output {
+#dialog-shell.dialog-shell .shell-return div.output {
     background: #444;
     color: #efeff1;
     padding: 6px;
     text-shadow: none;
 }
 
-#dialog-shell #shell-return .command-output div.output {
-    display: none;
-}
-
-#dialog-shell #shell-return .command-output:nth-of-type(1) div.output {
-    display: block;
-    max-height: 160px;
-    overflow: auto;
+#dialog-shell.dialog-shell .ui-accordion .ui-accordion-header .ui-accordion-header-icon {
+    left: 93%;
+    background-color: #EFEFF1;
 }
 
 .ui-autocomplete {
     -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     -moz-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-
+    background-color: #EFEFF1;
+    font-family: Helvetica, Arial, sans-serif;
 }
 
 .ui-autocomplete .ui-menu-item a {
@@ -931,6 +936,10 @@ div.cost {
 
     .ui-li-heading {
         max-width: 120px;
+    }
+
+    #images-list .ui-li-heading {
+        max-width: 400px;
     }
 
     /* Create machine button */
@@ -965,6 +974,12 @@ div.cost {
     .ui-li-heading {
         left: 64px;
         top: 20px;
+    }
+
+    #images-list .ui-li-heading {
+        left: 0px;
+        top: 0px;
+        max-width: 200px;
     }
 
     .caption-wrapper {

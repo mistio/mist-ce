@@ -1,0 +1,32 @@
+<div data-role="popup" id="monitoring-dialog" class="mist-dialog" data-overlay-theme="a" style="width: 400px; max-width:400px;">
+    <div data-role="header">
+        {{#if machine.hasMonitoring}}
+            <h1>Disable monitoring</h1>
+        {{else}}
+            <h1>Enable monitoring</h1>
+        {{/if}}
+    </div>
+    <div data-role="content" data-theme="b">
+        {{#if machine.hasMonitoring}}
+            <span>Are you sure you wish to disable monitoring for {{machine.name}}?</span>
+            {{#unless machine.hasKey}}
+            <p>This action can't be performed automactically because there is no key pair set.</p>
+            <p>To do it manually reffer to link for instructions. When completed successfuly press disable below.</p>
+            {{/unless}}
+            <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
+                <button id="create-cancel" class="btn-left-full" data-theme="c" {{action "backClicked" }}>Back</button>
+                <button id="create-ok" class="btn-right-full" data-theme="b" {{action "changeMonitoringClicked" }}>Disable</button>
+            </div>
+        {{else}}
+            <div>Are you sure you wish to enable monitoring for {{machine.name}}?</div>
+            {{#unless machine.hasKey}}
+            <p>This action can't be performed automactically because there is no key pair set.</p>
+            <p>To do it manually reffer to link for instructions. When completed successfuly press enable below.</p>
+            {{/unless}}
+            <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
+                <button id="create-cancel" class="btn-left-full" data-theme="c" {{action "backClicked" }}>Back</button>
+                <button id="create-ok" class="btn-right-full" data-theme="b" {{action "changeMonitoringClicked" }}>Enable</button>
+            </div>
+        {{/if}}
+    </div>
+</div>

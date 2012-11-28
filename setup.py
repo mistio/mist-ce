@@ -6,10 +6,10 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-requires = ['pyramid', 'apache-libcloud', 'PasteScript', 'fabric']
+requires = ['pyramid', 'apache-libcloud', 'PasteScript', 'fabric', 'paramiko']
 
 setup(name='mist.io',
-      version='0.8',
+      version='0.9.0',
       license = 'AGPLv3',
       description='cloud management web app',
       long_description=README + '\n\n' +  CHANGES,
@@ -23,7 +23,7 @@ setup(name='mist.io',
       author='unweb.me',
       author_email='we@unweb.me',
       url='https://mist.io',
-      keywords='web cloud mobile libcloud pyramid amazon rackspace openstack slicehost linode',
+      keywords='web cloud mobile libcloud pyramid amazon rackspace openstack linode',
       packages=find_packages('src'),
       package_dir = {'':'src'},
       namespace_packages=['mist'],

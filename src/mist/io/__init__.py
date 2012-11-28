@@ -5,9 +5,8 @@ from libcloud.compute.types import Provider
 from pyramid.config import Configurator
 
 from mist.io.resources import Root
-from mist.io.cors import CORSMiddleware
 
-log = getLogger('mist.core')
+log = getLogger('mist.io')
 
 
 def main(global_config, **settings):
@@ -15,17 +14,19 @@ def main(global_config, **settings):
     if not settings.keys():
         settings = global_config
 
-    # import BACKENDS and KEYPAIRS from config
+    # Import settings using sensible defaults where applicable
     try:
         user_config = {}
         execfile(global_config['here'] + '/settings.py',
                 {'Provider':Provider},
                 user_config)
-
         settings['keypairs'] = user_config['KEYPAIRS']
         settings['backends'] = user_config['BACKENDS']
+        settings['core_uri'] = user_config.get('CORE_URI', 'https://mist.io')
+        settings['js_build'] = user_config.get('JS_BUILD', False)
+        settings['js_log_level'] = user_config.get('JS_LOG_LEVEL', 3)
     except:
-        log.warn('local settings.py not available')
+        log.warn('Local settings.py not available.')
 
     config = Configurator(root_factory=Root, settings=settings)
 
@@ -42,15 +43,11 @@ def main(global_config, **settings):
                      '/backends/{backend}/machines/{machine}/shell')
 
     config.add_route('images', '/backends/{backend}/images')
-    config.add_route('image_metadata',
-                     '/backends/{backend}/images/{image}/metadata')
-
     config.add_route('sizes', '/backends/{backend}/sizes')
-
     config.add_route('locations', '/backends/{backend}/locations')
+    config.add_route('keys', '/keys')
 
     config.scan()
 
-    #app = CORSMiddleware(config.make_wsgi_app())
     app = config.make_wsgi_app()
     return app
