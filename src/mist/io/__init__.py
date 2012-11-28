@@ -1,12 +1,13 @@
 """Routes and create the wsgi app"""
-from logging import getLogger
-from libcloud.compute.types import Provider
+import yaml
+import logging
 
 from pyramid.config import Configurator
 
 from mist.io.resources import Root
+from mist.io import helpers
 
-log = getLogger('mist.io')
+log = logging.getLogger('mist.io')
 
 
 def main(global_config, **settings):
@@ -15,18 +16,7 @@ def main(global_config, **settings):
         settings = global_config
 
     # Import settings using sensible defaults where applicable
-    try:
-        user_config = {}
-        execfile(global_config['here'] + '/settings.py',
-                {'Provider':Provider},
-                user_config)
-        settings['keypairs'] = user_config['KEYPAIRS']
-        settings['backends'] = user_config['BACKENDS']
-        settings['core_uri'] = user_config.get('CORE_URI', 'https://mist.io')
-        settings['js_build'] = user_config.get('JS_BUILD', False)
-        settings['js_log_level'] = user_config.get('JS_LOG_LEVEL', 3)
-    except:
-        log.warn('Local settings.py not available.')
+    helpers.load_settings(settings)
 
     config = Configurator(root_factory=Root, settings=settings)
 
