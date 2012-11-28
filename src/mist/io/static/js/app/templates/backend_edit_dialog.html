@@ -1,11 +1,13 @@
+<div data-role="content">
 <div class="content-header">
     <span class='name'>{{backend.title}}</span>
-    <span class='state'>{{backend.state}}</span>
 </div>
-
-<div data-role="fieldcontain">
-    <label for="backend-enable">Enabled:</label>
-    {{view Mist.EnableBackendButtonView contentBinding="Mist.onOff"}}
+<div data-role="fieldcontain">    
+    <select id="backend-flipswitch" data-role="slider">
+        <option value="off">Disabled</option>
+        <option value="on" selected="true">Enabled</option>
+    </select>   
+    <span class="state">{{backend.state}}</span>          
 </div>
 
 <div data-role="fieldcontain">
@@ -32,4 +34,5 @@
         data-role="button"
         data-rel="back"
         data-theme="b">Close</a>
+</div>
 </div>

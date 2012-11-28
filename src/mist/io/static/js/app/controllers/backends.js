@@ -13,7 +13,7 @@ define('app/controllers/backends', [
             machineCount: 0,
             imageCount: 0,
             // TODO make this property dynamic according to all backends states
-            state: "wait",
+            state: "waiting",
 
             getMachineCount: function(){
                 var count = 0;
@@ -73,7 +73,7 @@ define('app/controllers/backends', [
                             var state = "ok";
 
                             that.content.forEach(function(backend){
-                                if(backend.state == 'wait'){
+                                if(backend.state == 'waiting'){
                                     waiting = true;
                                 } else if(backend.state == 'offline'){
                                     state = 'error';

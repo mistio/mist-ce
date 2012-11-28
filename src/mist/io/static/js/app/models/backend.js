@@ -12,7 +12,7 @@ define('app/models/backend', [
             SizesController, LocationsController) {
         return Ember.Object.extend({
             
-            BACKENDSTATES: ['offline', 'online', 'wait'], //TODO add more states
+            BACKENDSTATES: ['offline', 'online', 'waiting'], //TODO add more states
 
             index: null,
             id: null,

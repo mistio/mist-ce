@@ -55,13 +55,13 @@
             data-rel="popup"
             data-theme="b"
             data-inline="true"
-            data-transition="slidedown"
+            data-transition="pop"
             data-role="button"
             data-icon="plus">Add backend</a>
 
-        <div data-role="popup" id="add-backend" class="mist-dialog">
+        <div data-role="popup" id="add-backend" class="mist-dialog" data-overlay-theme="a">
             <div data-role="header">
-                <h1>Add Backend</h1>
+                <h1>Add backend</h1>
             </div>
             <script type="text/x-handlebars">
                 {{view Mist.AddBackendView backendBinding="Mist.backend"}}
@@ -78,7 +78,7 @@
 
         <div data-role="popup" id="edit-backend" class="mist-dialog" data-overlay-theme="a">
             <div data-role="header">
-                <h1>Edit provider</h1>
+                <h1>Edit backend</h1>
             </div>
             <script type="text/x-handlebars">
                 {{view Mist.EditBackendView backendBinding="Mist.backend"}}

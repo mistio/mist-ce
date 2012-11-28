@@ -280,7 +280,7 @@ define( 'app', [
             App.ImageListView = ImageList;
             App.EnableBackendButtonView = EnableBackendButton;
             App.DeleteTagView = DeleteTagView;
-            App.onOff = ['on', 'off'];
+            App.onOff = ['enabled', 'disabled'];
 
             var machineView = MachineView.create();
             machineView.append();

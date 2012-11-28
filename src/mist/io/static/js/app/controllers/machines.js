@@ -29,7 +29,7 @@ define('app/controllers/machines', [
 
                 var that = this;
 
-                this.backend.set('state', 'wait');
+                this.backend.set('state', 'waiting');
 
                 $.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
 
