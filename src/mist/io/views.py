@@ -97,7 +97,7 @@ def add_backend(request, renderer='json'):
     params = request.json_body
     provider = params.get('provider', '0')['provider']
     region = ''
-    if provider.__class__ is str and ':' in provider:
+    if not provider.__class__ is int and ':' in provider:
         region = provider.split(':')[1]
         provider = int(provider.split(':')[0])
         
