@@ -1,4 +1,4 @@
-define('app/views/backend_add', ['app/models/backend', 
+define('app/views/backend_add', ['app/models/backend',
     'text!app/templates/backend_add_dialog.html',
     'ember'],
     /**
@@ -8,13 +8,9 @@ define('app/views/backend_add', ['app/models/backend',
      * @returns Class
      */
     function(Backend, add_backend_dialog_html) {
-        
+
         return Ember.View.extend({
-            attributeBindings:['data-role', 'data-theme'],
-            
-            'data-role': 'content',
-            'data-theme': 'c',
-                        
+
             addButtonClick: function(){
                 var that = this;
                 var payload = {
@@ -32,18 +28,18 @@ define('app/views/backend_add', ['app/models/backend',
                     data: JSON.stringify(payload),
                     success: function(result) {
                         Mist.backendsController.pushObject(Backend.create(result));
-                        
+
                         info('added backend ' + index);
                     }
-                });            
+                });
             },
- 
+
             init: function() {
                 this._super();
                 // cannot have template in home.pt as pt complains
                 this.set('template', Ember.Handlebars.compile(add_backend_dialog_html));
             },
-            
+
             providerList: function() {
                 return [{'title': 'Rackspace', 'provider': '3'}];
             }.property('providerList')
