@@ -28,6 +28,7 @@ from mist.io.helpers import create_security_group
 from mist.io.helpers import run_command
 from mist.io.helpers import save_settings
 
+
 log = logging.getLogger('mist.io')
 
 
@@ -92,7 +93,7 @@ def add_backend(request, renderer='json'):
         return add_backend(request)
     except:
         pass
-    
+
     params = request.json_body
     backend = {'provider': params.get('provider', '0')['provider'],
                'title': params.get('provider', '0')['title'],
@@ -122,7 +123,7 @@ def delete_backend(request, renderer='json'):
         return delete_backend(request)
     except:
         pass
-    
+
     settings = request.registry.settings
     settings['backends'].remove(settings['backends'][int(request.matchdict['backend'])])
 

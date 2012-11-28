@@ -22,10 +22,11 @@ log = logging.getLogger('mist.io')
 
 
 def load_settings(settings):
-    """Get settings from settings.yaml local file.
+    """Gets settings from settings.yaml local file.
 
     The settings argument gets updated. It is the global_config of pyramid. If
-    no file is there it sets some sensible defaults.
+    there is no such file, it creates one for later use and sets some sensible
+    defaults without writing them in file.
     """
     try:
         config_file = open('settings.yaml', 'r')
@@ -47,11 +48,16 @@ def load_settings(settings):
     settings['backends'] = user_config.get('backends', [])
     settings['js_build'] = user_config.get('js_build', False)
     settings['js_log_level'] = user_config.get('js_log_level', 3)
-    if not settings.has_key('core_uri'):
+    if not 'core_uri' in settings:
         settings['core_uri'] = user_config.get('core_uri', 'https://mist.io')
 
+
 def save_settings(settings):
-    """
+    """Stores settings to settings.yaml local file.
+
+    This is useful for using mist.io UI to configure your installation. It
+    includes some yaml dump magic in order for the dumped private ssh keys
+    to be in a valid string format.
     """
     class literal_unicode(unicode): pass
 
@@ -64,9 +70,11 @@ def save_settings(settings):
 
     keypairs = {}
     for key in settings['keypairs'].keys():
-        keypairs[key] = {'public': literal_unicode(settings['keypairs'][key]['public']),
-                         'private': literal_unicode(settings['keypairs'][key]['private']),
-                         }
+        keypairs[key] = {
+            'public': literal_unicode(settings['keypairs'][key]['public']),
+            'private': literal_unicode(settings['keypairs'][key]['private']),
+        }
+
     yaml.dump({
         'keypairs': keypairs,
         'backends': settings['backends'],
