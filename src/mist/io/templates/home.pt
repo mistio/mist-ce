@@ -12,7 +12,7 @@
     <link rel="icon" href="static/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
     <script tal:content="string: var URL_PREFIX='${core_uri}'" />
-    <script tal:content="string: var SUPPORTED_PROVIDERS=${supported_providers}" />    
+    <script tal:content="string: var SUPPORTED_PROVIDERS=${supported_providers}" />
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
     <script src="static/js/lib/require/require.js"></script>
     <script tal:condition="js_build">
@@ -134,7 +134,7 @@
     class="mist-dialog">
 
     <div data-role="header">
-        <h1>Provider State</h1>
+        <h1>Backend state</h1>
     </div>
 
     <div data-role="content">
