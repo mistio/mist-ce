@@ -50,42 +50,49 @@
                 <div id="diskGraph"></div>
                 <div id="memoryGraph"></div>
 
-                <h4 class="monitoring-rules-title">Monitoring Rules</h4>
-                <table id="monitoring-rules-table">
-                    <tr>
-                        <td class="key">Load Average (15 min)</td>
-                        <td class="value">
-                            Alert if greater than
-                            <input type="text" value="15" class="rule-input">%
-                            <input type="text" value="15" class="rule-input">
-                            time(s) within
-                            <input type="text" value="1" class="rule-input">
-                            cycle(s)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="key">Load Average (5 min)</td>
-                        <td class="value">
-                            Alert if greater than
-                            <input type="text" value="15" class="rule-input">%
-                            <input type="text" value="15" class="rule-input">
-                            time(s) within
-                            <input type="text" value="1" class="rule-input">
-                            cycle(s)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="key">Load Average (1 min)</td>
-                        <td class="value">
-                            Alert if greater than
-                            <input type="text" value="15" class="rule-input">%
-                            <input type="text" value="15" class="rule-input">
-                            time(s) within
-                            <input type="text" value="1" class="rule-input">
-                            cycle(s)
-                        </td>
-                    </tr>
-                </table>
+                <h4 class="monitoring-rules-title">Rules</h4>
+
+                <a href="#add-rule"
+                    class="add-rule-button"
+                    data-role="button"
+                    data-icon="plus"
+                    data-theme="b">Add</a>
+
+                <div class="rules-container">
+                    <div class="rule-box">
+                        <div class="rule-if">if</div>
+
+                        <select class="rule-metric" data-icon="false"
+                                data-native-menu="false" data-inline="true">
+                            <option value="load">load</option>
+                            <option value="cpu">cpu</option>
+                            <option value="memory">memory</option>
+                            <option value="disk">disk</option>
+                            <option value="network">network</option>
+                        </select>
+
+                        <select class="rule-operator" data-icon="false"
+                                data-native-menu="false" data-inline="true">
+                            <option value="lt">&lt;</option>
+                            <option value="gt">&gt;</option>
+                        </select>
+
+                        <input type="number" data-type="range" data-highlight="true" class="rule-value" value="60" min="0" max="100" />
+
+                        <div class="rule-then">then</div>
+
+                        <select class="rule-action"  data-icon="false"
+                                data-native-menu="false" data-inline="true">
+                            <option value="alert">alert</option>
+                            <option value="reboot">reboot</option>
+                            <option value="destroy">destroy</option>
+                            <option value="launch">launch</option>
+                            <option value="command">command</option>
+                        </select>
+                    </div>
+
+
+                </div>
 
                 <a href="#monitoring-dialog"
                     class="monitoring-button"

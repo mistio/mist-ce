@@ -165,7 +165,7 @@ define( 'app', [
                         'selectImagesController',
                         SelectImagesController.create()
                     );
-                    
+
                     this.set(
                             'keysController',
                             KeysController.create()
@@ -231,6 +231,22 @@ define( 'app', [
                 });
             });
 
+            function showRuleSlider(){
+                    $('.rule-box .ui-slider').fadeIn(100);
+                    return false;
+            }
+            function hideRuleSlider(){
+                    $('.rule-box .ui-slider:visible').fadeOut(100);
+            }
+
+            // monitoring rule slider toggle
+            $('input.rule-value').live('mouseover', showRuleSlider);
+            $('input.rule-value').live('click', showRuleSlider);
+
+            $('.rule-box').live('mouseleave',hideRuleSlider);
+            $('#single-machine').live('tap',hideRuleSlider);
+
+
             App.Select = Ember.Select.extend({
                 attributeBindings: [
                     'name',
@@ -271,8 +287,8 @@ define( 'app', [
             App.FlipOption = Ember.SelectOption.extend({
                 defaultTemplate: Ember.Handlebars.compile('{{unbound view.label}}'),
                 attributeBindings: ['value']
-            });            
-            
+            });
+
             Ember.TextArea.reopen({
                 attributeBindings: ["name", "placeholder", "id"]
               });
@@ -321,10 +337,10 @@ define( 'app', [
             $(document).on( 'pagebeforeshow', '#dialog-add', function(){
                 $('#dialog-add').trigger('create');
             });
-            
+
             var keyListView = KeyListView.create();
             keyListView.append();
-            
+
             var keyView = KeyView.create();
             keyView.append();
 

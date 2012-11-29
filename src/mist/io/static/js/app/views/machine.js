@@ -150,6 +150,11 @@ define('app/views/machine', [
 
                 Em.run.next(function() {
                     $('.monitoring-button').button();
+                    $('.add-rule-button').button();
+                    $('.rule-metric').selectmenu();
+                    $('.rule-operator').selectmenu();
+                    $('.rule-value').slider();
+                    $('.rule-action').selectmenu();
                 });
 
                 if (!this.machine || !this.machine.hasMonitoring) {

@@ -596,6 +596,10 @@ a#mist-select-machines-button span.ui-btn-text {
     background: #C9E0F0;
 }
 
+#monitoring-wrapper {
+    padding: 0px;
+}
+
 .monitoring-info {
     color: grey;
     text-align: center;
@@ -611,14 +615,56 @@ div.pending-monitoring {
     margin: 20px auto 0;
 }
 
-#monitoring-rules-table, #machine-basic-table, #machine-metadata {
+.add-rule-button {
+    width: 13ex;
+    margin: 0;
+}
+
+.rules-container {
+    margin-top: 15px;
+    padding: 15px;
+    border: solid 1px grey;
+}
+
+.rule-box {
+    overflow: hidden;
+    padding-bottom: 10px;
+}
+
+.rule-if, .rule-then {
+    font-size: 24px;
+    font-weight: bold;
+    padding: 6px;
+    float: left;
+    margin-top: 8px;
+    height:40px;
+}
+
+.rule-box .ui-slider {
+    display: none;
+    float: left;
+    margin: 16px 16px 16px 8px;
+    width: 30%;
+}
+
+.rule-box .ui-select {
+    float: left;
+    height: 56px;
+}
+
+.rule-if, .rule-then, .rule-value {
+    float: left;
+    height: 24px;
+}
+
+#machine-basic-table, #machine-metadata {
     border-collapse:collapse;
     width: 100%;
     margin-top: 10px;
     background: #fff;
 }
 
-#monitoring-rules-table tr, #machine-basic-table tr, #machine-metadata tr {
+#machine-basic-table tr, #machine-metadata tr {
     border: 1px solid #ccc;
 }
 
@@ -630,7 +676,7 @@ div.pending-monitoring {
     margin: 0;
 }
 
-#monitoring-rules-table td, #machine-basic-table td, #machine-metadata td {
+#machine-basic-table td, #machine-metadata td {
     font-size: 14px;
     padding: 10px 12px;
     margin: 0;
@@ -640,11 +686,6 @@ div.pending-monitoring {
 #machine-basic-table .key, #machine-metadata .key {
     font-weight: 300;
     width: 40%;
-}
-
-#monitoring-rules-table .key {
-    font-weight: 300;
-    width: 30%;
 }
 
 #machine-basic-table .value, #machine-metadata .value {
