@@ -287,7 +287,6 @@ define( 'app', [
             App.DeleteTagView = DeleteTagView;
             App.onOff = [{'value': 0, 'label': 'Disabled'},
                          {'value': 1, 'label': 'Enabled'}];
-            App.on = 1;
 
             var machineView = MachineView.create();
             machineView.append();

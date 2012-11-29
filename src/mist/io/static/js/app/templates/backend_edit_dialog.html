@@ -2,8 +2,8 @@
 <div class="content-header">
     <span class='name'>{{backend.title}}</span>
 </div>
-<div data-role="fieldcontain">{{backend.enabled}}
-    {{view Mist.EnableBackendButtonView contentBinding="Mist.onOff" selectionBinding="Mist.on"}}
+<div data-role="fieldcontain">
+    {{view Mist.EnableBackendButtonView contentBinding="Mist.onOff" selectionBinding="backend.enabled"}}
     <span class="state">{{backend.state}}</span>          
 </div>
 

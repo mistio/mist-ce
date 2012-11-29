@@ -59,7 +59,7 @@ define('app/models/backend', [
                     this.machines.refresh();
                     this.images.init();
                     this.sizes.init();
-                    this.locations.init();                    
+                    this.locations.init();
                 }
             }.observes('enabled')
         

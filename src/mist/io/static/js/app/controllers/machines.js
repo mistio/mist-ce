@@ -22,7 +22,7 @@ define('app/controllers/machines', [
 
             refresh: function(){
 
-                if(this.backend.state == "offline" || !this.backend.enabled){
+                if(this.backend.state == "offline" || !this.backend.enabled.value){
                     this.clear();
                     return;
                 }

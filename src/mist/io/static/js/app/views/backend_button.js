@@ -17,6 +17,8 @@ define('app/views/backend_button', [
 
             openDialog: function(event){
                 Mist.set('backend', this.get('backend'));
+                $('select.ui-slider-switch option[value=1]')[0].selected = this.get('backend').enabled;
+                $('select.ui-slider-switch').slider('refresh');
             },
 
             init: function() {
