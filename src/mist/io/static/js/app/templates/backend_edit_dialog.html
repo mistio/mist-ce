@@ -2,11 +2,8 @@
 <div class="content-header">
     <span class='name'>{{backend.title}}</span>
 </div>
-<div data-role="fieldcontain">    
-    <select id="backend-flipswitch" data-role="slider">
-        <option value="off">Disabled</option>
-        <option value="on" selected="true">Enabled</option>
-    </select>   
+<div data-role="fieldcontain">{{backend.enabled}}
+    {{view Mist.EnableBackendButtonView contentBinding="Mist.onOff" selectionBinding="Mist.on"}}
     <span class="state">{{backend.state}}</span>          
 </div>
 

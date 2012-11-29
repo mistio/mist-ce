@@ -47,13 +47,21 @@ define('app/models/backend', [
                 this.locations = LocationsController.create({backend: this});
             },
             
-            disable: function(){
-                this.state = "offline";
-                this.machines.clear();
-                this.images.clear();
-                this.sizes.clear();
-                this.locations.clear();
-            }
+            toggle: function(){
+                if (!this.enabled || !this.enabled.value){
+                    this.set('state', "offline");
+                    this.machines.clear();
+                    this.images.clear();
+                    this.sizes.clear();
+                    this.locations.clear();
+                } else {
+                    this.set('state','waiting');
+                    this.machines.refresh();
+                    this.images.init();
+                    this.sizes.init();
+                    this.locations.init();                    
+                }
+            }.observes('enabled')
         
         });
     }

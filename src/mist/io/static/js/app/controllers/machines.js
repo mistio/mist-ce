@@ -22,7 +22,7 @@ define('app/controllers/machines', [
 
             refresh: function(){
 
-                if(this.backend.state == "offline"){
+                if(this.backend.state == "offline" || !this.backend.enabled){
                     this.clear();
                     return;
                 }
@@ -95,6 +95,7 @@ define('app/controllers/machines', [
                     Ember.run.later(that, function(){
                         this.refresh();
                     }, that.backend.poll_interval);
+                    
                 }).error(function(e) {
                     Mist.notificationController.notify("Error loading machines for backend: " +
                                                         that.backend.title);

@@ -267,6 +267,11 @@ define( 'app', [
                     'data-inline'
                 ],
             });
+
+            App.FlipOption = Ember.SelectOption.extend({
+                defaultTemplate: Ember.Handlebars.compile('{{unbound view.label}}'),
+                attributeBindings: ['value']
+            });            
             
             Ember.TextArea.reopen({
                 attributeBindings: ["name", "placeholder", "id"]
@@ -280,7 +285,9 @@ define( 'app', [
             App.ImageListView = ImageList;
             App.EnableBackendButtonView = EnableBackendButton;
             App.DeleteTagView = DeleteTagView;
-            App.onOff = ['enabled', 'disabled'];
+            App.onOff = [{'value': 0, 'label': 'Disabled'},
+                         {'value': 1, 'label': 'Enabled'}];
+            App.on = 1;
 
             var machineView = MachineView.create();
             machineView.append();

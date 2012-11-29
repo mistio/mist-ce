@@ -81,7 +81,8 @@ def list_backends(request):
                          # for Provider.RACKSPACE_FIRST_GEN
                          'region': backend.get('region', None),
                          # for Provider.RACKSPACE (the new Nova provider)
-                         'datacenter': backend.get('datacenter', None)
+                         'datacenter': backend.get('datacenter', None),
+                         'enabled': backend.get('enabled', 1) and 1 or 0,
                          })
         index = index + 1
 
@@ -670,8 +671,8 @@ def list_keys(request):
     List all key pairs that are configured on this server
 
     """
-    keypairs = request.registry.settings.get('keypairs',[])
-    ret = [key['id'] for key in keypairs ]
+    keypairs = request.registry.settings.get('keypairs',{})
+    ret = [key for key in keypairs.keys() ]
     return ret
 
 @view_config(route_name='keys', request_method='POST', renderer='json')
