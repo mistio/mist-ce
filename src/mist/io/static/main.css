@@ -96,38 +96,39 @@ div#splash div.mist-logo {
 
 /* Provider Icons */
 
-.state-providers .ui-icon {
-    background-color: #222;
+.state-providers .ui-icon, .backend-button .ui-icon {
     width: 18px;
     height: 18px;
     background-position: center;
 }
 
-.state-providers.state-wait .ui-icon {
+.state-providers.state-wait .ui-icon, .backend-button.waiting .ui-icon {
     background-image: url(states/load-white.gif);
 }
 
-.state-providers.state-wait-ok .ui-icon {
-    background-image: url(states/load-green.gif);
+.state-providers.state-wait-ok .ui-icon, .backend-button.waiting-ok .ui-icon {
+    background-image: url(states/load-white.gif);
 }
 
-.state-providers.state-wait-error .ui-icon {
+.state-providers.state-wait-error .ui-icon, .backend-button.waiting-error .ui-icon  {
     background-image: url(states/load-yellow.gif);
 }
 
-.state-providers.state-wait-down .ui-icon {
+.state-providers.state-wait-down .ui-icon{
     background-image: url(states/load-red.gif);
 }
 
-.state-providers.state-ok .ui-icon {
-    background-image: url(states/state-green.png);
+.state-providers.state-ok .ui-icon, .backend-button.online .ui-icon {
+    background: url("images/icons-18-white.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0.4);
+    background-position: -252px 50%;
+    
 }
 
-.state-providers.state-error .ui-icon {
+.state-providers.state-error .ui-icon, .backend-button.error .ui-icon {
     background-image: url(states/state-yellow.png);
 }
 
-.state-providers.state-down .ui-icon {
+.state-providers.state-down .ui-icon, .backend-button.waiting-offline .ui-icon {
     background-image: url(states/state-red.png);
 }
 
@@ -273,6 +274,10 @@ a.action-links {
 /* Keys */
 #mist-create-key {
     float: right;
+}
+
+#keys-list {
+    margin-top: 65px;
 }
 
 /* Machines Icons and their colors. */

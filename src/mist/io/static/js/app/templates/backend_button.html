@@ -5,4 +5,5 @@
     data-transition="pop"
     data-role="button"
     {{action "openDialog" on="click"}}
-    class="backend-state-{{unbound backend.state}}">{{backend.title}}</a>
+    data-icon="check"
+    {{bindAttr class="backend.state :backend-button"}}">{{backend.title}}</a>

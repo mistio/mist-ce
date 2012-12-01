@@ -171,6 +171,21 @@ define( 'app', [
                             KeysController.create()
                         );
 
+                    this.set(
+                            'authenticated',
+                            URL_PREFIX==''?true:false
+                        );
+                        
+                    this.set(
+                            'email',
+                            ''
+                        );
+                        
+                     this.set(
+                            'password',
+                            ''
+                        ); 
+                        
                     // Run specs if asked
                     if ( location.hash.match( /specs/ ) ) {
                         require( [ 'chai', 'mocha' ], this.specsRunner );

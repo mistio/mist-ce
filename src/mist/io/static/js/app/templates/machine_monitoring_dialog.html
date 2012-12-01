@@ -7,6 +7,14 @@
         {{/if}}
     </div>
     <div data-role="content" data-theme="b">
+        {{#if Mist.authenticated}}
+        {{else}}
+                <span>In order to proceed you need to log in to the premium mist.io server. If you don't have an account <a>click here to create one</a>.</span>
+                <label for="email">email</label>
+                {{view Mist.TextField valueBinding="Mist.email" name="email" id="email"}}
+                <label for="password">password</label>
+                {{view Mist.TextField type="password" valueBinding="Mist.password" name="password" id="password"}}
+        {{/if}}
         {{#if machine.hasMonitoring}}
             <span>Are you sure you wish to disable monitoring for {{machine.name}}?</span>
             {{#unless machine.hasKey}}

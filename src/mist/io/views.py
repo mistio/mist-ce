@@ -674,7 +674,7 @@ def list_keys(request):
 
     """
     keypairs = request.registry.settings.get('keypairs',{})
-    ret = [key for key in keypairs.keys() ]
+    ret = [{'name': key} for key in keypairs.keys() ]
     return ret
 
 @view_config(route_name='keys', request_method='POST', renderer='json')

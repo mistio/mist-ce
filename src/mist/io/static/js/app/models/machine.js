@@ -242,9 +242,24 @@ define('app/models/machine', [
 
             checkHasMonitoring: function() {
                 var that = this;
+                if (!Mist.authenticated && (!Mist.email || !Mist.password)){
+                    this.set('hasMonitoring', false);
+                    return
+                }
+                
+                if (!Mist.authenticated) {
+                    payload = {
+                        'email': Mist.email,
+                        'password': Mist.password
+                    };
+                } else {
+                    payload = {};
+                }
                 $.ajax({
                     url: URL_PREFIX + '/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
                     dataType: 'jsonp',
+                    timeout: 10000,
+                    data: JSON.stringify(payload),
                     success: function(data) {
                         log("machine has monitoring");
                         log(data);
@@ -281,7 +296,9 @@ define('app/models/machine', [
                     var payload = {
                        'monitoring': !this.hasMonitoring,
                        'host': host,
-                       'provider': this.backend.provider
+                       'provider': this.backend.provider,
+                       'email': Mist.email,
+                       'password' : Mist.password
                     };
 
                     if (this.hasMonitoring) {
@@ -289,12 +306,14 @@ define('app/models/machine', [
                     }
 
                     var that = this;
+                    warn('sending request');
                     $.ajax({
                         url: URL_PREFIX + '/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify(payload),
                         dataType: 'jsonp',
+                        timeout : 10000,
                         success: function(data) {
                             if (data.deployed_collectd) {
                                 that.set('hasMonitoring', true);
@@ -313,8 +332,10 @@ define('app/models/machine', [
                                 that.set('hasMonitoring', false);
                             }
                             that.set('pendingMonitoring', false);
+                            warn('success');
                         },
                         error: function(jqXHR, textstate, errorThrown) {
+                            warn('error');
                             that.set('pendingMonitoring', false);
                             Mist.notificationController.notify('Error when changing monitoring to ' +
                                 that.name);
@@ -326,7 +347,7 @@ define('app/models/machine', [
                     that.set('pendingMonitoring', false);
                 }
             },
-
+           
             init: function() {
                 this._super();
 

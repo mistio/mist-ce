@@ -36,6 +36,14 @@ define('app/controllers/images', [
                 this._super();
 
                 var that = this;
+                if (this.backend.state == 'online' || this.backend.state == 'waiting-ok'){
+                    this.backend.set('state', 'waiting-ok');
+                } else if (this.backend.state == 'error'){
+                    this.backend.set('state', 'waiting-error');
+                } else {
+                    this.backend.set('state', 'waiting');
+                }
+                
                 $.getJSON('/backends/' + this.backend.index + '/images', function(data) {
                     var content = new Array();
                     data.forEach(function(item){
@@ -44,8 +52,20 @@ define('app/controllers/images', [
                     });
                     that.set('content', content);
                     Mist.backendsController.getImageCount();
+                    that.backend.set('state', 'online');
                 }).error(function() {
                     Mist.notificationController.notify("Error loading images for backend: " + that.backend.title);
+                    if (that.backend.state == 'online') {
+                        // Mark error but try once again
+                        that.backend.set('state', 'error');
+                        Ember.run.later(that, function(){
+                            this.init();
+                        }, that.backend.poll_interval);                        
+                    } else {
+                        // This backend seems hopeless, disabling it                            
+                        that.backend.set('state', 'offline');
+                        that.backend.set('enabled', {'value': 0, 'label':'Disabled'});
+                    }                  
                 });
             }
         });
