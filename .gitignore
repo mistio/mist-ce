@@ -14,4 +14,4 @@ src/libcloud
 .DS_Store
 .Python
 /.project
-settings.yaml
+*.yaml
