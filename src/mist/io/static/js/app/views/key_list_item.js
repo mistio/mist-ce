@@ -55,7 +55,7 @@ define('app/views/key_list_item', [
                         var len = $('#machines-list input:checked').length; //FIXME use data instead of DOM
                         if (len > 1) {
                             $('#keys-footer').fadeIn(140);
-                            Mist.set('machine', null);
+                            Mist.set('key', null);
                         } else if (len == 1) {
                             $('#keys-footer').fadeIn(140);
                             if (len == 1) {

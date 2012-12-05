@@ -8,6 +8,7 @@ define('app/views/key', [
      */
     function(key_html) {
         return Ember.View.extend({
+
             tagName: false,
             keyBinding: 'Mist.key',
 
