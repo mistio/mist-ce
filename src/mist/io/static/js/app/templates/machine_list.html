@@ -3,19 +3,19 @@
     <div data-role="header">
 
         <a href="#home"
-        data-icon="home"
-        data-direction="reverse"
-        class="ui-btn-left">Home</a>
+            data-icon="home"
+            data-direction="reverse"
+            class="ui-btn-left">Home</a>
 
         <h1>Machines</h1>
 
         <a href="#dialog-providers"
-        data-rel="dialog"
-        data-role="button"
-        data-iconpos="notext"
-        data-transition="slidedown"
-        data-icon="check"
-        {{bindAttr class="Mist.backendsController.state :state-providers"}}>Backends</a>
+            data-rel="dialog"
+            data-role="button"
+            data-iconpos="notext"
+            data-transition="slidedown"
+            data-icon="check"
+            {{bindAttr class="Mist.backendsController.state :state-providers"}}>Backends</a>
 
     </div>
 
@@ -67,9 +67,8 @@
             data-role="button"
             data-icon="gear"
             data-rel="popup"
-            data-transition="slidedown"
-            {{bindAttr class="disabledShellClass"}}
-            data-position-to="window">Shell</a>
+            data-transition="slideup"
+            {{bindAttr class="disabledShellClass"}}>Shell</a>
 
             <a href="#dialog-tags"
             class="action-links"
@@ -77,9 +76,8 @@
             data-role="button"
             data-icon="grid"
             data-rel="popup"
-            data-transition="slidedown"
-            {{bindAttr class="disabledTagClass"}}
-            data-position-to="window">Tag</a>
+            data-transition="slideup"
+            {{bindAttr class="disabledTagClass"}}>Tag</a>
 
             <a href="#dialog-power"
             class="action-links"
@@ -87,9 +85,8 @@
             data-role="button"
             data-icon="mist-power"
             data-rel="popup"
-            data-transition="slidedown"
-            {{bindAttr class="disabledPowerClass"}}
-            data-position-to="window">Power</a>
+            data-transition="slideup"
+            {{bindAttr class="disabledPowerClass"}}>Power</a>
         </div>
     </div>
 </div>
