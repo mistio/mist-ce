@@ -35,8 +35,8 @@ define('app/controllers/key_add', [
             init: function() {
                 this._super();
                 this.addObserver('newKeyName', this, this.updateNewKeyReady);
-                this.addObserver('newKeyPublic', this, this.updateNewKeyPublic);
-                this.addObserver('newKeyPrivate', this, this.updateNewKeyPrivate);
+                this.addObserver('newKeyPublic', this, this.updateNewKeyReady);
+                this.addObserver('newKeyPrivate', this, this.updateNewKeyReady);
                 this.set('newKeyReady', false);
             }
         });

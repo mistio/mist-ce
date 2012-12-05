@@ -37,9 +37,9 @@ define('app/views/key_add_dialog', [
                 this.set('template', Ember.Handlebars.compile(key_add_dialog_html));
                 
                 Ember.run.next(function(){
-                    Mist.machineAddController.addObserver('newKeyReady', function(sender, keyReady, value, rev) {
+                    Mist.keyAddController.addObserver('newKeyReady', function(sender, keyReady, value, rev) {
                         Ember.run.next(function() {
-                            $('#add-key-button').button();
+                            //$('#add-key-button').button();
                             if (value) {
                                 $('#add-key-button').button('enable');
                             } else {
