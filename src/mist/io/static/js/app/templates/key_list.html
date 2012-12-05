@@ -46,36 +46,6 @@
 
     </div>
 
-    <div data-role="popup" id="dialog-add-key" class="mist-dialog" data-overlay-theme="a" style="width: 400px; max-width:400px;">
-        <div data-role="header">
-            <h1>Add key</h1>
-        </div>
-        <div data-role="content">
-
-        <button data-theme="b"
-        data-role="button"
-        data-icon="gear"
-        {{action "generateClicked" }} >Generate</button>
-
-        <label for="create-key-name">Name:</label>
-        {{view Mist.TextField valueBinding="Mist.keysController.newKeyName"
-        name="create-key-name" id="create-key-name"}}
-
-        <label for="textarea-public-key">Public Key:</label>
-        {{view Ember.TextArea valueBinding="Mist.keysController.newKeyPublicKey"
-            name="textarea-public-key" id="textarea-public-key"}}
-        <label for="textarea-private-key">Private Key:</label>
-        {{view Ember.TextArea valueBinding="Mist.keysController.newKeyPrivateKey"
-            name="textarea-private-key" id="textarea-private-key"}}
-
-        <div class="btn-full" data-role="controlgroup"
-            data-type="horizontal">
-            <button class="btn-left-full" data-theme="c"
-            {{action "backClicked" }}>Back</button>
-            <button class="btn-right-full"
-            data-theme="b" {{action "newKeyClicked" }}>Add</button>
-        </div>
-    </div>
 </div>
 
 </div>

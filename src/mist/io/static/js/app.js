@@ -42,6 +42,7 @@ define( 'app', [
     'app/controllers/confirmation',
     'app/controllers/notification',
     'app/controllers/machine_add',
+    'app/controllers/key_add',
     'app/controllers/select_machines',
     'app/controllers/select_images',
     'app/controllers/keys',
@@ -65,6 +66,7 @@ define( 'app', [
     'app/views/machine_monitoring_dialog',
     'app/views/key_list',
     'app/views/key',
+    'app/views/key_add_dialog',    
     'mobile',
     'cubism',
     'ember'
@@ -75,6 +77,7 @@ define( 'app', [
                 ConfirmationController,
                 NotificationController,
                 MachineAddController,
+                KeyAddController,
                 SelectMachinesController,
                 SelectImagesController,
                 KeysController,
@@ -98,6 +101,7 @@ define( 'app', [
                 MachineMonitoringDialog,
                 KeyListView,
                 KeyView,
+                KeyAddDialog,
                 Mobile,
                 cubism
                 ) {
@@ -170,7 +174,12 @@ define( 'app', [
                             'keysController',
                             KeysController.create()
                         );
-
+                        
+                    this.set(
+                            'keyAddController',
+                            KeyAddController.create()
+                        );
+                        
                     this.set(
                             'authenticated',
                             URL_PREFIX==''?true:false
@@ -358,6 +367,9 @@ define( 'app', [
 
             var keyView = KeyView.create();
             keyView.append();
+            
+            var keyAddDialog = KeyAddDialog.create();
+            keyAddDialog.appendTo("#keys");
 
             // Expose the application globally
             return window.Mist = App;
