@@ -23,6 +23,7 @@ define('app/controllers/key_add', [
             },
 
             updateNewKeyReady: function() {
+                
                 if (this.get('newKeyName') &&
                     this.get('newKeyPublic') &&
                     this.get('newKeyPrivate')) {

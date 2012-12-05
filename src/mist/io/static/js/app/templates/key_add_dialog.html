@@ -14,10 +14,10 @@
         {{action "generateClicked" }} >Generate</button>
     
     <label for="textarea-public-key">Public Key:</label>
-    {{view Ember.TextArea valueBinding="Mist.keyAddController.newKeyPublicKey"
+    {{view Ember.TextArea valueBinding="Mist.keyAddController.newKeyPublic"
         name="textarea-public-key" id="textarea-public-key"}}
     <label for="textarea-private-key">Private Key:</label>
-    {{view Ember.TextArea valueBinding="Mist.keyAddController.newKeyPrivateKey"
+    {{view Ember.TextArea valueBinding="Mist.keyAddController.newKeyPrivate"
         name="textarea-private-key" id="textarea-private-key"}}
 
     <div class="btn-full" data-role="controlgroup"
