@@ -19,10 +19,9 @@ define('app/views/delete_tag', [
 
             deleteTag: function() {
                 var tag = this.tag;
-
-                this.machine.tags.removeObject(this.tag.toString());
-
-                var machine = this.machine;
+                var machine = Mist.machine;
+                
+                machine.tags.removeObject(this.tag.toString());
 
                 log("tag to delete: " + tag);
 

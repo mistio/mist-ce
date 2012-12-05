@@ -48,36 +48,39 @@ define(
                                 'tag' : tag
                             };
 
-                            $
-                                    .ajax({
-                                        url : 'backends/'
-                                                + machine.backend.index
-                                                + '/machines/' + machine.id
-                                                + '/metadata',
-                                        type : 'POST',
-                                        contentType : 'application/json',
-                                        data : JSON.stringify(payload),
-                                        success : function(data) {
-                                            info(
-                                                    'Successfully added tag to machine',
-                                                    machine.name);
+                            $.ajax({
+                                url : 'backends/'
+                                        + machine.backend.index
+                                        + '/machines/' + machine.id
+                                        + '/metadata',
+                                type : 'POST',
+                                contentType : 'application/json',
+                                data : JSON.stringify(payload),
+                                success : function(data) {
+                                    info(
+                                            'Successfully added tag to machine',
+                                            machine.name);
 
-                                        },
-                                        error : function(jqXHR, textstate,
-                                                errorThrown) {
-                                            Mist.notificationController
-                                                    .notify('Error while adding tag to machine '
-                                                            + machine.name);
-                                            error(
-                                                    textstate,
-                                                    errorThrown,
-                                                    'while adding tag to machine machine',
-                                                    machine.name);
-                                            machine.tags.removeObject(tag);
-                                        }
-                                    });
+                                },
+                                error : function(jqXHR, textstate,
+                                        errorThrown) {
+                                    Mist.notificationController
+                                            .notify('Error while adding tag to machine '
+                                                    + machine.name);
+                                    error(
+                                            textstate,
+                                            errorThrown,
+                                            'while adding tag to machine machine',
+                                            machine.name);
+                                    machine.tags.removeObject(tag);
+                                }
+                            });
                         },
 
+                        deleteTag: function(){
+                            warn('delete tag');
+                        },
+                        
                         disabledClass : function() {
                             if (this.tag && this.tag.length > 0) {
                                 return '';

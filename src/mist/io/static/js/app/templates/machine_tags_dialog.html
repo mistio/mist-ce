@@ -13,8 +13,8 @@
             </table>
             <div id="tags-wrapper">
                 <ul id="tags-list">
-                {{#each machine.tags}}
-                    {{#view Mist.DeleteTagView tagBinding="this" machineBinding="machine"}}
+                {{#each Mist.machine.tags}}
+                    {{#view Mist.DeleteTagView tagBinding="this"}}
                     <li><a data-role="button" class="tagButton" {{action deleteTag}} data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>{{this.tag}}</li>
                     {{/view}}
                 {{/each}}
