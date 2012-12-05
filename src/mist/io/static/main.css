@@ -1,10 +1,5 @@
-/* Custom unweb rules */
-
-
-#machineGraph span {
-    font-size: 12px;
-    vertical-align: middle;
-    margin:5px;
+[data-role="page"], [data-role="dialog"] {
+    display: none;
 }
 
 /* Splash (loading) page */
@@ -31,23 +26,8 @@ div#splash div.mist-logo {
 
 /* Home Page */
 
-/* Add backend button top margin */
-#home a#add-backend-button {
-    margin: 0px !important;
-}
-
 #home .ui-content {
     overflow-y: hidden;
-}
-
-/* Machines Pane */
-
-#machines .ui-content {
-    padding-top: 6px;
-}
-
-#machines-list .node .ui-icon-arrow-r {
-    right: 18px;
 }
 
 /* Select Button */
@@ -69,6 +49,7 @@ div#splash div.mist-logo {
 }
 
 /* Search field */
+
 #machines .ui-listview-filter-inset {
     margin: -41px 124px 0 60px;
 }
@@ -82,7 +63,6 @@ div#splash div.mist-logo {
     top: -46px;
     right: -6px;
 }
-
 
 #machines #mist-create-machine .ui-icon {
     position: absolute;
@@ -121,7 +101,6 @@ div#splash div.mist-logo {
 .state-providers.state-ok .ui-icon, .backend-button.online .ui-icon {
     background: url("images/icons-18-white.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0.4);
     background-position: -252px 50%;
-    
 }
 
 .state-providers.state-error .ui-icon, .backend-button.error .ui-icon {
@@ -132,12 +111,12 @@ div#splash div.mist-logo {
     background-image: url(states/state-red.png);
 }
 
-
 /* Provider state dialog */
 
 #providers-state-list li {
     padding-left: 42px;
 }
+
 #providers-state-list .provider-state-icon {
     width: 16px;
     height: 16px;
@@ -177,77 +156,27 @@ div#splash div.mist-logo {
     font-size: 13px !important;
 }
 
-/* Machines List */
-
-#machines-list {
-    margin-top: 10px;
-}
-
-#machines-list .node {
+li.node {
     clear: left;
 }
 
-#machines-list .ui-checkbox {
-    float:left;
-    margin-bottom: 0px !important;
-}
-
-#machines-list .ui-checkbox label {
-
-    margin: 0 !important;
-}
-
-#machines-list .ui-checkbox input {
-    display: none;
-}
-
-#machines-list .ui-btn-icon-left {
-    background: none;
-    background-image: none;
-}
-
-#machines-list .ui-checkbox label {
-    border: none;
-    background-color: transparent;
-}
-
-#machines-list .ui-icon-checkbox-on, #machines-list .ui-icon-checkbox-off  {
-    z-index: 1000;
-}
-
-#machines-list .ui-btn-text .ui-checkbox {
-    width: 56px;
-    margin-top: -8px;
-}
-
-#machines-list .ui-checkbox .ui-btn-inner {
-    top: 0;
-    left: -11px;
-    height: 40px;
-    border-top: none;
-}
-
-#machines-list .ui-checkbox .ui-btn-text {
-    display: none;
-}
-
-#machines-list li.node .ui-btn-text, #images-list li.node .ui-btn-text {
+li.node .ui-btn-text {
     padding-right: 0;
 }
 
-#machines-list .node a, #images-list .node a {
-    height: 40px;
-    color: #2F3E46;
-}
-
-#machines-list .description, #images-list .description {
+li.node .description {
     position: absolute;
     right: 76px;
     top: 50%;
     margin-top: -11px;
 }
 
-#machines-list .bubble-container, #images-list .bubble-container {
+li.node a {
+    height: 40px;
+    color: #2F3E46;
+}
+
+li.node .bubble-container {
     float: right;
     display: block;
     overflow: hidden;
@@ -256,6 +185,83 @@ div#splash div.mist-logo {
     position: absolute;
     right: 48px;
     top: 50%;
+}
+
+li.node fieldset.list-item {
+    float: left;
+    padding-top: 12px;
+    padding-left: 12px;
+}
+
+li.node .ui-icon-arrow-r {
+    right: 18px;
+}
+
+li.node .ui-checkbox {
+    float:left;
+    margin-bottom: 0px !important;
+}
+
+li.node .ui-checkbox label {
+    margin: 0 !important;
+}
+
+li.node .ui-checkbox input {
+    display: none;
+}
+
+li.node .ui-checkbox label {
+    border: none;
+    background-color: transparent;
+}
+
+li.node .ui-icon-checkbox-on, li.node .ui-icon-checkbox-off  {
+    z-index: 1000;
+}
+
+li.node .ui-btn-text .ui-checkbox {
+    width: 56px;
+    margin-top: -8px;
+}
+
+li.node .ui-checkbox .ui-btn-inner {
+    top: 0;
+    left: -11px;
+    height: 40px;
+    border-top: none;
+}
+
+li.node .ui-checkbox .ui-btn-text {
+    display: none;
+}
+
+li.node .tag {
+    border: 1px solid #bfbfbf;
+    color: #555 !important;
+    font-weight: normal !important;
+    display: block;
+    float: right;
+    padding: 1px 7px;
+    margin: 3px 3px 9px 0;
+}
+
+a.action-links {
+    width: 33%;
+}
+
+/* Machines List */
+
+#machines .ui-content {
+    padding-top: 6px;
+}
+
+#machines-list {
+    margin-top: 10px;
+}
+
+#machines-list .ui-btn-icon-left {
+    background: none;
+    background-image: none;
 }
 
 #machines-list .state-icon.ui-icon-check {
@@ -267,11 +273,12 @@ div#actions div.ui-controlgroup-controls {
     width: 100%;
 }
 
-a.action-links {
-    width: 33%;
+/* Keys Listing */
+
+#keys .ui-content {
+    padding-top: 6px;
 }
 
-/* Keys */
 #mist-create-key {
     float: right;
 }
@@ -315,19 +322,6 @@ a.action-links {
    for the statically positioned footer */
 .bottom-padding {
     height: 46px;
-}
-
-/* Machines tags */
-
-#machines-list .node .tag,
-#images-list .node .tag {
-    border: 1px solid #bfbfbf;
-    color: #555 !important;
-    font-weight: normal !important;
-    display: block;
-    float: right;
-    padding: 1px 7px;
-    margin: 3px 3px 9px 0;
 }
 
 /* Machines states colors. */
@@ -387,7 +381,6 @@ a#mist-select-machines-button span.ui-btn-text {
     color: #fff;
     z-index: 0;
 }
-/**/
 
 .ui-li-heading {
     display: block;
@@ -452,6 +445,10 @@ a#mist-select-machines-button span.ui-btn-text {
     background-image: url("images/zap.png");
 }
 
+#machines-footer {
+    display: none;
+}
+
 /* Single View */
 
 #single-view-header {
@@ -498,7 +495,6 @@ a#mist-select-machines-button span.ui-btn-text {
     background-position: center center;
     background-repeat: no-repeat;
 }
-
 
 /* indices do not help here, let's use types as defined in
  libcloud.compute.types.Provider (we will use numbers, match in the Python) */
@@ -620,6 +616,12 @@ div.pending-monitoring {
     margin: 20px auto 0;
 }
 
+#machineGraph span {
+    font-size: 12px;
+    vertical-align: middle;
+    margin:5px;
+}
+
 .add-rule-button {
     width: 13ex;
     margin: 0;
@@ -723,8 +725,7 @@ div.pending-monitoring {
 
 /* DIALOGS */
 
-.ui-dialog .ui-content,
-{
+.ui-dialog .ui-content {
     max-width: 500px;
     margin: 0 auto 15px auto;
 }
@@ -1013,10 +1014,6 @@ div.cost {
     }
 }
 
-#machines-footer {
-	display: none;
-}
-
 /* Conditional for < 480px */
 @media only screen and (max-width: 480px) {
 
@@ -1080,16 +1077,4 @@ div.cost {
     #shell-return {
         overflow-x: scroll;
     }
-}
-
-[data-role="page"], [data-role="dialog"] {
-	display: none;
-}
-
-div#machines fieldset.machine-list-item {
-    float: left;
-    padding-top: 12px;
-    padding-left: 12px;
-}
-
 }
