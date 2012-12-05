@@ -20,8 +20,8 @@ define('app/views/key_add_dialog', [
                     contentType: "application/json",
                     dataType: "json",
                     success: function(result) {
-                        Mist.keyAddController.set('newKeyPublicKey', result.public);
-                        Mist.keyAddController.set('newKeyPrivateKey', result.private);
+                        Mist.keyAddController.set('newKeyPublic', result.public);
+                        Mist.keyAddController.set('newKeyPrivate', result.private);
                     }
                 });
             },
