@@ -666,6 +666,7 @@ def list_locations(request):
 
     return ret
 
+
 @view_config(route_name='keys', request_method='GET', renderer='json')
 def list_keys(request):
     """List keys.
@@ -677,8 +678,30 @@ def list_keys(request):
     ret = [{'name': key} for key in keypairs.keys() ]
     return ret
 
+
 @view_config(route_name='keys', request_method='POST', renderer='json')
 def generate_keypair(request):    
     key = RSA.generate(2048, os.urandom)
     return {'public' : key.exportKey('OpenSSH'),
             'private' : key.exportKey()}
+
+
+@view_config(route_name='key', request_method='PUT', renderer='json')
+def add_key(request):
+
+    try:
+        from mist.core.views import add_key
+        return add_key(request)
+    except:
+        pass
+
+    params = request.json_body
+    id = params.get('name', '')
+    
+    key = {'public':params.get('pub', ''),
+           'private':params.get('priv', '')}
+
+    request.registry.settings['keypairs'][id] = key
+    save_settings(request.registry.settings)
+
+    return {}    

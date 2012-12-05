@@ -29,6 +29,34 @@ define('app/controllers/keys', [
                     Mist.notificationController.notify("Error loading keys");
                 });
 
+            },
+            
+            newKey: function(name, publicKey, privateKey){
+                item = {
+                    'name':name,
+                    'pub': publicKey,
+                    'priv': privateKey
+                }
+                var key = Key.create(item);
+                this.addObject(key);
+                
+                var that = this;
+
+                $.ajax({
+                    url: 'keys/' + name,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(item),
+                    success: function(data) {
+                        info('Successfully sent create key ', name);
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while sending create key'  +
+                                name);
+                        error(textstate, errorThrown, 'while creating key', name);
+                        that.removeObject(key);
+                    }
+                });
             }
         });
     }

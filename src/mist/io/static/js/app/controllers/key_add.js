@@ -11,11 +11,9 @@ define('app/controllers/key_add', [
 
             newKey: function() {
                 warn("new key");
-                /*this.get('newMachineBackend').machines.newMachine(
-                                            this.get('newMachineName'),
-                                            this.get('newMachineImage'),
-                                            this.get('newMachineSize'),
-                                            this.get('newMachineLocation'));*/
+                Mist.keysController.newKey(this.get('newKeyName'),
+                                            this.get('newKeyPublic'),
+                                            this.get('newKeyPrivate'))
             },
 
             newKeyClear: function() {

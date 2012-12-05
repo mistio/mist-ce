@@ -37,6 +37,7 @@ def main(global_config, **settings):
     config.add_route('sizes', '/backends/{backend}/sizes')
     config.add_route('locations', '/backends/{backend}/locations')
     config.add_route('keys', '/keys')
+    config.add_route('key', '/keys/{key}')
 
     config.scan()
 
