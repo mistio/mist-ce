@@ -24,13 +24,13 @@ define('app/views/key_list_item', [
 
                             $this.checkboxradio("refresh");
 
-                            var len = $('#keys-list input:checked').length;
+                            var len = $('.keys-list input:checked').length;
 
                             if (len > 0) {
-                                $('#keys-footer').fadeIn(140);
+                                $('.keys-footer').fadeIn(140);
 
                             } else {
-                                $('#keys-footer').fadeOut(200);
+                                $('.keys-footer').fadeOut(200);
                             }
                             return;
                         }
@@ -52,12 +52,12 @@ define('app/views/key_list_item', [
                             }
                         }
 
-                        var len = $('#machines-list input:checked').length; //FIXME use data instead of DOM
+                        var len = $('#keys-list input:checked').length; //FIXME use data instead of DOM
                         if (len > 1) {
-                            $('#keys-footer').fadeIn(140);
+                            $('.keys-footer').fadeIn(140);
                             Mist.set('key', null);
                         } else if (len == 1) {
-                            $('#keys-footer').fadeIn(140);
+                            $('.keys-footer').fadeIn(140);
                             if (len == 1) {
                                 var keys = new Array();
                                 Mist.keysController.forEach(function(key) {
@@ -68,7 +68,7 @@ define('app/views/key_list_item', [
                                 Mist.set('key', keys[0]);
                             }
                         } else {
-                            $('#machines-footer').fadeOut(200);
+                            $('.keys-footer').fadeOut(200);
                             Mist.set('key', null);
                         }
                     });

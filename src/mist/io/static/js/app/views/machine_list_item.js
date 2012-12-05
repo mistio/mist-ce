@@ -46,10 +46,10 @@ define('app/views/machine_list_item', [
                             var len = $('#machines-list input:checked').length;
 
                             if (len > 0) {
-                                $('#machines-footer').fadeIn(140);
-                                
+                                $('.machines-footer').fadeIn(140);
+
                             } else {
-                                $('#machines-footer').fadeOut(200);
+                                $('.machines-footer').fadeOut(200);
                             }
                             return;
                         }
@@ -73,12 +73,12 @@ define('app/views/machine_list_item', [
 
                         var len = $('#machines-list input:checked').length; //FIXME use data instead of DOM
                         if (len > 1) {
-                            $('#machines-footer').fadeIn(140);
-                            $('#machines #footer-console').addClass('ui-disabled');
+                            $('.machines-footer').fadeIn(140);
+                            $('.machines #footer-console').addClass('ui-disabled');
                             Mist.set('machine', null);
                         } else if (len == 1) {
-                            $('#machines-footer').fadeIn(140);
-                            $('#machines #footer-console').removeClass('ui-disabled');
+                            $('.machines-footer').fadeIn(140);
+                            $('.machines #footer-console').removeClass('ui-disabled');
                             if(len == 1){
                                 var machines = new Array();
                                 Mist.backendsController.forEach(function(backend) {
@@ -91,7 +91,7 @@ define('app/views/machine_list_item', [
                                 Mist.set('machine', machines[0]);
                             }
                         } else {
-                            $('#machines-footer').fadeOut(200);
+                            $('.machines-footer').fadeOut(200);
                             Mist.set('machine', null);
                         }
                     });

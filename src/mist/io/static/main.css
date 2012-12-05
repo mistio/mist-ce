@@ -250,10 +250,6 @@ li.node .tag {
     margin: 3px 3px 9px 0;
 }
 
-a.action-links {
-    width: 33%;
-}
-
 /* Machines List */
 
 #machines .ui-content {
@@ -266,11 +262,6 @@ a.action-links {
 
 #machines-list .state-icon.ui-icon-check {
     background-color: #33dd44;
-}
-
-div#actions div.ui-controlgroup-controls {
-    display:inline !important;
-    width: 100%;
 }
 
 /* Keys Listing */
@@ -426,26 +417,41 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 100%;
 }
 
-.ui-footer table#actions {
+.ui-footer div.actions {
     margin: 0.4em 0;
-    width: 99.9%;
 }
 
-.ui-footer table#actions td {
+div.actions div.ui-controlgroup-controls {
+    display:inline !important;
+}
+
+.ui-footer div.actions {
     border: 0px;
     margin: 0px;
-    padding: 0px;
+    padding-left: 0.5%;
 }
 
-.ui-footer table#actions td a {
-    width: 100%;
+.keys-footer.ui-footer div.actions {
+    padding-left: 0.5%;
+}
+
+.ui-footer div.actions a {
+    width: 33%;
+}
+
+.keys-footer.ui-footer div.actions a {
+    width: 49%;
 }
 
 .ui-icon-mist-power {
     background-image: url("images/zap.png");
 }
 
-#machines-footer {
+.machines-footer {
+    display: none;
+}
+
+.keys-footer {
     display: none;
 }
 
