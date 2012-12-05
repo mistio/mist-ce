@@ -3,49 +3,44 @@
     <div data-role="header">
 
         <a href="#home"
-        data-icon="home"
-        data-direction="reverse"
-        class="ui-btn-left">Home</a>
+            data-icon="home"
+            data-direction="reverse"
+            class="ui-btn-left">Home</a>
 
         <h1>Keys</h1>
 
         <a href="#dialog-providers"
-        data-rel="dialog"
-        data-role="button"
-        data-iconpos="notext"
-        data-transition="slidedown"
-        data-icon="check"
-        {{bindAttr class="Mist.backendsController.state :state-providers"}}>Backends</a>
+            data-rel="dialog"
+            data-role="button"
+            data-iconpos="notext"
+            data-transition="slidedown"
+            data-icon="check"
+            {{bindAttr class="Mist.backendsController.state :state-providers"}}>Backends</a>
 
     </div>
 
     <div data-role="content">
 
         <a href="#dialog-add-key"
-        id="mist-create-key"
-        data-rel="popup"
-        data-theme="b"
-        data-inline="true"
-        data-transition="slidedown"
-        data-role="button"
-        data-icon="plus"
-        data-position-to="window" >Create</a>
+            id="mist-create-key"
+            data-rel="popup"
+            data-theme="b"
+            data-inline="true"
+            data-transition="slidedown"
+            data-role="button"
+            data-icon="plus"
+            data-position-to="window">Create</a>
 
-        <ul id="keys-list"
-        data-role="listview"
-        data-inset="true"
-        data-theme="c">
+        <ul id="keys-list" data-role="listview" data-inset="true" data-theme="c">
             {{#each Mist.keysController}}
-            <li class="node">
-                <a {{action "createMachine"}}>{{this.name}}</a>
-            </li>
+                <li class="node">
+                    <a href="#key">{{this.name}}</a>
+                </li>
             {{/each}}
         </ul>
 
         <div class="bottom-padding"></div>
 
     </div>
-
-</div>
 
 </div>
