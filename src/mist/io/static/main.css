@@ -235,6 +235,11 @@ li.node .ui-checkbox .ui-btn-text {
     display: none;
 }
 
+li.node .ui-btn-icon-left {
+    background: none;
+    background-image: none;
+}
+
 li.node .tag {
     border: 1px solid #bfbfbf;
     color: #555 !important;
@@ -257,11 +262,6 @@ a.action-links {
 
 #machines-list {
     margin-top: 10px;
-}
-
-#machines-list .ui-btn-icon-left {
-    background: none;
-    background-image: none;
 }
 
 #machines-list .state-icon.ui-icon-check {
