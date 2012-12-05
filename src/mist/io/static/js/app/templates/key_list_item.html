@@ -1,0 +1,13 @@
+<li class="node">
+
+    <fieldset class="machine-list-item">
+        <label>
+            {{view Mist.Checkbox checkedBinding="key.selected"}}
+        </label>
+    </fieldset>
+
+    <a href="#key" {{action "checkBoxClick" on="click"}}>
+        <h3 class="name">{{key.name}}</h3>
+    </a>
+
+</li>

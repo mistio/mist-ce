@@ -33,13 +33,33 @@
 
         <ul id="keys-list" data-role="listview" data-inset="true" data-theme="c">
             {{#each Mist.keysController}}
-                <li class="node">
-                    <a href="#key">{{this.name}}</a>
-                </li>
+                {{view Mist.KeyListView keyBinding="this"}}
             {{/each}}
         </ul>
 
         <div class="bottom-padding"></div>
+
+    </div>
+
+    <div id="keys-footer" data-role="footer" data-theme="a">
+
+        <div id="key-actions" data-role="controlgroup" data-type="horizontal">
+            <a href=""
+                class="action-links"
+                id="keys-button-delete"
+                data-role="button"
+                data-icon="delete"
+                data-rel="popup"
+                data-transition="slideup">Delete</a>
+
+            <a href=""
+                class="action-links"
+                id="keys-button-associate"
+                data-role="button"
+                data-icon="gear"
+                data-rel="popup"
+                data-transition="slideup">Associate</a>
+        </div>
 
     </div>
 

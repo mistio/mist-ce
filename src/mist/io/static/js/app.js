@@ -64,9 +64,10 @@ define( 'app', [
     'app/views/delete_tag',
     'app/views/machine_tags_dialog',
     'app/views/machine_monitoring_dialog',
+    'app/views/key_list_item',
     'app/views/key_list',
     'app/views/key',
-    'app/views/key_add_dialog',    
+    'app/views/key_add_dialog',
     'mobile',
     'cubism',
     'ember'
@@ -99,6 +100,7 @@ define( 'app', [
                 DeleteTagView,
                 MachineTagsDialog,
                 MachineMonitoringDialog,
+                KeyList,
                 KeyListView,
                 KeyView,
                 KeyAddDialog,
@@ -174,27 +176,27 @@ define( 'app', [
                             'keysController',
                             KeysController.create()
                         );
-                        
+
                     this.set(
                             'keyAddController',
                             KeyAddController.create()
                         );
-                        
+
                     this.set(
                             'authenticated',
                             URL_PREFIX==''?true:false
                         );
-                        
+
                     this.set(
                             'email',
                             ''
                         );
-                        
+
                      this.set(
                             'password',
                             ''
-                        ); 
-                        
+                        );
+
                     // Run specs if asked
                     if ( location.hash.match( /specs/ ) ) {
                         require( [ 'chai', 'mocha' ], this.specsRunner );
@@ -325,6 +327,8 @@ define( 'app', [
             App.ImageListView = ImageList;
             App.EnableBackendButtonView = EnableBackendButton;
             App.DeleteTagView = DeleteTagView;
+            App.KeyListView = KeyList;
+
             App.onOff = [{'value': 0, 'label': 'Disabled'},
                          {'value': 1, 'label': 'Enabled'}];
 
@@ -367,7 +371,7 @@ define( 'app', [
 
             var keyView = KeyView.create();
             keyView.append();
-            
+
             var keyAddDialog = KeyAddDialog.create();
             keyAddDialog.appendTo("#keys");
 

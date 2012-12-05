@@ -6,11 +6,11 @@ define('app/models/key', ['ember'],
      */
     function() {
         return Ember.Object.extend({
-            
+
             name: null,
             pub: null,
             priv: null
-            
+
         });
     }
 );
