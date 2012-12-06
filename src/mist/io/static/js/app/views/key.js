@@ -8,9 +8,22 @@ define('app/views/key', [
      */
     function(key_html) {
         return Ember.View.extend({
-
             tagName: false,
             keyBinding: 'Mist.key',
+
+            deleteKey: function() {
+                var key = this.key;
+
+                Mist.confirmationController.set('title', 'Delete Key: ' + key.name);
+                Mist.confirmationController.set('text', 'Are you sure you want to delete ' +
+                                                key.name + '?');
+
+                Mist.confirmationController.set('callback', function() {
+                    key.deleteKey();
+                });
+                Mist.confirmationController.set('fromDialog', true);
+                Mist.confirmationController.show();
+            },
 
             init: function() {
                 this._super();

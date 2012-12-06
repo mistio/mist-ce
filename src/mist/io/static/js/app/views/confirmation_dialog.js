@@ -9,7 +9,7 @@ define('app/views/confirmation_dialog', [
     function(confirmation_dialog_html) {
         return Ember.View.extend({
             tagName: false,
-            
+
             confirm: function(){
                 Mist.confirmationController.confirm();
             },
