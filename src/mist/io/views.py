@@ -93,13 +93,6 @@ def list_backends(request):
 
 @view_config(route_name='backend_action', request_method='PUT', renderer='json')
 def add_backend(request, renderer='json'):
-
-    try:
-        from mist.core.views import add_backend
-        return add_backend(request)
-    except:
-        pass
-
     params = request.json_body
     provider = params.get('provider', '0')['provider']
     region = ''
@@ -132,12 +125,6 @@ def add_backend(request, renderer='json'):
 
 @view_config(route_name='backend_action', request_method='DELETE', renderer='json')
 def delete_backend(request, renderer='json'):
-    try:
-        from mist.core.views import delete_backend
-        return delete_backend(request)
-    except:
-        pass
-
     settings = request.registry.settings
     settings['backends'].remove(settings['backends'][int(request.matchdict['backend'])])
 
@@ -674,8 +661,12 @@ def list_keys(request):
     List all key pairs that are configured on this server
 
     """
-    keypairs = request.registry.settings.get('keypairs',{})
-    ret = [{'name': key} for key in keypairs.keys() ]
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs',{})
+        
+    ret = [{'name': key, 'pub': keypairs[key]['public']} for key in keypairs.keys() ]
     return ret
 
 
@@ -688,13 +679,6 @@ def generate_keypair(request):
 
 @view_config(route_name='key', request_method='PUT', renderer='json')
 def add_key(request):
-
-    try:
-        from mist.core.views import add_key
-        return add_key(request)
-    except:
-        pass
-
     params = request.json_body
     id = params.get('name', '')
     
@@ -709,13 +693,6 @@ def add_key(request):
 
 @view_config(route_name='key', request_method='DELETE', renderer='json')
 def delete_key(request):
-
-    try:
-        from mist.core.views import delete_key
-        return delete_key(request)
-    except:
-        pass
-
     params = request.json_body
     id = params.get('name', '')
     
