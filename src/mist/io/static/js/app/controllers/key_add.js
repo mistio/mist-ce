@@ -10,7 +10,7 @@ define('app/controllers/key_add', [
         return Ember.Object.extend({
 
             newKey: function() {
-                warn("new key");
+                log("new key");
                 Mist.keysController.newKey(this.get('newKeyName'),
                                             this.get('newKeyPublic'),
                                             this.get('newKeyPrivate'));
@@ -18,11 +18,14 @@ define('app/controllers/key_add', [
             },
 
             newKeyClear: function() {
-                warn("new key clear");
+                log("new key clear");
+                this.set('newKeyName', null);
+                this.set('newKeyPublic', null);
+                this.set('newKeyPrivate', null);
             },
 
             updateNewKeyReady: function() {
-                
+
                 if (this.get('newKeyName') &&
                     this.get('newKeyPublic') &&
                     this.get('newKeyPrivate')) {

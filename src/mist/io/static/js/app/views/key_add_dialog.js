@@ -9,10 +9,12 @@ define('app/views/key_add_dialog', [
     function(key_add_dialog_html) {
         return Ember.View.extend({
             tagName: false,
-            backClicked: function(){
+
+            backClicked: function() {
+                Mist.keyAddController.newKeyClear();
                 history.back();
             },
-            
+
             generateClicked: function(){
                 $.ajax({
                     url: '/keys',
@@ -25,17 +27,17 @@ define('app/views/key_add_dialog', [
                     }
                 });
             },
-            
+
             newKeyClicked: function(){
                 //TODO
                 Mist.keyAddController.newKey();
-                history.back();                
+                history.back();
             },
-            
+
             init: function() {
                 this._super();
                 this.set('template', Ember.Handlebars.compile(key_add_dialog_html));
-                
+
                 Ember.run.next(function(){
                     Mist.keyAddController.addObserver('newKeyReady', function(sender, keyReady, value, rev) {
                         Ember.run.next(function() {
@@ -49,7 +51,7 @@ define('app/views/key_add_dialog', [
                     });
                     Mist.keyAddController.set('newKeyReady', true);
                     Mist.keyAddController.set('newKeyReady', false);
-                });                                  
+                });
             },
         });
     }
