@@ -447,14 +447,6 @@ div.actions div.ui-controlgroup-controls {
     background-image: url("images/zap.png");
 }
 
-.machines-footer {
-    display: none;
-}
-
-.keys-footer {
-    display: none;
-}
-
 /* Single View */
 
 #single-view-header {

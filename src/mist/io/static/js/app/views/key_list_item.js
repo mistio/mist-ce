@@ -14,7 +14,6 @@ define('app/views/key_list_item', [
                 tagName:false,
 
                 checkBoxClick: function(event, el){
-
                     log('key clicked');
 
                     if (event.target.tagName != 'A') {
@@ -27,10 +26,10 @@ define('app/views/key_list_item', [
                             var len = $('.keys-list input:checked').length;
 
                             if (len > 0) {
-                                $('.keys-footer').fadeIn(140);
+                                $('#keys .keys-footer').fadeIn(140);
 
                             } else {
-                                $('.keys-footer').fadeOut(200);
+                                $('#keys .keys-footer').fadeOut(200);
                             }
                             return;
                         }
@@ -40,7 +39,6 @@ define('app/views/key_list_item', [
 
                 keySelected: function(){
                     log('key selected changed');
-
                     var that = this;
 
                     Em.run.next(function() {
@@ -54,10 +52,10 @@ define('app/views/key_list_item', [
 
                         var len = $('#keys-list input:checked').length; //FIXME use data instead of DOM
                         if (len > 1) {
-                            $('.keys-footer').fadeIn(140);
+                            $('#keys .keys-footer').fadeIn(140);
                             Mist.set('key', null);
                         } else if (len == 1) {
-                            $('.keys-footer').fadeIn(140);
+                            $('#keys .keys-footer').fadeIn(140);
                             if (len == 1) {
                                 var keys = new Array();
                                 Mist.keysController.forEach(function(key) {
@@ -68,11 +66,10 @@ define('app/views/key_list_item', [
                                 Mist.set('key', keys[0]);
                             }
                         } else {
-                            $('.keys-footer').fadeOut(200);
+                            $('#keys .keys-footer').fadeOut(200);
                             Mist.set('key', null);
                         }
                     });
-
                 }.observes('key.selected'),
 
                 init: function() {
