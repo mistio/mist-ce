@@ -8,33 +8,38 @@
     </div>
     <div data-role="content" data-theme="b">
         {{#if Mist.authenticated}}
+            {{#if machine.hasMonitoring}}
+                <span>Are you sure you wish to disable monitoring for {{machine.name}}?</span>
+                {{#unless machine.hasKey}}
+                <p>This action can't be performed automactically because there is no key pair set.</p>
+                <p>To do it manually reffer to link for instructions. When completed successfuly press disable below.</p>
+                {{/unless}}
+                <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
+                    <button id="create-cancel" class="btn-left-full" data-theme="c" {{action "backClicked" }}>Back</button>
+                    <button id="create-ok" class="btn-right-full" data-theme="b" {{action "changeMonitoringClicked" }}>Disable</button>
+                </div>
+            {{else}}
+                <div>Are you sure you wish to enable monitoring for {{machine.name}}?</div>
+                {{#unless machine.hasKey}}
+                <p>This action can't be performed automactically because there is no key pair set.</p>
+                <p>To do it manually reffer to link for instructions. When completed successfuly press enable below.</p>
+                {{/unless}}
+                <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
+                    <button id="create-cancel" class="btn-left-full" data-theme="c" {{action "backClicked" }}>Back</button>
+                    <button id="create-ok" class="btn-right-full" data-theme="b" {{action "changeMonitoringClicked" }}>Enable</button>
+                </div>
+            {{/if}}
         {{else}}
-                <span>In order to proceed you need to log in to the premium mist.io server. If you don't have an account <a>click here to create one</a>.</span>
+                <span>In order to proceed you need to login to the premium <a href="https://mist.io">mist.io</a> service.</a>.</span>
                 <label for="email">email</label>
                 {{view Mist.TextField valueBinding="Mist.email" name="email" id="email"}}
                 <label for="password">password</label>
                 {{view Mist.TextField type="password" valueBinding="Mist.password" name="password" id="password"}}
+                <div id="auth-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
+                    <button id="auth-cancel" class="btn-left-full" data-theme="c" {{action "backClicked" }}>Back</button>
+                    <button id="auth-ok" class="btn-right-full" data-theme="b" {{action "authenticate" }}>Login</button>
+                </div>                
         {{/if}}
-        {{#if machine.hasMonitoring}}
-            <span>Are you sure you wish to disable monitoring for {{machine.name}}?</span>
-            {{#unless machine.hasKey}}
-            <p>This action can't be performed automactically because there is no key pair set.</p>
-            <p>To do it manually reffer to link for instructions. When completed successfuly press disable below.</p>
-            {{/unless}}
-            <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-                <button id="create-cancel" class="btn-left-full" data-theme="c" {{action "backClicked" }}>Back</button>
-                <button id="create-ok" class="btn-right-full" data-theme="b" {{action "changeMonitoringClicked" }}>Disable</button>
-            </div>
-        {{else}}
-            <div>Are you sure you wish to enable monitoring for {{machine.name}}?</div>
-            {{#unless machine.hasKey}}
-            <p>This action can't be performed automactically because there is no key pair set.</p>
-            <p>To do it manually reffer to link for instructions. When completed successfuly press enable below.</p>
-            {{/unless}}
-            <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-                <button id="create-cancel" class="btn-left-full" data-theme="c" {{action "backClicked" }}>Back</button>
-                <button id="create-ok" class="btn-right-full" data-theme="b" {{action "changeMonitoringClicked" }}>Enable</button>
-            </div>
-        {{/if}}
+
     </div>
 </div>
