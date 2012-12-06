@@ -447,9 +447,9 @@ div.actions div.ui-controlgroup-controls {
     background-image: url("images/zap.png");
 }
 
-/* Single View */
+/* Single View common */
 
-#single-view-header {
+.single-view-header {
     overflow: auto;
     padding: 0 0 0 15px;
     background: #e6e6e7;
@@ -462,10 +462,12 @@ div.actions div.ui-controlgroup-controls {
     border-bottom: #fff;
 }
 
-#single-view-name {
+.single-view-name {
     float: left;
     margin: 30px 0 0 10px;
 }
+
+/* Machine single View */
 
 #single-view-state {
     font-weight: normal;
@@ -477,7 +479,6 @@ div.actions div.ui-controlgroup-controls {
 .single-view-icon-wrapper {
     float: right;
     padding: 16px 20px;
-
     background-position: center;
     background-repeat: no-repeat;
     border-left: 1px solid #ccc;
@@ -719,6 +720,17 @@ div.pending-monitoring {
     -webkit-border-radius: 14px;
     -moz-border-radius: 14px;
     border-radius: 14px;
+}
+
+/* Key single view */
+#key .single-view-header {
+    height: 80px;
+}
+
+#key div.public-key {
+    width: 100%;
+    word-wrap: break-word;
+    white-space: pre;
 }
 
 /* DIALOGS */

@@ -17,8 +17,21 @@
             {{bindAttr class="Mist.backendsController.state :state-providers"}}>Backends</a>
     </div>
 
+    <div class="single-view-header">
+        <h3 class="single-view-name">{{key.name}}</h3>
+    </div>
+
     <div data-role="content">
-        Single key page for '{{key.name}}' key
+
+         <div data-role="collapsible" data-collapsed="false">
+            <h3>Public Key</h3>
+            <div class="public-key">{{key.pub}}</div>
+        </div>
+
+        <div data-role="collapsible" data-collapsed="true">
+            <h3>Private key</h3>
+            <div class="private-key"></div>
+        </div>
     </div>
 
     <div class="keys-footer" data-role="footer" data-theme="a">
