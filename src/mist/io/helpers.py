@@ -61,11 +61,20 @@ def save_settings(settings):
     includes some yaml dump magic in order for the dumped private ssh keys
     to be in a valid string format.
     """
+    class folded_unicode(unicode): pass
     class literal_unicode(unicode): pass
 
     def literal_unicode_representer(dumper, data):
         return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='|')
 
+    def folded_unicode_representer(dumper, data):
+        return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='>')
+
+    def unicode_representer(dumper, uni):
+        node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
+        return node
+
+    yaml.add_representer(unicode, unicode_representer)
     yaml.add_representer(literal_unicode, literal_unicode_representer)
 
     config_file = open('settings.yaml', 'w')
@@ -83,7 +92,7 @@ def save_settings(settings):
         'core_uri': settings['core_uri'],
         'js_build': settings['js_build'],
         'js_log_level': settings['js_log_level'],
-        }, config_file)
+        }, config_file, default_flow_style=False, )
 
     config_file.close()
 
