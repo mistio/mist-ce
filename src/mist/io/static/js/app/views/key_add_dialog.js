@@ -29,8 +29,8 @@ define('app/views/key_add_dialog', [
             },
 
             newKeyClicked: function(){
-                //TODO
                 Mist.keyAddController.newKey();
+                Mist.keyAddController.newKeyClear();
                 history.back();
             },
 
