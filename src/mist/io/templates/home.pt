@@ -115,7 +115,7 @@
                 <li>
                     <a id="keys-count" href="#keys">Keys
                         {{#view Mist.CountView
-                            numberBinding="Mist.keysController.keyCount"
+                            numberBinding="Mist.keysController.content.length"
                             tagName="span"
                             class="ui-li-count"}}
                             {{number}}
@@ -127,31 +127,6 @@
         </script>
     </div>
 </div><!-- /page home -->
-
-<!-- Start of provider state dialog -->
-<div data-role="dialog"
-    id="dialog-providers"
-    class="mist-dialog">
-
-    <div data-role="header">
-        <h1>Backend state</h1>
-    </div>
-
-    <div data-role="content">
-
-        <ul id="providers-state-list"
-            data-role="listview"
-            data-inset="true"
-            data-theme="c"
-            data-dividertheme="d"></ul>
-
-        <a data-role="button"
-            data-icon="arrow-l"
-            data-rel="back"
-            data-transition="slidedown"
-            data-theme="c">Close</a>
-    </div>
-</div><!-- /provider state dialog -->
 
 </body>
 

@@ -704,4 +704,22 @@ def add_key(request):
     request.registry.settings['keypairs'][id] = key
     save_settings(request.registry.settings)
 
-    return {}    
+    return {}
+
+
+@view_config(route_name='key', request_method='DELETE', renderer='json')
+def delete_key(request):
+
+    try:
+        from mist.core.views import delete_key
+        return delete_key(request)
+    except:
+        pass
+
+    params = request.json_body
+    id = params.get('name', '')
+    
+    request.registry.settings['keypairs'].pop(id)
+    save_settings(request.registry.settings)
+
+    return {} 

@@ -10,12 +10,17 @@
         <h1>Machines</h1>
 
         <a href="#dialog-providers"
-            data-rel="dialog"
+            data-rel="popup"
             data-role="button"
             data-iconpos="notext"
-            data-transition="slidedown"
             data-icon="check"
+            data-inline="true"
+            data-transition="pop"            
             {{bindAttr class="Mist.backendsController.state :state-providers"}}>Backends</a>
+            
+        <div data-role="popup"
+            id="dialog-providers"
+            class="mist-dialog"></div>            
 
     </div>
 
