@@ -266,10 +266,6 @@ li.node .tag {
 
 /* Keys Listing */
 
-#keys .ui-content {
-    padding-top: 6px;
-}
-
 #mist-create-key {
     float: right;
 }
