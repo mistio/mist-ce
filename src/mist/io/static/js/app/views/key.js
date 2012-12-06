@@ -20,6 +20,8 @@ define('app/views/key', [
 
                 Mist.confirmationController.set('callback', function() {
                     key.deleteKey();
+                    history.back();
+                    $.mobile.changePage('#keys');
                 });
                 Mist.confirmationController.set('fromDialog', true);
                 Mist.confirmationController.show();
