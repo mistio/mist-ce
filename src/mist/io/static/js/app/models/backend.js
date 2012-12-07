@@ -14,10 +14,10 @@ define('app/models/backend', [
             
             BACKENDSTATES: ['offline', 'online', 'waiting'], //TODO add more states
 
-            index: null,
             id: null,
             title: null,
             provider: null,
+            apikey: null,
             poll_interval: null,
             host: null,
             state: 'unknown',

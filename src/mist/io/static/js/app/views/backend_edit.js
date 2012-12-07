@@ -34,9 +34,9 @@ define('app/views/backend_edit', [
                         Mist.backendsController.arrayContentWillChange();
                         Mist.backendsController.removeObject(that.backend);
                         Mist.backendsController.arrayContentDidChange();
-                        // update indexes of remaining backends
-                        Mist.backendsController.content.forEach(function(obj,i){obj.index=i})
-                        setTimeout("$('#backend-buttons').controlgroup('refresh')",200);
+                        Ember.run.next(function(){
+                            $('#backend-buttons').controlgroup('refresh');
+                        });
                     }
                 });
             },

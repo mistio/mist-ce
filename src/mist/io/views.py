@@ -3,6 +3,8 @@ import os
 import logging
 import datetime
 
+from hashlib import sha256
+
 from Crypto.PublicKey import RSA
 
 from pyramid.response import Response
@@ -65,60 +67,66 @@ def list_backends(request):
     .. note:: Currently, this is only used by the backends controller in js.
     """
     try:
-        backend_list = request.environ['beaker.session']['backends']
+        backends = request.environ['beaker.session']['backends']
     except:
-        backend_list = request.registry.settings['backends']
+        backends = request.registry.settings['backends']
 
-    backends = []
-    index = 0
-    for backend in backend_list:
-        backends.append({'index': index,
-                         'id': backend['id'],
-                         'title': backend['title'],
-                         'provider': backend['provider'],
-                         'poll_interval': backend['poll_interval'],
-                         'state': 'wait',
-                         # for Provider.RACKSPACE_FIRST_GEN
-                         'region': backend.get('region', None),
-                         # for Provider.RACKSPACE (the new Nova provider)
-                         'datacenter': backend.get('datacenter', None),
-                         'enabled': backend.get('enabled', True) and \
-                                {'value': 1, 'label':'Enabled'} or \
-                                {'value': 0, 'label':'Disabled'},
-                         })
-        index = index + 1
+    ret = []
+    for backend_id in backends:
+        backend = backends[backend_id]
+        ret.append({'id': backend_id,
+                    'title': backend['title'],
+                    'provider': backend['provider'],
+                    'poll_interval': backend['poll_interval'],
+                    'state': 'wait',
+                    # for Provider.RACKSPACE_FIRST_GEN
+                    'region': backend.get('region', None),
+                    # for Provider.RACKSPACE (the new Nova provider)
+                    'datacenter': backend.get('datacenter', None),
+                    'enabled': backend.get('enabled', True) and \
+                        {'value': 1, 'label':'Enabled'} or \
+                        {'value': 0, 'label':'Disabled'},
+                     })
 
-    return backends
+    return ret
 
 
-@view_config(route_name='backend_action', request_method='PUT', renderer='json')
+@view_config(route_name='backends', request_method='POST', renderer='json')
 def add_backend(request, renderer='json'):
     params = request.json_body
     provider = params.get('provider', '0')['provider']
+    apikey = params.get('apikey', '')
+    apisecret = params.get('apisecret', '')
     region = ''
     if not provider.__class__ is int and ':' in provider:
         region = provider.split(':')[1]
         provider = int(provider.split(':')[0])
-        
-    backend = {'provider': provider,
-               'title': params.get('provider', '0')['title'],
-               'id': params.get('apikey', ''),
-               'secret': params.get('apisecret', ''),
+    
+    if not provider or not apikey or not apisecret:
+        return Response('Invalid backend data', 400)
+    
+    backend_id = sha256('%s%s%s' % (provider, region, apikey)).hexdigest()    
+    
+    backend = {'title': params.get('provider', '0')['title'],
+               'provider': provider,
+               'apikey': apikey,
+               'apisecret': apisecret,
                'region': region,
                'poll_interval': request.registry.settings['default_poll_interval'],
-               'enabled': True,
+               'enabled': 1,
               }
 
-    request.registry.settings['backends'].append(backend)
+    request.registry.settings['backends'][backend_id] = backend
     save_settings(request.registry.settings)
 
-    ret = {'index'        : len(request.registry.settings['backends']) - 1,
-           'id'           : backend['id'],
+    ret = {'id'           : backend_id,
+           'apikey'       : backend['apikey'],
            'title'        : backend['title'],
            'provider'     : backend['provider'],
            'poll_interval': backend['poll_interval'],
            'region'       : backend['region'],
            'status'       : 'off',
+           'enabled'      : 1,
           }
     return ret
 
@@ -126,7 +134,7 @@ def add_backend(request, renderer='json'):
 @view_config(route_name='backend_action', request_method='DELETE', renderer='json')
 def delete_backend(request, renderer='json'):
     settings = request.registry.settings
-    settings['backends'].remove(settings['backends'][int(request.matchdict['backend'])])
+    settings['backends'].pop(request.matchdict['backend'])
 
     save_settings(settings)
 
@@ -219,7 +227,8 @@ def create_machine(request):
     except:
         return Response('Backend not found', 404)
 
-    backend_index = int(request.matchdict['backend'])
+    backend_id = request.matchdict['backend']
+    key_id = 'default'
     try:
         machine_name = request.json_body['name']
         location_id = request.json_body['location']
@@ -245,11 +254,11 @@ def create_machine(request):
         location = NodeLocation(location_id, name='', country='', driver=conn)
 
     try:
-        private_key = request['beaker.session']['keypairs']['default']['private']
-        public_key = request['beaker.session']['keypairs']['default']['public']
+        private_key = request['beaker.session']['keypairs'][key_id]['private']
+        public_key = request['beaker.session']['keypairs'][key_id]['public']
     except KeyError:
-        private_key = request.registry.settings['keypairs']['default']['private']
-        public_key = request.registry.settings['keypairs']['default']['public']
+        private_key = request.registry.settings['keypairs'][key_id]['private']
+        public_key = request.registry.settings['keypairs'][key_id]['public']
 
     if conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE] and\
     public_key:
@@ -553,14 +562,13 @@ def shell_command(request):
     ssh_user = request.params.get('ssh_user', None)
     command = request.params.get('command', None)
 
-    backend_index = int(request.matchdict['backend'])
+    key_id = 'default'
     try:
-        private_key = request['beaker.session']['keypairs']['default']['private']
+        private_key = request['beaker.session']['keypairs'][key_id]['private']
     except KeyError:
-        private_key = request.registry.settings['keypairs']['default']['private']
+        private_key = request.registry.settings['keypairs'][key_id]['private']
 
-    return run_command(conn, machine_id, host, ssh_user, private_key,
-                      command)
+    return run_command(conn, machine_id, host, ssh_user, private_key, command)
 
 
 @view_config(route_name='images', request_method='GET', renderer='json')
@@ -699,4 +707,5 @@ def delete_key(request):
     request.registry.settings['keypairs'].pop(id)
     save_settings(request.registry.settings)
 
-    return {} 
+    return {}
+ 
