@@ -726,7 +726,7 @@ div.pending-monitoring {
 #key div.public-key {
     width: 100%;
     word-wrap: break-word;
-    white-space: pre;
+    white-space: pre-wrap;
 }
 
 /* DIALOGS */
