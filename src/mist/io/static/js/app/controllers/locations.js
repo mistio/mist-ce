@@ -17,7 +17,7 @@ define('app/controllers/locations', [
                 this._super();
 
                 var that = this;
-                $.getJSON('/backends/' + this.backend.index + '/locations', function(data) {
+                $.getJSON('/backends/' + this.backend.id + '/locations', function(data) {
                     var content = new Array();
                     data.forEach(function(item) {
                         content.push(Location.create(item));

@@ -30,7 +30,7 @@ define('app/views/delete_tag', [
                 };
 
                 $.ajax({
-                    url: 'backends/' + machine.backend.index + '/machines/' + machine.id + '/metadata',
+                    url: 'backends/' + machine.backend.id + '/machines/' + machine.id + '/metadata',
                     type: 'DELETE',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),

@@ -30,7 +30,7 @@ define('app/models/machine', [
 
                 var that = this;
                 $.ajax({
-                    url: '/backends/' + this.backend.index + '/machines/' + this.id,
+                    url: '/backends/' + this.backend.id + '/machines/' + this.id,
                     type: 'POST',
                     data: 'action=reboot',
                     success: function(data) {
@@ -51,7 +51,7 @@ define('app/models/machine', [
 
                 var that = this
                 $.ajax({
-                    url: '/backends/' + this.backend.index + '/machines/' + this.id,
+                    url: '/backends/' + this.backend.id + '/machines/' + this.id,
                     type: 'POST',
                     data: 'action=destroy',
                     success: function(data) {
@@ -72,7 +72,7 @@ define('app/models/machine', [
 
                 var that = this;
                 $.ajax({
-                    url: 'backends/' + this.backend.index + '/machines/' + this.id,
+                    url: 'backends/' + this.backend.id + '/machines/' + this.id,
                     type: 'POST',
                     data: 'action=start',
                     success: function(data) {
@@ -93,7 +93,7 @@ define('app/models/machine', [
 
                 var that = this;
                 $.ajax({
-                    url: 'backends/' + this.backend.index + '/machines/' + this.id,
+                    url: 'backends/' + this.backend.id + '/machines/' + this.id,
                     type: 'POST',
                     data: 'action=stop',
                     success: function(data) {
@@ -150,7 +150,7 @@ define('app/models/machine', [
                 var that = this;
                 if (host) {
                     $.ajax({
-                        url: '/backends/' + this.backend.index + '/machines/' + this.id + '/shell',
+                        url: '/backends/' + this.backend.id + '/machines/' + this.id + '/shell',
                         type: 'POST',
                         data: {'host': host,
                                'ssh_user': ssh_user,
@@ -202,7 +202,7 @@ define('app/models/machine', [
                             var ssh_user = that.getUser();
 
                             $.ajax({
-                                url: '/backends/' + that.backend.index + '/machines/' + that.id + '/shell',
+                                url: '/backends/' + that.backend.id + '/machines/' + that.id + '/shell',
                                 type: 'POST',
                                 data: {'host': host,
                                    'ssh_user': ssh_user,
@@ -256,7 +256,7 @@ define('app/models/machine', [
                     payload = {};
                 }
                 $.ajax({
-                    url: URL_PREFIX + '/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
+                    url: URL_PREFIX + '/backends/' + this.backend.id + '/machines/' + this.id + '/monitoring',
                     dataType: 'jsonp',
                     timeout: 10000,
                     data: JSON.stringify(payload),
@@ -308,7 +308,7 @@ define('app/models/machine', [
                     var that = this;
                     warn('sending request');
                     $.ajax({
-                        url: URL_PREFIX + '/backends/' + this.backend.index + '/machines/' + this.id + '/monitoring',
+                        url: URL_PREFIX + '/backends/' + this.backend.id + '/machines/' + this.id + '/monitoring',
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify(payload),

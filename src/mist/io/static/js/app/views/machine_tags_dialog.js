@@ -50,7 +50,7 @@ define(
 
                             $.ajax({
                                 url : 'backends/'
-                                        + machine.backend.index
+                                        + machine.backend.id
                                         + '/machines/' + machine.id
                                         + '/metadata',
                                 type : 'POST',

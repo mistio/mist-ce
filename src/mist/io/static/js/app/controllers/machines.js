@@ -37,7 +37,7 @@ define('app/controllers/machines', [
                     this.backend.set('state', 'waiting');
                 }
 
-                $.getJSON('/backends/' + this.backend.index + '/machines', function(data) {
+                $.getJSON('/backends/' + this.backend.id + '/machines', function(data) {
 
                     data.forEach(function(item){
                         var found = false;
@@ -155,7 +155,7 @@ define('app/controllers/machines', [
                 var that = this;
 
                 $.ajax({
-                    url: 'backends/' + this.backend.index + '/machines',
+                    url: 'backends/' + this.backend.id + '/machines',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),

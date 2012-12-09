@@ -45,7 +45,7 @@ def load_settings(settings):
         raise
 
     settings['keypairs'] = user_config.get('keypairs', {})
-    settings['backends'] = user_config.get('backends', [])
+    settings['backends'] = user_config.get('backends', {})
     settings['js_build'] = user_config.get('js_build', False)
     settings['js_log_level'] = user_config.get('js_log_level', 3)
     settings['default_poll_interval'] = user_config.get('default_poll_interval',
@@ -108,31 +108,31 @@ def connect(request):
         * Linode
     """
     try:
-        backend_list = request.environ['beaker.session']['backends']
+        backends = request.environ['beaker.session']['backends']
     except:
-        backend_list = request.registry.settings['backends']
+        backends = request.registry.settings['backends']
 
-    backend_index = int(request.matchdict['backend'])
-    backend = backend_list[backend_index]
+    backend_id = request.matchdict['backend']
+    backend = backends.get(backend_id)
 
     driver = get_driver(int(backend['provider']))
 
     if backend['provider'] == Provider.OPENSTACK:
-        conn = driver(backend['id'],
-                      backend['secret'],
+        conn = driver(backend['apikey'],
+                      backend['apisecret'],
                       ex_force_auth_url=backend.get('auth_url', None),
                       ex_force_auth_version=backend.get('auth_version', '2.0'))
     elif backend['provider'] == Provider.LINODE:
-        conn = driver(backend['secret'])
+        conn = driver(backend['apisecret'])
     elif backend['provider'] == Provider.RACKSPACE_FIRST_GEN:
-        conn = driver(backend['id'], backend['secret'],
+        conn = driver(backend['apikey'], backend['apisecret'],
                       region=backend['region'])
     elif backend['provider'] == Provider.RACKSPACE:
-        conn = driver(backend['id'], backend['secret'],
+        conn = driver(backend['apikey'], backend['api'],
                       datacenter=backend['region'])
     else:
         # ec2
-        conn = driver(backend['id'], backend['secret'])
+        conn = driver(backend['apikey'], backend['apisecret'])
         # Account for sub-provider regions (EC2_US_WEST, EC2_US_EAST etc.)
         conn.type = backend['provider']
     return conn

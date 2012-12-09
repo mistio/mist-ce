@@ -44,7 +44,7 @@ define('app/controllers/images', [
                     this.backend.set('state', 'waiting');
                 }
                 
-                $.getJSON('/backends/' + this.backend.index + '/images', function(data) {
+                $.getJSON('/backends/' + this.backend.id + '/images', function(data) {
                     var content = new Array();
                     data.forEach(function(item){
                         item.backend = that.backend;

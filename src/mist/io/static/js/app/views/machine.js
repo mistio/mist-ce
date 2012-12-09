@@ -205,7 +205,7 @@ define('app/views/machine', [
 
                                 var url = URL_PREFIX +
                                           '/backends/' +
-                                          machine.backend.index +
+                                          machine.backend.id +
                                           '/machines/' +
                                           machine.id +
                                           '/stats?&start=' +

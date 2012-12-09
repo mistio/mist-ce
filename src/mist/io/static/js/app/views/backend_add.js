@@ -14,15 +14,15 @@ define('app/views/backend_add', ['app/models/backend',
             addButtonClick: function(){
                 var that = this;
                 var payload = {
+                        "title": '', // TODO
                         "provider": this.backendProvider,
                         "apikey" : this.backendKey,
-                        "title": 'Rack',
                         "apisecret": this.backendSecret
                 };
-                var index = Mist.backendsController.content.length;
+                
                 $.ajax({
-                    url: '/backends/' + index,
-                    type: "PUT",
+                    url: '/backends',
+                    type: "POST",
                     contentType: "application/json",
                     dataType: "json",
                     data: JSON.stringify(payload),
@@ -30,7 +30,7 @@ define('app/views/backend_add', ['app/models/backend',
                         Mist.backendsController.pushObject(Backend.create(result));
                         setTimeout("$('#home-menu').listview()", 300);
                         setTimeout("$('#backend-buttons').controlgroup('refresh')", 300);
-                        info('added backend ' + index);
+                        info('added backend ' + result.id);
                     }
                 });
             },
