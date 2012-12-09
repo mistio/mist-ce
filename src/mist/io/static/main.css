@@ -597,8 +597,9 @@ div.actions div.ui-controlgroup-controls {
 }
 
 .monitoring-info {
-    color: grey;
+    color: #444;
     text-align: center;
+    font-size: 16px;
 }
 
 div.pending-monitoring {
@@ -606,9 +607,13 @@ div.pending-monitoring {
     margin-top: 20px;
 }
 
+.monitoring-info {
+    margin-bottom: 10px;
+}
+
 .monitoring-button {
     width: 26ex;
-    margin: 20px auto 0;
+    margin: 0 auto;
 }
 
 #machineGraph span {
@@ -622,23 +627,29 @@ div.pending-monitoring {
     margin: 0;
 }
 
-.rules-container {
-    margin-top: 15px;
+.add-rule-container {
     padding: 15px;
-    border: solid 1px grey;
+    background: #e6e6e7;
+}
+
+.rules-container {
+    padding: 0;
+    background: #e8e8e9;
+    border-bottom: 1px solid #ccc;
 }
 
 .rule-box {
     overflow: hidden;
-    padding-bottom: 10px;
+    padding: 6px 10px;
+    border-top: 1px solid #ccc;
 }
 
 .rule-if, .rule-then {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     padding: 6px;
     float: left;
-    margin-top: 8px;
+    margin-top: 12px;
     height:40px;
 }
 
@@ -671,9 +682,9 @@ div.pending-monitoring {
 }
 
 .monitoring-rules-title {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
-    padding: 12px;
+    padding: 12px 0;
     display: block;
     margin: 0;
 }
@@ -716,6 +727,11 @@ div.pending-monitoring {
     -webkit-border-radius: 14px;
     -moz-border-radius: 14px;
     border-radius: 14px;
+}
+
+.monitoring-dialog-container {
+    padding: 15px;
+    background: #e0e0e1;
 }
 
 /* Key single view */

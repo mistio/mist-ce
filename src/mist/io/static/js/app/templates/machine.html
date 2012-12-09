@@ -52,11 +52,13 @@
 
                 <h4 class="monitoring-rules-title">Rules</h4>
 
-                <a href="#add-rule"
-                    class="add-rule-button"
-                    data-role="button"
-                    data-icon="plus"
-                    data-theme="b">Add</a>
+                <div class="add-rule-container">
+                    <a href="#add-rule"
+                        class="add-rule-button"
+                        data-role="button"
+                        data-icon="plus"
+                        data-theme="b">Add</a>
+                </div>
 
                 <div class="rules-container">
                     <div class="rule-box">
@@ -94,31 +96,35 @@
 
                 </div>
 
-                <a href="#monitoring-dialog"
-                    class="monitoring-button"
-                    data-role="button"
-                    data-icon="delete"
-                    data-rel="popup"
-                    data-theme="a"
-                    data-transition="slidedown"
-                    data-position-to="window">Disable Monitoring</a>
-                {{else}}
-                <div class="monitoring-info">Monitoring is currently disabled</div>
+                <div class="monitoring-dialog-container">
+                    <a href="#monitoring-dialog"
+                        class="monitoring-button"
+                        data-role="button"
+                        data-icon="delete"
+                        data-rel="popup"
+                        data-theme="a"
+                        data-transition="slidedown"
+                        data-position-to="window">Disable Monitoring</a>
+                    {{else}}
 
-                <a href="#monitoring-dialog"
-                    class="monitoring-button"
-                    data-role="button"
-                    data-icon="star"
-                    data-rel="popup"
-                    data-theme="b"
-                    data-transition="slidedown"
-                    data-position-to="window">Enable Monitoring</a>
+                <div class="monitoring-dialog-container">
+                    <div class="monitoring-info">Monitoring is currently disabled</div>
+                
+                    <a href="#monitoring-dialog"
+                        class="monitoring-button"
+                        data-role="button"
+                        data-icon="star"
+                        data-rel="popup"
+                        data-theme="b"
+                        data-transition="slidedown"
+                        data-position-to="window">Enable Monitoring</a>
 
-                <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
-                    <span class="ui-icon ui-icon-loading"></span>
-                    <h1>Enabling monitoring</h1>
+                    <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
+                        <span class="ui-icon ui-icon-loading"></span>
+                        <h1>Enabling monitoring</h1>
+                    </div>
+                    {{/if}}
                 </div>
-                {{/if}}
             </div>
         </div>
 
