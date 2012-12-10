@@ -258,19 +258,19 @@ define( 'app', [
             });
 
             function showRuleSlider(){
-                    $('.rule-box .ui-slider').fadeIn(100);
+                    $(this).parent().children('.ui-slider').fadeIn(100);
                     return false;
             }
             function hideRuleSlider(){
-                    $('.rule-box .ui-slider:visible').fadeOut(100);
+                    $('.ui-slider').fadeOut(100);
             }
 
             // monitoring rule slider toggle
             $('input.rule-value').live('mouseover', showRuleSlider);
             $('input.rule-value').live('click', showRuleSlider);
 
-            $('.rule-box').live('mouseleave',hideRuleSlider);
-            $('#single-machine').live('tap',hideRuleSlider);
+            $('.rule-box').live('mouseleave', hideRuleSlider)
+            $('#single-machine').live('tap', hideRuleSlider);
 
 
             App.Select = Ember.Select.extend({
