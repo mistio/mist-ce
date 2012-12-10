@@ -60,12 +60,21 @@
                         data-theme="b">Add</a>
                 </div>
 
+                <script>
+                    $(document).on( 'click', '.add-rule-container', function() {
+                        $('.rule-box').clone().appendTo('.rules-container');
+                        return false;
+                    });
+                </script>
+
                 <div class="rules-container">
                     <div class="rule-box">
                         <div class="rule-if">if</div>
 
-                        <select class="rule-metric" data-icon="false"
-                                data-native-menu="false" data-inline="true">
+                        <select class="rule-metric"
+                            data-icon="false"
+                            data-native-menu="false"
+                            data-inline="true">
                             <option value="load">load</option>
                             <option value="cpu">cpu</option>
                             <option value="memory">memory</option>
@@ -73,18 +82,28 @@
                             <option value="network">network</option>
                         </select>
 
-                        <select class="rule-operator" data-icon="false"
-                                data-native-menu="false" data-inline="true">
+                        <select class="rule-operator"
+                            data-icon="false"
+                            data-native-menu="false"
+                            data-inline="true">
                             <option value="lt">&lt;</option>
                             <option value="gt">&gt;</option>
                         </select>
 
-                        <input type="number" data-type="range" data-highlight="true" class="rule-value" value="60" min="0" max="100" />
+                        <input type="number"
+                            data-type="range"
+                            data-highlight="true"
+                            class="rule-value"
+                            value="60"
+                            min="0"
+                            max="100" />
 
                         <div class="rule-then">then</div>
 
-                        <select class="rule-action"  data-icon="false"
-                                data-native-menu="false" data-inline="true">
+                        <select class="rule-action"
+                            data-icon="false"
+                            data-native-menu="false"
+                            data-inline="true">
                             <option value="alert">alert</option>
                             <option value="reboot">reboot</option>
                             <option value="destroy">destroy</option>
@@ -92,8 +111,6 @@
                             <option value="command">command</option>
                         </select>
                     </div>
-
-
                 </div>
 
                 <div class="monitoring-dialog-container">
@@ -109,7 +126,7 @@
 
                 <div class="monitoring-dialog-container">
                     <div class="monitoring-info">Monitoring is currently disabled</div>
-                
+
                     <a href="#monitoring-dialog"
                         class="monitoring-button"
                         data-role="button"
