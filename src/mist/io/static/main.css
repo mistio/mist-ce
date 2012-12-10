@@ -644,6 +644,11 @@ div.pending-monitoring {
     border-top: 1px solid #ccc;
 }
 
+/* This is only usefull for the add rule prototype */
+.rule-box.template {
+    display: none;
+}
+
 .rule-if, .rule-then {
     font-size: 20px;
     font-weight: bold;

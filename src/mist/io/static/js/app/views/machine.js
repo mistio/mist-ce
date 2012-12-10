@@ -151,10 +151,11 @@ define('app/views/machine', [
                 Em.run.next(function() {
                     $('.monitoring-button').button();
                     $('.add-rule-button').button();
-                    $('.rule-metric').selectmenu();
-                    $('.rule-operator').selectmenu();
-                    $('.rule-value').slider();
-                    $('.rule-action').selectmenu();
+                    // The last() are only usefull for the add rule prototype
+                    $('.rule-metric').last().selectmenu();
+                    $('.rule-operator').last().selectmenu();
+                    $('.rule-value').last().slider();
+                    $('.rule-action').last().selectmenu();
                 });
 
                 if (!this.machine || !this.machine.hasMonitoring) {
