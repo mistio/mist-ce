@@ -42,38 +42,6 @@ create a virtualenv and run buildout::
     ./bin/python bootstrap.py
     ./bin/buildout -v
 
-Configuration
--------------
-
-First copy settings.py.dist in the same path and name it settings.py In settings.py
-you can configure the cloud backends and your keys using Python syntax. 
-The BACKENDS global is an array of dictionaries, each dictionary describing a 
-backend. For example to configure a single EC2 backend you would have::
-
-    BACKENDS = [
-        {'title': 'EC2',
-         'provider': Provider.EC2,
-         'id': 'AKIAIHIF64EDA6VJDISQ',
-         'secret': 'mIAa25lukad1SqQvScX+spm4knQfmXbcKyoPi/hC',
-         'poll_interval': 10000,
-         },
-    ]
-
-The 'title' field is used to name your backend anyway you like.
-
-The KEYPAIRS global is a single dictionary with an key Id and a tuple containing
-the public and private key as strings. e.g.::
-
-    KEYPAIRS = {
-                'default':(  """ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA7qhW...""",
-                             """-----BEGIN RSA PRIVATE KEY-----
-                                MIIEowIBAAKCAQEA7qHnqOLy9hWcP5W+iADJmkIK9n5veATDf1hU2TEHyr5/gRP2
-                                Ykto7Am7iHJdtf0ym+Y5q5fzzOdQS9AJ8mTPouHM8dXWhIkZxfrK4Ylawr/P3jBX
-                                ...
-                                0pROU5zeZkNATRwXyD0F3NnxW8TJcvW0xtaaqiHpSWiItqqIDY6ySb2aC4k43Dyy
-                                0HfyGamX7rJIdcyxEzXChiG7nypZAgr6qFpsilcuChMj3kIov6c0
-                                -----END RSA PRIVATE KEY-----""") 
-                }
 
 Deployment
 ----------
