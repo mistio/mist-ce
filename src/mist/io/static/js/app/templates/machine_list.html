@@ -12,15 +12,10 @@
         <a href="#dialog-providers"
             data-rel="popup"
             data-role="button"
-            data-iconpos="notext"
+            data-transition="pop"
             data-icon="check"
-            data-inline="true"
-            data-transition="pop"            
-            {{bindAttr class="Mist.backendsController.state :state-providers"}}>Backends</a>
-            
-        <div data-role="popup"
-            id="dialog-providers"
-            class="mist-dialog"></div>            
+            data-iconpos="right"
+            {{bindAttr class="Mist.backendsController.state :state-providers"}}>me@mist.io</a>
 
     </div>
 
@@ -34,8 +29,7 @@
             selectionBinding="Mist.selectMachinesController.selection"
             optionLabelPath="content.name"
             optionValuePath="content.id"
-            prompt="Select Machines"
-        }}
+            prompt="Select Machines"}}
 
         <a href="#dialog-add"
         id="mist-create-machine"
@@ -44,7 +38,7 @@
         data-inline="true"
         data-transition="slidedown"
         data-role="button"
-        data-icon="plus" >Create</a>
+        data-icon="plus">Create</a>
 
         <ul id="machines-list"
         data-role="listview"

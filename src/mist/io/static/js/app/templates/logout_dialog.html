@@ -1,0 +1,14 @@
+<div id="dialog-providers" class="mist-dialog" data-role="popup" data-overlay-theme="a">
+    <div data-role="header">
+        <h1>me@mist.io</h1>
+    </div>
+    <div data-role="content" data-theme="b">
+        {{#each Mist.backendsController}}
+            <div class='backend-title'>
+                <label>{{this.title}}: </label><span>{{this.state}}</span>
+            </div>
+        {{/each}}
+        </ul>
+        <a data-role="button" data-rel="back" data-theme="a">Back</a>
+    </div>
+</div>
