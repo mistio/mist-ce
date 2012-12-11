@@ -10,13 +10,8 @@
 
         <h1 id="single-machine-name">{{name}}</h1>
 
-        <a href="#dialog-providers"
-            data-rel="popup"
-            data-role="button"
-            data-transition="pop"
-            data-icon="check"
-            data-iconpos="right"
-            {{bindAttr class="Mist.backendsController.state :state-providers"}}>me@mist.io</a>
+        {{view Mist.UserMenuView}}
+
 
     </div>
 

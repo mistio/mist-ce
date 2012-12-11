@@ -68,7 +68,7 @@ define( 'app', [
     'app/views/key_list',
     'app/views/key',
     'app/views/key_add_dialog',
-    'app/views/logout_dialog',
+    'app/views/user_menu',
     'mobile',
     'cubism',
     'ember'
@@ -105,7 +105,7 @@ define( 'app', [
                 KeyListView,
                 KeyView,
                 KeyAddDialog,
-                LogoutDialog,
+                UserMenuView,
                 Mobile,
                 cubism
                 ) {
@@ -330,6 +330,7 @@ define( 'app', [
             App.EnableBackendButtonView = EnableBackendButton;
             App.DeleteTagView = DeleteTagView;
             App.KeyListView = KeyList;
+            App.UserMenuView = UserMenuView;
 
             App.onOff = [{'value': 0, 'label': 'Disabled'},
                          {'value': 1, 'label': 'Enabled'}];
@@ -377,18 +378,7 @@ define( 'app', [
             var keyAddDialog = KeyAddDialog.create();
             keyAddDialog.appendTo("#keys");
 
-            var logoutDialog = LogoutDialog.create();
-            logoutDialog.appendTo("#machines")
-            // It needs to be re-initialized to work everywhere, simple append() won't do
-            // TODO is there a better way to do this?
-            logoutDialog = LogoutDialog.create();
-            logoutDialog.appendTo("#single-machine")
-            logoutDialog = LogoutDialog.create();
-            logoutDialog.appendTo("#images")
-            logoutDialog = LogoutDialog.create();
-            logoutDialog.appendTo("#keys")
-            logoutDialog = LogoutDialog.create();
-            logoutDialog.appendTo("#key")
+
 
             // Expose the application globally
             return window.Mist = App;

@@ -763,6 +763,15 @@ div.pending-monitoring {
     display: none;
 }
 
+.ui-header span.ember-view {
+    clear: none;
+    display: inline-block;
+    margin: 0;
+    position: absolute;
+    right: 5px;
+    top: -5px;    
+}
+
 /* Create Dialog */
 
 .btn-full {

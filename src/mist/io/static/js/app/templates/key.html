@@ -8,13 +8,8 @@
 
         <h1>{{key.name}}</h1>
 
-        <a href="#dialog-providers"
-            data-rel="popup"
-            data-role="button"
-            data-transition="pop"
-            data-icon="check"
-            data-iconpos="right"
-            {{bindAttr class="Mist.backendsController.state :state-providers"}}>me@mist.io</a>
+        {{view Mist.UserMenuView}}
+
     </div>
 
     <div class="single-view-header">

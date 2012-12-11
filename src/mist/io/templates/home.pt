@@ -45,6 +45,9 @@
 
     <div data-role="header">
         <h1>mist.io</h1>
+        <script type="text/x-handlebars" data-tag-name="span">
+        {{view Mist.UserMenuView}}
+        </script>
     </div>
 
     <div data-role="content">

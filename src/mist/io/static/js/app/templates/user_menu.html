@@ -1,0 +1,19 @@
+<a href="#dialog-providers"
+    data-rel="popup"
+    data-role="button"
+    data-transition="pop"
+    data-icon="check"
+    data-iconpos="right"
+    {{bindAttr class="Mist.backendsController.state :state-providers"}}>me</a>
+    
+<div id="dialog-providers" class="mist-dialog" data-role="popup">
+    <div data-role="content" data-theme="b">
+        {{#each Mist.backendsController}}
+            <div class='backend-title'>
+                <label>{{this.title}}: </label><span>{{this.state}}</span>
+            </div>
+        {{/each}}
+        </ul>
+        <a href="#logout" data-role="button">Logout</a>
+    </div>
+</div>
