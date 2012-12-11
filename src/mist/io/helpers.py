@@ -46,7 +46,7 @@ def load_settings(settings):
 
     settings['keypairs'] = user_config.get('keypairs', {})
     settings['backends'] = user_config.get('backends', {})
-    settings['js_build'] = user_config.get('js_build', False)
+    settings['js_build'] = user_config.get('js_build', True)
     settings['js_log_level'] = user_config.get('js_log_level', 3)
     settings['default_poll_interval'] = user_config.get('default_poll_interval',
                                                          10000)
