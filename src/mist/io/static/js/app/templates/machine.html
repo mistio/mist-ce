@@ -249,6 +249,14 @@
     <div class="machines-footer" data-role="footer" data-theme="a">
 
         <div class="actions" data-role="controlgroup" data-type="horizontal">
+            <a href="#dialog-tags"
+                class="action-links"
+                id="machines-button-tags"
+                data-role="button"
+                data-icon="grid"
+                data-rel="popup"
+                data-transition="slideup"
+                {{bindAttr class="disabledTagClass"}}>Tag</a>
 
             <a href="#dialog-shell"
                 class="action-links"
@@ -258,15 +266,6 @@
                 data-rel="popup"
                 data-transition="slideup"
                 {{bindAttr class="disabledShellClass"}}>Shell</a>
-
-            <a href="#dialog-tags"
-                class="action-links"
-                id="machines-button-tags"
-                data-role="button"
-                data-icon="grid"
-                data-rel="popup"
-                data-transition="slideup"
-                {{bindAttr class="disabledTagClass"}}>Tag</a>
 
             <a href="#dialog-single-power"
                 class="action-links"
