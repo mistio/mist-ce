@@ -274,6 +274,15 @@ li.node .tag {
     margin-top: 65px;
 }
 
+#dialog-add-key-popup {
+    width: 250px;
+}
+
+#textarea-public-key, #textarea-private-key {
+    height: 80px;
+    max-height: 100px;
+}
+
 /* Machines Icons and their colors. */
 
 #machines-list .key-icon {
@@ -769,7 +778,7 @@ div.pending-monitoring {
     margin: 0;
     position: absolute;
     right: 5px;
-    top: -5px;    
+    top: -5px;
 }
 
 /* Create Dialog */
