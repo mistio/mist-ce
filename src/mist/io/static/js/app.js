@@ -54,7 +54,6 @@ define( 'app', [
     'app/views/backend_edit',
     'app/views/machine_list_item',
     'app/views/image_list_item',
-    'app/views/enable_backend_button',
     'app/views/machine_add_dialog',
     'app/views/machine',
     'app/views/machine_list',
@@ -93,7 +92,6 @@ define( 'app', [
                 EditBackend,
                 MachineList,
                 ImageList,
-                EnableBackendButton,
                 MachineAddDialog,
                 MachineView,
                 MachineListView,
@@ -332,7 +330,6 @@ define( 'app', [
             App.EditBackendView = EditBackend;
             App.MachineListView = MachineList;
             App.ImageListView = ImageList;
-            App.EnableBackendButtonView = EnableBackendButton;
             App.DeleteTagView = DeleteTagView;
             App.KeyListView = KeyList;
             App.RuleView = RuleView;
