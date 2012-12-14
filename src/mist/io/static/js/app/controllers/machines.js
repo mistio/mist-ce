@@ -23,6 +23,7 @@ define('app/controllers/machines', [
             refresh: function(){
 
                 if(!this.backend.enabled){
+                    this.backend.set('state', 'offline');
                     this.clear();
                     return;
                 }
@@ -90,7 +91,12 @@ define('app/controllers/machines', [
                         }
                     });
 
-                    that.backend.set('state', 'online');
+                    if(that.backend.enabled){
+                        that.backend.set('state', 'online');
+                    } else {
+                        that.backend.set('state', 'offline');
+                    }
+                    
                     Mist.backendsController.getMachineCount()
 
                     Ember.run.later(that, function(){
