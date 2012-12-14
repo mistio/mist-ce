@@ -48,19 +48,22 @@ define('app/models/backend', [
             },
             
             toggle: function(){
-                if (!this.enabled || !this.enabled.value){
+                if (!this.enabled){
                     this.set('state', "offline");
                     this.machines.clear();
                     this.images.clear();
                     this.sizes.clear();
                     this.locations.clear();
                 } else {
-                    this.set('state','waiting');
+                    this.set('state', 'waiting');
                     this.machines.refresh();
                     this.images.init();
                     this.sizes.init();
                     this.locations.init();
                 }
+                Ember.run.next(function(){
+                    $('.backend-toggle').slider('refresh');
+                })
             }.observes('enabled')
         
         });

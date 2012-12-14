@@ -41,6 +41,13 @@ define('app/views/backend_edit', [
                 });
             },
 
+            toggleBackend: function(){
+                Mist.backend.set('enabled',!Mist.backend.enabled);
+                Ember.run.next(function(){
+                    $('.backend-toggle').slider('refresh');
+                });
+            },
+            
             init: function() {
                 this._super();
                 // cannot have template in home.pt as pt complains

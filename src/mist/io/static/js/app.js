@@ -322,11 +322,6 @@ define( 'app', [
                 ],
             });
 
-            App.FlipOption = Ember.SelectOption.extend({
-                defaultTemplate: Ember.Handlebars.compile('{{unbound view.label}}'),
-                attributeBindings: ['value']
-            });
-
             Ember.TextArea.reopen({
                 attributeBindings: ["name", "placeholder", "id"]
               });
@@ -342,9 +337,6 @@ define( 'app', [
             App.KeyListView = KeyList;
             App.RuleView = RuleView;
             App.UserMenuView = UserMenuView;
-
-            App.onOff = [{'value': 0, 'label': 'Disabled'},
-                         {'value': 1, 'label': 'Enabled'}];
 
             var machineView = MachineView.create();
             machineView.append();

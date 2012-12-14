@@ -3,7 +3,10 @@
     <span class='name'>{{backend.title}}</span>
 </div>
 <div data-role="fieldcontain">
-    {{view Mist.EnableBackendButtonView contentBinding="Mist.onOff" selectionBinding="backend.enabled"}}
+    <select class="backend-toggle" data-role="slider" {{action "toggleBackend" on="change"}}>
+        <option value="0">Disabled</option>
+        <option value="1" {{bindAttr selected="backend.enabled"}}>Enabled</option>
+    </select>
     <span class="state">{{backend.state}}</span>          
 </div>
 

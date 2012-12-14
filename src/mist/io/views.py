@@ -88,9 +88,7 @@ def list_backends(request):
                     'region': backend.get('region', None),
                     # for Provider.RACKSPACE (the new Nova provider)
                     'datacenter': backend.get('datacenter', None),
-                    'enabled': backend.get('enabled', True) and \
-                        {'value': 1, 'label':'Enabled'} or \
-                        {'value': 0, 'label':'Disabled'},
+                    'enabled': backend.get('enabled', True),
                      })
 
     return ret
