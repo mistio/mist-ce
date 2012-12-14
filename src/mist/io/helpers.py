@@ -294,6 +294,7 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
     env.host_string = host
     env.warn_only = True
     env.combine_stderr = True
+    env.keepalive = 15
 
     try:
         cmd_output = run(command)
