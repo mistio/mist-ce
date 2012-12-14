@@ -146,16 +146,25 @@ define('app/views/machine', [
                 return 'provider-' + this.machine.backend.provider;
             }.property('machine'),
 
-            setGraph: function() {
-
-                Em.run.next(function() {
-                    $('.monitoring-button').button();
-                    $('.add-rule-button').button();
-                    // The last() are only usefull for the add rule prototype
+            addRuleClicked: function() {
+                Mist.rulesController.newRule();
+                Ember.run.next(function(){
                     $('.rule-metric').last().selectmenu();
                     $('.rule-operator').last().selectmenu();
                     $('.rule-value').last().slider();
                     $('.rule-action').last().selectmenu();
+                });    
+            },
+            
+            setGraph: function() {
+
+                Em.run.next(function() {
+                    $('.monitoring-button').button();
+                    $('#add-rule-button').button();
+                    $('.rule-metric').selectmenu();
+                    $('.rule-operator').selectmenu();
+                    $('.rule-value').slider();
+                    $('.rule-action').selectmenu();                    
                 });
 
                 if (!this.machine || !this.machine.hasMonitoring) {

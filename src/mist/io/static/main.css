@@ -621,7 +621,7 @@ div.pending-monitoring {
 }
 
 .monitoring-button {
-    width: 26ex;
+    max-width: 26ex;
     margin: 0 auto;
 }
 
@@ -632,13 +632,16 @@ div.pending-monitoring {
 }
 
 .add-rule-button {
-    width: 13ex;
     margin: 0;
 }
 
 .add-rule-container {
     padding: 15px;
-    background: #e6e6e7;
+}
+
+.add-rule-container div {
+    max-width: 26ex;
+    margin: 0 auto;
 }
 
 .rules-container {
@@ -1006,6 +1009,16 @@ div.cost {
 .ui-autocomplete .ui-menu-item a {
     padding: .2em .4em .2em 1.6em;
     font-size: 16px;
+}
+
+.logout-link {
+    float: right;
+    text-decoration: none;
+}
+
+img.gravatar-image {
+    float: left;
+    margin-right: 10px;
 }
 
 /* Conditional for < 720px */

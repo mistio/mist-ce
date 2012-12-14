@@ -14,6 +14,7 @@
     <script tal:content="string: var URL_PREFIX='${core_uri}'" />
     <script tal:content="string: var SUPPORTED_PROVIDERS=${supported_providers}" />
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
+    <script tal:content="string: var EMAIL='${email}'" />
     <script src="static/js/lib/require/require.js"></script>
     <script tal:condition="js_build">
         require.config({

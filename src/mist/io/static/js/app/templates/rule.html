@@ -1,0 +1,43 @@
+<div class="rule-box">
+    <div class="rule-if">if</div>
+
+    <select class="rule-metric"
+        data-icon="false"
+        data-native-menu="false"
+        data-inline="true">
+        <option value="load">load</option>
+        <option value="cpu">cpu</option>
+        <option value="memory">memory</option>
+        <option value="disk">disk</option>
+        <option value="network">network</option>
+    </select>
+
+    <select class="rule-operator"
+        data-icon="false"
+        data-native-menu="false"
+        data-inline="true">
+        <option value="gt">&gt;</option>
+        <option value="lt">&lt;</option>
+    </select>
+
+    <input type="number"
+        data-type="range"
+        data-highlight="true"
+        class="rule-value"
+        value="60"
+        min="0"
+        max="100" />
+
+    <div class="rule-then">then</div>
+
+    <select class="rule-action"
+        data-icon="false"
+        data-native-menu="false"
+        data-inline="true">
+        <option value="alert">alert</option>
+        <option value="reboot">reboot</option>
+        <option value="destroy">destroy</option>
+        <option value="launch">launch</option>
+        <option value="command">command</option>
+    </select>
+</div>

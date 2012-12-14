@@ -8,12 +8,14 @@
     
 <div id="dialog-providers" class="mist-dialog" data-role="popup">
     <div data-role="content" data-theme="b">
-        {{#each Mist.backendsController}}
-            <div class='backend-title'>
-                <label>{{this.title}}: </label><span>{{this.state}}</span>
-            </div>
-        {{/each}}
-        </ul>
-        <a href="#logout" data-role="button">Logout</a>
+        {{#if email}}
+        <img class="gravatar-image" {{bindAttr src="gravatarURL"}} />
+        {{email}}
+        {{/if}}
+        <p>Everything is OK!</p>
+
+        {{#if email}}
+        <a href="logout" class="logout-link" data-ajax="false">Logout</a>
+        {{/if}}
     </div>
 </div>

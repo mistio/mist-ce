@@ -196,6 +196,10 @@ define('app/models/machine', [
                 var that = this;
 
                 function uptimeTimeout() {
+                    if (!that.backend) {
+                        return false;
+                    }
+                    
                     if (that.state == 'running') {
                         var host = that.getHost();
                         if (host) {

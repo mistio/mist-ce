@@ -24,7 +24,7 @@ define('app/views/backend_edit', [
             deleteConfirmButtonClick: function(){
                 var that = this;
                 $.ajax({
-                    url: '/backends/' + this.backend.index,
+                    url: '/backends/' + this.backend.id,
                     type: 'DELETE',
                     success: function(result) {
                         history.back();

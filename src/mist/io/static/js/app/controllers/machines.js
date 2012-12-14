@@ -22,20 +22,15 @@ define('app/controllers/machines', [
 
             refresh: function(){
 
-                if(!this.backend.enabled.value){
+                if(!this.backend.enabled){
                     this.clear();
                     return;
                 }
 
                 var that = this;
 
-                if (this.backend.state == 'online' || this.backend.state == 'waiting-ok'){
-                    this.backend.set('state', 'waiting-ok');
-                } else if (this.backend.state == 'error'|| this.backend.state == 'waiting-error' ){
-                    this.backend.set('state', 'waiting-error');
-                } else {
-                    this.backend.set('state', 'waiting');
-                }
+                
+                this.backend.set('state', 'waiting');
 
                 $.getJSON('/backends/' + this.backend.id + '/machines', function(data) {
 

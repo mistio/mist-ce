@@ -44,122 +44,21 @@
                 <div id="networkGraph"></div>
                 <div id="diskGraph"></div>
                 <div id="memoryGraph"></div>
-
-                <h4 class="monitoring-rules-title">Rules</h4>
-
+                
+                <div class="rules-container">
+                {{#each Mist.rulesController}}
+                    {{view Mist.RuleView ruleBinding="this"}}
+                {{/each}}                    
+                </div>
+                
                 <div class="add-rule-container">
-                    <a href="#add-rule"
-                        class="add-rule-button"
+                    <button id="add-rule-button"
                         data-role="button"
                         data-icon="plus"
-                        data-theme="b">Add</a>
+                        data-theme="b"
+                        {{action "addRuleClicked"}}>Add Rule</button>
                 </div>
-
-                <script>
-                    // this is only usefull for the add rule prototype
-                    $(document).on( 'click', '.add-rule-container', function() {
-                        $('.rule-box.template').clone()
-                                               .removeClass('template')
-                                               .appendTo('.rules-container')
-                                               .fadeIn();
-                        $('.rule-metric').last().selectmenu();
-                        $('.rule-operator').last().selectmenu();
-                        $('.rule-value').last().slider();
-                        $('.rule-action').last().selectmenu();
-                        return false;
-                    });
-                </script>
-
-                <div class="rules-container">
-                    <div class="rule-box template">
-                        <div class="rule-if">if</div>
-
-                        <select class="rule-metric"
-                            data-icon="false"
-                            data-native-menu="false"
-                            data-inline="true">
-                            <option value="load">load</option>
-                            <option value="cpu">cpu</option>
-                            <option value="memory">memory</option>
-                            <option value="disk">disk</option>
-                            <option value="network">network</option>
-                        </select>
-
-                        <select class="rule-operator"
-                            data-icon="false"
-                            data-native-menu="false"
-                            data-inline="true">
-                            <option value="lt">&lt;</option>
-                            <option value="gt">&gt;</option>
-                        </select>
-
-                        <input type="number"
-                            data-type="range"
-                            data-highlight="true"
-                            class="rule-value"
-                            value="60"
-                            min="0"
-                            max="100" />
-
-                        <div class="rule-then">then</div>
-
-                        <select class="rule-action"
-                            data-icon="false"
-                            data-native-menu="false"
-                            data-inline="true">
-                            <option value="alert">alert</option>
-                            <option value="reboot">reboot</option>
-                            <option value="destroy">destroy</option>
-                            <option value="launch">launch</option>
-                            <option value="command">command</option>
-                        </select>
-                    </div>
-
-                    <div class="rule-box">
-                        <div class="rule-if">if</div>
-
-                        <select class="rule-metric"
-                            data-icon="false"
-                            data-native-menu="false"
-                            data-inline="true">
-                            <option value="load">load</option>
-                            <option value="cpu">cpu</option>
-                            <option value="memory">memory</option>
-                            <option value="disk">disk</option>
-                            <option value="network">network</option>
-                        </select>
-
-                        <select class="rule-operator"
-                            data-icon="false"
-                            data-native-menu="false"
-                            data-inline="true">
-                            <option value="lt">&lt;</option>
-                            <option value="gt">&gt;</option>
-                        </select>
-
-                        <input type="number"
-                            data-type="range"
-                            data-highlight="true"
-                            class="rule-value"
-                            value="60"
-                            min="0"
-                            max="100" />
-
-                        <div class="rule-then">then</div>
-
-                        <select class="rule-action"
-                            data-icon="false"
-                            data-native-menu="false"
-                            data-inline="true">
-                            <option value="alert">alert</option>
-                            <option value="reboot">reboot</option>
-                            <option value="destroy">destroy</option>
-                            <option value="launch">launch</option>
-                            <option value="command">command</option>
-                        </select>
-                    </div>
-                </div>
-
+                
                 <div class="monitoring-dialog-container">
                     <a href="#monitoring-dialog"
                         class="monitoring-button"

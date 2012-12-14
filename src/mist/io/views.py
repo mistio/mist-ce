@@ -43,10 +43,14 @@ def home(request):
     """Gets all the basic data for backends, project name and session status.
     """
     try:
-        request.environ['beaker.session']['backends']
+        email = request.environ['beaker.session']['email']
         session = True
     except:
         session = False
+        try:
+            email = request.registry.settings['email']
+        except:
+            email = ''
 
     core_uri = request.registry.settings['core_uri']
     js_build = request.registry.settings['js_build']
@@ -54,6 +58,7 @@ def home(request):
 
     return {'project': 'mist.io',
             'session': session,
+            'email': email,
             'supported_providers': SUPPORTED_PROVIDERS,
             'core_uri': core_uri,
             'js_build': js_build,
@@ -556,7 +561,10 @@ def delete_machine_metadata(request):
              renderer='json')
 def shell_command(request):
     """Send a shell command to a machine over ssh, using fabric."""
-    conn = connect(request)
+    try:
+        conn = connect(request)
+    except:
+        return Response('Backend not found', 404)
     machine_id = request.matchdict['machine']
     host = request.params.get('host', None)
     ssh_user = request.params.get('ssh_user', None)

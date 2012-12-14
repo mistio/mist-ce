@@ -51,49 +51,49 @@ define('app/controllers/backends', [
                 });
 
                 Ember.run.next(function(){
-                $.getJSON('/backends', function(data) {
-                    data.forEach(function(item){
-                        that.pushObject(Backend.create(item));
-                    });
-                    that.content.forEach(function(item){
-                        item.machines.addObserver('length', function() {
-                            that.getMachineCount();
+                    $.getJSON('/backends', function(data) {
+                        data.forEach(function(item){
+                            that.pushObject(Backend.create(item));
                         });
-
-                        item.machines.addObserver('@each.selected', function() {
-                            that.getSelectedMachineCount();
-                        });
-
-                        item.images.addObserver('length', function() {
-                            that.getImageCount();
-                        });
-
-                        item.addObserver('state', function(){
-                            var waiting = false;
-                            var state = "ok";
-
-                            that.content.forEach(function(backend){
-                                if(backend.state == 'waiting'){
-                                    waiting = true;
-                                } else if(backend.state == 'offline'){
-                                    state = 'error';
-                                } else if(backend.state == 'off'){
-                                    state = 'down';
-                                }
+                        that.content.forEach(function(item){
+                            item.machines.addObserver('length', function() {
+                                that.getMachineCount();
                             });
-
-                            if(waiting){
-                                state = 'state-wait-' + state;
-                            } else {
-                                state = 'state-' + state;
-                            }
-                            info('setting backends state: ' + state);
-                            that.set('state', state);
+    
+                            item.machines.addObserver('@each.selected', function() {
+                                that.getSelectedMachineCount();
+                            });
+    
+                            item.images.addObserver('length', function() {
+                                that.getImageCount();
+                            });
+    
+                            item.addObserver('state', function(){
+                                var waiting = false;
+                                var state = "ok";
+    
+                                that.content.forEach(function(backend){
+                                    if(backend.state == 'waiting'){
+                                        waiting = true;
+                                    } else if(backend.state == 'offline'){
+                                        state = 'error';
+                                    } else if(backend.state == 'off'){
+                                        state = 'down';
+                                    }
+                                });
+    
+                                if(waiting){
+                                    state = 'state-wait-' + state;
+                                } else {
+                                    state = 'state-' + state;
+                                }
+                                info('setting backends state: ' + state);
+                                that.set('state', state);
+                            });
                         });
+                    }).error(function() {
+                        Mist.notificationController.notify("Error loading backends");
                     });
-                }).error(function() {
-                    Mist.notificationController.notify("Error loading backends");
-                });
                 });
             }
         });

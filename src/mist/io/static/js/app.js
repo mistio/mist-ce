@@ -12,11 +12,12 @@ require.config({
         ember: 'lib/ember-0.9.8.1',
         mobile: 'lib/jquery.mobile-1.2.0',
         d3: 'lib/d3-2.10.1',
-        cubism: 'lib/cubism-1.2.2'
+        cubism: 'lib/cubism-1.2.2',
+        md5: 'lib/md5'
     },
     shim: {
         'ember': {
-            deps: ['jquery']
+            deps: ['jquery', 'md5']
         },
         'jqueryUi': {
             deps: ['jquery']
@@ -46,6 +47,7 @@ define( 'app', [
     'app/controllers/select_machines',
     'app/controllers/select_images',
     'app/controllers/keys',
+    'app/controllers/rules',    
     'app/views/count',
     'app/views/backend_button',
     'app/views/backend_add',
@@ -68,6 +70,7 @@ define( 'app', [
     'app/views/key_list',
     'app/views/key',
     'app/views/key_add_dialog',
+    'app/views/rule',
     'app/views/user_menu',
     'mobile',
     'cubism',
@@ -83,6 +86,7 @@ define( 'app', [
                 SelectMachinesController,
                 SelectImagesController,
                 KeysController,
+                RulesController,
                 Count,
                 BackendButton,
                 AddBackend,
@@ -105,6 +109,7 @@ define( 'app', [
                 KeyListView,
                 KeyView,
                 KeyAddDialog,
+                RuleView,
                 UserMenuView,
                 Mobile,
                 cubism
@@ -178,6 +183,11 @@ define( 'app', [
                             'keysController',
                             KeysController.create()
                         );
+                        
+                    this.set(
+                            'rulesController',
+                            RulesController.create()
+                        );                        
 
                     this.set(
                             'keyAddController',
@@ -330,6 +340,7 @@ define( 'app', [
             App.EnableBackendButtonView = EnableBackendButton;
             App.DeleteTagView = DeleteTagView;
             App.KeyListView = KeyList;
+            App.RuleView = RuleView;
             App.UserMenuView = UserMenuView;
 
             App.onOff = [{'value': 0, 'label': 'Disabled'},
