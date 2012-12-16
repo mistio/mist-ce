@@ -103,9 +103,14 @@ define('app/controllers/machines', [
                         this.refresh();
                     }, that.backend.poll_interval);
                     
+                    if (that.backend.error) {
+                        that.backend.set('error', false);
+                    }
+                    
                 }).error(function(e) {
                     Mist.notificationController.notify("Error loading machines for backend: " +
                                                         that.backend.title);
+                    that.backend.set('error', e);
                     if (that.backend.state.search('error')==-1) {
                         // Mark error but try once again
                         that.backend.set('state', 'error');
@@ -163,12 +168,16 @@ define('app/controllers/machines', [
                     success: function(data) {
                         info('Successfully sent create machine', name, 'to backend',
                                     that.backend.title);
+                        if (that.backend.error) {
+                            that.backend.set('error', false);
+                        }                                    
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while sending create machine' +
                                 name + ' to backend ' + that.backend.title);
-                        error(textstate, errorThrown, 'while checking key of machine', that.name);
+                        error(textstate, errorThrown, 'while creating machine', that.name);
                         that.removeObject(machine);
+                        that.backend.set('error', textstate);
                     }
                 });
             }

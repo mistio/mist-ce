@@ -23,6 +23,13 @@ define('app/controllers/sizes', [
                         content.push(Size.create(item));
                     });
                     that.set('content', content);
+                    if (that.backend.error){
+                        that.backend.set('error', false);
+                    }
+                }).error(function() {
+                    Mist.notificationController.notify("Error loading sizes for backend: " +
+                                                        that.backend.title);
+                    that.backend.set('error', "Error loading sizes");
                 });
             }
         });

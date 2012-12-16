@@ -53,6 +53,9 @@ define('app/controllers/images', [
                     that.set('content', content);
                     Mist.backendsController.getImageCount();
                     that.backend.set('state', 'online');
+                    if (that.backend.error){
+                        that.backend.set('error', false);
+                    }
                 }).error(function() {
                     Mist.notificationController.notify("Error loading images for backend: " + that.backend.title);
                     if (that.backend.state == 'online') {
@@ -65,7 +68,8 @@ define('app/controllers/images', [
                         // This backend seems hopeless, disabling it                            
                         that.backend.set('state', 'offline');
                         that.backend.set('enabled', {'value': 0, 'label':'Disabled'});
-                    }                  
+                    }        
+                    that.backend.set('error', "Error loading images");          
                 });
             }
         });

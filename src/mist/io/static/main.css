@@ -991,6 +991,7 @@ div.cost {
     color: #efeff1;
     padding: 6px;
     text-shadow: none;
+    max-height: 40ex;
 }
 
 #dialog-shell.dialog-shell .ui-accordion .ui-accordion-header .ui-accordion-header-icon {

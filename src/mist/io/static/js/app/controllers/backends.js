@@ -73,11 +73,11 @@ define('app/controllers/backends', [
                                 var state = "ok";
     
                                 that.content.forEach(function(backend){
-                                    if(backend.state == 'waiting'){
+                                    if (backend.error) {
+                                        state = 'error';
+                                    } else if(backend.state == 'waiting'){
                                         waiting = true;
                                     } else if(backend.state == 'offline'){
-                                        state = 'error';
-                                    } else if(backend.state == 'off'){
                                         state = 'down';
                                     }
                                 });
