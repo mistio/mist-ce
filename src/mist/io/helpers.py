@@ -311,14 +311,23 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
                            driver=conn)
             conn.ex_create_tags(machine, {'ssh_user': username})
             env.user = username
+            cmd_output = run(command)
+    except Exception as e:
+        if 'SSH session not active' in e:
+            from fabric.state import connections
+            conn_keys = [k for k in connections.keys() if host in k]
+            for key in conn_keys:
+                del connections[key]
             try:
                 cmd_output = run(command)
+                log.warn("Recovered!")
             except Exception as e:
-                return Response('Exception while executing command: %s' % e,
-                                503)
-    except Exception as e:
-        log.error('Exception while executing command: %s' % e)
-        return Response('Exception while executing command: %s' % e, 503)
+                log.error("Failed to recover :(")  
+                log.error('Exception while executing command: %s' % e)
+                return Response('Exception while executing command: %s' % e, 503)
+        else:
+            log.error('Exception while executing command: %s' % e)
+            return Response('Exception while executing command: %s' % e, 503)            
     except SystemExit as e:
         log.warn('Got SystemExit: %s' % e)
         return Response('SystemExit: %s' % e, 204)
