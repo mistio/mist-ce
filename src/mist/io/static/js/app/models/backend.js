@@ -21,6 +21,7 @@ define('app/models/backend', [
             poll_interval: null,
             host: null,
             state: 'unknown',
+            waiting: false,
             enabled: null,
             machines: null,
             sizes: [],
@@ -39,6 +40,14 @@ define('app/models/backend', [
             isOff: function(){
                 return !this.isOn();
             },
+            
+            isWait: function() {
+                if (this.state == 'waiting'){
+                    this.set('waiting', true);
+                } else {
+                    this.set('waiting', false);
+                }
+            }.observes('state'),
             
             init: function() {
                 this._super();

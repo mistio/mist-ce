@@ -622,7 +622,7 @@ div.pending-monitoring {
 
 .monitoring-button {
     max-width: 26ex;
-    margin: 0 auto;
+    margin: 10px auto;
 }
 
 #machineGraph span {
@@ -639,9 +639,17 @@ div.pending-monitoring {
     padding: 15px;
 }
 
-.add-rule-container div {
+.monitoring-dialog-container div {
     max-width: 26ex;
     margin: 0 auto;
+}
+
+.monitoring-dialog-container.enabled div{
+    margin: 0;
+}
+
+.monitoring-dialog-container.enabled .monitoring-button{
+    float:right;
 }
 
 .rules-container {
@@ -1013,13 +1021,27 @@ div.cost {
 }
 
 .logout-link {
-    float: right;
+    text-align: right;
+}
+
+.logout-link a {
     text-decoration: none;
+}
+
+#dialog-providers-popup p {
+    width:250px;
+    overflow:hidden;
+    text-align: right;
 }
 
 img.gravatar-image {
     float: left;
-    margin-right: 10px;
+    margin: 5px;
+}
+
+div.userEmail {
+    font-weight: bold;
+    text-align: right;    
 }
 
 /* Conditional for < 720px */

@@ -51,15 +51,8 @@
                 {{/each}}                    
                 </div>
                 
-                <div class="add-rule-container">
-                    <button id="add-rule-button"
-                        data-role="button"
-                        data-icon="plus"
-                        data-theme="b"
-                        {{action "addRuleClicked"}}>Add Rule</button>
-                </div>
-                
-                <div class="monitoring-dialog-container">
+                <div class="monitoring-dialog-container enabled">   
+                                         
                     <a href="#monitoring-dialog"
                         class="monitoring-button"
                         data-role="button"
@@ -68,9 +61,15 @@
                         data-theme="a"
                         data-transition="slidedown"
                         data-position-to="window">Disable Monitoring</a>
+                        
+                    <button id="add-rule-button"
+                        data-role="button"
+                        data-icon="plus"
+                        data-theme="b"
+                        {{action "addRuleClicked"}}>Add Rule</button>                        
                     {{else}}
 
-                <div class="monitoring-dialog-container">
+                <div class="monitoring-dialog-container disabled">
                     <div class="monitoring-info">Monitoring is currently disabled</div>
 
                     <a href="#monitoring-dialog"

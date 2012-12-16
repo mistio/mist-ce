@@ -10,12 +10,21 @@
     <div data-role="content" data-theme="b">
         {{#if email}}
         <img class="gravatar-image" {{bindAttr src="gravatarURL"}} />
-        {{email}}
+        <div class="userEmail">{{email}}</div>
         {{/if}}
+        {{#if Mist.backendsController.ok}}
         <p>Everything is OK!</p>
-
+        {{/if}}
+        {{#each Mist.backendsController}}
+            {{#if this.error}}
+            Backend {{this.title}} is in error!
+            {{/if}}
+            {{#if this.waiting}}
+            <p>Waiting {{this.title}}</p>
+            {{/if}}
+        {{/each}}
         {{#if email}}
-        <a href="logout" class="logout-link" data-ajax="false">Logout</a>
+        <div class="logout-link"><a href="logout" data-ajax="false">Logout</a></div>
         {{/if}}
     </div>
 </div>

@@ -14,6 +14,15 @@ define('app/controllers/backends', [
             imageCount: 0,
             // TODO make this property dynamic according to all backends states
             state: "waiting",
+            ok: false,
+            
+            isOK: function() {
+                if(this.state == 'state-ok'){
+                    this.set('ok', true);
+                } else {
+                    this.set('ok', false);
+                }
+            }.observes('state'),
 
             getMachineCount: function(){
                 var count = 0;
@@ -87,7 +96,6 @@ define('app/controllers/backends', [
                                 } else {
                                     state = 'state-' + state;
                                 }
-                                info('setting backends state: ' + state);
                                 that.set('state', state);
                             });
                         });
