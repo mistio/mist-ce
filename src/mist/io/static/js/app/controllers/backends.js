@@ -102,6 +102,11 @@ define('app/controllers/backends', [
                     }).error(function() {
                         Mist.notificationController.notify("Error loading backends");
                     });
+                    Ember.run.next(function(){
+                        try {
+                            $('#home-menu').listview('refresh');
+                        } catch(e) { $('#home-menu').listview(); }
+                    });
                 });
             }
         });
