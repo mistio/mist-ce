@@ -153,6 +153,7 @@ define('app/views/machine', [
                     $('.rule-operator').last().selectmenu();
                     $('.rule-value').last().slider();
                     $('.rule-action').last().selectmenu();
+                    $('.delete-rule-button').last().button();
                 });    
             },
             
@@ -197,7 +198,7 @@ define('app/views/machine', [
                     }).done(function() { console.log('logged in'); });
                     */
 
-                    var context = cubism.context().serverDelay(0).clientDelay(0).step(5000).size($(window).width()-260);
+                    var context = cubism.context().serverDelay(0).clientDelay(0).step(5000).size($(window).width()-80);
                     that.context = context;
 
                     var localData = null;
@@ -260,7 +261,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('monitoring disabled'));
                             }
-                        }, 'Cpu: ');
+                        }, 'CPU');
                     }
 
                     function drawMemory() {
@@ -275,7 +276,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('unable to load data'));
                             }
-                        }, 'Memory: ');
+                        }, 'RAM');
                     }
 
                     function drawDisk(disk, ioMethod) {
@@ -293,7 +294,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('unable to load data'));
                             }
-                        }, 'Disk ' + disk + ' ' + ioMethod + ': ');
+                        }, 'DISK (' + disk + ', ' + ioMethod + ') ');
                     }
 
                     function drawLoad() {
@@ -305,7 +306,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('unable to load data'));
                             }
-                        }, 'Load: ');
+                        }, 'LOAD ');
                     }
 
                     function drawNetwork(iface, stream) {
@@ -323,7 +324,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('unable to load data'));
                             }
-                        }, 'Network (' + iface + ', ' + stream  + '): ');
+                        }, 'NET (' + iface + ', ' + stream  + ') ');
                     }
 
                     function configureNetworkGraphs() {

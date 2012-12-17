@@ -631,12 +631,33 @@ div.pending-monitoring {
     margin:5px;
 }
 
+.horizon span.title {
+    position:absolute;
+    left:0;
+    margin: 7px;
+    color: black;
+    text-shadow: none;
+}
+
+.horizon span.value {
+    right: 7px;
+    position: absolute;
+    margin: 7px;
+    color: black;
+    text-shadow: none;    
+}
+
 .add-rule-button {
     margin: 0;
 }
 
 .add-rule-container {
     padding: 15px;
+}
+
+.delete-rule-button {
+    float:right;
+    width:5ex;
 }
 
 .monitoring-dialog-container div {

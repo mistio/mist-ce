@@ -17,7 +17,7 @@
         {{/if}}
         {{#each Mist.backendsController}}
             {{#if this.error}}
-            Backend {{this.title}} is in error!
+            <p>Backend {{this.title}} is in error!</p>
             {{/if}}
             {{#if this.waiting}}
             <p>Waiting {{this.title}}</p>
