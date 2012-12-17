@@ -635,7 +635,7 @@ div.pending-monitoring {
     position:absolute;
     left:0;
     margin: 7px;
-    color: black;
+    color: #333;
     text-shadow: none;
 }
 
@@ -643,7 +643,7 @@ div.pending-monitoring {
     right: 7px;
     position: absolute;
     margin: 7px;
-    color: black;
+    color: #333;
     text-shadow: none;    
 }
 
@@ -1059,6 +1059,7 @@ div.userEmail {
 
 div.logout-placeholder {
     padding-top: 10px;
+    height: 30px;
 }
 
 .logout-button {
