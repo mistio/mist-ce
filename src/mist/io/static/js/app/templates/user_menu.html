@@ -5,7 +5,7 @@
     data-icon="check"
     data-iconpos="right"
     {{bindAttr class="Mist.backendsController.state :state-providers"}}>me</a>
-    
+
 <div id="dialog-providers" class="mist-dialog" data-role="popup">
     <div data-role="content" data-theme="b">
         {{#if email}}
@@ -24,7 +24,14 @@
             {{/if}}
         {{/each}}
         {{#if email}}
-        <div class="logout-link"><a href="logout" data-ajax="false">Logout</a></div>
+        <div class="logout-placeholder">
+            <a href="logout"
+                class="logout-button"
+                data-role="button"
+                data-mini="true"
+                data-theme="a"
+                data-ajax="false">Logout</a>
+        </div>
         {{/if}}
     </div>
 </div>

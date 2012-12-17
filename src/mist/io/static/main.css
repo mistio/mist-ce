@@ -1041,14 +1041,6 @@ div.cost {
     font-size: 16px;
 }
 
-.logout-link {
-    text-align: right;
-}
-
-.logout-link a {
-    text-decoration: none;
-}
-
 #dialog-providers-popup p {
     width:250px;
     overflow:hidden;
@@ -1062,7 +1054,16 @@ img.gravatar-image {
 
 div.userEmail {
     font-weight: bold;
-    text-align: right;    
+    text-align: right;
+}
+
+div.logout-placeholder {
+    padding-top: 10px;
+}
+
+.logout-button {
+    width: 70px;
+    float: right;
 }
 
 /* Conditional for < 720px */
