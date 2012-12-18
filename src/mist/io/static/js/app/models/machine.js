@@ -17,6 +17,7 @@ define('app/models/machine', [
             hasKey: false,
             hasMonitoring: null,
             pendingMonitoring: false,
+            pendingShell: false,
             state: 'stopped',
             stats:{'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
@@ -151,6 +152,7 @@ define('app/models/machine', [
                 var ssh_user = this.getUser();
                 var host = this.getHost();
 
+                this.set('pendingShell', true);
                 var that = this;
                 if (host) {
                     $.ajax({
@@ -166,12 +168,14 @@ define('app/models/machine', [
                             }
                             info('Successfully sent shell command', shell_command, 'to machine',
                                     that.name, 'with result:\n', data);
+                            that.set('pendingShell', false);
                         },
                         error: function(jqXHR, textstate, errorThrown) {
                             Mist.notificationController.notify('Error sending shell command ' +
                                     shell_command + ' to machine ' + that.name);
                             error(textstate, errorThrown, 'when sending shell command',
                                     shell_command, 'to machine', that.name);
+                            that.set('pendingShell', false);
                         }
                     });
                 }
