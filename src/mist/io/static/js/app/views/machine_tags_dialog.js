@@ -47,6 +47,7 @@ define('app/views/machine_tags_dialog',[
                     'tag' : tag
                 };
 
+                machine.set('pendingTag', true);
                 $.ajax({
                     url: 'backends/' + machine.backend.id + '/machines/' + machine.id + '/metadata',
                     type: 'POST',
@@ -54,11 +55,14 @@ define('app/views/machine_tags_dialog',[
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully added tag to machine', machine.name);
+                        machine.set('pendingTag', false);
+
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while adding tag to machine ' + machine.name);
                         error(textstate, errorThrown, 'while adding tag to machine machine', machine.name);
                         machine.tags.removeObject(tag);
+                        machine.set('pendingTag', false);
                     }
                 });
             },
@@ -77,8 +81,7 @@ define('app/views/machine_tags_dialog',[
 
             init: function() {
                 this._super();
-                this.set('template', Ember.Handlebars
-                        .compile(machine_tags_dialog_html));
+                this.set('template', Ember.Handlebars.compile(machine_tags_dialog_html));
             }
         });
     }

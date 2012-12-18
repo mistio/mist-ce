@@ -18,6 +18,7 @@ define('app/models/machine', [
             hasMonitoring: null,
             pendingMonitoring: false,
             pendingShell: false,
+            pendingTag: false,
             state: 'stopped',
             stats:{'cpu': [], 'load': [], 'disk': []},
             graphdata: {},

@@ -9,7 +9,6 @@ define('app/views/delete_tag', [
      * @returns Class
      */
     function() {
-
         return Ember.View.extend({
             tagName: false,
 
@@ -20,7 +19,7 @@ define('app/views/delete_tag', [
             deleteTag: function() {
                 var tag = this.tag;
                 var machine = Mist.machine;
-                
+
                 machine.tags.removeObject(this.tag.toString());
 
                 log("tag to delete: " + tag);
