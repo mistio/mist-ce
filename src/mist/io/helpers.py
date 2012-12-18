@@ -15,7 +15,7 @@ from libcloud.compute.types import Provider
 from fabric.api import env
 from fabric.api import run
 
-from mist.io.config import EC2_PROVIDERS
+from mist.io.config import EC2_PROVIDERS, COMMAND_TIMEOUT
 
 
 log = logging.getLogger('mist.io')
@@ -297,7 +297,7 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
     env.keepalive = 15
 
     try:
-        cmd_output = run(command)
+        cmd_output = run(command, timeout=COMMAND_TIMEOUT)
         if 'Please login as the' in cmd_output:
             # for EC2 Amazon Linux machines, usually with ec2-user
             username = cmd_output.split()[4].strip('"')
@@ -311,7 +311,7 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
                            driver=conn)
             conn.ex_create_tags(machine, {'ssh_user': username})
             env.user = username
-            cmd_output = run(command)
+            cmd_output = run(command, timeout=COMMAND_TIMEOUT)
     except Exception as e:
         if 'SSH session not active' in e:
             from fabric.state import connections
@@ -319,7 +319,7 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
             for key in conn_keys:
                 del connections[key]
             try:
-                cmd_output = run(command)
+                cmd_output = run(command, timeout=COMMAND_TIMEOUT)
                 log.warn("Recovered!")
             except Exception as e:
                 log.error("Failed to recover :(")  
