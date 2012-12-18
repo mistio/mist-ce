@@ -933,6 +933,9 @@ div.cost {
     margin: 14px 0 4px 0;
 }
 
+#add-backend-popup {
+    min-width: 286px;
+}
 /* Tags Dialog */
 
 #dialog-tags {
