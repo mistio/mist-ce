@@ -648,7 +648,7 @@ div.pending-monitoring {
     position: absolute;
     margin: 7px;
     color: #333;
-    text-shadow: none;    
+    text-shadow: none;
 }
 
 .add-rule-button {
@@ -664,7 +664,7 @@ div.pending-monitoring {
 .add-rule-container {
     width: 50%;
     padding: 15px;
-    background: #e0e0e1;    
+    background: #e0e0e1;
 }
 
 .delete-rule-container {
@@ -982,6 +982,11 @@ div.cost {
 }
 
 /* Shell Dialog */
+
+#dialog-shell {
+    width: 500px;
+    max-width: 500px;
+}
 
 #dialog-shell.dialog-shell div.ui-field-contain {
     margin: 0px;

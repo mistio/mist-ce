@@ -1,4 +1,4 @@
-<div data-role="popup" id="dialog-shell" class="dialog-shell mist-dialog" data-overlay-theme="a" style="width: 500px; max-width:500px;">
+<div id="dialog-shell" class="dialog-shell mist-dialog" data-role="popup" data-overlay-theme="a">
     <div data-role="header">
         <h1>Shell</h1>
     </div>
@@ -6,9 +6,18 @@
         <div data-role="fieldcontain">
             <table class="shell-input">
                 <tr>
-                    <td>{{view Mist.ShellTextField autocapitalize="off" valueBinding="command" controllerBinding="this"}}</td>
+                    <td>
+                        {{view Mist.ShellTextField
+                            autocapitalize="off"
+                            valueBinding="command"
+                            controllerBinding="this"}}
+                    </td>
                     <td class="shell-send-wrapper">
-                        <a  data-icon="shell-return" data-role="button" data-iconpos="notext" {{action submit}} {{bindAttr class=":shell-send disabledClass"}}></a>
+                        <a data-icon="shell-return"
+                            data-role="button"
+                            data-iconpos="notext"
+                            {{action submit}}
+                            {{bindAttr class=":shell-send disabledClass"}}></a>
                     </td>
                 </tr>
             </table>
