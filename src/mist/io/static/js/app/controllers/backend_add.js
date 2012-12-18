@@ -15,6 +15,9 @@ define('app/controllers/backend_add', [
                 this.set('newBackendProvider', null);
                 this.set('newBackendKey', null);
                 this.set('newBackendSecret', null);
+                Ember.run.next(function(){
+                    $('#create-select-provider').selectmenu('refresh');
+                });
             },
 
             updateNewBackendReady: function() {

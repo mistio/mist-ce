@@ -11,6 +11,11 @@ define('app/views/backend_add', ['app/models/backend',
 
         return Ember.View.extend({
 
+            backClicked: function() {
+                Mist.backendAddController.newBackendClear();
+                history.back();
+            },
+
             addButtonClick: function(){
                 var that = this;
                 var payload = {
