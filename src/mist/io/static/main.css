@@ -605,6 +605,10 @@ div.actions div.ui-controlgroup-controls {
     padding: 0px;
 }
 
+#monitoring-wrapper div.ui-loader {
+    margin: 0 0 0 -12ex;
+}
+
 .monitoring-info {
     color: #444;
     text-align: center;
