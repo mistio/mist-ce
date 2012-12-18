@@ -18,7 +18,7 @@ define('app/models/machine', [
             hasMonitoring: null,
             pendingMonitoring: false,
             state: 'stopped',
-            stats:{ 'cpu': [], 'load': [], 'disk': []},
+            stats:{'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
 
             image: function() {
@@ -204,7 +204,7 @@ define('app/models/machine', [
                     if (!that.backend) {
                         return false;
                     }
-                    
+
                     if (that.state == 'running') {
                         var host = that.getHost();
                         if (host) {
@@ -256,7 +256,7 @@ define('app/models/machine', [
                     this.set('hasMonitoring', false);
                     return
                 }
-                
+
                 if (!Mist.authenticated) {
                     payload = {
                         'email': Mist.email,
@@ -358,7 +358,7 @@ define('app/models/machine', [
                     that.set('pendingMonitoring', false);
                 }
             },
-           
+
             init: function() {
                 this._super();
 

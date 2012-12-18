@@ -1,30 +1,31 @@
-define('app/views/shell', [ 'text!app/templates/shell.html', 'ember', 'jqueryUi' ],
+define('app/views/shell', [
+    'text!app/templates/shell.html',
+    'ember',
+    'jqueryUi'
+    ],
 /**
- * 
+ *
  * Shell dialog
- * 
+ *
  * @returns Class
  */
 function(shell_html) {
     return Ember.View.extend({
-        tagName : false,
-        machineBinding : 'Mist.machine',
+        tagName: false,
+        machineBinding: 'Mist.machine',
         shellOutputItems: Ember.ArrayController.create(),
-        
-        availableCommands: [ "dmesg", "uptime", "uname",
-                                  "ls", "reboot", "whoami", "ifconfig" ],
+        availableCommands: ["dmesg", "uptime", "uname", "ls", "reboot", "whoami", "ifconfig" ],
 
-        didInsertElement : function() {
-
-            if('localStorage' in window && window['localStorage'] !== null){
+        didInsertElement: function() {
+            if ('localStorage' in window && window['localStorage'] !== null) {
                 var stored = localStorage['shellHistory'];
-                if(stored){
+                if (stored) {
                     stored = stored.split(',');
-                    
+
                     var that = this;
-                    
-                    stored.forEach(function(cmd){
-                        if(that.availableCommands.indexOf(cmd) == -1){
+
+                    stored.forEach(function(cmd) {
+                        if (that.availableCommands.indexOf(cmd) == -1) {
                             that.availableCommands.push(cmd);
                         }
                     });
@@ -35,9 +36,9 @@ function(shell_html) {
             });
         },
 
-        submit : function() {
+        submit: function() {
             var machine = this.machine;
-            
+
             if (!machine || !machine.hasKey || !this.command) {
                 return;
             }
@@ -46,13 +47,13 @@ function(shell_html) {
             var command = this.command;
 
             this.machine.shell(command, function(output) {
-                
+
                 if(!that.shellOutputItems.content){
                     that.shellOutputItems.set('content', new Array());
                 }
-                
+
                 that.shellOutputItems.arrayContentWillChange(0, 0, 1);
-                
+
                 that.shellOutputItems.content.unshift({
                     command: "# " + command,
                     output: output.replace(/\n/g, '<br />'),
@@ -64,15 +65,15 @@ function(shell_html) {
                          $(".shell-return").accordion("destroy").accordion({ header: "h3", collapsible: true });
                     } catch(e) {
                          $(".shell-return").accordion({ header: "h3", collapsible: true });
-                    } 
-                    
+                    }
+
                 });
             });
             this.clear();
-            
-            if('localStorage' in window && window['localStorage'] !== null){
+
+            if ('localStorage' in window && window['localStorage'] !== null) {
                 var stored = localStorage['shellHistory'];
-                if(stored){
+                if (stored) {
                     stored = stored.split(',');
                 } else {
                     stored = new Array();
@@ -89,11 +90,11 @@ function(shell_html) {
             });
         },
 
-        clear : function() {
+        clear: function() {
             this.set('command', '');
         },
 
-        disabledClass : function() {
+        disabledClass: function() {
             if (this.command && this.command.length > 0) {
                 return '';
             } else {
@@ -101,7 +102,7 @@ function(shell_html) {
             }
         }.property('command'),
 
-        init : function() {
+        init: function() {
             this._super();
             // cannot have template in home.pt as pt complains
             this.set('template', Ember.Handlebars.compile(shell_html));
