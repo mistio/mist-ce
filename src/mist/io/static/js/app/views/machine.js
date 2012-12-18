@@ -154,9 +154,9 @@ define('app/views/machine', [
                     $('.rule-value').last().slider();
                     $('.rule-action').last().selectmenu();
                     $('.delete-rule-button').last().button();
-                });    
+                });
             },
-            
+
             setGraph: function() {
 
                 Em.run.next(function() {
@@ -165,7 +165,7 @@ define('app/views/machine', [
                     $('.rule-metric').selectmenu();
                     $('.rule-operator').selectmenu();
                     $('.rule-value').slider();
-                    $('.rule-action').selectmenu();                    
+                    $('.rule-action').selectmenu();
                 });
 
                 if (!this.machine || !this.machine.hasMonitoring) {
@@ -183,6 +183,8 @@ define('app/views/machine', [
                 var machine = this.machine;
                 var that = this;
 
+                machine.set('pendingStats', true);
+
                 Em.run.next(function() {
 
                     // log in first perhaps
@@ -199,7 +201,11 @@ define('app/views/machine', [
                     }).done(function() { console.log('logged in'); });
                     */
 
-                    var context = cubism.context().serverDelay(0).clientDelay(0).step(5000).size($(window).width()-80);
+                    var context = cubism.context()
+                                        .serverDelay(0)
+                                        .clientDelay(0)
+                                        .step(5000)
+                                        .size($(window).width() - 80);
                     that.context = context;
 
                     var localData = null;
@@ -214,21 +220,16 @@ define('app/views/machine', [
                             stop = +stop;
 
                             if (machine.hasMonitoring) {
-
-                                var url = URL_PREFIX +
-                                          '/backends/' +
-                                          machine.backend.id +
-                                          '/machines/' +
-                                          machine.id +
-                                          '/stats?&start=' +
-                                          (start / 1000) +
-                                          '&stop=' +
-                                          (stop / 1000) +
-                                          '&step=' +
-                                          step +
-                                          '&callback=?';
-
-                                $.getJSON(url, function(data) {
+                                $.ajax({
+                                    url: URL_PREFIX + '/backends/' + machine.backend.id +
+                                         '/machines/' + machine.id + '/stats',
+                                    type: 'GET',
+                                    dataType: 'jsonp',
+                                    data: {'start': (start / 1000),
+                                           'stop': (stop / 1000),
+                                           'step': step},
+                                    timeout: 500,
+                                    success: function(data) {
                                         if (!data || !('cpu' in data)) {
                                             return callback(new Error('unable to load data'));
                                         } else {
@@ -245,10 +246,12 @@ define('app/views/machine', [
                                             if (!disks) {
                                                 configureDiskGraphs();
                                             }
-
                                         }
-                                }).error(function(jqXHR, textStatus, errorThrown) {
-                                    error('could not load monitoring data');
+                                        machine.set('pendingStats', false);
+                                    },
+                                    error: function(jqXHR, textstate, errorThrown) {
+                                        error('could not load monitoring data');
+                                    }
                                 });
 
                                 if (localData && machine.hasMonitoring && cores) {
@@ -338,7 +341,12 @@ define('app/views/machine', [
                         }
 
                         d3.select('#networkGraph').call(function(div) {
-                            div.selectAll('.horizon').data(data).enter().append('div').attr('class', 'horizon').call(context.horizon().extent([0, 100]));
+                            div.selectAll('.horizon')
+                               .data(data)
+                               .enter()
+                               .append('div')
+                               .attr('class', 'horizon')
+                               .call(context.horizon().extent([0, 100]));
                             div.append('div').attr('class', 'rule').call(context.rule());
                         });
                     }
@@ -354,7 +362,12 @@ define('app/views/machine', [
                         }
 
                         d3.select('#diskGraph').call(function(div) {
-                            div.selectAll('.horizon').data(data).enter().append('div').attr('class', 'horizon').call(context.horizon().extent([0, 100]));
+                            div.selectAll('.horizon')
+                               .data(data)
+                               .enter()
+                               .append('div')
+                               .attr('class', 'horizon')
+                               .call(context.horizon().extent([0, 100]));
                             div.append('div').attr('class', 'rule').call(context.rule());
                         });
                     }
@@ -365,17 +378,32 @@ define('app/views/machine', [
 
                     d3.select('#cpuGraph').call(function(div) {
                         div.append('div').attr('class', 'axis').call(context.axis().orient('top'));
-                        div.selectAll('.horizon').data([cpu]).enter().append('div').attr('class', 'horizon').call(context.horizon().extent([0, 100]));
+                        div.selectAll('.horizon')
+                           .data([cpu])
+                           .enter()
+                           .append('div')
+                           .attr('class', 'horizon')
+                           .call(context.horizon().extent([0, 100]));
                         div.append('div').attr('class', 'rule').call(context.rule());
                     });
 
                     d3.select('#memoryGraph').call(function(div) {
-                        div.selectAll('.horizon').data([memory]).enter().append('div').attr('class', 'horizon').call(context.horizon().extent([0, 100]));
+                        div.selectAll('.horizon')
+                           .data([memory])
+                           .enter()
+                           .append('div')
+                           .attr('class', 'horizon')
+                           .call(context.horizon().extent([0, 100]));
                         div.append('div').attr('class', 'rule').call(context.rule());
                     });
 
                     d3.select('#loadGraph').call(function(div) {
-                        div.selectAll('.horizon').data([load]).enter().append('div').attr('class', 'horizon').call(context.horizon().extent([0, 100]));
+                        div.selectAll('.horizon')
+                           .data([load])
+                           .enter()
+                           .append('div')
+                           .attr('class', 'horizon')
+                           .call(context.horizon().extent([0, 100]));
                         div.append('div').attr('class', 'rule').call(context.rule());
                     });
 

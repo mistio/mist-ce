@@ -36,7 +36,7 @@
         <div data-role="collapsible" data-collapsed="false">
 
             <h3>Monitoring</h3>
-                <div id="monitoring-wrapper" class="ui-btn-inner ui-corner-top ui-corner-bottom">
+                <div id="monitoring-wrapper" {{bindAttr class=":ui-btn-inner :ui-corner-top :ui-corner-bottom machine.pendingStats"}}>
 
                 {{#if machine.hasMonitoring}}
                 <div id="cpuGraph"></div>
@@ -44,15 +44,15 @@
                 <div id="networkGraph"></div>
                 <div id="diskGraph"></div>
                 <div id="memoryGraph"></div>
-                
+
                 <div class="rules-container">
                 {{#each Mist.rulesController}}
                     {{view Mist.RuleView ruleBinding="this"}}
-                {{/each}}                    
+                {{/each}}
                 </div>
-                
 
-                <div class="monitoring-dialog-container enabled">                                            
+
+                <div class="monitoring-dialog-container enabled">
                     <a href="#monitoring-dialog"
                         class="monitoring-button"
                         data-role="button"
@@ -67,8 +67,8 @@
                         data-role="button"
                         data-icon="plus"
                         data-theme="b"
-                        {{action "addRuleClicked"}}>Add Rule</button>                    
-                </div>                                              
+                        {{action "addRuleClicked"}}>Add Rule</button>
+                </div>
                 {{else}}
 
                 <div class="monitoring-dialog-container disabled">

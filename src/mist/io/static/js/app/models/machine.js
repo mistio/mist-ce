@@ -20,6 +20,7 @@ define('app/models/machine', [
             pendingShell: false,
             pendingAddTag: false,
             pendingDeleteTag: false,
+            pendingStats: false,
             state: 'stopped',
             stats:{'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
