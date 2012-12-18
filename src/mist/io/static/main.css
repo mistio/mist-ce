@@ -622,7 +622,7 @@ div.pending-monitoring {
 
 .monitoring-button {
     max-width: 26ex;
-    margin: 10px auto;
+    margin: 0px auto;
 }
 
 #machineGraph span {
@@ -648,16 +648,28 @@ div.pending-monitoring {
 }
 
 .add-rule-button {
-    margin: 0;
+    margin: 0 auto;
+    max-width: 26ex;
+}
+
+.add-rule-container div {
+    max-width: 26ex;
+    margin: 0 auto;
 }
 
 .add-rule-container {
+    width: 50%;
     padding: 15px;
+    background: #e0e0e1;    
 }
 
-.delete-rule-button {
-    float:right;
-    width:5ex;
+.delete-rule-container {
+    float: right;
+    margin: 9px;
+}
+
+.delete-rule-container div.ui-btn span.ui-btn-inner {
+    padding-left: 9px;
 }
 
 .monitoring-dialog-container div {
@@ -665,12 +677,13 @@ div.pending-monitoring {
     margin: 0 auto;
 }
 
-.monitoring-dialog-container.enabled div{
-    margin: 0;
+.monitoring-dialog-container.enabled {
+    width: 50%;
+    float: right;
 }
 
-.monitoring-dialog-container.enabled .monitoring-button{
-    float:right;
+.monitoring-dialog-container.enabled div{
+    margin: 0 auto;
 }
 
 .rules-container {

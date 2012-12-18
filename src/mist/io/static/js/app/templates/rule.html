@@ -1,8 +1,16 @@
 <div class="rule-box">
     <div class="rule-if">if</div>
-
+    
+    {{!view Mist.Select contentBinding="metricList"
+        selectionBinding="rule.metric"
+        class="rule-metric"
+        id="rule-metric"
+        data-native-menu="false"
+        data-inline="true"}}
     <select class="rule-metric"
         data-icon="false"
+        class="rule-metric"
+        id="rule-metric"
         data-native-menu="false"
         data-inline="true">
         <option value="load">load</option>
@@ -11,25 +19,51 @@
         <option value="disk">disk</option>
         <option value="network">network</option>
     </select>
-
+    
+    {{!view Mist.Select contentBinding="operatorList"
+        optionLabelPath="content.title"
+        optionValuePath="content.id"    
+        selectionBinding="rule.operator"
+        class="rule-operator"
+        id="rule-operator"
+        data-native-menu="false"
+        data-icon="false"
+        data-inline="true"}}
     <select class="rule-operator"
         data-icon="false"
+        class="rule-operator"
+        id="rule-operator"
         data-native-menu="false"
         data-inline="true">
         <option value="gt">&gt;</option>
         <option value="lt">&lt;</option>
-    </select>
+    </select>        
 
+    {{!view Mist.TextField
+        valueBinding="rule.value"
+        type="number"
+        data-type="range"
+        data-highlight="true"
+        class="rule-value"
+        value="60"
+        min="0"
+        max="100"}}
     <input type="number"
         data-type="range"
         data-highlight="true"
         class="rule-value"
         value="60"
         min="0"
-        max="100" />
+        max="100" />        
 
     <div class="rule-then">then</div>
 
+    {{!view Mist.Select contentBinding="actionList"
+        selectionBinding="rule.action"
+        class="rule-action"
+        data-icon="false"
+        data-native-menu="false"
+        data-inline="true"}}       
     <select class="rule-action"
         data-icon="false"
         data-native-menu="false"
@@ -41,10 +75,12 @@
         <option value="command">command</option>
     </select>
     
-    <button class="delete-rule-button"
-            data-role="button"
-            data-icon="delete"
-            data-theme="b"
-            data-mini="true"
-            {{action "deleteRuleClicked"}}></button>         
+    <div class="delete-rule-container">
+        <button class="delete-rule-button"
+                data-role="button"
+                data-icon="delete"
+                data-theme="d"
+                data-mini="true"
+                {{action "deleteRuleClicked"}}>&nbsp;</button>
+    </div>
 </div>

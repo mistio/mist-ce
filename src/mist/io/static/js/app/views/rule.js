@@ -15,6 +15,22 @@ define('app/views/rule', [
                 // cannot have template in home.pt as pt complains
                 this.set('template', Ember.Handlebars.compile(rule_html));
             },
+            
+            deleteRuleClicked: function(){
+                Mist.rulesController.removeObject(this.rule);
+            },
+            
+            metricList: function() {
+                return ['load', 'cpu', 'ram', 'disk', 'network'];
+            }.property('metricList'),
+            
+            operatorList: function() {
+                return [{'id': 'gt', 'title': '&gt;'}, {'id': 'lt', 'title': '&lt;'}]
+            }.property('operatorList'),
+            
+            actionList: function() {
+                return ['alert', 'reboot', 'destroy', 'launch', 'command'];
+            }.property('actionList')
         });
     }
 );
