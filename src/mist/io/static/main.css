@@ -1071,6 +1071,17 @@ div.cost {
     background-color: #EFEFF1;
 }
 
+#dialog-shell .pending-shell {
+    background: url("images/ajax-loader.gif") no-repeat;
+    background-size: contain;
+    box-shadow: none;
+    border: none;
+}
+
+#dialog-shell .pending-shell span {
+    display:none;
+}
+
 .ui-autocomplete {
     -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     -moz-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
