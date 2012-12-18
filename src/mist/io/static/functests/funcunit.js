@@ -6861,6 +6861,7 @@ jQuery.extend({
 			type: "POST",
 			url: url,
 			data: data,
+            headers: { "cache-control": "no-cache" }
 			success: callback,
 			dataType: type
 		});
