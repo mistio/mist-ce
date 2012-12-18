@@ -20,8 +20,6 @@ define('app/views/delete_tag', [
                 var tag = this.tag;
                 var machine = Mist.machine;
 
-                machine.tags.removeObject(this.tag.toString());
-
                 log("tag to delete: " + tag);
 
                 var payload = {
@@ -36,13 +34,13 @@ define('app/views/delete_tag', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully deleted tag from machine', machine.name);
+                        machine.tags.removeObject(this.tag.toString());
                         machine.set('pendingDeleteTag', false);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while deleting tag from machine ' +
                                 machine.name);
                         error(textstate, errorThrown, 'while deleting tag from machine machine', machine.name);
-                        machine.tags.addObject(tag.toString());
                         machine.set('pendingDeleteTag', false);
                     }
                 });
