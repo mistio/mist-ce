@@ -42,6 +42,7 @@ define( 'app', [
     'app/controllers/backends',
     'app/controllers/confirmation',
     'app/controllers/notification',
+    'app/controllers/backend_add',
     'app/controllers/machine_add',
     'app/controllers/key_add',
     'app/controllers/select_machines',
@@ -80,6 +81,7 @@ define( 'app', [
                 BackendsController,
                 ConfirmationController,
                 NotificationController,
+                BackendAddController,
                 MachineAddController,
                 KeyAddController,
                 SelectMachinesController,
@@ -150,6 +152,11 @@ define( 'app', [
                     this.set(
                         'backendsController',
                         BackendsController.create()
+                    );
+
+                    this.set(
+                        'backendAddController',
+                        BackendAddController.create()
                     );
 
                     this.set(

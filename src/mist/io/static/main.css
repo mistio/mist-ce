@@ -1117,7 +1117,7 @@ div.logout-placeholder {
     width: 49.2%;
 }
 
-#backend-delete-yes, #backend-delete-no, #create-backend-cancel, #create-backend-ok {
+#backend-delete-yes, #backend-delete-no, #add-backend .ui-controlgroup-controls > div {
     width: 49.2%;
 }
 
