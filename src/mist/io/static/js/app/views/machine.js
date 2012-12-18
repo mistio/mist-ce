@@ -192,6 +192,7 @@ define('app/views/machine', [
                     $.ajax({
                         url: 'https://' + HOST + '/login?callback=?',
                         type: 'POST',
+                        headers: { "cache-control": "no-cache" },
                         dataType: 'jsonp',
                         data: {email : USER, password: PASSWORD},
                         async: false

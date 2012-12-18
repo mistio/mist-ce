@@ -165,6 +165,7 @@ define('app/controllers/machines', [
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
+                    headers: { "cache-control": "no-cache" },
                     success: function(data) {
                         info('Successfully sent create machine', name, 'to backend',
                                     that.backend.title);

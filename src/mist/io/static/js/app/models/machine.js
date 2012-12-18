@@ -32,6 +32,7 @@ define('app/models/machine', [
                 $.ajax({
                     url: '/backends/' + this.backend.id + '/machines/' + this.id,
                     type: 'POST',
+                    headers: { "cache-control": "no-cache" },
                     data: 'action=reboot',
                     success: function(data) {
                         that.set('state', 'rebooting');
@@ -53,6 +54,7 @@ define('app/models/machine', [
                 $.ajax({
                     url: '/backends/' + this.backend.id + '/machines/' + this.id,
                     type: 'POST',
+                    headers: { "cache-control": "no-cache" },
                     data: 'action=destroy',
                     success: function(data) {
                         that.set('state', 'pending');
@@ -74,6 +76,7 @@ define('app/models/machine', [
                 $.ajax({
                     url: 'backends/' + this.backend.id + '/machines/' + this.id,
                     type: 'POST',
+                    headers: { "cache-control": "no-cache" },
                     data: 'action=start',
                     success: function(data) {
                         that.set('state', 'pending');
@@ -95,6 +98,7 @@ define('app/models/machine', [
                 $.ajax({
                     url: 'backends/' + this.backend.id + '/machines/' + this.id,
                     type: 'POST',
+                    headers: { "cache-control": "no-cache" },
                     data: 'action=stop',
                     success: function(data) {
                         that.set('state', 'stopped');
@@ -152,6 +156,7 @@ define('app/models/machine', [
                     $.ajax({
                         url: '/backends/' + this.backend.id + '/machines/' + this.id + '/shell',
                         type: 'POST',
+                        headers: { "cache-control": "no-cache" },
                         data: {'host': host,
                                'ssh_user': ssh_user,
                                'command': shell_command},
@@ -208,6 +213,7 @@ define('app/models/machine', [
                             $.ajax({
                                 url: '/backends/' + that.backend.id + '/machines/' + that.id + '/shell',
                                 type: 'POST',
+                                headers: { "cache-control": "no-cache" },
                                 data: {'host': host,
                                    'ssh_user': ssh_user,
                                    'command': 'cat /proc/uptime'},
@@ -314,6 +320,7 @@ define('app/models/machine', [
                     $.ajax({
                         url: URL_PREFIX + '/backends/' + this.backend.id + '/machines/' + this.id + '/monitoring',
                         type: 'POST',
+                        headers: { "cache-control": "no-cache" },
                         contentType: 'application/json',
                         data: JSON.stringify(payload),
                         dataType: 'jsonp',

@@ -20,7 +20,7 @@ define('app/views/key_add_dialog', [
                     url: '/keys',
                     type: "POST",
                     contentType: "application/json",
-                    headers: { "cache-control": "no-cache" }
+                    headers: { "cache-control": "no-cache" },
                     dataType: "json",
                     success: function(result) {
                         Mist.keyAddController.set('newKeyPublic', result.public);

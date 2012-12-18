@@ -25,7 +25,7 @@ define('app/views/backend_add', ['app/models/backend',
                     type: "POST",
                     contentType: "application/json",
                     dataType: "json",
-                    headers: { "cache-control": "no-cache" }
+                    headers: { "cache-control": "no-cache" },
                     data: JSON.stringify(payload),
                     success: function(result) {
                         Mist.backendsController.pushObject(Backend.create(result));
