@@ -855,6 +855,14 @@ div.cost {
     display: none;
 }
 
+#create-ok-cancel .ui-controlgroup-controls {
+    width: 100%;
+}
+
+#create-ok-cancel .ui-btn {
+    width: 49.6%;
+}
+
 /* Provider (backend) state dialog */
 
 #edit-backend .content-header {
@@ -905,6 +913,14 @@ div.cost {
 
 #edit-backend #backend-delete-confirm {
     display: none;
+}
+
+#dialog-confirm .ui-controlgroup-controls {
+    width: 100%;
+}
+
+#dialog-confirm .btn-left-full, #dialog-confirm .btn-right-full {
+    width: 49.6%;
 }
 
 /* Add backend dialog */
@@ -1078,6 +1094,22 @@ div.logout-placeholder {
 .logout-button {
     width: 70px;
     float: right;
+}
+
+#add-backend .ui-controlgroup-horizontal, #add-backend .ui-controlgroup-controls {
+    width: 100%;
+}
+
+#dialog-add-key .ui-controlgroup-controls {
+    width: 100%;
+}
+
+#dialog-add-key .ui-corner-left, #dialog-add-key .ui-corner-right {
+    width: 49.2%;
+}
+
+#backend-delete-yes, #backend-delete-no, #create-backend-cancel, #create-backend-ok {
+    width: 49.2%;
 }
 
 /* Conditional for < 720px */
