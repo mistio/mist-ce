@@ -935,6 +935,11 @@ div.cost {
 
 /* Tags Dialog */
 
+#dialog-tags {
+    width: 400px;
+    max-width: 400px;
+}
+
 #dialog-tags label {
     margin: 10px 0;
 }

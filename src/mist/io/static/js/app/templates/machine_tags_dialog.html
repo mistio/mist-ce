@@ -1,4 +1,4 @@
-<div data-role="popup" id="dialog-tags" class="mist-dialog" data-overlay-theme="a" style="width: 400px; max-width:400px;">
+<div data-role="popup" id="dialog-tags" class="mist-dialog" data-overlay-theme="a">
     <div data-role="header">
         <h1>Manage Tags</h1>
     </div>
@@ -6,22 +6,41 @@
         <div id="tags-container">
             <table id="tag-input">
                 <tr>
-
-                    <td>{{view Mist.ShellTextField valueBinding="tag" controllerBinding="this"}}</td>
-                <td id="tag-add-wrapper"><a id="tag-add" data-role="button" data-theme="c" {{bindAttr class="disabledClass"}} {{action submit}}>Add</a></td>
+                    <td>
+                        {{view Mist.ShellTextField valueBinding="tag" controllerBinding="this"}}
+                    </td>
+                    <td id="tag-add-wrapper">
+                        <a id="tag-add"
+                            data-role="button"
+                            data-theme="c"
+                            {{bindAttr class="disabledClass"}}
+                            {{action submit}}>Add</a>
+                    </td>
                 </tr>
             </table>
             <div id="tags-wrapper">
                 <ul id="tags-list">
                 {{#each Mist.machine.tags}}
                     {{#view Mist.DeleteTagView tagBinding="this"}}
-                    <li><a data-role="button" class="tagButton" {{action deleteTag}} data-theme="c" data-icon="delete" data-inline="true" data-iconpos="notext" ></a>{{this.tag}}</li>
+                        <li>
+                            <a data-role="button"
+                                class="tagButton"
+                                {{action deleteTag}}
+                                data-theme="c"
+                                data-icon="delete"
+                                data-inline="true"
+                                data-iconpos="notext">{{this.tag}}</a>
+                        </li>
                     {{/view}}
                 {{/each}}
                 </ul>
             </div>
         </div>
-            <a id="tag-back" data-rel="back" data-role="button" data-transition="flip" data-theme="b">Close</a>
+            <a id="tag-back"
+                data-rel="back"
+                data-role="button"
+                data-transition="flip"
+                data-theme="b">Close</a>
     </div>
 </div>
 
