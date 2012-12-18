@@ -28,6 +28,7 @@ define('app/views/delete_tag', [
                     'tag': tag.toString()
                 };
 
+                machine.set('pendingDeleteTag', true);
                 $.ajax({
                     url: 'backends/' + machine.backend.id + '/machines/' + machine.id + '/metadata',
                     type: 'DELETE',
@@ -35,12 +36,14 @@ define('app/views/delete_tag', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully deleted tag from machine', machine.name);
+                        machine.set('pendingDeleteTag', false);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while deleting tag from machine ' +
                                 machine.name);
                         error(textstate, errorThrown, 'while deleting tag from machine machine', machine.name);
                         machine.tags.addObject(tag.toString());
+                        machine.set('pendingDeleteTag', false);
                     }
                 });
             }

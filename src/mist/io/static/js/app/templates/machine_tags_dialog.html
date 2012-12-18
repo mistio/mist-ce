@@ -13,7 +13,7 @@
                         <a id="tag-add"
                             data-role="button"
                             data-theme="c"
-                            {{bindAttr class="disabledClass this.machine.pendingTag"}}
+                            {{bindAttr class="disabledClass this.machine.pendingAddTag"}}
                             {{action submit}}>Add</a>
                     </td>
                 </tr>
@@ -29,7 +29,8 @@
                                 data-theme="c"
                                 data-icon="delete"
                                 data-inline="true"
-                                data-iconpos="notext"></a>
+                                data-iconpos="notext"
+                                {{bindAttr class="this.machine.pendingDeleteTag"}}></a>
                             {{this.tag}}
                         </li>
                     {{/view}}
