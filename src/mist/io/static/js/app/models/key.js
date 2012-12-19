@@ -1,4 +1,6 @@
-define('app/models/key', ['ember'],
+define('app/models/key', [
+    'ember'
+    ],
     /**
      * Key model
      *
@@ -6,13 +8,12 @@ define('app/models/key', ['ember'],
      */
     function() {
         return Ember.Object.extend({
-
             name: null,
             pub: null,
             priv: null,
-            
-            deleteKey: function(){
-                payload = {'name':this.name}
+
+            deleteKey: function() {
+                payload = {'name': this.name}
                 var that = this
                 $.ajax({
                     url: 'keys/' + that.name,
@@ -30,9 +31,7 @@ define('app/models/key', ['ember'],
                         error(textstate, errorThrown, 'while deleting key', that.name);
                     }
                 });
-                
             }
-
         });
     }
 );

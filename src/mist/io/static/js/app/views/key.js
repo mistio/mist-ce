@@ -20,7 +20,6 @@ define('app/views/key', [
 
                 Mist.confirmationController.set('callback', function() {
                     key.deleteKey();
-                    history.back();
                     $.mobile.changePage('#keys');
                 });
                 Mist.confirmationController.set('fromDialog', true);
@@ -28,9 +27,9 @@ define('app/views/key', [
             },
 
             displayPrivateKey: function(){
-                alert('priv');    
+                alert('priv');
             },
-            
+
             init: function() {
                 this._super();
                 // cannot have template in home.pt as pt complains
@@ -39,7 +38,7 @@ define('app/views/key', [
                     this.select();
                 });
                 $('.public-key input, .private-key input').live('change', function(){
-                   return false; 
+                   return false;
                 });
             },
         });

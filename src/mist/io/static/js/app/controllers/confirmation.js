@@ -16,8 +16,10 @@ define('app/controllers/confirmation', [
 
             confirm: function(){
                 this.callback();
-                window.history.go(-1);
-
+                // if confirm doesn't come from the keys section, searching is case sensitive
+                if (this.title.indexOf('Key') == -1) {
+                    window.history.go(-1);
+                }
                 this.set("callback", function(){});
             }
         });
