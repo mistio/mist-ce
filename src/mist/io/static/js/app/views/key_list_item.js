@@ -56,15 +56,12 @@ define('app/views/key_list_item', [
                             Mist.set('key', null);
                         } else if (len == 1) {
                             $('#keys .keys-footer').fadeIn(140);
-                            if (len == 1) {
-                                var keys = new Array();
-                                Mist.keysController.forEach(function(key) {
-                                    if (key.selected) {
-                                        keys.push(key);
-                                    }
-                                });
-                                Mist.set('key', keys[0]);
-                            }
+
+                            Mist.keysController.forEach(function(key) {
+                                if (key.selected) {
+                                    Mist.set('key', key);
+                                }
+                            });
                         } else {
                             $('#keys .keys-footer').fadeOut(200);
                             Mist.set('key', null);
