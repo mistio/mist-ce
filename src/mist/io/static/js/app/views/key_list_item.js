@@ -13,7 +13,7 @@ define('app/views/key_list_item', [
 
                 tagName:false,
 
-                checkBoxClick: function(event, el){
+                keyClick: function(event, el){
                     log('key clicked');
 
                     if (event.target.tagName != 'A') {
