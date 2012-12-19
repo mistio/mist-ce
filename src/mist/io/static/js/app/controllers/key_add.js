@@ -14,7 +14,6 @@ define('app/controllers/key_add', [
                 Mist.keysController.newKey(this.get('newKeyName'),
                                             this.get('newKeyPublic'),
                                             this.get('newKeyPrivate'));
-                Ember.run.next(function(){$('#keys-list').listview('refresh')});
             },
 
             newKeyClear: function() {
@@ -25,7 +24,6 @@ define('app/controllers/key_add', [
             },
 
             updateNewKeyReady: function() {
-
                 if (this.get('newKeyName') &&
                     this.get('newKeyPublic') &&
                     this.get('newKeyPrivate')) {

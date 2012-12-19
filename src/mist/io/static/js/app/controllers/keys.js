@@ -11,12 +11,12 @@ define('app/controllers/keys', [
      */
     function(Key) {
         return Ember.ArrayController.extend({
-            
+
             keyCount: 0,
-            
+
             init: function() {
                 this._super();
-                
+
                 var that = this;
 
                 $.getJSON('/keys', function(data) {
@@ -28,20 +28,16 @@ define('app/controllers/keys', [
                 }).error(function() {
                     Mist.notificationController.notify("Error loading keys");
                 });
-
             },
-            
-            newKey: function(name, publicKey, privateKey){
+
+            newKey: function(name, publicKey, privateKey) {
                 item = {
                     'name':name,
                     'pub': publicKey,
                     'priv': privateKey
                 }
-                var key = Key.create(item);
-                this.addObject(key);
-                
-                var that = this;
 
+                var that = this;
                 $.ajax({
                     url: 'keys/' + name,
                     type: 'PUT',
@@ -49,12 +45,16 @@ define('app/controllers/keys', [
                     data: JSON.stringify(item),
                     success: function(data) {
                         info('Successfully sent create key ', name);
+                        // don't keep private key on the client
+                        item.priv = null;
+                        var key = Key.create(item);
+                        that.addObject(key);
+                        Ember.run.next(function(){$('#keys-list').listview('refresh')});
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while sending create key'  +
                                 name);
                         error(textstate, errorThrown, 'while creating key', name);
-                        that.removeObject(key);
                     }
                 });
             }
