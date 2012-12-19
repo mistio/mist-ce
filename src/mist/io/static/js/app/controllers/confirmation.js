@@ -16,9 +16,14 @@ define('app/controllers/confirmation', [
 
             confirm: function(){
                 this.callback();
-                // if confirm doesn't come from the keys section, searching is case sensitive
-                if (this.title.indexOf('Key') == -1) {
+
+                var section = location.hash;
+                if (section != '#key&ui-state=dialog') {
+                    // if confirm doesn't come from the single key section, simply go back
                     window.history.go(-1);
+                } else {
+                    // when in single key view go to keys list view
+                    $.mobile.changePage('#keys');
                 }
                 this.set("callback", function(){});
             }
