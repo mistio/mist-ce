@@ -422,6 +422,10 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 100%;
 }
 
+#machines .machines-footer, #keys .keys-footer {
+    display: none;
+}
+
 .ui-footer div.actions {
     margin: 0.4em 0;
 }
