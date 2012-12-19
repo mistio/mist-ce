@@ -48,10 +48,10 @@ define('app/views/machine_add_dialog', [
                         });
                     });
 
-                    Mist.machineAddController.addObserver('newMachineReady', function(sender, machineReady, value, rev) {
+                    Mist.machineAddController.addObserver('newMachineReady', function() {
                         Ember.run.next(function() {
                             $('#create-ok').button();
-                            if (value) {
+                            if (Mist.machineAddController.newMachineReady) {
                                 $('#create-ok').button('enable');
                             } else {
                                 $('#create-ok').button('disable');
@@ -59,10 +59,10 @@ define('app/views/machine_add_dialog', [
                         });
                     });
 
-                    Mist.machineAddController.addObserver('newMachineNameReady', function(sender, machineReady, value, rev) {
+                    Mist.machineAddController.addObserver('newMachineNameReady', function() {
                         Ember.run.next(function(){
                             $('#dialog-add select').selectmenu();
-                            if (value) {
+                            if (Mist.machineAddController.newMachineNameReady) {
                                 $('#createmachine-select-provider').selectmenu('enable');
                                 $('#createmachine-select-image').selectmenu('disable');
                                 $('#createmachine-select-size').selectmenu('disable');
@@ -77,10 +77,10 @@ define('app/views/machine_add_dialog', [
                         });
                     });
 
-                    Mist.machineAddController.addObserver('newMachineBackendReady', function(sender, machineReady, value, rev) {
+                    Mist.machineAddController.addObserver('newMachineBackendReady', function() {
                         Ember.run.next(function(){
                             $('#dialog-add select').selectmenu();
-                            if (value) {
+                            if (Mist.machineAddController.newMachineBackendReady) {
                                 $('#createmachine-select-image').selectmenu('enable');
                                 $('#createmachine-select-size').selectmenu('disable');
                                 $('#createmachine-select-location').selectmenu('disable');
@@ -93,10 +93,10 @@ define('app/views/machine_add_dialog', [
                         });
                     });
 
-                    Mist.machineAddController.addObserver('newMachineImageReady', function(sender, machineReady, value, rev) {
+                    Mist.machineAddController.addObserver('newMachineImageReady', function() {
                         Ember.run.next(function(){
                             $('#dialog-add select').selectmenu();
-                            if (value) {
+                            if (Mist.machineAddController.newMachineImageReady) {
                                 $('#createmachine-select-size').selectmenu('enable');
                                 $('#createmachine-select-location').selectmenu('disable');
                             } else {
@@ -107,10 +107,10 @@ define('app/views/machine_add_dialog', [
                         });
                     });
 
-                    Mist.machineAddController.addObserver('newMachineSizeReady', function(sender, machineReady, value, rev) {
+                    Mist.machineAddController.addObserver('newMachineSizeReady', function() {
                         Ember.run.next(function(){
                             $('#dialog-add select').selectmenu();
-                            if (value) {
+                            if (Mist.machineAddController.newMachineSizeReady) {
                                 $('#createmachine-select-location').selectmenu('enable');
                             } else {
                                 $('#createmachine-select-location').selectmenu('disable');
@@ -119,10 +119,10 @@ define('app/views/machine_add_dialog', [
                         });
                     });
 
-                    Mist.machineAddController.addObserver('newMachineLocationReady', function(sender, machineReady, value, rev) {
+                    Mist.machineAddController.addObserver('newMachineLocationReady', function() {
                         Ember.run.next(function(){
                             $('#dialog-add select').selectmenu();
-                            if (value) {
+                            if (Mist.machineAddController.newMachineLocationReady) {
                                 $('#create-ok').button('enable');
                             } else {
                                 $('#create-ok').button('disable');
