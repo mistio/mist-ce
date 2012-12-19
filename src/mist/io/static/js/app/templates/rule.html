@@ -1,26 +1,14 @@
 <div class="rule-box">
     <div class="rule-if">if</div>
     
-    {{!view Mist.Select contentBinding="view.metricList"
+    {{view Mist.Select contentBinding="view.metricList"
         selectionBinding="view.rule.metric"
         class="rule-metric"
         id="rule-metric"
         data-native-menu="false"
         data-inline="true"}}
-    <select class="rule-metric"
-        data-icon="false"
-        class="rule-metric"
-        id="rule-metric"
-        data-native-menu="false"
-        data-inline="true">
-        <option value="load">load</option>
-        <option value="cpu">cpu</option>
-        <option value="memory">memory</option>
-        <option value="disk">disk</option>
-        <option value="network">network</option>
-    </select>
     
-    {{!view Mist.Select contentBinding="view.operatorList"
+    {{view Mist.Select contentBinding="view.operatorList"
         optionLabelPath="content.title"
         optionValuePath="content.id"    
         selectionBinding="view.rule.operator"
@@ -28,16 +16,7 @@
         id="rule-operator"
         data-native-menu="false"
         data-icon="false"
-        data-inline="true"}}
-    <select class="rule-operator"
-        data-icon="false"
-        class="rule-operator"
-        id="rule-operator"
-        data-native-menu="false"
-        data-inline="true">
-        <option value="gt">&gt;</option>
-        <option value="lt">&lt;</option>
-    </select>        
+        data-inline="true"}}        
 
     {{!view Mist.TextField
         valueBinding="view.rule.value"
@@ -58,22 +37,12 @@
 
     <div class="rule-then">then</div>
 
-    {{!view Mist.Select contentBinding="view.actionList"
+    {{view Mist.Select contentBinding="view.actionList"
         selectionBinding="view.rule.action"
         class="rule-action"
         data-icon="false"
         data-native-menu="false"
         data-inline="true"}}       
-    <select class="rule-action"
-        data-icon="false"
-        data-native-menu="false"
-        data-inline="true">
-        <option value="alert">alert</option>
-        <option value="reboot">reboot</option>
-        <option value="destroy">destroy</option>
-        <option value="launch">launch</option>
-        <option value="command">command</option>
-    </select>
     
     <div class="delete-rule-container">
         <button class="delete-rule-button"
