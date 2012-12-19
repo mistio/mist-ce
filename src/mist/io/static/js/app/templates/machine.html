@@ -8,7 +8,7 @@
             data-direction="reverse"
             class="ui-btn-left">Machines</a>
 
-        <h1 id="single-machine-name">{{name}}</h1>
+        <h1 id="single-machine-name">{{Mist.machine.name}}</h1>
 
         {{view Mist.UserMenuView}}
 
@@ -17,17 +17,17 @@
 
     <div class="single-view-header">
 
-        <h3 class="single-view-name">{{name}}</h3>
+        <h3 class="single-view-name">{{Mist.machine.name}}</h3>
 
         <span class="single-view-icon-wrapper">
             <span id="single-view-provider-icon" {{bindAttr class="providerIconClass"}}></span>
         </span>
 
-        <span class="single-view-icon-wrapper" {{bindAttr class="machine.image.type"}}>
+        <span class="single-view-icon-wrapper" {{bindAttr class="Mist.machine.image.type"}}>
             <span id="single-view-image-icon"></span>
         </span>
 
-        <h3 id="single-view-state" {{bindAttr class="machine.state"}}>{{machine.state}}</h3>
+        <h3 id="single-view-state" {{bindAttr class="Mist.machine.state"}}>{{Mist.machine.state}}</h3>
 
     </div>
 
@@ -38,7 +38,7 @@
             <h3>Monitoring</h3>
                 <div id="monitoring-wrapper" {{bindAttr class=":ui-btn-inner :ui-corner-top :ui-corner-bottom machine.pendingStats"}}>
 
-                {{#if machine.hasMonitoring}}
+                {{#if Mist.machine.hasMonitoring}}
                 <div id="cpuGraph"></div>
                 <div id="loadGraph"></div>
                 <div id="networkGraph"></div>
@@ -99,25 +99,25 @@
 
             <table id="machine-basic-table">
 
-                {{#if machine.tags}}
+                {{#if Mist.machine.tags}}
                 <tr>
                     <td class="key">Tags</td>
                     <td class="value">
-                        {{#each machine.tags}}
+                        {{#each Mist.machine.tags}}
                         <span class="tag">{{this}}</span>
                         {{/each}}
                     </td>
                 </tr>
                 {{/if}}
 
-                {{#if machine.uptime}}
+                {{#if Mist.machine.uptime}}
                 <tr>
                    <td class="key">Up and running for</td>
-                   <td class="value">{{upFor}}</td>
+                   <td class="value">{{view.upFor}}</td>
                 </tr>
                 {{/if}}
 
-                {{#each basicvars}}
+                {{#each view.basicvars}}
                 <tr>
                    <td class="key">{{key}}</td>
                    <td class="value">{{value}}</td>
@@ -133,7 +133,7 @@
             <h3>Full metadata list</h3>
 
             <table id="machine-metadata">
-                {{#each metadata}}
+                {{#each view.metadata}}
                 <tr>
                    <td class="key">{{key}}</td>
                    <td class="value">{{value}}</td>

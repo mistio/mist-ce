@@ -27,7 +27,7 @@ define('app/controllers/backends', [
             getMachineCount: function(){
                 var count = 0;
                 this.content.forEach(function(item){
-                    count = count + item.machines.get('length');
+                    count = count + item.machines.content.length;
                 });
                 this.set('machineCount', count);
             },

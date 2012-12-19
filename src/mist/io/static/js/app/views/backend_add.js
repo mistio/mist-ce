@@ -49,10 +49,10 @@ define('app/views/backend_add', ['app/models/backend',
                 this.set('template', Ember.Handlebars.compile(add_backend_dialog_html));
 
                 Ember.run.next(function(){
-                    Mist.backendAddController.addObserver('newBackendReady', function(sender, keyReady, value, rev) {
+                    Mist.backendAddController.addObserver('newBackendReady', function() {
                         Ember.run.next(function() {
                             $('#create-backend-ok').button();
-                            if (value) {
+                            if (Mist.backendAddController.newBackendReady) {
                                 $('#create-backend-ok').button('enable');
                             } else {
                                 $('#create-backend-ok').button('disable');

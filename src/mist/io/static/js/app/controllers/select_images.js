@@ -24,9 +24,9 @@ define('app/controllers/select_images', [
                     content.push({name: item.title, id: item.provider});
                 });
 
-                this.contentWillChange();
+                //this.contentWillChange();
                 this.set('content', content);
-                this.contentDidChange();
+                //this.contentDidChange();
             }.observes('Mist.backendsController.@each'),
 
             selectionChanged: function(){

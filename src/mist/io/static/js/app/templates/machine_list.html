@@ -41,8 +41,8 @@
         data-theme="c"
         data-filter-placeholder="Filter machines...">
             {{#each Mist.backendsController}}
-                {{#each this.machines}}
-                    {{view Mist.MachineListView machineBinding="this"}}
+                {{#each machines}}
+                    {{view Mist.MachineListItemView machineBinding="this"}}
                 {{/each}}
             {{/each}}
         </ul>

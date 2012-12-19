@@ -206,7 +206,7 @@ define('app/views/machine', [
                                         .clientDelay(0)
                                         .step(5000)
                                         .size($(window).width() - 80);
-                    that.context = context;
+                    Mist.context = context;
 
                     var localData = null;
                     var cores = null;
@@ -251,6 +251,7 @@ define('app/views/machine', [
                                     },
                                     error: function(jqXHR, textstate, errorThrown) {
                                         error('could not load monitoring data');
+                                        Mist.context.stop();
                                     }
                                 });
 
@@ -415,11 +416,11 @@ define('app/views/machine', [
             }.observes('machine.hasMonitoring'),
 
             startStopContext: function(){
-                if('context' in this){
+                if('context' in Mist){
                     if(Mist.graphPolling){
-                        this.context.start();
+                        Mist.context.start();
                     } else {
-                        this.context.stop();
+                        Mist.context.stop();
                     }
                 }
             }.observes('Mist.graphPolling'),

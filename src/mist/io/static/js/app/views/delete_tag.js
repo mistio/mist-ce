@@ -17,6 +17,7 @@ define('app/views/delete_tag', [
             },
 
             deleteTag: function() {
+                alert('del');
                 var tag = this.tag;
                 var machine = Mist.machine;
 

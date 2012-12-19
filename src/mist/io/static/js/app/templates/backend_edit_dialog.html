@@ -1,13 +1,13 @@
 <div data-role="content">
 <div class="content-header">
-    <span class='name'>{{backend.title}}</span>
+    <span class='name'>{{view.backend.title}}</span>
 </div>
 <div data-role="fieldcontain">
     <select class="backend-toggle" data-role="slider" {{action "toggleBackend" on="change"}}>
         <option value="0">Disabled</option>
         <option value="1" {{bindAttr selected="backend.enabled"}}>Enabled</option>
     </select>
-    <span class="state">{{backend.state}}</span>          
+    <span class="state">{{view.backend.state}}</span>          
 </div>
 
 <div data-role="fieldcontain">

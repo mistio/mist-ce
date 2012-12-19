@@ -1,4 +1,5 @@
 <a href="#dialog-providers"
+    class="ui-btn-right"
     data-rel="popup"
     data-role="button"
     data-transition="pop"
@@ -8,9 +9,9 @@
 
 <div id="dialog-providers" class="mist-dialog" data-role="popup">
     <div data-role="content" data-theme="b">
-        {{#if email}}
-        <img class="gravatar-image" {{bindAttr src="gravatarURL"}} />
-        <div class="userEmail">{{email}}</div>
+        {{#if view.email}}
+        <img class="gravatar-image" {{bindAttr src="view.gravatarURL"}} />
+        <div class="userEmail">{{view.email}}</div>
         {{/if}}
         {{#if Mist.backendsController.ok}}
         <p>Everything is OK!</p>
@@ -23,7 +24,7 @@
             <p>Waiting {{this.title}}</p>
             {{/if}}
         {{/each}}
-        {{#if email}}
+        {{#if view.email}}
         <div class="logout-placeholder">
             <a href="logout"
                 class="logout-button"

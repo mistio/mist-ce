@@ -65,9 +65,7 @@ define('app/controllers/machines', [
                             item.backend = that.backend;
                             var machine = Machine.create(item);
                             machine.tags.set('content', item.tags)
-                            that.contentWillChange(that.content.length - 1, 0, 1);
-                            that.content.push(machine);
-                            that.contentDidChange(that.content.length - 1, 0, 1);
+                            that.pushObject(machine);
                         }
                     });
 

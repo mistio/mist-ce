@@ -15,7 +15,10 @@
     <script tal:content="string: var SUPPORTED_PROVIDERS=${supported_providers}" />
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
     <script tal:content="string: var EMAIL='${email}'" />
+    <script src="static/js/lib/handlebars-1.0.0.beta.6.js"></script>
+
     <script src="static/js/lib/require/require.js"></script>
+
     <script tal:condition="js_build">
         require.config({
             baseUrl: 'static/js/',
@@ -40,98 +43,6 @@
 <div data-role="page" id="splash">
     <div class="mist-logo"></div>
 </div>
-
-<!-- Start of first page: #home -->
-<div data-role="page" id="home">
-
-    <div data-role="header">
-        <h1>mist.io</h1>
-        <script type="text/x-handlebars" data-tag-name="span">
-        {{view Mist.UserMenuView}}
-        </script>
-    </div>
-
-    <div data-role="content">
-
-        <a id="add-backend-button"
-            href="#add-backend"
-            class="add-button"
-            data-rel="popup"
-            data-theme="b"
-            data-inline="true"
-            data-transition="pop"
-            data-role="button"
-            data-icon="plus">Add backend</a>
-
-        <div data-role="popup" id="add-backend" class="mist-dialog" data-overlay-theme="a">
-            <div data-role="header">
-                <h1>Add backend</h1>
-            </div>
-            <script type="text/x-handlebars">
-                {{view Mist.AddBackendView backendBinding="Mist.backend"}}
-            </script>
-        </div>
-
-        <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
-            <script type="text/x-handlebars">
-                {{#each Mist.backendsController}}
-                    {{view Mist.BackendButtonView backendBinding="this"}}
-                {{/each}}
-            </script>
-        </div>
-
-        <div data-role="popup" id="edit-backend" class="mist-dialog" data-overlay-theme="a">
-            <div data-role="header">
-                <h1>Edit backend</h1>
-            </div>
-            <script type="text/x-handlebars">
-                {{view Mist.EditBackendView backendBinding="Mist.backend"}}
-            </script>
-        </div>
-
-        <script type="text/x-handlebars">
-            {{#if Mist.backendsController.content.length}}
-            <ul data-role="listview"
-                data-theme="c"
-                data-dividertheme="d"
-                class="ui-listview ui-listview-inset ui-corner-all ui-shadow"
-                id="home-menu">
-                <li>
-                    <a id="machines-count" href="#machines">Machines
-                        {{#view Mist.CountView
-                            numberBinding="Mist.backendsController.machineCount"
-                            tagName="span"
-                            class="ui-li-count"}}
-                            {{number}}
-                        {{/view}}
-                    </a>
-                </li>
-                <li>
-                    <a id="images-count" href="#images">Images
-                        {{#view Mist.CountView
-                            numberBinding="Mist.backendsController.imageCount"
-                            tagName="span"
-                            class="ui-li-count"}}
-                            {{number}}
-                        {{/view}}
-                    </a>
-                </li>
-                <li>
-                    <a id="keys-count" href="#keys">Keys
-                        {{#view Mist.CountView
-                            numberBinding="Mist.keysController.content.length"
-                            tagName="span"
-                            class="ui-li-count"}}
-                            {{number}}
-                        {{/view}}
-                    </a>
-                </li>
-            </ul>
-        {{/if}}
-        </script>
-    </div>
-</div><!-- /page home -->
-
 </body>
 
 </html>

@@ -6,28 +6,28 @@
             data-direction="reverse"
             class="ui-btn-left">Keys</a>
 
-        <h1>{{key.name}}</h1>
+        <h1>{{view.key.name}}</h1>
 
         {{view Mist.UserMenuView}}
 
     </div>
 
     <div class="single-view-header">
-        <h3 class="single-view-name">{{key.name}}</h3>
+        <h3 class="single-view-name">{{view.key.name}}</h3>
     </div>
 
     <div data-role="content">
 
          <div data-role="collapsible" data-collapsed="false">
             <h3>Public Key</h3>
-            <div class="public-key"><input type="text" readonly="readonly" {{bindAttr value="key.pub"}} /></div>
+            <div class="public-key"><input type="text" readonly="readonly" {{bindAttr value="view.key.pub"}} /></div>
         </div>
 
         <div data-role="collapsible" data-collapsed="false">
             <h3>Private key</h3>
             <div class="private-key">
                 <a data-role="button" {{action displayPrivateKey}}>Display</a>
-                <input type="text" readonly="readonly" {{bindAttr value="key.priv"}} data-pattern="private key not available" />
+                <input type="text" readonly="readonly" {{bindAttr value="view.key.priv"}} data-pattern="private key not available" />
             </div>
         </div>
     </div>

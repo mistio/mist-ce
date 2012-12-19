@@ -9,7 +9,7 @@
                     <td>
                         {{view Mist.ShellTextField
                             autocapitalize="off"
-                            valueBinding="command"
+                            valueBinding="view.command"
                             controllerBinding="this"}}
                     </td>
                     <td class="shell-send-wrapper">
@@ -17,13 +17,13 @@
                             data-role="button"
                             data-iconpos="notext"
                             {{action submit}}
-                            {{bindAttr class=":shell-send machine.pendingShell disabledClass"}}></a>
+                            {{bindAttr class=":shell-send Mist.machine.pendingShell disabledClass"}}></a>
                     </td>
                 </tr>
             </table>
         </div>
         <div class="shell-return">
-        {{#each shellOutputItems}}
+        {{#each view.shellOutputItems}}
             <h3 class="command">{{command}}</h3>
             <div class="output">{{{output}}}</div>
         {{/each}}

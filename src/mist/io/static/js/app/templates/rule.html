@@ -1,8 +1,8 @@
 <div class="rule-box">
     <div class="rule-if">if</div>
     
-    {{!view Mist.Select contentBinding="metricList"
-        selectionBinding="rule.metric"
+    {{!view Mist.Select contentBinding="view.metricList"
+        selectionBinding="view.rule.metric"
         class="rule-metric"
         id="rule-metric"
         data-native-menu="false"
@@ -20,10 +20,10 @@
         <option value="network">network</option>
     </select>
     
-    {{!view Mist.Select contentBinding="operatorList"
+    {{!view Mist.Select contentBinding="view.operatorList"
         optionLabelPath="content.title"
         optionValuePath="content.id"    
-        selectionBinding="rule.operator"
+        selectionBinding="view.rule.operator"
         class="rule-operator"
         id="rule-operator"
         data-native-menu="false"
@@ -40,7 +40,7 @@
     </select>        
 
     {{!view Mist.TextField
-        valueBinding="rule.value"
+        valueBinding="view.rule.value"
         type="number"
         data-type="range"
         data-highlight="true"
@@ -58,8 +58,8 @@
 
     <div class="rule-then">then</div>
 
-    {{!view Mist.Select contentBinding="actionList"
-        selectionBinding="rule.action"
+    {{!view Mist.Select contentBinding="view.actionList"
+        selectionBinding="view.rule.action"
         class="rule-action"
         data-icon="false"
         data-native-menu="false"

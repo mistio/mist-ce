@@ -9,7 +9,8 @@ require.config({
         jquery: 'lib/jquery-1.8.3',
         jqueryUi: 'lib/jquery-ui-1.9.1.custom',
         text: 'lib/require/text',
-        ember: 'lib/ember-0.9.8.1',
+        ember: 'lib/ember-1.0.0-pre.2',
+        handlebars: 'lib/handlebars-1.0.0.beta.6',
         mobile: 'lib/jquery.mobile-1.2.0',
         d3: 'lib/d3-2.10.1',
         cubism: 'lib/cubism-1.2.2',
@@ -48,7 +49,8 @@ define( 'app', [
     'app/controllers/select_machines',
     'app/controllers/select_images',
     'app/controllers/keys',
-    'app/controllers/rules',    
+    'app/controllers/rules',   
+    'app/views/home',
     'app/views/count',
     'app/views/backend_button',
     'app/views/backend_add',
@@ -88,12 +90,13 @@ define( 'app', [
                 SelectImagesController,
                 KeysController,
                 RulesController,
+                Home,
                 Count,
                 BackendButton,
                 AddBackend,
                 EditBackend,
-                MachineList,
-                ImageList,
+                MachineListItem,
+                ImageListItem,
                 MachineAddDialog,
                 MachineView,
                 MachineListView,
@@ -226,7 +229,7 @@ define( 'app', [
 
                 }
             });
-
+            
             $(document).on( 'pagebeforeshow', '#machines', function() {
                 $('#machines-list').listview('refresh');
             });
@@ -330,18 +333,22 @@ define( 'app', [
             Ember.TextArea.reopen({
                 attributeBindings: ["name", "placeholder", "id"]
               });
-
+            
+            App.HomeView = Home;
             App.CountView = Count;
             App.BackendButtonView = BackendButton;
             App.AddBackendView = AddBackend;
             App.EditBackendView = EditBackend;
-            App.MachineListView = MachineList;
-            App.ImageListView = ImageList;
+            App.MachineListItemView = MachineListItem;
+            App.ImageListItemView = ImageListItem;
             App.DeleteTagView = DeleteTagView;
             App.KeyListView = KeyList;
             App.RuleView = RuleView;
             App.UserMenuView = UserMenuView;
 
+            var homeView = Home.create();
+            homeView.append();
+            
             var machineView = MachineView.create();
             machineView.append();
 
@@ -385,10 +392,10 @@ define( 'app', [
             var keyAddDialog = KeyAddDialog.create();
             keyAddDialog.appendTo("#keys");
 
-
-
             // Expose the application globally
-            return window.Mist = App;
+            window.Mist = App;
+            App.initialize();
+            return App
         });
     }
 );

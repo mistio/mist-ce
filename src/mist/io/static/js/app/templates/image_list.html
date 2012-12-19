@@ -31,8 +31,8 @@
         data-theme="c"
         data-filter-placeholder="Filter images...">
             {{#each Mist.backendsController}}
-                {{#each this.images}}
-                    {{view Mist.ImageListView imageBinding="this"}}
+                {{#each images}}
+                    {{view Mist.ImageListItemView imageBinding="this"}}
                 {{/each}}
             {{/each}}
         </ul>
