@@ -11,6 +11,8 @@ include
 *.egg-info
 docs/build
 src/libcloud
+src/fabric
+src/paramiko
 .DS_Store
 .Python
 /.project
