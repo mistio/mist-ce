@@ -32,8 +32,7 @@ define('app/views/machine_list_item', [
                     });
                 },
 
-                checkBoxClick: function(event, el){
-
+                machineClick: function(event, el){
                     log('machine clicked');
 
                     if(event.target.tagName != 'A'){
@@ -79,17 +78,14 @@ define('app/views/machine_list_item', [
                         } else if (len == 1) {
                             $('#machines .machines-footer').fadeIn(140);
                             $('.machines #footer-console').removeClass('ui-disabled');
-                            if(len == 1){
-                                var machines = new Array();
-                                Mist.backendsController.forEach(function(backend) {
-                                    backend.machines.forEach(function(machine) {
-                                        if (machine.selected) {
-                                            machines.push(machine);
-                                        }
-                                    });
+                            
+                            Mist.backendsController.forEach(function(backend) {
+                                backend.machines.forEach(function(machine) {
+                                    if (machine.selected && Mist.machine != machine) {
+                                        Mist.set('machine', machine);
+                                    }
                                 });
-                                Mist.set('machine', machines[0]);
-                            }
+                            });
                         } else {
                             $('#machines .machines-footer').fadeOut(200);
                             Mist.set('machine', null);
