@@ -14,17 +14,9 @@ define('app/controllers/confirmation', [
                 $.mobile.changePage('#dialog-confirm');
             },
 
-            confirm: function(){
+            confirm: function() {
+                // the callback should handle page change after it completes
                 this.callback();
-
-                var section = location.hash;
-                if (section != '#key&ui-state=dialog') {
-                    // if confirm doesn't come from the single key section, simply go back
-                    window.history.go(-1);
-                } else {
-                    // when in single key view go to keys list view
-                    $.mobile.changePage('#keys');
-                }
                 this.set("callback", function(){});
             }
         });

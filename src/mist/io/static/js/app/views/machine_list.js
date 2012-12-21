@@ -1,5 +1,7 @@
-define('app/views/machine_list', [ 'text!app/templates/machine_list.html',
-        'ember' ],
+define('app/views/machine_list', [
+    'text!app/templates/machine_list.html',
+    'ember'
+    ],
 /**
  *
  * Machine page

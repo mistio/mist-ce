@@ -1,5 +1,7 @@
 define('app/views/key_list', [
-    'text!app/templates/key_list.html','ember'],
+    'text!app/templates/key_list.html',
+    'ember'
+    ],
     /**
      *
      * Key list page
@@ -14,7 +16,7 @@ define('app/views/key_list', [
                 this._super();
                 this.set('template', Ember.Handlebars.compile(key_list_html));
             },
-            
+
             deleteKey: function(){
                 var keys = this.getSelectedKeys();
                 var plural = false;
@@ -35,15 +37,18 @@ define('app/views/key_list', [
 
                 Mist.confirmationController.set("text", 'Are you sure you want to delete' +
                         names +'?');
+
                 Mist.confirmationController.set("callback", function(){
                     keys.forEach(function(key){
                        key.deleteKey();
+                       window.history.go(-1);
                     });
                 });
+
                 Mist.confirmationController.set("fromDialog", true);
                 Mist.confirmationController.show();
             },
-            
+
             getSelectedKeys: function(){
                 var keys = new Array();
 
@@ -54,7 +59,7 @@ define('app/views/key_list', [
                 });
 
                 return keys;
-            },            
+            },
         });
     }
 );

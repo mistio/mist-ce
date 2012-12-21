@@ -1,5 +1,7 @@
 define('app/views/machine_actions_dialog', [
-    'text!app/templates/machine_actions_dialog.html','ember'],
+    'text!app/templates/machine_actions_dialog.html',
+    'ember'
+    ],
     /**
      *
      * Confirmation Dialog
@@ -34,6 +36,7 @@ define('app/views/machine_actions_dialog', [
                     machines.forEach(function(machine){
                         machine.reboot();
                     });
+                    window.history.go(-1);
                 });
                 Mist.confirmationController.set("fromDialog", true);
                 Mist.confirmationController.show();
@@ -63,6 +66,7 @@ define('app/views/machine_actions_dialog', [
                     machines.forEach(function(machine){
                         machine.destroy();
                     });
+                    window.history.go(-1);
                 });
                 Mist.confirmationController.set("fromDialog", true);
                 Mist.confirmationController.show();
@@ -92,6 +96,7 @@ define('app/views/machine_actions_dialog', [
                     machines.forEach(function(machine){
                         machine.start();
                     });
+                    window.history.go(-1);
                 });
                 Mist.confirmationController.set("fromDialog", true);
                 Mist.confirmationController.show();
@@ -121,6 +126,7 @@ define('app/views/machine_actions_dialog', [
                     machines.forEach(function(machine){
                         machine.shutdown();
                     });
+                    window.history.go(-1);
                 });
                 Mist.confirmationController.set("fromDialog", true);
                 Mist.confirmationController.show();

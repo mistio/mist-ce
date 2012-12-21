@@ -1,5 +1,7 @@
 define('app/views/key', [
-    'text!app/templates/key.html','ember'],
+    'text!app/templates/key.html',
+    'ember'
+    ],
     /**
      *
      * Key page
@@ -20,8 +22,10 @@ define('app/views/key', [
 
                 Mist.confirmationController.set('callback', function() {
                     key.deleteKey();
+                    $.mobile.changePage('#keys');
                 });
                 Mist.confirmationController.set('fromDialog', true);
+
                 Mist.confirmationController.show();
             },
 
