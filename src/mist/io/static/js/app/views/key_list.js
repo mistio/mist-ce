@@ -42,6 +42,7 @@ define('app/views/key_list', [
                     keys.forEach(function(key){
                        key.deleteKey();
                        window.history.go(-1);
+                       $('#keys .keys-footer').fadeOut(200);
                     });
                 });
 
