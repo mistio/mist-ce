@@ -3,7 +3,7 @@ from libcloud.compute.types import Provider
 from libcloud.compute.types import NodeState
 
 
-COMMAND_TIMEOUT = 10
+COMMAND_TIMEOUT = 20
 STATES = {
     NodeState.RUNNING: 'running',
     NodeState.REBOOTING: 'rebooting',

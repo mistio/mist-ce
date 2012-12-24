@@ -56,7 +56,7 @@ function(shell_html) {
 
                 that.shellOutputItems.content.unshift({
                     command: "# " + command,
-                    output: output.replace(/\n/g, '<br />'),
+                    output: output,
                     cmdIndex: "cmd-" + that.shellOutputItems.content.length
                 });
                 that.shellOutputItems.arrayContentDidChange(0, 0, 1);

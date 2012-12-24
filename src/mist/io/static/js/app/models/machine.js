@@ -152,36 +152,25 @@ define('app/models/machine', [
             shell: function(shell_command, callback) {
                 log('Sending', shell_command, 'to machine', this.name);
 
+                var url = '/backends/' + this.backend.id + '/machines/' + this.id + '/shell';
                 var ssh_user = this.getUser();
                 var host = this.getHost();
-
-                this.set('pendingShell', true);
                 var that = this;
-                if (host) {
-                    $.ajax({
-                        url: '/backends/' + this.backend.id + '/machines/' + this.id + '/shell',
-                        type: 'POST',
-                        headers: { "cache-control": "no-cache" },
-                        data: {'host': host,
+                var params =  {'host': host,
                                'ssh_user': ssh_user,
-                               'command': shell_command},
-                        success: function(data) {
-                            if (data){
-                                callback(data);
-                            }
-                            info('Successfully sent shell command', shell_command, 'to machine',
-                                    that.name, 'with result:\n', data);
-                            that.set('pendingShell', false);
-                        },
-                        error: function(jqXHR, textstate, errorThrown) {
-                            Mist.notificationController.notify('Error sending shell command ' +
-                                    shell_command + ' to machine ' + that.name);
-                            error(textstate, errorThrown, 'when sending shell command',
-                                    shell_command, 'to machine', that.name);
-                            that.set('pendingShell', false);
-                        }
-                    });
+                               'command': shell_command}
+                function EncodeQueryData(data)
+                {
+                   var ret = [];
+                   for (var d in data)
+                      ret.push(encodeURIComponent(d) + "=" + encodeURIComponent(data[d]));
+                   return ret.join("&");
                 }
+                url = url + '?' + EncodeQueryData(params);
+                this.set('pendingShell', true);
+                
+                $('#hidden-shell-iframe').attr('src', url);
+                callback('');
             },
 
             hasAlert : function() {
@@ -270,7 +259,7 @@ define('app/models/machine', [
                         'password': Mist.password
                     };
                 } else {
-                    payload = {};
+                    payload = { 'authToken': Mist.authToken};
                 }
                 $.ajax({
                     url: URL_PREFIX + '/backends/' + this.backend.id + '/machines/' + this.id + '/monitoring',

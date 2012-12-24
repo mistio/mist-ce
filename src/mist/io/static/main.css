@@ -1071,6 +1071,8 @@ div.cost {
     padding: 6px;
     text-shadow: none;
     max-height: 40ex;
+    height: auto !important;
+    overflow-y: scroll !important;
 }
 
 #dialog-shell.dialog-shell .ui-accordion .ui-accordion-header .ui-accordion-header-icon {
@@ -1087,6 +1089,10 @@ div.cost {
 
 #dialog-shell .pending-shell span {
     display:none;
+}
+
+iframe#hidden-shell-iframe {
+    display: none;
 }
 
 .ui-autocomplete {

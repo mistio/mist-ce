@@ -6,6 +6,7 @@ from pyramid.config import Configurator
 
 from mist.io.resources import Root
 from mist.io import helpers
+from mist.io.shell import ShellMiddleware
 
 log = logging.getLogger('mist.io')
 
@@ -42,4 +43,6 @@ def main(global_config, **settings):
     config.scan()
 
     app = config.make_wsgi_app()
+    
+    app = ShellMiddleware(app)
     return app

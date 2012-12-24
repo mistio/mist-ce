@@ -14,8 +14,7 @@ require.config({
         mobile: 'lib/jquery.mobile-1.2.0',
         d3: 'lib/d3-2.10.1',
         cubism: 'lib/cubism-1.2.2',
-        md5: 'lib/md5'
-    },
+        md5: 'lib/md5'    },
     shim: {
         'ember': {
             deps: ['jquery', 'md5']
@@ -318,7 +317,7 @@ define( 'app', [
                 ],
 
                 insertNewline: function() {
-                    this.controller.submit();
+                    this._parentView.submit();
                 }
             });
 
@@ -431,4 +430,18 @@ function error() {
             return console.error.apply(console, arguments);
         }
     } catch(err) {console.log(err);}
+}
+
+function appendShell(data){
+    if (data.length) {
+        console.warn(Date() + ': ' + data);
+        $('.shell-return .output').append(data);
+        $('.shell-return .output').scrollTop(10000);
+    } else {
+        that.set('pendingShell', false);
+    }  
+}
+
+function completeShell(){
+    Mist.machine.set('pendingShell', false);
 }

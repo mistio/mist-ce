@@ -97,7 +97,7 @@ def save_settings(settings):
     config_file.close()
 
 
-def connect(request):
+def connect(request, backend_id=False):
     """Establishes backend connection using the credentials specified.
 
     It has been tested with:
@@ -112,7 +112,8 @@ def connect(request):
     except:
         backends = request.registry.settings['backends']
 
-    backend_id = request.matchdict['backend']
+    if not backend_id:
+        backend_id = request.matchdict['backend']
     backend = backends.get(backend_id)
 
     driver = get_driver(int(backend['provider']))
