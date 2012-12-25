@@ -435,13 +435,15 @@ function error() {
 function appendShell(data){
     if (data.length) {
         console.warn(Date() + ': ' + data);
-        $('.shell-return .output').append(data);
-        $('.shell-return .output').scrollTop(10000);
+        $('.shell-return .output').first().append(data);
+        $('.shell-return .output').first().scrollTop(10000);
     } else {
         that.set('pendingShell', false);
+        $('.shell-return .pending').removeClass('pending');
     }  
 }
 
 function completeShell(){
     Mist.machine.set('pendingShell', false);
+    $('.shell-return .pending').removeClass('pending');
 }

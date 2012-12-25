@@ -66,6 +66,7 @@ class ShellMiddleware(object):
             Generator function that streams the output of the remote command 
             using the hidden iframe web pattern
         """
+        #TODO: add timeout
         outputPrefix = '[%s] out:' % host
         
         # save private key in temp file

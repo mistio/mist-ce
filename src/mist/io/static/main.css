@@ -1080,15 +1080,8 @@ div.cost {
     background-color: #EFEFF1;
 }
 
-#dialog-shell .pending-shell {
-    background: url("images/ajax-loader.gif") no-repeat;
-    background-size: contain;
-    box-shadow: none;
-    border: none;
-}
-
-#dialog-shell .pending-shell span {
-    display:none;
+.pending-shell .command.pending{
+    background: url("/static/images/spinner.gif") no-repeat scroll 92% center #EFEFF1 !important;
 }
 
 iframe#hidden-shell-iframe {

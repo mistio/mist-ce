@@ -66,8 +66,9 @@ function(shell_html) {
                     } catch(e) {
                          $(".shell-return").accordion({ header: "h3", collapsible: true });
                     }
-
+                    $(".shell-return .command").first().addClass('pending');
                 });
+                
             });
             this.clear();
 
@@ -95,7 +96,7 @@ function(shell_html) {
         },
 
         disabledClass: function() {
-            if (this.command && this.command.length > 0) {
+            if (this.command && this.command.length > 0 && !Mist.machine.pendingShell) {
                 return '';
             } else {
                 return 'ui-disabled';
