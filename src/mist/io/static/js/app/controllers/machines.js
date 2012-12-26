@@ -108,20 +108,17 @@ define('app/controllers/machines', [
                 }).error(function(e) {
                     Mist.notificationController.notify("Error loading machines for backend: " +
                                                         that.backend.title);
-                    that.backend.set('error', e);
-                    if (that.backend.state.search('error')==-1) {
-                        // Mark error but try once again
-                        that.backend.set('state', 'error');
-                        Ember.run.later(that, function(){
-                            this.refresh();
-                        }, that.backend.poll_interval);                        
-                    } else {
+                    if (that.backend.error){
                         // This backend seems hopeless, disabling it                            
                         that.backend.set('state', 'offline');
-                        that.backend.set('enabled', {'value': 0, 'label':'Disabled'});
-                    }
-                    log("Error loading machines for backend: " + that.backend.title);
-                    log(e.state + " " + e.stateText);
+                        that.backend.set('enabled', false);
+                    } else {
+                        // Mark error but try once again
+                        that.backend.set('error', "Error loading machines");
+                        Ember.run.later(that, function(){
+                            this.refresh();
+                        }, that.backend.poll_interval); 
+                    }   
                 });
             },
 
