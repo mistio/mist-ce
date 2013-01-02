@@ -30,10 +30,6 @@ class ShellMiddleware(object):
 
     def __call__(self, environ, start_response):
         request = Request(environ)
-        session = environ['beaker.session']
-
-        # Check to see if a value is in the session
-        logged_in = 'email' in session
                                     
         if request.path.endswith('shell') and request.method == 'GET':
             try:
