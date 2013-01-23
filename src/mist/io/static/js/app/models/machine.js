@@ -289,9 +289,25 @@ define('app/models/machine', [
                     dataType: 'json',
                     timeout : 10000,
                     success: function(data) {
-                        // TODO: deploy collectd
-                        that.set('hasMonitoring', !that.hasMonitoring);                        
-                        that.set('pendingMonitoring', false);
+                        var user = that.getUser();
+                        if (!that.hasMonitoring){
+                            $('.pending-monitoring h1').text('Installing collectd');
+                            var prefix = URL_PREFIX || document.location.href.split('#')[0];
+                            var cmd = 'wget ' + prefix + '/core/scripts/deploy_collectd.sh -O - > /tmp/deploy_collectd.sh && chmod o+x /tmp/deploy_collectd.sh && /tmp/deploy_collectd.sh ' + that.getHost() + ' ' + data['uuid'] + ' ' + data['passwd'];
+                            if (user != 'root'){
+                                cmd = "sudo su -c '" + cmd + "'";
+                            }
+                            collectd_install_target = that;
+                            warn(cmd);
+                            that.shell(cmd, function(){});
+                        } else {
+                            $('.pending-monitoring h1').text('Disabling collectd');
+                            var cmd = 'chmod -x /etc/init.d/collectd && killall -9 collectd';
+                            if (user != 'root'){
+                                cmd = "sudo su -c '" + cmd + "'";
+                            }
+                            collectd_install_target = that;                        
+                        }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         that.set('pendingMonitoring', false);
@@ -311,7 +327,6 @@ define('app/models/machine', [
 
                 this.startUptimeTimer();
                 this.checkUptime();
-                //this.checkHasMonitoring();
             }
         });
     }

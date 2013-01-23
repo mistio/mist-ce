@@ -434,18 +434,32 @@ function error() {
     } catch(err) {console.log(err);}
 }
 
+var collectd_install_target = false;
+
 function appendShell(data){
-    if (data.length) {
-        console.warn(Date() + ': ' + data);
-        $('.shell-return .output').first().append(data);
-        $('.shell-return .output').first().scrollTop(10000);
+    if (true || !collectd_install_target) {
+        if (data.length) {
+            console.warn(Date() + ': ' + data);
+            $('.shell-return .output').first().append(data);
+            $('.shell-return .output').first().scrollTop(10000);
+        } else {
+            that.set('pendingShell', false);
+            $('.shell-return .pending').removeClass('pending');
+        }          
     } else {
-        that.set('pendingShell', false);
-        $('.shell-return .pending').removeClass('pending');
-    }  
+        // TODO: display collectd install output
+    }
+
 }
 
 function completeShell(){
     Mist.machine.set('pendingShell', false);
     $('.shell-return .pending').removeClass('pending');
+    // TODO: deploy collectd error handling
+    if (collectd_install_target) {
+        collectd_install_target.set('hasMonitoring', !collectd_install_target.hasMonitoring);                        
+        collectd_install_target.set('pendingMonitoring', false);
+        $('.pending-monitoring h1').text('Enabling monitoring');          
+        collectd_install_target = false;
+    }
 }

@@ -59,7 +59,7 @@ define('app/controllers/backends', [
                                'hash': sha256(email + ':' + nowUTC + ':' + Mist.password)};
                 }            
                 $.ajax({
-                    url: '/monitoring',
+                    url: URL_PREFIX + '/monitoring',
                     type: 'GET',
                     dataType: 'jsonp',
                     timeout: 10000,
