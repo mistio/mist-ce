@@ -15,7 +15,6 @@
     <script tal:content="string: var SUPPORTED_PROVIDERS=${supported_providers}" />
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
     <script tal:content="string: var EMAIL='${email}'" />
-    <script src="static/js/lib/handlebars-1.0.0.beta.6.js"></script>
 
     <script src="static/js/lib/require/require.js"></script>
 

@@ -14,7 +14,7 @@ function(shell_html) {
         tagName: false,
         machineBinding: 'Mist.machine',
         shellOutputItems: Ember.ArrayController.create(),
-        availableCommands: ["dmesg", "uptime", "uname", "ls", "reboot", "whoami", "ifconfig" ],
+        availableCommands: [], //"dmesg", "uptime", "uname", "ls", "reboot", "whoami", "ifconfig" ],
 
         didInsertElement: function() {
             if ('localStorage' in window && window['localStorage'] !== null) {

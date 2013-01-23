@@ -714,4 +714,10 @@ def delete_key(request):
     save_settings(request.registry.settings)
 
     return {}
- 
+
+
+@view_config(route_name='monitoring', request_method='POST', renderer='json')
+def update_monitoring(request):
+    """Enable/disable monitoring for this machine using the hosted mist.io service."""
+    # TODO: fwd the request to https://mist.io
+    return

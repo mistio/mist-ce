@@ -15,8 +15,8 @@
                 <p>To do it manually reffer to link for instructions. When completed successfuly press disable below.</p>
                 {{/unless}}
                 <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-                    <button id="create-cancel" class="btn-left-full" data-theme="c" {{action "backClicked" }}>Back</button>
-                    <button id="create-ok" class="btn-right-full" data-theme="b" {{action "changeMonitoringClicked" }}>Disable</button>
+                    <button id="enable-monitoring-cancel" class="btn-left-full" data-theme="c" {{action "backClicked" }}>Back</button>
+                    <button id="enable-monitoring-ok" class="btn-right-full" data-theme="b" {{action "changeMonitoringClicked" }}>Disable</button>
                 </div>
             {{else}}
                 <div>Are you sure you wish to enable monitoring for {{machine.name}}?</div>
@@ -25,8 +25,8 @@
                 <p>To do it manually reffer to link for instructions. When completed successfuly press enable below.</p>
                 {{/unless}}
                 <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-                    <button id="create-cancel" class="btn-left-full" data-theme="c" {{action "backClicked" }}>Back</button>
-                    <button id="create-ok" class="btn-right-full" data-theme="b" {{action "changeMonitoringClicked" }}>Enable</button>
+                    <button id="enable-monitoring-cancel" class="btn-left-full" data-theme="c" {{action "backClicked" }}>Back</button>
+                    <button id="enable-monitoring-ok" class="btn-right-full" data-theme="b" {{action "changeMonitoringClicked" }}>Enable</button>
                 </div>
             {{/if}}
         {{else}}

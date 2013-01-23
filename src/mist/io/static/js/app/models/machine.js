@@ -246,42 +246,6 @@ define('app/models/machine', [
                 setTimeout(uptimeTimeout, 10000);
             },
 
-            checkHasMonitoring: function() {
-                var that = this;
-                if (!Mist.authenticated && (!Mist.email || !Mist.password)){
-                    this.set('hasMonitoring', false);
-                    return
-                }
-
-                if (!Mist.authenticated) {
-                    payload = {
-                        'email': Mist.email,
-                        'password': Mist.password
-                    };
-                } else {
-                    payload = { 'authToken': Mist.authToken};
-                }
-                $.ajax({
-                    url: URL_PREFIX + '/backends/' + this.backend.id + '/machines/' + this.id + '/monitoring',
-                    dataType: 'jsonp',
-                    timeout: 10000,
-                    data: JSON.stringify(payload),
-                    success: function(data) {
-                        log("machine has monitoring");
-                        log(data);
-                        if('monitoring' in data){
-                            that.set('hasMonitoring', data.monitoring);
-                        }
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error checking monitoring of machine ' +
-                                that.name);
-                        error(textstate, errorThrown, 'while checking monitoring of machine',
-                                that.name);
-                    }
-                });
-            },
-
             resetUptime: function() {
                 if (this.get('state') == 'running') {
                     this.startUptimeTimer();
@@ -296,63 +260,48 @@ define('app/models/machine', [
                 warn("Setting monitoring to:  " + !this.hasMonitoring);
 
                 this.set('pendingMonitoring', true);
-
-                var host = this.getHost();
-                if (host) {
-                    var payload = {
-                       'monitoring': !this.hasMonitoring,
-                       'host': host,
-                       'provider': this.backend.provider,
-                       'email': Mist.email,
-                       'password' : Mist.password
-                    };
-
-                    if (this.hasMonitoring) {
-                        this.set('hasMonitoring', false);
+                                
+                var payload = {
+                   'monitoring': !this.hasMonitoring
+                };
+                
+                if (!Mist.authenticated){
+                    if (!Mist.email || !Mist.password){
+                        warn('no auth credentials!');
+                        return false;
                     }
+                    var d = new Date();
+                    var nowUTC = d.getTime() + d.getTimezoneOffset()*60*1000;
+                    payload['email'] = Mist.email;
+                    payload['timestamp'] = nowUTC;
+                    payload['hash'] = sha256(email + ':' + nowUTC + ':' + Mist.password);
+                }            
 
-                    var that = this;
-                    warn('sending request');
-                    $.ajax({
-                        url: URL_PREFIX + '/backends/' + this.backend.id + '/machines/' + this.id + '/monitoring',
-                        type: 'POST',
-                        headers: { "cache-control": "no-cache" },
-                        contentType: 'application/json',
-                        data: JSON.stringify(payload),
-                        dataType: 'jsonp',
-                        timeout : 10000,
-                        success: function(data) {
-                            if (data.deployed_collectd) {
-                                that.set('hasMonitoring', true);
-                            } else if (data.disabled_collectd) {
-                                that.set('hasMonitoring', false);
-                            } else {
-                                var action;
-                                if (this.hasMonitoring) {
-                                    action = 'disabling';
-                                } else {
-                                    action = 'enabling';
-                                }
-                                Mist.notificationController.notify('Error ' + action + ' monitoring for ' +
-                                    that.name);
-                                error(data.output);
-                                that.set('hasMonitoring', false);
-                            }
-                            that.set('pendingMonitoring', false);
-                            warn('success');
-                        },
-                        error: function(jqXHR, textstate, errorThrown) {
-                            warn('error');
-                            that.set('pendingMonitoring', false);
-                            Mist.notificationController.notify('Error when changing monitoring to ' +
-                                that.name);
-                            error(textstate, errorThrown, 'when changing monitoring to machine',
-                                that.name);
-                        }
-                    });
-                } else {
-                    that.set('pendingMonitoring', false);
-                }
+
+                var that = this;
+                warn('sending request');
+                $.ajax({
+                    url: '/backends/' + this.backend.id + '/machines/' + this.id + '/monitoring',
+                    type: 'POST',
+                    headers: { "cache-control": "no-cache" },
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    dataType: 'json',
+                    timeout : 10000,
+                    success: function(data) {
+                        // TODO: deploy collectd
+                        that.set('hasMonitoring', !that.hasMonitoring);                        
+                        that.set('pendingMonitoring', false);
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        that.set('pendingMonitoring', false);
+                        Mist.notificationController.notify('Error when changing monitoring to ' +
+                            that.name);
+                        error(textstate, errorThrown, 'when changing monitoring to machine',
+                            that.name);
+                    }
+                });
+
             },
 
             init: function() {
@@ -362,7 +311,7 @@ define('app/models/machine', [
 
                 this.startUptimeTimer();
                 this.checkUptime();
-                this.checkHasMonitoring();
+                //this.checkHasMonitoring();
             }
         });
     }

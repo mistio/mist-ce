@@ -10,14 +10,16 @@ require.config({
         jqueryUi: 'lib/jquery-ui-1.9.1.custom',
         text: 'lib/require/text',
         ember: 'lib/ember-1.0.0-pre.2',
-        handlebars: 'lib/handlebars-1.0.0.beta.6',
+        handlebars: 'lib/handlebars-1.0.rc.1',
         mobile: 'lib/jquery.mobile-1.2.0',
         d3: 'lib/d3-2.10.1',
         cubism: 'lib/cubism-1.2.2',
-        md5: 'lib/md5'    },
+        md5: 'lib/md5',
+        sha256: 'lib/sha256'
+    },
     shim: {
         'ember': {
-            deps: ['jquery', 'md5']
+            deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256']
         },
         'jqueryUi': {
             deps: ['jquery']
