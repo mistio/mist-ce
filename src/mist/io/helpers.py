@@ -323,14 +323,17 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
                 cmd_output = run(command, timeout=COMMAND_TIMEOUT)
                 log.warn("Recovered!")
             except Exception as e:
-                log.error("Failed to recover :(")  
+                log.error("Failed to recover :(")
                 log.error('Exception while executing command: %s' % e)
+                os.remove(tmp_path)
                 return Response('Exception while executing command: %s' % e, 503)
         else:
             log.error('Exception while executing command: %s' % e)
-            return Response('Exception while executing command: %s' % e, 503)            
+            os.remove(tmp_path)
+            return Response('Exception while executing command: %s' % e, 503)
     except SystemExit as e:
         log.warn('Got SystemExit: %s' % e)
+        os.remove(tmp_path)
         return Response('SystemExit: %s' % e, 204)
 
     os.remove(tmp_path)
