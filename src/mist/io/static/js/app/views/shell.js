@@ -68,7 +68,7 @@ function(shell_html) {
                     }
                     $($.mobile.activePage).find(".shell-return .command").first().addClass('pending');
                 });
-                
+
             });
             this.clear();
 
@@ -93,6 +93,17 @@ function(shell_html) {
 
         clear: function() {
             this.set('command', '');
+        },
+
+        back: function() {
+            this.set('command', '');
+            if (history.state) {
+                history.go(-1);
+            } else {
+                // this is needed if you've ran a shell command before pressing back
+                // html streaming breaks the current history object
+                history.go(-2);
+            }
         },
 
         disabledClass: function() {
