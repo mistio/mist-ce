@@ -4,6 +4,7 @@ from libcloud.compute.types import NodeState
 
 
 COMMAND_TIMEOUT = 20
+
 STATES = {
     NodeState.RUNNING: 'running',
     NodeState.REBOOTING: 'rebooting',
@@ -195,7 +196,7 @@ LINODE_DATACENTERS = {
     8: 'Tokyo, JP'
 }
 
-    
+
 SUPPORTED_PROVIDERS = [
                        # EC2
                        {'title': 'EC2 AP NORTHEAST',
@@ -209,7 +210,7 @@ SUPPORTED_PROVIDERS = [
                         },
                        {'title': 'EC2 SA EAST',
                         'provider': Provider.EC2_SA_EAST,
-                        },                       
+                        },
                        {'title': 'EC2 US EAST',
                         'provider': Provider.EC2_US_EAST,
                         },
@@ -228,7 +229,7 @@ SUPPORTED_PROVIDERS = [
                        #{'title': 'OpenStack',
                        # 'provider': Provider.OPENSTACK,
                        # },
-                       
+
                        # RackSpace
                        {'title': 'RackSpace DFW',
                         'provider': "%s:%s" % (Provider.RACKSPACE,'dfw')
