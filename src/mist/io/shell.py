@@ -42,6 +42,7 @@ class ShellMiddleware(object):
                 try:
                     private_key = request['beaker.session']['keypairs'][key_id]['private']
                 except KeyError:
+                    request.registry = self.app.registry
                     private_key = request.registry.settings['keypairs'][key_id]['private']
                 conn = connect(request, backend)
                 if conn:

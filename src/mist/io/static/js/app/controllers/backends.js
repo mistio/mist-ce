@@ -52,11 +52,15 @@ define('app/controllers/backends', [
                 if (Mist.authenticated){
                     payload = {};         
                 } else {
+                    if (!Mist.email || !Mist.password){
+                        return false;
+                    }
+                    
                     var d = new Date();
                     var nowUTC = d.getTime() + d.getTimezoneOffset()*60*1000;
                     payload = {'email': Mist.email,
                                'timestamp': nowUTC,
-                               'hash': sha256(email + ':' + nowUTC + ':' + Mist.password)};
+                               'hash': CryptoJS.SHA256(email + ':' + nowUTC + ':' + Mist.password)};
                 }            
                 $.ajax({
                     url: URL_PREFIX + '/monitoring',
