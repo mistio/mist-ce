@@ -438,13 +438,15 @@ var collectd_install_target = false;
 
 function appendShell(data){
     if (true || !collectd_install_target) {
+        var target_page = $($.mobile.activePage);
+        var output = target_page.find('.shell-return .output').first();
         if (data.length) {
             console.warn(Date() + ': ' + data);
-            $('.shell-return .output').first().append(data);
-            $('.shell-return .output').first().scrollTop(10000);
+            output.append(data);
+            output.scrollTop(10000);
         } else {
             that.set('pendingShell', false);
-            $('.shell-return .pending').removeClass('pending');
+            target_page.find('.shell-return .pending').removeClass('pending');
         }          
     } else {
         // TODO: display collectd install output

@@ -66,7 +66,7 @@ function(shell_html) {
                     } catch(e) {
                          $(".shell-return").accordion({ header: "h3", collapsible: true });
                     }
-                    $(".shell-return .command").first().addClass('pending');
+                    $($.mobile.activePage).find(".shell-return .command").first().addClass('pending');
                 });
                 
             });
