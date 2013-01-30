@@ -15,7 +15,7 @@ define('app/controllers/backends', [
             // TODO make this property dynamic according to all backends states
             state: "waiting",
             ok: false,
-            
+
             isOK: function() {
                 if(this.state == 'state-ok'){
                     this.set('ok', true);
@@ -47,21 +47,21 @@ define('app/controllers/backends', [
                 });
                 this.set('imageCount', count);
             },
-            
+
             checkMonitoring: function(){
                 if (Mist.authenticated){
-                    payload = {};         
+                    payload = {};
                 } else {
                     if (!Mist.email || !Mist.password){
                         return false;
                     }
-                    
+
                     var d = new Date();
                     var nowUTC = d.getTime() + d.getTimezoneOffset()*60*1000;
                     payload = {'email': Mist.email,
                                'timestamp': nowUTC,
                                'hash': CryptoJS.SHA256(email + ':' + nowUTC + ':' + Mist.password)};
-                }            
+                }
                 $.ajax({
                     url: URL_PREFIX + '/monitoring',
                     type: 'GET',
@@ -78,25 +78,24 @@ define('app/controllers/backends', [
                                 if (Mist.backendsController.content[b]['id'] == backend_id)
                                     break;
                             }
-                            
+
                             if (b == Mist.backendsController.content.length) {
                                 return false;
                             }
-                            
+
                             for (m=0; m < Mist.backendsController.content[b].machines.content.length; m++){
                                 if (Mist.backendsController.content[b]['machines'].content[m]['id'] == machine_id)
                                     break;
-                            }   
-                            
+                            }
+
                             if (m < Mist.backendsController.content[b].machines.content.length)  {
                                 Mist.backendsController.content[b].machines.content[m].set('hasMonitoring', true);
-                            } 
+                            }
                         })
                     },
                     error: function(){
-                        alert('check monitoring failed!');
                         Mist.notificationController.notify('Error checking monitoring');
-                    }    
+                    }
                 });
 
             },
@@ -121,19 +120,19 @@ define('app/controllers/backends', [
                             item.machines.addObserver('length', function() {
                                 that.getMachineCount();
                             });
-    
+
                             item.machines.addObserver('@each.selected', function() {
                                 that.getSelectedMachineCount();
                             });
-    
+
                             item.images.addObserver('length', function() {
                                 that.getImageCount();
                             });
-    
+
                             item.addObserver('state', function(){
                                 var waiting = false;
                                 var state = "ok";
-    
+
                                 that.content.forEach(function(backend){
                                     if (backend.error) {
                                         state = 'error';
@@ -143,7 +142,7 @@ define('app/controllers/backends', [
                                         state = 'down';
                                     }
                                 });
-    
+
                                 if(waiting){
                                     state = 'state-wait-' + state;
                                 } else {
@@ -155,7 +154,7 @@ define('app/controllers/backends', [
                     }).error(function() {
                         Mist.notificationController.notify("Error loading backends");
                     });
-                    
+
                     setTimeout(function(){
                         Ember.run.next(function(){
                             try {
@@ -164,7 +163,7 @@ define('app/controllers/backends', [
                         });
                         Mist.backendsController.checkMonitoring();
                     }, 3000);
-                       
+
                 });
             }
         });
