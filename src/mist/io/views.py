@@ -104,12 +104,12 @@ def add_backend(request, renderer='json'):
     if not provider.__class__ is int and ':' in provider:
         region = provider.split(':')[1]
         provider = int(provider.split(':')[0])
-    
+
     if not provider or not apikey or not apisecret:
         return Response('Invalid backend data', 400)
-    
-    backend_id = sha256('%s%s%s' % (provider, region, apikey)).hexdigest()    
-    
+
+    backend_id = sha256('%s%s%s' % (provider, region, apikey)).hexdigest()
+
     backend = {'title': params.get('provider', '0')['title'],
                'provider': provider,
                'apikey': apikey,
@@ -672,30 +672,32 @@ def list_locations(request):
 def list_keys(request):
     """List keys.
 
-    List all key pairs that are configured on this server
+    List all key pairs that are configured on this server. Only the public
+    keys are returned.
 
     """
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs',{})
-        
-    ret = [{'name': key, 'pub': keypairs[key]['public']} for key in keypairs.keys() ]
+
+    ret = [{'name': key, 'pub': keypairs[key]['public']} for key in keypairs.keys()]
     return ret
 
 
 @view_config(route_name='keys', request_method='POST', renderer='json')
-def generate_keypair(request):    
+def generate_keypair(request):
+    """Generate a random keypair"""
     key = RSA.generate(2048, os.urandom)
-    return {'public' : key.exportKey('OpenSSH'),
-            'private' : key.exportKey()}
+    return {'public': key.exportKey('OpenSSH'),
+            'private': key.exportKey()}
 
 
 @view_config(route_name='key', request_method='PUT', renderer='json')
 def add_key(request):
     params = request.json_body
     id = params.get('name', '')
-    
+
     key = {'public':params.get('pub', ''),
            'private':params.get('priv', '')}
 
@@ -709,7 +711,7 @@ def add_key(request):
 def delete_key(request):
     params = request.json_body
     id = params.get('name', '')
-    
+
     request.registry.settings['keypairs'].pop(id)
     save_settings(request.registry.settings)
 
