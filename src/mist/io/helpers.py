@@ -46,6 +46,8 @@ def load_settings(settings):
 
     settings['keypairs'] = user_config.get('keypairs', {})
     settings['backends'] = user_config.get('backends', {})
+    settings['email'] = user_config.get('email', '')
+    settings['password'] = user_config.get('password', '')
     settings['js_build'] = user_config.get('js_build', True)
     settings['js_log_level'] = user_config.get('js_log_level', 3)
     settings['default_poll_interval'] = user_config.get('default_poll_interval',
@@ -86,13 +88,19 @@ def save_settings(settings):
             'private': literal_unicode(settings['keypairs'][key]['private']),
         }
 
-    yaml.dump({
+    payload = {
         'keypairs': keypairs,
         'backends': settings['backends'],
         'core_uri': settings['core_uri'],
         'js_build': settings['js_build'],
         'js_log_level': settings['js_log_level'],
-        }, config_file, default_flow_style=False, )
+        }
+    
+    if settings.get('email', False) and settings.get('password', False):
+        payload['email'] = settings['email']
+        payload['password'] = settings['password']
+
+    yaml.dump(payload, config_file, default_flow_style=False, )
 
     config_file.close()
 

@@ -222,13 +222,35 @@ define( 'app', [
                     if ( location.hash.match( /specs/ ) ) {
                         require( [ 'chai', 'mocha' ], this.specsRunner );
                     }
-
+                    
                     setTimeout(function(){
                         $.mobile.changePage('#home', { transition: 'fade' });
+                        Mist.emailReady();
+                        if (EMAIL != '') {
+                            Mist.set('authenticated', true);
+                        }
                     }, 2000);
 
 
-                }
+                },
+                
+                emailReady: function(){
+                    if (this.email && this.password){
+                        $('#auth-ok').button('enable');
+                    } else {
+                        try{
+                            $('#auth-ok').button('disable');
+                        } catch(e){
+                            $('#auth-ok').button();
+                            $('#auth-ok').button('disable');
+                        }
+                    }
+                }.observes('email'),
+                
+                passReady: function(){
+                    this.emailReady();
+                }.observes('password')
+                              
             });
             
             $(document).on( 'pagebeforeshow', '#machines', function() {
@@ -459,9 +481,14 @@ function completeShell(){
     $('.shell-return .pending').removeClass('pending');
     // TODO: deploy collectd error handling
     if (collectd_install_target) {
-        collectd_install_target.set('hasMonitoring', !collectd_install_target.hasMonitoring);                        
+        collectd_install_target.set('hasMonitoring', true);                        
         collectd_install_target.set('pendingMonitoring', false);
         $('.pending-monitoring h1').text('Enabling monitoring');          
         collectd_install_target = false;
+    } else if (collectd_uninstall_target) {
+        collectd_uninstall_target.set('hasMonitoring', false);                        
+        collectd_uninstall_target.set('pendingMonitoring', false);
+        $('.pending-monitoring h1').text('Enabling monitoring');          
+        collectd_uninstall_target = false;
     }
 }

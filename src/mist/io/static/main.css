@@ -1143,6 +1143,11 @@ div.logout-placeholder {
     width: 49.2%;
 }
 
+div.info {
+    margin:10px;
+    text-align: center;
+}
+
 /* Conditional for < 720px */
 @media only screen and (max-width: 720px) {
 

@@ -67,8 +67,9 @@ define('app/controllers/machines', [
                             machine.tags.set('content', item.tags)
                             that.pushObject(machine);
                         }
-                    });
 
+                    });
+                    
                     that.content.forEach(function(item) {
                         var found = false;
 
@@ -97,6 +98,10 @@ define('app/controllers/machines', [
                     
                     Mist.backendsController.getMachineCount()
 
+                    Ember.run.next(function(){
+                        $('#machines-list input.ember-checkbox').checkboxradio();    
+                    });
+                    
                     Ember.run.later(that, function(){
                         this.refresh();
                     }, that.backend.poll_interval);

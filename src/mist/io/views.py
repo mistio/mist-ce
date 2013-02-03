@@ -1,7 +1,10 @@
 """mist.io views"""
 import os
 import logging
-import datetime
+
+from datetime import datetime
+
+import requests
 
 from hashlib import sha256
 
@@ -49,6 +52,7 @@ def home(request):
         session = False
         try:
             email = request.registry.settings['email']
+            password = request.registry.settings['password']
         except:
             email = ''
 
@@ -446,7 +450,7 @@ def set_machine_metadata(request):
 
     try:
         tag = request.json_body['tag']
-        unique_key = 'mist.io_tag-' + datetime.datetime.now().isoformat()
+        unique_key = 'mist.io_tag-' + datetime.now().isoformat()
         pair = {unique_key: tag}
     except:
         return Response('Malformed metadata format', 400)
@@ -718,8 +722,58 @@ def delete_key(request):
     return {}
 
 
-@view_config(route_name='monitoring', request_method='POST', renderer='json')
+@view_config(route_name='monitoring', request_method='GET', renderer='json')
+def check_monitoring(request):
+    """
+    Ask the mist.io service if monitoring is enabled for this machine
+    """
+    core_uri = request.registry.settings['core_uri']
+    email = request.registry.settings.get('email','')
+    password = request.registry.settings.get('password','')
+    
+    timestamp = datetime.utcnow().strftime("%s")
+    hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
+    
+    payload = {'email': email,
+               'timestamp': timestamp,
+               'hash': hash,
+               }
+    
+    ret = requests.get(core_uri+request.path, params=payload, verify=False)
+    if ret.status_code == 200:
+        return ret.json()
+    else:
+        return Response('Service unavailable', 503)
+
+
+@view_config(route_name='update_monitoring', request_method='POST', renderer='json')
 def update_monitoring(request):
-    """Enable/disable monitoring for this machine using the hosted mist.io service."""
-    # TODO: fwd the request to https://mist.io
-    return
+    """
+    Enable/disable monitoring for this machine using the hosted mist.io service.
+    """
+    core_uri = request.registry.settings['core_uri']
+    try:
+        email = request.json_body['email']
+        password = request.json_body['pass']
+        timestamp = request.json_body['timestamp']
+        hash = request.json_body['hash']
+    except:
+        email = request.registry.settings.get('email','')
+        password = request.registry.settings.get('password','')
+        timestamp =  datetime.utcnow().strftime("%s")
+        hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
+        
+    action = request.json_body['action'] or 'enable'
+    payload = {'email': email,
+               'timestamp': timestamp,
+               'hash': hash,
+               'action': action,
+               }
+    ret = requests.post(core_uri+request.path, params=payload, verify=False)
+    if ret.status_code == 200:
+        request.registry.settings['email'] = email
+        request.registry.settings['password'] = password
+        save_settings(request.registry.settings)
+        return ret.json()
+    else:
+        return Response('Service unavailable', 503)

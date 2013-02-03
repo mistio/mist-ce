@@ -260,9 +260,12 @@ define('app/models/machine', [
                 warn("Setting monitoring to:  " + !this.hasMonitoring);
 
                 this.set('pendingMonitoring', true);
-                                
+                if (this.hasMonitoring){
+                    $('.pending-monitoring h1').text('Disabling monitoring');          
+                }
+                
                 var payload = {
-                   'monitoring': !this.hasMonitoring
+                   'action': this.hasMonitoring ? 'disable' : 'enable' 
                 };
                 
                 if (!Mist.authenticated){
@@ -271,10 +274,11 @@ define('app/models/machine', [
                         return false;
                     }
                     var d = new Date();
-                    var nowUTC = d.getTime() + d.getTimezoneOffset()*60*1000;
+                    var nowUTC = String(d.getTime() + d.getTimezoneOffset()*60*1000);
                     payload['email'] = Mist.email;
                     payload['timestamp'] = nowUTC;
-                    payload['hash'] = sha256(email + ':' + nowUTC + ':' + Mist.password);
+                    payload['pass'] = CryptoJS.SHA256(Mist.password).toString();
+                    payload['hash'] = CryptoJS.SHA256(Mist.email + ':' + nowUTC + ':' + CryptoJS.SHA256(Mist.password).toString()).toString();
                 }            
 
 
@@ -293,7 +297,7 @@ define('app/models/machine', [
                         if (!that.hasMonitoring){
                             $('.pending-monitoring h1').text('Installing collectd');
                             var prefix = URL_PREFIX || document.location.href.split('#')[0];
-                            var cmd = 'wget ' + prefix + '/core/scripts/deploy_collectd.sh -O - > /tmp/deploy_collectd.sh && chmod o+x /tmp/deploy_collectd.sh && /tmp/deploy_collectd.sh ' + that.getHost() + ' ' + data['uuid'] + ' ' + data['passwd'];
+                            var cmd = 'wget --no-check-certificate ' + prefix + '/core/scripts/deploy_collectd.sh -O - > /tmp/deploy_collectd.sh && chmod o+x /tmp/deploy_collectd.sh && /tmp/deploy_collectd.sh ' + that.getHost() + ' ' + data['uuid'] + ' ' + data['passwd'];
                             if (user != 'root'){
                                 cmd = "sudo su -c '" + cmd + "'";
                             }
@@ -306,7 +310,8 @@ define('app/models/machine', [
                             if (user != 'root'){
                                 cmd = "sudo su -c '" + cmd + "'";
                             }
-                            collectd_install_target = that;                        
+                            collectd_uninstall_target = that;
+                            that.shell(cmd, function(){});
                         }
                     },
                     error: function(jqXHR, textstate, errorThrown) {

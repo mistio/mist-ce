@@ -49,27 +49,17 @@ define('app/controllers/backends', [
             },
 
             checkMonitoring: function(){
-                if (Mist.authenticated){
-                    payload = {};
-                } else {
-                    if (!Mist.email || !Mist.password){
-                        return false;
-                    }
-
-                    var d = new Date();
-                    var nowUTC = d.getTime() + d.getTimezoneOffset()*60*1000;
-                    payload = {'email': Mist.email,
-                               'timestamp': nowUTC,
-                               'hash': CryptoJS.SHA256(email + ':' + nowUTC + ':' + Mist.password)};
+                if (!Mist.authenticated){
+                    return
                 }
+                        
                 $.ajax({
-                    url: URL_PREFIX + '/monitoring',
+                    url: '/monitoring',
                     type: 'GET',
-                    dataType: 'jsonp',
-                    timeout: 10000,
-                    data: JSON.stringify(payload),
+                    dataType: 'json',
                     headers: { "cache-control": "no-cache" },
                     success: function(data){
+                        warn(data);
                         data.forEach(function(machine_tuple){
                             var b,m;
                             backend_id = machine_tuple[0];

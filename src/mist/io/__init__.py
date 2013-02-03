@@ -39,7 +39,8 @@ def main(global_config, **settings):
     config.add_route('locations', '/backends/{backend}/locations')
     config.add_route('keys', '/keys')
     config.add_route('key', '/keys/{key}')
-    config.add_route('monitoring', '/backends/{backend}/machines/{machine}/monitoring')
+    config.add_route('monitoring', '/monitoring')
+    config.add_route('update_monitoring', '/backends/{backend}/machines/{machine}/monitoring')
 
     config.scan()
 

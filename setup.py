@@ -14,6 +14,7 @@ requires = [
     'paramiko',
     'pyyaml',
     'pycrypto',
+    'requests',
 ]
 
 setup(name='mist.io',

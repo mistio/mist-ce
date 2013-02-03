@@ -186,21 +186,6 @@ define('app/views/machine', [
                 machine.set('pendingStats', true);
 
                 Em.run.next(function() {
-
-                    // log in first perhaps
-                    //cant POST in jsonp
-
-                    /*
-                    $.ajax({
-                        url: 'https://' + HOST + '/login?callback=?',
-                        type: 'POST',
-                        headers: { "cache-control": "no-cache" },
-                        dataType: 'jsonp',
-                        data: {email : USER, password: PASSWORD},
-                        async: false
-                    }).done(function() { console.log('logged in'); });
-                    */
-
                     var context = cubism.context()
                                         .serverDelay(0)
                                         .clientDelay(0)
@@ -219,7 +204,7 @@ define('app/views/machine', [
                             start = +start;
                             stop = +stop;
 
-                            if (machine.hasMonitoring) {
+                            if (false && machine.hasMonitoring) {
                                 $.ajax({
                                     url: URL_PREFIX + '/backends/' + machine.backend.id +
                                          '/machines/' + machine.id + '/stats',
