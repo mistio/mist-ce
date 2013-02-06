@@ -264,7 +264,7 @@ define('app/models/machine', [
                 warn("Setting monitoring to:  " + !this.hasMonitoring);
 
                 this.set('pendingMonitoring', true);
-                
+                //$('.monitoring-button').show();
                 var payload = {
                    'action': this.hasMonitoring ? 'disable' : 'enable' 
                 };

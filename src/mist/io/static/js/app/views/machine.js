@@ -413,9 +413,9 @@ define('app/views/machine', [
             handlePendingMonitoring: function() {
                 if (this.machine && this.machine.pendingMonitoring) {
                     $('.pending-monitoring').show();
-                    $('.monitoring-button').hide();
+                    $('.monitoring-button').addClass('ui-disabled'); //.hide();
                 } else {
-                    $('.monitoring-button').show();
+                    $('.monitoring-button').removeClass('ui-disabled'); //.show();
                     $('.pending-monitoring').hide();
                 }
             }.observes('machine.pendingMonitoring'),

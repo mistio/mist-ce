@@ -492,7 +492,6 @@ function completeShell(ret){
     Mist.machine.set('pendingShell', false);
     $('.shell-return .pending').removeClass('pending');
     if (collectd_install_target) {
-        collectd_install_target = false;
         if (collectd_lastlog.search('root') == -1){
             // TODO: display instruction for manual installation
             alert('collectd install failed');
@@ -500,6 +499,7 @@ function completeShell(ret){
         collectd_install_target.set('hasMonitoring', true);                        
         collectd_install_target.set('pendingMonitoring', false);
         $('.pending-monitoring h1').text('Enabling monitoring');          
+        collectd_install_target = false;
     } else if (collectd_uninstall_target) {
         collectd_uninstall_target.set('hasMonitoring', false);                        
         collectd_uninstall_target.set('pendingMonitoring', false);

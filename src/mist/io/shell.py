@@ -64,7 +64,7 @@ class ShellMiddleware(object):
             using the hidden iframe web pattern
         """
         #TODO: add timeout
-        outputPrefix = '[%s] out:' % host
+        outputPrefix = u'[%s] out:' % host
         
         # save private key in temp file
         (tmp_key, key_path) = tempfile.mkstemp()
@@ -91,11 +91,10 @@ class ShellMiddleware(object):
             if line != '':
                 sys.stdout.write(line)
                 sys.stdout.flush()
-                if outputPrefix in line: # remove logging decorators
+                if outputPrefix.encode('utf-8','ignore') in line: # remove logging decorators
                     line = line[len(outputPrefix):]
                     # send the actual output
                     yield "<script type='text/javascript'>parent.appendShell('%s');</script>\n" % line.replace('\'','\\\'').replace('\n','<br/>') #.replace('<','&lt;').replace('>', '&gt;')
-    
         # wait for child
         stdout, stderr = proc.communicate()
         
