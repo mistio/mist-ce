@@ -769,11 +769,13 @@ def update_monitoring(request):
                'hash': hash,
                'action': action,
                }
+    #TODO: make ssl verification configurable globally, set to true by default    
     ret = requests.post(core_uri+request.path, params=payload, verify=False)
-    if ret.status_code == 200:
-        request.registry.settings['email'] = email
-        request.registry.settings['password'] = password
-        save_settings(request.registry.settings)
-        return ret.json()
-    else:
+    
+    if ret.status_code != 200:
         return Response('Service unavailable', 503)
+
+    request.registry.settings['email'] = email
+    request.registry.settings['password'] = password
+    save_settings(request.registry.settings)
+    return ret.json()

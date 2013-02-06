@@ -152,7 +152,7 @@ define('app/controllers/backends', [
                             } catch(e) { $('#home-menu').listview(); }
                         });
                         Mist.backendsController.checkMonitoring();
-                    }, 3000);
+                    }, 5000);
 
                 });
             }

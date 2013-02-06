@@ -796,6 +796,10 @@ div.pending-monitoring {
     border-radius: 14px;
 }
 
+#monitoring-dialog pre {
+    overflow: auto;
+}
+
 .monitoring-dialog-container {
     padding: 15px;
     background: #e0e0e1;

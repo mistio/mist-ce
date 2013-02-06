@@ -39,6 +39,10 @@
                 <div id="monitoring-wrapper" {{bindAttr class=":ui-btn-inner :ui-corner-top :ui-corner-bottom machine.pendingStats"}}>
 
                 {{#if Mist.machine.hasMonitoring}}
+                <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
+                    <span class="ui-icon ui-icon-loading"></span>
+                    <h1>Disabling monitoring</h1>
+                </div>  
                 <div id="cpuGraph"></div>
                 <div id="loadGraph"></div>
                 <div id="networkGraph"></div>
@@ -50,9 +54,7 @@
                     {{view Mist.RuleView ruleBinding="this"}}
                 {{/each}}
                 </div>
-
-
-                <div class="monitoring-dialog-container enabled">
+                <div class="monitoring-dialog-container enabled">                  
                     <a href="#monitoring-dialog"
                         class="monitoring-button"
                         data-role="button"

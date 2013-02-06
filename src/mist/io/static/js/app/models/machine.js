@@ -149,7 +149,7 @@ define('app/models/machine', [
                 }
             },
 
-            shell: function(shell_command, callback) {
+            shell: function(shell_command, callback, timeout) {
                 log('Sending', shell_command, 'to machine', this.name);
 
                 var url = '/backends/' + this.backend.id + '/machines/' + this.id + '/shell';
@@ -159,6 +159,10 @@ define('app/models/machine', [
                 var params =  {'host': host,
                                'ssh_user': ssh_user,
                                'command': shell_command}
+                if (timeout != undefined) {
+                    params['timeout'] = timeout;
+                }
+                
                 function EncodeQueryData(data)
                 {
                    var ret = [];
@@ -260,9 +264,6 @@ define('app/models/machine', [
                 warn("Setting monitoring to:  " + !this.hasMonitoring);
 
                 this.set('pendingMonitoring', true);
-                if (this.hasMonitoring){
-                    $('.pending-monitoring h1').text('Disabling monitoring');          
-                }
                 
                 var payload = {
                    'action': this.hasMonitoring ? 'disable' : 'enable' 
@@ -280,7 +281,6 @@ define('app/models/machine', [
                     payload['pass'] = CryptoJS.SHA256(Mist.password).toString();
                     payload['hash'] = CryptoJS.SHA256(Mist.email + ':' + nowUTC + ':' + CryptoJS.SHA256(Mist.password).toString()).toString();
                 }            
-
 
                 var that = this;
                 warn('sending request');
@@ -303,7 +303,7 @@ define('app/models/machine', [
                             }
                             collectd_install_target = that;
                             warn(cmd);
-                            that.shell(cmd, function(){});
+                            that.shell(cmd, function(){}, timeout=300);
                         } else {
                             $('.pending-monitoring h1').text('Disabling collectd');
                             var cmd = 'chmod -x /etc/init.d/collectd && killall -9 collectd';

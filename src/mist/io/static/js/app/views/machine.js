@@ -249,7 +249,7 @@ define('app/views/machine', [
                                 }
 
                             } else {
-                                return callback(new Error('monitoring disabled'));
+                                //return callback(new Error('monitoring disabled'));
                             }
                         }, 'CPU');
                     }
@@ -264,7 +264,7 @@ define('app/views/machine', [
                                     return (d / memoryTotal) * 100;
                                 }));
                             } else {
-                                return callback(new Error('unable to load data'));
+                                //return callback(new Error('unable to load data'));
                             }
                         }, 'RAM');
                     }
@@ -282,7 +282,7 @@ define('app/views/machine', [
                                     return d;
                                 }));
                             } else {
-                                return callback(new Error('unable to load data'));
+                                //return callback(new Error('unable to load data'));
                             }
                         }, 'DISK (' + disk + ', ' + ioMethod + ') ');
                     }
@@ -294,7 +294,7 @@ define('app/views/machine', [
                                     return d;
                                 }));
                             } else {
-                                return callback(new Error('unable to load data'));
+                                //return callback(new Error('unable to load data'));
                             }
                         }, 'LOAD ');
                     }
@@ -312,7 +312,7 @@ define('app/views/machine', [
                                     return d;
                                 }));
                             } else {
-                                return callback(new Error('unable to load data'));
+                                //return callback(new Error('unable to load data'));
                             }
                         }, 'NET (' + iface + ', ' + stream  + ') ');
                     }

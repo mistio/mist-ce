@@ -456,35 +456,50 @@ function error() {
     } catch(err) {console.log(err);}
 }
 
-var collectd_install_target = false;
+var collectd_install_target = false, collectd_uninstall_target = false, collectd_lastlog="";
 
 function appendShell(data){
-    if (true || !collectd_install_target) {
+    var line = data.trim();
+    
+    if (data.length){
+        warn(Date() + ': ' + data);
+    }
+    
+    if (collectd_install_target) {
+        if (line != '<br/>') {
+            collectd_lastlog = line;
+        }
+        // TODO: display collectd install output        
+    } else if (collectd_uninstall_target){
+        if (line != '<br/>') {
+            collectd_lastlog = line;
+        }
+        // TODO: display collectd uninstall output        
+    } else {
         var target_page = $($.mobile.activePage);
         var output = target_page.find('.shell-return .output').first();
         if (data.length) {
-            console.warn(Date() + ': ' + data);
             output.append(data);
             output.scrollTop(10000);
         } else {
             that.set('pendingShell', false);
             target_page.find('.shell-return .pending').removeClass('pending');
         }          
-    } else {
-        // TODO: display collectd install output
     }
-
 }
 
-function completeShell(){
+function completeShell(ret){
     Mist.machine.set('pendingShell', false);
     $('.shell-return .pending').removeClass('pending');
-    // TODO: deploy collectd error handling
     if (collectd_install_target) {
+        collectd_install_target = false;
+        if (collectd_lastlog.search('root') == -1){
+            // TODO: display instruction for manual installation
+            alert('collectd install failed');
+        }        
         collectd_install_target.set('hasMonitoring', true);                        
         collectd_install_target.set('pendingMonitoring', false);
         $('.pending-monitoring h1').text('Enabling monitoring');          
-        collectd_install_target = false;
     } else if (collectd_uninstall_target) {
         collectd_uninstall_target.set('hasMonitoring', false);                        
         collectd_uninstall_target.set('pendingMonitoring', false);

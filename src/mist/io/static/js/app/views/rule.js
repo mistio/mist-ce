@@ -30,7 +30,7 @@ define('app/views/rule', [
             }.property('metricList'),
             
             operatorList: function() {
-                return [{'id': 'gt', 'title': '&gt;'}, {'id': 'lt', 'title': '&lt;'}]
+                return [{'id': 'gt', 'title': '>'}, {'id': 'lt', 'title': '<'}]
             }.property('operatorList'),
             
             actionList: function() {

@@ -11,8 +11,10 @@
             {{#if machine.hasMonitoring}}
                 <span>Are you sure you wish to disable monitoring for {{machine.name}}?</span>
                 {{#unless machine.hasKey}}
-                <p>This action can't be performed automactically because there is no key pair set.</p>
-                <p>To do it manually reffer to link for instructions. When completed successfuly press disable below.</p>
+                <p>The collectd daemon can't be disabled automactically because there is no key pair set.</p>
+                <p>To do it manually run the following commands:</p>
+                <pre>chmod -x /etc/init.d/collectd &amp;&amp; killall -9 collectd</pre>
+                
                 {{/unless}}
                 <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
                     <button id="enable-monitoring-cancel" class="btn-left-full" data-theme="c" {{action "backClicked" }}>Back</button>
@@ -21,8 +23,8 @@
             {{else}}
                 <div>Are you sure you wish to enable monitoring for {{machine.name}}?</div>
                 {{#unless machine.hasKey}}
-                <p>This action can't be performed automactically because there is no key pair set.</p>
-                <p>To do it manually reffer to link for instructions. When completed successfuly press enable below.</p>
+                <p>The collectd daemon can't be installed automatically because there is no key pair set.</p>
+                <p>You will have to configure it manually by following the instructions after pressing enable.</p>
                 {{/unless}}
                 <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
                     <button id="enable-monitoring-cancel" class="btn-left-full" data-theme="c" {{action "backClicked" }}>Back</button>
