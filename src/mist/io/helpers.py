@@ -87,6 +87,8 @@ def save_settings(settings):
             'public': literal_unicode(settings['keypairs'][key]['public']),
             'private': literal_unicode(settings['keypairs'][key]['private']),
         }
+        if key.get('default', None):
+            keypairs[key]['default'] = True
 
     payload = {
         'keypairs': keypairs,
@@ -103,6 +105,19 @@ def save_settings(settings):
     yaml.dump(payload, config_file, default_flow_style=False, )
 
     config_file.close()
+
+
+def default_keypair(request):
+    "get default key pair"
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except KeyError:
+        keypairs = request.registry.settings['keypairs']
+    
+    for key in keypairs:
+        if keypairs[key].get('default', False):
+            return keypairs[key]
+    return {}
 
 
 def connect(request, backend_id=False):

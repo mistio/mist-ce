@@ -31,7 +31,7 @@ from mist.io.config import SUPPORTED_PROVIDERS
 
 from mist.io.helpers import connect
 from mist.io.helpers import get_machine_actions
-from mist.io.helpers import import_key
+from mist.io.helpers import import_key, default_keypair
 from mist.io.helpers import create_security_group
 from mist.io.helpers import run_command
 from mist.io.helpers import save_settings
@@ -45,6 +45,7 @@ log = logging.getLogger('mist.io')
 def home(request):
     """Gets all the basic data for backends, project name and session status.
     """
+    import pdb; pdb.set_trace()
     try:
         email = request.environ['beaker.session']['email']
         session = True
@@ -235,7 +236,14 @@ def create_machine(request):
         return Response('Backend not found', 404)
 
     backend_id = request.matchdict['backend']
-    key_id = 'default'
+    keypair = default_keypair(request)
+
+    if keypair:
+        private_key = keypair['private']
+        public_key = keypair['public']
+    else:
+        private_key = public_key = None
+
     try:
         machine_name = request.json_body['name']
         location_id = request.json_body['location']
@@ -259,13 +267,7 @@ def create_machine(request):
                 break
     else:
         location = NodeLocation(location_id, name='', country='', driver=conn)
-
-    try:
-        private_key = request['beaker.session']['keypairs'][key_id]['private']
-        public_key = request['beaker.session']['keypairs'][key_id]['public']
-    except KeyError:
-        private_key = request.registry.settings['keypairs'][key_id]['private']
-        public_key = request.registry.settings['keypairs'][key_id]['public']
+    
 
     if conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE] and\
     public_key:
@@ -572,11 +574,13 @@ def shell_command(request):
     ssh_user = request.params.get('ssh_user', None)
     command = request.params.get('command', None)
 
-    key_id = 'default'
-    try:
-        private_key = request['beaker.session']['keypairs'][key_id]['private']
-    except KeyError:
-        private_key = request.registry.settings['keypairs'][key_id]['private']
+    keypair = default_keypair(request)
+
+    if keypair:
+        private_key = keypair['private']
+        public_key = keypair['public']
+    else:
+        private_key = public_key = None
 
     return run_command(conn, machine_id, host, ssh_user, private_key, command)
 
@@ -685,7 +689,10 @@ def list_keys(request):
     except:
         keypairs = request.registry.settings.get('keypairs',{})
 
-    ret = [{'name': key, 'pub': keypairs[key]['public']} for key in keypairs.keys()]
+    ret = [{'name': key, 
+            'pub': keypairs[key]['public'],
+            'default_key': keypairs[key].get('default', False)} 
+           for key in keypairs.keys()]
     return ret
 
 
@@ -705,7 +712,28 @@ def add_key(request):
     key = {'public':params.get('pub', ''),
            'private':params.get('priv', '')}
 
+    if not len(request.registry.settings['keypairs']):
+        key['default'] = True
+  
     request.registry.settings['keypairs'][id] = key
+    save_settings(request.registry.settings)
+
+    return {}
+
+
+@view_config(route_name='key', request_method='POST', renderer='json')
+def set_default_key(request):
+    params = request.json_body
+    id = params.get('name', '')
+
+    keypairs = request.registry.settings['keypairs']
+    
+    for key in keypairs:
+        if keypairs[key].get('default', False):
+            keypairs[key]['default'] = False
+ 
+    keypairs[id]['default'] = True
+  
     save_settings(request.registry.settings)
 
     return {}
@@ -716,7 +744,15 @@ def delete_key(request):
     params = request.json_body
     id = params.get('name', '')
 
-    request.registry.settings['keypairs'].pop(id)
+    key = request.registry.settings['keypairs'].pop(id)
+    if key.get('default', None):
+        #if we delete the default key, make the next one as default, provided 
+        #that it exists
+        try:
+           first_key_id = request.registry.settings['keypairs'].keys()[0]
+           request.registry.settings['keypairs'][first_key_id]['default'] = True
+        except KeyError: 
+            pass
     save_settings(request.registry.settings)
 
     return {}

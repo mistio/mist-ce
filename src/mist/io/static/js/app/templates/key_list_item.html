@@ -8,6 +8,13 @@
 
     <a href="#key" {{action "keyClick" on="click"}}>
         <h3 class="name">{{view.key.name}}</h3>
+
+        <p class="description">          
+            {{#if view.key.default_key}}
+            <span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon">default</span>
+            {{/if}}  
+        </p>
+
     </a>
 
 </li>
