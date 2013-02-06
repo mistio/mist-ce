@@ -45,7 +45,6 @@ log = logging.getLogger('mist.io')
 def home(request):
     """Gets all the basic data for backends, project name and session status.
     """
-    import pdb; pdb.set_trace()
     try:
         email = request.environ['beaker.session']['email']
         session = True
@@ -709,8 +708,8 @@ def add_key(request):
     params = request.json_body
     id = params.get('name', '')
 
-    key = {'public':params.get('pub', ''),
-           'private':params.get('priv', '')}
+    key = {'public' : params.get('pub', ''),
+           'private' : params.get('priv', '')}
 
     if not len(request.registry.settings['keypairs']):
         key['default'] = True

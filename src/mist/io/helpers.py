@@ -87,7 +87,7 @@ def save_settings(settings):
             'public': literal_unicode(settings['keypairs'][key]['public']),
             'private': literal_unicode(settings['keypairs'][key]['private']),
         }
-        if key.get('default', None):
+        if settings['keypairs'][key].get('default', None):
             keypairs[key]['default'] = True
 
     payload = {
@@ -296,11 +296,15 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
     """
     if not host:
         log.error('Host not provided, exiting.')
-        return Response('Host not set', 503)
+        return Response('Host not set', 400)
 
     if not command:
         log.warn('No command was passed, returning empty.')
-        return ''
+        return Response('Command not set', 400)
+    
+    if not private_key:
+        log.warn('No private key provided, returning empty')
+        return Response('Key not set', 400)
 
     (tmp_key, tmp_path) = tempfile.mkstemp()
     key_fd = os.fdopen(tmp_key, 'w+b')
