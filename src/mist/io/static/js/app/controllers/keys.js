@@ -49,7 +49,10 @@ define('app/controllers/keys', [
                         item.priv = null;
                         var key = Key.create(item);
                         that.addObject(key);
-                        Ember.run.next(function(){$('#keys-list').listview('refresh')});
+                        Ember.run.next(function(){
+                            $('#keys-list').listview('refresh');
+                            $('#keys-list input.ember-checkbox').checkboxradio();  
+                        });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while sending create key'  +
