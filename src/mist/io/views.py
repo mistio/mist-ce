@@ -686,7 +686,7 @@ def list_keys(request):
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
-        keypairs = request.registry.settings.get('keypairs',{})
+        keypairs = request.registry.settings.get('keypairs', {})
 
     ret = [{'name': key, 
             'pub': keypairs[key]['public'],
@@ -717,7 +717,12 @@ def add_key(request):
     request.registry.settings['keypairs'][id] = key
     save_settings(request.registry.settings)
 
-    return {}
+    ret = {'name': id, 
+           'pub': key['public'], 
+           'priv': key['private'], 
+           'default_key': key.get('default', False)}
+
+    return ret
 
 
 @view_config(route_name='key', request_method='POST', renderer='json')

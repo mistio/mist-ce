@@ -47,7 +47,7 @@ define('app/controllers/keys', [
                         info('Successfully sent create key ', name);
                         // don't keep private key on the client
                         item.priv = null;
-                        var key = Key.create(item);
+                        var key = Key.create(data);
                         that.addObject(key);
                         Ember.run.next(function(){
                             $('#keys-list').listview('refresh');
