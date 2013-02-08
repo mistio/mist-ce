@@ -13,6 +13,9 @@ define('app/views/confirmation_dialog', [
             confirm: function(){
                 Mist.confirmationController.confirm();
             },
+            reject: function(){
+                history.back();
+            },
 
             init: function() {
                 this._super();

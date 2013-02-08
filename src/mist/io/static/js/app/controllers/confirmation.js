@@ -11,7 +11,9 @@ define('app/controllers/confirmation', [
     function() {
         return Ember.Object.extend({
             show: function(){
+                var machine = Mist.machine;
                 $.mobile.changePage('#dialog-confirm');
+                Mist.set('machine', machine);
             },
 
             confirm: function() {

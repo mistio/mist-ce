@@ -32,6 +32,10 @@ define('app/views/image_list_item', [
                     $.mobile.changePage('#dialog-add', 'pop', true, true);
                     Mist.machineAddController.set("newMachineBackend", this.image.backend);
                     Mist.machineAddController.set("newMachineImage", this.image);
+                    Ember.run.next(function(){
+                        $('#createmachine-select-image').selectmenu('refresh');
+                        $('#createmachine-select-provider').selectmenu('refresh');
+                    });
                 },
 
                 init: function() {
