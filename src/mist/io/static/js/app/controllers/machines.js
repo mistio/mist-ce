@@ -172,7 +172,8 @@ define('app/controllers/machines', [
                                     that.backend.title);
                         if (that.backend.error) {
                             that.backend.set('error', false);
-                        }                                    
+                        }     
+                        machine.set("id", data.id);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while sending create machine' +

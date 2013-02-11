@@ -307,7 +307,7 @@ def create_machine(request):
                 if key_name:
                     keypair['machines'] = [[backend_id, node.id],]
                     save_settings(request.registry.settings)
-                return Response('Success', 200)
+                return {'id': node.id}
             except:
                 log.warn('Failed to deploy node with ssh key, attempt without')
     elif conn.type is Provider.LINODE and public_key:
@@ -321,12 +321,12 @@ def create_machine(request):
             if key_name:
                 keypair['machines'] = [[backend_id, node.id],]
                 save_settings(request.registry.settings)
-            return Response('Success', 200)
+            return {'id': node.id}
         except:
             log.warn('Failed to deploy node with ssh key, attempt without')
 
     try:
-        conn.create_node(name=machine_name,
+        node = conn.create_node(name=machine_name,
                          image=image,
                          size=size,
                          location=location)
