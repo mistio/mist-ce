@@ -86,7 +86,7 @@ def save_settings(settings):
         keypairs[key] = {
             'public': literal_unicode(settings['keypairs'][key]['public']),
             'private': literal_unicode(settings['keypairs'][key]['private']),
-            'machines': settings['keypairs'][key]['machines']
+            'machines': settings['keypairs'][key].get('machines',[])
         }
         if settings['keypairs'][key].get('default', None):
             keypairs[key]['default'] = True
