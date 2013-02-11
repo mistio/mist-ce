@@ -58,6 +58,18 @@
             data-icon="check"
             id="createmachine-select-location"
             name="createmachine-select-location"}}
+            
+        <label for="createmachine-select-key">6. Key:</label>
+        {{view Mist.Select contentBinding="Mist.keysController"
+            optionLabelPath="content.name"
+            optionValuePath="content.name"
+            prompt="Select Key"
+            selectionBinding="Mist.machineAddController.newMachineKey"
+            class="create-select"
+            data-theme="c"
+            data-icon="check"
+            id="createmachine-select-key"
+            name="createmachine-select-key"}}
 
         <div class="cost">Cost: {{Mist.machineAddController.newMachineCost}}</div>
 

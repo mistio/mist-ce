@@ -119,6 +119,18 @@ def default_keypair(request):
             return keypairs[key]
     return {}
 
+def get_keypair(request, name):
+    "get key pair by name"
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except KeyError:
+        keypairs = request.registry.settings['keypairs']
+    
+    for key in keypairs:
+        if name == key:
+            return keypairs[key]
+    return {}
+
 
 def connect(request, backend_id=False):
     """Establishes backend connection using the credentials specified.

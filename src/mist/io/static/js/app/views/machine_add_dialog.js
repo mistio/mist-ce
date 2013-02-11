@@ -67,11 +67,13 @@ define('app/views/machine_add_dialog', [
                                 $('#createmachine-select-image').selectmenu('disable');
                                 $('#createmachine-select-size').selectmenu('disable');
                                 $('#createmachine-select-location').selectmenu('disable');
+                                $('#createmachine-select-key').selectmenu('disable');
                             } else {
                                 $('#createmachine-select-provider').selectmenu('disable');
                                 $('#createmachine-select-image').selectmenu('disable');
                                 $('#createmachine-select-size').selectmenu('disable');
                                 $('#createmachine-select-location').selectmenu('disable');
+                                $('#createmachine-select-key').selectmenu('disable');
                             }
                             $('#dialog-add select').selectmenu('refresh');
                         });
@@ -84,10 +86,12 @@ define('app/views/machine_add_dialog', [
                                 $('#createmachine-select-image').selectmenu('enable');
                                 $('#createmachine-select-size').selectmenu('disable');
                                 $('#createmachine-select-location').selectmenu('disable');
+                                $('#createmachine-select-key').selectmenu('disable');
                             } else {
                                 $('#createmachine-select-image').selectmenu('disable');
                                 $('#createmachine-select-size').selectmenu('disable');
                                 $('#createmachine-select-location').selectmenu('disable');
+                                $('#createmachine-select-key').selectmenu('disable');
                             }
                             $('#dialog-add select').selectmenu('refresh');
                         });
@@ -99,9 +103,11 @@ define('app/views/machine_add_dialog', [
                             if (Mist.machineAddController.newMachineImageReady) {
                                 $('#createmachine-select-size').selectmenu('enable');
                                 $('#createmachine-select-location').selectmenu('disable');
+                                $('#createmachine-select-key').selectmenu('disable');
                             } else {
                                 $('#createmachine-select-size').selectmenu('disable');
                                 $('#createmachine-select-location').selectmenu('disable');
+                                $('#createmachine-select-key').selectmenu('disable');
                             }
                             $('#dialog-add select').selectmenu('refresh');
                         });
@@ -112,8 +118,10 @@ define('app/views/machine_add_dialog', [
                             $('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineSizeReady) {
                                 $('#createmachine-select-location').selectmenu('enable');
+                                $('#createmachine-select-key').selectmenu('disable');
                             } else {
                                 $('#createmachine-select-location').selectmenu('disable');
+                                $('#createmachine-select-key').selectmenu('disable');
                             }
                             $('#dialog-add select').selectmenu('refresh');
                         });
@@ -124,8 +132,10 @@ define('app/views/machine_add_dialog', [
                             $('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineLocationReady) {
                                 $('#create-ok').button('enable');
+                                $('#createmachine-select-key').selectmenu('enable');
                             } else {
                                 $('#create-ok').button('disable');
+                                $('#createmachine-select-key').selectmenu('disable');
                             }
                         });
                     });

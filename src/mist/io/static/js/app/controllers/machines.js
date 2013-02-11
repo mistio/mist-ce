@@ -127,7 +127,7 @@ define('app/controllers/machines', [
                 });
             },
 
-            newMachine: function(name, image, size, location) {
+            newMachine: function(name, image, size, location, key) {
                 log('Creating machine', this.name, 'to backend', this.backend.title);
 
                 // TODO: find a way to pass ember objects to JSON, so the
@@ -137,10 +137,11 @@ define('app/controllers/machines', [
                         'name': name,
                         'image': image.id,
                         'size': size.id,
-                        // these are only usefull for Linode
+                        // these are only useful for Linode
                         'image_extra': image.extra,
                         'disk': size.disk,
-                        'location': location.id
+                        'location': location.id,
+                        'key': key
                 };
 
                 var item = {};

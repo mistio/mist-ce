@@ -31,7 +31,7 @@ from mist.io.config import SUPPORTED_PROVIDERS
 
 from mist.io.helpers import connect
 from mist.io.helpers import get_machine_actions
-from mist.io.helpers import import_key, default_keypair
+from mist.io.helpers import import_key, default_keypair, get_keypair
 from mist.io.helpers import create_security_group
 from mist.io.helpers import run_command
 from mist.io.helpers import save_settings
@@ -235,7 +235,17 @@ def create_machine(request):
         return Response('Backend not found', 404)
 
     backend_id = request.matchdict['backend']
-    keypair = default_keypair(request)
+    
+    try:
+        key_name = request.json_body['key']
+    except:
+        key_name = None
+    
+    if key_name:
+        keypair = get_keypair(request, key_name)
+    else:
+        keypair = default_keypair(request)
+        
 
     if keypair:
         private_key = keypair['private']
