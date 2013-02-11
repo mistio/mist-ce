@@ -282,11 +282,14 @@ def create_machine(request):
     public_key:
         key = SSHKeyDeployment(str(public_key))
         try:
-            conn.deploy_node(name=machine_name,
+            node = conn.deploy_node(name=machine_name,
                              image=image,
                              size=size,
                              location=location,
                              deploy=key)
+            if key_pair:
+                keypair['machines'] = [[backend_id, node.id],]
+                save_settings(request.registry.settings)
             return Response('Success', 200)
         except:
             log.warn('Failed to deploy node with ssh key, attempt without')
@@ -295,23 +298,29 @@ def create_machine(request):
         created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
         if imported_key and created_security_group:
             try:
-                conn.create_node(name=machine_name,
+                node = conn.create_node(name=machine_name,
                                  image=image,
                                  size=size,
                                  location=location,
                                  ex_keyname=EC2_KEY_NAME,
                                  ex_securitygroup=EC2_SECURITYGROUP['name'])
+                if key_name:
+                    keypair['machines'] = [[backend_id, node.id],]
+                    save_settings(request.registry.settings)
                 return Response('Success', 200)
             except:
                 log.warn('Failed to deploy node with ssh key, attempt without')
     elif conn.type is Provider.LINODE and public_key:
         auth = NodeAuthSSHKey(public_key)
         try:
-            conn.create_node(name=machine_name,
+            node = conn.create_node(name=machine_name,
                              image=image,
                              size=size,
                              location=location,
                              auth=auth)
+            if key_name:
+                keypair['machines'] = [[backend_id, node.id],]
+                save_settings(request.registry.settings)
             return Response('Success', 200)
         except:
             log.warn('Failed to deploy node with ssh key, attempt without')
