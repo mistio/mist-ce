@@ -288,7 +288,10 @@ def create_machine(request):
                              location=location,
                              deploy=key)
             if key_pair:
-                keypair['machines'] = [[backend_id, node.id],]
+                if keypair.has_key('machines'):
+                    keypair['machines'] = keypair['machines'].append([[backend_id, node.id],])
+                else:
+                    keypair['machines'] = [[backend_id, node.id],]
                 save_settings(request.registry.settings)
             return Response('Success', 200)
         except:
@@ -305,7 +308,10 @@ def create_machine(request):
                                  ex_keyname=EC2_KEY_NAME,
                                  ex_securitygroup=EC2_SECURITYGROUP['name'])
                 if key_name:
-                    keypair['machines'] = [[backend_id, node.id],]
+                    if keypair.has_key('machines'):
+                        keypair['machines'] = keypair['machines'].append([[backend_id, node.id],])
+                    else:
+                        keypair['machines'] = [[backend_id, node.id],]
                     save_settings(request.registry.settings)
                 return {'id': node.id}
             except:
@@ -319,7 +325,10 @@ def create_machine(request):
                              location=location,
                              auth=auth)
             if key_name:
-                keypair['machines'] = [[backend_id, node.id],]
+                if keypair.has_key('machines'):
+                    keypair['machines'] = keypair['machines'].append([[backend_id, node.id],])
+                else:
+                    keypair['machines'] = [[backend_id, node.id],]
                 save_settings(request.registry.settings)
             return {'id': node.id}
         except:
