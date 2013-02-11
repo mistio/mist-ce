@@ -141,7 +141,7 @@ define('app/controllers/machines', [
                         'image_extra': image.extra,
                         'disk': size.disk,
                         'location': location.id,
-                        'key': key
+                        'key': key.name
                 };
 
                 var item = {};
