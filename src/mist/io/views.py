@@ -312,7 +312,6 @@ def create_machine(request):
                         keypair['machines'] = keypair['machines'].append([[backend_id, node.id],])
                     else:
                         keypair['machines'] = [[backend_id, node.id],]
-                    import pdb; pdb.set_trace()
                     save_settings(request.registry.settings)
                 return {'id': node.id}
             except:

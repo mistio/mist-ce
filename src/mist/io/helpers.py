@@ -149,7 +149,6 @@ def get_keypair_for_machine(request, machine_id):
     for key in keypairs:
         if keypairs[key].has_key('machines'):
             for machine in keypairs[key]['machines']:
-                import pdb; pdb.set_trace()
                 if machine == [backend_id, machine_id]:
                     return keypairs[key]
     return {}
