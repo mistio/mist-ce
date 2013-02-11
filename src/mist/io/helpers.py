@@ -132,6 +132,28 @@ def get_keypair(request, name):
             return keypairs[key]
     return {}
 
+def get_keypair_for_machine(request, machine_id):
+    "get key pair by name"
+    try:
+        backends = request.environ['beaker.session']['backends']
+    except:
+        backends = request.registry.settings['backends']
+
+    backend_id = request.matchdict['backend']
+    
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except KeyError:
+        keypairs = request.registry.settings['keypairs']
+    
+    for key in keypairs:
+        if keypairs[key].has_key('machines'):
+            for machine in keypairs[key]['machines']:
+                import pdb; pdb.set_trace()
+                if machine == [backend_id, machine_id]:
+                    return keypairs[key]
+    return {}
+
 
 def connect(request, backend_id=False):
     """Establishes backend connection using the credentials specified.

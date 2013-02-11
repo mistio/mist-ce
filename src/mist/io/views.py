@@ -31,7 +31,7 @@ from mist.io.config import SUPPORTED_PROVIDERS
 
 from mist.io.helpers import connect
 from mist.io.helpers import get_machine_actions
-from mist.io.helpers import import_key, default_keypair, get_keypair
+from mist.io.helpers import import_key, default_keypair, get_keypair, get_keypair_for_machine
 from mist.io.helpers import create_security_group
 from mist.io.helpers import run_command
 from mist.io.helpers import save_settings
@@ -312,6 +312,7 @@ def create_machine(request):
                         keypair['machines'] = keypair['machines'].append([[backend_id, node.id],])
                     else:
                         keypair['machines'] = [[backend_id, node.id],]
+                    import pdb; pdb.set_trace()
                     save_settings(request.registry.settings)
                 return {'id': node.id}
             except:
@@ -601,7 +602,10 @@ def shell_command(request):
     ssh_user = request.params.get('ssh_user', None)
     command = request.params.get('command', None)
 
-    keypair = default_keypair(request)
+    keypair = get_keypair_for_machine(request, machine_id)
+    
+    if not keypair:
+        keypair = default_keypair(request)
 
     if keypair:
         private_key = keypair['private']
