@@ -296,7 +296,7 @@ def create_machine(request):
             if keypair:
                 machines = keypair.get('machines', None)
                 if machines and len(machines):
-                    keypair['machines'] = keypair['machines'].append([[backend_id, node.id],])
+                    keypair['machines'].append([[backend_id, node.id],])
                 else:
                     keypair['machines'] = [[backend_id, node.id],]
                 save_settings(request)
@@ -317,7 +317,7 @@ def create_machine(request):
                 if keypair:
                     machines = keypair.get('machines', None)
                     if machines and len(machines):
-                        keypair['machines'] = keypair['machines'].append([[backend_id, node.id],])
+                        keypair['machines'].append([[backend_id, node.id],])
                     else:
                         keypair['machines'] = [[backend_id, node.id],]
                     save_settings(request)
@@ -335,7 +335,7 @@ def create_machine(request):
             if keypair:
                 machines = keypair.get('machines', None)
                 if machines and len(machines):
-                    keypair['machines'] = keypair['machines'].append([[backend_id, node.id],])
+                    keypair['machines'].append([[backend_id, node.id],])
                 else:
                     keypair['machines'] = [[backend_id, node.id],]
                 save_settings(request)
@@ -816,7 +816,7 @@ def associate_key_to_machine(request):
         return Response('Keypair not found', 404)
 
     #FIXME: is this needed here??
-    request.registry.settings['keypairs'][key_name]['machines'] = keypair['machines']
+    #request.registry.settings['keypairs'][key_name]['machines'] = keypair['machines']
     save_settings(request)
 
     return {}

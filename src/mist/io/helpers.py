@@ -126,7 +126,6 @@ def get_keypair(keypairs, backend_id=None, machine_id=None):
         if machines and len(machines):
             for machine in keypairs[key]['machines']:
                 if machine == [backend_id, machine_id]:
-                    #TESTING: print 'got for machine %s key %s' % (machine_id, key)
                     return keypairs[key]
     for key in keypairs:
         if keypairs[key].get('default', False):
