@@ -35,9 +35,10 @@ from mist.io.helpers import import_key, get_keypair, get_keypair_by_name
 from mist.io.helpers import create_security_group
 from mist.io.helpers import run_command
 try:
-    from mist.core.helpers import save_settings
+    from mist.core.helpers import save_keypairs
 except ImportError:
-    from mist.io.helpers import save_settings
+    from mist.io.helpers import save_keypairs
+from mist.io.helpers import save_settings
 
 
 log = logging.getLogger('mist.io')
@@ -299,7 +300,7 @@ def create_machine(request):
                     keypair['machines'].append([backend_id, node.id])
                 else:
                     keypair['machines'] = [[backend_id, node.id],]
-                save_settings(request)
+                save_keypairs(request, keypair)
             return Response('Success', 200)
         except:
             log.warn('Failed to deploy node with ssh key, attempt without')
@@ -320,7 +321,7 @@ def create_machine(request):
                         keypair['machines'].append([backend_id, node.id])
                     else:
                         keypair['machines'] = [[backend_id, node.id],]
-                    save_settings(request)
+                    save_keypairs(request, keypair)
                 return {'id': node.id}
             except:
                 log.warn('Failed to deploy node with ssh key, attempt without')
@@ -338,7 +339,7 @@ def create_machine(request):
                     keypair['machines'].append([backend_id, node.id])
                 else:
                     keypair['machines'] = [[backend_id, node.id],]
-                save_settings(request)
+                save_keypairs(request, keypair)
             return {'id': node.id}
         except:
             log.warn('Failed to deploy node with ssh key, attempt without')

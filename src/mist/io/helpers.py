@@ -82,6 +82,7 @@ def save_settings(request):
     config_file = open('settings.yaml', 'w')
 
     settings = request.registry.settings
+
     keypairs = {}
     for key in settings['keypairs'].keys():
         keypairs[key] = {
@@ -91,7 +92,6 @@ def save_settings(request):
         }
         if settings['keypairs'][key].get('default', None):
             keypairs[key]['default'] = True
-
     payload = {
         'keypairs': keypairs,
         'backends': settings['backends'],
@@ -107,6 +107,70 @@ def save_settings(request):
     yaml.dump(payload, config_file, default_flow_style=False, )
 
     config_file.close()
+
+def save_keypairs(request, keypair):
+    """Stores keypairs to settings.yaml local file.
+
+    This is useful for using mist.io UI to configure your installation. It
+    includes some yaml dump magic in order for the dumped private ssh keys
+    to be in a valid string format.
+    """
+    class folded_unicode(unicode): pass
+    class literal_unicode(unicode): pass
+
+    def literal_unicode_representer(dumper, data):
+        return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='|')
+
+    def folded_unicode_representer(dumper, data):
+        return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='>')
+
+    def unicode_representer(dumper, uni):
+        node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
+        return node
+
+    yaml.add_representer(unicode, unicode_representer)
+    yaml.add_representer(literal_unicode, literal_unicode_representer)
+
+    if keypair:
+        config_file = open('settings.yaml', 'w')
+
+        settings = request.registry.settings
+        keypairs = {}
+
+        for key in settings['keypairs'].keys():
+            if settings['keypairs'][key]['public'] == keypair['public'] and settings['keypairs'][key]['private'] == keypair['private']:
+                #save keypair machines
+                keypairs[key] = {
+                    'public': literal_unicode(settings['keypairs'][key]['public']),
+                    'private': literal_unicode(settings['keypairs'][key]['private']),
+                    'machines': keypair['machines']
+                }
+                if settings['keypairs'][key].get('default', None):
+                    keypairs[key]['default'] = True
+            else:
+                keypairs[key] = {
+                    'public': literal_unicode(settings['keypairs'][key]['public']),
+                    'private': literal_unicode(settings['keypairs'][key]['private']),
+                    'machines': settings['keypairs'][key].get('machines',[])
+                }
+                if settings['keypairs'][key].get('default', None):
+                    keypairs[key]['default'] = True
+
+        payload = {
+            'keypairs': keypairs,
+            'backends': settings['backends'],
+            'core_uri': settings['core_uri'],
+            'js_build': settings['js_build'],
+            'js_log_level': settings['js_log_level'],
+            }
+        
+        if settings.get('email', False) and settings.get('password', False):
+            payload['email'] = settings['email']
+            payload['password'] = settings['password']
+
+        yaml.dump(payload, config_file, default_flow_style=False, )
+
+        config_file.close()
 
 
 def get_keypair_by_name(keypairs, name):
