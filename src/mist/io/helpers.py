@@ -56,7 +56,7 @@ def load_settings(settings):
         settings['core_uri'] = user_config.get('core_uri', 'https://mist.io')
 
 
-def save_settings(settings):
+def save_settings(request):
     """Stores settings to settings.yaml local file.
 
     This is useful for using mist.io UI to configure your installation. It
@@ -81,6 +81,7 @@ def save_settings(settings):
 
     config_file = open('settings.yaml', 'w')
 
+    settings = request.registry.settings
     keypairs = {}
     for key in settings['keypairs'].keys():
         keypairs[key] = {
@@ -108,49 +109,27 @@ def save_settings(settings):
     config_file.close()
 
 
-def default_keypair(request):
-    "get default key pair"
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except KeyError:
-        keypairs = request.registry.settings['keypairs']
-    
-    for key in keypairs:
-        if keypairs[key].get('default', False):
-            return keypairs[key]
-    return {}
-
-def get_keypair(request, name):
+def get_keypair_by_name(keypairs, name):
     "get key pair by name"
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except KeyError:
-        keypairs = request.registry.settings['keypairs']
     
     for key in keypairs:
         if name == key:
             return keypairs[key]
     return {}
 
-def get_keypair_for_machine(request, machine_id):
-    "get key pair by name"
-    try:
-        backends = request.environ['beaker.session']['backends']
-    except:
-        backends = request.registry.settings['backends']
 
-    backend_id = request.matchdict['backend']
-    
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except KeyError:
-        keypairs = request.registry.settings['keypairs']
-    
+def get_keypair(keypairs, backend_id=None, machine_id=None):
+    "get key pair for machine, else get default key pair"
+
     for key in keypairs:
         if keypairs[key].has_key('machines'):
             for machine in keypairs[key]['machines']:
                 if machine == [backend_id, machine_id]:
                     return keypairs[key]
+    for key in keypairs:
+        if keypairs[key].get('default', False):
+            return keypairs[key]
+
     return {}
 
 

@@ -15,7 +15,7 @@ from StringIO import StringIO
 
 from pyramid.request import Request
 from pyramid.response import Response
-from mist.io.helpers import connect, run_command, default_keypair
+from mist.io.helpers import connect, run_command, get_keypair
 
 log = logging.getLogger('mistshell')
 
@@ -40,7 +40,13 @@ class ShellMiddleware(object):
                 command = request.params.get('command', None)
                 request.registry = self.app.registry
 
-                keypair = default_keypair(request)
+                try:
+                    keypairs = environ['beaker.session']['keypairs']
+                except:
+                    keypairs = request.registry.settings['keypairs']
+
+                keypair = get_keypair(keypairs, backend, machine)
+              
 
                 if keypair:
                     private_key = keypair['private']
