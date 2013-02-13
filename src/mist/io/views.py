@@ -31,10 +31,13 @@ from mist.io.config import SUPPORTED_PROVIDERS
 
 from mist.io.helpers import connect
 from mist.io.helpers import get_machine_actions
-from mist.io.helpers import import_key, default_keypair, get_keypair, get_keypair_for_machine
+from mist.io.helpers import import_key, get_keypair, get_keypair_by_name
 from mist.io.helpers import create_security_group
 from mist.io.helpers import run_command
-from mist.io.helpers import save_settings
+try:
+    from mist.core.helpers import save_settings
+except ImportError:
+    from mist.io.helpers import save_settings
 
 
 log = logging.getLogger('mist.io')
@@ -124,7 +127,7 @@ def add_backend(request, renderer='json'):
               }
 
     request.registry.settings['backends'][backend_id] = backend
-    save_settings(request.registry.settings)
+    save_settings(request)
 
     ret = {'id'           : backend_id,
            'apikey'       : backend['apikey'],
@@ -140,10 +143,8 @@ def add_backend(request, renderer='json'):
 
 @view_config(route_name='backend_action', request_method='DELETE', renderer='json')
 def delete_backend(request, renderer='json'):
-    settings = request.registry.settings
-    settings['backends'].pop(request.matchdict['backend'])
-
-    save_settings(settings)
+    request.registry.settings['backends'].pop(request.matchdict['backend'])
+    save_settings(request)
 
     return Response('OK', 200)
 
@@ -235,17 +236,21 @@ def create_machine(request):
         return Response('Backend not found', 404)
 
     backend_id = request.matchdict['backend']
-    
+
     try:
         key_name = request.json_body['key']
     except:
         key_name = None
     
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+
     if key_name:
-        keypair = get_keypair(request, key_name)
+        keypair = get_keypair_by_name(keypairs, key_name)
     else:
-        keypair = default_keypair(request)
-        
+        keypair = get_keypair(keypairs)      
 
     if keypair:
         private_key = keypair['private']
@@ -292,7 +297,7 @@ def create_machine(request):
                     keypair['machines'] = keypair['machines'].append([[backend_id, node.id],])
                 else:
                     keypair['machines'] = [[backend_id, node.id],]
-                save_settings(request.registry.settings)
+                save_settings(request)
             return Response('Success', 200)
         except:
             log.warn('Failed to deploy node with ssh key, attempt without')
@@ -312,7 +317,7 @@ def create_machine(request):
                         keypair['machines'] = keypair['machines'].append([[backend_id, node.id],])
                     else:
                         keypair['machines'] = [[backend_id, node.id],]
-                    save_settings(request.registry.settings)
+                    save_settings(request)
                 return {'id': node.id}
             except:
                 log.warn('Failed to deploy node with ssh key, attempt without')
@@ -329,7 +334,7 @@ def create_machine(request):
                     keypair['machines'] = keypair['machines'].append([[backend_id, node.id],])
                 else:
                     keypair['machines'] = [[backend_id, node.id],]
-                save_settings(request.registry.settings)
+                save_settings(request)
             return {'id': node.id}
         except:
             log.warn('Failed to deploy node with ssh key, attempt without')
@@ -596,16 +601,20 @@ def shell_command(request):
         conn = connect(request)
     except:
         return Response('Backend not found', 404)
+
     machine_id = request.matchdict['machine']
+    backend_id = request.matchdict['backend']
     host = request.params.get('host', None)
     ssh_user = request.params.get('ssh_user', None)
     command = request.params.get('command', None)
 
-    keypair = get_keypair_for_machine(request, machine_id)
-    
-    if not keypair:
-        keypair = default_keypair(request)
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
 
+    keypair = get_keypair(keypairs, backend_id, machine_id)
+    
     if keypair:
         private_key = keypair['private']
         public_key = keypair['public']
@@ -720,6 +729,7 @@ def list_keys(request):
         keypairs = request.registry.settings.get('keypairs', {})
 
     ret = [{'name': key, 
+            'machines': keypairs[key].get('machines', False),
             'pub': keypairs[key]['public'],
             'default_key': keypairs[key].get('default', False)} 
            for key in keypairs.keys()]
@@ -746,12 +756,13 @@ def add_key(request):
         key['default'] = True
   
     request.registry.settings['keypairs'][id] = key
-    save_settings(request.registry.settings)
+    save_settings(request)
 
     ret = {'name': id, 
            'pub': key['public'], 
            'priv': key['private'], 
-           'default_key': key.get('default', False)}
+           'default_key': key.get('default', False),
+           'machines': []}
 
     return ret
 
@@ -769,7 +780,7 @@ def set_default_key(request):
  
     keypairs[id]['default'] = True
   
-    save_settings(request.registry.settings)
+    save_settings(request)
 
     return {}
 
@@ -788,7 +799,7 @@ def delete_key(request):
            request.registry.settings['keypairs'][first_key_id]['default'] = True
         except KeyError: 
             pass
-    save_settings(request.registry.settings)
+    save_settings(request)
 
     return {}
 
@@ -848,5 +859,5 @@ def update_monitoring(request):
 
     request.registry.settings['email'] = email
     request.registry.settings['password'] = password
-    save_settings(request.registry.settings)
+    save_settings(request)
     return ret.json()
