@@ -43,7 +43,7 @@ class ShellMiddleware(object):
                 try:
                     keypairs = environ['beaker.session']['keypairs']
                 except:
-                    keypairs = request.registry.settings['keypairs']
+                    keypairs = request.registry.settings.get('keypairs', {})
 
                 keypair = get_keypair(keypairs, backend, machine)
               

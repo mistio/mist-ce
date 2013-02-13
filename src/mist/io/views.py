@@ -230,6 +230,7 @@ def create_machine(request):
     get them. Also, it will create inconsistencies for machines created
     through mist.io and those from the Linode interface.
     """
+
     try:
         conn = connect(request)
     except:
@@ -292,8 +293,9 @@ def create_machine(request):
                              size=size,
                              location=location,
                              deploy=key)
-            if key_pair:
-                if keypair.has_key('machines'):
+            if key_name:
+                machines = keypair.get('machines', None)
+                if machines and len(machines):
                     keypair['machines'] = keypair['machines'].append([[backend_id, node.id],])
                 else:
                     keypair['machines'] = [[backend_id, node.id],]
@@ -313,7 +315,8 @@ def create_machine(request):
                                  ex_keyname=EC2_KEY_NAME,
                                  ex_securitygroup=EC2_SECURITYGROUP['name'])
                 if key_name:
-                    if keypair.has_key('machines'):
+                    machines = keypair.get('machines', None)
+                    if machines and len(machines):
                         keypair['machines'] = keypair['machines'].append([[backend_id, node.id],])
                     else:
                         keypair['machines'] = [[backend_id, node.id],]
@@ -330,7 +333,8 @@ def create_machine(request):
                              location=location,
                              auth=auth)
             if key_name:
-                if keypair.has_key('machines'):
+                machines = keypair.get('machines', None)
+                if machines and len(machines):
                     keypair['machines'] = keypair['machines'].append([[backend_id, node.id],])
                 else:
                     keypair['machines'] = [[backend_id, node.id],]
