@@ -135,7 +135,7 @@ def save_keypairs(request, keypair):
         config_file = open('settings.yaml', 'w')
 
         settings = request.registry.settings
-        keypairs = {}
+        keypairs = request.registry.settings['keypairs']
 
         for key in settings['keypairs'].keys():
             if settings['keypairs'][key]['public'] == keypair['public'] and settings['keypairs'][key]['private'] == keypair['private']:
@@ -143,18 +143,9 @@ def save_keypairs(request, keypair):
                 keypairs[key] = {
                     'public': literal_unicode(settings['keypairs'][key]['public']),
                     'private': literal_unicode(settings['keypairs'][key]['private']),
-                    'machines': keypair['machines']
+                    'machines': keypair['machines'],
+                    'default': settings['keypairs'][key].get('default', None)
                 }
-                if settings['keypairs'][key].get('default', None):
-                    keypairs[key]['default'] = True
-            else:
-                keypairs[key] = {
-                    'public': literal_unicode(settings['keypairs'][key]['public']),
-                    'private': literal_unicode(settings['keypairs'][key]['private']),
-                    'machines': settings['keypairs'][key].get('machines',[])
-                }
-                if settings['keypairs'][key].get('default', None):
-                    keypairs[key]['default'] = True
 
         payload = {
             'keypairs': keypairs,
