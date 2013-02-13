@@ -11,6 +11,7 @@ define('app/models/key', [
             name: null,
             pub: null,
             priv: null,
+            machines: null,
             default_key: null,
 
             deleteKey: function() {
