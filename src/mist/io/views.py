@@ -304,7 +304,7 @@ def create_machine(request):
         except:
             log.warn('Failed to deploy node with ssh key, attempt without')
     elif conn.type in EC2_PROVIDERS and public_key:
-        imported_key = import_key(conn, public_key, EC2_KEY_NAME)
+        imported_key = import_key(conn, public_key, key_name)
         created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
         if imported_key and created_security_group:
             try:
@@ -312,7 +312,7 @@ def create_machine(request):
                                  image=image,
                                  size=size,
                                  location=location,
-                                 ex_keyname=EC2_KEY_NAME,
+                                 ex_keyname=key_name,
                                  ex_securitygroup=EC2_SECURITYGROUP['name'])
                 if keypair:
                     machines = keypair.get('machines', None)
