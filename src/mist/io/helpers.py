@@ -48,7 +48,7 @@ def load_settings(settings):
     settings['backends'] = user_config.get('backends', {})
     settings['email'] = user_config.get('email', '')
     settings['password'] = user_config.get('password', '')
-    settings['js_build'] = user_config.get('js_build', True)
+    settings['js_build'] = user_config.get('js_build', settings.get('js_build', True))
     settings['js_log_level'] = user_config.get('js_log_level', 3)
     settings['default_poll_interval'] = user_config.get('default_poll_interval',
                                                          10000)
