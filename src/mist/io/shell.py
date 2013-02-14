@@ -40,6 +40,9 @@ class ShellMiddleware(object):
                 command = request.params.get('command', None)
                 request.registry = self.app.registry
 
+                if not ssh_user or ssh_user == 'undefined':
+                    ssh_user = 'root'
+
                 try:
                     keypairs = environ['beaker.session']['keypairs']
                 except:
@@ -47,7 +50,6 @@ class ShellMiddleware(object):
 
                 keypair = get_keypair(keypairs, backend, machine)
               
-
                 if keypair:
                     private_key = keypair['private']
                 else:
