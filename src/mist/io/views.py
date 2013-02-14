@@ -613,6 +613,9 @@ def shell_command(request):
     ssh_user = request.params.get('ssh_user', None)
     command = request.params.get('command', None)
 
+    if not ssh_user or ssh_user == 'undefined':
+        ssh_user = 'root'
+
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
