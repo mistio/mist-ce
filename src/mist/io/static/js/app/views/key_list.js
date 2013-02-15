@@ -17,6 +17,20 @@ define('app/views/key_list', [
                 this.set('template', Ember.Handlebars.compile(key_list_html));
             },
 
+            setDefaultKey: function(){
+                var key = this.getSelectedKeys();
+
+                if(key.length == 0){
+                    return;
+                } else if(key.length > 1){
+                    alert('You can only set one key as the deafult');
+                    return;
+                }
+                
+                key[0].setDefaultKey();
+                $('#keys .keys-footer').fadeOut(200);
+            },
+
             deleteKey: function(){
                 var keys = this.getSelectedKeys();
                 var plural = false;
