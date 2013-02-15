@@ -816,7 +816,7 @@ def associate_key_to_machine(request):
     if keypair:
         machines = keypair.get('machines', None)
         if machines and len(machines):
-            keypair['machines'] = keypair['machines'].append([backend_id, machine_id])
+            keypair['machines'].append([backend_id, machine_id])
         else:
             keypair['machines'] = [[backend_id, machine_id],]
 
