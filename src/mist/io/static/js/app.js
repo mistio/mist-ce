@@ -494,7 +494,7 @@ function completeShell(ret){
     if (collectd_install_target) {
         if (collectd_lastlog.search('root') == -1){
             // TODO: display instruction for manual installation
-            alert('collectd install failed');
+            // alert('collectd install failed');
         }        
         collectd_install_target.set('hasMonitoring', true);                        
         collectd_install_target.set('pendingMonitoring', false);
