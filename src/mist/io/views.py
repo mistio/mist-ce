@@ -797,27 +797,29 @@ def set_default_key(request):
 def associate_key_to_machine(request):
     params = request.json_body
     key_name = params.get('key_name', '')
-    machine_id = params.get('machine', '')
-    backend_id = params.get('backend', '')
+    machine_id = params.get('machine_id', '')
+    backend_id = params.get('backend_id', '')
 
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs', {})
     
-    for key in keypairs:
-        if keypairs[key] == key_name:
-            keypair = keypairs[key]
-            break
+    keypair = {}
+
+    if key_name in keypairs.keys():
+        keypair = keypairs[key_name]
+    else:
+        return Response('Keypair not found', 404)
+
 
     if keypair:
         machines = keypair.get('machines', None)
         if machines and len(machines):
-            keypair['machines'] = keypair['machines'].append([backend_id, node.id])
+            keypair['machines'] = keypair['machines'].append([backend_id, machine_id])
         else:
-            keypair['machines'] = [[backend_id, node.id],]
-    else:
-        return Response('Keypair not found', 404)
+            keypair['machines'] = [[backend_id, machine_id],]
+
 
     #FIXME: is this needed here??
     #request.registry.settings['keypairs'][key_name]['machines'] = keypair['machines']
