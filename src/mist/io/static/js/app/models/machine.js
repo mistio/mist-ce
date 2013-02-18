@@ -297,6 +297,9 @@ define('app/models/machine', [
                         if (!that.hasMonitoring){
                             $('.pending-monitoring h1').text('Installing collectd');
                             var prefix = URL_PREFIX || document.location.href.split('#')[0];
+                            if (prefix.slice(-1) == '/') {
+                                prefix = prefix.substring(0, prefix.length - 1);
+                            }
                             var cmd = 'wget --no-check-certificate ' + prefix + '/core/scripts/deploy_collectd.sh -O - > /tmp/deploy_collectd.sh && chmod o+x /tmp/deploy_collectd.sh && /tmp/deploy_collectd.sh ' + data['monitor_server'] + ' ' + data['uuid'] + ' ' + data['passwd'];
                             if (user != 'root'){
                                 cmd = "sudo su -c '" + cmd + "'";
