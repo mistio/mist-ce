@@ -12,10 +12,10 @@ define('app/views/machine_add_dialog', [
 
             clear: function(){
                 Mist.machineAddController.newMachineClear();
-                $('#dialog-add select').selectmenu();
-                $('#dialog-add select').selectmenu('disable');
-                $('#create-ok').button();
-                $('#create-ok').button('disable');
+                $('#create-machine-name').val('');
+                $('#dialog-add').find('select.create-select').children('option').removeAttr('selected');
+                $('#dialog-add').find('select.create-select').find('option:first').attr('selected','selected');
+                $('#dialog-add').find('select.create-select').selectmenu('refresh');
             },
 
             didInsertElement: function() {
@@ -30,6 +30,7 @@ define('app/views/machine_add_dialog', [
                 //FIXME there should be a way to bind the action directly to the controller
                 Mist.machineAddController.newMachine();
                 $.mobile.changePage('#machines');
+                clear();
             },
 
             backClicked: function(){

@@ -317,7 +317,8 @@ define( 'app', [
 
             $('#dialog-add').live('pagehide', function(event) {
                 $('#create-machine-name').val('');
-                $(this).find('select.create-select').attr('selectedIndex', -1).children('option').removeAttr('selected');
+                $(this).find('select.create-select').children('option').removeAttr('selected');
+                $(this).find('select.create-select').find('option:first').attr('selected','selected');
                 $(this).find('select.create-select').selectmenu('refresh');
             });
 
