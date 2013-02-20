@@ -315,13 +315,6 @@ define( 'app', [
             $('.rule-box').live('mouseleave', hideRuleSlider)
             $('#single-machine').live('tap', hideRuleSlider);
 
-            $('#dialog-add').live('pagehide', function(event) {
-                $('#create-machine-name').val('');
-                $(this).find('select.create-select').children('option').removeAttr('selected');
-                $(this).find('select.create-select').find('option:first').attr('selected','selected');
-                $(this).find('select.create-select').selectmenu('refresh');
-            });
-
             App.Select = Ember.Select.extend({
                 attributeBindings: [
                     'name',

@@ -30,10 +30,11 @@ define('app/views/machine_add_dialog', [
                 //FIXME there should be a way to bind the action directly to the controller
                 Mist.machineAddController.newMachine();
                 $.mobile.changePage('#machines');
-                clear();
+                this.clear();
             },
 
             backClicked: function(){
+                this.clear();
                 history.back();
             },
 
