@@ -36,7 +36,7 @@ it to /opt/local/share/curl/
 Supposing you have all the above, the steps are simple. Clone the repository,
 create a virtualenv and run buildout::
 
-    git clone https://github.com/unweb/mist.io.git
+    git clone https://github.com/mistio/mist.io.git
     cd mist.io
     virtualenv --no-site-packages .
     ./bin/python bootstrap.py
