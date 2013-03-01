@@ -29,6 +29,10 @@ define('app/models/machine', [
                 return this.backend.images.getImage(this.imageId);
             }.property('image'),
 
+            user: function() {                
+                return this.getUser();
+            }.property('user'),
+
             reboot: function() {
                 log('Rebooting machine', this.name);
 
@@ -143,11 +147,16 @@ define('app/models/machine', [
             getUser: function() {
                 // In case of ec2, mist.io could have set this. Server can handle empty string.
                 try {
-                    return this.extra.tags.ssh_user;
+                    if (this.extra.tags.ssh_user != undefined) {                   
+                        return this.extra.tags.ssh_user;
+                    } else {
+                        return 'root';
+                    }
                 } catch (error) {
                     return 'root';
                 }
             },
+
 
             shell: function(shell_command, callback, timeout) {
                 log('Sending', shell_command, 'to machine', this.name);
