@@ -168,6 +168,9 @@ def list_machines(request):
     """
     try:
         conn = connect(request)
+    except RuntimeError as e:
+        log.error(e)
+        return Response('Internal server error: %s' % e, 503)
     except:
         return Response('Backend not found', 404)
 

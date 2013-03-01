@@ -201,7 +201,7 @@ def connect(request, backend_id=False):
     """
     try:
         backends = request.environ['beaker.session']['backends']
-    except:
+    except KeyError:
         backends = request.registry.settings['backends']
 
     if not backend_id:
@@ -210,6 +210,7 @@ def connect(request, backend_id=False):
 
     driver = get_driver(int(backend['provider']))
 
+    
     if backend['provider'] == Provider.OPENSTACK:
         conn = driver(backend['apikey'],
                       backend['apisecret'],
