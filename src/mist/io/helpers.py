@@ -17,6 +17,9 @@ from fabric.api import run
 
 from mist.io.config import EC2_PROVIDERS, COMMAND_TIMEOUT
 
+# add curl ca-bundle default path to prevent libcloud certificate error
+import libcloud.security
+libcloud.security.CA_CERTS_PATH.append('/usr/share/curl/ca-bundle.crt')
 
 log = logging.getLogger('mist.io')
 
