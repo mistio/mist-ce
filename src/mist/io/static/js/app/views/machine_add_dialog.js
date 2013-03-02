@@ -75,12 +75,14 @@ define('app/views/machine_add_dialog', [
                                 $('#createmachine-select-size').selectmenu('disable');
                                 $('#createmachine-select-location').selectmenu('disable');
                                 $('#createmachine-select-key').selectmenu('disable');
+                                $('#createmachine-select-script').selectmenu('disable');
                             } else {
                                 $('#createmachine-select-provider').selectmenu('disable');
                                 $('#createmachine-select-image').selectmenu('disable');
                                 $('#createmachine-select-size').selectmenu('disable');
                                 $('#createmachine-select-location').selectmenu('disable');
                                 $('#createmachine-select-key').selectmenu('disable');
+                                $('#createmachine-select-script').selectmenu('disable');
                             }
                             $('#dialog-add select').selectmenu('refresh');
                         });
@@ -94,11 +96,13 @@ define('app/views/machine_add_dialog', [
                                 $('#createmachine-select-size').selectmenu('disable');
                                 $('#createmachine-select-location').selectmenu('disable');
                                 $('#createmachine-select-key').selectmenu('disable');
+                                $('#createmachine-select-script').selectmenu('disable');
                             } else {
                                 $('#createmachine-select-image').selectmenu('disable');
                                 $('#createmachine-select-size').selectmenu('disable');
                                 $('#createmachine-select-location').selectmenu('disable');
                                 $('#createmachine-select-key').selectmenu('disable');
+                                $('#createmachine-select-script').selectmenu('disable');
                             }
                             $('#dialog-add select').selectmenu('refresh');
                         });
@@ -111,10 +115,12 @@ define('app/views/machine_add_dialog', [
                                 $('#createmachine-select-size').selectmenu('enable');
                                 $('#createmachine-select-location').selectmenu('disable');
                                 $('#createmachine-select-key').selectmenu('disable');
+                                $('#createmachine-select-script').selectmenu('disable');
                             } else {
                                 $('#createmachine-select-size').selectmenu('disable');
                                 $('#createmachine-select-location').selectmenu('disable');
                                 $('#createmachine-select-key').selectmenu('disable');
+                                $('#createmachine-select-script').selectmenu('disable');
                             }
                             $('#dialog-add select').selectmenu('refresh');
                         });

@@ -71,6 +71,12 @@
             id="createmachine-select-key"
             name="createmachine-select-key"}}
 
+        <label for="create-machine-script">7.Script:</label>
+        {{view Mist.TextField
+            valueBinding="Mist.machineAddController.newMachineScript"
+            name="create-machine-script"
+            id="create-machine-script"}}
+
         <div class="cost">Cost: {{Mist.machineAddController.newMachineCost}}</div>
 
         <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">

@@ -127,7 +127,7 @@ define('app/controllers/machines', [
                 });
             },
 
-            newMachine: function(name, image, size, location, key) {
+            newMachine: function(name, image, size, location, key, script) {
                 log('Creating machine', this.name, 'to backend', this.backend.title);
 
                 // TODO: find a way to pass ember objects to JSON, so the
@@ -141,7 +141,8 @@ define('app/controllers/machines', [
                         'image_extra': image.extra,
                         'disk': size.disk,
                         'location': location.id,
-                        'key': key.name
+                        'key': key.name,
+                        'script': script,
                 };
 
                 var item = {};

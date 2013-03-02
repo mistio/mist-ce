@@ -16,7 +16,8 @@ define('app/controllers/machine_add', [
                                             this.get('newMachineImage'),
                                             this.get('newMachineSize'),
                                             this.get('newMachineLocation'),
-                                            this.get('newMachineKey'));
+                                            this.get('newMachineKey'),
+                                            this.get('newMachineScript'));
             },
 
             newMachineClear: function() {
@@ -26,6 +27,7 @@ define('app/controllers/machine_add', [
                 this.set('newMachineSize', null);
                 this.set('newMachineLocation', null);
                 this.set('newMachineKey', null);
+                this.set('newMachineScript', null);
                 this.set('newMachineCost', 0);
             },
 
@@ -48,6 +50,7 @@ define('app/controllers/machine_add', [
                 this.set('newMachineSizeReady', !!this.get('newMachineSize'));
                 this.set('newMachineLocationReady', !!this.get('newMachineLocation'));
                 this.set('newMachineKeyReady', !!this.get('newMachineKey'));
+                this.set('newMachineScriptReady', !!this.get('newMachineScript'));
             },
 
             init: function() {

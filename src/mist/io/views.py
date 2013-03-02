@@ -1,5 +1,6 @@
 """mist.io views"""
 import os
+import tempfile
 import logging
 
 from datetime import datetime
@@ -18,7 +19,7 @@ from libcloud.compute.base import NodeSize
 from libcloud.compute.base import NodeImage
 from libcloud.compute.base import NodeLocation
 from libcloud.compute.base import NodeAuthSSHKey
-from libcloud.compute.deployment import SSHKeyDeployment
+from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment, SSHKeyDeployment
 from libcloud.compute.types import Provider
 
 from mist.io.config import STATES
@@ -268,6 +269,8 @@ def create_machine(request):
         location_id = request.json_body['location']
         image_id = request.json_body['image']
         size_id = request.json_body['size']
+        #deploy_script received as unicode, but ScriptDeployment wants str
+        script = str(request.json_body.get('script', ''))
         # these are required only for Linode, passing them anyway
         image_extra = request.json_body['image_extra']
         disk = request.json_body['disk']
@@ -291,12 +294,14 @@ def create_machine(request):
     if conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE] and\
     public_key:
         key = SSHKeyDeployment(str(public_key))
+        deploy_script = ScriptDeployment(script)
+        msd = MultiStepDeployment([key, deploy_script])        
         try:
             node = conn.deploy_node(name=machine_name,
                              image=image,
                              size=size,
                              location=location,
-                             deploy=key)
+                             deploy=msd)
             if keypair:
                 machines = keypair.get('machines', None)
                 if machines and len(machines):
@@ -305,19 +310,29 @@ def create_machine(request):
                     keypair['machines'] = [[backend_id, node.id],]
                 save_keypairs(request, keypair)
             return Response('Success', 200)
-        except:
-            log.warn('Failed to deploy node with ssh key, attempt without')
+        except Exception as e:
+            return Response('Something went wrong with node creation', 500)
     elif conn.type in EC2_PROVIDERS and public_key:
         imported_key = import_key(conn, public_key, key_name)
         created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
+        deploy_script = ScriptDeployment(script)
+
+        (tmp_key, tmp_key_path) = tempfile.mkstemp()
+        key_fd = os.fdopen(tmp_key, 'w+b')
+        key_fd.write(private_key)
+        key_fd.close()
+        #deploy_node wants path for ssh private key
         if imported_key and created_security_group:
             try:
-                node = conn.create_node(name=machine_name,
+                node = conn.deploy_node(name=machine_name,
                                  image=image,
                                  size=size,
+                                 deploy=deploy_script,
                                  location=location,
+                                 ssh_key=tmp_key_path,
                                  ex_keyname=key_name,
                                  ex_securitygroup=EC2_SECURITYGROUP['name'])
+
                 if keypair:
                     machines = keypair.get('machines', None)
                     if machines and len(machines):
@@ -326,14 +341,16 @@ def create_machine(request):
                         keypair['machines'] = [[backend_id, node.id],]
                     save_keypairs(request, keypair)
                 return {'id': node.id}
-            except:
-                log.warn('Failed to deploy node with ssh key, attempt without')
+            except Exception as e:
+                return Response('Something went wrong with node creation', 500)
     elif conn.type is Provider.LINODE and public_key:
         auth = NodeAuthSSHKey(public_key)
+        deploy_script = ScriptDeployment(script)
         try:
             node = conn.create_node(name=machine_name,
                              image=image,
                              size=size,
+                             deploy=deploy_script,
                              location=location,
                              auth=auth)
             if keypair:
@@ -345,7 +362,7 @@ def create_machine(request):
                 save_keypairs(request, keypair)
             return {'id': node.id}
         except:
-            log.warn('Failed to deploy node with ssh key, attempt without')
+            return Response('Something went wrong with node creation', 500)
 
     try:
         node = conn.create_node(name=machine_name,
