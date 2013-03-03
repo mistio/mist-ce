@@ -14,8 +14,6 @@ define('app/views/key_list_item', [
                 tagName:false,
 
                 keyClick: function(event, el){
-                    log('key clicked');
-
                     if (event.target.tagName != 'A') {
                         if (event.target.tagName == 'INPUT') {
                             event.stopPropagation();
@@ -38,7 +36,6 @@ define('app/views/key_list_item', [
                 },
 
                 keySelected: function(){
-                    log('key selected changed');
                     var that = this;
 
                     Em.run.next(function() {
