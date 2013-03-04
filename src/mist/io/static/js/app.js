@@ -73,6 +73,7 @@ define( 'app', [
     'app/views/key_list',
     'app/views/key',
     'app/views/key_add_dialog',
+    'app/views/key_priv_dialog',
     'app/views/rule',
     'app/views/user_menu',
     'mobile',
@@ -113,6 +114,7 @@ define( 'app', [
                 KeyListView,
                 KeyView,
                 KeyAddDialog,
+                KeyPrivDialog,
                 RuleView,
                 UserMenuView,
                 Mobile,
@@ -410,6 +412,9 @@ define( 'app', [
 
             var keyView = KeyView.create();
             keyView.append();
+
+            var keyPrivDialog = KeyPrivDialog.create();
+            keyPrivDialog.append();
 
             var keyAddDialog = KeyAddDialog.create();
             keyAddDialog.appendTo("#keys");

@@ -26,7 +26,13 @@
         <div data-role="collapsible" data-collapsed="false">
             <h3>Private key</h3>
             <div class="private-key">
-                <a data-role="button" {{action displayPrivateKey}}>Display</a>
+                <a href="#key-private-dialog"
+                    class="action-links"
+                    id="key-private-button"
+                    data-role="button"
+                    data-rel="popup"
+                    data-transition="slideup"
+                    {{action displayPrivate}}>Display</a>
                 <input type="text" readonly="readonly" {{bindAttr value="view.key.priv"}} data-pattern="private key not available" />
             </div>
         </div>

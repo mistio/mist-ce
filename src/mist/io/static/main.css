@@ -1107,6 +1107,12 @@ iframe#hidden-shell-iframe {
     font-size: 16px;
 }
 
+/*  Keys */
+
+#private-key {
+    height: 200px !important;
+}
+
 #dialog-providers-popup p {
     width:250px;
     overflow:hidden;

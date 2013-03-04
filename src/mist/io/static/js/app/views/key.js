@@ -29,8 +29,10 @@ define('app/views/key', [
                 Mist.confirmationController.show();
             },
 
-            displayPrivateKey: function(){
-                alert('priv');
+            displayPrivate: function(){
+                var key = this.key;
+                Mist.keysController.getPrivKey(key.name);
+                $.mobile.changePage('#key-private-dialog');
             },
 
             init: function() {
