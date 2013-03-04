@@ -66,7 +66,7 @@ define('app/controllers/keys', [
                 payload = {'key_name': name}
                 var that = this
                 $.ajax({
-                    url: 'keys/private',
+                    url: 'keys/private/key',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
