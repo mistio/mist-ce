@@ -1145,6 +1145,14 @@ div.logout-placeholder {
     width: 49.2%;
 }
 
+#dialog-add-key .ajax-loader {
+    background-image: url(images/spinner.gif);
+    background-position: center !important;
+    background-repeat: no-repeat;
+    display: none;
+    height: 16px;
+}
+
 #backend-delete-yes, #backend-delete-no, #add-backend .ui-controlgroup-controls > div {
     width: 49.2%;
 }

@@ -16,6 +16,7 @@ define('app/views/key_add_dialog', [
             },
 
             generateClicked: function(){
+                $('#dialog-add-key .ajax-loader').fadeIn(200);
                 $.ajax({
                     url: '/keys',
                     type: "POST",
@@ -25,6 +26,7 @@ define('app/views/key_add_dialog', [
                     success: function(result) {
                         Mist.keyAddController.set('newKeyPublic', result.public);
                         Mist.keyAddController.set('newKeyPrivate', result.private);
+                        $('#dialog-add-key .ajax-loader').hide();
                     }
                 });
             },
