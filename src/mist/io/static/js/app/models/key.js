@@ -36,12 +36,20 @@ define('app/models/key', [
             },
 
             machineList: function() {
-                machineNames = []
+                //return a list with names of servers this key is associated to
+                machineNames = [];
                 this.machines.forEach(function(item){
-                    console.log(item[0],item[1]);
-                    machineNames.push(Mist.backendsController.getMachine(item[0],item[1]));
+                    Mist.backendsController.content.forEach(function(backend){
+                        if (backend.id == item[0]) {
+                            backend.machines.content.forEach(function(machine){
+                                if (machine.id == item[1]) {
+                                    machineNames.push(machine.name);
+                                }
+                            });
+                        }
+                    });
                 });
-                console.log(machineNames);
+                return machineNames;
             }.property('key'),
 
             setDefaultKey: function(){
