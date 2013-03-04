@@ -35,6 +35,15 @@ define('app/models/key', [
                 });
             },
 
+            machineList: function() {
+                machineNames = []
+                this.machines.forEach(function(item){
+                    console.log(item[0],item[1]);
+                    machineNames.push(Mist.backendsController.getMachine(item[0],item[1]));
+                });
+                console.log(machineNames);
+            }.property('key'),
+
             setDefaultKey: function(){
                 payload = {'name': this.name}
                 var that = this
