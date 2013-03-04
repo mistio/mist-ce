@@ -847,6 +847,29 @@ def associate_key_to_machine(request):
 
     return {}
 
+@view_config(route_name='key_private', request_method='POST', renderer='json')
+def get_private_key(request):
+    """get private key from keypair name, for display
+       on key view when user clicks display private key 
+    """
+    params = request.json_body
+    key_name = params.get('key_name', '')
+
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+    
+    keypair = {}
+
+    if key_name in keypairs.keys():
+        keypair = keypairs[key_name]
+    else:
+        return Response('Keypair not found', 404)
+
+
+    if keypair:
+        return keypair.get('private', '')
 
 @view_config(route_name='key', request_method='DELETE', renderer='json')
 def delete_key(request):
