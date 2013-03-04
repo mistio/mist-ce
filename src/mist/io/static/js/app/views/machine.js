@@ -420,6 +420,10 @@ define('app/views/machine', [
                 }
             }.observes('machine.pendingMonitoring'),
 
+            showShell: function() {
+                setTimeout(function(){$('.shell-input input').focus()}, 1000);
+            },
+
             init: function() {
                 this._super();
                 // cannot have template in home.pt as pt complains
