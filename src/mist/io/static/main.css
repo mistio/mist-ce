@@ -812,6 +812,24 @@ div.pending-monitoring {
     height: 80px;
 }
 
+#machine-key-table {
+    border-collapse:collapse;
+    width: 100%;
+    margin-top: 10px;
+    background: #fff;
+}
+
+#machine-key-table tr {
+    border: 1px solid #ccc;
+}
+
+#machine-key-table td {
+    font-size: 14px;
+    padding: 10px 12px;
+    margin: 0;
+    border: none;
+}
+
 #key div.public-key {
     width: 100%;
     word-wrap: break-word;

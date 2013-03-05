@@ -39,7 +39,15 @@
 
          <div data-role="collapsible" data-collapsed="false">
             <h3>Machines</h3>
-            <div>{{view.key.machineList}}</div>
+            <table id="machine-key-table">
+                <tbody>
+                    {{#each view.key.machineList}}
+                    <tr>
+                       <td class="key">{{name}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
         </div>
 
     </div>
