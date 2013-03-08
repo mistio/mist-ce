@@ -39,6 +39,17 @@ define('app/views/key', [
                 }
                 Mist.confirmationController.set('callback', function() {
                     key.deleteKey();
+                    key.machines.forEach(function(item){
+                        Mist.backendsController.content.forEach(function(backend){
+                            if (backend.id == item[0]) {
+                                backend.machines.content.forEach(function(machine){
+                                    if (machine.id == item[1]) {
+                                        machine.set("hasKey", false);
+                                    }
+                                });
+                            }
+                        });
+                    });
                     $.mobile.changePage('#keys');
                 });
                 Mist.confirmationController.set('fromDialog', true);
