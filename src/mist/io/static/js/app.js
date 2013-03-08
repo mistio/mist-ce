@@ -493,6 +493,7 @@ function appendShell(data){
 }
 
 function completeShell(ret){
+    $('iframe').remove();
     Mist.machine.set('pendingShell', false);
     $('.shell-return .pending').removeClass('pending');
     if (collectd_install_target) {
@@ -510,4 +511,5 @@ function completeShell(ret){
         $('.pending-monitoring h1').text('Enabling monitoring');          
         collectd_uninstall_target = false;
     }
+    $('body').append('<iframe id="hidden-shell-iframe"></iframe');
 }
