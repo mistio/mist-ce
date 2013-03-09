@@ -18,7 +18,7 @@ define('app/views/key_associate_dialog', [
                 var selectedMachines = this.getSelectedMachines();
                 var machines = []; 
                 selectedMachines.forEach(function(machine){
-                    machines.push([machine.id, machine.backend.id]);
+                    machines.push([machine.backend.id, machine.id]);
                 });
                 Mist.keysController.associateKey(Mist.key.name,machines);
                 history.back();

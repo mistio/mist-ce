@@ -838,8 +838,8 @@ def associate_key_to_machine(request):
         keypair['machines'] = []
         for pair in machine_backend_list:
             try:
-                machine_id = pair[0]
-                backend_id = pair[1]
+                backend_id = pair[0]
+                machine_id = pair[1]
             except:
                 continue
 
