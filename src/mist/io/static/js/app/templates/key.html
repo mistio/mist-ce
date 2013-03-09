@@ -64,12 +64,14 @@
                 {{action deleteKey}}>Delete</a>
 
             <a href=""
-                class="action-links ui-disabled"
+                class="action-links"
                 id="keys-button-associate"
                 data-role="button"
                 data-icon="gear"
                 data-rel="popup"
-                data-transition="slideup">Associate</a>
+                data-transition="slideup"
+                {{bindAttr class="disabledAssociateClass"}}
+                {{action associateKey}}>Associate</a>
         </div>
     </div>
 

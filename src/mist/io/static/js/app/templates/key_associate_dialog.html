@@ -1,0 +1,29 @@
+<div id="key-associate-dialog" class="mist-dialog" data-role="dialog" data-overlay-theme="a">
+    <div data-role="header">
+        <h1>Associate key</h1>
+    </div>
+    <div data-role="content">
+        <ul id="machines-list"
+        data-role="listview"
+        data-filter="true"
+        data-inset="true"
+        data-theme="c"
+        data-filter-placeholder="Filter machines...">
+            {{#each Mist.backendsController}}
+                {{#each machines}}
+                    {{view Mist.KeyMachineListItemView machineBinding="this"}}
+                {{/each}}
+            {{/each}}
+        </ul>
+        <div class="btn-full" data-role="controlgroup" data-type="horizontal">
+            <button class="btn-left-full"
+                data-theme="c"
+                {{action "back"}}>Back</button>
+
+            <button id="add-key-button"
+                class="btn-right-full"
+                data-theme="b"
+                {{action "associateKeys"}}>Save</button>
+        </div>
+    </div>
+</div>

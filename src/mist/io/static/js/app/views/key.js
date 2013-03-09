@@ -13,6 +13,22 @@ define('app/views/key', [
             tagName: false,
             keyBinding: 'Mist.key',
 
+            disabledAssociateClass: function() {
+                var count = 0
+                Mist.backendsController.content.forEach(function(item){
+                    count = count + item.machines.content.length;
+                });
+                if (count == 0) {
+                    return 'ui-disabled';
+                } else {
+                    return '';
+                }
+            }.property('key'),
+
+            associateKey: function() {
+                $.mobile.changePage('#key-associate-dialog');
+            },
+
             deleteKey: function() {
                 var key = this.key;
                 if (key.machines) {
