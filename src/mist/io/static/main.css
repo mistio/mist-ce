@@ -1181,6 +1181,10 @@ div.logout-placeholder {
     width: 49.2%;
 }
 
+#key-machines-list {
+    max-height: 250px;
+    overflow: auto;
+}
 div.info {
     margin:10px;
     text-align: center;

@@ -80,7 +80,27 @@ define('app/controllers/keys', [
                         error(textstate, errorThrown, 'while getting key', name);
                     }
                 });
+            },
+
+            associateKey: function(key_name, machines) {
+                payload = {'key_name': key_name, 'machine_backend_list': machines}
+                var that = this
+                $.ajax({
+                    url: 'keys/associate',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function(data) {
+                        info('Successfully associated key ', key_name);
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while associating key'  +
+                                key_name);
+                        error(textstate, errorThrown, 'while associating key', key_name);
+                    }
+                });
             }
+
         });
     }
 );

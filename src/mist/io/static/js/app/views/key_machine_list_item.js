@@ -29,19 +29,18 @@ define('app/views/key_machine_list_item', [
                                 error(e);
                             }
                         }
+
                     });
                 },
 
                 machineClick: function(event, el){
                     log('machine clicked');
                     if ($(event.target).parent().find("input[type='checkbox']").is(':checked')) {
-                        $(event.target).parent().find("input[type='checkbox']").attr("checked",false).checkboxradio("refresh"); 
+                        $(event.target).parent().find("input[type='checkbox']").attr("checked",false).checkboxradio("refresh");
                     } else {
                         $(event.target).parent().find("input[type='checkbox']").attr("checked",true).checkboxradio("refresh"); 
+                        this.machine.set("selected",true);
                     }
-                    event.stopPropagation();
-                    var len = $('#machines-list input:checked').length;
-                    Mist.set('machine', this.machine);
                 },
 
                 machineSelected: function(){
@@ -56,21 +55,6 @@ define('app/views/key_machine_list_item', [
                             if (that.get('parentView') != null) {
                               that.get('parentView').$().find("input[type='checkbox']").checkboxradio();
                             }
-                        }
-
-                        var len = $('#machines-list input:checked').length; //FIXME use data instead of DOM
-                        if (len > 1) {
-                            Mist.set('machine', null);
-                        } else if (len == 1) {                            
-                            Mist.backendsController.forEach(function(backend) {
-                                backend.machines.forEach(function(machine) {
-                                    if (machine.selected && Mist.machine != machine) {
-                                        Mist.set('machine', machine);
-                                    }
-                                });
-                            });
-                        } else {
-                            Mist.set('machine', null);
                         }
                     });
 

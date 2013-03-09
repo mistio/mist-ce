@@ -15,7 +15,26 @@ define('app/views/key_associate_dialog', [
             },
 
             associateKeys: function() {
+                var selectedMachines = this.getSelectedMachines();
+                var machines = []; 
+                selectedMachines.forEach(function(machine){
+                    machines.push([machine.id, machine.backend.id]);
+                });
+                Mist.keysController.associateKey(Mist.key.name,machines);
                 history.back();
+            },
+
+            getSelectedMachines: function() {
+                var machines = new Array();
+
+                Mist.backendsController.forEach(function(backend){
+                    backend.machines.forEach(function(machine){
+                        if(machine.selected){
+                            machines.push(machine);
+                        }
+                    });
+                });
+                return machines;
             },
 
             init: function() {
