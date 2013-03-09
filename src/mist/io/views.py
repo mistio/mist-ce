@@ -835,24 +835,17 @@ def associate_key_to_machine(request):
     #associate key name with list of machines/backends
     #machine_backend_list = [[machine1_id, backend1_id], [machine2_id, backend2_id], [machine3_id, backend3_id]]
     if keypair:
+        keypair['machines'] = []
         for pair in machine_backend_list:
             try:
-                backend_id = pair[0]
-                machine_id = pair[1]
+                machine_id = pair[0]
+                backend_id = pair[1]
             except:
                 continue
 
-	    machines = keypair.get('machines', None)
-	    if machines and len(machines):
-		#check if it exists
-                if pair not in machines:
-                    keypair['machines'].append(pair)
-            else:
-		keypair['machines'] = [pair,]
+	    keypair['machines'].append(pair)
 
 
-    #FIXME: is this needed here??
-    #request.registry.settings['keypairs'][key_name]['machines'] = keypair['machines']
     save_keypairs(request, keypair)
 
     return {}
