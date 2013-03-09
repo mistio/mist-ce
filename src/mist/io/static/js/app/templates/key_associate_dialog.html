@@ -9,6 +9,7 @@
         data-inset="false"
         data-theme="c"
         data-filter-placeholder="Filter machines...">
+
             {{#each Mist.backendsController}}
                 {{#each machines}}
                     {{view Mist.KeyMachineListItemView machineBinding="this"}}
