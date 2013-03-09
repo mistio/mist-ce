@@ -817,8 +817,7 @@ def set_default_key(request):
 def associate_key_to_machine(request):
     params = request.json_body
     key_name = params.get('key_name', '')
-    machine_id = params.get('machine_id', '')
-    backend_id = params.get('backend_id', '')
+    machine_backend_list = params.get('machine_backend_list', '')
 
     try:
         keypairs = request.environ['beaker.session']['keypairs']
@@ -833,17 +832,28 @@ def associate_key_to_machine(request):
         return Response('Keypair not found', 404)
 
 
+    #associate key name with list of machines/backends
+    #machine_backend_list = [[machine1_id, backend1_id], [machine2_id, backend2_id], [machine3_id, backend3_id]]
     if keypair:
-        machines = keypair.get('machines', None)
-        if machines and len(machines):
-            keypair['machines'].append([backend_id, machine_id])
-        else:
-            keypair['machines'] = [[backend_id, machine_id],]
+        for pair in machine_backend_list:
+            try:
+                backend_id = pair[0]
+                machine_id = pair[1]
+            except:
+                continue
+
+	    machines = keypair.get('machines', None)
+	    if machines and len(machines):
+		#check if it exists
+                if pair not in machines:
+                    keypair['machines'].append(pair)
+            else:
+		keypair['machines'] = [pair,]
 
 
     #FIXME: is this needed here??
     #request.registry.settings['keypairs'][key_name]['machines'] = keypair['machines']
-    save_settings(request)
+    save_keypairs(request, keypair)
 
     return {}
 
