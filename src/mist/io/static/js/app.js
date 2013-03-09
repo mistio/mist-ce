@@ -73,7 +73,9 @@ define( 'app', [
     'app/views/key_list',
     'app/views/key',
     'app/views/key_add_dialog',
+    'app/views/key_associate_dialog',
     'app/views/key_priv_dialog',
+    'app/views/key_machine_list_item',
     'app/views/rule',
     'app/views/user_menu',
     'mobile',
@@ -114,7 +116,9 @@ define( 'app', [
                 KeyListView,
                 KeyView,
                 KeyAddDialog,
+                KeyAssociateDialog,
                 KeyPrivDialog,
+                KeyMachineListItem,
                 RuleView,
                 UserMenuView,
                 Mobile,
@@ -369,6 +373,7 @@ define( 'app', [
             App.KeyListView = KeyList;
             App.RuleView = RuleView;
             App.UserMenuView = UserMenuView;
+            App.KeyMachineListItemView = KeyMachineListItem;
 
             var homeView = Home.create();
             homeView.append();
@@ -418,6 +423,9 @@ define( 'app', [
 
             var keyAddDialog = KeyAddDialog.create();
             keyAddDialog.appendTo("#keys");
+
+            var keyAssociateDialog = KeyAssociateDialog.create();
+            keyAssociateDialog.append();
 
             // Expose the application globally
             window.Mist = App;

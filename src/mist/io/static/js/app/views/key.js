@@ -13,15 +13,59 @@ define('app/views/key', [
             tagName: false,
             keyBinding: 'Mist.key',
 
+            disabledAssociateClass: function() {
+                var count = 0
+                Mist.backendsController.content.forEach(function(item){
+                    count = count + item.machines.content.length;
+                });
+                if (count == 0) {
+                    return 'ui-disabled';
+                } else {
+                    return '';
+                }
+            }.property('key'),
+
+            associateKey: function() {
+                $.mobile.changePage('#key-associate-dialog');
+            },
+
             deleteKey: function() {
                 var key = this.key;
+                if (key.machines) {
+                    machineNames = [];
+                    key.machines.forEach(function(item){
+                        Mist.backendsController.content.forEach(function(backend){
+                            if (backend.id == item[0]) {
+                                backend.machines.content.forEach(function(machine){
+                                    if (machine.id == item[1]) {
+                                        machineNames.push(machine.name);
+                                    }
+                                });
+                            }
+                        });
+                    });
+                }
 
                 Mist.confirmationController.set('title', 'Delete Key: ' + key.name);
-                Mist.confirmationController.set('text', 'Are you sure you want to delete ' +
+                if (key.machines.length > 0) {
+                Mist.confirmationController.set('text', 'Your key is associated with ' + machineNames.toString() +'. Are you sure you want to delete ' +  key.name + '? You will not be able use console and monitoring on these VMs.');                    
+                } else {
+                    Mist.confirmationController.set('text', 'Are you sure you want to delete ' +
                                                 key.name + '?');
-
+                }
                 Mist.confirmationController.set('callback', function() {
                     key.deleteKey();
+                    key.machines.forEach(function(item){
+                        Mist.backendsController.content.forEach(function(backend){
+                            if (backend.id == item[0]) {
+                                backend.machines.content.forEach(function(machine){
+                                    if (machine.id == item[1]) {
+                                        machine.set("hasKey", false);
+                                    }
+                                });
+                            }
+                        });
+                    });
                     $.mobile.changePage('#keys');
                 });
                 Mist.confirmationController.set('fromDialog', true);
