@@ -86,7 +86,7 @@ define('app/controllers/keys', [
                 payload = {'key_name': key_name, 'machine_backend_list': machines}
                 var that = this
                 $.ajax({
-                    url: 'keys/associate',
+                    url: 'keys/associate/key',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
