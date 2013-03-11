@@ -815,6 +815,8 @@ def set_default_key(request):
 
 @view_config(route_name='key_associate', request_method='POST', renderer='json')
 def associate_key_to_machine(request):
+    '''Associate a key with list of machines. 
+       Receives a key name, and a list of machine/backend ids'''
     params = request.json_body
     key_name = params.get('key_name', '')
     machine_backend_list = params.get('machine_backend_list', '')
@@ -832,14 +834,14 @@ def associate_key_to_machine(request):
         return Response('Keypair not found', 404)
 
 
-    #associate key name with list of machines/backends
+
     #machine_backend_list = [[machine1_id, backend1_id], [machine2_id, backend2_id], [machine3_id, backend3_id]]
     if keypair:
         keypair['machines'] = []
         for pair in machine_backend_list:
             try:
-                backend_id = pair[0]
-                machine_id = pair[1]
+                machine_id = pair[0]
+                backend_id = pair[1]
             except:
                 continue
 
@@ -849,6 +851,46 @@ def associate_key_to_machine(request):
     save_keypairs(request, keypair)
 
     return {}
+
+
+@view_config(route_name='key_disassociate', request_method='POST', renderer='json')
+def disassociate_key_to_machine(request):
+    '''Disassociate a key from a machine. 
+       Receives a key name, and a machine/backend id pair and removes the machine from that keypair'''
+    params = request.json_body
+    key_name = params.get('key_name', '')
+    machine_backend_id = params.get('machine_backend_id', '')
+
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+    
+    keypair = {}
+
+    if key_name in keypairs.keys():
+        keypair = keypairs[key_name]
+    else:
+        return Response('Keypair not found', 404)
+
+
+
+    #machine_backend_id = [machine_id, backend_id]
+    if keypair:
+        try:
+            machine_id = machine_backend_id[0]
+            backend_id = machine_backend_id[1]
+        except:
+            return Response('Machine id not found', 404)
+
+        for pair in keypair['machines']:
+            if pair[0] == machine_id and pair[1] == backend_id:
+                keypair['machines'].remove(pair)
+                save_keypairs(request, keypair)
+                break
+
+    return {}
+
 
 @view_config(route_name='key_private', request_method='POST', renderer='json')
 def get_private_key(request):

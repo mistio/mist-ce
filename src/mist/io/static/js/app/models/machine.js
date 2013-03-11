@@ -256,7 +256,7 @@ define('app/models/machine', [
                         }
                     }
                 };
-                setTimeout(uptimeTimeout, 10000);
+                setTimeout(uptimeTimeout, 2000);
             },
 
             resetUptime: function() {
