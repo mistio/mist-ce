@@ -35,11 +35,21 @@ define('app/views/key_machine_list_item', [
 
                 machineClick: function(event, el){
                     log('machine clicked');
-                    if ($(event.target).parent().find("input[type='checkbox']").is(':checked')) {
-                        $(event.target).parent().find("input[type='checkbox']").attr("checked",false).checkboxradio("refresh");
+                    if(event.target.tagName != 'A'){
+                        event.stopPropagation();
+                        if ($(event.target).parent().parent().find("input[type='checkbox']").is(':checked')) {
+                            $(event.target).parent().parent().find("input[type='checkbox']").attr("checked",false).checkboxradio("refresh");
+                        } else {
+                            $(event.target).parent().parent().find("input[type='checkbox']").attr("checked",true).checkboxradio("refresh"); 
+                            this.machine.set("selected",true);
+                        }
                     } else {
-                        $(event.target).parent().find("input[type='checkbox']").attr("checked",true).checkboxradio("refresh"); 
-                        this.machine.set("selected",true);
+                        if ($(event.target).parent().find("input[type='checkbox']").is(':checked')) {
+                            $(event.target).parent().find("input[type='checkbox']").attr("checked",false).checkboxradio("refresh");
+                        } else {
+                            $(event.target).parent().find("input[type='checkbox']").attr("checked",true).checkboxradio("refresh"); 
+                            this.machine.set("selected",true);
+                        }
                     }
                 },
 
