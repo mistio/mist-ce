@@ -1,4 +1,5 @@
 define('app/views/home', [
+    'app/views/jqm_page',
     'text!app/templates/home.html','ember'],
     /**
      *
@@ -6,9 +7,10 @@ define('app/views/home', [
      *
      * @returns Class
      */
-    function(home_html) {
-        return Ember.View.extend({
-            tagName: false,
+    function(Page, home_html) {
+        return Page.extend({
+
+            id: 'home',
 
             init: function() {
                 this._super();

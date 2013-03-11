@@ -10,6 +10,10 @@ define('app/views/backend_add', ['app/models/backend',
     function(Backend, add_backend_dialog_html) {
 
         return Ember.View.extend({
+            
+            attributeBindings: [
+                                'data-role',
+                                ],
 
             backClicked: function() {
                 Mist.backendAddController.newBackendClear();
@@ -45,6 +49,7 @@ define('app/views/backend_add', ['app/models/backend',
 
             init: function() {
                 this._super();
+                this['data-role'] = 'content';
                 // cannot have template in home.pt as pt complains
                 this.set('template', Ember.Handlebars.compile(add_backend_dialog_html));
 

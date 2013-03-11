@@ -1,4 +1,5 @@
 define('app/views/machine', [
+    'app/views/jqm_page',
     'text!app/templates/machine.html','ember', 'd3', 'cubism'],
     /**
      *
@@ -6,9 +7,11 @@ define('app/views/machine', [
      *
      * @returns Class
      */
-    function(machine_html) {
-        return Ember.View.extend({
-            tagName: false,
+    function(Page, machine_html) {
+        return Page.extend({
+            
+            id: 'single-machine',
+            
             machineBinding: 'Mist.machine',
 
             disabledShellClass: function() {
@@ -428,6 +431,10 @@ define('app/views/machine', [
                 this._super();
                 // cannot have template in home.pt as pt complains
                 this.set('template', Ember.Handlebars.compile(machine_html));
+                //TODO add class and theme:
+                //<div data-role="page" id="single-machine" data-theme="c"
+                //    class="type-interior">
+
             },
         });
     }

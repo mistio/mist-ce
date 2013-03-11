@@ -6,12 +6,12 @@ require.config({
     paths: {
         mocha: 'lib/mocha-1.4.2',
         chai: 'lib/chai-1.2.0',
-        jquery: 'lib/jquery-1.8.3',
+        jquery: 'lib/jquery-1.9.1',
         jqueryUi: 'lib/jquery-ui-1.9.1.custom',
         text: 'lib/require/text',
-        ember: 'lib/ember-1.0.0-pre.2',
-        handlebars: 'lib/handlebars-1.0.rc.1',
-        mobile: 'lib/jquery.mobile-1.2.0',
+        ember: 'lib/ember-1.0.0-rc.1',
+        handlebars: 'lib/handlebars-1.0.0-rc.3',
+        mobile: 'lib/jquery.mobile-1.3.0',
         d3: 'lib/d3-2.10.1',
         cubism: 'lib/cubism-1.2.2',
         md5: 'lib/md5',
@@ -136,7 +136,7 @@ define( 'app', [
             var App = Ember.Application.create({
 
                 VERSION: '0.3-ember',
-
+LOG_TRANSITIONS: true,
                 // Sets up mocha to run some integration tests
                 specsRunner: function( chai ) {
                     // Create placeholder for mocha output
@@ -155,9 +155,10 @@ define( 'app', [
                     );
                 },
 
+/*
                 // Constructor
                 init: function() {
-                    this._super();
+                    //this._super();
 
                     this.set(
                         'backendsController',
@@ -240,6 +241,7 @@ define( 'app', [
 
                 },
                 
+            */
                 emailReady: function(){
                     if (this.email && this.password){
                         $('#auth-ok').button('enable');
@@ -258,7 +260,87 @@ define( 'app', [
                 }.observes('password')
                               
             });
-            
+App.Router = Ember.Router.extend({
+    location : Ember.Location.create({
+        implementation : 'none'
+    })
+});
+            window.Mist = App;
+                  App.set(
+                        'backendAddController',
+                        BackendAddController.create()
+                    );
+App.set(
+                        'backendsController',
+                        BackendsController.create()
+                    );
+
+                    App.set(
+                        'confirmationController',
+                        ConfirmationController.create()
+                    );
+
+                    App.set(
+                        'notificationController',
+                           NotificationController.create()
+                    );
+
+                    App.set(
+                        'machineAddController',
+                        MachineAddController.create()
+                    );
+
+                    App.set(
+                        'selectMachinesController',
+                        SelectMachinesController.create()
+                    );
+
+                    App.set(
+                        'selectImagesController',
+                        SelectImagesController.create()
+                    );
+
+                    App.set(
+                            'keysController',
+                            KeysController.create()
+                        );
+                        
+                    App.set(
+                            'rulesController',
+                            RulesController.create()
+                        );                        
+
+                    App.set(
+                            'keyAddController',
+                            KeyAddController.create()
+                        );
+
+                    App.set(
+                            'authenticated',
+                            URL_PREFIX==''?true:false
+                        );
+
+                    App.set(
+                            'email',
+                            ''
+                        );
+
+                     App.set(
+                            'password',
+                            ''
+                        );
+
+                    
+                    setTimeout(function(){
+                        $.mobile.changePage('#home', { transition: 'fade' });
+                        Mist.emailReady();
+                        if (EMAIL != '') {
+                            Mist.set('authenticated', true);
+                        }
+                    }, 2000);
+
+
+
             $(document).on( 'pagebeforeshow', '#machines', function() {
                 $('#machines-list').listview('refresh');
             });
@@ -315,11 +397,11 @@ define( 'app', [
             }
 
             // monitoring rule slider toggle
-            $('input.rule-value').live('mouseover', showRuleSlider);
-            $('input.rule-value').live('click', showRuleSlider);
+            //$('input.rule-value').live('mouseover', showRuleSlider);
+            //$('input.rule-value').live('click', showRuleSlider);
 
-            $('.rule-box').live('mouseleave', hideRuleSlider)
-            $('#single-machine').live('tap', hideRuleSlider);
+            //$('.rule-box').live('mouseleave', hideRuleSlider)
+            //$('#single-machine').live('tap', hideRuleSlider);
 
             App.Select = Ember.Select.extend({
                 attributeBindings: [
@@ -380,7 +462,7 @@ define( 'app', [
             
             var machineView = MachineView.create();
             machineView.append();
-
+/*
             var confirmationDialog = ConfirmationDialog.create();
             confirmationDialog.append();
 
@@ -390,9 +472,11 @@ define( 'app', [
             shellDialog.appendTo("#single-machine");
             var machineTagsDialog = MachineTagsDialog.create();
             machineTagsDialog.appendTo("#single-machine");
-
+*/
             var machineListView = MachineListView.create();
             machineListView.append();
+            
+            /*
             var addDialog = MachineAddDialog.create();
             addDialog.append();
             shellDialog = Shell.create();
@@ -401,10 +485,10 @@ define( 'app', [
             machineActionsDialog.appendTo("#machines");
             machineTagsDialog = MachineTagsDialog.create();
             machineTagsDialog.appendTo("#machines");
-
+*/
             var imageListView = ImageListView.create();
             imageListView.append();
-
+/*
             var machineMonitoringDialog = MachineMonitoringDialog.create();
             machineMonitoringDialog.appendTo("#single-machine");
 
@@ -426,10 +510,9 @@ define( 'app', [
 
             var keyAssociateDialog = KeyAssociateDialog.create();
             keyAssociateDialog.append();
+*/
 
-            // Expose the application globally
-            window.Mist = App;
-            App.initialize();
+//            App.initialize();
             return App
         });
     }

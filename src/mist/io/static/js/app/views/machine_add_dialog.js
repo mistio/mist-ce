@@ -42,12 +42,12 @@ define('app/views/machine_add_dialog', [
                 this._super();
                 // cannot have template in home.pt as pt complains
                 this.set('template', Ember.Handlebars.compile(machine_add_dialog_html));
-
+/*
                 $('#dialog-add').live("pageshow", function (event) {
                         $('input#create-machine-name').focus();
                     }
                 );
-
+*/
                 Ember.run.next(function(){
                     Mist.machineAddController.addObserver('newMachineBackend', function() {
                         Ember.run.next(function() {

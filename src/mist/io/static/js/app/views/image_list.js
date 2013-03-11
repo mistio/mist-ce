@@ -1,14 +1,15 @@
 define('app/views/image_list', [
+    'app/views/jqm_page',
     'text!app/templates/image_list.html','ember'],
     /**
      *
-     * Machine page
+     * Images page
      *
      * @returns Class
      */
-    function(image_list_html) {
-        return Ember.View.extend({
-            tagName: false,
+    function(Page, image_list_html) {
+        return Page.extend({
+            id: 'images',
 
             init: function() {
                 this._super();

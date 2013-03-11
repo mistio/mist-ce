@@ -1,4 +1,5 @@
 define('app/views/machine_list', [
+    'app/views/jqm_page',
     'text!app/templates/machine_list.html',
     'ember'
     ],
@@ -8,9 +9,8 @@ define('app/views/machine_list', [
  *
  * @returns Class
  */
-function(machine_list_html) {
-    return Ember.View.extend({
-        tagName : false,
+function(Page, machine_list_html) {
+    return Page.extend({
 
         disabledShellClass : function() {
             var machines = new Array();
@@ -75,6 +75,8 @@ function(machine_list_html) {
             }
         }.property('Mist.backendsController.selectedMachineCount'),
 
+        id: 'machines',
+        
         init : function() {
             this._super();
             this.set('template', Ember.Handlebars.compile(machine_list_html));
