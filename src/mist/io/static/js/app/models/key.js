@@ -35,23 +35,6 @@ define('app/models/key', [
                 });
             },
 
-            machineList: function() {
-                //return a list with names of servers this key is associated to
-                machineNames = [];
-                this.machines.forEach(function(item){
-                    Mist.backendsController.content.forEach(function(backend){
-                        if (backend.id == item[0]) {
-                            backend.machines.content.forEach(function(machine){
-                                if (machine.id == item[1]) {
-                                    machineNames.push({name:machine.name});
-                                }
-                            });
-                        }
-                    });
-                });
-                return machineNames;
-            }.property('key'),
-
             setDefaultKey: function(){
                 payload = {'name': this.name}
                 var that = this

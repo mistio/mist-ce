@@ -27,6 +27,19 @@ define('app/views/key', [
 
             associateKey: function() {
                 $.mobile.changePage('#key-associate-dialog');
+                //check boxes for machines associated with this key
+                $('li').find("input[type='checkbox']").attr("checked",false).checkboxradio("refresh");
+                Mist.key.machines.forEach(function(item){
+                    info(item[1]);
+                    $('li.'+item[1]).find("input[type='checkbox']").attr("checked",true).checkboxradio("refresh");
+                    Mist.backendsController.content.forEach(function(backend){
+                        backend.machines.content.forEach(function(machine){
+                            if (machine.id == item[1]) {
+                                machine.set("selected",true);
+                            }
+                        });
+                    });
+                });
             },
 
             deleteKey: function() {
