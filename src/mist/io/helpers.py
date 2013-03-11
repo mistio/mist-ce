@@ -211,7 +211,7 @@ def connect(request, backend_id=False):
         backend_id = request.matchdict['backend']
     backend = backends.get(backend_id)
 
-    driver = get_driver(int(backend['provider']))
+    driver = get_driver(backend['provider'])
 
     
     if backend['provider'] == Provider.OPENSTACK:
