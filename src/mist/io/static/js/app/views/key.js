@@ -33,12 +33,13 @@ define('app/views/key', [
                         Mist.backendsController.content.forEach(function(backend){
                             backend.machines.content.forEach(function(machine){
                                 if (machine.id == item[1]) {
-                                    machineNames.push(machine.name);
+                                    machineNames.push(machine);
                                 }
                             });
                         });
                     });
                 }
+                console.log(machineNames);
                 return machineNames;
             }.property('key.machines'),
 

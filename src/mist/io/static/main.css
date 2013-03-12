@@ -837,6 +837,10 @@ div.pending-monitoring {
     white-space: pre-wrap;
 }
 
+#key-single-machines fieldset.list-item {
+    display:none;
+}
+
 /* DIALOGS */
 
 .ui-dialog .ui-content {
