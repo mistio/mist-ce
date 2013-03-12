@@ -39,6 +39,7 @@ define('app/views/key_machine_list_item', [
                         event.stopPropagation();
                         if ($(event.target).parent().parent().find("input[type='checkbox']").is(':checked')) {
                             $(event.target).parent().parent().find("input[type='checkbox']").attr("checked",false).checkboxradio("refresh");
+                            this.machine.set("selected",false);
                         } else {
                             $(event.target).parent().parent().find("input[type='checkbox']").attr("checked",true).checkboxradio("refresh"); 
                             this.machine.set("selected",true);
@@ -46,6 +47,7 @@ define('app/views/key_machine_list_item', [
                     } else {
                         if ($(event.target).parent().find("input[type='checkbox']").is(':checked')) {
                             $(event.target).parent().find("input[type='checkbox']").attr("checked",false).checkboxradio("refresh");
+                            this.machine.set("selected",false);
                         } else {
                             $(event.target).parent().find("input[type='checkbox']").attr("checked",true).checkboxradio("refresh"); 
                             this.machine.set("selected",true);

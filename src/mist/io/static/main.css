@@ -508,34 +508,35 @@ div.actions div.ui-controlgroup-controls {
  libcloud.compute.types.Provider (we will use numbers, match in the Python) */
 
 /* EC2 */
-#single-view-provider-icon.provider-1,
-#single-view-provider-icon.provider-2,
-#single-view-provider-icon.provider-10,
-#single-view-provider-icon.provider-22,
-#single-view-provider-icon.provider-26,
-#single-view-provider-icon.provider-36,
-#single-view-provider-icon.provider-39 {
+#single-view-provider-icon.provider-ec2_us_east,
+#single-view-provider-icon.provider-ec2_us_west,
+#single-view-provider-icon.provider-ec2_us_west_oregon,
+#single-view-provider-icon.provider-ec2_ap_northeast,
+#single-view-provider-icon.provider-ec2_ap_southeast,
+#single-view-provider-icon.provider-ec2_ap_southeast_2,
+#single-view-provider-icon.provider-ec2_eu_west,
+#single-view-provider-icon.provider-ec2_sa_east {
     background-image: url(images/p1_sm.png);
 }
 
 /* Linode */
-#single-view-provider-icon.provider-7  {
+#single-view-provider-icon.provider-linode  {
     background-image: url(images/p7_sm.png);
 }
 
 /* RackSpace */
-#single-view-provider-icon.provider-3,
-#single-view-provider-icon.provider-23,
-#single-view-provider-icon.provider-40,
-#single-view-provider-icon.provider-41,
-#single-view-provider-icon.provider-48,
-#single-view-provider-icon.provider-50,
-#single-view-provider-icon.provider-51 {
+#single-view-provider-icon.provider-rackspace,
+#single-view-provider-icon.provider-rackspace_first_gen,
+#single-view-provider-icon.provider-rackspace_nova_beta,
+#single-view-provider-icon.provider-rackspace_nova_dfw,
+#single-view-provider-icon.provider-rackspace_nova_lon,
+#single-view-provider-icon.provider-rackspace_nova_ord,
+#single-view-provider-icon.provider-rackspace_uk {
     background-image: url(images/p3_sm.png);
 }
 
 /* OpenStack */
-#single-view-provider-icon.provider-31 {
+#single-view-provider-icon.provider-openstack {
     background-image: url(images/p31_sm.png);
 }
 
@@ -834,6 +835,10 @@ div.pending-monitoring {
     width: 100%;
     word-wrap: break-word;
     white-space: pre-wrap;
+}
+
+#key-single-machines fieldset.list-item {
+    display:none;
 }
 
 /* DIALOGS */

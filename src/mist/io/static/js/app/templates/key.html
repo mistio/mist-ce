@@ -36,17 +36,18 @@
             </div>
         </div>
 
-         <div data-role="collapsible" data-collapsed="false">
+         <div data-role="collapsible" data-collapsed="false" id="key-single-machines">
             <h3>Machines</h3>
-            <table id="machine-key-table">
-                <tbody>
-                    {{#each view.key.machines}}
-                    <tr>
-                       <td class="key"><a href="/#machines">{{this}}</a></td>
-                    </tr>
-                    {{/each}}
-                </tbody>
-            </table>
+            <ul id="machines-list"
+            data-role="listview"
+            data-filter="true"
+            data-inset="true"
+            data-theme="c"
+            data-filter-placeholder="Filter machines...">
+                {{#each view.keyMachines}}
+                    {{view Mist.MachineListItemView machineBinding="this"}}
+                {{/each}}
+            </ul>
         </div>
 
     </div>

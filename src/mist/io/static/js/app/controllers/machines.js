@@ -61,7 +61,7 @@ define('app/controllers/machines', [
                             }
                         });
 
-                        if (!found) {
+                        if (!found && !that.backend.create_pending) {
                             item.backend = that.backend;
                             var machine = Machine.create(item);
                             machine.tags.set('content', item.tags)
@@ -84,9 +84,7 @@ define('app/controllers/machines', [
 
                         if (!found && item.id != -1) {
                             log("not found, deleting");
-                            that.contentWillChange();
                             that.removeObject(item);
-                            that.contentDidChange();
                         }
                     });
 
@@ -130,6 +128,13 @@ define('app/controllers/machines', [
             newMachine: function(name, image, size, location, key, script) {
                 log('Creating machine', this.name, 'to backend', this.backend.title);
 
+                this.backend.set('create_pending', true);
+                
+                if (this.backend.provider.search('rackspace') > -1){
+                    // Rackspace does not support spaces in names
+                    name = name.replace(/ /g,'');
+                }
+                
                 // TODO: find a way to pass ember objects to JSON, so the
                 // following will seem less messy. It will also be helpful for tags.
                 // http://stackoverflow.com/questions/8669340/ember-model-to-json
@@ -159,7 +164,9 @@ define('app/controllers/machines', [
 
                 var machine = Machine.create(item);
                 this.addObject(machine);
-
+                Ember.run.next(function(){
+                    $('#machines-list input.ember-checkbox').checkboxradio();    
+                });
                 var that = this;
 
                 $.ajax({
@@ -171,10 +178,16 @@ define('app/controllers/machines', [
                     success: function(data) {
                         info('Successfully sent create machine', name, 'to backend',
                                     that.backend.title);
+                        warn(data);
                         if (that.backend.error) {
                             that.backend.set('error', false);
                         }     
                         machine.set("id", data.id);
+                        machine.set("name", data.name);
+                        machine.set("public_ips", data.public_ips);
+                        machine.set("private_ips", data.private_ips);
+                        machine.set("extra", data.extra);
+                        that.backend.set('create_pending', false);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while sending create machine' +
@@ -182,6 +195,8 @@ define('app/controllers/machines', [
                         error(textstate, errorThrown, 'while creating machine', that.name);
                         that.removeObject(machine);
                         that.backend.set('error', textstate);
+                        that.backend.set('create_pending', false);
+
                     }
                 });
             }

@@ -290,7 +290,6 @@ def create_machine(request):
     else:
         location = NodeLocation(location_id, name='', country='', driver=conn)
     
-
     if conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE] and\
     public_key:
         key = SSHKeyDeployment(str(public_key))
@@ -309,9 +308,8 @@ def create_machine(request):
                 else:
                     keypair['machines'] = [[backend_id, node.id],]
                 save_keypairs(request, keypair)
-            return Response('Success', 200)
         except Exception as e:
-            return Response('Something went wrong with node creation', 500)
+            return Response('Something went wrong with node creation in RackSpace: %s' % e, 500)
     elif conn.type in EC2_PROVIDERS and public_key:
         imported_key = import_key(conn, public_key, key_name)
         created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
@@ -340,9 +338,8 @@ def create_machine(request):
                     else:
                         keypair['machines'] = [[backend_id, node.id],]
                     save_keypairs(request, keypair)
-                return {'id': node.id}
             except Exception as e:
-                return Response('Something went wrong with node creation', 500)
+                return Response('Something went wrong with node creation in EC2: %s' % e, 500)
     elif conn.type is Provider.LINODE and public_key:
         auth = NodeAuthSSHKey(public_key)
         deploy_script = ScriptDeployment(script)
@@ -360,18 +357,25 @@ def create_machine(request):
                 else:
                     keypair['machines'] = [[backend_id, node.id],]
                 save_keypairs(request, keypair)
-            return {'id': node.id}
         except:
-            return Response('Something went wrong with node creation', 500)
+            return Response('Something went wrong with Linode creation', 500)
 
-    try:
-        node = conn.create_node(name=machine_name,
-                         image=image,
-                         size=size,
-                         location=location)
-        return Response('Success', 200)
-    except Exception as e:
-        return Response('Something went wrong with node creation', 500)
+    else:
+        try:
+            node = conn.create_node(name=machine_name,
+                             image=image,
+                             size=size,
+                             location=location)
+        except Exception as e:
+            return Response('Something went wrong with generic node creation: %s' % e, 500)
+
+    return {'id': node.id,
+            'name': node.name,
+            'extra': node.extra,
+            'public_ips': node.public_ips,
+            'private_ips': node.private_ips,
+            }
+
 
 
 @view_config(route_name='machine', request_method='POST',

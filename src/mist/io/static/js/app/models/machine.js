@@ -213,6 +213,12 @@ define('app/models/machine', [
                     if (!that.backend) {
                         return false;
                     }
+                    
+                    if (that.backend.create_pending){
+                        // Try again later if a machine is being created on this backend
+                        setTimeout(uptimeTimeout, 10000);
+                        return false;
+                    }
 
                     if (that.state == 'running') {
                         var host = that.getHost();

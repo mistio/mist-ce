@@ -28,6 +28,24 @@ define('app/views/key', [
                 }
             }.property('key'),
 
+            keyMachines: function() {
+                var key = this.key;
+                machineNames = [];
+                if (key) {
+                    key.machines.forEach(function(item){
+                        Mist.backendsController.content.forEach(function(backend){
+                            backend.machines.content.forEach(function(machine){
+                                if (machine.id == item[1]) {
+                                    machineNames.push(machine);
+                                }
+                            });
+                        });
+                    });
+                }
+                console.log(machineNames);
+                return machineNames;
+            }.property('key.machines'),
+
             associateKey: function() {
                 $.mobile.changePage('#key-associate-dialog');
                 //check boxes for machines associated with this key
