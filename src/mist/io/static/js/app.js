@@ -132,11 +132,13 @@ define( 'app', [
             }
 
             mobileinit = true;
+            Ember.LOG_BINDINGS = true;
 
             var App = Ember.Application.create({
 
                 VERSION: '0.3-ember',
                 LOG_TRANSITIONS: true,
+                LOG_STATE_TRANSITIONS: true,
                 // Sets up mocha to run some integration tests
                 specsRunner: function( chai ) {
                     // Create placeholder for mocha output
@@ -155,93 +157,6 @@ define( 'app', [
                     );
                 },
 
-/*
-                // Constructor
-                init: function() {
-                    //this._super();
-
-                    this.set(
-                        'backendsController',
-                        BackendsController.create()
-                    );
-
-                    this.set(
-                        'backendAddController',
-                        BackendAddController.create()
-                    );
-
-                    this.set(
-                        'confirmationController',
-                        ConfirmationController.create()
-                    );
-
-                    this.set(
-                        'notificationController',
-                           NotificationController.create()
-                    );
-
-                    this.set(
-                        'machineAddController',
-                        MachineAddController.create()
-                    );
-
-                    this.set(
-                        'selectMachinesController',
-                        SelectMachinesController.create()
-                    );
-
-                    this.set(
-                        'selectImagesController',
-                        SelectImagesController.create()
-                    );
-
-                    this.set(
-                            'keysController',
-                            KeysController.create()
-                        );
-                        
-                    this.set(
-                            'rulesController',
-                            RulesController.create()
-                        );                        
-
-                    this.set(
-                            'keyAddController',
-                            KeyAddController.create()
-                        );
-
-                    this.set(
-                            'authenticated',
-                            URL_PREFIX==''?true:false
-                        );
-
-                    this.set(
-                            'email',
-                            ''
-                        );
-
-                     this.set(
-                            'password',
-                            ''
-                        );
-
-                    // Run specs if asked
-                    if ( location.hash.match( /specs/ ) ) {
-                        require( [ 'chai', 'mocha' ], this.specsRunner );
-                    }
-                    
-                    setTimeout(function(){
-                        $.mobile.changePage('#home', { transition: 'fade' });
-                        Mist.emailReady();
-                        if (EMAIL != '') {
-                            Mist.set('authenticated', true);
-                        }
-                    }, 2000);
-
-
-                },
-                
-            */
                 emailReady: function(){
                     if (this.email && this.password){
                         $('#auth-ok').button('enable');
@@ -260,16 +175,17 @@ define( 'app', [
                 }.observes('password')
                               
             });
-App.Router = Ember.Router.extend({
-    location : Ember.Location.create({
-        implementation : 'none'
-    })
-});
-            window.Mist = App;
-                  App.set(
-                        'backendAddController',
-                        BackendAddController.create()
-                    );
+
+            App.Router = Ember.Router.extend({
+                location : Ember.Location.create({
+                implementation : 'none'
+            })
+        });
+        
+        window.Mist = App;
+        
+        App.set('backendAddController',
+                BackendAddController.create());
 App.set(
                         'backendsController',
                         BackendsController.create()
@@ -463,59 +379,56 @@ App.set(
             
             var machineView = MachineView.create();
             machineView.append();
-/*
-            var confirmationDialog = ConfirmationDialog.create();
-            confirmationDialog.append();
-
-            var dialog = SingleMachineActionsDialog.create();
-            dialog.appendTo("#single-machine");
-            var shellDialog = Shell.create();
-            shellDialog.appendTo("#single-machine");
-            var machineTagsDialog = MachineTagsDialog.create();
-            machineTagsDialog.appendTo("#single-machine");
-*/
+///*
+//            var confirmationDialog = ConfirmationDialog.create();
+//            confirmationDialog.append();
+//
+//            var dialog = SingleMachineActionsDialog.create();
+//            dialog.appendTo("#single-machine");
+//            var shellDialog = Shell.create();
+//            shellDialog.appendTo("#single-machine");
+//            var machineTagsDialog = MachineTagsDialog.create();
+//            machineTagsDialog.appendTo("#single-machine");
+//*/
             var machineListView = MachineListView.create();
             machineListView.append();
             
             var addDialog = MachineAddDialog.create();
             addDialog.append();
             
-            /*
-            shellDialog = Shell.create();
-            shellDialog.appendTo("#machines");
-            var machineActionsDialog = MachineActionsDialog.create();
-            machineActionsDialog.appendTo("#machines");
-            */
-            //machineTagsDialog = MachineTagsDialog.create();
-            //machineTagsDialog.appendTo("#machines");
-
+//            /*
+//            shellDialog = Shell.create();
+//            shellDialog.appendTo("#machines");
+//            var machineActionsDialog = MachineActionsDialog.create();
+//            machineActionsDialog.appendTo("#machines");
+//            */
+//
             var imageListView = ImageListView.create();
             imageListView.append();
-/*
-            var machineMonitoringDialog = MachineMonitoringDialog.create();
-            machineMonitoringDialog.appendTo("#single-machine");
-
-            $(document).on( 'pagebeforeshow', '#dialog-add', function(){
-                $('#dialog-add').trigger('create');
-            });
-*/
+///*
+//            var machineMonitoringDialog = MachineMonitoringDialog.create();
+//            machineMonitoringDialog.appendTo("#single-machine");
+//
+//            $(document).on( 'pagebeforeshow', '#dialog-add', function(){
+//                $('#dialog-add').trigger('create');
+//            });
+//*/
             var keyListView = KeyListView.create();
             keyListView.append();
 
             var keyView = KeyView.create();
             keyView.append();
-/*
-            var keyPrivDialog = KeyPrivDialog.create();
-            keyPrivDialog.append();
+///*
+//            var keyPrivDialog = KeyPrivDialog.create();
+//            keyPrivDialog.append();
+//
+//            var keyAddDialog = KeyAddDialog.create();
+//            keyAddDialog.appendTo("#keys");
+//
+//            var keyAssociateDialog = KeyAssociateDialog.create();
+//            keyAssociateDialog.append();
+//*/
 
-            var keyAddDialog = KeyAddDialog.create();
-            keyAddDialog.appendTo("#keys");
-
-            var keyAssociateDialog = KeyAssociateDialog.create();
-            keyAssociateDialog.append();
-*/
-
-//            App.initialize();
             return App
         });
     }
