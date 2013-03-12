@@ -17,6 +17,10 @@ define('app/views/home', [
                 // cannot have template in home.pt as pt complains
                 this.set('template', Ember.Handlebars.compile(home_html));
             },
+            
+            addBackend: function(){
+        	$("#add-backend").popup("open");
+            }
         });
     }
 );
