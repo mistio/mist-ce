@@ -456,6 +456,7 @@ App.set(
             App.RuleView = RuleView;
             App.UserMenuView = UserMenuView;
             App.KeyMachineListItemView = KeyMachineListItem;
+            App.MachineTagsDialog = MachineTagsDialog;
 
             var homeView = Home.create();
             homeView.append();
@@ -476,16 +477,18 @@ App.set(
             var machineListView = MachineListView.create();
             machineListView.append();
             
-            /*
             var addDialog = MachineAddDialog.create();
             addDialog.append();
+            
+            /*
             shellDialog = Shell.create();
             shellDialog.appendTo("#machines");
             var machineActionsDialog = MachineActionsDialog.create();
             machineActionsDialog.appendTo("#machines");
-            machineTagsDialog = MachineTagsDialog.create();
-            machineTagsDialog.appendTo("#machines");
-*/
+            */
+            //machineTagsDialog = MachineTagsDialog.create();
+            //machineTagsDialog.appendTo("#machines");
+
             var imageListView = ImageListView.create();
             imageListView.append();
 /*

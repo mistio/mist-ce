@@ -81,5 +81,9 @@ function(Page, machine_list_html) {
             this._super();
             this.set('template', Ember.Handlebars.compile(machine_list_html));
         },
+        
+        openTags: function(){
+            $("#dialog-tags").popup("open");
+        }
     });
 });

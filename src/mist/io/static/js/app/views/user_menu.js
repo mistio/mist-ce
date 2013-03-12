@@ -19,6 +19,10 @@ define('app/views/user_menu', [
                 this.set('template', Ember.Handlebars.compile(user_menu_html));
                 this.set('email', EMAIL);
                 this.set('gravatarURL', 'https://www.gravatar.com/avatar/'+md5(EMAIL)+'?d=blank&s=40');
+            },
+        
+            click: function(){
+        	$("#dialog-providers").popup("open");
             }
         });
     }

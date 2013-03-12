@@ -1,5 +1,3 @@
-<div data-role="dialog" id="dialog-add" class="mist-dialog">
-
     <div data-role="header">
         <h1>Create Machine</h1>
     </div>
@@ -83,12 +81,11 @@
             <button id="create-cancel"
                 class="btn-left-full"
                 data-theme="c"
-                {{action "backClicked"}}>Back</button>
+                {{action "backClicked" target="view"}}>Back</button>
 
             <button id="create-ok"
                 class="btn-right-full"
                 data-theme="b"
-                {{action "newMachineClicked"}}>Launch!</button>
+                {{action "newMachineClicked" target="view"}}>Launch!</button>
         </div>
     </div>
-</div>

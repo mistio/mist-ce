@@ -1,4 +1,5 @@
 define('app/views/machine_add_dialog', [
+    'app/views/jqm_dialog',
     'text!app/templates/machine_add_dialog.html','ember'],
     /**
      *
@@ -6,9 +7,9 @@ define('app/views/machine_add_dialog', [
      *
      * @returns Class
      */
-    function(machine_add_dialog_html) {
-        return Ember.View.extend({
-            tagName: false,
+    function(Dialog, machine_add_dialog_html) {
+        return Dialog.extend({
+            id: 'dialog-add',
 
             clear: function(){
                 Mist.machineAddController.newMachineClear();
@@ -37,17 +38,18 @@ define('app/views/machine_add_dialog', [
                 this.clear();
                 history.back();
             },
+            
+            imagesBinding: "Mist.machineAddController.newMachineBackend.images",
 
             init: function() {
                 this._super();
-                // cannot have template in home.pt as pt complains
                 this.set('template', Ember.Handlebars.compile(machine_add_dialog_html));
-/*
-                $('#dialog-add').live("pageshow", function (event) {
+
+                $(document).on("pageshow", '#dialog-add', function (event) {
                         $('input#create-machine-name').focus();
                     }
                 );
-*/
+                
                 Ember.run.next(function(){
                     Mist.machineAddController.addObserver('newMachineBackend', function() {
                         Ember.run.next(function() {

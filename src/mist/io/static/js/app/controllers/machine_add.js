@@ -8,6 +8,8 @@ define('app/controllers/machine_add', [
      */
     function() {
         return Ember.Object.extend({
+            
+            newMachineBackend: null,
 
             newMachine: function() {
                 log("new machine");

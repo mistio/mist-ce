@@ -11,7 +11,6 @@ define('app/views/machine_tags_dialog',[
      */
     function(machine_tags_dialog_html) {
         return Ember.View.extend({
-            tagName: false,
 
             machine: function() {
                 var machine = null;

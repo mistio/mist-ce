@@ -15,7 +15,7 @@
     <div data-role="content">
 
         {{view Mist.Select
-            data-native-menu="false"
+            data-native-menu="true"
             name="select-machines"
             id="mist-select-machines"
             contentBinding="Mist.selectMachinesController.content"
@@ -60,7 +60,8 @@
                 data-icon="grid"
                 data-rel="popup"
                 data-transition="slideup"
-                {{bindAttr class="disabledTagClass"}}>Tag</a>
+                {{bindAttr class="disabledTagClass"}}
+                {{action openTags target="view"}}>Tag</a>
 
             <a href="#dialog-shell"
                 class="action-links"
@@ -82,3 +83,5 @@
         </div>
 
     </div>
+    
+    {{view Mist.MachineTagsDialog}}

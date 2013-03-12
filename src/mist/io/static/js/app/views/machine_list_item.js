@@ -32,9 +32,10 @@ define('app/views/machine_list_item', [
                     });
                 },
 
-                machineClick: function(event, el){
+                machineClick: function(){
                     log('machine clicked');
 
+                    /*
                     if(event.target.tagName != 'A'){
                         if(event.target.tagName == 'INPUT'){
                             event.stopPropagation();
@@ -53,7 +54,9 @@ define('app/views/machine_list_item', [
                             return;
                         }
                     }
+                    */
                     Mist.set('machine', this.machine);
+                    $.mobile.changePage("#single-machine");
                 },
 
                 machineSelected: function(){
