@@ -1,4 +1,5 @@
 define('app/views/key_list', [
+    'app/views/jqm_page',
     'text!app/templates/key_list.html',
     'ember'
     ],
@@ -8,10 +9,11 @@ define('app/views/key_list', [
      *
      * @returns Class
      */
-    function(key_list_html) {
-        return Ember.View.extend({
-            tagName: false,
-
+    function(Page, key_list_html) {
+        return Page.extend({
+            
+            id: 'keys',
+            
             init: function() {
                 this._super();
                 this.set('template', Ember.Handlebars.compile(key_list_html));

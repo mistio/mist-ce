@@ -136,7 +136,7 @@ define( 'app', [
             var App = Ember.Application.create({
 
                 VERSION: '0.3-ember',
-LOG_TRANSITIONS: true,
+                LOG_TRANSITIONS: true,
                 // Sets up mocha to run some integration tests
                 specsRunner: function( chai ) {
                     // Create placeholder for mocha output
@@ -397,11 +397,11 @@ App.set(
             }
 
             // monitoring rule slider toggle
-            //$('input.rule-value').live('mouseover', showRuleSlider);
-            //$('input.rule-value').live('click', showRuleSlider);
+            $(document).on('mouseover', 'input.rule-value', showRuleSlider);
+            $(document).on('click', 'input.rule-value', showRuleSlider);
 
-            //$('.rule-box').live('mouseleave', hideRuleSlider)
-            //$('#single-machine').live('tap', hideRuleSlider);
+            $(document).on('mouseleave', '.rule-box', hideRuleSlider);
+            $(document).on('tap', '#single-machine', hideRuleSlider);
 
             App.Select = Ember.Select.extend({
                 attributeBindings: [
@@ -495,13 +495,13 @@ App.set(
             $(document).on( 'pagebeforeshow', '#dialog-add', function(){
                 $('#dialog-add').trigger('create');
             });
-
+*/
             var keyListView = KeyListView.create();
             keyListView.append();
 
             var keyView = KeyView.create();
             keyView.append();
-
+/*
             var keyPrivDialog = KeyPrivDialog.create();
             keyPrivDialog.append();
 

@@ -6,7 +6,7 @@
         </label>
     </fieldset>
 
-    <a href="#key" {{action "keyClick" on="click"}}>
+    <a href="#key" {{action "keyClick" target="view" on="click"}}>
         <h3 class="name">{{view.key.name}}</h3>
         <p class="description">  
             {{#if view.key.default_key}}

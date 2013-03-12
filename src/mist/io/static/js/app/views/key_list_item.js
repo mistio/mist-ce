@@ -13,7 +13,8 @@ define('app/views/key_list_item', [
 
                 tagName:false,
 
-                keyClick: function(event, el){
+                keyClick: function(){
+                    /*
                     if (event.target.tagName != 'A') {
                         if (event.target.tagName == 'INPUT') {
                             event.stopPropagation();
@@ -32,7 +33,9 @@ define('app/views/key_list_item', [
                             return;
                         }
                     }
+                    */
                     Mist.set('key', this.key);
+                    $.mobile.changePage( "#key");
                 },
 
                 keySelected: function(){
@@ -66,11 +69,12 @@ define('app/views/key_list_item', [
                     });
                 }.observes('key.selected'),
 
-                init: function() {
-                    this._super();
+                template: Ember.Handlebars.compile(key_list_item_html),
+                //init: function() {
+                //    this._super();
                     // cannot have template in home.pt as pt complains
-                    this.set('template', Ember.Handlebars.compile(key_list_item_html));
-                },
+                //    this.set('template', Ember.Handlebars.compile(key_list_item_html));
+                //},
         });
 
     }

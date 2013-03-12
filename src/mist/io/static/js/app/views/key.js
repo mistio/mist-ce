@@ -1,4 +1,5 @@
 define('app/views/key', [
+    'app/views/jqm_page',
     'text!app/templates/key.html',
     'ember'
     ],
@@ -8,9 +9,11 @@ define('app/views/key', [
      *
      * @returns Class
      */
-    function(key_html) {
-        return Ember.View.extend({
-            tagName: false,
+    function(Page, key_html) {
+        return Page.extend({
+            
+            id: 'key',
+            
             keyBinding: 'Mist.key',
 
             disabledAssociateClass: function() {

@@ -11,7 +11,7 @@
 </div>
 
 <div data-role="fieldcontain">
-    <input id="backend-delete" type="button" value="Delete" {{action "deleteButtonClick" on="click"}} />
+    <input id="backend-delete" type="button" value="Delete" {{action "deleteButtonClick" target="view" on="click"}} />
 </div>
 
 <div id="backend-delete-confirm" class="btn-full" data-role="controlgroup" data-type="horizontal">
@@ -20,18 +20,18 @@
         class="btn-left-full"
         data-role="button"
         data-theme="c"
-        {{action "deleteConfirmButtonClick" on="click" }}>Yes</a>
+        {{action "deleteConfirmButtonClick" target="view" on="click" }}>Yes</a>
     <a id="backend-delete-no"
         class="btn-right-full"
         data-role="button"
         data-theme="b"
-        {{action "deleteCancelButtonClick" on="click" }}>No</a>
+        {{action "deleteCancelButtonClick" target="view" on="click" }}>No</a>
 </div>
 
 <div id="create-backend-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
     <a id="edit-backend-ok"
         class="btn-full"
-        data-role="button"
+        data-role="button" href="#home"
         data-rel="back"
         data-theme="b">Close</a>
 </div>

@@ -4,6 +4,6 @@
     data-inline="true"
     data-transition="pop"
     data-role="button"
-    {{action "openDialog" on="click"}}
+    {{action "openDialog" target='view' on="click"}}
     data-icon="check"
     {{bindAttr class="view.backend.state :backend-button"}}>{{view.backend.title}}</a>
