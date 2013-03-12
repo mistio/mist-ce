@@ -198,6 +198,7 @@ define('app/views/machine', [
                     var networkInterfaces = null;
                     var disks = null;
                     var memoryTotal = false;
+                    var loaded = false;
 
                     function drawCpu() {
                         return context.metric(function(start, stop, step, callback) {
@@ -209,15 +210,17 @@ define('app/views/machine', [
                                     url: URL_PREFIX + '/backends/' + machine.backend.id +
                                          '/machines/' + machine.id + '/stats',
                                     type: 'GET',
+                                    async: loaded,
                                     dataType: 'jsonp',
                                     data: {'start': (start / 1000),
                                            'stop': (stop / 1000),
                                            'step': step},
-                                    timeout: 2000,
+                                    timeout: 10000,
                                     success: function(data) {
                                         if (!data || !('cpu' in data)) {
                                             return callback(new Error('unable to load data'));
                                         } else {
+                    			    loaded = true;
                                             localData = data;
 
                                             if (!cores) {
@@ -236,7 +239,7 @@ define('app/views/machine', [
                                     },
                                     error: function(jqXHR, textstate, errorThrown) {
                                         error('could not load monitoring data');
-                                        Mist.context.stop();
+                                        //Mist.context.stop();
                                     }
                                 });
 
@@ -332,7 +335,7 @@ define('app/views/machine', [
                                .enter()
                                .append('div')
                                .attr('class', 'horizon')
-                               .call(context.horizon().extent([0, 100]));
+                               .call(context.horizon());
                             div.append('div').attr('class', 'rule').call(context.rule());
                         });
                     }
@@ -353,7 +356,7 @@ define('app/views/machine', [
                                .enter()
                                .append('div')
                                .attr('class', 'horizon')
-                               .call(context.horizon().extent([0, 100]));
+                               .call(context.horizon());
                             div.append('div').attr('class', 'rule').call(context.rule());
                         });
                     }
@@ -369,7 +372,7 @@ define('app/views/machine', [
                            .enter()
                            .append('div')
                            .attr('class', 'horizon')
-                           .call(context.horizon().extent([0, 100]));
+                           .call(context.horizon());
                         div.append('div').attr('class', 'rule').call(context.rule());
                     });
 
@@ -379,7 +382,7 @@ define('app/views/machine', [
                            .enter()
                            .append('div')
                            .attr('class', 'horizon')
-                           .call(context.horizon().extent([0, 100]));
+                           .call(context.horizon());
                         div.append('div').attr('class', 'rule').call(context.rule());
                     });
 
@@ -389,7 +392,7 @@ define('app/views/machine', [
                            .enter()
                            .append('div')
                            .attr('class', 'horizon')
-                           .call(context.horizon().extent([0, 100]));
+                           .call(context.horizon());
                         div.append('div').attr('class', 'rule').call(context.rule());
                     });
 
