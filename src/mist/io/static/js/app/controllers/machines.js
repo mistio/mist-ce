@@ -96,9 +96,9 @@ define('app/controllers/machines', [
                     
                     Mist.backendsController.getMachineCount()
 
-                    Ember.run.next(function(){
-                        $('#machines-list input.ember-checkbox').checkboxradio();    
-                    });
+//                    Ember.run.next(function(){
+//                        $('#machines-list input.ember-checkbox').checkboxradio();    
+//                    });
                     
                     Ember.run.later(that, function(){
                         this.refresh();

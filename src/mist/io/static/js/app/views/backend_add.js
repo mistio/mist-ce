@@ -55,14 +55,14 @@ define('app/views/backend_add', ['app/models/backend',
 
                 Ember.run.next(function(){
                     Mist.backendAddController.addObserver('newBackendReady', function() {
-                        Ember.run.next(function() {
-                            $('#create-backend-ok').button();
-                            if (Mist.backendAddController.newBackendReady) {
-                                $('#create-backend-ok').button('enable');
-                            } else {
-                                $('#create-backend-ok').button('disable');
-                            }
-                        });
+//                        Ember.run.next(function() {
+//                            $('#create-backend-ok').button();
+//                            if (Mist.backendAddController.newBackendReady) {
+//                                $('#create-backend-ok').button('enable');
+//                            } else {
+//                                $('#create-backend-ok').button('disable');
+//                            }
+//                        });
                     });
                     Mist.backendAddController.set('newBackendReady', true);
                     Mist.backendAddController.set('newBackendReady', false);

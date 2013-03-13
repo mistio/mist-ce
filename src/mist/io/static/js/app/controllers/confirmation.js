@@ -1,7 +1,6 @@
 define('app/controllers/confirmation', [
     'ember',
     'jquery',
-    'mobile'
     ],
     /**
      * Confirmation Dialog controller

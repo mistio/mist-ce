@@ -1,5 +1,3 @@
-location.hash = '#splash';
-
 // Define libraries
 require.config({
     baseUrl: 'static/js/',
@@ -23,9 +21,6 @@ require.config({
         },
         'jqueryUi': {
             deps: ['jquery']
-        },
-        'mobile': {
-           deps: ['ember']
         },
         'd3': {
             deps: ['jquery']
@@ -78,7 +73,6 @@ define( 'app', [
     'app/views/key_machine_list_item',
     'app/views/rule',
     'app/views/user_menu',
-    'mobile',
     'cubism',
     'ember'
     ], function($,
@@ -121,69 +115,127 @@ define( 'app', [
                 KeyMachineListItem,
                 RuleView,
                 UserMenuView,
-                Mobile,
                 cubism
                 ) {
 
-        var mobileinit = false;
-        $(document).bind('pageinit', function() {
-            if (mobileinit){
-                return
-            }
+    $(document).bind("mobileinit", function(){
+	  $.mobile.ajaxEnabled = false;
+	  $.mobile.hashListeningEnabled = false;
+	  $.mobile.linkBindingEnabled = false;
+    });
+    
+    App = Ember.Application.create({
+	rootElement: 'body',
+	ready: function(){
+	    Em.run.next(function() {
+	    var id = false;
+            for(key in Ember.View.views){
+		if("application" == Ember.View.views[key].renderedName){
+			id = key;
+		}
+	    }
+	    if(id){
+		$("#" + id).attr('data-role', 'page');
+		require(['mobile'], function(){console.log('jqm loaded');});	
+	    }
+	    });
+	}
+    });
+    
+    
+    App.Router.map(function() {
+	this.route('home');
+	this.route('providers');
+	this.route('providers&ui-state=dialog');
+	this.route('machines');
+	this.route('images');
+    });
 
-            mobileinit = true;
-            Ember.LOG_BINDINGS = true;
+    App.IndexRoute = Ember.Route.extend({
+	setupController : function(controller) {
+	    console.log('index route');
+	},
+    });
+    
+    App.ProvidersRoute = Ember.Route.extend({
+	setupController : function(controller) {
+	    console.log('dialog providers route');
+	},
+    });
+    
+    App.MachinesRoute = Ember.Route.extend({
+	setupController : function(controller) {
+	    console.log('machines route');
+	},
+    });
+    
+    App.ImagesRoute = Ember.Route.extend({
+	setupController : function(controller) {
+	    console.log('images route');
+	},
+    });
 
-            var App = Ember.Application.create({
-
-                VERSION: '0.3-ember',
-                LOG_TRANSITIONS: true,
-                LOG_STATE_TRANSITIONS: true,
-                // Sets up mocha to run some integration tests
-                specsRunner: function( chai ) {
-                    // Create placeholder for mocha output
-                    $( document.body ).before( '<div id="mocha"></div>' );
-
-                    // Setup mocha and expose chai matchers
-                    window.expect = chai.expect;
-                    mocha.setup('bdd');
-
-                    // Load testsuite
-                    require([
-                        'app/specs/templates/basic_acceptance'
-                    ], function() {
-                            mocha.run().globals( [ '$', 'Ember', 'Mist' ] );
-                        }
-                    );
-                },
-
-                emailReady: function(){
-                    if (this.email && this.password){
-                        $('#auth-ok').button('enable');
-                    } else {
-                        try{
-                            $('#auth-ok').button('disable');
-                        } catch(e){
-                            $('#auth-ok').button();
-                            $('#auth-ok').button('disable');
-                        }
-                    }
-                }.observes('email'),
-                
-                passReady: function(){
-                    this.emailReady();
-                }.observes('password')
-                              
-            });
-
-            App.Router = Ember.Router.extend({
-                location : Ember.Location.create({
-                implementation : 'none'
-            })
-        });
-        
-        window.Mist = App;
-        
+    App.UserMenuView = UserMenuView;
+    
+//        var mobileinit = false;
+//        $(document).bind('pageinit', function() {
+//            if (mobileinit){
+//                return
+//            }
+//
+//            mobileinit = true;
+//            Ember.LOG_BINDINGS = true;
+//
+//            var App = Ember.Application.create({
+//
+//                VERSION: '0.3-ember',
+//                LOG_TRANSITIONS: true,
+//                LOG_STATE_TRANSITIONS: true,
+//                // Sets up mocha to run some integration tests
+//                specsRunner: function( chai ) {
+//                    // Create placeholder for mocha output
+//                    $( document.body ).before( '<div id="mocha"></div>' );
+//
+//                    // Setup mocha and expose chai matchers
+//                    window.expect = chai.expect;
+//                    mocha.setup('bdd');
+//
+//                    // Load testsuite
+//                    require([
+//                        'app/specs/templates/basic_acceptance'
+//                    ], function() {
+//                            mocha.run().globals( [ '$', 'Ember', 'Mist' ] );
+//                        }
+//                    );
+//                },
+//
+//                emailReady: function(){
+//                    if (this.email && this.password){
+//                        $('#auth-ok').button('enable');
+//                    } else {
+//                        try{
+//                            $('#auth-ok').button('disable');
+//                        } catch(e){
+//                            $('#auth-ok').button();
+//                            $('#auth-ok').button('disable');
+//                        }
+//                    }
+//                }.observes('email'),
+//                
+//                passReady: function(){
+//                    this.emailReady();
+//                }.observes('password')
+//                              
+//            });
+//
+//            App.Router = Ember.Router.extend({
+//                location : Ember.Location.create({
+//                implementation : 'none'
+//            })
+//        });
+//        
+//        window.Mist = App;
+//        
         App.set('backendAddController',
                 BackendAddController.create());
 App.set(
@@ -245,80 +297,80 @@ App.set(
                             'password',
                             ''
                         );
-
-                    
-                    setTimeout(function(){
-                        $.mobile.changePage('#home', { transition: 'fade' });
-                        Mist.emailReady();
-                        if (EMAIL != '') {
-                            Mist.set('authenticated', true);
-                        }
-                    }, 2000);
-
-
-
-            $(document).on( 'pagebeforeshow', '#machines', function() {
-                $('#machines-list').listview('refresh');
-            });
-
-            $(document).on( 'popupbeforeposition', '#dialog-power', function() {
-                $("#dialog-power a").button();
-            });
-
-            $(document).on( 'popupbeforeposition', '#dialog-single-power', function() {
-                $("#dialog-single-power a").button();
-            });
-
-            $(document).on( 'popupbeforeposition', '#monitoring-dialog', function() {
-                $("#single-machine").trigger('pagecreate');
-            });
-
-            $(document).on( 'pagebeforeshow', '#images', function() {
-                $("#images-list").listview('refresh');
-            });
-
-            $(document).on( 'pagebeforeshow', '#single-machine', function() {
-                Mist.set('graphPolling', true);
-            });
-
-            $(document).on( 'pageshow', '#single-machine', function() {
-                $(".monitoring-button").button();
-            });
-
-            $(document).on( 'pagebeforehide', '#single-machine', function() {
-                Mist.set('graphPolling', false);
-                Mist.set('machine', null);
-            });
-
-            // Console toggle behavior
-            $(document).ready(function() {
-                $('#shell-return').on('click', '.command', function() {
-                    var out = $(this).next('.output');
-                    if (out.is(':visible')) {
-                        out.slideUp(300);
-                        $(this).parent().addClass('contracted').removeClass('expanded');
-                    } else {
-                        out.slideDown(200);
-                        $(this).parent().removeClass('contracted').addClass('expanded');
-                    }
-                });
-            });
-
-            function showRuleSlider(){
-                    $(this).parent().children('.ui-slider').fadeIn(100);
-                    return false;
-            }
-            function hideRuleSlider(){
-                    $('.ui-slider').fadeOut(100);
-            }
-
-            // monitoring rule slider toggle
-            $(document).on('mouseover', 'input.rule-value', showRuleSlider);
-            $(document).on('click', 'input.rule-value', showRuleSlider);
-
-            $(document).on('mouseleave', '.rule-box', hideRuleSlider);
-            $(document).on('tap', '#single-machine', hideRuleSlider);
-
+//
+//                    
+//                    setTimeout(function(){
+//                        $.mobile.changePage('#home', { transition: 'fade' });
+//                        Mist.emailReady();
+//                        if (EMAIL != '') {
+//                            Mist.set('authenticated', true);
+//                        }
+//                    }, 2000);
+//
+//
+//
+//            $(document).on( 'pagebeforeshow', '#machines', function() {
+//                $('#machines-list').listview('refresh');
+//            });
+//
+//            $(document).on( 'popupbeforeposition', '#dialog-power', function() {
+//                $("#dialog-power a").button();
+//            });
+//
+//            $(document).on( 'popupbeforeposition', '#dialog-single-power', function() {
+//                $("#dialog-single-power a").button();
+//            });
+//
+//            $(document).on( 'popupbeforeposition', '#monitoring-dialog', function() {
+//                $("#single-machine").trigger('pagecreate');
+//            });
+//
+//            $(document).on( 'pagebeforeshow', '#images', function() {
+//                $("#images-list").listview('refresh');
+//            });
+//
+//            $(document).on( 'pagebeforeshow', '#single-machine', function() {
+//                Mist.set('graphPolling', true);
+//            });
+//
+//            $(document).on( 'pageshow', '#single-machine', function() {
+//                $(".monitoring-button").button();
+//            });
+//
+//            $(document).on( 'pagebeforehide', '#single-machine', function() {
+//                Mist.set('graphPolling', false);
+//                Mist.set('machine', null);
+//            });
+//
+//            // Console toggle behavior
+//            $(document).ready(function() {
+//                $('#shell-return').on('click', '.command', function() {
+//                    var out = $(this).next('.output');
+//                    if (out.is(':visible')) {
+//                        out.slideUp(300);
+//                        $(this).parent().addClass('contracted').removeClass('expanded');
+//                    } else {
+//                        out.slideDown(200);
+//                        $(this).parent().removeClass('contracted').addClass('expanded');
+//                    }
+//                });
+//            });
+//
+//            function showRuleSlider(){
+//                    $(this).parent().children('.ui-slider').fadeIn(100);
+//                    return false;
+//            }
+//            function hideRuleSlider(){
+//                    $('.ui-slider').fadeOut(100);
+//            }
+//
+//            // monitoring rule slider toggle
+//            $(document).on('mouseover', 'input.rule-value', showRuleSlider);
+//            $(document).on('click', 'input.rule-value', showRuleSlider);
+//
+//            $(document).on('mouseleave', '.rule-box', hideRuleSlider);
+//            $(document).on('tap', '#single-machine', hideRuleSlider);
+//
             App.Select = Ember.Select.extend({
                 attributeBindings: [
                     'name',
@@ -335,7 +387,7 @@ App.set(
                     'data-theme'
                 ]
             });
-
+//
             App.ShellTextField = Ember.TextField.extend({
                 attributeBindings: [
                     'name',
@@ -347,90 +399,91 @@ App.set(
                     this._parentView.submit();
                 }
             });
-
-            App.Checkbox = Ember.Checkbox.extend({
-                attributeBindings: [
-                    'name',
-                    'id',
-                    'data-inline'
-                ],
-            });
-
-            Ember.TextArea.reopen({
-                attributeBindings: ["name", "placeholder", "id"]
-              });
-            
-            App.HomeView = Home;
+//
+//            App.Checkbox = Ember.Checkbox.extend({
+//                attributeBindings: [
+//                    'name',
+//                    'id',
+//                    'data-inline'
+//                ],
+//            });
+//
+//            Ember.TextArea.reopen({
+//                attributeBindings: ["name", "placeholder", "id"]
+//              });
+//            
+//            App.HomeView = Home;
             App.CountView = Count;
             App.BackendButtonView = BackendButton;
             App.AddBackendView = AddBackend;
             App.EditBackendView = EditBackend;
             App.MachineListItemView = MachineListItem;
             App.ImageListItemView = ImageListItem;
-            App.DeleteTagView = DeleteTagView;
-            App.KeyListView = KeyList;
-            App.RuleView = RuleView;
-            App.UserMenuView = UserMenuView;
-            App.KeyMachineListItemView = KeyMachineListItem;
+//            App.DeleteTagView = DeleteTagView;
+//            App.KeyListView = KeyList;
+//            App.RuleView = RuleView;
+//            App.UserMenuView = UserMenuView;
+//            App.KeyMachineListItemView = KeyMachineListItem;
             App.MachineTagsDialog = MachineTagsDialog;
+//
+//            var homeView = Home.create();
+//            homeView.append();
+//            
+//            var machineView = MachineView.create();
+//            machineView.append();
+/////*
+////            var confirmationDialog = ConfirmationDialog.create();
+////            confirmationDialog.append();
+////
+////            var dialog = SingleMachineActionsDialog.create();
+////            dialog.appendTo("#single-machine");
+////            var shellDialog = Shell.create();
+////            shellDialog.appendTo("#single-machine");
+////            var machineTagsDialog = MachineTagsDialog.create();
+////            machineTagsDialog.appendTo("#single-machine");
+////*/
+              App.MachineListView = MachineListView;
+//            machineListView.append();
+//            
+//            var addDialog = MachineAddDialog.create();
+//            addDialog.append();
+//            
+////            /*
+////            shellDialog = Shell.create();
+////            shellDialog.appendTo("#machines");
+////            var machineActionsDialog = MachineActionsDialog.create();
+////            machineActionsDialog.appendTo("#machines");
+////            */
+////
+//            var imageListView = ImageListView.create();
+//            imageListView.append();
+/////*
+////            var machineMonitoringDialog = MachineMonitoringDialog.create();
+////            machineMonitoringDialog.appendTo("#single-machine");
+////
+////            $(document).on( 'pagebeforeshow', '#dialog-add', function(){
+////                $('#dialog-add').trigger('create');
+////            });
+////*/
+//            var keyListView = KeyListView.create();
+//            keyListView.append();
+//
+//            var keyView = KeyView.create();
+//            keyView.append();
+/////*
+////            var keyPrivDialog = KeyPrivDialog.create();
+////            keyPrivDialog.append();
+////
+////            var keyAddDialog = KeyAddDialog.create();
+////            keyAddDialog.appendTo("#keys");
+////
+////            var keyAssociateDialog = KeyAssociateDialog.create();
+////            keyAssociateDialog.append();
+////*/
 
-            var homeView = Home.create();
-            homeView.append();
-            
-            var machineView = MachineView.create();
-            machineView.append();
-///*
-//            var confirmationDialog = ConfirmationDialog.create();
-//            confirmationDialog.append();
-//
-//            var dialog = SingleMachineActionsDialog.create();
-//            dialog.appendTo("#single-machine");
-//            var shellDialog = Shell.create();
-//            shellDialog.appendTo("#single-machine");
-//            var machineTagsDialog = MachineTagsDialog.create();
-//            machineTagsDialog.appendTo("#single-machine");
-//*/
-            var machineListView = MachineListView.create();
-            machineListView.append();
-            
-            var addDialog = MachineAddDialog.create();
-            addDialog.append();
-            
-//            /*
-//            shellDialog = Shell.create();
-//            shellDialog.appendTo("#machines");
-//            var machineActionsDialog = MachineActionsDialog.create();
-//            machineActionsDialog.appendTo("#machines");
-//            */
-//
-            var imageListView = ImageListView.create();
-            imageListView.append();
-///*
-//            var machineMonitoringDialog = MachineMonitoringDialog.create();
-//            machineMonitoringDialog.appendTo("#single-machine");
-//
-//            $(document).on( 'pagebeforeshow', '#dialog-add', function(){
-//                $('#dialog-add').trigger('create');
-//            });
-//*/
-            var keyListView = KeyListView.create();
-            keyListView.append();
-
-            var keyView = KeyView.create();
-            keyView.append();
-///*
-//            var keyPrivDialog = KeyPrivDialog.create();
-//            keyPrivDialog.append();
-//
-//            var keyAddDialog = KeyAddDialog.create();
-//            keyAddDialog.appendTo("#keys");
-//
-//            var keyAssociateDialog = KeyAssociateDialog.create();
-//            keyAssociateDialog.append();
-//*/
-
+    	    window.Mist = App;
             return App
-        });
+        
     }
 );
 

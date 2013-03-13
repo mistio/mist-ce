@@ -1,5 +1,4 @@
 define('app/views/home', [
-    'app/views/jqm_page',
     'text!app/templates/home.html','ember'],
     /**
      *
@@ -7,10 +6,12 @@ define('app/views/home', [
      *
      * @returns Class
      */
-    function(Page, home_html) {
-        return Page.extend({
+    function(home_html) {
+        return Ember.View.extend({
 
             id: 'home',
+            
+            //template: Ember.Handlebars.compile(home_html),
 
             init: function() {
                 this._super();
@@ -21,6 +22,8 @@ define('app/views/home', [
             addBackend: function(){
         	$("#add-backend").popup("open");
             }
+        
+        
         });
     }
 );

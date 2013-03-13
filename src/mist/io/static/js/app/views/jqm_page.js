@@ -6,7 +6,7 @@ define('app/views/jqm_page', ['ember'],
      * @returns Class
      */
     function() {
-        return Ember.View.extend({
+        return Ember.ContainerView.extend({
     
             attributeBindings: [
                     'data-role',

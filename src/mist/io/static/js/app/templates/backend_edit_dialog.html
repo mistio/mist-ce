@@ -3,7 +3,7 @@
     <span class='name'>{{view.backend.title}}</span>
 </div>
 <div data-role="fieldcontain">
-    <select class="backend-toggle" data-role="slider" {{action "toggleBackend" on="change"}}>
+    <select class="backend-toggle" data-role="slider" {{action "toggleBackend" target="view" on="change"}}>
         <option value="0">Disabled</option>
         <option value="1" {{bindAttr selected="view.backend.enabled"}}>Enabled</option>
     </select>

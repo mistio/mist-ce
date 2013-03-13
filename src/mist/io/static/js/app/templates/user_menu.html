@@ -1,14 +1,11 @@
-<a href="#dialog-providers"
+<a href="#providers"
     class="ui-btn-right"
-    data-rel="popup"
     data-role="button"
-    data-transition="pop"
     data-icon="check"
     data-iconpos="right"
-    {{bindAttr class="Mist.backendsController.state :state-providers"}}
-    {{action click target="view"}}>me</a>
+    {{bindAttr class="Mist.backendsController.state :state-providers"}}>me</a>
 
-<div id="dialog-providers" class="mist-dialog" data-role="popup">
+<div id="providers" class="mist-dialog" data-role="popup">
     <div data-role="content" data-theme="b">
         {{#if view.email}}
         <img class="gravatar-image" {{bindAttr src="view.gravatarURL"}} />
