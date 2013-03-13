@@ -112,7 +112,7 @@ def add_backend(request, renderer='json'):
     region = ''
     if not provider.__class__ is int and ':' in provider:
         region = provider.split(':')[1]
-        provider = int(provider.split(':')[0])
+        provider = provider.split(':')[0]
 
     if not provider or not apikey or not apisecret:
         return Response('Invalid backend data', 400)
