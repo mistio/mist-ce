@@ -23,7 +23,7 @@ define('app/views/key', [
                 } else {
                     return '';
                 }
-            }.property('key'),
+            }.property('Mist.backendsController.machineCount'),
 
             keyMachines: function() {
                 var key = this.key;
