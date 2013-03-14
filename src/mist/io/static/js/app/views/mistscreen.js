@@ -10,6 +10,12 @@ define('app/views/mistscreen', ['ember'],
 
             tagName: false,
             
+            willInsertElement: function(){
+        	try {
+        	    $('.ui-popup').popup('destroy').remove ();
+        	} catch(e){}
+            },
+            
             didInsertElement: function(){
         	try {
         	 $("[data-role=page]").page('destroy').page()

@@ -43,13 +43,6 @@
 
 <script type="text/x-handlebars" data-template-name="application">
 {{outlet}}
-
-<div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
-    <div data-role="header">
-        <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
-    </div>
-    {{view Mist.ConfirmationDialog data-role="content"}}
-</div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="index">
