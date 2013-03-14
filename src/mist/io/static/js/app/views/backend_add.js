@@ -36,11 +36,15 @@ define('app/views/backend_add', ['app/models/backend',
                     data: JSON.stringify(payload),
                     success: function(result) {
                         Mist.backendsController.pushObject(Backend.create(result));
-                        setTimeout("$('#home-menu').listview()", 300);
-                        setTimeout("$('#backend-buttons').controlgroup('refresh')", 300);
+                        //setTimeout("$('#home-menu').listview()", 300);
+                        //setTimeout("$('#backend-buttons').controlgroup('refresh')", 300);
                         info('added backend ' + result.id);
                         Mist.backendAddController.newBackendClear();
                         $("#add-backend").popup("close");
+//                        Ember.run.next(function(){
+//                            $('#backend-buttons [data-role=button]').button();
+//                            $('#backend-buttons').controlgroup('refresh');
+//                        });
                     }
                 });
             },
