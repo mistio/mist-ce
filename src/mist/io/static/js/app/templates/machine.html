@@ -129,6 +129,24 @@
 
         </div>
 
+         <div data-role="collapsible" data-collapsed="false" id="machine-single-keys">
+            <h3>Keys</h3>
+            <table id="machine-basic-table">
+                {{#each view.machineKeys}}
+                    {{view Mist.MachineKeyListItemView keyBinding="this"}}
+                {{/each}}
+            </table>
+            {{view Mist.Select contentBinding="view.machineKeysRest"
+                optionLabelPath="content.name"
+                optionValuePath="content.name"    
+                class="rule-operator"
+                id="machine-add-key"
+                data-native-menu="true"
+                prompt="Associate key"
+                data-icon="false"
+                data-inline="true"}}
+        </div>
+
         <div data-role="collapsible">
 
             <h3>Full metadata list</h3>

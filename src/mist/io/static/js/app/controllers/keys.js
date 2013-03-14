@@ -100,6 +100,29 @@ define('app/controllers/keys', [
                         error(textstate, errorThrown, 'while associating key', key.name);
                     }
                 });
+            },
+
+            disassociateKey: function(key, machine) {
+                payload = {'key_name': key.name, 'machine_backend_id': machine}
+                var that = this
+                $.ajax({
+                    url: 'keys/disassociate/key',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function(data) {
+                        info('Successfully disassociated key ', key.name);
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while disassociating key'  +
+                                key.name);
+                        error(textstate, errorThrown, 'while disassociating key', key.name);
+                    }
+                });
+            },
+
+            deleteAssociation: function(keyName, machine) {
+                payload = {'key_name': key.name, 'machine': machine };
             }
 
         });

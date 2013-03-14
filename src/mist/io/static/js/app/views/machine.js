@@ -49,6 +49,45 @@ define('app/views/machine', [
                 return ret;
             }.property('machine'),
 
+            machineKeys: function() {
+                if (!this.machine) {
+                    return [];
+                }
+                //return a list with the keys this server is associated to
+                var keys = [];
+                var that = this;
+                Mist.keysController.content.forEach(function(key){
+                    key.machines.forEach(function(item){
+                        if (item[1] == that.machine.id) {
+                            keys.push(key);
+                        }
+                    });
+                });
+                return keys
+            }.property('machine'),
+
+            machineKeysRest: function() {
+                if (!this.machine) {
+                    return [];
+                }
+                //return a list with the names of all keys except the ones that are associated
+                var keys = [];
+                var that = this;
+                var hasMachine = false;
+                Mist.keysController.content.forEach(function(key){
+                    hasMachine = false;
+                    key.machines.forEach(function(item){
+                        if (item[1] == that.machine.id) {
+                            hasMachine = true;
+                        }
+                    });
+                    if (hasMachine == false) {
+                        keys.push(key);
+                    }
+                });
+                return keys
+            }.property('machine'),
+
             basicvars: function() {
                 if (!this.machine) {
                     return [];
@@ -153,7 +192,7 @@ define('app/views/machine', [
                     $('.rule-operator').last().selectmenu();
                     $('.rule-value').last().slider();
                     $('.rule-action').last().selectmenu();
-                    $('.delete-rule-button').last().button();
+                    $('.rules-container .delete-rule-button').last().button();
                 });
             },
 

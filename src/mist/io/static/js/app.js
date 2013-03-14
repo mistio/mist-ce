@@ -61,6 +61,7 @@ define( 'app', [
     'app/views/machine_add_dialog',
     'app/views/machine',
     'app/views/machine_list',
+    'app/views/machine_key_list_item',
     'app/views/confirmation_dialog',
     'app/views/machine_actions_dialog',
     'app/views/single_machine_actions_dialog',
@@ -104,6 +105,7 @@ define( 'app', [
                 MachineAddDialog,
                 MachineView,
                 MachineListView,
+                MachineKeyListItem,
                 ConfirmationDialog,
                 MachineActionsDialog,
                 SingleMachineActionsDialog,
@@ -374,6 +376,7 @@ define( 'app', [
             App.RuleView = RuleView;
             App.UserMenuView = UserMenuView;
             App.KeyMachineListItemView = KeyMachineListItem;
+            App.MachineKeyListItemView = MachineKeyListItem;
 
             var homeView = Home.create();
             homeView.append();
