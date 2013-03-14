@@ -1,5 +1,4 @@
-define('app/views/backend_button', [
-    'text!app/templates/backend_button.html','ember'],
+define('app/views/backend_button', ['ember'],
     /**
      * Backend button view
      *

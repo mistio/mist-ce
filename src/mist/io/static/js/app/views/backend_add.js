@@ -11,13 +11,11 @@ define('app/views/backend_add', ['app/models/backend',
 
         return Ember.View.extend({
             
-            attributeBindings: [
-                                'data-role',
-                                ],
+            attributeBindings: ['data-role',],
 
             backClicked: function() {
                 Mist.backendAddController.newBackendClear();
-                history.back();
+                $("#add-backend").popup("close");
             },
 
             addButtonClick: function(){
@@ -42,32 +40,12 @@ define('app/views/backend_add', ['app/models/backend',
                         setTimeout("$('#backend-buttons').controlgroup('refresh')", 300);
                         info('added backend ' + result.id);
                         Mist.backendAddController.newBackendClear();
-                        history.back();
+                        $("#add-backend").popup("close");
                     }
                 });
             },
-
-            init: function() {
-                this._super();
-                this['data-role'] = 'content';
-                // cannot have template in home.pt as pt complains
-                this.set('template', Ember.Handlebars.compile(add_backend_dialog_html));
-
-                Ember.run.next(function(){
-                    Mist.backendAddController.addObserver('newBackendReady', function() {
-//                        Ember.run.next(function() {
-//                            $('#create-backend-ok').button();
-//                            if (Mist.backendAddController.newBackendReady) {
-//                                $('#create-backend-ok').button('enable');
-//                            } else {
-//                                $('#create-backend-ok').button('disable');
-//                            }
-//                        });
-                    });
-                    Mist.backendAddController.set('newBackendReady', true);
-                    Mist.backendAddController.set('newBackendReady', false);
-                });
-            },
+            
+            template: Ember.Handlebars.compile(add_backend_dialog_html),
 
             providerList: function() {
                 return SUPPORTED_PROVIDERS;
