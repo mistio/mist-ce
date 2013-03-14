@@ -37,7 +37,7 @@ define('app/views/backend_edit', [
                         Ember.run.next(function(){
                             $('#backend-buttons').controlgroup('refresh');
                         });
-                        ("#edit-backend").popup("close");
+                        $("#edit-backend").popup("close");
                     }
                 });
             },
@@ -49,11 +49,7 @@ define('app/views/backend_edit', [
                 });
             },
             
-            init: function() {
-                this._super();
-                // cannot have template in home.pt as pt complains
-                this.set('template', Ember.Handlebars.compile(edit_backend_dialog_html));
-            },
+            template: Ember.Handlebars.compile(edit_backend_dialog_html),
         });
     }
 );
