@@ -1,19 +1,12 @@
-<div data-role="dialog" id="dialog-confirm" data-transition="pop" class="mist-dialog">
-    <div data-role="header">
-        <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
-    </div>
-    <div data-role="content" data-theme="c">
         <p id="dialog-confirm-message">{{Mist.confirmationController.text}}</p>
         <div data-role="controlgroup" class="btn-full" data-type="horizontal">
             <a id="dialog-confirm-no"
                 class="btn-left-full"
                 data-role="button"
                 data-theme="b"
-                {{action reject}}>No</a>
+                {{action reject target="view"}}>No</a>
             <a id="dialog-confirm-yes"
                 class="btn-right-full"
                 data-role="button"
-                {{action confirm}}>Yes</a>
+                {{action confirm target="view"}}>Yes</a>
         </div>
-    </div>
-</div>

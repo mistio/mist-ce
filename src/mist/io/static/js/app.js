@@ -414,6 +414,8 @@ App.set(
             App.EditBackendView = EditBackend;
             App.MachineListItemView = MachineListItem;
             App.ImageListItemView = ImageListItem;
+            App.ConfirmationDialog = ConfirmationDialog;
+            
 //            App.DeleteTagView = DeleteTagView;
 //            App.RuleView = RuleView;
 //            App.UserMenuView = UserMenuView;
