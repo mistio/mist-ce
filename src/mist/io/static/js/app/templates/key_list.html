@@ -1,5 +1,5 @@
     <div data-role="header">
-        <a href="#home"
+        <a href="#"
             data-icon="home"
             data-direction="reverse"
             class="ui-btn-left">Home</a>
@@ -21,7 +21,7 @@
 
         <ul id="keys-list" data-role="listview" data-inset="true" data-theme="c">
             {{#each Mist.keysController}}
-                {{view Mist.KeyListView keyBinding="this"}}
+                {{view Mist.KeyListItemView keyBinding="this"}}
             {{/each}}
         </ul>
 

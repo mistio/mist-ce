@@ -81,6 +81,10 @@
 {{view Mist.MacView}}
 </script>
 
+<script type="text/x-handlebars" data-template-name="keys">
+{{view Mist.KeyListView}}
+</script>
+
 </body>
 
 </html>

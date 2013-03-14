@@ -107,7 +107,7 @@ define( 'app', [
                 DeleteTagView,
                 MachineTagsDialog,
                 MachineMonitoringDialog,
-                KeyList,
+                KeyListItemView,
                 KeyListView,
                 KeyView,
                 KeyAddDialog,
@@ -135,22 +135,19 @@ define( 'app', [
         
 	ready: function(){
 	    Em.run.next(function() {
-	    var id = false;
-            for(key in Ember.View.views){
-		if("application" == Ember.View.views[key].renderedName){
+	        var id = false;
+                for(key in Ember.View.views){
+		    if("application" == Ember.View.views[key].renderedName){
 			id = key;
-		}
-	    }
-	    if(id){
-		$("#" + id).attr('data-role', 'page');
-		require(['mobile'], function(){console.log('jqm loaded');});
-		//invoke this on each route change
-		//$("#ember338").page('destroy').page()
-	    }
+		    }
+	        }
+	        if(id){
+		    $("#" + id).attr('data-role', 'page');
+		    require(['mobile'], function(){console.log('jqm loaded');});
+	        }
 	    });
 	}
     });
-    
     
     App.Router.map(function() {
 	this.route('providers');
@@ -159,12 +156,14 @@ define( 'app', [
 	this.route('machine', {
 	    path : '/machines/:machine_id'
 	});
+	this.route('keys');
     });
     
     App.MacView = MachineView;
     App.MachineListView = MachineListView
-
     App.UserMenuView = UserMenuView;
+    App.KeyListView = KeyListView;
+    App.KeyListItemView = KeyListItemView;
     
 //        var mobileinit = false;
 //        $(document).bind('pageinit', function() {
@@ -409,7 +408,6 @@ App.set(
             App.MachineListItemView = MachineListItem;
             App.ImageListItemView = ImageListItem;
 //            App.DeleteTagView = DeleteTagView;
-//            App.KeyListView = KeyList;
 //            App.RuleView = RuleView;
 //            App.UserMenuView = UserMenuView;
 //            App.KeyMachineListItemView = KeyMachineListItem;

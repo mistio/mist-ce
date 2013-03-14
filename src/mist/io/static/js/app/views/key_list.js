@@ -1,5 +1,5 @@
 define('app/views/key_list', [
-    'app/views/jqm_page',
+     'app/views/mistscreen',
     'text!app/templates/key_list.html',
     'ember'
     ],
@@ -9,15 +9,10 @@ define('app/views/key_list', [
      *
      * @returns Class
      */
-    function(Page, key_list_html) {
-        return Page.extend({
+    function(MistScreen, key_list_html) {
+        return MistScreen.extend({
             
-            id: 'keys',
-            
-            init: function() {
-                this._super();
-                this.set('template', Ember.Handlebars.compile(key_list_html));
-            },
+            template: Ember.Handlebars.compile(key_list_html),
 
             setDefaultKey: function(){
                 var key = this.getSelectedKeys();
