@@ -808,6 +808,10 @@ div.pending-monitoring {
     background: #e0e0e1;
 }
 
+.delete-key {
+    float:right;
+}
+
 /* Key single view */
 #key .single-view-header {
     height: 80px;
@@ -952,11 +956,11 @@ div.cost {
     display: none;
 }
 
-#dialog-confirm .ui-controlgroup-controls {
+#dialog-confirm .ui-controlgroup-controls, #key-associate-dialog .ui-controlgroup-controls {
     width: 100%;
 }
 
-#dialog-confirm .btn-left-full, #dialog-confirm .btn-right-full {
+#dialog-confirm .btn-left-full, #dialog-confirm .btn-right-full, #key-associate-dialog .btn-left-full, #key-associate-dialog .btn-right-full {
     width: 49.6%;
 }
 
