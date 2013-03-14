@@ -53,28 +53,7 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="images">
-<div data-role="header">
-        <h1>Images</h1>
-<a href="#"
-            data-icon="home"
-            data-direction="reverse"
-            class="ui-btn-left">Home</a>
-    </div>
-
-    <div data-role="content">
-<ul id="images-list"
-        data-role="listview"
-        data-filter="true"
-        data-inset="true"
-        data-theme="c"
-        data-filter-placeholder="Filter images...">
-            {{#each Mist.backendsController}}
-                {{#each images}}
-                    {{view Mist.ImageListItemView imageBinding="this"}}
-                {{/each}}
-            {{/each}}
-        </ul>
-</div>
+{{view Mist.ImageListView}}
 </script>
 
 <script type="text/x-handlebars" data-template-name="machine">
@@ -83,6 +62,10 @@
 
 <script type="text/x-handlebars" data-template-name="keys">
 {{view Mist.KeyListView}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="key">
+{{view Mist.KView}}
 </script>
 
 </body>

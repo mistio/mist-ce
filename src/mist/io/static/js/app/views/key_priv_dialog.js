@@ -1,32 +1,23 @@
 define('app/views/key_priv_dialog', [
     'text!app/templates/key_priv_dialog.html',
-    'ember',
-    'jqueryUi'
+    'ember'
     ],
 /**
  *
- * Shell dialog
+ * Private Key Dialog dialog
  *
  * @returns Class
  */
 function(key_priv_dialog_html) {
     return Ember.View.extend({
-        tagName: false,
+
+	attributeBindings: ['data-role',],
 
         back: function() {
-            history.go(-1);
+            $("#key-private-dialog").popup("close");
         },
+        
+        template: Ember.Handlebars.compile(key_priv_dialog_html),
 
-        init: function() {
-            this._super();
-            // cannot have template in home.pt as pt complains
-            this.set('template', Ember.Handlebars.compile(key_priv_dialog_html));
-            $('#private-key').live('click', function(){
-                this.select();
-            });
-            $('#private-key').live('change', function(){
-               return false;
-            });
-        },
     });
 });

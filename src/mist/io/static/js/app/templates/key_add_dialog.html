@@ -1,10 +1,4 @@
-<div data-role="popup" id="dialog-add-key" class="mist-dialog" data-overlay-theme="a">
 
-    <div data-role="header">
-        <h1>Add key</h1>
-    </div>
-
-    <div data-role="content">
         <label for="create-key-name">Name:</label>
         {{view Mist.TextField
             valueBinding="Mist.keyAddController.newKeyName"
@@ -14,7 +8,7 @@
         <button data-theme="b"
             data-role="button"
             data-icon="gear"
-            {{action "generateClicked"}}>Generate</button>
+            {{action "generateClicked" target="view"}}>Generate</button>
 
         <label for="textarea-public-key">Public Key:</label>
         {{view Ember.TextArea
@@ -33,12 +27,11 @@
         <div class="btn-full" data-role="controlgroup" data-type="horizontal">
             <button class="btn-left-full"
                 data-theme="c"
-                {{action "backClicked"}}>Back</button>
+                {{action "backClicked" target="view"}}>Back</button>
 
             <button id="add-key-button"
                 class="btn-right-full"
                 data-theme="b"
-                {{action "newKeyClicked"}}>Add</button>
+                disabled
+                {{action "newKeyClicked" target="view"}}>Add</button>
         </div>
-    </div>
-</div>

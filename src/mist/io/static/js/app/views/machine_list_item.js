@@ -11,25 +11,7 @@ define('app/views/machine_list_item', [
                 tagName:false,
 
                 didInsertElement: function(){
-
-                    var that = this;
-
-                    Em.run.next(function() {
-
-                        try {
-                            that.get('parentView').$().find("ul").listview('refresh');
-                        } catch(e) {
-
-                            try {
-                                if($('.ui-page-active').attr('id') == 'machines'){
-                                    that.get('parentView').$().find("ul").listview();
-                                }
-                            } catch(e) {
-                                error('could not create listview');
-                                error(e);
-                            }
-                        }
-                    });
+                    $('machines-list').listview('refresh');
                 },
 
                 machineClick: function(){

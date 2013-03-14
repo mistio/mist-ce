@@ -10,18 +10,26 @@
     </div>
 
     <div data-role="content">
-        <a href="#dialog-add-key"
+        <a href="#keys"
             id="mist-create-key"
             data-rel="popup"
             data-theme="b"
             data-inline="true"
             data-transition="slidedown"
             data-role="button"
-            data-icon="plus">Create</a>
+            data-icon="plus"
+            {{action addKey target="view"}}>Create</a>
+            
+        <div data-role="popup" id="dialog-add-key" class="mist-dialog" data-overlay-theme="a">
+            <div data-role="header">
+                <h1>Add key</h1>
+            </div>
+            {{view Mist.AddKeyView data-role="content"}}
+        </div>
 
         <ul id="keys-list" data-role="listview" data-inset="true" data-theme="c">
             {{#each Mist.keysController}}
-                {{view Mist.KeyListItemView keyBinding="this"}}
+                {{view Mist.KeyListItemView keyBinding="this" class="node"}}
             {{/each}}
         </ul>
 

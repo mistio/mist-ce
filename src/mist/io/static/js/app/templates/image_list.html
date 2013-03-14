@@ -1,6 +1,6 @@
     <div data-role="header">
 
-        <a href="#home"
+        <a href="#"
         data-icon="home"
         data-direction="reverse"
         class="ui-btn-left">Home</a>
@@ -30,7 +30,7 @@
         data-filter-placeholder="Filter images...">
             {{#each Mist.backendsController}}
                 {{#each images}}
-                    {{view Mist.ImageListItemView imageBinding="this"}}
+                    {{view Mist.ImageListItemView imageBinding="this" class="node" }}
                 {{/each}}
             {{/each}}
         </ul>

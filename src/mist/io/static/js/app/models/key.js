@@ -13,6 +13,10 @@ define('app/models/key', [
             priv: null,
             machines: null,
             default_key: null,
+            
+            id: function(){
+        	return this.name;
+            }.property("name"),
 
             deleteKey: function() {
                 payload = {'name': this.name}

@@ -62,8 +62,8 @@ define('app/controllers/keys', [
                 });
             },
 
-            getPrivKey: function(name) {
-                payload = {'key_name': name}
+            getPrivKey: function(key) {
+                payload = {'key_name': key.name}
                 var that = this
                 $.ajax({
                     url: 'keys/private/key',
@@ -72,7 +72,7 @@ define('app/controllers/keys', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully got private key ', name);
-                        $("#private-key").val(data);
+                        key.set('priv', data);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while getting key'  +

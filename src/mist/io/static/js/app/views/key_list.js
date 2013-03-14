@@ -72,6 +72,10 @@ define('app/views/key_list', [
 
                 return keys;
             },
+            
+            addKey: function(){
+        	$("#dialog-add-key").popup("open", {transition: 'pop'});
+            }
         });
     }
 );

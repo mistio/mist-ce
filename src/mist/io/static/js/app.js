@@ -157,6 +157,9 @@ define( 'app', [
 	    path : '/machines/:machine_id'
 	});
 	this.route('keys');
+	this.route('key', {
+	    path : '/keys/:key_id'
+	});
     });
     
     App.MacView = MachineView;
@@ -164,6 +167,10 @@ define( 'app', [
     App.UserMenuView = UserMenuView;
     App.KeyListView = KeyListView;
     App.KeyListItemView = KeyListItemView;
+    App.ImageListView = ImageListView;
+    App.KView = KeyView; 
+    App.AddKeyView = KeyAddDialog;
+    App.KeyPrivDialog = KeyPrivDialog;
     
 //        var mobileinit = false;
 //        $(document).bind('pageinit', function() {

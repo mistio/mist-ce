@@ -21,7 +21,7 @@ define('app/views/backend_button', ['ember'],
                 Mist.set('backend', backend);
                 $('select.ui-slider-switch option[value=1]')[0].selected = backend.enabled;
                 $('select.ui-slider-switch').slider('refresh');
-                $("#edit-backend").popup("open");
+                $("#edit-backend").popup("open", {transition: 'pop'});
             },
 
             template: Ember.Handlebars.compile("{{title}}"),

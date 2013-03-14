@@ -13,7 +13,7 @@ define('app/views/home', [
             template: Ember.Handlebars.compile(home_html),
 
             addBackend: function(){
-        	$("#add-backend").popup("open");
+        	$("#add-backend").popup("open", {transition: 'pop'});
             }
         
         

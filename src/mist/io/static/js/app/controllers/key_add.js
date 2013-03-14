@@ -2,7 +2,7 @@ define('app/controllers/key_add', [
     'ember'
     ],
     /**
-     * Machine add controller
+     * Key add controller
      *
      * @returns Class
      */
@@ -25,11 +25,17 @@ define('app/controllers/key_add', [
 
             updateNewKeyReady: function() {
                 if (this.get('newKeyName') &&
-                    this.get('newKeyPublic') &&
-                    this.get('newKeyPrivate')) {
-                        this.set('newKeyReady', true);
+                        this.get('newKeyPublic') &&
+                        this.get('newKeyPrivate')) {
+                    this.set('newKeyReady', true);
+                    if('button' in $('#add-key-button')){
+                        $('#add-key-button').button('enable');
+                    }
                 } else {
                     this.set('newKeyReady', false);
+                    if('button' in $('#add-key-button')){
+                        $('#add-key-button').button('disable');
+                    }
                 }
             },
 
