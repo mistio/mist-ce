@@ -112,7 +112,7 @@ def add_backend(request, renderer='json'):
     region = ''
     if not provider.__class__ is int and ':' in provider:
         region = provider.split(':')[1]
-        provider = int(provider.split(':')[0])
+        provider = provider.split(':')[0]
 
     if not provider or not apikey or not apisecret:
         return Response('Invalid backend data', 400)
@@ -340,6 +340,11 @@ def create_machine(request):
                     save_keypairs(request, keypair)
             except Exception as e:
                 return Response('Something went wrong with node creation in EC2: %s' % e, 500)
+        #remove temp file with private key
+        try:
+            os.remove(tmp_key_path)
+        except:
+            pass
     elif conn.type is Provider.LINODE and public_key:
         auth = NodeAuthSSHKey(public_key)
         deploy_script = ScriptDeployment(script)

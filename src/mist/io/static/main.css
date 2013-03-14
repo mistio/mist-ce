@@ -845,6 +845,10 @@ div.pending-monitoring {
     display:none;
 }
 
+#key ul#machines-list span.tag, #key ul#machines-list span.bubble-container {
+    display:none;
+}
+
 /* DIALOGS */
 
 .ui-dialog .ui-content {

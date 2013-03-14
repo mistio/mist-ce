@@ -20,7 +20,9 @@
 
          <div data-role="collapsible" data-collapsed="false">
             <h3>Public Key</h3>
-            <div class="public-key"><input type="text" readonly="readonly" {{bindAttr value="view.key.pub"}} /></div>
+            <div class="public-key">
+                <input type="text" readonly="readonly" {{bindAttr value="view.key.pub"}} />
+            </div>
         </div>
 
         <div data-role="collapsible" data-collapsed="false">
@@ -33,7 +35,6 @@
                     data-rel="popup"
                     data-transition="slideup"
                     {{action displayPrivate}}>Display</a>
-                <input type="text" readonly="readonly" {{bindAttr value="view.key.priv"}} data-pattern="private key not available" />
             </div>
         </div>
 

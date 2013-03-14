@@ -102,7 +102,7 @@ def save_settings(request):
         'js_build': settings['js_build'],
         'js_log_level': settings['js_log_level'],
         }
-    
+
     if settings.get('email', False) and settings.get('password', False):
         payload['email'] = settings['email']
         payload['password'] = settings['password']
@@ -157,7 +157,7 @@ def save_keypairs(request, keypair):
             'js_build': settings['js_build'],
             'js_log_level': settings['js_log_level'],
             }
-        
+
         if settings.get('email', False) and settings.get('password', False):
             payload['email'] = settings['email']
             payload['password'] = settings['password']
@@ -169,7 +169,7 @@ def save_keypairs(request, keypair):
 
 def get_keypair_by_name(keypairs, name):
     "get key pair by name"
-    
+
     for key in keypairs:
         if name == key:
             return keypairs[key]
@@ -213,7 +213,6 @@ def connect(request, backend_id=False):
 
     driver = get_driver(backend['provider'])
 
-    
     if backend['provider'] == Provider.OPENSTACK:
         conn = driver(backend['apikey'],
                       backend['apisecret'],
@@ -225,7 +224,7 @@ def connect(request, backend_id=False):
         conn = driver(backend['apikey'], backend['apisecret'],
                       region=backend['region'])
     elif backend['provider'] == Provider.RACKSPACE:
-        conn = driver(backend['apikey'], backend['api'],
+        conn = driver(backend['apikey'], backend['apisecret'],
                       datacenter=backend['region'])
     else:
         # ec2
@@ -374,7 +373,7 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
     if not command:
         log.warn('No command was passed, returning empty.')
         return Response('Command not set', 400)
-    
+
     if not private_key:
         log.warn('No private key provided, returning empty')
         return Response('Key not set', 400)
