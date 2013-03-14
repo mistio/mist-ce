@@ -15,8 +15,17 @@
 
         <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
             {{#each Mist.backendsController}}
-                {{view Mist.BackendButtonView backendBinding="this"}}
+                {{view Mist.BackendButtonView backendBinding="this" data-theme="c"
+                   data-inline="true" data-role="button" data-icon="check" 
+                   classBinding="state" class="backend-button"}}
             {{/each}}
+        </div>
+        
+        <div data-role="popup" id="edit-backend" class="mist-dialog" data-overlay-theme="a">
+            <div data-role="header">
+                <h1>Edit backend</h1>
+            </div>
+            {{view Mist.EditBackendView backendBinding="Mist.backend"}}
         </div>
 
         {{#if Mist.backendsController.content.length}}
