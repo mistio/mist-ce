@@ -1,4 +1,8 @@
+<div data-role="header">
+        <h1>mist.io</h1>
+    </div>
 
+    <div data-role="content">
         <a id="add-backend-button"
             href="#add-backend"
             class="add-button"
@@ -7,27 +11,12 @@
             data-inline="true"
             data-transition="pop"
             data-role="button"
-            data-icon="plus"
-            {{action addBackend target="view"}}>Add backend</a>
-
-        <div data-role="popup" id="add-backend" class="mist-dialog" data-overlay-theme="a">
-            <div data-role="header">
-                <h1>Add backend</h1>
-            </div>
-            {{view Mist.AddBackendView backendBinding="Mist.backend"}}
-        </div>
+            data-icon="plus">Add backend</a>
 
         <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
             {{#each Mist.backendsController}}
                 {{view Mist.BackendButtonView backendBinding="this"}}
             {{/each}}
-        </div>
-
-        <div data-role="popup" id="edit-backend" class="mist-dialog" data-overlay-theme="a">
-            <div data-role="header">
-                <h1>Edit backend</h1>
-            </div>
-            {{view Mist.EditBackendView backendBinding="Mist.backend"}}
         </div>
 
         {{#if Mist.backendsController.content.length}}
@@ -37,14 +26,14 @@
             class="ui-listview ui-listview-inset ui-corner-all ui-shadow"
             id="home-menu">
             <li>
-                <a id="machines-count" href="#machines">Machines
+                {{#linkTo machines}}Machines
                     {{#view Mist.CountView
                         numberBinding="Mist.backendsController.machineCount"
                         tagName="span"
                         class="ui-li-count"}}
                         {{view.number}}
                     {{/view}}
-                </a>
+                {{/linkTo}}
             </li>
             <li>
                 <a id="images-count" href="#images">Images
@@ -68,4 +57,4 @@
             </li>
         </ul>
         {{/if}}
-    
+</div>    

@@ -73,6 +73,7 @@ define( 'app', [
     'app/views/key_machine_list_item',
     'app/views/rule',
     'app/views/user_menu',
+    'text!app/templates/machine.html',
     'cubism',
     'ember'
     ], function($,
@@ -115,6 +116,7 @@ define( 'app', [
                 KeyMachineListItem,
                 RuleView,
                 UserMenuView,
+                machine_html,
                 cubism
                 ) {
 
@@ -124,8 +126,13 @@ define( 'app', [
 	  $.mobile.linkBindingEnabled = false;
     });
     
+    Ember.LOG_BINDINGS = true;
+    
     App = Ember.Application.create({
 	rootElement: 'body',
+	LOG_TRANSITIONS: true,
+        LOG_STATE_TRANSITIONS: true,
+        
 	ready: function(){
 	    Em.run.next(function() {
 	    var id = false;
@@ -136,7 +143,9 @@ define( 'app', [
 	    }
 	    if(id){
 		$("#" + id).attr('data-role', 'page');
-		require(['mobile'], function(){console.log('jqm loaded');});	
+		require(['mobile'], function(){console.log('jqm loaded');});
+		//invoke this on each route change
+		//$("#ember338").page('destroy').page()
 	    }
 	    });
 	}
@@ -144,36 +153,16 @@ define( 'app', [
     
     
     App.Router.map(function() {
-	this.route('home');
 	this.route('providers');
-	this.route('providers&ui-state=dialog');
 	this.route('machines');
 	this.route('images');
-    });
-
-    App.IndexRoute = Ember.Route.extend({
-	setupController : function(controller) {
-	    console.log('index route');
-	},
+	this.route('machine', {
+	    path : '/machines/:machine_id'
+	});
     });
     
-    App.ProvidersRoute = Ember.Route.extend({
-	setupController : function(controller) {
-	    console.log('dialog providers route');
-	},
-    });
-    
-    App.MachinesRoute = Ember.Route.extend({
-	setupController : function(controller) {
-	    console.log('machines route');
-	},
-    });
-    
-    App.ImagesRoute = Ember.Route.extend({
-	setupController : function(controller) {
-	    console.log('images route');
-	},
-    });
+    App.MacView = MachineView;
+    App.MachineListView = MachineListView
 
     App.UserMenuView = UserMenuView;
     
@@ -387,7 +376,7 @@ App.set(
                     'data-theme'
                 ]
             });
-//
+
             App.ShellTextField = Ember.TextField.extend({
                 attributeBindings: [
                     'name',
@@ -399,20 +388,20 @@ App.set(
                     this._parentView.submit();
                 }
             });
-//
-//            App.Checkbox = Ember.Checkbox.extend({
-//                attributeBindings: [
-//                    'name',
-//                    'id',
-//                    'data-inline'
-//                ],
-//            });
-//
+
+            App.Checkbox = Ember.Checkbox.extend({
+                attributeBindings: [
+                    'name',
+                    'id',
+                    'data-inline'
+                ],
+            });
+
 //            Ember.TextArea.reopen({
 //                attributeBindings: ["name", "placeholder", "id"]
 //              });
 //            
-//            App.HomeView = Home;
+            App.HomeView = Home;
             App.CountView = Count;
             App.BackendButtonView = BackendButton;
             App.AddBackendView = AddBackend;

@@ -97,11 +97,7 @@ define('app/views/machine_list_item', [
 
                 }.observes('machine.selected'),
 
-                init: function() {
-                    this._super();
-                    // cannot have template in home.pt as pt complains
-                    this.set('template', Ember.Handlebars.compile(machine_list_item_html));
-                },
+                template: Ember.Handlebars.compile(machine_list_item_html),
         });
 
     }

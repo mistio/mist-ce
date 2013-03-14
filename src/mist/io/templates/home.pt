@@ -42,106 +42,26 @@
 <iframe id="hidden-shell-iframe"></iframe>
 
 <script type="text/x-handlebars" data-template-name="application">
-<div data-role="header">
-        <h1>{{title}}</h1>
-    </div>
-
-    <div data-role="content" id="mainPage">
 {{outlet}}
-</div>
-
 </script>
 
 <script type="text/x-handlebars" data-template-name="index">
-
-        <a id="add-backend-button"
-            href="#add-backend"
-            class="add-button"
-            data-rel="popup"
-            data-theme="b"
-            data-inline="true"
-            data-transition="pop"
-            data-role="button"
-            data-icon="plus">Add backend</a>
-
-        <div data-role="popup" id="add-backend" class="mist-dialog" data-overlay-theme="a">
-            <div data-role="header">
-                <h1>Add backend</h1>
-            </div>
-            {{view Mist.AddBackendView backendBinding="Mist.backend"}}
-        </div>
-
-        <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
-            {{#each Mist.backendsController}}
-                {{view Mist.BackendButtonView backendBinding="this"}}
-            {{/each}}
-        </div>
-
-        <div data-role="popup" id="edit-backend" class="mist-dialog" data-overlay-theme="a">
-            <div data-role="header">
-                <h1>Edit backend</h1>
-            </div>
-            {{view Mist.EditBackendView backendBinding="Mist.backend"}}
-        </div>
-
-        {{#if Mist.backendsController.content.length}}
-        <ul data-role="listview"
-            data-theme="c"
-            data-dividertheme="d"
-            class="ui-listview ui-listview-inset ui-corner-all ui-shadow"
-            id="home-menu">
-            <li>
-                {{#linkTo machines}}Machines
-                    {{#view Mist.CountView
-                        numberBinding="Mist.backendsController.machineCount"
-                        tagName="span"
-                        class="ui-li-count"}}
-                        {{view.number}}
-                    {{/view}}
-                {{/linkTo}}
-            </li>
-            <li>
-                <a id="images-count" href="#images">Images
-                    {{#view Mist.CountView
-                        numberBinding="Mist.backendsController.imageCount"
-                        tagName="span"
-                        class="ui-li-count"}}
-                        {{view.number}}
-                    {{/view}}
-                </a>
-            </li>
-            <li>
-                <a id="keys-count" href="#keys">Keys
-                    {{#view Mist.CountView
-                        numberBinding="Mist.keysController.content.length"
-                        tagName="span"
-                        class="ui-li-count"}}
-                        {{view.number}}
-                    {{/view}}
-                </a>
-            </li>
-        </ul>
-        {{/if}}
+{{view Mist.HomeView}}
 </script>
 <script type="text/x-handlebars" data-template-name="machines">
-
-        <ul id="machines-list"
-        data-role="listview"
-        data-filter="true"
-        data-inset="true"
-        data-theme="c"
-        data-filter-placeholder="Filter machines...">
-            {{#each Mist.backendsController}}
-                {{#each machines}}
-                    {{view Mist.MachineListItemView machineBinding="this"}}
-                {{/each}}
-            {{/each}}
-        </ul>
-
-
+{{view Mist.MachineListView}}
 </script>
 
 <script type="text/x-handlebars" data-template-name="images">
+<div data-role="header">
+        <h1>Images</h1>
+<a href="#"
+            data-icon="home"
+            data-direction="reverse"
+            class="ui-btn-left">Home</a>
+    </div>
+
+    <div data-role="content">
 <ul id="images-list"
         data-role="listview"
         data-filter="true"
@@ -154,6 +74,11 @@
                 {{/each}}
             {{/each}}
         </ul>
+</div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="machine">
+{{view Mist.MacView}}
 </script>
 
 </body>
