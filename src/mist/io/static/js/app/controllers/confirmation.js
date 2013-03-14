@@ -14,9 +14,9 @@ define('app/controllers/confirmation', [
             },
 
             confirm: function() {
+                $('#dialog-confirm').popup('close');
                 this.callback();
                 this.set("callback", function(){});
-                $('#dialog-confirm').popup('close');
             }
         });
     }

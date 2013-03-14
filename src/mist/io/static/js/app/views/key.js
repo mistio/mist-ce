@@ -28,7 +28,7 @@ define('app/views/key', [
         	var key = this.get('controller').get('model');
         	
                 machineNames = [];
-                if (key) {
+                if (key && key.machines && key.machines.forEach) {
                     key.machines.forEach(function(item){
                         Mist.backendsController.content.forEach(function(backend){
                             backend.machines.content.forEach(function(machine){
@@ -99,7 +99,7 @@ define('app/views/key', [
                             }
                         });
                     });
-                    $.mobile.changePage('#keys');
+                    Mist.Router.router.transitionTo('keys');
                 });
                 Mist.confirmationController.set('fromDialog', true);
 

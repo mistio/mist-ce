@@ -35,6 +35,14 @@
 
         <div class="bottom-padding"></div>
     </div>
+    
+    
+    <div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
+    <div data-role="header">
+        <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
+    </div>
+    {{view Mist.ConfirmationDialog data-role="content"}}
+    </div>
 
     <div class="keys-footer" data-role="footer" data-theme="a">
         <div class="actions" data-role="controlgroup" data-type="horizontal">
@@ -45,7 +53,7 @@
                 data-icon="delete"
                 data-rel="popup"
                 data-transition="slideup"
-                {{action deleteKey}}>Delete</a>
+                {{action deleteKey target="view"}}>Delete</a>
 
             <a href=""
                 class="action-links"
@@ -54,6 +62,6 @@
                 data-icon="gear"
                 data-rel="popup"
                 data-transition="slideup"
-                {{action setDefaultKey}}>Set default</a>
+                {{action setDefaultKey target="view"}}>Set default</a>
         </div>
     </div>
