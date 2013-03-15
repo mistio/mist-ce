@@ -21,17 +21,17 @@
             <div id="tags-wrapper">
                 <ul id="tags-list">
                 {{#each view.machine.tags}}
-                    {{#view Mist.DeleteTagView machineBinding="view.machine"}}
+                    {{#view Mist.DeleteTagView tagBinding="this" machineBinding="view.machine"}}
                         <li>
                             <a data-role="button"
                                 class="tagButton"
-                                {{action deleteTag}}
+                                {{action deleteTag target="view"}}
                                 data-theme="c"
                                 data-icon="delete"
                                 data-inline="true"
                                 data-iconpos="notext"
                                 {{bindAttr class="view.machine.pendingDeleteTag"}}></a>
-                            {{view.tag}}
+                            {{this}}
                         </li>
                     {{/view}}
                 {{/each}}

@@ -17,9 +17,8 @@ define('app/views/delete_tag', [
             },
 
             deleteTag: function() {
-                alert('del');
                 var tag = this.tag;
-                var machine = machine.get('machine');
+                var machine = this.get('machine');
 
                 if(!machine.tags){
                     machine = machine.get('model');
@@ -39,7 +38,7 @@ define('app/views/delete_tag', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully deleted tag from machine', machine.name);
-                        machine.tags.removeObject(this.tag.toString());
+                        machine.tags.removeObject(tag);
                         machine.set('pendingDeleteTag', false);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
