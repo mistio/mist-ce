@@ -54,7 +54,7 @@ define('app/views/machine_tags_dialog',[
                         machine.set('pendingAddTag', false);
                         machine.tags.addObject(tag);
                         $('#tags-container .ajax-loader').hide();
-
+                        $('#tags-container input[type=text]').val('')
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while adding tag to machine ' + machine.name);
