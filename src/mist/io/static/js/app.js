@@ -129,7 +129,6 @@ define( 'app', [
     Ember.LOG_BINDINGS = true;
 
     App = Ember.Application.create({
-        //TODO: shouldn't all routes and views/controllers sets be in here?
         rootElement: 'body',
         LOG_TRANSITIONS: true,
         LOG_STATE_TRANSITIONS: true,
@@ -151,8 +150,6 @@ define( 'app', [
     });
 
     App.Router.map(function() {
-        // TODO: should we leave this as providers or make it backends?
-        this.route('providers');
         this.route('machines');
         this.route('images');
         this.route('machine', {
