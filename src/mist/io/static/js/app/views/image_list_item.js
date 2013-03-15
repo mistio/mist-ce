@@ -15,13 +15,13 @@ define('app/views/image_list_item', [
                 },
 
                 click: function(){
-                    $.mobile.changePage('#dialog-add', 'pop', true, true);
                     Mist.machineAddController.set("newMachineBackend", this.image.backend);
                     Mist.machineAddController.set("newMachineImage", this.image);
                     Ember.run.next(function(){
                         $('#createmachine-select-image').selectmenu('refresh');
                         $('#createmachine-select-provider').selectmenu('refresh');
                     });
+                    $("#dialog-add").popup("open", {transition: 'pop'});
                 },
 
                 template: Ember.Handlebars.compile(image_list_item_html),
