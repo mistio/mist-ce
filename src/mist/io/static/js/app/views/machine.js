@@ -9,10 +9,10 @@ define('app/views/machine', [
      */
     function(MistScreen, machine_html) {
         return MistScreen.extend({
-            
+
             disabledShellClass: function() {
         	var machine = this.get('controller').get('model');
-        	
+
                 if (machine && machine.hasKey && machine.state == 'running') {
                     return '';
                 } else {
@@ -22,7 +22,7 @@ define('app/views/machine', [
 
             disabledTagClass: function() {
         	var machine = this.get('controller').get('model');
-        	
+
                 if (machine && machine.can_tag) {
                     return '';
                 } else {
@@ -32,7 +32,7 @@ define('app/views/machine', [
 
             disabledPowerClass: function() {
         	var machine = this.get('controller').get('model');
-        	
+
                 if (machine && machine.state === 'terminated') {
                     return 'ui-disabled';
                 } else {
@@ -42,7 +42,7 @@ define('app/views/machine', [
 
             metadata: function() {
         	var machine = this.get('controller').get('model');
-        	
+
                 if (!machine || !machine.extra) {
                     return [];
                 }
@@ -58,7 +58,7 @@ define('app/views/machine', [
 
             basicvars: function() {
         	var machine = this.get('controller').get('model');
-        	
+
                 if (!machine) {
                     return [];
                 }
@@ -105,7 +105,7 @@ define('app/views/machine', [
 
             name: function() {
         	var machine = this.get('controller').get('model');
-        	
+
                 if (!machine) {
                     return '';
                 }
@@ -114,7 +114,7 @@ define('app/views/machine', [
 
             upFor: function() {
         	var machine = this.get('controller').get('model');
-        	
+
                 if (machine && machine.uptime) {
                     var ret = '';
                     var x = Math.floor(machine.uptime / 1000);
@@ -154,7 +154,7 @@ define('app/views/machine', [
 
             providerIconClass: function() {
         	var machine = this.get('controller').get('model');
-        	
+
                 if (!machine) {
                     return '';
                 }
@@ -182,7 +182,7 @@ define('app/views/machine', [
                     $('.rule-value').slider();
                     $('.rule-action').selectmenu();
                 });
-                
+
                 var machine = this.get('controller').get('model');
 
                 if (!machine || !machine.hasMonitoring) {
@@ -428,7 +428,7 @@ define('app/views/machine', [
 
             handlePendingMonitoring: function() {
         	var machine = this.get('controller').get('model');
-        	
+
                 if (machine && machine.pendingMonitoring) {
                     $('.pending-monitoring').show();
                     $('.monitoring-button').addClass('ui-disabled'); //.hide();
@@ -441,7 +441,11 @@ define('app/views/machine', [
             showShell: function() {
                 setTimeout(function(){$('.shell-input input').focus()}, 1000);
             },
-            
+
+            openTags: function() {
+                $("#dialog-tags").popup("open", {transition: 'pop'});
+            },
+
             template: Ember.Handlebars.compile(machine_html),
         });
     }

@@ -44,13 +44,13 @@
                 <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
                     <span class="ui-icon ui-icon-loading"></span>
                     <h1>Disabling monitoring</h1>
-                </div>  
+                </div>
                 <div class="rules-container">
                 {{#each Mist.rulesController}}
                     {{view Mist.RuleView ruleBinding="this"}}
                 {{/each}}
                 </div>
-                <div class="monitoring-dialog-container enabled">                  
+                <div class="monitoring-dialog-container enabled">
                     <a href="#monitoring-dialog"
                         class="monitoring-button"
                         data-role="button"
@@ -145,7 +145,7 @@
 
     </div>
 
-    <div class="machines-footer" data-role="footer" data-theme="a">
+    <div class="machine-footer" data-role="footer" data-theme="a">
 
         <div class="actions" data-role="controlgroup" data-type="horizontal">
             <a href="#dialog-tags"
@@ -155,7 +155,9 @@
                 data-icon="grid"
                 data-rel="popup"
                 data-transition="slideup"
-                {{bindAttr class="disabledTagClass"}}>Tag</a>
+                {{bindAttr class="disabledTagClass"}}
+                {{action openTags target=view}}>Tag</a>
+                {{view Mist.MachineTagsDialog}}
 
             <a href="#dialog-shell"
                 class="action-links"

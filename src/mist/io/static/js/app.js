@@ -45,7 +45,7 @@ define( 'app', [
     'app/controllers/select_machines',
     'app/controllers/select_images',
     'app/controllers/keys',
-    'app/controllers/rules',   
+    'app/controllers/rules',
     'app/views/home',
     'app/views/count',
     'app/views/backend_button',
@@ -121,57 +121,57 @@ define( 'app', [
                 ) {
 
     $(document).bind("mobileinit", function(){
-	  $.mobile.ajaxEnabled = false;
-	  $.mobile.hashListeningEnabled = false;
-	  $.mobile.linkBindingEnabled = false;
+        $.mobile.ajaxEnabled = false;
+        $.mobile.hashListeningEnabled = false;
+        $.mobile.linkBindingEnabled = false;
     });
-    
+
     Ember.LOG_BINDINGS = true;
-    
+
     App = Ember.Application.create({
-	rootElement: 'body',
-	LOG_TRANSITIONS: true,
+        rootElement: 'body',
+        LOG_TRANSITIONS: true,
         LOG_STATE_TRANSITIONS: true,
-        
-	ready: function(){
-	    Em.run.next(function() {
-	        var id = false;
-                for(key in Ember.View.views){
-		    if("application" == Ember.View.views[key].renderedName){
-			id = key;
-		    }
-	        }
-	        if(id){
-		    $("#" + id).attr('data-role', 'page');
-		    require(['mobile'], function(){console.log('jqm loaded');});
-	        }
-	    });
-	}
+
+        ready: function(){
+            Em.run.next(function(){
+                var id = false;
+                for(key in Ember.View.views) {
+                    if("application" == Ember.View.views[key].renderedName) {
+                        id = key;
+                    }
+                }
+                if(id){
+                    $("#" + id).attr('data-role', 'page');
+                    require(['mobile'], function(){console.log('jqm loaded');});
+                }
+            });
+        }
     });
-    
+
     App.Router.map(function() {
-	this.route('providers');
-	this.route('machines');
-	this.route('images');
-	this.route('machine', {
-	    path : '/machines/:machine_id'
-	});
-	this.route('keys');
-	this.route('key', {
-	    path : '/keys/:key_id'
-	});
+        this.route('machines');
+        this.route('images');
+        this.route('machine', {
+            path : '/machines/:machine_id'
+        });
+        this.route('keys');
+        this.route('key', {
+            path : '/keys/:key_id'
+        });
     });
-    
+
+    // TODO: why the shortcut names? they don't make sense
     App.MacView = MachineView;
     App.MachineListView = MachineListView
     App.UserMenuView = UserMenuView;
     App.KeyListView = KeyListView;
     App.KeyListItemView = KeyListItemView;
     App.ImageListView = ImageListView;
-    App.KView = KeyView; 
+    App.KView = KeyView;
     App.AddKeyView = KeyAddDialog;
     App.KeyPrivDialog = KeyPrivDialog;
-    
+
 //        var mobileinit = false;
 //        $(document).bind('pageinit', function() {
 //            if (mobileinit){
@@ -216,11 +216,11 @@ define( 'app', [
 //                        }
 //                    }
 //                }.observes('email'),
-//                
+//
 //                passReady: function(){
 //                    this.emailReady();
 //                }.observes('password')
-//                              
+//
 //            });
 //
 //            App.Router = Ember.Router.extend({
@@ -228,72 +228,25 @@ define( 'app', [
 //                implementation : 'none'
 //            })
 //        });
-//        
-//        window.Mist = App;
-//        
-        App.set('backendAddController',
-                BackendAddController.create());
-App.set(
-                        'backendsController',
-                        BackendsController.create()
-                    );
-
-                    App.set(
-                        'confirmationController',
-                        ConfirmationController.create()
-                    );
-
-                    App.set(
-                        'notificationController',
-                           NotificationController.create()
-                    );
-
-                    App.set(
-                        'machineAddController',
-                        MachineAddController.create()
-                    );
-
-                    App.set(
-                        'selectMachinesController',
-                        SelectMachinesController.create()
-                    );
-
-                    App.set(
-                        'selectImagesController',
-                        SelectImagesController.create()
-                    );
-
-                    App.set(
-                            'keysController',
-                            KeysController.create()
-                        );
-                        
-                    App.set(
-                            'rulesController',
-                            RulesController.create()
-                        );                        
-
-                    App.set(
-                            'keyAddController',
-                            KeyAddController.create()
-                        );
-
-                    App.set(
-                            'authenticated',
-                            URL_PREFIX==''?true:false
-                        );
-
-                    App.set(
-                            'email',
-                            ''
-                        );
-
-                     App.set(
-                            'password',
-                            ''
-                        );
 //
-//                    
+//        window.Mist = App;
+//
+    App.set('backendAddController', BackendAddController.create());
+    App.set('backendsController', BackendsController.create());
+    App.set('confirmationController', ConfirmationController.create());
+    App.set('notificationController', NotificationController.create());
+    App.set('machineAddController', MachineAddController.create());
+    App.set('selectMachinesController', SelectMachinesController.create());
+    App.set('selectImagesController', SelectImagesController.create());
+    App.set('keysController', KeysController.create());
+    App.set('rulesController', RulesController.create());
+    App.set('keyAddController', KeyAddController.create());
+
+    App.set('authenticated', URL_PREFIX == '' ? true : false);
+    App.set('email', '');
+    App.set('password', '');
+//
+//
 //                    setTimeout(function(){
 //                        $.mobile.changePage('#home', { transition: 'fade' });
 //                        Mist.emailReady();
@@ -366,29 +319,29 @@ App.set(
 //            $(document).on('mouseleave', '.rule-box', hideRuleSlider);
 //            $(document).on('tap', '#single-machine', hideRuleSlider);
 //
-            App.Select = Ember.Select.extend({
-                attributeBindings: [
-                    'name',
-                    'data-theme',
-                    'data-icon',
-                    'data-native-menu',
-                    'disabled'
-                ],
-            });
+    App.Select = Ember.Select.extend({
+        attributeBindings: [
+            'name',
+            'data-theme',
+            'data-icon',
+            'data-native-menu',
+            'disabled'
+        ],
+    });
 
-            App.TextField = Ember.TextField.extend({
-                attributeBindings: [
-                    'name',
-                    'data-theme'
-                ]
-            });
+    App.TextField = Ember.TextField.extend({
+        attributeBindings: [
+            'name',
+            'data-theme'
+        ]
+    });
 
-            App.ShellTextField = Ember.TextField.extend({
-                attributeBindings: [
-                    'name',
-                    'data-theme',
-                    'autocapitalize'
-                ],
+    App.ShellTextField = Ember.TextField.extend({
+        attributeBindings: [
+            'name',
+            'data-theme',
+            'autocapitalize'
+        ],
 
                 insertNewline: function() {
                     this._parentView.submit();
@@ -406,26 +359,25 @@ App.set(
 //            Ember.TextArea.reopen({
 //                attributeBindings: ["name", "placeholder", "id"]
 //              });
-//            
-            App.HomeView = Home;
-            App.CountView = Count;
-            App.BackendButtonView = BackendButton;
-            App.AddBackendView = AddBackend;
-            App.EditBackendView = EditBackend;
-            App.MachineListItemView = MachineListItem;
-            App.ImageListItemView = ImageListItem;
-            App.ConfirmationDialog = ConfirmationDialog;
-            App.AddMachineView = MachineAddDialog;
-            
-            App.DeleteTagView = DeleteTagView;
+//
+    App.HomeView = Home;
+    App.CountView = Count;
+    App.BackendButtonView = BackendButton;
+    App.AddBackendView = AddBackend;
+    App.EditBackendView = EditBackend;
+    App.MachineListItemView = MachineListItem;
+    App.ImageListItemView = ImageListItem;
+    App.ConfirmationDialog = ConfirmationDialog;
+
+    App.DeleteTagView = DeleteTagView;
 //            App.RuleView = RuleView;
 //            App.UserMenuView = UserMenuView;
 //            App.KeyMachineListItemView = KeyMachineListItem;
-            App.MachineTagsDialog = MachineTagsDialog;
+    App.MachineTagsDialog = MachineTagsDialog;
 //
 //            var homeView = Home.create();
 //            homeView.append();
-//            
+//
 //            var machineView = MachineView.create();
 //            machineView.append();
 /////*
@@ -439,12 +391,12 @@ App.set(
 ////            var machineTagsDialog = MachineTagsDialog.create();
 ////            machineTagsDialog.appendTo("#single-machine");
 ////*/
-              App.MachineListView = MachineListView;
+    App.MachineListView = MachineListView;
 //            machineListView.append();
-//            
+//
 //            var addDialog = MachineAddDialog.create();
 //            addDialog.append();
-//            
+//
 ////            /*
 ////            shellDialog = Shell.create();
 ////            shellDialog.appendTo("#machines");
@@ -478,9 +430,8 @@ App.set(
 ////            keyAssociateDialog.append();
 ////*/
 
-    	    window.Mist = App;
-            return App
-        
+    window.Mist = App;
+    return App
     }
 );
 
@@ -521,21 +472,21 @@ var collectd_install_target = false, collectd_uninstall_target = false, collectd
 
 function appendShell(data){
     var line = data.trim();
-    
+
     if (data.length){
         warn(Date() + ': ' + data);
     }
-    
+
     if (collectd_install_target) {
         if (line != '<br/>') {
             collectd_lastlog = line;
         }
-        // TODO: display collectd install output        
+        // TODO: display collectd install output
     } else if (collectd_uninstall_target){
         if (line != '<br/>') {
             collectd_lastlog = line;
         }
-        // TODO: display collectd uninstall output        
+        // TODO: display collectd uninstall output
     } else {
         var target_page = $($.mobile.activePage);
         var output = target_page.find('.shell-return .output').first();
@@ -545,7 +496,7 @@ function appendShell(data){
         } else {
             that.set('pendingShell', false);
             target_page.find('.shell-return .pending').removeClass('pending');
-        }          
+        }
     }
 }
 
@@ -557,15 +508,15 @@ function completeShell(ret){
         if (collectd_lastlog.search('root') == -1){
             // TODO: display instruction for manual installation
             // alert('collectd install failed');
-        }        
-        collectd_install_target.set('hasMonitoring', true);                        
+        }
+        collectd_install_target.set('hasMonitoring', true);
         collectd_install_target.set('pendingMonitoring', false);
-        $('.pending-monitoring h1').text('Enabling monitoring');          
+        $('.pending-monitoring h1').text('Enabling monitoring');
         collectd_install_target = false;
     } else if (collectd_uninstall_target) {
-        collectd_uninstall_target.set('hasMonitoring', false);                        
+        collectd_uninstall_target.set('hasMonitoring', false);
         collectd_uninstall_target.set('pendingMonitoring', false);
-        $('.pending-monitoring h1').text('Enabling monitoring');          
+        $('.pending-monitoring h1').text('Enabling monitoring');
         collectd_uninstall_target = false;
     }
     $('body').append('<iframe id="hidden-shell-iframe"></iframe');
