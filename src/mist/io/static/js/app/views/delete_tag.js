@@ -17,16 +17,14 @@ define('app/views/delete_tag', [
             },
 
             deleteTag: function() {
-                alert('del');
                 var tag = this.tag;
                 var machine = Mist.machine;
 
-                log("tag to delete: " + tag);
 
                 var payload = {
                     'tag': tag.toString()
                 };
-
+                $('#tags-container .ajax-loader').fadeIn(200);
                 machine.set('pendingDeleteTag', true);
                 $.ajax({
                     url: 'backends/' + machine.backend.id + '/machines/' + machine.id + '/metadata',
@@ -35,14 +33,17 @@ define('app/views/delete_tag', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully deleted tag from machine', machine.name);
-                        machine.tags.removeObject(this.tag.toString());
+                        //machine.tags.removeObject(this.tag.toString());
                         machine.set('pendingDeleteTag', false);
+                        machine.tags.removeObject(tag.toString());
+                        $('#tags-container .ajax-loader').hide();
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while deleting tag from machine ' +
                                 machine.name);
                         error(textstate, errorThrown, 'while deleting tag from machine machine', machine.name);
                         machine.set('pendingDeleteTag', false);
+                        $('#tags-container .ajax-loader').hide();
                     }
                 });
             }

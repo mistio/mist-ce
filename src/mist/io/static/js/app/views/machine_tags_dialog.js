@@ -39,14 +39,10 @@ define('app/views/machine_tags_dialog',[
                     return;
                 }
 
-                machine.tags.addObject(tag);
-
-                log("tag to add: " + tag);
-
                 var payload = {
                     'tag' : tag
                 };
-
+                $('#tags-container .ajax-loader').fadeIn(200);
                 machine.set('pendingAddTag', true);
                 $.ajax({
                     url: 'backends/' + machine.backend.id + '/machines/' + machine.id + '/metadata',
@@ -56,6 +52,8 @@ define('app/views/machine_tags_dialog',[
                     success: function(data) {
                         info('Successfully added tag to machine', machine.name);
                         machine.set('pendingAddTag', false);
+                        machine.tags.addObject(tag);
+                        $('#tags-container .ajax-loader').hide();
 
                     },
                     error: function(jqXHR, textstate, errorThrown) {
@@ -63,6 +61,7 @@ define('app/views/machine_tags_dialog',[
                         error(textstate, errorThrown, 'while adding tag to machine machine', machine.name);
                         machine.tags.removeObject(tag);
                         machine.set('pendingAddTag', false);
+                        $('#tags-container .ajax-loader').hide();
                     }
                 });
             },
