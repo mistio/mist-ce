@@ -1,5 +1,4 @@
 define('app/views/machine_add_dialog', [
-    'app/views/jqm_dialog',
     'text!app/templates/machine_add_dialog.html','ember'],
     /**
      *
@@ -7,9 +6,10 @@ define('app/views/machine_add_dialog', [
      *
      * @returns Class
      */
-    function(Dialog, machine_add_dialog_html) {
-        return Dialog.extend({
-            id: 'dialog-add',
+    function(machine_add_dialog_html) {
+        return Ember.View.extend({
+            
+            attributeBindings: ['data-role',],
 
             clear: function(){
                 Mist.machineAddController.newMachineClear();
@@ -30,13 +30,13 @@ define('app/views/machine_add_dialog', [
             newMachineClicked: function(){
                 //FIXME there should be a way to bind the action directly to the controller
                 Mist.machineAddController.newMachine();
-                $.mobile.changePage('#machines');
+                $("#dialog-add").popup("close");
                 this.clear();
             },
 
             backClicked: function(){
                 this.clear();
-                history.back();
+                $("#dialog-add").popup("close");
             },
             
             imagesBinding: "Mist.machineAddController.newMachineBackend.images",

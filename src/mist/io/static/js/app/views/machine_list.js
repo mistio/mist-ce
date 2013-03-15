@@ -74,11 +74,15 @@ function(MistScreen, machine_list_html) {
                 return '';
             }
         }.property('Mist.backendsController.selectedMachineCount'),
+        
+        addMachine: function(){
+            $("#dialog-add").popup("open", {transition: 'pop'});
+        },
 
         template: Ember.Handlebars.compile(machine_list_html),
         
         openTags: function(){
-            $("#dialog-tags").popup("open");
+            $("#dialog-tags").popup("open", {transition: 'pop'});
         }
     });
 });

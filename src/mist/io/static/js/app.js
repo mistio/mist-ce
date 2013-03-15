@@ -415,6 +415,7 @@ App.set(
             App.MachineListItemView = MachineListItem;
             App.ImageListItemView = ImageListItem;
             App.ConfirmationDialog = ConfirmationDialog;
+            App.AddMachineView = MachineAddDialog;
             
             App.DeleteTagView = DeleteTagView;
 //            App.RuleView = RuleView;
