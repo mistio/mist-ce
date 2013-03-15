@@ -155,7 +155,9 @@
                 data-icon="grid"
                 data-rel="popup"
                 data-transition="slideup"
-                {{bindAttr class="disabledTagClass"}}>Tag</a>
+                {{bindAttr class="disabledTagClass"}}
+                {{action openTags target=view}}>Tag</a>
+                {{view Mist.MachineTagsDialog}}
 
             <a href="#dialog-shell"
                 class="action-links"
