@@ -443,7 +443,7 @@ define('app/views/machine', [
             },
 
             openTags: function() {
-                $("#dialog-tags").popup("open", {transition: 'pop'});
+                $('#dialog-tags').popup('open', {transition: 'slideup'});
             },
 
             template: Ember.Handlebars.compile(machine_html),
