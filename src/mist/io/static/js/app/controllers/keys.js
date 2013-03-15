@@ -82,11 +82,11 @@ define('app/controllers/keys', [
                 });
             },
 
-            associateKey: function(key, machines) {
+            associateKeys: function(key, machines) {
                 payload = {'key_name': key.name, 'machine_backend_list': machines}
                 var that = this
                 $.ajax({
-                    url: 'keys/associate/key',
+                    url: 'keys/associate/machines',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
@@ -102,11 +102,30 @@ define('app/controllers/keys', [
                 });
             },
 
-            disassociateKey: function(key, machine) {
-                payload = {'key_name': key.name, 'machine_backend_id': machine}
+            associateKey: function(key_name, backendId, machineId) {
+                payload = {'key_name': key_name, 'backend_id': backendId, 'machine_id': machineId}
                 var that = this
                 $.ajax({
-                    url: 'keys/disassociate/key',
+                    url: 'keys/associate/machine',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function(data) {
+                        info('Successfully associate key ', key_name);
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while associating key'  +
+                                key_name);
+                        error(textstate, errorThrown, 'while associating key', key_name);
+                    }
+                });
+            },
+
+            disassociateKey: function(key, machine) {
+                payload = {'key_name': key.name, 'backend_id': backendId, 'machine_id': machineId}
+                var that = this
+                $.ajax({
+                    url: 'keys/disassociate/machine',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),

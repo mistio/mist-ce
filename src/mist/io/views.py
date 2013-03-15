@@ -883,7 +883,7 @@ def associate_key_to_machine(request):
     else:
         return Response('Keypair not found', 404)
 
-    machine_backend = [machine_id, backend_id]
+    machine_backend = [backend_id, machine_id]
 
     if not machine_backend in keypair['machines']:
         keypair['machines'].append(machine_backend)
@@ -913,7 +913,7 @@ def disassociate_key_to_machine(request):
     else:
         return Response('Keypair not found', 404)
 
-    machine_backend = [machine_id, backend_id]
+    machine_backend = [backend_id, machine_id]
 
     for pair in keypair['machines']:
         if pair == machine_backend:

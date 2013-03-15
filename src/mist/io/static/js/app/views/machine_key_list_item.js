@@ -21,9 +21,7 @@ define('app/views/machine_key_list_item', [
 
                 keyDisassociate: function(event, el){
                     //TODO: turn parent to listview and refresh it properly
-                    console.log(this.key.name);
-                    console.log([Mist.machine.backend.id, Mist.machine.id]);
-                    Mist.keysController.disassociateKey(this.key, [Mist.machine.backend.id, Mist.machine.id]);
+                    Mist.keysController.disassociateKey(this.key, Mist.machine.backend.id, Mist.machine.id);
                 },
 
                 init: function() {

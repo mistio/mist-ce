@@ -66,6 +66,12 @@ define('app/views/machine', [
                 return keys
             }.property('machine'),
 
+            keySelect: function(event, el){
+                //Associates the selected key with the machine
+                //TODO: turn parent to listview and refresh it properly
+                Mist.keysController.associateKey($(event.target).val(), Mist.machine.backend.id, Mist.machine.id);
+            },
+
             machineKeysRest: function() {
                 if (!this.machine) {
                     return [];

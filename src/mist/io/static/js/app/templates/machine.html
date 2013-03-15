@@ -131,14 +131,31 @@
 
          <div data-role="collapsible" data-collapsed="false" id="machine-single-keys">
             <h3>Keys</h3>
+            <!--ul id="keys-list"
+            data-role="listview"
+            data-inset="true"
+            data-theme="c">
+                {{!#each view.machineKeys}}
+                    {{!view Mist.MachineKeyListItemView keyBinding="this"}}
+                {{!/each}}
+            </ul-->
             <table id="machine-basic-table">
                 {{#each view.machineKeys}}
                     {{view Mist.MachineKeyListItemView keyBinding="this"}}
                 {{/each}}
             </table>
-            {{view Mist.Select contentBinding="view.machineKeysRest"
+            <div data-role="fieldcontain">
+                <select name="machine-select-key" id="machine-select-key" data-native-menu="true" data-placeholder="true" {{action "keySelect" on="change"}}>
+                    <option value="">Associate Key</option>
+                    {{#each view.machineKeysRest}}
+        		        <option {{bindAttr value="{{name}}"}}>{{name}}</option>
+                    {{/each}}
+	            </select>
+            </div>
+            {{!view Mist.Select contentBinding="view.machineKeysRest"
                 optionLabelPath="content.name"
-                optionValuePath="content.name"    
+                optionValuePath="content.name"
+                selectionBinding="view.keyAssociate"
                 class="rule-operator"
                 id="machine-add-key"
                 data-native-menu="true"
