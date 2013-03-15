@@ -375,6 +375,7 @@ define( 'app', [
 //            App.UserMenuView = UserMenuView;
 //            App.KeyMachineListItemView = KeyMachineListItem;
     App.MachineTagsDialog = MachineTagsDialog;
+    App.ShellDialog = Shell;
 //
 //            var homeView = Home.create();
 //            homeView.append();

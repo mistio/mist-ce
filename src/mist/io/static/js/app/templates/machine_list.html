@@ -78,7 +78,8 @@
                 data-icon="gear"
                 data-rel="popup"
                 data-transition="slideup"
-                {{bindAttr class="disabledShellClass"}}>Shell</a>
+                {{bindAttr class="disabledShellClass"}}
+                {{action openShell target="view"}}>Shell</a>
 
             <a href="#dialog-power"
                 class="action-links"
@@ -93,3 +94,5 @@
     </div>
     
     {{view Mist.MachineTagsDialog machineBinding="Mist.backendsController.selectedMachine"}}
+    
+    {{view Mist.ShellDialog machineBinding="Mist.backendsController.selectedMachine"}}

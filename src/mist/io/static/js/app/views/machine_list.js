@@ -83,6 +83,10 @@ function(MistScreen, machine_list_html) {
         
         openTags: function(){
             $("#dialog-tags").popup("open", {transition: 'pop'});
+        },
+        
+        openShell: function(){
+            $("#dialog-shell").popup("open", {transition: 'pop'});
         }
     });
 });

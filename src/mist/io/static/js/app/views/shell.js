@@ -12,7 +12,7 @@ define('app/views/shell', [
 function(shell_html) {
     return Ember.View.extend({
         tagName: false,
-        machineBinding: 'Mist.machine',
+        
         shellOutputItems: Ember.ArrayController.create(),
         availableCommands: [], //"dmesg", "uptime", "uname", "ls", "reboot", "whoami", "ifconfig" ],
 
