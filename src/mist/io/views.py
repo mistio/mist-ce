@@ -898,7 +898,8 @@ def disassociate_key_to_machine(request):
        Receives a key name, and a machine/backend id pair and removes the machine from that keypair'''
     params = request.json_body
     key_name = params.get('key_name', '')
-    machine_backend_id = params.get('machine_backend_id', '')
+    machine_id = params.get('machine_id', '')
+    backend_id = params.get('backend_id', '')
 
     try:
         keypairs = request.environ['beaker.session']['keypairs']
@@ -912,21 +913,13 @@ def disassociate_key_to_machine(request):
     else:
         return Response('Keypair not found', 404)
 
+    machine_backend = [machine_id, backend_id]
 
-
-    #machine_backend_id = [machine_id, backend_id]
-    if keypair:
-        try:
-            machine_id = machine_backend_id[0]
-            backend_id = machine_backend_id[1]
-        except:
-            return Response('Machine id not found', 404)
-
-        for pair in keypair['machines']:
-            if pair[0] == machine_id and pair[1] == backend_id:
-                keypair['machines'].remove(pair)
-                save_keypairs(request, keypair)
-                break
+    for pair in keypair['machines']:
+        if pair == machine_backend:
+            keypair['machines'].remove(pair)
+            save_keypairs(request, keypair)
+            break
 
     return {}
 
