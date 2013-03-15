@@ -822,8 +822,8 @@ def set_default_key(request):
     return {}
 
 
-@view_config(route_name='key_associate', request_method='POST', renderer='json')
-def associate_key_to_machine(request):
+@view_config(route_name='key_machines_associate', request_method='POST', renderer='json')
+def associate_key_to_machines(request):
     '''Associate a key with list of machines. 
        Receives a key name, and a list of machine/backend ids'''
     params = request.json_body
@@ -861,6 +861,36 @@ def associate_key_to_machine(request):
 
     return {}
 
+
+@view_config(route_name='key_machine_associate', request_method='POST', renderer='json')
+def associate_key_to_machine(request):
+    '''Associate a key with a machine. 
+       Receives a key name, and a machine/backend id'''
+    params = request.json_body
+    key_name = params.get('key_name', '')
+    machine_id = params.get('machine_id', '')
+    backend_id = params.get('backend_id', '')
+
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+    
+    keypair = {}
+
+    if key_name in keypairs.keys():
+        keypair = keypairs[key_name]
+    else:
+        return Response('Keypair not found', 404)
+
+    machine_backend = [machine_id, backend_id]
+
+    if not machine_backend in keypair['machines']:
+        keypair['machines'].append(machine_backend)
+
+    save_keypairs(request, keypair)
+
+    return {}
 
 @view_config(route_name='key_disassociate', request_method='POST', renderer='json')
 def disassociate_key_to_machine(request):
