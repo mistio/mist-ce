@@ -12,27 +12,13 @@ define('app/views/machine_tags_dialog',[
     function(machine_tags_dialog_html) {
         return Ember.View.extend({
 
-            machine: function() {
-                var machine = null;
-                Mist.backendsController.forEach(function(backend) {
-                    backend.machines.forEach(function(m) {
-                        if (m.selected) {
-                            log('machine selected');
-                            machine = m;
-                        }
-                    });
-                });
-                if (machine) {
-                    return machine;
-                } else {
-                    return Mist.machine;
-                }
-            }.property("Mist.backendsController.selectedMachineCount"),
-
             submit: function() {
                 var tag = this.tag;
 
                 var machine = this.get('machine');
+                if(!machine){
+                    machine = this.get('controller').get('model');
+                }
 
                 if (!machine || !this.tag) {
                     return;

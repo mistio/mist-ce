@@ -20,7 +20,7 @@
             </table>
             <div id="tags-wrapper">
                 <ul id="tags-list">
-                {{#each view.machine.tags}}
+                {{#each tags}}
                     {{#view Mist.DeleteTagView tagBinding="this"}}
                         <li>
                             <a data-role="button"
