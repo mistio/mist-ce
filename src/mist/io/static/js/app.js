@@ -416,7 +416,7 @@ App.set(
             App.ImageListItemView = ImageListItem;
             App.ConfirmationDialog = ConfirmationDialog;
             
-//            App.DeleteTagView = DeleteTagView;
+            App.DeleteTagView = DeleteTagView;
 //            App.RuleView = RuleView;
 //            App.UserMenuView = UserMenuView;
 //            App.KeyMachineListItemView = KeyMachineListItem;
