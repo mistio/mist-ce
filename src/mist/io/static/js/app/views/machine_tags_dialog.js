@@ -16,12 +16,13 @@ define('app/views/machine_tags_dialog',[
                 var tag = this.tag;
 
                 var machine = this.get('machine');
-                if(!machine){
-                    machine = this.get('controller').get('model');
-                }
 
                 if (!machine || !this.tag) {
                     return;
+                }
+                
+                if(!machine.tags){
+                    machine = machine.get('model');
                 }
 
                 machine.tags.addObject(tag);

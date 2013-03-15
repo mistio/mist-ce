@@ -155,7 +155,7 @@
             data-icon="grid"
             {{bindAttr class="disabledTagClass"}}
             {{action openTags target=view}}>Tag</a>
-            {{view Mist.MachineTagsDialog}}
+            {{view Mist.MachineTagsDialog machineBinding="this"}}
 
         <a href="#dialog-shell"
             class="action-links"
