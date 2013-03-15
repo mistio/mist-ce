@@ -22,7 +22,6 @@
                 <ul id="tags-list">
                 {{#each view.machine.tags}}
                     {{#view Mist.DeleteTagView tagBinding="this" machineBinding="view.machine"}}
-                        <li>
                             <a data-role="button"
                                 class="tagButton"
                                 {{action deleteTag target="view"}}
@@ -32,7 +31,6 @@
                                 data-iconpos="notext"
                                 {{bindAttr class="view.machine.pendingDeleteTag"}}></a>
                             {{this}}
-                        </li>
                     {{/view}}
                 {{/each}}
                 </ul>
