@@ -522,6 +522,22 @@ def destroy_machine(request):
 
     machine.destroy()
 
+    #delete key associations with this machine
+
+    backend_id = request.matchdict['backend']
+    pair = [backend_id, machine_id]
+
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+
+    for key in keypairs:
+        machines = keypairs[key].get('machines', None)
+        if pair in machines:
+            keypairs[key]['machines'].remove(pair)
+            save_keypairs(request, keypairs[key])
+
     return Response('Success', 200)
 
 
