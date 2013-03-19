@@ -677,7 +677,8 @@ def delete_machine_metadata(request):
 @view_config(route_name='machine_shell', request_method='POST',
              renderer='json')
 def shell_command(request):
-    """Send a shell command to a machine over ssh, using fabric."""
+    """Send a shell command to a machine over ssh, using fabric.
+       Used for uptime only!!!"""
     try:
         conn = connect(request)
     except:
@@ -705,7 +706,8 @@ def shell_command(request):
     else:
         private_key = public_key = None
 
-    return run_command(conn, machine_id, host, ssh_user, private_key, command)
+    ret= run_command(conn, machine_id, host, ssh_user, private_key, command)
+    return ret
 
 
 @view_config(route_name='images', request_method='GET', renderer='json')
@@ -936,6 +938,35 @@ def associate_key_to_machine(request):
         keypair['machines'].append(machine_backend)
 
     save_keypairs(request, keypair)
+
+    #try to set the key to authorized_keys of that machine
+    #FIXME: inform the user what is going on!
+
+    try:
+        conn = connect(request, backend_id)
+    except:
+        return Response('Could not install the key to machine', 404)
+
+    node = None
+    machines = conn.list_nodes()
+    for machine in machines:
+        if machine.id == machine_id:
+            node = machine
+            break
+
+    if not node:
+        return Response('Could not install the key to machine', 404)
+
+    host = node.public_ip[0]
+    command = 'echo "%s" >> ~/.ssh/authorized_keys ' % keypair['public']
+    ssh_user = None
+    try:
+        ssh_user = node.extra.get('tags')['ssh_user']
+    except:
+        ssh_user = 'root'
+    if not ssh_user:
+        ssh_user = 'root'
+    run_command(conn, machine_id, host, ssh_user, keypair['private'], command)
 
     return {}
 
