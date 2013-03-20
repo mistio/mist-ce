@@ -439,7 +439,12 @@ define('app/views/machine', [
             }.observes('controller.model.pendingMonitoring'),
 
             showShell: function() {
+                $("#dialog-shell").popup("open", {transition: 'pop'});
                 setTimeout(function(){$('.shell-input input').focus()}, 1000);
+            },
+
+            showActions: function() {
+                $('#dialog-single-power').popup('open', {transition: 'slideup'});
             },
 
             openTags: function() {

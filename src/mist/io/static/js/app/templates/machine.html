@@ -164,7 +164,9 @@
             data-icon="gear"
             data-rel="popup"
             data-transition="slideup"
-            {{bindAttr class="disabledShellClass"}} {{action showShell}}>Shell</a>
+            {{bindAttr class="disabledShellClass"}}
+            {{action showShell target=view}}>Shell</a>
+            {{view Mist.ShellDialog machineBinding="this"}}
 
         <a href="#dialog-single-power"
             class="action-links"
@@ -173,7 +175,9 @@
             data-icon="mist-power"
             data-rel="popup"
             data-transition="slideup"
-            {{bindAttr class="disabledPowerClass"}}>Power</a>
+            {{bindAttr class="disabledPowerClass"}}
+            {{action showActions target=view}}>Power</a>
+            {{view Mist.PowerDialog machineBinding="this"}}
     </div>
 
 </div>
