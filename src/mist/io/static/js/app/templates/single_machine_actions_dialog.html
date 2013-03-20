@@ -3,17 +3,17 @@
         <h1>Actions</h1>
     </div>
     <div data-role="content">
-        {{#if machine.can_reboot}}
-        <a data-role="button" {{action reboot}}>Reboot</a>
+        {{#if can_reboot target="view"}}
+        <a data-role="button" {{action reboot target="view"}}>Reboot</a>
         {{/if}}
-        {{#if machine.can_stop}}
-        <a data-role="button" {{action shutdown}}>Shutdown</a>
+        {{#if can_stop target="view"}}
+        <a data-role="button" {{action shutdown target="view"}}>Shutdown</a>
         {{/if}}
-        {{#if machine.can_destroy}}
-        <a data-role="button" {{action destroy}}>Destroy</a>
+        {{#if can_destroy target="view"}}
+        <a data-role="button" {{action destroy target="view"}}>Destroy</a>
         {{/if}}
-        {{#if machine.can_start}}
-        <a data-role="button" {{action start}}>Start</a>
+        {{#if can_start target="view"}}
+        <a data-role="button" {{action start target="view"}}>Start</a>
         {{/if}}
         <a data-role="button" data-rel="back" data-theme="b">Close</a>
     </div>

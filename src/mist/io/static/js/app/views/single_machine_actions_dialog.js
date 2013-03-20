@@ -10,11 +10,9 @@ define('app/views/single_machine_actions_dialog', [
      */
     function(single_machine_actions_dialog_html) {
         return Ember.View.extend({
-            tagName: false,
-            machineBinding: 'Mist.machine',
 
             reboot: function(){
-                var machine = this.machine;
+                var machine = this.get('controller').get('model');
                 Mist.confirmationController.set("title", 'Reboot Machine');
                 Mist.confirmationController.set("text", 'Are you sure you want to reboot ' +
                         machine.name +' ?');

@@ -80,7 +80,7 @@ define('app/views/key', [
                 }
 
                 Mist.confirmationController.set('title', 'Delete Key: ' + key.name);
-                if (key.machines.length > 0) {
+                if (key.machines && key.machines.length > 0) {
                 Mist.confirmationController.set('text', 'Your key is associated with ' + machineNames.toString() +'. Are you sure you want to delete ' +  key.name + '? You will not be able use console and monitoring on these VMs.');                    
                 } else {
                     Mist.confirmationController.set('text', 'Are you sure you want to delete ' +
