@@ -11,7 +11,6 @@ define('app/views/shell', [
  */
 function(shell_html) {
     return Ember.View.extend({
-        tagName: false,
         
         shellOutputItems: Ember.ArrayController.create(),
         availableCommands: [], //"dmesg", "uptime", "uname", "ls", "reboot", "whoami", "ifconfig" ],
@@ -37,7 +36,7 @@ function(shell_html) {
         },
 
         submit: function() {
-            var machine = this.machine;
+            var machine = this.get('controller').get('model');
 
             if (!machine || !machine.hasKey || !this.command) {
                 return;
@@ -46,7 +45,7 @@ function(shell_html) {
 
             var command = this.command;
 
-            this.machine.shell(command, function(output) {
+            machine.shell(command, function(output) {
 
                 if(!that.shellOutputItems.content){
                     that.shellOutputItems.set('content', new Array());
