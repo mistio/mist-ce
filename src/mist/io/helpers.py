@@ -180,9 +180,9 @@ def get_keypair(keypairs, backend_id=None, machine_id=None):
     "get key pair for machine, else get default key pair"
 
     for key in keypairs:
-        machines = keypairs[key].get('machines', None)
-        if machines and len(machines):
-            for machine in keypairs[key]['machines']:
+        machines = keypairs[key].get('machines', [])
+        if machines:
+            for machine in machines:
                 if machine == [backend_id, machine_id]:
                     return keypairs[key]
     for key in keypairs:

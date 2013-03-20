@@ -912,13 +912,16 @@ def associate_key_to_machines(request):
 
 
 @view_config(route_name='key_machine_associate', request_method='POST', renderer='json')
-def associate_key_to_machine(request):
+def associate_key(request):
     '''Associate a key with a machine. 
        Receives a key name, and a machine/backend id'''
     params = request.json_body
     key_name = params.get('key_name', '')
-    machine_id = params.get('machine_id', '')
-    backend_id = params.get('backend_id', '')
+    machine_id = params.get('machine_id', None)
+    backend_id = params.get('backend_id', None)
+
+    if not machine_id or not backend_id:
+        return Response('Machine not found', 404)
 
     try:
         keypairs = request.environ['beaker.session']['keypairs']
@@ -934,18 +937,27 @@ def associate_key_to_machine(request):
 
     machine_backend = [backend_id, machine_id]
 
-    if not machine_backend in keypair['machines']:
+    #get existing key, if any. Will be used from deploy_key
+    existing_key = None
+    for key in keypairs:
+        machines = keypairs[key].get('machines', [])
+        if machine_backend in machines:
+            existing_key = keypairs[key]
+
+    if machine_backend in keypair['machines']:
+        return Response('Key already associated to machine', 204)
+    else:
         keypair['machines'].append(machine_backend)
+        save_keypairs(request, keypair)       
+        deploy_key(request, backend_id, machine_id, keypair, existing_key)
 
-    save_keypairs(request, keypair)
 
+def deploy_key(request, backend_id, machine_id, keypair, existing_key):
     #try to set the key to authorized_keys of that machine
-    #FIXME: inform the user what is going on!
-
     try:
         conn = connect(request, backend_id)
     except:
-        return Response('Could not install the key to machine', 404)
+        return Response('Key associated but could not install the key to machine', 204)
 
     node = None
     machines = conn.list_nodes()
@@ -955,10 +967,13 @@ def associate_key_to_machine(request):
             break
 
     if not node:
-        return Response('Could not install the key to machine', 404)
+        return Response('Key associated but could not install the key to machine', 204)
 
-    host = node.public_ip[0]
-    command = 'echo "%s" >> ~/.ssh/authorized_keys ' % keypair['public']
+    try:
+        host = node.public_ip[0]
+    except:
+        return Response('Key associated but could not install the key to machine', 204)
+
     ssh_user = None
     try:
         ssh_user = node.extra.get('tags')['ssh_user']
@@ -966,9 +981,28 @@ def associate_key_to_machine(request):
         ssh_user = 'root'
     if not ssh_user:
         ssh_user = 'root'
-    run_command(conn, machine_id, host, ssh_user, keypair['private'], command)
 
-    return {}
+    if existing_key:
+        #try to add the new associated key with the machine
+        command = 'if [ -z `grep "%s" ~/.ssh/authorized_keys` ]; then echo "%s" >> ~/.ssh/authorized_keys; fi' % (keypair['public'], keypair['public'])
+        private_key = existing_key['private']
+    else:
+        #try to login to the server with this key. does not add the key to authorized_keys, just
+        #make an attempt to login
+        command = 'uptime'
+        private_key = keypair['private']
+
+    try:
+        ret = run_command(conn, machine_id, host, ssh_user, private_key, command)
+        ret.title
+        #FIXME: needs a better check
+        #type(ret)
+        #<class 'fabric.operations._AttributeString'>
+    except:
+        return Response('Key associated but could not install the key to machine', 204)
+
+    return Response('OK', 200)
+
 
 @view_config(route_name='key_disassociate', request_method='POST', renderer='json')
 def disassociate_key_to_machine(request):
