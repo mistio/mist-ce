@@ -346,6 +346,8 @@ def create_machine(request):
                                  deploy=deploy_script,
                                  location=location,
                                  ssh_key=tmp_key_path,
+                                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
+                                 max_tries=2,
                                  ex_keyname=key_name,
                                  ex_securitygroup=EC2_SECURITYGROUP['name'])
             except Exception as e:
