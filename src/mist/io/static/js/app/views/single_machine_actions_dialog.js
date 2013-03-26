@@ -12,7 +12,9 @@ define('app/views/single_machine_actions_dialog', [
         return Ember.View.extend({
 
             reboot: function(){
-                var machine = this.get('controller').get('model');
+        	var machine = this.get('controller').get('model');
+        	
+        	$("#dialog-single-power" ).on( "popupafterclose", function( event, ui ) {
                 Mist.confirmationController.set("title", 'Reboot Machine');
                 Mist.confirmationController.set("text", 'Are you sure you want to reboot ' +
                         machine.name +' ?');
@@ -22,6 +24,13 @@ define('app/views/single_machine_actions_dialog', [
                 });
                 Mist.confirmationController.set("fromDialog", true);
                 Mist.confirmationController.show();
+                
+                //TODO remove event handler now
+                
+        	});
+        	
+        	$('#dialog-single-power').popup('close');
+        	
             },
 
             destroy: function(){
