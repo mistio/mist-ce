@@ -12,51 +12,58 @@ define('app/views/single_machine_actions_dialog', [
         return Ember.View.extend({
 
             reboot: function(){
-        	var machine = this.get('controller').get('model');
-        	
-        	$("#dialog-single-power" ).on( "popupafterclose", function( event, ui ) {
-                Mist.confirmationController.set("title", 'Reboot Machine');
-                Mist.confirmationController.set("text", 'Are you sure you want to reboot ' +
-                        machine.name +' ?');
-                Mist.confirmationController.set("callback", function(){
-                    machine.reboot();
-                    Mist.Router.router.transitionTo('keys');
-                });
-                Mist.confirmationController.set("fromDialog", true);
-                Mist.confirmationController.show();
-                
-                //TODO remove event handler now
-                
-        	});
-        	
-        	$('#dialog-single-power').popup('close');
-        	
+            	var machine = this.get('controller').get('model');
+            	$("#dialog-single-power" ).on( "popupafterclose", function( event, ui ) {
+                    Mist.confirmationController.set("title", 'Reboot Machine');
+                    Mist.confirmationController.set("text", 'Are you sure you want to reboot ' +
+                            machine.name +' ?');
+                    Mist.confirmationController.set("callback", function(){
+                        machine.reboot();
+                        Mist.Router.router.transitionTo('machines');
+                    });
+                    Mist.confirmationController.set("fromDialog", true);
+                    Mist.confirmationController.show();
+                    
+                    //TODO remove event handler now
+                    
+            	});
+            	$('#dialog-single-power').popup('close');
             },
 
             destroy: function(){
-                var machine = this.machine;
-                Mist.confirmationController.set("title", 'Destroy Machine');
-                Mist.confirmationController.set("text", 'Are you sure you want to destroy ' +
-                        machine.name +' ?');
-                Mist.confirmationController.set("callback", function(){
-                    machine.destroy();
-                    window.history.go(-1);
+            	var machine = this.get('controller').get('model');
+            	$("#dialog-single-power" ).on( "popupafterclose", function( event, ui ) {
+                    Mist.confirmationController.set("title", 'Destroy Machine');
+                    Mist.confirmationController.set("text", 'Are you sure you want to destroy ' +
+                            machine.name +' ?');
+                    Mist.confirmationController.set("callback", function(){
+                        machine.destroy();
+                        window.history.go(-1);
+                    });
+                    Mist.confirmationController.set("fromDialog", true);
+                    Mist.confirmationController.show();
+
+                    //TODO remove event handler now
                 });
-                Mist.confirmationController.set("fromDialog", true);
-                Mist.confirmationController.show();
+            	$('#dialog-single-power').popup('close');
             },
 
             shutdown: function(){
-                var machine = this.machine;
-                Mist.confirmationController.set("title", 'Shutdown Machine');
-                Mist.confirmationController.set("text", 'Are you sure you want to shutdown ' +
-                        machine.name +' ?');
-                Mist.confirmationController.set("callback", function(){
-                    machine.shutdown();
-                    window.history.go(-1);
+            	var machine = this.get('controller').get('model');
+            	$("#dialog-single-power" ).on( "popupafterclose", function( event, ui ) {
+                    Mist.confirmationController.set("title", 'Shutdown Machine');
+                    Mist.confirmationController.set("text", 'Are you sure you want to shutdown ' +
+                            machine.name +' ?');
+                    Mist.confirmationController.set("callback", function(){
+                        machine.shutdown();
+                        window.history.go(-1);
+                    });
+                    Mist.confirmationController.set("fromDialog", true);
+                    Mist.confirmationController.show();
+
+                    //TODO remove event handler now
                 });
-                Mist.confirmationController.set("fromDialog", true);
-                Mist.confirmationController.show();
+            	$('#dialog-single-power').popup('close');
             },
 
             start: function(){
