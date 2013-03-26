@@ -13,6 +13,7 @@ define('app/views/machine_actions_dialog', [
             tagName: false,
 
             reboot: function(){
+                console.log('test');
                 var machines = this.getSelectedMachines();
                 var plural = false;
 
@@ -36,7 +37,7 @@ define('app/views/machine_actions_dialog', [
                     machines.forEach(function(machine){
                         machine.reboot();
                     });
-                    window.history.go(-1);
+                    Mist.Router.router.transitionTo('model');
                 });
                 Mist.confirmationController.set("fromDialog", true);
                 Mist.confirmationController.show();
@@ -66,7 +67,7 @@ define('app/views/machine_actions_dialog', [
                     machines.forEach(function(machine){
                         machine.destroy();
                     });
-                    window.history.go(-1);
+                    Mist.Router.router.transitionTo('model');
                 });
                 Mist.confirmationController.set("fromDialog", true);
                 Mist.confirmationController.show();
@@ -96,7 +97,7 @@ define('app/views/machine_actions_dialog', [
                     machines.forEach(function(machine){
                         machine.start();
                     });
-                    window.history.go(-1);
+                    Mist.Router.router.transitionTo('model');
                 });
                 Mist.confirmationController.set("fromDialog", true);
                 Mist.confirmationController.show();
@@ -126,7 +127,7 @@ define('app/views/machine_actions_dialog', [
                     machines.forEach(function(machine){
                         machine.shutdown();
                     });
-                    window.history.go(-1);
+                    Mist.Router.router.transitionTo('model');
                 });
                 Mist.confirmationController.set("fromDialog", true);
                 Mist.confirmationController.show();

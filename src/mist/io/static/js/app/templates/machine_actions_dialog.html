@@ -4,17 +4,17 @@
     </div>
     <div data-role="content">
         {{#if canReboot}}
-        <a data-role="button" {{action reboot}}>Reboot</a>
+        <a data-role="button" {{action reboot target="view"}}>Reboot</a>
         {{/if}}
         
         {{#if canShutdown}}
-        <a data-role="button" {{action shutdown}}>Shutdown</a>
+        <a data-role="button" {{action shutdown target="view"}}>Shutdown</a>
         {{/if}}
         {{#if canDestroy}}
-        <a data-role="button" {{action destroy}}>Destroy</a>
+        <a data-role="button" {{action destroy target="view"}}>Destroy</a>
         {{/if}}
         {{#if canStart}}
-        <a data-role="button" {{action start}}>Start</a>
+        <a data-role="button" {{action start target="view"}}>Start</a>
         {{/if}}
         <a data-role="button" data-rel="back" data-theme="b">Close</a>
         

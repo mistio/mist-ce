@@ -18,7 +18,7 @@ define('app/views/single_machine_actions_dialog', [
                         machine.name +' ?');
                 Mist.confirmationController.set("callback", function(){
                     machine.reboot();
-                    window.history.go(-1);
+                    Mist.Router.router.transitionTo('keys');
                 });
                 Mist.confirmationController.set("fromDialog", true);
                 Mist.confirmationController.show();
