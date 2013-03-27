@@ -87,6 +87,10 @@ function(MistScreen, machine_list_html) {
         
         openShell: function(){
             $("#dialog-shell").popup("open", {transition: 'pop'});
+        },
+
+        openActions: function(){
+            $("#dialog-power").popup("open", {transition: 'pop'});
         }
     });
 });

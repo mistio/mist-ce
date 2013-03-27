@@ -377,6 +377,7 @@ define( 'app', [
     App.MachineTagsDialog = MachineTagsDialog;
     App.ShellDialog = Shell;
     App.PowerDialog = SingleMachineActionsDialog;
+    App.MachineActionsDialog = MachineActionsDialog;
 //
 //            var homeView = Home.create();
 //            homeView.append();

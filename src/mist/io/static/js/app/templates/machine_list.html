@@ -58,6 +58,13 @@
 
     </div>
 
+    <div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
+        <div data-role="header">
+            <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
+        </div>
+        {{view Mist.ConfirmationDialog data-role="content"}}
+    </div>
+
     <div class="machines-footer" data-role="footer" data-theme="a">
 
         <div class="actions" data-role="controlgroup" data-type="horizontal">
@@ -88,7 +95,8 @@
                 data-icon="mist-power"
                 data-rel="popup"
                 data-transition="slideup"
-                {{bindAttr class="disabledPowerClass"}}>Power</a>
+                {{bindAttr class="disabledPowerClass"}}
+                {{action openActions target="view"}}>Power</a>
         </div>
 
     </div>
@@ -96,3 +104,5 @@
     {{view Mist.MachineTagsDialog machineBinding="Mist.backendsController.selectedMachine"}}
     
     {{view Mist.ShellDialog machineBinding="Mist.backendsController.selectedMachine"}}
+
+    {{view Mist.MachineActionsDialog machineBinding="Mist.backendsController.selectedMachine"}}

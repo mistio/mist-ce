@@ -13,7 +13,6 @@ define('app/views/machine_actions_dialog', [
             tagName: false,
 
             reboot: function(){
-                console.log('test');
                 var machines = this.getSelectedMachines();
                 var plural = false;
 
@@ -23,24 +22,25 @@ define('app/views/machine_actions_dialog', [
                     plural = true;
                 }
 
-                Mist.confirmationController.set("title", 'Reboot Machine' + (plural ? 's' : ''));
-
-                var names = '';
-
-                machines.forEach(function(machine){
-                    names = names + ' ' + machine.name;
-                });
-
-                Mist.confirmationController.set("text", 'Are you sure you want to reboot' +
-                        names +'?');
-                Mist.confirmationController.set("callback", function(){
+                $("#dialog-power" ).on( "popupafterclose", function( event, ui ) {
+                    Mist.confirmationController.set("title", 'Reboot Machine' + (plural ? 's' : ''));
+                    var names = '';
                     machines.forEach(function(machine){
-                        machine.reboot();
+                        names = names + ' ' + machine.name;
                     });
-                    Mist.Router.router.transitionTo('model');
-                });
-                Mist.confirmationController.set("fromDialog", true);
-                Mist.confirmationController.show();
+                    Mist.confirmationController.set("text", 'Are you sure you want to reboot' +
+                            names +'?');
+                    Mist.confirmationController.set("callback", function(){
+                        machines.forEach(function(machine){
+                            machine.reboot();
+                        });
+                        Mist.Router.router.transitionTo('machines');
+                    });
+                    Mist.confirmationController.set("fromDialog", true);
+                    Mist.confirmationController.show();
+                    $("#dialog-power" ).off("popupafterclose");
+            	});
+            	$('#dialog-power').popup('close');
             },
 
             destroy: function(){
@@ -53,24 +53,25 @@ define('app/views/machine_actions_dialog', [
                     plural = true;
                 }
 
-                Mist.confirmationController.set("title", 'Destroy Machine' + (plural ? 's' : ''));
-
-                var names = '';
-
-                machines.forEach(function(machine){
-                    names = names + ' ' + machine.name;
-                });
-
-                Mist.confirmationController.set("text", 'Are you sure you want to destroy' +
-                        names +'?');
-                Mist.confirmationController.set("callback", function(){
+                $("#dialog-power" ).on( "popupafterclose", function( event, ui ) {
+                    Mist.confirmationController.set("title", 'Destroy Machine' + (plural ? 's' : ''));
+                    var names = '';
                     machines.forEach(function(machine){
-                        machine.destroy();
+                        names = names + ' ' + machine.name;
                     });
-                    Mist.Router.router.transitionTo('model');
-                });
-                Mist.confirmationController.set("fromDialog", true);
-                Mist.confirmationController.show();
+                    Mist.confirmationController.set("text", 'Are you sure you want to destroy' +
+                            names +'?');
+                    Mist.confirmationController.set("callback", function(){
+                        machines.forEach(function(machine){
+                            machine.destroy();
+                        });
+                        Mist.Router.router.transitionTo('machines');
+                    });
+                    Mist.confirmationController.set("fromDialog", true);
+                    Mist.confirmationController.show();
+                    $("#dialog-power" ).off("popupafterclose");
+            	});
+            	$('#dialog-power').popup('close');
             },
 
             start: function(){
@@ -83,24 +84,25 @@ define('app/views/machine_actions_dialog', [
                     plural = true;
                 }
 
-                Mist.confirmationController.set("title", 'Start Machine' + (plural ? 's' : ''));
-
-                var names = '';
-
-                machines.forEach(function(machine){
-                    names = names + ' ' + machine.name;
-                });
-
-                Mist.confirmationController.set("text", 'Are you sure you want to start' +
-                        names +'?');
-                Mist.confirmationController.set("callback", function(){
+                $("#dialog-power" ).on( "popupafterclose", function( event, ui ) {
+                    Mist.confirmationController.set("title", 'Start Machine' + (plural ? 's' : ''));
+                    var names = '';
                     machines.forEach(function(machine){
-                        machine.start();
+                        names = names + ' ' + machine.name;
                     });
-                    Mist.Router.router.transitionTo('model');
-                });
-                Mist.confirmationController.set("fromDialog", true);
-                Mist.confirmationController.show();
+                    Mist.confirmationController.set("text", 'Are you sure you want to start' +
+                            names +'?');
+                    Mist.confirmationController.set("callback", function(){
+                        machines.forEach(function(machine){
+                            machine.start();
+                        });
+                        Mist.Router.router.transitionTo('machines');
+                    });
+                    Mist.confirmationController.set("fromDialog", true);
+                    Mist.confirmationController.show();
+                    $("#dialog-power" ).off("popupafterclose");
+            	});
+            	$('#dialog-power').popup('close');
             },
 
             shutdown: function(){
@@ -113,24 +115,25 @@ define('app/views/machine_actions_dialog', [
                     plural = true;
                 }
 
-                Mist.confirmationController.set("title", 'Shutdown Machine' + (plural ? 's' : ''));
-
-                var names = '';
-
-                machines.forEach(function(machine){
-                    names = names + ' ' + machine.name;
-                });
-
-                Mist.confirmationController.set("text", 'Are you sure you want to shutdown' +
-                        names +'?');
-                Mist.confirmationController.set("callback", function(){
+                $("#dialog-power" ).on( "popupafterclose", function( event, ui ) {
+                    Mist.confirmationController.set("title", 'Shutdown Machine' + (plural ? 's' : ''));
+                    var names = '';
                     machines.forEach(function(machine){
-                        machine.shutdown();
+                        names = names + ' ' + machine.name;
                     });
-                    Mist.Router.router.transitionTo('model');
-                });
-                Mist.confirmationController.set("fromDialog", true);
-                Mist.confirmationController.show();
+                    Mist.confirmationController.set("text", 'Are you sure you want to shutdown' +
+                            names +'?');
+                    Mist.confirmationController.set("callback", function(){
+                        machines.forEach(function(machine){
+                            machine.shutdown();
+                        });
+                        Mist.Router.router.transitionTo('machines');
+                    });
+                    Mist.confirmationController.set("fromDialog", true);
+                    Mist.confirmationController.show();
+                    $("#dialog-power" ).off("popupafterclose");
+            	});
+            	$('#dialog-power').popup('close');
             },
 
             canReboot: function(){
