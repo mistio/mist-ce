@@ -23,8 +23,8 @@ define('app/views/single_machine_actions_dialog', [
                     });
                     Mist.confirmationController.set("fromDialog", true);
                     Mist.confirmationController.show();
-                    
-                    //TODO remove event handler now
+
+                    $("#dialog-single-power" ).off("popupafterclose");
                     
             	});
             	$('#dialog-single-power').popup('close');
@@ -43,7 +43,7 @@ define('app/views/single_machine_actions_dialog', [
                     Mist.confirmationController.set("fromDialog", true);
                     Mist.confirmationController.show();
 
-                    //TODO remove event handler now
+                    $("#dialog-single-power" ).off("popupafterclose");
                 });
             	$('#dialog-single-power').popup('close');
             },
@@ -56,25 +56,22 @@ define('app/views/single_machine_actions_dialog', [
                             machine.name +' ?');
                     Mist.confirmationController.set("callback", function(){
                         machine.shutdown();
-                        window.history.go(-1);
                     });
                     Mist.confirmationController.set("fromDialog", true);
                     Mist.confirmationController.show();
 
-                    //TODO remove event handler now
+                    $("#dialog-single-power" ).off("popupafterclose");
                 });
             	$('#dialog-single-power').popup('close');
             },
 
             start: function(){
-                this.machine.start();
+            	var machine = this.get('controller').get('model');
+                machine.start();
+            	$('#dialog-single-power').popup('close');
             },
 
-            init: function() {
-                this._super();
-                // cannot have template in home.pt as pt complains
-                this.set('template', Ember.Handlebars.compile(single_machine_actions_dialog_html));
-            },
+            template: Ember.Handlebars.compile(single_machine_actions_dialog_html),
         });
     }
 );

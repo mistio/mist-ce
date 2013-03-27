@@ -3,18 +3,10 @@
         <h1>Actions</h1>
     </div>
     <div data-role="content">
-        {{#if can_reboot target="view"}}
-        <a data-role="button" {{action reboot target="view"}}>Reboot</a>
-        {{/if}}
-        {{#if can_stop target="view"}}
-        <a data-role="button" {{action shutdown target="view"}}>Shutdown</a>
-        {{/if}}
-        {{#if can_destroy target="view"}}
-        <a data-role="button" {{action destroy target="view"}}>Destroy</a>
-        {{/if}}
-        {{#if can_start target="view"}}
-        <a data-role="button" {{action start target="view"}}>Start</a>
-        {{/if}}
+        <a data-role="button" {{bindAttr class=":single-action-button can_reboot"}} {{action reboot target="view"}}>Reboot</a>
+        <a data-role="button" {{bindAttr class=":single-action-button can_stop"}} {{action shutdown target="view"}}>Shutdown</a>
+        <a data-role="button" {{bindAttr class=":single-action-button can_destroy"}} {{action destroy target="view"}}>Destroy</a>
+        <a data-role="button" {{bindAttr class=":single-action-button can_start"}} {{action start target="view"}}>Start</a>
         <a data-role="button" data-rel="back" data-theme="b">Close</a>
     </div>
 </div>

@@ -504,6 +504,14 @@ div.actions div.ui-controlgroup-controls {
     background-repeat: no-repeat;
 }
 
+.single-action-button {
+    display: none;
+}
+
+.can-reboot, .can-stop, .can-destroy, .can-start {
+    display: block !important;
+}
+
 /* indices do not help here, let's use types as defined in
  libcloud.compute.types.Provider (we will use numbers, match in the Python) */
 
