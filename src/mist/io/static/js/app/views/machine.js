@@ -1,53 +1,60 @@
 define('app/views/machine', [
-    'text!app/templates/machine.html','ember', 'd3', 'cubism'],
+    'app/views/mistscreen',
+    'text!app/templates/machine.html', 'ember'],
     /**
      *
      * Machine page
      *
      * @returns Class
      */
-    function(machine_html) {
-        return Ember.View.extend({
-            tagName: false,
-            machineBinding: 'Mist.machine',
+    function(MistScreen, machine_html) {
+        return MistScreen.extend({
 
             disabledShellClass: function() {
-                if (this.machine && this.machine.hasKey && this.machine.state == 'running') {
+        	var machine = this.get('controller').get('model');
+
+                if (machine && machine.hasKey && machine.state == 'running') {
                     return '';
                 } else {
                     return 'ui-disabled';
                 }
-            }.property('machine.hasKey'),
+            }.property('controller.model.hasKey'),
 
             disabledTagClass: function() {
-                if (this.machine && this.machine.can_tag) {
+        	var machine = this.get('controller').get('model');
+
+                if (machine && machine.can_tag) {
                     return '';
                 } else {
                     return 'ui-disabled';
                 }
-            }.property('machine.can_tag'),
+            }.property('controller.model.can_tag'),
 
             disabledPowerClass: function() {
-                if (this.machine && this.machine.state === 'terminated') {
+        	var machine = this.get('controller').get('model');
+
+                if (machine && machine.state === 'terminated') {
                     return 'ui-disabled';
                 } else {
                     return '';
                 }
-            }.property('machine.state'),
+            }.property('controller.model.state'),
 
             metadata: function() {
-                if (!this.machine || !this.machine.extra) {
+        	var machine = this.get('controller').get('model');
+
+                if (!machine || !machine.extra) {
                     return [];
                 }
                 var ret = new Array();
 
-                $.each(this.machine.extra, function(key, value) {
+                $.each(machine.extra, function(key, value) {
                     if (typeof(value) == 'string' || typeof(value) == 'number') {
                         ret.push({key:key, value: value});
                     }
                 });
                 return ret;
-            }.property('machine'),
+            }.property('controller.model'),
 
             machineKeys: function() {
                 if (!this.machine) {
@@ -95,36 +102,38 @@ define('app/views/machine', [
             }.property('machine'),
 
             basicvars: function() {
-                if (!this.machine) {
+        	var machine = this.get('controller').get('model');
+
+                if (!machine) {
                     return [];
                 }
 
                 var publicIps = null;
 
-                if ($.isArray(this.machine.public_ips)) {
-                    publicIps = this.machine.public_ips.join();
-                } else if (typeof this.machine.public_ips === 'string') {
-                    publicIps = this.machine.public_ips;
+                if ($.isArray(machine.public_ips)) {
+                    publicIps = machine.public_ips.join();
+                } else if (typeof machine.public_ips === 'string') {
+                    publicIps = machine.public_ips;
                 }
 
                 var privateIps = null;
 
-                if ($.isArray(this.machine.private_ips)) {
-                    privateIps = this.machine.private_ips.join();
-                } else if (typeof this.machine.private_ips === 'string') {
-                    privateIps = this.machine.private_ips;
+                if ($.isArray(machine.private_ips)) {
+                    privateIps = machine.private_ips.join();
+                } else if (typeof machine.private_ips === 'string') {
+                    privateIps = machine.private_ips;
                 }
 
                 var basicvars = {
                         'Public IPs': publicIps,
                         'Private IPs': privateIps,
-                        'DNS Name': this.machine.extra.dns_name,
-                        'Launch Date': this.machine.extra.launchdatetime
+                        'DNS Name': machine.extra.dns_name,
+                        'Launch Date': machine.extra.launchdatetime
                 };
 
-                if (this.machine.image && 'image' in this.machine &&
-                        'name' in this.machine.image) {
-                    basicvars['Image'] = this.machine.image.name;
+                if (machine.image && 'image' in machine &&
+                        'name' in machine.image) {
+                    basicvars['Image'] = machine.image.name;
                 }
 
                 var ret = new Array();
@@ -137,19 +146,23 @@ define('app/views/machine', [
 
                 return ret;
 
-            }.property('machine'),
+            }.property('controller.model'),
 
             name: function() {
-                if (!this.machine) {
+        	var machine = this.get('controller').get('model');
+
+                if (!machine) {
                     return '';
                 }
-                return this.machine.name || this.machine.id;
-            }.property('machine'),
+                return machine.name || machine.id;
+            }.property('controller.model'),
 
             upFor: function() {
-                if (this.machine && this.machine.uptime) {
+        	var machine = this.get('controller').get('model');
+
+                if (machine && machine.uptime) {
                     var ret = '';
-                    var x = Math.floor(this.machine.uptime / 1000);
+                    var x = Math.floor(machine.uptime / 1000);
 
                     var seconds = x % 60;
                     x = Math.floor(x / 60);
@@ -182,14 +195,16 @@ define('app/views/machine', [
                 } else {
                     return '';
                 }
-            }.property('machine.uptime'),
+            }.property('controller.model.uptime'),
 
             providerIconClass: function() {
-                if (!this.machine) {
+        	var machine = this.get('controller').get('model');
+
+                if (!machine) {
                     return '';
                 }
-                return 'provider-' + this.machine.backend.provider;
-            }.property('machine'),
+                return 'provider-' + machine.backend.provider;
+            }.property('controller.model'),
 
             addRuleClicked: function() {
                 Mist.rulesController.newRule();
@@ -213,7 +228,9 @@ define('app/views/machine', [
                     $('.rule-action').selectmenu();
                 });
 
-                if (!this.machine || !this.machine.hasMonitoring) {
+                var machine = this.get('controller').get('model');
+
+                if (!machine || !machine.hasMonitoring) {
                     if (this.context) {
                         this.context.stop();
                         $('#cpuGraph').empty();
@@ -225,7 +242,6 @@ define('app/views/machine', [
                     return;
                 }
 
-                var machine = this.machine;
                 var that = this;
 
                 machine.set('pendingStats', true);
@@ -446,7 +462,7 @@ define('app/views/machine', [
                     });
                 });
 
-            }.observes('machine.hasMonitoring'),
+            }.observes('controller.model.hasMonitoring'),
 
             startStopContext: function(){
                 if('context' in Mist){
@@ -459,24 +475,31 @@ define('app/views/machine', [
             }.observes('Mist.graphPolling'),
 
             handlePendingMonitoring: function() {
-                if (this.machine && this.machine.pendingMonitoring) {
+        	var machine = this.get('controller').get('model');
+
+                if (machine && machine.pendingMonitoring) {
                     $('.pending-monitoring').show();
                     $('.monitoring-button').addClass('ui-disabled'); //.hide();
                 } else {
                     $('.monitoring-button').removeClass('ui-disabled'); //.show();
                     $('.pending-monitoring').hide();
                 }
-            }.observes('machine.pendingMonitoring'),
+            }.observes('controller.model.pendingMonitoring'),
 
             showShell: function() {
+                $("#dialog-shell").popup("open", {transition: 'pop'});
                 setTimeout(function(){$('.shell-input input').focus()}, 1000);
             },
 
-            init: function() {
-                this._super();
-                // cannot have template in home.pt as pt complains
-                this.set('template', Ember.Handlebars.compile(machine_html));
+            showActions: function() {
+                $('#dialog-single-power').popup('open', {transition: 'slideup'});
             },
+
+            openTags: function() {
+                $('#dialog-tags').popup('open', {transition: 'slideup'});
+            },
+
+            template: Ember.Handlebars.compile(machine_html),
         });
     }
 );

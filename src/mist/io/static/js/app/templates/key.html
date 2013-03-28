@@ -1,4 +1,3 @@
-<div data-role="page" id="key" data-theme="c" class="type-interior">
 
     <div data-role="header">
         <a href="#keys"
@@ -6,14 +5,14 @@
             data-direction="reverse"
             class="ui-btn-left">Keys</a>
 
-        <h1>{{view.key.name}}</h1>
+        <h1>{{name}}</h1>
 
         {{view Mist.UserMenuView}}
 
     </div>
 
     <div class="single-view-header">
-        <h3 class="single-view-name">{{view.key.name}}</h3>
+        <h3 class="single-view-name">{{name}}</h3>
     </div>
 
     <div data-role="content">
@@ -34,7 +33,14 @@
                     data-role="button"
                     data-rel="popup"
                     data-transition="slideup"
-                    {{action displayPrivate}}>Display</a>
+                    {{action displayPrivate target="view"}}>Display</a>
+                
+                <div data-role="popup" id="key-private-dialog" class="mist-dialog" data-overlay-theme="a">
+                    <div data-role="header">
+                        <h1>Private Key</h1>
+                    </div>
+                    {{view Mist.KeyPrivDialog data-role="content"}}
+                </div>
             </div>
         </div>
 
@@ -53,8 +59,23 @@
         </div>
 
     </div>
+    
+    
+<div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
+    <div data-role="header">
+        <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
+    </div>
+    {{view Mist.ConfirmationDialog data-role="content"}}
+</div>
 
-    <div class="keys-footer" data-role="footer" data-theme="a">
+<div id="key-associate-dialog" class="mist-dialog" data-role="popup" data-overlay-theme="a">
+    <div data-role="header">
+        <h1>Associate key</h1>
+    </div>
+    {{view Mist.KeyAssociateDialog data-role="content"}}
+</div>
+
+    <div class="keys-footer" data-role="footer" data-theme="a" style="display: block">
         <div class="actions" data-role="controlgroup" data-type="horizontal">
             <a href=""
                 class="action-links"
@@ -63,7 +84,7 @@
                 data-icon="delete"
                 data-rel="popup"
                 data-transition="slideup"
-                {{action deleteKey}}>Delete</a>
+                {{action deleteKey target="view"}}>Delete</a>
 
             <a href=""
                 class="action-links"
@@ -73,8 +94,6 @@
                 data-rel="popup"
                 data-transition="slideup"
                 {{bindAttr class="disabledAssociateClass"}}
-                {{action associateKey}}>Associate</a>
+                {{action associateKey target="view"}}>Associate</a>
         </div>
     </div>
-
-</div>

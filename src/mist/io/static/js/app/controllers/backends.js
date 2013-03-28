@@ -47,6 +47,21 @@ define('app/controllers/backends', [
                 });
                 this.set('imageCount', count);
             },
+            
+            getSelectedMachine: function() {
+        	if(this.selectedMachineCount == 1){
+                    var machine = null;
+                    this.content.forEach(function(item){
+                        var machines = item.machines.filterProperty('selected', true);
+                        if(machines.get('length') == 1){
+                	    machine = machines[0];
+                        }
+                    });
+                    this.set('selectedMachine', machine);
+        	} else {
+        	    this.set('selectedMachine', null);
+        	}
+            },
 
             checkMonitoring: function(){
                 if (!Mist.authenticated){
@@ -113,6 +128,7 @@ define('app/controllers/backends', [
 
                             item.machines.addObserver('@each.selected', function() {
                                 that.getSelectedMachineCount();
+                                that.getSelectedMachine();
                             });
 
                             item.images.addObserver('length', function() {
@@ -146,11 +162,11 @@ define('app/controllers/backends', [
                     });
 
                     setTimeout(function(){
-                        Ember.run.next(function(){
-                            try {
-                                $('#home-menu').listview('refresh');
-                            } catch(e) { $('#home-menu').listview(); }
-                        });
+//                        Ember.run.next(function(){
+//                            try {
+//                                $('#home-menu').listview('refresh');
+//                            } catch(e) { $('#home-menu').listview(); }
+//                        });
                         Mist.backendsController.checkMonitoring();
                     }, 5000);
 

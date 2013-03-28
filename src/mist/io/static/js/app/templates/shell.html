@@ -1,6 +1,6 @@
 <div id="dialog-shell" class="dialog-shell mist-dialog" data-role="popup" data-overlay-theme="a">
     <div data-role="header">
-        <h1>{{Mist.machine.user}}@{{Mist.machine.name}}</h1>
+        <h1>{{view.machine.user}}@{{view.machine.name}}</h1>
     </div>
     <div data-role="content" data-theme="b">
         <div data-role="fieldcontain">
@@ -18,7 +18,7 @@
                         <a data-icon="shell-return"
                             data-role="button"
                             data-iconpos="notext"
-                            {{action submit}}
+                            {{action submit target="view"}}
                             {{bindAttr class=":shell-send disabledClass"}}></a>
                     </td>
                 </tr>
@@ -30,6 +30,6 @@
             <div class="output">{{{output}}}</div>
         {{/each}}
         </div>
-        <a data-role="button" data-theme="a" {{action back}}>Back</a>
+        <a data-role="button" data-theme="a" {{action back target="view"}}>Back</a>
     </div>
 </div>

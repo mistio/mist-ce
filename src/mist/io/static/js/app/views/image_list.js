@@ -1,19 +1,15 @@
 define('app/views/image_list', [
+    'app/views/mistscreen',
     'text!app/templates/image_list.html','ember'],
     /**
      *
-     * Machine page
+     * Images page
      *
      * @returns Class
      */
-    function(image_list_html) {
-        return Ember.View.extend({
-            tagName: false,
-
-            init: function() {
-                this._super();
-                this.set('template', Ember.Handlebars.compile(image_list_html));
-            },
+    function(MistScreen, image_list_html) {
+        return MistScreen.extend({
+            template: Ember.Handlebars.compile(image_list_html),
         });
     }
 );

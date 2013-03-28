@@ -9,6 +9,7 @@ define('app/controllers/backend_add', [
     function() {
         return Ember.Object.extend({
 
+            newBackendReady: false,
 
             newBackendClear: function() {
                 log("new backend clear");
@@ -26,8 +27,14 @@ define('app/controllers/backend_add', [
                     this.get('newBackendKey') &&
                     this.get('newBackendSecret')) {
                         this.set('newBackendReady', true);
+                        if('button' in $('#create-backend-ok')){
+                            $('#create-backend-ok').button('enable');
+                        }
                 } else {
                     this.set('newBackendReady', false);
+                    if('button' in $('#create-backend-ok')){
+                        $('#create-backend-ok').button('disable');
+                    }
                 }
             },
 
@@ -36,7 +43,6 @@ define('app/controllers/backend_add', [
                 this.addObserver('newBackendProvider', this, this.updateNewBackendReady);
                 this.addObserver('newBackendKey', this, this.updateNewBackendReady);
                 this.addObserver('newBackendSecret', this, this.updateNewBackendReady);
-                this.set('newBackendReady', false);
             }
         });
     }

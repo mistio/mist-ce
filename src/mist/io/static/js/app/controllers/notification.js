@@ -1,7 +1,6 @@
 define('app/controllers/notification', [
     'ember',
     'jquery',
-    'mobile'
     ],
     /**
      * Notification controller

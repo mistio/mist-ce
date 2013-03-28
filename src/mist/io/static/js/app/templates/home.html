@@ -1,35 +1,35 @@
-<div data-role="page" id="home">
-
-    <div data-role="header">
+<div data-role="header">
         <h1>mist.io</h1>
-        {{view Mist.UserMenuView}}
     </div>
 
     <div data-role="content">
-
         <a id="add-backend-button"
-            href="#add-backend"
+            href="#"
             class="add-button"
             data-rel="popup"
             data-theme="b"
             data-inline="true"
             data-transition="pop"
             data-role="button"
-            data-icon="plus">Add backend</a>
-
+            data-icon="plus"
+            {{action addBackend target="view"}}
+            >Add backend</a>
+            
         <div data-role="popup" id="add-backend" class="mist-dialog" data-overlay-theme="a">
             <div data-role="header">
                 <h1>Add backend</h1>
             </div>
-            {{view Mist.AddBackendView backendBinding="Mist.backend"}}
+            {{view Mist.AddBackendView data-role="content"}}
         </div>
 
         <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
             {{#each Mist.backendsController}}
-                {{view Mist.BackendButtonView backendBinding="this"}}
+                {{view Mist.BackendButtonView backendBinding="this" data-theme="c"
+                   data-inline="true" data-role="button" data-icon="check" 
+                   classBinding="state" class="backend-button"}}
             {{/each}}
         </div>
-
+        
         <div data-role="popup" id="edit-backend" class="mist-dialog" data-overlay-theme="a">
             <div data-role="header">
                 <h1>Edit backend</h1>
@@ -37,21 +37,20 @@
             {{view Mist.EditBackendView backendBinding="Mist.backend"}}
         </div>
 
-        {{#if Mist.backendsController.content.length}}
         <ul data-role="listview"
             data-theme="c"
             data-dividertheme="d"
             class="ui-listview ui-listview-inset ui-corner-all ui-shadow"
             id="home-menu">
             <li>
-                <a id="machines-count" href="#machines">Machines
+                {{#linkTo machines}}Machines
                     {{#view Mist.CountView
                         numberBinding="Mist.backendsController.machineCount"
                         tagName="span"
                         class="ui-li-count"}}
                         {{view.number}}
                     {{/view}}
-                </a>
+                {{/linkTo}}
             </li>
             <li>
                 <a id="images-count" href="#images">Images
@@ -74,6 +73,5 @@
                 </a>
             </li>
         </ul>
-        {{/if}}
-    </div>
-</div>
+        
+</div>    

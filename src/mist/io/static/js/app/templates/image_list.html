@@ -1,8 +1,6 @@
-<div data-role="page" id="images" data-theme="c">
-
     <div data-role="header">
 
-        <a href="#home"
+        <a href="#"
         data-icon="home"
         data-direction="reverse"
         class="ui-btn-left">Home</a>
@@ -12,6 +10,13 @@
     </div>
 
     <div data-role="content">
+    
+        <div data-role="popup" id="dialog-add" class="mist-dialog" data-overlay-theme="a">
+            <div data-role="header">
+                <h1>Create Machine</h1>
+            </div>
+            {{view Mist.AddMachineView data-role="content"}}
+        </div>
 
         {{! view Mist.Select
             data-native-menu="false"
@@ -32,7 +37,7 @@
         data-filter-placeholder="Filter images...">
             {{#each Mist.backendsController}}
                 {{#each images}}
-                    {{view Mist.ImageListItemView imageBinding="this"}}
+                    {{view Mist.ImageListItemView imageBinding="this" class="node" }}
                 {{/each}}
             {{/each}}
         </ul>
@@ -40,5 +45,3 @@
         <div class="bottom-padding"></div>
 
     </div>
-
-</div>

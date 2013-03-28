@@ -11,17 +11,18 @@ define('app/views/key_associate_dialog', [
             tagName: false,
 
             back: function() {
-                history.back();
+                $('#key-associate-dialog').popup('close');
             },
 
             associateKeys: function() {
+            	var key = this.get('controller').get('model');
                 var selectedMachines = this.getSelectedMachines();
                 var machines = []; 
                 selectedMachines.forEach(function(machine){
                     machines.push([machine.backend.id, machine.id]);
                 });
-                Mist.keysController.associateKeys(Mist.key,machines);
-                history.back();
+                Mist.keysController.associateKeys(key,machines);
+            	$('#key-associate-dialog').popup('close');
             },
 
             getSelectedMachines: function() {
@@ -37,10 +38,7 @@ define('app/views/key_associate_dialog', [
                 return machines;
             },
 
-            init: function() {
-                this._super();
-                this.set('template', Ember.Handlebars.compile(key_associate_dialog_html));
-            },
+            template: Ember.Handlebars.compile(key_associate_dialog_html),
         });
     }
 );

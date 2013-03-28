@@ -7,14 +7,14 @@
             <table id="tag-input">
                 <tr>
                     <td>
-                        {{view Mist.ShellTextField valueBinding="tag" controllerBinding="this"}}
+                        {{view Mist.ShellTextField valueBinding="view.tag" controllerBinding="this"}}
                     </td>
                     <td id="tag-add-wrapper">
                         <a id="tag-add"
                             data-role="button"
                             data-theme="c"
-                            {{bindAttr class="disabledClass this.machine.pendingAddTag"}}
-                            {{action submit}}>Add</a>
+                            {{bindAttr class="disabledClass Mist.machine.pendingAddTag"}}
+                            {{action submit target="view"}}>Add</a>
                     </td>
                 </tr>
             </table>
@@ -23,19 +23,17 @@
 
             <div id="tags-wrapper">
                 <ul id="tags-list">
-                {{#each Mist.machine.tags}}
-                    {{#view Mist.DeleteTagView tagBinding="this"}}
-                        <li>
+                {{#each view.machine.tags}}
+                    {{#view Mist.DeleteTagView tagBinding="this" machineBinding="view.machine"}}
                             <a data-role="button"
                                 class="tagButton"
-                                {{action deleteTag}}
+                                {{action deleteTag target="view"}}
                                 data-theme="c"
                                 data-icon="delete"
                                 data-inline="true"
                                 data-iconpos="notext"
-                                {{bindAttr class="Mist.machine.pendingDeleteTag"}}></a>
-                            {{view.tag}}
-                        </li>
+                                {{bindAttr class="view.machine.pendingDeleteTag"}}></a>
+                            {{this}}
                     {{/view}}
                 {{/each}}
                 </ul>

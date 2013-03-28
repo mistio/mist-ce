@@ -27,7 +27,7 @@ define('app/views/backend_edit', [
                     url: '/backends/' + this.backend.id,
                     type: 'DELETE',
                     success: function(result) {
-                        history.back();
+                        
                         $('#backend-delete-confirm').hide();
                         var i = Mist.backendsController.content.indexOf(that.backend);
                         // refresh backend buttons
@@ -37,6 +37,7 @@ define('app/views/backend_edit', [
                         Ember.run.next(function(){
                             $('#backend-buttons').controlgroup('refresh');
                         });
+                        $("#edit-backend").popup("close");
                     }
                 });
             },
@@ -48,11 +49,7 @@ define('app/views/backend_edit', [
                 });
             },
             
-            init: function() {
-                this._super();
-                // cannot have template in home.pt as pt complains
-                this.set('template', Ember.Handlebars.compile(edit_backend_dialog_html));
-            },
+            template: Ember.Handlebars.compile(edit_backend_dialog_html),
         });
     }
 );

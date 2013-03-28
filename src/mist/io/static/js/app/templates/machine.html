@@ -1,133 +1,130 @@
-<div data-role="page" id="single-machine" data-theme="c"
-    class="type-interior">
+<div data-role="header">
 
-    <div data-role="header">
+    <a href="#machines"
+        data-icon="arrow-l"
+        data-direction="reverse"
+        class="ui-btn-left">Machines</a>
 
-        <a href="#machines"
-            data-icon="arrow-l"
-            data-direction="reverse"
-            class="ui-btn-left">Machines</a>
+    <h1 id="single-machine-name">{{name}}</h1>
 
-        <h1 id="single-machine-name">{{Mist.machine.name}}</h1>
-
-        {{view Mist.UserMenuView}}
+    {{view Mist.UserMenuView}}
 
 
-    </div>
+</div>
 
-    <div class="single-view-header">
+<div class="single-view-header">
 
-        <h3 class="single-view-name">{{Mist.machine.name}}</h3>
+    <h3 class="single-view-name">{{name}}</h3>
 
-        <span class="single-view-icon-wrapper">
-            <span id="single-view-provider-icon" {{bindAttr class="providerIconClass"}}></span>
-        </span>
+    <span class="single-view-icon-wrapper">
+        <span id="single-view-provider-icon" {{bindAttr class="providerIconClass"}}></span>
+    </span>
 
-        <span class="single-view-icon-wrapper" {{bindAttr class="Mist.machine.image.type"}}>
-            <span id="single-view-image-icon"></span>
-        </span>
+    <span class="single-view-icon-wrapper" {{bindAttr class="image.type"}}>
+        <span id="single-view-image-icon"></span>
+    </span>
 
-        <h3 id="single-view-state" {{bindAttr class="Mist.machine.state"}}>{{Mist.machine.state}}</h3>
+    <h3 id="single-view-state" {{bindAttr class="state"}}>{{state}}</h3>
 
-    </div>
+</div>
 
-    <div data-role="content">
+<div data-role="content">
 
-        <div data-role="collapsible" data-collapsed="false">
+    <div data-role="collapsible" data-collapsed="false">
 
-            <h3>Monitoring</h3>
-                <div id="monitoring-wrapper" {{bindAttr class=":ui-btn-inner :ui-corner-top :ui-corner-bottom machine.pendingStats"}}>
+        <h3>Monitoring</h3>
+            <div id="monitoring-wrapper" {{bindAttr class=":ui-btn-inner :ui-corner-top :ui-corner-bottom pendingStats"}}>
 
-                {{#if Mist.machine.hasMonitoring}}
-                <div id="cpuGraph"></div>
-                <div id="loadGraph"></div>
-                <div id="networkGraph"></div>
-                <div id="diskGraph"></div>
-                <div id="memoryGraph"></div>
+            {{#if hasMonitoring}}
+            <div id="cpuGraph"></div>
+            <div id="loadGraph"></div>
+            <div id="networkGraph"></div>
+            <div id="diskGraph"></div>
+            <div id="memoryGraph"></div>
+            <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
+                <span class="ui-icon ui-icon-loading"></span>
+                <h1>Disabling monitoring</h1>
+            </div>
+            <div class="rules-container">
+            {{#each Mist.rulesController}}
+                {{view Mist.RuleView ruleBinding="this"}}
+            {{/each}}
+            </div>
+            <div class="monitoring-dialog-container enabled">
+                <a href="#monitoring-dialog"
+                    class="monitoring-button"
+                    data-role="button"
+                    data-icon="delete"
+                    data-rel="popup"
+                    data-theme="a"
+                    data-transition="slidedown"
+                    data-position-to="window">Disable Monitoring</a>
+            </div>
+            <div class="add-rule-container">
+                <button id="add-rule-button"
+                    data-role="button"
+                    data-icon="plus"
+                    data-theme="b"
+                    {{action "addRuleClicked"}}>Add Rule</button>
+            </div>
+            {{else}}
+
+            <div class="monitoring-dialog-container disabled">
+                <div class="monitoring-info">Monitoring is currently disabled</div>
+
+                <a href="#monitoring-dialog"
+                    class="monitoring-button"
+                    data-role="button"
+                    data-icon="star"
+                    data-rel="popup"
+                    data-theme="b"
+                    data-transition="slidedown"
+                    data-position-to="window">Enable Monitoring</a>
+
                 <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
                     <span class="ui-icon ui-icon-loading"></span>
-                    <h1>Disabling monitoring</h1>
-                </div>  
-                <div class="rules-container">
-                {{#each Mist.rulesController}}
-                    {{view Mist.RuleView ruleBinding="this"}}
-                {{/each}}
+                    <h1>Enabling monitoring</h1>
                 </div>
-                <div class="monitoring-dialog-container enabled">                  
-                    <a href="#monitoring-dialog"
-                        class="monitoring-button"
-                        data-role="button"
-                        data-icon="delete"
-                        data-rel="popup"
-                        data-theme="a"
-                        data-transition="slidedown"
-                        data-position-to="window">Disable Monitoring</a>
-                </div>
-                <div class="add-rule-container">
-                    <button id="add-rule-button"
-                        data-role="button"
-                        data-icon="plus"
-                        data-theme="b"
-                        {{action "addRuleClicked"}}>Add Rule</button>
-                </div>
-                {{else}}
-
-                <div class="monitoring-dialog-container disabled">
-                    <div class="monitoring-info">Monitoring is currently disabled</div>
-
-                    <a href="#monitoring-dialog"
-                        class="monitoring-button"
-                        data-role="button"
-                        data-icon="star"
-                        data-rel="popup"
-                        data-theme="b"
-                        data-transition="slidedown"
-                        data-position-to="window">Enable Monitoring</a>
-
-                    <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
-                        <span class="ui-icon ui-icon-loading"></span>
-                        <h1>Enabling monitoring</h1>
-                    </div>
-                </div>
-
-                {{/if}}
             </div>
+
+            {{/if}}
         </div>
+    </div>
 
-        <div data-role="collapsible" data-collapsed="false">
+    <div data-role="collapsible" data-collapsed="false">
 
-            <h3>Basic Info</h3>
+        <h3>Basic Info</h3>
 
-            <table id="machine-basic-table">
+        <table id="machine-basic-table">
 
-                {{#if Mist.machine.tags}}
-                <tr>
-                    <td class="key">Tags</td>
-                    <td class="value">
-                        {{#each Mist.machine.tags}}
-                        <span class="tag">{{this}}</span>
-                        {{/each}}
-                    </td>
-                </tr>
-                {{/if}}
+            {{#if tags}}
+            <tr>
+                <td class="key">Tags</td>
+                <td class="value">
+                    {{#each tags}}
+                    <span class="tag">{{this}}</span>
+                    {{/each}}
+                </td>
+            </tr>
+            {{/if}}
 
-                {{#if Mist.machine.uptime}}
-                <tr>
-                   <td class="key">Up and running for</td>
-                   <td class="value">{{view.upFor}}</td>
-                </tr>
-                {{/if}}
+            {{#if uptime}}
+            <tr>
+               <td class="key">Up and running for</td>
+               <td class="value">{{view.upFor}}</td>
+            </tr>
+            {{/if}}
 
-                {{#each view.basicvars}}
-                <tr>
-                   <td class="key">{{key}}</td>
-                   <td class="value">{{value}}</td>
-                </tr>
-                {{/each}}
+            {{#each view.basicvars}}
+            <tr>
+               <td class="key">{{key}}</td>
+               <td class="value">{{value}}</td>
+            </tr>
+            {{/each}}
 
-            </table>
+        </table>
 
-        </div>
+    </div>
 
          <div data-role="collapsible" data-collapsed="false" id="machine-single-keys">
             <h3>Keys</h3>
@@ -166,53 +163,63 @@
 
         <div data-role="collapsible">
 
-            <h3>Full metadata list</h3>
+        <h3>Full metadata list</h3>
 
-            <table id="machine-metadata">
-                {{#each view.metadata}}
-                <tr>
-                   <td class="key">{{key}}</td>
-                   <td class="value">{{value}}</td>
-                </tr>
-                {{/each}}
-            </table>
-
-        </div>
-
-        <div class="bottom-padding"></div>
+        <table id="machine-metadata">
+            {{#each view.metadata}}
+            <tr>
+               <td class="key">{{key}}</td>
+               <td class="value">{{value}}</td>
+            </tr>
+            {{/each}}
+        </table>
 
     </div>
 
-    <div class="machines-footer" data-role="footer" data-theme="a">
+    <div class="bottom-padding"></div>
 
-        <div class="actions" data-role="controlgroup" data-type="horizontal">
-            <a href="#dialog-tags"
-                class="action-links"
-                id="machines-button-tags"
-                data-role="button"
-                data-icon="grid"
-                data-rel="popup"
-                data-transition="slideup"
-                {{bindAttr class="disabledTagClass"}}>Tag</a>
+</div>
 
-            <a href="#dialog-shell"
-                class="action-links"
-                id="machines-button-shell"
-                data-role="button"
-                data-icon="gear"
-                data-rel="popup"
-                data-transition="slideup"
-                {{bindAttr class="disabledShellClass"}} {{action showShell}}>Shell</a>
-
-            <a href="#dialog-single-power"
-                class="action-links"
-                id="machines-button-power"
-                data-role="button"
-                data-icon="mist-power"
-                data-rel="popup"
-                data-transition="slideup"
-                {{bindAttr class="disabledPowerClass"}}>Power</a>
-        </div>
-
+<div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
+    <div data-role="header">
+        <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
     </div>
+    {{view Mist.ConfirmationDialog data-role="content"}}
+</div>
+
+<div class="machine-footer" data-role="footer" data-theme="a">
+
+    <div class="actions" data-role="controlgroup" data-type="horizontal">
+        <a href="#dialog-tags"
+            class="action-links"
+            id="machines-button-tags"
+            data-role="button"
+            data-icon="grid"
+            {{bindAttr class="disabledTagClass"}}
+            {{action openTags target=view}}>Tag</a>
+            {{view Mist.MachineTagsDialog machineBinding="this"}}
+
+        <a href="#dialog-shell"
+            class="action-links"
+            id="machines-button-shell"
+            data-role="button"
+            data-icon="gear"
+            data-rel="popup"
+            data-transition="slideup"
+            {{bindAttr class="disabledShellClass"}}
+            {{action showShell target=view}}>Shell</a>
+            {{view Mist.ShellDialog machineBinding="this"}}
+
+        <a href="#dialog-single-power"
+            class="action-links"
+            id="machines-button-power"
+            data-role="button"
+            data-icon="mist-power"
+            data-rel="popup"
+            data-transition="slideup"
+            {{bindAttr class="disabledPowerClass"}}
+            {{action showActions target=view}}>Power</a>
+            {{view Mist.PowerDialog machineBinding="this"}}
+    </div>
+
 </div>

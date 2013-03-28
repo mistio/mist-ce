@@ -1,8 +1,7 @@
-<div data-role="page" id="machines" data-theme="c">
 
     <div data-role="header">
 
-        <a href="#home"
+        <a href="#"
             data-icon="home"
             data-direction="reverse"
             class="ui-btn-left">Home</a>
@@ -13,10 +12,10 @@
 
     </div>
 
-    <div data-role="content">
+    <div data-role="content" id="machines">
 
         {{view Mist.Select
-            data-native-menu="false"
+            data-native-menu="true"
             name="select-machines"
             id="mist-select-machines"
             contentBinding="Mist.selectMachinesController.content"
@@ -25,14 +24,22 @@
             optionValuePath="content.id"
             prompt="Select Machines"}}
 
-        <a href="#dialog-add"
+        <a href="#machines"
         id="mist-create-machine"
         data-rel="dialog"
         data-theme="b"
         data-inline="true"
         data-transition="slidedown"
         data-role="button"
-        data-icon="plus">Create</a>
+        data-icon="plus"
+        {{action addMachine target="view"}}>Create</a>
+        
+        <div data-role="popup" id="dialog-add" class="mist-dialog" data-overlay-theme="a">
+            <div data-role="header">
+                <h1>Create Machine</h1>
+            </div>
+            {{view Mist.AddMachineView data-role="content"}}
+        </div>
 
         <ul id="machines-list"
         data-role="listview"
@@ -51,6 +58,13 @@
 
     </div>
 
+    <div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
+        <div data-role="header">
+            <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
+        </div>
+        {{view Mist.ConfirmationDialog data-role="content"}}
+    </div>
+
     <div class="machines-footer" data-role="footer" data-theme="a">
 
         <div class="actions" data-role="controlgroup" data-type="horizontal">
@@ -61,7 +75,8 @@
                 data-icon="grid"
                 data-rel="popup"
                 data-transition="slideup"
-                {{bindAttr class="disabledTagClass"}}>Tag</a>
+                {{bindAttr class="disabledTagClass"}}
+                {{action openTags target="view"}}>Tag</a>
 
             <a href="#dialog-shell"
                 class="action-links"
@@ -70,7 +85,8 @@
                 data-icon="gear"
                 data-rel="popup"
                 data-transition="slideup"
-                {{bindAttr class="disabledShellClass"}}>Shell</a>
+                {{bindAttr class="disabledShellClass"}}
+                {{action openShell target="view"}}>Shell</a>
 
             <a href="#dialog-power"
                 class="action-links"
@@ -79,8 +95,14 @@
                 data-icon="mist-power"
                 data-rel="popup"
                 data-transition="slideup"
-                {{bindAttr class="disabledPowerClass"}}>Power</a>
+                {{bindAttr class="disabledPowerClass"}}
+                {{action openActions target="view"}}>Power</a>
         </div>
 
     </div>
-</div>
+    
+    {{view Mist.MachineTagsDialog machineBinding="Mist.backendsController.selectedMachine"}}
+    
+    {{view Mist.ShellDialog machineBinding="Mist.backendsController.selectedMachine"}}
+
+    {{view Mist.MachineActionsDialog machineBinding="Mist.backendsController.selectedMachine"}}

@@ -1,4 +1,5 @@
 define('app/views/home', [
+    'app/views/mistscreen',
     'text!app/templates/home.html','ember'],
     /**
      *
@@ -6,15 +7,16 @@ define('app/views/home', [
      *
      * @returns Class
      */
-    function(home_html) {
-        return Ember.View.extend({
-            tagName: false,
+    function(MistScreen, home_html) {
+        return MistScreen.extend({
 
-            init: function() {
-                this._super();
-                // cannot have template in home.pt as pt complains
-                this.set('template', Ember.Handlebars.compile(home_html));
-            },
+            template: Ember.Handlebars.compile(home_html),
+
+            addBackend: function(){
+        	$("#add-backend").popup("open", {transition: 'pop'});
+            }
+        
+        
         });
     }
 );

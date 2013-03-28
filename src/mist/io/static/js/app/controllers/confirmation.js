@@ -1,7 +1,6 @@
 define('app/controllers/confirmation', [
     'ember',
     'jquery',
-    'mobile'
     ],
     /**
      * Confirmation Dialog controller
@@ -11,13 +10,11 @@ define('app/controllers/confirmation', [
     function() {
         return Ember.Object.extend({
             show: function(){
-                var machine = Mist.machine;
-                $.mobile.changePage('#dialog-confirm');
-                Mist.set('machine', machine);
+                $('#dialog-confirm').popup('open', {transition: 'pop'});
             },
 
             confirm: function() {
-                // the callback should handle page change after it completes
+                $('#dialog-confirm').popup('close');
                 this.callback();
                 this.set("callback", function(){});
             }

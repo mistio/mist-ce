@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0" />
     <title>${project} - touch the clouds</title>
     <link type="text/css" href="static/ui-smoothness/jquery-ui-1.9.1.custom.css" rel="stylesheet" />
-    <link rel="stylesheet" href="static/jquery.mobile-1.2.0.css" />
+    <link rel="stylesheet" href="static/jquery.mobile-1.3.0.css" />
     <link rel="stylesheet" href="static/main.css" />
     <link rel="icon" href="static/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
@@ -38,13 +38,28 @@
 </head>
 
 <body style="background-color: #c2c3c4">
-
-<div data-role="page" id="splash">
-    <div class="mist-logo"></div>
-</div>
-
-<iframe id="hidden-shell-iframe"></iframe>
-
+    <iframe id="hidden-shell-iframe"></iframe>
+    <script type="text/x-handlebars" data-template-name="application">
+        {{outlet}}
+    </script>
+    <script type="text/x-handlebars" data-template-name="index">
+        {{view Mist.HomeView}}
+    </script>
+    <script type="text/x-handlebars" data-template-name="machines">
+        {{view Mist.MachineListView}}
+    </script>
+    <script type="text/x-handlebars" data-template-name="images">
+        {{view Mist.ImageListView}}
+    </script>
+    <script type="text/x-handlebars" data-template-name="machine">
+        {{view Mist.MacView}}
+    </script>
+    <script type="text/x-handlebars" data-template-name="keys">
+        {{view Mist.KeyListView}}
+    </script>
+    <script type="text/x-handlebars" data-template-name="key">
+        {{view Mist.KView}}
+    </script>
 </body>
 
 </html>

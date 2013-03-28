@@ -10,7 +10,7 @@ define('app/views/delete_tag', [
      */
     function() {
         return Ember.View.extend({
-            tagName: false,
+            tagName: 'li',
 
             didInsertElement: function(e){
                 $("a.tagButton").button();
@@ -18,7 +18,11 @@ define('app/views/delete_tag', [
 
             deleteTag: function() {
                 var tag = this.tag;
-                var machine = Mist.machine;
+                var machine = this.get('machine');
+
+                if(!machine.tags){
+                    machine = machine.get('model');
+                }
 
 
                 var payload = {
@@ -34,6 +38,7 @@ define('app/views/delete_tag', [
                     success: function(data) {
                         info('Successfully deleted tag from machine', machine.name);
                         //machine.tags.removeObject(this.tag.toString());
+
                         machine.set('pendingDeleteTag', false);
                         machine.tags.removeObject(tag.toString());
                         $('#tags-container .ajax-loader').hide();

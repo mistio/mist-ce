@@ -422,7 +422,7 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 100%;
 }
 
-#machines .machines-footer, #keys .keys-footer {
+.machines-footer, .keys-footer {
     display: none;
 }
 
@@ -502,6 +502,14 @@ div.actions div.ui-controlgroup-controls {
     height: 48px;
     background-position: center center;
     background-repeat: no-repeat;
+}
+
+.single-action-button {
+    display: none;
+}
+
+.can-reboot, .can-stop, .can-destroy, .can-start {
+    display: block !important;
 }
 
 /* indices do not help here, let's use types as defined in
@@ -905,7 +913,7 @@ div.cost {
 }
 
 #create-ok-cancel .ui-btn {
-    width: 49.5%;
+    width: 49%;
 }
 
 /* Provider (backend) state dialog */
@@ -960,12 +968,16 @@ div.cost {
     display: none;
 }
 
+#key-associate-dialog {
+    width: 400px;
+}
+
 #dialog-confirm .ui-controlgroup-controls, #key-associate-dialog .ui-controlgroup-controls {
     width: 100%;
 }
 
 #dialog-confirm .btn-left-full, #dialog-confirm .btn-right-full, #key-associate-dialog .btn-left-full, #key-associate-dialog .btn-right-full {
-    width: 49.6%;
+    width: 49%;
 }
 
 /* Add backend dialog */

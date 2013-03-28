@@ -8,7 +8,8 @@ define('app/views/machine_add_dialog', [
      */
     function(machine_add_dialog_html) {
         return Ember.View.extend({
-            tagName: false,
+            
+            attributeBindings: ['data-role',],
 
             clear: function(){
                 Mist.machineAddController.newMachineClear();
@@ -29,25 +30,26 @@ define('app/views/machine_add_dialog', [
             newMachineClicked: function(){
                 //FIXME there should be a way to bind the action directly to the controller
                 Mist.machineAddController.newMachine();
-                $.mobile.changePage('#machines');
+                $("#dialog-add").popup("close");
                 this.clear();
             },
 
             backClicked: function(){
                 this.clear();
-                history.back();
+                $("#dialog-add").popup("close");
             },
+            
+            imagesBinding: "Mist.machineAddController.newMachineBackend.images",
 
             init: function() {
                 this._super();
-                // cannot have template in home.pt as pt complains
                 this.set('template', Ember.Handlebars.compile(machine_add_dialog_html));
 
-                $('#dialog-add').live("pageshow", function (event) {
+                $(document).on("pageshow", '#dialog-add', function (event) {
                         $('input#create-machine-name').focus();
                     }
                 );
-
+                
                 Ember.run.next(function(){
                     Mist.machineAddController.addObserver('newMachineBackend', function() {
                         Ember.run.next(function() {

@@ -62,8 +62,8 @@ define('app/controllers/keys', [
                 });
             },
 
-            getPrivKey: function(name) {
-                payload = {'key_name': name}
+            getPrivKey: function(key) {
+                payload = {'key_name': key.name}
                 var that = this
                 $.ajax({
                     url: 'keys/private/key',

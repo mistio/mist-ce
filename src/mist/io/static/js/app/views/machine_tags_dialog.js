@@ -11,24 +11,6 @@ define('app/views/machine_tags_dialog',[
      */
     function(machine_tags_dialog_html) {
         return Ember.View.extend({
-            tagName: false,
-
-            machine: function() {
-                var machine = null;
-                Mist.backendsController.forEach(function(backend) {
-                    backend.machines.forEach(function(m) {
-                        if (m.selected) {
-                            log('machine selected');
-                            machine = m;
-                        }
-                    });
-                });
-                if (machine) {
-                    return machine;
-                } else {
-                    return Mist.machine;
-                }
-            }.property("Mist.backendsController.selectedMachineCount"),
 
             submit: function() {
                 var tag = this.tag;
@@ -37,6 +19,10 @@ define('app/views/machine_tags_dialog',[
 
                 if (!machine || !this.tag) {
                     return;
+                }
+                
+                if(!machine.tags){
+                    machine = machine.get('model');
                 }
 
                 var payload = {

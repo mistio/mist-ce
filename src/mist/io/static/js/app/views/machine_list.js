@@ -1,4 +1,5 @@
 define('app/views/machine_list', [
+    'app/views/mistscreen',
     'text!app/templates/machine_list.html',
     'ember'
     ],
@@ -8,9 +9,8 @@ define('app/views/machine_list', [
  *
  * @returns Class
  */
-function(machine_list_html) {
-    return Ember.View.extend({
-        tagName : false,
+function(MistScreen, machine_list_html) {
+    return MistScreen.extend({
 
         disabledShellClass : function() {
             var machines = new Array();
@@ -74,10 +74,23 @@ function(machine_list_html) {
                 return '';
             }
         }.property('Mist.backendsController.selectedMachineCount'),
-
-        init : function() {
-            this._super();
-            this.set('template', Ember.Handlebars.compile(machine_list_html));
+        
+        addMachine: function(){
+            $("#dialog-add").popup("open", {transition: 'pop'});
         },
+
+        template: Ember.Handlebars.compile(machine_list_html),
+        
+        openTags: function(){
+            $("#dialog-tags").popup("open", {transition: 'pop'});
+        },
+        
+        openShell: function(){
+            $("#dialog-shell").popup("open", {transition: 'pop'});
+        },
+
+        openActions: function(){
+            $("#dialog-power").popup("open", {transition: 'pop'});
+        }
     });
 });

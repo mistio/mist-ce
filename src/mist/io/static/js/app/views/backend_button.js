@@ -1,5 +1,4 @@
-define('app/views/backend_button', [
-    'text!app/templates/backend_button.html','ember'],
+define('app/views/backend_button', ['ember'],
     /**
      * Backend button view
      *
@@ -9,23 +8,28 @@ define('app/views/backend_button', [
 
         return Ember.View.extend({
 
-            tagName:false,
-
+            tagName: 'a',
+            
+            attributeBindings: ['data-role', 'data-theme', 'data-inline', 'data-role', 'data-icon'],
+            
             didInsertElement: function(e){
-                $("#backend-buttons").trigger('create');
+        	if('button' in $("#"+this.elementId)){
+        	    $("#"+this.elementId).button();
+        	}
+        	if('controlgroup' in $('#backend-buttons')){
+        	    $('#backend-buttons').controlgroup('refresh');
+        	}
             },
 
-            openDialog: function(event){
-                Mist.set('backend', this.get('backend'));
-                $('select.ui-slider-switch option[value=1]')[0].selected = this.get('backend').enabled;
+            click: function(){
+        	var backend = this.get('backend');
+                Mist.set('backend', backend);
+                $('select.ui-slider-switch option[value=1]')[0].selected = backend.enabled;
                 $('select.ui-slider-switch').slider('refresh');
+                $("#edit-backend").popup("open", {transition: 'pop'});
             },
 
-            init: function() {
-                this._super();
-                // cannot have template in home.pt as pt complains
-                this.set('template', Ember.Handlebars.compile(backend_button_html));
-            },
+            template: Ember.Handlebars.compile("{{title}}"),
         });
     }
 );

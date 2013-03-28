@@ -1,33 +1,26 @@
-<div id="key-associate-dialog" class="mist-dialog" data-role="dialog" data-overlay-theme="a">
-    <div data-role="header">
-        <h1>Associate key</h1>
-    </div>
-    <div data-role="content">
-        <ul id="key-machines-list"
-        data-role="listview"
-        data-filter="true"
-        data-inset="false"
+<ul id="key-machines-list"
+data-role="listview"
+data-filter="true"
+data-inset="false"
+data-theme="c"
+data-filter-placeholder="Filter machines...">
+
+    {{#each Mist.backendsController}}
+        {{#each machines}}
+            {{view Mist.KeyMachineListItemView machineBinding="this"}}
+        {{/each}}
+    {{/each}}
+</ul>
+<div class="btn-full" data-role="controlgroup" data-type="horizontal">
+    <a class="btn-left-full"
+        id="btn-associate-back"
         data-theme="c"
-        data-filter-placeholder="Filter machines...">
+        data-role="button"
+        {{action "back" target="view"}}>Back</a>
 
-            {{#each Mist.backendsController}}
-                {{#each machines}}
-                    {{view Mist.KeyMachineListItemView machineBinding="this"}}
-                {{/each}}
-            {{/each}}
-        </ul>
-        <div class="btn-full" data-role="controlgroup" data-type="horizontal">
-            <a class="btn-left-full"
-                id="btn-associate-back"
-                data-theme="c"
-                data-role="button"
-                {{action "back"}}>Back</a>
-
-            <a id="btn-associate-save"
-                class="btn-right-full"
-                data-theme="b"
-                data-role="button"
-                {{action "associateKeys"}}>Save</a>
-        </div>
-    </div>
+    <a id="btn-associate-save"
+        class="btn-right-full"
+        data-theme="b"
+        data-role="button"
+        {{action "associateKeys" target="view"}}>Save</a>
 </div>

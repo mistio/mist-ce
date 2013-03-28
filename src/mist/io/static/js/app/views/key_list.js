@@ -1,4 +1,5 @@
 define('app/views/key_list', [
+     'app/views/mistscreen',
     'text!app/templates/key_list.html',
     'ember'
     ],
@@ -8,14 +9,10 @@ define('app/views/key_list', [
      *
      * @returns Class
      */
-    function(key_list_html) {
-        return Ember.View.extend({
-            tagName: false,
-
-            init: function() {
-                this._super();
-                this.set('template', Ember.Handlebars.compile(key_list_html));
-            },
+    function(MistScreen, key_list_html) {
+        return MistScreen.extend({
+            
+            template: Ember.Handlebars.compile(key_list_html),
 
             setDefaultKey: function(){
                 var key = this.getSelectedKeys();
@@ -55,7 +52,6 @@ define('app/views/key_list', [
                 Mist.confirmationController.set("callback", function(){
                     keys.forEach(function(key){
                        key.deleteKey();
-                       window.history.go(-1);
                        $('#keys .keys-footer').fadeOut(200);
                     });
                 });
@@ -75,6 +71,10 @@ define('app/views/key_list', [
 
                 return keys;
             },
+            
+            addKey: function(){
+        	$("#dialog-add-key").popup("open", {transition: 'pop'});
+            }
         });
     }
 );
