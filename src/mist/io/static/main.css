@@ -656,6 +656,7 @@ div.pending-monitoring {
     margin: 7px;
     color: #333;
     text-shadow: none;
+    font-weight: bold;
 }
 
 .horizon span.value {
