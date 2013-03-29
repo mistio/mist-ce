@@ -1216,6 +1216,10 @@ div.info {
     text-align: center;
 }
 
+#single-machines-keys #machines-list fieldset {
+    display:none;
+}
+
 /* Conditional for < 720px */
 @media only screen and (max-width: 720px) {
 
