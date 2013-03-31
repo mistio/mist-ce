@@ -1195,7 +1195,7 @@ div.logout-placeholder {
     width: 49.2%;
 }
 
-#dialog-add-key .ajax-loader, #tags-container .ajax-loader  {
+#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader  {
     background-image: url(images/spinner.gif);
     background-position: center !important;
     background-repeat: no-repeat;
