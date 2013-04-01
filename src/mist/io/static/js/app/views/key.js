@@ -50,7 +50,7 @@ define('app/views/key', [
                 if (key && key.machines) {
                     key.machines.forEach(function(item){
                         Ember.run.next(function(){
-                            $("input[type='checkbox']").checkboxradio("refresh");
+                            $("#key-machines-list").find("input[type='checkbox']").checkboxradio("refresh");
                         });
                         Mist.backendsController.content.forEach(function(backend){
                             backend.machines.content.forEach(function(machine){
