@@ -175,6 +175,7 @@ define( 'app', [
     App.KeyPrivDialog = KeyPrivDialog;
     App.AddMachineView = MachineAddDialog;
     App.KeyAssociateDialog = KeyAssociateDialog;
+    App.MachineKeyListItemView = MachineKeyListItem;
 
 //        var mobileinit = false;
 //        $(document).bind('pageinit', function() {

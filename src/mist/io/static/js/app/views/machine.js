@@ -57,15 +57,12 @@ define('app/views/machine', [
             }.property('controller.model'),
 
             machineKeys: function() {
-                if (!this.machine) {
-                    return [];
-                }
+            	var machine = this.get('controller').get('model');
                 //return a list with the keys this server is associated to
                 var keys = [];
-                var that = this;
                 Mist.keysController.content.forEach(function(key){
                     key.machines.forEach(function(item){
-                        if (item[1] == that.machine.id) {
+                        if (item[1] == machine.id) {
                             keys.push(key);
                         }
                     });
@@ -80,17 +77,14 @@ define('app/views/machine', [
             },
 
             machineKeysRest: function() {
-                if (!this.machine) {
-                    return [];
-                }
+            	var machine = this.get('controller').get('model');
                 //return a list with the names of all keys except the ones that are associated
                 var keys = [];
-                var that = this;
                 var hasMachine = false;
                 Mist.keysController.content.forEach(function(key){
                     hasMachine = false;
                     key.machines.forEach(function(item){
-                        if (item[1] == that.machine.id) {
+                        if (item[1] == machine.id) {
                             hasMachine = true;
                         }
                     });
