@@ -63,6 +63,9 @@ define('app/controllers/select_machines', [
                         }
                     });
                 }
+                Ember.run.next(function(){
+                    $("input[type='checkbox']").checkboxradio("refresh");
+                });
             }.observes('selection'),
 
             init: function() {
