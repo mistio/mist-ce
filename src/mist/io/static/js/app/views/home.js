@@ -3,20 +3,13 @@ define('app/views/home', [
     'text!app/templates/home.html','ember'],
     /**
      *
-     * Key page
+     * Home page
      *
      * @returns Class
      */
     function(MistScreen, home_html) {
         return MistScreen.extend({
-
-            template: Ember.Handlebars.compile(home_html),
-
-            addBackend: function(){
-        	$("#add-backend").popup("open", {transition: 'pop'});
-            }
-        
-        
+            template: Ember.Handlebars.compile(home_html)
         });
     }
 );

@@ -1,4 +1,5 @@
-define('app/views/backend_add', ['app/models/backend',
+define('app/views/backend_add', [
+    'app/models/backend',
     'text!app/templates/backend_add_dialog.html',
     'ember'],
     /**
@@ -10,8 +11,12 @@ define('app/views/backend_add', ['app/models/backend',
     function(Backend, add_backend_dialog_html) {
 
         return Ember.View.extend({
-            
-            attributeBindings: ['data-role',],
+
+            template: Ember.Handlebars.compile(add_backend_dialog_html),
+
+            addBackend: function() {
+                $('#add-backend').popup('option', 'positionTo', '#add-backend-button').popup('open', {transition: 'pop'});
+            },
 
             backClicked: function() {
                 Mist.backendAddController.newBackendClear();
@@ -21,12 +26,12 @@ define('app/views/backend_add', ['app/models/backend',
             addButtonClick: function(){
                 var that = this;
                 var payload = {
-                        "title": '', // TODO
-                        "provider": Mist.backendAddController.newBackendProvider,
-                        "apikey" : Mist.backendAddController.newBackendKey,
-                        "apisecret": Mist.backendAddController.newBackendSecret
+                    "title": '', // TODO
+                    "provider": Mist.backendAddController.newBackendProvider,
+                    "apikey" : Mist.backendAddController.newBackendKey,
+                    "apisecret": Mist.backendAddController.newBackendSecret
                 };
-                
+
                 $.ajax({
                     url: '/backends',
                     type: "POST",
@@ -48,8 +53,6 @@ define('app/views/backend_add', ['app/models/backend',
                     }
                 });
             },
-            
-            template: Ember.Handlebars.compile(add_backend_dialog_html),
 
             providerList: function() {
                 return SUPPORTED_PROVIDERS;
