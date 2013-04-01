@@ -204,8 +204,6 @@
             id="machines-button-shell"
             data-role="button"
             data-icon="gear"
-            data-rel="popup"
-            data-transition="slideup"
             {{bindAttr class="disabledShellClass"}}
             {{action showShell target=view}}>Shell</a>
             {{view Mist.ShellDialog machineBinding="this"}}
@@ -215,8 +213,6 @@
             id="machines-button-power"
             data-role="button"
             data-icon="mist-power"
-            data-rel="popup"
-            data-transition="slideup"
             {{bindAttr class="disabledPowerClass"}}
             {{action showActions target=view}}>Power</a>
             {{view Mist.PowerDialog machineBinding="this"}}

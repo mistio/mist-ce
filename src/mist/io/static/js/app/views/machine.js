@@ -487,16 +487,16 @@ define('app/views/machine', [
             }.observes('controller.model.pendingMonitoring'),
 
             showShell: function() {
-                $("#dialog-shell").popup("open", {transition: 'pop'});
+                $("#dialog-shell").popup('option', 'positionTo', '#machines-button-shell').popup('open', {transition: 'slideup'});
                 setTimeout(function(){$('.shell-input input').focus()}, 1000);
             },
 
             showActions: function() {
-                $('#dialog-single-power').popup('open', {transition: 'slideup'});
+                $("#dialog-single-power").popup('option', 'positionTo', '#machines-button-power').popup('open', {transition: 'slideup'});
             },
 
             openTags: function() {
-                $('#dialog-tags').popup('open', {transition: 'slideup'});
+                $("#dialog-tags").popup('option', 'positionTo', '#machines-button-tags').popup('open', {transition: 'slideup'});
             },
 
             template: Ember.Handlebars.compile(machine_html),
