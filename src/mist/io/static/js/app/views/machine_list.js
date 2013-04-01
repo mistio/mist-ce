@@ -74,23 +74,23 @@ function(MistScreen, machine_list_html) {
                 return '';
             }
         }.property('Mist.backendsController.selectedMachineCount'),
-        
+
         addMachine: function(){
             $("#dialog-add").popup("open", {transition: 'pop'});
         },
 
         template: Ember.Handlebars.compile(machine_list_html),
-        
+
         openTags: function(){
-            $("#dialog-tags").popup("open", {transition: 'pop'});
+            $("#dialog-tags").popup('option', 'positionTo', '#machines-button-tags').popup('open', {transition: 'slideup'});
         },
-        
+
         openShell: function(){
-            $("#dialog-shell").popup("open", {transition: 'pop'});
+            $("#dialog-shell").popup('option', 'positionTo', '#machines-button-shell').popup('open', {transition: 'slideup'});
         },
 
         openActions: function(){
-            $("#dialog-power").popup("open", {transition: 'pop'});
+            $("#dialog-power").popup('option', 'positionTo', '#machines-button-power').popup('open', {transition: 'slideup'});
         }
     });
 });
