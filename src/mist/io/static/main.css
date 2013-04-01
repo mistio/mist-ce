@@ -919,6 +919,10 @@ div.cost {
 
 /* Provider (backend) state dialog */
 
+#edit-backend.mist-dialog {
+    min-width: 250px;
+}
+
 #edit-backend .content-header {
     overflow: auto;
     padding: 20px 6px;
