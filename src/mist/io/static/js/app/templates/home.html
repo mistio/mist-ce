@@ -16,7 +16,7 @@
             data-icon="plus"
             {{action addBackend target="view"}}
             >Add backend</a>
-            
+
         <div data-role="popup" id="add-backend" class="mist-dialog" data-overlay-theme="a">
             <div data-role="header">
                 <h1>Add backend</h1>
@@ -27,11 +27,11 @@
         <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
             {{#each Mist.backendsController}}
                 {{view Mist.BackendButtonView backendBinding="this" data-theme="c"
-                   data-inline="true" data-role="button" data-icon="check" 
+                   data-inline="true" data-role="button" data-icon="check"
                    classBinding="state" class="backend-button"}}
             {{/each}}
         </div>
-        
+
         <div data-role="popup" id="edit-backend" class="mist-dialog" data-overlay-theme="a">
             <div data-role="header">
                 <h1>Edit backend</h1>
@@ -75,5 +75,5 @@
                 </a>
             </li>
         </ul>
-        
-</div>    
+
+</div>
