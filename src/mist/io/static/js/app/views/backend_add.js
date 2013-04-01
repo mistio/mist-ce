@@ -1,6 +1,6 @@
 define('app/views/backend_add', [
     'app/models/backend',
-    'text!app/templates/backend_add_dialog.html',
+    'text!app/templates/backend_add.html',
     'ember'],
     /**
      *
@@ -8,11 +8,11 @@ define('app/views/backend_add', [
      *
      * @returns Class
      */
-    function(Backend, add_backend_dialog_html) {
+    function(Backend, backend_add_html) {
 
         return Ember.View.extend({
 
-            template: Ember.Handlebars.compile(add_backend_dialog_html),
+            template: Ember.Handlebars.compile(backend_add_html),
 
             addBackend: function() {
                 $('#add-backend').popup('option', 'positionTo', '#add-backend-button').popup('open', {transition: 'pop'});

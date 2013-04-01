@@ -93,7 +93,7 @@ define( 'app', [
                 Home,
                 Count,
                 BackendButton,
-                AddBackend,
+                BackendAdd,
                 EditBackend,
                 MachineListItem,
                 ImageListItem,
@@ -367,7 +367,7 @@ define( 'app', [
     App.HomeView = Home;
     App.CountView = Count;
     App.BackendButtonView = BackendButton;
-    App.AddBackendView = AddBackend;
+    App.BackendAddView = BackendAdd;
     App.EditBackendView = EditBackend;
     App.MachineListItemView = MachineListItem;
     App.ImageListItemView = ImageListItem;
