@@ -26,7 +26,7 @@ define('app/views/key', [
 
             keyMachines: function() {
 
-        	var key = this.get('controller').get('model');
+        	    var key = this.get('controller').get('model');
         	
                 machineList = [];
                 if (key && key.machines && key.machines.forEach) {
@@ -46,12 +46,12 @@ define('app/views/key', [
             associateKey: function() {
         	    var key = this.get('controller').get('model');
         	    $("#key-associate-dialog").popup("open", {transition: 'pop'});
-                //$.mobile.changePage('#key-associate-dialog');
                 //check boxes for machines associated with this key
-                $('li').find("input[type='checkbox']").attr("checked",false).checkboxradio("refresh");
-                if (Mist.key && Mist.key.machines) {
-                    Mist.key.machines.forEach(function(item){
-                        $('li.'+item[1]).find("input[type='checkbox']").attr("checked",true).checkboxradio("refresh");
+                if (key && key.machines) {
+                    key.machines.forEach(function(item){
+                        Ember.run.next(function(){
+                            $("input[type='checkbox']").checkboxradio("refresh");
+                        });
                         Mist.backendsController.content.forEach(function(backend){
                             backend.machines.content.forEach(function(machine){
                                 if (machine.id == item[1]) {
