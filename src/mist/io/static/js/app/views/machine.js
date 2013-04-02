@@ -10,9 +10,10 @@ define('app/views/machine', [
     function(MistScreen, machine_html) {
         return MistScreen.extend({
 
-            disabledShellClass: function() {
-        	var machine = this.get('controller').get('model');
+            template: Ember.Handlebars.compile(machine_html),
 
+            disabledShellClass: function() {
+                var machine = this.get('controller').get('model');
                 if (machine && machine.hasKey && machine.state == 'running') {
                     return '';
                 } else {
@@ -21,8 +22,7 @@ define('app/views/machine', [
             }.property('controller.model.hasKey'),
 
             disabledTagClass: function() {
-        	var machine = this.get('controller').get('model');
-
+                var machine = this.get('controller').get('model');
                 if (machine && machine.can_tag) {
                     return '';
                 } else {
@@ -31,8 +31,7 @@ define('app/views/machine', [
             }.property('controller.model.can_tag'),
 
             disabledPowerClass: function() {
-        	var machine = this.get('controller').get('model');
-
+                var machine = this.get('controller').get('model');
                 if (machine && machine.state === 'terminated') {
                     return 'ui-disabled';
                 } else {
@@ -41,8 +40,7 @@ define('app/views/machine', [
             }.property('controller.model.state'),
 
             metadata: function() {
-        	var machine = this.get('controller').get('model');
-
+                var machine = this.get('controller').get('model');
                 if (!machine || !machine.extra) {
                     return [];
                 }
@@ -96,7 +94,7 @@ define('app/views/machine', [
             }.property('machine'),
 
             basicvars: function() {
-        	var machine = this.get('controller').get('model');
+                var machine = this.get('controller').get('model');
 
                 if (!machine) {
                     return [];
@@ -143,8 +141,7 @@ define('app/views/machine', [
             }.property('controller.model'),
 
             name: function() {
-        	var machine = this.get('controller').get('model');
-
+                var machine = this.get('controller').get('model');
                 if (!machine) {
                     return '';
                 }
@@ -152,7 +149,7 @@ define('app/views/machine', [
             }.property('controller.model'),
 
             upFor: function() {
-        	var machine = this.get('controller').get('model');
+                var machine = this.get('controller').get('model');
 
                 if (machine && machine.uptime) {
                     var ret = '';
@@ -192,8 +189,7 @@ define('app/views/machine', [
             }.property('controller.model.uptime'),
 
             providerIconClass: function() {
-        	var machine = this.get('controller').get('model');
-
+                var machine = this.get('controller').get('model');
                 if (!machine) {
                     return '';
                 }
@@ -212,7 +208,6 @@ define('app/views/machine', [
             },
 
             setGraph: function() {
-
                 Em.run.next(function() {
                     $('.monitoring-button').button();
                     $('#add-rule-button').button();
@@ -469,8 +464,7 @@ define('app/views/machine', [
             }.observes('Mist.graphPolling'),
 
             handlePendingMonitoring: function() {
-        	var machine = this.get('controller').get('model');
-
+                var machine = this.get('controller').get('model');
                 if (machine && machine.pendingMonitoring) {
                     $('.pending-monitoring').show();
                     $('.monitoring-button').addClass('ui-disabled'); //.hide();
@@ -491,9 +485,7 @@ define('app/views/machine', [
 
             openTags: function() {
                 $("#dialog-tags").popup('option', 'positionTo', '#machines-button-tags').popup('open', {transition: 'slideup'});
-            },
-
-            template: Ember.Handlebars.compile(machine_html),
+            }
         });
     }
 );
