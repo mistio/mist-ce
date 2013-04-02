@@ -1,15 +1,22 @@
 define('app/views/machine_add_dialog', [
-    'text!app/templates/machine_add_dialog.html','ember'],
+    'text!app/templates/machine_add_dialog.html',
+    'ember'],
     /**
      *
-     * Machine Add Dialog page
+     * Machine Add Dialog
      *
      * @returns Class
      */
     function(machine_add_dialog_html) {
         return Ember.View.extend({
-            
-            attributeBindings: ['data-role',],
+
+            template: Ember.Handlebars.compile(machine_add_dialog_html),
+
+            imagesBinding: 'Mist.machineAddController.newMachineBackend.images',
+
+            openMachineAddDialog: function(){
+                $('#dialog-add').popup('open');
+            },
 
             clear: function(){
                 Mist.machineAddController.newMachineClear();
@@ -21,25 +28,22 @@ define('app/views/machine_add_dialog', [
 
             didInsertElement: function() {
                 var that = this;
-
                 this.$().bind('popupbeforeposition', function(e, data){
                     that.clear();
                 });
             },
 
-            newMachineClicked: function(){
+            newMachineClicked: function() {
                 //FIXME there should be a way to bind the action directly to the controller
                 Mist.machineAddController.newMachine();
-                $("#dialog-add").popup("close");
+                $('#dialog-add').popup('close');
                 this.clear();
             },
 
-            backClicked: function(){
+            backClicked: function() {
                 this.clear();
-                $("#dialog-add").popup("close");
+                $('#dialog-add').popup('close');
             },
-            
-            imagesBinding: "Mist.machineAddController.newMachineBackend.images",
 
             init: function() {
                 this._super();
@@ -49,7 +53,7 @@ define('app/views/machine_add_dialog', [
                         $('input#create-machine-name').focus();
                     }
                 );
-                
+
                 Ember.run.next(function(){
                     Mist.machineAddController.addObserver('newMachineBackend', function() {
                         Ember.run.next(function() {

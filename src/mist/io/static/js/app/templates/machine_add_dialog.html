@@ -1,3 +1,15 @@
+<a href="#machines"
+    id="mist-create-machine"
+    data-theme="b"
+    data-role="button"
+    data-icon="plus"
+    {{action openMachineAddDialog target="view"}}>Create</a>
+
+<div data-role="popup" id="dialog-add" class="mist-dialog" data-overlay-theme="a">
+    <div data-role="header">
+        <h1>Create Machine</h1>
+    </div>
+    <div data-role="content">
         <label for="create-machine-name">1. Name:</label>
         {{view Mist.TextField
             valueBinding="Mist.machineAddController.newMachineName"
@@ -51,7 +63,7 @@
             data-icon="check"
             id="createmachine-select-location"
             name="createmachine-select-location"}}
-            
+
         <label for="createmachine-select-key">6. Key:</label>
         {{view Mist.Select contentBinding="Mist.keysController"
             optionLabelPath="content.name"
@@ -76,10 +88,12 @@
             <button id="create-cancel"
                 class="btn-left-full"
                 data-theme="c"
-                {{action "backClicked" target="view"}}>Back</button>
+                {{action backClicked target="view"}}>Back</button>
 
             <button id="create-ok"
                 class="btn-right-full"
                 data-theme="b"
-                {{action "newMachineClicked" target="view"}}>Launch!</button>
+                {{action newMachineClicked target="view"}}>Launch!</button>
         </div>
+    </div>
+</div>

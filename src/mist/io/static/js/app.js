@@ -173,7 +173,7 @@ define( 'app', [
     App.KView = KeyView;
     App.AddKeyView = KeyAddDialog;
     App.KeyPrivDialog = KeyPrivDialog;
-    App.AddMachineView = MachineAddDialog;
+    App.MachineAddView = MachineAddDialog;
     App.KeyAssociateDialog = KeyAssociateDialog;
     App.MachineKeyListItemView = MachineKeyListItem;
 

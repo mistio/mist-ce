@@ -24,22 +24,7 @@
             optionValuePath="content.id"
             prompt="Select Machines"}}
 
-        <a href="#machines"
-        id="mist-create-machine"
-        data-rel="dialog"
-        data-theme="b"
-        data-inline="true"
-        data-transition="slidedown"
-        data-role="button"
-        data-icon="plus"
-        {{action addMachine target="view"}}>Create</a>
-
-        <div data-role="popup" id="dialog-add" class="mist-dialog" data-overlay-theme="a">
-            <div data-role="header">
-                <h1>Create Machine</h1>
-            </div>
-            {{view Mist.AddMachineView data-role="content"}}
-        </div>
+        {{view Mist.MachineAddView}}
 
         <ul id="machines-list"
         data-role="listview"

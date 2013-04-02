@@ -12,6 +12,8 @@ define('app/views/machine_list', [
 function(MistScreen, machine_list_html) {
     return MistScreen.extend({
 
+        template: Ember.Handlebars.compile(machine_list_html),
+
         disabledShellClass : function() {
             var machines = new Array();
 
@@ -74,12 +76,6 @@ function(MistScreen, machine_list_html) {
                 return '';
             }
         }.property('Mist.backendsController.selectedMachineCount'),
-
-        addMachine: function(){
-            $("#dialog-add").popup("open", {transition: 'pop'});
-        },
-
-        template: Ember.Handlebars.compile(machine_list_html),
 
         openTags: function(){
             $("#dialog-tags").popup('option', 'positionTo', '#machines-button-tags').popup('open', {transition: 'slideup'});
