@@ -509,7 +509,8 @@ function appendShell(data){
 
 function completeShell(ret){
     $('iframe').remove();
-    Mist.machine.set('pendingShell', false);
+    // TODO disabling this for now, spinners won't work, globals are not there
+    //Mist.machine.set('pendingShell', false);
     $('.shell-return .pending').removeClass('pending');
     if (collectd_install_target) {
         if (collectd_lastlog.search('root') == -1){

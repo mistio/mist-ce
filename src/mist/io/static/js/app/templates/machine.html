@@ -32,6 +32,7 @@
             <div id="monitoring-wrapper" {{bindAttr class=":ui-btn-inner :ui-corner-top :ui-corner-bottom pendingStats"}}>
 
             {{#if hasMonitoring}}
+
             <div id="cpuGraph"></div>
             <div id="loadGraph"></div>
             <div id="networkGraph"></div>
@@ -47,12 +48,7 @@
             {{/each}}
             </div>
             <div class="monitoring-dialog-container enabled">
-                <a href="#"
-                    class="monitoring-button"
-                    data-role="button"
-                    data-icon="delete"
-                    data-theme="a"
-                    data-position-to="window">Disable Monitoring</a>
+                {{view Mist.MachineMonitoringDialog machineBinding="this"}}
             </div>
             <div class="add-rule-container">
                 <button id="add-rule-button"
@@ -61,6 +57,7 @@
                     data-theme="b"
                     {{action "addRuleClicked"}}>Add Rule</button>
             </div>
+
             {{else}}
 
             <div class="monitoring-dialog-container disabled">
@@ -75,6 +72,7 @@
             </div>
 
             {{/if}}
+
         </div>
     </div>
 
@@ -183,7 +181,7 @@
             data-role="button"
             data-icon="grid"
             {{bindAttr class="disabledTagClass"}}
-            {{action openTags target=view}}>Tag</a>
+            {{action "openTags" target="view"}}>Tag</a>
             {{view Mist.MachineTagsDialog machineBinding="this"}}
 
         <a href="#dialog-shell"
@@ -192,7 +190,7 @@
             data-role="button"
             data-icon="gear"
             {{bindAttr class="disabledShellClass"}}
-            {{action showShell target=view}}>Shell</a>
+            {{action "showShell" target="view"}}>Shell</a>
             {{view Mist.ShellDialog machineBinding="this"}}
 
         <a href="#dialog-single-power"
@@ -201,7 +199,7 @@
             data-role="button"
             data-icon="mist-power"
             {{bindAttr class="disabledPowerClass"}}
-            {{action showActions target=view}}>Power</a>
+            {{action "showActions" target="view"}}>Power</a>
             {{view Mist.PowerDialog machineBinding="this"}}
     </div>
 
