@@ -3,7 +3,7 @@
     data-role="button"
     data-icon="star"
     data-theme="b"
-    {{action openMonitoringDialog target=view}}>Enable Monitoring</a>
+    {{action "openMonitoringDialog" target="view"}}>Enable Monitoring</a>
 
 <div data-role="popup" id="monitoring-dialog" class="mist-dialog" data-overlay-theme="a">
     <div data-role="header">
@@ -16,13 +16,14 @@
     <div data-role="content" data-theme="b">
         {{#if Mist.authenticated}}
             {{#if machine.hasMonitoring}}
-                <span>Are you sure you wish to disable monitoring for {{machine.name}}?</span>
-                {{#unless machine.hasKey}}
+                <span>Are you sure you wish to disable monitoring for {{name}}?</span>
+
+                {{#unless hasKey}}
                 <p>The collectd daemon can't be disabled automactically because there is no key pair set.</p>
                 <p>To do it manually run the following commands:</p>
                 <pre>chmod -x /etc/init.d/collectd &amp;&amp; killall -9 collectd</pre>
-
                 {{/unless}}
+
                 <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
                     <button id="enable-monitoring-cancel"
                         class="btn-left-full"
@@ -34,11 +35,13 @@
                         {{action "changeMonitoringClicked" target="view"}}>Disable</button>
                 </div>
             {{else}}
-                <div>Are you sure you wish to enable monitoring for {{machine.name}}?</div>
-                {{#unless machine.hasKey}}
+                <div>Are you sure you wish to enable monitoring for {{name}}?</div>
+
+                {{#unless hasKey}}
                 <p>The collectd daemon can't be installed automatically because there is no key pair set.</p>
                 <p>You will have to configure it manually by following the instructions after pressing enable.</p>
                 {{/unless}}
+
                 <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
                     <button id="enable-monitoring-cancel"
                         class="btn-left-full"
@@ -51,21 +54,21 @@
                 </div>
             {{/if}}
         {{else}}
-                <div class="info">In order to proceed you need to login to the premium <a href="https://mist.io">mist.io</a> service.</div>
-                <label for="email">Email</label>
-                {{view Mist.TextField valueBinding="Mist.email" name="email" id="email"}}
-                <label for="password">Password</label>
-                {{view Mist.TextField type="password" valueBinding="Mist.password" name="password" id="password"}}
-                <div id="auth-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-                    <button id="auth-cancel"
-                        class="btn-left-full"
-                        data-theme="c"
-                        {{action "backClicked" target="view"}}>Back</button>
-                    <button id="auth-ok"
-                        class="btn-right-full"
-                        data-theme="b"
-                        {{action "changeMonitoringClicked" target="view"}}>Login</button>
-                </div>
+            <div class="info">In order to proceed you need to login to the premium <a href="https://mist.io">mist.io</a> service.</div>
+            <label for="email">Email</label>
+            {{view Mist.TextField valueBinding="Mist.email" name="email" id="email"}}
+            <label for="password">Password</label>
+            {{view Mist.TextField type="password" valueBinding="Mist.password" name="password" id="password"}}
+            <div id="auth-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
+                <button id="auth-cancel"
+                    class="btn-left-full"
+                    data-theme="c"
+                    {{action "backClicked" target="view"}}>Back</button>
+                <button id="auth-ok"
+                    class="btn-right-full"
+                    data-theme="b"
+                    {{action "changeMonitoringClicked" target="view"}}>Login</button>
+            </div>
         {{/if}}
 
     </div>
