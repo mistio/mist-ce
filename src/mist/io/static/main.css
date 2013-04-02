@@ -991,9 +991,33 @@ div.cost {
     margin: 14px 0 4px 0;
 }
 
-#add-backend-popup {
-    min-width: 286px;
+#add-backend.ui-panel-open {
+    min-height: 385px !important;
+    margin-top: 10px;
+    min-width: 300px;
 }
+
+#add-backend .ui-collapsible-content {
+    padding-right: 27px;
+}
+
+#add-backend .ui-collapsible-heading {
+    border-bottom-left-radius: 0px;
+}
+
+#add-backend .ui-collapsible-heading-collapsed {
+    border-bottom-left-radius: inherit;
+}
+
+.ui-panel-inner {
+    padding:10px !important;
+}
+
+.select-listmenu {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
 /* Tags Dialog */
 
 #dialog-tags {

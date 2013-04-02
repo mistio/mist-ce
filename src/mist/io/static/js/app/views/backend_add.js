@@ -14,13 +14,29 @@ define('app/views/backend_add', [
 
             template: Ember.Handlebars.compile(backend_add_html),
 
+            init: function() {
+                this._super();
+                $(document).bind("mobileinit", function(){
+                    $('.select-listmenu li').on('click', function(event){
+                        $('.select-backend-collapsible').collapsible('option','collapsedIcon','check');
+                        $('.select-backend-collapsible span.ui-btn-text').text(event.target.text);
+                        Mist.backendAddController.set('newBackendProvider', 
+                            {provider: $(event.target).attr('title'),
+                             title: event.target.text 
+                            }
+                        );
+                        $('.select-backend-collapsible').trigger('collapse');               
+                    });
+                });           
+            },
+            
             addBackend: function() {
-                $('#add-backend').popup('option', 'positionTo', '#add-backend-button').popup('open', {transition: 'pop'});
+                $('#add-backend').panel('open');
             },
 
             backClicked: function() {
                 Mist.backendAddController.newBackendClear();
-                $("#add-backend").popup("close");
+                $("#add-backend").panel("close");
             },
 
             addButtonClick: function(){
@@ -45,7 +61,7 @@ define('app/views/backend_add', [
                         //setTimeout("$('#backend-buttons').controlgroup('refresh')", 300);
                         info('added backend ' + result.id);
                         Mist.backendAddController.newBackendClear();
-                        $("#add-backend").popup("close");
+                        $("#add-backend").panel("close");
 //                        Ember.run.next(function(){
 //                            $('#backend-buttons [data-role=button]').button();
 //                            $('#backend-buttons').controlgroup('refresh');

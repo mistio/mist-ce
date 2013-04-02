@@ -270,7 +270,7 @@ define('app/views/machine', [
                                         if (!data || !('cpu' in data)) {
                                             return callback(new Error('unable to load data'));
                                         } else {
-                    			    loaded = true;
+                    			            loaded = true;
                                             localData = data;
 
                                             if (!cores) {
