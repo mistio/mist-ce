@@ -375,12 +375,12 @@ define( 'app', [
 
     App.DeleteTagView = DeleteTagView;
 //            App.RuleView = RuleView;
-//            App.UserMenuView = UserMenuView;
     App.KeyMachineListItemView = KeyMachineListItem;
     App.MachineTagsDialog = MachineTagsDialog;
     App.ShellDialog = Shell;
     App.PowerDialog = SingleMachineActionsDialog;
     App.MachineActionsDialog = MachineActionsDialog;
+    App.MachineMonitoringDialog = MachineMonitoringDialog;
 //
 //            var homeView = Home.create();
 //            homeView.append();

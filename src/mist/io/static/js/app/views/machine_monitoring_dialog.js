@@ -9,23 +9,25 @@ define('app/views/machine_monitoring_dialog', [
      */
     function(machine_monitoring_dialog_html) {
         return Ember.View.extend({
+
+            template: Ember.Handlebars.compile(machine_monitoring_dialog_html),
+
             tagName: false,
-            machineBinding: 'Mist.machine',
+
+            openMonitoringDialog: function() {
+                console.log('click');
+                $("#monitoring-dialog").popup('option', 'positionTo', '.monitoring-button').popup('open');
+            },
 
             changeMonitoringClicked: function() {
-                this.machine.changeMonitoring();
-                history.back();
+                var machine = this.get('controller').get('model');
+                machine.changeMonitoring();
+                $("#monitoring-dialog").popup('close');
             },
 
             backClicked: function() {
-                history.back();
-            },
-            
-            init: function() {
-                this._super();
-                this.set('template', Ember.Handlebars.compile(machine_monitoring_dialog_html));
-                
-            },
+                $("#monitoring-dialog").popup('close');
+            }
         });
     }
 );

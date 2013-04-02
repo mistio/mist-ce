@@ -1,14 +1,10 @@
 <div data-role="header">
 
-    <a href="#machines"
-        data-icon="arrow-l"
-        data-direction="reverse"
-        class="ui-btn-left">Machines</a>
+    <a href="#machines" data-icon="arrow-l" data-direction="reverse" class="ui-btn-left">Machines</a>
 
     <h1 id="single-machine-name">{{name}}</h1>
 
     {{view Mist.UserMenuView}}
-
 
 </div>
 
@@ -51,13 +47,11 @@
             {{/each}}
             </div>
             <div class="monitoring-dialog-container enabled">
-                <a href="#monitoring-dialog"
+                <a href="#"
                     class="monitoring-button"
                     data-role="button"
                     data-icon="delete"
-                    data-rel="popup"
                     data-theme="a"
-                    data-transition="slidedown"
                     data-position-to="window">Disable Monitoring</a>
             </div>
             <div class="add-rule-container">
@@ -72,14 +66,7 @@
             <div class="monitoring-dialog-container disabled">
                 <div class="monitoring-info">Monitoring is currently disabled</div>
 
-                <a href="#monitoring-dialog"
-                    class="monitoring-button"
-                    data-role="button"
-                    data-icon="star"
-                    data-rel="popup"
-                    data-theme="b"
-                    data-transition="slidedown"
-                    data-position-to="window">Enable Monitoring</a>
+                {{view Mist.MachineMonitoringDialog machineBinding="this"}}
 
                 <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
                     <span class="ui-icon ui-icon-loading"></span>
