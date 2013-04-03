@@ -3,7 +3,7 @@ define('app/views/machine_monitoring_dialog', [
     'ember'],
     /**
      *
-     * Monitoring Dialog page
+     * Monitoring Dialog
      *
      * @returns Class
      */
