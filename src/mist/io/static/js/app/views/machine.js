@@ -12,6 +12,11 @@ define('app/views/machine', [
 
             template: Ember.Handlebars.compile(machine_html),
 
+            init: function() {
+                this._super();
+                this.setGraph();
+            },
+
             disabledShellClass: function() {
                 var machine = this.get('controller').get('model');
                 if (machine && machine.hasKey && machine.state == 'running') {
@@ -453,15 +458,14 @@ define('app/views/machine', [
 
             }.observes('controller.model.hasMonitoring'),
 
-            startStopContext: function(){
-                if('context' in Mist){
-                    if(Mist.graphPolling){
-                        Mist.context.start();
-                    } else {
-                        Mist.context.stop();
-                    }
+            backClicked: function() {
+                // if it polls for stats, stop it
+                if ('context' in Mist) {
+                    Mist.context.stop();
                 }
-            }.observes('Mist.graphPolling'),
+                // then get back to machines' list
+                Mist.Router.router.transitionTo('machines')
+            },
 
             handlePendingMonitoring: function() {
                 var machine = this.get('controller').get('model');
