@@ -16,7 +16,7 @@ define('app/views/user_menu', [
             template: Ember.Handlebars.compile(user_menu_html),
         
             click: function(){
-        	   $("#user-dialog").popup("open", {transition: 'pop'});
+        	   $("#user-dialog").popup('option', 'positionTo', '#me-btn').popup("open", {transition: 'pop'});
             }
         });
     }

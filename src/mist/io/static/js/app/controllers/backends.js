@@ -115,61 +115,63 @@ define('app/controllers/backends', [
                     that.getSelectedMachineCount();
                     that.getImageCount();
                 });
-
-                Ember.run.next(function(){
-                    $.getJSON('/backends', function(data) {
-                        data.forEach(function(item){
-                            that.pushObject(Backend.create(item));
-                        });
-                        that.content.forEach(function(item){
-                            item.machines.addObserver('length', function() {
-                                that.getMachineCount();
+                $(document).bind('ready', function(){
+                    
+                
+                    Ember.run.next(function(){
+                        $.getJSON('/backends', function(data) {
+                            data.forEach(function(item){
+                                that.pushObject(Backend.create(item));
                             });
-
-                            item.machines.addObserver('@each.selected', function() {
-                                that.getSelectedMachineCount();
-                                that.getSelectedMachine();
-                            });
-
-                            item.images.addObserver('length', function() {
-                                that.getImageCount();
-                            });
-
-                            item.addObserver('state', function(){
-                                var waiting = false;
-                                var state = "ok";
-
-                                that.content.forEach(function(backend){
-                                    if (backend.error) {
-                                        state = 'error';
-                                    } else if(backend.state == 'waiting'){
-                                        waiting = true;
-                                    } else if(backend.state == 'offline'){
-                                        state = 'down';
-                                    }
+                            that.content.forEach(function(item){
+                                item.machines.addObserver('length', function() {
+                                    that.getMachineCount();
                                 });
-
-                                if(waiting){
-                                    state = 'state-wait-' + state;
-                                } else {
-                                    state = 'state-' + state;
-                                }
-                                that.set('state', state);
+    
+                                item.machines.addObserver('@each.selected', function() {
+                                    that.getSelectedMachineCount();
+                                    that.getSelectedMachine();
+                                });
+    
+                                item.images.addObserver('length', function() {
+                                    that.getImageCount();
+                                });
+    
+                                item.addObserver('state', function(){
+                                    var waiting = false;
+                                    var state = "ok";
+    
+                                    that.content.forEach(function(backend){
+                                        if (backend.error) {
+                                            state = 'error';
+                                        } else if(backend.state == 'waiting'){
+                                            waiting = true;
+                                        } else if(backend.state == 'offline'){
+                                            state = 'down';
+                                        }
+                                    });
+    
+                                    if(waiting){
+                                        state = 'state-wait-' + state;
+                                    } else {
+                                        state = 'state-' + state;
+                                    }
+                                    that.set('state', state);
+                                });
                             });
+                        }).error(function() {
+                            Mist.notificationController.notify("Error loading backends");
                         });
-                    }).error(function() {
-                        Mist.notificationController.notify("Error loading backends");
+    
+                        setTimeout(function(){
+    //                        Ember.run.next(function(){
+    //                            try {
+    //                                $('#home-menu').listview('refresh');
+    //                            } catch(e) { $('#home-menu').listview(); }
+    //                        });
+                            Mist.backendsController.checkMonitoring();
+                        }, 5000);
                     });
-
-                    setTimeout(function(){
-//                        Ember.run.next(function(){
-//                            try {
-//                                $('#home-menu').listview('refresh');
-//                            } catch(e) { $('#home-menu').listview(); }
-//                        });
-                        Mist.backendsController.checkMonitoring();
-                    }, 5000);
-
                 });
             }
         });

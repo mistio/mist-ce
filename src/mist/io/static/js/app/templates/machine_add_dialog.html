@@ -1,11 +1,13 @@
-<a href="#machines"
+<a href="#"
     id="mist-create-machine"
+    class="add-button"    
     data-theme="b"
     data-role="button"
     data-icon="plus"
+    data-iconpos="right"
     {{action openMachineAddDialog target="view"}}>Create</a>
 
-<div data-role="popup" id="dialog-add" class="mist-dialog" data-overlay-theme="a">
+<div id="dialog-add" class="mist-dialog" data-role="panel" data-position="right" data-display="overlay" data-theme="b">
     <div data-role="header">
         <h1>Create Machine</h1>
     </div>
@@ -17,7 +19,18 @@
             id="create-machine-name"}}
 
         <label for="createmachine-select-provider">2. Provider:</label>
-        {{view Mist.Select contentBinding="Mist.backendsController"
+        <div class="select-provider-collapsible" data-role="collapsible" data-iconpos="right" data-corners="true" 
+            data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
+            <h2>Select Provider</h2>
+            <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
+                {{#each Mist.backendsController}}
+                <li data-icon="false" data-corners="true">
+                    <a href="#" title="{{unbound this.provider}}">{{this.title}}</a>
+                </li>
+                {{/each}}
+            </ul>
+        </div>        
+        {{!view Mist.Select contentBinding="Mist.backendsController"
             optionLabelPath="content.title"
             optionValuePath="content.provider"
             prompt="Select Provider"
@@ -29,7 +42,18 @@
             name="createmachine-select-provider"}}
 
         <label for="createmachine-select-image">3. Image:</label>
-        {{view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.images"
+        <div class="select-image-collapsible" data-role="collapsible" data-iconpos="right" data-corners="true" 
+            data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
+            <h2>Select Image</h2>
+            <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
+                {{#each Mist.machineAddController.newMachineBackend.images}}
+                <li data-icon="false" data-corners="true">
+                    <a href="#" title="{{unbound this.id}}">{{this.name}}</a>
+                </li>
+                {{/each}}
+            </ul>
+        </div>         
+        {{!view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.images"
             optionLabelPath="content.name"
             optionValuePath="content.id"
             prompt="Select Image"
@@ -41,7 +65,18 @@
             name="createmachine-select-image"}}
 
         <label for="createmachine-select-size">4. Size:</label>
-        {{view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.sizes"
+        <div class="select-size-collapsible" data-role="collapsible" data-iconpos="right" data-corners="true" 
+            data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
+            <h2>Select Size</h2>
+            <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
+                {{#each Mist.machineAddController.newMachineBackend.sizes}}
+                <li data-icon="false" data-corners="true">
+                    <a href="#" title="{{unbound this.id}}">{{this.name}}</a>
+                </li>
+                {{/each}}
+            </ul>
+        </div>         
+        {{!view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.sizes"
             optionLabelPath="content.name"
             optionValuePath="content.id"
             prompt="Select Size"
@@ -53,7 +88,7 @@
             name="createmachine-select-size"}}
 
         <label for="createmachine-select-location">5. Location:</label>
-        {{view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.locations"
+        {{!view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.locations"
             optionLabelPath="content.name"
             optionValuePath="content.id"
             prompt="Select Location"
@@ -65,7 +100,7 @@
             name="createmachine-select-location"}}
 
         <label for="createmachine-select-key">6. Key:</label>
-        {{view Mist.Select contentBinding="Mist.keysController"
+        {{!view Mist.Select contentBinding="Mist.keysController"
             optionLabelPath="content.name"
             optionValuePath="content.name"
             prompt="Select Key"
@@ -82,7 +117,7 @@
             name="create-machine-script"
             id="create-machine-script"}}
 
-        <div class="cost">Cost: {{Mist.machineAddController.newMachineCost}}</div>
+        <!--div class="cost">Cost: {{Mist.machineAddController.newMachineCost}}</div-->
 
         <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
             <button id="create-cancel"

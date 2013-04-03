@@ -13,7 +13,7 @@ function(MistScreen, machine_list_html) {
     return MistScreen.extend({
 
         template: Ember.Handlebars.compile(machine_list_html),
-
+        
         disabledShellClass : function() {
             var machines = new Array();
 
@@ -87,6 +87,52 @@ function(MistScreen, machine_list_html) {
 
         openActions: function(){
             $("#dialog-power").popup('option', 'positionTo', '#machines-button-power').popup('open', {transition: 'slideup'});
+        },
+        
+        selectMachines: function(event){
+            var selection = $(event.target).attr('title');
+
+            if(selection == 'none'){
+                Mist.backendsController.forEach(function(backend){
+                    backend.machines.forEach(function(machine){
+                        log('deselecting machine: ' + machine.name);
+                        machine.set('selected', false);
+                    });
+                });
+            } else if(selection == 'all'){
+                Mist.backendsController.forEach(function(backend){
+                    backend.machines.forEach(function(machine){
+                        log('selecting machine: ' + machine.name);
+                        machine.set('selected', true);
+                    });
+                });
+            } else {
+                Mist.backendsController.forEach(function(backend){
+                    if(backend.provider == selection){
+                        backend.machines.forEach(function(machine){
+                            log('selecting machine: ' + machine.name);
+                            machine.set('selected', true);
+                        });
+                    } else {
+                        backend.machines.forEach(function(machine){
+                            log('deselecting machine: ' + machine.name);
+                            machine.set('selected', false);
+                        });
+                    }
+                });
+            }
+            Ember.run.next(function(){
+                $("input[type='checkbox']").checkboxradio("refresh");
+            });
+            $("#select-machines-listmenu li a").off('click', this.selectMachines);            
+            $('#select-machines-popup').popup('close'); 
+            return false;            
+        },
+        
+        openMachineSelectPopup: function() {
+            $('#select-machines-listmenu').listview('refresh');
+            $('#select-machines-popup').popup('option', 'positionTo', '#select-machines').popup('open', {transition: 'pop'});
+            $("#select-machines-listmenu li a").on('click', this.selectMachines);
         }
     });
 });

@@ -15,7 +15,8 @@ define('app/views/machine_add_dialog', [
             imagesBinding: 'Mist.machineAddController.newMachineBackend.images',
 
             openMachineAddDialog: function(){
-                $('#dialog-add').popup('open');
+                $('.select-listmenu').listview('refresh');
+                $('#dialog-add').panel('open');
             },
 
             clear: function(){
@@ -36,13 +37,13 @@ define('app/views/machine_add_dialog', [
             newMachineClicked: function() {
                 //FIXME there should be a way to bind the action directly to the controller
                 Mist.machineAddController.newMachine();
-                $('#dialog-add').popup('close');
+                $('#dialog-add').panel('close');
                 this.clear();
             },
 
             backClicked: function() {
                 this.clear();
-                $('#dialog-add').popup('close');
+                $('#dialog-add').panel('close');
             },
 
             init: function() {

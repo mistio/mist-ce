@@ -51,27 +51,7 @@ div#splash div.mist-logo {
 /* Search field */
 
 #machines .ui-listview-filter-inset {
-    margin: -41px 124px 0 60px;
-}
-
-/* Create machine button */
-
-#machines #mist-create-machine {
-    width: 120px;
-
-    float: right;
-    top: -46px;
-    right: -6px;
-}
-
-#machines #mist-create-machine .ui-icon {
-    position: absolute;
-    left: 17px;
-    z-index: 1000;
-}
-
-#machines #mist-create-machine .ui-btn-inner {
-    border: none !important;
+    margin: -52px 120px 0 120px;
 }
 
 /* Provider Icons */
@@ -135,7 +115,6 @@ div#splash div.mist-logo {
 }
 
 #providers-state-list .state-off .provider-state-icon{
-    background-image: url(icons/loader.gif);
     background-position: center !important;
     background-repeat: no-repeat;
     overflow: hidden;
@@ -191,10 +170,6 @@ li.node fieldset.list-item {
     float: left;
     padding-top: 12px;
     padding-left: 12px;
-}
-
-li.node .ui-icon-arrow-r {
-    right: 18px;
 }
 
 li.node .ui-checkbox {
@@ -347,12 +322,8 @@ li.node .tag {
     color: #777;
 }
 
-#machines .ui-select {
-    width: 60px;
-}
-
 #machines .ui-input-search input.ui-input-text {
-    padding: .55em 0;
+    padding: .45em 0;
 }
 
 #machines .ui-link {
@@ -367,6 +338,16 @@ li.node .tag {
 
 #machines .dialog-add .ui-select, #images .dialog-add .ui-select {
     width: 100%;
+}
+
+#select-machines {
+    max-width: 110px;
+    color: #999999;
+    font-weight: normal;
+}
+
+#select-machines .ui-icon {
+    margin-left: 5px;
 }
 
 a#mist-select-machines-button {
@@ -905,10 +886,6 @@ div.pending-monitoring {
     float: right;
 }
 
-div.cost {
-    display: none;
-}
-
 #create-ok-cancel .ui-controlgroup-controls {
     width: 100%;
 }
@@ -991,9 +968,12 @@ div.cost {
     margin: 14px 0 4px 0;
 }
 
-#add-backend.ui-panel-open {
+#add-backend {
     min-height: 385px !important;
-    margin-top: 10px;
+}
+
+#add-backend.ui-panel-open {
+    margin-top: 0px;
     min-width: 300px;
 }
 
@@ -1016,6 +996,13 @@ div.cost {
 .select-listmenu {
     max-height: 150px;
     overflow-y: auto;
+}
+
+#dialog-add.ui-panel-open {
+    min-width: 320px;
+    margin-top: 0px;
+    width: 30%;
+    z-index: 10000;
 }
 
 /* Tags Dialog */
@@ -1277,6 +1264,18 @@ div.info {
         max-width: 400px;
     }
 
+    /* Select machines button */
+   
+    #machines #select-machines {
+        width: 60px;
+        right: -6px;
+        padding: 9px 0;
+    }
+    
+    #machines #select-machines .ui-btn-text {
+        display: none;
+    }
+        
     /* Create machine button */
 
     #machines #mist-create-machine {
@@ -1285,8 +1284,12 @@ div.info {
         padding: 9px 0;
     }
 
+    #machines #mist-create-machine .ui-btn-inner{
+        border: none;
+    }
+    
     #machines #mist-create-machine .ui-icon {
-        left: 21px;
+        left: 22px;
     }
 
     #machines #mist-create-machine .ui-btn-text {
@@ -1295,7 +1298,7 @@ div.info {
 
     /* Search field */
     #machines .ui-listview-filter-inset {
-        margin-right: 64px;
+        margin: -52px 80px 0;
     }
 }
 

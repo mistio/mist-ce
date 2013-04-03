@@ -15,27 +15,28 @@ define('app/views/backend_add', [
             template: Ember.Handlebars.compile(backend_add_html),
 
             init: function() {
-                this._super();
-                $(document).bind("mobileinit", function(){
-                    $('.select-listmenu li').on('click', function(event){
-                        $('.select-backend-collapsible').collapsible('option','collapsedIcon','check');
-                        $('.select-backend-collapsible span.ui-btn-text').text(event.target.text);
-                        Mist.backendAddController.set('newBackendProvider', 
-                            {provider: $(event.target).attr('title'),
-                             title: event.target.text 
-                            }
-                        );
-                        $('.select-backend-collapsible').trigger('collapse');               
-                    });
-                });           
+                this._super();         
+            },
+            
+            selectBackend: function(event){
+                $('.select-backend-collapsible').collapsible('option','collapsedIcon','check');
+                $('.select-backend-collapsible span.ui-btn-text').text(event.target.text);
+                Mist.backendAddController.set('newBackendProvider', 
+                    {provider: $(event.target).attr('title'),
+                     title: event.target.text 
+                    }
+                );
+                $('.select-backend-collapsible').trigger('collapse');                 
             },
             
             addBackend: function() {
+                $('.select-listmenu li').on('click', this.selectBackend);                
                 $('#add-backend').panel('open');
             },
 
             backClicked: function() {
                 Mist.backendAddController.newBackendClear();
+                $('.select-listmenu li').off('click', this.selectBackend);
                 $("#add-backend").panel("close");
             },
 
@@ -62,6 +63,7 @@ define('app/views/backend_add', [
                         info('added backend ' + result.id);
                         Mist.backendAddController.newBackendClear();
                         $("#add-backend").panel("close");
+                        $('.select-listmenu li').off('click', this.selectBackend);
 //                        Ember.run.next(function(){
 //                            $('#backend-buttons [data-role=button]').button();
 //                            $('#backend-buttons').controlgroup('refresh');

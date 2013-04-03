@@ -14,7 +14,7 @@
 
     <div data-role="content" id="machines">
 
-        {{view Mist.Select
+        {{!view Mist.Select
             data-native-menu="true"
             name="select-machines"
             id="mist-select-machines"
@@ -26,12 +26,30 @@
 
         {{view Mist.MachineAddView}}
 
+        <a href="#"
+            id="select-machines"
+            data-theme="d"
+            data-role="button"
+            data-icon="arrow-d"
+            data-iconpos="left"
+            {{action openMachineSelectPopup target="view"}}>Select</a>
+            
+        <div id="select-machines-popup" data-role="popup">
+            <ul id="select-machines-listmenu" data-role="listview">
+                {{#each Mist.selectMachinesController.content}}
+                <li data-icon="false">
+                    <a href="#" title="{{unbound this.id}}">{{this.name}}</a>
+                </li>
+                {{/each}} 
+            </ul>
+        </div>
+
         <ul id="machines-list"
         data-role="listview"
         data-filter="true"
         data-inset="true"
         data-theme="c"
-        data-filter-placeholder="Filter machines...">
+        data-filter-placeholder="Filter...">
             {{#each Mist.backendsController}}
                 {{#each machines}}
                     {{view Mist.MachineListItemView machineBinding="this"}}

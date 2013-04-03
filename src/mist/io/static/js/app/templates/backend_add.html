@@ -4,6 +4,7 @@
     data-theme="b"
     data-role="button"
     data-icon="plus"
+    data-iconpos="right"
     {{action addBackend target="view"}}>Add backend</a>
 
 <div data-role="panel" id="add-backend" data-position="right" data-display="overlay" data-theme="b">
@@ -22,7 +23,7 @@
                 </li>
                 {{/each}}
             </ul>
-        </div>        
+        </div>      
 
         <label for="apikey">2. API Key:</label>
         {{view Mist.TextField
