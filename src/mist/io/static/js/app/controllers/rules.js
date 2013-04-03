@@ -4,20 +4,22 @@ define('app/controllers/rules', [
     'jquery'
     ],
     /**
-     * Keys controller
      *
+     * Rules controller
      *
      * @returns Class
      */
     function(Rule) {
         return Ember.ArrayController.extend({
-            content: null,
-            ruleCount: 0,
-            
+
+            metricList: ['load', 'cpu', 'ram', 'disk', 'network'],
+            operatorList: [{'title': 'gt', 'symbol': '>'}, {'title': 'lt', 'symbol': '<'}],
+            actionList: ['alert', 'reboot', 'destroy', 'launch', 'command'],
+
             init: function() {
                 this._super();
-                this.set('content', []);
-                /*var that = this;
+                /*
+                var that = this;
 
                 $.getJSON('/keys', function(data) {
                     var content = new Array();
@@ -27,11 +29,11 @@ define('app/controllers/rules', [
                     that.set('content', content);
                 }).error(function() {
                     Mist.notificationController.notify("Error loading keys");
-                });*/
-
+                });
+                */
             },
-            
-            newRule: function(machine, metric, operator, value, action){
+
+            newRule: function(machine, metric, operator, value, action) {
                 item = {
                     'machine': machine,
                     'metric': metric,
@@ -39,7 +41,7 @@ define('app/controllers/rules', [
                     'value': value,
                     'action': action
                 }
-                
+
                 var rule = Rule.create(item);
                 this.addObject(rule);
                 /*
@@ -59,7 +61,8 @@ define('app/controllers/rules', [
                         error(textstate, errorThrown, 'while creating key', name);
                         that.removeObject(key);
                     }
-                });*/
+                });
+                */
             }
         });
     }

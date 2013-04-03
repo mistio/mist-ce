@@ -1,41 +1,60 @@
 define('app/views/rule', [
-    'text!app/templates/rule.html','ember'],
+    'text!app/templates/rule.html',
+    'ember'],
     /**
      *
-     * Key page
+     * Rules view
      *
      * @returns Class
      */
     function(rule_html) {
         return Ember.View.extend({
-            tagName: false,
-            
+
+            template: Ember.Handlebars.compile(rule_html),
+
             init: function() {
                 this._super();
-                // cannot have template in home.pt as pt complains
-                this.set('template', Ember.Handlebars.compile(rule_html));
-                Ember.run.next(function(){
+                /*
+                Ember.run.next(function() {
                     $('span.ember-view.rule-metric').removeClass('ember-view');
                     $('span.ember-view.rule-operator').removeClass('ember-view');
                     $('span.ember-view.rule-action').removeClass('ember-view');
                 });
+                */
             },
-            
+
+            openMetricPopup: function() {
+                $('.rule-metric-list').listview('refresh');
+                $('#rule-metric-popup').popup('option', 'positionTo', '.rule-button.metric').popup('open');
+            },
+
+            openOperatorPopup: function() {
+                $('.rule-operator-list').listview('refresh');
+                $('#rule-operator-popup').popup('option', 'positionTo', '.rule-button.operator').popup('open');
+            },
+
+            openActionPopup: function() {
+                $('.rule-action-list').listview('refresh');
+                $('#rule-action-popup').popup('option', 'positionTo', '.rule-button.action').popup('open');
+            },
+
             deleteRuleClicked: function(){
                 Mist.rulesController.removeObject(this.rule);
             },
-            
+
+/*
             metricList: function() {
                 return ['load', 'cpu', 'ram', 'disk', 'network'];
             }.property('metricList'),
-            
+
             operatorList: function() {
                 return [{'id': 'gt', 'title': '>'}, {'id': 'lt', 'title': '<'}]
             }.property('operatorList'),
-            
+
             actionList: function() {
                 return ['alert', 'reboot', 'destroy', 'launch', 'command'];
             }.property('actionList')
+*/
         });
     }
 );

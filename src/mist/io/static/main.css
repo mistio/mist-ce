@@ -699,11 +699,6 @@ div.pending-monitoring {
     border-top: 1px solid #ccc;
 }
 
-/* This is only usefull for the add rule prototype */
-.rule-box.template {
-    display: none;
-}
-
 .rule-if, .rule-then {
     font-size: 20px;
     font-weight: bold;
@@ -713,21 +708,22 @@ div.pending-monitoring {
     height:40px;
 }
 
+.rule-if, .rule-then, .rule-value {
+    float: left;
+    height: 24px;
+}
+
 .rule-box .ui-slider {
+    /* commented out until the interaction with the slider is ok
     display: none;
+    */
     float: left;
     margin: 16px 16px 16px 8px;
     width: 30%;
 }
 
-.rule-box .ui-select {
+.rule-box .rule-button {
     float: left;
-    height: 56px;
-}
-
-.rule-if, .rule-then, .rule-value {
-    float: left;
-    height: 24px;
 }
 
 #machine-basic-table, #machine-metadata {
@@ -1265,17 +1261,17 @@ div.info {
     }
 
     /* Select machines button */
-   
+
     #machines #select-machines {
         width: 60px;
         right: -6px;
         padding: 9px 0;
     }
-    
+
     #machines #select-machines .ui-btn-text {
         display: none;
     }
-        
+
     /* Create machine button */
 
     #machines #mist-create-machine {
@@ -1287,7 +1283,7 @@ div.info {
     #machines #mist-create-machine .ui-btn-inner{
         border: none;
     }
-    
+
     #machines #mist-create-machine .ui-icon {
         left: 22px;
     }

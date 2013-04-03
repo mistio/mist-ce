@@ -203,11 +203,19 @@ define('app/views/machine', [
 
             addRuleClicked: function() {
                 Mist.rulesController.newRule();
-                Ember.run.next(function(){
-                    $('.rule-metric').last().selectmenu();
-                    $('.rule-operator').last().selectmenu();
+
+                Ember.run.next(function() {
+                    $('.rule-button.metric').last().button();
+                    $('.rule-metric-list').last().listview();
+                    $('#rule-metric-popup').last().popup();
+                    $('.rule-button.operator').last().button();
+                    $('.rule-operator-list').last().listview();
+                    $('#rule-operator-popup').last().popup();
                     $('.rule-value').last().slider();
-                    $('.rule-action').last().selectmenu();
+                    $('input.rule-value').last().textinput()
+                    $('.rule-button.action').last().button();
+                    $('.rule-action-list').last().listview();
+                    $('#rule-action-popup').last().popup();
                     $('.rules-container .delete-rule-button').last().button();
                 });
             },

@@ -13,7 +13,7 @@ function(MistScreen, machine_list_html) {
     return MistScreen.extend({
 
         template: Ember.Handlebars.compile(machine_list_html),
-        
+
         disabledShellClass : function() {
             var machines = new Array();
 
@@ -88,7 +88,7 @@ function(MistScreen, machine_list_html) {
         openActions: function(){
             $("#dialog-power").popup('option', 'positionTo', '#machines-button-power').popup('open', {transition: 'slideup'});
         },
-        
+
         selectMachines: function(event){
             var selection = $(event.target).attr('title');
 
@@ -124,11 +124,11 @@ function(MistScreen, machine_list_html) {
             Ember.run.next(function(){
                 $("input[type='checkbox']").checkboxradio("refresh");
             });
-            $("#select-machines-listmenu li a").off('click', this.selectMachines);            
-            $('#select-machines-popup').popup('close'); 
-            return false;            
+            $("#select-machines-listmenu li a").off('click', this.selectMachines);
+            $('#select-machines-popup').popup('close');
+            return false;
         },
-        
+
         openMachineSelectPopup: function() {
             $('#select-machines-listmenu').listview('refresh');
             $('#select-machines-popup').popup('option', 'positionTo', '#select-machines').popup('open', {transition: 'pop'});

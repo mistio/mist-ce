@@ -31,16 +31,15 @@
             data-theme="d"
             data-role="button"
             data-icon="arrow-d"
-            data-iconpos="left"
             {{action openMachineSelectPopup target="view"}}>Select</a>
-            
+
         <div id="select-machines-popup" data-role="popup">
             <ul id="select-machines-listmenu" data-role="listview">
                 {{#each Mist.selectMachinesController.content}}
                 <li data-icon="false">
                     <a href="#" title="{{unbound this.id}}">{{this.name}}</a>
                 </li>
-                {{/each}} 
+                {{/each}}
             </ul>
         </div>
 
