@@ -121,15 +121,15 @@ define( 'app', [
                 machine_html,
                 cubism
                 ) {
-                    
+
     function initialize() {
         //$(window).load(function(){
         //    warn('preloading');
         //    $.preloadCssImages();
         //});
         //function init() {
-            
-        
+
+
         $(document).bind("mobileinit", function(){
             $.mobile.ajaxEnabled = false;
             $.mobile.hashListeningEnabled = false;
@@ -137,14 +137,14 @@ define( 'app', [
             $('#splash').fadeOut(1000);
             $('body').css('overflow', '');
         });
-    
+
         Ember.LOG_BINDINGS = true;
-    
+
         App = Ember.Application.create({
             rootElement: 'body',
             LOG_TRANSITIONS: true,
             LOG_STATE_TRANSITIONS: true,
-    
+
             ready: function(){
                 Em.run.next(function(){
                     var id = false;
@@ -160,7 +160,7 @@ define( 'app', [
                 });
             }
         });
-    
+
         App.Router.map(function() {
             this.route('machines');
             this.route('images');
@@ -172,7 +172,7 @@ define( 'app', [
                 path : '/keys/:key_id'
             });
         });
-    
+
         // TODO: why the shortcut names? they don't make sense
         App.MacView = MachineView;
         App.MachineListView = MachineListView
@@ -186,7 +186,7 @@ define( 'app', [
         App.MachineAddView = MachineAddDialog;
         App.KeyAssociateDialog = KeyAssociateDialog;
         App.MachineKeyListItemView = MachineKeyListItem;
-    
+
     //        var mobileinit = false;
     //        $(document).bind('pageinit', function() {
     //            if (mobileinit){
@@ -256,7 +256,7 @@ define( 'app', [
         App.set('keysController', KeysController.create());
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
-    
+
         App.set('authenticated', URL_PREFIX == '' ? true : false);
         App.set('email', '');
         App.set('password', '');
@@ -343,26 +343,26 @@ define( 'app', [
                 'disabled'
             ],
         });
-    
+
         App.TextField = Ember.TextField.extend({
             attributeBindings: [
                 'name',
                 'data-theme'
             ]
         });
-    
+
         App.ShellTextField = Ember.TextField.extend({
             attributeBindings: [
                 'name',
                 'data-theme',
                 'autocapitalize'
             ],
-    
+
                     insertNewline: function() {
                         this._parentView.submit();
                     }
                 });
-    
+
                 App.Checkbox = Ember.Checkbox.extend({
                     attributeBindings: [
                         'name',
@@ -382,9 +382,9 @@ define( 'app', [
         App.MachineListItemView = MachineListItem;
         App.ImageListItemView = ImageListItem;
         App.ConfirmationDialog = ConfirmationDialog;
-    
+
         App.DeleteTagView = DeleteTagView;
-    //            App.RuleView = RuleView;
+        App.RuleView = RuleView;
         App.KeyMachineListItemView = KeyMachineListItem;
         App.MachineTagsDialog = MachineTagsDialog;
         App.ShellDialog = Shell;
@@ -446,15 +446,15 @@ define( 'app', [
     ////            var keyAssociateDialog = KeyAssociateDialog.create();
     ////            keyAssociateDialog.append();
     ////*/
-    
+
         window.Mist = App;
         return App
     }
-    
+
     var allImgs = [],
         imgUrls = [],
         thisSheetRules;
-            
+
     function parseCSS(sheets, urls) {
         var w3cImport = false,
             imported = [],
@@ -462,9 +462,9 @@ define( 'app', [
             baseURL;
         var sheetIndex = sheets.length;
         while(sheetIndex--){//loop through each stylesheet
-            
+
             var cssPile = '';//create large string of all css rules in sheet
-            
+
             if(urls && urls[sheetIndex]){
                 baseURL = urls[sheetIndex];
             } else {
@@ -479,7 +479,7 @@ define( 'app', [
             if(sheets[sheetIndex].cssRules || sheets[sheetIndex].rules){
                 thisSheetRules = (sheets[sheetIndex].cssRules) ? //->>> http://www.quirksmode.org/dom/w3c_css.html
                     sheets[sheetIndex].cssRules : //w3
-                    sheets[sheetIndex].rules; //ie 
+                    sheets[sheetIndex].rules; //ie
                 var ruleIndex = thisSheetRules.length;
                 while(ruleIndex--){
                     if(thisSheetRules[ruleIndex].style && thisSheetRules[ruleIndex].style.cssText){
@@ -491,7 +491,7 @@ define( 'app', [
                         imported.push(thisSheetRules[ruleIndex].styleSheet);
                         w3cImport = true;
                     }
-                    
+
                 }
             }
             //parse cssPile for image urls
@@ -500,15 +500,15 @@ define( 'app', [
                 var i = tmpImage.length;
                 while(i--){ // handle baseUrl here for multiple stylesheets in different folders bug
                     var imgSrc = (tmpImage[i].charAt(0) == '/' || tmpImage[i].match('://')) ? // protocol-bug fixed
-                        tmpImage[i] : 
+                        tmpImage[i] :
                         baseURL + tmpImage[i];
-                    
+
                     if(jQuery.inArray(imgSrc, imgUrls) == -1){
                         imgUrls.push(imgSrc);
                     }
                 }
             }
-            
+
             if(!w3cImport && sheets[sheetIndex].imports && sheets[sheetIndex].imports.length) {
                 for(var iImport = 0, importLen = sheets[sheetIndex].imports.length; iImport < importLen; iImport++){
                     var iHref = sheets[sheetIndex].imports[iImport].href;
@@ -519,14 +519,14 @@ define( 'app', [
                         iHref += '/'; //tack on a / if needed
                     }
                     var iSrc = (iHref.charAt(0) == '/' || iHref.match('://')) ? // protocol-bug fixed
-                        iHref : 
+                        iHref :
                         baseURL + iHref;
-                    
+
                     importedSrc.push(iSrc);
                     imported.push(sheets[sheetIndex].imports[iImport]);
                 }
-                
-                
+
+
             }
         }//loop
         if(imported.length){
@@ -534,7 +534,7 @@ define( 'app', [
             return false;
         }
     }
-    
+
     function preloadImages(callback) {
         var imgs = [];
         parseCSS(document.styleSheets);
@@ -551,8 +551,8 @@ define( 'app', [
             img.src = imgUrls[i];
             imgs.push(img);
         }
-    }     
-    
+    }
+
     preloadImages(initialize);
 });
 
