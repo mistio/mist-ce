@@ -13,10 +13,10 @@
     <h3 class="single-view-name">{{name}}</h3>
 
     <span class="single-view-icon-wrapper">
-        <span id="single-view-provider-icon" {{bindAttr class="providerIconClass"}}></span>
+        <span id="single-view-provider-icon" {{bindAttr class="view.providerIconClass"}}></span>
     </span>
 
-    <span class="single-view-icon-wrapper" {{bindAttr class="image.type"}}>
+    <span {{bindAttr class=":single-view-icon-wrapper image.type"}}>
         <span id="single-view-image-icon"></span>
     </span>
 
