@@ -13,7 +13,7 @@ define('app/views/machine_monitoring_dialog', [
             template: Ember.Handlebars.compile(machine_monitoring_dialog_html),
 
             openMonitoringDialog: function() {
-                $("#monitoring-dialog").popup('option', 'positionTo', '.monitoring-button').popup('open');
+                $("#monitoring-dialog").popup('open');
             },
 
             changeMonitoringClicked: function() {
