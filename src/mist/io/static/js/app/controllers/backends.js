@@ -24,6 +24,14 @@ define('app/controllers/backends', [
                 }
             }.observes('state'),
 
+            getBackendById: function(backendId){
+                for (var i = 0; i < this.content.length; i++){
+                    if (this.content[i].id == backendId) {
+                        return this.content[i];
+                    }
+                }    
+            },
+            
             getMachineCount: function(){
                 var count = 0;
                 this.content.forEach(function(item){
