@@ -1054,14 +1054,20 @@ div.pending-monitoring {
 
 #dialog-shell.dialog-shell .shell-input input {
     width: 97%;
-    padding-left: 28px;
+    padding: 8px 0 8px 22px;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     background-image: url("images/prompt.png");
-    background-position: 12px 9px;
+    background-position: 4px 8px;
     background-repeat: no-repeat;
+}
+
+.ui-field-contain table.shell-input div.ui-input-text {
+    width: 95%;
+    margin-top: 3px;
+    margin-left: -3px;
 }
 
 #dialog-shell.dialog-shell .shell-send {

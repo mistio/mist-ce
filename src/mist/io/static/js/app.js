@@ -138,12 +138,12 @@ define( 'app', [
             $('body').css('overflow', '');
         });
 
-        Ember.LOG_BINDINGS = true;
+        Ember.LOG_BINDINGS = false;
 
         App = Ember.Application.create({
             rootElement: 'body',
-            LOG_TRANSITIONS: true,
-            LOG_STATE_TRANSITIONS: true,
+            LOG_TRANSITIONS: false,
+            LOG_STATE_TRANSITIONS: false,
 
             ready: function(){
                 Em.run.next(function(){
