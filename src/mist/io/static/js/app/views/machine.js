@@ -463,11 +463,15 @@ define('app/views/machine', [
 
             }.observes('controller.model.hasMonitoring'),
 
-            backClicked: function() {
+            stopPolling: function() {
                 // if it polls for stats, stop it
                 if ('context' in Mist) {
                     Mist.context.stop();
                 }
+            }.observes('controller.model.hasMonitoring'),
+
+            backClicked: function() {
+                this.stopPolling();
                 // then get back to machines' list
                 Mist.Router.router.transitionTo('machines')
             },
