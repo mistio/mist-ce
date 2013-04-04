@@ -1120,7 +1120,7 @@ div.pending-monitoring {
     background-color: #EFEFF1;
 }
 
-.pending-shell .command.pending{
+.command.pending{
     background: url("/static/images/spinner.gif") no-repeat scroll 92% center #EFEFF1 !important;
 }
 

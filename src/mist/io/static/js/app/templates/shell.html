@@ -7,7 +7,6 @@
             <table class="shell-input">
                 <tr>
                     <td>
-
                         {{view Mist.ShellTextField
                             autocapitalize="off"
                             autocorrect="off"
@@ -24,7 +23,7 @@
                 </tr>
             </table>
         </div>
-        <div {{bindAttr class=":shell-return Mist.machine.pendingShell"}}>
+        <div {{bindAttr class=":shell-return"}}>
         {{#each view.shellOutputItems}}
             <h3 class="command">{{command}}</h3>
             <div class="output">{{{output}}}</div>
