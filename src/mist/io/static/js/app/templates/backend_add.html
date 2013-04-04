@@ -38,20 +38,9 @@
             name="create-backend-secret"
             id="create-backend-secret"}}
 
-        <div id="create-backend-buttons" class="btn-full" data-role="controlgroup" data-type="horizontal">
-
-            <button id="create-backend-cancel"
-                class="btn-left-full"
-                data-role="button"
-                data-theme="c"
-                {{action "backClicked" target="view"}}>Back</button>
-
-            <button id="create-backend-ok"
-                class="btn-right-full"
-                data-role="button"
-                data-theme="b"
-                disabled
-                {{action "addButtonClick" target="view"}}>Add</button>
+        <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <button id="create-backend-cancel" data-theme="c" {{action "backClicked" target="view"}}>Back</button>
+            <button id="create-backend-ok" data-theme="b" disabled {{action "addButtonClick" target="view"}}>Add</button>
         </div>
     </div>
 </div>

@@ -24,6 +24,22 @@ div#splash div.mist-logo {
     margin-top: -140px;
 }
 
+/* Buttons */
+
+.btn-full {
+    width: 100%;
+    text-align: center;
+    margin-top: 2em;
+}
+
+.ok-cancel .ui-controlgroup-controls {
+    width: 100%;
+}
+
+.ok-cancel .ui-btn {
+    width: 49%;
+}
+
 /* Home Page */
 
 #home .ui-content {
@@ -237,6 +253,10 @@ li.node .tag {
 
 #machines-list .state-icon.ui-icon-check {
     background-color: #33dd44;
+}
+
+.add-button {
+    float: right;
 }
 
 /* Keys Listing */
@@ -857,39 +877,6 @@ div.pending-monitoring {
     top: -5px;
 }
 
-/* Create Dialog */
-
-.btn-full {
-    width: 100%;
-    text-align: center;
-    margin-top: 2em;
-}
-
-#new-machine-name {
-    margin: 12px 0;
-}
-
-.mist-li-selected {
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#AFD5FF), to(#98BBED)); /* Saf4+, Chrome */
-    background-image: -webkit-linear-gradient(#AFD5FF, #98BBED); /* Chrome 10+, Saf5.1+ */
-    background-image:    -moz-linear-gradient(#AFD5FF, #98BBED); /* FF3.6 */
-    background-image:     -ms-linear-gradient(#AFD5FF, #98BBED); /* IE10 */
-    background-image:      -o-linear-gradient(#AFD5FF, #98BBED); /* Opera 11.10+ */
-    background-image:         linear-gradient(#AFD5FF, #98BBED);
-}
-
-.add-button {
-    float: right;
-}
-
-#create-ok-cancel .ui-controlgroup-controls {
-    width: 100%;
-}
-
-#create-ok-cancel .ui-btn {
-    width: 49%;
-}
-
 /* Provider (backend) state dialog */
 
 #edit-backend.mist-dialog {
@@ -948,14 +935,6 @@ div.pending-monitoring {
 
 #key-associate-dialog {
     width: 400px;
-}
-
-#dialog-confirm .ui-controlgroup-controls, #key-associate-dialog .ui-controlgroup-controls {
-    width: 100%;
-}
-
-#dialog-confirm .btn-left-full, #dialog-confirm .btn-right-full, #key-associate-dialog .btn-left-full, #key-associate-dialog .btn-right-full {
-    width: 49%;
 }
 
 /* Add backend dialog */
@@ -1169,8 +1148,8 @@ iframe#hidden-shell-iframe {
 }
 
 #dialog-providers-popup p {
-    width:250px;
-    overflow:hidden;
+    width: 250px;
+    overflow: hidden;
     text-align: right;
 }
 
@@ -1194,18 +1173,6 @@ div.logout-placeholder {
     float: right;
 }
 
-#add-backend .ui-controlgroup-horizontal, #add-backend .ui-controlgroup-controls {
-    width: 100%;
-}
-
-#dialog-add-key .ui-controlgroup-controls {
-    width: 100%;
-}
-
-#dialog-add-key .ui-corner-left, #dialog-add-key .ui-corner-right {
-    width: 49.2%;
-}
-
 #invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader  {
     background-image: url(images/spinner.gif);
     background-position: center !important;
@@ -1214,14 +1181,11 @@ div.logout-placeholder {
     height: 16px;
 }
 
-#backend-delete-yes, #backend-delete-no, #add-backend .ui-controlgroup-controls > div {
-    width: 49.2%;
-}
-
 #key-machines-list {
     max-height: 250px;
     overflow: auto;
 }
+
 div.info {
     margin:10px;
     text-align: center;

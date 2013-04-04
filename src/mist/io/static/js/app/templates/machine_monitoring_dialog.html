@@ -33,15 +33,9 @@
                 <pre>chmod -x /etc/init.d/collectd &amp;&amp; killall -9 collectd</pre>
                 {{/unless}}
 
-                <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-                    <button id="enable-monitoring-cancel"
-                        class="btn-left-full"
-                        data-theme="c"
-                        {{action "backClicked" target="view"}}>Back</button>
-                    <button id="enable-monitoring-ok"
-                        class="btn-right-full"
-                        data-theme="b"
-                        {{action "changeMonitoringClicked" target="view"}}>Disable</button>
+                <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+                    <button data-theme="c" {{action "backClicked" target="view"}}>Back</button>
+                    <button data-theme="b" {{action "changeMonitoringClicked" target="view"}}>Disable</button>
                 </div>
             {{else}}
                 <div>Are you sure you wish to enable monitoring for {{name}}?</div>
@@ -51,32 +45,23 @@
                 <p>You will have to configure it manually by following the instructions after pressing enable.</p>
                 {{/unless}}
 
-                <div id="create-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-                    <button id="enable-monitoring-cancel"
-                        class="btn-left-full"
-                        data-theme="c"
-                        {{action "backClicked" target="view"}}>Back</button>
-                    <button id="enable-monitoring-ok"
-                        class="btn-right-full"
-                        data-theme="b"
-                        {{action "changeMonitoringClicked" target="view"}}>Enable</button>
+                <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+                    <button data-theme="c" {{action "backClicked" target="view"}}>Back</button>
+                    <button data-theme="b" {{action "changeMonitoringClicked" target="view"}}>Enable</button>
                 </div>
             {{/if}}
         {{else}}
             <div class="info">In order to proceed you need to login to the premium <a href="https://mist.io">mist.io</a> service.</div>
+
             <label for="email">Email</label>
             {{view Mist.TextField valueBinding="Mist.email" name="email" id="email"}}
+
             <label for="password">Password</label>
             {{view Mist.TextField type="password" valueBinding="Mist.password" name="password" id="password"}}
-            <div id="auth-ok-cancel" class="btn-full" data-role="controlgroup" data-type="horizontal">
-                <button id="auth-cancel"
-                    class="btn-left-full"
-                    data-theme="c"
-                    {{action "backClicked" target="view"}}>Back</button>
-                <button id="auth-ok"
-                    class="btn-right-full"
-                    data-theme="b"
-                    {{action "changeMonitoringClicked" target="view"}}>Login</button>
+
+            <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <button data-theme="c" {{action "backClicked" target="view"}}>Back</button>
+                <button data-theme="b" {{action "changeMonitoringClicked" target="view"}}>Login</button>
             </div>
         {{/if}}
 

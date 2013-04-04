@@ -5,10 +5,7 @@
             name="create-key-name"
             id="create-key-name"}}
 
-        <button data-theme="b"
-            data-role="button"
-            data-icon="gear"
-            {{action "generateClicked" target="view"}}>Generate</button>
+        <button data-theme="b" data-icon="gear" {{action "generateClicked" target="view"}}>Generate</button>
 
         <label for="textarea-public-key">Public Key:</label>
         {{view Ember.TextArea
@@ -22,16 +19,9 @@
             name="textarea-private-key"
             id="textarea-private-key"}}
 
-            <div class="ajax-loader"></div>
+        <div class="ajax-loader"></div>
 
-        <div class="btn-full" data-role="controlgroup" data-type="horizontal">
-            <button class="btn-left-full"
-                data-theme="c"
-                {{action "backClicked" target="view"}}>Back</button>
-
-            <button id="add-key-button"
-                class="btn-right-full"
-                data-theme="b"
-                disabled
-                {{action "newKeyClicked" target="view"}}>Add</button>
+        <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <button id="create-key-cancel" data-theme="c" {{action "backClicked" target="view"}}>Back</button>
+            <button id="create-key-ok" data-theme="b" disabled {{action "newKeyClicked" target="view"}}>Add</button>
         </div>

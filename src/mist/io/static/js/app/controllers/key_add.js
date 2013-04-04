@@ -28,13 +28,13 @@ define('app/controllers/key_add', [
                         this.get('newKeyPublic') &&
                         this.get('newKeyPrivate')) {
                     this.set('newKeyReady', true);
-                    if('button' in $('#add-key-button')){
-                        $('#add-key-button').button('enable');
+                    if('button' in $('#create-key-ok')){
+                        $('#create-key-ok').button('enable');
                     }
                 } else {
                     this.set('newKeyReady', false);
-                    if('button' in $('#add-key-button')){
-                        $('#add-key-button').button('disable');
+                    if('button' in $('#create-key-ok')){
+                        $('#create-key-ok').button('disable');
                     }
                 }
             },

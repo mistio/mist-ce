@@ -1,12 +1,5 @@
-        <p>{{Mist.confirmationController.text}}</p>
-        <div data-role="controlgroup" class="btn-full" data-type="horizontal">
-            <a
-                class="btn-left-full"
-                data-role="button"
-                data-theme="b"
-                {{action reject target="view"}}>No</a>
-            <a
-                class="btn-right-full"
-                data-role="button"
-                {{action confirm target="view"}}>Yes</a>
-        </div>
+<p>{{Mist.confirmationController.text}}</p>
+<div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
+    <button data-theme="c" {{action reject target="view"}}>No</button>
+    <button data-theme="b" {{action confirm target="view"}}>Yes</button>
+</div>

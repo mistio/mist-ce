@@ -27,7 +27,7 @@ define('app/views/backend_edit', [
                     url: '/backends/' + this.backend.id,
                     type: 'DELETE',
                     success: function(result) {
-                        
+
                         $('#backend-delete-confirm').hide();
                         var i = Mist.backendsController.content.indexOf(that.backend);
                         // refresh backend buttons
@@ -48,7 +48,7 @@ define('app/views/backend_edit', [
                     $('.backend-toggle').slider('refresh');
                 });
             },
-            
+
             template: Ember.Handlebars.compile(edit_backend_dialog_html),
         });
     }

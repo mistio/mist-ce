@@ -66,9 +66,9 @@ define('app/views/machine_add_dialog', [
                         Ember.run.next(function() {
                             $('#create-ok').button();
                             if (Mist.machineAddController.newMachineReady) {
-                                $('#create-ok').button('enable');
+                                $('#create-machine-ok').button('enable');
                             } else {
-                                $('#create-ok').button('disable');
+                                $('#create-machine-ok').button('disable');
                             }
                         });
                     });
@@ -151,10 +151,10 @@ define('app/views/machine_add_dialog', [
                         Ember.run.next(function(){
                             $('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineLocationReady) {
-                                $('#create-ok').button('enable');
+                                $('#create-machine-ok').button('enable');
                                 $('#createmachine-select-key').selectmenu('enable');
                             } else {
-                                $('#create-ok').button('disable');
+                                $('#create-machine-ok').button('disable');
                                 $('#createmachine-select-key').selectmenu('disable');
                             }
                         });
