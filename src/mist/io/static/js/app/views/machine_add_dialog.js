@@ -45,7 +45,15 @@ define('app/views/machine_add_dialog', [
                 $('.select-image-collapsible').trigger('collapse');
                 return false;               
             },
-            
+
+            selectLocation: function(event){
+                $('.select-location-collapsible').collapsible('option','collapsedIcon','check');
+                $('.select-location-collapsible span.ui-btn-text').text(event.target.text);
+                Mist.machineAddController.set('newMachineLocation', $(event.target).attr('title'));        
+                $('.select-location-collapsible').trigger('collapse');
+                return false;               
+            },
+                        
             selectKey: function(event){
                 $('.select-key-collapsible').collapsible('option','collapsedIcon','check');
                 $('.select-key-collapsible span.ui-btn-text').text(event.target.text);
@@ -53,7 +61,7 @@ define('app/views/machine_add_dialog', [
                 $('.select-key-collapsible').trigger('collapse');
                 return false;               
             },
-                          
+                            
             clear: function(){
                 Mist.machineAddController.newMachineClear();
                 $('#create-machine-name').val('');
