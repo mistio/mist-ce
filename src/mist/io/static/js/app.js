@@ -626,6 +626,7 @@ function completeShell(ret){
     // TODO disabling this for now, spinners won't work, globals are not there
     //Mist.machine.set('pendingShell', false);
     $('.shell-return .pending').removeClass('pending');
+    $('a.shell-send').removeClass('ui-disabled');
     if (collectd_install_target) {
         if (collectd_lastlog.search('root') == -1){
             // TODO: display instruction for manual installation

@@ -18,12 +18,12 @@
                             data-role="button"
                             data-iconpos="notext"
                             {{action submit target="view"}}
-                            {{bindAttr class=":shell-send disabledClass"}}></a>
+                            class="shell-send"></a>
                     </td>
                 </tr>
             </table>
         </div>
-        <div {{bindAttr class=":shell-return"}}>
+        <div class="shell-return">
         {{#each view.shellOutputItems}}
             <h3 class="command">{{command}}</h3>
             <div class="output">{{{output}}}</div>

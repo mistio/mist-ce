@@ -66,6 +66,7 @@ function(shell_html) {
                          $(".shell-return").accordion({ header: "h3", collapsible: true });
                     }
                     $($.mobile.activePage).find(".shell-return .command").first().addClass('pending');
+                    $($.mobile.activePage).find("a.shell-send").addClass('ui-disabled');
                 });
 
             });
@@ -93,14 +94,6 @@ function(shell_html) {
         clear: function() {
             this.set('command', '');
         },
-
-        disabledClass: function() {
-            if (this.command && this.command.length > 0 && !Mist.machine.pendingShell) {
-                return '';
-            } else {
-                return 'ui-disabled';
-            }
-        }.property('command'),
 
         init: function() {
             this._super();
