@@ -13,7 +13,7 @@
     </div>
     <div data-role="content">
         <label for="select-backend">1. Provider:</label>
-        <div class="select-backend-collapsible" data-role="collapsible" data-iconpos="right" data-corners="true" 
+        <div class="select-backend-collapsible" data-role="collapsible" data-iconpos="right" data-corners="true"
             data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
             <h2>Select backend</h2>
             <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
@@ -23,7 +23,7 @@
                 </li>
                 {{/each}}
             </ul>
-        </div>      
+        </div>
 
         <label for="apikey">2. API Key:</label>
         {{view Mist.TextField
@@ -44,7 +44,7 @@
                 class="btn-left-full"
                 data-role="button"
                 data-theme="c"
-                {{action "backClicked" target="view"}}>Close</button>
+                {{action "backClicked" target="view"}}>Back</button>
 
             <button id="create-backend-ok"
                 class="btn-right-full"

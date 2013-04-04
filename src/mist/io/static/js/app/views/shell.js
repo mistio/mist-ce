@@ -11,7 +11,7 @@ define('app/views/shell', [
  */
 function(shell_html) {
     return Ember.View.extend({
-        
+
         shellOutputItems: Ember.ArrayController.create(),
         availableCommands: [], //"dmesg", "uptime", "uname", "ls", "reboot", "whoami", "ifconfig" ],
 
@@ -92,10 +92,6 @@ function(shell_html) {
 
         clear: function() {
             this.set('command', '');
-        },
-        
-        back: function() {
-            $('#dialog-shell').popup('close');
         },
 
         disabledClass: function() {
