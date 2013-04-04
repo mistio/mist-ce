@@ -55,7 +55,6 @@
             </div>
             <div class="add-rule-container">
                 <button id="add-rule-button"
-                    data-role="button"
                     data-icon="plus"
                     data-theme="b"
                     {{action addRuleClicked target="view"}}>Add Rule</button>
@@ -116,37 +115,28 @@
 
          <div data-role="collapsible" data-collapsed="false" id="machine-single-keys">
             <h3>Keys</h3>
-            <!--ul id="keys-list"
-            data-role="listview"
-            data-inset="true"
-            data-theme="c">
-                {{!#each view.machineKeys}}
-                    {{!view Mist.MachineKeyListItemView keyBinding="this"}}
-                {{!/each}}
-            </ul-->
-            <table id="machine-basic-table">
+            <div class="key-container">
                 {{#each view.machineKeys}}
                     {{view Mist.MachineKeyListItemView keyBinding="this"}}
                 {{/each}}
-            </table>
-            <div data-role="fieldcontain">
-                <select name="machine-select-key" id="machine-select-key" data-native-menu="true" data-placeholder="true" {{action "keySelect" on="change"}}>
-                    <option value="">Associate Key</option>
-                    {{#each view.machineKeysRest}}
-        		        <option {{bindAttr value="{{name}}"}}>{{name}}</option>
-                    {{/each}}
-	            </select>
             </div>
-            {{!view Mist.Select contentBinding="view.machineKeysRest"
-                optionLabelPath="content.name"
-                optionValuePath="content.name"
-                selectionBinding="view.keyAssociate"
-                class="rule-operator"
-                id="machine-add-key"
-                data-native-menu="true"
-                prompt="Associate key"
-                data-icon="false"
-                data-inline="true"}}
+            <div class="associate-button-container">
+                <button id="associate-key-button"
+                    data-inline="true"
+                    data-icon="plus"
+                    data-theme="b"
+                    {{action associateKeyClicked target="view"}}>Associate</button>
+            </div>
+            <div id="associate-key" data-role="popup">
+                <ul class="rule-action-list" data-role="listview">
+                    {{#each view.machineKeysRest}}
+                    <li data-icon="false">
+                        <a href="#" title="{{unbound name}}">{{name}}</a>
+                    </li>
+                    {{/each}}
+                </ul>
+            </div>
+
         </div>
 
         <div data-role="collapsible">

@@ -1,16 +1,10 @@
-<tr>
-    <td class="key"><a href="#key" {{action "keyClick" on="click"}}>{{view.key.name}}</a><a href="#" class="delete-key" {{action "keyDisassociate" on="click"}}>Delete</a></td>
-</tr>
-
-<!--li class="node" data-icon="false">
-
-    <a href="" {{action "keyClick" on="click"}}>
-
-        <h3 class="name">{{view.key.name}}</h3>
-
-        <p class="description">
-            <span class="tag backend ui-btn-corner-all">{{view.key.name}}</span>
-        </p>
-    </a>
-
-</li-->
+<div class="key-box">
+    <div class="key-name">{{view.key.name}}</div>
+    <div class="delete-key-container">
+        <button class="delete-key-button"
+            data-icon="delete"
+            data-theme="d"
+            data-mini="true"
+            {{action keyDisassociate target="view"}}>&nbsp;</button>
+    </div>
+</div>

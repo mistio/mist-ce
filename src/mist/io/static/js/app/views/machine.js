@@ -498,6 +498,10 @@ define('app/views/machine', [
 
             openTags: function() {
                 $("#dialog-tags").popup('option', 'positionTo', '#machines-button-tags').popup('open', {transition: 'slideup'});
+            },
+
+            associateKeyClicked: function() {
+                $('#associate-key').popup('option', 'positionTo', '#associate-key-button').popup('open')
             }
         });
     }

@@ -684,16 +684,16 @@ div.pending-monitoring {
     background: #e0e0e1;
 }
 
-.delete-rule-container {
+.delete-rule-container, .delete-key-container {
     float: right;
     margin: 9px;
 }
 
-.delete-rule-container div.ui-btn span.ui-btn-inner {
+.delete-rule-container div.ui-btn span.ui-btn-inner, .delete-key-container div.ui-btn span.ui-btn-inner {
     padding-left: 9px;
 }
 
-.monitoring-dialog-container div {
+.monitoring-dialog-container div, .associate-button-container {
     max-width: 26ex;
     margin: 0 auto;
 }
@@ -707,19 +707,19 @@ div.pending-monitoring {
     margin: 0 auto;
 }
 
-.rules-container {
+.rules-container, .key-container {
     padding: 0;
     background: #e8e8e9;
     border-bottom: 1px solid #ccc;
 }
 
-.rule-box {
+.rule-box, .key-box {
     overflow: hidden;
     padding: 6px 10px;
     border-top: 1px solid #ccc;
 }
 
-.rule-if, .rule-then {
+.rule-if, .rule-then, .key-name {
     font-size: 20px;
     font-weight: bold;
     padding: 6px;
