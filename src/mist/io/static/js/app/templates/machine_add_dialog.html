@@ -41,8 +41,31 @@
             id="createmachine-select-provider"
             name="createmachine-select-provider"}}
 
-        <label for="createmachine-select-image">3. Image:</label>
-        <div class="select-image-collapsible" data-role="collapsible" data-iconpos="right" data-corners="true"
+        <label for="createmachine-select-size">3. Size:</label>
+        <div class="select-size-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
+            data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
+            <h2>Select Size</h2>
+            <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
+                {{#each Mist.machineAddController.newMachineBackend.sizes}}
+                <li data-icon="false" data-corners="true">
+                    <a href="#" title="{{unbound this.id}}">{{this.name}}</a>
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+        {{!view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.sizes"
+            optionLabelPath="content.name"
+            optionValuePath="content.id"
+            prompt="Select Size"
+            selectionBinding="Mist.machineAddController.newMachineSize"
+            class="create-select"
+            data-theme="c"
+            data-icon="check"
+            id="createmachine-select-size"
+            name="createmachine-select-size"}}
+            
+        <label for="createmachine-select-image">4. Image:</label>
+        <div class="select-image-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
             data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
             <h2>Select Image</h2>
             <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
@@ -64,30 +87,18 @@
             id="createmachine-select-image"
             name="createmachine-select-image"}}
 
-        <label for="createmachine-select-size">4. Size:</label>
-        <div class="select-size-collapsible" data-role="collapsible" data-iconpos="right" data-corners="true"
+        <label for="createmachine-select-location">5. Location:</label>
+        <div class="select-location-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
             data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
-            <h2>Select Size</h2>
+            <h2>Select Location</h2>
             <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
-                {{#each Mist.machineAddController.newMachineBackend.sizes}}
+                {{#each Mist.machineAddController.newMachineBackend.locations}}
                 <li data-icon="false" data-corners="true">
                     <a href="#" title="{{unbound this.id}}">{{this.name}}</a>
                 </li>
                 {{/each}}
             </ul>
-        </div>
-        {{!view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.sizes"
-            optionLabelPath="content.name"
-            optionValuePath="content.id"
-            prompt="Select Size"
-            selectionBinding="Mist.machineAddController.newMachineSize"
-            class="create-select"
-            data-theme="c"
-            data-icon="check"
-            id="createmachine-select-size"
-            name="createmachine-select-size"}}
-
-        <label for="createmachine-select-location">5. Location:</label>
+        </div>        
         {{!view Mist.Select contentBinding="Mist.machineAddController.newMachineBackend.locations"
             optionLabelPath="content.name"
             optionValuePath="content.id"
@@ -100,6 +111,17 @@
             name="createmachine-select-location"}}
 
         <label for="createmachine-select-key">6. Key:</label>
+        <div class="select-image-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
+            data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
+            <h2>Select Key</h2>
+            <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
+                {{#each Mist.keysController}}
+                <li data-icon="false" data-corners="true">
+                    <a href="#" title="{{unbound this.name}}">{{this.name}}</a>
+                </li>
+                {{/each}}
+            </ul>
+        </div>        
         {{!view Mist.Select contentBinding="Mist.keysController"
             optionLabelPath="content.name"
             optionValuePath="content.name"

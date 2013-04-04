@@ -50,15 +50,10 @@ define('app/views/machine_add_dialog', [
                 this._super();
                 this.set('template', Ember.Handlebars.compile(machine_add_dialog_html));
 
-                $(document).on("pageshow", '#dialog-add', function (event) {
-                        $('input#create-machine-name').focus();
-                    }
-                );
-
                 Ember.run.next(function(){
                     Mist.machineAddController.addObserver('newMachineBackend', function() {
                         Ember.run.next(function() {
-                            $('#dialog-add select').selectmenu('refresh');
+                            $('#dialog-add .ui-collapsible ul').listview('refresh');
                         });
                     });
 
@@ -75,23 +70,23 @@ define('app/views/machine_add_dialog', [
 
                     Mist.machineAddController.addObserver('newMachineNameReady', function() {
                         Ember.run.next(function(){
-                            $('#dialog-add select').selectmenu();
+                            //$('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineNameReady) {
-                                $('#createmachine-select-provider').selectmenu('enable');
-                                $('#createmachine-select-image').selectmenu('disable');
-                                $('#createmachine-select-size').selectmenu('disable');
-                                $('#createmachine-select-location').selectmenu('disable');
-                                $('#createmachine-select-key').selectmenu('disable');
-                                $('#createmachine-select-script').selectmenu('disable');
+                                $('.select-provider-collapsible').removeClass('ui-disabled');
+                                $('.select-image-collapsible').addClass('ui-disabled');
+                                $('.select-size-collapsible').addClass('ui-disabled');
+                                $('.select-location-collapsible').addClass('ui-disabled');
+                                $('.select-key-collapsible').addClass('ui-disabled');
+                                $('#create-machine-script').textinput('disable');
                             } else {
-                                $('#createmachine-select-provider').selectmenu('disable');
-                                $('#createmachine-select-image').selectmenu('disable');
-                                $('#createmachine-select-size').selectmenu('disable');
-                                $('#createmachine-select-location').selectmenu('disable');
-                                $('#createmachine-select-key').selectmenu('disable');
-                                $('#createmachine-select-script').selectmenu('disable');
+                                $('.select-provider-collapsible').addClass('ui-disabled');
+                                $('.select-image-collapsible').addClass('ui-disabled');
+                                $('.select-size-collapsible').addClass('ui-disabled');
+                                $('.select-location-collapsible').addClass('ui-disabled');
+                                $('.select-key-collapsible').addClass('ui-disabled');
+                                $('#create-machine-script').textinput('disable');
                             }
-                            $('#dialog-add select').selectmenu('refresh');
+                            $('#dialog-add .ui-collapsible ul').listview('refresh');
                         });
                     });
 
@@ -99,37 +94,19 @@ define('app/views/machine_add_dialog', [
                         Ember.run.next(function(){
                             $('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineBackendReady) {
-                                $('#createmachine-select-image').selectmenu('enable');
-                                $('#createmachine-select-size').selectmenu('disable');
-                                $('#createmachine-select-location').selectmenu('disable');
-                                $('#createmachine-select-key').selectmenu('disable');
-                                $('#createmachine-select-script').selectmenu('disable');
+                                $('.select-size-collapsible').removeClass('ui-disabled');
+                                $('.select-image-collapsible').addClass('ui-disabled');
+                                $('.select-location-collapsible').addClass('ui-disabled');
+                                $('.select-key-collapsible').addClass('ui-disabled');
+                                $('#create-machine-script').textinput('disable');
                             } else {
-                                $('#createmachine-select-image').selectmenu('disable');
-                                $('#createmachine-select-size').selectmenu('disable');
-                                $('#createmachine-select-location').selectmenu('disable');
-                                $('#createmachine-select-key').selectmenu('disable');
-                                $('#createmachine-select-script').selectmenu('disable');
+                                $('.select-image-collapsible').addClass('ui-disabled');
+                                $('.select-size-collapsible').addClass('ui-disabled');
+                                $('.select-location-collapsible').addClass('ui-disabled');
+                                $('.select-key-collapsible').addClass('ui-disabled');
+                                $('#create-machine-script').textinput('disable');
                             }
-                            $('#dialog-add select').selectmenu('refresh');
-                        });
-                    });
-
-                    Mist.machineAddController.addObserver('newMachineImageReady', function() {
-                        Ember.run.next(function(){
-                            $('#dialog-add select').selectmenu();
-                            if (Mist.machineAddController.newMachineImageReady) {
-                                $('#createmachine-select-size').selectmenu('enable');
-                                $('#createmachine-select-location').selectmenu('disable');
-                                $('#createmachine-select-key').selectmenu('disable');
-                                $('#createmachine-select-script').selectmenu('disable');
-                            } else {
-                                $('#createmachine-select-size').selectmenu('disable');
-                                $('#createmachine-select-location').selectmenu('disable');
-                                $('#createmachine-select-key').selectmenu('disable');
-                                $('#createmachine-select-script').selectmenu('disable');
-                            }
-                            $('#dialog-add select').selectmenu('refresh');
+                            $('#dialog-add .ui-collapsible ul').listview('refresh');
                         });
                     });
 
@@ -137,13 +114,33 @@ define('app/views/machine_add_dialog', [
                         Ember.run.next(function(){
                             $('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineSizeReady) {
-                                $('#createmachine-select-location').selectmenu('enable');
-                                $('#createmachine-select-key').selectmenu('disable');
+                                $('.select-image-collapsible').removeClass('ui-disabled');
+                                $('.select-location-collapsible').addClass('ui-disabled');
+                                $('.select-key-collapsible').addClass('ui-disabled');
+                                $('#create-machine-script').textinput('disable');
                             } else {
-                                $('#createmachine-select-location').selectmenu('disable');
-                                $('#createmachine-select-key').selectmenu('disable');
+                                $('.select-image-collapsible').addClass('ui-disabled');
+                                $('.select-location-collapsible').addClass('ui-disabled');
+                                $('.select-key-collapsible').addClass('ui-disabled');
+                                $('#create-machine-script').textinput('disable');
                             }
-                            $('#dialog-add select').selectmenu('refresh');
+                            $('#dialog-add .ui-collapsible ul').listview('refresh');
+                        });
+                    });
+                    
+                    Mist.machineAddController.addObserver('newMachineImageReady', function() {
+                        Ember.run.next(function(){
+                            $('#dialog-add select').selectmenu();
+                            if (Mist.machineAddController.newMachineImageReady) {
+                                $('.select-location-collapsible').removeClass('ui-disabled');
+                                $('.select-key-collapsible').addClass('ui-disabled');
+                                $('#create-machine-script').textinput('disable');
+                            } else {
+                                $('.select-location-collapsible').addClass('ui-disabled');
+                                $('.select-key-collapsible').addClass('ui-disabled');
+                                $('#create-machine-script').textinput('disable');
+                            }
+                            $('#dialog-add .ui-collapsible ul').listview('refresh');
                         });
                     });
 
@@ -151,11 +148,13 @@ define('app/views/machine_add_dialog', [
                         Ember.run.next(function(){
                             $('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineLocationReady) {
+                                $('.select-key-collapsible').removeClass('ui-disabled');
+                                $('#create-machine-script').textinput('enable');                                
                                 $('#create-machine-ok').button('enable');
-                                $('#createmachine-select-key').selectmenu('enable');
                             } else {
                                 $('#create-machine-ok').button('disable');
-                                $('#createmachine-select-key').selectmenu('disable');
+                                $('.select-key-collapsible').addClass('ui-disabled');
+                                $('#create-machine-script').textinput('enable');                                                                
                             }
                         });
                     });
