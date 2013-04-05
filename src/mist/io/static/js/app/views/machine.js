@@ -60,7 +60,7 @@ define('app/views/machine', [
             }.property('controller.model'),
 
             machineKeys: function() {
-            	var machine = this.get('controller').get('model');
+                var machine = this.get('controller').get('model');
                 //return a list with the keys this server is associated to
                 var keys = [];
                 Mist.keysController.content.forEach(function(key){
@@ -73,14 +73,15 @@ define('app/views/machine', [
                 return keys
             }.property('machine'),
 
-            keySelect: function(event, el){
-                //Associates the selected key with the machine
-                //TODO: turn parent to listview and refresh it properly
-                Mist.keysController.associateKey($(event.target).val(), Mist.machine.backend.id, Mist.machine.id);
+            keySelect: function() {
+                var key_name = $(event.target).attr('title');
+                var machine = this.get('controller').get('model');
+                Mist.keysController.associateKey(key_name, machine);
+                $('#associate-key').popup('close');
             },
 
             machineKeysRest: function() {
-            	var machine = this.get('controller').get('model');
+                var machine = this.get('controller').get('model');
                 //return a list with the names of all keys except the ones that are associated
                 var keys = [];
                 var hasMachine = false;
@@ -280,7 +281,7 @@ define('app/views/machine', [
                                         if (!data || !('cpu' in data)) {
                                             return callback(new Error('unable to load data'));
                                         } else {
-                    			            loaded = true;
+                                            loaded = true;
                                             localData = data;
 
                                             if (!cores) {
@@ -500,8 +501,9 @@ define('app/views/machine', [
                 $("#dialog-tags").popup('option', 'positionTo', '#machines-button-tags').popup('open', {transition: 'slideup'});
             },
 
-            associateKeyClicked: function() {
-                $('#associate-key').popup('option', 'positionTo', '#associate-key-button').popup('open')
+            associateClicked: function() {
+                $('.rule-action-list').listview('refresh');
+                $('#associate-key').popup('option', 'positionTo', '#associate-key-button').popup('open');
             }
         });
     }

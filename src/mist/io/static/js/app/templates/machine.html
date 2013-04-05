@@ -125,12 +125,12 @@
                     data-inline="true"
                     data-icon="plus"
                     data-theme="b"
-                    {{action associateKeyClicked target="view"}}>Associate</button>
+                    {{action associateClicked target="view"}}>Associate</button>
             </div>
             <div id="associate-key" data-role="popup">
                 <ul class="rule-action-list" data-role="listview">
                     {{#each view.machineKeysRest}}
-                    <li data-icon="false">
+                    <li data-icon="false" {{action keySelect target="view"}}>
                         <a href="#" title="{{unbound name}}">{{name}}</a>
                     </li>
                     {{/each}}

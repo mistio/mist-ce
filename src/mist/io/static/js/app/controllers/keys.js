@@ -51,7 +51,7 @@ define('app/controllers/keys', [
                         that.addObject(key);
                         Ember.run.next(function(){
                             $('#keys-list').listview('refresh');
-                            $('#keys-list input.ember-checkbox').checkboxradio();  
+                            $('#keys-list input.ember-checkbox').checkboxradio();
                         });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
@@ -102,9 +102,13 @@ define('app/controllers/keys', [
                 });
             },
 
-            associateKey: function(key_name, backendId, machineId) {
-                payload = {'key_name': key_name, 'backend_id': backendId, 'machine_id': machineId}
-                var that = this
+            associateKey: function(key_name, machine) {
+                payload = {
+                    'key_name': key_name,
+                    'backend_id': machine.backend.id,
+                    'machine_id': machine.id
+                }
+
                 $.ajax({
                     url: 'keys/associate/machine',
                     type: 'POST',
@@ -115,15 +119,19 @@ define('app/controllers/keys', [
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while associating key'  +
-                                key_name);
+                                key.name);
                         error(textstate, errorThrown, 'while associating key', key_name);
                     }
                 });
             },
 
             disassociateKey: function(key, machine) {
-                payload = {'key_name': key.name, 'backend_id': backendId, 'machine_id': machineId}
-                var that = this
+                payload = {
+                    'key_name': key.name,
+                    'backend_id': machine.backend.id,
+                    'machine_id': machine.id
+                }
+
                 $.ajax({
                     url: 'keys/disassociate/machine',
                     type: 'POST',
@@ -138,12 +146,7 @@ define('app/controllers/keys', [
                         error(textstate, errorThrown, 'while disassociating key', key.name);
                     }
                 });
-            },
-
-            deleteAssociation: function(keyName, machine) {
-                payload = {'key_name': key.name, 'machine': machine };
             }
-
         });
     }
 );

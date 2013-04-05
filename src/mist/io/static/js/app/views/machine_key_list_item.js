@@ -11,25 +11,12 @@ define('app/views/machine_key_list_item', [
     function(machine_key_list_item_html) {
         return Ember.View.extend({
 
-                tagName:false,
+            template: Ember.Handlebars.compile(machine_key_list_item_html),
 
-                keyClick: function(event, el){
-                    log('key clicked');
-
-                    Mist.set('key', this.key);
-                },
-
-                keyDisassociate: function(event, el){
-                    //TODO: turn parent to listview and refresh it properly
-                    Mist.keysController.disassociateKey(this.key, Mist.machine.backend.id, Mist.machine.id);
-                },
-
-                init: function() {
-                    this._super();
-                    // cannot have template in home.pt as pt complains
-                    this.set('template', Ember.Handlebars.compile(machine_key_list_item_html));
-                },
+            disassociateClick: function(event) {
+                var machine = this.get('controller').get('model');
+                Mist.keysController.disassociateKey(this.key, machine);
+            }
         });
-
     }
 );
