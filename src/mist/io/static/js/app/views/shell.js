@@ -12,7 +12,10 @@ define('app/views/shell', [
 function(shell_html) {
     return Ember.View.extend({
 
+        template: Ember.Handlebars.compile(shell_html),
+
         shellOutputItems: Ember.ArrayController.create(),
+
         availableCommands: [], //"dmesg", "uptime", "uname", "ls", "reboot", "whoami", "ifconfig" ],
 
         didInsertElement: function() {
@@ -36,13 +39,18 @@ function(shell_html) {
         },
 
         submit: function() {
+            // This will work in single machine view
             var machine = this.get('controller').get('model');
+            if (!machine) {
+                // This will work in list machine view, there should be only one machine selected
+                var machine = this.machine;
+            }
 
             if (!machine || !machine.hasKey || !this.command) {
                 return;
             }
-            var that = this;
 
+            var that = this;
             var command = this.command;
 
             machine.shell(command, function(output) {
@@ -93,12 +101,6 @@ function(shell_html) {
 
         clear: function() {
             this.set('command', '');
-        },
-
-        init: function() {
-            this._super();
-            // cannot have template in home.pt as pt complains
-            this.set('template', Ember.Handlebars.compile(shell_html));
-        },
+        }
     });
 });
