@@ -73,11 +73,15 @@ define('app/views/machine', [
                 return keys
             }.property('machine'),
 
-            keySelect: function() {
-                var key_name = $(event.target).attr('title');
-                var machine = this.get('controller').get('model');
+            keySelect: function(event) {
+                // associateClicked passes the machine object as event.data
+                // this is the only pattern working both in Chrome and Firefox
+                var machine = event.data;
+                var key_name = this.title;
                 Mist.keysController.associateKey(key_name, machine);
                 $('#associate-key').popup('close');
+                $("#associate-key li a").off('click', this.keySelect);
+                return false;
             },
 
             machineKeysRest: function() {
@@ -504,6 +508,10 @@ define('app/views/machine', [
             associateClicked: function() {
                 $('.rule-action-list').listview('refresh');
                 $('#associate-key').popup('option', 'positionTo', '#associate-key-button').popup('open');
+                // need to pass the machine object to the event handler, because the context of "this"
+                // in keySelect will be the DOM element clicked and not the ember view
+                var machine = this.get('controller').get('model');
+                $("#associate-key li a").on('click', machine, this.keySelect);
             }
         });
     }
