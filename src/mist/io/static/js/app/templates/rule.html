@@ -29,7 +29,7 @@
         {{action openOperatorPopup target="view"}}>&gt</a>
 
     <div id="rule-operator-popup" data-role="popup">
-        <ul class="rule-metric-list" data-role="listview">
+        <ul class="rule-operator-list" data-role="listview">
             {{#each Mist.rulesController.operatorList}}
             <li data-icon="false">
                 <a href="#" title="{{unbound this.title}}">{{this.symbol}}</a>

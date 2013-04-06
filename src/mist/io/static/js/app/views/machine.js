@@ -506,7 +506,7 @@ define('app/views/machine', [
             },
 
             associateClicked: function() {
-                $('.rule-action-list').listview('refresh');
+                $('.key-list').listview('refresh');
                 $('#associate-key').popup('option', 'positionTo', '#associate-key-button').popup('open');
                 // need to pass the machine object to the event handler, because the context of "this"
                 // in keySelect will be the DOM element clicked and not the ember view

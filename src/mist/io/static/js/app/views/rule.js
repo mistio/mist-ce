@@ -24,17 +24,14 @@ define('app/views/rule', [
             },
 
             openMetricPopup: function() {
-                $('.rule-metric-list').listview('refresh');
                 $('#rule-metric-popup').popup('option', 'positionTo', '.rule-button.metric').popup('open');
             },
 
             openOperatorPopup: function() {
-                $('.rule-operator-list').listview('refresh');
                 $('#rule-operator-popup').popup('option', 'positionTo', '.rule-button.operator').popup('open');
             },
 
             openActionPopup: function() {
-                $('.rule-action-list').listview('refresh');
                 $('#rule-action-popup').popup('option', 'positionTo', '.rule-button.action').popup('open');
             },
 
