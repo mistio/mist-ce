@@ -12,34 +12,34 @@ define('app/controllers/rules', [
     function(Rule) {
         return Ember.ArrayController.extend({
 
-            metricList: ['load', 'cpu', 'ram', 'disk', 'network'],
-            operatorList: [{'title': 'gt', 'symbol': '>'}, {'title': 'lt', 'symbol': '<'}],
-            actionList: ['alert', 'reboot', 'destroy', 'launch', 'command'],
+            metricList: [
+                'load',
+                'cpu',
+                'ram',
+                'disk',
+                'network'
+            ],
 
-            init: function() {
-                this._super();
-                /*
-                var that = this;
+            operatorList: [
+                {'title': 'gt', 'symbol': '>'},
+                {'title': 'lt', 'symbol': '<'}
+            ],
 
-                $.getJSON('/keys', function(data) {
-                    var content = new Array();
-                    data.forEach(function(item){
-                        content.push(Key.create(item));
-                    });
-                    that.set('content', content);
-                }).error(function() {
-                    Mist.notificationController.notify("Error loading keys");
-                });
-                */
-            },
+            actionList: [
+                'alert',
+                'reboot',
+                'destroy',
+                'launch',
+                'command'
+            ],
 
-            newRule: function(machine, metric, operator, value, action) {
+            newRule: function(machine, metric, operator, value, autoAction) {
                 item = {
                     'machine': machine,
                     'metric': metric,
                     'operator': operator,
                     'value': value,
-                    'action': action
+                    'autoAction': autoAction
                 }
 
                 var rule = Rule.create(item);

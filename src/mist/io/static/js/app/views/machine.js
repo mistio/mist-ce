@@ -207,7 +207,14 @@ define('app/views/machine', [
             }.property('controller.model'),
 
             addRuleClicked: function() {
-                Mist.rulesController.newRule();
+                // initialize the rule to some sensible defaults
+                var machine = this.get('controller').get('model');
+                var metric = 'load';
+                var operator = {'title': 'gt', 'symbol': '>'};
+                var value = 60;
+                var autoAction = 'alert';
+
+                Mist.rulesController.newRule(machine, metric, operator, value, autoAction);
 
                 Ember.run.next(function() {
                     $('.rule-button.metric').last().button();

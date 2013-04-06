@@ -12,21 +12,8 @@ define('app/models/rule', ['ember'],
             metric: null,
             operator: null,
             value: null,
-            action: null,
+            autoAction: null
 
-            /*
-            jqmEmberMetricFix: function() {
-                $('span.ember-view.rule-metric').removeClass('ember-view');
-            }.observes('metric'),
-
-            jqmEmberOperatorFix: function() {
-                $('span.ember-view.rule-operator').removeClass('ember-view');
-            }.observes('operator'),
-
-            jqmEmberActionFix: function() {
-                $('span.ember-view.rule-action').removeClass('ember-view');
-            }.observes('action')
-            */
         });
     }
 );

@@ -8,7 +8,7 @@
         data-icon="arrow-d"
         data-iconpos="right"
         data-inline="true"
-        {{action openMetricPopup target="view"}}>load</a>
+        {{action openMetricPopup target="view"}}>{{metric}}</a>
 
     <div id="rule-metric-popup" data-role="popup">
         <ul class="rule-metric-list" data-role="listview">
@@ -26,7 +26,7 @@
         data-role="button"
         data-icon="false"
         data-inline="true"
-        {{action openOperatorPopup target="view"}}>&gt</a>
+        {{action openOperatorPopup target="view"}}>{{operator.symbol}}</a>
 
     <div id="rule-operator-popup" data-role="popup">
         <ul class="rule-operator-list" data-role="listview">
@@ -42,7 +42,7 @@
         data-type="range"
         data-highlight="true"
         class="rule-value"
-        value="60"
+        value="{{unbound value}}"
         min="0"
         max="100" />
 
@@ -54,7 +54,7 @@
         data-role="button"
         data-icon="false"
         data-inline="true"
-        {{action openActionPopup target="view"}}>alert</a>
+        {{action openActionPopup target="view"}}>{{autoAction}}</a>
 
     <div id="rule-action-popup" data-role="popup">
         <ul class="rule-action-list" data-role="listview">
