@@ -108,7 +108,8 @@ define('app/controllers/keys', [
                     'backend_id': machine.backend.id,
                     'machine_id': machine.id
                 }
-
+                
+                var key = this.getKeyByName(key_name);
                 $.ajax({
                     url: 'keys/associate/machine',
                     type: 'POST',
@@ -116,11 +117,20 @@ define('app/controllers/keys', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully associate key ', key_name);
+                        //machine.keys.push(key);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while associating key'  +
-                                key.name);
+                                key_name);
                         error(textstate, errorThrown, 'while associating key', key_name);
+                    }
+                });
+            },
+
+            getKeyByName: function(key_name) {
+                Mist.keysController.content.forEach(function(key){
+                    if (key.name == key_name) {
+                        return key;
                     }
                 });
             },

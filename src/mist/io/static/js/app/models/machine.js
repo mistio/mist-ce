@@ -25,6 +25,20 @@ define('app/models/machine', [
             stats:{'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
 
+            keys: function() {
+                var that = this;
+                //return a list with the keys this server is associated to
+                var keyList = [];
+                Mist.keysController.content.forEach(function(key){
+                    key.machines.forEach(function(item){
+                        if (item[1] == that.id) {
+                            keyList.push(key);
+                        }
+                    });
+                });
+                return keyList
+            }.property('keys'),
+
             image: function() {
                 return this.backend.images.getImage(this.imageId);
             }.property('image'),
