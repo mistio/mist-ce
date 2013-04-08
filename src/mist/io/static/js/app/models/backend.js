@@ -50,6 +50,22 @@ define('app/models/backend', [
                 }
             }.observes('state'),
             
+            getSizeById: function(sizeId){
+                for (var i = 0; i < this.sizes.content.length; i++){
+                    if (this.sizes.content[i].id == sizeId) {
+                        return this.sizes.content[i];
+                    }
+                }    
+            },
+
+            getImageById: function(imageId){
+                for (var i = 0; i < this.images.content.length; i++){
+                    if (this.images.content[i].id == imageId) {
+                        return this.images.content[i];
+                    }
+                }    
+            },
+                        
             init: function() {
                 this._super();
                 this.images = ImagesController.create({backend: this});
