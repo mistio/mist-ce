@@ -24,6 +24,10 @@ div#splash div.mist-logo {
     margin-top: -140px;
 }
 
+#home-menu {
+    clear: both;
+}
+
 /* Buttons */
 
 .btn-full {

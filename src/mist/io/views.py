@@ -39,7 +39,7 @@ try:
     from mist.core.helpers import save_keypairs
 except ImportError:
     from mist.io.helpers import save_keypairs
-from mist.io.helpers import save_settings
+from mist.io.helpers import save_settings, generate_backend_id
 
 
 log = logging.getLogger('mist.io')
@@ -117,7 +117,7 @@ def add_backend(request, renderer='json'):
     if not provider or not apikey or not apisecret:
         return Response('Invalid backend data', 400)
 
-    backend_id = sha256('%s%s%s' % (provider, region, apikey)).hexdigest()
+    backend_id = generate_backend_id(provider, region, apikey)
 
     backend = {'title': params.get('provider', '0')['title'],
                'provider': provider,

@@ -4,6 +4,8 @@ import tempfile
 import logging
 import yaml
 
+from hashlib import sha1
+
 from pyramid.response import Response
 
 from libcloud.compute.types import Provider
@@ -438,3 +440,23 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
     os.remove(tmp_path)
 
     return cmd_output
+
+
+def generate_backend_id(provider, region, apikey):
+    alphabet = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
+    base_count = len(alphabet)     
+    def encode(num):
+        """ Returns num in a base58-encoded string """
+        encode = ''       
+        if (num < 0):
+            return ''
+        while (num >= base_count):    
+            mod = num % base_count
+            encode = alphabet[mod] + encode
+            num = num / base_count
+        if (num):
+            encode = alphabet[num] + encode
+        return encode
+    
+    i = int(sha1('%s%s%s' % (provider, region, apikey)).hexdigest(), 16)
+    return encode(i)

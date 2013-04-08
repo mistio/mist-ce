@@ -57,9 +57,9 @@ define('app/models/key', [
                         Ember.run.next(function(){$('#keys-list').listview('refresh')});
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while deafulting key'  +
-                                that.name);
-                        error(textstate, errorThrown, 'while defaulting key', that.name);
+                        Mist.notificationController.notify('Error while setting key'  +
+                                that.name + ' as default');
+                        error(textstate, errorThrown, 'while setting default key', that.name);
                     }
                 });
             },
