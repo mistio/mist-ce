@@ -34,11 +34,11 @@
         </div>
 
         <ul id="machines-list"
-        data-role="listview"
-        data-filter="true"
-        data-inset="true"
-        data-theme="c"
-        data-filter-placeholder="Filter...">
+            data-role="listview"
+            data-filter="true"
+            data-inset="true"
+            data-theme="c"
+            data-filter-placeholder="Filter...">
             {{#each Mist.backendsController}}
                 {{#each machines}}
                     {{view Mist.MachineListItemView machineBinding="this"}}

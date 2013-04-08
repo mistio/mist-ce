@@ -123,9 +123,8 @@ define('app/controllers/backends', [
                     that.getSelectedMachineCount();
                     that.getImageCount();
                 });
-                $(document).bind('ready', function(){
-                    
                 
+                $(document).bind('ready', function(){
                     Ember.run.next(function(){
                         $.getJSON('/backends', function(data) {
                             data.forEach(function(item){
