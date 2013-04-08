@@ -35,24 +35,24 @@
             {{/linkTo}}
         </li>
         <li>
-            <a id="images-count" href="#images">Images
+            {{#linkTo images}}Images
                 {{#view Mist.CountView
                     numberBinding="Mist.backendsController.imageCount"
                     tagName="span"
                     class="ui-li-count"}}
                     {{view.number}}
                 {{/view}}
-            </a>
+            {{/linkTo}}
         </li>
         <li>
-            <a id="keys-count" href="#keys">Keys
+            {{#linkTo keys}}Keys
                 {{#view Mist.CountView
                     numberBinding="Mist.keysController.content.length"
                     tagName="span"
                     class="ui-li-count"}}
                     {{view.number}}
                 {{/view}}
-            </a>
+            {{/linkTo}}
         </li>
     </ul>
 
