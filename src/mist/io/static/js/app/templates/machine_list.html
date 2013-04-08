@@ -71,29 +71,26 @@
 
         <div class="actions" data-role="controlgroup" data-type="horizontal">
             <a href="#"
-                class="action-links"
                 id="machines-button-tags"
+                {{bindAttr class=":action-links view.disabledTagClass"}}
                 data-role="button"
                 data-icon="grid"
-                {{bindAttr class="disabledTagClass"}}
                 {{action openTags target="view"}}>Tag</a>
                 {{view Mist.MachineTagsDialog machineBinding="Mist.backendsController.selectedMachine"}}
 
             <a href="#"
-                class="action-links"
                 id="machines-button-shell"
+                {{bindAttr class=":action-links view.disabledShellClass"}}
                 data-role="button"
                 data-icon="gear"
-                {{bindAttr class="disabledShellClass"}}
                 {{action openShell target="view"}}>Shell</a>
                 {{view Mist.ShellDialog machineBinding="Mist.backendsController.selectedMachine"}}
 
             <a href="#"
-                class="action-links"
                 id="machines-button-power"
+                {{bindAttr class=":action-links view.disabledPowerClass"}}
                 data-role="button"
                 data-icon="mist-power"
-                {{bindAttr class="disabledPowerClass"}}
                 {{action openActions target="view"}}>Power</a>
                 {{view Mist.MachineActionsDialog machineBinding="Mist.backendsController.selectedMachine"}}
 
