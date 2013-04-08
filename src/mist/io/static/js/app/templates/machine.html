@@ -169,29 +169,26 @@
 
     <div class="actions" data-role="controlgroup" data-type="horizontal">
         <a href="#dialog-tags"
-            class="action-links"
             id="machines-button-tags"
+            {{bindAttr class=":action-links view.disabledTagClass"}}
             data-role="button"
             data-icon="grid"
-            {{bindAttr class="disabledTagClass"}}
             {{action "openTags" target="view"}}>Tag</a>
             {{view Mist.MachineTagsDialog machineBinding="this"}}
 
         <a href="#dialog-shell"
-            class="action-links"
             id="machines-button-shell"
+            {{bindAttr class=":action-links view.disabledShellClass"}}
             data-role="button"
             data-icon="gear"
-            {{bindAttr class="disabledShellClass"}}
             {{action "showShell" target="view"}}>Shell</a>
             {{view Mist.ShellDialog machineBinding="this"}}
 
         <a href="#dialog-single-power"
-            class="action-links"
             id="machines-button-power"
+            {{bindAttr class=":action-links view.disabledPowerClass"}}
             data-role="button"
             data-icon="mist-power"
-            {{bindAttr class="disabledPowerClass"}}
             {{action "showActions" target="view"}}>Power</a>
             {{view Mist.PowerDialog machineBinding="this"}}
     </div>
