@@ -9,13 +9,13 @@
 
     </div>
 
-    <div data-role="content">
+    <div data-role="content" id="keys">
         <a href="#keys"
             id="mist-create-key"
             data-rel="popup"
-            data-theme="b"
-            data-inline="true"
             data-transition="slidedown"
+            class="add-button"
+            data-theme="b"
             data-role="button"
             data-icon="plus"
             data-iconpos="right"
@@ -28,7 +28,30 @@
             {{view Mist.AddKeyView data-role="content"}}
         </div>
 
-        <ul id="keys-list" data-role="listview" data-inset="true" data-theme="c">
+        <a href="#"
+            class="select-keys"
+            data-theme="d"
+            data-role="button"
+            data-icon="arrow-d"
+            {{action openKeySelectPopup target="view"}}>Select</a>
+    
+        <div id="select-keys-popup" data-role="popup">
+            <ul id="select-keys-listmenu" data-role="listview">
+                <li data-icon="false">
+                    <a href="#" title="all">All</a>
+                </li>
+                <li data-icon="false">
+                    <a href="#" title="none">None</a>
+                </li>                
+            </ul>
+        </div>
+        
+        <ul id="keys-list"
+            data-role="listview"
+            data-filter="true"
+            data-inset="true"
+            data-theme="c"
+            data-filter-placeholder="Filter...">
             {{#each Mist.keysController}}
                 {{view Mist.KeyListItemView keyBinding="this" class="node"}}
             {{/each}}
@@ -38,13 +61,13 @@
     </div>
     
     
-<div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
-    <div data-role="header">
-        <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
+    <div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
+        <div data-role="header">
+            <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
+        </div>
+        {{view Mist.ConfirmationDialog data-role="content"}}
     </div>
-    {{view Mist.ConfirmationDialog data-role="content"}}
-</div>
-
+    
     <div class="keys-footer" data-role="footer" data-theme="a">
         <div class="actions" data-role="controlgroup" data-type="horizontal">
             <a href=""

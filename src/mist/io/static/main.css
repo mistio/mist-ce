@@ -70,7 +70,7 @@ div#splash div.mist-logo {
 
 /* Search field */
 
-#machines .ui-listview-filter-inset {
+#machines .ui-listview-filter-inset, #keys .ui-listview-filter-inset {
     margin: -52px 120px 0 120px;
 }
 
@@ -269,10 +269,6 @@ li.node .tag {
     float: right;
 }
 
-#keys-list {
-    margin-top: 65px;
-}
-
 #dialog-add-key-popup {
     width: 250px;
 }
@@ -346,7 +342,7 @@ li.node .tag {
     color: #777;
 }
 
-#machines .ui-input-search input.ui-input-text {
+#machines .ui-input-search input.ui-input-text, #keys .ui-input-search input.ui-input-text {
     padding: .45em 0;
 }
 
@@ -364,13 +360,13 @@ li.node .tag {
     width: 100%;
 }
 
-#select-machines {
+.select-machines, .select-keys {
     max-width: 110px;
     color: #999999;
     font-weight: normal;
 }
 
-#select-machines .ui-icon {
+.select-machines .ui-icon, .select-keys .ui-icon {
     margin-left: 5px;
 }
 
@@ -1237,38 +1233,38 @@ div.info {
 
     /* Select machines button */
 
-    #machines #select-machines {
+    #machines .select-machines, #keys .select-keys {
         width: 60px;
         right: -6px;
         padding: 9px 0;
     }
 
-    #machines #select-machines .ui-btn-text {
+    #machines .select-machines .ui-btn-text, #keys .select-keys .ui-btn-text {
         display: none;
     }
 
-    /* Create machine button */
+    /* Create button */
 
-    #machines #mist-create-machine {
+    #machines .add-button, #keys .add-button {
         width: 60px;
         right: -6px;
         padding: 9px 0;
     }
 
-    #machines #mist-create-machine .ui-btn-inner{
+    #machines .add-button .ui-btn-inner, #keys .add-button .ui-btn-inner{
         border: none;
     }
 
-    #machines #mist-create-machine .ui-icon {
+    #machines .add-button .ui-icon, #keys .add-button .ui-icon {
         left: 22px;
     }
 
-    #machines #mist-create-machine .ui-btn-text {
+    #machines .add-button .ui-btn-text, #keys .add-button .ui-btn-text {
         display: none;
     }
 
     /* Search field */
-    #machines .ui-listview-filter-inset {
+    #machines .ui-listview-filter-inset, #keys .ui-listview-filter-inset {
         margin: -52px 80px 0;
     }
 }

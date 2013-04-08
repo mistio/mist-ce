@@ -131,7 +131,7 @@ function(MistScreen, machine_list_html) {
 
         openMachineSelectPopup: function() {
             $('#select-machines-listmenu').listview('refresh');
-            $('#select-machines-popup').popup('option', 'positionTo', '#select-machines').popup('open', {transition: 'pop'});
+            $('#select-machines-popup').popup('option', 'positionTo', '.select-machines').popup('open', {transition: 'pop'});
             $("#select-machines-listmenu li a").on('click', this.selectMachines);
         }
     });

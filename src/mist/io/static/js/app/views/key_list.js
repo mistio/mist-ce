@@ -73,8 +73,36 @@ define('app/views/key_list', [
             },
             
             addKey: function(){
-        	$("#dialog-add-key").popup("open", {transition: 'pop'});
-            }
+        	   $("#dialog-add-key").popup("open", {transition: 'pop'});
+            },
+            
+            selectKeys: function(event) {
+                var selection = $(event.target).attr('title');
+    
+                if(selection == 'none'){
+                    Mist.keysController.forEach(function(key){
+                        log('deselecting key: ' + key.name);
+                        key.set('selected', false);
+                    });
+                } else if(selection == 'all'){
+                    Mist.keysController.forEach(function(key){
+                        log('selecting key: ' + key.name);
+                        key.set('selected', true);
+                    });
+                }  
+                Ember.run.next(function(){
+                    $("input[type='checkbox']").checkboxradio("refresh");
+                });
+                $("#select-keys-listmenu li a").off('click', this.selectKeys);
+                $('#select-keys-popup').popup('close');
+                return false;                           
+            },
+            
+            openKeySelectPopup: function() {
+                $('#select-keys-listmenu').listview('refresh');
+                $('#select-keys-popup').popup('option', 'positionTo', '.select-keys').popup('open', {transition: 'pop'});
+                $("#select-keys-listmenu li a").on('click', this.selectKeys);
+            }            
         });
     }
 );
