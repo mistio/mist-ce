@@ -12,6 +12,8 @@ define('app/views/machine_tags_dialog',[
     function(machine_tags_dialog_html) {
         return Ember.View.extend({
 
+            template: Ember.Handlebars.compile(machine_tags_dialog_html),
+
             submit: function() {
                 var tag = this.tag;
 
@@ -20,7 +22,7 @@ define('app/views/machine_tags_dialog',[
                 if (!machine || !this.tag) {
                     return;
                 }
-                
+
                 if(!machine.tags){
                     machine = machine.get('model');
                 }
@@ -62,12 +64,7 @@ define('app/views/machine_tags_dialog',[
                 } else {
                     return 'ui-disabled';
                 }
-            }.property('tag'),
-
-            init: function() {
-                this._super();
-                this.set('template', Ember.Handlebars.compile(machine_tags_dialog_html));
-            }
+            }.property('tag')
         });
     }
 );
