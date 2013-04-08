@@ -30,11 +30,13 @@ define('app/models/machine', [
                 //return a list with the keys this server is associated to
                 var keyList = [];
                 Mist.keysController.content.forEach(function(key){
-                    key.machines.forEach(function(item){
-                        if (item[1] == that.id) {
-                            keyList.push(key);
-                        }
-                    });
+                    if (key.machines.length > 0){
+                        key.machines.forEach(function(item){
+                            if (item[1] == that.id) {
+                                keyList.push(key);
+                            }
+                        });                        
+                    }
                 });
                 return keyList
             }.property('keys'),

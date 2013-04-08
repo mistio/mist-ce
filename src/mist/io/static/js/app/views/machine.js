@@ -85,17 +85,19 @@ define('app/views/machine', [
             },
 
             machineKeysRest: function() {
-                var machine = this.get('controller').get('model');
                 //return a list with the names of all keys except the ones that are associated
+                var machine = this.get('controller').get('model');
                 var keys = [];
                 var hasMachine = false;
                 Mist.keysController.content.forEach(function(key){
                     hasMachine = false;
-                    key.machines.forEach(function(item){
-                        if (item[1] == machine.id) {
-                            hasMachine = true;
-                        }
-                    });
+                    if (key.machines.length > 0){
+                        key.machines.forEach(function(item){
+                            if (item[1] == machine.id) {
+                                hasMachine = true;
+                            }
+                        });                        
+                    }
                     if (hasMachine == false) {
                         keys.push(key);
                     }
