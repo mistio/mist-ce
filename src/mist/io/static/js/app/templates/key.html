@@ -1,6 +1,6 @@
 
     <div data-role="header">
-        <a href="#keys"
+        <a href="#/keys"
             data-icon="arrow-l"
             data-direction="reverse"
             class="ui-btn-left">Keys</a>
@@ -34,7 +34,7 @@
                     data-rel="popup"
                     data-transition="slideup"
                     {{action displayPrivate target="view"}}>Display</a>
-                
+
                 <div data-role="popup" id="key-private-dialog" class="mist-dialog" data-overlay-theme="a">
                     <div data-role="header">
                         <h1>Private Key</h1>
@@ -57,8 +57,8 @@
         </div>
 
     </div>
-    
-    
+
+
 <div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
     <div data-role="header">
         <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
@@ -75,23 +75,22 @@
 
     <div class="keys-footer" data-role="footer" data-theme="a" style="display: block">
         <div class="actions" data-role="controlgroup" data-type="horizontal">
-            <a href=""
-                class="action-links"
+            <a href="#"
                 id="keys-button-delete"
+                class="action-links"
                 data-role="button"
                 data-icon="delete"
                 data-rel="popup"
                 data-transition="slideup"
                 {{action deleteKey target="view"}}>Delete</a>
 
-            <a href=""
-                class="action-links"
+            <a href="#"
                 id="keys-button-associate"
+                {{bindAttr class=":action-links view.disabledAssociateClass"}}
                 data-role="button"
                 data-icon="gear"
                 data-rel="popup"
                 data-transition="slideup"
-                {{bindAttr class="disabledAssociateClass"}}
                 {{action associateKey target="view"}}>Associate</a>
         </div>
     </div>

@@ -11,8 +11,9 @@ define('app/views/key', [
      */
     function(MistScreen, key_html) {
         return MistScreen.extend({
-            
+
             disabledAssociateClass: function() {
+                /*
                 var count = 0
                 Mist.backendsController.content.forEach(function(item){
                     count = count + item.machines.content.length;
@@ -22,12 +23,14 @@ define('app/views/key', [
                 } else {
                     return '';
                 }
+                */
+                return 'ui-disabled';
             }.property('Mist.backendsController.machineCount'),
 
             keyMachines: function() {
 
         	    var key = this.get('controller').get('model');
-        	
+
                 machineList = [];
                 if (key && key.machines && key.machines.forEach) {
                     key.machines.forEach(function(item){
