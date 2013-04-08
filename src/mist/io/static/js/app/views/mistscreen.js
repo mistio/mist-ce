@@ -9,19 +9,18 @@ define('app/views/mistscreen', ['ember'],
         return Ember.View.extend({
 
             tagName: false,
-            
-            willInsertElement: function(){
-        	try {
-        	    $('.ui-popup').popup('destroy').remove ();
-        	} catch(e){}
+
+            willInsertElement: function() {
+                try {
+                    $('.ui-popup').popup('destroy').remove();
+                } catch(e){}
             },
-            
-            didInsertElement: function(){
-        	try {
-        	 $("[data-role=page]").page('destroy').page()
-        	} catch(e){}
+
+            didInsertElement: function() {
+                try {
+                    $("[data-role=page]").page('destroy').page()
+                } catch(e){}
             },
-        
         });
     }
 );
