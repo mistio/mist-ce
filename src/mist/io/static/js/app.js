@@ -98,7 +98,7 @@ define( 'app', [
                 MachineListItem,
                 ImageListItem,
                 MachineAddDialog,
-                MachineView,
+                SingleMachineView,
                 MachineListView,
                 MachineKeyListItem,
                 ConfirmationDialog,
@@ -111,7 +111,7 @@ define( 'app', [
                 MachineMonitoringDialog,
                 KeyListItemView,
                 KeyListView,
-                KeyView,
+                SingleKeyView,
                 KeyAddDialog,
                 KeyAssociateDialog,
                 KeyPrivDialog,
@@ -165,22 +165,55 @@ define( 'app', [
             this.route('machines');
             this.route('images');
             this.route('machine', {
-                path : '/machines/:machine_id'
+                path : '/machines/:machine_id',
             });
             this.route('keys');
             this.route('key', {
                 path : '/keys/:key_id'
             });
         });
+        
+        App.MachineRoute = Ember.Route.extend({
+          // Ember.js mindfuck warning
+          redirect: function(){
+              // redirect if the user visited the URL directly
+              if (this.target != undefined){
+                  var target = this.target;
+                  // clear redirect target
+                  this.target = undefined;
+                  this.transitionTo(target);
+              }
+          },
+          model: function(){
+              // set redirect target if the user visits directly the URL
+              this.target = 'machines';
+          }          
+        });        
 
-        // TODO: why the shortcut names? they don't make sense
-        App.MacView = MachineView;
+        App.KeyRoute = Ember.Route.extend({
+          // Ember.js mindfuck warning            
+          redirect: function(){
+              // redirect if the user visited the URL directly
+              if (this.target != undefined){
+                  var target = this.target;
+                  // clear redirect target
+                  this.target = undefined;
+                  this.transitionTo(target);
+              }
+          },
+          model: function(){
+              // set redirect target if the user visits directly the URL
+              this.target = 'keys';
+          }          
+        });  
+        
+        App.SingleMachineView = SingleMachineView;
         App.MachineListView = MachineListView
         App.UserMenuView = UserMenuView;
         App.KeyListView = KeyListView;
         App.KeyListItemView = KeyListItemView;
         App.ImageListView = ImageListView;
-        App.KView = KeyView;
+        App.SingleKeyView = SingleKeyView;
         App.AddKeyView = KeyAddDialog;
         App.KeyPrivDialog = KeyPrivDialog;
         App.MachineAddView = MachineAddDialog;

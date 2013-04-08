@@ -53,13 +53,13 @@
         {{view Mist.ImageListView}}
     </script>
     <script type="text/x-handlebars" data-template-name="machine">
-        {{view Mist.MacView}}
+        {{view Mist.SingleMachineView}}
     </script>
     <script type="text/x-handlebars" data-template-name="keys">
         {{view Mist.KeyListView}}
     </script>
     <script type="text/x-handlebars" data-template-name="key">
-        {{view Mist.KView}}
+        {{view Mist.SingleKeyView}}
     </script>
 </body>
 
