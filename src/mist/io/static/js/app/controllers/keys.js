@@ -18,13 +18,24 @@ define('app/controllers/keys', [
                 this._super();
 
                 var that = this;
-
+                
+                that.addObserver('length', function() {
+                    that.getSelectedKeyCount();
+                });
+                
                 $.getJSON('/keys', function(data) {
                     var content = new Array();
                     data.forEach(function(item){
                         content.push(Key.create(item));
                     });
                     that.set('content', content);
+                    Ember.run.next(function(){
+                        Mist.keysController.forEach(function(item){
+                            item.addObserver('selected', function() {
+                                that.getSelectedKeyCount();
+                            });
+                        });                          
+                    });
                 }).error(function() {
                     Mist.notificationController.notify("Error loading keys");
                 });
@@ -156,7 +167,17 @@ define('app/controllers/keys', [
                         error(textstate, errorThrown, 'while disassociating key', key.name);
                     }
                 });
-            }
+            },
+            
+            getSelectedKeyCount: function() {
+                var count = 0;
+                this.content.forEach(function(item){
+                    if (item.selected == true){
+                        count+=1;
+                    }
+                });
+                this.set('selectedKeyCount', count);
+            },            
         });
     }
 );

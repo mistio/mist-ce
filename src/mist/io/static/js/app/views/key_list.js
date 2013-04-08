@@ -102,7 +102,23 @@ define('app/views/key_list', [
                 $('#select-keys-listmenu').listview('refresh');
                 $('#select-keys-popup').popup('option', 'positionTo', '.select-keys').popup('open', {transition: 'pop'});
                 $("#select-keys-listmenu li a").on('click', this.selectKeys);
-            }            
+            },
+            
+            disabledDefaultClass : function() {
+                var keys = new Array();
+    
+                Mist.keysController.forEach(function(key) {
+                    if (key.selected == true) {
+                        keys.push(key);
+                    }
+                });
+                if (keys.length != 1) {
+                    // only enable action if a single key is selected
+                    return 'ui-disabled';
+                } else {
+                    return '';
+                }
+            }.property('Mist.keysController.selectedKeyCount')                     
         });
     }
 );

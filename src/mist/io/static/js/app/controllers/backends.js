@@ -57,18 +57,18 @@ define('app/controllers/backends', [
             },
             
             getSelectedMachine: function() {
-        	if(this.selectedMachineCount == 1){
-                    var machine = null;
-                    this.content.forEach(function(item){
-                        var machines = item.machines.filterProperty('selected', true);
-                        if(machines.get('length') == 1){
-                	    machine = machines[0];
-                        }
-                    });
-                    this.set('selectedMachine', machine);
-        	} else {
-        	    this.set('selectedMachine', null);
-        	}
+            	if(this.selectedMachineCount == 1){
+                        var machine = null;
+                        this.content.forEach(function(item){
+                            var machines = item.machines.filterProperty('selected', true);
+                            if(machines.get('length') == 1){
+                    	    machine = machines[0];
+                            }
+                        });
+                        this.set('selectedMachine', machine);
+            	} else {
+            	    this.set('selectedMachine', null);
+            	}
             },
 
             checkMonitoring: function(){
