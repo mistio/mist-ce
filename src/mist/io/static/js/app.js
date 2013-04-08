@@ -510,7 +510,7 @@ function completeShell(ret){
     $('.shell-return .pending').removeClass('pending');
     $('a.shell-send').removeClass('ui-disabled');
     if (collectd_install_target) {
-        if (collectd_lastlog.search('root') == -1){
+        if (collectd_lastlog.search('root') == -1) {
             // TODO: display instruction for manual installation
             // alert('collectd install failed');
         }

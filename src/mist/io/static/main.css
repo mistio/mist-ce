@@ -937,8 +937,8 @@ div.pending-monitoring {
     display: none;
 }
 
-#key-associate-dialog {
-    width: 400px;
+.mist-dialog .ui-listview-filter{
+    margin: 0;
 }
 
 /* Add backend dialog */
