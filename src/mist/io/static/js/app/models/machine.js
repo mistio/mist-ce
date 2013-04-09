@@ -263,7 +263,7 @@ define('app/models/machine', [
                                         // in every other case there is a problem
                                         that.set('hasKey', false);
                                         info('Got response other than 200 while getting uptime from machine', that.name);
-                                        setTimeout(uptimeTimeout, 10000);
+                                        retry(that);
                                     }
                                 },
                                 error: function(jqXHR, textstate, errorThrown) {
@@ -272,12 +272,20 @@ define('app/models/machine', [
                                     //    that.name);
                                     error(textstate, errorThrown, 'when getting uptime from machine',
                                         that.name);
-                                    setTimeout(uptimeTimeout, 10000);
+                                    retry();
                                 }
                             });
                         }
                     }
                 };
+                
+                function retry() {
+                    // retry only if the machine is still here and it's running
+                    if (that.backend.getMachineById(that.id) && that.state == 'running'){
+                        setTimeout(uptimeTimeout, 10000);
+                    }
+                }
+                
                 setTimeout(uptimeTimeout, 2000);
             },
 

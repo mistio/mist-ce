@@ -708,7 +708,7 @@ div.pending-monitoring {
     margin: 0 auto;
 }
 
-.rules-container, .key-container {
+.rules-container, .keys-container {
     padding: 0;
     background: #e8e8e9;
     border-bottom: 1px solid #ccc;
@@ -745,6 +745,11 @@ div.pending-monitoring {
 
 .rule-box .rule-button {
     float: left;
+}
+
+.ui-slider input.rule-value {
+    height: 32px;
+    margin-top: -8px;
 }
 
 #machine-basic-table, #machine-metadata {

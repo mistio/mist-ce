@@ -65,7 +65,15 @@ define('app/models/backend', [
                     }
                 }    
             },
-                        
+
+            getMachineById: function(machineId){
+                for (var i = 0; i < this.machines.content.length; i++){
+                    if (this.machines.content[i].id == machineId) {
+                        return this.machines.content[i];
+                    }
+                }    
+            },
+                                    
             init: function() {
                 this._super();
                 this.images = ImagesController.create({backend: this});
