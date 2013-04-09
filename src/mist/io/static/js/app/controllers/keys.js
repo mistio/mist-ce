@@ -118,7 +118,7 @@ define('app/controllers/keys', [
 
                 var key = this.getKeyByName(key_name);
                 $.ajax({
-                    url: '/keys/' + key.name,
+                    url: '/keys/' + key_name,
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),

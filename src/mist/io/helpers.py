@@ -479,6 +479,7 @@ def associate_key(request, key_name, backend_id, machine_id):
         return Response('Keypair not found', 404)
 
     machine_backend = [backend_id, machine_id]
+    machines = keypair.get('machines', [])
 
     if machine_backend in keypair['machines']:
         return Response('Key already associated to machine', 304)
