@@ -57,7 +57,6 @@ define('app/models/key', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully set key', that.name, 'as default');
-                        var keys = new Array();
                         Mist.keysController.forEach(function(key){
                             key.set('default_key', false);
                         });
