@@ -19,7 +19,9 @@ define('app/models/key', [
             }.property("name"),
 
             deleteKey: function() {
-                payload = {'name': this.name}
+                payload = {
+                    'key_name': this.name
+                }
                 var that = this
                 $.ajax({
                     url: 'keys/' + that.name,
@@ -27,12 +29,15 @@ define('app/models/key', [
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     success: function(data) {
-                        info('Successfully deleted key ', that.name);
-                        Mist.keysController.removeObject(that);
-                        Ember.run.next(function(){$('#keys-list').listview('refresh')});
+                        info('Successfully deleted key', that.name);
+                        Mist.keysController.updateKeyList(data);
+                        Ember.run.next(function() {
+                            $('#keys-list').listview('refresh');
+                            $('#keys-list .ember-checkbox').checkboxradio();
+                        });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while deleting key'  +
+                        Mist.notificationController.notify('Error while deleting key '  +
                                 that.name);
                         error(textstate, errorThrown, 'while deleting key', that.name);
                     }
@@ -40,15 +45,18 @@ define('app/models/key', [
             },
 
             setDefaultKey: function(){
-                payload = {'name': this.name}
+                payload = {
+                    'action': 'set_default',
+                    'key_name': this.name,
+                }
                 var that = this
                 $.ajax({
-                    url: 'keys/' + that.name,
+                    url: '/keys',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     success: function(data) {
-                        info('Successfully set key ', that.name, ' as default');
+                        info('Successfully set key', that.name, 'as default');
                         var keys = new Array();
                         Mist.keysController.forEach(function(key){
                             key.set('default_key', false);
@@ -57,7 +65,7 @@ define('app/models/key', [
                         Ember.run.next(function(){$('#keys-list').listview('refresh')});
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while setting key'  +
+                        Mist.notificationController.notify('Error while setting key '  +
                                 that.name + ' as default');
                         error(textstate, errorThrown, 'while setting default key', that.name);
                     }

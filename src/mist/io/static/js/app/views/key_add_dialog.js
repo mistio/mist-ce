@@ -17,9 +17,13 @@ define('app/views/key_add_dialog', [
 
             generateClicked: function(){
                 $('#dialog-add-key .ajax-loader').fadeIn(200);
+                var payload = {
+                    'action': 'generate'
+                }
                 $.ajax({
                     url: '/keys',
                     type: "POST",
+                    data: JSON.stringify(payload),
                     contentType: "application/json",
                     headers: { "cache-control": "no-cache" },
                     dataType: "json",
@@ -36,7 +40,7 @@ define('app/views/key_add_dialog', [
                 Mist.keyAddController.newKeyClear();
                 $("#dialog-add-key").popup("close");
             },
-            
+
             template: Ember.Handlebars.compile(key_add_dialog_html)
 
         });

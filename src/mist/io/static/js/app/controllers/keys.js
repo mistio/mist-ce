@@ -18,24 +18,13 @@ define('app/controllers/keys', [
                 this._super();
 
                 var that = this;
-                
+
                 that.addObserver('length', function() {
                     that.getSelectedKeyCount();
                 });
-                
+
                 $.getJSON('/keys', function(data) {
-                    var content = new Array();
-                    data.forEach(function(item){
-                        content.push(Key.create(item));
-                    });
-                    that.set('content', content);
-                    Ember.run.next(function(){
-                        Mist.keysController.forEach(function(item){
-                            item.addObserver('selected', function() {
-                                that.getSelectedKeyCount();
-                            });
-                        });                          
-                    });
+                    that.updateKeyList(data);
                 }).error(function() {
                     Mist.notificationController.notify("Error loading keys");
                 });
@@ -119,7 +108,7 @@ define('app/controllers/keys', [
                     'backend_id': machine.backend.id,
                     'machine_id': machine.id
                 }
-                
+
                 var key = this.getKeyByName(key_name);
                 $.ajax({
                     url: 'keys/associate/machine',
@@ -168,7 +157,7 @@ define('app/controllers/keys', [
                     }
                 });
             },
-            
+
             getSelectedKeyCount: function() {
                 var count = 0;
                 this.content.forEach(function(item){
@@ -177,7 +166,24 @@ define('app/controllers/keys', [
                     }
                 });
                 this.set('selectedKeyCount', count);
-            },            
+            },
+
+            updateKeyList: function(data) {
+                var content = new Array();
+                data.forEach(function(item){
+                    content.push(Key.create(item));
+                });
+                this.set('content', content);
+
+                var that = this;
+                Ember.run.next(function(){
+                    Mist.keysController.forEach(function(item){
+                        item.addObserver('selected', function() {
+                            that.getSelectedKeyCount();
+                        });
+                    });
+                });
+            }
         });
     }
 );

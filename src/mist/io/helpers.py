@@ -1,10 +1,11 @@
-"""Helper functions used in views"""
+"""Helper functions used in views and WSGI initialization"""
 import os
 import tempfile
 import logging
 import yaml
 
 from hashlib import sha1
+from Crypto.PublicKey import RSA
 
 from pyramid.response import Response
 
@@ -95,10 +96,10 @@ def save_settings(request):
         keypairs[key] = {
             'public': literal_unicode(settings['keypairs'][key]['public']),
             'private': literal_unicode(settings['keypairs'][key]['private']),
-            'machines': settings['keypairs'][key].get('machines',[])
+            'machines': settings['keypairs'][key].get('machines',[]),
+            'default': settings['keypairs'][key].get('default', False)
         }
-        if settings['keypairs'][key].get('default', None):
-            keypairs[key]['default'] = True
+
     payload = {
         'keypairs': keypairs,
         'backends': settings['backends'],
@@ -114,62 +115,6 @@ def save_settings(request):
     yaml.dump(payload, config_file, default_flow_style=False, )
 
     config_file.close()
-
-def save_keypairs(request, keypair):
-    """Stores keypairs to settings.yaml local file.
-
-    This is useful for using mist.io UI to configure your installation. It
-    includes some yaml dump magic in order for the dumped private ssh keys
-    to be in a valid string format.
-
-    """
-    class folded_unicode(unicode): pass
-    class literal_unicode(unicode): pass
-
-    def literal_unicode_representer(dumper, data):
-        return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='|')
-
-    def folded_unicode_representer(dumper, data):
-        return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='>')
-
-    def unicode_representer(dumper, uni):
-        node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
-        return node
-
-    yaml.add_representer(unicode, unicode_representer)
-    yaml.add_representer(literal_unicode, literal_unicode_representer)
-
-    if keypair:
-        config_file = open('settings.yaml', 'w')
-
-        settings = request.registry.settings
-        keypairs = request.registry.settings['keypairs']
-
-        for key in settings['keypairs'].keys():
-            if settings['keypairs'][key]['public'] == keypair['public'] and settings['keypairs'][key]['private'] == keypair['private']:
-                #save keypair machines
-                keypairs[key] = {
-                    'public': literal_unicode(settings['keypairs'][key]['public']),
-                    'private': literal_unicode(settings['keypairs'][key]['private']),
-                    'machines': keypair['machines'],
-                    'default': settings['keypairs'][key].get('default', None)
-                }
-
-        payload = {
-            'keypairs': keypairs,
-            'backends': settings['backends'],
-            'core_uri': settings['core_uri'],
-            'js_build': settings['js_build'],
-            'js_log_level': settings['js_log_level'],
-            }
-
-        if settings.get('email', False) and settings.get('password', False):
-            payload['email'] = settings['email']
-            payload['password'] = settings['password']
-
-        yaml.dump(payload, config_file, default_flow_style=False, )
-
-        config_file.close()
 
 
 def get_keypair_by_name(keypairs, name):
@@ -480,3 +425,39 @@ def b58_decode(s):
         multi = multi * base_count
 
     return decoded
+
+
+def generate_keypair():
+    """Generates a random keypair."""
+    key = RSA.generate(2048, os.urandom)
+    return {
+        'public': key.exportKey('OpenSSH'),
+        'private': key.exportKey()
+    }
+
+
+def set_default_key(request):
+    """Sets a key as default.
+
+    After all changes take place, it updates the configuration and saves the
+    updated yaml.
+
+    """
+    params = request.json_body
+
+    try:
+        key_name = params['key_name']
+    except KeyError:
+        raise
+
+    keypairs = request.registry.settings['keypairs']
+
+    for key in keypairs:
+        keypairs[key]['default'] = False
+
+    keypairs[key_name]['default'] = True
+
+    request.registry.settings['keypairs'] = keypairs
+    save_settings(request)
+
+    return {}

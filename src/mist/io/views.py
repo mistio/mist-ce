@@ -9,38 +9,27 @@ import requests
 
 from hashlib import sha256
 
-from Crypto.PublicKey import RSA
-
 from pyramid.response import Response
 from pyramid.view import view_config
 
-from libcloud.compute.base import Node
-from libcloud.compute.base import NodeSize
-from libcloud.compute.base import NodeImage
-from libcloud.compute.base import NodeLocation
+from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
 from libcloud.compute.base import NodeAuthSSHKey
-from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment, SSHKeyDeployment
+from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
+from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider
 
-from mist.io.config import STATES
-from mist.io.config import EC2_IMAGES
-from mist.io.config import EC2_PROVIDERS
-from mist.io.config import EC2_KEY_NAME
-from mist.io.config import EC2_SECURITYGROUP
+from mist.io.config import STATES, SUPPORTED_PROVIDERS
+from mist.io.config import EC2_IMAGES, EC2_PROVIDERS
+from mist.io.config import EC2_KEY_NAME, EC2_SECURITYGROUP
 from mist.io.config import LINODE_DATACENTERS
-from mist.io.config import SUPPORTED_PROVIDERS
 
 from mist.io.helpers import connect
-from mist.io.helpers import get_machine_actions
-from mist.io.helpers import import_key, get_keypair, get_keypair_by_name
-from mist.io.helpers import create_security_group
+from mist.io.helpers import generate_backend_id, get_machine_actions
+from mist.io.helpers import import_key, create_security_group
+from mist.io.helpers import get_keypair, get_keypair_by_name
 from mist.io.helpers import run_command
-try:
-    from mist.core.helpers import save_keypairs
-except ImportError:
-    from mist.io.helpers import save_keypairs
-from mist.io.helpers import save_settings, generate_backend_id
-
+from mist.io.helpers import save_settings
+from mist.io.helpers import generate_keypair, set_default_key
 
 log = logging.getLogger('mist.io')
 
@@ -79,7 +68,7 @@ def home(request):
 def list_backends(request):
     """Gets the available backends.
 
-    .. note:: Currently, this is only used by the backends controller in js.
+    .. note:: Currently, this is only used by the backend controller in js.
 
     """
     try:
@@ -145,7 +134,8 @@ def add_backend(request, renderer='json'):
     return ret
 
 
-@view_config(route_name='backend_action', request_method='DELETE', renderer='json')
+@view_config(route_name='backend_action', request_method='DELETE',
+             renderer='json')
 def delete_backend(request, renderer='json'):
     request.registry.settings['backends'].pop(request.matchdict['backend'])
     save_settings(request)
@@ -155,10 +145,10 @@ def delete_backend(request, renderer='json'):
 
 @view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
-    """Gets machines and their metadata for a backend.
+    """Gets machines and their metadata from a backend.
 
-    Because each provider stores metadata in different places several checks
-    are needed.
+    Several checks are needed, because each backend stores metadata
+    differently.
 
     The folowing are considered:::
 
@@ -217,7 +207,6 @@ def list_machines(request):
     return ret
 
 
-
 def save_machine_to_key(request, keypair, backend_id, node):
     """Saves machine-key association.
 
@@ -230,7 +219,7 @@ def save_machine_to_key(request, keypair, backend_id, node):
             keypair['machines'].append([backend_id, node.id])
         else:
             keypair['machines'] = [[backend_id, node.id],]
-        save_keypairs(request, keypair)
+        save_settings(request)
     return {}
 
 
@@ -547,7 +536,7 @@ def destroy_machine(request):
         machines = keypairs[key].get('machines', None)
         if pair in machines:
             keypairs[key]['machines'].remove(pair)
-            save_keypairs(request, keypairs[key])
+            save_settings(request)
 
     return Response('Success', 200)
 
@@ -840,16 +829,23 @@ def list_keys(request):
 
 
 @view_config(route_name='keys', request_method='POST', renderer='json')
-def generate_keypair(request):
-    """Generate a random keypair.
+def update_keys(request):
+    """Either generate a keypair or change the default one.
 
-    It is a POST because it has computanional cost and it should not be
-    exposed to everyone.
-
+    generate_keys() in in a POST because it has computanional cost and it
+    should not be exposed to everyone.
     """
-    key = RSA.generate(2048, os.urandom)
-    return {'public': key.exportKey('OpenSSH'),
-            'private': key.exportKey()}
+    params = request.json_body
+
+    if params['action'] == 'generate':
+        ret = generate_keypair()
+    elif params['action'] == 'set_default':
+        try:
+            ret = set_default_key(request)
+        except KeyError:
+            return Response('Key name not provided', 400)
+
+    return ret
 
 
 @view_config(route_name='key', request_method='PUT', renderer='json')
@@ -874,25 +870,7 @@ def add_key(request):
 
     return ret
 
-
-@view_config(route_name='key', request_method='POST', renderer='json')
-def set_default_key(request):
-    params = request.json_body
-    id = params.get('name', '')
-
-    keypairs = request.registry.settings['keypairs']
-
-    for key in keypairs:
-        if keypairs[key].get('default', False):
-            keypairs[key]['default'] = False
-
-    keypairs[id]['default'] = True
-
-    save_settings(request)
-
-    return {}
-
-
+'''
 @view_config(route_name='key_machines_associate', request_method='POST', renderer='json')
 def associate_key_to_machines(request):
     """Associate a key with list of machines.
@@ -931,7 +909,7 @@ def associate_key_to_machines(request):
 	    keypair['machines'].append(pair)
 
 
-    save_keypairs(request, keypair)
+    save_settings(request)
 
     return {}
 
@@ -976,7 +954,7 @@ def associate_key(request):
         return Response('Key already associated to machine', 204)
     else:
         keypair['machines'].append(machine_backend)
-        save_keypairs(request, keypair)
+        save_settings(request)
         deploy_key(request, backend_id, machine_id, keypair, existing_key)
 
 
@@ -1062,7 +1040,7 @@ def disassociate_key_to_machine(request):
     for pair in keypair['machines']:
         if pair == machine_backend:
             keypair['machines'].remove(pair)
-            save_keypairs(request, keypair)
+            save_settings(request)
             break
 
     return {}
@@ -1092,24 +1070,49 @@ def get_private_key(request):
 
     if keypair:
         return keypair.get('private', '')
+'''
 
 @view_config(route_name='key', request_method='DELETE', renderer='json')
 def delete_key(request):
-    params = request.json_body
-    id = params.get('name', '')
+    """Deletes a keypair.
 
-    key = request.registry.settings['keypairs'].pop(id)
+    If the default key gets deleted, it sets the next one as default, provided
+    that at least another key exists. It returns the list of all keys after
+    the deletion, excluding the private keys (check also list_keys).
+
+    """
+    params = request.json_body
+
+    try:
+        key_name = params['key_name']
+    except KeyError:
+        return Response('Key name not provided', 400)
+
+    try:
+        #undeploy_key(request)
+        ret_code = 200
+    except:
+        ret_code = 206
+
+    keypairs = request.registry.settings['keypairs']
+    key = keypairs.pop(key_name)
+
     if key.get('default', None):
-        #if we delete the default key, make the next one as default, provided
-        #that it exists
         try:
-           first_key_id = request.registry.settings['keypairs'].keys()[0]
-           request.registry.settings['keypairs'][first_key_id]['default'] = True
-        except KeyError:
+           new_default_key = keypairs.keys()[0]
+           keypairs[new_default_key]['default'] = True
+        except KeyError, IndexError:
             pass
+
     save_settings(request)
 
-    return {}
+    ret = [{'name': key,
+            'machines': keypairs[key].get('machines', False),
+            'pub': keypairs[key]['public'],
+            'default_key': keypairs[key].get('default', False)}
+           for key in keypairs.keys()]
+
+    return Response(status=ret_code, json_body=ret)
 
 
 @view_config(route_name='monitoring', request_method='GET', renderer='json')
