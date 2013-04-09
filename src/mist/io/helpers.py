@@ -500,7 +500,7 @@ def associate_key(request, key_name, backend_id, machine_id):
         return deploy_key(request, backend_id, machine_id, keypair, existing_key)
 
 
-def disassociate_key(request):
+def disassociate_key(request, key_name, backend_id, machine_id):
     """Disassociate a key from a machine.
 
     Receives a key name, and a machine/backend id pair and removes the machine
@@ -508,9 +508,6 @@ def disassociate_key(request):
 
     """
     params = request.json_body
-    key_name = params.get('key_name', '')
-    machine_id = params.get('machine_id', '')
-    backend_id = params.get('backend_id', '')
 
     try:
         keypairs = request.environ['beaker.session']['keypairs']
