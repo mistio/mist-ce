@@ -461,3 +461,151 @@ def set_default_key(request):
     save_settings(request)
 
     return {}
+
+
+def associate_key(request, key_name, backend_id, machine_id):
+    """Associates a key with a machine."""
+    if not machine_id or not backend_id:
+        return Response('Machine or backend not found', 400)
+
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+
+    try:
+        keypair = keypairs[key_name]
+    except KeyError:
+        return Response('Keypair not found', 404)
+
+    machine_backend = [backend_id, machine_id]
+
+    if machine_backend in keypair['machines']:
+        return Response('Key already associated to machine', 304)
+
+    keypair['machines'].append(machine_backend)
+    save_settings(request)
+
+    existing_key = None
+    for key in keypairs:
+        machines = keypairs[key].get('machines', [])
+        if machine_backend in machines:
+            existing_key = keypairs[key]
+            break
+
+    if not existing_key:
+        return Response('Manually deploy the public key to your server', 206)
+    else:
+        return deploy_key(request, backend_id, machine_id, keypair, existing_key)
+
+
+def disassociate_key(request):
+    """Disassociate a key from a machine.
+
+    Receives a key name, and a machine/backend id pair and removes the machine
+    from that keypair
+
+    """
+    params = request.json_body
+    key_name = params.get('key_name', '')
+    machine_id = params.get('machine_id', '')
+    backend_id = params.get('backend_id', '')
+
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+
+    keypair = {}
+
+    if key_name in keypairs.keys():
+        keypair = keypairs[key_name]
+    else:
+        return Response('Keypair not found', 404)
+
+    machine_backend = [backend_id, machine_id]
+
+    for pair in keypair['machines']:
+        if pair == machine_backend:
+            keypair['machines'].remove(pair)
+            save_settings(request)
+            break
+
+    return {}
+
+
+def get_private_key(request):
+    """Get private key from keypair name, for display on key view when user
+    clicks display private key.
+
+    """
+    params = request.json_body
+    key_name = params.get('key_name', '')
+
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+
+    keypair = {}
+
+    if key_name in keypairs.keys():
+        keypair = keypairs[key_name]
+    else:
+        return Response('Keypair not found', 404)
+
+
+    if keypair:
+        return keypair.get('private', '')
+
+
+def deploy_key(request, backend_id, machine_id, keypair, existing_key):
+    #try to set the key to authorized_keys of that machine
+    try:
+        conn = connect(request, backend_id)
+    except:
+        return Response('Key associated but could not install the key to machine', 204)
+
+    node = None
+    machines = conn.list_nodes()
+    for machine in machines:
+        if machine.id == machine_id:
+            node = machine
+            break
+
+    if not node:
+        return Response('Key associated but could not install the key to machine', 204)
+
+    try:
+        host = node.public_ip[0]
+    except:
+        return Response('Key associated but could not install the key to machine', 204)
+
+    ssh_user = None
+    try:
+        ssh_user = node.extra.get('tags')['ssh_user']
+    except:
+        ssh_user = 'root'
+    if not ssh_user:
+        ssh_user = 'root'
+
+    if existing_key:
+        #try to add the new associated key with the machine
+        command = 'if [ -z `grep "%s" ~/.ssh/authorized_keys` ]; then echo "%s" >> ~/.ssh/authorized_keys; fi' % (keypair['public'], keypair['public'])
+        private_key = existing_key['private']
+    else:
+        #try to login to the server with this key. does not add the key to authorized_keys, just
+        #make an attempt to login
+        command = 'uptime'
+        private_key = keypair['private']
+
+    try:
+        ret = run_command(conn, machine_id, host, ssh_user, private_key, command)
+        ret.title
+        #FIXME: needs a better check
+        #type(ret)
+        #<class 'fabric.operations._AttributeString'>
+    except:
+        return Response('Key associated but could not install the key to machine', 204)
+
+    return Response('OK', 200)

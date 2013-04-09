@@ -32,14 +32,14 @@ define('app/controllers/keys', [
 
             newKey: function(name, publicKey, privateKey) {
                 item = {
-                    'name':name,
+                    'name': name,
                     'pub': publicKey,
                     'priv': privateKey
                 }
 
                 var that = this;
                 $.ajax({
-                    url: 'keys/' + name,
+                    url: '/keys/' + name,
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(item),
@@ -66,10 +66,13 @@ define('app/controllers/keys', [
             },
 
             getPrivKey: function(key) {
-                payload = {'key_name': key.name}
-                var that = this
+                payload = {
+                    'action': 'get_private_key',
+                    'key_name': key.name
+                };
+                var that = this;
                 $.ajax({
-                    url: 'keys/private/key',
+                    url: '/keys/' + key.name,
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
@@ -107,6 +110,7 @@ define('app/controllers/keys', [
 
             associateKey: function(key_name, machine) {
                 payload = {
+                    'action': 'associate',
                     'key_name': key_name,
                     'backend_id': machine.backend.id,
                     'machine_id': machine.id
@@ -114,7 +118,7 @@ define('app/controllers/keys', [
 
                 var key = this.getKeyByName(key_name);
                 $.ajax({
-                    url: 'keys/associate/machine',
+                    url: '/keys/' + key.name,
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
@@ -140,13 +144,14 @@ define('app/controllers/keys', [
 
             disassociateKey: function(key, machine) {
                 payload = {
+                    'action': 'disassociate',
                     'key_name': key.name,
                     'backend_id': machine.backend.id,
                     'machine_id': machine.id
                 }
 
                 $.ajax({
-                    url: 'keys/disassociate/machine',
+                    url: '/keys/' + key.name,
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
