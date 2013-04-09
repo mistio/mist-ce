@@ -4,14 +4,14 @@
         data-role="button"
         data-icon="delete"
         data-theme="a"
-        {{action "openMonitoringDialog" target="view"}}>Disable Monitoring</a>
+        {{action "openMonitoringDialog" target="view"}}>Disable</a>
 {{else}}
     <a href="#"
         class="monitoring-button"
         data-role="button"
         data-icon="star"
         data-theme="b"
-        {{action "openMonitoringDialog" target="view"}}>Enable Monitoring</a>
+        {{action "openMonitoringDialog" target="view"}}>Enable</a>
 {{/if}}
 
 <div data-role="popup" id="monitoring-dialog" class="mist-dialog" data-overlay-theme="a">

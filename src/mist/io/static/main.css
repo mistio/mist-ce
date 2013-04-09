@@ -615,7 +615,7 @@ div.actions div.ui-controlgroup-controls {
     background: #C9E0F0;
 }
 
-#monitoring-wrapper {
+#monitoring-wrapper, #keys-wrapper {
     padding: 0px;
 }
 
@@ -629,6 +629,7 @@ div.actions div.ui-controlgroup-controls {
     color: #444;
     text-align: center;
     font-size: 16px;
+    margin: 5px auto !important;
 }
 
 div.pending-monitoring {
@@ -640,8 +641,8 @@ div.pending-monitoring {
     margin-bottom: 10px;
 }
 
-.monitoring-button {
-    max-width: 26ex;
+.monitoring-button, #associate-key-button {
+    width: 100%;
     margin: 0px auto;
 }
 
@@ -693,7 +694,7 @@ div.pending-monitoring {
     padding-left: 9px;
 }
 
-.monitoring-dialog-container div, .associate-button-container {
+.monitoring-dialog-container div, .associate-key-container div {
     max-width: 26ex;
     margin: 0 auto;
 }
@@ -809,7 +810,7 @@ div.pending-monitoring {
     overflow: auto;
 }
 
-.monitoring-dialog-container {
+.monitoring-dialog-container, .associate-key-container {
     padding: 15px;
     background: #e0e0e1;
 }

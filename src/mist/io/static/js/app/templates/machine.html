@@ -115,26 +115,33 @@
 
          <div data-role="collapsible" data-collapsed="false" id="machine-single-keys">
             <h3>Keys</h3>
-            <div class="key-container">
-                {{#each keys}}
-                    {{view Mist.MachineKeyListItemView keyBinding="this"}}
-                {{/each}}
-            </div>
-            <div class="associate-button-container">
-                <button id="associate-key-button"
-                    data-inline="true"
-                    data-icon="plus"
-                    data-theme="b"
-                    {{action associateClicked target="view"}}>Associate</button>
-            </div>
-            <div id="associate-key" data-role="popup">
-                <ul class="key-list" data-role="listview">
-                    {{#each view.machineKeysRest}}
-                    <li data-icon="false">
-                        <a href="#" title="{{unbound name}}">{{name}}</a>
-                    </li>
+            <div id="keys-wrapper" {{bindAttr class=":ui-btn-inner :ui-corner-top :ui-corner-bottom pendingStats"}}>
+                {{#if keys}}
+                <div class="keys-container">
+                    {{#each keys}}
+                        {{view Mist.MachineKeyListItemView keyBinding="this"}}
                     {{/each}}
-                </ul>
+                </div>
+                {{/if}}
+                <div class="associate-key-container">
+                    <div>
+                    <a id="associate-key-button"
+                        data-role="button"
+                        data-inline="true"
+                        data-icon="plus"
+                        data-theme="b"
+                        {{action associateClicked target="view"}}>Associate</a>
+                    </div>                
+                </div>
+                <div id="associate-key" data-role="popup">
+                    <ul class="key-list" data-role="listview">
+                        {{#each view.machineKeysRest}}
+                        <li data-icon="false">
+                            <a href="#" title="{{unbound name}}">{{name}}</a>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
             </div>
 
         </div>
