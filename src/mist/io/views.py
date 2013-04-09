@@ -834,6 +834,7 @@ def update_keys(request):
 
     generate_keys() in in a POST because it has computanional cost and it
     should not be exposed to everyone.
+
     """
     params = request.json_body
 
@@ -843,15 +844,18 @@ def update_keys(request):
         try:
             ret = set_default_key(request)
         except KeyError:
-            return Response('Key name not provided', 400)
+            ret = Response('Key name not provided', 400)
+    else:
+        ret = Response('Keys action not supported', 405)
 
     return ret
 
 
 @view_config(route_name='key', request_method='PUT', renderer='json')
 def add_key(request):
+    """Creates a new keypair."""
     params = request.json_body
-    id = params.get('name', '')
+    key_name = params.get('name', '')
 
     key = {'public' : params.get('pub', ''),
            'private' : params.get('priv', '')}
@@ -859,10 +863,10 @@ def add_key(request):
     if not len(request.registry.settings['keypairs']):
         key['default'] = True
 
-    request.registry.settings['keypairs'][id] = key
+    request.registry.settings['keypairs'][key_name] = key
     save_settings(request)
 
-    ret = {'name': id,
+    ret = {'name': key_name,
            'pub': key['public'],
            'priv': key['private'],
            'default_key': key.get('default', False),
