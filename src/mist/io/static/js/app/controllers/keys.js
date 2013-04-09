@@ -50,6 +50,9 @@ define('app/controllers/keys', [
                         var key = Key.create(data);
                         that.addObject(key);
                         Ember.run.next(function(){
+                            key.addObserver('selected', function() {
+                                that.getSelectedKeyCount();
+                            });
                             $('#keys-list').listview('refresh');
                             $('#keys-list input.ember-checkbox').checkboxradio();
                         });
