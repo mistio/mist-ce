@@ -32,6 +32,7 @@ def load_settings(settings):
     The settings argument gets updated. It is the global_config of pyramid. If
     there is no such file, it creates one for later use and sets some sensible
     defaults without writing them in file.
+
     """
     try:
         config_file = open('settings.yaml', 'r')
@@ -67,6 +68,7 @@ def save_settings(request):
     This is useful for using mist.io UI to configure your installation. It
     includes some yaml dump magic in order for the dumped private ssh keys
     to be in a valid string format.
+
     """
     class folded_unicode(unicode): pass
     class literal_unicode(unicode): pass
@@ -119,6 +121,7 @@ def save_keypairs(request, keypair):
     This is useful for using mist.io UI to configure your installation. It
     includes some yaml dump magic in order for the dumped private ssh keys
     to be in a valid string format.
+
     """
     class folded_unicode(unicode): pass
     class literal_unicode(unicode): pass
@@ -170,8 +173,7 @@ def save_keypairs(request, keypair):
 
 
 def get_keypair_by_name(keypairs, name):
-    "get key pair by name"
-
+    """get key pair by name."""
     for key in keypairs:
         if name == key:
             return keypairs[key]
@@ -179,8 +181,7 @@ def get_keypair_by_name(keypairs, name):
 
 
 def get_keypair(keypairs, backend_id=None, machine_id=None):
-    "get key pair for machine, else get default key pair"
-
+    """get key pair for machine, else get default key pair."""
     for key in keypairs:
         machines = keypairs[key].get('machines', [])
         if machines:
@@ -203,6 +204,7 @@ def connect(request, backend_id=False):
         * Rackspace, old style and the new Nova powered one,
         * Openstack Diablo through Trystack, should also try Essex,
         * Linode
+
     """
     try:
         backends = request.environ['beaker.session']['backends']
@@ -244,6 +246,7 @@ def get_machine_actions(machine, backend):
 
     The available actions are based on the machine state. The state
     codes supported by mist.io are those of libcloud, check config.py.
+
     """
     # defaults for running state
     can_start = False
@@ -291,6 +294,7 @@ def import_key(conn, public_key, name):
     considers it a success.
 
     This is supported only for EC2 at the moment.
+
     """
     if conn.type in EC2_PROVIDERS:
         (tmp_key, tmp_path) = tempfile.mkstemp()
@@ -320,6 +324,7 @@ def create_security_group(conn, info):
 
     This is supported only for EC2 at the moment. Info should be a dictionary
     with 'name' and 'description' keys.
+
     """
     name = info.get('name', None)
     description = info.get('description', None)
@@ -367,6 +372,7 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
         root). This misleads fabric to believe that everything went fine. To
         deal with this we check if the returned output contains a fragment
         of this message.
+
     """
     if not host:
         log.error('Host not provided, exiting.')
@@ -451,11 +457,11 @@ alphabet = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
 base_count = len(alphabet)
 
 def b58_encode(num):
-    """ Returns num in a base58-encoded string """
-    encode = ''       
+    """Returns num in a base58-encoded string."""
+    encode = ''
     if (num < 0):
         return ''
-    while (num >= base_count):    
+    while (num >= base_count):
         mod = num % base_count
         encode = alphabet[mod] + encode
         num = num / base_count
@@ -465,12 +471,12 @@ def b58_encode(num):
 
 
 def b58_decode(s):
-    """ Decodes the base58-encoded string s into an integer """
+    """Decodes the base58-encoded string s into an integer."""
     decoded = 0
     multi = 1
     s = s[::-1]
     for char in s:
         decoded += multi * alphabet.index(char)
         multi = multi * base_count
-        
+
     return decoded

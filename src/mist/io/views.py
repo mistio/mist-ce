@@ -49,6 +49,7 @@ log = logging.getLogger('mist.io')
              renderer='templates/home.pt')
 def home(request):
     """Gets all the basic data for backends, project name and session status.
+
     """
     try:
         email = request.environ['beaker.session']['email']
@@ -79,6 +80,7 @@ def list_backends(request):
     """Gets the available backends.
 
     .. note:: Currently, this is only used by the backends controller in js.
+
     """
     try:
         backends = request.environ['beaker.session']['backends']
@@ -166,6 +168,7 @@ def list_machines(request):
           attribute
         * For flavors, EC2 has an extra.instancetype attribute while Rackspace
           an extra.flavorId. however we also expect to get size attribute.
+
     """
     try:
         conn = connect(request)
@@ -216,7 +219,11 @@ def list_machines(request):
 
 
 def save_machine_to_key(request, keypair, backend_id, node):
-    "save association between a machine and a key. used on create machine"
+    """Saves machine-key association.
+
+    It is used in machine creation.
+
+    """
     if keypair:
         machines = keypair.get('machines', None)
         if machines and len(machines):
@@ -247,8 +254,8 @@ def create_machine(request):
     liblcoud doesn't support linode.config.list at the moment, so no way to
     get them. Also, it will create inconsistencies for machines created
     through mist.io and those from the Linode interface.
-    """
 
+    """
     try:
         conn = connect(request)
     except:
@@ -260,7 +267,7 @@ def create_machine(request):
         key_name = request.json_body['key']
     except:
         key_name = None
-    
+
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
@@ -269,7 +276,7 @@ def create_machine(request):
     if key_name:
         keypair = get_keypair_by_name(keypairs, key_name)
     else:
-        keypair = get_keypair(keypairs)      
+        keypair = get_keypair(keypairs)
 
     if keypair:
         private_key = keypair['private']
@@ -308,7 +315,7 @@ def create_machine(request):
     public_key:
         key = SSHKeyDeployment(str(public_key))
         deploy_script = ScriptDeployment(script)
-        msd = MultiStepDeployment([key, deploy_script])        
+        msd = MultiStepDeployment([key, deploy_script])
         try:
             node = conn.deploy_node(name=machine_name,
                              image=image,
@@ -426,6 +433,7 @@ def start_machine(request):
     .. note:: Normally try won't get an AttributeError exception because this
               action is not allowed for machines that don't support it. Check
               helpers.get_machine_actions.
+
     """
     try:
         conn = connect(request)
@@ -459,6 +467,7 @@ def stop_machine(request):
     .. note:: Normally try won't get an AttributeError exception because this
               action is not allowed for machines that don't support it. Check
               helpers.get_machine_actions.
+
     """
     try:
         conn = connect(request)
@@ -553,6 +562,7 @@ def set_machine_metadata(request):
 
     machine_id comes as u'...' but the rest are plain strings so use == when
     comparing in ifs. u'f' is 'f' returns false and 'in' is too broad.
+
     """
     try:
         conn = connect(request)
@@ -605,7 +615,7 @@ def set_machine_metadata(request):
 @view_config(route_name='machine_metadata', request_method='DELETE',
              renderer='json')
 def delete_machine_metadata(request):
-    """Delete metadata for a machine, given the machine id and the tag to be
+    """Deletes metadata for a machine, given the machine id and the tag to be
     deleted.
 
     Libcloud handles this differently for each provider. Linode and Rackspace,
@@ -618,6 +628,7 @@ def delete_machine_metadata(request):
 
     Don't forget to check string encoding before using them in ifs.
     u'f' is 'f' returns false.
+
     """
     try:
         conn = connect(request)
@@ -679,8 +690,11 @@ def delete_machine_metadata(request):
 @view_config(route_name='machine_shell', request_method='POST',
              renderer='json')
 def shell_command(request):
-    """Send a shell command to a machine over ssh, using fabric.
-       Used for uptime only!!!"""
+    """Sends a shell command to a machine over ssh, using fabric.
+
+    .. note:: Used for uptime only.
+
+    """
     try:
         conn = connect(request)
     except:
@@ -701,7 +715,7 @@ def shell_command(request):
         keypairs = request.registry.settings.get('keypairs', {})
 
     keypair = get_keypair(keypairs, backend_id, machine_id)
-    
+
     if keypair:
         private_key = keypair['private']
         public_key = keypair['public']
@@ -777,6 +791,7 @@ def list_locations(request):
 
     In EC2 all locations by a provider have the same name, so the availability
     zones are listed instead of name.
+
     """
     try:
         conn = connect(request)
@@ -816,17 +831,22 @@ def list_keys(request):
     except:
         keypairs = request.registry.settings.get('keypairs', {})
 
-    ret = [{'name': key, 
+    ret = [{'name': key,
             'machines': keypairs[key].get('machines', False),
             'pub': keypairs[key]['public'],
-            'default_key': keypairs[key].get('default', False)} 
+            'default_key': keypairs[key].get('default', False)}
            for key in keypairs.keys()]
     return ret
 
 
 @view_config(route_name='keys', request_method='POST', renderer='json')
 def generate_keypair(request):
-    """Generate a random keypair"""
+    """Generate a random keypair.
+
+    It is a POST because it has computanional cost and it should not be
+    exposed to everyone.
+
+    """
     key = RSA.generate(2048, os.urandom)
     return {'public': key.exportKey('OpenSSH'),
             'private': key.exportKey()}
@@ -842,13 +862,13 @@ def add_key(request):
 
     if not len(request.registry.settings['keypairs']):
         key['default'] = True
-  
+
     request.registry.settings['keypairs'][id] = key
     save_settings(request)
 
-    ret = {'name': id, 
-           'pub': key['public'], 
-           'priv': key['private'], 
+    ret = {'name': id,
+           'pub': key['public'],
+           'priv': key['private'],
            'default_key': key.get('default', False),
            'machines': []}
 
@@ -861,13 +881,13 @@ def set_default_key(request):
     id = params.get('name', '')
 
     keypairs = request.registry.settings['keypairs']
-    
+
     for key in keypairs:
         if keypairs[key].get('default', False):
             keypairs[key]['default'] = False
- 
+
     keypairs[id]['default'] = True
-  
+
     save_settings(request)
 
     return {}
@@ -875,8 +895,11 @@ def set_default_key(request):
 
 @view_config(route_name='key_machines_associate', request_method='POST', renderer='json')
 def associate_key_to_machines(request):
-    '''Associate a key with list of machines. 
-       Receives a key name, and a list of machine/backend ids'''
+    """Associate a key with list of machines.
+
+    Receives a key name, and a list of machine/backend ids
+
+    """
     params = request.json_body
     key_name = params.get('key_name', '')
     machine_backend_list = params.get('machine_backend_list', '')
@@ -885,7 +908,7 @@ def associate_key_to_machines(request):
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs', {})
-    
+
     keypair = {}
 
     if key_name in keypairs.keys():
@@ -915,8 +938,11 @@ def associate_key_to_machines(request):
 
 @view_config(route_name='key_machine_associate', request_method='POST', renderer='json')
 def associate_key(request):
-    '''Associate a key with a machine. 
-       Receives a key name, and a machine/backend id'''
+    """Associate a key with a machine.
+
+    Receives a key name, and a machine/backend id
+
+    """
     params = request.json_body
     key_name = params.get('key_name', '')
     machine_id = params.get('machine_id', None)
@@ -929,7 +955,7 @@ def associate_key(request):
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs', {})
-    
+
     keypair = {}
 
     if key_name in keypairs.keys():
@@ -950,7 +976,7 @@ def associate_key(request):
         return Response('Key already associated to machine', 204)
     else:
         keypair['machines'].append(machine_backend)
-        save_keypairs(request, keypair)       
+        save_keypairs(request, keypair)
         deploy_key(request, backend_id, machine_id, keypair, existing_key)
 
 
@@ -1008,8 +1034,12 @@ def deploy_key(request, backend_id, machine_id, keypair, existing_key):
 
 @view_config(route_name='key_disassociate', request_method='POST', renderer='json')
 def disassociate_key_to_machine(request):
-    '''Disassociate a key from a machine. 
-       Receives a key name, and a machine/backend id pair and removes the machine from that keypair'''
+    """Disassociate a key from a machine.
+
+    Receives a key name, and a machine/backend id pair and removes the machine
+    from that keypair
+
+    """
     params = request.json_body
     key_name = params.get('key_name', '')
     machine_id = params.get('machine_id', '')
@@ -1019,7 +1049,7 @@ def disassociate_key_to_machine(request):
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs', {})
-    
+
     keypair = {}
 
     if key_name in keypairs.keys():
@@ -1040,8 +1070,9 @@ def disassociate_key_to_machine(request):
 
 @view_config(route_name='key_private', request_method='POST', renderer='json')
 def get_private_key(request):
-    """get private key from keypair name, for display
-       on key view when user clicks display private key 
+    """Get private key from keypair name, for display on key view when user
+    clicks display private key.
+
     """
     params = request.json_body
     key_name = params.get('key_name', '')
@@ -1050,7 +1081,7 @@ def get_private_key(request):
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs', {})
-    
+
     keypair = {}
 
     if key_name in keypairs.keys():
@@ -1069,12 +1100,12 @@ def delete_key(request):
 
     key = request.registry.settings['keypairs'].pop(id)
     if key.get('default', None):
-        #if we delete the default key, make the next one as default, provided 
+        #if we delete the default key, make the next one as default, provided
         #that it exists
         try:
            first_key_id = request.registry.settings['keypairs'].keys()[0]
            request.registry.settings['keypairs'][first_key_id]['default'] = True
-        except KeyError: 
+        except KeyError:
             pass
     save_settings(request)
 
@@ -1083,21 +1114,21 @@ def delete_key(request):
 
 @view_config(route_name='monitoring', request_method='GET', renderer='json')
 def check_monitoring(request):
-    """
-    Ask the mist.io service if monitoring is enabled for this machine
+    """Ask the mist.io service if monitoring is enabled for this machine.
+
     """
     core_uri = request.registry.settings['core_uri']
     email = request.registry.settings.get('email','')
     password = request.registry.settings.get('password','')
-    
+
     timestamp = datetime.utcnow().strftime("%s")
     hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
-    
+
     payload = {'email': email,
                'timestamp': timestamp,
                'hash': hash,
                }
-    
+
     ret = requests.get(core_uri+request.path, params=payload, verify=False)
     if ret.status_code == 200:
         return ret.json()
@@ -1107,8 +1138,9 @@ def check_monitoring(request):
 
 @view_config(route_name='update_monitoring', request_method='POST', renderer='json')
 def update_monitoring(request):
-    """
-    Enable/disable monitoring for this machine using the hosted mist.io service.
+    """Enable/disable monitoring for this machine using the hosted mist.io
+    service.
+
     """
     core_uri = request.registry.settings['core_uri']
     try:
@@ -1121,16 +1153,16 @@ def update_monitoring(request):
         password = request.registry.settings.get('password','')
         timestamp =  datetime.utcnow().strftime("%s")
         hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
-        
+
     action = request.json_body['action'] or 'enable'
     payload = {'email': email,
                'timestamp': timestamp,
                'hash': hash,
                'action': action,
                }
-    #TODO: make ssl verification configurable globally, set to true by default    
+    #TODO: make ssl verification configurable globally, set to true by default
     ret = requests.post(core_uri+request.path, params=payload, verify=False)
-    
+
     if ret.status_code != 200:
         return Response('Service unavailable', 503)
 
