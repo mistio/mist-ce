@@ -15,59 +15,73 @@ define('app/views/machine_add_dialog', [
             imagesBinding: 'Mist.machineAddController.newMachineBackend.images',
 
             openMachineAddDialog: function(){
+                var that = this;
+                
                 $('.select-listmenu').listview('refresh');
-                $('#dialog-add').panel('open');
-                $('.select-provider-collapsible ul li').on( "click", this.selectProvider);
-                $('.select-image-collapsible ul li').on( "click", this.selectImage);
-                $('.select-key-collapsible ul li').on( "click", this.selectKey);                
+                $('#dialog-add').panel('open');              
             },
             
-            selectProvider: function(event){
+            selectProvider: function(backend){
                 $('.select-provider-collapsible').collapsible('option','collapsedIcon','check');
-                $('.select-provider-collapsible span.ui-btn-text').text(event.target.text);
-                Mist.machineAddController.set('newMachineBackend', Mist.backendsController.getBackendById($(event.target).attr('title')));        
-                $('.select-provider-collapsible').trigger('collapse');
+                $('.select-provider-collapsible span.ui-btn-text').text(backend.title);
+                Mist.machineAddController.set('newMachineBackend', backend);
+                Mist.machineAddController.set('newMachineSize', null);
+                $('.select-size-collapsible span.ui-btn-text').text('Select Size');                    
+                Mist.machineAddController.set('newMachineImage', null);
+                $('.select-image-collapsible span.ui-btn-text').text('Select Image');            
+                Mist.machineAddController.set('newMachineLocation', null);
+                $('.select-location-collapsible span.ui-btn-text').text('Select Location');      
+                
+                $('.select-provider-collapsible').trigger('collapse');                
                 return false;               
             },
             
-            selectSize: function(event){
+            selectSize: function(size){
                 $('.select-size-collapsible').collapsible('option','collapsedIcon','check');
-                $('.select-size-collapsible span.ui-btn-text').text(event.target.text);
-                Mist.machineAddController.set('newMachineSize', $(event.target).attr('title'));        
+                $('.select-size-collapsible span.ui-btn-text').text(size.name);
+                Mist.machineAddController.set('newMachineSize', size);  
+                Mist.machineAddController.set('newMachineImage', null);
+                $('.select-image-collapsible span.ui-btn-text').text('Select Image');            
+                Mist.machineAddController.set('newMachineLocation', null);
+                $('.select-location-collapsible span.ui-btn-text').text('Select Location');                     
                 $('.select-size-collapsible').trigger('collapse');
                 return false;               
             },
                        
-            selectImage: function(event){
+            selectImage: function(image){
                 $('.select-image-collapsible').collapsible('option','collapsedIcon','check');
-                $('.select-image-collapsible span.ui-btn-text').text(event.target.text);
-                Mist.machineAddController.set('newMachineImage', $(event.target).attr('title'));        
+                $('.select-image-collapsible span.ui-btn-text').text(image.name);
+                Mist.machineAddController.set('newMachineImage', image);        
                 $('.select-image-collapsible').trigger('collapse');
                 return false;               
             },
 
-            selectLocation: function(event){
+            selectLocation: function(location){
                 $('.select-location-collapsible').collapsible('option','collapsedIcon','check');
-                $('.select-location-collapsible span.ui-btn-text').text(event.target.text);
-                Mist.machineAddController.set('newMachineLocation', $(event.target).attr('title'));        
+                $('.select-location-collapsible span.ui-btn-text').text(location.name);
+                Mist.machineAddController.set('newMachineLocation', location);      
                 $('.select-location-collapsible').trigger('collapse');
                 return false;               
             },
                         
-            selectKey: function(event){
+            selectKey: function(key){
                 $('.select-key-collapsible').collapsible('option','collapsedIcon','check');
-                $('.select-key-collapsible span.ui-btn-text').text(event.target.text);
-                Mist.machineAddController.set('newMachineKey', $(event.target).attr('title'));        
+                $('.select-key-collapsible span.ui-btn-text').text(key.name);
+                Mist.machineAddController.set('newMachineKey', key);       
                 $('.select-key-collapsible').trigger('collapse');
                 return false;               
             },
                             
             clear: function(){
                 Mist.machineAddController.newMachineClear();
+                $('.select-provider-collapsible span.ui-btn-text').text('Select Provider');
+                $('.select-image-collapsible span.ui-btn-text').text('Select Image');
+                $('.select-size-collapsible span.ui-btn-text').text('Select Size');                
+                $('.select-location-collapsible span.ui-btn-text').text('Select Location');                
+                $('.select-key-collapsible span.ui-btn-text').text('Select Key');
+                
                 $('#create-machine-name').val('');
-                $('#dialog-add').find('select.create-select').children('option').removeAttr('selected');
-                $('#dialog-add').find('select.create-select').find('option:first').attr('selected','selected');
-                $('#dialog-add').find('select.create-select').selectmenu('refresh');
+                
             },
 
             didInsertElement: function() {
@@ -87,10 +101,6 @@ define('app/views/machine_add_dialog', [
             backClicked: function() {
                 this.clear();
                 $('#dialog-add').panel('close');
-                $('.select-provider-collapsible ul li').off( "click", this.selectProvider);
-                $('.select-size-collapsible ul li').off( "click", this.selectSize);
-                $('.select-image-collapsible ul li').off( "click", this.selectImage);
-                $('.select-key-collapsible ul li').off( "click", this.selectKey);
             },
 
             init: function() {
@@ -119,16 +129,16 @@ define('app/views/machine_add_dialog', [
 
                     Mist.machineAddController.addObserver('newMachineNameReady', function() {
                         Ember.run.next(function(){
-                            //$('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineNameReady) {
                                 $('.select-provider-collapsible').removeClass('ui-disabled');
+                                                                
                                 $('.select-image-collapsible').addClass('ui-disabled');
                                 $('.select-size-collapsible').addClass('ui-disabled');
                                 $('.select-location-collapsible').addClass('ui-disabled');
                                 $('.select-key-collapsible').addClass('ui-disabled');
                                 $('#create-machine-script').textinput('disable');
                             } else {
-                                $('.select-provider-collapsible').addClass('ui-disabled');
+                                $('.select-provider-collapsible').addClass('ui-disabled');                                
                                 $('.select-image-collapsible').addClass('ui-disabled');
                                 $('.select-size-collapsible').addClass('ui-disabled');
                                 $('.select-location-collapsible').addClass('ui-disabled');
@@ -144,7 +154,6 @@ define('app/views/machine_add_dialog', [
                             $('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineBackendReady) {
                                 $('.select-size-collapsible').removeClass('ui-disabled');
-                                $('.select-size-collapsible ul li').on( "click", that.selectSize);
 
                                 $('.select-image-collapsible').addClass('ui-disabled');
                                 $('.select-location-collapsible').addClass('ui-disabled');
@@ -152,8 +161,6 @@ define('app/views/machine_add_dialog', [
                                 $('#create-machine-script').textinput('disable');
                             } else {
                                 $('.select-image-collapsible').addClass('ui-disabled');
-                                $('.select-size-collapsible ul li').off( "click", that.selectSize);
-
                                 $('.select-size-collapsible').addClass('ui-disabled');
                                 $('.select-location-collapsible').addClass('ui-disabled');
                                 $('.select-key-collapsible').addClass('ui-disabled');
@@ -168,15 +175,12 @@ define('app/views/machine_add_dialog', [
                             $('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineSizeReady) {
                                 $('.select-image-collapsible').removeClass('ui-disabled');
-                                $('.select-image-collapsible ul li').on( "click", that.selectImage);
 
                                 $('.select-location-collapsible').addClass('ui-disabled');
                                 $('.select-key-collapsible').addClass('ui-disabled');
                                 $('#create-machine-script').textinput('disable');
                             } else {
                                 $('.select-image-collapsible').addClass('ui-disabled');
-                                $('.select-image-collapsible ul li').off( "click", that.selectImage);
-
                                 $('.select-location-collapsible').addClass('ui-disabled');
                                 $('.select-key-collapsible').addClass('ui-disabled');
                                 $('#create-machine-script').textinput('disable');
@@ -190,14 +194,11 @@ define('app/views/machine_add_dialog', [
                             $('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineImageReady) {
                                 $('.select-location-collapsible').removeClass('ui-disabled');
-                                $('.select-location-collapsible ul li').on( "click", that.selectLocation);
 
                                 $('.select-key-collapsible').addClass('ui-disabled');
                                 $('#create-machine-script').textinput('disable');
                             } else {
                                 $('.select-location-collapsible').addClass('ui-disabled');
-                                $('.select-location-collapsible ul li').on( "click", that.selectLocation);
-
                                 $('.select-key-collapsible').addClass('ui-disabled');
                                 $('#create-machine-script').textinput('disable');
                             }
@@ -210,14 +211,12 @@ define('app/views/machine_add_dialog', [
                             $('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineLocationReady) {
                                 $('.select-key-collapsible').removeClass('ui-disabled');
-                                $('.select-key-collapsible ul li').on( "click", that.selectKey);
 
                                 $('#create-machine-script').textinput('enable');                                
                                 $('#create-machine-ok').button('enable');
                             } else {
                                 $('#create-machine-ok').button('disable');
                                 $('.select-key-collapsible').addClass('ui-disabled');
-                                $('.select-key-collapsible ul li').off( "click", that.selectKey);
 
                                 $('#create-machine-script').textinput('enable');                                                                
                             }

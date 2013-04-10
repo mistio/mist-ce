@@ -125,7 +125,7 @@ define('app/controllers/machines', [
                 });
             },
 
-            newMachine: function(name, imageId, sizeId, location, key, script) {
+            newMachine: function(name, image, size, location, key, script) {
                 log('Creating machine', this.name, 'to backend', this.backend.title);
 
                 this.backend.set('create_pending', true);
@@ -139,9 +139,6 @@ define('app/controllers/machines', [
                 // following will seem less messy. It will also be helpful for tags.
                 // http://stackoverflow.com/questions/8669340/ember-model-to-json
                 
-                var size = this.backend.getSizeById(sizeId);
-                var image = this.backend.getImageById(imageId);
-                
                 var payload = {
                         'name': name,
                         'image': image.id,
@@ -149,8 +146,8 @@ define('app/controllers/machines', [
                         // these are only useful for Linode
                         'image_extra': image.extra,
                         'disk': size.disk,
-                        'location': location,
-                        'key': key,
+                        'location': location.id,
+                        'key': key.name,
                         'script': script,
                 };
 
