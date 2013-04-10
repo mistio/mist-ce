@@ -208,22 +208,6 @@ def list_machines(request):
     return ret
 
 
-def save_machine_to_key(request, keypair, backend_id, node):
-    """Saves machine-key association.
-
-    It is used in machine creation.
-
-    """
-    if keypair:
-        machines = keypair.get('machines', None)
-        if machines and len(machines):
-            keypair['machines'].append([backend_id, node.id])
-        else:
-            keypair['machines'] = [[backend_id, node.id],]
-        save_settings(request)
-    return {}
-
-
 @view_config(route_name='machines', request_method='POST', renderer='json')
 def create_machine(request):
     """Creates a new virtual machine on the specified backend.
@@ -321,7 +305,7 @@ def create_machine(request):
                     if machine.name == machine_name:
                         node = machine
                         break
-                save_machine_to_key(request, keypair, backend_id, node)
+                associate_key(request, key_name, backend_id, node.id, deploy=False)
             except:
                 pass
             return Response('Something went wrong with node creation in RackSpace: %s' % e, 500)
@@ -354,7 +338,7 @@ def create_machine(request):
                         if machine.name == machine_name:
                             node = machine
                             break
-                    save_machine_to_key(request, keypair, backend_id, node)
+                    associate_key(request, key_name, backend_id, node.id, deploy=False)
                 except:
                     pass
                 return Response('Something went wrong with node creation in EC2: %s' % e, 500)
@@ -380,7 +364,7 @@ def create_machine(request):
                     if machine.name == machine_name:
                         node = machine
                         break
-                save_machine_to_key(request, keypair, backend_id, node)
+                associate_key(request, key_name, backend_id, node.id, deploy=False)
             except:
                 pass
             return Response('Something went wrong with Linode creation', 500)
@@ -398,12 +382,13 @@ def create_machine(request):
                     if machine.name == machine_name:
                         node = machine
                         break
-                save_machine_to_key(request, keypair, backend_id, node)
+                associate_key(request, key_name, backend_id, node.id, deploy=False)
             except:
                 pass
             return Response('Something went wrong with generic node creation: %s' % e, 500)
 
-    save_machine_to_key(request, keypair, backend_id, node)
+    associate_key(request, key_name, backend_id, node.id, deploy=False)
+
     return {'id': node.id,
             'name': node.name,
             'extra': node.extra,

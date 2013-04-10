@@ -463,7 +463,7 @@ def set_default_key(request):
     return {}
 
 
-def associate_key(request, key_name, backend_id, machine_id):
+def associate_key(request, key_name, backend_id, machine_id, deploy=True):
     """Associates a key with a machine."""
     if not machine_id or not backend_id:
         return Response('Machine or backend not found', 400)
@@ -497,7 +497,8 @@ def associate_key(request, key_name, backend_id, machine_id):
     if not existing_key:
         return Response('Manually deploy the public key to your server', 206)
     else:
-        return deploy_key(request, backend_id, machine_id, keypair, existing_key)
+        if deploy:
+            return deploy_key(request, backend_id, machine_id, keypair, existing_key)
 
 
 def disassociate_key(request, key_name, backend_id, machine_id):
