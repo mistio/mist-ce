@@ -86,9 +86,9 @@ def list_backends(request):
     for backend_id in backends:
         backend = backends[backend_id]
         ret.append({'id': backend_id,
-                    'title': backend['title'],
+                    'title': backend.get('title', backend['provider']),
                     'provider': backend['provider'],
-                    'poll_interval': backend['poll_interval'],
+                    'poll_interval': backend.get('poll_interval', 10000),
                     'state': 'wait',
                     # for Provider.RACKSPACE_FIRST_GEN
                     'region': backend.get('region', None),
