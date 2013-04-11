@@ -1000,5 +1000,6 @@ def update_monitoring(request):
 
     request.registry.settings['email'] = email
     request.registry.settings['password'] = password
+    request.registry.settings['auth'] = 1
     save_settings(request)
     return ret.json()
