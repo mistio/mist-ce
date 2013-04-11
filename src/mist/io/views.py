@@ -29,8 +29,11 @@ from mist.io.helpers import import_key, create_security_group
 from mist.io.helpers import get_keypair, get_keypair_by_name
 from mist.io.helpers import run_command
 from mist.io.helpers import save_settings
-from mist.io.helpers import generate_keypair, set_default_key, undeploy_key
-from mist.io.helpers import associate_key, disassociate_key, get_private_key
+from mist.io.helpers import generate_keypair, set_default_key, undeploy_key, get_private_key
+try:
+    from mist.core import associate_key, disassociate_key
+except ImportError:
+    from mist.io import associate_key, disassociate_key
 
 log = logging.getLogger('mist.io')
 
