@@ -56,7 +56,7 @@ def home(request):
             email = ''
 
     core_uri = request.registry.settings['core_uri']
-    auth = request.registry.settings['auth']
+    auth = request.registry.settings.get('auth', 0)
     js_build = request.registry.settings['js_build']
     js_log_level = request.registry.settings['js_log_level']
 
@@ -992,6 +992,15 @@ def update_monitoring(request):
                'hash': hash,
                'action': action,
                }
+
+    if action == 'enable':
+        backend = request.registry.settings['backends'][request.matchdict['backend']]
+        payload['backend_title'] = backend['title']
+        payload['backend_provider'] = backend['provider']
+        payload['backend_region'] = backend['region']
+        payload['backend_apikey'] = backend['apikey']
+        payload['backend_apisecret'] = backend['apisecret']
+
     #TODO: make ssl verification configurable globally, set to true by default
     ret = requests.post(core_uri+request.path, params=payload, verify=False)
 
