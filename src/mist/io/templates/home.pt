@@ -12,6 +12,7 @@
     <link rel="icon" href="static/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
     <script tal:content="string: var URL_PREFIX='${core_uri}'" />
+    <script tal:content="string: var AUTH=${auth}" />    
     <script tal:content="string: var SUPPORTED_PROVIDERS=${supported_providers}" />
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
     <script tal:content="string: var EMAIL='${email}'" />

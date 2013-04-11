@@ -355,6 +355,7 @@ define('app/models/machine', [
                             collectd_uninstall_target = that;
                             that.shell(cmd, function(){});
                         }
+                        Mist.set('authenticated', true);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         that.set('pendingMonitoring', false);

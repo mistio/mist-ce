@@ -56,6 +56,7 @@ def home(request):
             email = ''
 
     core_uri = request.registry.settings['core_uri']
+    auth = request.registry.settings['auth']
     js_build = request.registry.settings['js_build']
     js_log_level = request.registry.settings['js_log_level']
 
@@ -64,6 +65,7 @@ def home(request):
             'email': email,
             'supported_providers': SUPPORTED_PROVIDERS,
             'core_uri': core_uri,
+            'auth': auth,
             'js_build': js_build,
             'js_log_level': js_log_level}
 

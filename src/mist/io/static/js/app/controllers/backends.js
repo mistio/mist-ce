@@ -171,11 +171,7 @@ define('app/controllers/backends', [
                         });
     
                         setTimeout(function(){
-    //                        Ember.run.next(function(){
-    //                            try {
-    //                                $('#home-menu').listview('refresh');
-    //                            } catch(e) { $('#home-menu').listview(); }
-    //                        });
+
                             Mist.backendsController.checkMonitoring();
                         }, 5000);
                     });

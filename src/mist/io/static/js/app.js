@@ -138,6 +138,8 @@ define( 'app', [
             rootElement: 'body',
             LOG_TRANSITIONS: false,
             LOG_STATE_TRANSITIONS: false,
+            email: null,
+            password: null,
 
             ready: function(){
                 Em.run.next(function(){
@@ -152,7 +154,7 @@ define( 'app', [
                         require(['mobile'], function(){console.log('jqm loaded');});
                     }
                 });
-            }
+            }           
         });
 
         App.Router.map(function() {
@@ -213,26 +215,7 @@ define( 'app', [
         App.MachineAddView = MachineAddDialog;
         App.KeyAssociateDialog = KeyAssociateDialog;
         App.MachineKeyListItemView = MachineKeyListItem;
-
-    //                emailReady: function(){
-    //                    if (this.email && this.password){
-    //                        $('#auth-ok').button('enable');
-    //                    } else {
-    //                        try{
-    //                            $('#auth-ok').button('disable');
-    //                        } catch(e){
-    //                            $('#auth-ok').button();
-    //                            $('#auth-ok').button('disable');
-    //                        }
-    //                    }
-    //                }.observes('email'),
-    //
-    //                passReady: function(){
-    //                    this.emailReady();
-    //                }.observes('password')
-    //
-    //            });
-
+        
         App.set('backendAddController', BackendAddController.create());
         App.set('backendsController', BackendsController.create());
         App.set('confirmationController', ConfirmationController.create());
@@ -244,18 +227,9 @@ define( 'app', [
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
 
-        App.set('authenticated', URL_PREFIX == '' ? true : false);
-        App.set('email', '');
+        App.set('authenticated', AUTH || URL_PREFIX == '' ? true : false);
+        App.set('email', EMAIL);
         App.set('password', '');
-
-    //                    setTimeout(function(){
-    //                        $.mobile.changePage('#home', { transition: 'fade' });
-    //                        Mist.emailReady();
-    //                        if (EMAIL != '') {
-    //                            Mist.set('authenticated', true);
-    //                        }
-    //                    }, 2000);
-    //
 
     //
     //            function showRuleSlider(){
@@ -297,18 +271,18 @@ define( 'app', [
                 'autocapitalize'
             ],
 
-                    insertNewline: function() {
-                        this._parentView.submit();
-                    }
-                });
+            insertNewline: function() {
+                this._parentView.submit();
+            }
+        });
 
-                App.Checkbox = Ember.Checkbox.extend({
-                    attributeBindings: [
-                        'name',
-                        'id',
-                        'data-inline'
-                    ],
-                });
+        App.Checkbox = Ember.Checkbox.extend({
+            attributeBindings: [
+                'name',
+                'id',
+                'data-inline'
+            ],
+        });
 
         App.HomeView = Home;
         App.CountView = Count;

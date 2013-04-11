@@ -2,6 +2,8 @@
 import yaml
 import logging
 
+import requests
+
 from pyramid.config import Configurator
 
 from mist.io.resources import Root
@@ -18,6 +20,16 @@ def main(global_config, **settings):
 
     # Import settings using sensible defaults where applicable
     helpers.load_settings(settings)
+
+    # try to authenticate with mist.io service if email & password are available
+    if settings.get('email') and settings.get('password'):
+        payload = {'email': settings.get('email'),
+                   'password': settings.get('password')}
+        ret = requests.post(settings['core_uri'] + '/auth', params=payload, verify=False)
+        if ret.status_code == 200:
+            settings['auth'] = 1
+        else:
+            settings['auth'] = 0
 
     config = Configurator(root_factory=Root, settings=settings)
 
@@ -48,6 +60,6 @@ def main(global_config, **settings):
     config.scan()
 
     app = config.make_wsgi_app()
-
     app = ShellMiddleware(app)
+            
     return app
