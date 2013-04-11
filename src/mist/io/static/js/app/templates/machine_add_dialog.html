@@ -25,7 +25,8 @@
             <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
                 {{#each Mist.backendsController}}
                 <li data-icon="false" data-corners="true">
-                    <a href="#" {{action selectProvider this target="view"}}>{{this.title}}</a>
+                    <a href="#" {{bindAttr title="title"}} 
+                                {{action selectProvider this target="view"}}>{{this.title}}</a>
                 </li>
                 {{/each}}
             </ul>
@@ -38,7 +39,8 @@
             <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
                 {{#each Mist.machineAddController.newMachineBackend.sizes}}
                 <li data-icon="false" data-corners="true">
-                    <a href="#" {{action selectSize this target="view"}}>{{this.name}}</a>
+                    <a href="#" {{bindAttr title="name"}} 
+                                {{action selectSize this target="view"}}>{{this.name}}</a>
                 </li>
                 {{/each}}
             </ul>
@@ -51,7 +53,8 @@
             <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
                 {{#each Mist.machineAddController.newMachineBackend.images}}
                 <li data-icon="false" data-corners="true">
-                    <a href="#" {{action selectImage this target="view"}}>{{this.name}}</a>
+                    <a href="#" {{bindAttr title="name"}} 
+                                {{action selectImage this target="view"}}>{{this.name}}</a>
                 </li>
                 {{/each}}
             </ul>
@@ -64,7 +67,8 @@
             <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
                 {{#each Mist.machineAddController.newMachineBackend.locations}}
                 <li data-icon="false" data-corners="true">
-                    <a href="#" {{action selectLocation this target="view"}}>{{this.name}}</a>
+                    <a href="#" {{bindAttr title="name"}} 
+                                {{action selectLocation this target="view"}}>{{this.name}}</a>
                 </li>
                 {{/each}}
             </ul>
@@ -77,7 +81,8 @@
             <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
                 {{#each Mist.keysController}}
                 <li data-icon="false" data-corners="true">
-                    <a href="#" {{action selectKey this target="view"}}>{{this.name}}</a>
+                    <a href="#" {{bindAttr title="name"}} 
+                                {{action selectKey this target="view"}}>{{this.name}}</a>
                 </li>
                 {{/each}}
             </ul>

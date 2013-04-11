@@ -982,7 +982,7 @@ div.pending-monitoring {
 #dialog-add.ui-panel-open {
     min-width: 320px;
     margin-top: 0px;
-    width: 30%;
+    width: 45%;
     z-index: 10000;
 }
 
