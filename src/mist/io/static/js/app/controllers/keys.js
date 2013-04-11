@@ -123,8 +123,11 @@ define('app/controllers/keys', [
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     success: function(data) {
-                        info('Successfully associate key ', key_name);
-                        //machine.keys.push(key);
+                        info('Successfully associated key ', key_name);
+                        machine.keys.addObject(key);     
+                        Ember.run.next(function(){
+                            $('.delete-key-button').button();
+                        });               
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while associating key'  +
@@ -135,11 +138,13 @@ define('app/controllers/keys', [
             },
 
             getKeyByName: function(key_name) {
-                Mist.keysController.content.forEach(function(key){
+                var ret;
+                this.forEach(function(key){
                     if (key.name == key_name) {
-                        return key;
+                        ret = key;
                     }
                 });
+                return ret;
             },
 
             disassociateKey: function(key, machine) {
@@ -157,6 +162,7 @@ define('app/controllers/keys', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully disassociated key ', key.name);
+                        machine.keys.removeObject(key);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while disassociating key'  +

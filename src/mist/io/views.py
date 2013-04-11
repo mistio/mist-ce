@@ -874,10 +874,7 @@ def add_key(request):
 
 @view_config(route_name='key', request_method='POST', renderer='json')
 def update_key(request):
-    """Either generate a keypair or change the default one.
-
-    generate_keys() is in a POST because it should not be exposed to everyone.
-
+    """Associate/disassociate a keypair with a machine, or get private key.
     """
     params = request.json_body
 

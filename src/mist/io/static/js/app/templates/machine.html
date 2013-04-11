@@ -123,7 +123,8 @@
                     {{/each}}
                 </div>
                 {{/if}}
-                {{#if view.machineKeysRest}}
+                
+                {{#if restKeys}}
                 <div class="associate-key-container">
                     <div>
                     <a id="associate-key-button"
@@ -131,19 +132,21 @@
                         data-inline="true"
                         data-icon="plus"
                         data-theme="b"
+                        {{bindAttr class="restKeys::ui-disabled"}}
                         {{action associateClicked target="view"}}>Associate</a>
-                    </div>                
+                    </div>
                 </div>
+                {{/if}}
+
                 <div id="associate-key" data-role="popup">
                     <ul class="key-list" data-role="listview">
-                        {{#each view.machineKeysRest}}
+                        {{#each restKeys}}
                         <li data-icon="false">
-                            <a href="#" title="{{unbound name}}">{{name}}</a>
-                        </li>
+                            <a href="#" {{action keySelect this target="view"}}>{{name}}</a>
+                        </li>                        
                         {{/each}}
                     </ul>
                 </div>
-                {{/if}}
             </div>
 
         </div>

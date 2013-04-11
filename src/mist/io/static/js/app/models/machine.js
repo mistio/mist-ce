@@ -24,23 +24,23 @@ define('app/models/machine', [
             state: 'stopped',
             stats:{'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
+            keys: [],
 
-            keys: function() {
-                var that = this;
-                //return a list with the keys this server is associated to
-                var keyList = [];
+            restKeys: function(){
+                var ret = [], keys = this.get('keys');
                 Mist.keysController.content.forEach(function(key){
-                    if (key.machines.length > 0){
-                        key.machines.forEach(function(item){
-                            if (item[1] == that.id) {
-                                keyList.push(key);
-                            }
-                        });                        
+                    if (keys.indexOf(key) == -1) {
+                        ret.push(key);
                     }
                 });
-                return keyList
-            }.property('keys'),
-
+                if (ret.length > 0){
+                    Ember.run.next(function(){
+                        $('#associate-key-button').button();
+                    });
+                }
+                return ret;
+            }.property('keys.@each', 'Mist.keysController.@each'),
+            
             image: function() {
                 return this.backend.images.getImage(this.imageId);
             }.property('image'),
@@ -371,6 +371,19 @@ define('app/models/machine', [
                 this._super();
 
                 this.tags = Ember.ArrayController.create();
+                //this.keys = Ember.ArrayController.create();
+                this.unassociatedKeys = Ember.ArrayController.create();
+                
+                var that = this;
+                Mist.keysController.content.forEach(function(key){
+                    if (key.machines.length > 0){
+                        key.machines.forEach(function(item){
+                            if (item[1] == that.id && item[0] == that.backend.id) {
+                                that.keys.addObject(key);
+                            }
+                        });                        
+                    }
+                });                    
 
                 this.startUptimeTimer();
                 this.checkUptime();
