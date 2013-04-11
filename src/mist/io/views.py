@@ -433,7 +433,7 @@ def start_machine(request):
     try:
         # In liblcoud it is not possible to call this with machine.start()
         conn.ex_start_node(machine)
-        Response('Success', 200)
+        return Response('Success', 200)
     except AttributeError:
         return Response('Action not supported for this machine', 404)
     except:
@@ -468,7 +468,7 @@ def stop_machine(request):
     try:
         # In libcloud it is not possible to call this with machine.stop()
         conn.ex_stop_node(machine)
-        Response('Success', 200)
+        return Response('Success', 200)
     except AttributeError:
         return Response('Action not supported for this machine', 404)
     except:
