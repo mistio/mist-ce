@@ -448,7 +448,7 @@ def set_default_key(request):
     try:
         key_name = params['key_name']
     except KeyError:
-        raise
+        return Response('Keypair not found', 404)
 
     keypairs = request.registry.settings['keypairs']
 
@@ -464,9 +464,14 @@ def set_default_key(request):
 
 
 def associate_key(request, key_name, backend_id, machine_id, deploy=True):
-    """Associates a key with a machine."""
-    if not machine_id or not backend_id:
-        return Response('Machine or backend not found', 400)
+    """Associates a key with a machine.
+
+    If deploy is set to True it will also attempt to actually deploy it to the
+    machine.
+
+    """
+    if not key_name or not machine_id or not backend_id:
+        return Response('Keypair, machine or backend not provided', 400)
 
     try:
         keypairs = request.environ['beaker.session']['keypairs']
@@ -482,7 +487,7 @@ def associate_key(request, key_name, backend_id, machine_id, deploy=True):
     machines = keypair.get('machines', [])
 
     if machine_backend in keypair['machines']:
-        return Response('Key already associated to machine', 304)
+        return Response('Keypair already associated to machine', 304)
 
     keypair['machines'].append(machine_backend)
     save_settings(request)
@@ -501,41 +506,50 @@ def associate_key(request, key_name, backend_id, machine_id, deploy=True):
             return deploy_key(request, backend_id, machine_id, keypair, existing_key)
 
 
-def disassociate_key(request, key_name, backend_id, machine_id):
-    """Disassociate a key from a machine.
+def disassociate_key(request, key_name, backend_id, machine_id, undeploy=True):
+    """Disassociates a key from a machine.
 
-    Receives a key name, and a machine/backend id pair and removes the machine
-    from that keypair
+    If undeploy is set to True it will also attempt to actually remove it from
+    the machine.
 
     """
-    params = request.json_body
+    if not key_name or not machine_id or not backend_id:
+        return Response('Keypair, machine or backend not provided', 400)
 
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs', {})
 
-    keypair = {}
-
-    if key_name in keypairs.keys():
+    try:
         keypair = keypairs[key_name]
-    else:
+    except KeyError:
         return Response('Keypair not found', 404)
 
     machine_backend = [backend_id, machine_id]
+    machines = keypair.get('machines', [])
 
-    for pair in keypair['machines']:
-        if pair == machine_backend:
-            keypair['machines'].remove(pair)
+    if machine_backend not in keypair['machines']:
+        return Response('Keypair is not associated to this machine', 304)
+
+
+    for machine in keypair['machines']:
+        if machine == machine_backend:
+            keypair['machines'].remove(machine)
             save_settings(request)
             break
 
-    return {}
+    if undeploy:
+        return undeploy_key(request, backend_id, machine_id, keypair)
+    else:
+        return Response('Manually deploy the public key to your server', 206)
 
 
 def get_private_key(request):
-    """Get private key from keypair name, for display on key view when user
-    clicks display private key.
+    """Gets private key from keypair name.
+
+    It is used in single key view when the user clicks the display private key
+    button.
 
     """
     params = request.json_body
@@ -553,13 +567,17 @@ def get_private_key(request):
     else:
         return Response('Keypair not found', 404)
 
-
     if keypair:
         return keypair.get('private', '')
 
 
 def deploy_key(request, backend_id, machine_id, keypair, existing_key):
-    #try to set the key to authorized_keys of that machine
+    """Deploys the provided keypair to the machine.
+
+    To do that it requires another keypair (existing_key) that can connect to
+    the machine.
+
+    """
     try:
         conn = connect(request, backend_id)
     except:
@@ -608,3 +626,12 @@ def deploy_key(request, backend_id, machine_id, keypair, existing_key):
         return Response('Key associated but could not install the key to machine', 204)
 
     return Response('OK', 200)
+
+
+def undeploy_key(request, keypair, backend_id, machine_id):
+    """Removes the provided keypair from the machine.
+
+    To do that it connects with the key provided.
+
+    """
+    return Response('Key disassociated but could not remove the key from the machine', 204)

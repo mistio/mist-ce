@@ -29,7 +29,7 @@ from mist.io.helpers import import_key, create_security_group
 from mist.io.helpers import get_keypair, get_keypair_by_name
 from mist.io.helpers import run_command
 from mist.io.helpers import save_settings
-from mist.io.helpers import generate_keypair, set_default_key
+from mist.io.helpers import generate_keypair, set_default_key, undeploy_key
 from mist.io.helpers import associate_key, disassociate_key, get_private_key
 
 log = logging.getLogger('mist.io')
@@ -138,6 +138,12 @@ def add_backend(request, renderer='json'):
 @view_config(route_name='backend_action', request_method='DELETE',
              renderer='json')
 def delete_backend(request, renderer='json'):
+    """Deletes a backend.
+
+    .. note:: It assumes the user may re-add it later so it does not remove
+              any key associations.
+
+    """
     request.registry.settings['backends'].pop(request.matchdict['backend'])
     save_settings(request)
 
@@ -397,7 +403,6 @@ def create_machine(request):
             }
 
 
-
 @view_config(route_name='machine', request_method='POST',
              request_param='action=start', renderer='json')
 def start_machine(request):
@@ -492,7 +497,13 @@ def reboot_machine(request):
 @view_config(route_name='machine', request_method='POST',
              request_param='action=destroy', renderer='json')
 def destroy_machine(request):
-    """Destroys a machine on a certain backend."""
+    """Destroys a machine on a certain backend.
+
+    After destroying a machine it also deletes all key associations. However,
+    it doesn't undeploy the keypair. There is no need to do it because the
+    machine will be destroyed.
+
+    """
     try:
         conn = connect(request)
     except:
@@ -508,8 +519,6 @@ def destroy_machine(request):
 
     machine.destroy()
 
-    #delete key associations with this machine
-
     backend_id = request.matchdict['backend']
     pair = [backend_id, machine_id]
 
@@ -521,8 +530,7 @@ def destroy_machine(request):
     for key in keypairs:
         machines = keypairs[key].get('machines', None)
         if pair in machines:
-            keypairs[key]['machines'].remove(pair)
-            save_settings(request)
+            disassociate_key(request, key, backend_id, machine_id, undeploy=False)
 
     return Response('Success', 200)
 
@@ -890,9 +898,13 @@ def update_key(request):
 def delete_key(request):
     """Deletes a keypair.
 
+    When a key gets deleted it takes its asociations with it so just need to
+    remove form the server too.
+
     If the default key gets deleted, it sets the next one as default, provided
     that at least another key exists. It returns the list of all keys after
     the deletion, excluding the private keys (check also list_keys).
+
 
     """
     params = request.json_body
@@ -902,14 +914,15 @@ def delete_key(request):
     except KeyError:
         return Response('Key name not provided', 400)
 
+    keypairs = request.registry.settings['keypairs']
+    key = keypairs.pop(key_name)
+
     try:
-        #undeploy_key(request)
+        for machine in key.get('machines', []):
+            undeploy_key(request, key, machine[0], machine[1])
         ret_code = 200
     except:
         ret_code = 206
-
-    keypairs = request.registry.settings['keypairs']
-    key = keypairs.pop(key_name)
 
     if key.get('default', None):
         try:
@@ -926,7 +939,7 @@ def delete_key(request):
             'default_key': keypairs[key].get('default', False)}
            for key in keypairs.keys()]
 
-    return Response(status=ret_code, json_body=ret)
+    return ret
 
 
 @view_config(route_name='monitoring', request_method='GET', renderer='json')
