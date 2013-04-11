@@ -489,7 +489,11 @@ def associate_key(request, key_name, backend_id, machine_id, deploy=True):
     if machine_backend in machines:
         return Response('Keypair already associated to machine', 304)
 
-    keypair['machines'].append(machine_backend)
+    try:
+        keypair['machines'].append(machine_backend)
+    except KeyError:
+        keypair['machines'] = machine_backend
+
     save_settings(request)
 
     existing_key = None
@@ -579,7 +583,7 @@ def deploy_key(request, backend_id, machine_id, keypair, existing_key):
     try:
         conn = connect(request, backend_id)
     except:
-        return Response('Key associated but could not install the key to machine', 204)
+        return Response('Key associated but could not deploy to machine', 204)
 
     node = None
     machines = conn.list_nodes()
@@ -589,39 +593,30 @@ def deploy_key(request, backend_id, machine_id, keypair, existing_key):
             break
 
     if not node:
-        return Response('Key associated but could not install the key to machine', 204)
+        return Response('Key associated but could not deploy to machine', 204)
 
     try:
         host = node.public_ip[0]
     except:
-        return Response('Key associated but could not install the key to machine', 204)
+        return Response('Key associated but could not deploy to machine', 204)
 
-    ssh_user = None
+    ssh_user = 'root'
     try:
         ssh_user = node.extra.get('tags')['ssh_user']
     except:
-        ssh_user = 'root'
-    if not ssh_user:
-        ssh_user = 'root'
+        pass
 
-    if existing_key:
-        #try to add the new associated key with the machine
-        command = 'if [ -z `grep "%s" ~/.ssh/authorized_keys` ]; then echo "%s" >> ~/.ssh/authorized_keys; fi' % (keypair['public'], keypair['public'])
-        private_key = existing_key['private']
-    else:
-        #try to login to the server with this key. does not add the key to authorized_keys, just
-        #make an attempt to login
-        command = 'uptime'
-        private_key = keypair['private']
+    command = 'if [ -z `grep "%s" ~/.ssh/authorized_keys` ]; then echo "%s" >> ~/.ssh/authorized_keys; fi' % (keypair['public'], keypair['public'])
+    private_key = existing_key['private']
 
     try:
-        ret = run_command(conn, machine_id, host, ssh_user, private_key, command)
-        ret.title
-        #FIXME: needs a better check
+        #FIXME: needs a check, right now run_command does not raise exceptions
         #type(ret)
         #<class 'fabric.operations._AttributeString'>
+        ret = run_command(conn, machine_id, host, ssh_user, private_key, command)
+        ret.title
     except:
-        return Response('Key associated but could not install the key to machine', 204)
+        return Response('Key associated but could not deploy to machine', 204)
 
     return Response('OK', 200)
 
@@ -629,7 +624,45 @@ def deploy_key(request, backend_id, machine_id, keypair, existing_key):
 def undeploy_key(request, keypair, backend_id, machine_id):
     """Removes the provided keypair from the machine.
 
-    To do that it connects with the key provided.
+    It connects to the server with the key that is supposed to be deleted.
 
     """
-    return Response('Key disassociated but could not remove the key from the machine', 204)
+    try:
+        conn = connect(request, backend_id)
+    except:
+        return Response('Key disassociated but could not remove from machine', 204)
+
+    node = None
+    machines = conn.list_nodes()
+    for machine in machines:
+        if machine.id == machine_id:
+            node = machine
+            break
+
+    if not node:
+        return Response('Key disassociated but could not remove from machine', 204)
+
+    try:
+        host = node.public_ip[0]
+    except:
+        return Response('Key disassociated but could not remove from machine', 204)
+
+    ssh_user = 'root'
+    try:
+        ssh_user = node.extra.get('tags')['ssh_user']
+    except:
+        pass
+
+    command = 'grep -v "%s" ~/.ssh/authorized_keys > ~/.ssh/authorized_keys.tmp && mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys' % keypair['public']
+    private_key = keypair['private']
+
+    try:
+        #FIXME: needs a check, right now run_command does not raise exceptions
+        #type(ret)
+        #<class 'fabric.operations._AttributeString'>
+        ret = run_command(conn, machine_id, host, ssh_user, private_key, command)
+        ret.title
+    except:
+        return Response('Key disassociated but could not remove from machine', 204)
+
+    return Response('OK', 200)
