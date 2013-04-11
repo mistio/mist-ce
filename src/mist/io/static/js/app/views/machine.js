@@ -224,7 +224,7 @@ define('app/views/machine', [
                     var context = cubism.context()
                                         .serverDelay(0)
                                         .clientDelay(0)
-                                        .step(5000)
+                                        .step(10000)
                                         .size($(window).width() - 80);
                     Mist.context = context;
 
