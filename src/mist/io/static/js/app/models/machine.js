@@ -330,7 +330,7 @@ define('app/models/machine', [
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     dataType: 'json',
-                    timeout : 10000,
+                    timeout : 60000,
                     success: function(data) {
                         var user = that.getUser();
                         if (!that.hasMonitoring){

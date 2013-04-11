@@ -250,7 +250,7 @@ define('app/views/machine', [
                                     data: {'start': (start / 1000),
                                            'stop': (stop / 1000),
                                            'step': step},
-                                    timeout: 10000,
+                                    timeout: 4000,
                                     success: function(data) {
                                         if (!data || !('cpu' in data)) {
                                             return callback(new Error('unable to load data'));

@@ -488,10 +488,12 @@ function completeShell(ret){
             // TODO: display instruction for manual installation
             // alert('collectd install failed');
         }
-        collectd_install_target.set('hasMonitoring', true);
-        collectd_install_target.set('pendingMonitoring', false);
-        $('.pending-monitoring h1').text('Enabling monitoring');
-        collectd_install_target = false;
+        setTimeout(function(){
+            collectd_install_target.set('hasMonitoring', true);
+            collectd_install_target.set('pendingMonitoring', false);
+            $('.pending-monitoring h1').text('Enabling monitoring');
+            collectd_install_target = false;
+        }, 10000);
     } else if (collectd_uninstall_target) {
         collectd_uninstall_target.set('hasMonitoring', false);
         collectd_uninstall_target.set('pendingMonitoring', false);
