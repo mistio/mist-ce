@@ -486,7 +486,7 @@ def associate_key(request, key_name, backend_id, machine_id, deploy=True):
     machine_backend = [backend_id, machine_id]
     machines = keypair.get('machines', [])
 
-    if machine_backend in keypair['machines']:
+    if machine_backend in machines:
         return Response('Keypair already associated to machine', 304)
 
     keypair['machines'].append(machine_backend)
@@ -494,7 +494,6 @@ def associate_key(request, key_name, backend_id, machine_id, deploy=True):
 
     existing_key = None
     for key in keypairs:
-        machines = keypairs[key].get('machines', [])
         if machine_backend in machines:
             existing_key = keypairs[key]
             break
@@ -529,11 +528,10 @@ def disassociate_key(request, key_name, backend_id, machine_id, undeploy=True):
     machine_backend = [backend_id, machine_id]
     machines = keypair.get('machines', [])
 
-    if machine_backend not in keypair['machines']:
+    if machine_backend not in machines:
         return Response('Keypair is not associated to this machine', 304)
 
-
-    for machine in keypair['machines']:
+    for machine in machines:
         if machine == machine_backend:
             keypair['machines'].remove(machine)
             save_settings(request)
