@@ -345,17 +345,29 @@ def create_machine(request):
             pass
     elif conn.type is Provider.LINODE and public_key:
         auth = NodeAuthSSHKey(public_key)
+
+        (tmp_key, tmp_key_path) = tempfile.mkstemp()
+        key_fd = os.fdopen(tmp_key, 'w+b')
+        key_fd.write(private_key)
+        key_fd.close()
+
         deploy_script = ScriptDeployment(script)
         try:
-            node = conn.create_node(name=machine_name,
+            node = conn.deploy_node(name=machine_name,
                              image=image,
                              size=size,
                              deploy=deploy_script,
                              location=location,
-                             auth=auth)
+                             auth=auth,
+                             ssh_key=tmp_key_path)
             associate_key(request, key_name, backend_id, node.id, deploy=False)
         except Exception as e:
             return Response('Failed to create machine in Linode: %s' % e, 500)
+        #remove temp file with private key
+        try:
+            os.remove(tmp_key_path)
+        except:
+            pass
     else:
         return Response('Cannot create a machine without a keypair', 400)
 
