@@ -313,7 +313,7 @@ def create_machine(request):
             associate_key(request, key_name, backend_id, node.id, deploy=False)
         except Exception as e:
             return Response('Failed to create machine in Rackspace: %s' % e, 500)
-    elif conn.type in EC2_PROVIDERS and public_key:
+    elif conn.type in EC2_PROVIDERS and public_key and private_key:
         imported_key = import_key(conn, public_key, key_name)
         created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
         deploy_script = ScriptDeployment(script)
