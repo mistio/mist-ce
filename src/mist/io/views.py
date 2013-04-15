@@ -356,15 +356,8 @@ def create_machine(request):
             associate_key(request, key_name, backend_id, node.id, deploy=False)
         except Exception as e:
             return Response('Faile to create machine in Linode' % e, 500)
-
     else:
-        try:
-            node = conn.create_node(name=machine_name,
-                             image=image,
-                             size=size,
-                             location=location)
-        except Exception as e:
-            return Response('Something went wrong with generic node creation: %s' % e, 500)
+        return Response('Cannot create a machine without a keypair', 400))
 
     return {'id': node.id,
             'name': node.name,
