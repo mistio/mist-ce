@@ -310,6 +310,7 @@ def create_machine(request):
                              size=size,
                              location=location,
                              deploy=msd)
+            associate_key(request, key_name, backend_id, node.id, deploy=False)
         except Exception as e:
             return Response('Failed to create machine in Rackspace: %s' % e, 500)
     elif conn.type in EC2_PROVIDERS and public_key:
@@ -334,6 +335,7 @@ def create_machine(request):
                                  max_tries=1,
                                  ex_keyname=key_name,
                                  ex_securitygroup=EC2_SECURITYGROUP['name'])
+                associate_key(request, key_name, backend_id, node.id, deploy=False)
             except Exception as e:
                 return Response('Failed to create machine in EC2: %s' % e, 500)
         #remove temp file with private key
@@ -351,6 +353,7 @@ def create_machine(request):
                              deploy=deploy_script,
                              location=location,
                              auth=auth)
+            associate_key(request, key_name, backend_id, node.id, deploy=False)
         except Exception as e:
             return Response('Faile to create machine in Linode' % e, 500)
 
@@ -362,8 +365,6 @@ def create_machine(request):
                              location=location)
         except Exception as e:
             return Response('Something went wrong with generic node creation: %s' % e, 500)
-
-    associate_key(request, key_name, backend_id, node.id, deploy=False)
 
     return {'id': node.id,
             'name': node.name,
