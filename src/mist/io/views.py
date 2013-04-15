@@ -311,18 +311,7 @@ def create_machine(request):
                              location=location,
                              deploy=msd)
         except Exception as e:
-            #save the keypair association, because deploy might have failed but
-            #the machine might has been created with the correct key
-            try:
-                machines = conn.list_nodes()
-                for machine in machines:
-                    if machine.name == machine_name:
-                        node = machine
-                        break
-                associate_key(request, key_name, backend_id, node.id, deploy=False)
-            except:
-                pass
-            return Response('Something went wrong with node creation in RackSpace: %s' % e, 500)
+            return Response('Failed to create machine in Rackspace: %s' % e, 500)
     elif conn.type in EC2_PROVIDERS and public_key:
         imported_key = import_key(conn, public_key, key_name)
         created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
@@ -346,16 +335,7 @@ def create_machine(request):
                                  ex_keyname=key_name,
                                  ex_securitygroup=EC2_SECURITYGROUP['name'])
             except Exception as e:
-                try:
-                    machines = conn.list_nodes()
-                    for machine in machines:
-                        if machine.name == machine_name:
-                            node = machine
-                            break
-                    associate_key(request, key_name, backend_id, node.id, deploy=False)
-                except:
-                    pass
-                return Response('Something went wrong with node creation in EC2: %s' % e, 500)
+                return Response('Failed to create machine in EC2: %s' % e, 500)
         #remove temp file with private key
         try:
             os.remove(tmp_key_path)
@@ -371,17 +351,8 @@ def create_machine(request):
                              deploy=deploy_script,
                              location=location,
                              auth=auth)
-        except:
-            try:
-                machines = conn.list_nodes()
-                for machine in machines:
-                    if machine.name == machine_name:
-                        node = machine
-                        break
-                associate_key(request, key_name, backend_id, node.id, deploy=False)
-            except:
-                pass
-            return Response('Something went wrong with Linode creation', 500)
+        except Exception as e:
+            return Response('Faile to create machine in Linode' % e, 500)
 
     else:
         try:
@@ -390,15 +361,6 @@ def create_machine(request):
                              size=size,
                              location=location)
         except Exception as e:
-            try:
-                machines = conn.list_nodes()
-                for machine in machines:
-                    if machine.name == machine_name:
-                        node = machine
-                        break
-                associate_key(request, key_name, backend_id, node.id, deploy=False)
-            except:
-                pass
             return Response('Something went wrong with generic node creation: %s' % e, 500)
 
     associate_key(request, key_name, backend_id, node.id, deploy=False)
