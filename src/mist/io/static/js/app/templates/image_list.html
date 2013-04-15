@@ -9,14 +9,10 @@
         {{view Mist.UserMenuView}}
     </div>
 
-    <div data-role="content">
+    <div data-role="content" id="images">
 
-        <div data-role="popup" id="dialog-add" class="mist-dialog" data-overlay-theme="a">
-            <div data-role="header">
-                <h1>Create Machine</h1>
-            </div>
-            {{view Mist.MachineAddView data-role="content"}}
-        </div>
+        {{view Mist.MachineAddView}}
+
 
         {{! view Mist.Select
             data-native-menu="false"

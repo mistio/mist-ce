@@ -18,41 +18,45 @@ define('app/views/machine_add_dialog', [
                 var that = this;
                 
                 $('.select-listmenu').listview('refresh');
-                $('#dialog-add').panel('open');              
+                $('.dialog-add').panel('open');              
             },
             
             selectProvider: function(backend){
                 $('.select-provider-collapsible').collapsible('option','collapsedIcon','check');
                 $('.select-provider-collapsible span.ui-btn-text').text(backend.title);
                 Mist.machineAddController.set('newMachineBackend', backend);
-                Mist.machineAddController.set('newMachineSize', null);
-                $('.select-size-collapsible span.ui-btn-text').text('Select Size');                    
+                  
                 Mist.machineAddController.set('newMachineImage', null);
-                $('.select-image-collapsible span.ui-btn-text').text('Select Image');            
+                $('.select-image-collapsible span.ui-btn-text').text('Select Image');   
+                Mist.machineAddController.set('newMachineSize', null);
+                $('.select-size-collapsible span.ui-btn-text').text('Select Size');                           
                 Mist.machineAddController.set('newMachineLocation', null);
                 $('.select-location-collapsible span.ui-btn-text').text('Select Location');      
                 
                 $('.select-provider-collapsible').trigger('collapse');                
                 return false;               
             },
-            
+                      
+            selectImage: function(image){
+                $('.select-image-collapsible').collapsible('option','collapsedIcon','check');
+                $('.select-image-collapsible span.ui-btn-text').text(image.name);
+                Mist.machineAddController.set('newMachineImage', image);
+                
+                Mist.machineAddController.set('newMachineSize', null);
+                $('.select-size-collapsible span.ui-btn-text').text('Select Size');  
+                                    
+                $('.select-image-collapsible').trigger('collapse');
+                return false;               
+            },
+                        
             selectSize: function(size){
                 $('.select-size-collapsible').collapsible('option','collapsedIcon','check');
                 $('.select-size-collapsible span.ui-btn-text').text(size.name);
                 Mist.machineAddController.set('newMachineSize', size);  
-                Mist.machineAddController.set('newMachineImage', null);
-                $('.select-image-collapsible span.ui-btn-text').text('Select Image');            
+                           
                 Mist.machineAddController.set('newMachineLocation', null);
                 $('.select-location-collapsible span.ui-btn-text').text('Select Location');                     
                 $('.select-size-collapsible').trigger('collapse');
-                return false;               
-            },
-                       
-            selectImage: function(image){
-                $('.select-image-collapsible').collapsible('option','collapsedIcon','check');
-                $('.select-image-collapsible span.ui-btn-text').text(image.name);
-                Mist.machineAddController.set('newMachineImage', image);        
-                $('.select-image-collapsible').trigger('collapse');
                 return false;               
             },
 
@@ -94,13 +98,14 @@ define('app/views/machine_add_dialog', [
             newMachineClicked: function() {
                 //FIXME there should be a way to bind the action directly to the controller
                 Mist.machineAddController.newMachine();
-                $('#dialog-add').panel('close');
+                $('.dialog-add').panel('close');
+                Mist.Router.router.transitionTo('machines');
                 this.clear();
             },
 
             backClicked: function() {
                 this.clear();
-                $('#dialog-add').panel('close');
+                $('.dialog-add').panel('close');
             },
 
             init: function() {
@@ -112,7 +117,7 @@ define('app/views/machine_add_dialog', [
                 Ember.run.next(function(){
                     Mist.machineAddController.addObserver('newMachineBackend', function() {
                         Ember.run.next(function() {
-                            $('#dialog-add .ui-collapsible ul').listview('refresh');
+                            $('.dialog-add .ui-collapsible ul').listview('refresh');
                         });
                     });
 
@@ -145,17 +150,16 @@ define('app/views/machine_add_dialog', [
                                 $('.select-key-collapsible').addClass('ui-disabled');
                                 $('#create-machine-script').textinput('disable');
                             }
-                            $('#dialog-add .ui-collapsible ul').listview('refresh');
+                            $('.dialog-add .ui-collapsible ul').listview('refresh');
                         });
                     });
 
                     Mist.machineAddController.addObserver('newMachineBackendReady', function() {       
                         Ember.run.next(function(){
-                            $('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineBackendReady) {
-                                $('.select-size-collapsible').removeClass('ui-disabled');
+                                $('.select-image-collapsible').removeClass('ui-disabled');
 
-                                $('.select-image-collapsible').addClass('ui-disabled');
+                                $('.select-size-collapsible').addClass('ui-disabled');
                                 $('.select-location-collapsible').addClass('ui-disabled');
                                 $('.select-key-collapsible').addClass('ui-disabled');
                                 $('#create-machine-script').textinput('disable');
@@ -166,33 +170,31 @@ define('app/views/machine_add_dialog', [
                                 $('.select-key-collapsible').addClass('ui-disabled');
                                 $('#create-machine-script').textinput('disable');
                             }
-                            $('#dialog-add .ui-collapsible ul').listview('refresh');
-                        });
-                    });
-
-                    Mist.machineAddController.addObserver('newMachineSizeReady', function() {
-                        Ember.run.next(function(){
-                            $('#dialog-add select').selectmenu();
-                            if (Mist.machineAddController.newMachineSizeReady) {
-                                $('.select-image-collapsible').removeClass('ui-disabled');
-
-                                $('.select-location-collapsible').addClass('ui-disabled');
-                                $('.select-key-collapsible').addClass('ui-disabled');
-                                $('#create-machine-script').textinput('disable');
-                            } else {
-                                $('.select-image-collapsible').addClass('ui-disabled');
-                                $('.select-location-collapsible').addClass('ui-disabled');
-                                $('.select-key-collapsible').addClass('ui-disabled');
-                                $('#create-machine-script').textinput('disable');
-                            }
-                            $('#dialog-add .ui-collapsible ul').listview('refresh');
+                            $('.dialog-add .ui-collapsible ul').listview('refresh');
                         });
                     });
                     
                     Mist.machineAddController.addObserver('newMachineImageReady', function() {
                         Ember.run.next(function(){
-                            $('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineImageReady) {
+                                $('.select-size-collapsible').removeClass('ui-disabled');
+
+                                $('.select-key-collapsible').addClass('ui-disabled');
+                                $('.select-location-collapsible').addClass('ui-disabled');
+                                $('#create-machine-script').textinput('disable');
+                            } else {
+                                $('.select-size-collapsible').addClass('ui-disabled');
+                                $('.select-location-collapsible').addClass('ui-disabled');
+                                $('.select-key-collapsible').addClass('ui-disabled');
+                                $('#create-machine-script').textinput('disable');
+                            }
+                            $('.dialog-add .ui-collapsible ul').listview('refresh');
+                        });
+                    });
+                    
+                    Mist.machineAddController.addObserver('newMachineSizeReady', function() {
+                        Ember.run.next(function(){
+                            if (Mist.machineAddController.newMachineSizeReady) {
                                 $('.select-location-collapsible').removeClass('ui-disabled');
 
                                 $('.select-key-collapsible').addClass('ui-disabled');
@@ -202,13 +204,12 @@ define('app/views/machine_add_dialog', [
                                 $('.select-key-collapsible').addClass('ui-disabled');
                                 $('#create-machine-script').textinput('disable');
                             }
-                            $('#dialog-add .ui-collapsible ul').listview('refresh');
+                            $('.dialog-add .ui-collapsible ul').listview('refresh');
                         });
                     });
 
                     Mist.machineAddController.addObserver('newMachineLocationReady', function() {
                         Ember.run.next(function(){
-                            $('#dialog-add select').selectmenu();
                             if (Mist.machineAddController.newMachineLocationReady) {
                                 $('.select-key-collapsible').removeClass('ui-disabled');
 

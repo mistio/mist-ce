@@ -7,7 +7,7 @@
     data-iconpos="right"
     {{action openMachineAddDialog target="view"}}>Create</a>
 
-<div id="dialog-add" class="mist-dialog" data-role="panel" data-position="right" data-display="overlay" data-theme="b">
+<div class="mist-dialog dialog-add" data-role="panel" data-position="right" data-display="overlay" data-theme="b">
     <div data-role="header">
         <h1>Create Machine</h1>
     </div>
@@ -31,22 +31,8 @@
                 {{/each}}
             </ul>
         </div>
-
-        <label for="createmachine-select-size">3. Size:</label>
-        <div class="select-size-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
-            data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
-            <h2>Select Size</h2>
-            <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
-                {{#each Mist.machineAddController.newMachineBackend.sizes}}
-                <li data-icon="false" data-corners="true">
-                    <a href="#" {{bindAttr title="name"}} 
-                                {{action selectSize this target="view"}}>{{this.name}}</a>
-                </li>
-                {{/each}}
-            </ul>
-        </div>
             
-        <label for="createmachine-select-image">4. Image:</label>
+        <label for="createmachine-select-image">3. Image:</label>
         <div class="select-image-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
             data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
             <h2>Select Image</h2>
@@ -55,6 +41,20 @@
                 <li data-icon="false" data-corners="true">
                     <a href="#" {{bindAttr title="name"}} 
                                 {{action selectImage this target="view"}}>{{this.name}}</a>
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+        
+        <label for="createmachine-select-size">4. Size:</label>
+        <div class="select-size-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
+            data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
+            <h2>Select Size</h2>
+            <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
+                {{#each Mist.machineAddController.newMachineBackend.sizes}}
+                <li data-icon="false" data-corners="true">
+                    <a href="#" {{bindAttr title="name"}} 
+                                {{action selectSize this target="view"}}>{{this.name}}</a>
                 </li>
                 {{/each}}
             </ul>
