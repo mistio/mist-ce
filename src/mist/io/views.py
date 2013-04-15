@@ -357,7 +357,7 @@ def create_machine(request):
         except Exception as e:
             return Response('Faile to create machine in Linode' % e, 500)
     else:
-        return Response('Cannot create a machine without a keypair', 400))
+        return Response('Cannot create a machine without a keypair', 400)
 
     return {'id': node.id,
             'name': node.name,
