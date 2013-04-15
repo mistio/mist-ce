@@ -17,6 +17,7 @@ from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
 from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider
+from libcloud.common.types import InvalidCredsError
 
 from mist.io.config import STATES, SUPPORTED_PROVIDERS
 from mist.io.config import EC2_IMAGES, EC2_PROVIDERS
@@ -182,6 +183,8 @@ def list_machines(request):
 
     try:
         machines = conn.list_nodes()
+    except InvalidCredsError:
+        return Response('Invalid credentials', 401)
     except:
         return Response('Backend unavailable', 503)
 
@@ -877,6 +880,7 @@ def add_key(request):
 @view_config(route_name='key', request_method='POST', renderer='json')
 def update_key(request):
     """Associate/disassociate a keypair with a machine, or get private key.
+
     """
     params = request.json_body
 
