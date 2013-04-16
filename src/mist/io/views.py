@@ -791,7 +791,7 @@ def list_keys(request):
         keypairs = request.registry.settings.get('keypairs', {})
 
     ret = [{'name': key,
-            'machines': keypairs[key].get('machines', False),
+            'machines': keypairs[key].get('machines', []),
             'pub': keypairs[key]['public'],
             'default_key': keypairs[key].get('default', False)}
            for key in keypairs.keys()]
