@@ -216,15 +216,23 @@ define('app/views/machine_add_dialog', [
                                 $('.select-key-collapsible').removeClass('ui-disabled');
 
                                 $('#create-machine-script').textinput('enable');                                
-                                $('#create-machine-ok').button('enable');
                             } else {
-                                $('#create-machine-ok').button('disable');
                                 $('.select-key-collapsible').addClass('ui-disabled');
 
                                 $('#create-machine-script').textinput('enable');                                                                
                             }
                         });
                     });
+                    
+                    Mist.machineAddController.addObserver('newMachineKeyReady', function() {
+                        Ember.run.next(function(){
+                            if (Mist.machineAddController.newMachineKeyReady) {
+                                $('#create-machine-ok').button('enable');
+                            } else {
+                                $('#create-machine-ok').button('disable');
+                            }
+                        });
+                    });                    
                 });
             },
         });
