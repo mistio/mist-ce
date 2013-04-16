@@ -343,7 +343,7 @@ def create_machine(request):
             os.remove(tmp_key_path)
         except:
             pass
-    elif conn.type is Provider.LINODE and public_key:
+    elif conn.type is Provider.LINODE and public_key and private_key:
         auth = NodeAuthSSHKey(public_key)
 
         (tmp_key, tmp_key_path) = tempfile.mkstemp()
