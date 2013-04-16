@@ -24,7 +24,6 @@ define('app/models/machine', [
             state: 'stopped',
             stats:{'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
-            keys: [],
 
             restKeys: function(){
                 var ret = [], keys = this.get('keys');
@@ -372,7 +371,7 @@ define('app/models/machine', [
                 this._super();
 
                 this.tags = Ember.ArrayController.create();
-                //this.keys = Ember.ArrayController.create();
+                this.keys = Ember.ArrayController.create();
                 this.unassociatedKeys = Ember.ArrayController.create();
                 
                 var that = this;

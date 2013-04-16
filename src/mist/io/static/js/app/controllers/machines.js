@@ -185,6 +185,8 @@ define('app/controllers/machines', [
                         machine.set("private_ips", data.private_ips);
                         machine.set("extra", data.extra);
                         that.backend.set('create_pending', false);
+                        key.machines.addObject([that.backend.id, data.id]);
+                        machine.keys.addObject(key);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while sending create machine' +

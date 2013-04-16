@@ -20,7 +20,7 @@ define('app/views/mistscreen', ['ember'],
                 try {
                     $("[data-role=page]").page('destroy').page()
                 } catch(e){}
-            },
+            }
         });
     }
 );

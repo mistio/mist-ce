@@ -492,7 +492,7 @@ def associate_key(request, key_name, backend_id, machine_id, deploy=True):
     try:
         keypair['machines'].append(machine_backend)
     except KeyError:
-        keypair['machines'] = machine_backend
+        keypair['machines'] = [machine_backend]
 
     save_settings(request)
 

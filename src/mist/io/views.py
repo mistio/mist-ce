@@ -902,7 +902,7 @@ def delete_key(request):
         try:
            new_default_key = keypairs.keys()[0]
            keypairs[new_default_key]['default'] = True
-        except KeyError, IndexError:
+        except IndexError:
             pass
 
     save_settings(request)
