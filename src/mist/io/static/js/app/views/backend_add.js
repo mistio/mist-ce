@@ -32,6 +32,8 @@ define('app/views/backend_add', [
             addBackend: function() {
                 $('.select-listmenu li').on('click', this.selectBackend);                
                 $('#add-backend').panel('open');
+                // resize dismiss div TODO: reset on window resize                
+                $('.ui-panel-dismiss-position-right').css('left',(0-$('.ui-panel-position-right.ui-panel-open').width()));                
             },
 
             backClicked: function() {
@@ -58,16 +60,10 @@ define('app/views/backend_add', [
                     data: JSON.stringify(payload),
                     success: function(result) {
                         Mist.backendsController.pushObject(Backend.create(result));
-                        //setTimeout("$('#home-menu').listview()", 300);
-                        //setTimeout("$('#backend-buttons').controlgroup('refresh')", 300);
                         info('added backend ' + result.id);
                         Mist.backendAddController.newBackendClear();
                         $("#add-backend").panel("close");
                         $('.select-listmenu li').off('click', this.selectBackend);
-//                        Ember.run.next(function(){
-//                            $('#backend-buttons [data-role=button]').button();
-//                            $('#backend-buttons').controlgroup('refresh');
-//                        });
                     }
                 });
             },

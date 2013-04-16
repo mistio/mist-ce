@@ -18,7 +18,9 @@ define('app/views/machine_add_dialog', [
                 var that = this;
                 
                 $('.select-listmenu').listview('refresh');
-                $('.dialog-add').panel('open');              
+                $('.dialog-add').panel('open');
+                // resize dismiss div TODO: reset on window resize
+                $('.ui-panel-dismiss-position-right').css('left',(0-$('.ui-panel-position-right.ui-panel-open').width()));            
             },
             
             selectProvider: function(backend){
