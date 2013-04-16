@@ -177,7 +177,10 @@ define( 'app', [
                   var target = this.target;
                   // clear redirect target
                   this.target = undefined;
-                  this.transitionTo(target);
+                  var that = this;
+                  Ember.run.next(function(){
+                      that.transitionTo(target);
+                  });
               }
           },
           model: function(){
@@ -194,7 +197,10 @@ define( 'app', [
                   var target = this.target;
                   // clear redirect target
                   this.target = undefined;
-                  this.transitionTo(target);
+                  var that = this;
+                  Ember.run.next(function(){
+                      that.transitionTo(target);
+                  });
               }
           },
           model: function(){
