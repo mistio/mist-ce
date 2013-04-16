@@ -893,7 +893,7 @@ def delete_key(request):
 
     try:
         for machine in key.get('machines', []):
-            undeploy_key(request, key, machine[0], machine[1])
+            undeploy_key(request, machine[0], machine[1], key)
         ret_code = 200
     except:
         ret_code = 206

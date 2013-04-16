@@ -621,7 +621,7 @@ def deploy_key(request, backend_id, machine_id, keypair, existing_key):
     return Response('OK', 200)
 
 
-def undeploy_key(request, keypair, backend_id, machine_id):
+def undeploy_key(request, backend_id, machine_id, keypair):
     """Removes the provided keypair from the machine.
 
     It connects to the server with the key that is supposed to be deleted.
