@@ -252,17 +252,17 @@ def create_machine(request):
     backend_id = request.matchdict['backend']
 
     try:
-        key_name = request.json_body['key']
+        key_id = request.json_body['key']
     except:
-        key_name = None
+        key_id = None
 
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs', {})
 
-    if key_name:
-        keypair = get_keypair_by_name(keypairs, key_name)
+    if key_id:
+        keypair = get_keypair_by_name(keypairs, key_id)
     else:
         keypair = get_keypair(keypairs)
 
@@ -310,11 +310,11 @@ def create_machine(request):
                              size=size,
                              location=location,
                              deploy=msd)
-            associate_key(request, key_name, backend_id, node.id, deploy=False)
+            associate_key(request, key_id, backend_id, node.id, deploy=False)
         except Exception as e:
             return Response('Failed to create machine in Rackspace: %s' % e, 500)
     elif conn.type in EC2_PROVIDERS and public_key and private_key:
-        imported_key = import_key(conn, public_key, key_name)
+        imported_key = import_key(conn, public_key, key_id)
         created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
         deploy_script = ScriptDeployment(script)
 
@@ -333,9 +333,9 @@ def create_machine(request):
                                  ssh_key=tmp_key_path,
                                  ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                                  max_tries=1,
-                                 ex_keyname=key_name,
+                                 ex_keyname=key_id,
                                  ex_securitygroup=EC2_SECURITYGROUP['name'])
-                associate_key(request, key_name, backend_id, node.id, deploy=False)
+                associate_key(request, key_id, backend_id, node.id, deploy=False)
             except Exception as e:
                 return Response('Failed to create machine in EC2: %s' % e, 500)
         #remove temp file with private key
@@ -360,7 +360,7 @@ def create_machine(request):
                              location=location,
                              auth=auth,
                              ssh_key=tmp_key_path)
-            associate_key(request, key_name, backend_id, node.id, deploy=False)
+            associate_key(request, key_id, backend_id, node.id, deploy=False)
         except Exception as e:
             return Response('Failed to create machine in Linode: %s' % e, 500)
         #remove temp file with private key
@@ -825,7 +825,7 @@ def update_keys(request):
 def add_key(request):
     """Creates a new keypair."""
     params = request.json_body
-    key_name = params.get('name', '')
+    key_id = params.get('name', '')
 
     key = {'public' : params.get('pub', ''),
            'private' : params.get('priv', '')}
@@ -833,10 +833,10 @@ def add_key(request):
     if not len(request.registry.settings['keypairs']):
         key['default'] = True
 
-    request.registry.settings['keypairs'][key_name] = key
+    request.registry.settings['keypairs'][key_id] = key
     save_settings(request)
 
-    ret = {'name': key_name,
+    ret = {'name': key_id,
            'pub': key['public'],
            'priv': key['private'],
            'default_key': key.get('default', False),
@@ -853,13 +853,13 @@ def update_key(request):
     params = request.json_body
 
     if params['action'] == 'associate' or params['action'] == 'disassociate':
-        key_name = params['key_name']
+        key_id = params['key_id']
         backend_id = params['backend_id']
         machine_id = params['machine_id']
         if params['action'] == 'associate':
-            ret = associate_key(request, key_name, backend_id, machine_id)
+            ret = associate_key(request, key_id, backend_id, machine_id)
         else:
-            ret = disassociate_key(request, key_name, backend_id, machine_id)
+            ret = disassociate_key(request, key_id, backend_id, machine_id)
     elif params['action'] == 'get_private_key':
         ret = get_private_key(request)
     else:
@@ -884,12 +884,12 @@ def delete_key(request):
     params = request.json_body
 
     try:
-        key_name = params['key_name']
+        key_id = params['key_id']
     except KeyError:
         return Response('Key name not provided', 400)
 
     keypairs = request.registry.settings['keypairs']
-    key = keypairs.pop(key_name)
+    key = keypairs.pop(key_id)
 
     try:
         for machine in key.get('machines', []):

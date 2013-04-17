@@ -20,7 +20,7 @@ define('app/models/key', [
 
             deleteKey: function() {
                 payload = {
-                    'key_name': this.name
+                    'key_id': this.name
                 }
                 var that = this
                 $.ajax({
@@ -47,7 +47,7 @@ define('app/models/key', [
             setDefaultKey: function(){
                 payload = {
                     'action': 'set_default',
-                    'key_name': this.name,
+                    'key_id': this.name,
                 }
                 var that = this
                 $.ajax({

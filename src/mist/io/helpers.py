@@ -446,7 +446,7 @@ def set_default_key(request):
     params = request.json_body
 
     try:
-        key_name = params['key_name']
+        key_id = params['key_id']
     except KeyError:
         return Response('Keypair not found', 404)
 
@@ -455,7 +455,7 @@ def set_default_key(request):
     for key in keypairs:
         keypairs[key]['default'] = False
 
-    keypairs[key_name]['default'] = True
+    keypairs[key_id]['default'] = True
 
     request.registry.settings['keypairs'] = keypairs
     save_settings(request)
@@ -463,14 +463,14 @@ def set_default_key(request):
     return {}
 
 
-def associate_key(request, key_name, backend_id, machine_id, deploy=True):
+def associate_key(request, key_id, backend_id, machine_id, deploy=True):
     """Associates a key with a machine.
 
     If deploy is set to True it will also attempt to actually deploy it to the
     machine.
 
     """
-    if not key_name or not machine_id or not backend_id:
+    if not key_id or not machine_id or not backend_id:
         return Response('Keypair, machine or backend not provided', 400)
 
     try:
@@ -479,14 +479,13 @@ def associate_key(request, key_name, backend_id, machine_id, deploy=True):
         keypairs = request.registry.settings.get('keypairs', {})
 
     try:
-        keypair = keypairs[key_name]
+        keypair = keypairs[key_id]
     except KeyError:
         return Response('Keypair not found', 404)
 
     machine_uid = [backend_id, machine_id]
-    machines = keypair.get('machines', [])
 
-    if machine_uid in machines:
+    if machine_uid in keypair.get('machines', []):
         return Response('Keypair already associated to machine', 304)
 
     try:
@@ -498,9 +497,9 @@ def associate_key(request, key_name, backend_id, machine_id, deploy=True):
 
     if deploy:
         existing_key = None
-        for key_id in keypairs:
-            if machine_uid in machines and key_name != key_id:
-                existing_key = keypairs[key_id]
+        for k in keypairs:
+            if machine_uid in keypairs[k].get('machines', []) and k != key_id:
+                existing_key = keypairs[key_id] # TODO select a tested key
                 break
         if existing_key:
             return deploy_key(request, backend_id, machine_id, keypair, existing_key)
@@ -508,14 +507,14 @@ def associate_key(request, key_name, backend_id, machine_id, deploy=True):
     return Response('Manually deploy the public key to your server', 206)
 
 
-def disassociate_key(request, key_name, backend_id, machine_id, undeploy=True):
+def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
     """Disassociates a key from a machine.
 
     If undeploy is set to True it will also attempt to actually remove it from
     the machine.
 
     """
-    if not key_name or not machine_id or not backend_id:
+    if not key_id or not machine_id or not backend_id:
         return Response('Keypair, machine or backend not provided', 400)
 
     try:
@@ -524,17 +523,16 @@ def disassociate_key(request, key_name, backend_id, machine_id, undeploy=True):
         keypairs = request.registry.settings.get('keypairs', {})
 
     try:
-        keypair = keypairs[key_name]
+        keypair = keypairs[key_id]
     except KeyError:
         return Response('Keypair not found', 404)
 
     machine_uid = [backend_id, machine_id]
-    machines = keypair.get('machines', [])
 
-    if machine_uid not in machines:
+    if machine_uid not in keypair.get('machines', []):
         return Response('Keypair is not associated to this machine', 304)
 
-    for uid in machines:
+    for uid in keypair.get('machines', []):
         if uid == machine_uid:
             keypair['machines'].remove(uid)
             break
@@ -555,7 +553,7 @@ def get_private_key(request):
 
     """
     params = request.json_body
-    key_name = params.get('key_name', '')
+    key_id = params.get('key_id', '')
 
     try:
         keypairs = request.environ['beaker.session']['keypairs']
@@ -564,8 +562,8 @@ def get_private_key(request):
 
     keypair = {}
 
-    if key_name in keypairs.keys():
-        keypair = keypairs[key_name]
+    if key_id in keypairs.keys():
+        keypair = keypairs[key_id]
     else:
         return Response('Keypair not found', 404)
 

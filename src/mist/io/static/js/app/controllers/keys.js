@@ -68,7 +68,7 @@ define('app/controllers/keys', [
             getPrivKey: function(key) {
                 payload = {
                     'action': 'get_private_key',
-                    'key_name': key.name
+                    'key_id': key.name
                 };
                 var that = this;
                 $.ajax({
@@ -89,7 +89,7 @@ define('app/controllers/keys', [
             },
 
             associateKeys: function(key, machines) {
-                payload = {'key_name': key.name, 'machine_backend_list': machines}
+                payload = {'key_id': key.name, 'machine_backend_list': machines}
                 var that = this
                 $.ajax({
                     url: 'keys/associate/machines',
@@ -111,7 +111,7 @@ define('app/controllers/keys', [
             associateKey: function(key_name, machine) {
                 payload = {
                     'action': 'associate',
-                    'key_name': key_name,
+                    'key_id': key_name,
                     'backend_id': machine.backend.id,
                     'machine_id': machine.id
                 }
@@ -124,10 +124,10 @@ define('app/controllers/keys', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully associated key ', key_name);
-                        machine.keys.addObject(key);     
+                        machine.keys.addObject(key);
                         Ember.run.next(function(){
                             $('.delete-key-button').button();
-                        });               
+                        });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while associating key'  +
@@ -150,7 +150,7 @@ define('app/controllers/keys', [
             disassociateKey: function(key, machine) {
                 payload = {
                     'action': 'disassociate',
-                    'key_name': key.name,
+                    'key_id': key.name,
                     'backend_id': machine.backend.id,
                     'machine_id': machine.id
                 }
