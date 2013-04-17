@@ -499,7 +499,7 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
         existing_key = None
         for k in keypairs:
             if machine_uid in keypairs[k].get('machines', []) and k != key_id:
-                existing_key = keypairs[key_id] # TODO select a tested key
+                existing_key = keypairs[k] # TODO select a tested key
                 break
         if existing_key:
             return deploy_key(request, backend_id, machine_id, keypair, existing_key)
