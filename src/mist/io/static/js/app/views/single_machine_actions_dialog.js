@@ -45,7 +45,9 @@ define('app/views/single_machine_actions_dialog', [
 
                     $("#dialog-single-power" ).off("popupafterclose");
                 });
-            	$('#dialog-single-power').popup('close');
+                try{
+                    $('#dialog-single-power').popup('close');                    
+                } catch(err){}
             },
 
             shutdown: function(){

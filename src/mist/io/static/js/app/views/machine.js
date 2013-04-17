@@ -197,9 +197,11 @@ define('app/views/machine', [
 
             setGraph: function() {
                 Em.run.next(function() {
-                    $('.monitoring-button').button();
-                    $('#add-rule-button').button();
-                    $('#monitoring-dialog').popup();
+                    try{
+                        $('.monitoring-button').button();
+                        $('#add-rule-button').button();
+                        $('#monitoring-dialog').popup();                        
+                    } catch(err){}
                 });
 
                 var machine = this.get('controller').get('model');
