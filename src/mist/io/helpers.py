@@ -606,7 +606,9 @@ def deploy_key(request, backend_id, machine_id, keypair, existing_key):
     except:
         pass
 
-    command = 'if [ -z `grep "%s" ~/.ssh/authorized_keys` ]; then echo "%s" >> ~/.ssh/authorized_keys; fi' % (keypair['public'], keypair['public'])
+    command = 'if [ -z `grep "' + keypair['public'] +\
+              '" ~/.ssh/authorized_keys` ]; then echo "' +\
+              keypair['public'] + '" >> ~/.ssh/authorized_keys; fi'
     private_key = existing_key['private']
 
     try:
@@ -653,7 +655,10 @@ def undeploy_key(request, backend_id, machine_id, keypair):
     except:
         pass
 
-    command = 'grep -v "%s" ~/.ssh/authorized_keys > ~/.ssh/authorized_keys.tmp && mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys && chmod go-w ~/.ssh/authorized_keys' % keypair['public']
+    command = 'grep -v "' + keypair['public'] + '" ~/.ssh/authorized_keys ' +\
+              '> ~/.ssh/authorized_keys.tmp && ' +\
+              'mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys ' +\
+              '&& chmod go-w ~/.ssh/authorized_keys'
     private_key = keypair['private']
 
     try:
