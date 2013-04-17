@@ -177,9 +177,6 @@ EC2_IMAGES = {
 }
 
 
-EC2_KEY_NAME = 'mistio'
-
-
 EC2_SECURITYGROUP = {
     'name': 'mistio',
     'description': 'Security group created by mist.io'

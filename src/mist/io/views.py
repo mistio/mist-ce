@@ -20,8 +20,7 @@ from libcloud.compute.types import Provider
 from libcloud.common.types import InvalidCredsError
 
 from mist.io.config import STATES, SUPPORTED_PROVIDERS
-from mist.io.config import EC2_IMAGES, EC2_PROVIDERS
-from mist.io.config import EC2_KEY_NAME, EC2_SECURITYGROUP
+from mist.io.config import EC2_IMAGES, EC2_PROVIDERS, EC2_SECURITYGROUP
 from mist.io.config import LINODE_DATACENTERS
 
 from mist.io.helpers import connect
