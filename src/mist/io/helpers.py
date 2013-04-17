@@ -483,30 +483,29 @@ def associate_key(request, key_name, backend_id, machine_id, deploy=True):
     except KeyError:
         return Response('Keypair not found', 404)
 
-    machine_backend = [backend_id, machine_id]
+    machine_uid = [backend_id, machine_id]
     machines = keypair.get('machines', [])
 
-    if machine_backend in machines:
+    if machine_uid in machines:
         return Response('Keypair already associated to machine', 304)
 
     try:
-        keypair['machines'].append(machine_backend)
+        keypair['machines'].append(machine_uid)
     except KeyError:
-        keypair['machines'] = [machine_backend]
+        keypair['machines'] = [machine_uid]
 
     save_settings(request)
 
-    existing_key = None
-    for key in keypairs:
-        if machine_backend in machines:
-            existing_key = keypairs[key]
-            break
-
-    if not existing_key:
-        return Response('Manually deploy the public key to your server', 206)
-    else:
-        if deploy:
+    if deploy:
+        existing_key = None
+        for key_id in keypairs:
+            if machine_uid in machines and key_name != key_id:
+                existing_key = keypairs[key_id]
+                break
+        if existing_key:
             return deploy_key(request, backend_id, machine_id, keypair, existing_key)
+
+    return Response('Manually deploy the public key to your server', 206)
 
 
 def disassociate_key(request, key_name, backend_id, machine_id, undeploy=True):
@@ -529,22 +528,23 @@ def disassociate_key(request, key_name, backend_id, machine_id, undeploy=True):
     except KeyError:
         return Response('Keypair not found', 404)
 
-    machine_backend = [backend_id, machine_id]
+    machine_uid = [backend_id, machine_id]
     machines = keypair.get('machines', [])
 
-    if machine_backend not in machines:
+    if machine_uid not in machines:
         return Response('Keypair is not associated to this machine', 304)
 
-    for machine in machines:
-        if machine == machine_backend:
-            keypair['machines'].remove(machine)
-            save_settings(request)
+    for uid in machines:
+        if uid == machine_uid:
+            keypair['machines'].remove(uid)
             break
+
+    save_settings(request)
 
     if undeploy:
         return undeploy_key(request, backend_id, machine_id, keypair)
-    else:
-        return Response('Manually deploy the public key to your server', 206)
+
+    return Response('Manually deploy the public key to your server', 206)
 
 
 def get_private_key(request):

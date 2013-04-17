@@ -681,7 +681,7 @@ def shell_command(request):
     else:
         private_key = public_key = None
 
-    ret= run_command(conn, machine_id, host, ssh_user, private_key, command)
+    ret = run_command(conn, machine_id, host, ssh_user, private_key, command)
     return ret
 
 
