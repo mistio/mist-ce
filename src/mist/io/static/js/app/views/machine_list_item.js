@@ -12,7 +12,10 @@ define('app/views/machine_list_item', [
 
                 didInsertElement: function(){
                     $('#machines-list').listview('refresh');
-                    $("#machines-list").trigger('create')
+                    $("#machines-list").trigger('create');
+                    //fix chrome botttom 0 bug
+                    $('.machines-footer').appendTo('.ember-view');
+                    $('#machines .machines-footer').remove();
                 },
 
                 machineSelected: function(){
