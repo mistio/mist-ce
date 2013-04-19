@@ -457,6 +457,12 @@ div.actions div.ui-controlgroup-controls {
     background-image: url("images/zap.png");
 }
 
+/* Footer Chrome Fix */
+div.ember-view div.ui-panel-content-wrap {
+    -webkit-transform: none;
+    -webkit-transition: none;
+}
+
 /* Single View common */
 
 .single-view-header {

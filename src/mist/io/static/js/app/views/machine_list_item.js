@@ -13,9 +13,6 @@ define('app/views/machine_list_item', [
                 didInsertElement: function(){
                     $('#machines-list').listview('refresh');
                     $("#machines-list").trigger('create');
-                    //fix chrome botttom 0 bug
-                    $('.ui-panel-content-wrap .machines-footer').appendTo('.ember-view');
-                    $('.ui-panel-content-wrap .machines-footer').remove();
                 },
 
                 machineSelected: function(){
