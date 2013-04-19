@@ -14,7 +14,7 @@ define('app/views/machine_list_item', [
                     $('#machines-list').listview('refresh');
                     $("#machines-list").trigger('create');
                     //fix chrome botttom 0 bug
-                    $('.machines-footer').appendTo('.ember-view');
+                    $('#machines .machines-footer').appendTo('.ember-view');
                     $('#machines .machines-footer').remove();
                 },
 
