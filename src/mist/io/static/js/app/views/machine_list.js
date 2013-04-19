@@ -11,6 +11,7 @@ define('app/views/machine_list', [
  */
 function(MistScreen, machine_list_html) {
     return MistScreen.extend({
+        tagName:false,
 
         template: Ember.Handlebars.compile(machine_list_html),
 

@@ -14,8 +14,8 @@ define('app/views/machine_list_item', [
                     $('#machines-list').listview('refresh');
                     $("#machines-list").trigger('create');
                     //fix chrome botttom 0 bug
-                    $('#machines .machines-footer').appendTo('.ember-view');
-                    $('#machines .machines-footer').remove();
+                    $('.ui-panel-content-wrap .machines-footer').appendTo('.ember-view');
+                    $('.ui-panel-content-wrap .machines-footer').remove();
                 },
 
                 machineSelected: function(){
