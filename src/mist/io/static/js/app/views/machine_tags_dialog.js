@@ -54,10 +54,6 @@ define('app/views/machine_tags_dialog',[
                 });
             },
 
-            deleteTag: function(){
-                warn('delete tag');
-            },
-
             disabledClass: function() {
                 if (this.tag && this.tag.length > 0) {
                     return '';

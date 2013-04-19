@@ -1011,9 +1011,6 @@ div.pending-monitoring {
     margin-top: 0px;
 }
 
-#dialog-tags div#tags-wrapper {
-}
-
 #dialog-tags div#tags-wrapper ul#tags-list{
     list-style: none;
     overflow: auto;

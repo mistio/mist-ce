@@ -12,8 +12,8 @@ define('app/views/delete_tag', [
         return Ember.View.extend({
             tagName: 'li',
 
-            didInsertElement: function(e){
-                $("a.tagButton").button();
+            didInsertElement: function() {
+                $("a.tag-button").button();
             },
 
             deleteTag: function() {
