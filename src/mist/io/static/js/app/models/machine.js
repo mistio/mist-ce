@@ -376,7 +376,7 @@ define('app/models/machine', [
                 
                 var that = this;
                 Mist.keysController.content.forEach(function(key){
-                    if (key.machines.length > 0){
+                    if (key.machines && key.machines.length > 0){
                         key.machines.forEach(function(item){
                             if (item[1] == that.id && item[0] == that.backend.id) {
                                 that.keys.addObject(key);
