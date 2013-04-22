@@ -6,7 +6,7 @@
             id="create-key-name"}}
 
         <button data-theme="b" data-icon="gear" {{action "generateClicked" target="view"}}>Generate</button>
-
+        <div class="ajax-loader"></div>
         <label for="textarea-public-key">Public Key:</label>
         {{view Ember.TextArea
             valueBinding="Mist.keyAddController.newKeyPublic"
@@ -19,7 +19,6 @@
             name="textarea-private-key"
             id="textarea-private-key"}}
 
-        <div class="ajax-loader"></div>
 
         <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
             <button id="create-key-cancel" data-theme="c" {{action "backClicked" target="view"}}>Back</button>
