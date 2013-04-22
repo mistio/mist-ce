@@ -891,8 +891,9 @@ def delete_key(request):
     key = keypairs.pop(key_id)
 
     try:
-        for machine in key.get('machines', []):
-            undeploy_key(request, machine[0], machine[1], key)
+        #TODO: alert user for key undeployment
+        #for machine in key.get('machines', []):
+        #    undeploy_key(request, machine[0], machine[1], key)
         ret_code = 200
     except:
         ret_code = 206
