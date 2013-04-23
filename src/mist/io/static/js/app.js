@@ -7,7 +7,7 @@ require.config({
         jquery: 'lib/jquery-1.9.1',
         jqueryUi: 'lib/jquery-ui-1.9.1.custom',
         text: 'lib/require/text',
-        ember: 'lib/ember-1.0.0-rc.1',
+        ember: 'lib/ember-1.0.0-rc.3',
         handlebars: 'lib/handlebars-1.0.0-rc.3',
         mobile: 'lib/jquery.mobile-1.3.0',
         d3: 'lib/d3-2.10.1',
