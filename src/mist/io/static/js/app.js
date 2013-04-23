@@ -175,13 +175,8 @@ define( 'app', [
           redirect: function(){
               // redirect if the user visited the URL directly
               if (this.target != undefined){
-                  var target = this.target;
-                  // clear redirect target
-                  this.target = undefined;
-                  var that = this;
-                  Ember.run.next(function(){
-                      that.transitionTo(target);
-                  });
+                  window.location.replace(window.location.href.split('#')[0]+ '#machines');
+                  window.location.reload();
               }
           },
           model: function(){
