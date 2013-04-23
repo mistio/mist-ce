@@ -1046,10 +1046,10 @@ div.pending-monitoring {
 /* Shell Dialog */
 
 #dialog-shell-popup {
-    position: fixed;
+    position: absolute;
     top: 10px !important;
     width: 60%;
-    min-width: 400px;
+    min-width: 300px;
 }
 
 #dialog-shell {
@@ -1102,20 +1102,17 @@ div.pending-monitoring {
 
 #dialog-shell.dialog-shell .shell-return {
     width: 100%;
-    overflow: hidden;
     border: 1px solid #AAA;
     height: 60ex;
     font-family: monospace;
     font-size: 11px;
+    max-height: 40% !important;
+    min-height: 150px;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
     margin-bottom: 20px;
     background: #dfe1e2;
-}
-
-#dialog-shell.dialog-shell .shell-return div {
-    min-width: 80ex;
 }
 
 #dialog-shell.dialog-shell .shell-return .command {
@@ -1132,7 +1129,8 @@ div.pending-monitoring {
     color: #efeff1;
     padding: 6px;
     text-shadow: none;
-    max-height: 40ex;
+    max-height: 40% !important;
+    min-height: 140px;
     height: auto !important;
     overflow-y: scroll !important;
 }
