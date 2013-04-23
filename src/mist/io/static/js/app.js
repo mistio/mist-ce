@@ -282,6 +282,27 @@ define( 'app', [
             }
         });
 
+        App.TagTextField = Ember.TextField.extend({
+            attributeBindings: [
+                'name',
+                'data-theme',
+                'autocapitalize'
+            ],
+
+            insertNewline: function() {
+                this._parentView.submit();
+            },
+        
+            keyUp: function() {
+                if (this.value && this.value.length > 0) {
+                    $('#tag-add').removeClass('ui-disabled')
+                } else {
+                    $('#tag-add').addClass('ui-disabled')
+                }
+            }
+
+        });
+
         App.Checkbox = Ember.Checkbox.extend({
             attributeBindings: [
                 'name',
