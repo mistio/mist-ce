@@ -13,8 +13,9 @@ define('app/views/confirmation_dialog', [
             confirm: function(){
                 Mist.confirmationController.confirm();
             },
+            
             reject: function(){
-        	$('#dialog-confirm').popup('close');
+        	   $('#dialog-confirm').popup('close');
             },
 
             template: Ember.Handlebars.compile(confirmation_dialog_html),

@@ -466,12 +466,14 @@ define('app/views/machine', [
 
             showShell: function() {
                 $("#dialog-shell").popup('option', 'positionTo', '#machines-button-shell').popup('open', {transition: 'slideup'});
-                setTimeout(function(){$('.shell-input input').focus()}, 1000);
                 Ember.run.next(function(){
                     $(window).on('resize', function(){
-                        warn(($(window).height()-250));
-                        $('.shell-return').css({'height': ($(window).height()-250) + 'px'})
-                    });                    
+                        $('#dialog-shell-popup').css({'left':'5%','width':'90%'});
+                        $('.shell-return').css({'height': (0.6*$(window).height()) + 'px'});
+                        $('.shell-input input').focus();
+                        return false;
+                    });
+                    $(window).trigger('resize');     
                 });                
             },
 
