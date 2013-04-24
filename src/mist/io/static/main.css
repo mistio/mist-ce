@@ -1201,12 +1201,20 @@ div.logout-placeholder {
     float: right;
 }
 
-#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader  {
+#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, #monitoring-wrapper .ajax-loader  {
     background-image: url(images/spinner.gif);
     background-position: center !important;
     background-repeat: no-repeat;
     display: none;
     height: 16px;
+}
+
+.pending-stats .ajax-loader  {
+    display: block !important;
+    position: absolute !important;
+    top: 70px;
+    width: 100%;
+    z-index: 10000 !important;
 }
 
 #key-machines-list {
