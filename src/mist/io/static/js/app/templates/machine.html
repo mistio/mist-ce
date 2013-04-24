@@ -62,7 +62,7 @@
 
             {{else}}
 
-            <div class="monitoring-dialog-container disabled">
+            <div {{bindAttr class=":monitoring-dialog-container :disabled state"}}>
                 <div class="monitoring-info">Monitoring is currently disabled</div>
 
                 {{view Mist.MachineMonitoringDialog machineBinding="this"}}

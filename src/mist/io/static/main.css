@@ -519,6 +519,14 @@ div.ember-view div.ui-panel-content-wrap {
     display: block !important;
 }
 
+#monitoring-wrapper .monitoring-dialog-container a.monitoring-button {
+    display: none;
+}
+
+#monitoring-wrapper .running a.monitoring-button {
+    display: block !important;
+}
+
 /* indices do not help here, let's use types as defined in
  libcloud.compute.types.Provider (we will use numbers, match in the Python) */
 
