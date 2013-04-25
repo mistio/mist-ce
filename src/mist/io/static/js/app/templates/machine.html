@@ -51,7 +51,7 @@
                 {{view Mist.RuleView ruleBinding="this"}}
             {{/each}}
             </div>
-            <div class="monitoring-dialog-container enabled">
+            <div {{bindAttr class=":monitoring-dialog-container :enabled state"}}>
                 {{view Mist.MachineMonitoringDialog machineBinding="this"}}
             </div>
             <div class="add-rule-container">
