@@ -1,7 +1,15 @@
 0.9.0
 -----
 
--  
+- Enable monitoring by connecting to mist.io service
+- Several graph related fixes for machine stats
+- Shell fixes and styling
+- Change the UI of add backend and add machine
+- Optionally run deployment script after machine creation
+- Add key section and key actions
+- Convert all jQuery Mobile dialogs to popups and panels
+- Upgrade jQuery to v1.9.1, jQuery Mobile to v1.3.0, Ember.js to v1.0.0-rc3 and libcloud to v0.12.3
+
 
 0.8.0
 -----
