@@ -15,7 +15,7 @@ define('app/models/machine', [
             backend: null,
             selected: false,
             hasKey: false,
-            hasMonitoring: null,
+            hasMonitoring: false,
             pendingMonitoring: false,
             pendingShell: false,
             pendingAddTag: false,

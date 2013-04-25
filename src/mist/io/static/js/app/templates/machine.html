@@ -33,7 +33,6 @@
 
         <h3>Monitoring</h3>
         <div id="monitoring-wrapper" {{bindAttr class=":ui-btn-inner :ui-corner-top :ui-corner-bottom pendingStats"}}>
-            <div class="ajax-loader"></div>
 
             {{#if hasMonitoring}}
 
@@ -52,6 +51,7 @@
             {{/each}}
             </div>
             <div {{bindAttr class=":monitoring-dialog-container :enabled state"}}>
+                <div class="ajax-loader"></div>
                 {{view Mist.MachineMonitoringDialog machineBinding="this"}}
             </div>
             <div class="add-rule-container">

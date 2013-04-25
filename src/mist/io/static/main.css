@@ -1209,13 +1209,14 @@ div.logout-placeholder {
     height: 16px;
 }
 
-.pending-stats .ajax-loader  {
+.pending-stats .enabled .ajax-loader  {
     display: block !important;
     position: absolute !important;
     top: 70px;
     width: 100%;
     z-index: 10000 !important;
 }
+
 
 #key-machines-list {
     max-height: 250px;
