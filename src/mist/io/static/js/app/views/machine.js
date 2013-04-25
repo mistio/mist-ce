@@ -251,7 +251,8 @@ define('app/views/machine', [
                                     dataType: 'jsonp',
                                     data: {'start': (start / 1000),
                                            'stop': (stop / 1000),
-                                           'step': step},
+                                           'step': step,
+                                           'auth_key': Mist.auth_key},
                                     timeout: 4000,
                                     success: function(data) {
                                         if (!data || !('cpu' in data)) {

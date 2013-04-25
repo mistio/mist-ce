@@ -83,7 +83,9 @@ define('app/controllers/backends', [
                     headers: { "cache-control": "no-cache" },
                     success: function(data){
                         warn(data);
-                        data.forEach(function(machine_tuple){
+                        machines = data.machines;
+                        Mist.set('auth_key', data.auth_key);
+                        machines.forEach(function(machine_tuple){
                             var b,m;
                             backend_id = machine_tuple[0];
                             machine_id = machine_tuple[1];
