@@ -11,6 +11,7 @@ div#splash {
     width: 100%;
     height: 100%;
     background: #c2c3c4 url('images/bg_splash.gif') top left repeat;
+    z-index: 1000;
 }
 
 div#splash div.mist-logo {
