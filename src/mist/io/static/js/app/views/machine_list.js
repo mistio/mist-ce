@@ -83,7 +83,14 @@ function(MistScreen, machine_list_html) {
         },
 
         openShell: function(){
-            $("#dialog-shell").popup('option', 'positionTo', '#machines-button-shell').popup('open', {transition: 'slideup'});
+            $("#dialog-shell").popup('option', 'positionTo', '#machines-button-shell')
+                              .popup('open', {transition: 'slideup'});
+            $("#dialog-shell").on('popupafterclose', 
+                    function(){
+                        $(window).off('resize');
+                    }
+            );
+            
             Ember.run.next(function(){
                 $(window).on('resize', function(){
                     $('#dialog-shell-popup').css({'left':'5%','width':'90%'});
