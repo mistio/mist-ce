@@ -1,5 +1,6 @@
 define('app/controllers/backends', [
     'app/models/backend',
+    'app/models/rule',
     'ember'
     ],
     /**
@@ -7,7 +8,7 @@ define('app/controllers/backends', [
      *
      * @returns Class
      */
-    function(Backend) {
+    function(Backend, Rule) {
         return Ember.ArrayController.extend({
             content: [],
             machineCount: 0,
@@ -32,6 +33,18 @@ define('app/controllers/backends', [
                 }    
             },
             
+            getMachineById: function(backendId, machineId){
+                for (var i = 0; i < this.content.length; i++){
+                    if (this.content[i].id == backendId) {
+                        for (var j=0; j < this.content[i].machines.content.length; j++){
+                            if (this.content[i].machines.content[j].id == machineId){
+                                return this.content[i].machines.content[j];
+                            }
+                        }
+                    }
+                }    
+            },
+                        
             getMachineCount: function(){
                 var count = 0;
                 this.content.forEach(function(item){
@@ -75,6 +88,8 @@ define('app/controllers/backends', [
                 if (!Mist.authenticated){
                     return
                 }
+                
+                var that = this;
                         
                 $.ajax({
                     url: '/monitoring',
@@ -106,7 +121,22 @@ define('app/controllers/backends', [
                             if (m < Mist.backendsController.content[b].machines.content.length)  {
                                 Mist.backendsController.content[b].machines.content[m].set('hasMonitoring', true);
                             }
-                        })
+                        });
+                        
+                        rules = data.rules;
+                        
+                        for (ruleId in rules){
+                            var rule = {};
+                            rule['id'] = ruleId;
+                            rule['machine'] = that.getMachineById(rules[ruleId]['backend'], rules[ruleId]['machine']);
+                            rule['metric'] = rules[ruleId]['metric'];
+                            rule['operator'] = rules[ruleId]['operator'];
+                            rule['value'] = rules[ruleId]['value'];
+                            rule['actionToTake'] = rules[ruleId]['action'];
+                            rule['command'] = rules[ruleId]['command'];
+                            Mist.rulesController.pushObject(Rule.create(rule));
+                        }
+                        Mist.rulesController.redrawRules();
                     },
                     error: function(){
                         Mist.notificationController.notify('Error checking monitoring');

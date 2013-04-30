@@ -750,12 +750,9 @@ div.pending-monitoring {
 }
 
 .rule-box .ui-slider {
-    /* commented out until the interaction with the slider is ok
-    display: none;
-    */
     float: left;
     margin: 16px 16px 16px 8px;
-    width: 30%;
+    width: auto;
 }
 
 .rule-box .rule-button {
@@ -765,6 +762,11 @@ div.pending-monitoring {
 .ui-slider input.rule-value {
     height: 32px;
     margin-top: -8px;
+}
+
+.ui-slider-track {
+    display: none;
+    min-width: 100px;
 }
 
 #machine-basic-table, #machine-metadata {

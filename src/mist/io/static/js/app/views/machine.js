@@ -16,6 +16,17 @@ define('app/views/machine', [
                 this._super();
                 this.setGraph();
             },
+            
+            rules: function(){
+                var ret = Ember.ArrayController.create(), 
+                    machine = this.get('controller').get('model');
+                Mist.rulesController.forEach(function(rule){
+                    if (rule.machine == machine) {
+                        ret.pushObject(rule);
+                    }
+                });
+                return ret;
+            }.property('Mist.rulesController.@each'),
 
             disabledShellClass: function() {
                 var machine = this.get('controller').get('model');
@@ -175,24 +186,9 @@ define('app/views/machine', [
                 var metric = 'load';
                 var operator = {'title': 'gt', 'symbol': '>'};
                 var value = 60;
-                var autoAction = 'alert';
+                var actionToTake = 'alert';
 
-                Mist.rulesController.newRule(machine, metric, operator, value, autoAction);
-
-                Ember.run.next(function() {
-                    $('.rule-button.metric').last().button();
-                    $('.rule-metric-list').last().listview();
-                    $('#rule-metric-popup').last().popup();
-                    $('.rule-button.operator').last().button();
-                    $('.rule-operator-list').last().listview();
-                    $('#rule-operator-popup').last().popup();
-                    $('.rule-value').last().slider();
-                    $('input.rule-value').last().textinput()
-                    $('.rule-button.action').last().button();
-                    $('.rule-action-list').last().listview();
-                    $('#rule-action-popup').last().popup();
-                    $('.rules-container .delete-rule-button').last().button();
-                });
+                Mist.rulesController.newRule(machine, metric, operator, value, actionToTake);
             },
 
             setGraph: function() {
@@ -439,6 +435,7 @@ define('app/views/machine', [
                     });
                 });
 
+                Mist.rulesController.redrawRules();
             }.observes('controller.model.hasMonitoring'),
 
             stopPolling: function() {

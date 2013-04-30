@@ -1,4 +1,4 @@
-<div class="rule-box">
+<div class="rule-box" id="{{unbound id}}">
     <div class="rule-if">if</div>
 
     <a href="#"
@@ -10,7 +10,7 @@
         data-inline="true"
         {{action openMetricPopup target="view"}}>{{metric}}</a>
 
-    <div id="rule-metric-popup" data-role="popup">
+    <div {{bindAttr class=":rule-metric-popup id"}} data-role="popup">
         <ul class="rule-metric-list" data-role="listview">
             {{#each Mist.rulesController.metricList}}
             <li data-icon="false">
@@ -28,7 +28,7 @@
         data-inline="true"
         {{action openOperatorPopup target="view"}}>{{operator.symbol}}</a>
 
-    <div id="rule-operator-popup" data-role="popup">
+    <div {{bindAttr class=":rule-operator-popup id"}} data-role="popup">
         <ul class="rule-operator-list" data-role="listview">
             {{#each Mist.rulesController.operatorList}}
             <li data-icon="false">
@@ -54,15 +54,18 @@
         data-role="button"
         data-icon="false"
         data-inline="true"
-        {{action openActionPopup target="view"}}>{{autoAction}}</a>
+        {{action openActionPopup target="view"}}>{{actionToTake}}</a>
 
-    <div id="rule-action-popup" data-role="popup">
+    <div {{bindAttr class=":rule-action-popup id"}} data-role="popup">
         <ul class="rule-action-list" data-role="listview">
             {{#each Mist.rulesController.actionList}}
             <li data-icon="false">
                 <a href="#" title="{{unbound this}}">{{this}}</a>
             </li>
             {{/each}}
+            <li data-icon="false" class="ui-disabled">
+                <a href="#" title="launch">launch</a>
+            </li>            
         </ul>
     </div>
 

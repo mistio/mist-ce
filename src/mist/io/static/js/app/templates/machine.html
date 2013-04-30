@@ -46,7 +46,7 @@
                 <h1>Disabling monitoring</h1>
             </div>
             <div class="rules-container">
-            {{#each Mist.rulesController}}
+            {{#each view.rules}}
                 {{view Mist.RuleView ruleBinding="this"}}
             {{/each}}
             </div>
