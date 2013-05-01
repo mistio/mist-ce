@@ -29,7 +29,7 @@ define('app/controllers/rules', [
                 'alert',
                 'reboot',
                 'destroy',
-                /*'launch',*/
+                //'launch',
                 'command'
             ],
 
@@ -38,9 +38,9 @@ define('app/controllers/rules', [
                     if (this.content[i].id == ruleId) {
                         return this.content[i];
                     }
-                }    
+                }
             },
-            
+
             newRule: function(machine, metric, operator, value, actionToTake) {
                 var rule = Rule.create({
                     'machine': machine,
@@ -57,9 +57,9 @@ define('app/controllers/rules', [
                     'metric': metric,
                     'operator': operator,
                     'value': value,
-                    'action': actionToTake                    
+                    'action': actionToTake
                 }
-                
+
                 $.ajax({
                     url: 'rules',
                     type: 'POST',
@@ -68,21 +68,21 @@ define('app/controllers/rules', [
                     success: function(data) {
                         info('Successfully created rule ', data['id']);
                         rule.set('id', data['id']);
-                        that.pushObject(rule);  
-                        that.redrawRules();         
+                        that.pushObject(rule);
+                        that.redrawRules();
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while creating rule');
                         error(textstate, errorThrown, 'while creating rule');
                     }
                 });
-                
+
                 return rule.id;
-                
+
             },
-            
+
             redrawRules: function(){
-                
+
                 var that = this;
                 Ember.run.next(function() {
                     $('.rule-button.metric').each(function(i, el){
@@ -93,7 +93,7 @@ define('app/controllers/rules', [
                     });
                     $('.rule-metric-list').each(function(i, el){
                         $(el).listview();
-                    });                    
+                    });
                     $('.rule-button.operator').each(function(i, el){
                         $(el).button();
                     });
@@ -102,7 +102,7 @@ define('app/controllers/rules', [
                     });
                     $('.rule-operator-list').each(function(i, el){
                         $(el).listview();
-                    });                    
+                    });
                     $('.rule-value').each(function(i, el){
                         $(el).slider();
                     });
@@ -115,9 +115,18 @@ define('app/controllers/rules', [
                     $('.rule-action-popup').each(function(i, el){
                         $(el).popup();
                     });
+                    $('.rule-command-content').each(function(i, el){
+                        $(el).textinput();
+                    });
+                    $('.rule-command-popup a').each(function(i, el){
+                        $(el).button();
+                    });
+                    $('.rule-command-popup').each(function(i, el){
+                        $(el).popup();
+                    });
                     $('.rule-action-list').each(function(i, el){
                         $(el).listview();
-                    });                    
+                    });
                     $('.rules-container .delete-rule-button').each(function(i, el){
                         $(el).button();
                     });
@@ -126,7 +135,7 @@ define('app/controllers/rules', [
                         $(event.currentTarget).find('.ui-slider-track').css('width', $(window).width()*0.3);
                         $(event.currentTarget).find('.ui-slider-track').fadeIn(100);
                     }
-                    
+
                     function hideRuleSlider(event){
                         $(event.currentTarget).find('.ui-slider-track').css('width','');
                         $(event.currentTarget).find('.ui-slider-track').fadeOut(100);
@@ -144,25 +153,25 @@ define('app/controllers/rules', [
                                 contentType: 'application/json',
                                 data: JSON.stringify(payload),
                                 success: function(data) {
-                                    info('Successfully updated rule ', rule.id); 
+                                    info('Successfully updated rule ', rule.id);
                                     rule.set('value', rule_value);
                                 },
                                 error: function(jqXHR, textstate, errorThrown) {
                                     Mist.notificationController.notify('Error while updating rule');
                                     error(textstate, errorThrown, 'while updating rule');
                                 }
-                            });   
+                            });
                         }
-                        
-                    }           
-                             
+
+                    }
+
                     $('.ui-slider').off('mouseover');
                     $('.ui-slider').on('mouseover', showRuleSlider);
                     $('.ui-slider').on('click', showRuleSlider);
                     $('.ui-slider').on('tap', showRuleSlider);
                     $('.rule-box').on('mouseleave', hideRuleSlider);
-                    $('#single-machine').on('tap', hideRuleSlider);                   
-                });                
+                    $('#single-machine').on('tap', hideRuleSlider);
+                });
             },
         });
     }

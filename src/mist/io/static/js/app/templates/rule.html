@@ -65,8 +65,21 @@
             {{/each}}
             <li data-icon="false" class="ui-disabled">
                 <a href="#" title="launch">launch</a>
-            </li>            
+            </li>
         </ul>
+    </div>
+
+    <div {{bindAttr class=":mist-dialog :rule-command-popup id"}} data-role="popup" data-overlay-theme="a">
+        <div data-role="header">
+            <h1>Command</h1>
+        </div>
+        <div data-role="content">
+            <textarea class="rule-command-content">{{command}}</textarea>
+            <div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
+                <a data-role="button" data-theme="c" data-rel="back">Back</a>
+                <a data-role="button" data-theme="b" {{action saveCommand target="view"}}>Save</a>
+            </div>
+        </div>
     </div>
 
     <div class="delete-rule-container">
