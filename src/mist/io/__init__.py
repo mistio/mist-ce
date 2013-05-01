@@ -53,13 +53,16 @@ def main(global_config, **settings):
     config.add_route('images', '/backends/{backend}/images')
     config.add_route('sizes', '/backends/{backend}/sizes')
     config.add_route('locations', '/backends/{backend}/locations')
-    
+
     config.add_route('keys', '/keys')
     config.add_route('key', '/keys/{key}')
+
+    config.add_route('rules', '/rules')
+    config.add_route('rule', '/rules/{rule}')
 
     config.scan()
 
     app = config.make_wsgi_app()
     app = ShellMiddleware(app)
-            
+
     return app
