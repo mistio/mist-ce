@@ -989,29 +989,32 @@ def update_monitoring(request):
 @view_config(route_name='rules', request_method='POST', renderer='json')
 def update_rule(request):
     """Creates or updates a rule.
+
     """
+    core_uri = request.registry.settings['core_uri']
     email = request.registry.settings.get('email','')
     password = request.registry.settings.get('password','')
     timestamp =  datetime.utcnow().strftime("%s")
     hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
-    
+
     payload = request.json_body.copy()
     payload['email'] = email
     payload['hash'] = hash
     payload['timestamp'] = timestamp
-    
+
     #TODO: make ssl verification configurable globally, set to true by default
     ret = requests.post(core_uri+request.path, params=payload, verify=False)
 
     if ret.status_code != 200:
         return Response('Service unavailable', 503)
-    
+
     return ret.json()
 
 
 @view_config(route_name='rule', request_method='DELETE')
 def delete_rule(request):
     """Deletes a rule.
+
     """
     # TODO: factor out common code in a shared function
     return update_rule(request)
