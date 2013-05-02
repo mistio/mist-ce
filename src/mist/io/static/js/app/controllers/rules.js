@@ -42,6 +42,16 @@ define('app/controllers/rules', [
                     }
                 }
             },
+            
+            getOperatorByTitle: function(title){
+                var ret = null;
+                this.operatorList.forEach(function(op){
+                    if (op.title == title){
+                        ret = op;
+                    }
+                });
+                return ret;
+            },
 
             newRule: function(machine, metric, operator, value, actionToTake) {
                 var rule = Rule.create({
@@ -57,7 +67,7 @@ define('app/controllers/rules', [
                     'backendId': machine.backend.id,
                     'machineId': machine.id,
                     'metric': metric,
-                    'operator': operator,
+                    'operator': operator.title,
                     'value': value,
                     'action': actionToTake
                 }

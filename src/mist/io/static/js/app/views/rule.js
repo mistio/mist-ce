@@ -74,7 +74,7 @@ define('app/views/rule', [
                 rule.set('operator', operator);
                 var payload = {
                     'id' : rule.id,
-                    'operator' : operator
+                    'operator' : operator.title
                 }
                 $.ajax({
                     url: 'rules',

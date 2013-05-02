@@ -130,7 +130,7 @@ define('app/controllers/backends', [
                             rule['id'] = ruleId;
                             rule['machine'] = that.getMachineById(rules[ruleId]['backend'], rules[ruleId]['machine']);
                             rule['metric'] = rules[ruleId]['metric'];
-                            rule['operator'] = rules[ruleId]['operator'];
+                            rule['operator'] = Mist.rulesController.getOperatorByTitle(rules[ruleId]['operator']);
                             rule['value'] = rules[ruleId]['value'];
                             rule['actionToTake'] = rules[ruleId]['action'];
                             rule['command'] = rules[ruleId]['command'];
