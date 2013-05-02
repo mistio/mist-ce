@@ -10,16 +10,6 @@
         data-inline="true"
         {{action openMetricPopup target="view"}}>{{metric}}</a>
 
-    <div {{bindAttr class=":rule-metric-popup id"}} data-role="popup">
-        <ul class="rule-metric-list" data-role="listview">
-            {{#each Mist.rulesController.metricList}}
-            <li data-icon="false">
-                <a href="#" title="{{unbound this}}">{{this}}</a>
-            </li>
-            {{/each}}
-        </ul>
-    </div>
-
     <a href="#"
         class="rule-button operator"
         data-theme="d"
@@ -27,16 +17,6 @@
         data-icon="false"
         data-inline="true"
         {{action openOperatorPopup target="view"}}>{{operator.symbol}}</a>
-
-    <div {{bindAttr class=":rule-operator-popup id"}} data-role="popup">
-        <ul class="rule-operator-list" data-role="listview">
-            {{#each Mist.rulesController.operatorList}}
-            <li data-icon="false">
-                <a href="#" title="{{unbound this.title}}">{{this.symbol}}</a>
-            </li>
-            {{/each}}
-        </ul>
-    </div>
 
     <input type="number"
         data-type="range"
@@ -55,32 +35,6 @@
         data-icon="false"
         data-inline="true"
         {{action openActionPopup target="view"}}>{{actionToTake}}</a>
-
-    <div {{bindAttr class=":rule-action-popup id"}} data-role="popup">
-        <ul class="rule-action-list" data-role="listview">
-            {{#each Mist.rulesController.actionList}}
-            <li data-icon="false">
-                <a href="#" title="{{unbound this}}">{{this}}</a>
-            </li>
-            {{/each}}
-            <li data-icon="false" class="ui-disabled">
-                <a href="#" title="launch">launch</a>
-            </li>
-        </ul>
-    </div>
-
-    <div {{bindAttr class=":mist-dialog :rule-command-popup id"}} data-role="popup" data-overlay-theme="a">
-        <div data-role="header">
-            <h1>Command</h1>
-        </div>
-        <div data-role="content">
-            <textarea class="rule-command-content">{{command}}</textarea>
-            <div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
-                <a data-role="button" data-theme="c" data-rel="back">Back</a>
-                <a data-role="button" data-theme="b" {{action saveCommand target="view"}}>Save</a>
-            </div>
-        </div>
-    </div>
 
     <div class="delete-rule-container">
         <button class="delete-rule-button"

@@ -46,9 +46,41 @@
                 <h1>Disabling monitoring</h1>
             </div>
             <div class="rules-container">
-            {{#each view.rules}}
-                {{view Mist.RuleView ruleBinding="this"}}
-            {{/each}}
+                {{#each view.rules}}
+                    {{view Mist.RuleView ruleBinding="this"}}
+                {{/each}}
+
+                <div class="rule-metric-popup" data-role="popup" data-position-to="origin">
+                    <ul class="rule-metric-list" data-role="listview">
+                        {{#each Mist.rulesController.metricList}}
+                        <li data-icon="false">
+                            <a href="#" title="{{unbound this}}">{{this}}</a>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+                <div class="rule-operator-popup" data-role="popup">
+                    <ul class="rule-operator-list" data-role="listview">
+                        {{#each Mist.rulesController.operatorList}}
+                        <li data-icon="false">
+                            <a href="#" title="{{unbound this.title}}">{{this.symbol}}</a>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+                <div class="rule-action-popup" data-role="popup">
+                    <ul class="rule-action-list" data-role="listview">
+                        {{#each Mist.rulesController.actionList}}
+                        <li data-icon="false">
+                            <a href="#" title="{{unbound this}}">{{this}}</a>
+                        </li>
+                        {{/each}}
+                        <li data-icon="false" class="ui-disabled">
+                            <a href="#" title="launch">launch</a>
+                        </li>
+                    </ul>
+                </div>                
+            
             </div>
             <div {{bindAttr class=":monitoring-dialog-container :enabled state"}}>
                 <div class="ajax-loader"></div>
@@ -75,6 +107,21 @@
             </div>
 
             {{/if}}
+            
+            <div class="mist-dialog rule-command-popup" data-role="popup" data-overlay-theme="a">
+                <div data-role="header">
+                    <h1>Command</h1>
+                </div>
+                <div data-role="content">
+                    {{view Ember.TextArea
+                        valueBinding="Mist.rulesController.command"
+                        name="rule-command-content"}}            
+                    <div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
+                        <a data-role="button" data-theme="c" data-rel="back">Back</a>
+                        <a data-role="button" data-theme="b" {{action saveCommand target="Mist.rulesController"}}>Save</a>
+                    </div>
+                </div>
+            </div>            
 
         </div>
     </div>

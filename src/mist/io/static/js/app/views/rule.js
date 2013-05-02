@@ -13,8 +13,8 @@ define('app/views/rule', [
             template: Ember.Handlebars.compile(rule_html),
 
             openMetricPopup: function() {
-                $('.' + this.rule.id + '.rule-metric-popup').popup('option', 'positionTo', '.rule-button.metric').popup('open');
-                $('.' + this.rule.id + '.rule-metric-popup li a').on('click', this.rule, this.selectMetric);
+                $('.rule-metric-popup').popup('option', 'positionTo', '#' + this.rule.id + ' .rule-button.metric').popup('open');
+                $('.rule-metric-popup li a').on('click', this.rule, this.selectMetric);
             },
 
             selectMetric: function(event) {
@@ -22,8 +22,8 @@ define('app/views/rule', [
                 var metric = this.title;
                 var oldmetric = rule.get('metric');
 
-                $('.' + rule.id + '.rule-metric-popup').popup('close');
-                $('.' + rule.id + '.rule-metric-popup li a').off('click', this.selectMetric);
+                $('.rule-metric-popup').popup('close');
+                $('.rule-metric-popup li a').off('click', this.selectMetric);
 
                 if (metric == oldmetric) {
                     return false;
@@ -52,8 +52,8 @@ define('app/views/rule', [
             },
 
             openOperatorPopup: function() {
-                $('.' + this.rule.id + '.rule-operator-popup').popup('option', 'positionTo', '.rule-button.operator').popup('open');
-                $('.' + this.rule.id + '.rule-operator-popup li a').on('click', this.rule, this.selectOperator);
+                $('.rule-operator-popup').popup('option', 'positionTo', '#' + this.rule.id + ' .rule-button.operator').popup('open');
+                $('.rule-operator-popup li a').on('click', this.rule, this.selectOperator);
             },
 
             selectOperator: function(event) {
@@ -64,8 +64,8 @@ define('app/views/rule', [
                 };
                 var oldoperator = rule.get('operator');
 
-                $('.' + rule.id + '.rule-operator-popup').popup('close');
-                $('.' + rule.id + '.rule-operator-popup li a').off('click', this.selectOperator);
+                $('.rule-operator-popup').popup('close');
+                $('.rule-operator-popup li a').off('click', this.selectOperator);
 
                 if (operator == oldoperator) {
                     return false;
@@ -94,8 +94,8 @@ define('app/views/rule', [
             },
 
             openActionPopup: function() {
-                $('.' + this.rule.id + '.rule-action-popup').popup('option', 'positionTo', '.rule-button.action').popup('open');
-                $('.' + this.rule.id + '.rule-action-popup li a').on('click', this.rule, this.selectAction);
+                $('.rule-action-popup').popup('option', 'positionTo', '#' + this.rule.id + ' .rule-button.action').popup('open');
+                $('.rule-action-popup li a').on('click', this.rule, this.selectAction);
             },
 
             selectAction: function(event) {
@@ -103,12 +103,18 @@ define('app/views/rule', [
                 var action = this.title;
                 var oldAction = rule.get('actionToTake');
 
-                $('.' + rule.id + '.rule-action-popup').popup('close');
-                $('.' + rule.id + '.rule-action-popup li a').off('click', this.selectAction);
+                $('.rule-action-popup').popup('close');
+                $('.rule-action-popup li a').off('click', this.selectAction);
 
                 // if 'command' is selected open the popup. Rule is updated by saveCommand()
                 if (action == 'command') {
-                    $('.' + rule.id + '.rule-command-popup').popup('option', 'positionTo', '.rule-button.action').popup('open');
+                    Mist.rulesController.set('commandRule', rule);
+                    Mist.rulesController.set('command', rule.command);
+                    $('.rule-command-popup').popup({
+                        beforeposition: function( event, ui ) {
+                            $('.rule-command-popup').css('width',0.7*$(window).width());
+                        }
+                    }).popup('option', 'positionTo', '#' + rule.id + ' .rule-button.command').popup('open');
                     return false;
                 };
 
@@ -138,44 +144,6 @@ define('app/views/rule', [
                     }
                 });
                 return false;
-            },
-
-            saveCommand: function() {
-                var oldAction = this.rule.get('actionToTake');
-                var oldCommand = this.rule.get('command');
-
-                var newCommand = $('.' + this.rule.id + ' .rule-command-content').val();
-
-                $('.' + this.rule.id + '.rule-command-popup').popup('close');
-
-                if (newCommand == oldCommand) {
-                    return false;
-                }
-
-                this.rule.set('actionToTake', 'command');
-                this.rule.set('command', newCommand);
-
-                var payload = {
-                    'id' : this.rule.id,
-                    'action' : 'command',
-                    'command': newCommand
-                }
-                var that = this;
-                $.ajax({
-                    url: 'rules',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    success: function(data) {
-                        info('Successfully updated rule', that.rule.id);
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while updating rule');
-                        error(textstate, errorThrown, 'while updating rule');
-                        that.rule.set('actionToTake', oldAction);
-                        that.rule.set('command', oldCommand);
-                    }
-                });
             },
 
             deleteRuleClicked: function(){

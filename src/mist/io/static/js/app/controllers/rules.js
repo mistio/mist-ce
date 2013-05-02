@@ -11,6 +11,8 @@ define('app/controllers/rules', [
      */
     function(Rule) {
         return Ember.ArrayController.extend({
+            command: null,
+            commandRule: null,
 
             metricList: [
                 'load',
@@ -81,6 +83,45 @@ define('app/controllers/rules', [
 
             },
 
+            saveCommand: function() {
+                var oldAction = this.commandRule.get('actionToTake');
+                var oldCommand = this.commandRule.get('command');
+
+                $('.rule-command-popup').popup('close');
+
+                if (this.command == oldCommand) {
+                    return false;
+                }
+                
+                warn('setting command for '+ this.commandRule.id + ' to ' + this.command);
+                
+                this.commandRule.set('actionToTake', 'command');
+                this.commandRule.set('command', this.command);
+
+                var payload = {
+                    'id' : this.commandRule.id,
+                    'action' : 'command',
+                    'command': this.command
+                }
+                var that = this;
+                $.ajax({
+                    url: 'rules',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function(data) {
+                        info('Successfully updated rule', that.commandRule.id);
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while updating rule');
+                        error(textstate, errorThrown, 'while updating rule');
+                        that.commandRule.set('actionToTake', oldAction);
+                        that.commandRule.set('command', oldCommand);
+                        that.command.set(oldCommand);
+                    }
+                });
+            },
+            
             redrawRules: function(){
 
                 var that = this;
