@@ -23,8 +23,23 @@ define('app/controllers/notification', [
                             textonly: true,
                             theme: $.mobile.pageLoadErrorMessageTheme
                 });
-                this.timeout = setTimeout("$.mobile.loading( 'hide' )", 1500);
-            }
+                this.timeout = setTimeout("$.mobile.loading( 'hide' )", 2000);
+            },
+            
+            warn: function(message){
+                if(this.timeout){
+                    clearTimeout(this.timeout);
+                }
+                log("warning: " + message);
+                $.mobile.loading( 'show', {
+                            text: message,
+                            textVisible: true,
+                            textonly: true,
+                            theme: $.mobile.pageLoadErrorMessageTheme
+                });
+                this.timeout = setTimeout("$.mobile.loading( 'hide' )", 5000);
+            },
+            
         });
     }
 );

@@ -358,8 +358,12 @@ define('app/models/machine', [
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         that.set('pendingMonitoring', false);
-                        Mist.notificationController.notify('Error when changing monitoring to ' +
+                        if (jqXHR.status == 402){
+                            Mist.notificationController.warn(jqXHR.responseText);    
+                        } else {
+                            Mist.notificationController.notify('Error when changing monitoring to ' +
                             that.name);
+                        }
                         error(textstate, errorThrown, 'when changing monitoring to machine',
                             that.name);
                     }
