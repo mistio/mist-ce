@@ -18,9 +18,9 @@ requires = [
 ]
 
 setup(name='mist.io',
-      version='0.9.0',
+      version='0.9.1',
       license = 'AGPLv3',
-      description='cloud management web app',
+      description='cloud management, monitoring & automation from any web device',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[
         "Programming Language :: Python",

@@ -233,22 +233,6 @@ define( 'app', [
         App.set('email', EMAIL);
         App.set('password', '');
 
-    //
-    //            function showRuleSlider(){
-    //                    $(this).parent().children('.ui-slider').fadeIn(100);
-    //                    return false;
-    //            }
-    //            function hideRuleSlider(){
-    //                    $('.ui-slider').fadeOut(100);
-    //            }
-    //
-    //            // monitoring rule slider toggle
-    //            $(document).on('mouseover', 'input.rule-value', showRuleSlider);
-    //            $(document).on('click', 'input.rule-value', showRuleSlider);
-    //
-    //            $(document).on('mouseleave', '.rule-box', hideRuleSlider);
-    //            $(document).on('tap', '#single-machine', hideRuleSlider);
-    //
         App.Select = Ember.Select.extend({
             attributeBindings: [
                 'name',

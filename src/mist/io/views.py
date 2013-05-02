@@ -976,7 +976,9 @@ def update_monitoring(request):
     #TODO: make ssl verification configurable globally, set to true by default
     ret = requests.post(core_uri+request.path, params=payload, verify=False)
 
-    if ret.status_code != 200:
+    if ret.status_code == 402:
+        return Response(ret.text, 402)
+    elif ret.status_code != 200:
         return Response('Service unavailable', 503)
 
     request.registry.settings['email'] = email
@@ -1017,4 +1019,21 @@ def delete_rule(request):
 
     """
     # TODO: factor out common code in a shared function
-    return update_rule(request)
+    core_uri = request.registry.settings['core_uri']
+    email = request.registry.settings.get('email','')
+    password = request.registry.settings.get('password','')
+    timestamp =  datetime.utcnow().strftime("%s")
+    hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
+
+    payload = {}
+    payload['email'] = email
+    payload['hash'] = hash
+    payload['timestamp'] = timestamp
+
+    #TODO: make ssl verification configurable globally, set to true by default
+    ret = requests.delete(core_uri+request.path, params=payload, verify=False)
+
+    if ret.status_code != 200:
+        return Response('Service unavailable', 503)
+
+    return Response('OK', 200)
