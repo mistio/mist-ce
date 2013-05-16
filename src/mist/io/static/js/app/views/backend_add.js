@@ -21,7 +21,7 @@ define('app/views/backend_add', [
             selectBackend: function(event){
                 if (event.target.title.indexOf("rackspace") !== -1 || event.target.title.indexOf("linode") !== -1)  {
                     $('#textApiKey').text('2. Username:');
-                    $('#textApiSecret').text('3. Password:');
+                    $('#textApiSecret').text('3. API Key:');
                 } else {
                     $('#textApiKey').text('2. API Key:');
                     $('#textApiSecret').text('3. API Secret:');
