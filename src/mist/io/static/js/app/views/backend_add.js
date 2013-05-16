@@ -19,6 +19,13 @@ define('app/views/backend_add', [
             },
             
             selectBackend: function(event){
+                if (event.target.title.indexOf("rackspace") !== -1 || event.target.title.indexOf("linode") !== -1)  {
+                    $('#textApiKey').text('2. Username:');
+                    $('#textApiSecret').text('3. Password:');
+                } else {
+                    $('#textApiKey').text('2. API Key:');
+                    $('#textApiSecret').text('3. API Secret:');
+                }
                 $('.select-backend-collapsible').collapsible('option','collapsedIcon','check');
                 $('.select-backend-collapsible span.ui-btn-text').text(event.target.text);
                 Mist.backendAddController.set('newBackendProvider', 
