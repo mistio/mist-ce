@@ -228,19 +228,19 @@ SUPPORTED_PROVIDERS = [
                        # },
 
                        # RackSpace
-                       {'title': 'RackSpace DFW',
+                       {'title': 'Rackspace DFW',
                         'provider': "%s:%s" % (Provider.RACKSPACE,'dfw')
                         },
-                       {'title': 'RackSpace ORD',
+                       {'title': 'Rackspace ORD',
                         'provider' : "%s:%s" % (Provider.RACKSPACE,'ord')
                         },
-                       {'title': 'RackSpace LON',
+                       {'title': 'Rackspace LON',
                         'provider' : "%s:%s" % (Provider.RACKSPACE,'lon')
                         },
-                       {'title': 'RackSpace US (OLD)',
+                       {'title': 'Rackspace US (OLD)',
                         'provider' : "%s:%s" % (Provider.RACKSPACE_FIRST_GEN,'us')
                         },
-                       {'title': 'RackSpace UK (OLD)',
+                       {'title': 'Rackspace UK (OLD)',
                         'provider' : "%s:%s" % (Provider.RACKSPACE_FIRST_GEN,'uk')
                         },
                        ]
