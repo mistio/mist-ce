@@ -86,7 +86,11 @@
                 </li>
                 {{/each}}
             </ul>
-        </div>        
+        </div>   
+        <div class="ajax-loader"></div>
+        <div class="btn-right create-key" data-role="controlgroup" data-type="horizontal">
+            <button id="create-key" data-theme="b" {{action newKeyClicked target="view"}}>Create</button>
+        </div>
 
         <label for="create-machine-script">7.Script:</label>
         {{view Mist.TextField

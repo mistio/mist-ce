@@ -355,6 +355,7 @@ li.node .tag {
 .dialog-add label, .dialog-add .select {
     display: block;
     margin-top: 12px;
+    clear: left;
 }
 
 .select-machines, .select-keys {
@@ -412,6 +413,19 @@ a#mist-select-machines-button span.ui-btn-text {
     position: absolute;
     top: 2px;
     left: -26px;
+}
+
+#machines .select-key-collapsible {
+    width: 380px;
+    float: left;
+}
+
+.ui-listview > .ui-li.ui-last-child, .ui-listview .ui-btn.ui-last-child > .ui-li > .ui-btn-text > .ui-link-inherit, .ui-collapsible-content > .ui-listview:not(.ui-listview-inset), .ui-collapsible-content > .ui-listview:not(.ui-listview-inset) .ui-li.ui-last-child {
+    z-index: 1000;
+}
+
+.btn-right {
+    margin-left: 430px;
 }
 
 /* FOOTER */
@@ -1204,12 +1218,19 @@ div.logout-placeholder {
     float: right;
 }
 
-#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, #monitoring-wrapper .ajax-loader  {
+#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, #monitoring-wrapper .ajax-loader, .dialog-add .ajax-loader  {
     background-image: url(images/spinner.gif);
     background-position: center !important;
     background-repeat: no-repeat;
     display: none;
     height: 16px;
+}
+
+.dialog-add .ajax-loader  {
+    float: left;
+    width: 16px;
+    margin-top: 25px;
+    margin-left: 15px;
 }
 
 .pending-stats .enabled .ajax-loader  {

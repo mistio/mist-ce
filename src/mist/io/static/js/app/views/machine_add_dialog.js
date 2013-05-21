@@ -105,6 +105,34 @@ define('app/views/machine_add_dialog', [
                 this.clear();
             },
 
+            newKeyClicked: function() {
+                $('.dialog-add .ajax-loader').css('display','block');
+                $('#create-key').button('disable');
+                $('#create-key').button('refresh');
+                var payload = {
+                    'action': 'generate'
+                }
+                $.ajax({
+                    url: '/keys',
+                    type: "POST",
+                    data: JSON.stringify(payload),
+                    contentType: "application/json",
+                    headers: { "cache-control": "no-cache" },
+                    dataType: "json",
+                    success: function(result) {
+                        Mist.keysController.newKey('generated',
+                                            result.public,
+                                            result.private);
+                        $('.dialog-add .ajax-loader').css('display','none');
+                        //$('.dialog-add .select-key-collapsible .ui-listview').listview('refresh');
+                        Ember.run.next(function(){
+                            $('.dialog-add .ui-collapsible ul').listview('refresh');
+                            //try{$('.select-key-collapsible ul').listview('refresh')}catch(e){$('.select-key-collapsible ul').listview()}
+                        });
+                    }
+                });
+            },
+
             backClicked: function() {
                 this.clear();
                 $('.dialog-add').panel('close');
@@ -117,6 +145,11 @@ define('app/views/machine_add_dialog', [
                 var that = this;
                 
                 Ember.run.next(function(){
+                    if (Mist.keysController.content.length > 0) {
+                        $('div.create-key').hide();
+                        $('#create-key').hide();
+                        $('#machines .select-key-collapsible').css('width', '100%');
+                    }
                     Mist.machineAddController.addObserver('newMachineBackend', function() {
                         Ember.run.next(function() {
                             $('.dialog-add .ui-collapsible ul').listview('refresh');
