@@ -15,6 +15,7 @@ define('app/models/backend', [
             BACKENDSTATES: ['offline', 'online', 'waiting'],
 
             id: null,
+            apikey: null,
             title: null,
             provider: null,
             apikey: null,
