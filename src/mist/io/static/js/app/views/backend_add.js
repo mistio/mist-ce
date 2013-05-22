@@ -33,14 +33,32 @@ define('app/views/backend_add', [
                      title: event.target.text 
                     }
                 );
-                $('.select-backend-collapsible').trigger('collapse');                 
+                $('.select-backend-collapsible').trigger('collapse');
+
+                Mist.backendsController.some(function(backend){
+                    if (event.target.title.split('_')[0] == 'ec2' && backend.provider.split('_')[0] == 'ec2') {
+                        //Autocomplete
+                        $('input[id=create-backend-key]').val(backend.apikey);
+                        $('input[id=create-backend-secret]').val('getsecretfromdb');
+                        $('#create-backend-ok').button('enable');
+                        return true;
+                    } else if (event.target.title.substr(0,9) == 'rackspace' &&
+ backend.provider.substr(0,9) == 'rackspace') {
+                        $('input[id=create-backend-key]').val(backend.apikey);
+                        $('input[id=create-backend-secret]').val('getsecretfromdb');
+                        $('#create-backend-ok').button('enable');
+                        return true;
+                    } else if (event.target.title == 'linode' && backend.provider == 'linode') {
+                        return true;
+                    }
+                });
             },
             
             addBackend: function() {
                 $('.select-listmenu li').on('click', this.selectBackend);                
                 $('#add-backend').panel('open');
                 // resize dismiss div TODO: reset on window resize                
-                $('.ui-panel-dismiss-position-right').css('left',(0-$('.ui-panel-position-right.ui-panel-open').width()));                
+                $('.ui-panel-dismiss-position-right').css('left',(0-$('.ui-panel-position-right.ui-panel-open').width()));
             },
 
             backClicked: function() {
@@ -54,8 +72,8 @@ define('app/views/backend_add', [
                 var payload = {
                     "title": '', // TODO
                     "provider": Mist.backendAddController.newBackendProvider,
-                    "apikey" : Mist.backendAddController.newBackendKey,
-                    "apisecret": Mist.backendAddController.newBackendSecret
+                    "apikey" : $('#create-backend-key').val(),
+                    "apisecret": $('#create-backend-secret').val()
                 };
 
                 $.ajax({

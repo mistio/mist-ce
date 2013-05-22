@@ -86,6 +86,7 @@ def list_backends(request):
     for backend_id in backends:
         backend = backends[backend_id]
         ret.append({'id': backend_id,
+                    'apikey': backend.get('apikey', None),
                     'title': backend.get('title', backend['provider']),
                     'provider': backend['provider'],
                     'poll_interval': backend.get('poll_interval', 10000),
@@ -102,10 +103,19 @@ def list_backends(request):
 
 @view_config(route_name='backends', request_method='POST', renderer='json')
 def add_backend(request, renderer='json'):
+    try:
+        backends = request.environ['beaker.session']['backends']
+    except:
+        backends = request.registry.settings['backends']
     params = request.json_body
     provider = params.get('provider', '0')['provider']
     apikey = params.get('apikey', '')
     apisecret = params.get('apisecret', '')
+    if apisecret == 'getsecretfromdb':
+        for backend_id in backends:
+            backend = backends[backend_id]
+            if backend.get('apikey', None) == apikey:
+                apisecret = backend.get('apisecret', None)
     region = ''
     if not provider.__class__ is int and ':' in provider:
         region = provider.split(':')[1]
