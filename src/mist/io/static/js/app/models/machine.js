@@ -304,7 +304,10 @@ define('app/models/machine', [
                 this.set('pendingMonitoring', true);
                 //$('.monitoring-button').show();
                 var payload = {
-                   'action': this.hasMonitoring ? 'disable' : 'enable' 
+                   'action': this.hasMonitoring ? 'disable' : 'enable',
+                   'dns_name': this.extra.dns_name? this.extra.dns_name : "n/a",
+                   'public_ips': this.public_ips ? this.public_ips : [],
+                   'name': this.name ? this.name : "n/a"
                 };
                 
                 if (!Mist.authenticated){
