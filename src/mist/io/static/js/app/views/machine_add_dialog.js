@@ -124,11 +124,6 @@ define('app/views/machine_add_dialog', [
                                             result.public,
                                             result.private);
                         $('.dialog-add .ajax-loader').css('display','none');
-                        //$('.dialog-add .select-key-collapsible .ui-listview').listview('refresh');
-                        Ember.run.next(function(){
-                            $('.dialog-add .ui-collapsible ul').listview('refresh');
-                            //try{$('.select-key-collapsible ul').listview('refresh')}catch(e){$('.select-key-collapsible ul').listview()}
-                        });
                     }
                 });
             },
