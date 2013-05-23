@@ -81,6 +81,7 @@ define('app/models/machine', [
                     data: 'action=destroy',
                     success: function(data) {
                         that.set('state', 'pending');
+                        that.set('hasMonitoring', false);
                         info('Successfully sent destroy to machine', that.name);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
