@@ -29,6 +29,14 @@
             <span class="ui-li-count node-icon no-key-icon ui-btn-corner-all"></span>
             {{/if}}
         </span>
+
+        <span class="bubble-container bubble-monitoring">
+            {{#if view.machine.hasMonitoring}}
+            <span class="ui-li-count node-icon monitoring-icon ui-btn-corner-all"></span>
+            {{else}}
+            <span class="ui-li-count node-icon no-monitoring-icon ui-btn-corner-all"></span>
+            {{/if}}
+        </span>
      {{/linkTo}}
 
 </li>

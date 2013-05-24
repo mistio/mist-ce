@@ -281,6 +281,10 @@ li.node .tag {
 
 /* Machines Icons and their colors. */
 
+#machines-list .ui-li-desc {
+    right: 98px;
+}
+
 #machines-list .key-icon {
     background-image: url("images/key.png");
     background-color: #333;
@@ -288,6 +292,20 @@ li.node .tag {
 
 #machines-list .no-key-icon {
     background-image: url("images/no-key.png");
+    background-color: #aaa;
+}
+
+span.bubble-monitoring {
+    right: 73px !important;
+}
+
+#machines-list .monitoring-icon {
+    background-image: url("images/monitor.png");
+    background-color: #333;
+}
+
+#machines-list .no-monitoring-icon {
+    background-image: url("images/no-monitor.png");
     background-color: #aaa;
 }
 
