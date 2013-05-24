@@ -19,8 +19,13 @@ define('app/views/machine_add_dialog', [
                 
                 $('.select-listmenu').listview('refresh');
                 $('.dialog-add').panel('open');
+                if (Mist.keysController.content.length > 0) {
+                    $('div.create-key').hide();
+                    $('#create-key').hide();
+                    $('#machines .select-key-collapsible').css('width', '100%');
+                }
                 // resize dismiss div TODO: reset on window resize
-                $('.ui-panel-dismiss-position-right').css('left',(0-$('.ui-panel-position-right.ui-panel-open').width()));            
+                $('.ui-panel-dismiss-position-right').css('left',(0-$('.ui-panel-position-right.ui-panel-open').width()));        
             },
             
             selectProvider: function(backend){
@@ -140,11 +145,6 @@ define('app/views/machine_add_dialog', [
                 var that = this;
                 
                 Ember.run.next(function(){
-                    if (Mist.keysController.content.length > 0) {
-                        $('div.create-key').hide();
-                        $('#create-key').hide();
-                        $('#machines .select-key-collapsible').css('width', '100%');
-                    }
                     Mist.machineAddController.addObserver('newMachineBackend', function() {
                         Ember.run.next(function() {
                             $('.dialog-add .ui-collapsible ul').listview('refresh');
