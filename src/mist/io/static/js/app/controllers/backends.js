@@ -100,29 +100,27 @@ define('app/controllers/backends', [
                         warn(data);
                         machines = data.machines;
                         Mist.set('auth_key', data.auth_key);
+                        //now loop on backend_id, machine_id  list of lists and check if pair found
                         machines.forEach(function(machine_tuple){
                             var b,m;
                             backend_id = machine_tuple[0];
                             machine_id = machine_tuple[1];
+
                             for (b=0; b < Mist.backendsController.content.length; b++) {
                                 if (Mist.backendsController.content[b]['id'] == backend_id)
                                     break;
                             }
 
-                            if (b == Mist.backendsController.content.length) {
-                                return false;
-                            }
-
-                            for (m=0; m < Mist.backendsController.content[b].machines.content.length; m++){
-                                if (Mist.backendsController.content[b]['machines'].content[m]['id'] == machine_id)
-                                    break;
-                            }
-
-                            if (m < Mist.backendsController.content[b].machines.content.length)  {
-                                Mist.backendsController.content[b].machines.content[m].set('hasMonitoring', true);
+                            if (b != Mist.backendsController.content.length) {
+                                for (m=0; m < Mist.backendsController.content[b].machines.content.length; m++){
+                                    if (Mist.backendsController.content[b]['machines'].content[m]['id'] == machine_id){
+                                        Mist.backendsController.content[b].machines.content[m].set('hasMonitoring', true);
+                                        break;
+                                    }
+                                }
                             }
                         });
-                        
+
                         rules = data.rules;
                         
                         for (ruleId in rules){
