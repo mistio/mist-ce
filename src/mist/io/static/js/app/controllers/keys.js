@@ -54,8 +54,10 @@ define('app/controllers/keys', [
                                 that.getSelectedKeyCount();
                             });
                             $('#keys-list').listview('refresh');
-                            $('.dialog-add .select-key-collapsible ul').listview('refresh')
+                        try{
+                            $('.dialog-add .select-key-collapsible ul').listview('refresh');
                             $('[title=generated]').click();
+                        } catch(err){}
                             $('#keys-list input.ember-checkbox').checkboxradio();
                         });
                     },
