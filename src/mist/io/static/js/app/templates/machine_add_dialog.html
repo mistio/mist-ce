@@ -89,7 +89,7 @@
         </div>   
         <div class="ajax-loader"></div>
         <div class="btn-right create-key" data-role="controlgroup" data-type="horizontal">
-            <button id="create-key" data-theme="b" {{action newKeyClicked target="view"}}>Create</button>
+            <button id="create-key" disabled="disabled" data-theme="b" {{action newKeyClicked target="view"}}>Create</button>
         </div>
 
         <label for="create-machine-script">7.Script:</label>
@@ -102,7 +102,7 @@
 
         <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
             <button id="create-machine-cancel" data-theme="c" {{action backClicked target="view"}}>Back</button>
-            <button id="create-machine-ok" data-theme="b" {{action newMachineClicked target="view"}}>Launch!</button>
+            <button id="create-machine-ok" data-theme="b" disabled="disabled"  {{action newMachineClicked target="view"}}>Launch!</button>
         </div>
     </div>
 </div>

@@ -242,12 +242,12 @@ define('app/views/machine_add_dialog', [
                         Ember.run.next(function(){
                             if (Mist.machineAddController.newMachineLocationReady) {
                                 $('.select-key-collapsible').removeClass('ui-disabled');
-
-                                $('#create-machine-script').textinput('enable');                                
+                                $('#create-machine-script').textinput('enable');
+                                $('#create-key').button('enable');
                             } else {
                                 $('.select-key-collapsible').addClass('ui-disabled');
-
-                                $('#create-machine-script').textinput('enable');                                                                
+                                $('#create-machine-script').textinput('enable');
+                                $('#create-key').button('disable');     
                             }
                         });
                     });
