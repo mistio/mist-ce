@@ -55,6 +55,7 @@ define('app/controllers/keys', [
                             });
                             $('#keys-list').listview('refresh');
                             $('.dialog-add .select-key-collapsible ul').listview('refresh')
+                            $('[title=generated]').click();
                             $('#keys-list input.ember-checkbox').checkboxradio();
                         });
                     },
