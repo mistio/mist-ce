@@ -35,23 +35,23 @@ define('app/views/backend_add', [
                 );
                 $('.select-backend-collapsible').trigger('collapse');
 
-                Mist.backendsController.some(function(backend){
-                    $('input[id=create-backend-key]').val('');
-                    $('input[id=create-backend-secret]').val('');                    
+                $('input[id=create-backend-key]').val('');
+                $('input[id=create-backend-secret]').val('');
+                for (var b = 0; b < Mist.backendsController.content.length; b++) {
+                    var backend = Mist.backendsController.content[b];                    
                     if (event.target.title.split('_')[0] == 'ec2' && backend.provider.split('_')[0] == 'ec2') {
                         //Autocomplete
                         $('input[id=create-backend-key]').val(backend.apikey);
                         $('input[id=create-backend-secret]').val('getsecretfromdb');
                         $('#create-backend-ok').button('enable');
-                        return true;
+                        break;
                     } else if (event.target.title.substr(0,9) == 'rackspace' && backend.provider.substr(0,9) == 'rackspace') {
                         $('input[id=create-backend-key]').val(backend.apikey);
                         $('input[id=create-backend-secret]').val('getsecretfromdb');
                         $('#create-backend-ok').button('enable');
-                        return true;
+                        break;
                     }
-                    return true;
-                });
+                }
             },
             
             addBackend: function() {
