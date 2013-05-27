@@ -110,10 +110,10 @@ define('app/views/machine_add_dialog', [
                 this.clear();
             },
 
-            newKeyClicked: function() {
-                $('.dialog-add .ajax-loader').css('display','block');
-                $('#create-key').button('disable');
-                $('#create-key').button('refresh');
+            generateKey: function() {
+                //$('.generate-key-collapsible').trigger('collapse');
+                $('.generate-key-collapsible .ui-icon').hide();
+                $('.dialog-add .ajax-loader').show();
                 var payload = {
                     'action': 'generate'
                 }
@@ -125,12 +125,14 @@ define('app/views/machine_add_dialog', [
                     headers: { "cache-control": "no-cache" },
                     dataType: "json",
                     success: function(result) {
-                        Mist.keysController.newKey('generated',
+                        var keyName = 'auto-generated-key-' + Math.round(+new Date/1000);
+                        Mist.keysController.newKey(keyName,
                                             result.public,
-                                            result.private);
+                                            result.private, true);
                         $('.dialog-add .ajax-loader').css('display','none');
                     }
                 });
+                return false;
             },
 
             backClicked: function() {
@@ -145,6 +147,8 @@ define('app/views/machine_add_dialog', [
                 var that = this;
                 
                 Ember.run.next(function(){
+                    $('.generate-key-collapsible h2').on('click', that.generateKey);
+                    
                     Mist.machineAddController.addObserver('newMachineBackend', function() {
                         Ember.run.next(function() {
                             $('.dialog-add .ui-collapsible ul').listview('refresh');
@@ -242,10 +246,12 @@ define('app/views/machine_add_dialog', [
                         Ember.run.next(function(){
                             if (Mist.machineAddController.newMachineLocationReady) {
                                 $('.select-key-collapsible').removeClass('ui-disabled');
+                                $('.generate-key-collapsible').removeClass('ui-disabled');
                                 $('#create-machine-script').textinput('enable');
                                 $('#create-key').button('enable');
                             } else {
                                 $('.select-key-collapsible').addClass('ui-disabled');
+                                $('.generate-key-collapsible').addClass('ui-disabled');
                                 $('#create-machine-script').textinput('enable');
                                 $('#create-key').button('disable');     
                             }

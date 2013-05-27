@@ -30,7 +30,7 @@ define('app/controllers/keys', [
                 });
             },
 
-            newKey: function(name, publicKey, privateKey) {
+            newKey: function(name, publicKey, privateKey, autoSelect) {
                 item = {
                     'name': name,
                     'pub': publicKey,
@@ -54,12 +54,20 @@ define('app/controllers/keys', [
                                 that.getSelectedKeyCount();
                             });
                             $('#keys-list').listview('refresh');
-                        try{
-                            $('.dialog-add .select-key-collapsible ul').listview('refresh');
-                            $('[title=generated]').click();
-                        } catch(err){}
                             $('#keys-list input.ember-checkbox').checkboxradio();
                         });
+                        
+                        if (autoSelect == true){
+                            Mist.machineAddController.set('newMachineKey', key);
+                            Ember.run.next(function(){
+                                $('.select-key-collapsible').collapsible({theme: "c"});
+                                $('.select-key-collapsible .select-listmenu').listview({theme: "c"});
+                                $('.select-key-collapsible').removeClass('ui-disabled');
+                                $('.select-key-collapsible').collapsible('option','collapsedIcon','check');
+                                $('.select-key-collapsible span.ui-btn-text').text(key.name);
+                                $('.select-key-collapsible').trigger('collapse');                                 
+                            });                                                    
+                        }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while sending create key'  +

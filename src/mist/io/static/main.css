@@ -433,11 +433,6 @@ a#mist-select-machines-button span.ui-btn-text {
     left: -26px;
 }
 
-#machines .select-key-collapsible {
-    width: 380px;
-    float: left;
-}
-
 .ui-listview > .ui-li.ui-last-child, .ui-listview .ui-btn.ui-last-child > .ui-li > .ui-btn-text > .ui-link-inherit, .ui-collapsible-content > .ui-listview:not(.ui-listview-inset), .ui-collapsible-content > .ui-listview:not(.ui-listview-inset) .ui-li.ui-last-child {
     z-index: 1000;
 }
@@ -1245,10 +1240,9 @@ div.logout-placeholder {
 }
 
 .dialog-add .ajax-loader  {
-    float: left;
+    float: right;
     width: 16px;
-    margin-top: 25px;
-    margin-left: 15px;
+    margin-right: -29px;
 }
 
 .pending-stats .enabled .ajax-loader  {

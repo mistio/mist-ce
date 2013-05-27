@@ -75,6 +75,7 @@
         </div>        
 
         <label for="createmachine-select-key">6. Key:</label>
+        {{#if Mist.keysController}}
         <div class="select-key-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
             data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
             <h2>Select Key</h2>
@@ -86,11 +87,13 @@
                 </li>
                 {{/each}}
             </ul>
-        </div>   
-        <div class="ajax-loader"></div>
-        <div class="btn-right create-key" data-role="controlgroup" data-type="horizontal">
-            <button id="create-key" disabled="disabled" data-theme="b" {{action newKeyClicked target="view"}}>Create</button>
         </div>
+        {{else}}
+        <div class="generate-key-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
+            data-collapsed-icon="gear">
+            <h2><div class="ajax-loader"></div> Generate Key</h2>
+        </div>        
+        {{/if}}
 
         <label for="create-machine-script">7.Script:</label>
         {{view Mist.TextField
