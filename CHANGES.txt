@@ -4,9 +4,10 @@
 - update apikey/secret backend labels for Rackspace and Linode
 - make the s in Rackspace lowercase
 - automatically generate key on create machine when there are no keys available
-- improve alerts
+- change default rule value to 5 instead of 60 since it refers to avg load
+- alerting improvements
 
- 
+
 0.9.1
 -----
 

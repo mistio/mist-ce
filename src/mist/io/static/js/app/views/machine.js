@@ -185,7 +185,7 @@ define('app/views/machine', [
                 var machine = this.get('controller').get('model');
                 var metric = 'load';
                 var operator = {'title': 'gt', 'symbol': '>'};
-                var value = 60;
+                var value = 5;
                 var actionToTake = 'alert';
 
                 Mist.rulesController.newRule(machine, metric, operator, value, actionToTake);
