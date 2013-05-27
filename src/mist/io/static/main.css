@@ -1245,6 +1245,10 @@ div.logout-placeholder {
     margin-right: -29px;
 }
 
+.generate-key-collapsible .ui-collapsible-content {
+    display: none !important;
+}
+
 .pending-stats .enabled .ajax-loader  {
     display: block !important;
     position: absolute !important;

@@ -111,7 +111,6 @@ define('app/views/machine_add_dialog', [
             },
 
             generateKey: function() {
-                //$('.generate-key-collapsible').trigger('collapse');
                 $('.generate-key-collapsible .ui-icon').hide();
                 $('.dialog-add .ajax-loader').show();
                 var payload = {
