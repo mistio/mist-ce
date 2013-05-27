@@ -1,3 +1,12 @@
+0.9.2
+-----
+
+- update apikey/secret backend labels for Rackspace and Linode
+- make the s in Rackspace lowercase
+- automatically generate key on create machine when there are no keys available
+- improve alerts
+
+ 
 0.9.1
 -----
 

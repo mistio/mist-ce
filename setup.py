@@ -18,7 +18,7 @@ requires = [
 ]
 
 setup(name='mist.io',
-      version='0.9.1',
+      version='0.9.2',
       license = 'AGPLv3',
       description='cloud management, monitoring & automation from any web device',
       long_description=README + '\n\n' +  CHANGES,
