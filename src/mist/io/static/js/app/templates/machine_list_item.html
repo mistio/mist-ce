@@ -14,7 +14,7 @@
             <span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
             {{/if}}
         </span>
-
+        
         <p class="description">
             <span class="tag backend ui-btn-corner-all prov-{{unbound backend.provider}}">{{view.machine.backend.title}}</span>
             {{#each view.machine.tags}}
@@ -27,14 +27,6 @@
             <span class="ui-li-count node-icon key-icon ui-btn-corner-all"></span>
             {{else}}
             <span class="ui-li-count node-icon no-key-icon ui-btn-corner-all"></span>
-            {{/if}}
-        </span>
-
-        <span class="bubble-container bubble-monitoring">
-            {{#if view.machine.hasMonitoring}}
-            <span class="ui-li-count node-icon monitoring-icon ui-btn-corner-all"></span>
-            {{else}}
-            <span class="ui-li-count node-icon no-monitoring-icon ui-btn-corner-all"></span>
             {{/if}}
         </span>
      {{/linkTo}}
