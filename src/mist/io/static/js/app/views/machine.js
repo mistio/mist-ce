@@ -294,11 +294,8 @@ define('app/views/machine', [
                     function drawMemory() {
                         return context.metric(function(start, stop, step, callback) {
                             if (localData && machine.hasMonitoring && 'memory' in localData) {
-                                if (!memoryTotal) {
-                                    memoryTotal = localData['memory']['total'];
-                                }
-                                return callback(null, localData['memory']['used'].map(function(d) {
-                                    return (d / memoryTotal) * 100;
+                                return callback(null, localData['memory'].map(function(d) {
+                                    return d;
                                 }));
                             } else {
                                 return callback(new Error('unable to load data'));
