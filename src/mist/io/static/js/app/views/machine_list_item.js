@@ -1,3 +1,7 @@
+                    //setTimeout(function(){
+
+                    //},10);
+
 define('app/views/machine_list_item', [
     'text!app/templates/machine_list_item.html','ember'],
     /**
@@ -13,11 +17,28 @@ define('app/views/machine_list_item', [
                 didInsertElement: function(){
                     $('#machines-list').listview('refresh');
                     $("#machines-list").trigger('create');
+                    var selector = '#' + this.machine.id + ' span.monitoring-icon';
+
+                    var d = new Date();
+                    var n = d.getTime()/1000 - 3600;
+                    var mac_id = this.machine.id
+                    var bac_id = this.machine.backend.id
+                    var uri = URL_PREFIX + '/backends/' + bac_id + '/machines/' + mac_id + '/loadavg.png?time=' + n;
+                    setInterval(function(){
+                        var bgimage = new Image();
+                        bgimage.src = uri;
+                        bgimage.onload = function () {
+                           $(selector).css('background-image', 'url(' + bgimage.src + ')');
+                        };
+                        warn(uri);
+                        d = new Date();
+                        n = d.getTime()/1000 - 3600;
+                        uri = URL_PREFIX + '/backends/' + bac_id + '/machines/' + mac_id + '/loadavg.png?time=' + n;
+                    },3*60*1000);
+
                 },
 
                 machineSelected: function(){
-                    log('selected changed');
-                    
                     var len = 0;
                     
                     Mist.backendsController.forEach(function(backend) {

@@ -183,7 +183,18 @@ li.node .bubble-container {
     height: 20px;
     margin-top: -10px;
     position: absolute;
-    right: 48px;
+    right: 40px;
+    top: 50%;
+}
+
+li.node .monitoring-container {
+    display: block;
+    float: right;
+    height: 20px;
+    left: 340px;
+    margin-top: -10px;
+    overflow: hidden;
+    position: absolute;
     top: 50%;
 }
 
@@ -264,6 +275,14 @@ li.node .tag {
     float: right;
 }
 
+#machines-list .monitoring-icon {
+    border-radius: 0 !important;
+    margin-left: 8px;
+    display: inline-block;
+    width: 100px !important;
+    padding: 0 !important;
+}
+
 /* Keys Listing */
 
 #mist-create-key {
@@ -282,7 +301,7 @@ li.node .tag {
 /* Machines Icons and their colors. */
 
 #machines-list .ui-li-desc {
-    right: 98px;
+    right: 68px;
 }
 
 #machines-list .key-icon {
@@ -297,16 +316,6 @@ li.node .tag {
 
 span.bubble-monitoring {
     right: 73px !important;
-}
-
-#machines-list .monitoring-icon {
-    background-image: url("images/monitor.png");
-    background-color: #333;
-}
-
-#machines-list .no-monitoring-icon {
-    background-image: url("images/no-monitor.png");
-    background-color: #aaa;
 }
 
 #machines-list .alert-icon {

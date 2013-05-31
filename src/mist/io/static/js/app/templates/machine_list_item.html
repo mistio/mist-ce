@@ -8,6 +8,12 @@
     {{#linkTo machine view.machine}}
         <h3 class="name">{{view.machine.name}}</h3>
 
+        <span class="monitoring-container" {{bindAttr id="view.machine.id"}}>
+            {{#if view.machine.hasMonitoring}}
+                <span class="ui-li-count node-icon monitoring-icon ui-btn-corner-all">&nbsp;</span>
+            {{/if}}
+        </span>
+
         <span class="caption-wrapper">
             <h3 {{bindAttr class="view.machine.state :state"}}>{{view.machine.state}}</h3>
             {{#if view.machine.hasAlert}}
@@ -29,6 +35,6 @@
             <span class="ui-li-count node-icon no-key-icon ui-btn-corner-all"></span>
             {{/if}}
         </span>
-     {{/linkTo}}
+    {{/linkTo}}
 
 </li>
