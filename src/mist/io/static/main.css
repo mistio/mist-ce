@@ -104,12 +104,8 @@ div#splash div.mist-logo {
     background-position: -252px 50%;
 }
 
-.state-providers.state-error .ui-icon, .backend-button.error .ui-icon {
+.state-providers.state-error .ui-icon, .backend-button.offline .ui-icon {
     background-image: url(states/state-yellow.png);
-}
-
-.state-providers.state-down .ui-icon, .backend-button.waiting-offline .ui-icon {
-    background-image: url(states/state-red.png);
 }
 
 /* Provider state dialog */
@@ -281,6 +277,7 @@ li.node .tag {
     display: inline-block;
     width: 100px !important;
     padding: 0 !important;
+    background-color: transparent;
 }
 
 /* Keys Listing */
@@ -409,7 +406,7 @@ a#mist-select-machines-button span.ui-btn-text {
     position: absolute;
     top: 50%;
     margin-top: -7px;
-    max-width: 160px;
+    max-width: 250px;
     overflow: hidden;
 }
 
