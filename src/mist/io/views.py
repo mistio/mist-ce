@@ -961,18 +961,25 @@ def update_monitoring(request):
         email = request.json_body['email']
         password = request.json_body['pass']
         timestamp = request.json_body['timestamp']
-        hash = request.json_body['hash']
+        hash = request.json_body['hash']       
     except:
         email = request.registry.settings.get('email','')
         password = request.registry.settings.get('password','')
         timestamp =  datetime.utcnow().strftime("%s")
         hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
 
+    name = request.json_body.get('name','')
+    public_ips = request.json_body.get('public_ips', [])
+    dns_name = request.json_body.get('dns_name', '')
+    
     action = request.json_body['action'] or 'enable'
     payload = {'email': email,
                'timestamp': timestamp,
                'hash': hash,
                'action': action,
+               'name': name,
+               'public_ips': public_ips,
+               'dns_name': dns_name,
                }
 
     if action == 'enable':
