@@ -680,9 +680,10 @@ div.ember-view div.ui-panel-content-wrap {
     margin: 5px auto !important;
 }
 
-div.pending-monitoring {
-    position: relative;
-    margin-top: 20px;
+div.loading-monitoring {
+    position: absolute !important;
+    margin: 0px;
+    top: 0px !important;
 }
 
 .monitoring-info {
@@ -1263,14 +1264,9 @@ div.logout-placeholder {
     display: none !important;
 }
 
-.pending-stats .enabled .ajax-loader  {
+.pending-stats .enabled .loading-monitoring  {
     display: block !important;
-    position: absolute !important;
-    top: 70px;
-    width: 100%;
-    z-index: 10000 !important;
 }
-
 
 #key-machines-list {
     max-height: 250px;
