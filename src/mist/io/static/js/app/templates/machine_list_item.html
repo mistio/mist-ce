@@ -8,7 +8,7 @@
     {{#linkTo machine view.machine}}
         <h3 class="name">{{view.machine.name}}</h3>
 
-        <span class="monitoring-container" {{bindAttr id="view.machine.id"}}>
+        <span class="monitoring-container" {{bindAttr id="view.machine.id" class=":action-links view.disabledMonitoringClass"}}>
             {{#if view.machine.hasMonitoring}}
                 <span class="ui-li-count node-icon monitoring-icon ui-btn-corner-all">&nbsp;</span>
             {{/if}}
