@@ -187,11 +187,8 @@ li.node .monitoring-container {
     display: block;
     float: right;
     height: 20px;
-    left: 340px;
-    margin-top: -10px;
+    margin-top: 5px;
     overflow: hidden;
-    position: absolute;
-    top: 50%;
 }
 
 li.node fieldset.list-item {
@@ -406,8 +403,12 @@ a#mist-select-machines-button span.ui-btn-text {
     position: absolute;
     top: 50%;
     margin-top: -7px;
-    max-width: 250px;
+    max-width: 160px;
     overflow: hidden;
+}
+
+#keys .ui-li-heading {
+    max-width: 250px;    
 }
 
 #images #mist-create-machine {
