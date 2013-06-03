@@ -277,7 +277,7 @@ li.node .tag {
     display: inline-block;
     width: 100px !important;
     padding: 0 !important;
-    background-color: transparent;
+    background: transparent;
 }
 
 /* Keys Listing */
