@@ -1,3 +1,10 @@
+0.9.3
+-----
+
+- add bigger spinner while fetching stats
+- improve ram drawing
+- add small png depicting the avg load in list view for monitored machines
+
 0.9.2
 -----
 
