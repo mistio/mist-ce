@@ -17,24 +17,22 @@ define('app/views/machine_list_item', [
                 didInsertElement: function(){
                     $('#machines-list').listview('refresh');
                     $("#machines-list").trigger('create');
-                    var selector = '#' + this.machine.id + ' span.monitoring-icon';
 
-                    var d = new Date();
-                    var n = d.getTime()/1000 - 3600;
-                    var mac_id = this.machine.id
-                    var bac_id = this.machine.backend.id
-                    var uri = URL_PREFIX + '/backends/' + bac_id + '/machines/' + mac_id + '/loadavg.png?time=' + n;
+                    var machine = this.machine;                
+                    var uri = URL_PREFIX + '/backends/' + machine.backend.id + '/machines/' + machine.id + '/loadavg.png';
                     setInterval(function(){
-                        var bgimage = new Image();
-                        bgimage.src = uri;
-                        bgimage.onload = function () {
-                           $(selector).css('background-image', 'url(' + bgimage.src + ')');
-                        };
-                        warn(uri);
-                        d = new Date();
-                        n = d.getTime()/1000 - 3600;
-                        uri = URL_PREFIX + '/backends/' + bac_id + '/machines/' + mac_id + '/loadavg.png?time=' + n;
-                    },3*60*1000);
+                        warn('1');
+                        if (machine.hasMonitoring){
+                            var bgimage = new Image();
+                            var timestamp = new Date().getTime();
+                            bgimage.src = uri + '?' + timestamp;
+                            // update load graph after the image is loaded
+                            bgimage.onload = function () {
+                               $('#' + machine.id + ' span.monitoring-icon').css('background-image', 'url(' + bgimage.src + ')');
+                            };
+                            timestamp = new Date().getTime();
+                        }
+                    }, 3*60*1000);
 
                 },
 
