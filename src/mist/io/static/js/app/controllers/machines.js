@@ -57,6 +57,19 @@ define('app/controllers/machines', [
                                 machine.tags.set('content', item.tags)
                                 machine.set('public_ips', item.public_ips);
                                 machine.set('extra', item.extra);
+                                if (typeof Mist.monitored_machines === 'undefined') { 
+                                    //check monitoring failed, re-run. This shall be moved though, since here it gets executed just 2 times
+                                    Mist.backendsController.checkMonitoring();
+                                }
+                                Mist.monitored_machines.forEach(function(machine_tuple){
+                                    backend_id = machine_tuple[0];
+                                    machine_id = machine_tuple[1];
+                                    if (that.backend.id == backend_id && machine.id == machine_id && machine.hasMonitoring == false) {
+                                        machine.set('hasMonitoring', true);
+                                        return false;
+                                    }        
+                                 });
+
                                 return false;
                             }
                         });
