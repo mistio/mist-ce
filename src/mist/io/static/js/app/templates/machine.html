@@ -94,6 +94,7 @@
                 {{view Mist.MachineMonitoringDialog machineBinding="this"}}
             </div>
             <div class="add-rule-container">
+                <div class="ajax-loader"></div>
                 <button id="add-rule-button"
                     data-icon="plus"
                     data-theme="b"
@@ -127,6 +128,7 @@
                         <a data-role="button" data-theme="c" data-rel="back">Back</a>
                         <a data-role="button" data-theme="b" {{action saveCommand target="Mist.rulesController"}}>Save</a>
                     </div>
+                    <div class="ajax-loader"></div>
                 </div>
             </div>            
 

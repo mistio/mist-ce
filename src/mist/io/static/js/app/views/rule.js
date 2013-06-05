@@ -34,6 +34,7 @@ define('app/views/rule', [
                     'id' : rule.id,
                     'metric' : metric
                 }
+                $('#' + rule.id + ' .ajax-loader').fadeIn(200);
                 $.ajax({
                     url: 'rules',
                     type: 'POST',
@@ -41,11 +42,13 @@ define('app/views/rule', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully updated rule ', rule.id);
+                        $('#' + rule.id + ' .ajax-loader').hide();
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while updating rule');
                         error(textstate, errorThrown, 'while updating rule');
                         rule.set('metric', oldmetric);
+                        $('#' + rule.id + ' .ajax-loader').hide();
                     }
                 });
                 return false;
@@ -76,6 +79,7 @@ define('app/views/rule', [
                     'id' : rule.id,
                     'operator' : operator.title
                 }
+                $('#' + rule.id + ' .ajax-loader').fadeIn(200);
                 $.ajax({
                     url: 'rules',
                     type: 'POST',
@@ -83,11 +87,13 @@ define('app/views/rule', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully updated rule ', rule.id);
+                        $('#' + rule.id + ' .ajax-loader').hide();
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while updating rule');
                         error(textstate, errorThrown, 'while updating rule');
                         rule.set('operator', oldoperator);
+                        $('#' + rule.id + ' .ajax-loader').hide();
                     }
                 });
                 return false;
@@ -102,7 +108,7 @@ define('app/views/rule', [
                 var rule = event.data;
                 var action = this.title;
                 var oldAction = rule.get('actionToTake');
-
+ 
                 $('.rule-action-popup').popup('close');
                 $('.rule-action-popup li a').off('click', this.selectAction);
 
@@ -129,6 +135,7 @@ define('app/views/rule', [
                     'id' : rule.id,
                     'action' : action
                 }
+                $('#' + rule.id + ' .ajax-loader').fadeIn(200);
                 $.ajax({
                     url: 'rules',
                     type: 'POST',
@@ -136,11 +143,13 @@ define('app/views/rule', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully updated rule ', rule.id);
+                        $('#' + rule.id + ' .ajax-loader').hide();
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while updating rule');
                         error(textstate, errorThrown, 'while updating rule');
                         rule.set('actionToTake', oldAction);
+                        $('#' + rule.id + ' .ajax-loader').hide();
                     }
                 });
                 return false;
@@ -148,7 +157,7 @@ define('app/views/rule', [
 
             deleteRuleClicked: function(){
                 var that = this;
-
+                $('#' + that.rule.id + ' .ajax-loader').fadeIn(200);
                 $.ajax({
                     url: 'rules/' + that.rule.id,
                     type: 'DELETE',
@@ -157,11 +166,12 @@ define('app/views/rule', [
                         info('Successfully deleted rule ', that.rule.id);
                         Mist.rulesController.removeObject(that.rule);
                         Mist.rulesController.redrawRules();
-
+                        $('#' + that.rule.id + ' .ajax-loader').hide();
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while deleting rule');
                         error(textstate, errorThrown, 'while deleting rule');
+                        $('#' + that.rule.id + ' .ajax-loader').hide();
                     }
                 });
 

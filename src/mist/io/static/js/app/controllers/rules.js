@@ -71,7 +71,7 @@ define('app/controllers/rules', [
                     'value': value,
                     'action': actionToTake
                 }
-
+                $('.add-rule-container .ajax-loader').fadeIn(200);
                 $.ajax({
                     url: 'rules',
                     type: 'POST',
@@ -82,10 +82,12 @@ define('app/controllers/rules', [
                         rule.set('id', data['id']);
                         that.pushObject(rule);
                         that.redrawRules();
+                        $('.add-rule-container .ajax-loader').hide();
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while creating rule');
                         error(textstate, errorThrown, 'while creating rule');
+                        $('.add-rule-container .ajax-loader').hide();
                     }
                 });
 
@@ -198,6 +200,7 @@ define('app/controllers/rules', [
                                 'id' : rule.id,
                                 'value' : rule_value
                             }
+                            $('#' + rule.id + ' .ajax-loader').fadeIn(200);
                             $.ajax({
                                 url: 'rules',
                                 type: 'POST',
@@ -206,10 +209,12 @@ define('app/controllers/rules', [
                                 success: function(data) {
                                     info('Successfully updated rule ', rule.id);
                                     rule.set('value', rule_value);
+                                    $('#' + rule.id + ' .ajax-loader').hide();
                                 },
                                 error: function(jqXHR, textstate, errorThrown) {
                                     Mist.notificationController.notify('Error while updating rule');
                                     error(textstate, errorThrown, 'while updating rule');
+                                    $('#' + rule.id + ' .ajax-loader').hide();
                                 }
                             });
                         }
