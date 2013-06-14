@@ -1247,6 +1247,11 @@ div.logout-placeholder {
     height: 16px;
 }
 
+.add-rule-container .ajax-loader {
+    float: right;
+    width: 46px;
+}
+
 #monitoring-wrapper .ajax-loader {
     background-image: url(images/ajax-loader.gif);
     background-position: center !important;
