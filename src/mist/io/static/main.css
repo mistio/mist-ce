@@ -770,6 +770,10 @@ div.loading-monitoring {
     border-top: 1px solid #ccc;
 }
 
+.rule-box {
+    max-height: 60px;
+}
+
 .rule-if, .rule-then, .key-name {
     font-size: 20px;
     font-weight: bold;
