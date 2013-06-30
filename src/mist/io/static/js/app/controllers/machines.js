@@ -41,6 +41,21 @@ define('app/controllers/machines', [
                         log("item id: " + item.id);
 
                         that.content.forEach(function(machine){
+                            if (typeof Mist.monitored_machines === 'undefined') {
+                                //check monitoring failed, re-run. This shall be moved though, since here it gets executed just 2 times
+                                Mist.backendsController.checkMonitoring();
+                            }
+                            else {
+                                Mist.monitored_machines.forEach(function(machine_tuple){
+                                    backend_id = machine_tuple[0];
+                                    machine_id = machine_tuple[1];
+                                    if (that.backend.id == backend_id && machine.id == machine_id && machine.hasMonitoring == false) {
+                                        machine.set('hasMonitoring', true);
+                                        return false;
+                                    }
+                                 });
+                             }
+
                             if (machine.id == item.id || (machine.id == -1 && machine.name == item.name)) {
                                 found = true;
                                 // machine.set(item); //FIXME this does not change anything;
@@ -57,19 +72,6 @@ define('app/controllers/machines', [
                                 machine.tags.set('content', item.tags)
                                 machine.set('public_ips', item.public_ips);
                                 machine.set('extra', item.extra);
-                                if (typeof Mist.monitored_machines === 'undefined') { 
-                                    //check monitoring failed, re-run. This shall be moved though, since here it gets executed just 2 times
-                                    Mist.backendsController.checkMonitoring();
-                                }
-                                Mist.monitored_machines.forEach(function(machine_tuple){
-                                    backend_id = machine_tuple[0];
-                                    machine_id = machine_tuple[1];
-                                    if (that.backend.id == backend_id && machine.id == machine_id && machine.hasMonitoring == false) {
-                                        machine.set('hasMonitoring', true);
-                                        return false;
-                                    }        
-                                 });
-
                                 return false;
                             }
                         });
