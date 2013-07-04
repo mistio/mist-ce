@@ -1191,7 +1191,7 @@ div.loading-monitoring {
 }
 
 .command.pending{
-    background: url("/static/images/spinner.gif") no-repeat scroll 92% center #EFEFF1 !important;
+    background: url("/resources/images/spinner.gif") no-repeat scroll 92% center #EFEFF1 !important;
 }
 
 iframe#hidden-shell-iframe {
