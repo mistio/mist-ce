@@ -34,14 +34,20 @@ def load_settings(settings):
     there is no such file, it creates one for later use and sets some sensible
     defaults without writing them in file.
 
+    settings.yaml is saved either in Opensift's data dir, in order to have
+    write access, or to the current path.
+
     """
+    base_path = os.environ.get('OPENSHIFT_DATA_DIR', '')
+    yaml_path = base_path + 'settings.yaml'
+
     try:
-        config_file = open('settings.yaml', 'r')
+        config_file = open(yaml_path, 'r')
     except IOError:
         log.warn('settings.yaml does not exist.')
-        config_file = open('settings.yaml', 'w')
+        config_file = open(yaml_path, 'w')
         config_file.close()
-        config_file = open('settings.yaml', 'r')
+        config_file = open(yaml_path, 'r')
 
     try:
         user_config = yaml.load(config_file) or {}
@@ -87,7 +93,9 @@ def save_settings(request):
     yaml.add_representer(unicode, unicode_representer)
     yaml.add_representer(literal_unicode, literal_unicode_representer)
 
-    config_file = open('settings.yaml', 'w')
+    base_path = os.environ.get('OPENSHIFT_DATA_DIR', '')
+    yaml_path = base_path + 'settings.yaml'
+    config_file = open(yaml_path, 'w')
 
     settings = request.registry.settings
 
