@@ -111,6 +111,8 @@ def add_backend(request, renderer='json'):
     provider = params.get('provider', '0')['provider']
     apikey = params.get('apikey', '')
     apisecret = params.get('apisecret', '')
+    apiurl = params.get('apiurl', '')
+    tenant_name = params.get('tenant_name', '')
     if apisecret == 'getsecretfromdb':
         for backend_id in backends:
             backend = backends[backend_id]
@@ -130,6 +132,8 @@ def add_backend(request, renderer='json'):
                'provider': provider,
                'apikey': apikey,
                'apisecret': apisecret,
+               'apiurl': apiurl,
+               'tenant_name': tenant_name,
                'region': region,
                'poll_interval': request.registry.settings['default_poll_interval'],
                'enabled': 1,
@@ -140,6 +144,8 @@ def add_backend(request, renderer='json'):
 
     ret = {'id'           : backend_id,
            'apikey'       : backend['apikey'],
+           'apiurl'       : backend['apiurl'],
+           'tenant_name'  : backend['tenant_name'],
            'title'        : backend['title'],
            'provider'     : backend['provider'],
            'poll_interval': backend['poll_interval'],
@@ -283,7 +289,7 @@ def create_machine(request):
 
     try:
         machine_name = request.json_body['name']
-        location_id = request.json_body['location']
+        location_id = request.json_body.get('location', None)
         image_id = request.json_body['image']
         size_id = request.json_body['size']
         #deploy_script received as unicode, but ScriptDeployment wants str
@@ -308,7 +314,7 @@ def create_machine(request):
         location = NodeLocation(location_id, name='', country='', driver=conn)
 
 
-    if conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE] and\
+    if conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE, Provider.OPENSTACK] and\
     public_key:
         key = SSHKeyDeployment(str(public_key))
         deploy_script = ScriptDeployment(script)

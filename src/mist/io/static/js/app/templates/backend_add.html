@@ -38,6 +38,20 @@
             name="create-backend-secret"
             id="create-backend-secret"}}
 
+        <div id="addBackendOpenstack" style="display:none;">
+            <label for="apiurl" id="textURL">4. Auth URL:</label>
+            {{view Mist.TextField
+                valueBinding="Mist.backendAddController.newBackendURL"
+                name="create-backend-url"
+                id="create-backend-url"}}
+
+            <label for="apitenant" id="textTenant">5. Tenant Name:</label>
+            {{view Mist.TextField
+                valueBinding="Mist.backendAddController.newBackendTenant"
+                name="create-backend-tenant"
+                id="create-backend-tenant"}}
+        </div>
+
         <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
             <button id="create-backend-cancel" data-theme="c" {{action "backClicked" target="view"}}>Back</button>
             <button id="create-backend-ok" data-theme="b" disabled {{action "addButtonClick" target="view"}}>Add</button>

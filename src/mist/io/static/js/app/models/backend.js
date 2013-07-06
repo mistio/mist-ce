@@ -18,7 +18,6 @@ define('app/models/backend', [
             apikey: null,
             title: null,
             provider: null,
-            apikey: null,
             poll_interval: null,
             host: null,
             state: 'unknown',
