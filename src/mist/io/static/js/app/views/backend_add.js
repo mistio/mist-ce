@@ -19,12 +19,19 @@ define('app/views/backend_add', [
             },
             
             selectBackend: function(event){
+                console.log(event.target.title);
                 if (event.target.title.indexOf("rackspace") !== -1 || event.target.title.indexOf("linode") !== -1)  {
                     $('#textApiKey').text('2. Username:');
                     $('#textApiSecret').text('3. API Key:');
+                    $('#addBackendURL').hide();
+                } else if (event.target.title.indexOf("openstack") !== -1) {
+                    $('#textApiKey').text('2. Username:');
+                    $('#textApiSecret').text('3. API Key:');
+                    $('#addBackendURL').show();
                 } else {
                     $('#textApiKey').text('2. API Key:');
                     $('#textApiSecret').text('3. API Secret:');
+                    $('#addBackendURL').hide();
                 }
                 $('.select-backend-collapsible').collapsible('option','collapsedIcon','check');
                 $('.select-backend-collapsible span.ui-btn-text').text(event.target.text);
@@ -73,7 +80,8 @@ define('app/views/backend_add', [
                     "title": '', // TODO
                     "provider": Mist.backendAddController.newBackendProvider,
                     "apikey" : $('#create-backend-key').val(),
-                    "apisecret": $('#create-backend-secret').val()
+                    "apisecret": $('#create-backend-secret').val(),
+                    "apiurl": $('#create-backend-url').val()
                 };
 
                 $.ajax({

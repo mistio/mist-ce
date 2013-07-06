@@ -223,9 +223,9 @@ SUPPORTED_PROVIDERS = [
                         'provider' : Provider.LINODE},
 
                        # OpenStack TODO: re-enable & test
-                       #{'title': 'OpenStack',
-                       # 'provider': Provider.OPENSTACK,
-                       # },
+                       {'title': 'OpenStack',
+                        'provider': Provider.OPENSTACK,
+                       },
 
                        # RackSpace
                        {'title': 'Rackspace DFW',

@@ -38,6 +38,14 @@
             name="create-backend-secret"
             id="create-backend-secret"}}
 
+        <div id="addBackendURL" style="display:none;">
+            <label for="apiurl" id="textUsername">4. URL:</label>
+            {{view Mist.TextField
+                valueBinding="Mist.backendAddController.newBackendURL"
+                name="create-backend-url"
+                id="create-backend-url"}}
+        </div>
+
         <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
             <button id="create-backend-cancel" data-theme="c" {{action "backClicked" target="view"}}>Back</button>
             <button id="create-backend-ok" data-theme="b" disabled {{action "addButtonClick" target="view"}}>Add</button>
