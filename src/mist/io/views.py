@@ -289,7 +289,7 @@ def create_machine(request):
 
     try:
         machine_name = request.json_body['name']
-        location_id = request.json_body['location']
+        location_id = request.json_body.get('location', None)
         image_id = request.json_body['image']
         size_id = request.json_body['size']
         #deploy_script received as unicode, but ScriptDeployment wants str
@@ -314,7 +314,7 @@ def create_machine(request):
         location = NodeLocation(location_id, name='', country='', driver=conn)
 
 
-    if conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE] and\
+    if conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE, Provider.OPENSTACK] and\
     public_key:
         key = SSHKeyDeployment(str(public_key))
         deploy_script = ScriptDeployment(script)

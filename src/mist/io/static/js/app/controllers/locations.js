@@ -25,6 +25,9 @@ define('app/controllers/locations', [
                 $.getJSON('/backends/' + this.backend.id + '/locations', function(data) {
                     var content = new Array();
                     data.forEach(function(item) {
+                        if (item.name == '') {
+                            item.name = 'Default';
+                        }
                         content.push(Location.create(item));
                     });
                     that.set('content', content);
