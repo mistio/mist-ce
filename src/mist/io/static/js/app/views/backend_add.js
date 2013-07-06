@@ -25,7 +25,7 @@ define('app/views/backend_add', [
                     $('#addBackendOpenstack').hide();
                 } else if (event.target.title.indexOf("openstack") !== -1) {
                     $('#textApiKey').text('2. Username:');
-                    $('#textApiSecret').text('3. API Key:');
+                    $('#textApiSecret').text('3. Password:');
                     $('#addBackendOpenstack').show();
                 } else {
                     $('#textApiKey').text('2. API Key:');
@@ -81,7 +81,7 @@ define('app/views/backend_add', [
                     "apikey" : $('#create-backend-key').val(),
                     "apisecret": $('#create-backend-secret').val(),
                     "apiurl": $('#create-backend-url').val(),
-                    "apitenant": $('#create-backend-tenant').val()
+                    "tenant_name": $('#create-backend-tenant').val()
                 };
 
                 $.ajax({

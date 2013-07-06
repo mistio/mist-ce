@@ -112,6 +112,7 @@ def add_backend(request, renderer='json'):
     apikey = params.get('apikey', '')
     apisecret = params.get('apisecret', '')
     apiurl = params.get('apiurl', '')
+    tenant_name = params.get('tenant_name', '')
     if apisecret == 'getsecretfromdb':
         for backend_id in backends:
             backend = backends[backend_id]
@@ -132,6 +133,7 @@ def add_backend(request, renderer='json'):
                'apikey': apikey,
                'apisecret': apisecret,
                'apiurl': apiurl,
+               'tenant_name': tenant_name,
                'region': region,
                'poll_interval': request.registry.settings['default_poll_interval'],
                'enabled': 1,
@@ -143,6 +145,7 @@ def add_backend(request, renderer='json'):
     ret = {'id'           : backend_id,
            'apikey'       : backend['apikey'],
            'apiurl'       : backend['apiurl'],
+           'tenant_name'  : backend['tenant_name'],
            'title'        : backend['title'],
            'provider'     : backend['provider'],
            'poll_interval': backend['poll_interval'],
