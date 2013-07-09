@@ -465,14 +465,25 @@ def stop_machine(request):
 
 @view_config(route_name='machine', request_method='POST',
              request_param='action=reboot', renderer='json')
-def reboot_machine(request):
+def reboot_machine(request, backend_id=None, machine_id=None):
     """Reboots a machine on a certain backend."""
+
+    if not backend_id:
+        try:
+            backend_id = request.matchdict['backend']
+        except:
+            Response('Bad Request', 400)
     try:
-        conn = connect(request)
+        conn = connect(request, backend_id=backend_id)
     except:
         return Response('Backend not found', 404)
 
-    machine_id = request.matchdict['machine']
+    if not machine_id:
+        try:
+            machine_id = request.matchdict['machine']
+        except:
+            Response('Bad Request', 400)
+
     machine = Node(machine_id,
                    name=machine_id,
                    state=0,
@@ -487,7 +498,7 @@ def reboot_machine(request):
 
 @view_config(route_name='machine', request_method='POST',
              request_param='action=destroy', renderer='json')
-def destroy_machine(request):
+def destroy_machine(request, backend_id=None, machine_id=None):
     """Destroys a machine on a certain backend.
 
     After destroying a machine it also deletes all key associations. However,
@@ -495,12 +506,22 @@ def destroy_machine(request):
     machine will be destroyed.
 
     """
+    if not backend_id:
+        try:
+            backend_id = request.matchdict['backend']
+        except:
+            Response('Bad Request', 400)
     try:
-        conn = connect(request)
+        conn = connect(request, backend_id=backend_id)
     except:
         return Response('Backend not found', 404)
 
-    machine_id = request.matchdict['machine']
+    if not machine_id:
+        try:
+            machine_id = request.matchdict['machine']
+        except:
+            Response('Bad Request', 400)
+
     machine = Node(machine_id,
                    name=machine_id,
                    state=0,
@@ -510,7 +531,6 @@ def destroy_machine(request):
 
     machine.destroy()
 
-    backend_id = request.matchdict['backend']
     pair = [backend_id, machine_id]
 
     try:
