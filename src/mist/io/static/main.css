@@ -1251,6 +1251,11 @@ div.logout-placeholder {
     height: 16px;
 }
 
+.rule-box .ajax-loader {
+    float: left;
+    width: 100px;
+}
+
 .add-rule-container .ajax-loader {
     float: right;
     width: 46px;
