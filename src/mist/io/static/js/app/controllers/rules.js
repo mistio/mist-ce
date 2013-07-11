@@ -71,6 +71,9 @@ define('app/controllers/rules', [
                     'value': value,
                     'action': actionToTake
                 }
+                console.log('test');
+                $('#add-rule-button').button('disable');
+                $('#add-rule-button').button('refresh');
                 $('.add-rule-container .ajax-loader').fadeIn(200);
                 $.ajax({
                     url: 'rules',
@@ -83,11 +86,15 @@ define('app/controllers/rules', [
                         that.pushObject(rule);
                         that.redrawRules();
                         $('.add-rule-container .ajax-loader').hide();
+                        $('#add-rule-button').button('enable');
+                        $('#add-rule-button').button('refresh');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while creating rule');
                         error(textstate, errorThrown, 'while creating rule');
                         $('.add-rule-container .ajax-loader').hide();
+                        $('#add-rule-button').button('enable');
+                        $('#add-rule-button').button('refresh');
                     }
                 });
 
@@ -201,6 +208,7 @@ define('app/controllers/rules', [
                                 'value' : rule_value
                             }
                             $('#' + rule.id + ' .ajax-loader').fadeIn(200);
+                            $('#' + rule.id + ' .delete-rule-container').fadeOut(200);
                             $.ajax({
                                 url: 'rules',
                                 type: 'POST',
@@ -210,11 +218,13 @@ define('app/controllers/rules', [
                                     info('Successfully updated rule ', rule.id);
                                     rule.set('value', rule_value);
                                     $('#' + rule.id + ' .ajax-loader').hide();
+                                    $('#' + rule.id + ' .delete-rule-container').show();
                                 },
                                 error: function(jqXHR, textstate, errorThrown) {
                                     Mist.notificationController.notify('Error while updating rule');
                                     error(textstate, errorThrown, 'while updating rule');
                                     $('#' + rule.id + ' .ajax-loader').hide();
+                                    $('#' + rule.id + ' .delete-rule-container').show();
                                 }
                             });
                         }
