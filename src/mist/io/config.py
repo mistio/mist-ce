@@ -243,4 +243,7 @@ SUPPORTED_PROVIDERS = [
                        {'title': 'Rackspace UK (OLD)',
                         'provider' : "%s:%s" % (Provider.RACKSPACE_FIRST_GEN,'uk')
                         },
+                       {'title': 'Rackspace AU',
+                        'provider' : "%s:%s" % (Provider.RACKSPACE,'syd')
+                        },
                        ]

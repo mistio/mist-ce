@@ -589,6 +589,7 @@ div.ember-view div.ui-panel-content-wrap {
 #single-view-provider-icon.provider-rackspace_nova_dfw,
 #single-view-provider-icon.provider-rackspace_nova_lon,
 #single-view-provider-icon.provider-rackspace_nova_ord,
+#single-view-provider-icon.provider-rackspace_nova_au,
 #single-view-provider-icon.provider-rackspace_uk {
     background-image: url(images/p3_sm.png);
 }
