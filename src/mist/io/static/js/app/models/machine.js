@@ -357,6 +357,12 @@ define('app/models/machine', [
                             }
                             collectd_uninstall_target = that;
                             that.shell(cmd, function(){});
+                            //remove machine from monitored_machines array
+                            var new_monitored_machines = jQuery.grep(Mist.monitored_machines, function(value) {
+                                var machine_arr = [that.backend.id, that.id]
+                                return (!($(value).not(machine_arr).length == 0 && $(machine_arr).not(value).length == 0));
+                            });
+                            Mist.set('monitored_machines', new_monitored_machines);
                         }
                         Mist.set('authenticated', true);
                     },

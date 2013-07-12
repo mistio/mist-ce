@@ -62,6 +62,13 @@ define('app/controllers/rules', [
                     'actionToTake': actionToTake
                 });
                 var that = this;
+                rule.set('id', 'new');
+                that.pushObject(rule);
+                that.redrawRules();
+                setTimeout(function() {
+                        $('#new .delete-rule-container').hide()
+                        $('#new .ajax-loader').show()
+                    }, 100)
 
                 payload = {
                     'backendId': machine.backend.id,
@@ -71,7 +78,8 @@ define('app/controllers/rules', [
                     'value': value,
                     'action': actionToTake
                 }
-                $('.add-rule-container .ajax-loader').fadeIn(200);
+                $('#add-rule-button').button('disable');
+                $('#add-rule-button').button('refresh');
                 $.ajax({
                     url: 'rules',
                     type: 'POST',
@@ -80,14 +88,19 @@ define('app/controllers/rules', [
                     success: function(data) {
                         info('Successfully created rule ', data['id']);
                         rule.set('id', data['id']);
-                        that.pushObject(rule);
-                        that.redrawRules();
-                        $('.add-rule-container .ajax-loader').hide();
+                        $('#new').attr('id', data['id']);
+                        $('.rule-box').last().find('.delete-rule-container').show()
+                        $('.rule-box').last().find('.ajax-loader').hide()
+                        $('#add-rule-button').button('enable');
+                        $('#add-rule-button').button('refresh');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while creating rule');
                         error(textstate, errorThrown, 'while creating rule');
-                        $('.add-rule-container .ajax-loader').hide();
+                        that.removeObject(rule);
+                        that.redrawRules();
+                        $('#add-rule-button').button('enable');
+                        $('#add-rule-button').button('refresh');
                     }
                 });
 
@@ -135,7 +148,6 @@ define('app/controllers/rules', [
             },
             
             redrawRules: function(){
-
                 var that = this;
                 Ember.run.next(function() {
                     $('.rule-button.metric').each(function(i, el){
@@ -192,33 +204,38 @@ define('app/controllers/rules', [
                     function hideRuleSlider(event){
                         $(event.currentTarget).find('.ui-slider-track').css('width','');
                         $(event.currentTarget).find('.ui-slider-track').fadeOut(100);
-                        var rule_id = $(event.currentTarget).attr('id');
-                        var rule_value = $(event.currentTarget).find('.ui-slider-handle').attr('aria-valuenow');
-                        var rule = that.getRuleById(rule_id);
-                        if (rule.value != rule_value) {
-                            var payload = {
-                                'id' : rule.id,
-                                'value' : rule_value
-                            }
-                            $('#' + rule.id + ' .ajax-loader').fadeIn(200);
-                            $.ajax({
-                                url: 'rules',
-                                type: 'POST',
-                                contentType: 'application/json',
-                                data: JSON.stringify(payload),
-                                success: function(data) {
-                                    info('Successfully updated rule ', rule.id);
-                                    rule.set('value', rule_value);
-                                    $('#' + rule.id + ' .ajax-loader').hide();
-                                },
-                                error: function(jqXHR, textstate, errorThrown) {
-                                    Mist.notificationController.notify('Error while updating rule');
-                                    error(textstate, errorThrown, 'while updating rule');
-                                    $('#' + rule.id + ' .ajax-loader').hide();
-                                }
-                            });
-                        }
 
+                        if (($(event.currentTarget).attr('id') != 'new') && ($(event.currentTarget).attr('id'))) {
+                            var rule_id = $(event.currentTarget).attr('id');
+                            var rule_value = $(event.currentTarget).find('.ui-slider-handle').attr('aria-valuenow');
+                            var rule = that.getRuleById(rule_id);
+                            if (rule.value != rule_value) {
+                                var payload = {
+                                    'id' : rule.id,
+                                    'value' : rule_value
+                                }
+                                $('#' + rule.id + ' .delete-rule-container').hide();
+                                $('#' + rule.id + ' .ajax-loader').show();
+                                $.ajax({
+                                    url: 'rules',
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify(payload),
+                                    success: function(data) {
+                                        info('Successfully updated rule ', rule.id);
+                                        rule.set('value', rule_value);
+                                        $('#' + rule.id + ' .ajax-loader').hide();
+                                        $('#' + rule.id + ' .delete-rule-container').show();
+                                    },
+                                    error: function(jqXHR, textstate, errorThrown) {
+                                        Mist.notificationController.notify('Error while updating rule');
+                                        error(textstate, errorThrown, 'while updating rule');
+                                        $('#' + rule.id + ' .ajax-loader').hide();
+                                        $('#' + rule.id + ' .delete-rule-container').show();
+                                    }
+                                });
+                            }
+                        }
                     }
 
                     $('.ui-slider').off('mouseover');

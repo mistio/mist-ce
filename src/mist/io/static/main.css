@@ -589,6 +589,7 @@ div.ember-view div.ui-panel-content-wrap {
 #single-view-provider-icon.provider-rackspace_nova_dfw,
 #single-view-provider-icon.provider-rackspace_nova_lon,
 #single-view-provider-icon.provider-rackspace_nova_ord,
+#single-view-provider-icon.provider-rackspace_nova_au,
 #single-view-provider-icon.provider-rackspace_uk {
     background-image: url(images/p3_sm.png);
 }
@@ -1191,7 +1192,7 @@ div.loading-monitoring {
 }
 
 .command.pending{
-    background: url("/static/images/spinner.gif") no-repeat scroll 92% center #EFEFF1 !important;
+    background: url("/resources/images/spinner.gif") no-repeat scroll 92% center #EFEFF1 !important;
 }
 
 iframe#hidden-shell-iframe {
@@ -1243,12 +1244,18 @@ div.logout-placeholder {
     float: right;
 }
 
-#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, .dialog-add .ajax-loader, .rule-box .ajax-loader, .rule-command-popup .ajax-loader, .add-rule-container .ajax-loader  {
+#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, .dialog-add .ajax-loader, .rule-box .ajax-loader, .rule-command-popup .ajax-loader, .add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader  {
     background-image: url(images/spinner.gif);
     background-position: center !important;
     background-repeat: no-repeat;
     display: none;
     height: 16px;
+}
+
+#monitoring-wrapper .rule-box .ajax-loader  {
+    float: right;
+    margin-top: 22px;
+    margin-right: -22px;
 }
 
 .rule-box .ajax-loader {

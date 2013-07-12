@@ -123,17 +123,27 @@ define('app/controllers/backends', [
                         });
 
                         rules = data.rules;
-                        
+
                         for (ruleId in rules){
-                            var rule = {};
-                            rule['id'] = ruleId;
-                            rule['machine'] = that.getMachineById(rules[ruleId]['backend'], rules[ruleId]['machine']);
-                            rule['metric'] = rules[ruleId]['metric'];
-                            rule['operator'] = Mist.rulesController.getOperatorByTitle(rules[ruleId]['operator']);
-                            rule['value'] = rules[ruleId]['value'];
-                            rule['actionToTake'] = rules[ruleId]['action'];
-                            rule['command'] = rules[ruleId]['command'];
-                            Mist.rulesController.pushObject(Rule.create(rule));
+                            var isInController = false;
+                            for (r=0; r < Mist.rulesController.content.length; r++) {
+                                if (Mist.rulesController.content[r]['id'] == ruleId) {
+                                    isInController = true;
+                                    break;
+                                }
+                            }
+                            if (!(isInController)) {
+                                var rule = {};
+                                rule['id'] = ruleId;
+                                rule['machine'] = that.getMachineById(rules[ruleId]['backend'], rules[ruleId]['machine']);
+                                rule['metric'] = rules[ruleId]['metric'];
+                                rule['operator'] = Mist.rulesController.getOperatorByTitle(rules[ruleId]['operator']);
+                                rule['value'] = rules[ruleId]['value'];
+                                rule['actionToTake'] = rules[ruleId]['action'];
+                                rule['command'] = rules[ruleId]['command'];
+
+                                Mist.rulesController.pushObject(Rule.create(rule));
+                            }
                         }
                         Mist.rulesController.redrawRules();
                     },
