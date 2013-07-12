@@ -71,7 +71,6 @@ define('app/controllers/rules', [
                     'value': value,
                     'action': actionToTake
                 }
-                console.log('test');
                 $('#add-rule-button').button('disable');
                 $('#add-rule-button').button('refresh');
                 $('.add-rule-container .ajax-loader').fadeIn(200);
@@ -142,7 +141,6 @@ define('app/controllers/rules', [
             },
             
             redrawRules: function(){
-
                 var that = this;
                 Ember.run.next(function() {
                     $('.rule-button.metric').each(function(i, el){
@@ -207,8 +205,8 @@ define('app/controllers/rules', [
                                 'id' : rule.id,
                                 'value' : rule_value
                             }
-                            $('#' + rule.id + ' .ajax-loader').fadeIn(200);
-                            $('#' + rule.id + ' .delete-rule-container').fadeOut(200);
+                            $('#' + rule.id + ' .delete-rule-container').hide();
+                            $('#' + rule.id + ' .ajax-loader').show();
                             $.ajax({
                                 url: 'rules',
                                 type: 'POST',
