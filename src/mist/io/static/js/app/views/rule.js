@@ -166,7 +166,7 @@ define('app/views/rule', [
 
             deleteRuleClicked: function(){
                 var that = this;
-                $('#' + rule.id + ' .delete-rule-container').hide();
+                $('#' + that.rule.id + ' .delete-rule-container').hide();
                 $('#' + that.rule.id + ' .ajax-loader').fadeIn(200);
                 $.ajax({
                     url: 'rules/' + that.rule.id,
@@ -177,13 +177,13 @@ define('app/views/rule', [
                         Mist.rulesController.removeObject(that.rule);
                         Mist.rulesController.redrawRules();
                         $('#' + that.rule.id + ' .ajax-loader').hide();
-                        $('#' + rule.id + ' .delete-rule-container').show();
+                        $('#' + that.rule.id + ' .delete-rule-container').show();
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while deleting rule');
                         error(textstate, errorThrown, 'while deleting rule');
                         $('#' + that.rule.id + ' .ajax-loader').hide();
-                        $('#' + rule.id + ' .delete-rule-container').show();
+                        $('#' + that.rule.id + ' .delete-rule-container').show();
                     }
                 });
 
