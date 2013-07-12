@@ -1,6 +1,6 @@
 // Define libraries
 require.config({
-    baseUrl: 'static/js/',
+    baseUrl: 'resources/js/',
     waitSeconds: 200,
     paths: {
         mocha: 'lib/mocha-1.4.2',

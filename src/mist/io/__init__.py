@@ -33,7 +33,7 @@ def main(global_config, **settings):
 
     config = Configurator(root_factory=Root, settings=settings)
 
-    config.add_static_view('static', 'mist.io:static')
+    config.add_static_view('resources', 'mist.io:static')
 
     config.add_route('home', '/')
     config.add_route('backends', '/backends')
