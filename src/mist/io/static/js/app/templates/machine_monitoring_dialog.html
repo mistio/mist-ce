@@ -16,15 +16,11 @@
 
 <div data-role="popup" id="monitoring-dialog" class="mist-dialog" data-overlay-theme="a">
     <div data-role="header">
-        {{#if view.machine.hasMonitoring}}
-            <h1>Disable monitoring</h1>
-        {{else}}
-            <h1>Enable monitoring</h1>
-        {{/if}}
+        <h1>Disable monitoring</h1>
     </div>
     <div data-role="content" data-theme="b">
         {{#if Mist.authenticated}}
-            {{#if view.machine.hasMonitoring}}
+            <div id="monitoring-enabled">
                 <span>Are you sure you wish to disable monitoring for {{name}}?</span>
 
                 {{#unless hasKey}}
@@ -34,10 +30,11 @@
                 {{/unless}}
 
                 <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-                    <button data-theme="c" {{action "backClicked" target="view"}}>Back</button>
-                    <button data-theme="b" {{action "changeMonitoringClicked" target="view"}}>Disable</button>
+                    <button data-theme="c" id="button-back-enabled">Back</button>
+                    <button data-theme="b" id="button-disable-monitoring">Disable</button>
                 </div>
-            {{else}}
+            </div>
+            <div id="monitoring-disabled">
                 <div>Are you sure you wish to enable monitoring for {{name}}?</div>
 
                 {{#unless hasKey}}
@@ -46,10 +43,10 @@
                 {{/unless}}
 
                 <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-                    <button data-theme="c" {{action "backClicked" target="view"}}>Back</button>
-                    <button data-theme="b" {{action "changeMonitoringClicked" target="view"}}>Enable</button>
+                    <button data-theme="c" id="button-back-disabled">Back</button>
+                    <button data-theme="b" id="button-enable-monitoring">Enable</button>
                 </div>
-            {{/if}}
+            </div>
         {{else}}
             <div class="info">In order to proceed you need to login to the premium <a href="https://mist.io">mist.io</a> service.</div>
 

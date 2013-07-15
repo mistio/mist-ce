@@ -13,18 +13,32 @@ define('app/views/machine_monitoring_dialog', [
             template: Ember.Handlebars.compile(machine_monitoring_dialog_html),
 
             openMonitoringDialog: function() {
+                var machine = this.get('controller').get('model');
+                if (machine.hasMonitoring) {
+                    $('#monitoring-dialog div h1').text('Disable monitoring');
+                    $('#monitoring-enabled').show();
+                    $('#monitoring-disabled').hide();
+                    $('#button-back-enabled').on("click", function() {
+                        $("#monitoring-dialog").popup('close');
+                    });
+                    $('#button-disable-monitoring').on("click", function() {
+                        machine.changeMonitoring();
+                        $("#monitoring-dialog").popup('close');
+                    });
+                } else {
+                    $('#monitoring-dialog div h1').text('Enable monitoring');
+                    $('#monitoring-disabled').show();
+                    $('#monitoring-enabled').hide()
+                    $('#button-back-disabled').on("click", function() {
+                        $("#monitoring-dialog").popup('close');
+                    });
+                    $('#button-enable-monitoring').on("click", function() {
+                        machine.changeMonitoring();
+                        $("#monitoring-dialog").popup('close');
+                    });
+                }
                 $("#monitoring-dialog").popup('open');
                 this.emailReady();
-            },
-
-            changeMonitoringClicked: function() {
-                var machine = this.get('controller').get('model');
-                machine.changeMonitoring();
-                $("#monitoring-dialog").popup('close');
-            },
-
-            backClicked: function() {
-                $("#monitoring-dialog").popup('close');
             },
             
             emailReady: function(){
