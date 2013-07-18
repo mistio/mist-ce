@@ -100,7 +100,7 @@ def list_backends(request):
 
     return ret
 
-
+   
 @view_config(route_name='backends', request_method='POST', renderer='json')
 def add_backend(request, renderer='json'):
     try:
@@ -127,6 +127,9 @@ def add_backend(request, renderer='json'):
         return Response('Invalid backend data', 400)
 
     backend_id = generate_backend_id(provider, region, apikey)
+    
+    if backend_id in backends:
+        return Response('Backend exists', 409)
 
     backend = {'title': params.get('provider', '0')['title'],
                'provider': provider,
