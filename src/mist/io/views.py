@@ -844,7 +844,10 @@ def add_key(request):
     """Creates a new keypair."""
     params = request.json_body
     key_id = params.get('name', '')
-
+    
+    if key_id in request.registry.settings['keypairs']:
+        return Response('Key "%s" already exists' % key_id, 409)
+        
     key = {'public' : params.get('pub', ''),
            'private' : params.get('priv', '')}
 
