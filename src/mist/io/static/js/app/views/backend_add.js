@@ -97,6 +97,9 @@ define('app/views/backend_add', [
                         Mist.backendAddController.newBackendClear();
                         $("#add-backend").panel("close");
                         $('.select-listmenu li').off('click', this.selectBackend);
+                    },
+                    error: function(request){
+                        Mist.notificationController.notify(request.responseText);
                     }
                 });
             },
