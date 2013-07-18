@@ -70,8 +70,7 @@ define('app/controllers/keys', [
                         }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while sending create key'  +
-                                name);
+                        Mist.notificationController.notify(jqXHR.responseText);
                         error(textstate, errorThrown, 'while creating key', name);
                     }
                 });
