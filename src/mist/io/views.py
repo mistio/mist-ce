@@ -100,7 +100,7 @@ def list_backends(request):
 
     return ret
 
-
+   
 @view_config(route_name='backends', request_method='POST', renderer='json')
 def add_backend(request, renderer='json'):
     try:
@@ -127,6 +127,9 @@ def add_backend(request, renderer='json'):
         return Response('Invalid backend data', 400)
 
     backend_id = generate_backend_id(provider, region, apikey)
+    
+    if backend_id in backends:
+        return Response('Backend exists', 409)
 
     backend = {'title': params.get('provider', '0')['title'],
                'provider': provider,
@@ -861,7 +864,10 @@ def add_key(request):
     """Creates a new keypair."""
     params = request.json_body
     key_id = params.get('name', '')
-
+    
+    if key_id in request.registry.settings['keypairs']:
+        return Response('Key "%s" already exists' % key_id, 409)
+        
     key = {'public' : params.get('pub', ''),
            'private' : params.get('priv', '')}
 
