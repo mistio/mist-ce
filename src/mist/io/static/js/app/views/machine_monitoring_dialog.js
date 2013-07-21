@@ -23,6 +23,7 @@ define('app/views/machine_monitoring_dialog', [
                     });
                     $('#button-disable-monitoring').on("click", function() {
                         machine.changeMonitoring();
+                        $('#button-disable-monitoring').off("click");
                         $("#monitoring-dialog").popup('close');
                     });
                 } else {
@@ -34,6 +35,7 @@ define('app/views/machine_monitoring_dialog', [
                     });
                     $('#button-enable-monitoring').on("click", function() {
                         machine.changeMonitoring();
+                        $('#button-enable-monitoring').off("click");
                         $("#monitoring-dialog").popup('close');
                     });
                 }
