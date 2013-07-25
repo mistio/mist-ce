@@ -36,6 +36,8 @@ define('app/views/machine_add_dialog', [
                 Mist.machineAddController.set('newMachineImage', null);
                 $('.select-image-collapsible span.ui-btn-text').text('Select Image');   
                 Mist.machineAddController.set('newMachineSize', null);
+                Mist.machineAddController.set('newMachineCost', 0);
+                $('.cost').css('display', 'none');
                 $('.select-size-collapsible span.ui-btn-text').text('Select Size');                           
                 Mist.machineAddController.set('newMachineLocation', null);
                 $('.select-location-collapsible span.ui-btn-text').text('Select Location');      
@@ -50,6 +52,8 @@ define('app/views/machine_add_dialog', [
                 Mist.machineAddController.set('newMachineImage', image);
                 
                 Mist.machineAddController.set('newMachineSize', null);
+                Mist.machineAddController.set('newMachineCost', 0);
+                $('.cost').css('display', 'none');
                 $('.select-size-collapsible span.ui-btn-text').text('Select Size');  
                                     
                 $('.select-image-collapsible').trigger('collapse');
@@ -60,7 +64,8 @@ define('app/views/machine_add_dialog', [
                 $('.select-size-collapsible').collapsible('option','collapsedIcon','check');
                 $('.select-size-collapsible span.ui-btn-text').text(size.name);
                 Mist.machineAddController.set('newMachineSize', size);  
-                           
+                Mist.machineAddController.set('newMachineCost', size.price);
+                $('.cost').css('display', 'block');                          
                 Mist.machineAddController.set('newMachineLocation', null);
                 $('.select-location-collapsible span.ui-btn-text').text('Select Location');                     
                 $('.select-size-collapsible').trigger('collapse');

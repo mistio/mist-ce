@@ -562,6 +562,15 @@ div.ember-view div.ui-panel-content-wrap {
     display: block !important;
 }
 
+.cost {
+    display: none;
+    text-align: center;
+}
+
+.cost span {
+    color: #333;
+}
+
 /* indices do not help here, let's use types as defined in
  libcloud.compute.types.Provider (we will use numbers, match in the Python) */
 
