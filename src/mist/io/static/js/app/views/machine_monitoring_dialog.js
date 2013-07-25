@@ -40,7 +40,14 @@ define('app/views/machine_monitoring_dialog', [
                 $("#monitoring-dialog").popup('open');
                 this.emailReady();
             },
-            
+            changeMonitoringClicked: function() {
+                 var machine = this.get('controller').get('model');
+                 machine.changeMonitoring();
+                 $("#monitoring-dialog").popup('close');
+            }, 
+            backClicked: function() {
+                $("#monitoring-dialog").popup('close');
+            }, 
             emailReady: function(){
                 if (Mist.email && Mist.password){
                     $('#auth-ok').button('enable');
