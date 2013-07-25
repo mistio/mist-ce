@@ -141,6 +141,7 @@ define('app/views/machine_add_dialog', [
 
             backClicked: function() {
                 this.clear();
+                $('div.cost').hide();
                 $('.dialog-add').panel('close');
             },
 
