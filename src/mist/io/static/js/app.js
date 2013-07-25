@@ -169,6 +169,18 @@ define( 'app', [
                 path : '/keys/:key_id'
             });
         });
+
+        App.MachinesRoute = Ember.Route.extend({
+            //clear selected machines when exiting view
+            exit: function(){
+              Mist.backendsController.forEach(function(backend){
+                  backend.machines.forEach(function(machine){
+                      log('deselecting machine: ' + machine.name);
+                      machine.set('selected', false);
+                  });
+              });
+            }          
+        }); 
         
         App.MachineRoute = Ember.Route.extend({
           // Ember.js mindfuck warning
