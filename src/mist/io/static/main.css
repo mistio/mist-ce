@@ -1005,6 +1005,14 @@ div.loading-monitoring {
     display: none;
 }
 
+#edit-backend #backend-has-monitoring {
+    margin-bottom: 1em;
+}
+
+#edit-backend .btn-full {
+    margin-top: 1em !important;
+}
+
 .mist-dialog .ui-listview-filter{
     margin: 0;
 }
