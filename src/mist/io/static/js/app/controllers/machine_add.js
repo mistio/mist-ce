@@ -19,7 +19,8 @@ define('app/controllers/machine_add', [
                                             this.get('newMachineSize'),
                                             this.get('newMachineLocation'),
                                             this.get('newMachineKey'),
-                                            this.get('newMachineScript'));
+                                            this.get('newMachineScript'),
+                                            this.get('newMachineCost'));
             },
 
             newMachineClear: function() {
@@ -30,7 +31,7 @@ define('app/controllers/machine_add', [
                 this.set('newMachineLocation', null);
                 this.set('newMachineKey', null);
                 this.set('newMachineScript', null);
-                //this.set('newMachineCost', 0);
+                this.set('newMachineCost', 0);
             },
 
             updateNewMachineReady: function() {
@@ -64,7 +65,7 @@ define('app/controllers/machine_add', [
                 this.addObserver('newMachineSize', this, this.updateNewMachineReady);
                 this.addObserver('newMachineLocation', this, this.updateNewMachineReady);
                 this.addObserver('newMachineKey', this, this.updateNewMachineReady);
-                //this.addObserver('newMachineCost', this, this.updateNewMachineReady);
+                this.addObserver('newMachineCost', this, this.updateNewMachineReady);
             }
         });
     }
