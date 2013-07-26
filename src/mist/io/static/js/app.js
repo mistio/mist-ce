@@ -132,6 +132,18 @@ define( 'app', [
             $('#splash').fadeOut(1000);
             $('body').css('overflow', '');
         });
+
+        App.MachinesRoute = Ember.Route.extend({
+            //clear selected machines when exiting view
+            exit: function(){
+              Mist.backendsController.forEach(function(backend){
+                  backend.machines.forEach(function(machine){
+                      log('deselecting machine: ' + machine.name);
+                      machine.set('selected', false);
+                  });
+              });
+            }          
+        }); 
         
         Ember.LOG_BINDINGS = false;
 
