@@ -27,6 +27,8 @@ define('app/views/backend_add', [
                     $('#textApiKey').text('2. Username:');
                     $('#textApiSecret').text('3. Password:');
                     $('#addBackendOpenstack').show();
+                } else if (event.target.title.indexOf("libvirt") !== -1) {
+                    $('#addBackendOpenstack').show();
                 } else {
                     $('#textApiKey').text('2. API Key:');
                     $('#textApiSecret').text('3. API Secret:');

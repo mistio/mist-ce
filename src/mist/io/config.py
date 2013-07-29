@@ -80,6 +80,11 @@ SUPPORTED_PROVIDERS = [
                         'provider': Provider.OPENSTACK,
                        },
 
+                       # Libvirt
+                       {'title': 'Libvirt',
+                        'provider': Provider.LIBVIRT,
+                       },
+
                        # RackSpace
                        {'title': 'Rackspace DFW',
                         'provider': "%s:%s" % (Provider.RACKSPACE,'dfw')
