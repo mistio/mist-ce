@@ -148,6 +148,33 @@ define('app/controllers/keys', [
                 });
             },
 
+            associateUserKey: function(ssh_user, key_name, machine) {
+                payload = {
+                    'action': 'associate_ssh_user',
+                    'ssh_user': ssh_user,
+                    'key_id': key_name,
+                    'backend_id': machine.backend.id,
+                    'machine_id': machine.id
+                }
+
+                var key = this.getKeyByName(key_name);
+                $.ajax({
+                    url: '/keys/' + key_name,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function(data) {
+                        info('Successfully associated ssh user with key ', key_name);
+                        //machine.keys.addObject(key);
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while associating ssh user with key'  +
+                                key_name);
+                        error(textstate, errorThrown, 'while associating key', key_name);
+                    }
+                });
+            },
+
             getKeyByName: function(key_name) {
                 var ret;
                 this.forEach(function(key){

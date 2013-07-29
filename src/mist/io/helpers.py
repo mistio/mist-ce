@@ -139,13 +139,26 @@ def get_keypair(keypairs, backend_id=None, machine_id=None):
         machines = keypairs[key].get('machines', [])
         if machines:
             for machine in machines:
-                if machine == [backend_id, machine_id]:
+                if machine[:2] == [backend_id, machine_id]:
                     return keypairs[key]
     for key in keypairs:
         if keypairs[key].get('default', False):
             return keypairs[key]
 
     return {}
+
+
+def get_ssh_user_from_keypair(keypair, backend_id=None, machine_id=None):
+    """get ssh user for key pair given the key pair"""
+    machines = keypair.get('machines', [])
+    for machine in machines:
+        if machine[:2] == [backend_id, machine_id]:
+            try:
+                #this should be the user, since machine = [backend_id, machine_id, ssh_user]
+                return machine[2]
+            except:
+                return ''
+    return ''
 
 
 def connect(request, backend_id=False):
@@ -184,6 +197,8 @@ def connect(request, backend_id=False):
     elif backend['provider'] == Provider.RACKSPACE:
         conn = driver(backend['apikey'], backend['apisecret'],
                       datacenter=backend['region'])
+    elif backend['provider'] == Provider.LIBVIRT:
+        conn = driver(uri=backend.get('apiurl', None))
     else:
         # ec2
         conn = driver(backend['apikey'], backend['apisecret'])
@@ -493,9 +508,11 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
         return Response('Keypair not found', 404)
 
     machine_uid = [backend_id, machine_id]
-
-    if machine_uid in keypair.get('machines', []):
-        return Response('Keypair already associated to machine', 304)
+    machines = keypair.get('machines', [])
+    
+    for machine in machines:
+        if machine[:2] == machine_uid:
+            return Response('Keypair already associated to machine', 304)
 
     try:
         keypair['machines'].append(machine_uid)
@@ -537,14 +554,15 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
         return Response('Keypair not found', 404)
 
     machine_uid = [backend_id, machine_id]
+    machines = keypair.get('machines', [])
 
-    if machine_uid not in keypair.get('machines', []):
-        return Response('Keypair is not associated to this machine', 304)
-
-    for uid in keypair.get('machines', []):
-        if uid == machine_uid:
-            keypair['machines'].remove(uid)
+    for machine in machines:
+        if machine[:2] == machine_uid:
+            keypair['machines'].remove(machine)
             break
+        else:
+            return Response('Keypair is not associated to this machine', 304)
+
 
     save_settings(request)
 
@@ -552,6 +570,36 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
         return undeploy_key(request, backend_id, machine_id, keypair)
 
     return Response('Manually deploy the public key to your server', 206)
+
+
+def associate_user_key(request, key_id, ssh_user, backend_id, machine_id):
+    """Associates an ssh user for a machine for a key.
+
+    """
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+
+    try:
+        keypair = keypairs[key_id]
+    except KeyError:
+        return Response('Keypair not found', 404)
+
+    machine_uid = [backend_id, machine_id]
+    machine_user_uid = [backend_id, machine_id, ssh_user]
+    machines = keypair.get('machines', [])
+    if machines:
+        for machine in machines:
+            if machine_uid == machine[:2]:
+                machines.remove(machine)
+        machines.append(machine_user_uid)
+    else:
+        keypair['machines'] = [machine_user_uid]
+
+    save_settings(request)
+
+    return Response('User associated with key', 206)
 
 
 def get_private_key(request):

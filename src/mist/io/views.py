@@ -33,7 +33,7 @@ from mist.io.helpers import generate_keypair, set_default_key, undeploy_key, get
 try:
     from mist.core.helpers import associate_key, disassociate_key
 except ImportError:
-    from mist.io.helpers import associate_key, disassociate_key
+    from mist.io.helpers import associate_key, disassociate_key, get_ssh_user_from_keypair, associate_user_key
 
 log = logging.getLogger('mist.io')
 
@@ -543,8 +543,9 @@ def destroy_machine(request, backend_id=None, machine_id=None):
 
     for key in keypairs:
         machines = keypairs[key].get('machines', None)
-        if pair in machines:
-            disassociate_key(request, key, backend_id, machine_id, undeploy=False)
+        for machine in machines:
+            if pair==machine[:2]:
+                disassociate_key(request, key, backend_id, machine_id, undeploy=False)
 
     return Response('Success', 200)
 
@@ -715,9 +716,11 @@ def shell_command(request):
 
     if keypair:
         private_key = keypair['private']
-        public_key = keypair['public']
+        s_user = get_ssh_user_from_keypair(keypair, backend_id, machine_id)
+        if s_user: 
+            ssh_user = s_user
     else:
-        private_key = public_key = None
+        private_key = None
 
     ret = run_command(conn, machine_id, host, ssh_user, private_key, command)
     return ret
@@ -893,7 +896,7 @@ def update_key(request):
     """
     params = request.json_body
 
-    if params['action'] == 'associate' or params['action'] == 'disassociate':
+    if params['action'] in ['associate', 'disassociate']:
         key_id = params['key_id']
         backend_id = params['backend_id']
         machine_id = params['machine_id']
@@ -903,6 +906,12 @@ def update_key(request):
             ret = disassociate_key(request, key_id, backend_id, machine_id)
     elif params['action'] == 'get_private_key':
         ret = get_private_key(request)
+    elif params['action'] == 'associate_ssh_user':
+        key_id = params['key_id']
+        ssh_user = params['ssh_user']
+        backend_id = params['backend_id']
+        machine_id = params['machine_id']
+        ret = associate_user_key(request, key_id, ssh_user, backend_id, machine_id)
     else:
         ret = Response('Key action not supported', 405)
 
