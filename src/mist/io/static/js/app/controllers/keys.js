@@ -210,6 +210,8 @@ define('app/controllers/keys', [
                         Mist.notificationController.notify('Error while disassociating key'  +
                                 key.name);
                         error(textstate, errorThrown, 'while disassociating key', key.name);
+                        $('.' + this.key.name + ' .delete-key-container').show();
+                        $('.' + this.key.name + ' .ajax-loader').hide();
                     }
                 });
             },
