@@ -139,11 +139,15 @@ define('app/controllers/keys', [
                         Ember.run.next(function(){
                             $('.delete-key-button').button();
                         });
+                        $('#keys-wrapper .ajax-loader').hide()
+                        $('#associate-key-button').removeClass('ui-disabled');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while associating key'  +
                                 key_name);
                         error(textstate, errorThrown, 'while associating key', key_name);
+                        $('#keys-wrapper .ajax-loader').hide()
+                        $('#associate-key-button').removeClass('ui-disabled');
                     }
                 });
             },
