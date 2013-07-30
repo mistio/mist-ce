@@ -4,21 +4,27 @@
             valueBinding="Mist.keyAddController.newKeyName"
             name="create-key-name"
             id="create-key-name"}}
-
+        <div id="upload-inputs">
+            <input type="file" id="upload-public-key-input" name="file"/>
+            <input type="file" id="upload-private-key-input" name="file"/>
+        </div>
+        
         <button data-theme="b" data-icon="gear" {{action "generateClicked" target="view"}}>Generate</button>
         <div class="ajax-loader"></div>
+             
+        <a class="upload-key" id="upload-public-key" >Upload</a>
         <label for="textarea-public-key">Public Key:</label>
         {{view Ember.TextArea
             valueBinding="Mist.keyAddController.newKeyPublic"
             name="textarea-public-key"
             id="textarea-public-key"}}
-
+             
+        <a class="upload-key" id="upload-private-key" >Upload</a>
         <label for="textarea-private-key">Private Key:</label>
         {{view Ember.TextArea
             valueBinding="Mist.keyAddController.newKeyPrivate"
             name="textarea-private-key"
             id="textarea-private-key"}}
-
 
         <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
             <button id="create-key-cancel" data-theme="c" {{action "backClicked" target="view"}}>Back</button>
