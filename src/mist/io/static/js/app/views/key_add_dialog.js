@@ -8,6 +8,7 @@ define('app/views/key_add_dialog', [
      */
     function(key_add_dialog_html) {
         return Ember.View.extend({
+            
             attributeBindings: ['data-role',],
 
             backClicked: function() {
@@ -15,7 +16,7 @@ define('app/views/key_add_dialog', [
                 $("#dialog-add-key").popup("close");
             },
 
-            generateClicked: function(){
+            generateClicked: function() {
                 $('#dialog-add-key .ajax-loader').fadeIn(200);
                 var payload = {
                     'action': 'generate'
@@ -34,12 +35,41 @@ define('app/views/key_add_dialog', [
                     }
                 });
             },
+            
+            change: function(e) {
+                if ($(e.target).is('input')) {
+                    var f = e.target.files[0]
+                    var reader = new FileReader();
+                    reader.onloadend = function(evt) {
+                        if (evt.target.readyState == FileReader.DONE) {
+                            if(e.target.id == 'upload-public-key-input') {
+                                $('#dialog-add-key #textarea-public-key').val(evt.target.result).trigger('change');
+                            } 
+                            else if (e.target.id == 'upload-private-key-input') {
+                                $('#dialog-add-key #textarea-private-key').val(evt.target.result).trigger('change');   
+                            }
+                         }
+                    };
+                    reader.readAsText(f, 'UTF-8');
+                 }
+            },
+             
+            click: function(e) {
+                var target_id = e.target.id
+                if (target_id == 'upload-private-key' || target_id == 'upload-public-key') {
+                    if (window.File && window.FileReader && window.FileList) {
+                        $("#dialog-add-key #" + target_id + "-input").click();
+                    } else {
+                        alert('The File APIs are not fully supported in this browser.');
+                    }                    
+                }
+            },
 
-            newKeyClicked: function(){
+            newKeyClicked: function() {
                 Mist.keyAddController.newKey();
                 Mist.keyAddController.newKeyClear();
                 $("#dialog-add-key").popup("close");
-            },
+             },
 
             template: Ember.Handlebars.compile(key_add_dialog_html)
 
