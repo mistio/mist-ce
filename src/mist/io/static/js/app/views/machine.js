@@ -71,7 +71,7 @@ define('app/views/machine', [
             }.property('controller.model'),
             
             keySelect: function(key) {
-                $('#keys-wrapper .ajax-loader').show()
+                $('#associate-button').show();
                 $('#associate-key-button').addClass('ui-disabled');
                 var machine = this.get('controller').get('model');
                 Mist.keysController.associateKey(key.name, machine);

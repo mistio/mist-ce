@@ -556,12 +556,16 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
     machine_uid = [backend_id, machine_id]
     machines = keypair.get('machines', [])
 
+    key_found = False
     for machine in machines:
         if machine[:2] == machine_uid:
             keypair['machines'].remove(machine)
+            key_found = True
             break
-        else:
-            return Response('Keypair is not associated to this machine', 304)
+
+    #key not associated
+    if not key_found: 
+        return Response('Keypair is not associated to this machine', 304)
 
 
     save_settings(request)
