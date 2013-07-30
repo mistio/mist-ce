@@ -31,6 +31,9 @@ define('app/views/backend_edit', [
             },
 
             deleteConfirmButtonClick: function(){
+		$('#edit-backend .ajax-loader').show()
+		$('#button-confirm-disable').button('disable');
+		$('#button-confirm-disable').button('refresh');
                 var that = this;
                 var monitoredMachines = this.getMonitoredMachines();
                 if (monitoredMachines.length > 0) {
@@ -42,8 +45,10 @@ define('app/views/backend_edit', [
                     url: '/backends/' + this.backend.id,
                     type: 'DELETE',
                     success: function(result) {
-
+			$('#edit-backend .ajax-loader').hide()
                         $('#backend-delete-confirm').hide();
+			$('#button-confirm-disable').button('enable');
+			$('#button-confirm-disable').button('refresh');
                         var i = Mist.backendsController.content.indexOf(that.backend);
                         // refresh backend buttons
                         Mist.backendsController.arrayContentWillChange();
