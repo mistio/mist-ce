@@ -14,6 +14,8 @@ define('app/views/machine_key_list_item', [
             template: Ember.Handlebars.compile(machine_key_list_item_html),
 
             disassociateClick: function(event) {
+                $('.' + this.key.name + ' .delete-key-container').hide();
+                $('.' + this.key.name + ' .ajax-loader').show();
                 var machine = this.get('controller').get('model');
                 Mist.keysController.disassociateKey(this.key, machine);
             }
