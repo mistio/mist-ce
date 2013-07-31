@@ -152,7 +152,7 @@ define('app/controllers/keys', [
                 });
             },
 
-            associateUserKey: function(ssh_user, key_name, machine) {
+            associateUserKey: function(key, ssh_user, key_name, machine) {
                 payload = {
                     'action': 'associate_ssh_user',
                     'ssh_user': ssh_user,
@@ -160,7 +160,6 @@ define('app/controllers/keys', [
                     'backend_id': machine.backend.id,
                     'machine_id': machine.id
                 }
-
                 var key = this.getKeyByName(key_name);
                 $.ajax({
                     url: '/keys/' + key_name,
@@ -174,15 +173,15 @@ define('app/controllers/keys', [
                                 machineKey[2] = ssh_user;
                             }
                         });
-                        $('.' + key_name + ' .ajax-loader').hide();
-                        $('.' + key_name + ' .delete-key-container').show();
+                        $('.' + key.strippedname + ' .ajax-loader').hide();
+                        $('.' + key.strippedname + ' .delete-key-container').show();
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while associating ssh user with key'  +
                                 key_name);
                         error(textstate, errorThrown, 'while associating key', key_name);
-                        $('.' + key_name + ' .ajax-loader').hide();
-                        $('.' + key_name + ' .delete-key-container').show();
+                        $('.' + key.strippedname + ' .ajax-loader').hide();
+                        $('.' + key.strippedname + ' .delete-key-container').show();
                     }
                 });
             },
@@ -218,8 +217,8 @@ define('app/controllers/keys', [
                         Mist.notificationController.notify('Error while disassociating key'  +
                                 key.name);
                         error(textstate, errorThrown, 'while disassociating key', key.name);
-                        $('.' + this.key.name + ' .delete-key-container').show();
-                        $('.' + this.key.name + ' .ajax-loader').hide();
+                        $('.' + this.key.strippedname + ' .delete-key-container').show();
+                        $('.' + this.key.strippedname + ' .ajax-loader').hide();
                     }
                 });
             },
@@ -244,6 +243,7 @@ define('app/controllers/keys', [
                 var that = this;
                 Ember.run.next(function(){
                     Mist.keysController.forEach(function(item){
+                        item.strippedname = item.name.split(' ').join('-');
                         item.addObserver('selected', function() {
                             that.getSelectedKeyCount();
                         });

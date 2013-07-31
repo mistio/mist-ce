@@ -894,7 +894,6 @@ def update_key(request):
 
     """
     params = request.json_body
-
     if params['action'] in ['associate', 'disassociate']:
         key_id = params['key_id']
         backend_id = params['backend_id']
