@@ -14,8 +14,8 @@ define('app/views/machine_key_list_item', [
             template: Ember.Handlebars.compile(machine_key_list_item_html),
 
             disassociateClick: function(event) {
-                $('.' + this.key.name + ' .delete-key-container').hide();
-                $('.' + this.key.name + ' .ajax-loader').show();
+                $('.' + this.key.strippedname + ' .delete-key-container').hide();
+                $('.' + this.key.strippedname + ' .ajax-loader').show();
                 var machine = this.get('controller').get('model');
                 Mist.keysController.disassociateKey(this.key, machine);
             },
@@ -36,11 +36,11 @@ define('app/views/machine_key_list_item', [
             }.property('this.getKeyUser'),
 
             updateKeyUser: function(event) {
-                $('.' + this.key.name + ' .delete-key-container').hide();
-                $('.' + this.key.name + ' .ajax-loader').show();
+                $('.' + this.key.strippedname + ' .delete-key-container').hide();
+                $('.' + this.key.strippedname + ' .ajax-loader').show();
                 var machine = this.get('controller').get('model');
-                var keyUser = $('.' + this.key.name + ' input').val();
-                Mist.keysController.associateUserKey(keyUser, this.key.name, machine);
+                var keyUser = $('.' + this.key.strippedname + ' input').val();
+                Mist.keysController.associateUserKey(this.key, keyUser, this.key.name, machine);
             }
         });
     }
