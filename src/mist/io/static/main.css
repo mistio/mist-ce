@@ -583,6 +583,25 @@ div.ember-view div.ui-panel-content-wrap {
     color: #333;
 }
 
+.key-user .ui-input-text {
+    width: 200px;
+    height: 30px;
+    float: left;
+    padding-bottom: 5px;
+    margin-top: 10px;
+}
+
+#textKeyUser {
+    float: left;
+    margin-top: 15px;
+    margin-right: 7px
+}
+
+.key-user {
+    float: right;
+    margin-top: 7px;
+}
+
 /* indices do not help here, let's use types as defined in
  libcloud.compute.types.Provider (we will use numbers, match in the Python) */
 
@@ -1297,6 +1316,7 @@ div.logout-placeholder {
     position: relative;
     left: 150px;
     top: -43px;
+    margin-left: 30px;
 }
 
 #monitoring-wrapper .rule-box .ajax-loader  {
