@@ -169,12 +169,20 @@ define('app/controllers/keys', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully associated ssh user with key ', key_name);
-                        //machine.keys.addObject(key);
+                        key.machines.forEach(function(machineKey) {
+                            if (machineKey[1] == machine.id) {
+                                machineKey[2] = ssh_user;
+                            }
+                        });
+                        $('.' + key_name + ' .ajax-loader').hide();
+                        $('.' + key_name + ' .delete-key-container').show();
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while associating ssh user with key'  +
                                 key_name);
                         error(textstate, errorThrown, 'while associating key', key_name);
+                        $('.' + key_name + ' .ajax-loader').hide();
+                        $('.' + key_name + ' .delete-key-container').show();
                     }
                 });
             },
