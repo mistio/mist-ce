@@ -197,8 +197,6 @@ def connect(request, backend_id=False):
     elif backend['provider'] == Provider.RACKSPACE:
         conn = driver(backend['apikey'], backend['apisecret'],
                       datacenter=backend['region'])
-    elif backend['provider'] == Provider.LIBVIRT:
-        conn = driver(uri=backend.get('apiurl', None))
     else:
         # ec2
         conn = driver(backend['apikey'], backend['apisecret'])
