@@ -1,4 +1,5 @@
 define('app/views/key', [
+    'app/models/machine',
     'app/views/mistscreen',
     'text!app/templates/key.html',
     'ember'
@@ -9,7 +10,7 @@ define('app/views/key', [
      *
      * @returns Class
      */
-    function(MistScreen, key_html) {
+    function(Machine, MistScreen, key_html) {
         return MistScreen.extend({
 
             disabledAssociateClass: function() {
@@ -32,16 +33,36 @@ define('app/views/key', [
         	    var key = this.get('controller').get('model');
 
                 machineList = [];
-                if (key && key.machines && key.machines.forEach) {
-                    key.machines.forEach(function(item){
+                if (key && key.machines) {
+                    for (var m=0; m < key.machines.length; m++){
+                        var backend_id = key.machines[m][0], 
+                            machine_id = key.machines[m][1],
+                            found = false;
+                        
                         Mist.backendsController.content.forEach(function(backend){
                             backend.machines.content.forEach(function(machine){
-                                if (machine.id == item[1]) {
-                                    machineList.push(machine);
+                                if (machine.id == machine_id) {
+                                    found = machine;
                                 }
                             });
                         });
-                    });
+                        
+                        if (found){
+                            machineList.push(found);
+                        } else { // machine does not exist
+                            var backend = Mist.backendsController.getBackendById(backend_id);
+                            var state = 'unknown';
+                            if (backend && backend.machines.content.length) {
+                                state = 'terminated';
+                            }
+                            var item = {id: machine_id,
+                                        name: machine_id,
+                                        backend: backend,
+                                        state: state};
+                            var machine = Machine.create(item);
+                            machineList.push(machine);                           
+                        }
+                    }
                 }
                 return machineList;
             }.property('key.machines'),
