@@ -316,7 +316,6 @@ def create_machine(request):
     else:
         location = NodeLocation(location_id, name='', country='', driver=conn)
 
-
     if conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE, Provider.OPENSTACK] and\
     public_key:
         key = SSHKeyDeployment(str(public_key))
