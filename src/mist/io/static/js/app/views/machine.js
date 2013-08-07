@@ -310,9 +310,9 @@ define('app/views/machine', [
                                 'disk' in localData &&
                                 ioMethod in localData.disk &&
                                 disk in localData.disk[ioMethod] &&
-                                'disk_ops' in localData.disk[ioMethod][disk]) {
+                                'disk_octets' in localData.disk[ioMethod][disk]) {
 
-                                return callback(null, localData['disk'][ioMethod][disk]['disk_ops'].map(function(d) {
+                                return callback(null, localData['disk'][ioMethod][disk]['disk_octets'].map(function(d) {
                                     return d;
                                 }));
                             } else {
