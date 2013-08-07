@@ -288,7 +288,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('monitoring disabled'));
                             }
-                        }, 'CPU');
+                        }, 'CPU (%)');
                     }
 
                     function drawMemory() {
@@ -300,7 +300,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('unable to load data'));
                             }
-                        }, 'RAM');
+                        }, 'RAM (%)');
                     }
 
                     function drawDisk(disk, ioMethod) {
@@ -318,7 +318,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('unable to load data'));
                             }
-                        }, 'DISK (' + disk + ', ' + ioMethod + ') ');
+                        }, 'DISK ' + ioMethod + ' (B/s)');
                     }
 
                     function drawLoad() {
@@ -330,7 +330,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('unable to load data'));
                             }
-                        }, 'LOAD ');
+                        }, 'LOAD');
                     }
 
                     function drawNetwork(iface, stream) {
@@ -348,7 +348,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('unable to load data'));
                             }
-                        }, 'NET (' + iface + ', ' + stream  + ') ');
+                        }, 'NET ' + stream  + ' (B/s)');
                     }
 
                     function configureNetworkGraphs() {
