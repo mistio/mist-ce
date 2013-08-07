@@ -18,8 +18,8 @@ define('app/controllers/rules', [
                 'load',
                 'cpu',
                 'ram',
-                'disk',
-                'network'
+                'disk-write',
+                'network-tx'
             ],
 
             operatorList: [
