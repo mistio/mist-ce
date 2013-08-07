@@ -292,15 +292,13 @@ li.node .tag {
     max-height: 100px;
 }
 
-#dialog-add-key #upload-key-input {
-    display: none;
-}
-
 #dialog-add-key .upload-key {
     float: right; 
+    position: relative;
+    top: 3px;
 }
 
-#dialog-add-key #upload-inputs{
+#dialog-add-key #upload-input .ui-input-text{
     display: none;
 }
 
