@@ -57,30 +57,11 @@ define('app/views/key_add_dialog', [
                 var reader = new FileReader();
                 reader.onloadend = function(evt) {
                 	if (evt.target.readyState == FileReader.DONE) {
-                		filetext = evt.target.result;
                 		if (keytype == 'private'){
-                			
-                			beginkey = '-----BEGIN RSA PRIVATE KEY-----'
-                			endkey = '-----END RSA PRIVATE KEY-----'
-                			endkeyindex = filetext.length - endkey.length - 1;
-                			
-                    		if (filetext.indexOf(beginkey) != 0) {
-                    			Mist.notificationController.notify('Private key should begin with ' + beginkey);
-                				return;
-                			} else if (filetext.indexOf(endkey) != endkeyindex) {
-                				Mist.notificationController.notify('Private key should end with ' + endkey);
-                				return;
-                			}
-                			$('#dialog-add-key #textarea-private-key').val(filetext).trigger('change');		
+                			$('#dialog-add-key #textarea-private-key').val(evt.target.result).trigger('change');		
                 		}
                 		else if (keytype == 'public') {
-                			if ((filetext.indexOf('ssh-rsa') != 0) &&
-                				(filetext.indexOf('ssh-dsa') != 0)) {
-                			
-                			    Mist.notificationController.notify('Public key should begin with "ssh-rsa" or "ssh-dsa".');
-                				return;		
-                			}
-                			$('#dialog-add-key #textarea-public-key').val(filetext).trigger('change');	
+                			$('#dialog-add-key #textarea-public-key').val(evt.target.result).trigger('change');	
                 		}
                      }
                };
@@ -88,6 +69,32 @@ define('app/views/key_add_dialog', [
             },
             
             newKeyClicked: function() {
+            	
+            	publickey = $('#dialog-add-key #textarea-public-key').val().trim();
+            	privatekey = $('#dialog-add-key #textarea-private-key').val().trim();
+            	keytype = "";
+            	
+            	if (publickey.indexOf('ssh-rsa' ) == 0) {
+            		keytype = 'RSA';
+            	} else if (publickey.indexOf('ssh-dss') == 0) {
+            		keytype = 'DSA';
+            	} else {
+                	Mist.notificationController.notify('Public key should begin with "ssh-rsa" or "ssh-dss"');
+                	return;
+            	}
+            	
+            	beginning = '-----BEGIN ' + keytype + ' PRIVATE KEY-----';
+                ending = '-----END ' + keytype + ' PRIVATE KEY-----';
+                endingindex = privatekey.length - ending.length;
+                			
+                if (privatekey.indexOf(beginning) != 0) {
+                	Mist.notificationController.notify('Private key should begin with ' + beginning);
+                	return;
+                } else if (privatekey.indexOf(ending) != endingindex) {
+                	Mist.notificationController.notify('Private key should end with ' + ending);
+                	return;
+                }
+                		
                 Mist.keyAddController.newKey();
                 Mist.keyAddController.newKeyClear();
                 $("#dialog-add-key").popup("close");

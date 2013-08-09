@@ -3,6 +3,7 @@ import os
 import tempfile
 import logging
 import yaml
+import subprocess
 
 from hashlib import sha1
 from Crypto.PublicKey import RSA
@@ -728,3 +729,47 @@ def undeploy_key(request, backend_id, machine_id, keypair):
         return Response('Key disassociated but could not remove from machine', 204)
 
     return Response('OK', 200)
+
+def validate_key_pair(public_key, private_key):
+    """ Validates a pair of keys
+    
+    It first creates a temporary file and writes in the private_key. Then passes the temp file to
+    ssh-keygen to generate a public key and then compares public_key with the generated one.
+    
+    """
+    # TODO: Remove comments after code review
+    
+    # Make sure public_key has at least two parts
+    if (" " not in public_key) or (public_key.index(" ") >= len(public_key) - 1):
+        return False
+    
+    # Create temp file to store private key
+    (tmp_key, tmp_key_path) = tempfile.mkstemp()
+    key_fd = os.fdopen(tmp_key, 'w+b')
+    key_fd.write(private_key)
+    key_fd.close()
+    
+    # Generate public key
+    cmd = ['ssh-keygen','-y', '-f', tmp_key_path]
+    proc = subprocess.Popen(cmd, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    stdout = []
+    while True:
+        # get commands output, line by line
+        line_out = proc.stdout.readline()
+        if line_out == '' and proc.poll() != None:
+            break
+        stdout.append(line_out)
+    
+    # stdout will have 0 items if private_key is invalid 
+    if len(stdout) == 0:
+        return False
+    
+    # Get bare keys
+    generated_public_key = stdout[0].split(' ')[1][:-1] # Last char is a new line "\n"
+    user_public_key = public_key.split(' ')[1]
+    
+    # Compare keys
+    if generated_public_key != user_public_key:
+        return False
+    
+    return True

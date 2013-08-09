@@ -29,7 +29,7 @@ from mist.io.helpers import import_key, create_security_group
 from mist.io.helpers import get_keypair, get_keypair_by_name
 from mist.io.helpers import run_command
 from mist.io.helpers import save_settings
-from mist.io.helpers import generate_keypair, set_default_key, undeploy_key, get_private_key
+from mist.io.helpers import generate_keypair, set_default_key, undeploy_key, get_private_key, validate_key_pair
 try:
     from mist.core.helpers import associate_key, disassociate_key
 except ImportError:
@@ -876,9 +876,10 @@ def add_key(request):
     key = {'public' : params.get('pub', ''),
            'private' : params.get('priv', '')}
 
-    if not (key.get('public') and key.get('private')):
-        return Response('Need to specify public and private keys', 400)
-    
+
+    if not validate_key_pair(key.get('public'), key.get('private')):
+        return Response('Key pair is not valid', 409)
+        
     if not len(request.registry.settings['keypairs']):
         key['default'] = True
 
