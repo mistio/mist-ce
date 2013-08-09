@@ -292,6 +292,16 @@ li.node .tag {
     max-height: 100px;
 }
 
+#dialog-add-key .upload-key {
+    float: right; 
+    position: relative;
+    top: 3px;
+}
+
+#dialog-add-key #upload-input .ui-input-text{
+    display: none;
+}
+
 /* Machines Icons and their colors. */
 
 #machines-list .ui-li-desc {
