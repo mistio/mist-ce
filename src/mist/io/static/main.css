@@ -775,6 +775,15 @@ div.loading-monitoring {
     max-height: 60px;
 }
 
+.rule-unit {
+    padding: 6px;
+    float: left;
+    margin-top: 12px;
+    margin-left: -10px;
+    height:40px;
+
+}
+
 .rule-if, .rule-then, .key-name {
     font-size: 20px;
     font-weight: bold;

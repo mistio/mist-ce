@@ -93,6 +93,7 @@ define('app/controllers/rules', [
                         $('.rule-box').last().find('.ajax-loader').hide()
                         $('#add-rule-button').button('enable');
                         $('#add-rule-button').button('refresh');
+                        rule.set('maxValue', data['max_value']);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while creating rule');

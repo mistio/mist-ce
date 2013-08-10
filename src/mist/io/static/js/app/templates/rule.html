@@ -24,7 +24,8 @@
         class="rule-value"
         value="{{unbound value}}"
         min="0"
-        max="100" />
+        {{bindAttr max="maxValue"}} />
+    <div class="rule-unit">{{unit}}</div>
 
     <div class="rule-then">then</div>
 

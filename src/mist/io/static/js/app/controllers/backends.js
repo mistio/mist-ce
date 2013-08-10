@@ -141,6 +141,10 @@ define('app/controllers/backends', [
                                 rule['value'] = rules[ruleId]['value'];
                                 rule['actionToTake'] = rules[ruleId]['action'];
                                 rule['command'] = rules[ruleId]['command'];
+                                rule['maxValue'] = rules[ruleId]['max_value'];
+                                if (rule['maxValue'] > 100) {
+                                    rule['unit'] = 'K';
+                                }
 
                                 Mist.rulesController.pushObject(Rule.create(rule));
                             }

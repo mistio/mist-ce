@@ -29,11 +29,13 @@ define('app/views/rule', [
                     return false;
                 }
 
+                warn(rule.maxValue);
                 rule.set('metric', metric);
                 var payload = {
                     'id' : rule.id,
                     'metric' : metric
                 }
+
                 $('#' + rule.id + ' .delete-rule-container').hide();
                 $('#' + rule.id + ' .ajax-loader').fadeIn(200);
                 $.ajax({
@@ -45,6 +47,12 @@ define('app/views/rule', [
                         info('Successfully updated rule ', rule.id);
                         $('#' + rule.id + ' .ajax-loader').hide();
                         $('#' + rule.id + ' .delete-rule-container').show();
+                        rule.set('maxValue', data['max_value']);
+                        if (rule.maxValue > 100) {
+                            rule.set('unit','K');
+                        } else {
+                            rule.set('unit','');
+                        }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while updating rule');
