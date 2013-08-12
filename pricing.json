@@ -1,0 +1,302 @@
+{
+    "compute": {
+        "bluebox": {
+           "1gb": 0.15,
+           "2gb": 0.25,
+           "4gb": 0.35,
+           "8gb": 0.45
+        },
+
+        "rackspace": {
+            "1": 0.015,
+            "2": 0.030,
+            "3": 0.060,
+            "4": 0.120,
+            "5": 0.240,
+            "6": 0.480,
+            "7": 0.960,
+            "8": 1.800
+        },        
+        
+        "rackspacenovaord": {
+            "3": {"mswin": "0.080", "rhel": "0.140", "vyatta": "0.240", "linux": "0.060"},
+            "2": {"rhel": "0.102", "linux": "0.022"},
+            "5": {"mswinSQL": "1.040", "linux": "0.240", "vyatta": "0.420", "mswin": "0.320", "rhel": "0.320", "mswinSQLWeb": "0.380"},
+            "4": {"mswinSQL": "0.880", "linux": "0.120", "vyatta": "0.300", "mswin": "0.160", "rhel": "0.200", "mswinSQLWeb": "0.220"},
+            "7": {"mswinSQL": "1.900", "linux": "0.900", "vyatta": "1.080", "mswin": "1.080", "rhel": "1.050", "mswinSQLWeb": "1.140"},
+            "6": {"mswinSQL": "1.300", "vyatta": "0.660", "mswin": "0.580", "mswinSQLWeb": "0.640", "rhel": "0.560", "linux": "0.480"},
+            "8": {"mswinSQL": "2.640", "mswinSQLWeb": "1.650", "vyatta": "1.380", "mswin": "1.560", "rhel": "1.350", "linux": "1.200"}
+        },
+
+        "rackspacenovadfw": {
+            "3": {"mswin": "0.080", "rhel": "0.140", "vyatta": "0.240", "linux": "0.060"},
+            "2": {"rhel": "0.102", "linux": "0.022"},
+            "5": {"mswinSQL": "1.040", "linux": "0.240", "vyatta": "0.420", "mswin": "0.320", "rhel": "0.320", "mswinSQLWeb": "0.380"},
+            "4": {"mswinSQL": "0.880", "linux": "0.120", "vyatta": "0.300", "mswin": "0.160", "rhel": "0.200", "mswinSQLWeb": "0.220"},
+            "7": {"mswinSQL": "1.900", "linux": "0.900", "vyatta": "1.080", "mswin": "1.080", "rhel": "1.050", "mswinSQLWeb": "1.140"},
+            "6": {"mswinSQL": "1.300", "vyatta": "0.660", "mswin": "0.580", "mswinSQLWeb": "0.640", "rhel": "0.560", "linux": "0.480"},
+            "8": {"mswinSQL": "2.640", "mswinSQLWeb": "1.650", "vyatta": "1.380", "mswin": "1.560", "rhel": "1.350", "linux": "1.200"}
+        },
+
+        "rackspacenovalon": {
+            "3": {"mswin": "0.052", "rhel": "0.095", "vyatta": "0.184", "linux": "0.040"},
+            "2": {"rhel": "0.075", "linux": "0.020"},
+            "5": {"mswinSQL": "0.658", "linux": "0.160", "vyatta": "0.304", "mswin": "0.208", "rhel": "0.215", "mswinSQLWeb": "0.248"},
+            "4": {"mswinSQL": "0.554", "linux": "0.080", "vyatta": "0.224", "mswin": "0.104", "rhel": "0.135", "mswinSQLWeb": "0.144"},
+            "7": {"mswinSQL": "1.342", "linux": "0.600", "vyatta": "0.744", "mswin": "0.792", "rhel": "0.700", "mswinSQLWeb": "0.832"},
+            "6": {"mswinSQL": "0.866", "vyatta": "0.464", "mswin": "0.416", "mswinSQLWeb": "0.456", "rhel": "0.375", "linux": "0.320"},
+            "8": {"mswinSQL": "2.060", "mswinSQLWeb": "1.440", "vyatta": "1.144", "mswin": "1.380", "rhel": "1.100", "linux": "1.000"}
+        },
+
+        "rackspacenovaiad": {
+            "3": {"mswin": "0.080", "rhel": "0.140", "vyatta": "0.240", "linux": "0.060"},
+            "2": {"rhel": "0.102", "linux": "0.022"},
+            "5": {"mswinSQL": "1.040", "linux": "0.240", "vyatta": "0.420", "mswin": "0.320", "rhel": "0.320", "mswinSQLWeb": "0.380"},
+            "4": {"mswinSQL": "0.880", "linux": "0.120", "vyatta": "0.300", "mswin": "0.160", "rhel": "0.200", "mswinSQLWeb": "0.220"},
+            "7": {"mswinSQL": "1.900", "linux": "0.900", "vyatta": "1.080", "mswin": "1.080", "rhel": "1.050", "mswinSQLWeb": "1.140"},
+            "6": {"mswinSQL": "1.300", "vyatta": "0.660", "mswin": "0.580", "mswinSQLWeb": "0.640", "rhel": "0.560", "linux": "0.480"},
+            "8": {"mswinSQL": "2.640", "mswinSQLWeb": "1.650", "vyatta": "1.380", "mswin": "1.560", "rhel": "1.350", "linux": "1.200"}
+        },
+
+        "rackspacenovasyd": {
+            "3": {"mswin": "0.094", "rhel": "0.152", "vyatta": "0.292", "linux": "0.072"},
+            "2": {"rhel": "0.106", "linux": "0.026"},
+            "5": {"mswinSQL": "1.168", "linux": "0.288", "vyatta": "0.508", "mswin": "0.376", "rhel": "0.368", "mswinSQLWeb": "0.442"},
+            "4": {"mswinSQL": "0.980", "linux": "0.144", "vyatta": "0.364", "mswin": "0.188", "rhel": "0.224", "mswinSQLWeb": "0.254"},
+            "7": {"mswinSQL": "2.180", "linux": "1.080", "vyatta": "1.300", "mswin": "1.278", "rhel": "1.230", "mswinSQLWeb": "1.344"},
+            "6": {"mswinSQL": "1.478", "vyatta": "0.796", "mswin": "0.686", "mswinSQLWeb": "0.752", "rhel": "0.656", "linux": "0.576"},
+            "8": {"mswinSQL": "3.024", "mswinSQLWeb": "1.935", "vyatta": "1.660", "mswin": "1.836", "rhel": "1.590", "linux": "1.440"}
+        },
+        
+        "dreamhost": {
+            "minimum": 15,
+            "maximum": 200,
+            "default": 115,
+            "low": 50,
+            "high": 150
+        },
+
+        "ec2_eu_west": {
+            "m1.medium": {"mswinSQL": 0.744, "mswin": 0.182, "mswinSQLWeb": 0.27, "rhel": 0.18, "linux": 0.13, "sles": 0.21},
+            "m3.2xlarge": {"mswinSQL": 3.16, "mswin": 1.56, "mswinSQLWeb": 2.04, "rhel": 1.2, "linux": 1.1, "sles": 1.2},
+            "cc2.8xlarge": {"mswinSQLWeb": 3.175, "sles": 2.8, "mswinSQL": 4.85, "mswin": 2.97, "linux": 2.83},
+            "m1.large": {"mswinSQL": 0.974, "mswin": 0.364, "mswinSQLWeb": 0.5, "rhel": 0.32, "linux": 0.26, "sles": 0.36},
+            "m2.2xlarge": {"mswinSQL": 1.654, "mswin": 1.02, "mswinSQLWeb": 1.18, "rhel": 0.98, "linux": 0.92, "sles": 1.02},
+            "hs1.8xlarge": {"mswinSQL": 8.35, "mswin": 4.931, "mswinSQLWeb": 5.144, "rhel": 5.03, "linux": 4.9, "sles": 5.0},
+            "cr1.8xlarge": {"mswinSQL": 7.25, "mswin": 3.831, "mswinSQLWeb": 4.044, "rhel": 3.88, "linux": 3.75, "sles": 3.85},
+            "m1.small": {"mswinSQL": 0.629, "mswin": 0.091, "mswinSQLWeb": 0.155, "rhel": 0.125, "linux": 0.065, "sles": 0.095},
+            "c1.medium": {"sles": 0.265, "mswinSQLWeb": 0.325, "mswin": 0.225, "rhel": 0.225, "linux": 0.165},
+            "cg1.4xlarge": {"mswinSQL": 3.85, "mswin": 2.6, "mswinSQLWeb": 2.703, "rhel": 2.49, "linux": 2.36, "sles": 2.46},
+            "m1.xlarge": {"mswinSQL": 1.434, "mswin": 0.728, "mswinSQLWeb": 0.96, "rhel": 0.58, "linux": 0.52, "sles": 0.62},
+            "m2.xlarge": {"mswinSQL": 1.084, "mswin": 0.51, "mswinSQLWeb": 0.61, "rhel": 0.52, "linux": 0.46, "sles": 0.56},
+            "hi1.4xlarge": {"mswinSQL": 4.607, "mswin": 3.58, "mswinSQLWeb": 3.66, "rhel": 3.58, "linux": 3.41, "sles": 3.58},
+            "t1.micro": {"sles": 0.035, "mswinSQLWeb": 0.075, "mswin": 0.035, "rhel": 0.085, "linux": 0.02},
+            "m2.4xlarge": {"mswinSQL": 3.307, "mswin": 2.04, "mswinSQLWeb": 2.36, "rhel": 1.94, "linux": 1.84, "sles": 1.94},
+            "c1.xlarge": {"mswinSQL": 2.167, "mswin": 0.9, "mswinSQLWeb": 1.22, "rhel": 0.76, "linux": 0.66, "sles": 0.76},
+            "m3.xlarge": {"mswinSQL": 1.58, "mswin": 0.78, "mswinSQLWeb": 1.02, "rhel": 0.61, "linux": 0.55, "sles": 0.65}
+        },
+
+        "ec2_sa_east": {
+            "m1.medium": {"mswinSQL": 0.814, "mswin": 0.222, "mswinSQLWeb": 0.34, "rhel": 0.21, "linux": 0.16, "sles": 0.24},
+            "m3.2xlarge": {"mswinSQL": 3.72, "mswin": 1.92, "mswinSQLWeb": 2.6, "rhel": 1.46, "linux": 1.36, "sles": 1.46},
+            "m1.large": {"mswinSQL": 1.114, "mswin": 0.444, "mswinSQLWeb": 0.64, "rhel": 0.38, "linux": 0.32, "sles": 0.42},
+            "m2.2xlarge": {"mswinSQL": 2.114, "mswin": 1.28, "mswinSQLWeb": 1.64, "rhel": 1.14, "linux": 1.08, "sles": 1.18},
+            "m1.small": {"mswinSQL": 0.664, "mswin": 0.111, "mswinSQLWeb": 0.19, "rhel": 0.14, "linux": 0.08, "sles": 0.11},
+            "c1.medium": {"sles": 0.3, "mswinSQLWeb": 0.39, "mswin": 0.28, "rhel": 0.26, "linux": 0.2},
+            "m1.xlarge": {"mswinSQL": 1.714, "mswin": 0.888, "mswinSQLWeb": 1.24, "rhel": 0.7, "linux": 0.64, "sles": 0.74},
+            "m2.xlarge": {"mswinSQL": 1.314, "mswin": 0.64, "mswinSQLWeb": 0.84, "rhel": 0.6, "linux": 0.54, "sles": 0.64},
+            "t1.micro": {"sles": 0.037, "mswinSQLWeb": 0.077, "mswin": 0.037, "rhel": 0.087, "linux": 0.027},
+            "m2.4xlarge": {"mswinSQL": 4.227, "mswin": 2.56, "mswinSQLWeb": 3.28, "rhel": 2.26, "linux": 2.16, "sles": 2.26},
+            "c1.xlarge": {"mswinSQL": 2.427, "mswin": 1.12, "mswinSQLWeb": 1.48, "rhel": 0.9, "linux": 0.8, "sles": 0.9},
+            "m3.xlarge": {"mswinSQL": 1.86, "mswin": 0.96, "mswinSQLWeb": 1.3, "rhel": 0.74, "linux": 0.68, "sles": 0.78}
+        },
+
+        "ec2_ap_northeast": {
+            "m1.medium": {"mswinSQL": 0.821, "mswin": 0.23, "mswinSQLWeb": 0.276, "rhel": 0.22, "linux": 0.175, "sles": 0.234},
+            "m3.2xlarge": {"mswinSQL": 3.34, "mswin": 1.96, "mswinSQLWeb": 2.052, "rhel": 1.635, "linux": 1.52, "sles": 1.635},
+            "cc2.8xlarge": {"mswinSQL": 4.97, "mswin": 3.53, "mswinSQLWeb": 3.735, "rhel": 3.11, "linux": 2.96, "sles": 3.075},
+            "m1.large": {"mswinSQL": 1.051, "mswin": 0.46, "mswinSQLWeb": 0.506, "rhel": 0.419, "linux": 0.35, "sles": 0.465},
+            "m2.2xlarge": {"mswinSQL": 1.731, "mswin": 1.14, "mswinSQLWeb": 1.186, "rhel": 1.079, "linux": 1.01, "sles": 1.125},
+            "hs1.8xlarge": {"mswinSQL": 9.419, "mswin": 6.0, "mswinSQLWeb": 6.213, "rhel": 5.82, "linux": 5.67, "sles": 5.785},
+            "cr1.8xlarge": {"mswinSQL": 8.06, "mswin": 4.641, "mswinSQLWeb": 4.854, "rhel": 4.46, "linux": 4.31, "sles": 4.425},
+            "m1.small": {"mswinSQL": 0.706, "mswin": 0.115, "mswinSQLWeb": 0.161, "rhel": 0.155, "linux": 0.088, "sles": 0.122},
+            "c1.medium": {"sles": 0.29, "mswinSQLWeb": 0.331, "mswin": 0.285, "rhel": 0.254, "linux": 0.185},
+            "m1.xlarge": {"mswinSQL": 1.511, "mswin": 0.92, "mswinSQLWeb": 0.966, "rhel": 0.769, "linux": 0.7, "sles": 0.815},
+            "m2.xlarge": {"mswinSQL": 1.161, "mswin": 0.57, "mswinSQLWeb": 0.616, "rhel": 0.574, "linux": 0.505, "sles": 0.62},
+            "hi1.4xlarge": {"mswinSQL": 7.97, "mswin": 4.3, "mswinSQLWeb": 4.764, "rhel": 3.97, "linux": 3.82, "sles": 3.935},
+            "t1.micro": {"sles": 0.037, "mswinSQLWeb": 0.081, "mswin": 0.035, "rhel": 0.087, "linux": 0.027},
+            "m2.4xlarge": {"mswinSQL": 3.462, "mswin": 2.28, "mswinSQLWeb": 2.372, "rhel": 2.135, "linux": 2.02, "sles": 2.135},
+            "c1.xlarge": {"mswinSQL": 2.322, "mswin": 1.14, "mswinSQLWeb": 1.232, "rhel": 0.855, "linux": 0.74, "sles": 0.855},
+            "m3.xlarge": {"mswinSQL": 1.67, "mswin": 0.98, "mswinSQLWeb": 1.026, "rhel": 0.829, "linux": 0.76, "sles": 0.875}
+        },
+
+        "ec2_ap_southeast_2": {
+            "m1.medium": {"mswinSQL": 0.744, "mswin": 0.23, "mswinSQLWeb": 0.27, "rhel": 0.21, "linux": 0.16, "sles": 0.23},
+            "m3.2xlarge": {"mswinSQL": 3.16, "mswin": 1.96, "mswinSQLWeb": 2.04, "rhel": 1.5, "linux": 1.4, "sles": 1.5},
+            "m1.large": {"mswinSQL": 0.974, "mswin": 0.46, "mswinSQLWeb": 0.5, "rhel": 0.38, "linux": 0.32, "sles": 0.42},
+            "m2.2xlarge": {"mswinSQL": 1.654, "mswin": 1.14, "mswinSQLWeb": 1.18, "rhel": 1.05, "linux": 0.99, "sles": 1.09},
+            "m1.small": {"mswinSQL": 0.629, "mswin": 0.115, "mswinSQLWeb": 0.155, "rhel": 0.14, "linux": 0.08, "sles": 0.11},
+            "c1.medium": {"sles": 0.283, "mswinSQLWeb": 0.325, "mswin": 0.285, "rhel": 0.243, "linux": 0.183},
+            "m1.xlarge": {"mswinSQL": 1.434, "mswin": 0.92, "mswinSQLWeb": 0.96, "rhel": 0.7, "linux": 0.64, "sles": 0.74},
+            "m2.xlarge": {"mswinSQL": 1.084, "mswin": 0.57, "mswinSQLWeb": 0.61, "rhel": 0.555, "linux": 0.495, "sles": 0.595},
+            "t1.micro": {"sles": 0.035, "mswinSQLWeb": 0.075, "mswin": 0.02, "rhel": 0.085, "linux": 0.02},
+            "m2.4xlarge": {"mswinSQL": 3.307, "mswin": 2.28, "mswinSQLWeb": 2.36, "rhel": 2.08, "linux": 1.98, "sles": 2.08},
+            "c1.xlarge": {"mswinSQL": 2.167, "mswin": 1.14, "mswinSQLWeb": 1.22, "rhel": 0.83, "linux": 0.73, "sles": 0.83},
+            "m3.xlarge": {"mswinSQL": 1.58, "mswin": 0.98, "mswinSQLWeb": 1.02, "rhel": 0.76, "linux": 0.7, "sles": 0.8}
+        },
+
+        "ec2_ap_southeast": {
+            "m1.medium": {"mswinSQL": 0.744, "mswin": 0.23, "mswinSQLWeb": 0.27, "rhel": 0.21, "linux": 0.16, "sles": 0.23},
+            "m3.2xlarge": {"mswinSQL": 3.16, "mswin": 1.96, "mswinSQLWeb": 2.04, "rhel": 1.5, "linux": 1.4, "sles": 1.5},
+            "m1.large": {"mswinSQL": 0.974, "mswin": 0.46, "mswinSQLWeb": 0.5, "rhel": 0.38, "linux": 0.32, "sles": 0.42},
+            "m2.2xlarge": {"mswinSQL": 1.654, "mswin": 1.14, "mswinSQLWeb": 1.18, "rhel": 1.05, "linux": 0.99, "sles": 1.09},
+            "m1.small": {"mswinSQL": 0.629, "mswin": 0.115, "mswinSQLWeb": 0.155, "rhel": 0.14, "linux": 0.08, "sles": 0.11},
+            "c1.medium": {"sles": 0.283, "mswinSQLWeb": 0.325, "mswin": 0.285, "rhel": 0.243, "linux": 0.183},
+            "m1.xlarge": {"mswinSQL": 1.434, "mswin": 0.92, "mswinSQLWeb": 0.96, "rhel": 0.7, "linux": 0.64, "sles": 0.74},
+            "m2.xlarge": {"mswinSQL": 1.084, "mswin": 0.57, "mswinSQLWeb": 0.61, "rhel": 0.555, "linux": 0.495, "sles": 0.595},
+            "t1.micro": {"sles": 0.035, "mswinSQLWeb": 0.075, "mswin": 0.02, "rhel": 0.085, "linux": 0.02},
+            "m2.4xlarge": {"mswinSQL": 3.307, "mswin": 2.28, "mswinSQLWeb": 2.36, "rhel": 2.08, "linux": 1.98, "sles": 2.08},
+            "c1.xlarge": {"mswinSQL": 2.167, "mswin": 1.14, "mswinSQLWeb": 1.22, "rhel": 0.83, "linux": 0.73, "sles": 0.83},
+            "m3.xlarge": {"mswinSQL": 1.58, "mswin": 0.98, "mswinSQLWeb": 1.02, "rhel": 0.76, "linux": 0.7, "sles": 0.8}
+        },
+
+        "ec2_us_west": {
+            "m1.medium": {"mswinSQL": 0.764, "mswin": 0.192, "mswinSQLWeb": 0.29, "rhel": 0.18, "linux": 0.13, "sles": 0.21},
+            "m3.2xlarge": {"mswinSQL": 3.32, "mswin": 1.66, "mswinSQLWeb": 2.2, "rhel": 1.2, "linux": 1.1, "sles": 1.2},
+            "m1.large": {"mswinSQL": 1.014, "mswin": 0.384, "mswinSQLWeb": 0.54, "rhel": 0.32, "linux": 0.26, "sles": 0.36},
+            "m2.2xlarge": {"mswinSQL": 1.766, "mswin": 1.12, "mswinSQLWeb": 1.292, "rhel": 0.98, "linux": 0.92, "sles": 1.02},
+            "m1.small": {"mswinSQL": 0.639, "mswin": 0.096, "mswinSQLWeb": 0.165, "rhel": 0.125, "linux": 0.065, "sles": 0.095},
+            "c1.medium": {"sles": 0.265, "mswinSQLWeb": 0.346, "mswin": 0.245, "rhel": 0.225, "linux": 0.165},
+            "m1.xlarge": {"mswinSQL": 1.514, "mswin": 0.768, "mswinSQLWeb": 1.04, "rhel": 0.58, "linux": 0.52, "sles": 0.62},
+            "m2.xlarge": {"mswinSQL": 1.14, "mswin": 0.56, "mswinSQLWeb": 0.666, "rhel": 0.52, "linux": 0.46, "sles": 0.56},
+            "t1.micro": {"sles": 0.035, "mswinSQLWeb": 0.075, "mswin": 0.035, "rhel": 0.085, "linux": 0.025},
+            "m2.4xlarge": {"mswinSQL": 3.531, "mswin": 2.24, "mswinSQLWeb": 2.584, "rhel": 1.94, "linux": 1.84, "sles": 1.94},
+            "c1.xlarge": {"mswinSQL": 2.251, "mswin": 0.98, "mswinSQLWeb": 1.304, "rhel": 0.76, "linux": 0.66, "sles": 0.76},
+            "m3.xlarge": {"mswinSQL": 1.66, "mswin": 0.83, "mswinSQLWeb": 1.1, "rhel": 0.61, "linux": 0.55, "sles": 0.65}
+        },
+
+        "ec2_us_west_oregon": {
+            "m1.medium": {"mswinSQL": 0.744, "mswin": 0.182, "mswinSQLWeb": 0.27, "rhel": 0.17, "linux": 0.12, "sles": 0.2},
+            "m3.2xlarge": {"mswinSQL": 3.16, "mswin": 1.56, "mswinSQLWeb": 2.04, "rhel": 1.1, "linux": 1.0, "sles": 1.1},
+            "cc2.8xlarge": {"mswinSQL": 4.41, "mswin": 2.97, "mswinSQLWeb": 3.175, "rhel": 2.53, "linux": 2.4, "sles": 2.5},
+            "m1.large": {"mswinSQL": 0.974, "mswin": 0.364, "mswinSQLWeb": 0.5, "rhel": 0.3, "linux": 0.24, "sles": 0.34},
+            "m2.2xlarge": {"mswinSQL": 1.654, "mswin": 1.02, "mswinSQLWeb": 1.18, "rhel": 0.88, "linux": 0.82, "sles": 0.92},
+            "hs1.8xlarge": {"mswinSQL": 8.35, "mswin": 4.931, "mswinSQLWeb": 5.144, "rhel": 4.7, "linux": 4.6, "sles": 4.7},
+            "cr1.8xlarge": {"mswinSQL": 7.25, "mswin": 3.831, "mswinSQLWeb": 4.044, "rhel": 3.63, "linux": 3.5, "sles": 3.6},
+            "m1.small": {"mswinSQL": 0.629, "mswin": 0.091, "mswinSQLWeb": 0.155, "rhel": 0.12, "linux": 0.06, "sles": 0.09},
+            "c1.medium": {"sles": 0.245, "mswinSQLWeb": 0.325, "mswin": 0.225, "rhel": 0.205, "linux": 0.145},
+            "m1.xlarge": {"mswinSQL": 1.434, "mswin": 0.728, "mswinSQLWeb": 0.96, "rhel": 0.54, "linux": 0.48, "sles": 0.58},
+            "m2.xlarge": {"mswinSQL": 1.084, "mswin": 0.51, "mswinSQLWeb": 0.61, "rhel": 0.47, "linux": 0.41, "sles": 0.51},
+            "hi1.4xlarge": {"mswinSQL": 4.607, "mswin": 3.58, "mswinSQLWeb": 3.66, "rhel": 3.255, "linux": 3.1, "sles": 3.255},
+            "t1.micro": {"sles": 0.03, "mswinSQLWeb": 0.07, "mswin": 0.02, "rhel": 0.08, "linux": 0.02},
+            "m2.4xlarge": {"mswinSQL": 3.307, "mswin": 2.04, "mswinSQLWeb": 2.36, "rhel": 1.74, "linux": 1.64, "sles": 1.74},
+            "c1.xlarge": {"mswinSQL": 2.167, "mswin": 0.9, "mswinSQLWeb": 1.22, "rhel": 0.68, "linux": 0.58, "sles": 0.68},
+            "m3.xlarge": {"mswinSQL": 1.58, "mswin": 0.78, "mswinSQLWeb": 1.02, "rhel": 0.56, "linux": 0.5, "sles": 0.6}
+        },
+
+        "ec2_us_east": {
+            "m1.medium": {"mswinSQL": 0.744, "mswin": 0.182, "mswinSQLWeb": 0.27, "rhel": 0.17, "linux": 0.12, "sles": 0.2},
+            "m3.2xlarge": {"mswinSQL": 3.16, "mswin": 1.56, "mswinSQLWeb": 2.04, "rhel": 1.1, "linux": 1.0, "sles": 1.1},
+            "cc2.8xlarge": {"mswinSQL": 4.41, "mswin": 2.97, "mswinSQLWeb": 3.175, "rhel": 2.53, "linux": 2.4, "sles": 2.5},
+            "m1.large": {"mswinSQL": 0.974, "mswin": 0.364, "mswinSQLWeb": 0.5, "rhel": 0.3, "linux": 0.24, "sles": 0.34},
+            "m2.2xlarge": {"mswinSQL": 1.654, "mswin": 1.02, "mswinSQLWeb": 1.18, "rhel": 0.88, "linux": 0.82, "sles": 0.92},
+            "hs1.8xlarge": {"mswinSQL": 8.35, "mswin": 4.931, "mswinSQLWeb": 5.144, "rhel": 4.7, "linux": 4.6, "sles": 4.7},
+            "cr1.8xlarge": {"mswinSQL": 7.25, "mswin": 3.831, "mswinSQLWeb": 4.044, "rhel": 3.63, "linux": 3.5, "sles": 3.6},
+            "m1.small": {"mswinSQL": 0.629, "mswin": 0.091, "mswinSQLWeb": 0.155, "rhel": 0.12, "linux": 0.06, "sles": 0.09},
+            "c1.medium": {"sles": 0.245, "mswinSQLWeb": 0.325, "mswin": 0.225, "rhel": 0.205, "linux": 0.145},
+            "cg1.4xlarge": {"mswinSQL": 3.85, "mswin": 2.6, "mswinSQLWeb": 2.703, "rhel": 2.2, "linux": 2.1, "sles": 2.2},
+            "m1.xlarge": {"mswinSQL": 1.434, "mswin": 0.728, "mswinSQLWeb": 0.96, "rhel": 0.54, "linux": 0.48, "sles": 0.58},
+            "m2.xlarge": {"mswinSQL": 1.084, "mswin": 0.51, "mswinSQLWeb": 0.61, "rhel": 0.47, "linux": 0.41, "sles": 0.51},
+            "hi1.4xlarge": {"mswinSQL": 4.607, "mswin": 3.58, "mswinSQLWeb": 3.66, "rhel": 3.255, "linux": 3.1, "sles": 3.255},
+            "t1.micro": {"sles": 0.03, "mswinSQLWeb": 0.07, "mswin": 0.02, "rhel": 0.08, "linux": 0.02},
+            "m2.4xlarge": {"mswinSQL": 3.307, "mswin": 2.04, "mswinSQLWeb": 2.36, "rhel": 1.74, "linux": 1.64, "sles": 1.74},
+            "c1.xlarge": {"mswinSQL": 2.167, "mswin": 0.9, "mswinSQLWeb": 1.22, "rhel": 0.68, "linux": 0.58, "sles": 0.68},
+            "m3.xlarge": {"mswinSQL": 1.58, "mswin": 0.78, "mswinSQLWeb": 1.02, "rhel": 0.56, "linux": 0.5, "sles": 0.6},
+            "cc1.4xlarge": {"mswinSQL": 2.39, "mswin": 1.61, "mswinSQLWeb": 1.713, "rhel": 1.43, "linux": 1.3, "sles": 1.4}
+        },
+
+        "nimbus" : {
+            "m1.small": 0.0,
+            "m1.large": 0.0,
+            "m1.xlarge": 0.0
+        },
+
+        "cloudsigma_zrh": {
+            "micro-regular": 0.0548,
+            "micro-high-cpu": 0.381,
+            "standard-small": 0.0796,
+            "standard-large": 0.381,
+            "standard-extra-large": 0.762,
+            "high-memory-extra-large": 0.642,
+            "high-memory-double-extra-large": 1.383,
+            "high-cpu-medium": 0.211,
+            "high-cpu-extra-large": 0.780
+        },
+
+        "cloudsigma_lvs": {
+            "micro-regular": 0.0,
+            "micro-high-cpu": 0.0,
+            "standard-small": 0.0,
+            "standard-large": 0.0,
+            "standard-extra-large": 0.0,
+            "high-memory-extra-large": 0.0,
+            "high-memory-double-extra-large": 0.0,
+            "high-cpu-medium": 0.0,
+            "high-cpu-extra-large": 0.0
+        },
+
+        "elastichosts": {
+           "small": 0.100,
+           "medium": 0.223,
+           "large": 0.378,
+           "extra-large": 0.579,
+           "high-cpu-medium": 0.180,
+           "high-cpu-extra-large": 0.770
+        },
+
+        "skalicloud": {
+           "small": 0.136,
+           "medium": 0.301,
+           "large": 0.505,
+           "extra-large": 0.654,
+           "high-cpu-medium": 0.249,
+           "high-cpu-extra-large": 0.936
+        },
+
+        "serverlove": {
+           "small": 0.161,
+           "medium": 0.404,
+           "large": 0.534,
+           "extra-large": 0.615,
+           "high-cpu-medium": 0.291,
+           "high-cpu-extra-large": 0.776
+        },
+
+        "gogrid": {
+            "512MB": 0.095,
+            "1GB": 0.19,
+            "2GB": 0.38,
+            "4GB": 0.76,
+            "8GB": 1.52,
+            "16GB": 3.04,
+            "24GB": 4.56
+        },
+
+        "gandi": {
+            "1": 0.02,
+            "small": 0.02,
+            "medium": 0.03,
+            "large": 0.06,
+            "x-large": 0.12
+        },
+
+        "vps_net": {
+            "1": 0.416
+        }
+    },
+
+    "storage": {
+    },
+
+    "updated": 1349661768
+}
