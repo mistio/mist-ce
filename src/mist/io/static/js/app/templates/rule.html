@@ -18,14 +18,14 @@
         data-inline="true"
         {{action openOperatorPopup target="view"}}>{{operator.symbol}}</a>
 
+    <div class="rule-unit">{{unit}}</div>
     <input type="number"
         data-type="range"
         data-highlight="true"
         class="rule-value"
-        value="{{unbound value}}"
+        {{bindAttr value="value"}}
         min="0"
         {{bindAttr max="maxValue"}} />
-    <div class="rule-unit">{{unit}}</div>
 
     <div class="rule-then">then</div>
 

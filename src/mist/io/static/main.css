@@ -776,12 +776,13 @@ div.loading-monitoring {
 }
 
 .rule-unit {
-    padding: 6px;
     float: left;
-    margin-top: 12px;
-    margin-left: -10px;
-    height:40px;
-
+    position: relative;
+    top: 21px;
+    left: 50px;
+    font-size: 14px;
+    font-weight: bold;
+    width: 0px;
 }
 
 .rule-if, .rule-then, .key-name {
@@ -811,11 +812,14 @@ div.loading-monitoring {
 .ui-slider input.rule-value {
     height: 32px;
     margin-top: -8px;
+    margin-left: -8px;
+    margin-right: 20px;
 }
 
 .ui-slider-track {
     display: none;
     min-width: 100px;
+    margin-left: 85px;
 }
 
 #machine-basic-table, #machine-metadata {
