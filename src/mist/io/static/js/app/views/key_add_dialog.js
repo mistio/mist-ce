@@ -49,7 +49,7 @@ define('app/views/key_add_dialog', [
             uploadInputChanged: function(keytype) {
                 var f = "";
                 if (keytype == 'public') {
-                f = $('#upload-public-key-input')[0].files[0];
+                    f = $('#upload-public-key-input')[0].files[0];
                 } 
                 else if (keytype == 'private') {
                     f = $('#upload-private-key-input')[0].files[0];
@@ -69,32 +69,44 @@ define('app/views/key_add_dialog', [
             },
             
             newKeyClicked: function() {
-                
-                publickey = $('#dialog-add-key #textarea-public-key').val().trim();
-                privatekey = $('#dialog-add-key #textarea-private-key').val().trim();
-                keytype = "";
-                
-                if (publickey.indexOf('ssh-rsa' ) == 0) {
-                    keytype = 'RSA';
-                } else if (publickey.indexOf('ssh-dss') == 0) {
-                    keytype = 'DSA';
-                } else {
-                    Mist.notificationController.notify('Public key should begin with "ssh-rsa" or "ssh-dss"');
-                    return;
+                var publickey = $('#dialog-add-key #textarea-public-key').val().trim();
+                var privatekey = $('#dialog-add-key #textarea-private-key').val().trim();     
+                var publickey_type = "";
+                var privatekey_type = "";           
+                if (publickey.length) {
+                    if (publickey.indexOf('ssh-rsa') != 0 && publickey.indexOf('ssh-dss') != 0) {
+                        Mist.notificationController.notify('Public key should begin with "ssh-rsa" or "ssh-dsa"');
+                        return;
+                    } else if (publickey.indexOf('ssh-rsa') == 0) {
+                        publickey_type = 'RSA';
+                    } else {
+                        publickey_type = 'DSA';
+                    }
                 }
-                
-                beginning = '-----BEGIN ' + keytype + ' PRIVATE KEY-----';
-                ending = '-----END ' + keytype + ' PRIVATE KEY-----';
-                endingindex = privatekey.length - ending.length;
-                
-                if (privatekey.indexOf(beginning) != 0) {
-                    Mist.notificationController.notify('Private key should begin with ' + beginning);
-                    return;
-                } else if (privatekey.indexOf(ending) != endingindex) {
-                    Mist.notificationController.notify('Private key should end with ' + ending);
-                    return;
+                if (privatekey.length) {
+                    if (privatekey.indexOf('-----BEGIN ') == -1) {
+                        Mist.notificationController.notify('Unindentifiable private key');
+                        return;  
+                    }
+                    privatekey_type = privatekey.substring('-----BEGIN '.length , '-----BEGIN '.length + 3);
+                    if (privatekey_type != 'RSA' && privatekey_type != 'DSA') {
+                        Mist.notificationController.notify('Unknown key type: ' + privatekey_type);
+                        return;   
+                    } else if (publickey.length && publickey_type != privatekey_type) {
+                        Mist.notificationController.notify("Key pair types don't match");
+                        return;
+                    }  
+                    var beginning = '-----BEGIN ' + privatekey_type + ' PRIVATE KEY-----';
+                    var ending = '-----END ' + privatekey_type + ' PRIVATE KEY-----';
+                    var endingindex = privatekey.length - ending.length;
+                    if (privatekey.indexOf(beginning) != 0) {
+                        Mist.notificationController.notify('Private key should begin with ' + beginning);
+                        return;
+                    } else if (privatekey.indexOf(ending) != endingindex) {
+                        Mist.notificationController.notify('Private key should end with ' + ending);
+                        return;
+                    }
                 }
-                
                 Mist.keyAddController.newKey();
                 Mist.keyAddController.newKeyClear();
                 $("#dialog-add-key").popup("close");
