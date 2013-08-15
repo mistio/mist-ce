@@ -25,8 +25,8 @@ define('app/controllers/key_add', [
 
             updateNewKeyReady: function() {
                 if (this.get('newKeyName') &&
-                        this.get('newKeyPublic') &&
-                        this.get('newKeyPrivate')) {
+                       (this.get('newKeyPublic') ||
+                        this.get('newKeyPrivate'))) {
                     this.set('newKeyReady', true);
                     if('button' in $('#create-key-ok')){
                         $('#create-key-ok').button('enable');
