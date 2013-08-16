@@ -877,8 +877,9 @@ def add_key(request):
     key = {'public' : params.get('pub', ''),
            'private' : params.get('priv', '')}
     
-    if not validate_key_pair(key.get('public'), key.get('private')):
-        return Response('Key pair is not valid', 409)
+    if key.get('public') and key.get('private'): # User is now allowed to create public or private key only
+        if not validate_key_pair(key.get('public'), key.get('private')):
+            return Response('Key pair is not valid', 409)
         
     if not len(request.registry.settings['keypairs']):
         key['default'] = True
