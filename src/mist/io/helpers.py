@@ -4,9 +4,12 @@ import tempfile
 import logging
 import yaml
 import subprocess
+import struct
+import binascii
 
 from hashlib import sha1
-from Crypto.PublicKey import RSA
+from Crypto.PublicKey import RSA , DSA
+from Crypto.Util.number import bytes_to_long, long_to_bytes, isPrime
 
 from pyramid.response import Response
 
@@ -730,46 +733,58 @@ def undeploy_key(request, backend_id, machine_id, keypair):
 
     return Response('OK', 200)
 
+def validate_dsa_key_pair(public_key, private_key):
+    """ Validates a pair of dsa keys """
+    
+    # FIXME: Make this function validate private key too
+    
+    # Construct DSA key
+    keystring = binascii.a2b_base64(public_key.split(' ')[1])
+    keyparts = []
+    
+    while len(keystring) > 4:
+        length = struct.unpack('>I', keystring[:4])[0]
+        keyparts.append(keystring[4:4 + length])
+        keystring = keystring[4 + length:]
+        
+    if keyparts[0] == 'ssh-dss':
+        tup = [bytes_to_long(keyparts[x]) for x in (4, 3, 1, 2)]
+    else:
+        return False
+    
+    key = DSA.construct(tup)
+    
+    # Validate DSA key
+    fmt_error = not isPrime(key.p)
+    fmt_error |= ((key.p-1) % key.q)!=0 
+    fmt_error |= key.g<=1 or key.g>=key.p
+    fmt_error |= pow(key.g, key.q, key.p)!=1 
+    fmt_error |= key.y<=0 or key.y>=key.p 
+    
+    # The following piece of code is currently useless, because 'x' attribute is the private key
+    #if hasattr(key, 'x'):
+    #    fmt_error |= key.x<=0 or key.x>=key.q 
+    #    fmt_error |= pow(key.g, key.x, key.p)!=key.y 
+        
+    return not fmt_error
+
 def validate_key_pair(public_key, private_key):
-    """ Validates a pair of keys
+    """ Validates a pair of keys """
     
-    It first creates a temporary file and writes in the private_key. Then passes the temp file to
-    ssh-keygen to generate a public key and then compares public_key with the generated one.
+    message = 'Encrypted message 1234567890'
     
-    """
-    # TODO: Remove comments after code review
+    if 'ssh-rsa' in public_key:
+        
+        public_key_container = RSA.importKey(public_key)
+        private_key_container = RSA.importKey(private_key)
+        encrypted_message = public_key_container.encrypt(message, 0)
+        decrypted_message = private_key_container.decrypt(encrypted_message)
+        
+        if message == decrypted_message:
+            return True
+        
+    elif 'ssh-dss' in public_key:
     
-    # Make sure public_key has at least two parts
-    if (" " not in public_key) or (public_key.index(" ") >= len(public_key) - 1):
-        return False
+        return validate_dsa_key_pair(public_key, private_key)
     
-    # Create temp file to store private key
-    (tmp_key, tmp_key_path) = tempfile.mkstemp()
-    key_fd = os.fdopen(tmp_key, 'w+b')
-    key_fd.write(private_key)
-    key_fd.close()
-    
-    # Generate public key
-    cmd = ['ssh-keygen','-y', '-f', tmp_key_path]
-    proc = subprocess.Popen(cmd, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-    stdout = []
-    while True:
-        # get commands output, line by line
-        line_out = proc.stdout.readline()
-        if line_out == '' and proc.poll() != None:
-            break
-        stdout.append(line_out)
-    
-    # stdout will have 0 items if private_key is invalid 
-    if len(stdout) == 0:
-        return False
-    
-    # Get bare keys
-    generated_public_key = stdout[0].split(' ')[1][:-1] # Last char is a new line "\n"
-    user_public_key = public_key.split(' ')[1]
-    
-    # Compare keys
-    if generated_public_key != user_public_key:
-        return False
-    
-    return True
+    return False

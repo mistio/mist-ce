@@ -30,6 +30,7 @@ from mist.io.helpers import get_keypair, get_keypair_by_name
 from mist.io.helpers import run_command
 from mist.io.helpers import save_settings
 from mist.io.helpers import generate_keypair, set_default_key, undeploy_key, get_private_key, validate_key_pair
+
 try:
     from mist.core.helpers import associate_key, disassociate_key
 except ImportError:
@@ -875,9 +876,16 @@ def add_key(request):
         
     key = {'public' : params.get('pub', ''),
            'private' : params.get('priv', '')}
+<<<<<<< HEAD
 
     if not validate_key_pair(key.get('public'), key.get('private')):
         return Response('Key pair is not valid', 409)
+=======
+    
+    if key.get('public') and key.get('private'): # User is now allowed to create public or private key only
+        if not validate_key_pair(key.get('public'), key.get('private')):
+            return Response('Key pair is not valid', 409)
+>>>>>>> User is able of creating a key that has only public or private part (server side)
         
     if not len(request.registry.settings['keypairs']):
         key['default'] = True
