@@ -947,6 +947,17 @@ div.loading-monitoring {
     display:none;
 }
 
+.ghost-machine {
+    background-color: #FFFAF0;
+}
+
+.ghost-machine-delete-button {
+    float: right;
+    position: relative;
+    right: 8px;
+    top: 12px;
+}
+
 /* DIALOGS */
 
 .ui-dialog .ui-content {

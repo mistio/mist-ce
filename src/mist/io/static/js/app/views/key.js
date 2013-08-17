@@ -58,7 +58,8 @@ define('app/views/key', [
                             var item = {id: machine_id,
                                         name: machine_id,
                                         backend: backend,
-                                        state: state};
+                                        state: state,
+                                        isGhost: true};
                             var machine = Machine.create(item);
                             machineList.push(machine);                           
                         }

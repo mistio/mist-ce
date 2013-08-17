@@ -5,6 +5,13 @@
             {{view Mist.Checkbox checkedBinding="view.machine.selected"}}
         </label>
     </fieldset>
+    
+    {{#if view.machine.isGhost}}
+        <div class="ghost-machine-delete-button" >
+            <button data-icon="delete" data-iconpos="notext" data-mini="true" {{action disassociateGhostMachine target="view"}}></button>
+        </div>
+    {{/if}}
+    
     {{#linkTo machine view.machine}}
         <h3 class="name">{{view.machine.name}}</h3>
 
@@ -17,6 +24,10 @@
         
         <p class="description">          
             <span class="tag backend ui-btn-corner-all prov-{{unbound backend.provider}}">{{view.machine.backend.title}}</span>
+            {{#if view.machine.isGhost}}
+            <span class="tag backend ui-btn-corner-all">Ghost</span>
+            {{/if}}
+            
             {{#each view.machine.tags}}
             <span class="tag ui-btn-corner-all">{{this}}</span>
             {{/each}}
@@ -26,7 +37,9 @@
                 {{/if}}
             </span>            
         </p>
-
+        
+        {{#if view.machine.isGhost}}
+        {{else}}
         <span class="bubble-container">
             {{#if view.machine.hasKey}}
             <span class="ui-li-count node-icon key-icon ui-btn-corner-all"></span>
@@ -34,6 +47,7 @@
             <span class="ui-li-count node-icon no-key-icon ui-btn-corner-all"></span>
             {{/if}}
         </span>
+        {{/if}}
     {{/linkTo}}
 
 </li>
