@@ -29,6 +29,9 @@ define('app/views/machine_list_item', [
                     $("#machines-list").trigger('create');
                     var machine = this.machine;
                     setInterval(this.fetchLoadavg, 4*60*1000, machine);
+                    if (this.machine.isGhost){
+                        this.switchToGhost();
+                    }
                 },
 
                 disabledMonitoringClass: function() {
@@ -63,6 +66,19 @@ define('app/views/machine_list_item', [
                     }
                     
                 }.observes('machine.selected'),
+
+                switchToGhost: function() {
+                    $('#machines-list a[href="#/machines/' + this.machine.name + '"]').eq(0)
+                    .removeAttr('href')
+                    .attr('id', this.machine.name)
+                    .parent().addClass('ghost-machine');
+                },
+
+                disassociateGhostMachine: function() {
+                    var key = this.get('controller').get('model');
+                    Mist.keysController.disassociateKey(key, this.machine);
+                    $('#machines-list a[id="' + this.machine.name + '"]').eq(0).parent().parent().parent().remove();           
+                },
 
                 template: Ember.Handlebars.compile(machine_list_item_html),
         });
