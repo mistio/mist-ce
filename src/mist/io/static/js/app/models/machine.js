@@ -256,9 +256,8 @@ define('app/models/machine', [
                                        // got it fine, also means it has a key
                                     if (jqXHR.status === 200) {
                                         that.set('hasKey', true);
-                                        var resp = data.split(' ');
-                                        warn(resp); warn(resp.length);
-                                        var uptime = parseFloat(resp[1]) * 1000;
+                                        warn(data.uptime);
+                                        var uptime = parseFloat(data['uptime'].split(' ')[0]) * 1000;
                                         that.set('uptimeChecked', Date.now());
                                         that.set('uptimeFromServer', uptime);
                                         info('Successfully got uptime', uptime, 'from machine', that.name);

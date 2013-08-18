@@ -702,7 +702,7 @@ def probe(request):
     backend_id = request.matchdict['backend']
     host = request.params.get('host', None)
     ssh_user = request.params.get('ssh_user', None)
-    command = "uptime && cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null|awk '{print $2}'` 2>/dev/null || cat ~/.ssh/authorized_keys 2>/dev/null"
+    command = "cat /proc/uptime && echo -------- && cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null|awk '{print $2}'` 2>/dev/null || cat ~/.ssh/authorized_keys 2>/dev/null"
     
     if not ssh_user or ssh_user == 'undefined':
         ssh_user = 'root'
@@ -755,11 +755,13 @@ def probe(request):
             if new_ssh_user:
                 # TODO: add username in key-machine association
                 response = run_command(conn, machine_id, host, new_ssh_user, private_key, command)
-            print response.text
+            cmd_output = response.text.split('--------')
             if response.status_code != 200:
                 # TODO: mark key failure
                 continue
-            return Response(response.text, response.status_code)
+            return {'uptime': cmd_output[0],
+                    'keys': cmd_output[1],
+                   }
     
     return Response('No valid keys for server', 401)
 
