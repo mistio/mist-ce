@@ -66,7 +66,7 @@ define('app/views/key', [
                     }
                 }
                 return machineList;
-            }.property('key.machines'),
+            }.property('controller.model'),
 
             associateKey: function() {
         	    var key = this.get('controller').get('model');

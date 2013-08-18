@@ -685,12 +685,12 @@ def delete_machine_metadata(request):
     return Response('Success', 200)
 
 
-@view_config(route_name='machine_shell', request_method='POST',
+@view_config(route_name='probe', request_method='POST',
              renderer='json')
-def shell_command(request):
-    """Sends a shell command to a machine over ssh, using fabric.
+def probe(request):
+    """Probes a machine over ssh, using fabric.
 
-    .. note:: Used for uptime only.
+    .. note:: Used for getting uptime and a list of deployed keys.
 
     """
     try:
@@ -702,8 +702,8 @@ def shell_command(request):
     backend_id = request.matchdict['backend']
     host = request.params.get('host', None)
     ssh_user = request.params.get('ssh_user', None)
-    command = request.params.get('command', None)
-
+    command = "uptime && cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null|awk '{print $2}'` 2>/dev/null || cat ~/.ssh/authorized_keys 2>/dev/null"
+    
     if not ssh_user or ssh_user == 'undefined':
         ssh_user = 'root'
 
@@ -712,18 +712,56 @@ def shell_command(request):
     except:
         keypairs = request.registry.settings.get('keypairs', {})
 
-    keypair = get_keypair(keypairs, backend_id, machine_id)
-
-    if keypair:
-        private_key = keypair['private']
-        s_user = get_ssh_user_from_keypair(keypair, backend_id, machine_id)
-        if s_user: 
-            ssh_user = s_user
+    associated_keypairs = [k for k in keypairs for m in keypairs[k]['machines'] if m[0] == backend_id and m[1] == machine_id]
+    recently_tested_keypairs = [k for k in associated_keypairs for m in keypairs[k]['machines'] if len(m) > 2 and int(time()) - int(m[2]) < 7*24*3600]
+    
+    # Try to find a recently tested root keypair
+    root_keypairs = [k for k in recently_tested_keypairs for m in keypairs[k]['machines'] if len(m) > 3 and m[3] == 'root']
+    
+    if not root_keypairs:
+        # If not try to get a recently tested sudoer keypair
+        sudo_keypairs = [k for k in recently_tested_keypairs for m in keypairs[k]['machines'] if len(m) > 4 and m[4] == 'sudo']
+        print "sudo keypairs %s" % sudo_keypairs
+        if not sudo_keypairs:
+            # If there is none just try to get a root or sudoer associated keypair even if not recently tested
+            preferred_keypairs = [k for k in associated_keypairs for m in keypairs[k]['machines'] if len(m) > 3 and m[3] == 'root'] or \
+                                 [k for k in associated_keypairs for m in keypairs[k]['machines'] if len(m) > 4 and m[4] == 'sudo']
+            if not preferred_keypairs:
+                # If there is none of the above then just use whatever keys are available
+                preferred_keypairs = associated_keypairs
+        else:
+            preferred_keypairs = sudo_keypairs
     else:
-        private_key = None
+        print "root keypairs %s" % root_keypairs
+        preferred_keypairs = root_keypairs
+                    
+    print "preferred keypairs %s" % preferred_keypairs
 
-    ret = run_command(conn, machine_id, host, ssh_user, private_key, command)
-    return ret
+    for k in preferred_keypairs:
+        keypair = keypairs[k]
+        private_key = keypair.get('private', None)
+        if private_key:
+            ssh_user = get_ssh_user_from_keypair(keypair, backend_id, machine_id)
+            #import pdb;pdb.set_trace()
+            response = run_command(conn, machine_id, host, ssh_user, private_key, command)
+            cmd_output = response.text
+            new_ssh_user = False
+            if 'Please login as the' in cmd_output:
+                # for EC2 Amazon Linux machines, usually with ec2-user
+                new_ssh_user = cmd_output.split()[4].strip('"')
+            elif 'Please login as the user ' in cmd_output:
+                new_ssh_user = cmd_output.split()[5].strip('"')
+                
+            if new_ssh_user:
+                # TODO: add username in key-machine association
+                response = run_command(conn, machine_id, host, new_ssh_user, private_key, command)
+            print response.text
+            if response.status_code != 200:
+                # TODO: mark key failure
+                continue
+            return Response(response.text, response.status_code)
+    
+    return Response('No valid keys for server', 401)
 
 
 @view_config(route_name='images', request_method='GET', renderer='json')

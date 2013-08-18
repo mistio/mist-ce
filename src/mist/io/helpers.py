@@ -377,20 +377,6 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
 
     try:
         cmd_output = run(command, timeout=COMMAND_TIMEOUT)
-        if 'Please login as the' in cmd_output:
-            # for EC2 Amazon Linux machines, usually with ec2-user
-            username = cmd_output.split()[4].strip('"')
-            if 'Please login as the user ' in cmd_output:
-                username = cmd_output.split()[5].strip('"')
-            machine = Node(machine_id,
-                           name=machine_id,
-                           state=0,
-                           public_ips=[],
-                           private_ips=[],
-                           driver=conn)
-            conn.ex_create_tags(machine, {'ssh_user': username})
-            env.user = username
-            cmd_output = run(command, timeout=COMMAND_TIMEOUT)
     except Exception as e:
         if 'SSH session not active' in e:
             from fabric.state import connections
@@ -412,11 +398,11 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
     except SystemExit as e:
         log.warn('Got SystemExit: %s' % e)
         os.remove(tmp_path)
-        return Response('SystemExit: %s' % e, 204)
+        return Response('SystemExit: %s' % e, 401)
 
     os.remove(tmp_path)
 
-    return cmd_output
+    return Response(cmd_output, 200)
 
 
 def generate_backend_id(provider, region, apikey):

@@ -69,7 +69,7 @@ define('app/models/key', [
                         error(textstate, errorThrown, 'while setting default key', that.name);
                     }
                 });
-            },
+            }
         });
     }
 );

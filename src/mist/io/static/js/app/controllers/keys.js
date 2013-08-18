@@ -212,6 +212,7 @@ define('app/controllers/keys', [
                     success: function(data) {
                         info('Successfully disassociated key ', key.name);
                         machine.keys.removeObject(key);
+                        key.machines.removeObject([machine.backend.id, machine.id])
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while disassociating key'  +
