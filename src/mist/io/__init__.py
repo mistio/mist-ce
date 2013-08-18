@@ -43,8 +43,8 @@ def main(global_config, **settings):
     config.add_route('machine', '/backends/{backend}/machines/{machine}')
     config.add_route('machine_metadata',
                      '/backends/{backend}/machines/{machine}/metadata')
-    config.add_route('machine_shell',
-                     '/backends/{backend}/machines/{machine}/shell')
+    config.add_route('probe',
+                     '/backends/{backend}/machines/{machine}/probe')
 
     config.add_route('monitoring', '/monitoring')
     config.add_route('update_monitoring',

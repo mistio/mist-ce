@@ -29,9 +29,6 @@ define('app/views/machine_list_item', [
                     $("#machines-list").trigger('create');
                     var machine = this.machine;
                     setInterval(this.fetchLoadavg, 4*60*1000, machine);
-                    if (this.machine.isGhost){
-                        this.switchToGhost();
-                    }
                 },
 
                 disabledMonitoringClass: function() {
@@ -67,13 +64,6 @@ define('app/views/machine_list_item', [
                     
                 }.observes('machine.selected'),
 
-                switchToGhost: function() {
-                    $('#machines-list a[href="#/machines/' + this.machine.name + '"]').eq(0)
-                    .removeAttr('href')
-                    .attr('id', this.machine.name)
-                    .parent().addClass('ghost-machine');
-                },
-
                 disassociateGhostMachine: function() {
                     var that = this;
                     Mist.confirmationController.set('title', 'Disassociate Ghost Machine');
@@ -81,7 +71,6 @@ define('app/views/machine_list_item', [
                     Mist.confirmationController.set('callback', function() {
                         var key = that.get('controller').get('model');
                         Mist.keysController.disassociateKey(key, that.machine);
-                        $('#machines-list a[id="' + that.machine.name + '"]').eq(0).parent().parent().parent().remove();
                     });
                     Mist.confirmationController.set('fromDialog', true);
                     Mist.confirmationController.show();

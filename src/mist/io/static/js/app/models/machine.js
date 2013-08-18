@@ -47,6 +47,10 @@ define('app/models/machine', [
             user: function() {                
                 return this.getUser();
             }.property('user'),
+            
+            isNotGhost: function() {                
+                return this.state != 'terminated' && this.state != 'unknown';
+            }.property('state'),
 
             reboot: function() {
                 log('Rebooting machine', this.name);
@@ -242,7 +246,7 @@ define('app/models/machine', [
                             var ssh_user = that.getUser();
 
                             $.ajax({
-                                url: '/backends/' + that.backend.id + '/machines/' + that.id + '/shell',
+                                url: '/backends/' + that.backend.id + '/machines/' + that.id + '/probe',
                                 type: 'POST',
                                 headers: { "cache-control": "no-cache" },
                                 data: {'host': host,
@@ -253,12 +257,11 @@ define('app/models/machine', [
                                     if (jqXHR.status === 200) {
                                         that.set('hasKey', true);
                                         var resp = data.split(' ');
-                                        if (resp.length == 2) {
-                                            var uptime = parseFloat(resp[0]) * 1000;
-                                            that.set('uptimeChecked', Date.now());
-                                            that.set('uptimeFromServer', uptime);
-                                        }
-                                        info('Successfully got uptime', data, 'from machine', that.name);
+                                        warn(resp); warn(resp.length);
+                                        var uptime = parseFloat(resp[1]) * 1000;
+                                        that.set('uptimeChecked', Date.now());
+                                        that.set('uptimeFromServer', uptime);
+                                        info('Successfully got uptime', uptime, 'from machine', that.name);
                                     } else {
                                         // in every other case there is a problem
                                         that.set('hasKey', false);
