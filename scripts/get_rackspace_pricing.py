@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*- 
+
 #get pricing for rackspace providers by asking rackspace. Outputs dicts with providers and pricing per size, per image type, suitable for mist.io's config.py
 
 import urllib
@@ -46,7 +48,7 @@ image_mapping = {
 
 
 #available datacenters/regions: 'rackspacenovalon', 'rackspacenovadfw', 'rackspacenovaord', 'rackspacenovasyd', 'rackspacenovaiad'
-
+#rackspace dict on pricing.json refers to first generation cloud servers and is manually created from http://www.rackspace.com/cloud/pricing/ First Gen...
 rackspace = {
   'rackspacenovalon': {
     '2': {},
@@ -95,6 +97,12 @@ rackspace = {
   }
 }
 
+#FIXME: GBP mapping
+currency_mapping = {
+   'USD': '$',
+   'GBP': 'GBP'
+}
+
 #populate our dict with prices
 for prod in price_list:
     description = prod['description'] # description, contains the image type as well
@@ -107,7 +115,8 @@ for prod in price_list:
             if line.get('characteristicCategory') == 'PROVISIONING':
                 size = line['value'] #the size value, values 2-8
         for pricing in prod['priceList']['productOfferingPrice'][0]['prices']['price']: 
-            amount = pricing['amount']
+            currency = currency_mapping.get(pricing['currency'], '')
+            amount = currency + pricing['amount'] + "/hour"
             region = 'rackspacenova' + pricing['region'].lower()
             rackspace[region][size][image] = amount
     except Exception as e: 

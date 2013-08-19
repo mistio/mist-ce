@@ -398,6 +398,7 @@ if __name__ == "__main__":
                 continue
             size = ec2_providers[region].get(image, None)
             #create dict or if it exists populate with the price for the os
+            price = "$%s/hour" % price
             if size:
                ec2_providers[region][image][os] = price
             else:
