@@ -49,7 +49,8 @@ define('app/models/machine', [
             }.property('user'),
             
             isNotGhost: function() {                
-                return this.state != 'terminated' && this.state != 'unknown';
+                return ! this.isGhost;
+                //return this.state != 'terminated' && this.state != 'unknown';
             }.property('state'),
 
             reboot: function() {

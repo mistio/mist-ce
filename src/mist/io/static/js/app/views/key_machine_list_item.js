@@ -2,7 +2,7 @@ define('app/views/key_machine_list_item', [
     'text!app/templates/key_machine_list_item.html','ember'],
     /**
      *
-     * Machine List Item View
+     * Key Machine List Item View
      *
      * @returns Class
      */

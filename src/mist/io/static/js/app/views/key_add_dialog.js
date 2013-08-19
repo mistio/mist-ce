@@ -47,32 +47,18 @@ define('app/views/key_add_dialog', [
             },
             
             uploadInputChanged: function(keytype) {
-                var f = "";
-                if (keytype == 'public') {
-                    f = $('#upload-public-key-input')[0].files[0];
-                } 
-                else if (keytype == 'private') {
-                    f = $('#upload-private-key-input')[0].files[0];
-                }
                 var reader = new FileReader();
                 reader.onloadend = function(evt) {
                     if (evt.target.readyState == FileReader.DONE) {
-                        if (keytype == 'private'){
-                            $('#dialog-add-key #textarea-private-key').val(evt.target.result).trigger('change');		
-                        }
-                        else if (keytype == 'public') {
-                            $('#dialog-add-key #textarea-public-key').val(evt.target.result).trigger('change');	
-                        }
+                        $('#textarea-' + keytype + '-key').val(evt.target.result).trigger('change');
                      }
                };
-               reader.readAsText(f, 'UTF-8');
+               reader.readAsText($('#upload-' + keytype + '-key-input')[0].files[0], 'UTF-8');
             },
             
             newKeyClicked: function() {
-                var publickey = $('#dialog-add-key #textarea-public-key').val().trim();
-                var privatekey = $('#dialog-add-key #textarea-private-key').val().trim();     
-                var publickey_type = "";
-                var privatekey_type = "";           
+                var publickey = $('#textarea-public-key').val().trim();
+                var publickey_type = "";          
                 if (publickey.length) {
                     if (publickey.indexOf('ssh-rsa') != 0 && publickey.indexOf('ssh-dss') != 0) {
                         Mist.notificationController.notify('Public key should begin with "ssh-rsa" or "ssh-dsa"');
@@ -83,26 +69,22 @@ define('app/views/key_add_dialog', [
                         publickey_type = 'DSA';
                     }
                 }
+                var privatekey = $('#textarea-private-key').val().trim();
                 if (privatekey.length) {
-                    if (privatekey.indexOf('-----BEGIN ') == -1) {
-                        Mist.notificationController.notify('Unindentifiable private key');
-                        return;  
-                    }
-                    privatekey_type = privatekey.substring('-----BEGIN '.length , '-----BEGIN '.length + 3);
+                    var privatekey_type = privatekey.substring('-----BEGIN '.length , '-----BEGIN '.length + 3);
                     if (privatekey_type != 'RSA' && privatekey_type != 'DSA') {
-                        Mist.notificationController.notify('Unknown key type: ' + privatekey_type);
+                        Mist.notificationController.notify('Unknown ssh type of private key');
                         return;   
                     } else if (publickey.length && publickey_type != privatekey_type) {
-                        Mist.notificationController.notify("Key pair types don't match");
+                        Mist.notificationController.notify("Key pair ssh types don't match");
                         return;
                     }  
                     var beginning = '-----BEGIN ' + privatekey_type + ' PRIVATE KEY-----';
                     var ending = '-----END ' + privatekey_type + ' PRIVATE KEY-----';
-                    var endingindex = privatekey.length - ending.length;
                     if (privatekey.indexOf(beginning) != 0) {
                         Mist.notificationController.notify('Private key should begin with ' + beginning);
                         return;
-                    } else if (privatekey.indexOf(ending) != endingindex) {
+                    } else if (privatekey.indexOf(ending) != privatekey.length - ending.length) {
                         Mist.notificationController.notify('Private key should end with ' + ending);
                         return;
                     }
