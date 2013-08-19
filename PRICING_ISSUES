@@ -18,6 +18,10 @@ b)git diff libcloud/pricing.py
 -    price = float(pricing[size_id])
 +    price = pricing[size_id]
 
-c)cp pricing.json src/libcloud/libcloud/data/
+c)libcloud/compute/drivers/linode.py list_sizes:
+                         price='$' + str(obj["PRICE"]) + '/month', driver=self.connection.driver)
+
+
+d)cp pricing.json src/libcloud/libcloud/data/
 (use updated file with pricing rather than the one shipped by libcloud)
 
