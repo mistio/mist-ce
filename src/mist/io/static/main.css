@@ -772,6 +772,7 @@ div.loading-monitoring {
     width: 50%;
     padding: 15px;
     background: #e0e0e1;
+    position: absolute;
 }
 
 .delete-rule-container, .delete-key-container {
@@ -1367,6 +1368,28 @@ div.info {
 
 #single-machines-keys #machines-list fieldset {
     display:none;
+}
+
+/* Conditional for < 600px */
+@media only screen and  (max-width: 600px) {
+    
+    #monitoring-wrapper .monitoring-dialog-container.enabled {
+        float: none !important;
+        width: 100%;
+    }
+    
+    .add-rule-container {
+        width: 100%;
+        position: relative;
+    }
+    
+    .add-rule-container div {
+        right: 15px;
+    }
+    
+    #monitoring-wrapper .monitoring-dialog-container a.monitoring-button {
+        right: 15px;
+    }
 }
 
 /* Conditional for < 720px */
