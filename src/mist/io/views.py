@@ -797,7 +797,7 @@ def list_locations(request):
     try:
         locations = conn.list_locations()
     except:
-        return Response('Backend unavailable', 503)
+        locations = [NodeLocation('', name='default', country='', driver=conn)]
 
     ret = []
     for location in locations:
