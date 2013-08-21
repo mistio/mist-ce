@@ -141,10 +141,10 @@ define('app/controllers/machines', [
 
                 this.backend.set('create_pending', true);
                 
-                if (this.backend.provider.search('rackspace') > -1){
-                    // Rackspace does not support spaces in names
-                    name = name.replace(/ /g,'');
-                }
+//                if (this.backend.provider.search('rackspace') > -1){
+//                    // Rackspace (first gen) does not support spaces in names
+//                    name = name.replace(/ /g,'');
+//                }
                 
                 // TODO: find a way to pass ember objects to JSON, so the
                 // following will seem less messy. It will also be helpful for tags.
