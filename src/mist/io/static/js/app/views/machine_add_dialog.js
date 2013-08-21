@@ -64,6 +64,12 @@ define('app/views/machine_add_dialog', [
                 Mist.machineAddController.set('newMachineLocation', null);
                 $('.select-location-collapsible span.ui-btn-text').text('Select Location');                     
                 $('.select-size-collapsible').trigger('collapse');
+
+                if (Mist.machineAddController.newMachineBackend.locations.content.length == 1){
+                    $('.select-location-collapsible').collapsible('option','collapsedIcon','check');
+                    $('.select-location-collapsible span.ui-btn-text').text(Mist.machineAddController.newMachineBackend.locations.content[0].name);
+                    Mist.machineAddController.set('newMachineLocation', Mist.machineAddController.newMachineBackend.locations.content[0]);
+                }
                 return false;               
             },
 
@@ -72,6 +78,12 @@ define('app/views/machine_add_dialog', [
                 $('.select-location-collapsible span.ui-btn-text').text(location.name);
                 Mist.machineAddController.set('newMachineLocation', location);      
                 $('.select-location-collapsible').trigger('collapse');
+
+                if (Mist.keysController.content.length == 1){
+                    $('.select-key-collapsible').collapsible('option','collapsedIcon','check');
+                    $('.select-key-collapsible span.ui-btn-text').text(Mist.keysController.content[0].name);
+                    Mist.machineAddController.set('newMachineKey', Mist.keysController.content[0]);       
+                }                
                 return false;               
             },
                         
@@ -169,6 +181,11 @@ define('app/views/machine_add_dialog', [
                         Ember.run.next(function(){
                             if (Mist.machineAddController.newMachineNameReady) {
                                 $('.select-provider-collapsible').removeClass('ui-disabled');
+                                if (Mist.backendsController.content.length == 1){
+                                    $('.select-provider-collapsible').collapsible('option','collapsedIcon','check');                                    
+                                    $('.select-provider-collapsible span.ui-btn-text').text(Mist.backendsController.content[0].title);
+                                    Mist.machineAddController.set('newMachineBackend', Mist.backendsController.content[0]);
+                                }
                                                                 
                                 $('.select-image-collapsible').addClass('ui-disabled');
                                 $('.select-size-collapsible').addClass('ui-disabled');
