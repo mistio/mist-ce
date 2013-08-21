@@ -42,8 +42,7 @@
                     <h1>Fetching stats...</h1>
                 </div>
             </div>
-
-
+            
             <div id="cpuGraph"></div>
             <div id="loadGraph"></div>
             <div id="networkGraph"></div>
@@ -90,15 +89,17 @@
                 </div>                
             
             </div>
-            <div {{bindAttr class=":monitoring-dialog-container :enabled state"}}>
-                {{view Mist.MachineMonitoringDialog machineBinding="this"}}
-            </div>
+            
             <div class="add-rule-container">
                 <div class="ajax-loader"></div>
                 <button id="add-rule-button"
                     data-icon="plus"
                     data-theme="b"
                     {{action addRuleClicked target="view"}}>Add Rule</button>
+            </div>
+            
+            <div {{bindAttr class=":monitoring-dialog-container :enabled state"}}>
+                {{view Mist.MachineMonitoringDialog machineBinding="this"}}
             </div>
 
             {{else}}
