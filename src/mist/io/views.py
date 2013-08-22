@@ -3,6 +3,8 @@ import os
 import tempfile
 import logging
 
+from time import time
+
 from datetime import datetime
 
 import requests
@@ -31,9 +33,9 @@ from mist.io.helpers import run_command
 from mist.io.helpers import save_settings
 from mist.io.helpers import generate_keypair, set_default_key, undeploy_key, get_private_key, validate_key_pair
 try:
-    from mist.core.helpers import associate_key, disassociate_key
+    from mist.core.helpers import associate_key, disassociate_key, save_keypair #TODO
 except ImportError:
-    from mist.io.helpers import associate_key, disassociate_key, get_ssh_user_from_keypair, associate_user_key
+    from mist.io.helpers import associate_key, disassociate_key, get_ssh_user_from_keypair, save_keypair
 
 log = logging.getLogger('mist.io')
 
@@ -603,7 +605,7 @@ def set_machine_metadata(request):
 
         try:
             machine.extra['metadata'].update(pair)
-            conn.ex_set_metadata(machine, pair)
+            conn.ex_set_metadata(machine, machine.extra['metadata'])
         except:
             return Response('Error while creating tag', 503)
 
@@ -702,7 +704,7 @@ def probe(request):
     backend_id = request.matchdict['backend']
     host = request.params.get('host', None)
     ssh_user = request.params.get('ssh_user', None)
-    command = "cat /proc/uptime && echo -------- && cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null|awk '{print $2}'` 2>/dev/null || cat ~/.ssh/authorized_keys 2>/dev/null"
+    command = "cat /proc/uptime && echo -------- && sudo -n uptime 2>&1|grep load|wc -l && echo -------- && cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null|awk '{print $2}'` 2>/dev/null || cat ~/.ssh/authorized_keys 2>/dev/null"
     
     if not ssh_user or ssh_user == 'undefined':
         ssh_user = 'root'
@@ -712,58 +714,71 @@ def probe(request):
     except:
         keypairs = request.registry.settings.get('keypairs', {})
 
-    associated_keypairs = [k for k in keypairs for m in keypairs[k]['machines'] if m[0] == backend_id and m[1] == machine_id]
-    recently_tested_keypairs = [k for k in associated_keypairs for m in keypairs[k]['machines'] if len(m) > 2 and int(time()) - int(m[2]) < 7*24*3600]
+    default_keypair = [k for k in keypairs if keypairs[k]['default']]
+    associated_keypairs = [k for k in keypairs for m in keypairs[k].get('machines',[]) if m[0] == backend_id and m[1] == machine_id]
+    recently_tested_keypairs = [k for k in associated_keypairs for m in keypairs[k].get('machines',[]) if len(m) > 2 and int(time()) - int(m[2]) < 7*24*3600]
     
     # Try to find a recently tested root keypair
-    root_keypairs = [k for k in recently_tested_keypairs for m in keypairs[k]['machines'] if len(m) > 3 and m[3] == 'root']
+    root_keypairs = [k for k in recently_tested_keypairs for m in keypairs[k].get('machines',[]) if len(m) > 3 and m[3] == 'root']
     
     if not root_keypairs:
         # If not try to get a recently tested sudoer keypair
-        sudo_keypairs = [k for k in recently_tested_keypairs for m in keypairs[k]['machines'] if len(m) > 4 and m[4] == 'sudo']
-        print "sudo keypairs %s" % sudo_keypairs
+        sudo_keypairs = [k for k in recently_tested_keypairs for m in keypairs[k].get('machines',[]) if len(m) > 4 and m[4] == True]
         if not sudo_keypairs:
             # If there is none just try to get a root or sudoer associated keypair even if not recently tested
-            preferred_keypairs = [k for k in associated_keypairs for m in keypairs[k]['machines'] if len(m) > 3 and m[3] == 'root'] or \
-                                 [k for k in associated_keypairs for m in keypairs[k]['machines'] if len(m) > 4 and m[4] == 'sudo']
+            preferred_keypairs = [k for k in associated_keypairs for m in keypairs[k].get('machines',[]) if len(m) > 3 and m[3] == 'root'] or \
+                                 [k for k in associated_keypairs for m in keypairs[k].get('machines',[]) if len(m) > 4 and m[4] == True]
             if not preferred_keypairs:
                 # If there is none of the above then just use whatever keys are available
                 preferred_keypairs = associated_keypairs
         else:
             preferred_keypairs = sudo_keypairs
     else:
-        print "root keypairs %s" % root_keypairs
         preferred_keypairs = root_keypairs
-                    
-    print "preferred keypairs %s" % preferred_keypairs
+    
+    if len(default_keypair) and default_keypair[0] not in preferred_keypairs:
+        preferred_keypairs.append(default_keypair[0])
 
     for k in preferred_keypairs:
         keypair = keypairs[k]
         private_key = keypair.get('private', None)
         if private_key:
             ssh_user = get_ssh_user_from_keypair(keypair, backend_id, machine_id)
-            #import pdb;pdb.set_trace()
             response = run_command(conn, machine_id, host, ssh_user, private_key, command)
             cmd_output = response.text
             new_ssh_user = False
-            if 'Please login as the' in cmd_output:
+            if 'Please login as the user ' in cmd_output:
+                new_ssh_user = cmd_output.split()[5].strip('"')
+            elif 'Please login as the' in cmd_output:
                 # for EC2 Amazon Linux machines, usually with ec2-user
                 new_ssh_user = cmd_output.split()[4].strip('"')
-            elif 'Please login as the user ' in cmd_output:
-                new_ssh_user = cmd_output.split()[5].strip('"')
-                
+
+            sudoer = False
+
             if new_ssh_user:
-                # TODO: add username in key-machine association
                 response = run_command(conn, machine_id, host, new_ssh_user, private_key, command)
+                ssh_user = new_ssh_user # update username in key-machine association
+             
             cmd_output = response.text.split('--------')
             if response.status_code != 200:
-                # TODO: mark key failure
+                # Mark key failure
+                save_keypair(request, k, backend_id, machine_id, -1*int(time()), ssh_user, sudoer)
                 continue
+            
+            try:
+                if int(cmd_output[1]) > 0:
+                    sudoer = True
+            except ValueError:
+                pass
+            
+            # Mark key success
+            save_keypair(request, k, backend_id, machine_id, int(time()), ssh_user, sudoer)
+            
             return {'uptime': cmd_output[0],
-                    'keys': cmd_output[1],
+                    'updated_keys': {}, # TODO: populate updated keys
                    }
     
-    return Response('No valid keys for server', 401)
+    return Response('No valid keys for server', 405)
 
 
 @view_config(route_name='images', request_method='GET', renderer='json')
@@ -952,12 +967,12 @@ def update_key(request):
             ret = disassociate_key(request, key_id, backend_id, machine_id)
     elif params['action'] == 'get_private_key':
         ret = get_private_key(request)
-    elif params['action'] == 'associate_ssh_user':
-        key_id = params['key_id']
-        ssh_user = params['ssh_user']
-        backend_id = params['backend_id']
-        machine_id = params['machine_id']
-        ret = associate_user_key(request, key_id, ssh_user, backend_id, machine_id)
+    #elif params['action'] == 'associate_ssh_user': #TODO: test
+    #    key_id = params['key_id']
+    #    ssh_user = params['ssh_user']
+    #    backend_id = params['backend_id']
+    #    machine_id = params['machine_id']
+    #    ret = save_keypair(request, key_id, ssh_user, backend_id, machine_id)
     else:
         ret = Response('Key action not supported', 405)
 

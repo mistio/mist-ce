@@ -225,19 +225,22 @@ define('app/models/machine', [
                         return;
                     }
                 }, 1000);
+                
+                this.set('probeInterval', 10000);
             },
 
-            checkUptime: function() {
+            probe: function() {
                 var that = this;
+                if (that.get)
 
-                function uptimeTimeout() {
+                function sendProbe() {
                     if (!that.backend) {
                         return false;
                     }
                     
                     if (that.backend.create_pending){
                         // Try again later if a machine is being created on this backend
-                        setTimeout(uptimeTimeout, 10000);
+                        retryProbe();
                         return false;
                     }
 
@@ -251,8 +254,7 @@ define('app/models/machine', [
                                 type: 'POST',
                                 headers: { "cache-control": "no-cache" },
                                 data: {'host': host,
-                                   'ssh_user': ssh_user,
-                                   'command': 'cat /proc/uptime'},
+                                       'ssh_user': ssh_user},
                                 success: function(data, textStatus, jqXHR) {
                                        // got it fine, also means it has a key
                                     if (jqXHR.status === 200) {
@@ -265,7 +267,7 @@ define('app/models/machine', [
                                     } else {
                                         // in every other case there is a problem
                                         that.set('hasKey', false);
-                                        info('Got response other than 200 while getting uptime from machine', that.name);
+                                        info('Got response other than 200 while probing machine', that.name);
                                         retry(that);
                                     }
                                 },
@@ -273,26 +275,30 @@ define('app/models/machine', [
                                     that.set('hasKey', false);
                                     //Mist.notificationController.notify('Error getting uptime from machine ' +
                                     //    that.name);
-                                    error(textstate, errorThrown, 'when getting uptime from machine',
+                                    error(textstate, errorThrown, 'when probing machine',
                                         that.name);
-                                    retry();
+                                    that.set('probeInterval', 2*that.get('probeInterval'));
+                                    retryProbe(that.get('probeInterval'));
                                 }
                             });
                         }
                     }
                 };
                 
-                function retry() {
+                function retryProbe(interval) {
+                    if (interval == undefined) {
+                        interval = 10000;
+                    }
                     // retry only if the machine is still here and it's running
                     if (that.backend.getMachineById(that.id) && that.state == 'running'){
-                        setTimeout(uptimeTimeout, 10000);
+                        setTimeout(sendProbe, interval);
                     }
                 }
                 
-                setTimeout(uptimeTimeout, 2000);
+                setTimeout(sendProbe, 2000);
             },
 
-            resetUptime: function() {
+            reProbe: function() {
                 if (this.get('state') == 'running') {
                     this.startUptimeTimer();
                     this.checkUptime();
@@ -336,7 +342,7 @@ define('app/models/machine', [
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     dataType: 'json',
-                    timeout : 60000,
+                    timeout : 600000,
                     success: function(data) {
                         var user = that.getUser();
                         if (!that.hasMonitoring){
@@ -403,7 +409,7 @@ define('app/models/machine', [
                 });                    
 
                 this.startUptimeTimer();
-                this.checkUptime();
+                this.probe();
             }
         });
     }

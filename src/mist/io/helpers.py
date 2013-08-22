@@ -159,7 +159,7 @@ def get_ssh_user_from_keypair(keypair, backend_id=None, machine_id=None):
         if machine[:2] == [backend_id, machine_id]:
             try:
                 #this should be the user, since machine = [backend_id, machine_id, ssh_user]
-                return machine[2]
+                return machine[3]
             except:
                 return ''
     return ''
@@ -564,7 +564,7 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
     return Response('Manually deploy the public key to your server', 206)
 
 
-def associate_user_key(request, key_id, ssh_user, backend_id, machine_id):
+def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, sudoer):
     """Associates an ssh user for a machine for a key.
 
     """
@@ -573,25 +573,16 @@ def associate_user_key(request, key_id, ssh_user, backend_id, machine_id):
     except:
         keypairs = request.registry.settings.get('keypairs', {})
 
-    try:
-        keypair = keypairs[key_id]
-    except KeyError:
-        return Response('Keypair not found', 404)
+    keypair = keypairs[key_id]
 
-    machine_uid = [backend_id, machine_id]
-    machine_user_uid = [backend_id, machine_id, ssh_user]
-    machines = keypair.get('machines', [])
-    if machines:
-        for machine in machines:
-            if machine_uid == machine[:2]:
-                machines.remove(machine)
-        machines.append(machine_user_uid)
-    else:
-        keypair['machines'] = [machine_user_uid]
+
+    for machine in keypair.get('machines',[]):
+        if [backend_id, machine_id] == machine[:2]:
+            keypairs[key_id]['machines'][keypair['machines'].index(machine)] = [backend_id, machine_id, timestamp, ssh_user, sudoer]
 
     save_settings(request)
 
-    return Response('User associated with key', 206)
+    return True
 
 
 def get_private_key(request):
