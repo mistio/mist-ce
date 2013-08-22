@@ -1247,13 +1247,13 @@ div.userEmail {
     text-align: right;
 }
 
-div.logout-placeholder {
+div.logout-placeholder, div.account-placeholder {
     padding-top: 10px;
     height: 30px;
 }
 
-.logout-button {
-    width: 70px;
+.logout-button, .account-button {
+    width: 170px;
     float: right;
 }
 
