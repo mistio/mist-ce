@@ -16,6 +16,7 @@ from StringIO import StringIO
 from pyramid.request import Request
 from pyramid.response import Response
 from mist.io.helpers import connect, run_command, get_keypair, get_ssh_user_from_keypair
+from mist.io.views import get_preferred_keypairs
 
 log = logging.getLogger('mistshell')
 
@@ -30,7 +31,6 @@ class ShellMiddleware(object):
 
     def __call__(self, environ, start_response):
         request = Request(environ)
-                                    
         if request.path.endswith('shell') and request.method == 'GET':
             try:
                 backend = self.app.routes_mapper(request)['match']['backend']
@@ -48,12 +48,13 @@ class ShellMiddleware(object):
                 except:
                     keypairs = request.registry.settings.get('keypairs', {})
 
-                keypair = get_keypair(keypairs, backend, machine)
+                preferred_keypairs = get_preferred_keypairs(keypairs, backend, machine)
               
-                if keypair:
+                if preferred_keypairs:
+                    keypair = keypairs[preferred_keypairs[0]]
                     private_key = keypair['private']
                     s_user = get_ssh_user_from_keypair(keypair, backend, machine)
-                    if s_user: 
+                    if s_user:
                         ssh_user = s_user
                 else:
                     private_key = None
