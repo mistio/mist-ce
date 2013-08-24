@@ -322,7 +322,7 @@ define('app/models/machine', [
                     payload['timestamp'] = nowUTC;
                     payload['pass'] = CryptoJS.SHA256(Mist.password).toString();
                     payload['hash'] = CryptoJS.SHA256(Mist.email + ':' + nowUTC + ':' + CryptoJS.SHA256(Mist.password).toString()).toString();
-                }            
+                }
 
                 var that = this;
                 warn('sending request');

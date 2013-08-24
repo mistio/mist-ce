@@ -35,16 +35,22 @@
                 </div>
             </div>
             <div id="monitoring-disabled">
-                <div>Are you sure you wish to enable monitoring for {{name}}?</div>
+                <div id="enable-monitoring-dialog">
+                    <div>Are you sure you wish to enable monitoring for {{name}}?</div>
 
-                {{#unless hasKey}}
-                <p>The collectd daemon can't be installed automatically because there is no key pair set.</p>
-                <p>You will have to configure it manually by following the instructions after pressing enable.</p>
-                {{/unless}}
+                    {{#unless hasKey}}
+                    <p>The collectd daemon can't be installed automatically because there is no key pair set.</p>
+                    <p>You will have to configure it manually by following the instructions after pressing enable.</p>
+                    {{/unless}}
 
-                <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-                    <button data-theme="c" id="button-back-disabled">Back</button>
-                    <button data-theme="b" id="button-enable-monitoring">Enable</button>
+                    <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+                        <button data-theme="c" id="button-back-disabled">Back</button>
+                        <button data-theme="b" id="button-enable-monitoring">Enable</button>
+                    </div>
+                </div>
+                <div id="plan-dialog">
+                    <div id="free-trial">Trial</div>
+                    <div id="purchase-account">Account</div>
                 </div>
             </div>
         {{else}}
