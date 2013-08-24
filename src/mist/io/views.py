@@ -28,7 +28,7 @@ from mist.io.config import LINODE_DATACENTERS
 from mist.io.helpers import connect
 from mist.io.helpers import generate_backend_id, get_machine_actions
 from mist.io.helpers import import_key, create_security_group
-from mist.io.helpers import get_keypair, get_keypair_by_name
+from mist.io.helpers import get_keypair, get_keypair_by_name, get_preferred_keypairs
 from mist.io.helpers import run_command
 from mist.io.helpers import generate_keypair, set_default_key, undeploy_key, get_private_key, validate_key_pair, get_ssh_user_from_keypair
 
@@ -715,42 +715,7 @@ def probe(request):
     except:
         keypairs = request.registry.settings.get('keypairs', {})
 
-    default_keypair = [k for k in keypairs if keypairs[k].get('default', False)]
-    associated_keypairs = [k for k in keypairs \
-                           for m in keypairs[k].get('machines',[]) \
-                           if m[0] == backend_id and m[1] == machine_id]
-    recently_tested_keypairs = [k for k in associated_keypairs \
-                                for m in keypairs[k].get('machines',[]) \
-                                if len(m) > 2 and int(time()) - int(m[2]) < 7*24*3600]
-    
-    # Try to find a recently tested root keypair
-    root_keypairs = [k for k in recently_tested_keypairs \
-                     for m in keypairs[k].get('machines',[]) \
-                     if len(m) > 3 and m[3] == 'root']
-    
-    if not root_keypairs:
-        # If not try to get a recently tested sudoer keypair
-        sudo_keypairs = [k for k in recently_tested_keypairs \
-                         for m in keypairs[k].get('machines',[]) \
-                         if len(m) > 4 and m[4] == True]
-        if not sudo_keypairs:
-            # If there is none just try to get a root or sudoer associated keypair even if not recently tested
-            preferred_keypairs = [k for k in associated_keypairs \
-                                  for m in keypairs[k].get('machines',[]) \
-                                  if len(m) > 3 and m[3] == 'root'] or \
-                                 [k for k in associated_keypairs \
-                                  for m in keypairs[k].get('machines',[]) \
-                                  if len(m) > 4 and m[4] == True]
-            if not preferred_keypairs:
-                # If there is none of the above then just use whatever keys are available
-                preferred_keypairs = associated_keypairs
-        else:
-            preferred_keypairs = sudo_keypairs
-    else:
-        preferred_keypairs = root_keypairs
-    
-    if len(default_keypair) and default_keypair[0] not in preferred_keypairs:
-        preferred_keypairs.append(default_keypair[0])
+    preferred_keypairs = get_preferred_keypairs(keypairs, backend_id, machine_id)
 
     for k in preferred_keypairs:
         keypair = keypairs[k]
