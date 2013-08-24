@@ -264,6 +264,10 @@ define('app/models/machine', [
                                         that.set('uptimeChecked', Date.now());
                                         that.set('uptimeFromServer', uptime);
                                         info('Successfully got uptime', uptime, 'from machine', that.name);
+                                        Mist.keysController.updateKeyList(data.updated_keys, 'append');
+                                        if (data.updated_keys.length){
+                                            warn('Added ' + data.updated_keys.length + ' new keys from machine ' + that.name);
+                                        }
                                     } else {
                                         // in every other case there is a problem
                                         that.set('hasKey', false);

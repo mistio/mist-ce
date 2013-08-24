@@ -30,13 +30,13 @@ from mist.io.helpers import generate_backend_id, get_machine_actions
 from mist.io.helpers import import_key, create_security_group
 from mist.io.helpers import get_keypair, get_keypair_by_name
 from mist.io.helpers import run_command
-from mist.io.helpers import save_settings
-from mist.io.helpers import generate_keypair, set_default_key, undeploy_key, get_private_key, validate_key_pair
+
+from mist.io.helpers import generate_keypair, set_default_key, undeploy_key, get_private_key, validate_key_pair, get_ssh_user_from_keypair
 
 try:
-    from mist.core.helpers import associate_key, disassociate_key, save_keypair #TODO
+    from mist.core.helpers import save_settings, associate_key, disassociate_key #save_keypair #TODO
 except ImportError:
-    from mist.io.helpers import associate_key, disassociate_key, get_ssh_user_from_keypair, save_keypair
+    from mist.io.helpers import save_settings, associate_key, disassociate_key
 
 log = logging.getLogger('mist.io')
 
@@ -319,8 +319,9 @@ def create_machine(request):
     else:
         location = NodeLocation(location_id, name='', country='', driver=conn)
 
-    if conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE, Provider.OPENSTACK] and\
-    public_key:
+    if conn.type in [Provider.RACKSPACE_FIRST_GEN, 
+                     Provider.RACKSPACE, 
+                     Provider.OPENSTACK] and public_key:
         key = SSHKeyDeployment(str(public_key))
         deploy_script = ScriptDeployment(script)
         msd = MultiStepDeployment([key, deploy_script])
@@ -714,20 +715,32 @@ def probe(request):
     except:
         keypairs = request.registry.settings.get('keypairs', {})
 
-    default_keypair = [k for k in keypairs if keypairs[k]['default']]
-    associated_keypairs = [k for k in keypairs for m in keypairs[k].get('machines',[]) if m[0] == backend_id and m[1] == machine_id]
-    recently_tested_keypairs = [k for k in associated_keypairs for m in keypairs[k].get('machines',[]) if len(m) > 2 and int(time()) - int(m[2]) < 7*24*3600]
+    default_keypair = [k for k in keypairs if keypairs[k].get('default', False)]
+    associated_keypairs = [k for k in keypairs \
+                           for m in keypairs[k].get('machines',[]) \
+                           if m[0] == backend_id and m[1] == machine_id]
+    recently_tested_keypairs = [k for k in associated_keypairs \
+                                for m in keypairs[k].get('machines',[]) \
+                                if len(m) > 2 and int(time()) - int(m[2]) < 7*24*3600]
     
     # Try to find a recently tested root keypair
-    root_keypairs = [k for k in recently_tested_keypairs for m in keypairs[k].get('machines',[]) if len(m) > 3 and m[3] == 'root']
+    root_keypairs = [k for k in recently_tested_keypairs \
+                     for m in keypairs[k].get('machines',[]) \
+                     if len(m) > 3 and m[3] == 'root']
     
     if not root_keypairs:
         # If not try to get a recently tested sudoer keypair
-        sudo_keypairs = [k for k in recently_tested_keypairs for m in keypairs[k].get('machines',[]) if len(m) > 4 and m[4] == True]
+        sudo_keypairs = [k for k in recently_tested_keypairs \
+                         for m in keypairs[k].get('machines',[]) \
+                         if len(m) > 4 and m[4] == True]
         if not sudo_keypairs:
             # If there is none just try to get a root or sudoer associated keypair even if not recently tested
-            preferred_keypairs = [k for k in associated_keypairs for m in keypairs[k].get('machines',[]) if len(m) > 3 and m[3] == 'root'] or \
-                                 [k for k in associated_keypairs for m in keypairs[k].get('machines',[]) if len(m) > 4 and m[4] == True]
+            preferred_keypairs = [k for k in associated_keypairs \
+                                  for m in keypairs[k].get('machines',[]) \
+                                  if len(m) > 3 and m[3] == 'root'] or \
+                                 [k for k in associated_keypairs \
+                                  for m in keypairs[k].get('machines',[]) \
+                                  if len(m) > 4 and m[4] == True]
             if not preferred_keypairs:
                 # If there is none of the above then just use whatever keys are available
                 preferred_keypairs = associated_keypairs
@@ -743,8 +756,15 @@ def probe(request):
         keypair = keypairs[k]
         private_key = keypair.get('private', None)
         if private_key:
-            ssh_user = get_ssh_user_from_keypair(keypair, backend_id, machine_id)
-            response = run_command(conn, machine_id, host, ssh_user, private_key, command)
+            ssh_user = get_ssh_user_from_keypair(keypair, 
+                                                 backend_id, 
+                                                 machine_id)
+            response = run_command(conn, 
+                                   machine_id, 
+                                   host, 
+                                   ssh_user, 
+                                   private_key, 
+                                   command)
             cmd_output = response.text
             new_ssh_user = False
             if 'Please login as the user ' in cmd_output:
@@ -756,13 +776,24 @@ def probe(request):
             sudoer = False
 
             if new_ssh_user:
-                response = run_command(conn, machine_id, host, new_ssh_user, private_key, command)
+                response = run_command(conn, 
+                                       machine_id, 
+                                       host, 
+                                       new_ssh_user, 
+                                       private_key, 
+                                       command)
                 ssh_user = new_ssh_user # update username in key-machine association
              
             cmd_output = response.text.split('--------')
             if response.status_code != 200:
                 # Mark key failure
-                save_keypair(request, k, backend_id, machine_id, -1*int(time()), ssh_user, sudoer)
+                save_keypair(request, 
+                             k, 
+                             backend_id, 
+                             machine_id, 
+                             -1*int(time()), # minus means failure
+                             ssh_user, 
+                             sudoer)
                 continue
             
             try:
@@ -772,10 +803,21 @@ def probe(request):
                 pass
             
             # Mark key success
-            save_keypair(request, k, backend_id, machine_id, int(time()), ssh_user, sudoer)
+            save_keypair(request, 
+                         k, 
+                         backend_id, 
+                         machine_id, 
+                         int(time()), 
+                         ssh_user, 
+                         sudoer)
             
             return {'uptime': cmd_output[0],
-                    'updated_keys': {}, # TODO: populate updated keys
+                    'updated_keys': update_available_keys(request, 
+                                                          backend_id, 
+                                                          machine_id, 
+                                                          ssh_user, 
+                                                          host, 
+                                                          cmd_output[2]),
                    }
     
     return Response('No valid keys for server', 405)
@@ -931,16 +973,10 @@ def add_key(request):
         
     key = {'public' : params.get('pub', ''),
            'private' : params.get('priv', '')}
-<<<<<<< HEAD
-
-    if not validate_key_pair(key.get('public'), key.get('private')):
-        return Response('Key pair is not valid', 409)
-=======
     
     if key.get('public') and key.get('private'): # User is now allowed to create public or private key only
         if not validate_key_pair(key.get('public'), key.get('private')):
             return Response('Key pair is not valid', 409)
->>>>>>> User is able of creating a key that has only public or private part (server side)
         
     if not len(request.registry.settings['keypairs']):
         key['default'] = True
@@ -1162,3 +1198,99 @@ def delete_rule(request):
         return Response('Service unavailable', 503)
 
     return Response('OK', 200)
+
+
+def update_available_keys(request, backend_id, machine_id, ssh_user, host, authorized_keys):
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+    
+    # track which keypairs will be updated
+    updated_keypairs = {}
+    
+    # get the actual public keys from the blob
+    ak = [k for k in authorized_keys.split('\n') if k.startswith('ssh')]
+    
+    # for each public key
+    for pk in ak:
+        exists = False
+        pub_key = pk.split(' ')
+        for k in keypairs:
+            # check if the public key already exists in our keypairs 
+            if keypairs[k]['public'].split(' ')[:2] == pub_key[:2]:
+                exists = True
+                associated = False
+                # check if it is already associated with this machine
+                for m in keypairs[k].get('machines', []):
+                    if m[:2] == [backend_id, machine_id]:
+                        associated = True
+                        break
+                if not associated:
+                    keypairs[k]['machines'].append([backend_id, machine_id])
+                    updated_keypairs[k] = keypairs[k]
+                    
+        # if public key does not exist in our keypairs, add a new entry
+        if not exists:
+            if len(pub_key)>2:
+                key_name = pub_key[2].strip('\r')
+            else:
+                key_name = "%s@%s" % (ssh_user, host)
+                if key_name in keypairs:
+                    i = 0
+                    while True:
+                        key_name = '%s@%s-%d' % (ssh_user, host, i)
+                        i+=1
+                        if key_name not in keypairs:
+                            break
+            keypairs[key_name] = {'public': ' '.join(pk.split(' ')[:2]),
+                                  'private': '',
+                                  'machines': [[backend_id, machine_id, 0, ssh_user]]}
+            updated_keypairs[key_name] = keypairs[key_name]
+
+    if updated_keypairs:
+        save_settings(request)
+
+    ret = [{'name': key,
+            'machines': keypairs[key].get('machines', []),
+            'pub': keypairs[key]['public'],
+            'default_key': keypairs[key].get('default', False)}
+           for key in updated_keypairs.keys()]
+     
+    return ret
+
+
+def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, sudoer, public_key = False, private_key = False, default = False):
+    """ Updates an ssh keypair or associates an ssh user for a machine with a key.
+
+    """
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+
+    if key_id not in keypairs:
+        keypairs[key_id] = {'machines': []}
+    
+    keypair = keypairs[key_id]
+
+    if public_key:
+        keypair['public'] = public_key
+
+    if private_key:
+        keypair['private'] = private_key
+
+    if default != None:
+        keypair['default'] = default
+
+    for machine in keypair.get('machines',[]):
+        if [backend_id, machine_id] == machine[:2]:
+            keypairs[key_id]['machines'][keypair['machines'].index(machine)] = [backend_id, machine_id, timestamp, ssh_user, sudoer]
+
+    try:
+        save_settings(request)
+    except Exception, e:
+        log.error('Error saving keypair %s: %s' % (key_id, e))
+        return False
+        
+    return True
