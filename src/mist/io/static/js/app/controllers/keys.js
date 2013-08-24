@@ -234,11 +234,29 @@ define('app/controllers/keys', [
                 this.set('selectedKeyCount', count);
             },
 
-            updateKeyList: function(data) {
+            updateKeyList: function(data, mode) {
                 var content = new Array();
+                
+                if (mode == 'append'){
+                    this.forEach(function(item){
+                        content.push(item);
+                    });                    
+                }  
+                              
                 data.forEach(function(item){
-                    content.push(Key.create(item));
+                    var key = Key.create(item);
+                    content.push(key);
+                    if (key.machines && key.machines.length > 0){
+                        key.machines.forEach(function(item){
+                            var machine = Mist.backendsController.getMachineById(item[0], item[1]);
+                            if (machine != undefined) {
+                                machine.keys.addObject(key);
+                            }
+                        });                        
+                    }
+                    
                 });
+                
                 this.set('content', content);
 
                 var that = this;

@@ -564,27 +564,6 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
     return Response('Manually deploy the public key to your server', 206)
 
 
-def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, sudoer):
-    """Associates an ssh user for a machine for a key.
-
-    """
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
-
-    keypair = keypairs[key_id]
-
-
-    for machine in keypair.get('machines',[]):
-        if [backend_id, machine_id] == machine[:2]:
-            keypairs[key_id]['machines'][keypair['machines'].index(machine)] = [backend_id, machine_id, timestamp, ssh_user, sudoer]
-
-    save_settings(request)
-
-    return True
-
-
 def get_private_key(request):
     """Gets private key from keypair name.
 
