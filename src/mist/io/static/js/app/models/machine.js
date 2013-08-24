@@ -305,7 +305,7 @@ define('app/models/machine', [
             reProbe: function() {
                 if (this.get('state') == 'running') {
                     this.startUptimeTimer();
-                    this.checkUptime();
+                    this.probe();
                 } else {
                     this.set('uptime', 0);
                     this.uptimeTimer = false;
