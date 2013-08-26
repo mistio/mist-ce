@@ -7,6 +7,7 @@ import subprocess
 import struct
 import binascii
 
+from time import time
 from hashlib import sha1
 from Crypto.PublicKey import RSA , DSA
 from Crypto.Util.number import bytes_to_long, long_to_bytes, isPrime
@@ -564,27 +565,6 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
     return Response('Manually deploy the public key to your server', 206)
 
 
-def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, sudoer):
-    """Associates an ssh user for a machine for a key.
-
-    """
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
-
-    keypair = keypairs[key_id]
-
-
-    for machine in keypair.get('machines',[]):
-        if [backend_id, machine_id] == machine[:2]:
-            keypairs[key_id]['machines'][keypair['machines'].index(machine)] = [backend_id, machine_id, timestamp, ssh_user, sudoer]
-
-    save_settings(request)
-
-    return True
-
-
 def get_private_key(request):
     """Gets private key from keypair name.
 
@@ -765,3 +745,47 @@ def validate_key_pair(public_key, private_key):
         return validate_dsa_key_pair(public_key, private_key)
     
     return False
+
+def get_preferred_keypairs(keypairs, backend_id, machine_id):
+    """ Returns a list with the preferred keypairs for this machine
+    """
+
+    default_keypair = [k for k in keypairs if keypairs[k].get('default', False)]
+    associated_keypairs = [k for k in keypairs \
+                           for m in keypairs[k].get('machines',[]) \
+                           if m[0] == backend_id and m[1] == machine_id]
+    recently_tested_keypairs = [k for k in associated_keypairs \
+                                for m in keypairs[k].get('machines',[]) \
+                                if len(m) > 2 and int(time()) - int(m[2]) < 7*24*3600]
+    
+    # Try to find a recently tested root keypair
+    root_keypairs = [k for k in recently_tested_keypairs \
+                     for m in keypairs[k].get('machines',[]) \
+                     if len(m) > 3 and m[3] == 'root']
+    
+    if not root_keypairs:
+        # If not try to get a recently tested sudoer keypair
+        sudo_keypairs = [k for k in recently_tested_keypairs \
+                         for m in keypairs[k].get('machines',[]) \
+                         if len(m) > 4 and m[4] == True]
+        if not sudo_keypairs:
+            # If there is none just try to get a root or sudoer associated keypair even if not recently tested
+            preferred_keypairs = [k for k in associated_keypairs \
+                                  for m in keypairs[k].get('machines',[]) \
+                                  if len(m) > 3 and m[3] == 'root'] or \
+                                 [k for k in associated_keypairs \
+                                  for m in keypairs[k].get('machines',[]) \
+                                  if len(m) > 4 and m[4] == True]
+            if not preferred_keypairs:
+                # If there is none of the above then just use whatever keys are available
+                preferred_keypairs = associated_keypairs
+        else:
+            preferred_keypairs = sudo_keypairs
+    else:
+        preferred_keypairs = root_keypairs
+    
+    if len(default_keypair) and default_keypair[0] not in preferred_keypairs:
+        preferred_keypairs.append(default_keypair[0])
+        
+    return preferred_keypairs
+    
