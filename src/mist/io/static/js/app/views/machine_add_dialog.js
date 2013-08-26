@@ -36,6 +36,8 @@ define('app/views/machine_add_dialog', [
                 Mist.machineAddController.set('newMachineImage', null);
                 $('.select-image-collapsible span.ui-btn-text').text('Select Image');   
                 Mist.machineAddController.set('newMachineSize', null);
+                Mist.machineAddController.set('newMachineCost', 0);
+                $('.cost').css('display', 'none');
                 $('.select-size-collapsible span.ui-btn-text').text('Select Size');                           
                 Mist.machineAddController.set('newMachineLocation', null);
                 $('.select-location-collapsible span.ui-btn-text').text('Select Location');      
@@ -50,17 +52,55 @@ define('app/views/machine_add_dialog', [
                 Mist.machineAddController.set('newMachineImage', image);
                 
                 Mist.machineAddController.set('newMachineSize', null);
+                Mist.machineAddController.set('newMachineCost', 0);
+                $('.cost').css('display', 'none');
                 $('.select-size-collapsible span.ui-btn-text').text('Select Size');  
                                     
                 $('.select-image-collapsible').trigger('collapse');
                 return false;               
             },
-                        
+                                                                                                
+            getPrice: function(size, image){
+            //return price, for size/image combination for EC2/Rackspace, otherwise just size
+            //eg on provider Linode
+                if (Mist.machineAddController.newMachineBackend.provider.indexOf('ec2') != -1){
+                    if(image.name.indexOf('Red Hat') != -1){
+                        return size.price.rhel;
+                    } else if(image.name.indexOf('SUSE Linux Enterprise') !=-1 ){
+                        return size.price.sles;
+                    } else if(image.name.indexOf('SQL Server Web') !=-1 ){
+                        return size.price.mswinSQLWeb;
+                    } else if(image.name.indexOf('SQL Server') !=-1 ){
+                        return size.price.mswinSQL;
+                    } else if(image.name.indexOf('Windows') !=-1 ){
+                        return size.price.mswin;
+                    } else {
+                        return size.price.linux;
+                    }
+                } else if (Mist.machineAddController.newMachineBackend.provider.indexOf('rackspace') != -1){
+                    if(image.name.indexOf('Red Hat') != -1){
+                        return size.price.rhel;
+                    } else if(image.name.indexOf('SQL Server Web') !=-1 ){
+                        return size.price.mswinSQLWeb;
+                    } else if(image.name.indexOf('SQL Server') !=-1 ){
+                        return size.price.mswinSQL;
+                    } else if(image.name.indexOf('Windows') !=-1 ){
+                        return size.price.mswin;
+                    } else if(image.name.indexOf('Vyatta') !=-1 ){
+                        return size.price.vyatta;                        
+                    } else {
+                        return size.price.linux;
+                    }                    
+                } else {return size.price;
+                }              
+            },
+                                   
             selectSize: function(size){
                 $('.select-size-collapsible').collapsible('option','collapsedIcon','check');
                 $('.select-size-collapsible span.ui-btn-text').text(size.name);
                 Mist.machineAddController.set('newMachineSize', size);  
-                           
+                Mist.machineAddController.set('newMachineCost', this.getPrice(size, Mist.machineAddController.newMachineImage));
+                $('.cost').css('display', 'block');                          
                 Mist.machineAddController.set('newMachineLocation', null);
                 $('.select-location-collapsible span.ui-btn-text').text('Select Location');                     
                 $('.select-size-collapsible').trigger('collapse');
@@ -148,6 +188,7 @@ define('app/views/machine_add_dialog', [
 
             backClicked: function() {
                 this.clear();
+                $('div.cost').hide();
                 $('.dialog-add').panel('close');
             },
 

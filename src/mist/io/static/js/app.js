@@ -132,6 +132,7 @@ define( 'app', [
             $('#splash').fadeOut(1000);
             $('body').css('overflow', '');
         });
+
         
         Ember.LOG_BINDINGS = false;
 

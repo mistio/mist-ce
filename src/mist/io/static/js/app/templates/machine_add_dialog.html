@@ -54,7 +54,7 @@
                 {{#each Mist.machineAddController.newMachineBackend.sizes}}
                 <li data-icon="false" data-corners="true">
                     <a href="#" {{bindAttr title="name"}} 
-                                {{action selectSize this target="view"}}>{{this.name}}</a>
+                                {{action selectSize this target="view"}}>{{this.name}} <span style="color: rgb(170,170,170); font-size: 80%">- disk:{{this.disk}}, ram:{{this.ram}}</span></a>
                 </li>
                 {{/each}}
             </ul>
@@ -101,7 +101,7 @@
             name="create-machine-script"
             id="create-machine-script"}}
 
-        <!--div class="cost">Cost: {{Mist.machineAddController.newMachineCost}}</div-->
+        <div class="cost">Price: <span>{{Mist.machineAddController.newMachineCost}}</span></div>
 
         <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
             <button id="create-machine-cancel" data-theme="c" {{action backClicked target="view"}}>Back</button>
