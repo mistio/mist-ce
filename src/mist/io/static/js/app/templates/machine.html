@@ -263,3 +263,18 @@
     </div>
 
 </div>
+
+<div id="trial-dialog" class="mist-dialog" data-role="popup">
+    <div data-role="header">
+        <h1>Free Trial</h1>
+    </div>
+    <div data-role="content" data-theme="c">
+        <label for="user-name">Name:</label>
+        <span class="required">*</span>
+        <input type="text" name="user-name" id="trial-user-name" />
+        <label for="company-name">Company Name:</label>
+        <span class="required">*</span>
+        <input type="text" name="company-name" id="trial-company-name" />
+        <a id="submit-trial" data-role="button" data-theme="b" {{action submitTrial target="view"}}>Go!</a>
+    </div>
+</div>

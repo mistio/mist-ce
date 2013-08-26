@@ -48,7 +48,7 @@ define('app/views/machine_monitoring_dialog', [
                         //Trial or Plan expired, hide monitoring-dialog, hide free-trial
                         $('#enable-monitoring-dialog').hide();
                         $('#free-trial').hide();
-                    } else if (!(Mist.expired) && (Mist.plan != 'None')) {
+                    } else if (!(Mist.expired) && Mist.plan) {
                         //Trial or Plan enabled. Check for quota 
                         if (Mist.machine_limit <= Mist.monitored_machines.length) {
                             //Quota exceeded, show buy option
@@ -67,6 +67,12 @@ define('app/views/machine_monitoring_dialog', [
                 }
                 $("#monitoring-dialog").popup('open');
                 this.emailReady();
+            },
+
+            openTrialDialog: function() {
+                console.log('test');
+                $("#monitoring-dialog").popup('close');
+                $("#trial-dialog").popup('open');               
             },
 
             changeMonitoringClicked: function() {
