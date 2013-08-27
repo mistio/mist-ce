@@ -894,6 +894,14 @@ div.loading-monitoring {
     float:right;
 }
 
+.buy-button {
+    width: 240px;
+}
+
+#free-trial {
+    width: 240px;
+}
+
 /* Key single view */
 #key .single-view-header {
     height: 80px;
@@ -1257,7 +1265,7 @@ div.logout-placeholder, div.account-placeholder {
     float: right;
 }
 
-#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, .dialog-add .ajax-loader, .rule-box .ajax-loader, .rule-command-popup .ajax-loader, .add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader  {
+#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, .dialog-add .ajax-loader, .rule-box .ajax-loader, .rule-command-popup .ajax-loader, .add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader, #account-details .ajax-loader {
     background-image: url(images/spinner.gif);
     background-position: center !important;
     background-repeat: no-repeat;

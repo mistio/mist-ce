@@ -44,20 +44,22 @@ define('app/views/machine_monitoring_dialog', [
                     $('#free-trial').show();
                     $('#plan-dialog').show();
 
-                    if (Mist.expired) {
-                        //Trial or Plan expired, hide monitoring-dialog, hide free-trial
-                        $('#enable-monitoring-dialog').hide();
-                        $('#free-trial').hide();
-                    } else if (!(Mist.expired) && Mist.plan) {
-                        //Trial or Plan enabled. Check for quota 
-                        if (Mist.machine_limit <= Mist.monitored_machines.length) {
-                            //Quota exceeded, show buy option
-                            $('#enable-monitoring-dialog').hide();  
-                            $('#free-trial').hide();                          
+                    if (Mist.current_plan['title']) {
+                        if (Mist.current_plan['expired']) {
+                            //Trial or Plan expired, hide monitoring-dialog, hide free-trial
+                            $('#enable-monitoring-dialog').hide();
+                            $('#free-trial').hide();
                         } else {
-                            //Everything ok, show monitoring-dialog, hide plan-dialog
-                            $('#enable-monitoring-dialog').show();
-                            $('#plan-dialog').hide();
+                            //Trial or Plan enabled. Check for quota 
+                            if (Mist.current_plan['machine_limit'] <= Mist.monitored_machines.length) {
+                                //Quota exceeded, show buy option
+                                $('#enable-monitoring-dialog').hide();  
+                                $('#free-trial').hide();                          
+                            } else {
+                                //Everything ok, show monitoring-dialog, hide plan-dialog
+                                $('#enable-monitoring-dialog').show();
+                                $('#plan-dialog').hide();
+                            }
                         }
                     } else {
                         //There were never any plans, show plan-dialog, hide monitoring-dialog
@@ -70,9 +72,13 @@ define('app/views/machine_monitoring_dialog', [
             },
 
             openTrialDialog: function() {
-                console.log('test');
                 $("#monitoring-dialog").popup('close');
                 $("#trial-dialog").popup('open');               
+            },
+
+            clickedPurchaseDialog: function() {
+                $("#monitoring-dialog").popup('close');
+                window.location.href = URL_PREFIX + "/account";  
             },
 
             changeMonitoringClicked: function() {

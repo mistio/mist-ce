@@ -479,6 +479,39 @@ define('app/views/machine', [
                 });                
             },
 
+            submitTrial: function(){
+                //TODO: POST data to backend
+                if ($('#trial-user-name').val() && $('#trial-company-name').val()) {
+                    var payload = {
+                        "action": 'upgrade_plans', 
+                        "plan": 'Free',
+                    };
+                    $.ajax({
+                        url: '/account',
+                        type: "POST",
+                        contentType: "application/json",
+                        dataType: "json",
+                        headers: { "cache-control": "no-cache" },
+                        data: JSON.stringify(payload),
+                        success: function(result) {
+                            $('#trial-user-name').val('');
+                            $('#trial-company-name').val('');
+                            $("#trial-dialog").popup("close"); 
+                        },
+                        error: function(request){
+
+                        }
+                    });
+
+                } else {
+                    if (!($('#trial-user-name').val())) {
+                        $('#trial-user-name').focus();
+                    } else {
+                        $('#trial-company-name').focus();
+                    }
+                }
+            },
+
             showActions: function() {
                 $("#dialog-single-power").popup('option', 'positionTo', '#machines-button-power').popup('open', {transition: 'slideup'});
             },
