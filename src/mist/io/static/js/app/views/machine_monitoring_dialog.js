@@ -89,6 +89,10 @@ define('app/views/machine_monitoring_dialog', [
 
             backClicked: function() {
                 $("#monitoring-dialog").popup('close');
+                $('#free-trial').hide();   
+                $('#purchase-plan').hide();                   
+                $('#quota-plan').hide();  
+                $("#trial-user-details").hide();                                                                                           
             },
 
             emailReady: function(){
