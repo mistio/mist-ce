@@ -41,20 +41,19 @@ define('app/views/machine_monitoring_dialog', [
 
                     //Reset all divs
                     $('#enable-monitoring-dialog').show();
-                    $('#free-trial').show();
-                    $('#plan-dialog').show();
 
                     if (Mist.current_plan['title']) {
                         if (Mist.current_plan['has_expired']) {
                             //Trial or Plan expired, hide monitoring-dialog, hide free-trial
                             $('#enable-monitoring-dialog').hide();
                             $('#free-trial').hide();
+                            $('#purchase-plan').show();                                                       
                         } else {
                             //Trial or Plan enabled. Check for quota 
                             if (Mist.current_plan['machine_limit'] <= Mist.monitored_machines.length) {
                                 //Quota exceeded, show buy option
                                 $('#enable-monitoring-dialog').hide();  
-                                $('#free-trial').hide();                          
+                                $('#quota-plan').show();                          
                             } else {
                                 //Everything ok, show monitoring-dialog, hide plan-dialog
                                 $('#enable-monitoring-dialog').show();
@@ -65,6 +64,8 @@ define('app/views/machine_monitoring_dialog', [
                         //There were never any plans, show plan-dialog, hide monitoring-dialog
                         $('#enable-monitoring-dialog').hide();
                         $('#plan-dialog').show(); 
+                        $('#free-trial').show();   
+                        $('.trial-button').show();                                               
                     }
                 }
                 $("#monitoring-dialog").popup('open');

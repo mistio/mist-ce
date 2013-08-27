@@ -894,7 +894,7 @@ div.loading-monitoring {
     float:right;
 }
 
-.buy-button {
+.buy-button, .trial-button {
     width: 240px;
 }
 
@@ -902,6 +902,16 @@ div.loading-monitoring {
     padding: 10px;
     width: 240px;
 }
+
+#free-trial, #purchace-plan {
+     padding: 10px;
+     width: 240px;
+ }
+ 
+#purchace-plan [
+   display: none;
+}
+
 
 /* Key single view */
 #key .single-view-header {
