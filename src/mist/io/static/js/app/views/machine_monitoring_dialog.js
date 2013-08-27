@@ -73,7 +73,8 @@ define('app/views/machine_monitoring_dialog', [
             },
 
             openTrialDialog: function() {
-                $("#trial-user-details").show();          
+                $("#trial-user-details").show();      
+                $('.trial-button').addClass('ui-disabled');    
             },
 
             clickedPurchaseDialog: function() {
@@ -92,7 +93,8 @@ define('app/views/machine_monitoring_dialog', [
                 $('#free-trial').hide();   
                 $('#purchase-plan').hide();                   
                 $('#quota-plan').hide();  
-                $("#trial-user-details").hide();                                                                                           
+                $("#trial-user-details").hide();   
+                $('.trial-button').removeClass('ui-disabled');                                                                                        
             },
 
             emailReady: function(){

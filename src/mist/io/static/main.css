@@ -1290,6 +1290,9 @@ div.logout-placeholder, div.account-placeholder {
 
 #trial-user-details {
     display: none;
+    color: #666;
+    padding-bottom: 20px;
+    width: 60%;
 }
 
 #monitoring-wrapper .rule-box .ajax-loader  {
