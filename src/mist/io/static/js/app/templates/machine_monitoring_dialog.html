@@ -49,8 +49,20 @@
                     </div>
                 </div>
                 <div id="plan-dialog">
-                    <div id="free-trial">Monitoring is a premium service. You can try it for free for one month     <a href="#" class="buy-button" data-role="button" data-theme="b"
-        {{action "openTrialDialog" target="view"}}>Try it</a></div>or purchase a Premium plan
+                    <div id="free-trial">Monitoring is a premium service in Mist.io. You can try it for free for one month, or purchase a Premium plan!</div> 
+                     <a href="#" class="buy-button" data-role="button" data-theme="b"
+        {{action "openTrialDialog" target="view"}}>One month Free trial</a>
+        
+                    <div id="trial-user-details">
+                        <label for="user-name">Name:</label>
+                        <span class="required">*</span>
+                        <input type="text" name="user-name" id="trial-user-name" />
+                        <label for="company-name">Company Name:</label>
+                        <span class="required">*</span>
+                        <input type="text" name="company-name" id="trial-company-name" />
+                        <a id="submit-trial" data-role="button" data-theme="b" {{action submitTrial target="view"}}>Go!</a>
+                    </div>
+
                     <div id="purchase-account"><a href="#" class="buy-button" data-role="button" data-theme="b"
         {{action "clickedPurchaseDialog" target="view"}}>Purchase Plan</a></div>
                 </div>

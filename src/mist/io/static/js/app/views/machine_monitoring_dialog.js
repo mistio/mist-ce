@@ -72,8 +72,7 @@ define('app/views/machine_monitoring_dialog', [
             },
 
             openTrialDialog: function() {
-                $("#monitoring-dialog").popup('close');
-                $("#trial-dialog").popup('open');               
+                $("#trial-user-details").show();          
             },
 
             clickedPurchaseDialog: function() {

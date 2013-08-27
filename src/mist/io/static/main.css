@@ -899,6 +899,7 @@ div.loading-monitoring {
 }
 
 #free-trial {
+    padding: 10px;
     width: 240px;
 }
 
@@ -1265,12 +1266,16 @@ div.logout-placeholder, div.account-placeholder {
     float: right;
 }
 
-#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, .dialog-add .ajax-loader, .rule-box .ajax-loader, .rule-command-popup .ajax-loader, .add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader, #account-details .ajax-loader {
+#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, .dialog-add .ajax-loader, .rule-box .ajax-loader, .rule-command-popup .ajax-loader, .add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader {
     background-image: url(images/spinner.gif);
     background-position: center !important;
     background-repeat: no-repeat;
     display: none;
     height: 16px;
+}
+
+#trial-user-details {
+    display: none;
 }
 
 #monitoring-wrapper .rule-box .ajax-loader  {

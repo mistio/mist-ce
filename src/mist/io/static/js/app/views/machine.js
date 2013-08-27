@@ -480,11 +480,12 @@ define('app/views/machine', [
             },
 
             submitTrial: function(){
-                //TODO: POST data to backend
                 if ($('#trial-user-name').val() && $('#trial-company-name').val()) {
                     var payload = {
                         "action": 'upgrade_plans', 
                         "plan": 'Free',
+                        "name": $('#trial-user-name').val(),
+                        "company_name": $('#trial-company-name').val()                        
                     };
                     $.ajax({
                         url: '/account',
@@ -494,11 +495,13 @@ define('app/views/machine', [
                         headers: { "cache-control": "no-cache" },
                         data: JSON.stringify(payload),
                         success: function(result) {
-                            $('#trial-user-name').val('');
-                            $('#trial-company-name').val('');
-                            $("#trial-dialog").popup("close"); 
+                            $("#monitoring-dialog").popup('close');
+                            Mist.set('current_plan', result);
+
+                            //pataei enable monitoring
                         },
                         error: function(request){
+                            //deixnei to error
 
                         }
                     });
