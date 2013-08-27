@@ -479,42 +479,6 @@ define('app/views/machine', [
                 });                
             },
 
-            submitTrial: function(){
-                if ($('#trial-user-name').val() && $('#trial-company-name').val()) {
-                    var payload = {
-                        "action": 'upgrade_plans', 
-                        "plan": 'Free',
-                        "name": $('#trial-user-name').val(),
-                        "company_name": $('#trial-company-name').val()                        
-                    };
-                    $.ajax({
-                        url: '/account',
-                        type: "POST",
-                        contentType: "application/json",
-                        dataType: "json",
-                        headers: { "cache-control": "no-cache" },
-                        data: JSON.stringify(payload),
-                        success: function(result) {
-                            $("#monitoring-dialog").popup('close');
-                            Mist.set('current_plan', result);
-
-                            //pataei enable monitoring
-                        },
-                        error: function(request){
-                            //deixnei to error
-
-                        }
-                    });
-
-                } else {
-                    if (!($('#trial-user-name').val())) {
-                        $('#trial-user-name').focus();
-                    } else {
-                        $('#trial-company-name').focus();
-                    }
-                }
-            },
-
             showActions: function() {
                 $("#dialog-single-power").popup('option', 'positionTo', '#machines-button-power').popup('open', {transition: 'slideup'});
             },

@@ -96,6 +96,50 @@ define('app/views/machine_monitoring_dialog', [
                 $("#trial-user-details").hide();   
                 $('.trial-button').removeClass('ui-disabled');                                                                                        
             },
+            
+            submitTrial: function(){
+                if ($('#trial-user-name').val() && $('#trial-company-name').val()) {
+                    var payload = {
+                        "action": 'upgrade_plans', 
+                        "plan": 'Basic',
+                        "name": $('#trial-user-name').val(),
+                        "company_name": $('#trial-company-name').val()                        
+                    };
+                    $('#trial-user-details .ajax-loader').show();  
+                    $('#submit-trial').addClass('ui-disabled');                      
+                    $.ajax({
+                        url: '/account',
+                        type: "POST",
+                        contentType: "application/json",
+                        dataType: "json",
+                        headers: { "cache-control": "no-cache" },
+                        data: JSON.stringify(payload),
+                        success: function(result) {
+                            $('#trial-user-details .ajax-loader').hide();     
+                            $('#submit-trial').removeClass('ui-disabled');                                                                                         
+                            $("#monitoring-dialog").popup('close');                            
+                            Mist.set('current_plan', result);
+
+                        },
+                        error: function(jqXHR, textstate, errorThrown) {
+                            //Mist.notificationController.notify(jqXHR.responseText);
+                            //cannot use it because of buggy 'enabling/disabling' popup appearing
+                            $('#trial-user-details .ajax-loader').hide();   
+                            $('.trial-button').removeClass('ui-disabled');  
+                            $('#submit-trial').removeClass('ui-disabled');
+                                                                                                                                                                                                                                                                                                                                                    
+                        }
+                    });
+
+                } else {
+                    if (!($('#trial-user-name').val())) {
+                        $('#trial-user-name').focus();
+                    } else {
+                        $('#trial-company-name').focus();
+                    }
+                }
+            },
+            
 
             emailReady: function(){
                 if (Mist.email && Mist.password){
