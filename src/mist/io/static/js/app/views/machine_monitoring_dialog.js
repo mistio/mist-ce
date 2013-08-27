@@ -119,7 +119,7 @@ define('app/views/machine_monitoring_dialog', [
                             $('#submit-trial').removeClass('ui-disabled');                                                                                         
                             $("#monitoring-dialog").popup('close');                            
                             Mist.set('current_plan', result);
-
+                            $("a.monitoring-button").click()
                         },
                         error: function(jqXHR, textstate, errorThrown) {
                             //Mist.notificationController.notify(jqXHR.responseText);
