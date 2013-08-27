@@ -1274,6 +1274,10 @@ div.logout-placeholder, div.account-placeholder {
     height: 16px;
 }
 
+#user-dialog .ui-content {
+    height: 120px;
+}
+
 #trial-user-details {
     display: none;
 }
