@@ -13,11 +13,6 @@
         <img class="gravatar-image" {{bindAttr src="view.gravatarURL"}} />
         <div class="userEmail">{{view.email}}</div>
         {{/if}}
-        {{#each Mist.backendsController}}
-            {{#if this.error}}
-            <p>Backend {{this.title}} is in error!</p>
-            {{/if}}
-        {{/each}}
 
         <div class="account-placeholder">
             <a href="/account"
