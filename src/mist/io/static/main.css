@@ -1285,7 +1285,7 @@ div.logout-placeholder, div.account-placeholder {
 }
 
 #user-dialog .ui-content {
-    height: 120px;
+    min-height: 120px;
 }
 
 #trial-user-details {
