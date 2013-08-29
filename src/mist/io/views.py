@@ -952,7 +952,7 @@ def edit_key(request):
         else:        
             keypairs[key_id] = key
     else:
-        if key_id in request.registry.settings['keypairs']:
+        if key_id in keypairs:
             return Response('Key "%s" already exists' % key_id, 409)     
         keypairs[key_id] = key
     
@@ -960,7 +960,7 @@ def edit_key(request):
         if not validate_key_pair(key['public'], key['private']):
             return Response('Key pair is not valid', 409)
         
-    if len(request.registry.settings['keypairs']) < 2:
+    if len(keypairs) < 2:
         key['default'] = True
     
     save_settings(request)
