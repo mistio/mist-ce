@@ -35,7 +35,7 @@ define('app/controllers/keys', [
                     'name': name,
                     'pub': publicKey,
                     'priv': privateKey
-                }
+                };
 
                 var that = this;
                 $.ajax({
@@ -84,7 +84,7 @@ define('app/controllers/keys', [
                     'name': name,
                     'pub': publicKey,
                     'priv': privateKey
-                }
+                };
         
                 var that = this;
                 $.ajax({
@@ -105,7 +105,7 @@ define('app/controllers/keys', [
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify(jqXHR.responseText);
-                        error(textstate, errorThrown, 'while creating key', name);
+                        error(textstate, errorThrown, 'while editing key', name);
                     }
                 });
             },
@@ -126,16 +126,15 @@ define('app/controllers/keys', [
                         $(element).val(data).trigger('change');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while getting key'  +
-                                name);
+                        Mist.notificationController.notify('Error while getting key' + name);
                         error(textstate, errorThrown, 'while getting key', name);
                     }
                 });
             },
 
             associateKeys: function(key, machines) {
-                payload = {'key_id': key.name, 'machine_backend_list': machines}
-                var that = this
+                payload = {'key_id': key.name, 'machine_backend_list': machines};
+                var that = this;
                 $.ajax({
                     url: 'keys/associate/machines',
                     type: 'POST',
@@ -159,7 +158,7 @@ define('app/controllers/keys', [
                     'key_id': key_name,
                     'backend_id': machine.backend.id,
                     'machine_id': machine.id
-                }
+                };
 
                 var key = this.getKeyByName(key_name);
                 $.ajax({
@@ -173,14 +172,14 @@ define('app/controllers/keys', [
                         Ember.run.next(function(){
                             $('.delete-key-button').button();
                         });
-                        $('#keys-wrapper .ajax-loader').hide()
+                        $('#keys-wrapper .ajax-loader').hide();
                         $('#associate-key-button').removeClass('ui-disabled');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while associating key'  +
                                 key_name);
                         error(textstate, errorThrown, 'while associating key', key_name);
-                        $('#keys-wrapper .ajax-loader').hide()
+                        $('#keys-wrapper .ajax-loader').hide();
                         $('#associate-key-button').removeClass('ui-disabled');
                     }
                 });
@@ -193,7 +192,7 @@ define('app/controllers/keys', [
                     'key_id': key_name,
                     'backend_id': machine.backend.id,
                     'machine_id': machine.id
-                }
+                };
                 var key = this.getKeyByName(key_name);
                 $.ajax({
                     url: '/keys/' + key_name,
@@ -236,7 +235,7 @@ define('app/controllers/keys', [
                     'key_id': key.name,
                     'backend_id': machine.backend.id,
                     'machine_id': machine.id
-                }
+                };
 
                 $.ajax({
                     url: '/keys/' + key.name,
@@ -246,7 +245,7 @@ define('app/controllers/keys', [
                     success: function(data) {
                         info('Successfully disassociated key ', key.name);
                         machine.keys.removeObject(key);
-                        key.machines.removeObject([machine.backend.id, machine.id])
+                        key.machines.removeObject([machine.backend.id, machine.id]);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while disassociating key'  +

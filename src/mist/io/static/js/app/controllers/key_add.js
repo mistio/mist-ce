@@ -18,18 +18,10 @@ define('app/controllers/key_add', [
             
             editKey: function(oldKeyName) {
                 log("edit key");
-                var newPrivateKey = this.get('newKeyPrivate');
-                if (!newPrivateKey){
-                    if ($('#textarea-private-key').val().trim() == "") {
-                        newPrivateKey = '';
-                    } else {
-                        newPrivateKey = 'getkeyfromdb'; // Program doesn't seem to get in here any more...
-                    }
-                }
-                //alert(newPrivateKey);
-                Mist.keysController.editKey(oldKeyName, this.get('newKeyName'),
-                                                        this.get('newKeyPublic'),
-                                                        newPrivateKey);
+                Mist.keysController.editKey(oldKeyName, 
+                                             this.get('newKeyName'),
+                                             this.get('newKeyPublic'),
+                                             this.get('newKeyPrivate', ''));
             },
 
             newKeyClear: function() {

@@ -942,9 +942,6 @@ def edit_key(request):
     key = {'public' : params.get('pub', ''),
             'private' : params.get('priv', '')}
     
-    if key['private'] == 'getkeyfromdb':
-        key['private'] = keypairs[old_id]['private']
-    
     if old_id:
         if old_id != key_id:
             if key_id in keypairs:
