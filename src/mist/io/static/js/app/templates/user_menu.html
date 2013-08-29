@@ -12,16 +12,16 @@
         {{#if view.email}}
         <img class="gravatar-image" {{bindAttr src="view.gravatarURL"}} />
         <div class="userEmail">{{view.email}}</div>
-        {{/if}}
 
         <div class="account-placeholder">
-            <a href="/account"
+            <a href="https://mist.io/account"
                 class="account-button"
                 data-role="button"
                 data-mini="true"
                 data-theme="a"
                 data-ajax="false">My account</a>
         </div>
+        {{/if}}
 
         {{#if view.logout}}
         <div class="logout-placeholder">
