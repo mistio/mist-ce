@@ -4,10 +4,12 @@
             valueBinding="Mist.keyAddController.newKeyName"
             name="create-key-name"
             id="create-key-name"}}
-
+        
+        {{#if view.notEditMode}}
         <button data-theme="b" data-icon="gear" {{action "generateClicked" target="view"}}>Generate</button>
         <div class="ajax-loader"></div>
-                   
+        {{/if}}
+        
         <div id="upload-input">
         	<a class="upload-key" id="upload-public-key" {{action uploadClicked "public" target="view"}} >Upload</a>
             <input type="file" id="upload-public-key-input" name="file" {{action uploadInputChanged "public" on="change" target="view"}} />
@@ -29,8 +31,10 @@
             valueBinding="Mist.keyAddController.newKeyPrivate"
             name="textarea-private-key"
             id="textarea-private-key"}}
-
+            
         <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
             <button id="create-key-cancel" data-theme="c" {{action "backClicked" target="view"}}>Back</button>
-            <button id="create-key-ok" data-theme="b" disabled {{action "newKeyClicked" target="view"}}>Add</button>
+            <button id="create-key-ok" data-theme="b" disabled {{action "newKeyClicked" target="view"}}>
+            {{#if view.notEditMode}}Add{{else}}Save{{/if}}
+            </button>
         </div>

@@ -925,35 +925,54 @@ def update_keys(request):
 
 
 @view_config(route_name='key', request_method='PUT', renderer='json')
-def add_key(request):
-    """Creates a new keypair."""
+def edit_key(request):
+    """Creates or edits a keypair."""
     params = request.json_body
     key_id = params.get('name', '')
+    old_id = params.get('oldname', '')
 
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+    
     if not key_id:
         ret = Response('Key name not provided', 400)
 
-    if key_id in request.registry.settings['keypairs']:
-        return Response('Key "%s" already exists' % key_id, 409)
-        
     key = {'public' : params.get('pub', ''),
-           'private' : params.get('priv', '')}
+            'private' : params.get('priv', '')}
     
-    if key.get('public') and key.get('private'): # User is now allowed to create public or private key only
-        if not validate_key_pair(key.get('public'), key.get('private')):
+    if key['private'] == 'getkeyfromdb':
+        key['private'] = keypairs[old_id]['private']
+    
+    if old_id:
+        if old_id != key_id:
+            if key_id in keypairs:
+                return Response('Key "%s" already exists' % key_id, 409)
+            keypairs[key_id] = key
+            keypairs[key_id]['machines'] = keypairs[old_id].get('machines', [])
+            keypairs.pop(old_id)
+        else:        
+            keypairs[key_id] = key
+    else:
+        if key_id in request.registry.settings['keypairs']:
+            return Response('Key "%s" already exists' % key_id, 409)     
+        keypairs[key_id] = key
+    
+    if key['public'] and key['private']:
+        if not validate_key_pair(key['public'], key['private']):
             return Response('Key pair is not valid', 409)
         
-    if not len(request.registry.settings['keypairs']):
+    if len(request.registry.settings['keypairs']) < 2:
         key['default'] = True
     
-    request.registry.settings['keypairs'][key_id] = key
     save_settings(request)
     
     ret = {'name': key_id,
            'pub': key['public'],
            'priv': key['private'],
            'default_key': key.get('default', False),
-           'machines': []}
+           'machines': keypairs[key_id].get('machines', [])}
 
     return ret
 
