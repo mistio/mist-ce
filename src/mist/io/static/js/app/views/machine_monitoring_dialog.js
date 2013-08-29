@@ -62,10 +62,10 @@ define('app/views/machine_monitoring_dialog', [
                         }
                     } else {
                         //no plans, show plan-dialog, hide monitoring-dialog
-                        if (Mist.user_details[0]) {
+                        if ((Mist.user) && (Mist.user_details[0])) {
                             $('#trial-user-name').val(Mist.user_details[0])
                         }
-                        if (Mist.user_details[1]) {
+                        if ((Mist.user) && (Mist.user_details[1])) {
                             $('#trial-company-name').val(Mist.user_details[1])
                         }
                         $('#enable-monitoring-dialog').hide();
