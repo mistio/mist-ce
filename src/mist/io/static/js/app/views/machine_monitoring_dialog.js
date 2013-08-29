@@ -97,7 +97,7 @@ define('app/views/machine_monitoring_dialog', [
                     'timestamp': nowUTC,
                     'pass': CryptoJS.SHA256(Mist.password).toString(),
                     'hash': CryptoJS.SHA256(Mist.email + ':' + nowUTC + ':' + CryptoJS.SHA256(Mist.password).toString()).toString()
-                }
+                };
                 $.ajax({
                     url: '/backends/' + this.backend.id + '/machines/' + this.id + '/monitoring',
                     type: 'POST',
@@ -112,6 +112,7 @@ define('app/views/machine_monitoring_dialog', [
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.warn('Authentication error');
                     }
+                });
                 $("#monitoring-dialog").popup('close');
                 this.openMonitoringDialog();
             },
