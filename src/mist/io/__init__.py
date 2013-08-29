@@ -1,6 +1,7 @@
 """Routes and wsgi app creation"""
 import yaml
 import logging
+import json
 
 import requests
 
@@ -28,6 +29,10 @@ def main(global_config, **settings):
         ret = requests.post(settings['core_uri'] + '/auth', params=payload, verify=False)
         if ret.status_code == 200:
             settings['auth'] = 1
+            ret = json.loads(ret.content) 
+            settings['current_plan'] = ret.get('current_plan',{})
+            settings['name'] = ret.get('user_details', ['',''])[0]
+            settings['company_name'] = ret.get('user_details', ['',''])[1]
         else:
             settings['auth'] = 0
 
