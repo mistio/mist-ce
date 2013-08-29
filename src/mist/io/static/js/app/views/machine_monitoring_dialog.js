@@ -12,66 +12,74 @@ define('app/views/machine_monitoring_dialog', [
 
             template: Ember.Handlebars.compile(machine_monitoring_dialog_html),
 
+            enableMonitoringClick: function() {
+                if (Mist.authenticated) {
+                    this.openMonitoringDialog()
+                } else {
+                    $("#login-dialog").popup('open');
+                }
+            },
+
             openMonitoringDialog: function() {
                 var machine = this.get('controller').get('model');
-                if (machine.hasMonitoring) {
-                    $('#monitoring-dialog div h1').text('Disable monitoring');
-                    $('#monitoring-enabled').show();
-                    $('#monitoring-disabled').hide();
-                    $('#button-back-enabled').on("click", function() {
-                        $("#monitoring-dialog").popup('close');
-                    });
-                    $('#button-disable-monitoring').on("click", function() {
-                        machine.changeMonitoring();
-                        $('#button-disable-monitoring').off("click");
-                        $("#monitoring-dialog").popup('close');
-                    });
-                } else {
-                    $('#monitoring-dialog div h1').text('Enable monitoring');
-                    $('#monitoring-disabled').show();
-                    $('#monitoring-enabled').hide()
-                    $('#button-back-disabled').on("click", function() {
-                        $("#monitoring-dialog").popup('close');
-                    });
-                    $('#button-enable-monitoring').on("click", function() {
-                        machine.changeMonitoring();
-                        $('#button-enable-monitoring').off("click");
-                        $("#monitoring-dialog").popup('close');
-                    });
-
-                    //Reset all divs
-                    $('#enable-monitoring-dialog').show();
-
-                    if ((Mist.current_plan) && (Mist.current_plan['title'])) {
-                        if (Mist.current_plan['has_expired']) {
-                            //Trial or Plan expired, hide monitoring-dialog, hide free-trial
-                            $('#enable-monitoring-dialog').hide();
-                            $('#free-trial').hide();
-                            $('#purchase-plan').show();                                                       
-                        } else {
-                            //Trial or Plan enabled. Check for quota 
-                            if (Mist.current_plan['machine_limit'] <= Mist.monitored_machines.length) {
-                                //Quota exceeded, show buy option
-                                $('#enable-monitoring-dialog').hide();  
-                                $('#quota-plan').show();                          
-                            } else {
-                                //Everything ok, show monitoring-dialog, hide plan-dialog
-                                $('#enable-monitoring-dialog').show();
-                                $('#plan-dialog').hide();
-                            }
-                        }
+                if (Mist.authenticated) {
+                    if (machine.hasMonitoring) {
+                        $('#monitoring-dialog div h1').text('Disable monitoring');
+                        $('#monitoring-enabled').show();
+                        $('#monitoring-disabled').hide();
+                        $('#button-back-enabled').on("click", function() {
+                            $("#monitoring-dialog").popup('close');
+                        });
+                        $('#button-disable-monitoring').on("click", function() {
+                            machine.changeMonitoring();
+                            $('#button-disable-monitoring').off("click");
+                            $("#monitoring-dialog").popup('close');
+                        });
                     } else {
-                        //no plans, show plan-dialog, hide monitoring-dialog
-                        if ((Mist.user_details) && (Mist.user_details[0])) {
-                            $('#trial-user-name').val(Mist.user_details[0])
+                        $('#monitoring-dialog div h1').text('Enable monitoring');
+                        $('#monitoring-disabled').show();
+                        $('#monitoring-enabled').hide()
+                        $('#button-back-disabled').on("click", function() {
+                            $("#monitoring-dialog").popup('close');
+                        });
+                        $('#button-enable-monitoring').on("click", function() {
+                            machine.changeMonitoring();
+                            $('#button-enable-monitoring').off("click");
+                            $("#monitoring-dialog").popup('close');
+                        });
+
+                        if ((Mist.current_plan) && (Mist.current_plan['title'])) {
+                            if (Mist.current_plan['has_expired']) {
+                                //Trial or Plan expired, hide monitoring-dialog, hide free-trial
+                                $('#enable-monitoring-dialog').hide();
+                                $('#free-trial').hide();
+                                $('#purchase-plan').show();                                                       
+                            } else {
+                                //Trial or Plan enabled. Check for quota 
+                                if (Mist.current_plan['machine_limit'] <= Mist.monitored_machines.length) {
+                                    //Quota exceeded, show buy option
+                                    $('#enable-monitoring-dialog').hide();  
+                                    $('#quota-plan').show();                          
+                                } else {
+                                    //Everything ok, show monitoring-dialog, hide plan-dialog
+                                    $('#enable-monitoring-dialog').show();
+                                    $('#plan-dialog').hide();
+                                }
+                            }
+                        } else {
+                            //no plans, show plan-dialog, hide monitoring-dialog
+                            if ((Mist.user_details) && (Mist.user_details[0])) {
+                                $('#trial-user-name').val(Mist.user_details[0]);
+                            }
+                            if ((Mist.user_details) && (Mist.user_details[1])) {
+                                $('#trial-company-name').val(Mist.user_details[1]);
+                            }
+                            $('#enable-monitoring-dialog').hide();
+                            $('#monitoring-enabled').hide();
+                            $('#plan-dialog').show(); 
+                            $('#free-trial').show();   
+                            $('.trial-button').show();
                         }
-                        if ((Mist.user_details) && (Mist.user_details[1])) {
-                            $('#trial-company-name').val(Mist.user_details[1])
-                        }
-                        $('#enable-monitoring-dialog').hide();
-                        $('#plan-dialog').show(); 
-                        $('#free-trial').show();   
-                        $('.trial-button').show();                                               
                     }
                 }
                 $("#monitoring-dialog").popup('open');
@@ -88,14 +96,13 @@ define('app/views/machine_monitoring_dialog', [
                 window.location.href = "https://mist.io/account";  
             },
 
-            checkValidLogin: function() {
+            doLogin: function() {
                 //sends email, passwords and check if auth is ok
-                
                 var payload = {
                     'email': Mist.email,
                     'password': CryptoJS.SHA256(Mist.password).toString()
                 };
-                $("#monitoring-dialog .ajax-loader").show()
+                $("#login-dialog .ajax-loader").show()
                 $.ajax({
                     url: '/auth',
                     type: 'POST',
@@ -108,17 +115,15 @@ define('app/views/machine_monitoring_dialog', [
                         Mist.set('authenticated', true);
                         Mist.set('current_plan', data.current_plan);
                         Mist.set('user_details', data.user_details);
-                        $("#monitoring-dialog .ajax-loader").hide()
+                        $("#login-dialog .ajax-loader").hide()
                         //If ok set Mist.auth, Mist.current_plan and Mist.user_details and keep on with enable monitoring (if current plan allows), or show the change plans dialog
+                        $("#login-dialog").popup('close');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        $("#monitoring-dialog .ajax-loader").hide()
-                        //Mist.notificationController.warn('Authentication error');
+                        $("#login-dialog .ajax-loader").hide()
+                        Mist.notificationController.warn('Authentication error');
                     }
                 });
-                
-                //$("#monitoring-dialog").popup('close');
-                //this.openMonitoringDialog();
             },
 
             backClicked: function() {
