@@ -82,6 +82,10 @@ def check_auth(request):
 
     if ret.status_code == 200:
         ret = json.loads(ret.content)
+        request.registry.settings['email'] = email
+        request.registry.settings['password'] = password
+        request.registry.settings['auth'] = 1
+        save_settings(request)
         return ret
     else:
         return Response('Unauthorized', 401)
