@@ -64,6 +64,7 @@ def main(global_config, **settings):
 
     config.add_route('rules', '/rules')
     config.add_route('rule', '/rules/{rule}')
+    config.add_route('check_auth', '/auth')
 
     config.scan()
 

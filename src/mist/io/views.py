@@ -6,6 +6,7 @@ import logging
 from datetime import datetime
 
 import requests
+import json
 
 from hashlib import sha256
 
@@ -68,6 +69,22 @@ def home(request):
             'auth': auth,
             'js_build': js_build,
             'js_log_level': js_log_level}
+
+
+@view_config(route_name="check_auth", request_method='POST', renderer="json")
+def check_auth(request):
+    params = request.json_body
+    email = params.get('email', '').lower()
+    password = params.get('password', '')
+    payload = {'email': email, 'password': password}
+    core_uri = request.registry.settings['core_uri']
+    ret = requests.post(core_uri + '/auth', params=payload, verify=False)
+
+    if ret.status_code == 200:
+        ret = json.loads(ret.content)
+        return ret
+    else:
+        return Response('Unauthorized', 401)
 
 
 @view_config(route_name='backends', request_method='GET', renderer='json')
