@@ -89,9 +89,31 @@ define('app/views/machine_monitoring_dialog', [
             },
 
             changeMonitoringClicked: function() {
-                 var machine = this.get('controller').get('model');
-                 machine.changeMonitoring();
-                 $("#monitoring-dialog").popup('close');
+                var machine = this.get('controller').get('model');
+                var d = new Date();
+                var nowUTC = String(d.getTime() + d.getTimezoneOffset()*60*1000);
+                var payload = {
+                    'emai': Mist.email,
+                    'timestamp': nowUTC,
+                    'pass': CryptoJS.SHA256(Mist.password).toString(),
+                    'hash': CryptoJS.SHA256(Mist.email + ':' + nowUTC + ':' + CryptoJS.SHA256(Mist.password).toString()).toString()
+                }
+                $.ajax({
+                    url: '/backends/' + this.backend.id + '/machines/' + this.id + '/monitoring',
+                    type: 'POST',
+                    headers: { "cache-control": "no-cache" },
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    dataType: 'json',
+                    timeout : 60000,
+                    success: function(data) {
+
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.warn('Authentication error');
+                    }
+                $("#monitoring-dialog").popup('close');
+                this.openMonitoringDialog();
             },
 
             backClicked: function() {
