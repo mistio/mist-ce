@@ -9,21 +9,16 @@
         <button data-theme="b" data-icon="gear" {{action "generateClicked" target="view"}}>Generate</button>
         <div class="ajax-loader"></div>
         {{/if}}
-        
-        <div id="upload-input">
-        	<a class="upload-key" id="upload-public-key" {{action uploadClicked "public" target="view"}} >Upload</a>
-            <input type="file" id="upload-public-key-input" name="file" {{action uploadInputChanged "public" on="change" target="view"}} />
-        </div>
-        
+
         <label for="textarea-public-key">Public Key:</label>
         {{view Ember.TextArea
             valueBinding="Mist.keyAddController.newKeyPublic"
             name="textarea-public-key"
             id="textarea-public-key"}}
-             
+            
         <div id="upload-input">
-        	<a class="upload-key" id="upload-private-key" {{action uploadClicked "private" target="view"}} >Upload</a>
-            <input type="file" id="upload-private-key-input" name="file"{{action uploadInputChanged "private" on="change" target="view"}} />
+            <a class="upload-key" data-role="button" data-mini="true" {{action uploadClicked "public" target="view"}} >Upload</a>
+            <input type="file" id="upload-public-key-input" name="file" {{action uploadInputChanged "public" on="change" target="view"}} />
         </div>
         
         <label for="textarea-private-key">Private Key:</label>
@@ -31,7 +26,12 @@
             valueBinding="Mist.keyAddController.newKeyPrivate"
             name="textarea-private-key"
             id="textarea-private-key"}}
-            
+        
+        <div id="upload-input">
+            <a class="upload-key" data-role="button" data-mini="true" {{action uploadClicked "private" target="view"}} >Upload</a>
+            <input type="file" id="upload-private-key-input" name="file"{{action uploadInputChanged "private" on="change" target="view"}} />
+        </div>
+        
         <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
             <button id="create-key-cancel" data-theme="c" {{action "backClicked" target="view"}}>Back</button>
             <button id="create-key-ok" data-theme="b" disabled {{action "newKeyClicked" target="view"}}>

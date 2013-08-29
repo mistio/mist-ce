@@ -293,13 +293,15 @@ li.node .tag {
 }
 
 #dialog-add-key .upload-key {
-    float: right; 
-    position: relative;
-    top: 3px;
+    width: 100%;
 }
 
-#dialog-add-key #upload-input .ui-input-text{
+#upload-input .ui-input-text{
     display: none;
+}
+
+#upload-input {
+    margin-bottom: 20px;
 }
 
 /* Machines Icons and their colors. */
@@ -499,7 +501,7 @@ div.actions div.ui-controlgroup-controls {
 }
 
 .single-key-footer.ui-footer div.actions a {
-    width: 33%;
+    max-width:32%;
 }
 
 .ui-icon-mist-power {

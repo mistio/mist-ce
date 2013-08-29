@@ -24,7 +24,7 @@ define('app/views/key_add_dialog', [
                 $('#dialog-add-key .ajax-loader').fadeIn(200);
                 var payload = {
                     'action': 'generate'
-                }
+                };
                 $.ajax({
                     url: '/keys',
                     type: "POST",
