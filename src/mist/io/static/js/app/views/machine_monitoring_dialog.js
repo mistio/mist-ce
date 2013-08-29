@@ -42,7 +42,7 @@ define('app/views/machine_monitoring_dialog', [
                     //Reset all divs
                     $('#enable-monitoring-dialog').show();
 
-                    if (Mist.current_plan['title']) {
+                    if ((Mist.current_plan) && (Mist.current_plan['title'])) {
                         if (Mist.current_plan['has_expired']) {
                             //Trial or Plan expired, hide monitoring-dialog, hide free-trial
                             $('#enable-monitoring-dialog').hide();
