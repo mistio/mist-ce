@@ -85,7 +85,7 @@ define('app/views/machine_monitoring_dialog', [
 
             clickedPurchaseDialog: function() {
                 $("#monitoring-dialog").popup('close');
-                window.location.href = URL_PREFIX + "/account";  
+                window.location.href = "https://mist.io/account";  
             },
 
             changeMonitoringClicked: function() {
@@ -136,7 +136,7 @@ define('app/views/machine_monitoring_dialog', [
                     $('#trial-user-details .ajax-loader').show();  
                     $('#submit-trial').addClass('ui-disabled');                      
                     $.ajax({
-                        url: '/account',
+                        url: 'https://mist.io/account',
                         type: "POST",
                         contentType: "application/json",
                         dataType: "json",
