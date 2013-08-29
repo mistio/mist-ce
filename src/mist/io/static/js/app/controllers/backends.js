@@ -101,6 +101,8 @@ define('app/controllers/backends', [
                         machines = data.machines;
                         Mist.set('auth_key', data.auth_key);
                         Mist.set('monitored_machines', data.machines);
+                        Mist.set('current_plan', data.current_plan);
+                        Mist.set('user_details', data.user_details);
                         //now loop on backend_id, machine_id  list of lists and check if pair found
                         machines.forEach(function(machine_tuple){
                             var b,m;

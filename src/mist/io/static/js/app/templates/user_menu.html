@@ -13,17 +13,16 @@
         <img class="gravatar-image" {{bindAttr src="view.gravatarURL"}} />
         <div class="userEmail">{{view.email}}</div>
         {{/if}}
-        {{#if Mist.backendsController.ok}}
-        <p>Everything is OK!</p>
-        {{/if}}
-        {{#each Mist.backendsController}}
-            {{#if this.error}}
-            <p>Backend {{this.title}} is in error!</p>
-            {{/if}}
-            {{#if this.waiting}}
-            <p>Waiting {{this.title}}</p>
-            {{/if}}
-        {{/each}}
+
+        <div class="account-placeholder">
+            <a href="/account"
+                class="account-button"
+                data-role="button"
+                data-mini="true"
+                data-theme="a"
+                data-ajax="false">My account</a>
+        </div>
+
         {{#if view.logout}}
         <div class="logout-placeholder">
             <a href="logout"

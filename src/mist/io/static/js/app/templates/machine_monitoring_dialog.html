@@ -35,16 +35,43 @@
                 </div>
             </div>
             <div id="monitoring-disabled">
-                <div>Are you sure you wish to enable monitoring for {{name}}?</div>
+                <div id="enable-monitoring-dialog">
+                    <div>Are you sure you wish to enable monitoring for {{name}}?</div>
 
-                {{#unless hasKey}}
-                <p>The collectd daemon can't be installed automatically because there is no key pair set.</p>
-                <p>You will have to configure it manually by following the instructions after pressing enable.</p>
-                {{/unless}}
+                    {{#unless hasKey}}
+                    <p>The collectd daemon can't be installed automatically because there is no key pair set.</p>
+                    <p>You will have to configure it manually by following the instructions after pressing enable.</p>
+                    {{/unless}}
 
-                <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-                    <button data-theme="c" id="button-back-disabled">Back</button>
-                    <button data-theme="b" id="button-enable-monitoring">Enable</button>
+                    <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+                        <button data-theme="c" id="button-back-disabled">Back</button>
+                        <button data-theme="b" id="button-enable-monitoring">Enable</button>
+                    </div>
+                </div>
+                <div id="plan-dialog">
+                    <div id="free-trial" style="display:none;">Monitoring is a premium service. You can try it for free for one month, or purchase a plan!</div> 
+                    <div id="purchase-plan" style="display:none;">You have to purchase a plan in order to enable monitoring</div>   
+                    <div id="quota-plan" style="display:none;">You have reached the limits for your plan. Please upgrade plan in order to continue</div>                                                           
+                    
+                     <a href="#" class="trial-button" data-role="button" data-theme="b" style="display:none;"
+        {{action "openTrialDialog" target="view"}}>One month Free trial</a>
+        
+                    <div id="trial-user-details" style="display:none;">
+
+                        <label for="user-name">Name:</label>
+                        <span class="required">*</span>
+                        <input type="text" name="user-name" id="trial-user-name" />
+                        <label for="company-name">Company Name:</label>
+                        <span class="required">*</span>
+                        <input type="text" name="company-name" id="trial-company-name" />
+                        <a id="submit-trial" data-role="button" data-theme="b" {{action submitTrial target="view"}}>Enable</a>
+                        <div class="ajax-loader"></div>
+                    </div>
+
+                    <div id="purchase-account"><a href="#" class="buy-button" data-role="button" data-theme="b" {{action "clickedPurchaseDialog" target="view"}}>Purchase Plan</a></div>
+   
+                   <a href="#" data-rel="back" class="buy-button" data-role="button" data-theme="b" {{action "backClicked" target="view"}}>Back</a></div> 
+   
                 </div>
             </div>
         {{else}}
