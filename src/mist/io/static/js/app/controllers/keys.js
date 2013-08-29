@@ -68,6 +68,40 @@ define('app/controllers/keys', [
                                 $('.select-key-collapsible').trigger('collapse');                                 
                             });                                                    
                         }
+                        Mist.keyAddController.newKeyClear();
+                        $("#dialog-add-key").popup("close");
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify(jqXHR.responseText);
+                        error(textstate, errorThrown, 'while creating key', name);
+                    }
+                });
+            },
+            
+            editKey: function(oldName, name, publicKey, privateKey) {  
+                item = {
+                    'oldname': oldName,
+                    'name': name,
+                    'pub': publicKey,
+                    'priv': privateKey
+                }
+        
+                var that = this;
+                $.ajax({
+                    url: '/keys/' + name,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(item),
+                    success: function(data) {
+                        info('Successfully sent edit key ', name);
+                        // don't keep private key on the client
+                        item.priv = null;;
+                        var key = that.getKeyByName(oldName);
+                        key.set('name', name);
+                        key.set('pub', publicKey);
+                        $('#keys-list').listview('refresh');
+                        Mist.keyAddController.newKeyClear();
+                        $("#dialog-add-key").popup("close");
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify(jqXHR.responseText);
@@ -76,7 +110,7 @@ define('app/controllers/keys', [
                 });
             },
 
-            getPrivKey: function(key) {
+            getPrivKey: function(key, element) {
                 payload = {
                     'action': 'get_private_key',
                     'key_id': key.name
@@ -89,7 +123,7 @@ define('app/controllers/keys', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully got private key ', name);
-                        $("#private-key").val(data);
+                        $(element).val(data).trigger('change');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while getting key'  +

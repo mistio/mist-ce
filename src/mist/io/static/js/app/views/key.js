@@ -87,6 +87,14 @@ define('app/views/key', [
                     });
                 }
             },
+            
+            editKey: function() {
+                var key = this.get('controller').get('model');
+                $("#dialog-add-key").popup("open", {transition: 'pop'});
+                Mist.keysController.getPrivKey(key, "#textarea-private-key"); 
+                $("#textarea-public-key").val(key.pub).trigger('change');
+                $("#create-key-name").val(key.name).trigger('change');
+            },
 
             deleteKey: function() {
                 var key = this.get('controller').get('model');
@@ -134,7 +142,7 @@ define('app/views/key', [
 
             displayPrivate: function(){
                 var key = this.get('controller').get('model');
-                Mist.keysController.getPrivKey(key);
+                Mist.keysController.getPrivKey(key, "#private-key");
                 $("#key-private-dialog").popup("open", {transition: 'pop'});
             },
 

@@ -468,7 +468,7 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 100%;
 }
 
-.machines-footer, .keys-footer {
+.machines-footer, .keys-footer, .single-key-footer {
     display: none;
 }
 
@@ -486,7 +486,7 @@ div.actions div.ui-controlgroup-controls {
     padding-left: 0.5%;
 }
 
-.keys-footer.ui-footer div.actions {
+.keys-footer.ui-footer div.actions, .single-key-footer.ui-footer div.actions {
     padding-left: 0.5%;
 }
 
@@ -496,6 +496,10 @@ div.actions div.ui-controlgroup-controls {
 
 .keys-footer.ui-footer div.actions a {
     width: 49%;
+}
+
+.single-key-footer.ui-footer div.actions a {
+    width: 33%;
 }
 
 .ui-icon-mist-power {

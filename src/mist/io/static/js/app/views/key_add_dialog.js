@@ -10,6 +10,13 @@ define('app/views/key_add_dialog', [
         return Ember.View.extend({
             
             attributeBindings: ['data-role',],
+            
+            notEditMode: function() {
+                if (this.get('parentView').toString().indexOf('SingleKeyView') > -1 ) {
+                    return false;
+                }
+                return true;
+            }.property('notEditMode'),
 
             backClicked: function() {
                 Mist.keyAddController.newKeyClear();
@@ -89,11 +96,14 @@ define('app/views/key_add_dialog', [
                         return;
                     }
                 }
-                Mist.keyAddController.newKey();
-                Mist.keyAddController.newKeyClear();
-                $("#dialog-add-key").popup("close");
-            },
 
+                if (this.get('notEditMode')) {
+                    Mist.keyAddController.newKey();
+                } else {
+                    Mist.keyAddController.editKey(this.get('parentView').get('controller').get('model').name);
+                }
+            },
+            
             template: Ember.Handlebars.compile(key_add_dialog_html)
 
         });
