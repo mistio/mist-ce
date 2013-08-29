@@ -88,18 +88,16 @@ define('app/views/machine_monitoring_dialog', [
                 window.location.href = "https://mist.io/account";  
             },
 
-            changeMonitoringClicked: function() {
-                var machine = this.get('controller').get('model');
-                var d = new Date();
-                var nowUTC = String(d.getTime() + d.getTimezoneOffset()*60*1000);
+            checkValidLogin: function() {
+                //sends email, passwords and check if auth is ok
+                
                 var payload = {
-                    'emai': Mist.email,
-                    'timestamp': nowUTC,
-                    'pass': CryptoJS.SHA256(Mist.password).toString(),
-                    'hash': CryptoJS.SHA256(Mist.email + ':' + nowUTC + ':' + CryptoJS.SHA256(Mist.password).toString()).toString()
+                    'email': Mist.email,
+                    'password': CryptoJS.SHA256(Mist.password).toString()
                 };
+                $("#monitoring-dialog .ajax-loader").show()
                 $.ajax({
-                    url: '/backends/' + this.backend.id + '/machines/' + this.id + '/monitoring',
+                    url: '/auth',
                     type: 'POST',
                     headers: { "cache-control": "no-cache" },
                     contentType: 'application/json',
@@ -107,14 +105,20 @@ define('app/views/machine_monitoring_dialog', [
                     dataType: 'json',
                     timeout : 60000,
                     success: function(data) {
-
+                        Mist.set('authenticated', true);
+                        Mist.set('current_plan', data.current_plan);
+                        Mist.set('user_details', data.user_details);
+                        $("#monitoring-dialog .ajax-loader").hide()
+                        //If ok set Mist.auth, Mist.current_plan and Mist.user_details and keep on with enable monitoring (if current plan allows), or show the change plans dialog
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.warn('Authentication error');
+                        $("#monitoring-dialog .ajax-loader").hide()
+                        //Mist.notificationController.warn('Authentication error');
                     }
                 });
-                $("#monitoring-dialog").popup('close');
-                this.openMonitoringDialog();
+                
+                //$("#monitoring-dialog").popup('close');
+                //this.openMonitoringDialog();
             },
 
             backClicked: function() {
