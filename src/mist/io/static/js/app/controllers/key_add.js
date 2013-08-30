@@ -9,11 +9,13 @@ define('app/controllers/key_add', [
     function() {
         return Ember.Object.extend({
 
-            newKey: function() {
+            newKey: function(machine) {
                 log("new key");
                 Mist.keysController.newKey(this.get('newKeyName'),
                                             this.get('newKeyPublic'),
-                                            this.get('newKeyPrivate'));
+                                            this.get('newKeyPrivate'),
+                                            null,
+                                            machine);
             },
             
             editKey: function(oldKeyName) {

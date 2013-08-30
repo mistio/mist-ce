@@ -537,14 +537,19 @@ div.ember-view div.ui-panel-content-wrap {
 /* Machine single View */
 
 #single-view-state {
-    font-weight: normal;
-    float: left;
-    margin: 30px 20px 0 10px;
+   font-weight: normal;
+    left: 50%;
+    margin-bottom: 0;
+    margin-top: 30px;
     text-shadow: none;
 }
 
+#key-icon-wrapper {
+    margin: auto;
+}
+
 .single-view-icon-wrapper {
-    float: right;
+    float: left;
     padding: 16px 20px;
     background-position: center;
     background-repeat: no-repeat;
@@ -1270,6 +1275,47 @@ iframe#hidden-shell-iframe {
     font-size: 16px;
 }
 
+/*  Machine Manage Keys */
+
+#machine-associated-keys {
+    
+}
+
+#machine-associated-keys .associated-key {
+    display: block;
+    float: left;
+    position: relative;
+    padding: 0 16px 0 3px;
+    margin: 0 6px 8px 0;
+    background: #ddd;
+    -webkit-border-radius: 19px;
+    -moz-border-radius: 19px;
+    border-radius: 19px;
+    border: 1px solid #c4c4c4;
+}
+
+#single-machine-select-key .ui-btn-inner {
+    text-align: center;
+}
+
+#single-machine-select-key {
+    clear: right;
+    width: 100%;
+}
+
+#single-machine-create-key {
+    width: 100%;    
+}
+
+#machine-manage-keys-cancel {
+    width: 100%;
+}
+
+#no-associated-keys {
+    width: 100%;
+    text-align: center;
+}
+
 /*  Keys */
 
 #private-key {
@@ -1302,7 +1348,7 @@ div.logout-placeholder {
     float: right;
 }
 
-#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, .dialog-add .ajax-loader, .rule-box .ajax-loader, .rule-command-popup .ajax-loader, .add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader, #keys-wrapper .ajax-loader, #keys-container .ajax-loader  {
+#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, #manage-keys .ajax-loader, .dialog-add .ajax-loader, .rule-box .ajax-loader, .rule-command-popup .ajax-loader, .add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader, #keys-wrapper .ajax-loader, #keys-container .ajax-loader  {
     background-image: url(images/spinner.gif);
     background-position: center !important;
     background-repeat: no-repeat;
@@ -1323,6 +1369,13 @@ div.logout-placeholder {
     top: -43px;
     margin-left: 30px;
 }
+
+#manage-keys .ajax-loader  {
+    position: relative;
+    top: -43px;
+    margin-left: 30px;
+}
+
 
 #monitoring-wrapper .rule-box .ajax-loader  {
     float: right;

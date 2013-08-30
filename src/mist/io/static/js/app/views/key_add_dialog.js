@@ -14,10 +14,17 @@ define('app/views/key_add_dialog', [
             notEditMode: function() {
                 return this.get('parentView').toString().indexOf('SingleKeyView') == -1;
             }.property('notEditMode'),
-
+            
+            comesFromManageKeys: function() {
+                return this.get('parentView').toString().indexOf('MachineManageKeys') > -1; 
+            }.property('comesFromManageKeys'),
+            
             backClicked: function() {
                 Mist.keyAddController.newKeyClear();
                 $("#dialog-add-key").popup("close");
+                if (this.get('comesFromManageKeys')){
+                    $('#manage-keys').panel('open');
+                }
             },
 
             generateClicked: function() {
@@ -91,8 +98,13 @@ define('app/views/key_add_dialog', [
                         return;
                     }
                 }
+                
                 if (this.get('notEditMode')) {
-                    Mist.keyAddController.newKey();
+                    var machine;
+                    if (this.get('comesFromManageKeys')) {
+                        machine = this.get('parentView').get('controller').get('model');
+                    }
+                    Mist.keyAddController.newKey(machine);
                 } else {
                     Mist.keyAddController.editKey(this.get('parentView').get('controller').get('model').name);
                 }

@@ -66,6 +66,7 @@ define( 'app', [
     'app/views/delete_tag',
     'app/views/machine_tags_dialog',
     'app/views/machine_monitoring_dialog',
+    'app/views/machine_manage_keys',
     'app/views/key_list_item',
     'app/views/key_list',
     'app/views/key',
@@ -110,6 +111,7 @@ define( 'app', [
                 DeleteTagView,
                 MachineTagsDialog,
                 MachineMonitoringDialog,
+                MachineManageKeys,
                 KeyListItemView,
                 KeyListView,
                 SingleKeyView,
@@ -229,7 +231,7 @@ define( 'app', [
         });  
         
         App.SingleMachineView = SingleMachineView;
-        App.MachineListView = MachineListView
+        App.MachineListView = MachineListView;
         App.UserMenuView = UserMenuView;
         App.KeyListView = KeyListView;
         App.KeyListItemView = KeyListItemView;
@@ -331,6 +333,7 @@ define( 'app', [
         App.PowerDialog = SingleMachineActionsDialog;
         App.MachineActionsDialog = MachineActionsDialog;
         App.MachineMonitoringDialog = MachineMonitoringDialog;
+        App.MachineManageKeys = MachineManageKeys;
         App.MachineListView = MachineListView;
 
         window.Mist = App;

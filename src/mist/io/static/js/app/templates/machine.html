@@ -11,9 +11,9 @@
 
 </div>
 
-<div class="single-view-header">
+{{view Mist.MachineManageKeys}}
 
-    <h3 class="single-view-name">{{name}}</h3>
+<div class="single-view-header" data-role="header">
 
     <span class="single-view-icon-wrapper">
         <span id="single-view-provider-icon" {{bindAttr class="view.providerIconClass"}}></span>
@@ -24,7 +24,27 @@
     </span>
 
     <h3 id="single-view-state" {{bindAttr class="state"}}>{{state}}</h3>
-
+    
+    <span class="key-icon-wrapper">
+        <span class="bubble-container">
+            {{#if hasKey}}
+            <div class="key-icon"></div>     
+            {{else}}
+            <div class="no-key-icon"></div>
+            {{/if}}
+            
+            <a href="#"
+                id="mist-create-machine"
+                class="add-button"
+                data-theme="b"
+                data-role="button"
+                data-icon="arrow-d"
+                data-iconpos="right"
+                data-mini="false"
+                {{action manageKeysClicked target="view"}}>{{#if hasKey}}3 keys{{else}}No keys{{/if}}</a>         
+        </span>
+    </span>
+    
 </div>
 
 <div data-role="content">

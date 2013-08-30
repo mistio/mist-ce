@@ -30,13 +30,13 @@ define('app/controllers/keys', [
                 });
             },
 
-            newKey: function(name, publicKey, privateKey, autoSelect) {
+            newKey: function(name, publicKey, privateKey, autoSelect, machine) {
                 item = {
                     'name': name,
                     'pub': publicKey,
                     'priv': privateKey
                 };
-
+                var mac = machine;
                 var that = this;
                 $.ajax({
                     url: '/keys/' + name,
@@ -70,6 +70,12 @@ define('app/controllers/keys', [
                         }
                         Mist.keyAddController.newKeyClear();
                         $("#dialog-add-key").popup("close");
+                        if (mac) {
+                            var machine = Mist.backendsController.getMachineById(mac.backend.id, mac.id );
+                            $('#manage-keys .ajax-loader').fadeIn(200);
+                            Mist.keysController.associateKey(name, mac); 
+                            $('#manage-keys').panel('open');
+                        }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify(jqXHR.responseText);
@@ -251,8 +257,6 @@ define('app/controllers/keys', [
                         Mist.notificationController.notify('Error while disassociating key'  +
                                 key.name);
                         error(textstate, errorThrown, 'while disassociating key', key.name);
-                        $('.' + this.key.strippedname + ' .delete-key-container').show();
-                        $('.' + this.key.strippedname + ' .ajax-loader').hide();
                     }
                 });
             },

@@ -71,11 +71,11 @@ define('app/views/machine', [
             }.property('controller.model'),
             
             keySelect: function(key) {
-                $('#associate-button').show();
-                $('#associate-key-button').addClass('ui-disabled');
+                //$('#associate-button').show();
+                //$('#associate-key-button').addClass('ui-disabled');
                 var machine = this.get('controller').get('model');
                 Mist.keysController.associateKey(key.name, machine);
-                $('#associate-key').popup('close');
+                //$('#associate-key').popup('close');
                 return false;
             },
 
@@ -492,7 +492,12 @@ define('app/views/machine', [
             associateClicked: function() {
                 $('.key-list').listview('refresh');
                 $('#associate-key').popup('option', 'positionTo', '#associate-key-button').popup('open');
-            }
+            },
+            
+            manageKeysClicked: function() {
+                $('#manage-keys').panel("open");
+            } 
+            
         });
     }
 );
