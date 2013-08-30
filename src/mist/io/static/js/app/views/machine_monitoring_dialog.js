@@ -118,6 +118,7 @@ define('app/views/machine_monitoring_dialog', [
                         $("#login-dialog .ajax-loader").hide();
                         //If ok set Mist.auth, Mist.current_plan and Mist.user_details and keep on with enable monitoring (if current plan allows), or show the change plans dialog
                         $("#login-dialog").popup('close');
+                        $("a.monitoring-button").click();
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         $("#login-dialog .ajax-loader").hide();
@@ -147,6 +148,7 @@ define('app/views/machine_monitoring_dialog', [
                     var payload = {
                         "action": 'upgrade_plans', 
                         "plan": 'Basic',
+                        "auth_key": Mist.auth_key,
                         "name": $('#trial-user-name').val(),
                         "company_name": $('#trial-company-name').val()                        
                     };
@@ -172,7 +174,6 @@ define('app/views/machine_monitoring_dialog', [
                             $('#trial-user-details .ajax-loader').hide();   
                             $('.trial-button').removeClass('ui-disabled');  
                             $('#submit-trial').removeClass('ui-disabled');
-                                                                                                                                                                                                                                                                                                                                                    
                         }
                     });
 
