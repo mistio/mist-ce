@@ -109,7 +109,7 @@ define('app/controllers/machines', [
                         that.backend.set('state', 'offline');
                     }
                     
-                    Mist.backendsController.getMachineCount()
+                    Mist.backendsController.getMachineCount();
                     
                     Ember.run.later(that, function(){
                         this.refresh();

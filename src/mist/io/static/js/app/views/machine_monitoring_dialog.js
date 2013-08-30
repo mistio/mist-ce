@@ -14,7 +14,7 @@ define('app/views/machine_monitoring_dialog', [
 
             enableMonitoringClick: function() {
                 if (Mist.authenticated) {
-                    this.openMonitoringDialog()
+                    this.openMonitoringDialog();
                 } else {
                     $("#login-dialog").show();
                     $("#login-dialog").popup('open');
@@ -39,7 +39,7 @@ define('app/views/machine_monitoring_dialog', [
                     } else {
                         $('#monitoring-dialog div h1').text('Enable monitoring');
                         $('#monitoring-disabled').show();
-                        $('#monitoring-enabled').hide()
+                        $('#monitoring-enabled').hide();
                         $('#button-back-disabled').on("click", function() {
                             $("#monitoring-dialog").popup('close');
                         });
@@ -172,7 +172,7 @@ define('app/views/machine_monitoring_dialog', [
                             $('#submit-trial').removeClass('ui-disabled');                                                                                         
                             $("#monitoring-dialog").popup('close');                            
                             Mist.set('current_plan', result);
-                            $("a.monitoring-button").click()
+                            $("a.monitoring-button").click();
                         },
                         error: function(jqXHR, textstate, errorThrown) {
                             Mist.notificationController.notify(jqXHR.responseText);
