@@ -134,7 +134,13 @@ define('app/views/machine_monitoring_dialog', [
                 $("#trial-user-details").hide();   
                 $('.trial-button').removeClass('ui-disabled');                                                                                        
             },
-            
+
+            backLoginClicked: function() {
+                $('#login-dialog').popup('close');
+                $('#login-dialog #email').val('');
+                $('#login-dialog #password').val('');
+           },
+ 
             submitTrial: function(){
                 if ($('#trial-user-name').val() && $('#trial-company-name').val()) {
                     var payload = {
