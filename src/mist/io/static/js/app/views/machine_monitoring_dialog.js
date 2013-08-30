@@ -16,6 +16,7 @@ define('app/views/machine_monitoring_dialog', [
                 if (Mist.authenticated) {
                     this.openMonitoringDialog()
                 } else {
+                    $("#login-dialog").show();
                     $("#login-dialog").popup('open');
                 }
             },
@@ -118,6 +119,11 @@ define('app/views/machine_monitoring_dialog', [
                         $("#login-dialog .ajax-loader").hide();
                         //If ok set Mist.auth, Mist.current_plan and Mist.user_details and keep on with enable monitoring (if current plan allows), or show the change plans dialog
                         $("#login-dialog").popup('close');
+                        //if Mist.monitored_machines is undefined, then set to []. /monitoring takes some time to run, to get the real monitored_machines
+
+                        if (typeof Mist.monitored_machines === 'undefined') {
+                            Mist.set('monitored_machines', []);
+                        }
                         $("a.monitoring-button").click();
                     },
                     error: function(jqXHR, textstate, errorThrown) {
