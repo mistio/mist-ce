@@ -101,10 +101,13 @@ define('app/views/key_add_dialog', [
                 
                 if (this.get('notEditMode')) {
                     var machine;
-                    if (this.get('comesFromManageKeys')) {
+                    
+                    try {
                         machine = this.get('parentView').get('controller').get('model');
-                    }
+                    } catch (e) {}
+                    
                     Mist.keyAddController.newKey(machine);
+                
                 } else {
                     Mist.keyAddController.editKey(this.get('parentView').get('controller').get('model').name);
                 }
