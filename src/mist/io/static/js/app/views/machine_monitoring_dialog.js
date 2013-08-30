@@ -102,7 +102,7 @@ define('app/views/machine_monitoring_dialog', [
                     'email': Mist.email,
                     'password': CryptoJS.SHA256(Mist.password).toString()
                 };
-                $("#login-dialog .ajax-loader").show()
+                $("#login-dialog .ajax-loader").show();
                 $.ajax({
                     url: '/auth',
                     type: 'POST',
@@ -115,13 +115,14 @@ define('app/views/machine_monitoring_dialog', [
                         Mist.set('authenticated', true);
                         Mist.set('current_plan', data.current_plan);
                         Mist.set('user_details', data.user_details);
-                        $("#login-dialog .ajax-loader").hide()
+                        $("#login-dialog .ajax-loader").hide();
                         //If ok set Mist.auth, Mist.current_plan and Mist.user_details and keep on with enable monitoring (if current plan allows), or show the change plans dialog
                         $("#login-dialog").popup('close');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        $("#login-dialog .ajax-loader").hide()
+                        $("#login-dialog .ajax-loader").hide();
                         Mist.notificationController.warn('Authentication error');
+                        $('div.pending-monitoring').hide();
                     }
                 });
             },
@@ -166,8 +167,8 @@ define('app/views/machine_monitoring_dialog', [
                             $("a.monitoring-button").click()
                         },
                         error: function(jqXHR, textstate, errorThrown) {
-                            //Mist.notificationController.notify(jqXHR.responseText);
-                            //cannot use it because of buggy 'enabling/disabling' popup appearing
+                            Mist.notificationController.notify(jqXHR.responseText);
+                            $('div.pending-monitoring').hide();                            
                             $('#trial-user-details .ajax-loader').hide();   
                             $('.trial-button').removeClass('ui-disabled');  
                             $('#submit-trial').removeClass('ui-disabled');
