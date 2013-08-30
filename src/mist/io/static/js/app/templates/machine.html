@@ -37,7 +37,7 @@
             {{#if hasMonitoring}}
 
             <div {{bindAttr class=":enabled state"}}>
-                <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose loading-monitoring">
+                <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose loading-monitoring" style="display:none;">
                     <span class="ui-icon ui-icon-loading"></span>
                     <h1>Fetching stats...</h1>
                 </div>
@@ -49,7 +49,7 @@
             <div id="networkGraph"></div>
             <div id="diskGraph"></div>
             <div id="memoryGraph"></div>
-            <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
+            <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring"  style="display:none;">
                 <span class="ui-icon ui-icon-loading"></span>
                 <h1>Disabling monitoring</h1>
             </div>
@@ -108,7 +108,7 @@
 
                 {{view Mist.MachineMonitoringDialog machineBinding="this"}}
 
-                <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
+                <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring"  style="display:none;">
                     <span class="ui-icon ui-icon-loading"></span>
                     <h1>Enabling monitoring</h1>
                 </div>
