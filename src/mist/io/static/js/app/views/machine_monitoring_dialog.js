@@ -153,7 +153,7 @@ define('app/views/machine_monitoring_dialog', [
                     $('#trial-user-details .ajax-loader').show();  
                     $('#submit-trial').addClass('ui-disabled');                      
                     $.ajax({
-                        url: 'https://mist.io/account',
+                        url: '/account',
                         type: "POST",
                         contentType: "application/json",
                         dataType: "json",
