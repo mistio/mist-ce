@@ -66,8 +66,8 @@ define('app/controllers/rules', [
                 that.pushObject(rule);
                 that.redrawRules();
                 setTimeout(function() {
-                        $('#new .delete-rule-container').hide()
-                        $('#new .ajax-loader').show()
+                        $('#new .delete-rule-container').hide();
+                        $('#new .ajax-loader').show();
                     }, 100)
 
                 payload = {
@@ -89,8 +89,8 @@ define('app/controllers/rules', [
                         info('Successfully created rule ', data['id']);
                         rule.set('id', data['id']);
                         $('#new').attr('id', data['id']);
-                        $('.rule-box').last().find('.delete-rule-container').show()
-                        $('.rule-box').last().find('.ajax-loader').hide()
+                        $('.rule-box').last().find('.delete-rule-container').show();
+                        $('.rule-box').last().find('.ajax-loader').hide();
                         $('#add-rule-button').button('enable');
                         $('#add-rule-button').button('refresh');
                         rule.set('maxValue', data['max_value']);

@@ -93,7 +93,7 @@
         {{view Mist.TextField type="password" valueBinding="Mist.password" name="password" id="password"}}
 
         <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <button data-theme="c" {{action "backClicked" target="view"}}>Back</button>
+            <button data-theme="c" {{action "backLoginClicked" target="view"}}>Back</button>
             <button id="auth-ok" data-theme="b" {{action "doLogin" target="view"}}>Login</button>
         </div>
         <div class="ajax-loader"></div>

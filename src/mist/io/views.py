@@ -73,6 +73,7 @@ def home(request):
 
 @view_config(route_name="check_auth", request_method='POST', renderer="json")
 def check_auth(request):
+    "Check on the mist.core service if authenticated"
     params = request.json_body
     email = params.get('email', '').lower()
     password = params.get('password', '')
@@ -89,6 +90,30 @@ def check_auth(request):
         return ret
     else:
         return Response('Unauthorized', 401)
+
+@view_config(route_name='account', request_method='POST', renderer='json')
+def update_user_settings(request, renderer='json'):
+    """try free plan, by communicating to the mist.core service
+    """
+    params = request.json_body
+    action = params.get('action', '').lower()
+    plan = params.get('plan', '')
+    name = params.get('name', '')
+    auth_key = params.get('auth_key', '')
+    company_name = params.get('company_name', '')
+
+    payload = {'auth_key': auth_key, 'action': action, 'plan': plan, 'name': name, 'company_name': company_name}
+
+    core_uri = request.registry.settings['core_uri']
+    ret = requests.post(core_uri + '/account', params=payload, verify=False)
+
+    if ret.status_code == 200:
+        ret = json.loads(ret.content)
+        return ret
+    else:
+        return Response('Unauthorized', 401)
+
+
 
 
 @view_config(route_name='backends', request_method='GET', renderer='json')
