@@ -52,14 +52,13 @@ define('app/views/machine_monitoring_dialog', [
                             if (Mist.current_plan['has_expired']) {
                                 //Trial or Plan expired, hide monitoring-dialog, hide free-trial
                                 $('#enable-monitoring-dialog').hide();
-                                $('#free-trial').hide();
-                                $('#purchase-plan').show();                                                       
+                                $('#plan-text span').text('You have to purchase a plan in order to enable monitoring.');
                             } else {
                                 //Trial or Plan enabled. Check for quota 
                                 if (Mist.current_plan['machine_limit'] <= Mist.monitored_machines.length) {
                                     //Quota exceeded, show buy option
                                     $('#enable-monitoring-dialog').hide();  
-                                    $('#quota-plan').show();                          
+                                    $('#plan-text span').text('You have reached the limits for your plan. Please upgrade plan in order to continue.');
                                 } else {
                                     //Everything ok, show monitoring-dialog, hide plan-dialog
                                     $('#enable-monitoring-dialog').show();
@@ -77,7 +76,7 @@ define('app/views/machine_monitoring_dialog', [
                             $('#enable-monitoring-dialog').hide();
                             $('#monitoring-enabled').hide();
                             $('#plan-dialog').show(); 
-                            $('#free-trial').show();   
+                            $('#plan-text span').text('Monitoring is a premium service. You can try it for free for one month, or purchase a plan.');
                             $('.trial-button').show();
                         }
                     }
@@ -87,8 +86,8 @@ define('app/views/machine_monitoring_dialog', [
             },
 
             openTrialDialog: function() {
-                $("#trial-user-details").show();      
-                $('.trial-button').addClass('ui-disabled');    
+                $("#monitoring-dialog").popup('close');
+                $("#trial-dialog").popup('open');
             },
 
             clickedPurchaseDialog: function() {

@@ -1288,11 +1288,8 @@ div.logout-placeholder, div.account-placeholder {
     min-height: 120px;
 }
 
-#trial-user-details {
-    display: none;
-    color: #666;
-    padding-bottom: 20px;
-    width: 60%;
+#monitoring-dialog #plan-text {
+    width: 250px;
 }
 
 #monitoring-wrapper .rule-box .ajax-loader  {
