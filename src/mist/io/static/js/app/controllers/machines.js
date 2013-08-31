@@ -69,7 +69,7 @@ define('app/controllers/machines', [
                                 machine.set('can_reboot', item.can_reboot);
                                 machine.set('can_tag', item.can_tag);
                                 //FIXME check for changes
-                                machine.tags.set('content', item.tags)
+                                machine.tags.set('content', item.tags);
                                 machine.set('public_ips', item.public_ips);
                                 machine.set('extra', item.extra);
                                 return false;
@@ -79,7 +79,7 @@ define('app/controllers/machines', [
                         if (!found && !that.backend.create_pending) {
                             item.backend = that.backend;
                             var machine = Machine.create(item);
-                            machine.tags.set('content', item.tags)
+                            machine.tags.set('content', item.tags);
                             that.pushObject(machine);
                         }
 

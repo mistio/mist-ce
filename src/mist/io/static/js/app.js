@@ -57,7 +57,6 @@ define( 'app', [
     'app/views/machine_add_dialog',
     'app/views/machine',
     'app/views/machine_list',
-    'app/views/machine_key_list_item',
     'app/views/confirmation_dialog',
     'app/views/machine_actions_dialog',
     'app/views/single_machine_actions_dialog',
@@ -102,7 +101,6 @@ define( 'app', [
                 MachineAddDialog,
                 SingleMachineView,
                 MachineListView,
-                MachineKeyListItem,
                 ConfirmationDialog,
                 MachineActionsDialog,
                 SingleMachineActionsDialog,
@@ -241,7 +239,6 @@ define( 'app', [
         App.KeyPrivDialog = KeyPrivDialog;
         App.MachineAddView = MachineAddDialog;
         App.KeyAssociateDialog = KeyAssociateDialog;
-        App.MachineKeyListItemView = MachineKeyListItem;
         
         App.set('backendAddController', BackendAddController.create());
         App.set('backendsController', BackendsController.create());

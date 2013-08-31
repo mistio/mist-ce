@@ -15,15 +15,23 @@ define('app/views/key_add_dialog', [
                 return this.get('parentView').toString().indexOf('SingleKeyView') == -1;
             }.property('notEditMode'),
             
-            comesFromManageKeys: function() {
-                return this.get('parentView').toString().indexOf('MachineManageKeys') > -1; 
-            }.property('comesFromManageKeys'),
+            getAssociatedMachine: function() {
+                var machine;
+                try {
+                    machine = this.get('parentView').get('controller').get('model');
+                } catch (e) {}
+                return machine;
+            },
             
             backClicked: function() {
                 Mist.keyAddController.newKeyClear();
                 $("#dialog-add-key").popup("close");
-                if (this.get('comesFromManageKeys')){
-                    $('#manage-keys').panel('open');
+                if (this.getAssociatedMachine()){
+                    // JQM won't open second popup imediately
+                    setTimeout( function(){
+                            $('#associate-key-dialog').popup('open', {transition: 'pop'});
+                        }, 
+                        350); 
                 }
             },
 
@@ -100,14 +108,7 @@ define('app/views/key_add_dialog', [
                 }
                 
                 if (this.get('notEditMode')) {
-                    var machine;
-                    
-                    try {
-                        machine = this.get('parentView').get('controller').get('model');
-                    } catch (e) {}
-                    
-                    Mist.keyAddController.newKey(machine);
-                
+                    Mist.keyAddController.newKey(this.getAssociatedMachine());
                 } else {
                     Mist.keyAddController.editKey(this.get('parentView').get('controller').get('model').name);
                 }

@@ -1,53 +1,74 @@
-<div class="mist-dialog dialog-add" id="manage-keys" data-role="panel" data-position="right" data-display="overlay" >
+<div id="manage-keys" data-role="panel" data-position="right" data-display="overlay" >
     
     <div data-role="header">
         <h1>Manage Keys</h1>
     </div>
-    
+    <br>    
     {{#if keys}}
-        <label for="machine-associated-keys">Associated keys:</label>
+        <label for="machine-associated-keys" style="display:block;">Associated keys:</label>
         <ul id="machine-associated-keys">
-        {{#each keys}}
-            <a class="associated-key"
-               data-role="button"
-               data-theme="c"
-               data-icon="delete"
-               data-inline="true"
-               {{action disassociateClick this target="view"}}>{{this.name}}</a>
+        {{#each keys}}     
+            <div class="associated-key">
+                <a data-role="button"
+                    data-icon="delete"
+                    data-inline="true"
+                    data-iconpos="notext"
+                    {{action disassociateClicked this target="view"}}></a>
+                {{this.name}}
+            </div>         
         {{/each}}
         </ul>
     {{else}}
-        <label id="no-associated-keys">There aren't any keys associated with this machine</label>
+    <label>There aren't any keys associated with this machine</label>
     {{/if}}
     
     <div class="ajax-loader"></div>
- 
-    <a id="single-machine-create-key"
-       data-rel="popup"
-       data-transition="slidedown"
-       class="add-button"
-       data-theme="b"
-       data-role="button"
-       data-icon="plus"
-       data-iconpos="right"
-       {{action createKeyClicked target="view"}}>Create</a>
+        
+    <button data-theme="b" {{action associateKeyClicked target="view"}}>Associate Key</button>
     
-    <div class="select-key-collapsible" id="single-machine-select-key" data-role="collapsible" data-iconpos="right" data-corners="true"
-        data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
-        <h2>Select Key</h2>
-        <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
-            {{#each restKeys}}
-            <li data-icon="false" data-corners="true">
-                <a href="#" {{bindAttr title="name"}} 
-                            {{action selectKey this target="view"}}>{{this.name}}</a>
-            </li>
-            {{/each}}
-        </ul>
+    <button {{action cancelManageKeysClicked target="view"}}>Back</button>
+    
+</div>
+
+
+<!-- ASSOCIATE KEY DIALOG -->
+
+<div data-role="popup" id="associate-key-dialog" class="mist-dialog" data-overlay-theme="a">
+
+    <!-- HEADER -->
+    
+    <div data-role="header">
+        <h1>Associate key</h1>
     </div>
     
-    <button id="machine-manage-keys-cancel" data-theme="c" {{action cancelManageKeysClicked target="view"}}>Back</button>
+    <!-- CREATE BUTTON -->
+    
+    <button data-theme="b" {{action createKeyClicked target="view"}}>Create Key</button>
+    
+    <!-- KEYS LIST -->
+    
+    {{#if restKeys}}
+    <br>
+    <ul id="non-associated-keys" data-role="listview">
+        
+        <li data-role="list-devider" data-theme="a">Existing Keys</li>
+        
+        {{#each restKeys}}
+        <li data-icon="false" data-corners="true">
+            <a href="#" {{action selectKey this target="view"}}>{{this.name}}</a>
+        </li>
+        {{/each}}
+        
+    </ul>
+    {{/if}}
+    
+    <!-- BACK BUTTON -->
+    
+    <button {{action cancelAssociateKeyClicked target="view"}}>Back</button>
 
 </div>
+
+<!-- CREATE KEY DIALOG -->
 
 <div data-role="popup" id="dialog-add-key" class="mist-dialog" data-overlay-theme="a">
 

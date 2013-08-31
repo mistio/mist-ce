@@ -19,26 +19,41 @@ define('app/views/machine_manage_keys', [
             },
             
             selectKey: function(key){
-                //$('.select-key-collapsible').collapsible('option','collapsedIcon','check');    
-                $('.select-key-collapsible').trigger('collapse');
-                var machine = this.get('controller').get('model');
+                $('#associate-key-dialog').popup('close');
+                $('#manage-keys').panel('open');
                 $('#manage-keys .ajax-loader').fadeIn(200);
-                Mist.keysController.associateKey(key.name, machine);    
+                var machine = this.get('controller').get('model');
+                Mist.keysController.associateKey(key.name, machine);
             },
             
             cancelManageKeysClicked: function() {
                 $('#manage-keys').panel("close");
             },
             
-            disassociateClick: function(key) {
+            associateKeyClicked: function() {
+                $('#manage-keys').panel('close');
+                $('#associate-key-dialog').popup('open', {transition: 'pop'});
+                $('#non-associated-keys').listview('refresh');
+            },
+            
+            disassociateClicked: function(key) {
                 var machine = this.get('controller').get('model');
                 $('#manage-keys .ajax-loader').fadeIn(200);
                 Mist.keysController.disassociateKey(key, machine);
             },
             
             createKeyClicked: function() {
-                $('#manage-keys').panel('close');
-                $('#dialog-add-key').popup('open', {transition: 'pop'});
+                $('#associate-key-dialog').popup('close');
+                // JQM won't open second popup imediately
+                setTimeout( function(){
+                        $('#dialog-add-key').popup('open', {transition: 'pop'});
+                    }, 
+                    350); 
+            },
+            
+            cancelAssociateKeyClicked: function() {
+                $('#associate-key-dialog').popup('close');
+                $('#manage-keys').panel('open');
             }
       
         });

@@ -206,46 +206,7 @@
 
     </div>
 
-         <div data-role="collapsible" data-collapsed="false" id="machine-single-keys">
-            <h3>Keys</h3>
-            <div id="keys-wrapper" class="ui-btn-inner ui-corner-top ui-corner-bottom">
-                {{#if keys}}
-                <div class="keys-container">
-                    {{#each keys}}
-                        {{view Mist.MachineKeyListItemView keyBinding="this"}}
-                    {{/each}}
-                </div>
-                {{/if}}
-
-                {{#if restKeys}}
-                <div class="associate-key-container">
-                    <div>
-                    <a id="associate-key-button"
-                        data-role="button"
-                        data-inline="true"
-                        data-icon="plus"
-                        data-theme="b"
-                        {{bindAttr class="restKeys::ui-disabled"}}
-                        {{action associateClicked target="view"}}>Associate</a>
-                    </div>
-                </div>
-                {{/if}}
-                <div class="ajax-loader" id="associate-button"></div>
-
-                <div id="associate-key" data-role="popup">
-                    <ul class="key-list" data-role="listview">
-                        {{#each restKeys}}
-                        <li data-icon="false">
-                            <a href="#" {{action keySelect this target="view"}}>{{name}}</a>
-                        </li>
-                        {{/each}}
-                    </ul>
-                </div>
-            </div>
-
-        </div>
-
-        <div data-role="collapsible">
+    <div data-role="collapsible">
 
         <h3>Full metadata list</h3>
 

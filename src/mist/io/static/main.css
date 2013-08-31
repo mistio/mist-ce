@@ -1286,14 +1286,21 @@ iframe#hidden-shell-iframe {
 
 /*  Machine Manage Keys */
 
-#machine-associated-keys {
-    
+#manage-keys, #manage-keys.ui-panel-open {
+    min-height: 100px !important;
 }
 
-#machine-associated-keys .associated-key {
+#manage-keys.ui-panel-open {
+    min-width: 320px;
+}
+
+#machine-associated-keys {
+    display: inline-block;
+}
+
+#machine-associated-keys div.associated-key {
     display: block;
     float: left;
-    position: relative;
     padding: 0 16px 0 3px;
     margin: 0 6px 8px 0;
     background: #ddd;
@@ -1303,26 +1310,18 @@ iframe#hidden-shell-iframe {
     border: 1px solid #c4c4c4;
 }
 
-#single-machine-select-key .ui-btn-inner {
-    text-align: center;
-}
-
-#single-machine-select-key {
-    clear: right;
-    width: 100%;
-}
-
 #single-machine-create-key {
-    width: 100%;    
+    /*width: 100%;*/
 }
 
 #machine-manage-keys-cancel {
-    width: 100%;
+   /* width: 100%;
+    display: inline;*/
 }
 
 #no-associated-keys {
-    width: 100%;
-    text-align: center;
+   /* width: 100%;
+    text-align: center;*/
 }
 
 /*  Keys */
@@ -1380,8 +1379,6 @@ div.logout-placeholder {
 }
 
 #manage-keys .ajax-loader  {
-    position: relative;
-    top: -43px;
     margin-left: 30px;
 }
 
