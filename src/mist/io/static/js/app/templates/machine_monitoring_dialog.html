@@ -23,7 +23,7 @@
             <div id="monitoring-enabled">
                 <span>Are you sure you wish to disable monitoring for {{name}}?</span>
 
-                {{#unless hasKey}}
+                {{#unless probed}}
                 <p>The collectd daemon can't be disabled automactically because there is no key pair set.</p>
                 <p>To do it manually run the following commands:</p>
                 <pre>chmod -x /etc/init.d/collectd &amp;&amp; killall -9 collectd</pre>
@@ -37,7 +37,7 @@
             <div id="monitoring-disabled">
                 <div>Are you sure you wish to enable monitoring for {{name}}?</div>
 
-                {{#unless hasKey}}
+                {{#unless probed}}
                 <p>The collectd daemon can't be installed automatically because there is no key pair set.</p>
                 <p>You will have to configure it manually by following the instructions after pressing enable.</p>
                 {{/unless}}

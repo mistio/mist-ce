@@ -896,6 +896,7 @@ def list_keys(request):
     ret = [{'name': key,
             'machines': keypairs[key].get('machines', []),
             'pub': keypairs[key]['public'],
+            'priv': keypairs[key]['private'] and True or False,
             'default_key': keypairs[key].get('default', False)}
            for key in keypairs.keys()]
     return ret

@@ -24,7 +24,7 @@ function(MistScreen, machine_list_html) {
 
             Mist.backendsController.forEach(function(backend) {
                 backend.machines.forEach(function(machine) {
-                    if (machine.selected && machine.hasKey && machine.state == 'running') {
+                    if (machine.selected && machine.probed && machine.state == 'running') {
                         machines.push(machine);
                     }
                 });

@@ -20,8 +20,6 @@ define('app/views/machine_key_list_item', [
                     if (machineKey[1] == machine.id) {
                         if (machineKey[2]) {
                             keyUser = machineKey[2];
-                        } else {
-                            keyUser = machine.getUser();
                         }
                     }
                 });
@@ -32,7 +30,6 @@ define('app/views/machine_key_list_item', [
                 $('.' + this.key.strippedname + ' .delete-key-container').hide();
                 $('.' + this.key.strippedname + ' .ajax-loader').show();
                 var machine = this.get('controller').get('model');
-                var keyUser = $('.' + this.key.strippedname + ' input').val();
                 Mist.keysController.associateUserKey(this.key, keyUser, this.key.name, machine);
             }
         });

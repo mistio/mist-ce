@@ -10,6 +10,11 @@ define('app/views/machine_list_item', [
         return Ember.View.extend({
                 tagName:false,
 
+                probed: function(){
+                    warn(this.machine);
+                    return true;    
+                }.property('controller.model.probed'),
+                
                 fetchLoadavg: function(machine){
                     if (machine.hasMonitoring){
                         var uri = URL_PREFIX + '/backends/' + machine.backend.id + '/machines/' + machine.id + '/loadavg.png';

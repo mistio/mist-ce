@@ -26,31 +26,47 @@
     <h3 id="single-view-state" {{bindAttr class="state"}}>{{state}}</h3>
     
     <span class="key-icon-wrapper">
-        <span class="bubble-container">
-            {{#if hasKey}}
-            <div class="key-icon"></div>     
-            {{else}}
-            <div class="no-key-icon"></div>
-            {{/if}}
-            
+        {{#if probed}}
             <a href="#"
-                id="mist-create-machine"
-                class="add-button"
-                data-theme="b"
-                data-role="button"
-                data-icon="arrow-d"
-                data-iconpos="right"
-                data-mini="false"
-                {{action manageKeysClicked target="view"}}>{{#if hasKey}}3 keys{{else}}No keys{{/if}}</a>         
-        </span>
-    </span>
-    
+                id="mist-manage-keys"
+                {{bindAttr class="probed probing"}}
+                data-theme="c"
+                data-role="button"               
+                {{action manageKeysClicked target="view"}}>
+                {{keys.length}} keys</a>
+        {{else}}
+            {{#if keys.length}}
+                <a href="#"
+                    id="mist-manage-keys"
+                    data-theme="b"
+                    data-role="button"
+                    data-icon="gear"
+                    data-iconpos="right"
+                    {{action manageKeysClicked target="view"}}>
+                    Manage keys</a>
+            {{else}}
+                <a href="#"
+                    id="mist-manage-keys"
+                    data-theme="b"
+                    data-role="button"
+                    data-icon="plus"
+                    data-iconpos="right"
+                    {{action manageKeysClicked target="view"}}>Add keys</a>
+            {{/if}}    
+        {{/if}}
+    </span>    
 </div>
 
 <div data-role="content">
-
-    <div data-role="collapsible" data-collapsed="false">
-
+    {{#if probing}}
+        <div class="probing">
+            <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
+                <span class="ui-icon ui-icon-loading"></span>
+                <h1>Probing</h1>
+            </div>
+        </div>        
+    {{/if}}
+    <div data-role="collapsible" data-collapsed="false" {{bindAttr class="probed :monitoring-collapsible"}}>
         <h3>Monitoring</h3>
         <div id="monitoring-wrapper" {{bindAttr class=":ui-btn-inner :ui-corner-top :ui-corner-bottom pendingStats"}}>
 
@@ -107,7 +123,6 @@
                         </li>
                     </ul>
                 </div>                
-            
             </div>
             
             <div class="add-rule-container">

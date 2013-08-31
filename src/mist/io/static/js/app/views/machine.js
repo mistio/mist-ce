@@ -30,12 +30,12 @@ define('app/views/machine', [
 
             disabledShellClass: function() {
                 var machine = this.get('controller').get('model');
-                if (machine && machine.hasKey && machine.state == 'running') {
+                if (machine && machine.probed && machine.state == 'running') {
                     return '';
                 } else {
                     return 'ui-disabled';
                 }
-            }.property('controller.model.hasKey'),
+            }.property('controller.model.probed'),
 
             disabledTagClass: function() {
                 var machine = this.get('controller').get('model');
@@ -460,6 +460,19 @@ define('app/views/machine', [
                     $('.pending-monitoring').hide();
                 }
             }.observes('controller.model.pendingMonitoring'),
+            
+            updateManageKeysButton: function() {
+                Ember.run.next(function(){
+                    Ember.run.next(function(){
+                        try{
+                            $('#mist-manage-keys').button();
+                            warn('updating button');
+                        } catch(e) {
+                            $('#mist-manage-keys').button('refresh');
+                        }                    
+                    });
+                });
+            }.observes('controller.model.probed'),            
 
             showShell: function() {
                 $("#dialog-shell").popup('option', 'positionTo', '#machines-button-shell')

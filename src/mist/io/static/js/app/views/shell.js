@@ -46,7 +46,7 @@ function(shell_html) {
                 var machine = this.machine;
             }
 
-            if (!machine || !machine.hasKey || !this.command) {
+            if (!machine || !machine.probed || !this.command) {
                 return;
             }
 

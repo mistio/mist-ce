@@ -14,7 +14,8 @@ define('app/models/machine', [
             name: null,
             backend: null,
             selected: false,
-            hasKey: false,
+            probed: false,
+            probing: false,
             hasMonitoring: false,
             pendingMonitoring: false,
             pendingShell: false,
@@ -28,7 +29,7 @@ define('app/models/machine', [
             restKeys: function(){
                 var ret = [], keys = this.get('keys');
                 Mist.keysController.content.forEach(function(key){
-                    if (keys.indexOf(key) == -1) {
+                    if (keys.indexOf(key) == -1 && key.priv) {
                         ret.push(key);
                     }
                 });
@@ -43,10 +44,6 @@ define('app/models/machine', [
             image: function() {
                 return this.backend.images.getImage(this.imageId);
             }.property('image'),
-
-            user: function() {                
-                return this.getUser();
-            }.property('user'),
             
             isNotGhost: function() {                
                 return ! this.isGhost;
@@ -165,29 +162,13 @@ define('app/models/machine', [
                 }
             },
 
-            getUser: function() {
-                // In case of ec2, mist.io could have set this. Server can handle empty string.
-                try {
-                    if (this.extra.tags.ssh_user != undefined) {                   
-                        return this.extra.tags.ssh_user;
-                    } else {
-                        return 'root';
-                    }
-                } catch (error) {
-                    return 'root';
-                }
-            },
-
-
             shell: function(shell_command, callback, timeout) {
                 log('Sending', shell_command, 'to machine', this.name);
 
                 var url = '/backends/' + this.backend.id + '/machines/' + this.id + '/shell';
-                var ssh_user = this.getUser();
                 var host = this.getHost();
                 var that = this;
                 var params =  {'host': host,
-                               'ssh_user': ssh_user,
                                'command': shell_command}
                 if (timeout != undefined) {
                     params['timeout'] = timeout;
@@ -229,7 +210,7 @@ define('app/models/machine', [
                 this.set('probeInterval', 10000);
             },
 
-            probe: function() {
+            probe: function(key) {
                 var that = this;
                 if (that.get)
 
@@ -247,19 +228,22 @@ define('app/models/machine', [
                     if (that.state == 'running') {
                         var host = that.getHost();
                         if (host) {
-                            var ssh_user = that.getUser();
-
+                            if (key != undefined){
+                                that.set('probing', key);    
+                            } else {
+                                that.set('probing', true);
+                            }
+                            
                             $.ajax({
                                 url: '/backends/' + that.backend.id + '/machines/' + that.id + '/probe',
                                 type: 'POST',
                                 headers: { "cache-control": "no-cache" },
                                 data: {'host': host,
-                                       'ssh_user': ssh_user},
+                                       'key': key},
                                 success: function(data, textStatus, jqXHR) {
                                        // got it fine, also means it has a key
                                     if (jqXHR.status === 200) {
-                                        that.set('hasKey', true);
-                                        warn(data.uptime);
+                                        that.set('probed', true);
                                         var uptime = parseFloat(data['uptime'].split(' ')[0]) * 1000;
                                         that.set('uptimeChecked', Date.now());
                                         that.set('uptimeFromServer', uptime);
@@ -270,19 +254,21 @@ define('app/models/machine', [
                                         }
                                     } else {
                                         // in every other case there is a problem
-                                        that.set('hasKey', false);
+                                        that.set('probed', false);
                                         info('Got response other than 200 while probing machine', that.name);
                                         retry(that);
                                     }
+                                    that.set('probing', false);
                                 },
                                 error: function(jqXHR, textstate, errorThrown) {
-                                    that.set('hasKey', false);
+                                    that.set('probed', false);
                                     //Mist.notificationController.notify('Error getting uptime from machine ' +
                                     //    that.name);
-                                    error(textstate, errorThrown, 'when probing machine',
-                                        that.name);
+                                    //error(textstate, errorThrown, 'when probing machine',
+                                    //    that.name);
                                     that.set('probeInterval', 2*that.get('probeInterval'));
                                     retryProbe(that.get('probeInterval'));
+                                    that.set('probing', false);
                                 }
                             });
                         }
@@ -311,7 +297,7 @@ define('app/models/machine', [
                     this.uptimeTimer = false;
                 }
             }.observes('state'),
-
+            
             changeMonitoring: function() {
                 warn("Setting monitoring to:  " + !this.hasMonitoring);
 
@@ -348,7 +334,6 @@ define('app/models/machine', [
                     dataType: 'json',
                     timeout : 600000,
                     success: function(data) {
-                        var user = that.getUser();
                         if (!that.hasMonitoring){
                             $('.pending-monitoring h1').text('Installing collectd');
                             var prefix = URL_PREFIX || document.location.href.split('#')[0];
@@ -356,18 +341,14 @@ define('app/models/machine', [
                                 prefix = prefix.substring(0, prefix.length - 1);
                             }
                             var cmd = 'wget --no-check-certificate ' + prefix + '/core/scripts/deploy_collectd.sh -O - > /tmp/deploy_collectd.sh && chmod o+x /tmp/deploy_collectd.sh && /tmp/deploy_collectd.sh ' + data['monitor_server'] + ' ' + data['uuid'] + ' ' + data['passwd'];
-                            if (user != 'root'){
-                                cmd = "sudo su -c '" + cmd + "'";
-                            }
+                            cmd = "sudo su -c '" + cmd + "' || " + cmd;
                             collectd_install_target = that;
                             warn(cmd);
                             that.shell(cmd, function(){}, timeout=300);
                         } else {
                             $('.pending-monitoring h1').text('Disabling collectd');
                             var cmd = 'chmod -x /etc/init.d/collectd && killall -9 collectd';
-                            if (user != 'root'){
-                                cmd = "sudo su -c '" + cmd + "'";
-                            }
+                            cmd = "sudo su -c '" + cmd + "' || " + cmd;
                             collectd_uninstall_target = that;
                             that.shell(cmd, function(){});
                             //remove machine from monitored_machines array

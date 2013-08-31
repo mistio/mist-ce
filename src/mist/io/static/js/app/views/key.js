@@ -127,7 +127,7 @@ define('app/views/key', [
                             if (backend.id == item[0]) {
                                 backend.machines.content.forEach(function(machine){
                                     if (machine.id == item[1]) {
-                                        machine.set("hasKey", false);
+                                        machine.set("probed", false);
                                     }
                                 });
                             }

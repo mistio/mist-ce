@@ -320,6 +320,12 @@ li.node .tag {
     background-color: #aaa;
 }
 
+#machines-list .probing-icon {
+    background-image: url("states/load-white.gif");  
+    background-color: #aaa;
+    background-position: center;
+}
+
 span.bubble-monitoring {
     right: 73px !important;
 }
@@ -456,6 +462,11 @@ a#mist-select-machines-button span.ui-btn-text {
     z-index: 1000;
 }
 
+.ui-collapsible-inset .ui-collapsible-content {
+    padding-top: 0px;
+    margin-top: -1px;
+}
+
 .btn-right {
     margin-left: 430px;
 }
@@ -518,7 +529,6 @@ div.ember-view div.ui-panel-content-wrap {
 
 .single-view-header {
     overflow: auto;
-    padding: 0 0 0 15px;
     background: #e6e6e7;
     background-image: -webkit-gradient(linear, left top, left bottom, from(#e8e9e9), to(#e0e1e1)); /* Saf4+, Chrome */
     background-image: -webkit-linear-gradient(#e8e9e9, #e0e1e1); /* Chrome 10+, Saf5.1+ */
@@ -540,7 +550,7 @@ div.ember-view div.ui-panel-content-wrap {
    font-weight: normal;
     left: 50%;
     margin-bottom: 0;
-    margin-top: 30px;
+    margin-top: 20px;
     text-shadow: none;
 }
 
@@ -550,7 +560,7 @@ div.ember-view div.ui-panel-content-wrap {
 
 .single-view-icon-wrapper {
     float: left;
-    padding: 16px 20px;
+    padding: 0px;
     background-position: center;
     background-repeat: no-repeat;
     border-left: 1px solid #ccc;
@@ -714,7 +724,7 @@ div.ember-view div.ui-panel-content-wrap {
     background: #C9E0F0;
 }
 
-#monitoring-wrapper, #keys-wrapper {
+#monitoring-wrapper, #keys-wrapper, #probe-wrapper {
     padding: 0px;
 }
 
@@ -795,7 +805,7 @@ div.loading-monitoring {
     padding-left: 9px;
 }
 
-.monitoring-dialog-container div, .associate-key-container div {
+.monitoring-dialog-container div, .associate-key-container div, .probe-dialog-container div {
     max-width: 26ex;
     margin: 0 auto;
 }
@@ -935,7 +945,7 @@ div.loading-monitoring {
     overflow: auto;
 }
 
-.monitoring-dialog-container, .associate-key-container {
+.monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {
     padding: 15px;
     background: #e0e0e1;
 }
@@ -1110,7 +1120,6 @@ div.loading-monitoring {
 /* Tags Dialog */
 
 #dialog-tags {
-    width: 400px;
     max-width: 400px;
 }
 
@@ -1255,7 +1264,7 @@ div.loading-monitoring {
 }
 
 .command.pending{
-    background: url("/resources/images/spinner.gif") no-repeat scroll 92% center #EFEFF1 !important;
+    background: url("images/spinner.gif") no-repeat scroll 92% center #EFEFF1 !important;
 }
 
 iframe#hidden-shell-iframe {
@@ -1427,6 +1436,40 @@ div.info {
 
 #single-machines-keys #machines-list fieldset {
     display:none;
+}
+
+#mist-manage-keys {
+    float: right;
+    margin-top: -28px;
+    margin-right: 5px;
+    background-position: right !important;
+    background-repeat: no-repeat;
+}
+
+#mist-manage-keys.probed {
+    background-image: url(images/key.png);
+
+}
+
+#mist-manage-keys.unprobed {
+    background-image: url(images/no-key.png);
+
+}
+
+#mist-manage-keys.probing {
+    background-image: url(states/load-white.gif) !important;
+}
+
+.probing .ui-loader {
+    display: block;
+}
+
+.monitoring-collapsible {
+    display: none;
+}
+
+.probed.monitoring-collapsible {
+    display: block;
 }
 
 /* Conditional for < 600px */
