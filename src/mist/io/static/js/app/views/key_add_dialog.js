@@ -24,14 +24,12 @@ define('app/views/key_add_dialog', [
             },
             
             backClicked: function() {
-                Mist.keyAddController.newKeyClear();
                 $("#dialog-add-key").popup("close");
+                Mist.keyAddController.newKeyClear();
                 if (this.getAssociatedMachine()){
-                    // JQM won't open second popup imediately
                     setTimeout( function(){
-                            $('#associate-key-dialog').popup('open', {transition: 'pop'});
-                        }, 
-                        350); 
+                            $('#associate-key-dialog').popup('option', 'positionTo', '#associate-key-button').popup('open');
+                    }, 350); 
                 }
             },
 

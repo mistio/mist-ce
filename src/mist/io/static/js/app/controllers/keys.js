@@ -36,7 +36,8 @@ define('app/controllers/keys', [
                     'pub': publicKey,
                     'priv': privateKey
                 };
-                var mac = machine;
+                
+                var machine = machine;
                 var that = this;
                 $.ajax({
                     url: '/keys/' + name,
@@ -69,12 +70,11 @@ define('app/controllers/keys', [
                             });                                                    
                         }
                         
-                        Mist.keyAddController.newKeyClear();
-                        
                         $("#dialog-add-key").popup("close");
-                
-                        if (mac) {
-                            Mist.keysController.associateKey(name, mac); 
+                        Mist.keyAddController.newKeyClear();
+                         
+                        if (machine) {
+                            Mist.keysController.associateKey(name, machine); 
                             $('#manage-keys').panel('open');
                         }
                     },
@@ -92,7 +92,7 @@ define('app/controllers/keys', [
                     'pub': publicKey,
                     'priv': privateKey
                 };
-        
+                
                 var that = this;
                 $.ajax({
                     url: '/keys/' + name,
@@ -107,8 +107,8 @@ define('app/controllers/keys', [
                         key.set('name', name);
                         key.set('pub', publicKey);
                         $('#keys-list').listview('refresh');
-                        Mist.keyAddController.newKeyClear();
                         $("#dialog-add-key").popup("close");
+                        Mist.keyAddController.newKeyClear();
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify(jqXHR.responseText);
@@ -122,6 +122,7 @@ define('app/controllers/keys', [
                     'action': 'get_private_key',
                     'key_id': key.name
                 };
+                
                 var that = this;
                 $.ajax({
                     url: '/keys/' + key.name,
@@ -175,18 +176,14 @@ define('app/controllers/keys', [
                     success: function(data) {
                         info('Successfully associated key ', key_name);
                         machine.keys.addObject(key);
-                        $('#manage-keys .ajax-loader').fadeOut(200);
                         setTimeout(function(){
-                            $('#manage-keys div.associated-key').trigger('create');
                             $('.key-icon-wrapper').trigger('create');
+                            $('#manage-keys .ajax-loader').fadeOut(200);
                         }, 100); 
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while associating key'  +
-                                key_name);
+                        Mist.notificationController.notify('Error while associating key' + key_name);
                         error(textstate, errorThrown, 'while associating key', key_name);
-                        $('#keys-wrapper .ajax-loader').hide();
-                        $('#associate-key-button').removeClass('ui-disabled');
                         $('#manage-keys .ajax-loader').fadeOut(200);
                     }
                 });
@@ -253,14 +250,13 @@ define('app/controllers/keys', [
                         info('Successfully disassociated key ', key.name);
                         machine.keys.removeObject(key);
                         key.machines.removeObject([machine.backend.id, machine.id]);
-                        $('#manage-keys .ajax-loader').fadeOut(200);
                         setTimeout(function(){
                             $('.key-icon-wrapper').trigger('create');
+                            $('#manage-keys .ajax-loader').fadeOut(200);
                         }, 100); 
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while disassociating key'  +
-                                key.name);
+                        Mist.notificationController.notify('Error while disassociating key' + key.name);
                         error(textstate, errorThrown, 'while disassociating key', key.name);
                         $('#manage-keys .ajax-loader').fadeOut(200);
                     }

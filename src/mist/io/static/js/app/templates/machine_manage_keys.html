@@ -1,80 +1,54 @@
 <div id="manage-keys" data-role="panel" data-position="right" data-display="overlay" >
-    
     <div data-role="header">
         <h1>Manage Keys</h1>
     </div>
-    <br>    
+    <br>  
     {{#if keys}}
-        <label for="machine-associated-keys" style="display:block;">Associated keys:</label>
-        <ul id="machine-associated-keys">
-        {{#each keys}}     
-            <div class="associated-key">
-                <a data-role="button"
-                    data-icon="delete"
-                    data-inline="true"
-                    data-iconpos="notext"
-                    {{action disassociateClicked this target="view"}}></a>
-                {{this.name}}
-            </div>         
-        {{/each}}
+        <label id="associated-keys-label">Associated keys:</label>
+        <ul id="associated-keys">
+            {{#each keys}}     
+            <div class="associated-key" {{action associatedKeyClicked this target="view"}}>
+                  {{this.name}}
+            </div>
+            {{/each}}
         </ul>
     {{else}}
-    <label>There aren't any keys associated with this machine</label>
+        <label>There aren't any keys associated with this machine</label>
     {{/if}}
-    
     <div class="ajax-loader"></div>
-        
-    <button data-theme="b" {{action associateClicked target="view"}}>Associate Key</button>
-    
-    <button {{action cancelManageKeysClicked target="view"}}>Back</button>
-    
+    <br>
+    <button id="associate-key-button" data-theme="b" {{action associateButtonClicked target="view"}}>Associate Key</button>
+    <button {{action backClicked target="view"}}>Back</button>
 </div>
 
-
-<!-- ASSOCIATE KEY DIALOG -->
-
-<div data-role="popup" id="associate-key-dialog" class="mist-dialog" data-overlay-theme="a">
-
-    <!-- HEADER -->
-    
+<div id="key-actions" data-role="popup">
     <div data-role="header">
-        <h1>Associate key</h1>
+        <h1>Actions</h1>
     </div>
-    
-    <!-- CREATE BUTTON -->
-    
-    <button data-theme="b" {{action createKeyClicked target="view"}}>Create Key</button>
-    
-    <!-- KEYS LIST -->
-    
-    {{#if restKeys}}
-    <br>
-    <ul id="non-associated-keys" data-role="listview">
-        
-        <li data-role="list-devider" data-theme="a">Existing Keys</li>
-        
+    <div id="key-actions-container">
+        <button id="key-action-remove" {{action actionRemoveClicked target="view"}}>Remove</button>  
+        <button id="key-action-upload" {{action actionUploadClicked target="view"}}>Upload private</button>
+        <button id="key-action-probe" {{action actionProbeClicked target="view"}}>Probe</button>
+        <button id="key-action-back" {{action actionBackClicked target="view"}}>Back</button>
+    </div>
+</div>
+
+<div id="associate-key-dialog" data-role="popup">
+    <ul data-role="listview">
         {{#each restKeys}}
         <li data-icon="false" data-corners="true">
-            <a href="#" {{action selectKey this target="view"}}>{{this.name}}</a>
+            <a {{action associateKeyClicked this target="view"}}>{{this.name}}</a>
         </li>
         {{/each}}
-        
+        <li data-icon="false" data-corners="true" data-theme="b" > 
+            <a {{action createKeyClicked target="view"}}>Create Key</a>
+        </li>
     </ul>
-    {{/if}}
-    
-    <!-- BACK BUTTON -->
-    
-    <button {{action cancelAssociateClicked target="view"}}>Back</button>
-
 </div>
 
-<!-- CREATE KEY DIALOG -->
-
-<div data-role="popup" id="dialog-add-key" class="mist-dialog" data-overlay-theme="a">
-
+<div id="dialog-add-key" data-role="popup" class="mist-dialog">
     <div data-role="header">
         <h1>Create key</h1>
     </div>
-    
     {{view Mist.AddKeyView data-role="content"}}
 </div>
