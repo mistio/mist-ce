@@ -54,6 +54,7 @@ define('app/views/machine_monitoring_dialog', [
                                 //Trial or Plan expired, hide monitoring-dialog, hide free-trial
                                 $('#enable-monitoring-dialog').hide();
                                 $('#plan-text span').text('You have to purchase a plan in order to enable monitoring.');
+                                $('#button-enable-trial').closest('.ui-btn').hide();
                             } else {
                                 //Trial or Plan enabled. Check for quota 
                                 if (Mist.current_plan['machine_limit'] <= Mist.monitored_machines.length) {
@@ -78,12 +79,21 @@ define('app/views/machine_monitoring_dialog', [
                             $('#monitoring-enabled').hide();
                             $('#plan-dialog').show(); 
                             $('#plan-text span').text('Monitoring is a premium service. You can try it for free for one month, or purchase a plan.');
-                            $('.trial-button').show();
+                            $('#button-enable-trial').closest('.ui-btn').show();
+                            $('#button-purchase').closest('.ui-btn').hide();
                         }
                     }
                 }
                 $("#monitoring-dialog").popup('open');
                 this.emailReady();
+            },
+
+            closePlanDialog: function() {
+                $("#monitoring-dialog").popup('close');
+            },
+
+            closeTrialDialog: function() {
+                $("#trial-dialog").popup('close');
             },
 
             openTrialDialog: function() {

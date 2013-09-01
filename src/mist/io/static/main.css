@@ -1289,7 +1289,7 @@ div.logout-placeholder, div.account-placeholder {
 }
 
 #monitoring-dialog #plan-text {
-    width: 250px;
+    width: 400px;
 }
 
 #monitoring-wrapper .rule-box .ajax-loader  {

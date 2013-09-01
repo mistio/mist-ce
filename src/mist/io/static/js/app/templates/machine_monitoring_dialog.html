@@ -49,13 +49,11 @@
             </div>
             <div id="plan-dialog">
                 <div id="plan-text"><span></span></div>
-                <div id="free-trial" style="display:none;">Monitoring is a premium service. You can try it for free for one month, or purchase a plan!</div>
-                <div id="purchase-plan" style="display:none;">You have to purchase a plan in order to enable monitoring</div>
-                <div id="quota-plan" style="display:none;">You have reached the limits for your plan. Please upgrade plan in order to continue</div>
-
-                <a href="#" class="trial-button" data-role="button" data-theme="b" style="display:none;" {{action "openTrialDialog" target="view"}}>One month Free trial</a>
-                <div id="purchase-account"><a href="#" class="buy-button" data-role="button" data-theme="b" {{action "clickedPurchaseDialog" target="view"}}>Purchase Plan</a></div>
-                <a href="#" data-rel="back" class="buy-button" data-role="button" data-theme="b" {{action "backClicked" target="view"}}>Back</a></div> 
+                <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+                    <button data-theme="c" id="button-back-plan" {{action "closePlanDialog" target="view"}}>Back</button>
+                    <button data-theme="b" id="button-enable-trial" {{action "openTrialDialog" target="view"}}>Enable Trial</button>
+                    <button data-theme="b" id="button-purchase" {{action "clickedPurchaseDialog" target="view"}}>Purchase Plan</button>
+                </div>
             </div>
         </div>
     </div>
@@ -73,7 +71,10 @@
             <label for="company-name">Company Name:</label>
             <span class="required">*</span>
             <input type="text" name="company-name" id="trial-company-name" />
-            <a id="submit-trial" data-role="button" data-theme="b" {{action submitTrial target="view"}}>Enable</a>
+            <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <button data-theme="c" id="button-back-plan" {{action "closeTrialDialog" target="view"}}>Back</button>
+                <button data-theme="b" id="button-enable-trial" {{action "submitTrial" target="view"}}>Enable</button>
+            </div>
             <div class="ajax-loader"></div>
         </div>
     </div>
