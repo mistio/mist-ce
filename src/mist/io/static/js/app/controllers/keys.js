@@ -68,10 +68,12 @@ define('app/controllers/keys', [
                                 $('.select-key-collapsible').trigger('collapse');                                 
                             });                                                    
                         }
+                        
                         Mist.keyAddController.newKeyClear();
+                        
                         $("#dialog-add-key").popup("close");
+                
                         if (mac) {
-                            var machine = Mist.backendsController.getMachineById(mac.backend.id, mac.id );
                             Mist.keysController.associateKey(name, mac); 
                             $('#manage-keys').panel('open');
                         }
@@ -174,9 +176,10 @@ define('app/controllers/keys', [
                         info('Successfully associated key ', key_name);
                         machine.keys.addObject(key);
                         $('#manage-keys .ajax-loader').fadeOut(200);
-                        Ember.run.next(function(){
-                            $('.delete-key-button').button();
-                        });
+                        setTimeout(function(){
+                            $('#manage-keys div.associated-key').trigger('create');
+                            $('.key-icon-wrapper').trigger('create');
+                        }, 100); 
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while associating key'  +
@@ -251,6 +254,9 @@ define('app/controllers/keys', [
                         machine.keys.removeObject(key);
                         key.machines.removeObject([machine.backend.id, machine.id]);
                         $('#manage-keys .ajax-loader').fadeOut(200);
+                        setTimeout(function(){
+                            $('.key-icon-wrapper').trigger('create');
+                        }, 100); 
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while disassociating key'  +

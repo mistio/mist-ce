@@ -20,8 +20,8 @@ define('app/views/machine_manage_keys', [
             
             selectKey: function(key){
                 $('#associate-key-dialog').popup('close');
-                $('#manage-keys').panel('open');
                 $('#manage-keys .ajax-loader').fadeIn(200);
+                $('#manage-keys').panel('open');
                 var machine = this.get('controller').get('model');
                 Mist.keysController.associateKey(key.name, machine);
             },
@@ -30,15 +30,15 @@ define('app/views/machine_manage_keys', [
                 $('#manage-keys').panel("close");
             },
             
-            associateKeyClicked: function() {
+            associateClicked: function() {
                 $('#manage-keys').panel('close');
                 $('#associate-key-dialog').popup('open', {transition: 'pop'});
                 $('#non-associated-keys').listview('refresh');
             },
             
             disassociateClicked: function(key) {
-                var machine = this.get('controller').get('model');
                 $('#manage-keys .ajax-loader').fadeIn(200);
+                var machine = this.get('controller').get('model');
                 Mist.keysController.disassociateKey(key, machine);
             },
             
@@ -51,7 +51,7 @@ define('app/views/machine_manage_keys', [
                     350); 
             },
             
-            cancelAssociateKeyClicked: function() {
+            cancelAssociateClicked: function() {
                 $('#associate-key-dialog').popup('close');
                 $('#manage-keys').panel('open');
             }
