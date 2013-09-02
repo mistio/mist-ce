@@ -23,7 +23,8 @@ define('app/views/machine_manage_keys', [
             associatedKeyClicked: function(key) {
                 this.selectedKey = key;
                 Mist.keysController.getPrivKey(key, "#key-action-textarea");
-                $('#key-actions').popup('open', {transition: 'pop'});
+                $('#non-associated-keys').listview('refresh');
+                $('#key-actions').popup('option', 'positionTo', '#associated-keys').popup('open');
             },
             
             associateButtonClicked: function() {
@@ -43,17 +44,36 @@ define('app/views/machine_manage_keys', [
             },
             
             actionUploadClicked: function() {
-                // TODO: Upload a private key and add it to selectedKey
-                alert('Uploading private key for ' + this.selectedKey.name );  
+                if (window.File && window.FileReader && window.FileList) {
+                    $("#key-action-upload-key").click();
+                } else {
+                    alert('The File APIs are not fully supported in this browser.');
+                }
             },
             
             actionProbeClicked: function() {
-                // TODO: Do something in here...
-                alert('Probing...');
+                $('#key-actions').popup('close');
+                this.get('controller').get('model').probe(this.selectedKey.name);
             },
             
             actionBackClicked: function() {
                 $('#key-actions').popup('close');
+            },
+            
+            uploadInputChanged: function() {
+                $('#manage-keys .ajax-loader').fadeIn(200);
+                var reader = new FileReader();
+                var key = this.selectedKey;
+                reader.onloadend = function(evt) {
+                    if (evt.target.readyState == FileReader.DONE) {
+                        $('#key-actions').popup('close');
+                        Mist.keysController.editKey(key.name,
+                                                     key.name,
+                                                     key.pub,
+                                                     evt.target.result);
+                    }
+               };
+               reader.readAsText($('#key-action-upload-key')[0].files[0], 'UTF-8');  
             },
             
             associateKeyClicked: function(key){

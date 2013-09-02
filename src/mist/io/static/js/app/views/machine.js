@@ -508,7 +508,6 @@ define('app/views/machine', [
             },
             
             manageKeysClicked: function() {
-                $('#associated-keys').listview('refresh');
                 $('#manage-keys').panel('open');
             } 
             

@@ -1319,6 +1319,14 @@ iframe#hidden-shell-iframe {
     padding: 0 6px 0 6px;
 }
 
+#key-actions {
+    min-width: 200px;
+}
+
+#action-upload-key {
+    display: none;
+}
+
 /*  Keys */
 
 #private-key {

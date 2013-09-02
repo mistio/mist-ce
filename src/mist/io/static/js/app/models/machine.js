@@ -33,11 +33,6 @@ define('app/models/machine', [
                         ret.push(key);
                     }
                 });
-                if (ret.length > 0){
-                    Ember.run.next(function(){
-                        $('#associate-key-button').button();
-                    });
-                }
                 return ret;
             }.property('keys.@each', 'Mist.keysController.@each'),
             

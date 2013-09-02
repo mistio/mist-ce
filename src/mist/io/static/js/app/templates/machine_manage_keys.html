@@ -2,13 +2,11 @@
     <div data-role="header">
         <h1>Manage Keys</h1>
     </div>
-    <br>  
+    <button id="associate-key-button" data-theme="b" data-icon="plus" data-iconpos="right" {{action associateButtonClicked target="view"}}>Associate</button>
     {{#if keys}}
-        <label id="associated-keys-label">Associated keys:</label>
-        <br>
         <div>
             <ul id="associated-keys" data-role="listview">
-                {{#each keys}}     
+                {{#each keys}}
                 <div class="associated-key" {{action associatedKeyClicked this target="view"}}>
                       {{this.name}}
                 </div>
@@ -19,8 +17,6 @@
         <label>There aren't any keys associated with this machine</label>
     {{/if}}
     <div class="ajax-loader"></div>
-    <br>
-    <button id="associate-key-button" data-theme="b" {{action associateButtonClicked target="view"}}>Associate Key</button>
     <button {{action backClicked target="view"}}>Back</button>
 </div>
 
@@ -29,12 +25,15 @@
         <h1>Actions</h1>
     </div>
     <div id="key-actions-container">
-        <button id="key-action-remove" {{action actionRemoveClicked target="view"}}>Remove</button>  
+        <button id="key-action-remove" {{action actionRemoveClicked target="view"}}>Remove</button>
         <button id="key-action-upload" {{action actionUploadClicked target="view"}}>Upload private</button>
         <button id="key-action-probe" {{action actionProbeClicked target="view"}}>Probe</button>
         <button id="key-action-back" {{action actionBackClicked target="view"}}>Back</button>
     </div>
     <textarea id="key-action-textarea" style="display:none;"></textarea>
+    <div id="action-upload-key">
+        <input type="file" id="key-action-upload-key" name="file" {{action uploadInputChanged on="change" target="view"}} />
+    </div>
 </div>
 
 <div id="associate-key-dialog" data-role="popup">
@@ -44,7 +43,7 @@
             <a {{action associateKeyClicked this target="view"}}>{{this.name}}</a>
         </li>
         {{/each}}
-        <li data-icon="false" data-corners="true" data-theme="b" > 
+        <li data-icon="false" data-corners="true" data-theme="b"> 
             <a {{action createKeyClicked target="view"}}>Create Key</a>
         </li>
     </ul>

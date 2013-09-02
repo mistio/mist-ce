@@ -61,7 +61,8 @@ define('app/models/key', [
                             key.set('default_key', false);
                         });
                         that.set('default_key', true);
-                        Ember.run.next(function(){$('#keys-list').listview('refresh')});
+                        Mist.keysController.updateKeyList(data);
+                        Ember.run.next(function(){$('#non-associated-keys').listview('refresh')});
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while setting key '  +

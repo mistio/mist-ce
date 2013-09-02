@@ -43,7 +43,7 @@ define('app/views/machine_add_dialog', [
                 $('.select-location-collapsible span.ui-btn-text').text('Select Location');      
                 
                 $('.select-provider-collapsible').trigger('collapse');                
-                return false;               
+                return false;
             },
                       
             selectImage: function(image){

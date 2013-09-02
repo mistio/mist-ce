@@ -55,7 +55,7 @@ define('app/views/key_add_dialog', [
 
             uploadClicked: function(keyType) {
                 if (window.File && window.FileReader && window.FileList) {
-                    $("#dialog-add-key #upload-" + keyType + "-key-input").click();
+                    $("#upload-" + keyType + "-key-input").click();
                 } else {
                     alert('The File APIs are not fully supported in this browser.');
                 }
@@ -73,7 +73,7 @@ define('app/views/key_add_dialog', [
             
             newKeyClicked: function() {
                 var publicKey = $('#textarea-public-key').val().trim();
-                var publicKeyType = "";          
+                var publicKeyType = "";     
                 if (publicKey) {
                     if (publicKey.indexOf('ssh-rsa') != 0 && publicKey.indexOf('ssh-dss') != 0) {
                         Mist.notificationController.notify('Public key should begin with "ssh-rsa" or "ssh-dss"');
@@ -103,6 +103,9 @@ define('app/views/key_add_dialog', [
                         Mist.notificationController.notify('Private key should end with ' + ending);
                         return;
                     }
+                } else {
+                    Mist.notificationController.notify('Private key required');
+                    return;
                 }
                 
                 if (this.get('notEditMode')) {

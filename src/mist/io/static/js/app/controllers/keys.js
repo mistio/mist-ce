@@ -130,10 +130,16 @@ define('app/controllers/keys', [
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     success: function(data) {
-                        info('Successfully got private key ', data);
+                        info('Successfully got private key ' + name);
                         $(element).val(data).trigger('change');
                         if (element == "#key-action-textarea") {
-                            $('#key-action-upload').parent().css('display', data ? 'none' : 'block');    
+                            if (data) {
+                                $('#key-action-upload').parent().css('display', 'none');
+                                $('#key-action-probe').parent().css('display', 'block');
+                            } else {
+                                $('#key-action-upload').parent().css('display', 'block');
+                                $('#key-action-probe').parent().css('display', 'none'); 
+                            }
                         }
                     },
                     error: function(jqXHR, textstate, errorThrown) {

@@ -950,8 +950,9 @@ def edit_key(request):
             keypairs[key_id] = key
             keypairs[key_id]['machines'] = keypairs[old_id].get('machines', [])
             keypairs.pop(old_id)
-        else:        
+        else:
             keypairs[key_id] = key
+            keypairs[key_id]['machines'] = keypairs[old_id].get('machines', [])
     else:
         if key_id in keypairs:
             return Response('Key "%s" already exists' % key_id, 409)     
