@@ -92,10 +92,6 @@ define('app/views/machine_monitoring_dialog', [
                 $("#monitoring-dialog").popup('close');
             },
 
-            closeTrialDialog: function() {
-                $("#trial-dialog").popup('close');
-            },
-
             openTrialDialog: function() {
                 $("#monitoring-dialog").popup('close');
                 $("#trial-dialog").popup('open');
@@ -105,102 +101,6 @@ define('app/views/machine_monitoring_dialog', [
                 $("#monitoring-dialog").popup('close');
                 window.location.href = "https://mist.io/account";  
             },
-
-            doLogin: function() {
-                //sends email, passwords and check if auth is ok
-                var payload = {
-                    'email': Mist.email,
-                    'password': CryptoJS.SHA256(Mist.password).toString()
-                };
-                $("#login-dialog .ajax-loader").show();
-                $.ajax({
-                    url: '/auth',
-                    type: 'POST',
-                    headers: { "cache-control": "no-cache" },
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    dataType: 'json',
-                    timeout : 60000,
-                    success: function(data) {
-                        Mist.set('authenticated', true);
-                        Mist.set('current_plan', data.current_plan);
-                        Mist.set('user_details', data.user_details);
-                        $("#login-dialog .ajax-loader").hide();
-                        //If ok set Mist.auth, Mist.current_plan and Mist.user_details and keep on with enable monitoring (if current plan allows), or show the change plans dialog
-                        $("#login-dialog").popup('close');
-                        //if Mist.monitored_machines is undefined, then set to []. /monitoring takes some time to run, to get the real monitored_machines
-
-                        if (typeof Mist.monitored_machines === 'undefined') {
-                            Mist.set('monitored_machines', []);
-                        }
-                        $("a.monitoring-button").click();
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        $("#login-dialog .ajax-loader").hide();
-                        Mist.notificationController.warn('Authentication error');
-                        $('div.pending-monitoring').hide();
-                    }
-                });
-            },
-
-            backClicked: function() {
-                $("#monitoring-dialog").popup('close');
-                $('#free-trial').hide();   
-                $('#purchase-plan').hide();                   
-                $('#quota-plan').hide();  
-                $("#trial-user-details").hide();   
-                $('.trial-button').removeClass('ui-disabled');                                                                                        
-            },
-
-            backLoginClicked: function() {
-                $('#login-dialog').popup('close');
-                $('#login-dialog #email').val('');
-                $('#login-dialog #password').val('');
-           },
- 
-            submitTrial: function(){
-                if ($('#trial-user-name').val() && $('#trial-company-name').val()) {
-                    var payload = {
-                        "action": 'upgrade_plans', 
-                        "plan": 'Basic',
-                        "auth_key": Mist.auth_key,
-                        "name": $('#trial-user-name').val(),
-                        "company_name": $('#trial-company-name').val()                        
-                    };
-                    $('#trial-user-details .ajax-loader').show();  
-                    $('#submit-trial').addClass('ui-disabled');                      
-                    $.ajax({
-                        url: '/account',
-                        type: "POST",
-                        contentType: "application/json",
-                        dataType: "json",
-                        headers: { "cache-control": "no-cache" },
-                        data: JSON.stringify(payload),
-                        success: function(result) {
-                            $('#trial-user-details .ajax-loader').hide();     
-                            $('#submit-trial').removeClass('ui-disabled');                                                                                         
-                            $("#monitoring-dialog").popup('close');                            
-                            Mist.set('current_plan', result);
-                            $("a.monitoring-button").click();
-                        },
-                        error: function(jqXHR, textstate, errorThrown) {
-                            Mist.notificationController.notify(jqXHR.responseText);
-                            $('div.pending-monitoring').hide();                            
-                            $('#trial-user-details .ajax-loader').hide();   
-                            $('.trial-button').removeClass('ui-disabled');  
-                            $('#submit-trial').removeClass('ui-disabled');
-                        }
-                    });
-
-                } else {
-                    if (!($('#trial-user-name').val())) {
-                        $('#trial-user-name').focus();
-                    } else {
-                        $('#trial-company-name').focus();
-                    }
-                }
-            },
-            
 
             emailReady: function(){
                 if (Mist.email && Mist.password){
