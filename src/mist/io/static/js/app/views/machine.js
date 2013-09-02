@@ -559,6 +559,7 @@ define('app/views/machine', [
                         headers: { "cache-control": "no-cache" },
                         data: JSON.stringify(payload),
                         success: function(result) {
+                            Mist.notificationController.notify('Successfully created the free trial plan!');
                             $('#trial-user-details .ajax-loader').hide();     
                             $('#submit-trial').removeClass('ui-disabled');
                             $("#trial-dialog").popup('close');
