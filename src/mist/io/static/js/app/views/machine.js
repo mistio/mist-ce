@@ -540,6 +540,7 @@ define('app/views/machine', [
             },
  
             submitTrial: function(){
+                var machine = this.get('controller').get('model');
                 if ($('#trial-user-name').val() && $('#trial-company-name').val()) {
                     var payload = {
                         "action": 'upgrade_plans', 
@@ -559,10 +560,10 @@ define('app/views/machine', [
                         data: JSON.stringify(payload),
                         success: function(result) {
                             $('#trial-user-details .ajax-loader').hide();     
-                            $('#submit-trial').removeClass('ui-disabled');                                                                                         
-                            $("#monitoring-dialog").popup('close');                            
+                            $('#submit-trial').removeClass('ui-disabled');
+                            $("#trial-dialog").popup('close');
                             Mist.set('current_plan', result);
-                            $("a.monitoring-button").click();
+                            machine.openMonitoringDialog();
                         },
                         error: function(jqXHR, textstate, errorThrown) {
                             Mist.notificationController.notify(jqXHR.responseText);
