@@ -582,6 +582,23 @@ define('app/views/machine', [
                     }
                 }
             },
+
+            emailReady: function(){
+                if (Mist.email && Mist.password){
+                    $('#auth-ok').button('enable');
+                } else {
+                    try{
+                        $('#auth-ok').button('disable');
+                    } catch(e){
+                        $('#auth-ok').button();
+                        $('#auth-ok').button('disable');
+                    }
+                }
+            }.observes('Mist.email'),
+    
+            passReady: function(){
+                this.emailReady();
+            }.observes('Mist.password') 
             
         });
     }
