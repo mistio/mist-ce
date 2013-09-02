@@ -77,7 +77,10 @@ def check_auth(request):
     params = request.json_body
     email = params.get('email', '').lower()
     password = params.get('password', '')
-    payload = {'email': email, 'password': password}
+    timestamp = params.get('timestamp', '')
+    hash_key = params.get('hash', '')
+
+    payload = {'email': email, 'password': password, 'timestamp': timestamp, 'hash_key': hash_key}
     core_uri = request.registry.settings['core_uri']
     ret = requests.post(core_uri + '/auth', params=payload, verify=False)
 
