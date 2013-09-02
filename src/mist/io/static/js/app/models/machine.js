@@ -439,8 +439,9 @@ define('app/models/machine', [
                             }
                             $('#enable-monitoring-dialog').hide();
                             $('#monitoring-enabled').hide();
-                            $('#plan-dialog').show(); 
+                            $('#plan-dialog').show();
                             $('#plan-text span').text('Monitoring is a premium service. You can try it for free for one month, or purchase a plan.');
+                            $('#button-enable-trial').parent().addClass('ui-last-child');
                             $('#button-enable-trial').closest('.ui-btn').show();
                             $('#button-purchase').closest('.ui-btn').hide();
                         }
