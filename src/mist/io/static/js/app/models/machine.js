@@ -448,7 +448,6 @@ define('app/models/machine', [
                     }
                 }
                 $("#monitoring-dialog").popup('open');
-                this.emailReady();
             },
 
             init: function() {

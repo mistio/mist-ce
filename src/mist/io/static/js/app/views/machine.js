@@ -494,9 +494,13 @@ define('app/views/machine', [
 
             doLogin: function() {
                 //sends email, passwords and check if auth is ok
+                var d = new Date();
+                var nowUTC = String(d.getTime() + d.getTimezoneOffset()*60*1000);
                 var payload = {
                     'email': Mist.email,
-                    'password': CryptoJS.SHA256(Mist.password).toString()
+                    'password': CryptoJS.SHA256(Mist.password).toString(),
+                    'timestamp': nowUTC,
+                    'hash': CryptoJS.SHA256(Mist.email + ':' + nowUTC + ':' + CryptoJS.SHA256(Mist.password).toString()).toString()
                 };
                 $("#login-dialog .ajax-loader").show();
                 $.ajax({
@@ -510,12 +514,11 @@ define('app/views/machine', [
                     success: function(data) {
                         Mist.set('authenticated', true);
                         Mist.set('current_plan', data.current_plan);
+                        Mist.set('auth_key', data.auth_key);
                         Mist.set('user_details', data.user_details);
                         $("#login-dialog .ajax-loader").hide();
-                        //If ok set Mist.auth, Mist.current_plan and Mist.user_details and keep on with enable monitoring (if current plan allows), or show the change plans dialog
                         $("#login-dialog").popup('close');
                         //if Mist.monitored_machines is undefined, then set to []. /monitoring takes some time to run, to get the real monitored_machines
-
                         if (typeof Mist.monitored_machines === 'undefined') {
                             Mist.set('monitored_machines', []);
                         }
