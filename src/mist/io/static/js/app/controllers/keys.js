@@ -130,8 +130,11 @@ define('app/controllers/keys', [
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     success: function(data) {
-                        info('Successfully got private key ', name);
+                        info('Successfully got private key ', data);
                         $(element).val(data).trigger('change');
+                        if (element == "#key-action-textarea") {
+                            $('#key-action-upload').parent().css('display', data ? 'none' : 'block');    
+                        }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while getting key' + name);
@@ -179,6 +182,7 @@ define('app/controllers/keys', [
                         setTimeout(function(){
                             $('.key-icon-wrapper').trigger('create');
                             $('#manage-keys .ajax-loader').fadeOut(200);
+                            $('#associated-keys').listview('refresh');
                         }, 100); 
                     },
                     error: function(jqXHR, textstate, errorThrown) {
@@ -253,6 +257,7 @@ define('app/controllers/keys', [
                         setTimeout(function(){
                             $('.key-icon-wrapper').trigger('create');
                             $('#manage-keys .ajax-loader').fadeOut(200);
+                            $('#associated-keys').listview('refresh');
                         }, 100); 
                     },
                     error: function(jqXHR, textstate, errorThrown) {
@@ -280,8 +285,14 @@ define('app/controllers/keys', [
                     this.forEach(function(item){
                         content.push(item);
                     });                    
-                }  
-                              
+                }
+                
+                Mist.backendsController.content.forEach(function(item) {
+                    item.machines.forEach(function(machine) { 
+                        machine.set('keys', new Array() );
+                    });
+                });
+                   
                 data.forEach(function(item){
                     var key = Key.create(item);
                     content.push(key);
@@ -291,9 +302,8 @@ define('app/controllers/keys', [
                             if (machine != undefined) {
                                 machine.keys.addObject(key);
                             }
-                        });                        
+                        });                 
                     }
-                    
                 });
                 
                 this.set('content', content);

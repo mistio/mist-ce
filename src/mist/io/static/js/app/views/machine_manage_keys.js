@@ -22,11 +22,12 @@ define('app/views/machine_manage_keys', [
             
             associatedKeyClicked: function(key) {
                 this.selectedKey = key;
+                Mist.keysController.getPrivKey(key, "#key-action-textarea");
                 $('#key-actions').popup('open', {transition: 'pop'});
             },
             
             associateButtonClicked: function() {
-                $('#associate-key-dialog ul').listview('refresh');
+                $('#non-associated-keys').listview('refresh');
                 $('#associate-key-dialog').popup('option', 'positionTo', '#associate-key-button').popup('open');
             },
             
