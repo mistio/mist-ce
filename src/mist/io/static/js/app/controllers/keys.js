@@ -284,7 +284,7 @@ define('app/controllers/keys', [
                 this.set('selectedKeyCount', count);
             },
 
-            updateKeyList: function(data, mode) {
+            updateKeyList: function(data) {
                 var content = new Array();
 
                 Mist.backendsController.content.forEach(function(item) {

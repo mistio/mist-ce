@@ -244,9 +244,8 @@ define('app/models/machine', [
                                         that.set('uptimeFromServer', uptime);
                                         info('Successfully got uptime', uptime, 'from machine', that.name);
                                         data.updated_keys.forEach(function(key) {
-                                            Mist.keysController(key.name, key.publicKey, null, null, this)
+                                            Mist.keysController(key.name, key.publicKey, null, null, this);
                                         });
-                                        //Mist.keysController.updateKeyList(data.updated_keys, 'append');
                                         if (data.updated_keys.length){
                                             warn('Added ' + data.updated_keys.length + ' new keys from machine ' + that.name);
                                         }
@@ -378,8 +377,6 @@ define('app/models/machine', [
 
                 this.tags = Ember.ArrayController.create();
                 this.keys = Ember.ArrayController.create();
-                this.keys.clear();
-                this.unassociatedKeys = Ember.ArrayController.create();
                 
                 var that = this;
                 Mist.keysController.content.forEach(function(key){
