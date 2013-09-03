@@ -529,10 +529,11 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
     the machine.
 
     """
+    
     if not key_id or not machine_id or not backend_id:
         return Response('Keypair, machine or backend not provided', 400)
 
-    try:
+    try:gi
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs', {})
