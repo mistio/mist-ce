@@ -1310,7 +1310,7 @@ div.logout-placeholder {
     float: right;
 }
 
-#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, .dialog-add .ajax-loader, .rule-box .ajax-loader, .rule-command-popup .ajax-loader, .add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader, #edit-backend .ajax-loader, #keys-wrapper .ajax-loader, #keys-container .ajax-loader  {
+#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, .dialog-add .ajax-loader, .rule-box .ajax-loader, .rule-command-popup .ajax-loader, .add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader, #edit-backend .ajax-loader, #keys-wrapper .ajax-loader, #keys-container .ajax-loader, #home-menu .ajax-loader {
     background-image: url(images/spinner.gif);
     background-position: center !important;
     background-repeat: no-repeat;
@@ -1360,6 +1360,13 @@ div.logout-placeholder {
     float: right;
     width: 16px;
     margin-right: -29px;
+}
+
+#home-menu .ajax-loader {
+    display: block;
+    float: right;
+    margin-top: -18px;
+    width: 16px;
 }
 
 .generate-key-collapsible .ui-collapsible-content {
