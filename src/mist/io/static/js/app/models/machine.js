@@ -371,14 +371,12 @@ define('app/models/machine', [
                         if (jqXHR.status == 402){
                             Mist.notificationController.warn(jqXHR.responseText);    
                         } else {
-                            Mist.notificationController.notify('Error when changing monitoring to ' +
-                            that.name);
+                            Mist.notificationController.notify('Error when changing monitoring to ' + that.name);
                         }
                         error(textstate, errorThrown, 'when changing monitoring to machine',
                             that.name);
                     }
                 });
-
             },
 
             init: function() {
