@@ -186,9 +186,10 @@ define('app/controllers/keys', [
                         info('Successfully associated key ', key_name);
                         machine.keys.addObject(key);
                         setTimeout(function(){
+                            $('#associated-keys').listview('refresh');
                             $('.key-icon-wrapper').trigger('create');
                             $('#manage-keys .ajax-loader').fadeOut(200);
-                            $('#associated-keys').listview('refresh');
+                            $('#associated-keys').parent().trigger('create');
                         }, 100); 
                     },
                     error: function(jqXHR, textstate, errorThrown) {

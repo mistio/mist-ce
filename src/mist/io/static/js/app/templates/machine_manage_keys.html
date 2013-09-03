@@ -7,6 +7,7 @@
             data-icon="plus" 
             data-iconpos="right" 
             {{action associateButtonClicked target="view"}}>Associate</button>
+    {{#if keys}}
     <div>
         <ul id="associated-keys" data-role="listview">
             {{#each keys}}
@@ -16,6 +17,7 @@
             {{/each}}
         </ul>
     </div>
+    {{/if}}
     <div class="ajax-loader"></div>
     <button {{action backClicked target="view"}}>Back</button>
 </div>
