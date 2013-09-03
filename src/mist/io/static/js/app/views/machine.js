@@ -546,7 +546,7 @@ define('app/views/machine', [
                 var machine = this.get('controller').get('model');
                 if ($('#trial-user-name').val() && $('#trial-company-name').val()) {
                     var payload = {
-                        "action": 'upgrade_plans', 
+                        "action": 'get_trial',
                         "plan": 'Basic',
                         "auth_key": Mist.auth_key,
                         "name": $('#trial-user-name').val(),
