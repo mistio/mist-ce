@@ -141,6 +141,14 @@ define('app/controllers/backends', [
                                 rule['value'] = rules[ruleId]['value'];
                                 rule['actionToTake'] = rules[ruleId]['action'];
                                 rule['command'] = rules[ruleId]['command'];
+                                rule['maxValue'] = rules[ruleId]['max_value'];
+                                if (rule['maxValue'] > 100) {
+                                    rule['unit'] = 'KB/s';
+                                } else if (rule['metric'] == 'cpu' || rule['metric'] == 'ram') {
+                                        rule['unit'] = '%';
+                                } else {
+                                        rule['unit'] = '';
+                                }
 
                                 Mist.rulesController.pushObject(Rule.create(rule));
                             }

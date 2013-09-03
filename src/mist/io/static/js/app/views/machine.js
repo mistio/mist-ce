@@ -71,6 +71,8 @@ define('app/views/machine', [
             }.property('controller.model'),
             
             keySelect: function(key) {
+                $('#associate-button').show();
+                $('#associate-key-button').addClass('ui-disabled');
                 var machine = this.get('controller').get('model');
                 Mist.keysController.associateKey(key.name, machine);
                 $('#associate-key').popup('close');
@@ -288,7 +290,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('monitoring disabled'));
                             }
-                        }, 'CPU');
+                        }, 'CPU (%)');
                     }
 
                     function drawMemory() {
@@ -300,7 +302,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('unable to load data'));
                             }
-                        }, 'RAM');
+                        }, 'RAM (%)');
                     }
 
                     function drawDisk(disk, ioMethod) {
@@ -310,15 +312,15 @@ define('app/views/machine', [
                                 'disk' in localData &&
                                 ioMethod in localData.disk &&
                                 disk in localData.disk[ioMethod] &&
-                                'disk_ops' in localData.disk[ioMethod][disk]) {
+                                'disk_octets' in localData.disk[ioMethod][disk]) {
 
-                                return callback(null, localData['disk'][ioMethod][disk]['disk_ops'].map(function(d) {
+                                return callback(null, localData['disk'][ioMethod][disk]['disk_octets'].map(function(d) {
                                     return d;
                                 }));
                             } else {
                                 return callback(new Error('unable to load data'));
                             }
-                        }, 'DISK (' + disk + ', ' + ioMethod + ') ');
+                        }, 'DISK ' + ioMethod + ' (B/s)');
                     }
 
                     function drawLoad() {
@@ -330,7 +332,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('unable to load data'));
                             }
-                        }, 'LOAD ');
+                        }, 'LOAD');
                     }
 
                     function drawNetwork(iface, stream) {
@@ -348,7 +350,7 @@ define('app/views/machine', [
                             } else {
                                 return callback(new Error('unable to load data'));
                             }
-                        }, 'NET (' + iface + ', ' + stream  + ') ');
+                        }, 'NET ' + stream  + ' (B/s)');
                     }
 
                     function configureNetworkGraphs() {
