@@ -29,6 +29,8 @@ define('app/models/backend', [
             locations: [],
             error: false,
             create_pending: false,
+            loadingMachines: false,
+            loadingImages: false,
             
             isOn: function(){
                 if(this.state == "offline"){

@@ -26,13 +26,17 @@
         id="home-menu">
         <li>
             {{#linkTo machines}}Machines
+                {{#if Mist.backendsController.loadingMachines}}
                 <div id="home-machines-loader" class="ajax-loader"></div>
+                {{/if}}    
                 <span class="ui-li-count">{{Mist.backendsController.machineCount}}</span>
             {{/linkTo}}
         </li>
         <li>
             {{#linkTo images}}Images
+                {{#if Mist.backendsController.loadingImages}}
                 <div id="home-images-loader" class="ajax-loader"></div>
+                {{/if}}
                 <span class="ui-li-count">{{Mist.backendsController.imageCount}}</span>
             {{/linkTo}}
         </li>

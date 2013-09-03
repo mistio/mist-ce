@@ -48,7 +48,6 @@ define( 'app', [
     'app/controllers/keys',
     'app/controllers/rules',
     'app/views/home',
-    'app/views/count',
     'app/views/backend_button',
     'app/views/backend_add',
     'app/views/backend_edit',
@@ -92,7 +91,6 @@ define( 'app', [
                 KeysController,
                 RulesController,
                 Home,
-                Count,
                 BackendButton,
                 BackendAdd,
                 EditBackend,
@@ -315,7 +313,6 @@ define( 'app', [
         });
 
         App.HomeView = Home;
-        App.CountView = Count;
         App.BackendButtonView = BackendButton;
         App.BackendAddView = BackendAdd;
         App.EditBackendView = EditBackend;

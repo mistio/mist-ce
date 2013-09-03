@@ -38,11 +38,12 @@ define('app/controllers/images', [
                 if (this.backend.error && this.backend.state == 'offline'){
                     return
                 }
+                
                 $('#home-images-loader').fadeIn(200);
                 this.backend.set('state', 'waiting');
+                this.backend.set('loadingImages', true);
                 var that = this;
                 $.getJSON('/backends/' + this.backend.id + '/images', function(data) {
-                    $('#home-images-loader').fadeOut(200);
                     var content = new Array();
                     data.forEach(function(item){
                         item.backend = that.backend;
@@ -54,8 +55,8 @@ define('app/controllers/images', [
                     if (that.backend.error){
                         that.backend.set('error', false);
                     }
-                }).error(function() {         
-                    $('#home-images-loader').fadeOut(200);
+                    that.backend.set('loadingImages', false);
+                }).error(function() {
                     Mist.notificationController.notify("Error loading images for backend: " + that.backend.title);
                     if (that.backend.error){
                         // This backend seems hopeless, disabling it                            
@@ -68,6 +69,7 @@ define('app/controllers/images', [
                             this.init();
                         }, that.backend.poll_interval); 
                     }
+                    that.backend.set('loadingImages', false);
                 });
             }
         });

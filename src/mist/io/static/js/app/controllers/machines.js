@@ -11,7 +11,6 @@ define('app/controllers/machines', [
     function(Machine) {
         return Ember.ArrayController.extend({
             backend: null,
-
             content: null,
 
             init: function() {
@@ -29,9 +28,9 @@ define('app/controllers/machines', [
                 }
 
                 var that = this;
-                
-                this.backend.set('state', 'waiting');
 
+                this.backend.set('state', 'waiting');
+                this.backend.set('loadingMachines', true);
                 $.getJSON('/backends/' + this.backend.id + '/machines', function(data) {
 
                     data.forEach(function(item){
@@ -109,7 +108,6 @@ define('app/controllers/machines', [
                     }
                     
                     Mist.backendsController.getMachineCount()
-                    $('#home-machines-loader').fadeOut(200);
                     
                     Ember.run.later(that, function(){
                         this.refresh();
@@ -119,8 +117,9 @@ define('app/controllers/machines', [
                         that.backend.set('error', false);
                     }
                     
+                    that.backend.set('loadingMachines', false);
+                    
                 }).error(function(e) {
-                    $('#home-machines-loader').fadeOut(200);
                     Mist.notificationController.notify("Error loading machines for backend: " +
                                                         that.backend.title);
                     if (that.backend.error){
@@ -133,7 +132,8 @@ define('app/controllers/machines', [
                         Ember.run.later(that, function(){
                             this.refresh();
                         }, that.backend.poll_interval); 
-                    }   
+                    }
+                    that.backend.set('loadingMachines', false);
                 });
             },
 
