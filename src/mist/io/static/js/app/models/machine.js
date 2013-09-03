@@ -27,7 +27,7 @@ define('app/models/machine', [
             graphdata: {},
 
             restKeys: function(){
-                var ret = [], keys = this.get('keys');
+                var ret = [], keys = this.keys;
                 Mist.keysController.content.forEach(function(key){
                     if (keys.indexOf(key) == -1 && key.priv) {
                         ret.push(key);
@@ -243,7 +243,10 @@ define('app/models/machine', [
                                         that.set('uptimeChecked', Date.now());
                                         that.set('uptimeFromServer', uptime);
                                         info('Successfully got uptime', uptime, 'from machine', that.name);
-                                        Mist.keysController.updateKeyList(data.updated_keys, 'append');
+                                        data.updated_keys.forEach(function(key) {
+                                            Mist.keysController(key.name, key.publicKey, null, null, this)
+                                        });
+                                        //Mist.keysController.updateKeyList(data.updated_keys, 'append');
                                         if (data.updated_keys.length){
                                             warn('Added ' + data.updated_keys.length + ' new keys from machine ' + that.name);
                                         }
@@ -375,6 +378,7 @@ define('app/models/machine', [
 
                 this.tags = Ember.ArrayController.create();
                 this.keys = Ember.ArrayController.create();
+                this.keys.clear();
                 this.unassociatedKeys = Ember.ArrayController.create();
                 
                 var that = this;
@@ -384,9 +388,9 @@ define('app/models/machine', [
                             if (item[1] == that.id && item[0] == that.backend.id) {
                                 that.keys.addObject(key);
                             }
-                        });                        
+                        });
                     }
-                });                    
+                });
 
                 this.startUptimeTimer();
                 this.probe();

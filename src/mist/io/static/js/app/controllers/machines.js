@@ -29,7 +29,6 @@ define('app/controllers/machines', [
                 }
 
                 var that = this;
-
                 
                 this.backend.set('state', 'waiting');
 

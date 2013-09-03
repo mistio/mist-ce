@@ -2,20 +2,20 @@
     <div data-role="header">
         <h1>Manage Keys</h1>
     </div>
-    <button id="associate-key-button" data-theme="b" data-icon="plus" data-iconpos="right" {{action associateButtonClicked target="view"}}>Associate</button>
-    {{#if keys}}
-        <div>
-            <ul id="associated-keys" data-role="listview">
-                {{#each keys}}
-                <div class="associated-key" {{action associatedKeyClicked this target="view"}}>
-                      {{this.name}}
-                </div>
-                {{/each}}
-            </ul>
-        </div>
-    {{else}}
-        <label>There aren't any keys associated with this machine</label>
-    {{/if}}
+    <button id="associate-key-button" 
+            data-theme="b" 
+            data-icon="plus" 
+            data-iconpos="right" 
+            {{action associateButtonClicked target="view"}}>Associate</button>
+    <div>
+        <ul id="associated-keys" data-role="listview">
+            {{#each keys}}
+            <div class="associated-key" {{action associatedKeyClicked this target="view"}}>
+                  {{this.name}}
+            </div>
+            {{/each}}
+        </ul>
+    </div>
     <div class="ajax-loader"></div>
     <button {{action backClicked target="view"}}>Back</button>
 </div>
@@ -30,8 +30,8 @@
         <button id="key-action-probe" {{action actionProbeClicked target="view"}}>Probe</button>
         <button id="key-action-back" {{action actionBackClicked target="view"}}>Back</button>
     </div>
-    <textarea id="key-action-textarea" style="display:none;"></textarea>
     <div id="action-upload-key">
+        <textarea id="key-action-textarea"></textarea>
         <input type="file" id="key-action-upload-key" name="file" {{action uploadInputChanged on="change" target="view"}} />
     </div>
 </div>

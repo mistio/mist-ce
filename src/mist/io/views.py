@@ -1194,7 +1194,7 @@ def update_available_keys(request, backend_id, machine_id, ssh_user, host, autho
     
     # get the actual public keys from the blob
     ak = [k for k in authorized_keys.split('\n') if k.startswith('ssh')]
-    
+
     # for each public key
     for pk in ak:
         exists = False

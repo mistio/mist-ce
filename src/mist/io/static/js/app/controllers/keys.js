@@ -286,19 +286,13 @@ define('app/controllers/keys', [
 
             updateKeyList: function(data, mode) {
                 var content = new Array();
-                
-                if (mode == 'append'){
-                    this.forEach(function(item){
-                        content.push(item);
-                    });                    
-                }
-                
+
                 Mist.backendsController.content.forEach(function(item) {
                     item.machines.forEach(function(machine) { 
-                        machine.set('keys', new Array() );
+                        machine.get('keys').clear();
                     });
                 });
-                   
+
                 data.forEach(function(item){
                     var key = Key.create(item);
                     content.push(key);
