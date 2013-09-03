@@ -1,3 +1,27 @@
+0.9.5
+-----
+
+- add support for Openstack
+- add support for RedHat Openshift
+- update install instructions
+- reset machine selection when leaving machine list view
+- fix bug that prevented login to the service in order to get server stats
+- don't allow adding duplicate SSH keys
+- don't allow adding duplicate backends
+- fix refreshing of the enable monitoring popup
+- support Rackspace Sydney backend
+- upgrade libcloud version
+- stop polling a machine for data after user disables monitoring for that machine
+- fix duplicate rules bug
+- UI improvements on spinners for rules
+- add extra arguments to machine actions to assist in automatic execution
+
+0.9.4
+-----
+
+- show spinners when editing rules
+- fix issue with polling for monitored machines
+
 0.9.3
 -----
 

@@ -21,6 +21,7 @@ define('app/views/rule', [
                 var rule = event.data;
                 var metric = this.title;
                 var oldmetric = rule.get('metric');
+                var oldvalue = rule.get('value');
 
                 $('.rule-metric-popup').popup('close');
                 $('.rule-metric-popup li a').off('click', this.selectMetric);
@@ -30,10 +31,20 @@ define('app/views/rule', [
                 }
 
                 rule.set('metric', metric);
+                if ((rule.metric == 'ram' || rule.metric == 'cpu' || rule.metric == 'load') && 
+                         (oldmetric == 'network-tx' || oldmetric == 'disk-write') && rule.value > 100) {
+                    rule.set('value', 100);
+                    $('#' + rule.id + ' .rule-value').val(100);
+                    $('#' + rule.id + ' .rule-value').slider('refresh');
+                    warn("changing value");
+                    warn(rule.value);
+                }
                 var payload = {
                     'id' : rule.id,
-                    'metric' : metric
+                    'metric' : metric,
+                    'value' : rule.value
                 }
+
                 $('#' + rule.id + ' .delete-rule-container').hide();
                 $('#' + rule.id + ' .ajax-loader').fadeIn(200);
                 $.ajax({
@@ -45,11 +56,31 @@ define('app/views/rule', [
                         info('Successfully updated rule ', rule.id);
                         $('#' + rule.id + ' .ajax-loader').hide();
                         $('#' + rule.id + ' .delete-rule-container').show();
+                        rule.set('maxValue', data['max_value']);
+                        var maxvalue = parseInt(rule.maxValue);
+                        var curvalue = parseInt(rule.value);
+                        if (curvalue > maxvalue) {
+                            rule.set('value', maxvalue);
+                            $('#' + rule.id + ' .rule-value').val(maxvalue);
+                        }
+                        if (rule.maxValue > 100) {
+                            rule.set('unit','KB/s');
+                        } else if (rule.metric == 'cpu' || rule.metric == 'ram') {
+                                rule.set('unit','%');
+                        } else {
+                                rule.set('unit','');
+                        }
+                        Ember.run.next(function(){ 
+                            $('#' + rule.id + ' .rule-value').slider('refresh');
+                        });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while updating rule');
                         error(textstate, errorThrown, 'while updating rule');
                         rule.set('metric', oldmetric);
+                        rule.set('value', oldvalue);
+                        $('#' + rule.id + ' .rule-value').val(oldvalue);
+                        $('#' + rule.id + ' .rule-value').slider('refresh');
                         $('#' + rule.id + ' .ajax-loader').hide();
                         $('#' + rule.id + ' .delete-rule-container').show();
                     }

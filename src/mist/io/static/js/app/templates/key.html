@@ -73,8 +73,24 @@
     {{view Mist.KeyAssociateDialog data-role="content"}}
 </div>
 
-    <div class="keys-footer" data-role="footer" data-theme="a" style="display: block">
+<div data-role="popup" id="dialog-add-key" class="mist-dialog" data-overlay-theme="a">
+    <div data-role="header">
+        <h1>Edit key</h1>
+    </div>
+    {{view Mist.AddKeyView data-role="content"}}
+</div>
+
+    <div class="single-key-footer" data-role="footer" data-theme="a" style="display: block">
         <div class="actions" data-role="controlgroup" data-type="horizontal">
+            <a href="#"
+                id="keys-button-edit"
+                class="action-links"
+                data-role="button"
+                data-icon="edit"
+                data-rel="popup"
+                data-transition="slideup"
+                {{action editKey target="view"}}>Edit</a>
+                
             <a href="#"
                 id="keys-button-delete"
                 class="action-links"

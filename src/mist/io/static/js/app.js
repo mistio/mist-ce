@@ -132,6 +132,7 @@ define( 'app', [
             $('#splash').fadeOut(1000);
             $('body').css('overflow', '');
         });
+
         
         Ember.LOG_BINDINGS = false;
 
@@ -195,7 +196,17 @@ define( 'app', [
               // set redirect target if the user visits directly the URL
               this.target = 'machines';
           }          
-        });        
+        });   
+        
+        App.KeysRoute = Ember.Route.extend({
+          //clear selected keys when exiting view           
+          exit: function(){
+              Mist.keysController.forEach(function(key){
+                   log('deselecting key: ' + key.name);
+                   key.set('selected', false);
+              });
+            }  
+        });       
 
         App.KeyRoute = Ember.Route.extend({
           // Ember.js mindfuck warning            
@@ -214,7 +225,7 @@ define( 'app', [
           model: function(){
               // set redirect target if the user visits directly the URL
               this.target = 'keys';
-          }          
+          }
         });  
         
         App.SingleMachineView = SingleMachineView;
