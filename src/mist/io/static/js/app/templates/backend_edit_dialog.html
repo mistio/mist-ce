@@ -20,7 +20,8 @@
 
         <div id="backend-delete-confirm" class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
             <div class="label">Confirm backend removal?</div>
-            <button data-theme="c" {{action "deleteConfirmButtonClick" target="view"}}>Yes</a>
+            <div id="backend-has-monitoring">There are monitored machines.<br />Monitoring for these will be disabled</div>
+            <button data-theme="c" id="button-confirm-disable" {{action "deleteConfirmButtonClick" target="view"}}>Yes</a>
             <button data-theme="b" {{action "deleteCancelButtonClick" target="view"}}>No</a>
         </div>
 
