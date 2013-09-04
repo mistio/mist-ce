@@ -553,7 +553,7 @@ define('app/views/machine', [
                 if (user_name && company_name && user_country && user_servers && user_people) {
                     var payload = {
                         "action": 'get_trial',
-                        "plan": 'Basic',
+                        "plan": 'Startup',
                         "auth_key": Mist.auth_key,
                         "name": user_name,
                         "company_name": company_name,
