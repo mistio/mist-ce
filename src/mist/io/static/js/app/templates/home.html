@@ -42,7 +42,9 @@
         </li>
         <li>
             {{#linkTo keys}}Keys
+                {{#if Mist.keysController.loadingKeys}}
                 <div id="home-keys-loader" class="ajax-loader"></div>
+                {{/if}}
                 <span class="ui-li-count">{{Mist.keysController.content.length}}</span>
             {{/linkTo}}
         </li>
