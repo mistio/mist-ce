@@ -23,7 +23,8 @@
                 <input type="text" readonly="readonly" {{bindAttr value="pub"}} />
             </div>
         </div>
-
+        
+        {{#if priv}}
         <div data-role="collapsible" data-collapsed="false">
             <h3>Private key</h3>
             <div class="private-key">
@@ -43,8 +44,10 @@
                 </div>
             </div>
         </div>
+        {{/if}}
 
-         <div data-role="collapsible" data-collapsed="false" id="single-machines-keys">
+        {{#if machines}}
+        <div data-role="collapsible" data-collapsed="false" id="single-machines-keys">
             <h3>Machines</h3>
             <ul id="machines-list"
             data-role="listview"
@@ -55,6 +58,7 @@
                 {{/each}}
             </ul>
         </div>
+        {{/if}}
 
     </div>
 

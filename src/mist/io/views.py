@@ -688,7 +688,7 @@ def delete_machine_metadata(request):
     return Response('Success', 200)
 
 
-def shell_command(request, backend_id, machine_id, host, command, ssh_user = None):
+def shell_command(request, backend_id, machine_id, host, command, ssh_user = None, key = None):
     """ Sends a command over ssh, using fabric """
         
     if not ssh_user or ssh_user == 'undefined':
@@ -699,7 +699,10 @@ def shell_command(request, backend_id, machine_id, host, command, ssh_user = Non
     except:
         keypairs = request.registry.settings.get('keypairs', {})
 
-    preferred_keypairs = get_preferred_keypairs(keypairs, backend_id, machine_id)
+    if not key:
+        preferred_keypairs = get_preferred_keypairs(keypairs, backend_id, machine_id)
+    else:
+        preferred_keypairs = [key]
 
     for k in preferred_keypairs:
         keypair = keypairs[k]
@@ -746,7 +749,7 @@ def shell_command(request, backend_id, machine_id, host, command, ssh_user = Non
                              sudoer) 
                 continue
             
-            # Test if user is sudoer
+            # TODO: Test if user is sudoer
             #cmd_output = cmd_output.split('--------')
             #try:
             #    if int(cmd_output[0]) > 0:
@@ -780,10 +783,17 @@ def probe(request):
     machine_id = request.matchdict['machine']
     backend_id = request.matchdict['backend']
     host = request.params.get('host', None)
+    key = request.params.get('key', None)
+    if key == 'undefined':
+        key = None
+
     ssh_user = request.params.get('ssh_user', None)
     command = "cat /proc/uptime && echo -------- && cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null|awk '{print $2}'` 2>/dev/null || cat ~/.ssh/authorized_keys 2>/dev/null"
 
-    ret = shell_command(request, backend_id, machine_id, host, command, ssh_user)
+    if key:
+        log.warn('probing with key %s' % key)
+
+    ret = shell_command(request, backend_id, machine_id, host, command, ssh_user, key)
     if ret:
         cmd_output = ret['output'].split('--------')
 
@@ -1394,11 +1404,27 @@ def deploy_key(request, keypair):
     machine_id = request.json_body.get('machine_id', None)
 
     try:
-        ret = shell_command(request, backend_id, machine_id, host, command) 
+        ret = shell_command(request, backend_id, machine_id, host, command)
     except:
-        return False
+        pass
 
-    return ret
+    # Maybe the deployment failed but let's try to connect with the new key and see what happens
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+    
+    key_name = None
+    for key_name, k in keypairs.items():
+        if k == keypair:
+            break
+
+    if key_name:
+        log.warn('probing with key %s' % key_name)
+
+    test = shell_command(request, backend_id, machine_id, host, 'whoami', ssh_user = None, key = key_name)
+
+    return test
 
 
 def undeploy_key(request, keypair):
