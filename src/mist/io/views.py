@@ -101,11 +101,22 @@ def update_user_settings(request, renderer='json'):
     params = request.json_body
     action = params.get('action', '').lower()
     plan = params.get('plan', '')
-    name = params.get('name', '')
     auth_key = params.get('auth_key', '')
+    name = params.get('name', '')    
     company_name = params.get('company_name', '')
+    country = params.get('country', '') 
+    number_of_servers = params.get('number_of_servers', '') 
+    number_of_people = params.get('number_of_people', '')            
 
-    payload = {'auth_key': auth_key, 'action': action, 'plan': plan, 'name': name, 'company_name': company_name}
+    payload = {'auth_key': auth_key,
+               'action': action, 
+               'plan': plan, 
+               'name': name, 
+               'company_name': company_name, 
+               'country': country,
+               'number_of_servers': number_of_servers,
+               'number_of_people': number_of_people
+    }
 
     core_uri = request.registry.settings['core_uri']
     ret = requests.post(core_uri + '/account', params=payload, verify=False)
