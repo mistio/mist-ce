@@ -26,32 +26,20 @@
         id="home-menu">
         <li>
             {{#linkTo machines}}Machines
-                {{#view Mist.CountView
-                    numberBinding="Mist.backendsController.machineCount"
-                    tagName="span"
-                    class="ui-li-count"}}
-                    {{view.number}}
-                {{/view}}
+                <div id="home-machines-loader" class="ajax-loader"></div>
+                <span class="ui-li-count">{{Mist.backendsController.machineCount}}</span>
             {{/linkTo}}
         </li>
         <li>
             {{#linkTo images}}Images
-                {{#view Mist.CountView
-                    numberBinding="Mist.backendsController.imageCount"
-                    tagName="span"
-                    class="ui-li-count"}}
-                    {{view.number}}
-                {{/view}}
+                <div id="home-images-loader" class="ajax-loader"></div>
+                <span class="ui-li-count">{{Mist.backendsController.imageCount}}</span>
             {{/linkTo}}
         </li>
         <li>
             {{#linkTo keys}}Keys
-                {{#view Mist.CountView
-                    numberBinding="Mist.keysController.content.length"
-                    tagName="span"
-                    class="ui-li-count"}}
-                    {{view.number}}
-                {{/view}}
+                <div id="home-keys-loader" class="ajax-loader"></div>
+                <span class="ui-li-count">{{Mist.keysController.content.length}}</span>
             {{/linkTo}}
         </li>
     </ul>

@@ -9,7 +9,7 @@ define('app/views/count', ['ember'],
         return Ember.View.extend({
             didInsertElement: function(e){
                 try{
-                  $("#home-menu").listview('refresh');
+                  //$("#home-menu").listview('refresh');
                 } catch(e) {}
             },
         });

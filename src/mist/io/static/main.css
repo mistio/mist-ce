@@ -1068,6 +1068,14 @@ div.loading-monitoring {
     display: none;
 }
 
+#edit-backend #backend-has-monitoring {
+    margin-bottom: 1em;
+}
+
+#edit-backend .btn-full {
+    margin-top: 1em !important;
+}
+
 .mist-dialog .ui-listview-filter{
     margin: 0;
 }
@@ -1413,6 +1421,13 @@ div.logout-placeholder {
     float: right;
     width: 16px;
     margin-right: -29px;
+}
+
+#home-menu .ajax-loader {
+    display: block;
+    float: right;
+    margin-top: -18px;
+    width: 16px;
 }
 
 .generate-key-collapsible .ui-collapsible-content {

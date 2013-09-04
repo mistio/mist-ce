@@ -109,6 +109,7 @@ define('app/controllers/machines', [
                     }
                     
                     Mist.backendsController.getMachineCount()
+                    $('#home-machines-loader').fadeOut(200);
                     
                     Ember.run.later(that, function(){
                         this.refresh();
@@ -119,6 +120,7 @@ define('app/controllers/machines', [
                     }
                     
                 }).error(function(e) {
+                    $('#home-machines-loader').fadeOut(200);
                     Mist.notificationController.notify("Error loading machines for backend: " +
                                                         that.backend.title);
                     if (that.backend.error){

@@ -25,8 +25,10 @@ define('app/controllers/keys', [
 
                 $.getJSON('/keys', function(data) {
                     that.updateKeyList(data);
+                    $('#home-keys-loader').fadeOut(200);
                 }).error(function() {
                     Mist.notificationController.notify("Error loading keys");
+                    $('#home-keys-loader').fadeOut(200);
                 });
             },
 
