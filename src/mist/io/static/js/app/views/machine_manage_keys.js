@@ -22,7 +22,13 @@ define('app/views/machine_manage_keys', [
             
             associatedKeyClicked: function(key) {
                 this.selectedKey = key;
-                Mist.keysController.getPrivKey(key, "#key-action-textarea");
+                if (key.priv) {
+                    $('#key-action-upload').parent().css('display', 'none');
+                    $('#key-action-probe').parent().css('display', 'block');
+                } else {
+                    $('#key-action-upload').parent().css('display', 'block');
+                    $('#key-action-probe').parent().css('display', 'none'); 
+                }
                 $('#non-associated-keys').listview('refresh');
                 $('#key-actions').popup('option', 'positionTo', '#associated-keys').popup('open');
             },
@@ -38,9 +44,21 @@ define('app/views/machine_manage_keys', [
             
             actionRemoveClicked: function() {
                 $('#key-actions').popup('close');
-                $('#manage-keys .ajax-loader').fadeIn(200);
-                var machine = this.get('controller').get('model');
-                Mist.keysController.disassociateKey(this.selectedKey, machine);
+                var that = this;
+                var machine = that.get('controller').get('model');
+                if (machine.keys.content.length == 1 /*&& machine.keys.content[0] == that.selectedKey*/) {
+                    Mist.confirmationController.set('title', 'Remove last asosciated key');
+                    Mist.confirmationController.set('text', 'Warning you are about to remove the last associated key with this machine.\
+                                                             You will not be able to login through mist.io. Are you sure you want to do this ?');
+                    Mist.confirmationController.set('callback', function() {
+                        $('#manage-keys .ajax-loader').fadeIn(200);
+                        Mist.keysController.disassociateKey(that.selectedKey, machine);      
+                    });
+                    Mist.confirmationController.show();
+                } else {
+                    $('#manage-keys .ajax-loader').fadeIn(200);
+                    Mist.keysController.disassociateKey(that.selectedKey, machine); 
+                }         
             },
             
             actionUploadClicked: function() {

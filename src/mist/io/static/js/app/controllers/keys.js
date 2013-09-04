@@ -134,15 +134,6 @@ define('app/controllers/keys', [
                     success: function(data) {
                         info('Successfully got private key ' + name);
                         $(element).val(data).trigger('change');
-                        if (element == "#key-action-textarea") {
-                            if (data) {
-                                $('#key-action-upload').parent().css('display', 'none');
-                                $('#key-action-probe').parent().css('display', 'block');
-                            } else {
-                                $('#key-action-upload').parent().css('display', 'block');
-                                $('#key-action-probe').parent().css('display', 'none'); 
-                            }
-                        }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while getting key' + name);
@@ -188,17 +179,17 @@ define('app/controllers/keys', [
                     success: function(data) {
                         info('Successfully associated key ', key_name);
                         machine.keys.addObject(key);
+                        $('#manage-keys .ajax-loader').fadeOut(200);
                         setTimeout(function(){
                             $('#associated-keys').listview('refresh');
                             $('.key-icon-wrapper').trigger('create');
-                            $('#manage-keys .ajax-loader').fadeOut(200);
                             $('#associated-keys').parent().trigger('create');
                         }, 100); 
                     },
                     error: function(jqXHR, textstate, errorThrown) {
+                        $('#manage-keys .ajax-loader').fadeOut(200);
                         Mist.notificationController.notify('Error while associating key ' + key_name);
                         error(textstate, errorThrown, 'while associating key', key_name);
-                        $('#manage-keys .ajax-loader').fadeOut(200);
                     }
                 });
             },
@@ -266,16 +257,16 @@ define('app/controllers/keys', [
                         info('Successfully disassociated key ', key.name);
                         machine.keys.removeObject(key);
                         key.machines.removeObject([machine.backend.id, machine.id]);
+                        $('#manage-keys .ajax-loader').fadeOut(200);
                         setTimeout(function(){
                             $('.key-icon-wrapper').trigger('create');
-                            $('#manage-keys .ajax-loader').fadeOut(200);
                             $('#associated-keys').listview('refresh');
                         }, 100); 
                     },
                     error: function(jqXHR, textstate, errorThrown) {
+                        $('#manage-keys .ajax-loader').fadeOut(200);
                         Mist.notificationController.notify('Error while disassociating key' + key.name);
                         error(textstate, errorThrown, 'while disassociating key', key.name);
-                        $('#manage-keys .ajax-loader').fadeOut(200);
                     }
                 });
             },
