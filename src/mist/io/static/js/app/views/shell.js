@@ -60,7 +60,9 @@ function(shell_html) {
                 commandHistory = new Array();
             }
             
+            this.commandHistory.pop();
             this.commandHistory.push(command);
+            this.commandHistory.push('');
             this.commandHistoryIndex = this.commandHistory.length - 1;
 
             machine.shell(command, function(output) {

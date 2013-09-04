@@ -287,14 +287,14 @@ define( 'app', [
             
             keyDown: function(event, view) {
                 var parent = this._parentView;
-                var textarea = '.shell-input div.ui-input-text input';
+                var inputField = '.shell-input div.ui-input-text input';
                 
                 if (event.keyCode == 38 ) { // Up Key
                     if (parent.commandHistoryIndex > -1) {
                         if (parent.commandHistoryIndex > 0) {
                             parent.commandHistoryIndex--;
                         }
-                        $(textarea).val(parent.commandHistory[parent.commandHistoryIndex]);
+                        $(inputField).val(parent.commandHistory[parent.commandHistoryIndex]);
                         
                     }
                 } else if (event.keyCode == 40) { // Down key
@@ -302,15 +302,20 @@ define( 'app', [
                         if (parent.commandHistoryIndex < parent.commandHistory.length - 1) {
                             parent.commandHistoryIndex++;
                         }
-                        $(textarea).val(parent.commandHistory[parent.commandHistoryIndex]);
+                        $(inputField).val(parent.commandHistory[parent.commandHistoryIndex]);
                     }
                 } else if (event.keyCode == 9) { // Tab key
                     if(event.preventDefault) {
                         event.preventDefault();
                     }
                     // TODO: Autocomplete stuff...
+                } else {
+                    Ember.run.next(function(){
+                        parent.commandHistory[parent.commandHistoryIndex] = parent.command;
+                    });      
                 }
-                if (event.keyCode == 38 || event.keyCode == 40) { 
+                
+                if (event.keyCode == 38 || event.keyCode == 40) { // Up or Down key
                     // TODO: Move cursor to the end of input field
                 }   
             }
