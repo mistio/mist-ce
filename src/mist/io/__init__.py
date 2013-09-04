@@ -33,6 +33,9 @@ def main(global_config, **settings):
             settings['current_plan'] = ret.get('current_plan',{})
             settings['name'] = ret.get('user_details', ['',''])[0]
             settings['company_name'] = ret.get('user_details', ['',''])[1]
+            settings['country'] = ret.get('country', ['',''])[2]
+            settings['number_of_servers'] = ret.get('number_of_servers', ['',''])[3]
+            settings['number_of_people'] = ret.get('number_of_people', ['',''])[4]
         else:
             settings['auth'] = 0
 
