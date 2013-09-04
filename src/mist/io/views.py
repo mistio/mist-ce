@@ -31,12 +31,12 @@ from mist.io.helpers import import_key, create_security_group
 from mist.io.helpers import get_keypair, get_keypair_by_name, get_preferred_keypairs
 from mist.io.helpers import run_command
 
-from mist.io.helpers import generate_keypair, set_default_key, undeploy_key, get_private_key, validate_key_pair, get_ssh_user_from_keypair
+from mist.io.helpers import generate_keypair, set_default_key, get_private_key, validate_key_pair, get_ssh_user_from_keypair
 
 try:
-    from mist.core.helpers import save_settings, associate_key, disassociate_key #save_keypair #TODO
+    from mist.core.helpers import save_settings
 except ImportError:
-    from mist.io.helpers import save_settings, associate_key, disassociate_key
+    from mist.io.helpers import save_settings
 
 log = logging.getLogger('mist.io')
 
@@ -688,25 +688,9 @@ def delete_machine_metadata(request):
     return Response('Success', 200)
 
 
-@view_config(route_name='probe', request_method='POST',
-             renderer='json')
-def probe(request):
-    """Probes a machine over ssh, using fabric.
-
-    .. note:: Used for getting uptime and a list of deployed keys.
-
-    """
-    try:
-        conn = connect(request)
-    except:
-        return Response('Backend not found', 404)
-
-    machine_id = request.matchdict['machine']
-    backend_id = request.matchdict['backend']
-    host = request.params.get('host', None)
-    ssh_user = request.params.get('ssh_user', None)
-    command = "cat /proc/uptime && echo -------- && sudo -n uptime 2>&1|grep load|wc -l && echo -------- && cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null|awk '{print $2}'` 2>/dev/null || cat ~/.ssh/authorized_keys 2>/dev/null"
-    
+def shell_command(request, backend_id, machine_id, host, command, ssh_user = None):
+    """ Sends a command over ssh, using fabric """
+        
     if not ssh_user or ssh_user == 'undefined':
         ssh_user = 'root'
 
@@ -724,8 +708,11 @@ def probe(request):
             ssh_user = get_ssh_user_from_keypair(keypair, 
                                                  backend_id, 
                                                  machine_id)
-            response = run_command(conn, 
-                                   machine_id, 
+            
+            # Test if user is sudoer
+            #command = "sudo -n uptime 2>&1|grep load|wc -l && echo -------- && %s" % command
+              
+            response = run_command(machine_id, 
                                    host, 
                                    ssh_user, 
                                    private_key, 
@@ -741,15 +728,13 @@ def probe(request):
             sudoer = False
 
             if new_ssh_user:
-                response = run_command(conn, 
-                                       machine_id, 
+                response = run_command(machine_id, 
                                        host, 
                                        new_ssh_user, 
                                        private_key, 
                                        command)
                 ssh_user = new_ssh_user # update username in key-machine association
-             
-            cmd_output = response.text.split('--------')
+            
             if response.status_code != 200:
                 # Mark key failure
                 save_keypair(request, 
@@ -757,15 +742,18 @@ def probe(request):
                              backend_id, 
                              machine_id, 
                              -1*int(time()), # minus means failure
-                             ssh_user, 
-                             sudoer)
+                             ssh_user,
+                             sudoer) 
                 continue
             
-            try:
-                if int(cmd_output[1]) > 0:
-                    sudoer = True
-            except ValueError:
-                pass
+            # Test if user is sudoer
+            #cmd_output = cmd_output.split('--------')
+            #try:
+            #    if int(cmd_output[0]) > 0:
+            #        sudoer = True
+            #except ValueError:
+            #    pass
+            #cmd_output = '--------'.join(cmd_output[1:])
             
             # Mark key success
             save_keypair(request, 
@@ -776,14 +764,37 @@ def probe(request):
                          ssh_user, 
                          sudoer)
             
-            return {'uptime': cmd_output[0],
-                    'updated_keys': update_available_keys(request, 
-                                                          backend_id, 
-                                                          machine_id, 
-                                                          ssh_user, 
-                                                          host, 
-                                                          cmd_output[2]),
-                   }
+            return {'output': cmd_output}
+        
+    return False
+
+
+@view_config(route_name='probe', request_method='POST',
+             renderer='json')
+def probe(request):
+    """Probes a machine over ssh, using fabric.
+
+    .. note:: Used for getting uptime and a list of deployed keys.
+
+    """
+    machine_id = request.matchdict['machine']
+    backend_id = request.matchdict['backend']
+    host = request.params.get('host', None)
+    ssh_user = request.params.get('ssh_user', None)
+    command = "cat /proc/uptime && echo -------- && cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null|awk '{print $2}'` 2>/dev/null || cat ~/.ssh/authorized_keys 2>/dev/null"
+
+    ret = shell_command(request, backend_id, machine_id, host, command, ssh_user)
+    if ret:
+        cmd_output = ret['output'].split('--------')
+
+        return {'uptime': cmd_output[0],
+                'updated_keys': update_available_keys(request, 
+                                                      backend_id, 
+                                                      machine_id, 
+                                                      ssh_user, 
+                                                      host, 
+                                                      cmd_output[1]),
+               }
     
     return Response('No valid keys for server', 405)
 
@@ -1277,3 +1288,137 @@ def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, s
         return False
         
     return True
+
+
+def associate_key(request, key_id, backend_id, machine_id, deploy=True):
+    """Associates a key with a machine.
+
+    If deploy is set to True it will also attempt to actually deploy it to the
+    machine.
+
+    """
+    if not key_id or not machine_id or not backend_id:
+        return Response('Keypair, machine or backend not provided', 400)
+
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+
+    try:
+        keypair = keypairs[key_id]
+    except KeyError:
+        return Response('Keypair not found', 404)
+
+    machine_uid = [backend_id, machine_id]
+    machines = keypair.get('machines', [])
+    
+    for machine in machines:
+        if machine[:2] == machine_uid:
+            return Response('Keypair already associated to machine', 304)
+
+    try:
+        keypair['machines'].append(machine_uid)
+    except KeyError: 
+        # initialize machine associations array if it does not exist
+        keypair['machines'] = [machine_uid]
+
+    if deploy:
+        ret = deploy_key(request, keypair)
+    
+    if ret:    
+        save_settings(request)
+        return Response('OK', 200)
+    
+    if machine_uid in keypair['machines']:
+        keypair['machines'].remove(machine_uid)
+    
+    return Response('Failed to deploy key', 412)
+
+
+def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
+    """Disassociates a key from a machine.
+
+    If undeploy is set to True it will also attempt to actually remove it from
+    the machine.
+
+    """
+    if not key_id or not machine_id or not backend_id:
+        return Response('Keypair, machine or backend not provided', 400)
+
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+
+    try:
+        keypair = keypairs[key_id]
+    except KeyError:
+        return Response('Keypair not found', 404)
+
+    machine_uid = [backend_id, machine_id]
+    machines = keypair.get('machines', [])
+
+    key_found = False
+    for machine in machines:
+        if machine[:2] == machine_uid:
+            keypair['machines'].remove(machine)
+            key_found = True
+            break
+
+    #key not associated
+    if not key_found: 
+        return Response('Keypair is not associated to this machine', 304)
+
+    if undeploy:
+        ret = undeploy_key(request, keypair)
+
+    save_settings(request)
+
+    return Response('OK', 200)
+
+
+def deploy_key(request, keypair):
+    """Deploys the provided keypair to the machine.
+
+    To do that it requires another keypair (existing_key) that can connect to
+    the machine.
+
+    """
+
+    command = 'if [ -z `grep "' + keypair['public'] +\
+              '" ~/.ssh/authorized_keys` ]; then echo "' +\
+              keypair['public'] + '" >> ~/.ssh/authorized_keys; fi'
+    host = request.json_body.get('host', None)
+    backend_id = request.json_body.get('backend_id', None)
+    machine_id = request.json_body.get('machine_id', None)
+
+    try:
+        ret = shell_command(request, backend_id, machine_id, host, command) 
+    except:
+        return False
+
+    return ret
+
+
+def undeploy_key(request, keypair):
+    """Removes the provided keypair from the machine.
+
+    It connects to the server with the key that is supposed to be deleted.
+
+    """
+    command = 'grep -v "' + keypair['public'] + '" ~/.ssh/authorized_keys ' +\
+              '> ~/.ssh/authorized_keys.tmp && ' +\
+              'mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys ' +\
+              '&& chmod go-w ~/.ssh/authorized_keys'
+    host = request.json_body.get('host', None)
+    backend_id = request.json_body.get('backend_id', None)
+    machine_id = request.json_body.get('machine_id', None)
+                  
+    try:
+        ret = shell_command(request, backend_id, machine_id, host, command)
+    except:
+        return False
+
+    return ret
+

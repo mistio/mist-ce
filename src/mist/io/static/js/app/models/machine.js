@@ -244,7 +244,7 @@ define('app/models/machine', [
                                         that.set('uptimeFromServer', uptime);
                                         info('Successfully got uptime', uptime, 'from machine', that.name);
                                         data.updated_keys.forEach(function(key) {
-                                            Mist.keysController(key.name, key.publicKey, null, null, this);
+                                            Mist.keysController.newKey(key.name, key.publicKey, null, null, this);
                                         });
                                         if (data.updated_keys.length){
                                             warn('Added ' + data.updated_keys.length + ' new keys from machine ' + that.name);

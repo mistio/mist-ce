@@ -173,7 +173,8 @@ define('app/controllers/keys', [
                     'action': 'associate',
                     'key_id': key_name,
                     'backend_id': machine.backend.id,
-                    'machine_id': machine.id
+                    'machine_id': machine.id,
+                    'host': machine.getHost()
                 };
 
                 var key = this.getKeyByName(key_name);
@@ -193,13 +194,14 @@ define('app/controllers/keys', [
                         }, 100); 
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while associating key' + key_name);
+                        Mist.notificationController.notify('Error while associating key ' + key_name);
                         error(textstate, errorThrown, 'while associating key', key_name);
                         $('#manage-keys .ajax-loader').fadeOut(200);
                     }
                 });
             },
 
+            // Unused
             associateUserKey: function(key, ssh_user, key_name, machine) {
                 payload = {
                     'action': 'associate_ssh_user',
@@ -249,9 +251,10 @@ define('app/controllers/keys', [
                     'action': 'disassociate',
                     'key_id': key.name,
                     'backend_id': machine.backend.id,
-                    'machine_id': machine.id
+                    'machine_id': machine.id,
+                    'host': machine.getHost()
                 };
-
+                warn(payload);
                 $.ajax({
                     url: '/keys/' + key.name,
                     type: 'POST',

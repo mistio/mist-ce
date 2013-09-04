@@ -318,7 +318,7 @@ def create_security_group(conn, info):
         return False
 
 
-def run_command(conn, machine_id, host, ssh_user, private_key, command):
+def run_command(machine_id, host, ssh_user, private_key, command):
     """Runs a command over Fabric.
 
     Fabric does not support passing the private key as a string, but only as a
@@ -476,96 +476,6 @@ def set_default_key(request):
     return {}
 
 
-def associate_key(request, key_id, backend_id, machine_id, deploy=True):
-    """Associates a key with a machine.
-
-    If deploy is set to True it will also attempt to actually deploy it to the
-    machine.
-
-    """
-    if not key_id or not machine_id or not backend_id:
-        return Response('Keypair, machine or backend not provided', 400)
-
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
-
-    try:
-        keypair = keypairs[key_id]
-    except KeyError:
-        return Response('Keypair not found', 404)
-
-    machine_uid = [backend_id, machine_id]
-    machines = keypair.get('machines', [])
-    
-    for machine in machines:
-        if machine[:2] == machine_uid:
-            return Response('Keypair already associated to machine', 304)
-
-    try:
-        keypair['machines'].append(machine_uid)
-    except KeyError:
-        keypair['machines'] = [machine_uid]
-
-    save_settings(request)
-
-    if deploy:
-        existing_key = None
-        for k in keypairs:
-            if machine_uid in keypairs[k].get('machines', []) and k != key_id:
-                existing_key = keypairs[k] # TODO select a tested key
-                break
-        if existing_key:
-            return deploy_key(request, backend_id, machine_id, keypair, existing_key)
-
-    return Response('Manually deploy the public key to your server', 206)
-
-
-def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
-    """Disassociates a key from a machine.
-
-    If undeploy is set to True it will also attempt to actually remove it from
-    the machine.
-
-    """
-    
-    if not key_id or not machine_id or not backend_id:
-        return Response('Keypair, machine or backend not provided', 400)
-
-    try:gi
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
-
-    try:
-        keypair = keypairs[key_id]
-    except KeyError:
-        return Response('Keypair not found', 404)
-
-    machine_uid = [backend_id, machine_id]
-    machines = keypair.get('machines', [])
-
-    key_found = False
-    for machine in machines:
-        if machine[:2] == machine_uid:
-            keypair['machines'].remove(machine)
-            key_found = True
-            break
-
-    #key not associated
-    if not key_found: 
-        return Response('Keypair is not associated to this machine', 304)
-
-
-    save_settings(request)
-
-    if undeploy:
-        return undeploy_key(request, backend_id, machine_id, keypair)
-
-    return Response('Manually deploy the public key to your server', 206)
-
-
 def get_private_key(request):
     """Gets private key from keypair name.
 
@@ -591,105 +501,6 @@ def get_private_key(request):
     if keypair:
         return keypair.get('private', '')
 
-
-def deploy_key(request, backend_id, machine_id, keypair, existing_key):
-    """Deploys the provided keypair to the machine.
-
-    To do that it requires another keypair (existing_key) that can connect to
-    the machine.
-
-    """
-    try:
-        conn = connect(request, backend_id)
-    except:
-        return Response('Key associated but could not deploy to machine', 204)
-
-    node = None
-    machines = conn.list_nodes()
-    for machine in machines:
-        if machine.id == machine_id:
-            node = machine
-            break
-
-    if not node:
-        return Response('Key associated but could not deploy to machine', 204)
-
-    try:
-        host = node.public_ip[0]
-    except:
-        return Response('Key associated but could not deploy to machine', 204)
-
-    ssh_user = 'root'
-    try:
-        ssh_user = node.extra.get('tags')['ssh_user']
-    except:
-        pass
-
-    command = 'if [ -z `grep "' + keypair['public'] +\
-              '" ~/.ssh/authorized_keys` ]; then echo "' +\
-              keypair['public'] + '" >> ~/.ssh/authorized_keys; fi'
-    private_key = existing_key['private']
-
-    try:
-        #FIXME: needs a check, right now run_command does not raise exceptions
-        #type(ret)
-        #<class 'fabric.operations._AttributeString'>
-        ret = run_command(conn, machine_id, host, ssh_user, private_key, command)
-        ret.title
-    except:
-        return Response('Key associated but could not deploy to machine', 204)
-
-    return Response('OK', 200)
-
-
-def undeploy_key(request, backend_id, machine_id, keypair):
-    """Removes the provided keypair from the machine.
-
-    It connects to the server with the key that is supposed to be deleted.
-
-    """
-    try:
-        conn = connect(request, backend_id)
-    except:
-        return Response('Key disassociated but could not remove from machine', 204)
-
-    node = None
-    machines = conn.list_nodes()
-    for machine in machines:
-        if machine.id == machine_id:
-            node = machine
-            break
-
-    if not node:
-        return Response('Key disassociated but could not remove from machine', 204)
-
-    try:
-        host = node.public_ip[0]
-    except:
-        return Response('Key disassociated but could not remove from machine', 204)
-
-    ssh_user = 'root'
-    try:
-        ssh_user = node.extra.get('tags')['ssh_user']
-    except:
-        pass
-
-    command = 'grep -v "' + keypair['public'] + '" ~/.ssh/authorized_keys ' +\
-              '> ~/.ssh/authorized_keys.tmp && ' +\
-              'mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys ' +\
-              '&& chmod go-w ~/.ssh/authorized_keys'
-    private_key = keypair['private']
-
-    try:
-        #FIXME: needs a check, right now run_command does not raise exceptions
-        #type(ret)
-        #<class 'fabric.operations._AttributeString'>
-        ret = run_command(conn, machine_id, host, ssh_user, private_key, command)
-        ret.title
-    except:
-        return Response('Key disassociated but could not remove from machine', 204)
-
-    return Response('OK', 200)
 
 def validate_dsa_key_pair(public_key, private_key):
     """ Validates a pair of dsa keys """
