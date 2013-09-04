@@ -544,13 +544,22 @@ define('app/views/machine', [
  
             submitTrial: function(){
                 var machine = this.get('controller').get('model');
-                if ($('#trial-user-name').val() && $('#trial-company-name').val()) {
+                user_name = $('#trial-user-name').val();
+                company_name = $('#trial-company-name').val();
+                user_country = $('#trial-user-country').val();
+                user_servers = $('#trial-user-servers').val();
+                user_people = $('#trial-user-people').val();
+
+                if (user_name && company_name && user_country && user_servers && user_people) {
                     var payload = {
                         "action": 'get_trial',
                         "plan": 'Basic',
                         "auth_key": Mist.auth_key,
-                        "name": $('#trial-user-name').val(),
-                        "company_name": $('#trial-company-name').val()                        
+                        "name": user_name,
+                        "company_name": company_name,
+                        "country": user_country,
+                        "number_of_servers": user_servers,
+                        "user_people": user_people                       
                     };
                     $('#trial-user-details .ajax-loader').show();  
                     $('#submit-trial').addClass('ui-disabled');                      
@@ -579,11 +588,17 @@ define('app/views/machine', [
                     });
 
                 } else {
-                    if (!($('#trial-user-name').val())) {
+                    if (!(user_name)) {
                         $('#trial-user-name').focus();
-                    } else {
+                    } else if (!(company_name)){
                         $('#trial-company-name').focus();
-                    }
+                    } else if (!(user_country)){
+                        $('#trial-user-country').focus();
+                    } else if (!(user_servers)){
+                        $('#trial-user-servers').focus();
+                    } else {
+                        $('#trial-user-people').focus();
+                    } 
                 }
             },
 
