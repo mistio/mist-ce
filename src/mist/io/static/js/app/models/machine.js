@@ -437,6 +437,15 @@ define('app/models/machine', [
                             if ((Mist.user_details) && (Mist.user_details[1])) {
                                 $('#trial-company-name').val(Mist.user_details[1]);
                             }
+                            if ((Mist.user_details) && (Mist.user_details[2])) {
+                                $('#trial-user-country').val(Mist.user_details[2]);
+                            }
+                            if ((Mist.user_details) && (Mist.user_details[3])) {
+                                $('#trial-user-servers').val(Mist.user_details[3]);
+                            }
+                            if ((Mist.user_details) && (Mist.user_details[4])) {
+                                $('#trial-user-people').val(Mist.user_details[4]);
+                            }
                             $('#enable-monitoring-dialog').hide();
                             $('#monitoring-enabled').hide();
                             $('#plan-dialog').show();

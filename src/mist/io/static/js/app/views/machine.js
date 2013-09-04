@@ -559,7 +559,7 @@ define('app/views/machine', [
                         "company_name": company_name,
                         "country": user_country,
                         "number_of_servers": user_servers,
-                        "user_people": user_people                       
+                        "number_of_people": user_people                       
                     };
                     $('#trial-user-details .ajax-loader').show();  
                     $('#submit-trial').addClass('ui-disabled');                      
