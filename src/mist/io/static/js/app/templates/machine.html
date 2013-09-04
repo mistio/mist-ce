@@ -277,6 +277,15 @@
             <label for="company-name">Company Name:</label>
             <span class="required">*</span>
             <input type="text" name="company-name" id="trial-company-name" />
+            <label for="user-country">Country:</label>
+            <span class="required">*</span>
+            <input type="text" name="user-country" id="trial-user-country" />
+            <label for="user-servers">Number of servers:</label>
+            <span class="required">*</span>
+            <input type="text" name="user-servers" id="trial-user-servers" />
+            <label for="user-people">Number of employees:</label>
+            <span class="required">*</span>
+            <input type="text" name="user-people" id="trial-user-people" />
             <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
                 <button data-theme="c" id="button-back-plan" {{action "closeTrialDialog" target="view"}}>Back</button>
                 <button data-theme="b" id="button-enable-trial" {{action "submitTrial" target="view"}}>Enable</button>
