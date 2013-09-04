@@ -596,6 +596,8 @@ div.ember-view div.ui-panel-content-wrap {
 .cost {
     display: none;
     text-align: center;
+    margin-top: 20px;
+    margin-bottom: -10px;
 }
 
 .cost span {

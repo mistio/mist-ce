@@ -102,11 +102,17 @@ define('app/views/machine', [
                     privateIps = machine.private_ips;
                 }
 
+                try {
+                    var dnsName = machine.extra.dns_name, launchDate = machine.extra.launchdatetime;
+                } catch(e){
+                    //var dnsName = null, launchDate = null;
+                }
+                
                 var basicvars = {
                         'Public IPs': publicIps,
                         'Private IPs': privateIps,
-                        'DNS Name': machine.extra.dns_name,
-                        'Launch Date': machine.extra.launchdatetime
+                        'DNS Name': dnsName,
+                        'Launch Date': launchDate
                 };
 
                 if (machine.image && 'image' in machine &&

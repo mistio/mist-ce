@@ -711,9 +711,6 @@ def shell_command(request, backend_id, machine_id, host, command, ssh_user = Non
             ssh_user = get_ssh_user_from_keypair(keypair, 
                                                  backend_id, 
                                                  machine_id)
-            
-            # Test if user is sudoer
-            #command = "sudo -n uptime 2>&1|grep load|wc -l && echo -------- && %s" % command
               
             response = run_command(machine_id, 
                                    host, 
@@ -750,13 +747,13 @@ def shell_command(request, backend_id, machine_id, host, command, ssh_user = Non
                 continue
             
             # TODO: Test if user is sudoer
-            #cmd_output = cmd_output.split('--------')
-            #try:
-            #    if int(cmd_output[0]) > 0:
-            #        sudoer = True
-            #except ValueError:
-            #    pass
-            #cmd_output = '--------'.join(cmd_output[1:])
+            if command.startswith('sudo -n uptime 2>&1'):
+                split_output = cmd_output.split('--------')
+                try:
+                    if int(split_output[0]) > 0:
+                        sudoer = True
+                except ValueError:
+                    pass
             
             # Mark key success
             save_keypair(request, 
@@ -788,7 +785,7 @@ def probe(request):
         key = None
 
     ssh_user = request.params.get('ssh_user', None)
-    command = "cat /proc/uptime && echo -------- && cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null|awk '{print $2}'` 2>/dev/null || cat ~/.ssh/authorized_keys 2>/dev/null"
+    command = "sudo -n uptime 2>&1|grep load|wc -l && echo -------- && cat /proc/uptime && echo -------- && cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null|awk '{print $2}'` 2>/dev/null || cat ~/.ssh/authorized_keys 2>/dev/null"
 
     if key:
         log.warn('probing with key %s' % key)
@@ -797,14 +794,15 @@ def probe(request):
     if ret:
         cmd_output = ret['output'].split('--------')
 
-        return {'uptime': cmd_output[0],
-                'updated_keys': update_available_keys(request, 
-                                                      backend_id, 
-                                                      machine_id, 
-                                                      ssh_user, 
-                                                      host, 
-                                                      cmd_output[1]),
-               }
+        if len(cmd_output) > 2:
+            return {'uptime': cmd_output[1],
+                    'updated_keys': update_available_keys(request, 
+                                                          backend_id, 
+                                                          machine_id, 
+                                                          ssh_user, 
+                                                          host, 
+                                                          cmd_output[2]),
+                   }
     
     return Response('No valid keys for server', 405)
 

@@ -172,6 +172,8 @@ define('app/controllers/machines', [
                 item.id = -1;
 
                 var machine = Machine.create(item);
+                machine.keys.addObject(key);
+                
                 this.addObject(machine);
                 Ember.run.next(function(){
                     $('#machines-list input.ember-checkbox').checkboxradio();    
@@ -198,7 +200,6 @@ define('app/controllers/machines', [
                         machine.set("extra", data.extra);
                         that.backend.set('create_pending', false);
                         key.machines.addObject([that.backend.id, data.id]);
-                        machine.keys.addObject(key);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while sending create machine' +
