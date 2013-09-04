@@ -29,13 +29,13 @@ def main(global_config, **settings):
         ret = requests.post(settings['core_uri'] + '/auth', params=payload, verify=False)
         if ret.status_code == 200:
             settings['auth'] = 1
-            ret = json.loads(ret.content) 
+            ret = json.loads(ret.content)
             settings['current_plan'] = ret.get('current_plan',{})
             settings['name'] = ret.get('user_details', ['',''])[0]
             settings['company_name'] = ret.get('user_details', ['',''])[1]
-            settings['country'] = ret.get('country', ['',''])[2]
-            settings['number_of_servers'] = ret.get('number_of_servers', ['',''])[3]
-            settings['number_of_people'] = ret.get('number_of_people', ['',''])[4]
+            settings['country'] = ret.get('country', ['','',''])[2]
+            settings['number_of_servers'] = ret.get('number_of_servers', ['','','',''])[3]
+            settings['number_of_people'] = ret.get('number_of_people', ['','','','',''])[4]
         else:
             settings['auth'] = 0
 
