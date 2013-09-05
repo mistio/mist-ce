@@ -108,7 +108,6 @@ define('app/controllers/machines', [
                     }
 
                     Mist.backendsController.getMachineCount();
-                    $('#home-machines-loader').fadeOut(200);
                     
                     Ember.run.later(that, function(){
                         this.refresh();
