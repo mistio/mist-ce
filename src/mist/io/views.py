@@ -690,10 +690,7 @@ def delete_machine_metadata(request):
 
 def shell_command(request, backend_id, machine_id, host, command, ssh_user = None, key = None):
     """ Sends a command over ssh, using fabric """
-        
-    if not ssh_user or ssh_user == 'undefined':
-        ssh_user = 'root'
-
+    
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
@@ -708,9 +705,11 @@ def shell_command(request, backend_id, machine_id, host, command, ssh_user = Non
         keypair = keypairs[k]
         private_key = keypair.get('private', None)
         if private_key:
-            ssh_user = get_ssh_user_from_keypair(keypair, 
+            if ssh_user == 'undefined':
+                ssh_user = None
+            ssh_user = ssh_user or get_ssh_user_from_keypair(keypair, 
                                                  backend_id, 
-                                                 machine_id)
+                                                 machine_id) or 'root'
               
             response = run_command(machine_id, 
                                    host, 
@@ -764,7 +763,9 @@ def shell_command(request, backend_id, machine_id, host, command, ssh_user = Non
                          ssh_user, 
                          sudoer)
             
-            return {'output': cmd_output}
+            return {'output': cmd_output,
+                    'ssh_user': ssh_user,
+                    'sudoer': sudoer}
         
     return False
 
@@ -1334,7 +1335,8 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
     if deploy:
         ret = deploy_key(request, keypair)
     
-    if ret:    
+    if ret:
+        keypair['machines'][-1] += [int(time()), ret.get('ssh_user', ''), ret.get('sudoer', False)]
         save_settings(request)
         return Response('OK', 200)
     
@@ -1393,14 +1395,12 @@ def deploy_key(request, keypair):
     the machine.
 
     """
-
-    command = 'if [ -z `grep "' + keypair['public'] +\
-              '" ~/.ssh/authorized_keys` ]; then echo "' +\
-              keypair['public'] + '" >> ~/.ssh/authorized_keys; fi'
+    grep_output = '`grep \'%s\' ~/.ssh/authorized_keys`' % keypair['public']
+    command = 'if [ -z "%s" ]; then echo "%s" >> ~/.ssh/authorized_keys; fi' % (grep_output, keypair['public'])
     host = request.json_body.get('host', None)
     backend_id = request.json_body.get('backend_id', None)
     machine_id = request.json_body.get('machine_id', None)
-
+    
     try:
         ret = shell_command(request, backend_id, machine_id, host, command)
     except:
@@ -1420,7 +1420,7 @@ def deploy_key(request, keypair):
     if key_name:
         log.warn('probing with key %s' % key_name)
 
-    test = shell_command(request, backend_id, machine_id, host, 'whoami', ssh_user = None, key = key_name)
+    test = shell_command(request, backend_id, machine_id, host, 'whoami', ssh_user = ret.get('ssh_user', None), key = key_name)
 
     return test
 
