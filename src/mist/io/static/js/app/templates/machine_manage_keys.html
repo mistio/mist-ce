@@ -16,7 +16,7 @@
     <div>
         <ul id="associated-keys" data-role="listview">
             {{#each keys}}
-            <div class="associated-key" {{action associatedKeyClicked this target="view"}}>
+            <div class="associated-key" {{bindAttr class="probeState"}}{{action associatedKeyClicked this target="view"}}>
                   {{this.name}}
             </div>
             {{/each}}

@@ -1322,6 +1322,8 @@ iframe#hidden-shell-iframe {
     border-radius: 19px;
     border: 1px solid #c4c4c4;
     cursor: pointer;
+    background-position: right !important;
+    background-repeat: no-repeat;
 }
 
 #key-actions-container {
@@ -1462,17 +1464,17 @@ div.info {
     background-repeat: no-repeat;
 }
 
-#mist-manage-keys.probed {
+#mist-manage-keys.probed, .associated-key.probed {
     background-image: url(images/key.png);
 
 }
 
-#mist-manage-keys.unprobed {
+#mist-manage-keys.unprobed, .associated-key.unprobed {
     background-image: url(images/no-key.png);
 
 }
 
-#mist-manage-keys.probing {
+#mist-manage-keys.probing, .associated-key.probing {
     background-image: url(states/load-white.gif) !important;
 }
 

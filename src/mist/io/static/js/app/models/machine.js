@@ -205,10 +205,10 @@ define('app/models/machine', [
                 this.set('probeInterval', 10000);
             },
 
-            probe: function(key) {
+            probe: function(keyName) {
                 var that = this;
                 if (that.get)
-
+                
                 function sendProbe() {
                     if (!that.backend) {
                         return false;
@@ -223,8 +223,10 @@ define('app/models/machine', [
                     if (that.state == 'running') {
                         var host = that.getHost();
                         if (host) {
-                            if (key != undefined){
-                                that.set('probing', key);    
+                            var key = Mist.keysController.getKeyByName(keyName);
+                            if (keyName != undefined){
+                                that.set('probing', keyName);
+                                key.set('probing', that.id);   
                             } else {
                                 that.set('probing', true);
                             }
@@ -234,17 +236,20 @@ define('app/models/machine', [
                                 type: 'POST',
                                 headers: { "cache-control": "no-cache" },
                                 data: {'host': host,
-                                       'key': key},
+                                       'key': keyName},
                                 success: function(data, textStatus, jqXHR) {
                                        // got it fine, also means it has a key
                                     if (jqXHR.status === 200) {
                                         that.set('probed', true);
+                                        if(key) {
+                                            key.set('probed', true);
+                                        }
                                         var uptime = parseFloat(data['uptime'].split(' ')[0]) * 1000;
                                         that.set('uptimeChecked', Date.now());
                                         that.set('uptimeFromServer', uptime);
                                         info('Successfully got uptime', uptime, 'from machine', that.name);
-                                        data.updated_keys.forEach(function(key) {
-                                            Mist.keysController.newKey(key.name, key.publicKey, null, null, this);
+                                        data.updated_keys.forEach(function(ukey) {
+                                            Mist.keysController.newKey(ukey.name, ukey.publicKey, null, null, this);
                                         });
                                         if (data.updated_keys.length){
                                             warn('Added ' + data.updated_keys.length + ' new keys from machine ' + that.name);
@@ -252,13 +257,22 @@ define('app/models/machine', [
                                     } else {
                                         // in every other case there is a problem
                                         that.set('probed', false);
+                                        if(key) {
+                                            key.set('probed', false);
+                                        }
                                         info('Got response other than 200 while probing machine', that.name);
                                         retry(that);
                                     }
                                     that.set('probing', false);
+                                    if (key) {
+                                        key.set('probing', false);
+                                    }
                                 },
                                 error: function(jqXHR, textstate, errorThrown) {
                                     that.set('probed', false);
+                                    if (key) {
+                                        key.set('probed', false);
+                                    }
                                     //Mist.notificationController.notify('Error getting uptime from machine ' +
                                     //    that.name);
                                     //error(textstate, errorThrown, 'when probing machine',

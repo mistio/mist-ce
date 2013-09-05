@@ -20,6 +20,20 @@ define('app/views/machine_manage_keys', [
                 this._super();
             },
             
+            didInsertElement: function() {
+                var machine = this.get('controller').get('model'), that=this;
+                for (var i=0; i < machine.keys.content.length; i++){
+                    machine.keys.content[i].machines.forEach(function(item){
+                        if (item[1] == machine.id && item[0] == machine.backend.id && item[2] > 0) {
+                            machine.keys.content[i].set('probed', true);
+                            warn('set probed for key ' + machine.keys.content[i].name);
+                        } else if (item[1] == machine.id && item[0] == machine.backend.id && item[2] < 0){
+                            machine.keys.content[i].set('probed', false);
+                        }
+                    });
+                }
+            },
+            
             associatedKeyClicked: function(key) {
                 this.selectedKey = key;
                 if (key.priv) {

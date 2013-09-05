@@ -13,10 +13,22 @@ define('app/models/key', [
             priv: null,
             machines: null,
             default_key: null,
+            probed: null,
+            probing: null,
 
             id: function() {
                return this.name;
             }.property("name"),
+            
+            probeState: function() {
+                if (this.probing) {
+                    return 'probing';
+                } else if (this.probed) {
+                    return 'probed';
+                } else {
+                    return 'unprobed';
+                }
+            }.property('probed', 'probing'),
 
             deleteKey: function() {
                 payload = {
