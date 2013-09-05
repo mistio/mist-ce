@@ -47,6 +47,11 @@ define('app/models/machine', [
             user: function() {                
                 return this.getUser();
             }.property('user'),
+            
+            isNotGhost: function() {                
+                return ! this.isGhost;
+                //return this.state != 'terminated' && this.state != 'unknown';
+            }.property('state'),
 
             reboot: function() {
                 log('Rebooting machine', this.name);
@@ -85,10 +90,8 @@ define('app/models/machine', [
                         info('Successfully sent destroy to machine', that.name);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error when sending destroy to machine ' +
-                                that.name);
-                        error(textstate, errorThrown, 'when sending destroy to machine',
-                                that.name);
+                        Mist.notificationController.notify('Error when sending destroy to machine ' + that.name);
+                        error(textstate, errorThrown, 'when sending destroy to machine', that.name);
                     }
                 });
             },
@@ -220,19 +223,22 @@ define('app/models/machine', [
                         return;
                     }
                 }, 1000);
+                
+                this.set('probeInterval', 10000);
             },
 
-            checkUptime: function() {
+            probe: function() {
                 var that = this;
+                if (that.get)
 
-                function uptimeTimeout() {
+                function sendProbe() {
                     if (!that.backend) {
                         return false;
                     }
                     
                     if (that.backend.create_pending){
                         // Try again later if a machine is being created on this backend
-                        setTimeout(uptimeTimeout, 10000);
+                        retryProbe();
                         return false;
                     }
 
@@ -242,27 +248,28 @@ define('app/models/machine', [
                             var ssh_user = that.getUser();
 
                             $.ajax({
-                                url: '/backends/' + that.backend.id + '/machines/' + that.id + '/shell',
+                                url: '/backends/' + that.backend.id + '/machines/' + that.id + '/probe',
                                 type: 'POST',
                                 headers: { "cache-control": "no-cache" },
                                 data: {'host': host,
-                                   'ssh_user': ssh_user,
-                                   'command': 'cat /proc/uptime'},
+                                       'ssh_user': ssh_user},
                                 success: function(data, textStatus, jqXHR) {
                                        // got it fine, also means it has a key
                                     if (jqXHR.status === 200) {
                                         that.set('hasKey', true);
-                                        var resp = data.split(' ');
-                                        if (resp.length == 2) {
-                                            var uptime = parseFloat(resp[0]) * 1000;
-                                            that.set('uptimeChecked', Date.now());
-                                            that.set('uptimeFromServer', uptime);
+                                        warn(data.uptime);
+                                        var uptime = parseFloat(data['uptime'].split(' ')[0]) * 1000;
+                                        that.set('uptimeChecked', Date.now());
+                                        that.set('uptimeFromServer', uptime);
+                                        info('Successfully got uptime', uptime, 'from machine', that.name);
+                                        Mist.keysController.updateKeyList(data.updated_keys, 'append');
+                                        if (data.updated_keys.length){
+                                            warn('Added ' + data.updated_keys.length + ' new keys from machine ' + that.name);
                                         }
-                                        info('Successfully got uptime', data, 'from machine', that.name);
                                     } else {
                                         // in every other case there is a problem
                                         that.set('hasKey', false);
-                                        info('Got response other than 200 while getting uptime from machine', that.name);
+                                        info('Got response other than 200 while probing machine', that.name);
                                         retry(that);
                                     }
                                 },
@@ -270,29 +277,33 @@ define('app/models/machine', [
                                     that.set('hasKey', false);
                                     //Mist.notificationController.notify('Error getting uptime from machine ' +
                                     //    that.name);
-                                    error(textstate, errorThrown, 'when getting uptime from machine',
+                                    error(textstate, errorThrown, 'when probing machine',
                                         that.name);
-                                    retry();
+                                    that.set('probeInterval', 2*that.get('probeInterval'));
+                                    retryProbe(that.get('probeInterval'));
                                 }
                             });
                         }
                     }
                 };
                 
-                function retry() {
+                function retryProbe(interval) {
+                    if (interval == undefined) {
+                        interval = 10000;
+                    }
                     // retry only if the machine is still here and it's running
                     if (that.backend.getMachineById(that.id) && that.state == 'running'){
-                        setTimeout(uptimeTimeout, 10000);
+                        setTimeout(sendProbe, interval);
                     }
                 }
                 
-                setTimeout(uptimeTimeout, 2000);
+                setTimeout(sendProbe, 2000);
             },
 
-            resetUptime: function() {
+            reProbe: function() {
                 if (this.get('state') == 'running') {
                     this.startUptimeTimer();
-                    this.checkUptime();
+                    this.probe();
                 } else {
                     this.set('uptime', 0);
                     this.uptimeTimer = false;
@@ -333,7 +344,7 @@ define('app/models/machine', [
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     dataType: 'json',
-                    timeout : 60000,
+                    timeout : 600000,
                     success: function(data) {
                         var user = that.getUser();
                         if (!that.hasMonitoring){
@@ -342,7 +353,7 @@ define('app/models/machine', [
                             if (prefix.slice(-1) == '/') {
                                 prefix = prefix.substring(0, prefix.length - 1);
                             }
-                            var cmd = 'wget --no-check-certificate ' + prefix + '/core/scripts/deploy_collectd.sh -O - > /tmp/deploy_collectd.sh && chmod o+x /tmp/deploy_collectd.sh && /tmp/deploy_collectd.sh ' + data['monitor_server'] + ' ' + data['uuid'] + ' ' + data['passwd'];
+                            var cmd = 'wget --no-check-certificate ' + prefix + '/core/scripts/deploy_collectd.sh -O - > /tmp/deploy_collectd.sh && chmod +x /tmp/deploy_collectd.sh && sudo /tmp/deploy_collectd.sh ' + data['monitor_server'] + ' ' + data['uuid'] + ' ' + data['passwd'];
                             if (user != 'root'){
                                 cmd = "sudo su -c '" + cmd + "'";
                             }
@@ -476,7 +487,7 @@ define('app/models/machine', [
                 });                    
 
                 this.startUptimeTimer();
-                this.checkUptime();
+                this.probe();
             }
         });
     }

@@ -3,9 +3,14 @@ import os
 import tempfile
 import logging
 import yaml
+import subprocess
+import struct
+import binascii
 
+from time import time
 from hashlib import sha1
-from Crypto.PublicKey import RSA
+from Crypto.PublicKey import RSA , DSA
+from Crypto.Util.number import bytes_to_long, long_to_bytes, isPrime
 
 from pyramid.response import Response
 
@@ -139,13 +144,26 @@ def get_keypair(keypairs, backend_id=None, machine_id=None):
         machines = keypairs[key].get('machines', [])
         if machines:
             for machine in machines:
-                if machine == [backend_id, machine_id]:
+                if machine[:2] == [backend_id, machine_id]:
                     return keypairs[key]
     for key in keypairs:
         if keypairs[key].get('default', False):
             return keypairs[key]
 
     return {}
+
+
+def get_ssh_user_from_keypair(keypair, backend_id=None, machine_id=None):
+    """get ssh user for key pair given the key pair"""
+    machines = keypair.get('machines', [])
+    for machine in machines:
+        if machine[:2] == [backend_id, machine_id]:
+            try:
+                #this should be the user, since machine = [backend_id, machine_id, ssh_user]
+                return machine[3]
+            except:
+                return ''
+    return ''
 
 
 def connect(request, backend_id=False):
@@ -221,13 +239,13 @@ def get_machine_actions(machine, backend):
         can_start = False
         can_stop = False
         can_reboot = False
-    elif machine.state is NodeState.UNKNOWN and \
-                          backend.type in EC2_PROVIDERS:
+    elif machine.state is NodeState.UNKNOWN:
         # We assume uknown state in EC2 mean stopped
-        can_stop = False
-        can_start = True
+        if backend.type in EC2_PROVIDERS:
+            can_stop = False
+            can_start = True
         can_reboot = False
-    elif machine.state in (NodeState.TERMINATED, NodeState.UNKNOWN):
+    elif machine.state in (NodeState.TERMINATED,):
         can_start = False
         can_destroy = False
         can_stop = False
@@ -360,20 +378,6 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
 
     try:
         cmd_output = run(command, timeout=COMMAND_TIMEOUT)
-        if 'Please login as the' in cmd_output:
-            # for EC2 Amazon Linux machines, usually with ec2-user
-            username = cmd_output.split()[4].strip('"')
-            if 'Please login as the user ' in cmd_output:
-                username = cmd_output.split()[5].strip('"')
-            machine = Node(machine_id,
-                           name=machine_id,
-                           state=0,
-                           public_ips=[],
-                           private_ips=[],
-                           driver=conn)
-            conn.ex_create_tags(machine, {'ssh_user': username})
-            env.user = username
-            cmd_output = run(command, timeout=COMMAND_TIMEOUT)
     except Exception as e:
         if 'SSH session not active' in e:
             from fabric.state import connections
@@ -395,11 +399,11 @@ def run_command(conn, machine_id, host, ssh_user, private_key, command):
     except SystemExit as e:
         log.warn('Got SystemExit: %s' % e)
         os.remove(tmp_path)
-        return Response('SystemExit: %s' % e, 204)
+        return Response('SystemExit: %s' % e, 401)
 
     os.remove(tmp_path)
 
-    return cmd_output
+    return Response(cmd_output, 200)
 
 
 def generate_backend_id(provider, region, apikey):
@@ -493,9 +497,11 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
         return Response('Keypair not found', 404)
 
     machine_uid = [backend_id, machine_id]
-
-    if machine_uid in keypair.get('machines', []):
-        return Response('Keypair already associated to machine', 304)
+    machines = keypair.get('machines', [])
+    
+    for machine in machines:
+        if machine[:2] == machine_uid:
+            return Response('Keypair already associated to machine', 304)
 
     try:
         keypair['machines'].append(machine_uid)
@@ -537,14 +543,19 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
         return Response('Keypair not found', 404)
 
     machine_uid = [backend_id, machine_id]
+    machines = keypair.get('machines', [])
 
-    if machine_uid not in keypair.get('machines', []):
+    key_found = False
+    for machine in machines:
+        if machine[:2] == machine_uid:
+            keypair['machines'].remove(machine)
+            key_found = True
+            break
+
+    #key not associated
+    if not key_found: 
         return Response('Keypair is not associated to this machine', 304)
 
-    for uid in keypair.get('machines', []):
-        if uid == machine_uid:
-            keypair['machines'].remove(uid)
-            break
 
     save_settings(request)
 
@@ -678,3 +689,103 @@ def undeploy_key(request, backend_id, machine_id, keypair):
         return Response('Key disassociated but could not remove from machine', 204)
 
     return Response('OK', 200)
+
+def validate_dsa_key_pair(public_key, private_key):
+    """ Validates a pair of dsa keys """
+    
+    # FIXME: Make this function validate private key too
+    
+    # Construct DSA key
+    keystring = binascii.a2b_base64(public_key.split(' ')[1])
+    keyparts = []
+    
+    while len(keystring) > 4:
+        length = struct.unpack('>I', keystring[:4])[0]
+        keyparts.append(keystring[4:4 + length])
+        keystring = keystring[4 + length:]
+        
+    if keyparts[0] == 'ssh-dss':
+        tup = [bytes_to_long(keyparts[x]) for x in (4, 3, 1, 2)]
+    else:
+        return False
+    
+    key = DSA.construct(tup)
+    
+    # Validate DSA key
+    fmt_error = not isPrime(key.p)
+    fmt_error |= ((key.p-1) % key.q)!=0 
+    fmt_error |= key.g<=1 or key.g>=key.p
+    fmt_error |= pow(key.g, key.q, key.p)!=1 
+    fmt_error |= key.y<=0 or key.y>=key.p 
+    
+    # The following piece of code is currently useless, because 'x' attribute is the private key
+    #if hasattr(key, 'x'):
+    #    fmt_error |= key.x<=0 or key.x>=key.q 
+    #    fmt_error |= pow(key.g, key.x, key.p)!=key.y 
+        
+    return not fmt_error
+
+def validate_key_pair(public_key, private_key):
+    """ Validates a pair of keys """
+    
+    message = 'Encrypted message 1234567890'
+    
+    if 'ssh-rsa' in public_key:
+        
+        public_key_container = RSA.importKey(public_key)
+        private_key_container = RSA.importKey(private_key)
+        encrypted_message = public_key_container.encrypt(message, 0)
+        decrypted_message = private_key_container.decrypt(encrypted_message)
+        
+        if message == decrypted_message:
+            return True
+        
+    elif 'ssh-dss' in public_key:
+    
+        return validate_dsa_key_pair(public_key, private_key)
+    
+    return False
+
+def get_preferred_keypairs(keypairs, backend_id, machine_id):
+    """ Returns a list with the preferred keypairs for this machine
+    """
+
+    default_keypair = [k for k in keypairs if keypairs[k].get('default', False)]
+    associated_keypairs = [k for k in keypairs \
+                           for m in keypairs[k].get('machines',[]) \
+                           if m[0] == backend_id and m[1] == machine_id]
+    recently_tested_keypairs = [k for k in associated_keypairs \
+                                for m in keypairs[k].get('machines',[]) \
+                                if len(m) > 2 and int(time()) - int(m[2]) < 7*24*3600]
+    
+    # Try to find a recently tested root keypair
+    root_keypairs = [k for k in recently_tested_keypairs \
+                     for m in keypairs[k].get('machines',[]) \
+                     if len(m) > 3 and m[3] == 'root']
+    
+    if not root_keypairs:
+        # If not try to get a recently tested sudoer keypair
+        sudo_keypairs = [k for k in recently_tested_keypairs \
+                         for m in keypairs[k].get('machines',[]) \
+                         if len(m) > 4 and m[4] == True]
+        if not sudo_keypairs:
+            # If there is none just try to get a root or sudoer associated keypair even if not recently tested
+            preferred_keypairs = [k for k in associated_keypairs \
+                                  for m in keypairs[k].get('machines',[]) \
+                                  if len(m) > 3 and m[3] == 'root'] or \
+                                 [k for k in associated_keypairs \
+                                  for m in keypairs[k].get('machines',[]) \
+                                  if len(m) > 4 and m[4] == True]
+            if not preferred_keypairs:
+                # If there is none of the above then just use whatever keys are available
+                preferred_keypairs = associated_keypairs
+        else:
+            preferred_keypairs = sudo_keypairs
+    else:
+        preferred_keypairs = root_keypairs
+    
+    if len(default_keypair) and default_keypair[0] not in preferred_keypairs:
+        preferred_keypairs.append(default_keypair[0])
+        
+    return preferred_keypairs
+    

@@ -29,7 +29,6 @@ define('app/controllers/machines', [
                 }
 
                 var that = this;
-
                 
                 this.backend.set('state', 'waiting');
 
@@ -108,8 +107,9 @@ define('app/controllers/machines', [
                     } else {
                         that.backend.set('state', 'offline');
                     }
-                    
+
                     Mist.backendsController.getMachineCount();
+                    $('#home-machines-loader').fadeOut(200);
                     
                     Ember.run.later(that, function(){
                         this.refresh();
@@ -120,6 +120,7 @@ define('app/controllers/machines', [
                     }
                     
                 }).error(function(e) {
+                    $('#home-machines-loader').fadeOut(200);
                     Mist.notificationController.notify("Error loading machines for backend: " +
                                                         that.backend.title);
                     if (that.backend.error){
@@ -141,14 +142,10 @@ define('app/controllers/machines', [
 
                 this.backend.set('create_pending', true);
                 
-//                if (this.backend.provider.search('rackspace') > -1){
-//                    // Rackspace (first gen) does not support spaces in names
-//                    name = name.replace(/ /g,'');
-//                }
-                
-                // TODO: find a way to pass ember objects to JSON, so the
-                // following will seem less messy. It will also be helpful for tags.
-                // http://stackoverflow.com/questions/8669340/ember-model-to-json
+                if (this.backend.provider.search('rackspace_first_gen') > -1){
+                    // Rackspace (first gen) does not support spaces in names
+                    name = name.replace(/ /g,'');
+                }
                 
                 var payload = {
                         'name': name,

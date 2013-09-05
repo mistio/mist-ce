@@ -1,5 +1,6 @@
-<div class="key-box">
+<div {{bindAttr class=":key-box strippedname"}}>
     <div class="key-name">{{name}}</div>
+    <div class="ajax-loader"></div>
     <div class="delete-key-container">
         <button class="delete-key-button"
             data-icon="delete"
@@ -7,4 +8,8 @@
             data-mini="true"
             {{action disassociateClick target="view"}}>&nbsp;</button>
     </div>
+    <!--div class="key-user">
+        <label for="keyuser" id="textKeyUser">User:</label>
+        <input type="text" {{bindAttr value="view.getKeyUser"}} data-mini="true" {{action "updateKeyUser" target="view" on="change"}} />
+    </div-->
 </div>
