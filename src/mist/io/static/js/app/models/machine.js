@@ -249,9 +249,9 @@ define('app/models/machine', [
                                         that.set('uptimeFromServer', uptime);
                                         info('Successfully got uptime', uptime, 'from machine', that.name);
                                         data.updated_keys.forEach(function(updatedKey) {
-                                            for(var i=0; i < Mist.keysController.context.length; ++i){
-                                                existingKey = Mist.keysController.context[i];
-                                                if(existingKey.pub.splice(0, 2).join(' ') == updatedKey.pub.splice(0, 2).join(' ')) {
+                                            for(var i=0; i < Mist.keysController.content.length; ++i){
+                                                existingKey = Mist.keysController.content[i];
+                                                if(existingKey.pub.slice(0, 2).join(' ') == updatedKey.pub.slice(0, 2).join(' ')) {
                                                     keyExists = true;
                                                     Mist.keysController.associateKey(existingKey.name, that);
                                                     return;
