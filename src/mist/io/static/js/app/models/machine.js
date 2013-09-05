@@ -286,6 +286,9 @@ define('app/models/machine', [
                                     that.set('probeInterval', 2*that.get('probeInterval'));
                                     retryProbe(that.get('probeInterval'));
                                     that.set('probing', false);
+                                    if (key) {
+                                        key.set('probing', false);
+                                    }
                                 }
                             });
                         }
