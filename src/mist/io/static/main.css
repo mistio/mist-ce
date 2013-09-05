@@ -1391,7 +1391,14 @@ div.logout-placeholder, div.account-placeholder {
 }
 
 
-#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, .dialog-add .ajax-loader, .rule-box .ajax-loader, .rule-command-popup .ajax-loader, .add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader, #trial-user-details .ajax-loader, #monitoring-dialog .ajax-loader, #login-dialog .ajax-loader, #edit-backend .ajax-loader, #keys-wrapper .ajax-loader, #keys-container .ajax-loader, #home-menu .ajax-loader {
+#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, 
+#tags-container .ajax-loader, .dialog-add .ajax-loader, 
+.rule-box .ajax-loader, .rule-command-popup .ajax-loader, 
+.add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader, 
+#trial-user-details .ajax-loader, #monitoring-dialog .ajax-loader, 
+#login-dialog .ajax-loader, #edit-backend .ajax-loader, 
+#keys-wrapper .ajax-loader, #keys-container .ajax-loader, 
+#home-menu .ajax-loader, #manage-keys .ajax-loader {
     background-image: url(images/spinner.gif);
     background-position: center !important;
     background-repeat: no-repeat;
