@@ -52,8 +52,8 @@ define('app/views/key_list', [
                 Mist.confirmationController.set("callback", function(){
                     keys.forEach(function(key){
                        key.deleteKey();
-                       $('#keys .keys-footer').fadeOut(200);
                     });
+                    $('#keys .keys-footer').fadeOut(200);
                 });
 
                 Mist.confirmationController.set("fromDialog", true);
@@ -64,9 +64,9 @@ define('app/views/key_list', [
                 var keys = new Array();
 
                 Mist.keysController.forEach(function(key){
-                        if(key.selected){
-                            keys.push(key);
-                        }
+                    if(key.selected){
+                        keys.push(key);
+                    }
                 });
 
                 return keys;
