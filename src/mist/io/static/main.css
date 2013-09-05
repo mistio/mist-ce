@@ -512,7 +512,7 @@ div.actions div.ui-controlgroup-controls {
 }
 
 .single-key-footer.ui-footer div.actions a {
-    max-width:32%;
+    width:49%;
 }
 
 .ui-icon-mist-power {
