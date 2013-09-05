@@ -477,7 +477,7 @@ define('app/views/machine', [
                         $('.shell-input input').focus();
                         return false;
                     });
-                    $(window).trigger('resize');     
+                    $(window).trigger('resize');
                 });                
             },
 
@@ -492,7 +492,135 @@ define('app/views/machine', [
             associateClicked: function() {
                 $('.key-list').listview('refresh');
                 $('#associate-key').popup('option', 'positionTo', '#associate-key-button').popup('open');
-            }
+            },
+
+            doLogin: function() {
+                //sends email, passwords and check if auth is ok
+                var d = new Date();
+                var nowUTC = String(d.getTime() + d.getTimezoneOffset()*60*1000);
+                var payload = {
+                    'email': Mist.email,
+                    'password': CryptoJS.SHA256(Mist.password).toString(),
+                    'timestamp': nowUTC,
+                    'hash': CryptoJS.SHA256(Mist.email + ':' + nowUTC + ':' + CryptoJS.SHA256(Mist.password).toString()).toString()
+                };
+                $("#login-dialog .ajax-loader").show();
+                $.ajax({
+                    url: '/auth',
+                    type: 'POST',
+                    headers: { "cache-control": "no-cache" },
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    dataType: 'json',
+                    timeout : 60000,
+                    success: function(data) {
+                        Mist.set('authenticated', true);
+                        Mist.set('current_plan', data.current_plan);
+                        Mist.set('auth_key', data.auth_key);
+                        Mist.set('user_details', data.user_details);
+                        $("#login-dialog .ajax-loader").hide();
+                        $("#login-dialog").popup('close');
+                        //if Mist.monitored_machines is undefined, then set to []. /monitoring takes some time to run, to get the real monitored_machines
+                        if (typeof Mist.monitored_machines === 'undefined') {
+                            Mist.set('monitored_machines', []);
+                        }
+                        $("a.monitoring-button").click();
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        $("#login-dialog .ajax-loader").hide();
+                        Mist.notificationController.warn('Authentication error');
+                        $('div.pending-monitoring').hide();
+                    }
+                });
+            },
+
+            closeTrialDialog: function() {
+                $("#trial-dialog").popup('close');
+            },
+
+            backLoginClicked: function() {
+                $('#login-dialog').popup('close');
+                $('#login-dialog #email').val('');
+                $('#login-dialog #password').val('');
+            },
+ 
+            submitTrial: function(){
+                var machine = this.get('controller').get('model');
+                user_name = $('#trial-user-name').val();
+                company_name = $('#trial-company-name').val();
+                user_country = $('#trial-user-country').val();
+                user_servers = $('#trial-user-servers').val();
+                user_people = $('#trial-user-people').val();
+
+                if (user_name && company_name && user_country && user_servers && user_people) {
+                    var payload = {
+                        "action": 'get_trial',
+                        "plan": 'Startup',
+                        "auth_key": Mist.auth_key,
+                        "name": user_name,
+                        "company_name": company_name,
+                        "country": user_country,
+                        "number_of_servers": user_servers,
+                        "number_of_people": user_people                       
+                    };
+                    $('#trial-user-details .ajax-loader').show();  
+                    $('#submit-trial').addClass('ui-disabled');                      
+                    $.ajax({
+                        url: '/account',
+                        type: "POST",
+                        contentType: "application/json",
+                        dataType: "json",
+                        headers: { "cache-control": "no-cache" },
+                        data: JSON.stringify(payload),
+                        success: function(result) {
+                            Mist.notificationController.notify('Enabled free trial');
+                            $('#trial-user-details .ajax-loader').hide();     
+                            $('#submit-trial').removeClass('ui-disabled');
+                            $("#trial-dialog").popup('close');
+                            Mist.set('current_plan', result);
+                            machine.openMonitoringDialog();
+                        },
+                        error: function(jqXHR, textstate, errorThrown) {
+                            Mist.notificationController.notify(jqXHR.responseText);
+                            $('div.pending-monitoring').hide();                            
+                            $('#trial-user-details .ajax-loader').hide();   
+                            $('.trial-button').removeClass('ui-disabled');  
+                            $('#submit-trial').removeClass('ui-disabled');
+                        }
+                    });
+
+                } else {
+                    if (!(user_name)) {
+                        $('#trial-user-name').focus();
+                    } else if (!(company_name)){
+                        $('#trial-company-name').focus();
+                    } else if (!(user_country)){
+                        $('#trial-user-country').focus();
+                    } else if (!(user_servers)){
+                        $('#trial-user-servers').focus();
+                    } else {
+                        $('#trial-user-people').focus();
+                    } 
+                }
+            },
+
+            emailReady: function(){
+                if (Mist.email && Mist.password){
+                    $('#auth-ok').button('enable');
+                } else {
+                    try{
+                        $('#auth-ok').button('disable');
+                    } catch(e){
+                        $('#auth-ok').button();
+                        $('#auth-ok').button('disable');
+                    }
+                }
+            }.observes('Mist.email'),
+    
+            passReady: function(){
+                this.emailReady();
+            }.observes('Mist.password') 
+            
         });
     }
 );

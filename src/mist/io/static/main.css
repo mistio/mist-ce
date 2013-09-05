@@ -939,6 +939,25 @@ div.loading-monitoring {
     float:right;
 }
 
+.buy-button, .trial-button {
+    width: 240px;
+}
+
+#free-trial-text {
+    padding: 10px;
+    width: 240px;
+}
+
+#free-trial, #purchace-plan {
+     padding: 10px;
+     width: 240px;
+ }
+ 
+#purchace-plan {
+   display: none;
+}
+
+
 /* Key single view */
 #key .single-view-header {
     height: 80px;
@@ -1300,22 +1319,30 @@ div.userEmail {
     text-align: right;
 }
 
-div.logout-placeholder {
+div.logout-placeholder, div.account-placeholder {
     padding-top: 10px;
     height: 30px;
 }
 
-.logout-button {
-    width: 70px;
+.logout-button, .account-button {
+    width: 170px;
     float: right;
 }
 
-#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, .dialog-add .ajax-loader, .rule-box .ajax-loader, .rule-command-popup .ajax-loader, .add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader, #edit-backend .ajax-loader, #keys-wrapper .ajax-loader, #keys-container .ajax-loader, #home-menu .ajax-loader {
+#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, #tags-container .ajax-loader, .dialog-add .ajax-loader, .rule-box .ajax-loader, .rule-command-popup .ajax-loader, .add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader, #trial-user-details .ajax-loader, #monitoring-dialog .ajax-loader, #login-dialog .ajax-loader, #edit-backend .ajax-loader, #keys-wrapper .ajax-loader, #keys-container .ajax-loader, #home-menu .ajax-loader {
     background-image: url(images/spinner.gif);
     background-position: center !important;
     background-repeat: no-repeat;
     display: none;
     height: 16px;
+}
+
+#user-dialog .ui-content {
+    min-height: 120px;
+}
+
+#monitoring-dialog #plan-text {
+    width: 400px;
 }
 
 .key-box .ajax-loader {

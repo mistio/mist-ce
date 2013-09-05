@@ -37,7 +37,7 @@
             {{#if hasMonitoring}}
 
             <div {{bindAttr class=":enabled state"}}>
-                <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose loading-monitoring">
+                <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose loading-monitoring" style="display:none;">
                     <span class="ui-icon ui-icon-loading"></span>
                     <h1>Fetching stats...</h1>
                 </div>
@@ -48,7 +48,7 @@
             <div id="networkGraph"></div>
             <div id="diskGraph"></div>
             <div id="memoryGraph"></div>
-            <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
+            <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring"  style="display:none;">
                 <span class="ui-icon ui-icon-loading"></span>
                 <h1>Disabling monitoring</h1>
             </div>
@@ -109,7 +109,7 @@
 
                 {{view Mist.MachineMonitoringDialog machineBinding="this"}}
 
-                <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
+                <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring"  style="display:none;">
                     <span class="ui-icon ui-icon-loading"></span>
                     <h1>Enabling monitoring</h1>
                 </div>
@@ -264,4 +264,56 @@
             {{view Mist.PowerDialog machineBinding="this"}}
     </div>
 
+</div>
+
+<div data-role="popup" id="trial-dialog" class="mist-dialog" data-overlay-theme="a">
+    <div data-role="header">
+        <h1>Enable Trial</h1>
+    </div>
+    <div data-role="content" data-theme="b">
+        <span>Please provide the following info</span>
+        <div id="trial-user-details">
+            <label for="user-name">Name:</label>
+            <span class="required">*</span>
+            <input type="text" name="user-name" id="trial-user-name" />
+            <label for="company-name">Company Name:</label>
+            <span class="required">*</span>
+            <input type="text" name="company-name" id="trial-company-name" />
+            <label for="user-country">Country:</label>
+            <span class="required">*</span>
+            <input type="text" name="user-country" id="trial-user-country" />
+            <label for="user-servers">Number of servers:</label>
+            <span class="required">*</span>
+            <input type="text" name="user-servers" id="trial-user-servers" />
+            <label for="user-people">Number of employees:</label>
+            <span class="required">*</span>
+            <input type="text" name="user-people" id="trial-user-people" />
+            <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <button data-theme="c" id="button-back-plan" {{action "closeTrialDialog" target="view"}}>Back</button>
+                <button data-theme="b" id="button-enable-trial" {{action "submitTrial" target="view"}}>Enable</button>
+            </div>
+            <div class="ajax-loader"></div>
+        </div>
+    </div>
+</div>
+
+<div data-role="popup" id="login-dialog" class="mist-dialog" data-overlay-theme="a">
+    <div data-role="header">
+        <h1>Login to mist.io</h1>
+    </div>
+    <div data-role="content" data-theme="b">
+        <div class="info">In order to proceed you need to login to the premium <a href="https://mist.io">mist.io</a> service.</div>
+
+        <label for="email">Email</label>
+        {{view Mist.TextField valueBinding="Mist.email" name="email" id="email"}}
+
+        <label for="password">Password</label>
+        {{view Mist.TextField type="password" valueBinding="Mist.password" name="password" id="password"}}
+
+        <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <button data-theme="c" {{action "backLoginClicked" target="view"}}>Back</button>
+            <button id="auth-ok" data-theme="b" {{action "doLogin" target="view"}}>Login</button>
+        </div>
+        <div class="ajax-loader"></div>
+    </div>
 </div>
