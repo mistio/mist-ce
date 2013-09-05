@@ -316,7 +316,9 @@ define( 'app', [
                 }
                 
                 if (event.keyCode == 38 || event.keyCode == 40) { // Up or Down key
-                    // TODO: Move cursor to the end of input field
+                    if(event.preventDefault) {
+                        event.preventDefault();
+                    }
                 }   
             }
         });
