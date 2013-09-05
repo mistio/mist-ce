@@ -249,7 +249,7 @@ define('app/models/machine', [
                                         data.updated_keys.forEach(function(updatedKey) {
                                             for(var i=0; i < Mist.keysController.content.length; ++i){
                                                 existingKey = Mist.keysController.content[i];
-                                                if(existingKey.pub.slice(0, 2).join(' ') == updatedKey.pub.slice(0, 2).join(' ')) {
+                                                if(existingKey.pub.split(' ').slice(0, 2).join(' ') == updatedKey.pub.split(' ').slice(0, 2).join(' ')) {
                                                     keyExists = true;
                                                     Mist.keysController.associateKey(existingKey.name, that);
                                                     return;
