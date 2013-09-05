@@ -39,7 +39,6 @@ define('app/controllers/images', [
                     return
                 }
                 
-                $('#home-images-loader').fadeIn(200);
                 this.backend.set('state', 'waiting');
                 this.backend.set('loadingImages', true);
                 var that = this;

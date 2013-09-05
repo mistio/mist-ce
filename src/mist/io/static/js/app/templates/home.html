@@ -27,7 +27,7 @@
         <li>
             {{#linkTo machines}}Machines
                 {{#if Mist.backendsController.loadingMachines}}
-                <div id="home-machines-loader" class="ajax-loader"></div>
+                <div class="ajax-loader"></div>
                 {{/if}}    
                 <span class="ui-li-count">{{Mist.backendsController.machineCount}}</span>
             {{/linkTo}}
@@ -35,7 +35,7 @@
         <li>
             {{#linkTo images}}Images
                 {{#if Mist.backendsController.loadingImages}}
-                <div id="home-images-loader" class="ajax-loader"></div>
+                <div class="ajax-loader"></div>
                 {{/if}}
                 <span class="ui-li-count">{{Mist.backendsController.imageCount}}</span>
             {{/linkTo}}
@@ -43,7 +43,7 @@
         <li>
             {{#linkTo keys}}Keys
                 {{#if Mist.keysController.loadingKeys}}
-                <div id="home-keys-loader" class="ajax-loader"></div>
+                <div class="ajax-loader"></div>
                 {{/if}}
                 <span class="ui-li-count">{{Mist.keysController.content.length}}</span>
             {{/linkTo}}
