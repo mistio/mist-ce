@@ -18,7 +18,7 @@ function(shell_html) {
         
         availableCommands: [], //"dmesg", "uptime", "uname", "ls", "reboot", "whoami", "ifconfig" ],
         
-        commandHistory: [],
+        commandHistory: new Array(),
         commandHistoryIndex: -1,
         
         didInsertElement: function() {
@@ -55,10 +55,6 @@ function(shell_html) {
 
             var that = this;
             var command = this.command;
-            
-            if (!this.commandHistory) {
-                commandHistory = new Array();
-            }
             
             this.commandHistory.pop();
             this.commandHistory.push(command);

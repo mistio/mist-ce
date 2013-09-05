@@ -305,17 +305,14 @@ define( 'app', [
                         $(inputField).val(parent.commandHistory[parent.commandHistoryIndex]);
                     }
                 } else if (event.keyCode == 9) { // Tab key
-                    if(event.preventDefault) {
-                        event.preventDefault();
-                    }
                     // TODO: Autocomplete stuff...
-                } else {
+                } else { 
                     Ember.run.next(function(){
                         parent.commandHistory[parent.commandHistoryIndex] = parent.command;
                     });      
                 }
                 
-                if (event.keyCode == 38 || event.keyCode == 40) { // Up or Down key
+                if (event.keyCode == 38 || event.keyCode == 40 || event.keycode == 9) { // Up or Down or Tab
                     if(event.preventDefault) {
                         event.preventDefault();
                     }
