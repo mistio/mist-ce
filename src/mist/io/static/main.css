@@ -1365,9 +1365,16 @@ div.logout-placeholder {
 #home-menu .ajax-loader {
     display: block;
     float: right;
-    margin-top: -18px;
+    margin-top: 0px;
     width: 16px;
 }
+
+@-moz-document url-prefix() {
+    #home-menu .ajax-loader {
+        margin-top: -18px;
+    }
+}
+
 
 .generate-key-collapsible .ui-collapsible-content {
     display: none !important;
