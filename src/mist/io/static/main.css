@@ -1322,8 +1322,9 @@ iframe#hidden-shell-iframe {
     border-radius: 19px;
     border: 1px solid #c4c4c4;
     cursor: pointer;
-    background-position: right !important;
-    background-repeat: no-repeat;
+    background-position: 6px 10px;
+    padding-left: 28px;
+    background-repeat: no-repeat !important;
 }
 
 #key-actions-container {
@@ -1460,8 +1461,9 @@ div.info {
     float: right;
     margin-top: -28px;
     margin-right: 5px;
-    background-position: right !important;
-    background-repeat: no-repeat;
+    background-position: 6px 4px;
+    padding-left: 18px;
+    background-repeat: no-repeat !important;
 }
 
 #mist-manage-keys.probed, .associated-key.probed {

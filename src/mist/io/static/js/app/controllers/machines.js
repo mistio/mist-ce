@@ -81,7 +81,6 @@ define('app/controllers/machines', [
                             machine.tags.set('content', item.tags);
                             that.pushObject(machine);
                         }
-
                     });
                     
                     that.content.forEach(function(item) {
