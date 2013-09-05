@@ -1395,15 +1395,18 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
     if deploy:
         ret = deploy_key(request, keypair)
     
-    if ret:
-        keypair['machines'][-1] += [int(time()), ret.get('ssh_user', ''), ret.get('sudoer', False)]
+        if ret:
+            keypair['machines'][-1] += [int(time()), ret.get('ssh_user', ''), ret.get('sudoer', False)]
+            save_settings(request)
+            return Response('OK', 200)
+        else:
+            if machine_uid in keypair['machines']:
+                keypair['machines'].remove(machine_uid)
+            
+            return Response('Failed to deploy key', 412)
+    else:
         save_settings(request)
         return Response('OK', 200)
-    
-    if machine_uid in keypair['machines']:
-        keypair['machines'].remove(machine_uid)
-    
-    return Response('Failed to deploy key', 412)
 
 
 def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
