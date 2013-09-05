@@ -31,11 +31,12 @@ def main(global_config, **settings):
             settings['auth'] = 1
             ret = json.loads(ret.content)
             settings['current_plan'] = ret.get('current_plan',{})
-            settings['name'] = ret.get('user_details', ['',''])[0]
-            settings['company_name'] = ret.get('user_details', ['',''])[1]
-            settings['country'] = ret.get('country', ['','',''])[2]
-            settings['number_of_servers'] = ret.get('number_of_servers', ['','','',''])[3]
-            settings['number_of_people'] = ret.get('number_of_people', ['','','','',''])[4]
+            user_details = ret.get('user_details', {})
+            settings['name'] = user_details.get('name', '')
+            settings['company_name'] = user_details.get('company_name', '')            
+            settings['country'] = user_details.get('country', '')            
+            settings['number_of_servers'] = user_details.get('number_of_servers', '')            
+            settings['number_of_people'] = user_details.get('number_of_people', '')                                                
         else:
             settings['auth'] = 0
 

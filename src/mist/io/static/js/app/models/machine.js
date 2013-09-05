@@ -440,20 +440,20 @@ define('app/models/machine', [
                             }
                         } else {
                             //no plans, show plan-dialog, hide monitoring-dialog
-                            if ((Mist.user_details) && (Mist.user_details[0])) {
-                                $('#trial-user-name').val(Mist.user_details[0]);
+                            if ((Mist.user_details) && (Mist.user_details.name)) {
+                                $('#trial-user-name').val(Mist.user_details.name);
                             }
-                            if ((Mist.user_details) && (Mist.user_details[1])) {
-                                $('#trial-company-name').val(Mist.user_details[1]);
+                            if ((Mist.user_details) && (Mist.user_details.company_name)) {
+                                $('#trial-company-name').val(Mist.user_details.company_name);
                             }
-                            if ((Mist.user_details) && (Mist.user_details[2])) {
-                                $('#trial-user-country').val(Mist.user_details[2]);
+                            if ((Mist.user_details) && (Mist.user_details.country)) {
+                                $('#trial-user-country').val(Mist.user_details.country);
                             }
-                            if ((Mist.user_details) && (Mist.user_details[3])) {
-                                $('#trial-user-servers').val(Mist.user_details[3]);
+                            if ((Mist.user_details) && (Mist.user_details.number_of_servers)) {
+                                $('#trial-user-servers').val(Mist.user_details.number_of_servers);
                             }
-                            if ((Mist.user_details) && (Mist.user_details[4])) {
-                                $('#trial-user-people').val(Mist.user_details[4]);
+                            if ((Mist.user_details) && (Mist.user_details.number_of_people)) {
+                                $('#trial-user-people').val(Mist.user_details.number_of_people);
                             }
                             $('#enable-monitoring-dialog').hide();
                             $('#monitoring-enabled').hide();
