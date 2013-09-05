@@ -1496,14 +1496,17 @@ div.info {
     float: right;
     margin-top: -28px;
     margin-right: 5px;
-    background-position: 6px 4px;
-    padding-left: 18px;
-    background-repeat: no-repeat !important;
+    background-position: left;
+    background-repeat: no-repeat;
 }
 
 #mist-manage-keys.probed, .associated-key.probed {
     background-image: url(images/key.png);
+}
 
+#mist-manage-keys.probed, #mist-manage-keys.probing {
+    background-position: 5px 4px;
+    padding-left: 18px;
 }
 
 #mist-manage-keys.unprobed, .associated-key.unprobed {
