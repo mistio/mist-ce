@@ -792,6 +792,7 @@ def shell_command(request, backend_id, machine_id, host, command, ssh_user = Non
                                        new_ssh_user, 
                                        private_key, 
                                        command)
+                cmd_output = response.text
                 ssh_user = new_ssh_user # update username in key-machine association
             
             if response.status_code != 200:
