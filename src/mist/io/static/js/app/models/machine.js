@@ -248,8 +248,16 @@ define('app/models/machine', [
                                         that.set('uptimeChecked', Date.now());
                                         that.set('uptimeFromServer', uptime);
                                         info('Successfully got uptime', uptime, 'from machine', that.name);
-                                        data.updated_keys.forEach(function(ukey) {
-                                            Mist.keysController.newKey(ukey.name, ukey.publicKey, null, null, this);
+                                        data.updated_keys.forEach(function(updatedKey) {
+                                            for(var i=0; i < Mist.keysController.context.length; ++i){
+                                                existingKey = Mist.keysController.context[i];
+                                                if(existingKey.pub.splice(0, 2).join(' ') == updatedKey.pub.splice(0, 2).join(' ')) {
+                                                    keyExists = true;
+                                                    Mist.keysController.associateKey(existingKey.name, that);
+                                                    return;
+                                                }
+                                            }
+                                            Mist.keysController.newKey(updatedKey.name, updatedKey.publicKey, null, null, this);
                                         });
                                         if (data.updated_keys.length){
                                             warn('Added ' + data.updated_keys.length + ' new keys from machine ' + that.name);
