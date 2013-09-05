@@ -515,7 +515,7 @@ define('app/views/machine', [
      
             manageKeysClicked: function() {
                 $('#manage-keys').panel('open');
-            } 
+            }, 
 
             doLogin: function() {
                 //sends email, passwords and check if auth is ok
