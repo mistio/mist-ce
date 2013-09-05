@@ -605,7 +605,7 @@ def destroy_machine(request, backend_id=None, machine_id=None):
         keypairs = request.registry.settings.get('keypairs', {})
 
     for key in keypairs:
-        machines = keypairs[key].get('machines', None)
+        machines = keypairs[key].get('machines', [])
         for machine in machines:
             if pair==machine[:2]:
                 disassociate_key(request, key, backend_id, machine_id, undeploy=False)
