@@ -13,10 +13,29 @@ define('app/controllers/backends', [
             content: [],
             machineCount: 0,
             imageCount: 0,
+            
             // TODO make this property dynamic according to all backends states
             state: "waiting",
             ok: false,
-
+            
+            loadingMachines: function() {
+                for (var i = 0; i < this.content.length; i++){
+                    if (this.content[i].loadingMachines) {
+                        return true;
+                    }
+                }
+                return false;
+            }.property('@each.loadingMachines'),
+            
+            loadingImages: function() {
+                for (var i = 0; i < this.content.length; i++){
+                    if (this.content[i].loadingImages) {
+                        return true;
+                    }
+                }
+                return false;
+            }.property('@each.loadingImages'),
+            
             isOK: function() {
                 if(this.state == 'state-ok'){
                     this.set('ok', true);
@@ -24,7 +43,7 @@ define('app/controllers/backends', [
                     this.set('ok', false);
                 }
             }.observes('state'),
-
+            
             getBackendById: function(backendId){
                 for (var i = 0; i < this.content.length; i++){
                     if (this.content[i].id == backendId) {
@@ -101,6 +120,8 @@ define('app/controllers/backends', [
                         machines = data.machines;
                         Mist.set('auth_key', data.auth_key);
                         Mist.set('monitored_machines', data.machines);
+                        Mist.set('current_plan', data.current_plan);
+                        Mist.set('user_details', data.user_details);
                         //now loop on backend_id, machine_id  list of lists and check if pair found
                         machines.forEach(function(machine_tuple){
                             var b,m;

@@ -8,6 +8,7 @@ from time import time
 from datetime import datetime
 
 import requests
+import json
 
 from hashlib import sha256
 
@@ -71,6 +72,65 @@ def home(request):
             'auth': auth,
             'js_build': js_build,
             'js_log_level': js_log_level}
+
+
+@view_config(route_name="check_auth", request_method='POST', renderer="json")
+def check_auth(request):
+    "Check on the mist.core service if authenticated"
+    params = request.json_body
+    email = params.get('email', '').lower()
+    password = params.get('password', '')
+    timestamp = params.get('timestamp', '')
+    hash_key = params.get('hash', '')
+
+    payload = {'email': email, 'password': password, 'timestamp': timestamp, 'hash_key': hash_key}
+    core_uri = request.registry.settings['core_uri']
+    ret = requests.post(core_uri + '/auth', params=payload, verify=False)
+
+    if ret.status_code == 200:
+        ret = json.loads(ret.content)
+        request.registry.settings['email'] = email
+        request.registry.settings['password'] = password
+        request.registry.settings['auth'] = 1
+        save_settings(request)
+        return ret
+    else:
+        return Response('Unauthorized', 401)
+
+@view_config(route_name='account', request_method='POST', renderer='json')
+def update_user_settings(request, renderer='json'):
+    """try free plan, by communicating to the mist.core service
+    """
+    params = request.json_body
+    action = params.get('action', '').lower()
+    plan = params.get('plan', '')
+    auth_key = params.get('auth_key', '')
+    name = params.get('name', '')    
+    company_name = params.get('company_name', '')
+    country = params.get('country', '') 
+    number_of_servers = params.get('number_of_servers', '') 
+    number_of_people = params.get('number_of_people', '')            
+
+    payload = {'auth_key': auth_key,
+               'action': action, 
+               'plan': plan, 
+               'name': name, 
+               'company_name': company_name, 
+               'country': country,
+               'number_of_servers': number_of_servers,
+               'number_of_people': number_of_people
+    }
+
+    core_uri = request.registry.settings['core_uri']
+    ret = requests.post(core_uri + '/account', params=payload, verify=False)
+
+    if ret.status_code == 200:
+        ret = json.loads(ret.content)
+        return ret
+    else:
+        return Response('Unauthorized', 401)
+
+
 
 
 @view_config(route_name='backends', request_method='GET', renderer='json')

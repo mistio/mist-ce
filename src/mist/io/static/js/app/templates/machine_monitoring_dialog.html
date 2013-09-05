@@ -4,14 +4,14 @@
         data-role="button"
         data-icon="delete"
         data-theme="a"
-        {{action "openMonitoringDialog" target="view"}}>Disable</a>
+        {{action "enableMonitoringClick" target="view"}}>Disable</a>
 {{else}}
     <a href="#"
         class="monitoring-button"
         data-role="button"
         data-icon="star"
         data-theme="b"
-        {{action "openMonitoringDialog" target="view"}}>Enable</a>
+        {{action "enableMonitoringClick" target="view"}}>Enable</a>
 {{/if}}
 
 <div data-role="popup" id="monitoring-dialog" class="mist-dialog" data-overlay-theme="a">
@@ -19,27 +19,27 @@
         <h1>Disable monitoring</h1>
     </div>
     <div data-role="content" data-theme="b">
-        {{#if Mist.authenticated}}
-            <div id="monitoring-enabled">
-                <span>Are you sure you wish to disable monitoring for {{name}}?</span>
+        <div id="monitoring-enabled">
+            <span>Are you sure you wish to disable monitoring for {{name}}?</span>
 
-                {{#unless probed}}
+            {{#unless probed}}
                 <p>The collectd daemon can't be disabled automactically because there is no key pair set.</p>
                 <p>To do it manually run the following commands:</p>
                 <pre>chmod -x /etc/init.d/collectd &amp;&amp; killall -9 collectd</pre>
-                {{/unless}}
+            {{/unless}}
 
-                <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-                    <button data-theme="c" id="button-back-enabled">Back</button>
-                    <button data-theme="b" id="button-disable-monitoring">Disable</button>
-                </div>
+            <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <button data-theme="c" id="button-back-enabled">Back</button>
+                <button data-theme="b" id="button-disable-monitoring">Disable</button>
             </div>
-            <div id="monitoring-disabled">
+        </div>
+        <div id="monitoring-disabled">
+            <div id="enable-monitoring-dialog">
                 <div>Are you sure you wish to enable monitoring for {{name}}?</div>
 
                 {{#unless probed}}
-                <p>The collectd daemon can't be installed automatically because there is no key pair set.</p>
-                <p>You will have to configure it manually by following the instructions after pressing enable.</p>
+                    <p>The collectd daemon can't be installed automatically because there is no key pair set.</p>
+                    <p>You will have to configure it manually by following the instructions after pressing enable.</p>
                 {{/unless}}
 
                 <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
@@ -47,20 +47,14 @@
                     <button data-theme="b" id="button-enable-monitoring">Enable</button>
                 </div>
             </div>
-        {{else}}
-            <div class="info">In order to proceed you need to login to the premium <a href="https://mist.io">mist.io</a> service.</div>
-
-            <label for="email">Email</label>
-            {{view Mist.TextField valueBinding="Mist.email" name="email" id="email"}}
-
-            <label for="password">Password</label>
-            {{view Mist.TextField type="password" valueBinding="Mist.password" name="password" id="password"}}
-
-            <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-                <button data-theme="c" {{action "backClicked" target="view"}}>Back</button>
-                <button id="auth-ok" data-theme="b" {{action "changeMonitoringClicked" target="view"}}>Login</button>
+            <div id="plan-dialog">
+                <div id="plan-text"><span></span></div>
+                <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+                    <button data-theme="c" id="button-back-plan" {{action "closePlanDialog" target="view"}}>Back</button>
+                    <button data-theme="b" id="button-enable-trial" {{action "openTrialDialog" target="view"}}>Enable Trial</button>
+                    <button data-theme="b" id="button-purchase" {{action "clickedPurchaseDialog" target="view"}}>Purchase Plan</button>
+                </div>
             </div>
-        {{/if}}
-
+        </div>
     </div>
 </div>

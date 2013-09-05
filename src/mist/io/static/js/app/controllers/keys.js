@@ -13,6 +13,7 @@ define('app/controllers/keys', [
         return Ember.ArrayController.extend({
 
             keyCount: 0,
+            loadingKeys: false,
 
             init: function() {
                 this._super();
@@ -22,13 +23,15 @@ define('app/controllers/keys', [
                 that.addObserver('length', function() {
                     that.getSelectedKeyCount();
                 });
-
+                
+                that.set('loadingKeys', true);
+                
                 $.getJSON('/keys', function(data) {
+                    that.set('loadingKeys', false);
                     that.updateKeyList(data);
-                    $('#home-keys-loader').fadeOut(200);
                 }).error(function() {
+                    that.set('loadingKeys', false);
                     Mist.notificationController.notify("Error loading keys");
-                    $('#home-keys-loader').fadeOut(200);
                 });
             },
 
