@@ -12,7 +12,6 @@ define('app/controllers/backend_add', [
             newBackendReady: false,
 
             newBackendClear: function() {
-                log("new backend clear");
                 this.set('newBackendProvider', null);
                 this.set('newBackendKey', null);
                 this.set('newBackendSecret', null);
@@ -23,19 +22,14 @@ define('app/controllers/backend_add', [
             },
 
             updateNewBackendReady: function() {
-
                 if (this.get('newBackendProvider') &&
                     this.get('newBackendKey') &&
                     this.get('newBackendSecret')) {
                         this.set('newBackendReady', true);
-                        if('button' in $('#create-backend-ok')){
-                            $('#create-backend-ok').button('enable');
-                        }
+                        $('#create-backend-ok').button('enable');
                 } else {
                     this.set('newBackendReady', false);
-                    if('button' in $('#create-backend-ok')){
-                        $('#create-backend-ok').button('disable');
-                    }
+                    $('#create-backend-ok').button('disable');
                 }
             },
 

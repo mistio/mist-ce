@@ -20,16 +20,16 @@ define('app/views/backend_add', [
             
             selectBackend: function(event){
                 if (event.target.title.indexOf("rackspace") !== -1 || event.target.title.indexOf("linode") !== -1)  {
-                    $('#textApiKey').text('2. Username:');
-                    $('#textApiSecret').text('3. API Key:');
+                    $('#ApiKeylabel').text('2. Username:');
+                    $('#ApiSecretlabel').text('3. API Key:');
                     $('#addBackendOpenstack').hide();
                 } else if (event.target.title.indexOf("openstack") !== -1) {
-                    $('#textApiKey').text('2. Username:');
-                    $('#textApiSecret').text('3. Password:');
+                    $('#ApiKeylabel').text('2. Username:');
+                    $('#ApiSecretlabel').text('3. Password:');
                     $('#addBackendOpenstack').show();
                 } else {
-                    $('#textApiKey').text('2. API Key:');
-                    $('#textApiSecret').text('3. API Secret:');
+                    $('#ApiKeylabel').text('2. API Key:');
+                    $('#ApiSecretlabel').text('3. API Secret:');
                     $('#addBackendOpenstack').hide();
                 }
                 $('.select-backend-collapsible').collapsible('option','collapsedIcon','check');
