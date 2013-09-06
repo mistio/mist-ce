@@ -2,7 +2,7 @@ define('app/controllers/backend_add', [
     'ember'
     ],
     /**
-     * Backend add controller
+     * Backend Add Controller
      *
      * @returns Class
      */
@@ -19,6 +19,7 @@ define('app/controllers/backend_add', [
                 Ember.run.next(function(){
                     $('#create-select-provider').selectmenu('refresh');
                 });
+                $('.select-backend-collapsible span.ui-btn-text').text('Select backend');
             },
 
             updateNewBackendReady: function() {

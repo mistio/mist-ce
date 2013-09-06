@@ -18,8 +18,8 @@ define('app/views/backend_add', [
                 this._super();         
             },
             
-            selectBackend: function(event){
-                if (event.target.title.indexOf("rackspace") !== -1 || event.target.title.indexOf("linode") !== -1)  {
+            selectBackend: function(event) {
+                if (event.target.title.indexOf("rackspace") !== -1 || event.target.title.indexOf("linode") !== -1) {
                     $('#ApiKeylabel').text('2. Username:');
                     $('#ApiSecretlabel').text('3. API Key:');
                     $('#addBackendOpenstack').hide();
@@ -40,21 +40,19 @@ define('app/views/backend_add', [
                     }
                 );
                 $('.select-backend-collapsible').trigger('collapse');
-
-                $('input[id=create-backend-key]').val('');
-                $('input[id=create-backend-secret]').val('');
+                
+                Mist.backendAddController.set('newBackendKey', '');
+                Mist.backendAddController.set('newBackendSecret', '');
                 for (var b = 0; b < Mist.backendsController.content.length; b++) {
                     var backend = Mist.backendsController.content[b];                    
                     if (event.target.title.split('_')[0] == 'ec2' && backend.provider.split('_')[0] == 'ec2') {
                         //Autocomplete
-                        $('input[id=create-backend-key]').val(backend.apikey);
-                        $('input[id=create-backend-secret]').val('getsecretfromdb');
-                        $('#create-backend-ok').button('enable');
+                        Mist.backendAddController.set('newBackendKey', backend.apikey);
+                        Mist.backendAddController.set('newBackendSecret', 'getsecretfromdb');
                         break;
                     } else if (event.target.title.substr(0,9) == 'rackspace' && backend.provider.substr(0,9) == 'rackspace') {
-                        $('input[id=create-backend-key]').val(backend.apikey);
-                        $('input[id=create-backend-secret]').val('getsecretfromdb');
-                        $('#create-backend-ok').button('enable');
+                        Mist.backendAddController.set('newBackendKey', backend.apikey);
+                        Mist.backendAddController.set('newBackendSecret', 'getsecretfromdb');
                         break;
                     }
                 }
