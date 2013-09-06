@@ -1293,6 +1293,8 @@ def update_available_keys(request, backend_id, machine_id, ssh_user, host, autho
                 if not associated:
                     keypairs[k]['machines'].append([backend_id, machine_id])
                     updated_keypairs[k] = keypairs[k]
+            if exists:
+                break
                     
         # if public key does not exist in our keypairs, add a new entry
         if not exists:
@@ -1324,7 +1326,7 @@ def update_available_keys(request, backend_id, machine_id, ssh_user, host, autho
     return ret
 
 
-def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, sudoer, public_key = False, private_key = False, default = None):
+def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, sudoer, public_key = False, private_key = False, default = False):
     """ Updates an ssh keypair or associates an ssh user for a machine with a key.
 
     """
