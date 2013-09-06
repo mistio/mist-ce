@@ -43,6 +43,8 @@ define('app/views/backend_add', [
                 
                 Mist.backendAddController.set('newBackendKey', '');
                 Mist.backendAddController.set('newBackendSecret', '');
+                //Mist.backendAddController.set('newBackendUrl', '');
+                //Mist.backendAddController.set('newBackendTenant', '');
                 for (var b = 0; b < Mist.backendsController.content.length; b++) {
                     var backend = Mist.backendsController.content[b];                    
                     if (event.target.title.split('_')[0] == 'ec2' && backend.provider.split('_')[0] == 'ec2') {
@@ -59,16 +61,16 @@ define('app/views/backend_add', [
             },
             
             addBackend: function() {
-                $('.select-listmenu li').on('click', this.selectBackend);                
+                $('.select-listmenu li').on('click', this.selectBackend);              
                 $('#add-backend').panel('open');
                 // resize dismiss div TODO: reset on window resize                
-                $('.ui-panel-dismiss-position-right').css('left',(0-$('.ui-panel-position-right.ui-panel-open').width()));
+                //$('.ui-panel-dismiss-position-right').css('left',(0-$('.ui-panel-position-right.ui-panel-open').width()));
             },
 
             backClicked: function() {
-                Mist.backendAddController.newBackendClear();
-                $('.select-listmenu li').off('click', this.selectBackend);
                 $("#add-backend").panel("close");
+                $('.select-listmenu li').off('click', this.selectBackend);
+                Mist.backendAddController.newBackendClear();  
             },
 
             addButtonClick: function(){
@@ -76,10 +78,10 @@ define('app/views/backend_add', [
                 var payload = {
                     "title": '', // TODO
                     "provider": Mist.backendAddController.newBackendProvider,
-                    "apikey" : $('#create-backend-key').val(),
-                    "apisecret": $('#create-backend-secret').val(),
-                    "apiurl": $('#create-backend-url').val(),
-                    "tenant_name": $('#create-backend-tenant').val()
+                    "apikey" : Mist.backendAddController.newBackendKey,
+                    "apisecret": Mist.backendAddController.newBackendSecret,
+                    "apiurl": Mist.backendAddController.newBackendUrl,
+                    "tenant_name": Mist.backendAddController.newBackendTenant
                 };
 
                 $.ajax({
@@ -89,12 +91,10 @@ define('app/views/backend_add', [
                     dataType: "json",
                     headers: { "cache-control": "no-cache" },
                     data: JSON.stringify(payload),
-                    success: function(result) {
-                        Mist.backendsController.pushObject(Backend.create(result));
-                        info('added backend ' + result.id);
-                        Mist.backendAddController.newBackendClear();
-                        $("#add-backend").panel("close");
-                        $('.select-listmenu li').off('click', this.selectBackend);
+                    success: function(data) {
+                        Mist.backendsController.pushObject(Backend.create(data));
+                        info('added backend ' + data.id);
+                        that.backClicked();
                     },
                     error: function(request){
                         Mist.notificationController.notify(request.responseText);
