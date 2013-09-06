@@ -267,23 +267,22 @@
         <h1>Enable Trial</h1>
     </div>
     <div data-role="content" data-theme="b">
-        <span>Please provide the following info</span>
         <div id="trial-user-details">
-            <label for="user-name">Name:</label>
+            <label for="user-name">1. What's your name:</label>
             <span class="required">*</span>
             <input type="text" name="user-name" id="trial-user-name" />
-            <label for="company-name">Company Name:</label>
-            <span class="required">*</span>
-            <input type="text" name="company-name" id="trial-company-name" />
-            <label for="user-country">Country:</label>
+            <label for="user-country">2. Where is your business located?</label>
             <span class="required">*</span>
             <input type="text" name="user-country" id="trial-user-country" />
-            <label for="user-servers">Number of servers:</label>
+            <label for="company-name">3. What's your company name?</label>
             <span class="required">*</span>
-            <input type="text" name="user-servers" id="trial-user-servers" />
-            <label for="user-people">Number of employees:</label>
+            <input type="text" name="company-name" id="trial-company-name" />
+            <label for="user-people">4. How many people work there?</label>
             <span class="required">*</span>
             <input type="text" name="user-people" id="trial-user-people" />
+            <label for="user-servers">5. How many servers do you have?</label>
+            <span class="required">*</span>
+            <input type="text" name="user-servers" id="trial-user-servers" />
             <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
                 <button data-theme="c" id="button-back-plan" {{action "closeTrialDialog" target="view"}}>Back</button>
                 <button data-theme="b" id="button-enable-trial" {{action "submitTrial" target="view"}}>Enable</button>
