@@ -1326,7 +1326,7 @@ def update_available_keys(request, backend_id, machine_id, ssh_user, host, autho
     return ret
 
 
-def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, sudoer, public_key = False, private_key = False, default = False):
+def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, sudoer, public_key = False, private_key = False, default = None):
     """ Updates an ssh keypair or associates an ssh user for a machine with a key.
 
     """
