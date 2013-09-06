@@ -33,17 +33,18 @@ define('app/controllers/machines', [
                 this.backend.set('loadingMachines', true);
                 $.getJSON('/backends/' + this.backend.id + '/machines', function(data) {
 
+                    if (typeof Mist.monitored_machines === 'undefined') {
+                        //check monitoring failed, re-run. This shall be moved though, since here it gets executed just 2 times
+                        Mist.backendsController.checkMonitoring();
+                    }
+
                     data.forEach(function(item){
                         var found = false;
 
                         log("item id: " + item.id);
 
                         that.content.forEach(function(machine){
-                            if (typeof Mist.monitored_machines === 'undefined') {
-                                //check monitoring failed, re-run. This shall be moved though, since here it gets executed just 2 times
-                                Mist.backendsController.checkMonitoring();
-                            }
-                            else {
+                            if (typeof Mist.monitored_machines !== 'undefined') {
                                 Mist.monitored_machines.forEach(function(machine_tuple){
                                     backend_id = machine_tuple[0];
                                     machine_id = machine_tuple[1];
@@ -52,7 +53,7 @@ define('app/controllers/machines', [
                                         return false;
                                     }
                                  });
-                             }
+                            }
 
                             if (machine.id == item.id || (machine.id == -1 && machine.name == item.name)) {
                                 found = true;
