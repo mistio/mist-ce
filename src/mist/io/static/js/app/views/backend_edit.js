@@ -16,12 +16,11 @@ define('app/views/backend_edit', [
                 $("#edit-backend").popup("close");
             },
 
-
             deleteButtonClick: function(){
                 if (this.getMonitoredMachines().length > 0) {
-                    $('#backend-has-monitoring').show()
+                    $('#backend-has-monitoring').show();
                 } else {
-                    $('#backend-has-monitoring').hide()
+                    $('#backend-has-monitoring').hide();
                 }
                 $('#backend-delete-confirm').slideDown();
             },
@@ -31,9 +30,8 @@ define('app/views/backend_edit', [
             },
 
             deleteConfirmButtonClick: function(){
-		$('#edit-backend .ajax-loader').show()
-		$('#button-confirm-disable').button('disable');
-		$('#button-confirm-disable').button('refresh');
+                $('#edit-backend .ajax-loader').fadeIn(200);
+                $('#button-confirm-disable').button('disable');
                 var that = this;
                 var monitoredMachines = this.getMonitoredMachines();
                 if (monitoredMachines.length > 0) {
@@ -45,10 +43,9 @@ define('app/views/backend_edit', [
                     url: '/backends/' + this.backend.id,
                     type: 'DELETE',
                     success: function(result) {
-			$('#edit-backend .ajax-loader').hide()
-                        $('#backend-delete-confirm').hide();
-			$('#button-confirm-disable').button('enable');
-			$('#button-confirm-disable').button('refresh');
+                        $('#edit-backend .ajax-loader').fadeOut(200);
+                        $('#backend-delete-confirm').slideUp();
+                        $('#button-confirm-disable').button('enable');
                         var i = Mist.backendsController.content.indexOf(that.backend);
                         // refresh backend buttons
                         Mist.backendsController.arrayContentWillChange();
@@ -71,8 +68,7 @@ define('app/views/backend_edit', [
 
             getMonitoredMachines: function(){
                 var monitoredMachines = [];
-                var that = this;
-                that.backend.machines.forEach(function(machine_iter) {
+                this.backend.machines.forEach(function(machine_iter) {
                     if (machine_iter.hasMonitoring) {
                         monitoredMachines.push(machine_iter);
                     }

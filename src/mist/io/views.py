@@ -169,7 +169,6 @@ def add_backend(request, renderer='json'):
     """Adds a new backend.
     
     """
-    
     try:
         backends = request.environ['beaker.session']['backends']
     except:
