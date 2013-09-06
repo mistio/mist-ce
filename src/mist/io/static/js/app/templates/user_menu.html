@@ -14,7 +14,7 @@
         <div class="userEmail">{{view.email}}</div>
 
         <div class="account-placeholder">
-            <a href="https://mist.io/account"
+            <a {{bindAttr href="view.account_url"}}
                 class="account-button"
                 data-role="button"
                 data-mini="true"
@@ -22,6 +22,16 @@
                 data-ajax="false">My account</a>
         </div>
         {{/if}}
+
+        <div class="support-placeholder">
+            <a href="http://mistio.uservoice.com"
+                class="support-button"
+                data-role="button"
+                target="_blank"
+                data-mini="true"
+                data-theme="a"
+                data-ajax="false">Support</a>
+        </div>
 
         {{#if view.logout}}
         <div class="logout-placeholder">

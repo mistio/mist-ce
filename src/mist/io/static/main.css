@@ -1380,12 +1380,12 @@ div.userEmail {
     text-align: right;
 }
 
-div.logout-placeholder, div.account-placeholder {
+div.logout-placeholder, div.account-placeholder, div.support-placeholder {
     padding-top: 10px;
     height: 30px;
 }
 
-.logout-button, .account-button {
+.support-button, .logout-button, .account-button {
     width: 170px;
     float: right;
 }
