@@ -76,8 +76,8 @@ define('app/views/backend_add', [
             addButtonClick: function(){
                 var that = this;
                 var payload = {
-                    "title": '', // TODO
-                    "provider": Mist.backendAddController.newBackendProvider,
+                    "title": Mist.backendAddController.newBackendProvider.title,
+                    "provider": Mist.backendAddController.newBackendProvider.provider,
                     "apikey" : Mist.backendAddController.newBackendKey,
                     "apisecret": Mist.backendAddController.newBackendSecret,
                     "apiurl": Mist.backendAddController.newBackendUrl,

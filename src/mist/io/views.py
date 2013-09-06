@@ -166,21 +166,29 @@ def list_backends(request):
    
 @view_config(route_name='backends', request_method='POST', renderer='json')
 def add_backend(request, renderer='json'):
+    """Adds a new backend.
+    
+    """
+    
     try:
         backends = request.environ['beaker.session']['backends']
     except:
         backends = request.registry.settings['backends']
+        
     params = request.json_body
-    provider = params.get('provider', '0')['provider']
+    title = params.get('title', '0')
+    provider = params.get('provider', '0')
     apikey = params.get('apikey', '')
     apisecret = params.get('apisecret', '')
     apiurl = params.get('apiurl', '')
     tenant_name = params.get('tenant_name', '')
+    
     if apisecret == 'getsecretfromdb':
         for backend_id in backends:
             backend = backends[backend_id]
             if backend.get('apikey', None) == apikey:
                 apisecret = backend.get('apisecret', None)
+                
     region = ''
     if not provider.__class__ is int and ':' in provider:
         region = provider.split(':')[1]
@@ -194,7 +202,7 @@ def add_backend(request, renderer='json'):
     if backend_id in backends:
         return Response('Backend exists', 409)
 
-    backend = {'title': params.get('provider', '0')['title'],
+    backend = {'title': title,
                'provider': provider,
                'apikey': apikey,
                'apisecret': apisecret,
@@ -219,6 +227,7 @@ def add_backend(request, renderer='json'):
            'status'       : 'off',
            'enabled'      : 1,
           }
+    
     return ret
 
 
