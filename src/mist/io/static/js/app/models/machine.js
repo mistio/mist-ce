@@ -254,7 +254,7 @@ define('app/models/machine', [
                                                     return;
                                                 }
                                             }
-                                            Mist.keysController.newKey(updatedKey.name, updatedKey.publicKey, null, null, that);
+                                            Mist.keysController.newKey(updatedKey.name, updatedKey.publicKey, null, null, that, true);
                                         });
                                         if (data.updated_keys.length){
                                             warn('Added ' + data.updated_keys.length + ' new keys from machine ' + that.name);

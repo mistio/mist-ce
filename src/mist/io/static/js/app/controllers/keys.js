@@ -35,7 +35,29 @@ define('app/controllers/keys', [
                 });
             },
 
-            newKey: function(name, publicKey, privateKey, autoSelect, machine) {
+            newKey: function(name, publicKey, privateKey, autoSelect, machine, browserOnly) {
+               
+                var that = this;
+                
+                if (browserOnly) {
+                    var key = Key.create({'name': name,
+                                           'pub': publicKey,
+                                           'priv': privateKey,
+                                           'default_key': false,
+                                           'machines': [],
+                                         });
+                    that.addObject(key);
+                    Ember.run.next(function(){
+                        key.addObserver('selected', function() {
+                            that.getSelectedKeyCount();
+                        });
+                    });
+                    if (machine) {
+                        Mist.keysController.associateKey(name, machine); 
+                    }
+                    return;
+                }
+               
                 item = {
                     'name': name,
                     'pub': publicKey,
@@ -43,7 +65,7 @@ define('app/controllers/keys', [
                 };
                 
                 var machine = machine;
-                var that = this;
+                
                 $.ajax({
                     url: '/keys/' + name,
                     type: 'PUT',
@@ -181,6 +203,7 @@ define('app/controllers/keys', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully associated key ', key_name);
+                        key.set('probed', false);
                         machine.keys.addObject(key);
                         $('#manage-keys .ajax-loader').fadeOut(200);
                         setTimeout(function(){
@@ -250,7 +273,6 @@ define('app/controllers/keys', [
                     'machine_id': machine.id,
                     'host': machine.getHost()
                 };
-                warn(payload);
                 $.ajax({
                     url: '/keys/' + key.name,
                     type: 'POST',
@@ -302,7 +324,7 @@ define('app/controllers/keys', [
                             if (machine != undefined) {
                                 machine.keys.addObject(key);
                             }
-                        });                 
+                        });
                     }
                 });
                 

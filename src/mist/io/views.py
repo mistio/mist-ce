@@ -1279,10 +1279,10 @@ def update_available_keys(request, backend_id, machine_id, ssh_user, host, autho
     # for each public key
     for pk in ak:
         exists = False
-        pub_key = pk.split(' ')
+        pub_key = pk.strip().split(' ')
         for k in keypairs:
             # check if the public key already exists in our keypairs 
-            if keypairs[k]['public'].split(' ')[:2] == pub_key[:2]:
+            if keypairs[k]['public'].strip().split(' ')[:2] == pub_key[:2]:
                 exists = True
                 associated = False
                 # check if it is already associated with this machine

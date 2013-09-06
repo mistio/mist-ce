@@ -25,9 +25,9 @@ define('app/views/machine_manage_keys', [
                 for (var i=0; i < machine.keys.content.length; i++){
                     for (var j=0; j<machine.keys.content[i].machines.length; j++){
                         var item = machine.keys.content[i].machines[j];
+                        machine.keys.content[i].set('probed', null);
                         if (item[1] == machine.id && item[0] == machine.backend.id && item[2] > 0) {
                             machine.keys.content[i].set('probed', true);
-                            warn('set probed for key ' + machine.keys.content[i].name);
                         } else if (item[1] == machine.id && item[0] == machine.backend.id && item[2] < 0){
                             machine.keys.content[i].set('probed', false);
                         }                        
