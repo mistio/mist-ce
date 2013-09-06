@@ -33,7 +33,7 @@ define('app/views/machine_monitoring_dialog', [
 
             clickedPurchaseDialog: function() {
                 $("#monitoring-dialog").popup('close');
-                window.location.href = "https://mist.io/account";  
+                window.location.href = URL_PREFIX + "/account";  
             }
             
             
