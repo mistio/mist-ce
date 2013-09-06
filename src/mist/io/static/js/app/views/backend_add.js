@@ -15,7 +15,7 @@ define('app/views/backend_add', [
             template: Ember.Handlebars.compile(backend_add_html),
 
             init: function() {
-                this._super();         
+                this._super();
             },
             
             selectBackend: function(event) {
@@ -96,7 +96,7 @@ define('app/views/backend_add', [
                         info('added backend ' + data.id);
                         that.backClicked();
                     },
-                    error: function(request){
+                    error: function(request) {
                         Mist.notificationController.notify(request.responseText);
                     }
                 });

@@ -17,9 +17,6 @@ define('app/controllers/backend_add', [
                 this.set('newBackendSecret', null);
                 this.set('newBackendURL', null);
                 this.set('newBackendTenant', null);
-                Ember.run.next(function(){
-                    $('#create-select-provider').selectmenu('refresh');
-                });
                 $('.select-backend-collapsible span.ui-btn-text').text('Select backend');
             },
 
