@@ -32,9 +32,9 @@ define('app/models/key', [
 
             deleteKey: function() {
                 payload = {
-                    'key_id': this.name
-                }
-                var that = this
+                    'key_id': this.name,
+                };
+                var that = this;
                 $.ajax({
                     url: 'keys/' + that.name,
                     type: 'DELETE',
@@ -60,8 +60,8 @@ define('app/models/key', [
                 payload = {
                     'action': 'set_default',
                     'key_id': this.name,
-                }
-                var that = this
+                };
+                var that = this;
                 $.ajax({
                     url: '/keys',
                     type: 'POST',
@@ -73,11 +73,9 @@ define('app/models/key', [
                             key.set('default_key', false);
                         });
                         that.set('default_key', true);
-                        Mist.keysController.updateKeyList(data);
-                        Ember.run.next(function(){$('#non-associated-keys').listview('refresh')});
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while setting key '  +
+                        Mist.notificationController.notify('Error while setting key ' +
                                 that.name + ' as default');
                         error(textstate, errorThrown, 'while setting default key', that.name);
                     }

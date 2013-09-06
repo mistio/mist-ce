@@ -250,12 +250,11 @@ define('app/models/machine', [
                                             for(var i=0; i < Mist.keysController.content.length; ++i){
                                                 existingKey = Mist.keysController.content[i];
                                                 if(existingKey.pub.split(' ').slice(0, 2).join(' ') == updatedKey.pub.split(' ').slice(0, 2).join(' ')) {
-                                                    keyExists = true;
                                                     Mist.keysController.associateKey(existingKey.name, that);
                                                     return;
                                                 }
                                             }
-                                            Mist.keysController.newKey(updatedKey.name, updatedKey.publicKey, null, null, this);
+                                            Mist.keysController.newKey(updatedKey.name, updatedKey.publicKey, null, null, that, true);
                                         });
                                         if (data.updated_keys.length){
                                             warn('Added ' + data.updated_keys.length + ' new keys from machine ' + that.name);
@@ -286,6 +285,9 @@ define('app/models/machine', [
                                     that.set('probeInterval', 2*that.get('probeInterval'));
                                     retryProbe(that.get('probeInterval'));
                                     that.set('probing', false);
+                                    if (key) {
+                                        key.set('probing', false);
+                                    }
                                 }
                             });
                         }

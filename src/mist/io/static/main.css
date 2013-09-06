@@ -512,7 +512,7 @@ div.actions div.ui-controlgroup-controls {
 }
 
 .single-key-footer.ui-footer div.actions a {
-    max-width:32%;
+    width:49%;
 }
 
 .ui-icon-mist-power {
@@ -1466,7 +1466,6 @@ div.logout-placeholder, div.account-placeholder, div.support-placeholder {
 #home-menu .ajax-loader {
     display: block;
     float: right;
-    margin-top: 0px;
     width: 16px;
 }
 
