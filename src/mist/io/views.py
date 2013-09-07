@@ -245,34 +245,16 @@ def delete_backend(request, renderer='json'):
     return Response('OK', 200)
 
 
-@view_config(route_name='backend_toggle', request_method='POST', renderer='json')
+@view_config(route_name='backend_action', request_method='POST', request_param="action=toggle", renderer='json')
 def toggle_backend(request):
-    """Toggles backend's state.
-    """
-    try:
-        backends = request.environ['beaker.session']['backends']
-    except:
-        backends = request.registry.settings['backends']
     
-    params = request.json_body
-    state = params.get('state', '')
-    backend_id = params.get('backend_id', '') 
+    backend_id = request.matchdict['backend']
+    state = request.registry.settings['backends'][backend_id]['enabled']
+    request.registry.settings['backends'][backend_id]['enabled'] = not state
     
-    if not type(state) is bool:
-        return Response('Invalid state %s' %state, 400)
-    
-    if state:
-        state = 1
-    else:
-        state = 0
-    
-    if not backend_id:
-        return Response('Invalid backend id', 400)
-    
-    request.registry.settings['backends'][backend_id]['enabled'] = state
     save_settings(request)
     
-    return Response('OK', 200)
+    return {'state': not state,}
 
 
 @view_config(route_name='machines', request_method='GET', renderer='json')

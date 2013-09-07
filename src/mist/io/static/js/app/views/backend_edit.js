@@ -60,17 +60,12 @@ define('app/views/backend_edit', [
             },
 
             toggleBackend: function(){
-                payload = {
-                    'state': !Mist.backend.enabled,
-                    'backend_id': this.backend.id,
-                };
                 $.ajax({
-                    url: '/backend_toggle',
+                    url: '/backends/' + this.backend.id,
                     type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    success: function() {
-                        Mist.backend.set('enabled',!Mist.backend.enabled);
+                    data: 'action=toggle',
+                    success: function(data) {
+                        Mist.backend.set('enabled', data.state);
                         Ember.run.next(function(){
                             $('.backend-toggle').slider('refresh');
                         });               
