@@ -19,7 +19,7 @@ define('app/controllers/backends', [
             ok: false,
             
             loadingMachines: function() {
-                for (var i = 0; i < this.content.length; i++){
+                for (var i = 0; i < this.content.length; i++) {
                     if (this.content[i].loadingMachines) {
                         return true;
                     }
@@ -28,7 +28,7 @@ define('app/controllers/backends', [
             }.property('@each.loadingMachines'),
             
             loadingImages: function() {
-                for (var i = 0; i < this.content.length; i++){
+                for (var i = 0; i < this.content.length; i++) {
                     if (this.content[i].loadingImages) {
                         return true;
                     }
@@ -37,45 +37,45 @@ define('app/controllers/backends', [
             }.property('@each.loadingImages'),
             
             isOK: function() {
-                if(this.state == 'state-ok'){
+                if(this.state == 'state-ok') {
                     this.set('ok', true);
                 } else {
                     this.set('ok', false);
                 }
             }.observes('state'),
             
-            getBackendById: function(backendId){
-                for (var i = 0; i < this.content.length; i++){
+            getBackendById: function(backendId) {
+                for (var i = 0; i < this.content.length; i++) {
                     if (this.content[i].id == backendId) {
                         return this.content[i];
                     }
                 }    
             },
             
-            getMachineById: function(backendId, machineId){
-                for (var i = 0; i < this.content.length; i++){
+            getMachineById: function(backendId, machineId) {
+                for (var i = 0; i < this.content.length; i++) {
                     if (this.content[i].id == backendId) {
-                        for (var j=0; j < this.content[i].machines.content.length; j++){
-                            if (this.content[i].machines.content[j].id == machineId){
+                        for (var j=0; j < this.content[i].machines.content.length; j++) {
+                            if (this.content[i].machines.content[j].id == machineId) {
                                 return this.content[i].machines.content[j];
                             }
                         }
                     }
                 }    
             },
-                        
-            getMachineCount: function(){
+
+            getMachineCount: function() {
                 var count = 0;
-                this.content.forEach(function(item){
-                    count = count + item.machines.content.length;
+                this.content.forEach(function(item) {
+                    count += item.machines.content.length;
                 });
                 this.set('machineCount', count);
             },
 
             getSelectedMachineCount: function() {
                 var count = 0;
-                this.content.forEach(function(item){
-                    count = count + item.machines.filterProperty('selected', true).get('length');
+                this.content.forEach(function(item) {
+                    count += item.machines.filterProperty('selected', true).get('length');
                 });
                 this.set('selectedMachineCount', count);
             },
@@ -83,17 +83,17 @@ define('app/controllers/backends', [
             getImageCount: function() {
                 var count = 0;
                 this.content.forEach(function(item){
-                    count = count + item.images.get('length');
+                    count += item.images.get('length');
                 });
                 this.set('imageCount', count);
             },
             
             getSelectedMachine: function() {
-            	if(this.selectedMachineCount == 1){
+            	if(this.selectedMachineCount == 1) {
                         var machine = null;
-                        this.content.forEach(function(item){
+                        this.content.forEach(function(item) {
                             var machines = item.machines.filterProperty('selected', true);
-                            if(machines.get('length') == 1){
+                            if(machines.get('length') == 1) {
                     	    machine = machines[0];
                             }
                         });
@@ -103,9 +103,9 @@ define('app/controllers/backends', [
             	}
             },
 
-            checkMonitoring: function(){
-                if (!Mist.authenticated){
-                    return
+            checkMonitoring: function() {
+                if (!Mist.authenticated) {
+                    return;
                 }
                 
                 var that = this;
@@ -115,8 +115,7 @@ define('app/controllers/backends', [
                     type: 'GET',
                     dataType: 'json',
                     headers: { "cache-control": "no-cache" },
-                    success: function(data){
-                        warn(data);
+                    success: function(data) {
                         machines = data.machines;
                         Mist.set('auth_key', data.auth_key);
                         Mist.set('monitored_machines', data.machines);
@@ -125,17 +124,18 @@ define('app/controllers/backends', [
                         //now loop on backend_id, machine_id  list of lists and check if pair found
                         machines.forEach(function(machine_tuple){
                             var b,m;
-                            backend_id = machine_tuple[0];
-                            machine_id = machine_tuple[1];
+                            var backend_id = machine_tuple[0];
+                            var machine_id = machine_tuple[1];
 
                             for (b=0; b < Mist.backendsController.content.length; b++) {
-                                if (Mist.backendsController.content[b]['id'] == backend_id)
+                                if (Mist.backendsController.content[b]['id'] == backend_id) {
                                     break;
+                                }
                             }
 
                             if (b != Mist.backendsController.content.length) {
-                                for (m=0; m < Mist.backendsController.content[b].machines.content.length; m++){
-                                    if (Mist.backendsController.content[b]['machines'].content[m]['id'] == machine_id){
+                                for (m=0; m < Mist.backendsController.content[b].machines.content.length; m++) {
+                                    if (Mist.backendsController.content[b]['machines'].content[m]['id'] == machine_id) {
                                         Mist.backendsController.content[b].machines.content[m].set('hasMonitoring', true);
                                         break;
                                     }
@@ -143,7 +143,7 @@ define('app/controllers/backends', [
                             }
                         });
 
-                        rules = data.rules;
+                        var rules = data.rules;
 
                         for (ruleId in rules){
                             var isInController = false;
@@ -219,17 +219,17 @@ define('app/controllers/backends', [
                                     var waiting = false;
                                     var state = "ok";
     
-                                    that.content.forEach(function(backend){
+                                    that.content.forEach(function(backend) {
                                         if (backend.error) {
                                             state = 'error';
-                                        } else if(backend.state == 'waiting'){
+                                        } else if(backend.state == 'waiting') {
                                             waiting = true;
-                                        } else if(backend.state == 'offline'){
+                                        } else if(backend.state == 'offline') {
                                             state = 'down';
                                         }
                                     });
     
-                                    if(waiting){
+                                    if (waiting) {
                                         state = 'state-wait-' + state;
                                     } else {
                                         state = 'state-' + state;
@@ -241,8 +241,7 @@ define('app/controllers/backends', [
                             Mist.notificationController.notify("Error loading backends");
                         });
     
-                        setTimeout(function(){
-
+                        setTimeout(function() {
                             Mist.backendsController.checkMonitoring();
                         }, 5000);
                     });

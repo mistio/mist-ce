@@ -11,13 +11,13 @@ define('app/views/backend_edit', [
 
         return Ember.View.extend({
 
-            backButtonClick: function(){
+            backButtonClick: function() {
                 $('#backend-delete-confirm').slideUp();
                 $("#edit-backend").popup("close");
             },
 
-            deleteButtonClick: function(){
-                if (this.getMonitoredMachines().length > 0) {
+            deleteButtonClick: function( ){
+                if (this.getMonitoredMachines()) {
                     $('#backend-has-monitoring').show();
                 } else {
                     $('#backend-has-monitoring').hide();
@@ -25,11 +25,11 @@ define('app/views/backend_edit', [
                 $('#backend-delete-confirm').slideDown();
             },
 
-            deleteCancelButtonClick: function(){
+            deleteCancelButtonClick: function() {
                 $('#backend-delete-confirm').slideUp();
             },
 
-            deleteConfirmButtonClick: function(){
+            deleteConfirmButtonClick: function() {
                 $('#edit-backend .ajax-loader').fadeIn(200);
                 $('#button-confirm-disable').button('disable');
                 var monitoredMachines = this.getMonitoredMachines();
@@ -55,6 +55,10 @@ define('app/views/backend_edit', [
                             $('#backend-buttons').controlgroup('refresh');
                         });
                         $("#edit-backend").popup("close");
+                    },
+                    error: function() {
+                        $('#edit-backend .ajax-loader').fadeOut(200);
+                        $('#button-confirm-disable').button('enable');
                     }
                 });
             },

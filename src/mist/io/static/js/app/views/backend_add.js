@@ -19,11 +19,11 @@ define('app/views/backend_add', [
             },
             
             selectBackend: function(event) {
-                if (event.target.title.indexOf("rackspace") !== -1 || event.target.title.indexOf("linode") !== -1) {
+                if (event.target.title.indexOf("rackspace") != -1 || event.target.title.indexOf("linode") != -1) {
                     $('#ApiKeylabel').text('2. Username:');
                     $('#ApiSecretlabel').text('3. API Key:');
                     $('#addBackendOpenstack').hide();
-                } else if (event.target.title.indexOf("openstack") !== -1) {
+                } else if (event.target.title.indexOf("openstack") != -1) {
                     $('#ApiKeylabel').text('2. Username:');
                     $('#ApiSecretlabel').text('3. Password:');
                     $('#addBackendOpenstack').show();
