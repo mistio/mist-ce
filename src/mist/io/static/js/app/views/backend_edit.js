@@ -65,7 +65,7 @@ define('app/views/backend_edit', [
                     'backend_id': this.backend.id,
                 };
                 $.ajax({
-                    url: '/backends/' + this.backend.id + '/toggle',
+                    url: '/backend_toggle',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),

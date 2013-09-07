@@ -245,7 +245,7 @@ def delete_backend(request, renderer='json'):
     return Response('OK', 200)
 
 
-@view_config(route_name='toggle_backend', request_method='POST', renderer='json')
+@view_config(route_name='backend_toggle', request_method='POST', renderer='json')
 def toggle_backend(request):
     """Toggles backend's state.
     """
