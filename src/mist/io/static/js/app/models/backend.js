@@ -82,6 +82,10 @@ define('app/models/backend', [
                 this.machines = MachinesController.create({backend: this});
                 this.sizes = SizesController.create({backend: this});
                 this.locations = LocationsController.create({backend: this});
+                var that = this;
+                Ember.run.next(function() {
+                    that.toggle()
+                });
             },
             
             toggle: function(){
@@ -91,6 +95,8 @@ define('app/models/backend', [
                     this.images.clear();
                     this.sizes.clear();
                     this.locations.clear();
+                    this.set('loadingImages', false);
+                    this.set('loadingMachines', false);
                 } else {
                     this.set('state', 'waiting');
                     this.machines.refresh();

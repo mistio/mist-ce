@@ -32,17 +32,17 @@ define('app/views/backend_edit', [
             deleteConfirmButtonClick: function(){
                 $('#edit-backend .ajax-loader').fadeIn(200);
                 $('#button-confirm-disable').button('disable');
-                var that = this;
                 var monitoredMachines = this.getMonitoredMachines();
-                if (monitoredMachines.length > 0) {
+                if (monitoredMachines) {
                     monitoredMachines.forEach(function(monitored_machine) {
                         monitored_machine.changeMonitoring();
                     });
                 }
+                var that = this;
                 $.ajax({
                     url: '/backends/' + this.backend.id,
                     type: 'DELETE',
-                    success: function(result) {
+                    success: function() {
                         $('#edit-backend .ajax-loader').fadeOut(200);
                         $('#backend-delete-confirm').slideUp();
                         $('#button-confirm-disable').button('enable');
@@ -60,9 +60,24 @@ define('app/views/backend_edit', [
             },
 
             toggleBackend: function(){
-                Mist.backend.set('enabled',!Mist.backend.enabled);
-                Ember.run.next(function(){
-                    $('.backend-toggle').slider('refresh');
+                payload = {
+                    'state': !Mist.backend.enabled,
+                    'backend_id': this.backend.id,
+                };
+                $.ajax({
+                    url: '/backends/' + this.backend.id + '/toggle',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function() {
+                        Mist.backend.set('enabled',!Mist.backend.enabled);
+                        Ember.run.next(function(){
+                            $('.backend-toggle').slider('refresh');
+                        });               
+                    },
+                    error: function(jqXHR) {
+                        Mist.notificationController.notify(jqXHR.responseText);
+                    }
                 });
             },
 

@@ -194,13 +194,13 @@ define('app/controllers/backends', [
                     that.getImageCount();
                 });
                 
-                $(document).bind('ready', function(){
-                    Ember.run.next(function(){
+                $(document).bind('ready', function() {
+                    Ember.run.next(function() {
                         $.getJSON('/backends', function(data) {
                             data.forEach(function(item){
                                 that.pushObject(Backend.create(item));
                             });
-                            that.content.forEach(function(item){
+                            that.content.forEach(function(item) {
                                 item.machines.addObserver('length', function() {
                                     that.getMachineCount();
                                 });
@@ -214,7 +214,8 @@ define('app/controllers/backends', [
                                     that.getImageCount();
                                 });
     
-                                item.addObserver('state', function(){
+                                item.addObserver('state', function() {
+                                    
                                     var waiting = false;
                                     var state = "ok";
     

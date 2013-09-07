@@ -15,15 +15,13 @@ define('app/controllers/machines', [
 
             init: function() {
                 this._super();
-                this.set('content', []),
+                this.set('content', []);
                 this.refresh();
             },
 
             refresh: function(){
 
                 if(!this.backend.enabled){
-                    this.backend.set('state', 'offline');
-                    this.clear();
                     return;
                 }
 
@@ -32,7 +30,9 @@ define('app/controllers/machines', [
                 this.backend.set('state', 'waiting');
                 this.backend.set('loadingMachines', true);
                 $.getJSON('/backends/' + this.backend.id + '/machines', function(data) {
-
+                    if (!that.backend.enabled) {
+                        return;
+                    }
                     if (typeof Mist.monitored_machines === 'undefined') {
                         //check monitoring failed, re-run. This shall be moved though, since here it gets executed just 2 times
                         Mist.backendsController.checkMonitoring();
