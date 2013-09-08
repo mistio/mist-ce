@@ -26,6 +26,16 @@ define('app/views/machine_monitoring_dialog', [
                 $("#monitoring-dialog").popup('close');
             },
 
+            buttonBackMonitoring: function() {
+                $("#monitoring-dialog").popup('close');
+            },
+
+            buttonChangeMonitoring: function() {
+                var machine = this.get('controller').get('model');
+                machine.changeMonitoring();
+                $("#monitoring-dialog").popup('close');
+            },
+
             openTrialDialog: function() {
                 $("#monitoring-dialog").popup('close');
                 $("#trial-dialog").popup('open');

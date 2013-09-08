@@ -29,8 +29,8 @@
             {{/unless}}
 
             <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-                <button data-theme="c" id="button-back-enabled">Back</button>
-                <button data-theme="b" id="button-disable-monitoring">Disable</button>
+                <button data-theme="c" id="button-back-enabled" {{action buttonBackMonitoring target="view"}}>Back</button>
+                <button data-theme="b" id="button-disable-monitoring" {{action buttonChangeMonitoring target="view"}}>Disable</button>
             </div>
         </div>
         <div id="monitoring-disabled">
@@ -43,8 +43,8 @@
                 {{/unless}}
 
                 <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-                    <button data-theme="c" id="button-back-disabled">Back</button>
-                    <button data-theme="b" id="button-enable-monitoring">Enable</button>
+                    <button data-theme="c" id="button-back-disabled" {{action buttonBackMonitoring target="view"}}>Back</button>
+                    <button data-theme="b" id="button-enable-monitoring" {{action buttonChangeMonitoring target="view"}}>Enable</button>
                 </div>
             </div>
             <div id="plan-dialog">

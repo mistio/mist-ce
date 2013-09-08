@@ -399,26 +399,10 @@ define('app/models/machine', [
                         $('#monitoring-dialog div h1').text('Disable monitoring');
                         $('#monitoring-enabled').show();
                         $('#monitoring-disabled').hide();
-                        $('#button-back-enabled').on("click", function() {
-                            $("#monitoring-dialog").popup('close');
-                        });
-                        $('#button-disable-monitoring').on("click", function() {
-                            machine.changeMonitoring();
-                            $('#button-disable-monitoring').off("click");
-                            $("#monitoring-dialog").popup('close');
-                        });
                     } else {
                         $('#monitoring-dialog div h1').text('Enable monitoring');
                         $('#monitoring-disabled').show();
                         $('#monitoring-enabled').hide();
-                        $('#button-back-disabled').on("click", function() {
-                            $("#monitoring-dialog").popup('close');
-                        });
-                        $('#button-enable-monitoring').on("click", function() {
-                            machine.changeMonitoring();
-                            $('#button-enable-monitoring').off("click");
-                            $("#monitoring-dialog").popup('close');
-                        });
 
                         if ((Mist.current_plan) && (Mist.current_plan['title'])) {
                             if (Mist.current_plan['has_expired']) {
