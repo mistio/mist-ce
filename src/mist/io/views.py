@@ -1311,6 +1311,8 @@ def update_available_keys(request, backend_id, machine_id, ssh_user, host, autho
                         associated = True
                         break
                 if not associated:
+                    if not keypairs[k].get('machines', None):
+                        keypairs[k]['machines'] = []
                     keypairs[k]['machines'].append([backend_id, machine_id])
                     updated_keypairs[k] = keypairs[k]
             if exists:
@@ -1506,7 +1508,12 @@ def deploy_key(request, keypair):
     if key_name:
         log.warn('probing with key %s' % key_name)
 
-    test = shell_command(request, backend_id, machine_id, host, 'whoami', ssh_user = ret.get('ssh_user', None), key = key_name)
+    if ret:
+        ssh_user = ret.get('ssh_user', None)
+    else:
+        ssh_user = None
+
+    test = shell_command(request, backend_id, machine_id, host, 'whoami', ssh_user, key = key_name)
 
     return test
 
