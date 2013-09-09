@@ -44,7 +44,7 @@ define('app/views/backend_add', [
                 $('input[id=create-backend-key]').val('');
                 $('input[id=create-backend-secret]').val('');
                 for (var b = 0; b < Mist.backendsController.content.length; b++) {
-                    var backend = Mist.backendsController.content[b];                    
+                    var backend = Mist.backendsController.content[b];
                     if (event.target.title.split('_')[0] == 'ec2' && backend.provider.split('_')[0] == 'ec2') {
                         //Autocomplete
                         $('input[id=create-backend-key]').val(backend.apikey);
