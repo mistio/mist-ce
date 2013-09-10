@@ -359,7 +359,7 @@ define('app/models/machine', [
                             if (prefix.slice(-1) == '/') {
                                 prefix = prefix.substring(0, prefix.length - 1);
                             }
-                            var cmd = 'wget --no-check-certificate ' + prefix + '/core/scripts/deploy_collectd.sh -O - > /tmp/deploy_collectd.sh && chmod +x /tmp/deploy_collectd.sh && sudo /tmp/deploy_collectd.sh ' + data['monitor_server'] + ' ' + data['uuid'] + ' ' + data['passwd'];
+                            var cmd = 'wget --no-check-certificate ' + prefix + '/core/scripts/deploy_collectd.sh -O - > /tmp/deploy_collectd.sh && sudo chmod +x /tmp/deploy_collectd.sh && sudo /tmp/deploy_collectd.sh ' + data['monitor_server'] + ' ' + data['uuid'] + ' ' + data['passwd'];
                             cmd = "sudo su -c '" + cmd + "' || " + cmd;
                             collectd_install_target = that;
                             warn(cmd);

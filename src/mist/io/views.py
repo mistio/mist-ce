@@ -92,6 +92,7 @@ def check_auth(request):
         request.registry.settings['email'] = email
         request.registry.settings['password'] = password
         request.registry.settings['auth'] = 1
+        log.debug('save settings (check auth)')
         save_settings(request)
         return ret
     else:
@@ -206,6 +207,7 @@ def add_backend(request, renderer='json'):
               }
 
     request.registry.settings['backends'][backend_id] = backend
+    log.debug('save settings (add backend')
     save_settings(request)
 
     ret = {'id'           : backend_id,
@@ -232,6 +234,7 @@ def delete_backend(request, renderer='json'):
 
     """
     request.registry.settings['backends'].pop(request.matchdict['backend'])
+    log.debug('save settings (del backend)')
     save_settings(request)
 
     return Response('OK', 200)
@@ -441,7 +444,7 @@ def create_machine(request):
                              location=location,
                              auth=auth,
                              ssh_key=tmp_key_path)
-            associate_key(request, key_id, backend_id, node.id, deploy=False)
+            associate_key(request, key_id, backend_id, node.id, deploy=True)
         except Exception as e:
             return Response('Failed to create machine in Linode: %s' % e, 500)
         #remove temp file with private key
@@ -771,6 +774,7 @@ def shell_command(request, backend_id, machine_id, host, command, ssh_user = Non
                                                  backend_id, 
                                                  machine_id) or 'root'
               
+            log.debug("before run command %s" % ssh_user)
             response = run_command(machine_id, 
                                    host, 
                                    ssh_user, 
@@ -1046,6 +1050,7 @@ def edit_key(request):
     if len(keypairs) < 2:
         key['default'] = True
     
+    log.debug('saving settings (edit key)')
     save_settings(request)
     
     ret = {'name': key_id,
@@ -1123,6 +1128,7 @@ def delete_key(request):
         except IndexError:
             pass
 
+    log.debug('saving settings (del key)')
     save_settings(request)
 
     ret = [{'name': key,
@@ -1209,6 +1215,7 @@ def update_monitoring(request):
     request.registry.settings['email'] = email
     request.registry.settings['password'] = password
     request.registry.settings['auth'] = 1
+    log.debug('saving settings (update monitoring)')
     save_settings(request)
     return ret.json()
 
@@ -1317,6 +1324,7 @@ def update_available_keys(request, backend_id, machine_id, ssh_user, host, autho
             updated_keypairs[key_name] = keypairs[key_name]
 
     if updated_keypairs:
+        log.debug('update keypairs')
         save_settings(request)
 
     ret = [{'name': key,
@@ -1351,11 +1359,15 @@ def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, s
     if default != None:
         keypair['default'] = default
 
+    log.debug("Keypair is : %s" % keypair)
     for machine in keypair.get('machines',[]):
         if [backend_id, machine_id] == machine[:2]:
             keypairs[key_id]['machines'][keypair['machines'].index(machine)] = [backend_id, machine_id, timestamp, ssh_user, sudoer]
+        else:
+            log.debug("Machines are : %s" % keypair.get('machines', []))
 
     try:
+        log.debug('save settings (save keypair)')
         save_settings(request)
     except Exception, e:
         log.error('Error saving keypair %s: %s' % (key_id, e))
@@ -1371,6 +1383,7 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
     machine.
 
     """
+    log.debug("Associate key, deploy = %s" % deploy)
     if not key_id or not machine_id or not backend_id:
         return Response('Keypair, machine or backend not provided', 400)
 
@@ -1402,14 +1415,19 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
     
         if ret:
             keypair['machines'][-1] += [int(time()), ret.get('ssh_user', ''), ret.get('sudoer', False)]
+            log.debug('save settings (associate key)')
             save_settings(request)
+            log.debug("Associate key, %s" % keypair['machines'])
             return Response('OK', 200)
         else:
             if machine_uid in keypair['machines']:
                 keypair['machines'].remove(machine_uid)
+            log.debug("Associate key, %s" % keypair['machines'])
             
             return Response('Failed to deploy key', 412)
     else:
+        log.debug('save settings (associate key2)')
+        log.debug("deploy false")
         save_settings(request)
         return Response('OK', 200)
 
@@ -1451,6 +1469,7 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
     if undeploy:
         ret = undeploy_key(request, keypair)
 
+    log.debug('save settings (disassociate key)')
     save_settings(request)
 
     return Response('OK', 200)
