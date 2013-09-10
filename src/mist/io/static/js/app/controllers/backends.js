@@ -67,7 +67,7 @@ define('app/controllers/backends', [
             getMachineCount: function() {
                 var count = 0;
                 this.content.forEach(function(item) {
-                    count += item.machines.content.length;
+                    count += item.machines.get('length', 0);
                 });
                 this.set('machineCount', count);
             },
@@ -83,7 +83,7 @@ define('app/controllers/backends', [
             getImageCount: function() {
                 var count = 0;
                 this.content.forEach(function(item){
-                    count += item.images.content.length;
+                    count += item.images.get('length', 0);
                 });
                 this.set('imageCount', count);
             },
