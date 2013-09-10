@@ -209,7 +209,7 @@ def add_backend(request, renderer='json'):
                'tenant_name': tenant_name,
                'region': region,
                'poll_interval': request.registry.settings['default_poll_interval'],
-               'enabled': 1,
+               'enabled': True,
               }
 
     request.registry.settings['backends'][backend_id] = backend
@@ -224,7 +224,7 @@ def add_backend(request, renderer='json'):
            'poll_interval': backend['poll_interval'],
            'region'       : backend['region'],
            'status'       : 'off',
-           'enabled'      : 1,
+           'enabled'      : True,
           }
     
     return ret

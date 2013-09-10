@@ -43,8 +43,10 @@ define('app/views/backend_add', [
                 
                 Mist.backendAddController.set('newBackendKey', '');
                 Mist.backendAddController.set('newBackendSecret', '');
-                //Mist.backendAddController.set('newBackendUrl', '');
-                //Mist.backendAddController.set('newBackendTenant', '');
+                /* OpenStack support
+                Mist.backendAddController.set('newBackendUrl', '');
+                Mist.backendAddController.set('newBackendTenant', '');
+                */
                 for (var b = 0; b < Mist.backendsController.content.length; b++) {
                     var backend = Mist.backendsController.content[b];                    
                     if (event.target.title.split('_')[0] == 'ec2' && backend.provider.split('_')[0] == 'ec2') {
@@ -63,8 +65,6 @@ define('app/views/backend_add', [
             addBackend: function() {
                 $('.select-listmenu li').on('click', this.selectBackend);              
                 $('#add-backend').panel('open');
-                // resize dismiss div TODO: reset on window resize                
-                //$('.ui-panel-dismiss-position-right').css('left',(0-$('.ui-panel-position-right.ui-panel-open').width()));
             },
 
             backClicked: function() {
@@ -74,7 +74,6 @@ define('app/views/backend_add', [
             },
 
             addButtonClick: function(){
-                var that = this;
                 var payload = {
                     "title": Mist.backendAddController.newBackendProvider.title,
                     "provider": Mist.backendAddController.newBackendProvider.provider,
@@ -83,7 +82,7 @@ define('app/views/backend_add', [
                     "apiurl": Mist.backendAddController.newBackendUrl,
                     "tenant_name": Mist.backendAddController.newBackendTenant
                 };
-
+                var that = this;
                 $.ajax({
                     url: '/backends',
                     type: "POST",
@@ -93,11 +92,12 @@ define('app/views/backend_add', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         Mist.backendsController.pushObject(Backend.create(data));
-                        info('added backend ' + data.id);
+                        info('Successfully added backend: ' + data.id);
                         that.backClicked();
                     },
-                    error: function(request) {
-                        Mist.notificationController.notify(request.responseText);
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while adding backend: ' + jqXHR.responseText);
+                        error(textstate, errorThrown, ' while adding backend');
                     }
                 });
             },

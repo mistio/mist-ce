@@ -1102,6 +1102,11 @@ div.loading-monitoring {
 }
 
 /* Add backend dialog */
+
+#addBackendOpenstack {
+    display: none;
+}
+
 #add-backend label {
     display: block;
     margin: 14px 0 4px 0;

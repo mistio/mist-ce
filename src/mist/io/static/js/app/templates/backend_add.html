@@ -15,7 +15,7 @@
         <label>1. Provider:</label>
         <div class="select-backend-collapsible" data-role="collapsible" data-iconpos="right"
             data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
-            <h2>Select backend</h2>
+            <h2>Select provider</h2>
             <ul class="select-listmenu" data-role="listview">
                 {{#each view.providerList}}
                 <li data-icon="false">
@@ -38,7 +38,7 @@
             name="create-backend-secret"
             id="create-backend-secret"}}
 
-        <div id="addBackendOpenstack" style="display:none;">
+        <div id="addBackendOpenstack">
             <label for="create-backend-url" id="URLlabel">4. Auth URL:</label>
             {{view Mist.TextField
                 valueBinding="Mist.backendAddController.newBackendURL"
