@@ -17,7 +17,7 @@ define('app/views/backend_edit', [
             },
 
             deleteButtonClick: function( ){
-                if (this.getMonitoredMachines()) {
+                if (this.getMonitoredMachines.length) {
                     $('#backend-has-monitoring').show();
                 } else {
                     $('#backend-has-monitoring').hide();
@@ -33,7 +33,7 @@ define('app/views/backend_edit', [
                 $('#edit-backend .ajax-loader').fadeIn(200);
                 $('#button-confirm-disable').button('disable');
                 var monitoredMachines = this.getMonitoredMachines();
-                if (monitoredMachines) {
+                if (monitoredMachines.length) {
                     monitoredMachines.forEach(function(monitored_machine) {
                         monitored_machine.changeMonitoring();
                     });
@@ -47,7 +47,6 @@ define('app/views/backend_edit', [
                         $('#backend-delete-confirm').slideUp();
                         $('#button-confirm-disable').button('enable');
                         var i = Mist.backendsController.content.indexOf(that.backend);
-                        // refresh backend buttons
                         Mist.backendsController.arrayContentWillChange();
                         Mist.backendsController.removeObject(that.backend);
                         Mist.backendsController.arrayContentDidChange();
@@ -56,9 +55,11 @@ define('app/views/backend_edit', [
                         });
                         $("#edit-backend").popup("close");
                     },
-                    error: function() {
+                    error: function(jqXHR, textstate, errorThrown) {
                         $('#edit-backend .ajax-loader').fadeOut(200);
                         $('#button-confirm-disable').button('enable');
+                        Mist.notificationController.notify('Error while deleting backend: ' + jqXHR.responseText);
+                        error(textstate, errorThrown, ' while deleting backend');
                     }
                 });
             },
@@ -74,8 +75,9 @@ define('app/views/backend_edit', [
                             $('.backend-toggle').slider('refresh');
                         });               
                     },
-                    error: function(jqXHR) {
-                        Mist.notificationController.notify(jqXHR.responseText);
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while toggling backend: ' + jqXHR.responseText);
+                        error(textstate, errorThrown, ' while toggling backend');
                     }
                 });
             },
