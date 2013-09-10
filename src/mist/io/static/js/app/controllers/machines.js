@@ -202,8 +202,7 @@ define('app/controllers/machines', [
                         key.machines.addObject([that.backend.id, data.id]);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while sending create machine' +
-                                name + ' to backend ' + that.backend.title);
+                        Mist.notificationController.timeNotify(jqXHR.responseText, 20000);
                         error(textstate, errorThrown, 'while creating machine', that.name);
                         that.removeObject(machine);
                         that.backend.set('error', textstate);
