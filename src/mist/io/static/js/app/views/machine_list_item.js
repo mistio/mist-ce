@@ -52,10 +52,12 @@ define('app/views/machine_list_item', [
                     Mist.backendsController.forEach(function(backend) {
                         backend.machines.forEach(function(machine) {
                             if (machine.selected){
-                        	len++;
+                                len++;
                             }
                         });
                     });
+
+                    Mist.backendsController.set('selectedMachineCount', len);
                     
                     if (len > 1) {
                         $('.machines-footer').fadeIn(140);

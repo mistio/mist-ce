@@ -48,7 +48,7 @@ define('app/views/backend_add', [
                 Mist.backendAddController.set('newBackendTenant', '');
                 */
                 for (var b = 0; b < Mist.backendsController.content.length; b++) {
-                    var backend = Mist.backendsController.content[b];                    
+                    var backend = Mist.backendsController.content[b];
                     if (event.target.title.split('_')[0] == 'ec2' && backend.provider.split('_')[0] == 'ec2') {
                         //Autocomplete
                         Mist.backendAddController.set('newBackendKey', backend.apikey);

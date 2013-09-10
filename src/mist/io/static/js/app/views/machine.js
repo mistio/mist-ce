@@ -16,6 +16,40 @@ define('app/views/machine', [
                 this._super();
                 this.setGraph();
             },
+
+enableMonitoringClick: function() {
+                if (Mist.authenticated) {
+                    var machine = this.get('controller').get('model');
+                    machine.openMonitoringDialog();
+                } else {
+                    $("#login-dialog").show();
+                    $("#login-dialog").popup('open');
+                }
+            },
+
+            closePlanDialog: function() {
+                $("#monitoring-dialog").popup('close');
+            },
+
+            buttonBackMonitoring: function() {
+                $("#monitoring-dialog").popup('close');
+            },
+
+            buttonChangeMonitoring: function() {
+                var machine = this.get('controller').get('model');
+                machine.changeMonitoring();
+                $("#monitoring-dialog").popup('close');
+            },
+
+            openTrialDialog: function() {
+                $("#monitoring-dialog").popup('close');
+                $("#trial-dialog").popup('open');
+            },
+
+            clickedPurchaseDialog: function() {
+                $("#monitoring-dialog").popup('close');
+                window.location.href = URL_PREFIX + "/account";  
+            },
             
             rules: function(){
                 var ret = Ember.ArrayController.create(), 

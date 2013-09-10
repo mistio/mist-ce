@@ -63,7 +63,6 @@ define( 'app', [
     'app/views/image_list',
     'app/views/delete_tag',
     'app/views/machine_tags_dialog',
-    'app/views/machine_monitoring_dialog',
     'app/views/machine_manage_keys',
     'app/views/key_list_item',
     'app/views/key_list',
@@ -106,7 +105,6 @@ define( 'app', [
                 ImageListView,
                 DeleteTagView,
                 MachineTagsDialog,
-                MachineMonitoringDialog,
                 MachineManageKeys,
                 KeyListItemView,
                 KeyListView,
@@ -361,7 +359,6 @@ define( 'app', [
         App.ShellDialog = Shell;
         App.PowerDialog = SingleMachineActionsDialog;
         App.MachineActionsDialog = MachineActionsDialog;
-        App.MachineMonitoringDialog = MachineMonitoringDialog;
         App.MachineManageKeys = MachineManageKeys;
         App.MachineListView = MachineListView;
 

@@ -587,6 +587,7 @@ div.ember-view div.ui-panel-content-wrap {
 
 #monitoring-wrapper .monitoring-dialog-container a.monitoring-button {
     display: none;
+    width: 25ex;
 }
 
 #monitoring-wrapper .running a.monitoring-button {
