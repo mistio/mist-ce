@@ -630,7 +630,6 @@ enableMonitoringClick: function() {
                         headers: { "cache-control": "no-cache" },
                         data: JSON.stringify(payload),
                         success: function(result) {
-                            Mist.notificationController.notify('Enabled free trial');
                             $('#trial-user-details .ajax-loader').hide();     
                             $('#submit-trial').removeClass('ui-disabled');
                             $("#trial-dialog").popup('close');
