@@ -50,9 +50,8 @@
             data-role="listview"
             data-filter="true"
             data-inset="true"
-            data-theme="c"
             data-filter-placeholder="Filter...">
-            {{#each Mist.keysController}}
+            {{#each Mist.keysController.keys}}
                 {{view Mist.KeyListItemView keyBinding="this" class="node"}}
             {{/each}}
         </ul>

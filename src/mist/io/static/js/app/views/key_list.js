@@ -13,6 +13,10 @@ define('app/views/key_list', [
         return MistScreen.extend({
             
             template: Ember.Handlebars.compile(key_list_html),
+            
+            init: function() {
+                this._super();
+            },
 
             setDefaultKey: function(){
                 var key = this.getSelectedKeys();
