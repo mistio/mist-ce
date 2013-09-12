@@ -13,8 +13,12 @@ define('app/views/backend_button', ['ember'],
             attributeBindings: ['data-role', 'data-theme', 'data-inline', 'data-role', 'data-icon'],
 
             didInsertElement: function() {
-                $("#"+this.elementId).button();
-                $('#backend-buttons').controlgroup('refresh');
+                if ('button' in $("#"+this.elementId)) {
+                    $("#"+this.elementId).button();
+                }
+                if ('controlgroup' in $('#backend-buttons')) {
+                    $('#backend-buttons').controlgroup('refresh');
+                }
             },
 
             click: function() {
