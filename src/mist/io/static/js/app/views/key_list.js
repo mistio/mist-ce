@@ -75,7 +75,7 @@ define('app/views/key_list', [
                 return keys;
             },
             
-            addKey: function(){
+            createKeyClicked: function(){
         	   $("#dialog-add-key").popup("open", {transition: 'pop'});
             },
             
