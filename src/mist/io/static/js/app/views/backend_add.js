@@ -18,6 +18,20 @@ define('app/views/backend_add', [
                 this._super();
             },
             
+            keyDown: function(event) {
+                if (event.keyCode == 13) { // Enter
+                    if (event.preventDefault) {
+                        event.preventDefault();
+                    }
+                    if (Mist.backendAddController.newBackendReady) {
+                        warn('yeay!');
+                        this.addButtonClick();
+                    }
+                } else if (event.keyCode == 27) { // Esc
+                    this.backClicked();
+                }
+            },
+            
             selectBackend: function(event) {
                 if (event.target.title.indexOf("rackspace") != -1 || event.target.title.indexOf("linode") != -1) {
                     $('#ApiKeylabel').text('2. Username:');
