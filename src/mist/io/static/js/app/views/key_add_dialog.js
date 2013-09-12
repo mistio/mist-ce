@@ -13,6 +13,8 @@ define('app/views/key_add_dialog', [
                 this._super();    
             },
             
+            attributeBindings: ['data-role'],
+            
             notEditMode: function() {
                 return this.get('parentView').toString().indexOf('SingleKeyView') == -1;
             },

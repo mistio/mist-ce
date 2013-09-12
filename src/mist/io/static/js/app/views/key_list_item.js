@@ -13,29 +13,11 @@ define('app/views/key_list_item', [
             
                 template: Ember.Handlebars.compile(key_list_item_html),
                 
-                //init: function() {
-                //    this._super();
-                //},
+                init: function() {
+                    this._super();
+                },
                 
                 tagName:'li',
-
-                keySelected: function() {
-                    var len = 0;
-                    Mist.keysController.forEach(function(key) {
-                        if (key.selected) {
-                            len++;
-                        }
-                    });
-                    
-                    if (len > 0) {
-                        $('.keys-footer').fadeIn(200);
-                    } else {
-                        $('.keys-footer').fadeOut(200);
-                    }
-                }.observes('key.selected'),
-
-                
         });
-
     }
 );

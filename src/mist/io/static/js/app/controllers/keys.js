@@ -13,8 +13,6 @@ define('app/controllers/keys', [
         return Ember.ArrayController.extend({
     
             keys: null,
-            length: null,
-            keyCount: null,
             loadingKeys: null,
             
             init: function() {
@@ -36,10 +34,6 @@ define('app/controllers/keys', [
                     $('#keys-footer').fadeOut(200);
                 }
             }.observes('keys.@each.selected'),
-            
-            lengthObserver: function() {
-                this.getSelectedKeyCount();
-            }.observes('length'),
             
             loadKeys: function() {
                 this.set('loadingKeys', true);
@@ -158,11 +152,11 @@ define('app/controllers/keys', [
                     data: JSON.stringify(payload),
                     success: function(data) {
                         info('Successfully set default key: ', name);
-                        Mist.keysController.forEach(function(key){
+                        Mist.keysController.keys.forEach(function(key){
                             if (key.name == name) {
                                 key.set('default_key', true);
                             } else {
-                                key.set('default_key', false); 
+                                key.set('default_key', false);
                             }
                         });
                     },

@@ -27,7 +27,7 @@ define('app/models/key', [
                 } else {
                     return 'unprobed';
                 }
-            }.property('probed', 'probing')
+            }.property('probed', 'probing'),
         });
     }
 );

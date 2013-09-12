@@ -68,16 +68,14 @@
     <div id="keys-footer" data-role="footer" data-theme="a">
         <div class="actions" data-role="controlgroup" data-type="horizontal">
             <a href=""
-                {{bindAttr class=":action-links view.disabledDefaultClass"}}
                 id="keys-button-delete"
                 data-role="button"
                 data-icon="delete"
                 data-rel="popup"
                 data-transition="slideup"
-                {{action deleteKey target="view"}}>Delete</a>
+                {{action deleteClicked target="view"}}>Delete</a>
 
             <a href=""
-                {{bindAttr class=":action-links view.disabledDefaultClass"}}
                 id="keys-button-associate"
                 data-role="button"
                 data-icon="gear"
