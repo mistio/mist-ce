@@ -41,6 +41,7 @@ class ShellMiddleware(object):
                 request.registry = self.app.registry
 
                 if not ssh_user or ssh_user == 'undefined':
+                    log.debug("Will select root as the ssh-user as we don't know who we are")
                     ssh_user = 'root'
 
                 try:
@@ -49,13 +50,16 @@ class ShellMiddleware(object):
                     keypairs = request.registry.settings.get('keypairs', {})
 
                 preferred_keypairs = get_preferred_keypairs(keypairs, backend, machine)
+                log.debug("preferred keypairs = %s" % preferred_keypairs)
               
                 if preferred_keypairs:
                     keypair = keypairs[preferred_keypairs[0]]
                     private_key = keypair['private']
                     s_user = get_ssh_user_from_keypair(keypair, backend, machine)
+                    log.debug("get user from keypair returned: %s" % s_user)
                     if s_user:
                         ssh_user = s_user
+                        log.debug("Will select %s as the ssh-user" % ssh_user)
                 else:
                     private_key = None
 

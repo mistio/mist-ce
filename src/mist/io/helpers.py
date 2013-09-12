@@ -156,12 +156,16 @@ def get_keypair(keypairs, backend_id=None, machine_id=None):
 def get_ssh_user_from_keypair(keypair, backend_id=None, machine_id=None):
     """get ssh user for key pair given the key pair"""
     machines = keypair.get('machines', [])
+    log.debug("Machines in keypair %s: %s" % (keypair, machines))
     for machine in machines:
+        log.debug("Machine: %s" % machine)
         if machine[:2] == [backend_id, machine_id]:
             try:
-                #this should be the user, since machine = [backend_id, machine_id, ssh_user]
+                #this should be the user, since machine = [backend_id, machine_id, timestamp, ssh_user, sudoer]
+                log.debug("user %s" % machine[3])
                 return machine[3]
             except:
+                log.debug("user is None")
                 return ''
     return ''
 
@@ -600,4 +604,3 @@ def get_preferred_keypairs(keypairs, backend_id, machine_id):
         preferred_keypairs.append(default_keypair[0])
         
     return preferred_keypairs
-    
