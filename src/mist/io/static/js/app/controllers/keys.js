@@ -259,23 +259,11 @@ define('app/controllers/keys', [
             },
 
             getKeyByName: function(key_name) {
-                var ret = null;
-                this.forEach(function(key){
-                    if (key.name == key_name) {
-                        ret = key;
+                for (var i = 0; i < keys.length; ++i) {
+                    if (keys[i].name == key_name) {
+                        return keys[i];
                     }
-                });
-                return ret;
-            },
-
-            getSelectedKeyCount: function() {
-                var count = 0;
-                this.content.forEach(function(item){
-                    if (item.selected == true){
-                        count+=1;
-                    }
-                });
-                this.set('selectedKeyCount', count);
+                }
             },
 
             updateKeyList: function(data) {
