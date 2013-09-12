@@ -12,17 +12,12 @@ define('app/models/key', [
             pub: null,
             priv: null,
             name: null,
-            probed: null,
-            probing: null,
+            probed: new Array(),
+            probing: new Array(),
             selected: null,
-            machines: null,
             default_key: null,
-            
-            selectedObserver: function() {
-                Mist.keysController.getSelectedKeyCount();
-            }.observes('selected'),
-            
-            probeState: function() {
+                        
+            probeState: function(machine) {
                 if (this.probing) {
                     return 'probing';
                 } else if (this.probed) {

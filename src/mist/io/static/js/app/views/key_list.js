@@ -5,7 +5,7 @@ define('app/views/key_list', [
     ],
     /**
      *
-     * Key list page
+     * Key List View
      *
      * @returns Class
      */
@@ -20,7 +20,6 @@ define('app/views/key_list', [
 
             setDefaultKey: function(){
                 var key = this.getSelectedKeys();
-
                 if(key.length == 0){
                     return;
                 } else if(key.length > 1){

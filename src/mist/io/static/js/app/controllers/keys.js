@@ -13,14 +13,29 @@ define('app/controllers/keys', [
         return Ember.ArrayController.extend({
     
             keys: null,
-            length: 0,
-            keyCount: 0,
-            loadingKeys: false,
+            length: null,
+            keyCount: null,
+            loadingKeys: null,
             
             init: function() {
                 this._super();
                 this.loadKeys();
             },
+            
+            selectedKeysObserver: function() {
+                var selectedKeysCount = 0;
+                this.keys.forEach(function(key){
+                    if (key.selected) {
+                        selectedKeysCount++;
+                    }
+                });
+                // TODO: Transfer this code to KeyListView
+                if (selectedKeysCount == 1) {
+                    $('#keys-footer').fadeIn(200);
+                } else {
+                    $('#keys-footer').fadeOut(200);
+                }
+            }.observes('keys.@each.selected'),
             
             lengthObserver: function() {
                 this.getSelectedKeyCount();
