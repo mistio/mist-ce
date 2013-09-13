@@ -27,6 +27,10 @@ define('app/controllers/keys', [
                     info('Successfully loaded keys');
                     that.set('loadingKeys', false);
                     that.updateKeyList(data);
+                    Ember.run.next(function(){
+                        $('#keys-list').listview('refresh');
+                        $('#keys-list input.ember-checkbox').checkboxradio();
+                    });
                 }).error(function(jqXHR, textStatus, errorThrown) {
                     Mist.notificationController.notify('Error while loading key: ' + jqXHR.responseText);
                     error(textstate, errorThrown, ', while loading keys. ' + jqXHR.responseText);
@@ -63,7 +67,28 @@ define('app/controllers/keys', [
                     }
                 });
             },
-            
+
+            deleteKey: function(name) {
+                //var name = name;
+                var that = this;
+                $.ajax({
+                    url: '/keys/' + name,
+                    type: 'DELETE',
+                    success: function(data) {
+                        info('Successfully deleted key: ', name);
+                        Mist.keysController.updateKeyList(data);
+                        Ember.run.next(function() {
+                            $('#keys-list').listview('refresh');
+                            $('#keys-list .ember-checkbox').checkboxradio();
+                        });
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while deleting key: ' + jqXHR.responseText);
+                        error(textstate, errorThrown, ', while deleting key: ', name);
+                    }
+                });
+            },
+
             editKey: function(oldName, name, publicKey, privateKey) {
                 item = {
                     'action': 'edit',
@@ -76,7 +101,6 @@ define('app/controllers/keys', [
                 $.ajax({
                     url: '/keys/' + name,
                     type: 'PUT',
-                    contentType: 'application/json',
                     data: JSON.stringify(item),
                     success: function(data) {
                         info('Successfully edited key: ', name);
@@ -93,32 +117,6 @@ define('app/controllers/keys', [
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while editting key: ' + jqXHR.responseText);
                         error(textstate, errorThrown, ', while editting key: ', name);
-                    }
-                });
-            },
-            
-            deleteKey: function(name) {
-                payload = {
-                    'key_id': name,
-                };
-                var name = name;
-                var that = this;
-                $.ajax({
-                    url: 'keys/' + that.name,
-                    type: 'DELETE',
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    success: function(data) {
-                        info('Successfully deleted key: ', name);
-                        Mist.keysController.updateKeyList(data);
-                        Ember.run.next(function() {
-                            $('#keys-list').listview('refresh');
-                            $('#keys-list .ember-checkbox').checkboxradio();
-                        });
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while deleting key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ', while deleting key: ', name);
                     }
                 });
             },

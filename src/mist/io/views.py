@@ -164,7 +164,7 @@ def list_backends(request):
 
     return ret
 
-   
+
 @view_config(route_name='backends', request_method='POST', renderer='json')
 def add_backend(request, renderer='json'):
     try:
@@ -1041,40 +1041,52 @@ def add_key(request):
             'machines': []}
 
 
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-@view_config(route_name='key_generate', request_method='GET', renderer='json')
-def generate_keys(request):
-    return generate_keypair()
+@view_config(route_name='key_action', request_method='DELETE', renderer='json')
+def delete_key(request):
+    """Deletes a keypair.
 
+    When a key gets deleted it takes its asociations with it so just need to
+    remove from the server too.
 
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-@view_config(route_name='key_action', request_method='POST', request_param='action=get_priv', renderer='json')
-def get_priv_key(request):
-    return get_private_key(request)
-
-
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-@view_config(route_name='keys', request_method='POST', renderer='json')
-def update_keys(request):
-    """Either generate a keypair or change the default one.
-
-    generate_keys() in in a POST because it has computanional cost and it
-    should not be exposed to everyone.
+    If the default key gets deleted, it sets the next one as default, provided
+    that at least another key exists. It returns the list of all keys after
+    the deletion, excluding the private keys (check also list_keys).
 
     """
-    params = request.json_body
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+        
+    key_id = request.matchdict.get('key', '')
+    
+    if not key_id:
+        return Response('Key name not provided', 400)
+        
+    key = keypairs.pop(key_id)
 
-    if params['action'] == 'generate':
-        ret = generate_keypair()
-    elif params['action'] == 'set_default':
-        try:
-            ret = set_default_key(request)
-        except KeyError:
-            ret = Response('Key name not provided', 400)
-    else:
-        ret = Response('Keys action not supported', 405)
+    #try:
+    #    #TODO: alert user for key undeployment
+    #    #for machine in key.get('machines', []):
+    #    #    undeploy_key(request, machine[0], machine[1], key)
+    #    ret_code = 200
+    #except:
+    #    ret_code = 206
+    
+    if key.get('default', False):
+        if len(keypairs):
+            new_default_key = keypairs.keys()[0]
+            keypairs[new_default_key]['default'] = True
 
-    return ret
+    save_settings(request)
+
+    #return [{'name': key,
+    #        'machines': keypairs[key].get('machines', False),
+    #        'pub': keypairs[key]['public'],
+    #        'default_key': keypairs[key].get('default', False)}
+    #      for key in keypairs.keys()]
+    
+    return Response('OK', 200)
 
 
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
@@ -1129,6 +1141,42 @@ def edit_key(request):
     return ret
 
 
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+@view_config(route_name='key_generate', request_method='GET', renderer='json')
+def generate_keys(request):
+    return generate_keypair()
+
+
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+@view_config(route_name='key_action', request_method='POST', request_param='action=get_priv', renderer='json')
+def get_priv_key(request):
+    return get_private_key(request)
+
+
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+@view_config(route_name='keys', request_method='POST', renderer='json')
+def update_keys(request):
+    """Either generate a keypair or change the default one.
+
+    generate_keys() in in a POST because it has computanional cost and it
+    should not be exposed to everyone.
+
+    """
+    params = request.json_body
+
+    if params['action'] == 'generate':
+        ret = generate_keypair()
+    elif params['action'] == 'set_default':
+        try:
+            ret = set_default_key(request)
+        except KeyError:
+            ret = Response('Key name not provided', 400)
+    else:
+        ret = Response('Keys action not supported', 405)
+
+    return ret
+
+
 @view_config(route_name='key_action', request_method='POST', renderer='json')
 def update_key(request):
     """Associate/disassociate a keypair with a machine, or get private key.
@@ -1153,56 +1201,6 @@ def update_key(request):
     #    ret = save_keypair(request, key_id, ssh_user, backend_id, machine_id)
     else:
         ret = Response('Key action not supported', 405)
-
-    return ret
-
-
-@view_config(route_name='key_action', request_method='DELETE', renderer='json')
-def delete_key(request):
-    """Deletes a keypair.
-
-    When a key gets deleted it takes its asociations with it so just need to
-    remove form the server too.
-
-    If the default key gets deleted, it sets the next one as default, provided
-    that at least another key exists. It returns the list of all keys after
-    the deletion, excluding the private keys (check also list_keys).
-
-
-    """
-    params = request.json_body
-
-    try:
-        key_id = params['key_id']
-    except KeyError:
-        return Response('Key name not provided', 400)
-
-    keypairs = request.registry.settings['keypairs']
-    key = keypairs.pop(key_id)
-
-    try:
-        #TODO: alert user for key undeployment
-        #for machine in key.get('machines', []):
-        #    undeploy_key(request, machine[0], machine[1], key)
-        ret_code = 200
-    except:
-        ret_code = 206
-
-    if key.get('default', None):
-        try:
-           new_default_key = keypairs.keys()[0]
-           keypairs[new_default_key]['default'] = True
-        except IndexError:
-            pass
-
-    log.debug('saving settings (del key)')
-    save_settings(request)
-
-    ret = [{'name': key,
-            'machines': keypairs[key].get('machines', False),
-            'pub': keypairs[key]['public'],
-            'default_key': keypairs[key].get('default', False)}
-           for key in keypairs.keys()]
 
     return ret
 
