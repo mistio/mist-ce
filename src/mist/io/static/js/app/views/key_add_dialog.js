@@ -9,6 +9,8 @@ define('app/views/key_add_dialog', [
     function(key_add_dialog_html) {
         return Ember.View.extend({
             
+            template: Ember.Handlebars.compile(key_add_dialog_html),
+            
             init: function() {
                 this._super();    
             },
@@ -45,8 +47,9 @@ define('app/views/key_add_dialog', [
                 $("#dialog-add-key").popup("close");
                 Mist.keyAddController.newKeyClear();
                 if (this.getAssociatedMachine()){
-                    Ember.run.next( function(){
-                            $('#associate-key-dialog').popup('option', 'positionTo', '#associate-key-button').popup('open');
+                    // TODO: Revert this to timeout
+                    Ember.run.later(function(){
+                        $('#associate-key-dialog').popup('option', 'positionTo', '#associate-key-button').popup('open');
                     });
                 }
             },
@@ -82,7 +85,8 @@ define('app/views/key_add_dialog', [
                         return;
                     }
                     if (publicKeyType != privateKeyType) {
-                        Mist.notificationController.notify("Ssh types of public and private keys don't match");
+                        Mist.notificationController.notify("Ssh types of public and private key don't match");
+                        return;
                     }
                 }
                 
@@ -103,10 +107,7 @@ define('app/views/key_add_dialog', [
                     machine = this.get('parentView').get('controller').get('model');
                 } catch (e) {}
                 return machine;
-            },
-            
-            template: Ember.Handlebars.compile(key_add_dialog_html)
-
+            }
         });
     }
 );

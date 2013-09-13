@@ -18,17 +18,34 @@ define('app/views/key_list', [
                 this._super();
             },
             
+            selectedKey: null,
+            
+            selectedKeysObserver: function() {
+                var selectedKeysCount = 0;
+                var that = this;
+                Mist.keysController.keys.forEach(function(key){
+                    if (key.selected) {
+                        selectedKeysCount++;
+                        that.selectedKey = key;
+                    }
+                });
+                if (selectedKeysCount == 0) {
+                    $('#keys-footer').fadeOut(200);
+                }
+                else if (selectedKeysCount == 1) {
+                    $('#keys-footer').fadeIn(200);
+                    $('#keys-footer a').removeClass('ui-disabled');
+                } else {
+                    $('#keys-footer a').addClass('ui-disabled');
+                }
+            }.observes('Mist.keysController.keys.@each.selected'),
+            
             createKeyClicked: function() {
                $("#dialog-add-key").popup("open", {transition: 'pop'});
             },
 
-            setDefaultKey: function() {
-                var key = this.getSelectedKey();
-                Mist.keysController.setDefaultKey(key.name);
-            },
-
             deleteClicked: function() {
-                var key = this.getSelectedKey();
+                var key = this.selectedKey;
                 Mist.confirmationController.set('title', 'Delete key');
                 Mist.confirmationController.set('text', 'Are you sure you want to delete ' + key.name +'?');
                 Mist.confirmationController.set('callback', function() {
@@ -36,6 +53,11 @@ define('app/views/key_list', [
                 });
                 Mist.confirmationController.set('fromDialog', true);
                 Mist.confirmationController.show();
+            },
+            
+            setDefaultKey: function() {
+                var key = this.selectedKey;
+                Mist.keysController.setDefaultKey(key.name);
             },
 
             getSelectedKey: function() {

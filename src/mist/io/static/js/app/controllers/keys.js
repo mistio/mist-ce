@@ -20,21 +20,6 @@ define('app/controllers/keys', [
                 this.loadKeys();
             },
             
-            selectedKeysObserver: function() {
-                var selectedKeysCount = 0;
-                this.keys.forEach(function(key){
-                    if (key.selected) {
-                        selectedKeysCount++;
-                    }
-                });
-                // TODO: Transfer this code to KeyListView
-                if (selectedKeysCount == 1) {
-                    $('#keys-footer').fadeIn(200);
-                } else {
-                    $('#keys-footer').fadeOut(200);
-                }
-            }.observes('keys.@each.selected'),
-            
             loadKeys: function() {
                 this.set('loadingKeys', true);
                 var that = this;
@@ -43,9 +28,9 @@ define('app/controllers/keys', [
                     that.set('loadingKeys', false);
                     that.updateKeyList(data);
                 }).error(function(jqXHR, textStatus, errorThrown) {
-                    that.set('loadingKeys', false);
                     Mist.notificationController.notify('Error while loading key: ' + jqXHR.responseText);
                     error(textstate, errorThrown, ', while loading keys');
+                    that.set('loadingKeys', false);
                 });
             },
 
