@@ -964,7 +964,20 @@ def list_locations(request):
 
     return ret
 
-
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @view_config(route_name='keys', request_method='GET', renderer='json')
 def list_keys(request):
     """List keys.
@@ -984,9 +997,63 @@ def list_keys(request):
             'priv': keypairs[key]['private'] and True or False,
             'default_key': keypairs[key].get('default', False)}
            for key in keypairs.keys()]
+    
     return ret
 
 
+@view_config(route_name='keys', request_method='PUT', renderer='json')
+def add_key(request):
+    """Add key.
+    
+    Get a new keypair from user and store it.
+    The newly created keypair is returned.
+    
+    """
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+    
+    params = request.json_body
+    key_id = params.get('name', '')
+    
+    if not key_id:
+        ret = Response('Key name not provided', 400)
+    
+    if key_id in keypairs:
+        return Response('Key "%s" already exists' % key_id, 400)
+    
+    key = {'public' : params.get('pub', ''),
+            'private' : params.get('priv', ''),
+             'default' : not len(keypairs) }
+    
+    if key['public'] and key['private']:
+        if not validate_key_pair(key['public'], key['private']):
+            return Response('Key pair is not valid', 400)
+    
+    keypairs[key_id] = key
+    save_settings(request)
+    
+    return {'name': key_id,
+            'pub': key['public'],
+            'priv': key['private'],
+            'default_key': key.get('default', False),
+            'machines': []}
+
+
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+@view_config(route_name='key_generate', request_method='GET', renderer='json')
+def generate_keys(request):
+    return generate_keypair()
+
+
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+@view_config(route_name='key_action', request_method='POST', request_param='action=get_priv', renderer='json')
+def get_priv_key(request):
+    return get_private_key(request)
+
+
+# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @view_config(route_name='keys', request_method='POST', renderer='json')
 def update_keys(request):
     """Either generate a keypair or change the default one.
@@ -1010,7 +1077,7 @@ def update_keys(request):
     return ret
 
 
-@view_config(route_name='key', request_method='PUT', renderer='json')
+@view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
     """Creates or edits a keypair."""
     params = request.json_body
@@ -1062,7 +1129,7 @@ def edit_key(request):
     return ret
 
 
-@view_config(route_name='key', request_method='POST', renderer='json')
+@view_config(route_name='key_action', request_method='POST', renderer='json')
 def update_key(request):
     """Associate/disassociate a keypair with a machine, or get private key.
 
@@ -1090,7 +1157,7 @@ def update_key(request):
     return ret
 
 
-@view_config(route_name='key', request_method='DELETE', renderer='json')
+@view_config(route_name='key_action', request_method='DELETE', renderer='json')
 def delete_key(request):
     """Deletes a keypair.
 

@@ -50,17 +50,10 @@ define('app/controllers/key_add', [
             
             generateKey: function() {
                 $('#dialog-add-key .ajax-loader').fadeIn(200);
-                var payload = {
-                    'action': 'generate'
-                };
                 var that = this;
                 $.ajax({
-                    url: '/keys',
-                    type: "POST",
-                    data: JSON.stringify(payload),
-                    contentType: "application/json",
-                    headers: { "cache-control": "no-cache" },
-                    dataType: "json",
+                    url: '/key_generate',
+                    type: 'GET',
                     success: function(result) {
                         $('#dialog-add-key .ajax-loader').fadeOut(200);
                         info('Successfully generated key');

@@ -29,7 +29,7 @@ define('app/controllers/keys', [
                     that.updateKeyList(data);
                 }).error(function(jqXHR, textStatus, errorThrown) {
                     Mist.notificationController.notify('Error while loading key: ' + jqXHR.responseText);
-                    error(textstate, errorThrown, ', while loading keys');
+                    error(textstate, errorThrown, ', while loading keys. ' + jqXHR.responseText);
                     that.set('loadingKeys', false);
                 });
             },
@@ -42,15 +42,14 @@ define('app/controllers/keys', [
                 };
                 var that = this;
                 $.ajax({
-                    url: '/keys/' + name,
+                    url: '/keys',
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(item),
                     success: function(data) {
                         info('Successfully created key : ', name);
                         item.priv = null; // don't keep private key on the client
-                        var key = Key.create(data);
-                        that.keys.addObject(key);
+                        that.keys.addObject(Key.create(data));
                         Ember.run.next(function(){
                             $('#keys-list').listview('refresh');
                             $('#keys-list input.ember-checkbox').checkboxradio();
@@ -60,13 +59,14 @@ define('app/controllers/keys', [
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while creating new key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ', while creating key: ', name);
+                        error(textstate, errorThrown, ', while creating key: ', name + '. ' + jqXHR.responseText);
                     }
                 });
             },
             
-            editKey: function(oldName, name, publicKey, privateKey) {  
+            editKey: function(oldName, name, publicKey, privateKey) {
                 item = {
+                    'action': 'edit',
                     'oldname': oldName,
                     'name': name,
                     'pub': publicKey,
@@ -216,16 +216,11 @@ define('app/controllers/keys', [
             },
             
             getPrivKey: function(key, element) {
-                payload = {
-                    'action': 'get_private_key',
-                    'key_id': key.name
-                };
                 var that = this;
                 $.ajax({
                     url: '/keys/' + key.name,
                     type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
+                    data: 'action=get_priv',
                     success: function(data) {
                         info('Successfully got private key: ' + name);
                         $(element).val(data).trigger('change');

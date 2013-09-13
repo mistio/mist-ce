@@ -64,17 +64,18 @@ def main(global_config, **settings):
     config.add_route('images', '/backends/{backend}/images')
     config.add_route('sizes', '/backends/{backend}/sizes')
     config.add_route('locations', '/backends/{backend}/locations')
-
+    
     config.add_route('keys', '/keys')
-    config.add_route('key', '/keys/{key}')
-
+    config.add_route('key_action', '/keys/{key}')
+    config.add_route('key_generate', '/key_generate')
+    
     config.add_route('rules', '/rules')
     config.add_route('rule', '/rules/{rule}')
     config.add_route('check_auth', '/auth')
     config.add_route('account', '/account')
-
+    
     config.scan()
-
+    
     app = config.make_wsgi_app()
     app = ShellMiddleware(app)
 

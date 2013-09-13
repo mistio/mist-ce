@@ -14,7 +14,7 @@ define('app/models/key', [
             name: null,         // str
             probed: null,       // array of objects[str,str]
             probing: null,      // array of objects[str,str]
-            machines: null,     // array of objects[str,str]
+            machines: null,     // array of machine
             selected: null,     // bool
             default_key: null,  // bool
                         
