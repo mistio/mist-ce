@@ -27,10 +27,6 @@ define('app/controllers/keys', [
                     info('Successfully loaded keys');
                     that.set('loadingKeys', false);
                     that.updateKeyList(data);
-                    Ember.run.next(function(){
-                        $('#keys-list').listview('refresh');
-                        $('#keys-list input.ember-checkbox').checkboxradio();
-                    });
                 }).error(function(jqXHR, textStatus, errorThrown) {
                     Mist.notificationController.notify('Error while loading key: ' + jqXHR.responseText);
                     error(textstate, errorThrown, ', while loading keys. ' + jqXHR.responseText);
@@ -53,13 +49,17 @@ define('app/controllers/keys', [
                     success: function(data) {
                         info('Successfully created key : ', name);
                         item.priv = null; // don't keep private key on the client
+                        $("#dialog-add-key").popup("close");
+                        Mist.keyAddController.newKeyClear();
+                        $('#keys-list').fadeOut(200);
+                        Ember.run.later(function(){
                         that.keys.addObject(Key.create(data));
-                        Ember.run.next(function(){
-                            $('#keys-list').listview('refresh');
-                            $('#keys-list input.ember-checkbox').checkboxradio();
-                            $("#dialog-add-key").popup("close");
-                            Mist.keyAddController.newKeyClear();
-                        });
+                            Ember.run.next(function(){
+                                $('#keys-list').listview('refresh');
+                                $('#keys-list input.ember-checkbox').checkboxradio();
+                                $('#keys-list').fadeIn(200);
+                            });
+                        }, 200);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while creating new key: ' + jqXHR.responseText);
@@ -77,10 +77,6 @@ define('app/controllers/keys', [
                     success: function(data) {
                         info('Successfully deleted key: ', name);
                         Mist.keysController.updateKeyList(data);
-                        Ember.run.next(function() {
-                            $('#keys-list').listview('refresh');
-                            $('#keys-list .ember-checkbox').checkboxradio();
-                        });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while deleting key: ' + jqXHR.responseText);
@@ -91,7 +87,6 @@ define('app/controllers/keys', [
 
             editKey: function(oldName, name, publicKey, privateKey) {
                 item = {
-                    'action': 'edit',
                     'oldname': oldName,
                     'name': name,
                     'pub': publicKey,
@@ -102,6 +97,7 @@ define('app/controllers/keys', [
                     url: '/keys/' + name,
                     type: 'PUT',
                     data: JSON.stringify(item),
+                    contentType: 'application/json',
                     success: function(data) {
                         info('Successfully edited key: ', name);
                         item.priv = null; // don't keep private key on the client
@@ -239,11 +235,20 @@ define('app/controllers/keys', [
             },
 
             updateKeyList: function(data) {
+                $('#keys-list').fadeOut(200);
                 var keys = new Array();
                 data.forEach(function(key) {
                     keys.push(Key.create(key));
                 });
-                this.set('keys', keys);
+                var that = this;
+                Ember.run.later(function(){
+                    that.set('keys', keys);
+                    Ember.run.next(function(){
+                        $('#keys-list').listview('refresh');
+                        $('#keys-list input.ember-checkbox').checkboxradio();
+                        $('#keys-list').fadeIn(200);
+                    });
+                }, 200);
             }
         });
     }

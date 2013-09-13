@@ -91,11 +91,7 @@ define('app/views/key_add_dialog', [
                 }
                 
                 if (this.get('notEditMode')) {
-                    var machine = this.getAssociatedMachine();
-                    if (machine) {
-                        $('#manage-keys .ajax-loader').fadeIn(200);
-                    }
-                    Mist.keyAddController.newKey(machine);
+                    Mist.keyAddController.newKey();
                 } else {
                     Mist.keyAddController.editKey(this.get('parentView').get('controller').get('model').name);
                 }
