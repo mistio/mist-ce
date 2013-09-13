@@ -13,21 +13,6 @@ define('app/views/key', [
     function(Machine, MistScreen, key_html) {
         return MistScreen.extend({
 
-            disabledAssociateClass: function() {
-                /*
-                var count = 0
-                Mist.backendsController.content.forEach(function(item){
-                    count = count + item.machines.content.length;
-                });
-                if (count == 0) {
-                    return 'ui-disabled';
-                } else {
-                    return '';
-                }
-                */
-                return 'ui-disabled';
-            }.property('Mist.backendsController.machineCount'),
-
             keyMachines: function() {
 
         	    var key = this.get('controller').get('model');

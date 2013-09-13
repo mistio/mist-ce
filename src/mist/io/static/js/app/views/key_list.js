@@ -45,12 +45,6 @@ define('app/views/key_list', [
                         return key;
                     }
                 }
-            },
-            
-            openKeySelectPopup: function() {
-                $('#select-keys-listmenu').listview('refresh');
-                $('#select-keys-popup').popup('option', 'positionTo', '.select-keys').popup('open', {transition: 'pop'});
-                $("#select-keys-listmenu li a").on('click', this.selectKeys());
             }
         });
     }

@@ -17,7 +17,7 @@ define('app/views/key_add_dialog', [
             
             notEditMode: function() {
                 return this.get('parentView').toString().indexOf('SingleKeyView') == -1;
-            },
+            }.property(),
             
             generateClicked: function() {
                 Mist.keyAddController.generateKey();
@@ -86,7 +86,7 @@ define('app/views/key_add_dialog', [
                     }
                 }
                 
-                if (this.notEditMode()) {
+                if (this.notEditMode) {
                     var machine = this.getAssociatedMachine();
                     if (machine) {
                         $('#manage-keys .ajax-loader').fadeIn(200);

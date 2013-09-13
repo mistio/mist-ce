@@ -27,23 +27,11 @@
             {{view Mist.AddKeyView data-role="content"}}
         </div>
 
-        <a href="#"
-            class="select-keys"
-            data-theme="d"
+        <!-- TODO: Remove this element without breaking css -->
+        <a class="select-keys"
             data-role="button"
-            data-icon="arrow-d"
-            {{action openKeySelectPopup target="view"}}>Select</a>
-    
-        <div id="select-keys-popup" data-role="popup">
-            <ul id="select-keys-listmenu" data-role="listview">
-                <li data-icon="false">
-                    <a href="#" title="all">All</a>
-                </li>
-                <li data-icon="false">
-                    <a href="#" title="none">None</a>
-                </li>                
-            </ul>
-        </div>
+            data-icon="arrow-d">Select</a>
+        <!-- =============================================================== -->
         
         <ul id="keys-list"
             data-role="listview"

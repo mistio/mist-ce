@@ -253,9 +253,9 @@ define('app/controllers/keys', [
             },
 
             getKeyByName: function(key_name) {
-                for (var i = 0; i < keys.length; ++i) {
-                    if (keys[i].name == key_name) {
-                        return keys[i];
+                for (var i = 0; i < this.keys.length; ++i) {
+                    if (this.keys[i].name == key_name) {
+                        return this.keys[i];
                     }
                 }
             },
