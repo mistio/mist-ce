@@ -40,33 +40,23 @@ define('app/views/key_list', [
                 }
             }.observes('Mist.keysController.keys.@each.selected'),
             
-            createKeyClicked: function() {
+            createClicked: function() {
                $("#dialog-add-key").popup("open", {transition: 'pop'});
             },
 
             deleteClicked: function() {
-                var key = this.selectedKey;
+                var that = this;
                 Mist.confirmationController.set('title', 'Delete key');
-                Mist.confirmationController.set('text', 'Are you sure you want to delete ' + key.name +'?');
+                Mist.confirmationController.set('text', 'Are you sure you want to delete ' + that.selectedKey.name +'?');
                 Mist.confirmationController.set('callback', function() {
-                    Mist.keysController.deleteKey(key.name);                
+                    Mist.keysController.deleteKey(that.selectedKey.name);                
                 });
                 Mist.confirmationController.set('fromDialog', true);
                 Mist.confirmationController.show();
             },
             
-            setDefaultKey: function() {
-                var key = this.selectedKey;
-                Mist.keysController.setDefaultKey(key.name);
-            },
-
-            getSelectedKey: function() {
-                for (var i = 0; i < Mist.keysController.keys.length; ++i) {
-                    var key = Mist.keysController.keys[i];
-                    if (key.selected) {
-                        return key;
-                    }
-                }
+            setDefaultClicked: function() {
+                Mist.keysController.setDefaultKey(this.selectedKey.name);
             }
         });
     }

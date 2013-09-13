@@ -90,7 +90,7 @@ define('app/views/key_add_dialog', [
                     }
                 }
                 
-                if (this.notEditMode) {
+                if (this.get('notEditMode')) {
                     var machine = this.getAssociatedMachine();
                     if (machine) {
                         $('#manage-keys .ajax-loader').fadeIn(200);
