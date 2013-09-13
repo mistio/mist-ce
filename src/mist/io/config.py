@@ -2,7 +2,9 @@
 from libcloud.compute.types import Provider
 from libcloud.compute.types import NodeState
 
+
 COMMAND_TIMEOUT = 20
+
 
 STATES = {
     NodeState.RUNNING: 'running',
@@ -80,7 +82,7 @@ SUPPORTED_PROVIDERS = [
                         'provider': Provider.OPENSTACK,
                        },
 
-                       # RackSpace
+                       # Rackspace
                        {'title': 'Rackspace DFW',
                         'provider': "%s:%s" % (Provider.RACKSPACE,'dfw')
                         },
@@ -119,16 +121,6 @@ EC2_IMAGES = {
         'ami-b6c146df': 'Cluster Instances HVM SUSE Linux Enterprise 11 64bit',
         'ami-d4f89fbd': 'Ubuntu Server 12.04.2 LTS for HVM Instances 64bit',
         'ami-c70360ae': 'Ubuntu Server 13.04 for HVM Instances 64bit',
-        'ami-4cc7bb25': 'Microsoft Windows Server 2008 Base 64bit',
-        'ami-dec2beb7': 'Microsoft Windows Server 2008 Base 32bit',
-        'ami-90c4b8f9': 'Microsoft Windows Server 2008 R2 Base 64bit',
-        'ami-86c6baef': 'Microsoft Windows Server 2008 R2 with SQL Server Express and IIS 64bit',
-        'ami-9cc0bcf5': 'Microsoft Windows Server 2008 R2 with SQL Server Web 64bit',
-        'ami-dac7bbb3': 'Microsoft Windows Server 2008 R2 with SQL Server Standard 64bit',
-        'ami-60c0bc09': 'Microsoft Windows Server 2012 Base 64bit',
-        'ami-acc7bbc5': 'Microsoft Windows Server 2012 with SQL Server Express 64bit',
-        'ami-bac7bbd3': 'Microsoft Windows Server 2012 with SQL Server Web 64bit',
-        'ami-d2c0bcbb': 'Microsoft Windows Server 2012 with SQL Server Standard 64bit',
     },
 
     'us-west-2': {
@@ -147,16 +139,6 @@ EC2_IMAGES = {
         'ami-72f96e42': 'Ubuntu Server 12.04.2 LTS for Cluster Instances 64bit',
         'ami-203eb710': 'Cluster Instances HVM SUSE Linux Enterprise 11 64bit',
         'ami-a11d8a91': 'Ubuntu Server 13.04 for HVM Instances 64bit',
-        'ami-715fcc41': 'Microsoft Windows Server 2008 Base 64bit',
-        'ami-7b5ecd4b': 'Microsoft Windows Server 2008 Base 32bit',
-        'ami-eb58cbdb': 'Microsoft Windows Server 2008 R2 Base 64bit',
-        'ami-0f5fcc3f': 'Microsoft Windows Server 2008 R2 with SQL Server Express and IIS 64bit',
-        'ami-5d5ecd6d': 'Microsoft Windows Server 2008 R2 with SQL Server Web 64bit',
-        'ami-eb5fccdb': 'Microsoft Windows Server 2008 R2 with SQL Server Standard 64bit',
-        'ami-855fccb5': 'Microsoft Windows Server 2012 Base 64bit',
-        'ami-795fcc49': 'Microsoft Windows Server 2012 with SQL Server Express 64bit',
-        'ami-e75fccd7': 'Microsoft Windows Server 2012 with SQL Server Web 64bit',
-        'ami-2b5ecd1b': 'Microsoft Windows Server 2012 with SQL Server Standard 64bit',
     },
     'us-west-1': {
         'ami-3ffed17a': 'Amazon Linux AMI 2013.03.1 64bit',
@@ -171,16 +153,6 @@ EC2_IMAGES = {
         'ami-d183af94': 'Ubuntu Server 13.04 32bit',
         'ami-47fed102': 'Cluster Compute Amazon Linux AMI 2013.03.1 64bit',
         'ami-5dfad518': 'Red Hat Enterprise Linux 6.4 for Cluster Instances 64bit',
-        'ami-c6486083': 'Microsoft Windows Server 2008 Base 64bit',
-        'ami-d6496193': 'Microsoft Windows Server 2008 Base 32bit',
-        'ami-76486033': 'Microsoft Windows Server 2008 R2 Base 64bit',
-        'ami-c4486081': 'Microsoft Windows Server 2008 R2 with SQL Server Express and IIS 64bit',
-        'ami-ec4961a9': 'Microsoft Windows Server 2008 R2 with SQL Server Web 64bit',
-        'ami-4e49610b': 'Microsoft Windows Server 2008 R2 with SQL Server Standard 64bit',
-        'ami-ac4860e9': 'Microsoft Windows Server 2012 Base 64bit',
-        'ami-ce48608b': 'Microsoft Windows Server 2012 with SQL Server Express 64bit',
-        'ami-40496105': 'Microsoft Windows Server 2012 with SQL Server Web 64bit',
-        'ami-2e49616b': 'Microsoft Windows Server 2012 with SQL Server Standard 64bit',
     },
     'eu-west-1': {
         'ami-c7c0d6b3': 'Amazon Linux AMI 2013.03.1 64bit',
@@ -198,16 +170,6 @@ EC2_IMAGES = {
         'ami-c87b6fbc': 'Ubuntu Server 12.04.2 LTS for HVM instances 64bit',
         'ami-011b1975': 'Cluster Instances HVM SUSE Linux Enterprise 11 64bit',
         'ami-3f16014b': 'Ubuntu Server 13.04 for HVM Instances 64bit',
-        'ami-31d7cb45': 'Microsoft Windows Server 2008 Base 64bit',
-        'ami-89d0ccfd': 'Microsoft Windows Server 2008 Base 32bit',
-        'ami-25d7cb51': 'Microsoft Windows Server 2008 R2 Base 64bit',
-        'ami-e3d7cb97': 'Microsoft Windows Server 2008 R2 with SQL Server Express and IIS 64bit',
-        'ami-5dd1cd29': 'Microsoft Windows Server 2008 R2 with SQL Server Web 64bit',
-        'ami-afd0ccdb': 'Microsoft Windows Server 2008 R2 with SQL Server Standard 64bit',
-        'ami-b9d7cbcd': 'Microsoft Windows Server 2012 Base 64bit',
-        'ami-2bd7cb5f': 'Microsoft Windows Server 2012 with SQL Server Express 64bit',
-        'ami-95d7cbe1': 'Microsoft Windows Server 2012 with SQL Server Web 64bit',
-        'ami-fbd0cc8f': 'Microsoft Windows Server 2012 with SQL Server Standard 64bit',
     },
 
     'ap-southeast-1': {
@@ -223,16 +185,6 @@ EC2_IMAGES = {
         'ami-25511e77': 'Ubuntu Server 13.04 32bit',
         'ami-18de914a': 'Cluster Compute Amazon Linux AMI 2013.03.1 64bit',
         'ami-b4dc93e6': 'Red Hat Enterprise Linux 6.4 for Cluster Instances 64bit',
-        'ami-d2aae380': 'Microsoft Windows Server 2008 Base 64bit',
-        'ami-6eade43c': 'Microsoft Windows Server 2008 Base 32bit',
-        'ami-d4aae386': 'Microsoft Windows Server 2008 R2 Base 64bit',
-        'ami-f2aae3a0': 'Microsoft Windows Server 2008 R2 with SQL Server Express and IIS 64bit',
-        'ami-0eade45c': 'Microsoft Windows Server 2008 R2 with SQL Server Web 64bit',
-        'ami-60ade432': 'Microsoft Windows Server 2008 R2 with SQL Server Standard 64bit',
-        'ami-98aae3ca': 'Microsoft Windows Server 2012 Base 64bit',
-        'ami-d8aae38a': 'Microsoft Windows Server 2012 with SQL Server Express 64bit',
-        'ami-b8aae3ea': 'Microsoft Windows Server 2012 with SQL Server Web 64bit',
-        'ami-4cade41e': 'Microsoft Windows Server 2012 with SQL Server Standard 64bit',
     },
     'ap-northeast-1': {
         'ami-39b23d38': 'Amazon Linux AMI 2013.03.1 64bit',
@@ -248,16 +200,6 @@ EC2_IMAGES = {
         'ami-2db33c2c': 'Cluster Compute Amazon Linux AMI 2013.03.1 64bit',
         'ami-b34edbb2': 'Cluster Instances HVM SUSE Linux Enterprise 11 64bit',
         'ami-8b4dc28a': 'Red Hat Enterprise Linux 6.4 for Cluster Instances 64bit',
-        'ami-db48dcda': 'Microsoft Windows Server 2008 Base 64bit',
-        'ami-294ade28': 'Microsoft Windows Server 2008 Base 32bit',
-        'ami-0149dd00': 'Microsoft Windows Server 2008 R2 Base 64bit',
-        'ami-0349dd02': 'Microsoft Windows Server 2008 R2 with SQL Server Express and IIS 64bit',
-        'ami-634ade62': 'Microsoft Windows Server 2008 R2 with SQL Server Web 64bit',
-        'ami-174ade16': 'Microsoft Windows Server 2008 R2 with SQL Server Standard 64bit',
-        'ami-4549dd44': 'Microsoft Windows Server 2012 Base 64bit',
-        'ami-e148dce0': 'Microsoft Windows Server 2012 with SQL Server Express 64bit',
-        'ami-7f49dd7e': 'Microsoft Windows Server 2012 with SQL Server Web 64bit',
-        'ami-094ade08': 'Microsoft Windows Server 2012 with SQL Server Standard 64bit',
     },
     'ap-southeast-2': {
         'ami-d16bfbeb': 'Amazon Linux AMI 2013.03.1 64bit',
@@ -272,16 +214,6 @@ EC2_IMAGES = {
         'ami-24a5331e': 'SUSE Linux Enterprise Server 11 32bit',
         'ami-876bfbbd': 'Cluster Compute Amazon Linux AMI 2013.03.1 64bit',
         'ami-b36dfd89': 'Red Hat Enterprise Linux 6.4 for Cluster Instances 64bit',
-        'ami-da3cafe0': 'Microsoft Windows Server 2008 Base 64bit',
-        'ami-aa23b090': 'Microsoft Windows Server 2008 Base 32bit',
-        'ami-dc3cafe6': 'Microsoft Windows Server 2008 R2 Base 64bit',
-        'ami-c43caffe': 'Microsoft Windows Server 2008 R2 with SQL Server Express and IIS 64bit',
-        'ami-9823b0a2': 'Microsoft Windows Server 2008 R2 with SQL Server Web 64bit',
-        'ami-bc23b086': 'Microsoft Windows Server 2008 R2 with SQL Server Standard 64bit',
-        'ami-1223b028': 'Microsoft Windows Server 2012 Base 64bit',
-        'ami-d23cafe8': 'Microsoft Windows Server 2012 with SQL Server Express 64bit',
-        'ami-7823b042': 'Microsoft Windows Server 2012 with SQL Server Web 64bit',
-        'ami-4623b07c': 'Microsoft Windows Server 2012 with SQL Server Standard 64bit',
     },
     'sa-east-1': {
         'ami-5253894f': 'Amazon Linux AMI 2013.03.1 64bit',
@@ -296,16 +228,6 @@ EC2_IMAGES = {
         'ami-2ee43e33': 'Ubuntu Server 13.04 32bit',
         'ami-38538925': 'Cluster Compute Amazon Linux AMI 2013.03.1 64bit',
         'ami-28518b35': 'Red Hat Enterprise Linux 6.4 for Cluster Instances 64bit',
-        'ami-f000a5ed': 'Microsoft Windows Server 2008 Base 64bit',
-        'ami-fa00a5e7': 'Microsoft Windows Server 2008 Base 32bit',
-        'ami-c200a5df': 'Microsoft Windows Server 2008 R2 Base 64bit',
-        'ami-c600a5db': 'Microsoft Windows Server 2008 R2 with SQL Server Express and IIS 64bit',
-        'ami-de00a5c3': 'Microsoft Windows Server 2008 R2 with SQL Server Web 64bit',
-        'ami-c000a5dd': 'Microsoft Windows Server 2008 R2 with SQL Server Standard 64bit',
-        'ami-1a03a607': 'Microsoft Windows Server 2012 Base 64bit',
-        'ami-1203a60f': 'Microsoft Windows Server 2012 with SQL Server Express 64bit',
-        'ami-0e03a613': 'Microsoft Windows Server 2012 with SQL Server Web 64bit',
-        'ami-0c03a611': 'Microsoft Windows Server 2012 with SQL Server Standard 64bit',
     },
 }
 
