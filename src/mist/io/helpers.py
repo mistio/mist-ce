@@ -460,11 +460,9 @@ def set_default_key(request):
     updated yaml.
 
     """
-    params = request.json_body
-
-    try:
-        key_id = params['key_id']
-    except KeyError:
+    key_id = request.matchdict['key']
+    
+    if not key_id:
         return Response('Keypair not found', 404)
 
     keypairs = request.registry.settings['keypairs']
@@ -474,10 +472,9 @@ def set_default_key(request):
 
     keypairs[key_id]['default'] = True
 
-    request.registry.settings['keypairs'] = keypairs
     save_settings(request)
 
-    return {}
+    return Response('OK', 200)
 
 
 def get_private_key(request):
@@ -486,24 +483,18 @@ def get_private_key(request):
     It is used in single key view when the user clicks the display private key
     button.
 
-    """
-    params = request.json_body
-    key_id = params.get('key_id', '')
-
+    """    
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs', {})
-
-    keypair = {}
+    
+    key_id = request.matchdict['key']
 
     if key_id in keypairs.keys():
-        keypair = keypairs[key_id]
+        return keypairs[key_id].get('private', '')
     else:
         return Response('Keypair not found', 404)
-
-    if keypair:
-        return keypair.get('private', '')
 
 
 def validate_dsa_key_pair(public_key, private_key):

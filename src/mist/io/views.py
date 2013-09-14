@@ -964,41 +964,26 @@ def list_locations(request):
 
     return ret
 
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 @view_config(route_name='keys', request_method='GET', renderer='json')
 def list_keys(request):
     """List keys.
-
+    
     List all key pairs that are configured on this server. Only the public
     keys are returned.
-
+    
     """
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs', {})
-
-    ret = [{'name': key,
-            'machines': keypairs[key].get('machines', []),
-            'pub': keypairs[key]['public'],
-            'priv': keypairs[key]['private'] and True or False,
-            'default_key': keypairs[key].get('default', False)}
-           for key in keypairs.keys()]
     
-    return ret
+    return [{'name': key,
+              'machines': keypairs[key].get('machines', []),
+               'pub': keypairs[key]['public'],
+                'priv': keypairs[key]['private'] and True or False,
+                 'default_key': keypairs[key].get('default', False)}
+             for key in keypairs.keys()]
 
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
@@ -1008,17 +993,17 @@ def add_key(request):
     Stores a new keypair. The newly created keypair is returned.
     
     """
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
-    
     params = request.json_body
     key_id = params.get('name', '')
     
     if not key_id:
         ret = Response('Key name not provided', 400)
     
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+        
     if key_id in keypairs:
         return Response('Key "%s" already exists' % key_id, 400)
     
@@ -1048,22 +1033,22 @@ def delete_key(request):
     
     When a keypair gets deleted, it takes its asociations with it so just need to
     remove from the server too.
-
+    
     If the default key gets deleted, it sets the next one as default, provided
     that at least another key exists. It returns the list of all keys after
     the deletion, excluding the private keys (check also list_keys).
-
+    
     """
-
+    
     keypairs = request.registry.settings.get('keypairs', {})
-        
+    
     key_id = request.matchdict.get('key', '')
     
     if not key_id:
         return Response('Key name not provided', 400)
-        
+    
     key = keypairs.pop(key_id)
-
+    
     #try:
     #    #TODO: alert user for key undeployment
     #    #for machine in key.get('machines', []):
@@ -1076,14 +1061,15 @@ def delete_key(request):
         if len(keypairs):
             new_default_key = keypairs.keys()[0]
             keypairs[new_default_key]['default'] = True
-
+    
     save_settings(request)
-
+    
     return [{'name': key,
-              'machines': keypairs[key].get('machines', False),
+              'machines': keypairs[key].get('machines', []),
                'pub': keypairs[key]['public'],
-                'default_key': keypairs[key].get('default', False)}
-            for key in keypairs.keys()]
+                'priv': keypairs[key]['private'] and True or False,
+                 'default_key': keypairs[key].get('default', False)}
+             for key in keypairs.keys()]
 
 
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
@@ -1093,11 +1079,6 @@ def edit_key(request):
     Edits a key.
     
     """
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
-        
     params = request.json_body
     key_id = params.get('name', '')
     old_id = params.get('oldname', '')
@@ -1107,20 +1088,27 @@ def edit_key(request):
     
     if not key_id:
         ret = Response('New key name not provided', 400)
-        
-    if old_id != key_id:
-        if key_id in keypairs:
-            return Response('Key "%s" already exists' % key_id, 400)
-        keypairs.pop(old_id)
-
+    
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})    
+    
     key = {'public' : params.get('pub', ''),
             'private' : params.get('priv', ''),
              'default' : keypairs[old_id].get('default', False),
               'machines' : keypairs[old_id].get('machines', [])}
+
+    if old_id != key_id:
+        if key_id in keypairs:
+            return Response('Key "%s" already exists' % key_id, 400)
+        keypairs.pop(old_id)
     
     if key['public'] and key['private']:
         if not validate_key_pair(key['public'], key['private']):
             return Response('Key pair is not valid', 400)
+    
+    keypairs[key_id] = key
     
     save_settings(request)
     
@@ -1131,43 +1119,24 @@ def edit_key(request):
                 'machines': key['machines']}
 
 
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-@view_config(route_name='key_generate', request_method='GET', renderer='json')
-def generate_keys(request):
-    return generate_keypair()
+@view_config(route_name='key_action', request_method='POST', renderer='json')
+def set_default_keypair(request):
+    return set_default_key(request)
 
 
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-@view_config(route_name='key_action', request_method='POST', request_param='action=get_priv', renderer='json')
+@view_config(route_name='key_action', request_method='GET', renderer='json')
 def get_priv_key(request):
     return get_private_key(request)
 
 
-# HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-@view_config(route_name='keys', request_method='POST', renderer='json')
-def update_keys(request):
-    """Either generate a keypair or change the default one.
-
-    generate_keys() in in a POST because it has computanional cost and it
-    should not be exposed to everyone.
-
-    """
-    params = request.json_body
-
-    if params['action'] == 'generate':
-        ret = generate_keypair()
-    elif params['action'] == 'set_default':
-        try:
-            ret = set_default_key(request)
-        except KeyError:
-            ret = Response('Key name not provided', 400)
-    else:
-        ret = Response('Keys action not supported', 405)
-
-    return ret
+@view_config(route_name='key_generate', request_method='GET', renderer='json')
+def gen_keypair(request):
+    return generate_keypair()
 
 
-@view_config(route_name='key_action', request_method='POST', renderer='json')
+#@view_config(route_name='key_association', request_method='PUT', renderer='json')
+
+#@view_config(route_name='key_action', request_method='POST', renderer='json')
 def update_key(request):
     """Associate/disassociate a keypair with a machine, or get private key.
 

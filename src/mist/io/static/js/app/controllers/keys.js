@@ -11,26 +11,31 @@ define('app/controllers/keys', [
      */
     function(Key) {
         return Ember.ArrayController.extend({
-    
+
             keys: null,
             loadingKeys: null,
-            
+
             init: function() {
                 this._super();
                 this.loadKeys();
             },
-            
+
             loadKeys: function() {
                 this.set('loadingKeys', true);
                 var that = this;
-                $.getJSON('/keys', function(data) {
-                    info('Successfully loaded keys');
-                    that.set('loadingKeys', false);
-                    that.updateKeyList(data);
-                }).error(function(jqXHR, textStatus, errorThrown) {
-                    Mist.notificationController.notify('Error while loading key: ' + jqXHR.responseText);
-                    error(textstate, errorThrown, ', while loading keys. ' + jqXHR.responseText);
-                    that.set('loadingKeys', false);
+                $.ajax({
+                    url: '/keys',
+                    type: 'GET',
+                    success: function(data) {
+                        info('Successfully loaded keys');
+                        that.set('loadingKeys', false);
+                        that.updateKeyList(data);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        Mist.notificationController.notify('Error while loading key: ', jqXHR.responseText);
+                        error(textstate, errorThrown, ' while loading keys. ', jqXHR.responseText);
+                        that.set('loadingKeys', false);
+                    }
                 });
             },
 
@@ -52,9 +57,9 @@ define('app/controllers/keys', [
                         $("#dialog-add-key").popup("close");
                         Mist.keyAddController.newKeyClear();
                         $('#keys-list').fadeOut(200);
-                        Ember.run.later(function(){
-                        that.keys.addObject(Key.create(data));
-                            Ember.run.next(function(){
+                        Ember.run.later(function() {
+                            that.keys.addObject(Key.create(data));
+                            Ember.run.next(function() {
                                 $('#keys-list').listview('refresh');
                                 $('#keys-list input.ember-checkbox').checkboxradio();
                                 $('#keys-list').fadeIn(200);
@@ -62,15 +67,13 @@ define('app/controllers/keys', [
                         }, 200);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while creating new key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ', while creating key: ', name + '. ' + jqXHR.responseText);
+                        Mist.notificationController.notify('Error while creating new key: ', jqXHR.responseText);
+                        error(textstate, errorThrown, ' while creating key: ', name, '. ', jqXHR.responseText);
                     }
                 });
             },
 
             deleteKey: function(name) {
-                //var name = name;
-                var that = this;
                 $.ajax({
                     url: '/keys/' + name,
                     type: 'DELETE',
@@ -79,8 +82,8 @@ define('app/controllers/keys', [
                         Mist.keysController.updateKeyList(data);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while deleting key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ', while deleting key: ', name);
+                        Mist.notificationController.notify('Error while deleting key: ', jqXHR.responseText);
+                        error(textstate, errorThrown, ' while deleting key: ', name, '. ', jqXHR.responseText);
                     }
                 });
             },
@@ -96,42 +99,33 @@ define('app/controllers/keys', [
                 $.ajax({
                     url: '/keys/' + name,
                     type: 'PUT',
-                    data: JSON.stringify(item),
                     contentType: 'application/json',
-                    success: function(data) {
+                    data: JSON.stringify(item),
+                    success: function() {
                         info('Successfully edited key: ', name);
                         item.priv = null; // don't keep private key on the client
                         var key = that.getKeyByName(oldName);
                         key.set('name', name);
                         key.set('pub', publicKey);
-                        Ember.run.next(function(){
-                            $('#keys-list').listview('refresh');
+                        Ember.run.next(function() {
                             $("#dialog-add-key").popup("close");
                             Mist.keyAddController.newKeyClear();
                         });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while editting key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ', while editting key: ', name);
+                        Mist.notificationController.notify('Error while editting key: ', jqXHR.responseText);
+                        error(textstate, errorThrown, ' while editting key: ', name, '. ', jqXHR.responseText);
                     }
                 });
             },
-            
-            setDefaultKey: function(name){
-                payload = {
-                    'action': 'set_default',
-                    'key_id': name,
-                };
-                var that = this;
-                var name = name;
+
+            setDefaultKey: function(name) {
                 $.ajax({
-                    url: '/keys',
+                    url: '/keys/' + name,
                     type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    success: function(data) {
+                    success: function() {
                         info('Successfully set default key: ', name);
-                        Mist.keysController.keys.forEach(function(key){
+                        Mist.keysController.keys.forEach(function(key) {
                             if (key.name == name) {
                                 key.set('default_key', true);
                             } else {
@@ -140,8 +134,8 @@ define('app/controllers/keys', [
                         });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while setting default key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ', while setting default key: ', name);
+                        Mist.notificationController.notify('Error while setting default key: ', jqXHR.responseText);
+                        error(textstate, errorThrown, ' while setting default key: ', name, ', ', jqXHR.responseText);
                     }
                 });
             },
@@ -210,18 +204,16 @@ define('app/controllers/keys', [
             },
             
             getPrivKey: function(key, element) {
-                var that = this;
                 $.ajax({
                     url: '/keys/' + key.name,
-                    type: 'POST',
-                    data: 'action=get_priv',
+                    type: 'GET',
                     success: function(data) {
                         info('Successfully got private key: ' + name);
                         $(element).val(data).trigger('change');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while getting key: ' + name);
-                        error(textstate, errorThrown, ', while getting key', name);
+                        Mist.notificationController.notify('Error while getting private key: ', name);
+                        error(textstate, errorThrown, ' while getting private key. ', jqXHR.responseText);
                     }
                 });
             },
