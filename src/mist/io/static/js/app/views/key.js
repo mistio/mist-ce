@@ -75,7 +75,7 @@ define('app/views/key', [
             
             editKey: function() {
                 var key = this.get('controller').get('model');
-                Mist.keysController.getPrivKey(key, "#textarea-private-key");
+                Mist.keysController.getPrivKey(key.name, "#textarea-private-key");
                 $("#textarea-public-key").val(key.pub).trigger('change');
                 $("#create-key-name").val(key.name).trigger('change');
                 $("#dialog-add-key").popup("open", {transition: 'pop'});
@@ -127,7 +127,7 @@ define('app/views/key', [
 
             displayPrivate: function(){
                 var key = this.get('controller').get('model');
-                Mist.keysController.getPrivKey(key, "#private-key");
+                Mist.keysController.getPrivKey(key.name, "#private-key");
                 $("#key-private-dialog").popup("open", {transition: 'pop'});
             },
 

@@ -50,16 +50,12 @@ def main(global_config, **settings):
 
     config.add_route('machines', '/backends/{backend}/machines')
     config.add_route('machine', '/backends/{backend}/machines/{machine}')
-    config.add_route('machine_metadata',
-                     '/backends/{backend}/machines/{machine}/metadata')
-    config.add_route('probe',
-                     '/backends/{backend}/machines/{machine}/probe')
-    config.add_route('shell',
-                     '/backends/{backend}/machines/{machine}/shell')
+    config.add_route('machine_metadata', '/backends/{backend}/machines/{machine}/metadata')
+    config.add_route('probe', '/backends/{backend}/machines/{machine}/probe')
+    config.add_route('shell', '/backends/{backend}/machines/{machine}/shell')
 
     config.add_route('monitoring', '/monitoring')
-    config.add_route('update_monitoring',
-                     '/backends/{backend}/machines/{machine}/monitoring')
+    config.add_route('update_monitoring', '/backends/{backend}/machines/{machine}/monitoring')
 
     config.add_route('images', '/backends/{backend}/images')
     config.add_route('sizes', '/backends/{backend}/sizes')
@@ -68,7 +64,7 @@ def main(global_config, **settings):
     config.add_route('keys', '/keys')
     config.add_route('key_action', '/keys/{key}')
     config.add_route('key_generate', '/key_generate')
-    config.add_route('key_association', '/keys/{key}/backends/{backend}/machines/{machine}')
+    config.add_route('key_association', '/backends/{backend}/machines/{machine}/keys/{key}')
     
     config.add_route('rules', '/rules')
     config.add_route('rule', '/rules/{rule}')

@@ -142,7 +142,6 @@ define('app/controllers/keys', [
 
             associateKey: function(key_name, machine) {
                 payload = {
-                    'action': 'associate',
                     'key_id': key_name,
                     'backend_id': machine.backend.id,
                     'machine_id': machine.id,
@@ -151,13 +150,13 @@ define('app/controllers/keys', [
                 var machine = machine;
                 var key = this.getKeyByName(key_name);
                 $.ajax({
-                    url: '/keys/' + key_name,
-                    type: 'POST',
+                    url: '/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + key_name,
+                    type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     success: function(data) {
                         $('#manage-keys .ajax-loader').fadeOut(200);
-                        info('Successfully associated key: ' + key_name + ' with machine: ' + machine.id);
+                        info('Successfully associated key: ', key_name, ' with machine: ', machine.id);
                         Ember.run.next(function(){
                             try {
                                 $('#associated-keys').listview('refresh');
@@ -168,27 +167,26 @@ define('app/controllers/keys', [
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         $('#manage-keys .ajax-loader').fadeOut(200);
-                        Mist.notificationController.notify('Error while associating key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ', while associating key', key_name);
+                        Mist.notificationController.notify('Error while associating key: ', key_name);
+                        error(textstate, errorThrown, ' while associating key', key_name, '. ', jqXHR.responseText);
                     }
                 });
             },
             
-            disassociateKey: function(key, machine) {
+            disassociateKey: function(key_name, machine) {
                 payload = {
-                    'action': 'disassociate',
-                    'key_id': key.name,
+                    'key_id': key_name,
                     'backend_id': machine.backend.id,
                     'machine_id': machine.id,
                     'host': machine.getHost()
                 };
                 $.ajax({
-                    url: '/keys/' + key.name,
-                    type: 'POST',
+                    url: '/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + key_name,
+                    type: 'DELETE',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     success: function(data) {
-                        info('Successfully disassociated key: ', key.name);
+                        info('Successfully disassociated key: ', key_name, ' with machine: ', machine.id);
                         $('#manage-keys .ajax-loader').fadeOut(200);
                         Ember.run.next(function(){
                             $('.key-icon-wrapper').trigger('create');
@@ -197,22 +195,22 @@ define('app/controllers/keys', [
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         $('#manage-keys .ajax-loader').fadeOut(200);
-                        Mist.notificationController.notify('Error while disassociating key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ', while disassociating key', key_name);
+                        Mist.notificationController.notify('Error while disassociating key: ', key_name);
+                        error(textstate, errorThrown, ' while disassociating key ', key_name, '. ', jqXHR.responseText);
                     }
                 });
             },
             
-            getPrivKey: function(key, element) {
+            getPrivKey: function(key_name, element) {
                 $.ajax({
-                    url: '/keys/' + key.name,
+                    url: '/keys/' + key_name,
                     type: 'GET',
                     success: function(data) {
-                        info('Successfully got private key: ' + name);
+                        info('Successfully got private key: ' + key_name);
                         $(element).val(data).trigger('change');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while getting private key: ', name);
+                        Mist.notificationController.notify('Error while getting private key: ', key_name);
                         error(textstate, errorThrown, ' while getting private key. ', jqXHR.responseText);
                     }
                 });

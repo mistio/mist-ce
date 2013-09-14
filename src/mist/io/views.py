@@ -988,11 +988,6 @@ def list_keys(request):
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
 def add_key(request):
-    """Add key.
-    
-    Stores a new keypair. The newly created keypair is returned.
-    
-    """
     params = request.json_body
     key_id = params.get('name', '')
     
@@ -1028,8 +1023,6 @@ def add_key(request):
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
 def delete_key(request):
     """Delete key.
-    
-    Deletes a keypair.
     
     When a keypair gets deleted, it takes its asociations with it so just need to
     remove from the server too.
@@ -1074,11 +1067,6 @@ def delete_key(request):
 
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
-    """Edit key.
-    
-    Edits a key.
-    
-    """
     params = request.json_body
     key_id = params.get('name', '')
     old_id = params.get('oldname', '')
@@ -1120,48 +1108,34 @@ def edit_key(request):
 
 
 @view_config(route_name='key_action', request_method='POST', renderer='json')
-def set_default_keypair(request):
+def set_default_key_request(request):
     return set_default_key(request)
 
 
 @view_config(route_name='key_action', request_method='GET', renderer='json')
-def get_priv_key(request):
+def get_private_key_request(request):
     return get_private_key(request)
 
 
 @view_config(route_name='key_generate', request_method='GET', renderer='json')
-def gen_keypair(request):
+def generate_keypair_request(request):
     return generate_keypair()
 
 
-#@view_config(route_name='key_association', request_method='PUT', renderer='json')
+@view_config(route_name='key_association', request_method='PUT', renderer='json')
+def associate_key_request(request):
+    return associate_key(request,
+                          request.matchdict['key'],
+                           request.matchdict['backend'],
+                            request.matchdict['machine'])
 
-#@view_config(route_name='key_action', request_method='POST', renderer='json')
-def update_key(request):
-    """Associate/disassociate a keypair with a machine, or get private key.
 
-    """
-    params = request.json_body
-    if params['action'] in ['associate', 'disassociate']:
-        key_id = params['key_id']
-        backend_id = params['backend_id']
-        machine_id = params['machine_id']
-        if params['action'] == 'associate':
-            ret = associate_key(request, key_id, backend_id, machine_id)
-        else:
-            ret = disassociate_key(request, key_id, backend_id, machine_id)
-    elif params['action'] == 'get_private_key':
-        ret = get_private_key(request)
-    #elif params['action'] == 'associate_ssh_user': #TODO: test
-    #    key_id = params['key_id']
-    #    ssh_user = params['ssh_user']
-    #    backend_id = params['backend_id']
-    #    machine_id = params['machine_id']
-    #    ret = save_keypair(request, key_id, ssh_user, backend_id, machine_id)
-    else:
-        ret = Response('Key action not supported', 405)
-
-    return ret
+@view_config(route_name='key_association', request_method='DELETE', renderer='json')
+def disassociate_key_request(request):
+    return disassociate_key(request,
+                             request.matchdict['key'],
+                              request.matchdict['backend'],
+                               request.matchdict['machine'])
 
 
 @view_config(route_name='monitoring', request_method='GET', renderer='json')
