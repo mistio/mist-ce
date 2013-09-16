@@ -40,6 +40,20 @@ define('app/views/key_list', [
                 }
             }.observes('Mist.keysController.keys.@each.selected'),
             
+            selectClicked: function() {
+                $('#select-keys-dialog').popup('option', 'positionTo', '#select-keys').popup('open');
+            },
+            
+            selectKeys: function(mode) {
+                Mist.keysController.keys.forEach(function(key){
+                    key.set('selected', mode);
+                });
+                Ember.run.next(function(){
+                    $("input[type='checkbox']").checkboxradio("refresh");
+                });
+                $('#select-keys-dialog').popup('close');
+            },
+            
             createClicked: function() {
                $("#dialog-add-key").popup("open", {transition: 'pop'});
             },
