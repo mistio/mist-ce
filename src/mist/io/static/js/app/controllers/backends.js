@@ -49,19 +49,21 @@ define('app/controllers/backends', [
                     if (this.content[i].id == backendId) {
                         return this.content[i];
                     }
-                }    
+                }
+                return null;
             },
             
-            getMachineById: function(backendId, machineId){
-                for (var i = 0; i < this.content.length; i++){
+            getMachineById: function(backendId, machineId) {
+                for (var i = 0; i < this.content.length; i++) {
                     if (this.content[i].id == backendId) {
-                        for (var j=0; j < this.content[i].machines.content.length; j++){
-                            if (this.content[i].machines.content[j].id == machineId){
+                        for (var j=0; j < this.content[i].machines.content.length; j++) {
+                            if (this.content[i].machines.content[j].id == machineId) {
                                 return this.content[i].machines.content[j];
                             }
                         }
                     }
-                }    
+                }
+                return null;
             },
                         
             getMachineCount: function(){

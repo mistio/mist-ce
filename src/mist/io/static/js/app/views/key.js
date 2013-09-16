@@ -6,74 +6,52 @@ define('app/views/key', [
     ],
     /**
      *
-     * Key page
+     * Single Key View
      *
      * @returns Class
      */
     function(Machine, MistScreen, key_html) {
         return MistScreen.extend({
+            
+            associatedMachines: null,
+            
+            init: function() {
+                this._super();
+                // cannot have template in home.pt as pt complains
+                this.set('template', Ember.Handlebars.compile(key_html));
+                var that=this;
+                Ember.run.next(function(){
+                    that.machinesObserver();
+                });
+            },
 
-            keyMachines: function() {
-
+            machinesObserver: function() {
         	    var key = this.get('controller').get('model');
-
-                machineList = [];
-                if (key && key.machines) {
-                    for (var m=0; m < key.machines.length; m++){
-                        var backend_id = key.machines[m][0], 
-                            machine_id = key.machines[m][1],
-                            found = false;
-                        
-                        Mist.backendsController.content.forEach(function(backend){
-                            backend.machines.content.forEach(function(machine){
-                                if (machine.id == machine_id) {
-                                    found = machine;
-                                }
-                            });
-                        });
-                        
-                        if (found){
-                            machineList.push(found);
-                        } else { // machine does not exist
-                            var backend = Mist.backendsController.getBackendById(backend_id);
+                machineList = new Array();
+                if (key.machines) {
+                    key.machines.forEach(function(key_machine) {
+                        var machine = Mist.backendsController.getMachineById(key_machine[0], key_machine[1]);
+                        if (machine) {
+                            machineList.push(machine);
+                        } else {
+                            var backend = Mist.backendsController.getBackendById(key_machine[0]);
                             var state = 'unknown';
-                            if (backend && backend.machines.content.length) {
+                            if (backend) {
                                 state = 'terminated';
                             }
-                            var item = {id: machine_id,
-                                        name: machine_id,
+                            var item = {id: key_machine[0],
+                                        name: key_machine[0],
                                         backend: backend,
                                         state: state,
                                         isGhost: true};
-                            var machine = Machine.create(item);
-                            machineList.push(machine);                           
+                            machineList.push(Machine.create(item)); 
                         }
-                    }
-                }
-                return machineList;
-            }.property('controller.model.machines'),
-
-            associateKey: function() {
-        	    var key = this.get('controller').get('model');
-        	    $("#key-associate-dialog").popup("open", {transition: 'pop'});
-                //check boxes for machines associated with this key
-                if (key && key.machines) {
-                    key.machines.forEach(function(item){
-                        Ember.run.next(function(){
-                            $("#key-machines-list").find("input[type='checkbox']").checkboxradio("refresh");
-                        });
-                        Mist.backendsController.content.forEach(function(backend){
-                            backend.machines.content.forEach(function(machine){
-                                if (machine.id == item[1]) {
-                                    machine.set("selected",true);
-                                }
-                            });
-                        });
                     });
                 }
-            },
+                this.set('associatedMachines', machineList);
+            }.observes('controller.model.machines'),
             
-            editKey: function() {
+            editClicked: function() {
                 var key = this.get('controller').get('model');
                 Mist.keysController.getPrivKey(key.name, "#textarea-private-key");
                 $("#textarea-public-key").val(key.pub).trigger('change');
@@ -81,66 +59,21 @@ define('app/views/key', [
                 $("#dialog-add-key").popup("open", {transition: 'pop'});
             },
 
-            deleteKey: function() {
+            deleteClicked: function() {
                 var key = this.get('controller').get('model');
-                if (key.machines) {
-                    machineNames = [];
-                    key.machines.forEach(function(item){
-                        Mist.backendsController.content.forEach(function(backend){
-                            if (backend.id == item[0]) {
-                                backend.machines.content.forEach(function(machine){
-                                    if (machine.id == item[1]) {
-                                        machineNames.push(machine.name);
-                                    }
-                                });
-                            }
-                        });
-                    });
-                }
-
-                Mist.confirmationController.set('title', 'Delete Key: ' + key.name);
-                if (key.machines && key.machines.length > 0) {
-                Mist.confirmationController.set('text', 'Your key is associated with ' + machineNames.toString() +'. Are you sure you want to delete ' +  key.name + '? You will not be able use console and monitoring on these VMs.');
-                } else {
-                    Mist.confirmationController.set('text', 'Are you sure you want to delete ' +
-                                                key.name + '?');
-                }
+                Mist.confirmationController.set('title', 'Delete key');
+                Mist.confirmationController.set('text', 'Are you sure you want to delete ' + key.name +'?');
                 Mist.confirmationController.set('callback', function() {
-                    key.deleteKey();
-                    key.machines.forEach(function(item){
-                        Mist.backendsController.content.forEach(function(backend){
-                            if (backend.id == item[0]) {
-                                backend.machines.content.forEach(function(machine){
-                                    if (machine.id == item[1]) {
-                                        machine.set("probed", false);
-                                    }
-                                });
-                            }
-                        });
-                    });
-                    Mist.Router.router.transitionTo('keys');
+                    Mist.keysController.deleteKey(key.name);                
                 });
                 Mist.confirmationController.set('fromDialog', true);
-
                 Mist.confirmationController.show();
             },
 
-            displayPrivate: function(){
+            displayPrivateClicked: function(){
                 var key = this.get('controller').get('model');
                 Mist.keysController.getPrivKey(key.name, "#private-key");
                 $("#key-private-dialog").popup("open", {transition: 'pop'});
-            },
-
-            init: function() {
-                this._super();
-                // cannot have template in home.pt as pt complains
-                this.set('template', Ember.Handlebars.compile(key_html));
-                $('.public-key input').on('click', function(){
-                    this.select();
-                });
-                $('.public-key input').on('change', function(){
-                   return false;
-                });
             },
         });
     }

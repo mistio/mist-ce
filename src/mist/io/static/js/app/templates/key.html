@@ -1,14 +1,10 @@
-
     <div data-role="header">
         <a href="#/keys"
             data-icon="arrow-l"
             data-direction="reverse"
             class="ui-btn-left">Keys</a>
-
         <h1>{{name}}</h1>
-
         {{view Mist.UserMenuView}}
-
     </div>
 
     <div class="single-view-header">
@@ -20,7 +16,7 @@
          <div data-role="collapsible" data-collapsed="false">
             <h3>Public Key</h3>
             <div class="public-key">
-                <input type="text" readonly="readonly" {{bindAttr value="pub"}} />
+                <input type="text" readonly="readonly" {{bindAttr value="pub"}}/>
             </div>
         </div>
         
@@ -28,7 +24,7 @@
         <div data-role="collapsible" data-collapsed="false">
             <h3>Private key</h3>
             <div class="private-key">
-                <a href="#" data-role="button" {{action displayPrivate target="view"}}>Display</a>
+                <a href="#" data-role="button" {{action displayPrivateClicked target="view"}}>Display</a>
                 <div data-role="popup" id="key-private-dialog" class="mist-dialog" data-overlay-theme="a">
                     <div data-role="header">
                         <h1>Private Key</h1>
@@ -44,19 +40,18 @@
             <h3>Machines</h3>
             <ul id="machines-list"
                 data-role="listview"
-                data-inset="true"
-                data-theme="c">
-                {{#each view.keyMachines}}
+                data-inset="true">
+                {{#each view.associatedMachines}}
                     {{view Mist.MachineListItemView machineBinding="this"}}
                 {{/each}}
             </ul>
         </div>
         {{/if}}
-
+        
     </div>
 
 
-<div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
+<div data-role="popup" id="dialog-confirm" class="mist-dialog" data-overlay-theme="a" data-position-to='window'>
     <div data-role="header">
         <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
     </div>
@@ -74,16 +69,14 @@
     <div class="actions" data-role="controlgroup" data-type="horizontal">
         <a href="#"
             id="keys-button-edit"
-            class="action-links"
             data-role="button"
             data-icon="edit"
-            {{action editKey target="view"}}>Edit</a>
+            {{action editClicked target="view"}}>Edit</a>
             
         <a href="#"
             id="keys-button-delete"
-            class="action-links"
             data-role="button"
             data-icon="delete"
-            {{action deleteKey target="view"}}>Delete</a>
+            {{action deleteClicked target="view"}}>Delete</a>
     </div>
 </div>
