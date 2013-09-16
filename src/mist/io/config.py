@@ -71,6 +71,10 @@ SUPPORTED_PROVIDERS = [
                         'provider': Provider.EC2_US_WEST_OREGON,
                         },
 
+                       # NephoScale
+                       {'title': 'NephoScale',
+                        'provider' : Provider.NEPHOSCALE},
+
                        # Linode
                        {'title': 'Linode',
                         'provider' : Provider.LINODE},

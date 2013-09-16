@@ -639,6 +639,11 @@ div.ember-view div.ui-panel-content-wrap {
     background-image: url(images/p1_sm.png);
 }
 
+/* NephoScale */
+#single-view-provider-icon.provider-nephoscale  {
+    background-image: url(images/nephoscale_sm.png);
+}
+
 /* Linode */
 #single-view-provider-icon.provider-linode  {
     background-image: url(images/p7_sm.png);

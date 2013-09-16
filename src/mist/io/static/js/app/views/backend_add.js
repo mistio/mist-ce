@@ -23,6 +23,10 @@ define('app/views/backend_add', [
                     $('#textApiKey').text('2. Username:');
                     $('#textApiSecret').text('3. API Key:');
                     $('#addBackendOpenstack').hide();
+                } else if (event.target.title.indexOf("nephoscale") !== -1) {
+                    $('#textApiKey').text('2. Username:');
+                    $('#textApiSecret').text('3. Password:');
+                    $('#addBackendOpenstack').hide();
                 } else if (event.target.title.indexOf("openstack") !== -1) {
                     $('#textApiKey').text('2. Username:');
                     $('#textApiSecret').text('3. Password:');
