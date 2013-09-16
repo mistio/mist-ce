@@ -10,10 +10,8 @@
     </div>
 
     <div data-role="content" id="keys">
-        <a href="#keys"
+        <a href="#"
             id="mist-create-key"
-            data-rel="popup"
-            data-transition="slidedown"
             class="add-button"
             data-theme="b"
             data-role="button"
@@ -30,16 +28,15 @@
 
         <a id="select-keys"
             data-role="button"
-            data-theme="c"
             data-icon="arrow-d"
             {{action selectClicked target="view"}}>Select</a>
             
         <div id="select-keys-dialog" data-role="popup">
             <ul data-role='listview'>
-                <li data-icon="false" data-corners="false">
+                <li data-icon="false">
                     <a {{action selectKeys true target="view"}}>All</a>
                 </li>
-                <li data-icon="false" data-corners="false"> 
+                <li data-icon="false"> 
                     <a {{action selectKeys false target="view"}}>None</a>
                 </li>
             </ul>
@@ -67,20 +64,16 @@
     
     <div id="keys-footer" data-role="footer" data-theme="a">
         <div class="actions" data-role="controlgroup" data-type="horizontal">
-            <a href=""
+            <a href="#"
                 id="keys-button-delete"
                 data-role="button"
                 data-icon="delete"
-                data-rel="popup"
-                data-transition="slideup"
                 {{action deleteClicked target="view"}}>Delete</a>
 
-            <a href=""
+            <a href="#"
                 id="keys-button-associate"
                 data-role="button"
                 data-icon="gear"
-                data-rel="popup"
-                data-transition="slideup"
                 {{action setDefaultClicked target="view"}}>Set default</a>
         </div>
     </div>
