@@ -31,7 +31,7 @@ define('app/controllers/keys', [
                         that.updateKeyList(data);
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        Mist.notificationController.notify('Error while loading key: ', jqXHR.responseText);
+                        Mist.notificationController.notify('Error while loading key: ' + jqXHR.responseText);
                         error(textstate, errorThrown, ' while loading keys. ', jqXHR.responseText);
                         that.set('loadingKeys', false);
                     }
@@ -66,7 +66,7 @@ define('app/controllers/keys', [
                         }, 200);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while creating new key: ', jqXHR.responseText);
+                        Mist.notificationController.notify('Error while creating new key: ' + jqXHR.responseText);
                         error(textstate, errorThrown, ' while creating key: ', name, '. ', jqXHR.responseText);
                     }
                 });
@@ -81,7 +81,7 @@ define('app/controllers/keys', [
                         Mist.keysController.updateKeyList(data);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while deleting key: ', jqXHR.responseText);
+                        Mist.notificationController.notify('Error while deleting key: ' + jqXHR.responseText);
                         error(textstate, errorThrown, ' while deleting key: ', name, '. ', jqXHR.responseText);
                     }
                 });
@@ -112,7 +112,7 @@ define('app/controllers/keys', [
                         });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while editting key: ', jqXHR.responseText);
+                        Mist.notificationController.notify('Error while editting key: ' + jqXHR.responseText);
                         error(textstate, errorThrown, ' while editting key: ', name, '. ', jqXHR.responseText);
                     }
                 });
@@ -133,7 +133,7 @@ define('app/controllers/keys', [
                         });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while setting default key: ', jqXHR.responseText);
+                        Mist.notificationController.notify('Error while setting default key: ' + jqXHR.responseText);
                         error(textstate, errorThrown, ' while setting default key: ', name, ', ', jqXHR.responseText);
                     }
                 });
@@ -164,7 +164,7 @@ define('app/controllers/keys', [
                         });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while associating key: ', key_name);
+                        Mist.notificationController.notify('Error while associating key: ' + key_name);
                         error(textstate, errorThrown, ' while associating key', key_name, '. ', jqXHR.responseText);
                         $('#manage-keys .ajax-loader').fadeOut(200);
                     }
@@ -192,7 +192,7 @@ define('app/controllers/keys', [
                         });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while disassociating key: ', key_name);
+                        Mist.notificationController.notify('Error while disassociating key: ' + key_name);
                         error(textstate, errorThrown, ' while disassociating key ', key_name, '. ', jqXHR.responseText);
                         $('#manage-keys .ajax-loader').fadeOut(200);
                     }
@@ -208,7 +208,7 @@ define('app/controllers/keys', [
                         $(element).val(data).trigger('change');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while getting private key: ', key_name);
+                        Mist.notificationController.notify('Error while getting private key: ' + key_name);
                         error(textstate, errorThrown, ' while getting private key. ', jqXHR.responseText);
                     }
                 });

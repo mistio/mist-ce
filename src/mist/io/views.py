@@ -1016,7 +1016,7 @@ def add_key(request):
     return {'name': key_id,
              'pub': key['public'],
               'priv': key['private'],
-               'default_key': key.get('default', False),
+               'default_key': key['default'],
                 'machines': []}
 
 
@@ -1033,22 +1033,14 @@ def delete_key(request):
     
     """
     
-    keypairs = request.registry.settings.get('keypairs', {})
-    
     key_id = request.matchdict.get('key', '')
     
     if not key_id:
         return Response('Key name not provided', 400)
     
-    key = keypairs.pop(key_id)
+    keypairs = request.registry.settings.get('keypairs', {})
     
-    #try:
-    #    #TODO: alert user for key undeployment
-    #    #for machine in key.get('machines', []):
-    #    #    undeploy_key(request, machine[0], machine[1], key)
-    #    ret_code = 200
-    #except:
-    #    ret_code = 206
+    key = keypairs.pop(key_id)
     
     if key.get('default', False):
         if len(keypairs):
@@ -1060,7 +1052,7 @@ def delete_key(request):
     return [{'name': key,
               'machines': keypairs[key].get('machines', []),
                'pub': keypairs[key]['public'],
-                'priv': keypairs[key]['private'] and True or False,
+                'priv': keypairs[key]['private'] and True,
                  'default_key': keypairs[key].get('default', False)}
              for key in keypairs.keys()]
 
