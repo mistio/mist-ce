@@ -1,25 +1,27 @@
     <div data-role="header">
+
         <a href="#"
-            data-icon="home"
-            data-role="button"
-            data-direction="reverse"
-            class="ui-btn-left">Home</a>
+           data-icon="home"
+           data-role="button"
+           data-direction="reverse"
+           class="ui-btn-left">Home</a>
 
         <h1>Keys</h1>
+
         {{view Mist.UserMenuView}}
+
     </div>
 
     <div data-role="content" id="keys">
-        <a href="#"
-            id="mist-create-key"
-            class="add-button"
-            data-theme="b"
-            data-role="button"
-            data-icon="plus"
-            data-iconpos="right"
-            {{action createClicked target="view"}}>Create</a>
+
+        <a class="add-button"
+           data-theme="b"
+           data-icon="plus"
+           data-role="button"
+           data-iconpos="right"
+           {{action createClicked target="view"}}>Create</a>
             
-        <div data-role="popup" id="dialog-add-key" class="mist-dialog" data-overlay-theme="a">
+        <div data-role="popup" id="create-key-dialog" data-transition="pop" data-overlay-theme="a">
             <div data-role="header">
                 <h1>Add key</h1>
             </div>
@@ -27,17 +29,17 @@
         </div>
 
         <a id="select-keys"
-            data-role="button"
-            data-icon="arrow-d"
-            {{action selectClicked target="view"}}>Select</a>
+           data-role="button"
+           data-icon="arrow-d"
+           {{action selectClicked target="view"}}>Select</a>
             
-        <div id="select-keys-dialog" data-role="popup">
+        <div id="select-keys-dialog" data-role="popup" data-transition="pop" data-position-to="#select-keys">
             <ul data-role='listview'>
                 <li data-icon="false">
-                    <a {{action selectKeys true target="view"}}>All</a>
+                    <a {{action selectModeClicked true target="view"}}>All</a>
                 </li>
                 <li data-icon="false"> 
-                    <a {{action selectKeys false target="view"}}>None</a>
+                    <a {{action selectModeClicked false target="view"}}>None</a>
                 </li>
             </ul>
         </div>
@@ -64,16 +66,14 @@
     
     <div id="keys-footer" data-role="footer" data-theme="a">
         <div class="actions" data-role="controlgroup" data-type="horizontal">
-            <a href="#"
-                id="keys-button-delete"
-                data-role="button"
-                data-icon="delete"
-                {{action deleteClicked target="view"}}>Delete</a>
+            <a id="keys-button-delete"
+               data-role="button"
+               data-icon="delete"
+               {{action deleteClicked target="view"}}>Delete</a>
 
-            <a href="#"
-                id="keys-button-associate"
-                data-role="button"
-                data-icon="gear"
-                {{action setDefaultClicked target="view"}}>Set default</a>
+            <a id="keys-button-associate"
+               data-role="button"
+               data-icon="gear"
+               {{action setDefaultClicked target="view"}}>Set default</a>
         </div>
     </div>

@@ -1,13 +1,11 @@
 <li class="node prov-{{unbound view.machine.backend.provider}} {{unbound view.machine.id}}" data-icon="false">
-
     <fieldset class="list-item">
         <label>
             {{view Mist.Checkbox checkedBinding="view.machine.selected"}}
         </label>
     </fieldset>
 
-    <a href="" {{action "machineClick" on="click"}}>
-
+    <a {{action machineClick}}>
         <h3 class="name">{{view.machine.name}}</h3>
     </a>
 </li>

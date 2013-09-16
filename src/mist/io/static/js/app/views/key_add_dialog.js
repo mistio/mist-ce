@@ -44,7 +44,7 @@ define('app/views/key_add_dialog', [
             },
             
             backClicked: function() {
-                $("#dialog-add-key").popup("close");
+                $("#create-key-dialog").popup("close");
                 Mist.keyAddController.newKeyClear();
                 if (this.getAssociatedMachine()){
                     // TODO: Revert this to timeout

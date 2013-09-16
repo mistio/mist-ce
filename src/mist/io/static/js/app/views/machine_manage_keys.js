@@ -120,7 +120,7 @@ define('app/views/machine_manage_keys', [
             createKeyClicked: function() {
                 $('#associate-key-dialog').popup('close');
                 setTimeout(function(){
-                        $('#dialog-add-key').popup('open', {transition: 'pop'});
+                        $('#create-key-dialog').popup('open', {transition: 'pop'});
                 }, 350); 
             },
 

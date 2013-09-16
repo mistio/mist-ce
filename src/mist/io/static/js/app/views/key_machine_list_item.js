@@ -14,7 +14,7 @@ define('app/views/key_machine_list_item', [
 
                     var that = this;
 
-                    Em.run.next(function() {
+                    Ember.run.next(function() {
 
                         try {
                             that.get('parentView').$().find("ul").listview('refresh');

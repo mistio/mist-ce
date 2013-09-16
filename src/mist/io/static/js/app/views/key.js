@@ -22,7 +22,7 @@ define('app/views/key', [
                 var that=this;
                 // TODO: This observer shouldn't be called explicitly.
                 // There must be an inproper set of key.machines when mist loads.
-                Ember.run.next(function(){
+                Ember.run.next(function() {
                     that.machinesObserver();
                 });
             },
@@ -58,7 +58,7 @@ define('app/views/key', [
                 Mist.keysController.getPrivKey(key.name, "#textarea-private-key");
                 $("#textarea-public-key").val(key.pub).trigger('change');
                 $("#create-key-name").val(key.name).trigger('change');
-                $("#dialog-add-key").popup("open", {transition: 'pop'});
+                $("#create-key-dialog").popup("open");
             },
 
             deleteClicked: function() {
@@ -66,7 +66,8 @@ define('app/views/key', [
                 Mist.confirmationController.set('title', 'Delete key');
                 Mist.confirmationController.set('text', 'Are you sure you want to delete ' + key.name +'?');
                 Mist.confirmationController.set('callback', function() {
-                    Mist.keysController.deleteKey(key.name);                
+                    Mist.Router.router.transitionTo('keys'); 
+                    Mist.keysController.deleteKey(key.name);
                 });
                 Mist.confirmationController.set('fromDialog', true);
                 Mist.confirmationController.show();
@@ -75,7 +76,7 @@ define('app/views/key', [
             displayPrivateClicked: function(){
                 var key = this.get('controller').get('model');
                 Mist.keysController.getPrivKey(key.name, "#private-key");
-                $("#key-private-dialog").popup("open", {transition: 'pop'});
+                $("#key-private-dialog").popup("open");
             },
         });
     }

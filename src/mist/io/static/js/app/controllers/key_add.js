@@ -9,10 +9,10 @@ define('app/controllers/key_add', [
     function() {
         return Ember.Object.extend({
 
-            newKeyName: null,    // str
-            newKeyPublic: null,  // str
-            newKeyPrivate: null, // str
-            newKeyReady: null,   // bool
+            newKeyName: null,
+            newKeyReady: null,
+            newKeyPublic: null,
+            newKeyPrivate: null,
 
             init: function() {
                 this._super();
@@ -45,25 +45,24 @@ define('app/controllers/key_add', [
                 this.set('newKeyName', null);
                 this.set('newKeyPublic', null);
                 this.set('newKeyPrivate', null);
-                $('#create-key-ok').addClass('ui-disabled');
             },
-            
+
             generateKey: function() {
-                $('#dialog-add-key .ajax-loader').fadeIn(200);
+                $('#create-key-dialog .ajax-loader').fadeIn(200);
                 var that = this;
                 $.ajax({
                     url: '/key_generate',
                     type: 'GET',
                     success: function(result) {
-                        $('#dialog-add-key .ajax-loader').fadeOut(200);
                         info('Successfully generated key');
+                        $('#create-key-dialog .ajax-loader').fadeOut(200);
                         that.set('newKeyPublic', result.public);
                         that.set('newKeyPrivate', result.private);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while generating key: ', jqXHR.responseText);
+                        error(textstate, errorThrown, ', while generating key. ', jqXHR.responseText);
                         $('#manage-keys .ajax-loader').fadeOut(200);
-                        Mist.notificationController.notify('Error while generating key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ', while generating key');
                     }
                 });
             }

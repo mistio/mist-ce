@@ -41,10 +41,10 @@ define('app/views/key_list', [
             }.observes('Mist.keysController.keys.@each.selected'),
             
             selectClicked: function() {
-                $('#select-keys-dialog').popup('option', 'positionTo', '#select-keys').popup('open');
+                $('#select-keys-dialog').popup('open');
             },
             
-            selectKeys: function(mode) {
+            selectModeClicked: function(mode) {
                 Mist.keysController.keys.forEach(function(key){
                     key.set('selected', mode);
                 });
@@ -55,7 +55,7 @@ define('app/views/key_list', [
             },
             
             createClicked: function() {
-               $("#dialog-add-key").popup("open", {transition: 'pop'});
+               $("#create-key-dialog").popup("open");
             },
 
             deleteClicked: function() {

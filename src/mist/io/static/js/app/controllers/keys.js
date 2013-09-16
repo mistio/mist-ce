@@ -6,7 +6,6 @@ define('app/controllers/keys', [
     /**
      * Keys controller
      *
-     *
      * @returns Class
      */
     function(Key) {
@@ -54,7 +53,7 @@ define('app/controllers/keys', [
                     success: function(data) {
                         info('Successfully created key : ', name);
                         item.priv = null; // don't keep private key on the client
-                        $("#dialog-add-key").popup("close");
+                        $("#create-key-dialog").popup("close");
                         Mist.keyAddController.newKeyClear();
                         $('#keys-list').fadeOut(200);
                         Ember.run.later(function() {
@@ -108,7 +107,7 @@ define('app/controllers/keys', [
                         key.set('name', name);
                         key.set('pub', publicKey);
                         Ember.run.next(function() {
-                            $("#dialog-add-key").popup("close");
+                            $("#create-key-dialog").popup("close");
                             Mist.keyAddController.newKeyClear();
                         });
                     },
@@ -147,7 +146,6 @@ define('app/controllers/keys', [
                     'machine_id': machine.id,
                     'host': machine.getHost()
                 };
-                var machine = machine;
                 var key = this.getKeyByName(key_name);
                 $.ajax({
                     url: '/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + key_name,
@@ -155,8 +153,8 @@ define('app/controllers/keys', [
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     success: function(data) {
-                        $('#manage-keys .ajax-loader').fadeOut(200);
                         info('Successfully associated key: ', key_name, ' with machine: ', machine.id);
+                        $('#manage-keys .ajax-loader').fadeOut(200);
                         Ember.run.next(function(){
                             try {
                                 $('#associated-keys').listview('refresh');
@@ -166,13 +164,13 @@ define('app/controllers/keys', [
                         });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        $('#manage-keys .ajax-loader').fadeOut(200);
                         Mist.notificationController.notify('Error while associating key: ', key_name);
                         error(textstate, errorThrown, ' while associating key', key_name, '. ', jqXHR.responseText);
+                        $('#manage-keys .ajax-loader').fadeOut(200);
                     }
                 });
             },
-            
+
             disassociateKey: function(key_name, machine) {
                 payload = {
                     'key_id': key_name,
@@ -194,13 +192,13 @@ define('app/controllers/keys', [
                         });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        $('#manage-keys .ajax-loader').fadeOut(200);
                         Mist.notificationController.notify('Error while disassociating key: ', key_name);
                         error(textstate, errorThrown, ' while disassociating key ', key_name, '. ', jqXHR.responseText);
+                        $('#manage-keys .ajax-loader').fadeOut(200);
                     }
                 });
             },
-            
+
             getPrivKey: function(key_name, element) {
                 $.ajax({
                     url: '/keys/' + key_name,
@@ -222,6 +220,7 @@ define('app/controllers/keys', [
                         return this.keys[i];
                     }
                 }
+                return null;
             },
 
             updateKeyList: function(data) {

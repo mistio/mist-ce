@@ -277,13 +277,9 @@ li.node .tag {
     background: transparent;
 }
 
-/* Keys Listing */
+/* Create Key Dialog */
 
-#mist-create-key {
-    float: right;
-}
-
-#dialog-add-key-popup {
+#create-key-dialog-popup {
     width: 250px;
 }
 
@@ -292,7 +288,7 @@ li.node .tag {
     max-height: 100px;
 }
 
-#dialog-add-key .upload-key {
+#create-key-dialog .upload-key {
     width: 100%;
 }
 
@@ -480,7 +476,7 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 100%;
 }
 
-.machines-footer, #keys-footer, .single-key-footer {
+.machines-footer, #keys-footer, #single-key-footer {
     display: none;
 }
 
@@ -498,7 +494,7 @@ div.actions div.ui-controlgroup-controls {
     padding-left: 0.5%;
 }
 
-#keys-footer.ui-footer div.actions, .single-key-footer.ui-footer div.actions {
+#keys-footer.ui-footer div.actions, #single-key-footer.ui-footer div.actions {
     padding-left: 0.5%;
 }
 
@@ -510,8 +506,12 @@ div.actions div.ui-controlgroup-controls {
     width: 49%;
 }
 
-.single-key-footer.ui-footer div.actions a {
+#single-key-footer.ui-footer div.actions a {
     width:49%;
+}
+
+#single-key-footer {
+    display: block;
 }
 
 .ui-icon-mist-power {
@@ -1392,7 +1392,7 @@ div.logout-placeholder, div.account-placeholder, div.support-placeholder {
 }
 
 
-#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, 
+#invitation-dialog .ajax-loader, #create-key-dialog .ajax-loader, 
 #tags-container .ajax-loader, .dialog-add .ajax-loader, 
 .rule-box .ajax-loader, .rule-command-popup .ajax-loader, 
 .add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader, 
@@ -1587,13 +1587,13 @@ div.info {
 
     /* Select machines button */
 
-    #machines .select-machines, #keys #select-keys {
+    #machines .select-machines, #select-keys {
         width: 60px;
         right: -6px;
         padding: 9px 0;
     }
 
-    #machines .select-machines .ui-btn-text, #keys #select-keys .ui-btn-text {
+    #machines .select-machines .ui-btn-text, #select-keys .ui-btn-text {
         display: none;
     }
 
