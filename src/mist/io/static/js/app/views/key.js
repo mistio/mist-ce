@@ -20,6 +20,8 @@ define('app/views/key', [
                 // cannot have template in home.pt as pt complains
                 this.set('template', Ember.Handlebars.compile(key_html));
                 var that=this;
+                // TODO: This observer shouldn't be called explicitly.
+                // There must be an inproper set of key.machines when mist loads.
                 Ember.run.next(function(){
                     that.machinesObserver();
                 });

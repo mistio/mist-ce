@@ -32,8 +32,8 @@
         </div>
         
         <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <button id="create-key-cancel" {{action backClicked target="view"}}>Back</button>
-            <button id="create-key-ok" data-theme="b" disabled {{action newKeyClicked target="view"}}>
+            <a data-role="button" id="create-key-cancel" {{action backClicked target="view"}}>Back</a>
+            <a data-role="button" id="create-key-ok" data-theme="b" {{action newKeyClicked target="view"}}>
             {{#if view.notEditMode}}Add{{else}}Save{{/if}}
-            </button>
+            </a>
         </div>
