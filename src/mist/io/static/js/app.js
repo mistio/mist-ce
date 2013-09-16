@@ -69,7 +69,6 @@ define( 'app', [
     'app/views/key',
     'app/views/key_add_dialog',
     'app/views/key_priv_dialog',
-    'app/views/key_machine_list_item',
     'app/views/rule',
     'app/views/user_menu',
     'text!app/templates/machine.html',
@@ -110,7 +109,6 @@ define( 'app', [
                 SingleKeyView,
                 KeyAddDialog,
                 KeyPrivDialog,
-                KeyMachineListItem,
                 RuleView,
                 UserMenuView,
                 machine_html,
@@ -351,7 +349,6 @@ define( 'app', [
 
         App.DeleteTagView = DeleteTagView;
         App.RuleView = RuleView;
-        App.KeyMachineListItemView = KeyMachineListItem;
         App.MachineTagsDialog = MachineTagsDialog;
         App.ShellDialog = Shell;
         App.PowerDialog = SingleMachineActionsDialog;

@@ -2,7 +2,7 @@ define('app/controllers/key_add', [
     'ember'
     ],
     /**
-     * Key add controller
+     * Key Add Controller
      *
      * @returns Class
      */

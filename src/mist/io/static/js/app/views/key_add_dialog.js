@@ -1,30 +1,25 @@
 define('app/views/key_add_dialog', [
     'text!app/templates/key_add_dialog.html','ember'],
     /**
-     *
      * Add Key dialog
      *
      * @returns Class
      */
     function(key_add_dialog_html) {
         return Ember.View.extend({
-            
+
             template: Ember.Handlebars.compile(key_add_dialog_html),
-            
-            init: function() {
-                this._super();    
-            },
-            
+
             attributeBindings: ['data-role'],
-            
+
             notEditMode: function() {
                 return this.get('parentView').toString().indexOf('SingleKeyView') == -1;
             }.property(),
-            
+
             generateClicked: function() {
                 Mist.keyAddController.generateKey();
             },
-            
+
             uploadClicked: function(keyType) {
                 if (window.File && window.FileReader && window.FileList) {
                     $("#upload-" + keyType + "-key-input").click();
@@ -32,7 +27,7 @@ define('app/views/key_add_dialog', [
                     alert('The File APIs are not fully supported in this browser.');
                 }
             },
-            
+
             uploadInputChanged: function(keyType) {
                 var reader = new FileReader();
                 reader.onloadend = function(evt) {
@@ -42,7 +37,7 @@ define('app/views/key_add_dialog', [
                };
                reader.readAsText($('#upload-' + keyType + '-key-input')[0].files[0], 'UTF-8');
             },
-            
+
             backClicked: function() {
                 $("#create-key-dialog").popup("close");
                 Mist.keyAddController.newKeyClear();
@@ -53,15 +48,15 @@ define('app/views/key_add_dialog', [
                     });
                 }
             },
-            
-            newKeyClicked: function() {
+
+            createClicked: function() {
                 
                 var privateKey = $('#textarea-private-key').val().trim();
                 var privateKeyType = privateKey.substring('-----BEGIN '.length , '-----BEGIN '.length + 3);
                 
                 if (privateKeyType != 'RSA' && privateKeyType != 'DSA') {
                     Mist.notificationController.notify('Unknown ssh type of private key');
-                    return;   
+                    return;
                 }
                 var beginning = '-----BEGIN ' + privateKeyType + ' PRIVATE KEY-----';
                 var ending = '-----END ' + privateKeyType + ' PRIVATE KEY-----';
@@ -75,7 +70,7 @@ define('app/views/key_add_dialog', [
                 
                 var publicKey = $('#textarea-public-key').val().trim();
                 if (publicKey) {
-                    var publicKeyType = ""; 
+                    var publicKeyType = "";
                     if (publicKey.indexOf('ssh-rsa') == 0) {
                         publicKeyType = 'RSA';
                     } else if (publicKey.indexOf('ssh-dss') == 0) {
@@ -95,14 +90,6 @@ define('app/views/key_add_dialog', [
                 } else {
                     Mist.keyAddController.editKey(this.get('parentView').get('controller').get('model').name);
                 }
-            },
-            
-            getAssociatedMachine: function() {
-                var machine;
-                try {
-                    machine = this.get('parentView').get('controller').get('model');
-                } catch (e) {}
-                return machine;
             }
         });
     }

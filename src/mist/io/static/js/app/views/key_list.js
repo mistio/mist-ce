@@ -4,26 +4,21 @@ define('app/views/key_list', [
     'ember'
     ],
     /**
-     *
      * Key List View
      *
      * @returns Class
      */
     function(MistScreen, key_list_html) {
         return MistScreen.extend({
-            
+
             template: Ember.Handlebars.compile(key_list_html),
-            
-            init: function() {
-                this._super();
-            },
-            
+
             selectedKey: null,
-            
+
             selectedKeysObserver: function() {
                 var selectedKeysCount = 0;
                 var that = this;
-                Mist.keysController.keys.forEach(function(key){
+                Mist.keysController.keys.forEach(function(key) {
                     if (key.selected) {
                         selectedKeysCount++;
                         that.selectedKey = key;
@@ -39,11 +34,15 @@ define('app/views/key_list', [
                     $('#keys-footer a').addClass('ui-disabled');
                 }
             }.observes('Mist.keysController.keys.@each.selected'),
-            
+
+            createClicked: function() {
+               $("#create-key-dialog").popup("open");
+            },
+
             selectClicked: function() {
                 $('#select-keys-dialog').popup('open');
             },
-            
+
             selectModeClicked: function(mode) {
                 Mist.keysController.keys.forEach(function(key){
                     key.set('selected', mode);
@@ -53,15 +52,11 @@ define('app/views/key_list', [
                 });
                 $('#select-keys-dialog').popup('close');
             },
-            
-            createClicked: function() {
-               $("#create-key-dialog").popup("open");
-            },
 
             deleteClicked: function() {
                 var that = this;
                 Mist.confirmationController.set('title', 'Delete key');
-                Mist.confirmationController.set('text', 'Are you sure you want to delete ' + that.selectedKey.name +'?');
+                Mist.confirmationController.set('text', 'Are you sure you want to delete "' + that.selectedKey.name +'" ?');
                 Mist.confirmationController.set('callback', function() {
                     Mist.keysController.deleteKey(that.selectedKey.name);                
                 });
