@@ -1408,7 +1408,7 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
             log.debug('save settings (associate key)')
             save_settings(request)
             log.debug("Associate key, %s" % keypair['machines'])
-            return Response('OK', 200)
+            return keypair['machines']
         else:
             if machine_uid in keypair['machines']:
                 keypair['machines'].remove(machine_uid)
@@ -1419,7 +1419,7 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
         log.debug('save settings (associate key2)')
         log.debug("deploy false")
         save_settings(request)
-        return Response('OK', 200)
+        return keypair['machines']
 
 
 def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
@@ -1462,7 +1462,7 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
     log.debug('save settings (disassociate key)')
     save_settings(request)
 
-    return Response('OK', 200)
+    return keypair['machines']
 
 
 def deploy_key(request, keypair):

@@ -199,7 +199,9 @@ define('app/controllers/machines', [
                         machine.set("private_ips", data.private_ips);
                         machine.set("extra", data.extra);
                         that.backend.set('create_pending', false);
-                        key.machines.addObject([that.backend.id, data.id]);
+                        var key_machines = key.machines;
+                        key_machines.push([machine.backend.id, machine.id]);
+                        key.set('machines', key_machines);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.timeNotify(jqXHR.responseText, 20000);

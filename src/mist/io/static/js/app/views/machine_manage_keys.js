@@ -17,7 +17,7 @@ define('app/views/machine_manage_keys', [
             selectedKey: null,
             associatedKeys: null,
             nonAssociatedKeys: null,
-            
+
             keysObserver: function() {
                 
                 var aKeys = new Array();
@@ -27,7 +27,7 @@ define('app/views/machine_manage_keys', [
                 
                 Mist.keysController.keys.forEach(function(key) {
                     found = false;
-                    for (var m = 0; m < key.get('machines').get('length'); ++m) {
+                    for (var m = 0; m < key.machines.length; ++m) {
                         k_machine = key.machines[m];
                         if (machine.backend.id == k_machine[0] && machine.id == k_machine[1]) {
                             aKeys.push(key);
@@ -43,12 +43,11 @@ define('app/views/machine_manage_keys', [
                 this.set('associatedKeys', aKeys);
                 this.set('nonAssociatedKeys', naKeys);
                 machine.set('keysCount', aKeys.length);
-                
-                Ember.run.next(function(){
+                Ember.run.next(function() {
                     $('#associated-keys').listview();
                 });
                                 
-            }.observes('Mist.keysController.keys'),
+            }.observes('Mist.keysController.keys', 'Mist.keysController.keys.@each.machines'),
             
             keysProbeObserver: function() {
                 
@@ -57,7 +56,7 @@ define('app/views/machine_manage_keys', [
             
             didInsertElement: function() {
                 var that = this;
-                Ember.run.next(function(){
+                Ember.run.next(function() {
                     that.keysObserver();
                 });
             },
@@ -94,12 +93,12 @@ define('app/views/machine_manage_keys', [
                                                              You will not be able to login through mist.io. Are you sure you want to do this?');
                     Mist.confirmationController.set('callback', function() {
                         $('#manage-keys .ajax-loader').fadeIn(200);
-                        Mist.keysController.disassociateKey(that.selectedKey, machine);      
+                        Mist.keysController.disassociateKey(that.selectedKey.name, machine);      
                     });
                     Mist.confirmationController.show();
                 } else {
                     $('#manage-keys .ajax-loader').fadeIn(200);
-                    Mist.keysController.disassociateKey(that.selectedKey, machine); 
+                    Mist.keysController.disassociateKey(that.selectedKey.name, machine); 
                 }         
             },
             

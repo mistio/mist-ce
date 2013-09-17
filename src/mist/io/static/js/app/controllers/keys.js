@@ -146,7 +146,7 @@ define('app/controllers/keys', [
                     'machine_id': machine.id,
                     'host': machine.getHost()
                 };
-                var key = this.getKeyByName(key_name);
+                var that = this;
                 $.ajax({
                     url: '/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + key_name,
                     type: 'PUT',
@@ -155,13 +155,7 @@ define('app/controllers/keys', [
                     success: function(data) {
                         info('Successfully associated key: ', key_name, ' with machine: ', machine.id);
                         $('#manage-keys .ajax-loader').fadeOut(200);
-                        Ember.run.next(function(){
-                            try {
-                                $('#associated-keys').listview('refresh');
-                                $('.key-icon-wrapper').trigger('create');
-                                $('#associated-keys').parent().trigger('create');
-                            } catch (e) {}
-                        });
+                        that.updateKeyMachineList(key_name, data);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while associating key: ' + key_name);
@@ -178,6 +172,7 @@ define('app/controllers/keys', [
                     'machine_id': machine.id,
                     'host': machine.getHost()
                 };
+                var that = this;
                 $.ajax({
                     url: '/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + key_name,
                     type: 'DELETE',
@@ -186,10 +181,7 @@ define('app/controllers/keys', [
                     success: function(data) {
                         info('Successfully disassociated key: ', key_name, ' with machine: ', machine.id);
                         $('#manage-keys .ajax-loader').fadeOut(200);
-                        Ember.run.next(function(){
-                            $('.key-icon-wrapper').trigger('create');
-                            $('#associated-keys').listview('refresh');
-                        });
+                        that.updateKeyMachineList(key_name, data);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while disassociating key: ' + key_name);
@@ -238,6 +230,16 @@ define('app/controllers/keys', [
                         $('#keys-list').fadeIn(200);
                     });
                 }, 200);
+            },
+            
+            updateKeyMachineList: function(key_name, data) {
+                for (var k = 0; k < this.keys.length; ++k) {
+                    if (this.keys[k].name == key_name) {
+                        this.keys[k].set('machines', data);
+                        warn(data);
+                        return;
+                    }
+                }
             }
         });
     }
