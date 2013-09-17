@@ -17,7 +17,7 @@ define('app/views/machine', [
                 this.setGraph();
             },
 
-enableMonitoringClick: function() {
+            enableMonitoringClick: function() {
                 if (Mist.authenticated) {
                     var machine = this.get('controller').get('model');
                     machine.openMonitoringDialog();

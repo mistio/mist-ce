@@ -11,28 +11,55 @@ define('app/views/machine_manage_keys', [
     function(Machine, machine_manage_keys_html) {
 
         return Ember.View.extend({
-            
-            selectedKey: null,
-            
+
             template: Ember.Handlebars.compile(machine_manage_keys_html),
+                        
+            selectedKey: null,
+            associatedKeys: null,
+            nonAssociatedKeys: null,
             
-            init: function() {
-                this._super();
-            },
+            keysObserver: function() {
+                
+                var aKeys = new Array();
+                var naKeys = new Array();
+                var machine = this.get('controller').get('model');
+                var found = false;
+                
+                Mist.keysController.keys.forEach(function(key) {
+                    found = false;
+                    for (var m = 0; m < key.get('machines').get('length'); ++m) {
+                        k_machine = key.machines[m];
+                        if (machine.backend.id == k_machine[0] && machine.id == k_machine[1]) {
+                            aKeys.push(key);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        naKeys.push(key);
+                    }
+                });
+                
+                this.set('associatedKeys', aKeys);
+                this.set('nonAssociatedKeys', naKeys);
+                machine.set('keysCount', aKeys.length);
+                
+                Ember.run.next(function(){
+                    $('#associated-keys').listview();
+                });
+                                
+            }.observes('Mist.keysController.keys'),
+            
+            keysProbeObserver: function() {
+                
+                
+            }.observes('associatedKeys.@each.probed', 'associatedKeys.@each.probing'),
             
             didInsertElement: function() {
-                var machine = this.get('controller').get('model'), that=this;
-                for (var i=0; i < machine.keys.content.length; i++){
-                    for (var j=0; j<machine.keys.content[i].machines.length; j++){
-                        var item = machine.keys.content[i].machines[j];
-                        machine.keys.content[i].set('probed', null);
-                        if (item[1] == machine.id && item[0] == machine.backend.id && item[2] > 0) {
-                            machine.keys.content[i].set('probed', true);
-                        } else if (item[1] == machine.id && item[0] == machine.backend.id && item[2] < 0){
-                            machine.keys.content[i].set('probed', false);
-                        }                        
-                    }
-                }
+                var that = this;
+                Ember.run.next(function(){
+                    that.keysObserver();
+                });
             },
             
             associatedKeyClicked: function(key) {

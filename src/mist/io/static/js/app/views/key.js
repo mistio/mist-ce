@@ -68,14 +68,14 @@ define('app/views/key', [
             deleteClicked: function() {
                 var key = this.get('controller').get('model');
                 Mist.confirmationController.set('title', 'Delete key');
-                Mist.confirmationController.set('text', 'Are you sure you want to delete "' + key.name +'" ?');
+                Mist.confirmationController.set('text', 'Are you sure you want to delete "' + key.name + '" ?');
                 Mist.confirmationController.set('callback', function() {
                     Mist.Router.router.transitionTo('keys'); 
                     Mist.keysController.deleteKey(key.name);
                 });
                 Mist.confirmationController.set('fromDialog', true);
                 Mist.confirmationController.show();
-            },
+            }
         });
     }
 );

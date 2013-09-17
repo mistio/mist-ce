@@ -60,7 +60,7 @@ define('app/controllers/key_add', [
                         that.set('newKeyPrivate', result.private);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while generating key: ', jqXHR.responseText);
+                        Mist.notificationController.notify('Error while generating key: ' + jqXHR.responseText);
                         error(textstate, errorThrown, ', while generating key. ', jqXHR.responseText);
                         $('#manage-keys .ajax-loader').fadeOut(200);
                     }

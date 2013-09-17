@@ -23,18 +23,9 @@ define('app/models/machine', [
             pendingDeleteTag: false,
             pendingStats: false,
             state: 'stopped',
+            keysCount: 0,
             stats:{'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
-
-            restKeys: function(){
-                var ret = [], keys = this.keys;
-                Mist.keysController.content.forEach(function(key){
-                    if (keys.indexOf(key) == -1 && key.priv) {
-                        ret.push(key);
-                    }
-                });
-                return ret;
-            }.property('keys.@each', 'Mist.keysController.@each'),
             
             image: function() {
                 return this.backend.images.getImage(this.imageId);
@@ -42,8 +33,7 @@ define('app/models/machine', [
             
             isNotGhost: function() {                
                 return ! this.isGhost;
-                //return this.state != 'terminated' && this.state != 'unknown';
-            }.property('state'),
+            }.property('isGhost'),
 
             reboot: function() {
                 log('Rebooting machine', this.name);
@@ -70,7 +60,7 @@ define('app/models/machine', [
             destroy: function() {
                 log('Destroying machine', this.name);
 
-                var that = this
+                var that = this;
                 $.ajax({
                     url: '/backends/' + this.backend.id + '/machines/' + this.id,
                     type: 'POST',
@@ -162,7 +152,7 @@ define('app/models/machine', [
                 var host = this.getHost();
                 var that = this;
                 var params =  {'host': host,
-                               'command': shell_command}
+                               'command': shell_command};
                 if (timeout != undefined) {
                     params['timeout'] = timeout;
                 }
@@ -224,7 +214,7 @@ define('app/models/machine', [
                             var key = Mist.keysController.getKeyByName(keyName);
                             if (keyName != undefined){
                                 that.set('probing', keyName);
-                                key.set('probing', that.id);   
+                                key.set('probing', that.id);
                             } else {
                                 that.set('probing', true);
                             }
@@ -372,7 +362,7 @@ define('app/models/machine', [
                             that.shell(cmd, function(){});
                             //remove machine from monitored_machines array
                             var new_monitored_machines = jQuery.grep(Mist.monitored_machines, function(value) {
-                                var machine_arr = [that.backend.id, that.id]
+                                var machine_arr = [that.backend.id, that.id];
                                 return (!($(value).not(machine_arr).length == 0 && $(machine_arr).not(value).length == 0));
                             });
                             Mist.set('monitored_machines', new_monitored_machines);

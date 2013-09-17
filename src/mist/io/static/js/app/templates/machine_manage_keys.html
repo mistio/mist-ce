@@ -12,10 +12,10 @@
             data-icon="plus" 
             data-iconpos="right" 
             {{action associateButtonClicked target="view"}}>Associate</button>
-    {{#if keys}}
+    {{#if view.associatedKeys}}
     <div>
         <ul id="associated-keys" data-role="listview">
-            {{#each keys}}
+            {{#each view.associatedKeys}}
             <div class="associated-key" {{bindAttr class="probeState"}}{{action associatedKeyClicked this target="view"}}>
                   {{this.name}}
             </div>
@@ -43,9 +43,9 @@
     </div>
 </div>
 
-<div id="associate-key-dialog" data-role="popup">
+<div id="associate-key-dialog" data-role="popup" data-corners="false">
     <ul id="non-associated-keys" data-role="listview">
-        {{#each restKeys}}
+        {{#each view.nonAssociatedKeys}}
         <li data-icon="false" data-corners="true">
             <a {{action associateKeyClicked this target="view"}}>{{this.name}}</a>
         </li>

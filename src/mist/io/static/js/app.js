@@ -230,6 +230,7 @@ define( 'app', [
         App.AddKeyView = KeyAddDialog;
         App.KeyPrivDialog = KeyPrivDialog;
         App.MachineAddView = MachineAddDialog;
+        App.MachineManageKeys = MachineManageKeys;
         
         App.set('backendAddController', BackendAddController.create());
         App.set('backendsController', BackendsController.create());
@@ -353,7 +354,6 @@ define( 'app', [
         App.ShellDialog = Shell;
         App.PowerDialog = SingleMachineActionsDialog;
         App.MachineActionsDialog = MachineActionsDialog;
-        App.MachineManageKeys = MachineManageKeys;
         App.MachineListView = MachineListView;
 
         window.Mist = App;
