@@ -16,9 +16,11 @@
     <div>
         <ul id="associated-keys" data-role="listview">
             {{#each view.associatedKeys}}
-            <div class="associated-key" {{bindAttr class="probeState"}}{{action associatedKeyClicked this target="view"}}>
-                  {{this.name}}
-            </div>
+            <span class='associated-key'> <!-- doing this nesting to deal with ember's bindAttr helper >:( -->
+                <div {{bindAttr class="probeState"}} {{action associatedKeyClicked this target="view"}}>
+                      {{this.name}}
+                </div>
+            </span>
             {{/each}}
         </ul>
     </div>

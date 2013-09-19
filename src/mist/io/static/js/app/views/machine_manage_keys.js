@@ -9,27 +9,29 @@ define('app/views/machine_manage_keys', [
      * @returns Class
      */
     function(Machine, machine_manage_keys_html) {
-
         return Ember.View.extend({
 
             template: Ember.Handlebars.compile(machine_manage_keys_html),
-                        
+
             selectedKey: null,
             associatedKeys: null,
             nonAssociatedKeys: null,
+            parentMachine: null,
 
             keysObserver: function() {
-                
                 var aKeys = new Array();
                 var naKeys = new Array();
+                var probedKeysCount = 0;
                 var machine = this.get('controller').get('model');
                 var found = false;
-                
                 Mist.keysController.keys.forEach(function(key) {
                     found = false;
                     for (var m = 0; m < key.machines.length; ++m) {
                         k_machine = key.machines[m];
-                        if (machine.backend.id == k_machine[0] && machine.id == k_machine[1]) {
+                        if (machine.id == k_machine[1] && machine.backend.id == k_machine[0]) {
+                            if (k_machine[2] > 0) {
+                                probedKeysCount++;
+                            }
                             aKeys.push(key);
                             found = true;
                             break;
@@ -39,28 +41,42 @@ define('app/views/machine_manage_keys', [
                         naKeys.push(key);
                     }
                 });
-                
                 this.set('associatedKeys', aKeys);
                 this.set('nonAssociatedKeys', naKeys);
-                machine.set('keysCount', aKeys.length);
+                machine.set('keysCount', probedKeysCount);
+                $('#mist-manage-keys').button();
                 Ember.run.next(function() {
                     $('#associated-keys').listview();
                 });
-                                
             }.observes('Mist.keysController.keys', 'Mist.keysController.keys.@each.machines'),
-            
+
             keysProbeObserver: function() {
-                
-                
-            }.observes('associatedKeys.@each.probed', 'associatedKeys.@each.probing'),
-            
+                $('#mist-manage-keys').button();
+                var that = this;
+                Mist.keysController.keys.forEach(function(key) {
+                   if (that.parentMachine.probing == key.name) {
+                       key.set('probeState', 'probing');
+                   } else {
+                       key.machines.forEach(function(machine){
+                           if (machine[2] > 0) {
+                               key.set('probeState', 'probed');
+                           } else {
+                               key.set('probeState', 'unprobed');
+                           }
+                       });
+                   }
+                });
+            }.observes('this.parentMachine.probed', 'this.parentMachine.probing'),
+
             didInsertElement: function() {
                 var that = this;
                 Ember.run.next(function() {
+                    that.set('parentMachine', that.get('controller').get('model'));
                     that.keysObserver();
+                    that.keysProbeObserver();
                 });
             },
-            
+
             associatedKeyClicked: function(key) {
                 this.selectedKey = key;
                 if (key.priv) {

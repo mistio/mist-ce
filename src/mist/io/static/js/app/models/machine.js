@@ -214,11 +214,10 @@ define('app/models/machine', [
                             var key = Mist.keysController.getKeyByName(keyName);
                             if (keyName != undefined){
                                 that.set('probing', keyName);
-                                key.set('probing', that.id);
                             } else {
                                 that.set('probing', true);
                             }
-                            
+                            $('#mist-manage-keys').button();
                             $.ajax({
                                 url: '/backends/' + that.backend.id + '/machines/' + that.id + '/probe',
                                 type: 'POST',
@@ -229,15 +228,23 @@ define('app/models/machine', [
                                        // got it fine, also means it has a key
                                     if (jqXHR.status === 200) {
                                         that.set('probed', true);
-                                        if(key) {
-                                            key.set('probed', true);
-                                        }
                                         var uptime = parseFloat(data['uptime'].split(' ')[0]) * 1000;
                                         that.set('uptimeChecked', Date.now());
                                         that.set('uptimeFromServer', uptime);
                                         info('Successfully got uptime', uptime, 'from machine', that.name);
+                                        if (key) {
+                                            Mist.keysController.updateKeyUptime(keyName, that, that.uptimeChecked);
+                                        }
                                         data.updated_keys.forEach(function(updatedKey) {
-                                            for(var i=0; i < Mist.keysController.content.length; ++i){
+                                            for (var k = 0; k < Mist.keysController.keys.length; ++k) {
+                                                existingKey = Mist.keysController.keys[k];
+                                                if (existingKey.name == updatedKey.name) {
+                                                    Mist.keysController.keys[k].set('machines', updatedKey.machines);
+                                                }
+                                            }
+                                        });
+                                        /*data.updated_keys.forEach(function(updatedKey) {
+                                            for(var i=0; i < Mist.keysController.content.length; ++i) {
                                                 existingKey = Mist.keysController.content[i];
                                                 if(existingKey.pub.split(' ').slice(0, 2).join(' ') == updatedKey.pub.split(' ').slice(0, 2).join(' ')) {
                                                     Mist.keysController.associateKey(existingKey.name, that);
@@ -248,36 +255,26 @@ define('app/models/machine', [
                                         });
                                         if (data.updated_keys.length){
                                             warn('Added ' + data.updated_keys.length + ' new keys from machine ' + that.name);
-                                        }
+                                        }*/
                                     } else {
                                         // in every other case there is a problem
                                         that.set('probed', false);
-                                        if(key) {
-                                            key.set('probed', false);
-                                        }
                                         info('Got response other than 200 while probing machine', that.name);
                                         retry(that);
                                     }
                                     that.set('probing', false);
-                                    if (key) {
-                                        key.set('probing', false);
-                                    }
                                 },
                                 error: function(jqXHR, textstate, errorThrown) {
                                     that.set('probed', false);
                                     if (key) {
-                                        key.set('probed', false);
+                                        Mist.keysController.updateKeyUptime(keyName, that, -Date.now());
                                     }
                                     //Mist.notificationController.notify('Error getting uptime from machine ' +
                                     //    that.name);
-                                    //error(textstate, errorThrown, 'when probing machine',
-                                    //    that.name);
+                                    error(textstate, errorThrown, 'when probing machine', that.name);
                                     that.set('probeInterval', 2*that.get('probeInterval'));
                                     retryProbe(that.get('probeInterval'));
                                     that.set('probing', false);
-                                    if (key) {
-                                        key.set('probing', false);
-                                    }
                                 }
                             });
                         }
