@@ -7,41 +7,43 @@
     {{bindAttr class="Mist.backendsController.state :state-providers"}}
     {{action click target="view"}}>me</button>
 
-<div id="user-dialog" class="mist-dialog" data-role="popup">
+<div id="user-dialog" class="mist-dialog" data-role="popup" data-transition="pop" data-position-to="#me-btn">
     <div data-role="content" data-theme="b">
         {{#if view.email}}
-        <img class="gravatar-image" {{bindAttr src="view.gravatarURL"}} />
+        <img class="gravatar-image" {{bindAttr src="view.gravatarURL"}}/>
         <div class="userEmail">{{view.email}}</div>
-
-        <div class="account-placeholder">
-            <a {{bindAttr href="view.account_url"}}
-                class="account-button"
-                data-role="button"
-                data-mini="true"
-                data-theme="a"
-                data-ajax="false">My account</a>
+        
+        <div id="user-dialog-buttons">
+            <div class="account-placeholder">
+                <a {{bindAttr href="view.account_url"}}
+                    class="account-button"
+                    data-role="button"
+                    data-mini="true"
+                    data-theme="a"
+                    data-ajax="false">My account</a>
+            </div>
+            {{/if}}
+    
+            <div class="support-placeholder">
+                <a href="http://mistio.uservoice.com"
+                    class="support-button"
+                    data-role="button"
+                    target="_blank"
+                    data-mini="true"
+                    data-theme="a"
+                    data-ajax="false">Support</a>
+            </div>
+    
+            {{#if view.logout}}
+            <div class="logout-placeholder">
+                <a href="logout"
+                    class="logout-button"
+                    data-role="button"
+                    data-mini="true"
+                    data-theme="a"
+                    data-ajax="false">Logout</a>
+            </div>
+            {{/if}}
         </div>
-        {{/if}}
-
-        <div class="support-placeholder">
-            <a href="http://mistio.uservoice.com"
-                class="support-button"
-                data-role="button"
-                target="_blank"
-                data-mini="true"
-                data-theme="a"
-                data-ajax="false">Support</a>
-        </div>
-
-        {{#if view.logout}}
-        <div class="logout-placeholder">
-            <a href="logout"
-                class="logout-button"
-                data-role="button"
-                data-mini="true"
-                data-theme="a"
-                data-ajax="false">Logout</a>
-        </div>
-        {{/if}}
     </div>
 </div>
