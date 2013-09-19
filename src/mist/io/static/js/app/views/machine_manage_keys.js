@@ -70,8 +70,8 @@ define('app/views/machine_manage_keys', [
 
             didInsertElement: function() {
                 var that = this;
+                this.set('parentMachine', this.get('controller').get('model'));
                 Ember.run.next(function() {
-                    that.set('parentMachine', that.get('controller').get('model'));
                     that.keysObserver();
                     that.keysProbeObserver();
                 });
@@ -151,7 +151,7 @@ define('app/views/machine_manage_keys', [
                reader.readAsText($('#key-action-upload-key')[0].files[0], 'UTF-8');  
             },
             
-            associateKeyClicked: function(key){
+            associateKeyClicked: function(key) {
                 $('#associate-key-dialog').popup('close');
                 $('#manage-keys').panel('open');
                 $('#manage-keys .ajax-loader').fadeIn(200);
@@ -161,11 +161,12 @@ define('app/views/machine_manage_keys', [
             
             createKeyClicked: function() {
                 $('#associate-key-dialog').popup('close');
-                setTimeout(function(){
-                        $('#create-key-dialog').popup('open', {transition: 'pop'});
-                }, 350); 
+                var that = this;
+                Ember.run.next(function() {
+                        $('#create-key-dialog').popup('open');
+                        Mist.keyAddController.set('associateMachine', that.parentMachine);
+                });
             },
-
         });
     }
 );

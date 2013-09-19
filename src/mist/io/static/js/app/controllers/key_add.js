@@ -13,6 +13,7 @@ define('app/controllers/key_add', [
             newKeyReady: null,
             newKeyPublic: null,
             newKeyPrivate: null,
+            associateMachine: null,
 
             init: function() {
                 this._super();

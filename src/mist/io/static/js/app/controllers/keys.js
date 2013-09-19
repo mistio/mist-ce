@@ -65,6 +65,11 @@ define('app/controllers/keys', [
                                 $('#keys-list').fadeIn(200);
                             });
                         }, 200);
+                        if (Mist.keyAddController.associateMachine) {
+                            that.associateKey(name, Mist.keyAddController.associateMachine);
+                            $('#manage-keys .ajax-loader').fadeIn(200);
+                            Mist.keyAddController.set('associateMachine', null);
+                        }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while creating new key: ' + jqXHR.responseText);

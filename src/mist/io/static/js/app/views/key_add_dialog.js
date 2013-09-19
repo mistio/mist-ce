@@ -41,9 +41,9 @@ define('app/views/key_add_dialog', [
             backClicked: function() {
                 $("#create-key-dialog").popup("close");
                 Mist.keyAddController.newKeyClear();
-                if (this.getAssociatedMachine()){
-                    // TODO: Revert this to timeout
-                    Ember.run.later(function(){
+                if (Mist.keyAddController.associateMachine){
+                    Mist.keyAddController.set('associateMachine', null);
+                    Ember.run.next(function() {
                         $('#associate-key-dialog').popup('option', 'positionTo', '#associate-key-button').popup('open');
                     });
                 }
