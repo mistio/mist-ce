@@ -254,6 +254,9 @@ def get_machine_actions(machine, backend):
         if backend.type in EC2_PROVIDERS:
             can_stop = False
             can_start = True
+        if backend.type == Provider.NEPHOSCALE:
+            can_stop = False
+            can_start = True        
         can_reboot = False
     elif machine.state in (NodeState.TERMINATED,):
         can_start = False
