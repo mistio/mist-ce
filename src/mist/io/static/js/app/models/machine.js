@@ -27,6 +27,18 @@ define('app/models/machine', [
             stats:{'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
             
+            probedObserver: function() {
+                Ember.run.next(function() {
+                    Ember.run.next(function() {
+                        try{
+                            $('#mist-manage-keys').button();
+                        } catch(e) {
+                            $('#mist-manage-keys').button('refresh');
+                        }
+                    });
+                });
+            }.observes('probed', 'probing', 'keysCount'),
+            
             image: function() {
                 return this.backend.images.getImage(this.imageId);
             }.property('image'),
@@ -217,7 +229,6 @@ define('app/models/machine', [
                             } else {
                                 that.set('probing', true);
                             }
-                            $('#mist-manage-keys').button();
                             $.ajax({
                                 url: '/backends/' + that.backend.id + '/machines/' + that.id + '/probe',
                                 type: 'POST',

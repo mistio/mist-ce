@@ -500,19 +500,6 @@ define('app/views/machine', [
                     $('.pending-monitoring').hide();
                 }
             }.observes('controller.model.pendingMonitoring'),
-            
-            updateManageKeysButton: function() {
-                Ember.run.next(function(){
-                    Ember.run.next(function(){
-                        try{
-                            $('#mist-manage-keys').button();
-                            warn('updating button');
-                        } catch(e) {
-                            $('#mist-manage-keys').button('refresh');
-                        }                    
-                    });
-                });
-            }.observes('controller.model.probed'),            
 
             showShell: function() {
                 $("#dialog-shell").popup('option', 'positionTo', '#machines-button-shell')

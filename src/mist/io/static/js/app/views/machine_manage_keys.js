@@ -44,14 +44,12 @@ define('app/views/machine_manage_keys', [
                 this.set('associatedKeys', aKeys);
                 this.set('nonAssociatedKeys', naKeys);
                 machine.set('keysCount', probedKeysCount);
-                $('#mist-manage-keys').button();
                 Ember.run.next(function() {
                     $('#associated-keys').listview();
                 });
             }.observes('Mist.keysController.keys', 'Mist.keysController.keys.@each.machines'),
 
             keysProbeObserver: function() {
-                $('#mist-manage-keys').button();
                 var that = this;
                 Mist.keysController.keys.forEach(function(key) {
                    if (that.parentMachine.probing == key.name) {
