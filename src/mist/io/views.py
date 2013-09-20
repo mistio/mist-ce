@@ -2,7 +2,7 @@
 import os
 import tempfile
 import logging
-
+import random
 from time import time
 
 from datetime import datetime
@@ -427,6 +427,42 @@ def create_machine(request):
             os.remove(tmp_key_path)
         except:
             pass
+    elif conn.type is Provider.NEPHOSCALE and public_key:
+        machine_name = machine_name[:15].replace(' ','-')
+        #machine name in NephoScale need be up to 15 chars, with no spaces        
+
+        key = str(public_key)
+        
+        #NephoScale has 2 keys that need be specified, console and ssh key
+        #get the id of the ssh key if it exists, otherwise add the key
+        try:
+            keys = conn.list_ssh_keys()
+            for k in keys:
+                if key == k.get('public_key'):
+                    server_key = k.get('id')
+                    break
+            server_key = conn.add_ssh_key(machine_name, key)
+        except:
+            server_key = conn.add_ssh_key('mistio'+str(random.randint(1,100000)), key)                          
+
+        #mist.io does not support console key add through the wizzard. Try to add one    
+        try:
+            console_key = conn.add_password_key('mistio'+str(random.randint(1,100000)))
+        except:
+            console_keys = conn.list_all_keys(key_group=4)
+            if console_keys:
+                console_key = console_keys[0].get('id')        
+
+        try:
+            node = conn.deploy_node(name=machine_name,
+                             hostname=machine_name,
+                             image=image,
+                             size=size,
+                             server_key=server_key,
+                             console_key=console_key)
+            associate_key(request, key_id, backend_id, node.id, deploy=False)
+        except Exception as e:
+            return Response('Failed to create machine in NephoScale: %s' % e, 500)
     elif conn.type is Provider.LINODE and public_key and private_key:
         auth = NodeAuthSSHKey(public_key)
 
