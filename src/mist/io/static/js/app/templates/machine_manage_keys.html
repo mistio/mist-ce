@@ -1,20 +1,15 @@
-<div id="manage-keys" 
-     data-role="panel" 
-     data-position="right" 
-     data-theme="b"
-     data-display="overlay">
-     
+<div data-role="panel" id="manage-keys" data-position="right" data-display="overlay" data-theme="b">
     <div data-role="header">
         <h1>Manage Keys</h1>
     </div>
-    <button id="associate-key-button" 
-            data-theme="b" 
-            data-icon="plus" 
-            data-iconpos="right" 
-            {{action associateButtonClicked target="view"}}>Associate</button>
-    {{#if view.associatedKeys}}
-    <div>
-        <ul id="associated-keys" data-role="listview">
+    <div data-role="content">
+        <button id="associate-key-button" 
+                data-theme="b" 
+                data-icon="plus" 
+                data-iconpos="right" 
+                {{action associateButtonClicked target="view"}}>Associate</button>
+        {{#if view.associatedKeys}}
+        <div id="associated-keys" data-role="listview">
             {{#each view.associatedKeys}}
             <span class='associated-key'> <!-- doing this nesting to deal with ember's bindAttr helper >:( -->
                 <div {{bindAttr class="probeState"}} {{action associatedKeyClicked this target="view"}}>
@@ -22,45 +17,44 @@
                 </div>
             </span>
             {{/each}}
-        </ul>
+        </div>
+        {{/if}}
+        <div class="ajax-loader"></div>
+        <button {{action backClicked target="view"}}>Back</button>
     </div>
-    {{/if}}
-    <div class="ajax-loader"></div>
-    <button {{action backClicked target="view"}}>Back</button>
-</div>
 
-<div id="key-actions" data-role="popup">
-    <div data-role="header">
-        <h1>Actions</h1>
+    <div id="key-actions" data-role="popup">
+        <div data-role="header">
+            <h1>Actions</h1>
+        </div>
+        <div id="key-actions-container">
+            <button id="key-action-remove" {{action actionRemoveClicked target="view"}}>Remove</button>
+            <button id="key-action-upload" {{action actionUploadClicked target="view"}}>Upload private</button>
+            <button id="key-action-probe" {{action actionProbeClicked target="view"}}>Probe</button>
+            <button id="key-action-back" {{action actionBackClicked target="view"}}>Back</button>
+        </div>
+        <div id="action-upload-key">
+            <input type="file" id="key-action-upload-key" name="file" {{action uploadInputChanged on="change" target="view"}} />
+        </div>
     </div>
     
-    <div id="key-actions-container">
-        <button id="key-action-remove" {{action actionRemoveClicked target="view"}}>Remove</button>
-        <button id="key-action-upload" {{action actionUploadClicked target="view"}}>Upload private</button>
-        <button id="key-action-probe" {{action actionProbeClicked target="view"}}>Probe</button>
-        <button id="key-action-back" {{action actionBackClicked target="view"}}>Back</button>
+    <div id="associate-key-dialog" data-role="popup" data-corners="false">
+        <ul id="non-associated-keys" data-role="listview">
+            {{#each view.nonAssociatedKeys}}
+            <li data-icon="false" data-corners="true">
+                <a {{action associateKeyClicked this target="view"}}>{{this.name}}</a>
+            </li>
+            {{/each}}
+            <li data-icon="false" data-corners="true" data-theme="b"> 
+                <a {{action createKeyClicked target="view"}}>New key</a>
+            </li>
+        </ul>
     </div>
-    <div id="action-upload-key">
-        <input type="file" id="key-action-upload-key" name="file" {{action uploadInputChanged on="change" target="view"}} />
+    
+    <div id="create-key-dialog" data-role="popup" class="mist-dialog" data-transition="pop">
+        <div data-role="header">
+            <h1>Create key</h1>
+        </div>
+        {{view Mist.AddKeyView data-role="content"}}
     </div>
-</div>
-
-<div id="associate-key-dialog" data-role="popup" data-corners="false">
-    <ul id="non-associated-keys" data-role="listview">
-        {{#each view.nonAssociatedKeys}}
-        <li data-icon="false" data-corners="true">
-            <a {{action associateKeyClicked this target="view"}}>{{this.name}}</a>
-        </li>
-        {{/each}}
-        <li data-icon="false" data-corners="true" data-theme="b"> 
-            <a {{action createKeyClicked target="view"}}>New key</a>
-        </li>
-    </ul>
-</div>
-
-<div id="create-key-dialog" data-role="popup" class="mist-dialog" data-transition="pop">
-    <div data-role="header">
-        <h1>Create key</h1>
-    </div>
-    {{view Mist.AddKeyView data-role="content"}}
 </div>

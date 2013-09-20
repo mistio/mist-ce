@@ -1325,7 +1325,7 @@ iframe#hidden-shell-iframe {
 }
 
 #manage-keys.ui-panel-open {
-    min-width: 320px;
+    min-width: 305px;
 }
 
 #associated-keys-label {
@@ -1334,13 +1334,14 @@ iframe#hidden-shell-iframe {
 
 #associated-keys {
     display: inline-block;
+    margin: 1px;
 }
 
 .associated-key div{
     display: block;
     float: left;
-    padding: 12px;
-    margin: 0 6px 6px 0;
+    padding: 10px;
+    margin: 0 5px 5px 0;
     background: #ddd;
     -webkit-border-radius: 19px;
     -moz-border-radius: 19px;

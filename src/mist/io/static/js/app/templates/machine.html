@@ -11,8 +11,6 @@
 
 </div>
 
-{{view Mist.MachineManageKeys}}
-
 <div class="single-view-header" data-role="header">
 
     <span class="single-view-icon-wrapper">
@@ -58,6 +56,7 @@
 </div>
 
 <div data-role="content">
+    
     {{#if probing}}
         <div class="probing">
             <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
@@ -232,6 +231,8 @@
     <div class="bottom-padding"></div>
 
 </div>
+
+{{view Mist.MachineManageKeys}}
 
 <div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
     <div data-role="header">
