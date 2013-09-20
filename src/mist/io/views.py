@@ -436,12 +436,14 @@ def create_machine(request):
         #NephoScale has 2 keys that need be specified, console and ssh key
         #get the id of the ssh key if it exists, otherwise add the key
         try:
+            server_key = ''        
             keys = conn.list_ssh_keys()
             for k in keys:
                 if key == k.get('public_key'):
                     server_key = k.get('id')
                     break
-            server_key = conn.add_ssh_key(machine_name, key)
+            if not server_key:
+                server_key = conn.add_ssh_key(machine_name, key)
         except:
             server_key = conn.add_ssh_key('mistio'+str(random.randint(1,100000)), key)                          
 
