@@ -141,6 +141,7 @@ enableMonitoringClick: function() {
                 } catch(e){
                     //var dnsName = null, launchDate = null;
                 }
+
                 
                 var basicvars = {
                         'Public IPs': publicIps,
