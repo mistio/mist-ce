@@ -13,7 +13,6 @@ define('app/controllers/key_add', [
             newKeyReady: null,
             newKeyPublic: null,
             newKeyPrivate: null,
-            associateMachine: null,
 
             init: function() {
                 this._super();
@@ -29,10 +28,11 @@ define('app/controllers/key_add', [
                 }
             }.observes('newKeyName', 'newKeyPrivate'),
 
-            newKey: function() {
+            newKey: function(machine) {
                 Mist.keysController.newKey(this.get('newKeyName'),
                                             this.get('newKeyPublic'),
-                                            this.get('newKeyPrivate'));
+                                            this.get('newKeyPrivate'),
+                                            machine);
             },
 
             editKey: function(oldKeyName) {

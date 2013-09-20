@@ -38,7 +38,7 @@ define('app/controllers/keys', [
                 });
             },
 
-            newKey: function(name, publicKey, privateKey) {
+            newKey: function(name, publicKey, privateKey, machine) {
                 name = name.trim();
                 item = {
                     'name': name,
@@ -65,10 +65,9 @@ define('app/controllers/keys', [
                                 $('#keys-list').fadeIn(200);
                             });
                         }, 200);
-                        if (Mist.keyAddController.associateMachine) {
-                            that.associateKey(name, Mist.keyAddController.associateMachine);
+                        if (machine) {
+                            that.associateKey(name, machine);
                             $('#manage-keys .ajax-loader').fadeIn(200);
-                            Mist.keyAddController.set('associateMachine', null);
                         }
                     },
                     error: function(jqXHR, textstate, errorThrown) {

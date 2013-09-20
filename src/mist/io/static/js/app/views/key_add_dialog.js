@@ -41,8 +41,7 @@ define('app/views/key_add_dialog', [
             backClicked: function() {
                 $("#create-key-dialog").popup("close");
                 Mist.keyAddController.newKeyClear();
-                if (Mist.keyAddController.associateMachine){
-                    Mist.keyAddController.set('associateMachine', null);
+                if (this.getAssociatedMachine()){
                     Ember.run.next(function() {
                         $('#associate-key-dialog').popup('option', 'positionTo', '#associate-key-button').popup('open');
                     });
@@ -86,10 +85,18 @@ define('app/views/key_add_dialog', [
                 }
                 
                 if (this.get('notEditMode')) {
-                    Mist.keyAddController.newKey();
+                    Mist.keyAddController.newKey(this.getAssociatedMachine());
                 } else {
                     Mist.keyAddController.editKey(this.get('parentView').get('controller').get('model').name);
                 }
+            },
+            
+            getAssociatedMachine: function() {
+                var machine;
+                try {
+                    machine = this.get('parentView').get('controller').get('model');
+                } catch (e) {}
+                return machine;
             }
         });
     }
