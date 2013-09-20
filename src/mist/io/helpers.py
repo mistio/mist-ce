@@ -236,6 +236,10 @@ def get_machine_actions(machine, backend):
     if backend.type in EC2_PROVIDERS:
         can_stop = True
 
+    if backend.type == Provider.NEPHOSCALE:
+        can_stop = True
+        can_tag = False
+
     if backend.type == Provider.RACKSPACE_FIRST_GEN or \
                        backend.type == Provider.LINODE:
         can_tag = False
