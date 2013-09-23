@@ -156,10 +156,16 @@ define('app/views/machine_add_dialog', [
 
             newMachineClicked: function() {
                 //FIXME there should be a way to bind the action directly to the controller
-                Mist.machineAddController.newMachine();
-                $('.dialog-add').panel('close');
-                Mist.Router.router.transitionTo('machines');
-                this.clear();
+                var providerName = $('.select-provider-collapsible span.ui-btn-text').text()
+                var machineName = $('#create-machine-name').val()
+                if ((providerName == 'NephoScale') && ((machineName.length > 15)||  (machineName.indexOf(' ') >= 0))) {
+                    Mist.notificationController.warn('Nephoscale only accepts machine names less than 15 characters long and without white spaces');
+                } else { 
+                    Mist.machineAddController.newMachine();
+                    $('.dialog-add').panel('close');
+                    Mist.Router.router.transitionTo('machines');
+                    this.clear();
+                }
             },
 
             generateKey: function() {
