@@ -242,27 +242,10 @@ define('app/controllers/keys', [
                 for (var k = 0; k < this.keys.length; ++k) {
                     if (this.keys[k].name == keyName) {
                         this.keys[k].set('machines', data);
-                        warn(data);
                         return;
                     }
                 }
-            },
-
-            updateKeyUptime: function(keyName, machine, timeStamp) {
-                for (var k = 0; k < this.keys.length; ++k) {
-                    var key = this.keys[k];
-                    if (key.name == keyName) {
-                        for (var m = 0; m < key.machines.length; ++m) {
-                            if (key.machines[m][1] == machine.id && key.machines[m][0] == machine.backend.id) {
-                                var machines = this.keys[k].machines;
-                                machines[m][2] = timeStamp;
-                                this.keys[k].set('machines', machines);
-                                return;
-                            }
-                        }
-                    }
-                } 
-            } 
+            }
         });
     }
 );

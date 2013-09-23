@@ -107,7 +107,7 @@ define('app/controllers/backends', [
 
             checkMonitoring: function(){
                 if (!Mist.authenticated){
-                    return
+                    return;
                 }
                 
                 var that = this;

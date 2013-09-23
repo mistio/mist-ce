@@ -15,7 +15,22 @@ define('app/models/key', [
             machines: null,
             selected: null,
             default_key: null,
-            probeState: 'unprobed'
+            probeState: 'unprobed',
+            
+            updateProbeState: function(machine, timeStamp) {
+                for (var m = 0; m < this.machines.length; ++m) {
+                    if (this.machines[m][1] == machine.id && 
+                        this.machines[m][0] == machine.backend.id) {
+                            this.machines[m][2] = timeStamp;
+                            if (timeStamp > 0) {
+                                this.set('probeState', 'probed');
+                            } else {
+                                this.set('probeState', 'unprobed');
+                            }
+                            return;
+                    }
+                }
+            }
         });
     }
 );
