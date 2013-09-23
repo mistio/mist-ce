@@ -158,8 +158,8 @@ define('app/views/machine_add_dialog', [
                 //FIXME there should be a way to bind the action directly to the controller
                 var providerName = $('.select-provider-collapsible span.ui-btn-text').text();
                 var machineName = $('#create-machine-name').val();
-                if ((providerName == 'NephoScale') && ((machineName.length > 15)||(machineName.indexOf(' ') >= 0))) {
-                    Mist.notificationController.warn('Nephoscale only accepts machine names less than 15 characters long and without white spaces');
+                if ((providerName == 'NephoScale') && ((machineName.length > 64)||(machineName.indexOf(' ') >= 0))) {
+                    Mist.notificationController.timeNotify("Server name in NephoScale must start with a letter, can contain mixed alpha-numeric characters, hyphen ('-') and underscore ('_') characters, cannot exceed 64 characters, and can end with a letter or a number.", 7000);
                 } else { 
                     Mist.machineAddController.newMachine();
                     $('.dialog-add').panel('close');

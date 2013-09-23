@@ -428,10 +428,13 @@ def create_machine(request):
         except:
             pass
     elif conn.type is Provider.NEPHOSCALE and public_key:
-        machine_name = machine_name[:15].replace(' ','-')
-        #machine name in NephoScale need be up to 15 chars, with no spaces        
+        machine_name = machine_name[:64].replace(' ','-')
+        #name in NephoScale must start with a letter, can contain mixed alpha-numeric characters, 
+        #hyphen ('-') and underscore ('_') characters, cannot exceed 64 characters, and can end with a letter or a number."
 
-        key = str(public_key)
+        #Hostname must start with a letter, can contain mixed alpha-numeric characters 
+        #and the hyphen ('-') character, cannot exceed 15 characters, and can end with a letter or a number.
+        key = str(public_key).replace('\n','')
         
         #NephoScale has 2 keys that need be specified, console and ssh key
         #get the id of the ssh key if it exists, otherwise add the key
@@ -457,7 +460,7 @@ def create_machine(request):
 
         try:
             node = conn.deploy_node(name=machine_name,
-                             hostname=machine_name,
+                             hostname=machine_name[:15],
                              image=image,
                              size=size,
                              server_key=server_key,
