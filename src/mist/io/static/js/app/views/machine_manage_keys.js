@@ -37,7 +37,7 @@ define('app/views/machine_manage_keys', [
                                 aKeys.push(key);
                                 found = true;
                                 break;
-                            }
+                            } 
                         }
                     }
                     if (!found) {
