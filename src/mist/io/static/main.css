@@ -69,6 +69,12 @@ div#splash div.mist-logo {
     left: 20px;
 }
 
+/* User dialog */
+
+#user-dialog-buttons {
+    margin: 5px;
+}
+
 /* Search field */
 
 #machines .ui-listview-filter-inset, #keys .ui-listview-filter-inset {

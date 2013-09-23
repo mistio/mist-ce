@@ -400,14 +400,13 @@ def create_machine(request):
                     price='', driver=conn)
     image = NodeImage(image_id, name='', extra=image_extra, driver=conn)
 
+    location = NodeLocation(location_id, name='', country='', driver=conn)
     if conn.type in EC2_PROVIDERS:
         locations = conn.list_locations()
         for loc in locations:
             if loc.id == location_id:
                 location = loc
                 break
-    else:
-        location = NodeLocation(location_id, name='', country='', driver=conn)
 
     if conn.type in [Provider.RACKSPACE_FIRST_GEN, 
                      Provider.RACKSPACE, 
@@ -980,7 +979,10 @@ def list_locations(request):
     ret = []
     for location in locations:
         if conn.type in EC2_PROVIDERS:
-            name = location.availability_zone.name
+            try:
+                name = location.availability_zone.name
+            except:
+                name = location.name
         else:
             name = location.name
 
