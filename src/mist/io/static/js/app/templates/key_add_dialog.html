@@ -1,40 +1,37 @@
 
-        <label for="create-key-name">Name:</label>
-        {{view Mist.TextField
-            valueBinding="Mist.keyAddController.newKeyName"
-            name="create-key-name"
-            id="create-key-name"}}
-        
-        {{#if view.notEditMode}}
-        <button data-theme="b" data-icon="gear" {{action "generateClicked" target="view"}}>Generate</button>
-        <div class="ajax-loader"></div>
-        {{/if}}
+    <label for="create-key-name">Name:</label>
+    {{view Mist.TextField
+        valueBinding="Mist.keyAddController.newKeyName"
+        id="create-key-name"}}
 
-        <label for="textarea-public-key">Public Key:</label>
-        {{view Ember.TextArea
-            valueBinding="Mist.keyAddController.newKeyPublic"
-            name="textarea-public-key"
-            id="textarea-public-key"}}
-            
-        <div id="upload-input">
-            <a class="upload-key" data-role="button" data-mini="true" {{action uploadClicked "public" target="view"}} >Upload</a>
-            <input type="file" id="upload-public-key-input" name="file" {{action uploadInputChanged "public" on="change" target="view"}} />
-        </div>
-        
-        <label for="textarea-private-key">Private Key:</label>
-        {{view Ember.TextArea
-            valueBinding="Mist.keyAddController.newKeyPrivate"
-            name="textarea-private-key"
-            id="textarea-private-key"}}
-        
-        <div id="upload-input">
-            <a class="upload-key" data-role="button" data-mini="true" {{action uploadClicked "private" target="view"}} >Upload</a>
-            <input type="file" id="upload-private-key-input" name="file"{{action uploadInputChanged "private" on="change" target="view"}} />
-        </div>
-        
-        <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <button id="create-key-cancel" data-theme="c" {{action "backClicked" target="view"}}>Back</button>
-            <button id="create-key-ok" data-theme="b" disabled {{action "newKeyClicked" target="view"}}>
-            {{#if view.notEditMode}}Add{{else}}Save{{/if}}
-            </button>
-        </div>
+    {{#if view.notEditMode}}
+    <button data-theme="b" data-icon="gear" {{action generateClicked target="view"}}>Generate</button>
+    <div class="ajax-loader"></div>
+    {{/if}}
+
+    <label for="textarea-public-key">Public Key:</label>
+    {{view Ember.TextArea
+        valueBinding="Mist.keyAddController.newKeyPublic"
+        id="textarea-public-key"}}
+
+    <div id="upload-input">
+        <a class="upload-key" data-role="button" data-mini="true" {{action uploadClicked "public" target="view"}}>Upload</a>
+        <input type="file" id="upload-public-key-input" name="file" {{action uploadInputChanged "public" on="change" target="view"}}/>
+    </div>
+
+    <label for="textarea-private-key">Private Key:</label>
+    {{view Ember.TextArea
+        valueBinding="Mist.keyAddController.newKeyPrivate"
+        id="textarea-private-key"}}
+
+    <div id="upload-input">
+        <a class="upload-key" data-role="button" data-mini="true" {{action uploadClicked "private" target="view"}}>Upload</a>
+        <input type="file" id="upload-private-key-input" name="file"{{action uploadInputChanged "private" on="change" target="view"}}/>
+    </div>
+
+    <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+        <a href="#" data-role="button" id="create-key-cancel" {{action backClicked target="view"}}>Back</a>
+        <a href="#" data-role="button" id="create-key-ok" class="ui-disabled" data-theme="b" {{action createClicked target="view"}}>
+        {{#if view.notEditMode}}Create{{else}}Save{{/if}}
+        </a>
+    </div>

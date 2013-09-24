@@ -15,15 +15,13 @@ define('app/controllers/machines', [
 
             init: function() {
                 this._super();
-                this.set('content', []),
+                this.set('content', []);
                 this.refresh();
             },
 
             refresh: function(){
 
                 if(!this.backend.enabled){
-                    this.backend.set('state', 'offline');
-                    this.clear();
                     return;
                 }
 
@@ -32,7 +30,9 @@ define('app/controllers/machines', [
                 this.backend.set('state', 'waiting');
                 this.backend.set('loadingMachines', true);
                 $.getJSON('/backends/' + this.backend.id + '/machines', function(data) {
-
+                    if (!that.backend.enabled) {
+                        return;
+                    }
                     if (typeof Mist.monitored_machines === 'undefined') {
                         //check monitoring failed, re-run. This shall be moved though, since here it gets executed just 2 times
                         Mist.backendsController.checkMonitoring();
@@ -179,7 +179,6 @@ define('app/controllers/machines', [
                     $('#machines-list input.ember-checkbox').checkboxradio();    
                 });
                 var that = this;
-
                 $.ajax({
                     url: 'backends/' + this.backend.id + '/machines',
                     type: 'POST',
@@ -189,17 +188,19 @@ define('app/controllers/machines', [
                     success: function(data) {
                         info('Successfully sent create machine', name, 'to backend',
                                     that.backend.title);
-                        warn(data);
                         if (that.backend.error) {
                             that.backend.set('error', false);
-                        }     
+                        }
                         machine.set("id", data.id);
                         machine.set("name", data.name);
                         machine.set("public_ips", data.public_ips);
                         machine.set("private_ips", data.private_ips);
                         machine.set("extra", data.extra);
                         that.backend.set('create_pending', false);
-                        key.machines.addObject([that.backend.id, data.id]);
+                        var key_machines = key.machines;
+                        key_machines.push([machine.backend.id, machine.id]);
+                        key.set('machines', key_machines);
+                        machine.probe(key.name);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.timeNotify(jqXHR.responseText, 15000);
@@ -207,7 +208,6 @@ define('app/controllers/machines', [
                         that.removeObject(machine);
                         that.backend.set('error', textstate);
                         that.backend.set('create_pending', false);
-
                     }
                 });
             }

@@ -4,121 +4,69 @@ define('app/views/key_list', [
     'ember'
     ],
     /**
-     *
-     * Key list page
+     * Key List View
      *
      * @returns Class
      */
     function(MistScreen, key_list_html) {
         return MistScreen.extend({
-            
+
             template: Ember.Handlebars.compile(key_list_html),
 
-            setDefaultKey: function(){
-                var key = this.getSelectedKeys();
+            selectedKey: null,
 
-                if(key.length == 0){
-                    return;
-                } else if(key.length > 1){
-                    alert('You can only set one key as the deafult');
-                    return;
-                }
-                
-                key[0].setDefaultKey();
-                $('#keys .keys-footer').fadeOut(200);
-            },
-
-            deleteKey: function(){
-                var keys = this.getSelectedKeys();
-                var plural = false;
-
-                if(keys.length == 0){
-                    return;
-                } else if(keys.length > 1){
-                    plural = true;
-                }
-
-                Mist.confirmationController.set("title", 'Delete Key' + (plural ? 's' : ''));
-
-                var names = '';
-
-                keys.forEach(function(key){
-                    names = names + ' ' + key.name;
-                });
-
-                Mist.confirmationController.set("text", 'Are you sure you want to delete' +
-                        names +'?');
-
-                Mist.confirmationController.set("callback", function(){
-                    keys.forEach(function(key){
-                       key.deleteKey();
-                    });
-                    $('#keys .keys-footer').fadeOut(200);
-                });
-
-                Mist.confirmationController.set("fromDialog", true);
-                Mist.confirmationController.show();
-            },
-
-            getSelectedKeys: function(){
-                var keys = new Array();
-
-                Mist.keysController.forEach(function(key){
-                    if(key.selected){
-                        keys.push(key);
+            selectedKeysObserver: function() {
+                var selectedKeysCount = 0;
+                var that = this;
+                Mist.keysController.keys.forEach(function(key) {
+                    if (key.selected) {
+                        selectedKeysCount++;
+                        that.selectedKey = key;
                     }
                 });
+                if (selectedKeysCount == 0) {
+                    $('#keys-footer').fadeOut(200);
+                }
+                else if (selectedKeysCount == 1) {
+                    $('#keys-footer').fadeIn(200);
+                    $('#keys-footer a').removeClass('ui-disabled');
+                } else {
+                    $('#keys-footer a').addClass('ui-disabled');
+                }
+            }.observes('Mist.keysController.keys.@each.selected'),
 
-                return keys;
+            createClicked: function() {
+               $("#create-key-dialog").popup("open");
             },
-            
-            addKey: function(){
-        	   $("#dialog-add-key").popup("open", {transition: 'pop'});
+
+            selectClicked: function() {
+                $('#select-keys-dialog').popup('open');
             },
-            
-            selectKeys: function(event) {
-                var selection = $(event.target).attr('title');
-    
-                if(selection == 'none'){
-                    Mist.keysController.forEach(function(key){
-                        log('deselecting key: ' + key.name);
-                        key.set('selected', false);
-                    });
-                } else if(selection == 'all'){
-                    Mist.keysController.forEach(function(key){
-                        log('selecting key: ' + key.name);
-                        key.set('selected', true);
-                    });
-                }  
+
+            selectModeClicked: function(mode) {
+                Mist.keysController.keys.forEach(function(key){
+                    key.set('selected', mode);
+                });
                 Ember.run.next(function(){
                     $("input[type='checkbox']").checkboxradio("refresh");
                 });
-                $("#select-keys-listmenu li a").off('click', this.selectKeys);
-                $('#select-keys-popup').popup('close');
-                return false;                           
+                $('#select-keys-dialog').popup('close');
             },
-            
-            openKeySelectPopup: function() {
-                $('#select-keys-listmenu').listview('refresh');
-                $('#select-keys-popup').popup('option', 'positionTo', '.select-keys').popup('open', {transition: 'pop'});
-                $("#select-keys-listmenu li a").on('click', this.selectKeys);
-            },
-            
-            disabledDefaultClass : function() {
-                var keys = new Array();
-    
-                Mist.keysController.forEach(function(key) {
-                    if (key.selected == true) {
-                        keys.push(key);
-                    }
+
+            deleteClicked: function() {
+                var that = this;
+                Mist.confirmationController.set('title', 'Delete key');
+                Mist.confirmationController.set('text', 'Are you sure you want to delete "' + that.selectedKey.name +'" ?');
+                Mist.confirmationController.set('callback', function() {
+                    Mist.keysController.deleteKey(that.selectedKey.name);                
                 });
-                if (keys.length != 1) {
-                    // only enable action if a single key is selected
-                    return 'ui-disabled';
-                } else {
-                    return '';
-                }
-            }.property('Mist.keysController.selectedKeyCount')                     
+                Mist.confirmationController.set('fromDialog', true);
+                Mist.confirmationController.show();
+            },
+            
+            setDefaultClicked: function() {
+                Mist.keysController.setDefaultKey(this.selectedKey.name);
+            }
         });
     }
 );

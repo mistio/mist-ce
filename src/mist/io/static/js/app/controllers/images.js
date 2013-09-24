@@ -34,15 +34,21 @@ define('app/controllers/images', [
 
             init: function() {
                 this._super();
-
-                if (this.backend.error && this.backend.state == 'offline'){
-                    return
+                
+                if (!this.backend.enabled) {
+                    return;
+                }
+                else if (this.backend.error && this.backend.state == 'offline'){
+                    return;
                 }
                 
                 this.backend.set('state', 'waiting');
                 this.backend.set('loadingImages', true);
                 var that = this;
                 $.getJSON('/backends/' + this.backend.id + '/images', function(data) {
+                    if (!that.backend.enabled) {
+                        return;
+                    }
                     var content = new Array();
                     data.forEach(function(item){
                         item.backend = that.backend;

@@ -12,7 +12,7 @@ define('app/views/backend_button', ['ember'],
 
             attributeBindings: ['data-role', 'data-theme', 'data-inline', 'data-role', 'data-icon'],
 
-            didInsertElement: function(e) {
+            didInsertElement: function() {
                 if ('button' in $("#"+this.elementId)) {
                     $("#"+this.elementId).button();
                 }

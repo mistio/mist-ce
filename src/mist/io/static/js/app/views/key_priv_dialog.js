@@ -11,7 +11,7 @@ define('app/views/key_priv_dialog', [
 function(key_priv_dialog_html) {
     return Ember.View.extend({
 
-	attributeBindings: ['data-role',],
+	    attributeBindings: ['data-role',],
 
         back: function() {
             $("#key-private-dialog").popup("close");

@@ -22,28 +22,28 @@ define('app/models/machine', [
             pendingAddTag: false,
             pendingDeleteTag: false,
             pendingStats: false,
+            keysCount: 0,
             state: 'stopped',
             stats:{'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
-
-            restKeys: function(){
-                var ret = [], keys = this.keys;
-                Mist.keysController.content.forEach(function(key){
-                    if (keys.indexOf(key) == -1 && key.priv) {
-                        ret.push(key);
+            
+            probedObserver: function() {
+                Ember.run.next(function() {
+                    try {
+                        $('#mist-manage-keys').button();
+                    } catch (e) {
+                        $('#mist-manage-keys').button('refresh');
                     }
                 });
-                return ret;
-            }.property('keys.@each', 'Mist.keysController.@each'),
+            }.observes('probed', 'probing'),
             
             image: function() {
                 return this.backend.images.getImage(this.imageId);
-            }.property('image'),
+            }.property('imageId'),
             
             isNotGhost: function() {                
                 return ! this.isGhost;
-                //return this.state != 'terminated' && this.state != 'unknown';
-            }.property('state'),
+            }.property('isGhost'),
 
             reboot: function() {
                 log('Rebooting machine', this.name);
@@ -69,8 +69,7 @@ define('app/models/machine', [
 
             destroy: function() {
                 log('Destroying machine', this.name);
-
-                var that = this
+                var that = this;
                 $.ajax({
                     url: '/backends/' + this.backend.id + '/machines/' + this.id,
                     type: 'POST',
@@ -162,7 +161,7 @@ define('app/models/machine', [
                 var host = this.getHost();
                 var that = this;
                 var params =  {'host': host,
-                               'command': shell_command}
+                               'command': shell_command};
                 if (timeout != undefined) {
                     params['timeout'] = timeout;
                 }
@@ -212,9 +211,7 @@ define('app/models/machine', [
                         return false;
                     }
                     
-                    if (that.backend.create_pending){
-                        // Try again later if a machine is being created on this backend
-                        retryProbe();
+                    if (that.backend.create_pending) {
                         return false;
                     }
 
@@ -238,56 +235,67 @@ define('app/models/machine', [
                                 success: function(data, textStatus, jqXHR) {
                                        // got it fine, also means it has a key
                                     if (jqXHR.status === 200) {
-                                        that.set('probed', true);
                                         if(key) {
-                                            key.set('probed', true);
+                                            key.updateProbeState(that, Date.now());
+                                        } else {
+                                            that.set('probed', true);
                                         }
                                         var uptime = parseFloat(data['uptime'].split(' ')[0]) * 1000;
                                         that.set('uptimeChecked', Date.now());
                                         that.set('uptimeFromServer', uptime);
                                         info('Successfully got uptime', uptime, 'from machine', that.name);
+                                        /*
                                         data.updated_keys.forEach(function(updatedKey) {
-                                            for(var i=0; i < Mist.keysController.content.length; ++i){
-                                                existingKey = Mist.keysController.content[i];
-                                                if(existingKey.pub.split(' ').slice(0, 2).join(' ') == updatedKey.pub.split(' ').slice(0, 2).join(' ')) {
+                                            for (var i=0; i < Mist.keysController.keys.length; ++i) {
+                                                existingKey = Mist.keysController.keys[i];
+                                                if (existingKey.name == updatedKey.name) {
+                                                    warn('existing name');
+                                                    warn(existingKey.name);
+                                                    Mist.keysController.associateKey(existingKey.name, that);
+                                                    return;
+                                                }
+                                                else if (existingKey.pub.split(' ').slice(0, 2).join(' ') == updatedKey.pub.split(' ').slice(0, 2).join(' ')) {
+                                                    warn('existing public');
                                                     Mist.keysController.associateKey(existingKey.name, that);
                                                     return;
                                                 }
                                             }
-                                            Mist.keysController.newKey(updatedKey.name, updatedKey.publicKey, null, null, that, true);
+                                            warn('create new');
+                                            Mist.keysController.newKey(updatedKey.name, updatedKey.publicKey, null, null, that);
                                         });
                                         if (data.updated_keys.length){
                                             warn('Added ' + data.updated_keys.length + ' new keys from machine ' + that.name);
                                         }
+                                        */
                                     } else {
                                         // in every other case there is a problem
-                                        that.set('probed', false);
                                         if(key) {
-                                            key.set('probed', false);
+                                            key.updateProbeState(that, -Date.now());
+                                        } else {
+                                            that.set('probed', false);
                                         }
                                         info('Got response other than 200 while probing machine', that.name);
-                                        retry(that);
+                                        if (!that.backend.create_pending){
+                                             retry(that);
+                                        }
                                     }
                                     that.set('probing', false);
-                                    if (key) {
-                                        key.set('probing', false);
-                                    }
                                 },
                                 error: function(jqXHR, textstate, errorThrown) {
-                                    that.set('probed', false);
-                                    if (key) {
-                                        key.set('probed', false);
+                                    if(key) {
+                                        key.updateProbeState(that, -Date.now());
+                                    } else {
+                                        that.set('probed', false);
                                     }
                                     //Mist.notificationController.notify('Error getting uptime from machine ' +
                                     //    that.name);
                                     //error(textstate, errorThrown, 'when probing machine',
                                     //    that.name);
                                     that.set('probeInterval', 2*that.get('probeInterval'));
-                                    retryProbe(that.get('probeInterval'));
-                                    that.set('probing', false);
-                                    if (key) {
-                                        key.set('probing', false);
+                                    if (!that.backend.create_pending){
+                                         retryProbe(that.get('probeInterval'));
                                     }
+                                    that.set('probing', false);
                                 }
                             });
                         }
@@ -295,16 +303,20 @@ define('app/models/machine', [
                 };
                 
                 function retryProbe(interval) {
+                    
                     if (interval == undefined) {
                         interval = 10000;
                     }
                     // retry only if the machine is still here and it's running
                     if (that.backend.getMachineById(that.id) && that.state == 'running'){
-                        setTimeout(sendProbe, interval);
+                        if (!that.backend.create_pending){
+                             setTimeout(sendProbe, interval);
+                        }
                     }
                 }
-                
-                setTimeout(sendProbe, 2000);
+                if (!that.backend.create_pending){
+                     setTimeout(sendProbe, 2000);
+                }               
             },
 
             reProbe: function() {
@@ -372,7 +384,7 @@ define('app/models/machine', [
                             that.shell(cmd, function(){});
                             //remove machine from monitored_machines array
                             var new_monitored_machines = jQuery.grep(Mist.monitored_machines, function(value) {
-                                var machine_arr = [that.backend.id, that.id]
+                                var machine_arr = [that.backend.id, that.id];
                                 return (!($(value).not(machine_arr).length == 0 && $(machine_arr).not(value).length == 0));
                             });
                             Mist.set('monitored_machines', new_monitored_machines);

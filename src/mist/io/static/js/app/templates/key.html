@@ -1,14 +1,10 @@
-
     <div data-role="header">
         <a href="#/keys"
             data-icon="arrow-l"
             data-direction="reverse"
             class="ui-btn-left">Keys</a>
-
         <h1>{{name}}</h1>
-
         {{view Mist.UserMenuView}}
-
     </div>
 
     <div class="single-view-header">
@@ -20,23 +16,16 @@
          <div data-role="collapsible" data-collapsed="false">
             <h3>Public Key</h3>
             <div class="public-key">
-                <input type="text" readonly="readonly" {{bindAttr value="pub"}} />
+                <input type="text" readonly="readonly" {{bindAttr value="pub"}}/>
             </div>
         </div>
-        
+
         {{#if priv}}
         <div data-role="collapsible" data-collapsed="false">
             <h3>Private key</h3>
             <div class="private-key">
-                <a href="#key-private-dialog"
-                    class="action-links"
-                    id="key-private-button"
-                    data-role="button"
-                    data-rel="popup"
-                    data-transition="slideup"
-                    {{action displayPrivate target="view"}}>Display</a>
-
-                <div data-role="popup" id="key-private-dialog" class="mist-dialog" data-overlay-theme="a">
+                <a data-role="button" {{action displayPrivateClicked target="view"}}>Display</a>
+                <div data-role="popup" id="key-private-dialog" data-overlay-theme="a" data-transition="pop">
                     <div data-role="header">
                         <h1>Private Key</h1>
                     </div>
@@ -47,13 +36,12 @@
         {{/if}}
 
         {{#if machines}}
-        <div data-role="collapsible" data-collapsed="false" id="single-machines-keys">
+        <div data-role="collapsible" id="single-machines-keys" data-collapsed="false">
             <h3>Machines</h3>
             <ul id="machines-list"
-            data-role="listview"
-            data-inset="true"
-            data-theme="c">
-                {{#each view.keyMachines}}
+                data-role="listview"
+                data-inset="true">
+                {{#each view.associatedMachines}}
                     {{view Mist.MachineListItemView machineBinding="this"}}
                 {{/each}}
             </ul>
@@ -62,56 +50,30 @@
 
     </div>
 
-
-<div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
-    <div data-role="header">
-        <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
+    <div data-role="popup" id="dialog-confirm" data-overlay-theme="a" data-transition="pop">
+        <div data-role="header">
+            <h1>{{Mist.confirmationController.title}}</h1>
+        </div>
+        {{view Mist.ConfirmationDialog data-role="content"}}
     </div>
-    {{view Mist.ConfirmationDialog data-role="content"}}
-</div>
 
-<div id="key-associate-dialog" class="mist-dialog" data-role="popup" data-overlay-theme="a">
-    <div data-role="header">
-        <h1>Associate key</h1>
+    <div data-role="popup" id="create-key-dialog" data-overlay-theme="a" data-transition="pop">
+        <div data-role="header">
+            <h1>Edit key</h1>
+        </div>
+        {{view Mist.AddKeyView data-role="content"}}
     </div>
-    {{view Mist.KeyAssociateDialog data-role="content"}}
-</div>
 
-<div data-role="popup" id="dialog-add-key" class="mist-dialog" data-overlay-theme="a">
-    <div data-role="header">
-        <h1>Edit key</h1>
-    </div>
-    {{view Mist.AddKeyView data-role="content"}}
-</div>
-
-    <div class="single-key-footer" data-role="footer" data-theme="a" style="display: block">
+    <div data-role="footer" id="single-key-footer" data-theme="a">
         <div class="actions" data-role="controlgroup" data-type="horizontal">
-            <a href="#"
-                id="keys-button-edit"
-                class="action-links"
-                data-role="button"
-                data-icon="edit"
-                data-rel="popup"
-                data-transition="slideup"
-                {{action editKey target="view"}}>Edit</a>
-                
-            <a href="#"
-                id="keys-button-delete"
-                class="action-links"
-                data-role="button"
-                data-icon="delete"
-                data-rel="popup"
-                data-transition="slideup"
-                {{action deleteKey target="view"}}>Delete</a>
-<!--
-            <a href="#"
-                id="keys-button-associate"
-                {{bindAttr class=":action-links view.disabledAssociateClass"}}
-                data-role="button"
-                data-icon="gear"
-                data-rel="popup"
-                data-transition="slideup"
-                {{action associateKey target="view"}}>Associate</a>
--->
+            <a id="keys-button-edit"
+               data-role="button"
+               data-icon="edit"
+               {{action editClicked target="view"}}>Edit</a>
+
+            <a id="keys-button-delete"
+               data-role="button"
+               data-icon="delete"
+               {{action deleteClicked target="view"}}>Delete</a>
         </div>
     </div>

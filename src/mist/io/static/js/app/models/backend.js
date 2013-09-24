@@ -32,7 +32,7 @@ define('app/models/backend', [
             loadingMachines: false,
             loadingImages: false,
             
-            isOn: function(){
+            isOn: function() {
                 if(this.state == "offline"){
                     return false;
                 } else {
@@ -40,7 +40,7 @@ define('app/models/backend', [
                 }
             },
             
-            isOff: function(){
+            isOff: function() {
                 return !this.isOn();
             },
             
@@ -53,23 +53,23 @@ define('app/models/backend', [
             }.observes('state'),
             
             getSizeById: function(sizeId){
-                for (var i = 0; i < this.sizes.content.length; i++){
+                for (var i = 0; i < this.sizes.content.length; i++) {
                     if (this.sizes.content[i].id == sizeId) {
                         return this.sizes.content[i];
                     }
                 }    
             },
 
-            getImageById: function(imageId){
-                for (var i = 0; i < this.images.content.length; i++){
+            getImageById: function(imageId) {
+                for (var i = 0; i < this.images.content.length; i++) {
                     if (this.images.content[i].id == imageId) {
                         return this.images.content[i];
                     }
                 }    
             },
 
-            getMachineById: function(machineId){
-                for (var i = 0; i < this.machines.content.length; i++){
+            getMachineById: function(machineId) {
+                for (var i = 0; i < this.machines.content.length; i++) {
                     if (this.machines.content[i].id == machineId) {
                         return this.machines.content[i];
                     }
@@ -82,15 +82,21 @@ define('app/models/backend', [
                 this.machines = MachinesController.create({backend: this});
                 this.sizes = SizesController.create({backend: this});
                 this.locations = LocationsController.create({backend: this});
+                var that = this;
+                Ember.run.next(function() {
+                    that.toggle();
+                });
             },
             
-            toggle: function(){
-                if (!this.enabled){
+            toggle: function() {
+                if (!this.enabled) {
                     this.set('state', "offline");
                     this.machines.clear();
                     this.images.clear();
                     this.sizes.clear();
                     this.locations.clear();
+                    this.set('loadingImages', false);
+                    this.set('loadingMachines', false);
                 } else {
                     this.set('state', 'waiting');
                     this.machines.refresh();
@@ -98,9 +104,9 @@ define('app/models/backend', [
                     this.sizes.init();
                     this.locations.init();
                 }
-                Ember.run.next(function(){
+                Ember.run.next(function() {
                     $('.backend-toggle').slider('refresh');
-                })
+                });
             }.observes('enabled')
         
         });

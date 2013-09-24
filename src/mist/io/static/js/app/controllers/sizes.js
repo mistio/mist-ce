@@ -15,14 +15,20 @@ define('app/controllers/sizes', [
 
             init: function() {
                 this._super();
-
-                if (this.backend.error && this.backend.state == 'offline'){
-                    return
+                
+                if (!this.backend.enabled) {
+                    return;
+                }
+                else if (this.backend.error && this.backend.state == 'offline') {
+                    return;
                 }
                 
                 this.backend.set('state', 'waiting');
                 var that = this;
                 $.getJSON('/backends/' + this.backend.id + '/sizes', function(data) {
+                    if (!that.backend.enabled) {
+                        return;
+                    }
                     var content = new Array();
                     data.forEach(function(item){
                         content.push(Size.create(item));

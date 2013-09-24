@@ -1,90 +1,75 @@
     <div data-role="header">
         <a href="#"
-            data-icon="home"
-            data-direction="reverse"
-            class="ui-btn-left">Home</a>
-
+           data-icon="home"
+           data-role="button"
+           data-direction="reverse"
+           class="ui-btn-left">Home</a>
         <h1>Keys</h1>
         {{view Mist.UserMenuView}}
-
     </div>
 
     <div data-role="content" id="keys">
-        <a href="#keys"
-            id="mist-create-key"
-            data-rel="popup"
-            data-transition="slidedown"
-            class="add-button"
-            data-theme="b"
-            data-role="button"
-            data-icon="plus"
-            data-iconpos="right"
-            {{action addKey target="view"}}>Create</a>
-            
-        <div data-role="popup" id="dialog-add-key" class="mist-dialog" data-overlay-theme="a">
-            <div data-role="header">
-                <h1>Add key</h1>
-            </div>
-            {{view Mist.AddKeyView data-role="content"}}
-        </div>
 
-        <a href="#"
-            class="select-keys"
-            data-theme="d"
-            data-role="button"
-            data-icon="arrow-d"
-            {{action openKeySelectPopup target="view"}}>Select</a>
-    
-        <div id="select-keys-popup" data-role="popup">
-            <ul id="select-keys-listmenu" data-role="listview">
-                <li data-icon="false">
-                    <a href="#" title="all">All</a>
-                </li>
-                <li data-icon="false">
-                    <a href="#" title="none">None</a>
-                </li>                
-            </ul>
-        </div>
-        
+        <a class="add-button"
+           data-theme="b"
+           data-icon="plus"
+           data-role="button"
+           data-iconpos="right"
+           {{action createClicked target="view"}}>Create</a>
+
+        <a id="select-keys"
+           data-role="button"
+           data-icon="arrow-d"
+           {{action selectClicked target="view"}}>Select</a>
+
         <ul id="keys-list"
             data-role="listview"
             data-filter="true"
             data-inset="true"
-            data-theme="c"
             data-filter-placeholder="Filter...">
-            {{#each Mist.keysController}}
+            {{#each Mist.keysController.keys}}
                 {{view Mist.KeyListItemView keyBinding="this" class="node"}}
             {{/each}}
         </ul>
 
         <div class="bottom-padding"></div>
     </div>
-    
-    <div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
+
+    <div data-role="popup" id="create-key-dialog" data-transition="pop" data-overlay-theme="a">
         <div data-role="header">
-            <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
+            <h1>Create key</h1>
+        </div>
+        {{view Mist.AddKeyView data-role="content"}}
+    </div>
+
+    <div data-role="popup" id="select-keys-dialog" data-transition="pop" data-position-to="#select-keys">
+        <ul data-role='listview'>
+            <li data-icon="false">
+                <a {{action selectModeClicked true target="view"}}>All</a>
+            </li>
+            <li data-icon="false">
+                <a {{action selectModeClicked false target="view"}}>None</a>
+            </li>
+        </ul>
+    </div>
+
+    <div data-role="popup" id="dialog-confirm" data-transition="pop" data-overlay-theme="a">
+        <div data-role="header">
+            <h1>{{Mist.confirmationController.title}}</h1>
         </div>
         {{view Mist.ConfirmationDialog data-role="content"}}
     </div>
-    
-    <div class="keys-footer" data-role="footer" data-theme="a">
-        <div class="actions" data-role="controlgroup" data-type="horizontal">
-            <a href=""
-                {{bindAttr class=":action-links view.disabledDefaultClass"}}
-                id="keys-button-delete"
-                data-role="button"
-                data-icon="delete"
-                data-rel="popup"
-                data-transition="slideup"
-                {{action deleteKey target="view"}}>Delete</a>
 
-            <a href=""
-                {{bindAttr class=":action-links view.disabledDefaultClass"}}
-                id="keys-button-associate"
-                data-role="button"
-                data-icon="gear"
-                data-rel="popup"
-                data-transition="slideup"
-                {{action setDefaultKey target="view"}}>Set default</a>
+    <div data-role="footer" id="keys-footer" data-theme="a">
+        <div class="actions" data-role="controlgroup" data-type="horizontal">
+            <a id="keys-button-delete"
+               data-role="button"
+               data-icon="delete"
+               {{action deleteClicked target="view"}}>Delete</a>
+
+            <a id="keys-button-associate"
+               data-role="button"
+               data-icon="gear"
+               {{action setDefaultClicked target="view"}}>Set default</a>
         </div>
     </div>
