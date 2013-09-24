@@ -11,12 +11,11 @@ define('app/views/machine_list_item', [
                 tagName:false,
 
                 probed: function(){
-                    warn(this.machine);
-                    return true;    
+                    return this.machine.probed;
                 }.property('controller.model.probed'),
                 
-                fetchLoadavg: function(machine){
-                    if (machine.hasMonitoring){
+                fetchLoadavg: function(machine) {
+                    if (machine.hasMonitoring) {
                         var uri = URL_PREFIX + '/backends/' + machine.backend.id + '/machines/' + machine.id + '/loadavg.png';
                         var bgimage = new Image();
                         var timestamp = new Date().getTime();

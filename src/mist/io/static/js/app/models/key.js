@@ -24,6 +24,8 @@ define('app/models/key', [
                             this.machines[m][2] = timeStamp;
                             if (timeStamp > 0) {
                                 this.set('probeState', 'probed');
+                                Mist.backendsController.getMachineById(this.machines[m][0],
+                                                                       this.machines[m][1]).set('probed', true);
                             } else {
                                 this.set('probeState', 'unprobed');
                             }
