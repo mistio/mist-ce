@@ -324,12 +324,6 @@ def list_machines(request):
         machine.update(get_machine_actions(m, conn))
         ret.append(machine)
     
-    session = request.environ['beaker.session']
-    print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-    print session['backends']
-    print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-    
-    
     return ret
 
 
