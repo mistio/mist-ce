@@ -283,13 +283,9 @@ li.node .tag {
     background: transparent;
 }
 
-/* Keys Listing */
+/* Create Key Dialog */
 
-#mist-create-key {
-    float: right;
-}
-
-#dialog-add-key-popup {
+#create-key-dialog-popup {
     width: 250px;
 }
 
@@ -298,7 +294,7 @@ li.node .tag {
     max-height: 100px;
 }
 
-#dialog-add-key .upload-key {
+#create-key-dialog .upload-key {
     width: 100%;
 }
 
@@ -403,13 +399,12 @@ span.bubble-monitoring {
     clear: left;
 }
 
-.select-machines, .select-keys {
+.select-machines, #select-keys {
     max-width: 110px;
-    color: #999999;
     font-weight: normal;
 }
 
-.select-machines .ui-icon, .select-keys .ui-icon {
+.select-machines .ui-icon, #select-keys .ui-icon {
     margin-left: 5px;
 }
 
@@ -487,7 +482,7 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 100%;
 }
 
-.machines-footer, .keys-footer, .single-key-footer {
+.machines-footer, #keys-footer, #single-key-footer {
     display: none;
 }
 
@@ -505,7 +500,7 @@ div.actions div.ui-controlgroup-controls {
     padding-left: 0.5%;
 }
 
-.keys-footer.ui-footer div.actions, .single-key-footer.ui-footer div.actions {
+#keys-footer.ui-footer div.actions, #single-key-footer.ui-footer div.actions {
     padding-left: 0.5%;
 }
 
@@ -513,12 +508,16 @@ div.actions div.ui-controlgroup-controls {
     width: 33%;
 }
 
-.keys-footer.ui-footer div.actions a {
+#keys-footer.ui-footer div.actions a {
     width: 49%;
 }
 
-.single-key-footer.ui-footer div.actions a {
+#single-key-footer.ui-footer div.actions a {
     width:49%;
+}
+
+#single-key-footer {
+    display: block;
 }
 
 .ui-icon-mist-power {
@@ -1331,7 +1330,7 @@ iframe#hidden-shell-iframe {
 }
 
 #manage-keys.ui-panel-open {
-    min-width: 320px;
+    min-width: 305px;
 }
 
 #associated-keys-label {
@@ -1340,13 +1339,14 @@ iframe#hidden-shell-iframe {
 
 #associated-keys {
     display: inline-block;
+    margin: 1px;
 }
 
-.associated-key {
+.associated-key div{
     display: block;
     float: left;
-    padding: 12px;
-    margin: 0 6px 6px 0;
+    padding: 10px;
+    margin: 0 5px 5px 0;
     background: #ddd;
     -webkit-border-radius: 19px;
     -moz-border-radius: 19px;
@@ -1404,7 +1404,7 @@ div.logout-placeholder, div.account-placeholder, div.support-placeholder {
 }
 
 
-#invitation-dialog .ajax-loader, #dialog-add-key .ajax-loader, 
+#invitation-dialog .ajax-loader, #create-key-dialog .ajax-loader, 
 #tags-container .ajax-loader, .dialog-add .ajax-loader, 
 .rule-box .ajax-loader, .rule-command-popup .ajax-loader, 
 .add-rule-container .ajax-loader, #monitoring-wrapper .rule-box .ajax-loader, 
@@ -1516,21 +1516,24 @@ div.info {
     background-repeat: no-repeat;
 }
 
-#mist-manage-keys.probed, .associated-key.probed {
+#mist-manage-keys.probed, .associated-key .probed {
     background-image: url(images/key.png);
 }
 
-#mist-manage-keys.probed, #mist-manage-keys.probing {
+#mist-manage-keys.probed {
     background-position: 5px 4px;
     padding-left: 18px;
 }
 
-#mist-manage-keys.unprobed, .associated-key.unprobed {
-    background-image: url(images/no-key.png);
-
+#mist-manage-keys.probing {
+    padding-left: 18px;  
 }
 
-#mist-manage-keys.probing, .associated-key.probing {
+#mist-manage-keys.unprobed, .associated-key .unprobed {
+    background-image: url(images/no-key.png);
+}
+
+#mist-manage-keys.probing, .associated-key .probing {
     background-image: url(states/load-white.gif) !important;
 }
 
@@ -1599,13 +1602,13 @@ div.info {
 
     /* Select machines button */
 
-    #machines .select-machines, #keys .select-keys {
+    #machines .select-machines, #select-keys {
         width: 60px;
         right: -6px;
         padding: 9px 0;
     }
 
-    #machines .select-machines .ui-btn-text, #keys .select-keys .ui-btn-text {
+    #machines .select-machines .ui-btn-text, #select-keys .ui-btn-text {
         display: none;
     }
 

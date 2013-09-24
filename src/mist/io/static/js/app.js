@@ -68,9 +68,7 @@ define( 'app', [
     'app/views/key_list',
     'app/views/key',
     'app/views/key_add_dialog',
-    'app/views/key_associate_dialog',
     'app/views/key_priv_dialog',
-    'app/views/key_machine_list_item',
     'app/views/rule',
     'app/views/user_menu',
     'text!app/templates/machine.html',
@@ -110,9 +108,7 @@ define( 'app', [
                 KeyListView,
                 SingleKeyView,
                 KeyAddDialog,
-                KeyAssociateDialog,
                 KeyPrivDialog,
-                KeyMachineListItem,
                 RuleView,
                 UserMenuView,
                 machine_html,
@@ -234,7 +230,7 @@ define( 'app', [
         App.AddKeyView = KeyAddDialog;
         App.KeyPrivDialog = KeyPrivDialog;
         App.MachineAddView = MachineAddDialog;
-        App.KeyAssociateDialog = KeyAssociateDialog;
+        App.MachineManageKeys = MachineManageKeys;
         
         App.set('backendAddController', BackendAddController.create());
         App.set('backendsController', BackendsController.create());
@@ -354,12 +350,10 @@ define( 'app', [
 
         App.DeleteTagView = DeleteTagView;
         App.RuleView = RuleView;
-        App.KeyMachineListItemView = KeyMachineListItem;
         App.MachineTagsDialog = MachineTagsDialog;
         App.ShellDialog = Shell;
         App.PowerDialog = SingleMachineActionsDialog;
         App.MachineActionsDialog = MachineActionsDialog;
-        App.MachineManageKeys = MachineManageKeys;
         App.MachineListView = MachineListView;
 
         window.Mist = App;

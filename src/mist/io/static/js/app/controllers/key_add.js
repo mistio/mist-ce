@@ -2,59 +2,70 @@ define('app/controllers/key_add', [
     'ember'
     ],
     /**
-     * Key add controller
+     * Key Add Controller
      *
      * @returns Class
      */
     function() {
         return Ember.Object.extend({
 
+            newKeyName: null,
+            newKeyReady: null,
+            newKeyPublic: null,
+            newKeyPrivate: null,
+
+            init: function() {
+                this._super();
+            },
+
+            newKeyObserver: function() {
+                if (this.newKeyName && this.newKeyPrivate) {
+                    this.set('newKeyReady', true);
+                    $('#create-key-ok').removeClass('ui-disabled');
+                } else {
+                    this.set('newKeyReady', false);
+                    $('#create-key-ok').addClass('ui-disabled');
+                }
+            }.observes('newKeyName', 'newKeyPrivate'),
+
             newKey: function(machine) {
-                log("new key");
                 Mist.keysController.newKey(this.get('newKeyName'),
                                             this.get('newKeyPublic'),
                                             this.get('newKeyPrivate'),
-                                            null,
                                             machine);
             },
-            
+
             editKey: function(oldKeyName) {
-                log("edit key");
-                Mist.keysController.editKey(oldKeyName, 
+                Mist.keysController.editKey(oldKeyName,
                                              this.get('newKeyName'),
                                              this.get('newKeyPublic'),
-                                             this.get('newKeyPrivate', ''));
+                                             this.get('newKeyPrivate'));
             },
 
             newKeyClear: function() {
-                log("new key clear");
                 this.set('newKeyName', null);
                 this.set('newKeyPublic', null);
                 this.set('newKeyPrivate', null);
             },
 
-            updateNewKeyReady: function() {
-                if (this.get('newKeyName') &&
-                       (this.get('newKeyPublic') ||
-                        this.get('newKeyPrivate'))) {
-                    this.set('newKeyReady', true);
-                    if('button' in $('#create-key-ok')){
-                        $('#create-key-ok').button('enable');
+            generateKey: function() {
+                $('#create-key-dialog .ajax-loader').fadeIn(200);
+                var that = this;
+                $.ajax({
+                    url: '/key_generate',
+                    type: 'GET',
+                    success: function(result) {
+                        info('Successfully generated key');
+                        $('#create-key-dialog .ajax-loader').fadeOut(200);
+                        that.set('newKeyPublic', result.public);
+                        that.set('newKeyPrivate', result.private);
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while generating key: ' + jqXHR.responseText);
+                        error(textstate, errorThrown, ', while generating key. ', jqXHR.responseText);
+                        $('#manage-keys .ajax-loader').fadeOut(200);
                     }
-                } else {
-                    this.set('newKeyReady', false);
-                    if('button' in $('#create-key-ok')){
-                        $('#create-key-ok').button('disable');
-                    }
-                }
-            },
-
-            init: function() {
-                this._super();
-                this.addObserver('newKeyName', this, this.updateNewKeyReady);
-                this.addObserver('newKeyPublic', this, this.updateNewKeyReady);
-                this.addObserver('newKeyPrivate', this, this.updateNewKeyReady);
-                this.set('newKeyReady', false);
+                });
             }
         });
     }

@@ -49,7 +49,8 @@ define('app/controllers/backends', [
                     if (this.content[i].id == backendId) {
                         return this.content[i];
                     }
-                }    
+                }
+                return null;
             },
             
             getMachineById: function(backendId, machineId) {
@@ -61,7 +62,8 @@ define('app/controllers/backends', [
                             }
                         }
                     }
-                }    
+                }
+                return null;
             },
 
             getMachineCount: function() {

@@ -11,8 +11,6 @@
 
 </div>
 
-{{view Mist.MachineManageKeys}}
-
 <div class="single-view-header" data-role="header">
 
     <span class="single-view-icon-wrapper">
@@ -26,38 +24,28 @@
     <h3 id="single-view-state" {{bindAttr class="state"}}>{{state}}</h3>
     
     <span class="key-icon-wrapper">
-        {{#if probed}}
+        {{#if keysCount}}
             <a href="#"
                 id="mist-manage-keys"
                 {{bindAttr class="probed probing"}}
                 data-theme="c"
                 data-role="button"               
                 {{action manageKeysClicked target="view"}}>
-                {{keys.length}} keys</a>
+                {{keysCount}} keys</a>
         {{else}}
-            {{#if keys.length}}
-                <a href="#"
-                    id="mist-manage-keys"
-                    data-theme="b"
-                    data-role="button"
-                    data-icon="gear"
-                    data-iconpos="right"
-                    {{action manageKeysClicked target="view"}}>
-                    Manage keys</a>
-            {{else}}
-                <a href="#"
-                    id="mist-manage-keys"
-                    data-theme="b"
-                    data-role="button"
-                    data-icon="plus"
-                    data-iconpos="right"
-                    {{action manageKeysClicked target="view"}}>Add key</a>
-            {{/if}}    
+            <a href="#"
+                id="mist-manage-keys"
+                data-theme="b"
+                data-role="button"
+                data-icon="plus"
+                data-iconpos="right"
+                {{action manageKeysClicked target="view"}}>Add key</a>
         {{/if}}
     </span>    
 </div>
 
 <div data-role="content">
+    
     {{#if probing}}
         <div class="probing">
             <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring">
@@ -232,6 +220,8 @@
     <div class="bottom-padding"></div>
 
 </div>
+
+{{view Mist.MachineManageKeys}}
 
 <div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
     <div data-role="header">
