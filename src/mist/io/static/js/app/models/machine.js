@@ -211,9 +211,7 @@ define('app/models/machine', [
                         return false;
                     }
                     
-                    if (that.backend.create_pending){
-                        // Try again later if a machine is being created on this backend
-                        retryProbe();
+                    if (that.backend.create_pending) {
                         return false;
                     }
 
@@ -248,7 +246,7 @@ define('app/models/machine', [
                                         info('Successfully got uptime', uptime, 'from machine', that.name);
                                         /*
                                         data.updated_keys.forEach(function(updatedKey) {
-                                            for(var i=0; i < Mist.keysController.keys.length; ++i) {
+                                            for (var i=0; i < Mist.keysController.keys.length; ++i) {
                                                 existingKey = Mist.keysController.keys[i];
                                                 if (existingKey.name == updatedKey.name) {
                                                     warn('existing name');
@@ -277,7 +275,9 @@ define('app/models/machine', [
                                             that.set('probed', false);
                                         }
                                         info('Got response other than 200 while probing machine', that.name);
-                                        retry(that);
+                                        if (!that.backend.create_pending){
+                                             retry(that);
+                                        }
                                     }
                                     that.set('probing', false);
                                 },
@@ -292,7 +292,9 @@ define('app/models/machine', [
                                     //error(textstate, errorThrown, 'when probing machine',
                                     //    that.name);
                                     that.set('probeInterval', 2*that.get('probeInterval'));
-                                    retryProbe(that.get('probeInterval'));
+                                    if (!that.backend.create_pending){
+                                         retryProbe(that.get('probeInterval'));
+                                    }
                                     that.set('probing', false);
                                 }
                             });
@@ -301,16 +303,20 @@ define('app/models/machine', [
                 };
                 
                 function retryProbe(interval) {
+                    
                     if (interval == undefined) {
                         interval = 10000;
                     }
                     // retry only if the machine is still here and it's running
                     if (that.backend.getMachineById(that.id) && that.state == 'running'){
-                        setTimeout(sendProbe, interval);
+                        if (!that.backend.create_pending){
+                             setTimeout(sendProbe, interval);
+                        }
                     }
                 }
-                
-                setTimeout(sendProbe, 2000);
+                if (!that.backend.create_pending){
+                     setTimeout(sendProbe, 2000);
+                }               
             },
 
             reProbe: function() {

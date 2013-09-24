@@ -106,7 +106,7 @@ function(MistScreen, machine_list_html) {
             $("#dialog-power").popup('option', 'positionTo', '#machines-button-power').popup('open', {transition: 'slideup'});
         },
 
-        selectMachines: function(event){
+        selectMachines: function(event) {
             var selection = $(event.target).attr('title');
 
             if(selection == 'none'){
