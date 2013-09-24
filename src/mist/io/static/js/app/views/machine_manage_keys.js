@@ -87,9 +87,9 @@ define('app/views/machine_manage_keys', [
             
             actionRemoveClicked: function() {
                 $('#key-actions').popup('close');
-                var that = this;
-                var machine = that.get('controller').get('model');
-                if (machine.keys.content.length == 1 /*&& machine.keys.content[0] == that.selectedKey*/) {
+                var machine = this.parentMachine;
+                if (this.associatedKeys.length == 1) {
+                    var that = this;
                     Mist.confirmationController.set('title', 'Remove last key?');
                     Mist.confirmationController.set('text', 'WARNING! You are about to remove the last key associated with this machine.\
                                                              You will not be able to login through mist.io. Are you sure you want to do this?');
@@ -100,7 +100,7 @@ define('app/views/machine_manage_keys', [
                     Mist.confirmationController.show();
                 } else {
                     $('#manage-keys .ajax-loader').fadeIn(200);
-                    Mist.keysController.disassociateKey(that.selectedKey.name, machine); 
+                    Mist.keysController.disassociateKey(this.selectedKey.name, machine); 
                 }         
             },
             
