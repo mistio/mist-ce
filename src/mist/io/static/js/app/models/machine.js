@@ -28,11 +28,13 @@ define('app/models/machine', [
             graphdata: {},
             
             probedObserver: function() {
-                try {
-                    $('#mist-manage-keys').button();
-                } catch (e) {
-                    $('#mist-manage-keys').button('refresh');
-                }
+                Ember.run.next(function() {
+                    try {
+                        $('#mist-manage-keys').button();
+                    } catch (e) {
+                        $('#mist-manage-keys').button('refresh');
+                    }
+                });
             }.observes('probed', 'probing'),
             
             image: function() {

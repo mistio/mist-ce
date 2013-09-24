@@ -48,6 +48,7 @@ define('app/views/machine_manage_keys', [
                 this.set('nonAssociatedKeys', naKeys);
                 this.parentMachine.set('keysCount', aKeys.length);
                 this.parentMachine.set('probed', aKeys.length ? true : false);
+                this.parentMachine.probedObserver();
                 Ember.run.next(function() {
                     $('#associated-keys').listview();
                 });
