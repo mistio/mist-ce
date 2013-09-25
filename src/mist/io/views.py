@@ -488,9 +488,11 @@ def create_machine(request):
                              hostname=machine_name[:15],
                              image=image,
                              size=size,
+                             location=location.id,                             
                              server_key=server_key,
                              console_key=console_key,
                              ssh_key=tmp_key_path,
+                             connect_attempts=20,
                              deploy=deploy_script)
             associate_key(request, key_id, backend_id, node.id, deploy=False)
         except Exception as e:
