@@ -221,7 +221,8 @@ define('app/models/machine', [
                             var key = Mist.keysController.getKeyByName(keyName);
                             if (keyName != undefined){
                                 that.set('probing', keyName);
-                                key.set('probing', that.id);   
+                                key.set('probeState', 'probing');
+                                warn('yeay!');
                             } else {
                                 that.set('probing', true);
                             }

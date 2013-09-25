@@ -173,7 +173,6 @@ define('app/views/machine_add_dialog', [
                         Mist.keysController.newKey(keyName,
                                             result.public,
                                             result.private, null, true);
-                        $('.select-key-collapsible').removeClass('ui-disabled');
                         $('.dialog-add .ajax-loader').css('display','none');
                     }
                 });
