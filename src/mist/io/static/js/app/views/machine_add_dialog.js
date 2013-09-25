@@ -165,21 +165,15 @@ define('app/views/machine_add_dialog', [
             generateKey: function() {
                 $('.generate-key-collapsible .ui-icon').hide();
                 $('.dialog-add .ajax-loader').show();
-                var payload = {
-                    'action': 'generate'
-                }
                 $.ajax({
-                    url: '/keys',
-                    type: "POST",
-                    data: JSON.stringify(payload),
-                    contentType: "application/json",
-                    headers: { "cache-control": "no-cache" },
-                    dataType: "json",
+                    url: '/key_generate',
+                    type: 'GET',
                     success: function(result) {
                         var keyName = 'auto-generated-key-' + Math.round(+new Date/1000);
                         Mist.keysController.newKey(keyName,
                                             result.public,
-                                            result.private, true);
+                                            result.private, null, true);
+                        $('.select-key-collapsible').removeClass('ui-disabled');
                         $('.dialog-add .ajax-loader').css('display','none');
                     }
                 });

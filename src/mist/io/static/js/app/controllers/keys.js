@@ -38,7 +38,7 @@ define('app/controllers/keys', [
                 });
             },
 
-            newKey: function(name, publicKey, privateKey, machine) {
+            newKey: function(name, publicKey, privateKey, machine, autoSelect) {
                 name = name.trim();
                 item = {
                     'name': name,
@@ -56,15 +56,25 @@ define('app/controllers/keys', [
                         item.priv = null; // don't keep private key on the client
                         $("#create-key-dialog").popup("close");
                         Mist.keyAddController.newKeyClear();
-                        $('#keys-list').fadeOut(200);
-                        Ember.run.later(function() {
+                        if (autoSelect) {
                             that.keys.addObject(Key.create(data));
-                            Ember.run.next(function() {
-                                $('#keys-list').listview('refresh');
-                                $('#keys-list input.ember-checkbox').checkboxradio();
-                                $('#keys-list').fadeIn(200);
+                            Ember.run.next(function(){
+                                $('.select-key-collapsible .select-listmenu').listview();
+                                $('.select-key-collapsible').parent().trigger('create');
+                                $('.select-key-collapsible li a').eq(0).click();
+                                $('.select-key-collapsible').removeClass('ui-disabled');
                             });
-                        }, 200);
+                        } else {
+                            $('#keys-list').fadeOut(200);
+                            Ember.run.later(function() {
+                                that.keys.addObject(Key.create(data));
+                                Ember.run.next(function() {
+                                    $('#keys-list').listview('refresh');
+                                    $('#keys-list input.ember-checkbox').checkboxradio();
+                                    $('#keys-list').fadeIn(200);
+                                });
+                            }, 200);
+                        }
                         if (machine) {
                             that.associateKey(name, machine);
                             $('#manage-keys .ajax-loader').fadeIn(200);
