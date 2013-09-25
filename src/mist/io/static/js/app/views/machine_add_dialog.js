@@ -157,15 +157,24 @@ define('app/views/machine_add_dialog', [
             newMachineClicked: function() {
                 //FIXME there should be a way to bind the action directly to the controller
                 var providerName = $('.select-provider-collapsible span.ui-btn-text').text();
+                var machineSize = $('.select-size-collapsible span.ui-btn-text').text();                
+                var machineImage = $('.select-image-collapsible span.ui-btn-text').text();                                
                 var machineName = $('#create-machine-name').val();
-                if ((providerName == 'NephoScale') && ((machineName.length > 64)||(machineName.indexOf(' ') >= 0))) {
-                    Mist.notificationController.timeNotify("Server name in NephoScale must start with a letter, can contain mixed alpha-numeric characters, hyphen ('-') and underscore ('_') characters, cannot exceed 64 characters, and can end with a letter or a number.", 7000);
-                } else { 
-                    Mist.machineAddController.newMachine();
-                    $('.dialog-add').panel('close');
-                    Mist.Router.router.transitionTo('machines');
-                    this.clear();
-                }
+                if (providerName == 'NephoScale') {
+                    if ((machineName.length > 64)||(machineName.indexOf(' ') >= 0)) {
+                        Mist.notificationController.timeNotify("Server name in NephoScale must start with a letter, can contain mixed alpha-numeric characters, hyphen ('-') and underscore ('_') characters, cannot exceed 64 characters, and can end with a letter or a number.", 7000);
+                        return false;                        
+                    } else if (machineSize.indexOf('CS025') != -1) {
+                          if (!((machineImage == 'Linux Ubuntu Server 10.04 LTS 64-bit') || (machineImage =='Linux CentOS 6.2 64-bit'))) {
+                              Mist.notificationController.timeNotify("On CS025 size you can only create one of the two images: Linux Ubuntu Server 10.04 LTS 64-bit or Linux CentOS 6.2 64-bit", 10000);
+                              return false;                                                      
+                          }
+                    }                                         
+                } 
+                Mist.machineAddController.newMachine();
+                $('.dialog-add').panel('close');
+                Mist.Router.router.transitionTo('machines');
+                this.clear();                
             },
 
             generateKey: function() {
