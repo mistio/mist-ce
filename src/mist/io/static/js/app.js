@@ -324,9 +324,9 @@ define( 'app', [
         
             keyUp: function() {
                 if (this.value && this.value.length > 0) {
-                    $('#tag-add').removeClass('ui-disabled')
+                    $('#tag-add').removeClass('ui-disabled');
                 } else {
-                    $('#tag-add').addClass('ui-disabled')
+                    $('#tag-add').addClass('ui-disabled');
                 }
             }
 

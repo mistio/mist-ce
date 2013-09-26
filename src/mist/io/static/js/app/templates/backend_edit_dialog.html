@@ -21,12 +21,12 @@
         <div id="backend-delete-confirm" class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
             <div class="label">Confirm backend removal?</div>
             <div id="backend-has-monitoring">There are monitored machines.<br />Monitoring for these will be disabled</div>
-            <button data-theme="c" id="button-confirm-disable" {{action "deleteConfirmButtonClick" target="view"}}>Yes</a>
-            <button data-theme="b" {{action "deleteCancelButtonClick" target="view"}}>No</a>
+            <button id="button-confirm-disable" {{action "deleteConfirmButtonClick" target="view"}}>Yes</button>
+            <button data-theme="b" {{action "deleteCancelButtonClick" target="view"}}>No</button>
         </div>
-	<div class="ajax-loader"></div>
+        <div class="ajax-loader"></div>
         <div class="btn-full" data-role="controlgroup" data-type="horizontal">
-            <a href="#" data-role="button" data-theme="c" {{action "backButtonClick" target="view"}}>Back</a>
+            <a href="#" data-role="button" {{action "backButtonClick" target="view"}}>Back</a>
         </div>
     </div>
 </div>

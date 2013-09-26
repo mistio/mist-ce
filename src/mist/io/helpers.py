@@ -206,6 +206,8 @@ def connect(request, backend_id=False):
     elif backend['provider'] == Provider.RACKSPACE:
         conn = driver(backend['apikey'], backend['apisecret'],
                       datacenter=backend['region'])
+    elif backend['provider'] == Provider.NEPHOSCALE:
+        conn = driver(backend['apikey'], backend['apisecret'])
     else:
         # ec2
         conn = driver(backend['apikey'], backend['apisecret'])
@@ -234,6 +236,10 @@ def get_machine_actions(machine, backend):
     if backend.type in EC2_PROVIDERS:
         can_stop = True
 
+    if backend.type == Provider.NEPHOSCALE:
+        can_stop = True
+        can_tag = False
+
     if backend.type == Provider.RACKSPACE_FIRST_GEN or \
                        backend.type == Provider.LINODE:
         can_tag = False
@@ -248,6 +254,9 @@ def get_machine_actions(machine, backend):
         if backend.type in EC2_PROVIDERS:
             can_stop = False
             can_start = True
+        if backend.type == Provider.NEPHOSCALE:
+            can_stop = False
+            can_start = True        
         can_reboot = False
     elif machine.state in (NodeState.TERMINATED,):
         can_start = False

@@ -12,40 +12,40 @@
         <h1>Add backend</h1>
     </div>
     <div data-role="content">
-        <label for="select-backend">1. Provider:</label>
-        <div class="select-backend-collapsible" data-role="collapsible" data-iconpos="right" data-corners="true"
+        <label>1. Provider:</label>
+        <div class="select-backend-collapsible" data-role="collapsible" data-iconpos="right"
             data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
-            <h2>Select backend</h2>
-            <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
+            <h2>Select provider</h2>
+            <ul class="select-listmenu" data-role="listview">
                 {{#each view.providerList}}
-                <li data-icon="false" data-corners="true">
+                <li data-icon="false">
                     <a href="#" title="{{unbound this.provider}}">{{this.title}}</a>
                 </li>
                 {{/each}}
             </ul>
         </div>
 
-        <label for="apikey" id="textApiKey">2. API Key:</label>
+        <label for="create-backend-key" id="ApiKeylabel">2. API Key:</label>
         {{view Mist.TextField
             valueBinding="Mist.backendAddController.newBackendKey"
             name="create-backend-key"
             id="create-backend-key"}}
 
-        <label for="apisecret" id="textApiSecret">3. API Secret:</label>
+        <label for="create-backend-secret" id="ApiSecretlabel">3. API Secret:</label>
         {{view Mist.TextField
             type="password"
             valueBinding="Mist.backendAddController.newBackendSecret"
             name="create-backend-secret"
             id="create-backend-secret"}}
 
-        <div id="addBackendOpenstack" style="display:none;">
-            <label for="apiurl" id="textURL">4. Auth URL:</label>
+        <div id="addBackendOpenstack">
+            <label for="create-backend-url" id="URLlabel">4. Auth URL:</label>
             {{view Mist.TextField
                 valueBinding="Mist.backendAddController.newBackendURL"
                 name="create-backend-url"
                 id="create-backend-url"}}
 
-            <label for="apitenant" id="textTenant">5. Tenant Name:</label>
+            <label for="create-backend-tenant" id="Tenantlabel">5. Tenant Name:</label>
             {{view Mist.TextField
                 valueBinding="Mist.backendAddController.newBackendTenant"
                 name="create-backend-tenant"
@@ -53,7 +53,7 @@
         </div>
 
         <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <button id="create-backend-cancel" data-theme="c" {{action "backClicked" target="view"}}>Back</button>
+            <button id="create-backend-cancel" {{action "backClicked" target="view"}}>Back</button>
             <button id="create-backend-ok" data-theme="b" disabled {{action "addButtonClick" target="view"}}>Add</button>
         </div>
     </div>

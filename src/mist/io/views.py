@@ -2,7 +2,7 @@
 import os
 import tempfile
 import logging
-
+import random
 from time import time
 
 from datetime import datetime
@@ -167,21 +167,28 @@ def list_backends(request):
 
 @view_config(route_name='backends', request_method='POST', renderer='json')
 def add_backend(request, renderer='json'):
+    """Adds a new backend.
+    
+    """
     try:
         backends = request.environ['beaker.session']['backends']
     except:
         backends = request.registry.settings['backends']
+        
     params = request.json_body
-    provider = params.get('provider', '0')['provider']
+    title = params.get('title', '0')
+    provider = params.get('provider', '0')
     apikey = params.get('apikey', '')
     apisecret = params.get('apisecret', '')
     apiurl = params.get('apiurl', '')
     tenant_name = params.get('tenant_name', '')
+    
     if apisecret == 'getsecretfromdb':
         for backend_id in backends:
             backend = backends[backend_id]
             if backend.get('apikey', None) == apikey:
                 apisecret = backend.get('apisecret', None)
+                
     region = ''
     if not provider.__class__ is int and ':' in provider:
         region = provider.split(':')[1]
@@ -195,7 +202,7 @@ def add_backend(request, renderer='json'):
     if backend_id in backends:
         return Response('Backend exists', 409)
 
-    backend = {'title': params.get('provider', '0')['title'],
+    backend = {'title': title,
                'provider': provider,
                'apikey': apikey,
                'apisecret': apisecret,
@@ -203,7 +210,7 @@ def add_backend(request, renderer='json'):
                'tenant_name': tenant_name,
                'region': region,
                'poll_interval': request.registry.settings['default_poll_interval'],
-               'enabled': 1,
+               'enabled': True,
               }
 
     request.registry.settings['backends'][backend_id] = backend
@@ -219,8 +226,9 @@ def add_backend(request, renderer='json'):
            'poll_interval': backend['poll_interval'],
            'region'       : backend['region'],
            'status'       : 'off',
-           'enabled'      : 1,
+           'enabled'      : True,
           }
+    
     return ret
 
 
@@ -238,6 +246,18 @@ def delete_backend(request, renderer='json'):
     save_settings(request)
 
     return Response('OK', 200)
+
+
+@view_config(route_name='backend_action', request_method='POST', request_param="action=toggle", renderer='json')
+def toggle_backend(request):
+    
+    backend_id = request.matchdict['backend']
+    state = request.registry.settings['backends'][backend_id]['enabled']
+    request.registry.settings['backends'][backend_id]['enabled'] = not state
+    
+    save_settings(request)
+    
+    return {'state': not state,}
 
 
 @view_config(route_name='machines', request_method='GET', renderer='json')
@@ -303,6 +323,7 @@ def list_machines(request):
                   }
         machine.update(get_machine_actions(m, conn))
         ret.append(machine)
+    
     return ret
 
 
@@ -426,6 +447,61 @@ def create_machine(request):
             os.remove(tmp_key_path)
         except:
             pass
+    elif conn.type is Provider.NEPHOSCALE and public_key:
+        machine_name = machine_name[:64].replace(' ','-')
+        #name in NephoScale must start with a letter, can contain mixed alpha-numeric characters, 
+        #hyphen ('-') and underscore ('_') characters, cannot exceed 64 characters, and can end with a letter or a number."
+
+        #Hostname must start with a letter, can contain mixed alpha-numeric characters 
+        #and the hyphen ('-') character, cannot exceed 15 characters, and can end with a letter or a number.
+        key = str(public_key).replace('\n','')
+        deploy_script = ScriptDeployment(script)        
+        
+        (tmp_key, tmp_key_path) = tempfile.mkstemp()
+        key_fd = os.fdopen(tmp_key, 'w+b')
+        key_fd.write(private_key)
+        key_fd.close()
+        
+        #NephoScale has 2 keys that need be specified, console and ssh key
+        #get the id of the ssh key if it exists, otherwise add the key
+        try:
+            server_key = ''        
+            keys = conn.list_ssh_keys()
+            for k in keys:
+                if key == k.get('public_key'):
+                    server_key = k.get('id')
+                    break
+            if not server_key:
+                server_key = conn.add_ssh_key(machine_name, key)
+        except:
+            server_key = conn.add_ssh_key('mistio'+str(random.randint(1,100000)), key)                          
+
+        #mist.io does not support console key add through the wizzard. Try to add one    
+        try:
+            console_key = conn.add_password_key('mistio'+str(random.randint(1,100000)))
+        except:
+            console_keys = conn.list_all_keys(key_group=4)
+            if console_keys:
+                console_key = console_keys[0].get('id')        
+        try:
+            node = conn.deploy_node(name=machine_name,
+                             hostname=machine_name[:15],
+                             image=image,
+                             size=size,
+                             location=location.id,                             
+                             server_key=server_key,
+                             console_key=console_key,
+                             ssh_key=tmp_key_path,
+                             connect_attempts=20,
+                             deploy=deploy_script)
+            associate_key(request, key_id, backend_id, node.id, deploy=False)
+        except Exception as e:
+            return Response('Failed to create machine in NephoScale: %s' % e, 500)
+        #remove temp file with private key
+        try:
+            os.remove(tmp_key_path)
+        except:
+            pass            
     elif conn.type is Provider.LINODE and public_key and private_key:
         auth = NodeAuthSSHKey(public_key)
 
