@@ -1392,7 +1392,7 @@ def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, s
     """ Updates an ssh keypair or associates an ssh user for a machine with a key.
 
     """
-    with get_user(request):
+    with get_user(request) as user:
         keypairs = user['keypairs']
 
         if key_id not in keypairs:
