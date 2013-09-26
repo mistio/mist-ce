@@ -181,8 +181,8 @@ define('app/views/machine_add_dialog', [
                 $('.generate-key-collapsible .ui-icon').hide();
                 $('.dialog-add .ajax-loader').show();
                 $.ajax({
-                    url: '/key_generate',
-                    type: 'GET',
+                    url: '/keys',
+                    type: 'POST',
                     success: function(result) {
                         var keyName = 'auto-generated-key-' + Math.round(+new Date/1000);
                         Mist.keysController.newKey(keyName,
