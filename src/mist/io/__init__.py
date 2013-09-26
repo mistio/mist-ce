@@ -23,20 +23,20 @@ def main(global_config, **settings):
     helpers.load_settings(settings)
 
     # try to authenticate with mist.io service if email & password are available
-    if settings.get('email') and settings.get('password'):
-        payload = {'email': settings.get('email'),
-                   'password': settings.get('password')}
+    if settings['user'].get('email') and settings['user'].get('password'):
+        payload = {'email': settings['user'].get('email'),
+                   'password': settings['user'].get('password')}
         ret = requests.post(settings['core_uri'] + '/auth', params=payload, verify=False)
         if ret.status_code == 200:
             settings['auth'] = 1
             ret = json.loads(ret.content)
             settings['current_plan'] = ret.get('current_plan',{})
             user_details = ret.get('user_details', {})
-            settings['name'] = user_details.get('name', '')
-            settings['company_name'] = user_details.get('company_name', '')            
-            settings['country'] = user_details.get('country', '')            
-            settings['number_of_servers'] = user_details.get('number_of_servers', '')            
-            settings['number_of_people'] = user_details.get('number_of_people', '')                                                
+            settings['user']['name'] = user_details.get('name', '')
+            settings['user']['company_name'] = user_details.get('company_name', '')            
+            settings['user']['country'] = user_details.get('country', '')            
+            settings['user']['number_of_servers'] = user_details.get('number_of_servers', '')            
+            settings['user']['number_of_people'] = user_details.get('number_of_people', '')                                                
         else:
             settings['auth'] = 0
 

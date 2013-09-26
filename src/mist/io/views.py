@@ -41,6 +41,13 @@ except ImportError:
 
 log = logging.getLogger('mist.io')
 
+try:
+    from mist.core.helpers import get_user
+    log.error('Imported get_user from core.')
+except ImportError:
+    log.error('Imported get_user from io.')
+    from mist.io.helpers import get_user
+
 
 @view_config(route_name='home', request_method='GET',
              renderer='templates/home.pt')
@@ -48,55 +55,45 @@ def home(request):
     """Gets all the basic data for backends, project name and session status.
 
     """
-    try:
-        email = request.environ['beaker.session']['email']
-        session = True
-    except:
-        session = False
-        try:
-            email = request.registry.settings['email']
-            password = request.registry.settings['password']
-        except:
-            email = ''
-
+    with get_user(request, readonly=True) as user:
+        email = user.get('email', '')
     core_uri = request.registry.settings['core_uri']
     auth = request.registry.settings.get('auth', 0)
     js_build = request.registry.settings['js_build']
     js_log_level = request.registry.settings['js_log_level']
 
     return {'project': 'mist.io',
-            'session': session,
             'email': email,
             'supported_providers': SUPPORTED_PROVIDERS,
             'core_uri': core_uri,
             'auth': auth,
             'js_build': js_build,
-            'js_log_level': js_log_level}
+        'js_log_level': js_log_level}
 
 
-@view_config(route_name="check_auth", request_method='POST', renderer="json")
-def check_auth(request):
-    "Check on the mist.core service if authenticated"
-    params = request.json_body
-    email = params.get('email', '').lower()
-    password = params.get('password', '')
-    timestamp = params.get('timestamp', '')
-    hash_key = params.get('hash', '')
-
-    payload = {'email': email, 'password': password, 'timestamp': timestamp, 'hash_key': hash_key}
-    core_uri = request.registry.settings['core_uri']
-    ret = requests.post(core_uri + '/auth', params=payload, verify=False)
-
-    if ret.status_code == 200:
-        ret = json.loads(ret.content)
-        request.registry.settings['email'] = email
-        request.registry.settings['password'] = password
-        request.registry.settings['auth'] = 1
-        log.debug('save settings (check auth)')
-        save_settings(request)
-        return ret
-    else:
-        return Response('Unauthorized', 401)
+#~ @view_config(route_name="check_auth", request_method='POST', renderer="json")
+#~ def check_auth(request):
+    #~ "Check on the mist.core service if authenticated"
+    #~ params = request.json_body
+    #~ email = params.get('email', '').lower()
+    #~ password = params.get('password', '')
+    #~ timestamp = params.get('timestamp', '')
+    #~ hash_key = params.get('hash', '')
+#~ 
+    #~ payload = {'email': email, 'password': password, 'timestamp': timestamp, 'hash_key': hash_key}
+    #~ core_uri = request.registry.settings['core_uri']
+    #~ ret = requests.post(core_uri + '/auth', params=payload, verify=False)
+#~ 
+    #~ if ret.status_code == 200:
+        #~ ret = json.loads(ret.content)
+        #~ request.registry.settings['email'] = email
+        #~ request.registry.settings['password'] = password
+        #~ request.registry.settings['auth'] = 1
+        #~ log.debug('save settings (check auth)')
+        #~ save_settings(request)
+        #~ return ret
+    #~ else:
+        #~ return Response('Unauthorized', 401)
 
 @view_config(route_name='account', request_method='POST', renderer='json')
 def update_user_settings(request, renderer='json'):
@@ -132,8 +129,6 @@ def update_user_settings(request, renderer='json'):
         return Response('Unauthorized', 401)
 
 
-
-
 @view_config(route_name='backends', request_method='GET', renderer='json')
 def list_backends(request):
     """Gets the available backends.
@@ -141,28 +136,24 @@ def list_backends(request):
     .. note:: Currently, this is only used by the backend controller in js.
 
     """
-    try:
-        backends = request.environ['beaker.session']['backends']
-    except:
-        backends = request.registry.settings['backends']
+    with get_user(request, readonly=True) as user:
+        ret = []
+        for backend_id in user['backends']:
+            backend = user['backends'][backend_id]
+            ret.append({'id': backend_id,
+                        'apikey': backend.get('apikey', None),
+                        'title': backend.get('title', backend['provider']),
+                        'provider': backend['provider'],
+                        'poll_interval': backend.get('poll_interval', 10000),
+                        'state': 'wait',
+                        # for Provider.RACKSPACE_FIRST_GEN
+                        'region': backend.get('region', None),
+                        # for Provider.RACKSPACE (the new Nova provider)
+                        'datacenter': backend.get('datacenter', None),
+                        'enabled': backend.get('enabled', True),
+                         })
 
-    ret = []
-    for backend_id in backends:
-        backend = backends[backend_id]
-        ret.append({'id': backend_id,
-                    'apikey': backend.get('apikey', None),
-                    'title': backend.get('title', backend['provider']),
-                    'provider': backend['provider'],
-                    'poll_interval': backend.get('poll_interval', 10000),
-                    'state': 'wait',
-                    # for Provider.RACKSPACE_FIRST_GEN
-                    'region': backend.get('region', None),
-                    # for Provider.RACKSPACE (the new Nova provider)
-                    'datacenter': backend.get('datacenter', None),
-                    'enabled': backend.get('enabled', True),
-                     })
-
-    return ret
+        return ret
 
 
 @view_config(route_name='backends', request_method='POST', renderer='json')
@@ -170,11 +161,6 @@ def add_backend(request, renderer='json'):
     """Adds a new backend.
     
     """
-    try:
-        backends = request.environ['beaker.session']['backends']
-    except:
-        backends = request.registry.settings['backends']
-        
     params = request.json_body
     title = params.get('title', '0')
     provider = params.get('provider', '0')
@@ -182,54 +168,55 @@ def add_backend(request, renderer='json'):
     apisecret = params.get('apisecret', '')
     apiurl = params.get('apiurl', '')
     tenant_name = params.get('tenant_name', '')
-    
-    if apisecret == 'getsecretfromdb':
-        for backend_id in backends:
-            backend = backends[backend_id]
-            if backend.get('apikey', None) == apikey:
-                apisecret = backend.get('apisecret', None)
-                
-    region = ''
-    if not provider.__class__ is int and ':' in provider:
-        region = provider.split(':')[1]
-        provider = provider.split(':')[0]
+    with get_user(request) as user:
+        backends = user['backends']
+        
+        if apisecret == 'getsecretfromdb':
+            for backend_id in backends:
+                backend = backends[backend_id]
+                if backend.get('apikey', None) == apikey:
+                    apisecret = backend.get('apisecret', None)
+                    
+        region = ''
+        if not provider.__class__ is int and ':' in provider:
+            region = provider.split(':')[1]
+            provider = provider.split(':')[0]
 
-    if not provider or not apikey or not apisecret:
-        return Response('Invalid backend data', 400)
+        if not provider or not apikey or not apisecret:
+            return Response('Invalid backend data', 400)
 
-    backend_id = generate_backend_id(provider, region, apikey)
-    
-    if backend_id in backends:
-        return Response('Backend exists', 409)
+        backend_id = generate_backend_id(provider, region, apikey)
+        
+        if backend_id in backends:
+            return Response('Backend exists', 409)
 
-    backend = {'title': title,
-               'provider': provider,
-               'apikey': apikey,
-               'apisecret': apisecret,
-               'apiurl': apiurl,
-               'tenant_name': tenant_name,
-               'region': region,
-               'poll_interval': request.registry.settings['default_poll_interval'],
-               'enabled': True,
+        backend = {'title': title,
+                   'provider': provider,
+                   'apikey': apikey,
+                   'apisecret': apisecret,
+                   'apiurl': apiurl,
+                   'tenant_name': tenant_name,
+                   'region': region,
+                   'poll_interval': request.registry.settings['default_poll_interval'],
+                   'enabled': True,
+                  }
+
+        backends[backend_id] = backend
+        log.debug('save settings (add backend')
+
+        ret = {'id'           : backend_id,
+               'apikey'       : backend['apikey'],
+               'apiurl'       : backend['apiurl'],
+               'tenant_name'  : backend['tenant_name'],
+               'title'        : backend['title'],
+               'provider'     : backend['provider'],
+               'poll_interval': backend['poll_interval'],
+               'region'       : backend['region'],
+               'status'       : 'off',
+               'enabled'      : True,
               }
-
-    request.registry.settings['backends'][backend_id] = backend
-    log.debug('save settings (add backend')
-    save_settings(request)
-
-    ret = {'id'           : backend_id,
-           'apikey'       : backend['apikey'],
-           'apiurl'       : backend['apiurl'],
-           'tenant_name'  : backend['tenant_name'],
-           'title'        : backend['title'],
-           'provider'     : backend['provider'],
-           'poll_interval': backend['poll_interval'],
-           'region'       : backend['region'],
-           'status'       : 'off',
-           'enabled'      : True,
-          }
-    
-    return ret
+        
+        return ret
 
 
 @view_config(route_name='backend_action', request_method='DELETE',
@@ -241,9 +228,9 @@ def delete_backend(request, renderer='json'):
               any key associations.
 
     """
-    request.registry.settings['backends'].pop(request.matchdict['backend'])
-    log.debug('save settings (del backend)')
-    save_settings(request)
+    with get_user(request) as user:
+        user['backends'].pop(request.matchdict['backend'])
+        log.debug('save settings (del backend)')
 
     return Response('OK', 200)
 
@@ -252,10 +239,9 @@ def delete_backend(request, renderer='json'):
 def toggle_backend(request):
     
     backend_id = request.matchdict['backend']
-    state = request.registry.settings['backends'][backend_id]['enabled']
-    request.registry.settings['backends'][backend_id]['enabled'] = not state
-    
-    save_settings(request)
+    with get_user(request) as user:
+        state = user['backends'][backend_id]['enabled']
+        user['backends'][backend_id]['enabled'] = not state
     
     return {'state': not state,}
 
@@ -361,10 +347,8 @@ def create_machine(request):
     except:
         key_id = None
 
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    with get_user(request, readonly=True) as user:
+        keypairs = user['keypairs']
 
     if key_id:
         keypair = get_keypair_by_name(keypairs, key_id)
@@ -1408,40 +1392,38 @@ def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, s
     """ Updates an ssh keypair or associates an ssh user for a machine with a key.
 
     """
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    with get_user(request):
+        keypairs = user['keypairs']
 
-    if key_id not in keypairs:
-        keypairs[key_id] = {'machines': []}
-    
-    keypair = keypairs[key_id]
-
-    if public_key:
-        keypair['public'] = public_key
-
-    if private_key:
-        keypair['private'] = private_key
-
-    if default != None:
-        keypair['default'] = default
-
-    log.debug("Keypair is : %s" % keypair)
-    for machine in keypair.get('machines',[]):
-        if [backend_id, machine_id] == machine[:2]:
-            keypairs[key_id]['machines'][keypair['machines'].index(machine)] = [backend_id, machine_id, timestamp, ssh_user, sudoer]
-        else:
-            log.debug("Machines are : %s" % keypair.get('machines', []))
-
-    try:
-        log.debug('save settings (save keypair)')
-        save_settings(request)
-    except Exception, e:
-        log.error('Error saving keypair %s: %s' % (key_id, e))
-        return False
+        if key_id not in keypairs:
+            keypairs[key_id] = {'machines': []}
         
-    return True
+        keypair = keypairs[key_id]
+
+        if public_key:
+            keypair['public'] = public_key
+
+        if private_key:
+            keypair['private'] = private_key
+
+        if default != None:
+            keypair['default'] = default
+
+        log.debug("Keypair is : %s" % keypair)
+        for machine in keypair.get('machines',[]):
+            if [backend_id, machine_id] == machine[:2]:
+                keypairs[key_id]['machines'][keypair['machines'].index(machine)] = [backend_id, machine_id, timestamp, ssh_user, sudoer]
+            else:
+                log.debug("Machines are : %s" % keypair.get('machines', []))
+
+        try:
+            log.debug('save settings (save keypair)')
+            #~ save_settings(request)
+        except Exception, e:
+            log.error('Error saving keypair %s: %s' % (key_id, e))
+            return False
+            
+        return True
 
 
 def associate_key(request, key_id, backend_id, machine_id, deploy=True):

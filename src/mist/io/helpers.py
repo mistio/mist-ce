@@ -11,6 +11,8 @@ from time import time
 from hashlib import sha1
 from Crypto.PublicKey import RSA , DSA
 from Crypto.Util.number import bytes_to_long, long_to_bytes, isPrime
+from contextlib import contextmanager
+from copy import deepcopy
 
 from pyramid.response import Response
 
@@ -31,7 +33,40 @@ libcloud.security.CA_CERTS_PATH.append('/usr/share/curl/ca-bundle.crt')
 
 log = logging.getLogger('mist.io')
 
+@contextmanager
+def get_user(request, readonly=False, refresh=False, ext_auth=False):
+    """Use it like this:
+        with get_user(request) as user:
+            code....
+    It will automagically clean up and save the data to the session and the database
+    """
+    
+    try:
+        settings = request.registry.settings
+        user = settings['user']
+        user_before = deepcopy(user)
+        yield user
+    except:
+        # An exception occured. Returning False will reraise it.
+        log.error('Get_user io got an exception')
+        raise
+    else:
+        # All went fine. Save.
+        if not readonly and user_before and user != user_before:
+			save_settings(request)
+    finally:
+        if not readonly:
+            # release lock
+            pass
 
+try:
+    from mist.core.helpers import get_user
+except:
+    pass
+	
+def get_auth_key(request):
+    pass
+    
 def load_settings(settings):
     """Gets settings from settings.yaml local file.
 
@@ -61,11 +96,11 @@ def load_settings(settings):
         log.error('Error parsing settings.yaml')
         config_file.close()
         raise
-
-    settings['keypairs'] = user_config.get('keypairs', {})
-    settings['backends'] = user_config.get('backends', {})
-    settings['email'] = user_config.get('email', '')
-    settings['password'] = user_config.get('password', '')
+    settings['user'] = {}
+    settings['user']['keypairs'] = user_config.get('keypairs', {})
+    settings['user']['backends'] = user_config.get('backends', {})
+    settings['user']['email'] = user_config.get('email', '')
+    settings['user']['password'] = user_config.get('password', '')
     settings['js_build'] = user_config.get('js_build', settings.get('js_build', True))
     settings['js_log_level'] = user_config.get('js_log_level', 3)
     settings['default_poll_interval'] = user_config.get('default_poll_interval',
@@ -105,25 +140,25 @@ def save_settings(request):
     settings = request.registry.settings
 
     keypairs = {}
-    for key in settings['keypairs'].keys():
+    for key in settings['user']['keypairs'].keys():
         keypairs[key] = {
-            'public': literal_unicode(settings['keypairs'][key]['public']),
-            'private': literal_unicode(settings['keypairs'][key]['private']),
-            'machines': settings['keypairs'][key].get('machines',[]),
-            'default': settings['keypairs'][key].get('default', False)
+            'public': literal_unicode(settings['user']['keypairs'][key]['public']),
+            'private': literal_unicode(settings['user']['keypairs'][key]['private']),
+            'machines': settings['user']['keypairs'][key].get('machines',[]),
+            'default': settings['user']['keypairs'][key].get('default', False)
         }
 
     payload = {
         'keypairs': keypairs,
-        'backends': settings['backends'],
+        'backends': settings['user']['backends'],
         'core_uri': settings['core_uri'],
         'js_build': settings['js_build'],
         'js_log_level': settings['js_log_level'],
         }
 
-    if settings.get('email', False) and settings.get('password', False):
-        payload['email'] = settings['email']
-        payload['password'] = settings['password']
+    if settings['user'].get('email', False) and settings['user'].get('password', False):
+        payload['email'] = settings['user']['email']
+        payload['password'] = settings['user']['password']
 
     yaml.dump(payload, config_file, default_flow_style=False, )
 
@@ -181,10 +216,8 @@ def connect(request, backend_id=False):
         * Linode
 
     """
-    try:
-        backends = request.environ['beaker.session']['backends']
-    except KeyError:
-        backends = request.registry.settings['backends']
+    with get_user(request, readonly=True) as user:
+		backends = user['backends']
 
     if not backend_id:
         backend_id = request.matchdict['backend']
@@ -474,14 +507,13 @@ def set_default_key(request):
     if not key_id:
         return Response('Keypair not found', 404)
 
-    keypairs = request.registry.settings['keypairs']
+	with get_user(request) as user:
+		keypairs = user['keypairs']
 
-    for key in keypairs:
-        keypairs[key]['default'] = False
+		for key in keypairs:
+			keypairs[key]['default'] = False
 
-    keypairs[key_id]['default'] = True
-
-    save_settings(request)
+		keypairs[key_id]['default'] = True
 
     return Response('OK', 200)
 
@@ -493,17 +525,14 @@ def get_private_key(request):
     button.
 
     """    
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
-    
-    key_id = request.matchdict['key']
-
-    if key_id in keypairs.keys():
-        return keypairs[key_id].get('private', '')
-    else:
-        return Response('Keypair not found', 404)
+    with get_user(request, readonly=True) as user:
+		keypairs = user['keypairs']
+		key_id = request.matchdict['key']
+		
+		if key_id in keypairs.keys():
+			return keypairs[key_id].get('private', '')
+		else:
+			return Response('Keypair not found', 404)
 
 
 def validate_dsa_key_pair(public_key, private_key):
