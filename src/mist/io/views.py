@@ -1187,7 +1187,7 @@ def get_private_key_request(request):
     return get_private_key(request)
 
 
-@view_config(route_name='key_generate', request_method='GET', renderer='json')
+@view_config(route_name='keys', request_method='POST', renderer='json')
 def generate_keypair_request(request):
     return generate_keypair()
 
