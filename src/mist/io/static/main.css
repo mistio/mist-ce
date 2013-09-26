@@ -1424,6 +1424,13 @@ div.logout-placeholder, div.account-placeholder, div.support-placeholder {
     width: 400px;
 }
 
+#add-backend .ajax-loader {
+    background-image: url(images/spinner.gif);
+    background-position: center !important;
+    background-repeat: no-repeat;
+    height: 16px;
+}
+
 .key-box .ajax-loader {
     float: right;
     width: 20px;

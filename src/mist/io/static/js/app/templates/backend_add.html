@@ -51,6 +51,10 @@
                 name="create-backend-tenant"
                 id="create-backend-tenant"}}
         </div>
+        
+        {{#if view.pendingCreation}}
+        <div class="ajax-loader"></div>
+        {{/if}}
 
         <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
             <button id="create-backend-cancel" {{action "backClicked" target="view"}}>Back</button>
