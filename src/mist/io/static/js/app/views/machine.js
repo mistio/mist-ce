@@ -538,6 +538,11 @@ define('app/views/machine', [
             manageKeysClicked: function() {
                 $('#manage-keys').panel('open');
             }, 
+           
+            addKeyClicked: function() {
+                $('#non-associated-keys').listview('refresh');
+                $('#associate-key-dialog').popup('option', 'positionTo', '#mist-manage-keys').popup('open');
+            },
 
             doLogin: function() {
                 //sends email, passwords and check if auth is ok

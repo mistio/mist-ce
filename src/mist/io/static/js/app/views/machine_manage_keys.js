@@ -29,10 +29,12 @@ define('app/views/machine_manage_keys', [
                         for (var m = 0; m < key.machines.length; ++m) {
                             k_machine = key.machines[m];
                             if (machine.id == k_machine[1] && machine.backend.id == k_machine[0]) {
-                                if (k_machine[2] > 0) {
-                                    key.set('probeState', 'probed');
-                                } else {
-                                    key.set('probeState', 'unprobed');
+                                if (machine.probing != key.name){
+                                    if (k_machine[2] > 0) {
+                                        key.set('probeState', 'probed');
+                                    } else {
+                                        key.set('probeState', 'unprobed');
+                                    }   
                                 }
                                 aKeys.push(key);
                                 found = true;
@@ -149,8 +151,8 @@ define('app/views/machine_manage_keys', [
                 $('#associate-key-dialog').popup('close');
                 var that = this;
                 Ember.run.next(function() {
-                        $('#create-key-dialog').popup('open');
-                        Mist.keyAddController.set('associateMachine', that.parentMachine);
+                    $('#create-key-dialog').popup('open');
+                    Mist.keyAddController.set('associateMachine', that.parentMachine);
                 });
             },
         });
