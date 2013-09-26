@@ -372,14 +372,14 @@ define('app/models/machine', [
                                 prefix = prefix.substring(0, prefix.length - 1);
                             }
                             var cmd = 'wget --no-check-certificate ' + prefix + '/core/scripts/deploy_collectd.sh -O - > /tmp/deploy_collectd.sh && sudo chmod +x /tmp/deploy_collectd.sh && sudo /tmp/deploy_collectd.sh ' + data['monitor_server'] + ' ' + data['uuid'] + ' ' + data['passwd'];
-                            cmd = "sudo su -c '" + cmd + "' || " + cmd;
+                            //cmd = "sudo su -c '" + cmd + "' || " + cmd;
                             collectd_install_target = that;
                             warn(cmd);
                             that.shell(cmd, function(){}, timeout=300);
                         } else {
                             $('.pending-monitoring h1').text('Disabling collectd');
-                            var cmd = 'chmod -x /etc/init.d/collectd && killall -9 collectd';
-                            cmd = "sudo su -c '" + cmd + "' || " + cmd;
+                            var cmd = 'sudo chmod -x /etc/init.d/collectd && sudo killall -9 collectd';
+                            //cmd = "sudo su -c '" + cmd + "' || " + cmd;
                             collectd_uninstall_target = that;
                             that.shell(cmd, function(){});
                             //remove machine from monitored_machines array
