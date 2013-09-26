@@ -151,8 +151,8 @@ define('app/views/machine_manage_keys', [
                 $('#associate-key-dialog').popup('close');
                 var that = this;
                 Ember.run.next(function() {
-                        $('#create-key-dialog').popup('open');
-                        Mist.keyAddController.set('associateMachine', that.parentMachine);
+                    $('#create-key-dialog').popup('open');
+                    Mist.keyAddController.set('associateMachine', that.parentMachine);
                 });
             },
         });

@@ -1445,6 +1445,8 @@ div.logout-placeholder, div.account-placeholder, div.support-placeholder {
 
 #manage-keys .ajax-loader  {
     margin-left: 30px;
+    position: relative;
+    right: 15px;
 }
 
 
