@@ -2,7 +2,7 @@
 import os
 import tempfile
 import logging
-
+import random
 from time import time
 
 from datetime import datetime
@@ -324,12 +324,6 @@ def list_machines(request):
         machine.update(get_machine_actions(m, conn))
         ret.append(machine)
     
-    session = request.environ['beaker.session']
-    print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-    print session['backends']
-    print '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-    
-    
     return ret
 
 
@@ -453,6 +447,61 @@ def create_machine(request):
             os.remove(tmp_key_path)
         except:
             pass
+    elif conn.type is Provider.NEPHOSCALE and public_key:
+        machine_name = machine_name[:64].replace(' ','-')
+        #name in NephoScale must start with a letter, can contain mixed alpha-numeric characters, 
+        #hyphen ('-') and underscore ('_') characters, cannot exceed 64 characters, and can end with a letter or a number."
+
+        #Hostname must start with a letter, can contain mixed alpha-numeric characters 
+        #and the hyphen ('-') character, cannot exceed 15 characters, and can end with a letter or a number.
+        key = str(public_key).replace('\n','')
+        deploy_script = ScriptDeployment(script)        
+        
+        (tmp_key, tmp_key_path) = tempfile.mkstemp()
+        key_fd = os.fdopen(tmp_key, 'w+b')
+        key_fd.write(private_key)
+        key_fd.close()
+        
+        #NephoScale has 2 keys that need be specified, console and ssh key
+        #get the id of the ssh key if it exists, otherwise add the key
+        try:
+            server_key = ''        
+            keys = conn.list_ssh_keys()
+            for k in keys:
+                if key == k.get('public_key'):
+                    server_key = k.get('id')
+                    break
+            if not server_key:
+                server_key = conn.add_ssh_key(machine_name, key)
+        except:
+            server_key = conn.add_ssh_key('mistio'+str(random.randint(1,100000)), key)                          
+
+        #mist.io does not support console key add through the wizzard. Try to add one    
+        try:
+            console_key = conn.add_password_key('mistio'+str(random.randint(1,100000)))
+        except:
+            console_keys = conn.list_all_keys(key_group=4)
+            if console_keys:
+                console_key = console_keys[0].get('id')        
+        try:
+            node = conn.deploy_node(name=machine_name,
+                             hostname=machine_name[:15],
+                             image=image,
+                             size=size,
+                             location=location.id,                             
+                             server_key=server_key,
+                             console_key=console_key,
+                             ssh_key=tmp_key_path,
+                             connect_attempts=20,
+                             deploy=deploy_script)
+            associate_key(request, key_id, backend_id, node.id, deploy=False)
+        except Exception as e:
+            return Response('Failed to create machine in NephoScale: %s' % e, 500)
+        #remove temp file with private key
+        try:
+            os.remove(tmp_key_path)
+        except:
+            pass            
     elif conn.type is Provider.LINODE and public_key and private_key:
         auth = NodeAuthSSHKey(public_key)
 

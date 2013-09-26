@@ -203,7 +203,7 @@ define('app/controllers/machines', [
                         machine.probe(key.name);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.timeNotify(jqXHR.responseText, 20000);
+                        Mist.notificationController.timeNotify(jqXHR.responseText, 15000);
                         error(textstate, errorThrown, 'while creating machine', that.name);
                         that.removeObject(machine);
                         that.backend.set('error', textstate);
