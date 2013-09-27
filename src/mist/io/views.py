@@ -43,9 +43,7 @@ log = logging.getLogger('mist.io')
 
 try:
     from mist.core.helpers import get_user
-    log.error('Imported get_user from core.')
 except ImportError:
-    log.error('Imported get_user from io.')
     from mist.io.helpers import get_user
 
 
@@ -102,7 +100,7 @@ def update_user_settings(request, renderer='json'):
     params = request.json_body
     action = params.get('action', '').lower()
     plan = params.get('plan', '')
-    auth_key = params.get('auth_key', '')
+    auth_key = get_auth_key(request)
     name = params.get('name', '')    
     company_name = params.get('company_name', '')
     country = params.get('country', '') 
@@ -117,7 +115,7 @@ def update_user_settings(request, renderer='json'):
                'country': country,
                'number_of_servers': number_of_servers,
                'number_of_people': number_of_people
-    }
+    }    
 
     core_uri = request.registry.settings['core_uri']
     ret = requests.post(core_uri + '/account', params=payload, verify=False)
@@ -1202,12 +1200,9 @@ def check_monitoring(request):
     password = request.registry.settings.get('password','')
 
     timestamp = datetime.utcnow().strftime("%s")
-    hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
+    auth_key = get_auth_key(request)
 
-    payload = {'email': email,
-               'timestamp': timestamp,
-               'hash': hash,
-               }
+    payload = {'auth_key': auth_key}
 
     ret = requests.get(core_uri+request.path, params=payload, verify=False)
     if ret.status_code == 200:
@@ -1222,54 +1217,50 @@ def update_monitoring(request):
     service.
 
     """
-    core_uri = request.registry.settings['core_uri']
-    try:
-        email = request.json_body['email']
-        password = request.json_body['pass']
-        timestamp = request.json_body['timestamp']
-        hash = request.json_body['hash']       
-    except:
-        email = request.registry.settings.get('email','')
-        password = request.registry.settings.get('password','')
-        timestamp =  datetime.utcnow().strftime("%s")
-        hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
+    with get_user(request) as user:
+        core_uri = request.registry.settings['core_uri']
+        try:
+            email = request.json_body['email']
+            password = request.json_body['pass']
+            payload = {'email': email, 'password': password}
+            ret = requests.post(settings['core_uri'] + '/auth', params=payload, verify=False)
+            if ret.status_code == 200:
+                request.settings['auth'] = 1
+                user['email'] = email
+                user['password'] = password
+        except:
+            pass   
+        auth_key = get_auth_key(request)
 
-    name = request.json_body.get('name','')
-    public_ips = request.json_body.get('public_ips', [])
-    dns_name = request.json_body.get('dns_name', '')
-    
-    action = request.json_body['action'] or 'enable'
-    payload = {'email': email,
-               'timestamp': timestamp,
-               'hash': hash,
-               'action': action,
-               'name': name,
-               'public_ips': public_ips,
-               'dns_name': dns_name,
-               }
+        name = request.json_body.get('name','')
+        public_ips = request.json_body.get('public_ips', [])
+        dns_name = request.json_body.get('dns_name', '')
+        
+        action = request.json_body['action'] or 'enable'
+        payload = {'auth_key': auth_key,
+                   'action': action,
+                   'name': name,
+                   'public_ips': public_ips,
+                   'dns_name': dns_name,
+                   }
 
-    if action == 'enable':
-        backend = request.registry.settings['backends'][request.matchdict['backend']]
-        payload['backend_title'] = backend['title']
-        payload['backend_provider'] = backend['provider']
-        payload['backend_region'] = backend['region']
-        payload['backend_apikey'] = backend['apikey']
-        payload['backend_apisecret'] = backend['apisecret']
+        if action == 'enable':
+            backend = user['backends'][request.matchdict['backend']]
+            payload['backend_title'] = backend['title']
+            payload['backend_provider'] = backend['provider']
+            payload['backend_region'] = backend['region']
+            payload['backend_apikey'] = backend['apikey']
+            payload['backend_apisecret'] = backend['apisecret']
 
-    #TODO: make ssl verification configurable globally, set to true by default
-    ret = requests.post(core_uri+request.path, params=payload, verify=False)
+        #TODO: make ssl verification configurable globally, set to true by default
+        ret = requests.post(core_uri+request.path, params=payload, verify=False)
 
-    if ret.status_code == 402:
-        return Response(ret.text, 402)
-    elif ret.status_code != 200:
-        return Response('Service unavailable', 503)
+        if ret.status_code == 402:
+            return Response(ret.text, 402)
+        elif ret.status_code != 200:
+            return Response('Service unavailable', 503)
 
-    request.registry.settings['email'] = email
-    request.registry.settings['password'] = password
-    request.registry.settings['auth'] = 1
-    log.debug('saving settings (update monitoring)')
-    save_settings(request)
-    return ret.json()
+        return ret.json()
 
 
 @view_config(route_name='rules', request_method='POST', renderer='json')
@@ -1278,15 +1269,8 @@ def update_rule(request):
 
     """
     core_uri = request.registry.settings['core_uri']
-    email = request.registry.settings.get('email','')
-    password = request.registry.settings.get('password','')
-    timestamp =  datetime.utcnow().strftime("%s")
-    hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
-
     payload = request.json_body.copy()
-    payload['email'] = email
-    payload['hash'] = hash
-    payload['timestamp'] = timestamp
+    payload['auth_key'] = get_auth_key(request)
 
     #TODO: make ssl verification configurable globally, set to true by default
     ret = requests.post(core_uri+request.path, params=payload, verify=False)
@@ -1304,15 +1288,8 @@ def delete_rule(request):
     """
     # TODO: factor out common code in a shared function
     core_uri = request.registry.settings['core_uri']
-    email = request.registry.settings.get('email','')
-    password = request.registry.settings.get('password','')
-    timestamp =  datetime.utcnow().strftime("%s")
-    hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
-
     payload = {}
-    payload['email'] = email
-    payload['hash'] = hash
-    payload['timestamp'] = timestamp
+    payload['auth_key'] = get_auth_key(request)
 
     #TODO: make ssl verification configurable globally, set to true by default
     ret = requests.delete(core_uri+request.path, params=payload, verify=False)
@@ -1324,68 +1301,65 @@ def delete_rule(request):
 
 
 def update_available_keys(request, backend_id, machine_id, ssh_user, host, authorized_keys):
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    with get_user(request) as user:
+        keypairs = user['keypairs']
     
-    # track which keypairs will be updated
-    updated_keypairs = {}
-    
-    # get the actual public keys from the blob
-    ak = [k for k in authorized_keys.split('\n') if k.startswith('ssh')]
+        # track which keypairs will be updated
+        updated_keypairs = {}
+        
+        # get the actual public keys from the blob
+        ak = [k for k in authorized_keys.split('\n') if k.startswith('ssh')]
 
-    # for each public key
-    for pk in ak:
-        exists = False
-        pub_key = pk.strip().split(' ')
-        for k in keypairs:
-            # check if the public key already exists in our keypairs 
-            if keypairs[k]['public'].strip().split(' ')[:2] == pub_key[:2]:
-                exists = True
-                associated = False
-                # check if it is already associated with this machine
-                for m in keypairs[k].get('machines', []):
-                    if m[:2] == [backend_id, machine_id]:
-                        associated = True
-                        break
-                if not associated:
-                    if not keypairs[k].get('machines', None):
-                        keypairs[k]['machines'] = []
-                    keypairs[k]['machines'].append([backend_id, machine_id])
-                    updated_keypairs[k] = keypairs[k]
-            if exists:
-                break
-                    
-        # if public key does not exist in our keypairs, add a new entry
-        if not exists:
-            if len(pub_key)>2:
-                key_name = pub_key[2].strip('\r')
-            else:
-                key_name = "%s@%s" % (ssh_user, host)
-                if key_name in keypairs:
-                    i = 0
-                    while True:
-                        key_name = '%s@%s-%d' % (ssh_user, host, i)
-                        i+=1
-                        if key_name not in keypairs:
+        # for each public key
+        for pk in ak:
+            exists = False
+            pub_key = pk.strip().split(' ')
+            for k in keypairs:
+                # check if the public key already exists in our keypairs 
+                if keypairs[k]['public'].strip().split(' ')[:2] == pub_key[:2]:
+                    exists = True
+                    associated = False
+                    # check if it is already associated with this machine
+                    for m in keypairs[k].get('machines', []):
+                        if m[:2] == [backend_id, machine_id]:
+                            associated = True
                             break
-            keypairs[key_name] = {'public': ' '.join(pk.split(' ')[:2]),
-                                  'private': '',
-                                  'machines': [[backend_id, machine_id, 0, ssh_user]]}
-            updated_keypairs[key_name] = keypairs[key_name]
+                    if not associated:
+                        if not keypairs[k].get('machines', None):
+                            keypairs[k]['machines'] = []
+                        keypairs[k]['machines'].append([backend_id, machine_id])
+                        updated_keypairs[k] = keypairs[k]
+                if exists:
+                    break
+                        
+            # if public key does not exist in our keypairs, add a new entry
+            if not exists:
+                if len(pub_key)>2:
+                    key_name = pub_key[2].strip('\r')
+                else:
+                    key_name = "%s@%s" % (ssh_user, host)
+                    if key_name in keypairs:
+                        i = 0
+                        while True:
+                            key_name = '%s@%s-%d' % (ssh_user, host, i)
+                            i+=1
+                            if key_name not in keypairs:
+                                break
+                keypairs[key_name] = {'public': ' '.join(pk.split(' ')[:2]),
+                                      'private': '',
+                                      'machines': [[backend_id, machine_id, 0, ssh_user]]}
+                updated_keypairs[key_name] = keypairs[key_name]
 
-    if updated_keypairs:
-        log.debug('update keypairs')
-        save_settings(request)
+        if updated_keypairs:
+            log.debug('update keypairs')
 
-    ret = [{'name': key,
-            'machines': keypairs[key].get('machines', []),
-            'pub': keypairs[key]['public'],
-            'default_key': keypairs[key].get('default', False)}
-           for key in updated_keypairs.keys()]
-     
-    return ret
+        ret = [{'name': key,
+                'machines': keypairs[key].get('machines', []),
+                'pub': keypairs[key]['public'],
+                'default_key': keypairs[key].get('default', False)}
+               for key in updated_keypairs.keys()]
+         
+        return ret
 
 
 def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, sudoer, public_key = False, private_key = False, default = None):
@@ -1418,7 +1392,6 @@ def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, s
 
         try:
             log.debug('save settings (save keypair)')
-            #~ save_settings(request)
         except Exception, e:
             log.error('Error saving keypair %s: %s' % (key_id, e))
             return False

@@ -65,7 +65,8 @@ except:
     pass
     
 def get_auth_key(request):
-    pass
+    with get_user(request, readonly=True) as user:
+        return "%s:%s" % (user['email'], user['password'])
     
 def load_settings(settings):
     """Gets settings from settings.yaml local file.
