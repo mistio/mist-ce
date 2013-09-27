@@ -13,10 +13,17 @@ define('app/views/backend_add', [
         return Ember.View.extend({
 
             template: Ember.Handlebars.compile(backend_add_html),
-
-            init: function() {
-                this._super();
-            },
+            
+            pendingCreation: false,
+            
+            pendingCreationObserver: function() {
+                warn('Yeay1');
+                if (this.pendingCreation) {
+                    $('#create-backend-ok').addClass('ui-disabled');
+                } else {
+                    $('#create-backend-ok').removeClass('ui-disabled');
+                }
+            }.observes('pendingCreation'),
             
             keyDown: function(event) {
                 if (event.keyCode == 13) { // Enter
@@ -91,7 +98,9 @@ define('app/views/backend_add', [
                 Mist.backendAddController.newBackendClear();  
             },
 
-            addButtonClick: function(){
+            addButtonClick: function() {
+                var that = this;
+                that.set('pendingCreation', true);
                 var payload = {
                     "title": Mist.backendAddController.newBackendProvider.title,
                     "provider": Mist.backendAddController.newBackendProvider.provider,
@@ -100,7 +109,6 @@ define('app/views/backend_add', [
                     "apiurl": Mist.backendAddController.newBackendUrl,
                     "tenant_name": Mist.backendAddController.newBackendTenant
                 };
-                var that = this;
                 $.ajax({
                     url: '/backends',
                     type: "POST",
@@ -108,14 +116,17 @@ define('app/views/backend_add', [
                     dataType: "json",
                     headers: { "cache-control": "no-cache" },
                     data: JSON.stringify(payload),
-                    success: function(data) {
-                        Mist.backendsController.pushObject(Backend.create(data));
-                        info('Successfully added backend: ' + data.id);
-                        that.backClicked();
+                    success: function(result) {
+                        that.set('pendingCreation', false);
+                        Mist.backendsController.pushObject(Backend.create(result));
+                        info('added backend ' + result.id);
+                        Mist.backendAddController.newBackendClear();
+                        $("#add-backend").panel("close");
+                        $('.select-listmenu li').off('click', this.selectBackend);
                     },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while adding backend: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ' while adding backend');
+                    error: function(request){
+                        that.set('pendingCreation', false);
+                        Mist.notificationController.notify(request.responseText);
                     }
                 });
             },
