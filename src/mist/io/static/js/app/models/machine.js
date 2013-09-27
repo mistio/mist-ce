@@ -221,8 +221,7 @@ define('app/models/machine', [
                             var key = Mist.keysController.getKeyByName(keyName);
                             if (keyName != undefined){
                                 that.set('probing', keyName);
-                                key.set('probeState', 'probing');
-                                warn('yeay!');
+                                key.set('probing', that);
                             } else {
                                 that.set('probing', true);
                             }
@@ -237,7 +236,7 @@ define('app/models/machine', [
                                        // got it fine, also means it has a key
                                     if (jqXHR.status === 200) {
                                         if(key) {
-                                            key.updateProbeState(that, Date.now());
+                                            key.set('probing', false);
                                         } else {
                                             that.set('probed', true);
                                         }
@@ -271,7 +270,7 @@ define('app/models/machine', [
                                     } else {
                                         // in every other case there is a problem
                                         if(key) {
-                                            key.updateProbeState(that, -Date.now());
+                                            key.set('probing', false);
                                         } else {
                                             that.set('probed', false);
                                         }
@@ -284,7 +283,7 @@ define('app/models/machine', [
                                 },
                                 error: function(jqXHR, textstate, errorThrown) {
                                     if(key) {
-                                        key.updateProbeState(that, -Date.now());
+                                        key.set('probing', false);
                                     } else {
                                         that.set('probed', false);
                                     }

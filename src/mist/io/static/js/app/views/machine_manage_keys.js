@@ -3,7 +3,6 @@ define('app/views/machine_manage_keys', [
     'text!app/templates/machine_manage_keys.html',
     'ember'],
     /**
-     *
      * Machine Manage Keys
      *
      * @returns Class
@@ -29,13 +28,6 @@ define('app/views/machine_manage_keys', [
                         for (var m = 0; m < key.machines.length; ++m) {
                             k_machine = key.machines[m];
                             if (machine.id == k_machine[1] && machine.backend.id == k_machine[0]) {
-                                if (machine.probing != key.name){
-                                    if (k_machine[2] > 0) {
-                                        key.set('probeState', 'probed');
-                                    } else {
-                                        key.set('probeState', 'unprobed');
-                                    }   
-                                }
                                 aKeys.push(key);
                                 found = true;
                                 break;
@@ -65,19 +57,6 @@ define('app/views/machine_manage_keys', [
                 });
             },
 
-            associatedKeyClicked: function(key) {
-                this.selectedKey = key;
-                if (key.priv) {
-                    $('#key-action-upload').parent().css('display', 'none');
-                    $('#key-action-probe').parent().css('display', 'block');
-                } else {
-                    $('#key-action-upload').parent().css('display', 'block');
-                    $('#key-action-probe').parent().css('display', 'none'); 
-                }
-                $('#non-associated-keys').listview('refresh');
-                $('#key-actions').popup('option', 'positionTo', '#associated-keys').popup('open');
-            },
-            
             associateButtonClicked: function() {
                 $('#non-associated-keys').listview('refresh');
                 $('#associate-key-dialog').popup('option', 'positionTo', '#associate-key-button').popup('open');

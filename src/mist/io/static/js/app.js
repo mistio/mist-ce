@@ -64,6 +64,7 @@ define( 'app', [
     'app/views/delete_tag',
     'app/views/machine_tags_dialog',
     'app/views/machine_manage_keys',
+    'app/views/machine_manage_keys_list_item',
     'app/views/key_list_item',
     'app/views/key_list',
     'app/views/key',
@@ -103,7 +104,8 @@ define( 'app', [
                 ImageListView,
                 DeleteTagView,
                 MachineTagsDialog,
-                MachineManageKeys,
+                MachineManageKeysView,
+                MachineManageKeysListItemView,
                 KeyListItemView,
                 KeyListView,
                 SingleKeyView,
@@ -230,7 +232,8 @@ define( 'app', [
         App.AddKeyView = KeyAddDialog;
         App.KeyPrivDialog = KeyPrivDialog;
         App.MachineAddView = MachineAddDialog;
-        App.MachineManageKeys = MachineManageKeys;
+        App.MachineManageKeysView = MachineManageKeysView;
+        App.MachineManageKeysListItemView = MachineManageKeysListItemView;
         
         App.set('backendAddController', BackendAddController.create());
         App.set('backendsController', BackendsController.create());
