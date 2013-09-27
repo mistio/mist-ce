@@ -18,8 +18,8 @@ define('app/views/machine_manage_keys', [
             parentMachine: null,
 
             keysObserver: function() {
-                var aKeys = new Array();
-                var naKeys = new Array();
+                var newAssociatedKeys = new Array();
+                var newNonAssociatedKeys = new Array();
                 var machine = this.parentMachine;
                 var found = false;
                 Mist.keysController.keys.forEach(function(key) {
@@ -28,20 +28,19 @@ define('app/views/machine_manage_keys', [
                         for (var m = 0; m < key.machines.length; ++m) {
                             k_machine = key.machines[m];
                             if (machine.id == k_machine[1] && machine.backend.id == k_machine[0]) {
-                                aKeys.push(key);
+                                newAssociatedKeys.push(key);
                                 found = true;
                                 break;
                             } 
                         }
                     }
                     if (!found) {
-                        naKeys.push(key);
+                        newNonAssociatedKeys.push(key);
                     }
                 });
-                this.set('associatedKeys', aKeys);
-                this.set('nonAssociatedKeys', naKeys);
-                this.parentMachine.set('keysCount', aKeys.length);
-                this.parentMachine.set('probed', aKeys.length ? true : false);
+                this.set('associatedKeys', newAssociatedKeys);
+                this.set('nonAssociatedKeys', newNonAssociatedKeys);
+                this.parentMachine.set('keysCount', newAssociatedKeys.length);
                 this.parentMachine.probedObserver();
                 Ember.run.next(function() {
                     $('#associated-keys').listview();

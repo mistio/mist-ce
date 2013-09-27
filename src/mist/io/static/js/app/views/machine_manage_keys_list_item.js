@@ -41,11 +41,11 @@ define('app/views/machine_manage_keys_list_item', [
             keyClicked: function() {
                 this.get('parentView').set('selectedKey', this.key);
                 if (this.key.priv) {
-                    $('#key-action-upload').parent().css('display', 'none');
-                    $('#key-action-probe').parent().css('display', 'block');
+                    $('#key-action-upload').parent().hide();
+                    $('#key-action-probe').parent().show();
                 } else {
-                    $('#key-action-upload').parent().css('display', 'block');
-                    $('#key-action-probe').parent().css('display', 'none');
+                    $('#key-action-upload').parent().show();
+                    $('#key-action-probe').parent().hide();
                 }
                 $('#key-actions').popup('open');
             }

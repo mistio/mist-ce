@@ -1540,7 +1540,8 @@ div.info {
 }
 
 #mist-manage-keys.probing {
-    padding-left: 18px;  
+    background-position: 8px 5px;
+    padding-left: 18px;
 }
 
 #mist-manage-keys.unprobed, .associated-key .unprobed {
