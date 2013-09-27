@@ -53,7 +53,7 @@ def get_user(request, readonly=False, refresh=False, ext_auth=False):
     else:
         # All went fine. Save.
         if not readonly and user_before and user != user_before:
-			save_settings(request)
+            save_settings(request)
     finally:
         if not readonly:
             # release lock
@@ -63,7 +63,7 @@ try:
     from mist.core.helpers import get_user
 except:
     pass
-	
+    
 def get_auth_key(request):
     pass
     
@@ -217,7 +217,7 @@ def connect(request, backend_id=False):
 
     """
     with get_user(request, readonly=True) as user:
-		backends = user['backends']
+        backends = user['backends']
 
     if not backend_id:
         backend_id = request.matchdict['backend']
@@ -507,13 +507,13 @@ def set_default_key(request):
     if not key_id:
         return Response('Keypair not found', 404)
 
-	with get_user(request) as user:
-		keypairs = user['keypairs']
+    with get_user(request) as user:
+        keypairs = user['keypairs']
 
-		for key in keypairs:
-			keypairs[key]['default'] = False
+        for key in keypairs:
+            keypairs[key]['default'] = False
 
-		keypairs[key_id]['default'] = True
+        keypairs[key_id]['default'] = True
 
     return Response('OK', 200)
 
@@ -526,13 +526,13 @@ def get_private_key(request):
 
     """    
     with get_user(request, readonly=True) as user:
-		keypairs = user['keypairs']
-		key_id = request.matchdict['key']
-		
-		if key_id in keypairs.keys():
-			return keypairs[key_id].get('private', '')
-		else:
-			return Response('Keypair not found', 404)
+        keypairs = user['keypairs']
+        key_id = request.matchdict['key']
+        
+        if key_id in keypairs.keys():
+            return keypairs[key_id].get('private', '')
+        else:
+            return Response('Keypair not found', 404)
 
 
 def validate_dsa_key_pair(public_key, private_key):

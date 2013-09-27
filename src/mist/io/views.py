@@ -68,7 +68,7 @@ def home(request):
             'core_uri': core_uri,
             'auth': auth,
             'js_build': js_build,
-        'js_log_level': js_log_level}
+            'js_log_level': js_log_level}
 
 
 #~ @view_config(route_name="check_auth", request_method='POST', renderer="json")
