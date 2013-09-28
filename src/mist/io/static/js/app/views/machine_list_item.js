@@ -75,16 +75,8 @@ define('app/views/machine_list_item', [
                     Mist.confirmationController.set('title', 'Disassociate machine');
                     Mist.confirmationController.set('text', 'Are you sure you want to disassociate ' + this.machine.name + ' ?');
                     Mist.confirmationController.set('callback', function() {
-                        var key = that.get('controller').get('model')//, newMachines=[];
-                        Mist.keysController.disassociateKey(key.name, that.machine);
-                        /*
-                        for (i=0;i<key.machines.length;i++) {
-                            if (key.machines[i].toString() != [that.machine.backend.id, that.machine.id].toString()) {
-                                newMachines.push(key.machines[i]);
-                            }
-                        }
-                        key.set('machines', newMachines);
-                        */
+                        Mist.keysController.disassociateKey(that.get('controller').get('model').name,
+                                                            that.machine);
                     });
                     Mist.confirmationController.set('fromDialog', true);
                     Mist.confirmationController.show();
