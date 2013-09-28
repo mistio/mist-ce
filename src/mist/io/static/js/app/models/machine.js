@@ -314,9 +314,11 @@ define('app/models/machine', [
                         }
                     }
                 }
-                if (!that.backend.create_pending){
-                     setTimeout(sendProbe, 2000);
-                }               
+                if (that.backend) {
+                    if (!that.backend.create_pending){
+                         setTimeout(sendProbe, 2000);
+                    }   
+                }
             },
 
             reProbe: function() {

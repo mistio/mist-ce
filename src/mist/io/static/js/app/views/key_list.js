@@ -16,8 +16,8 @@ define('app/views/key_list', [
             selectedKey: null,
 
             selectedKeysObserver: function() {
-                var selectedKeysCount = 0;
                 var that = this;
+                var selectedKeysCount = 0;
                 Mist.keysController.keys.forEach(function(key) {
                     if (key.selected) {
                         selectedKeysCount++;
@@ -43,11 +43,11 @@ define('app/views/key_list', [
                 $('#select-keys-dialog').popup('open');
             },
 
-            selectModeClicked: function(mode) {
+            selectionModeClicked: function(mode) {
                 Mist.keysController.keys.forEach(function(key){
                     key.set('selected', mode);
                 });
-                Ember.run.next(function(){
+                Ember.run.next(function() {
                     $("input[type='checkbox']").checkboxradio("refresh");
                 });
                 $('#select-keys-dialog').popup('close');

@@ -40,9 +40,9 @@ define('app/views/key', [
                             if (backend) {
                                 state = 'terminated';
                             }
-                            var item = {id: key_machine[0],
-                                        name: key_machine[0],
-                                        backend: backend,
+                            var item = {id: key_machine[1],
+                                        name: key_machine[1],
+                                        backend: backend ? backend : key_machine[0],
                                         state: state,
                                         isGhost: true};
                             machineList.push(Machine.create(item)); 
