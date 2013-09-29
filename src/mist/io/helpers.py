@@ -506,6 +506,7 @@ def get_private_key(request):
         return Response('Keypair not found', 404)
 
 
+# Currently not used
 def validate_dsa_key_pair(public_key, private_key):
     """ Validates a pair of dsa keys """
     
@@ -541,6 +542,8 @@ def validate_dsa_key_pair(public_key, private_key):
         
     return not fmt_error
 
+
+# Currently not used
 def validate_key_pair(public_key, private_key):
     """ Validates a pair of keys """
     
@@ -561,6 +564,12 @@ def validate_key_pair(public_key, private_key):
         return validate_dsa_key_pair(public_key, private_key)
     
     return False
+
+
+def generate_public_key(private_key):
+    key = RSA.importKey(private_key)
+    return key.publickey().exportKey('OpenSSH')
+
 
 def get_preferred_keypairs(keypairs, backend_id, machine_id):
     """ Returns a list with the preferred keypairs for this machine

@@ -32,7 +32,7 @@ from mist.io.helpers import import_key, create_security_group
 from mist.io.helpers import get_keypair, get_keypair_by_name, get_preferred_keypairs
 from mist.io.helpers import run_command
 
-from mist.io.helpers import generate_keypair, set_default_key, get_private_key, validate_key_pair, get_ssh_user_from_keypair
+from mist.io.helpers import generate_keypair, generate_public_key, set_default_key, get_private_key, get_ssh_user_from_keypair
 
 try:
     from mist.core.helpers import save_settings
@@ -1068,25 +1068,25 @@ def list_keys(request):
 def add_key(request):
     params = request.json_body
     key_id = params.get('name', '')
+    private_key = params.get('priv', '')
     
     if not key_id:
-        ret = Response('Key name not provided', 400)
+        return Response('Key name not provided', 400)
+    
+    if not private_key:
+        return Response('Private key not provided', 400)
     
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs', {})
-        
+    
     if key_id in keypairs:
         return Response('Key "%s" already exists' % key_id, 400)
     
-    key = {'public' : params.get('pub', ''),
-            'private' : params.get('priv', ''),
-             'default' : not len(keypairs) }
-    
-    if key['public'] and key['private']:
-        if not validate_key_pair(key['public'], key['private']):
-            return Response('Key pair is not valid', 400)
+    key = {'public' : generate_public_key(private_key),
+            'private' : private_key,
+             'default' : not len(keypairs)}
     
     keypairs[key_id] = key
     save_settings(request)

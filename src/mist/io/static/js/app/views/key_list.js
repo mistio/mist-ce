@@ -44,7 +44,7 @@ define('app/views/key_list', [
             },
 
             selectionModeClicked: function(mode) {
-                Mist.keysController.keys.forEach(function(key){
+                Mist.keysController.keys.forEach(function(key) {
                     key.set('selected', mode);
                 });
                 Ember.run.next(function() {
@@ -54,16 +54,16 @@ define('app/views/key_list', [
             },
 
             deleteClicked: function() {
-                var that = this;
+                var keyName = this.selectedKey.name;
                 Mist.confirmationController.set('title', 'Delete key');
-                Mist.confirmationController.set('text', 'Are you sure you want to delete "' + that.selectedKey.name +'" ?');
+                Mist.confirmationController.set('text', 'Are you sure you want to delete ' + keyName +' ?');
                 Mist.confirmationController.set('callback', function() {
-                    Mist.keysController.deleteKey(that.selectedKey.name);                
+                    Mist.keysController.deleteKey(keyName);
                 });
                 Mist.confirmationController.set('fromDialog', true);
                 Mist.confirmationController.show();
             },
-            
+
             setDefaultClicked: function() {
                 Mist.keysController.setDefaultKey(this.selectedKey.name);
             }

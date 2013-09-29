@@ -37,10 +37,9 @@ define('app/controllers/keys', [
                 });
             },
 
-            newKey: function(name, publicKey, privateKey, machine, autoSelect) {
+            newKey: function(name, privateKey, machine, autoSelect) {
                 item = {
                     'name': name,
-                    'pub': publicKey,
                     'priv': privateKey
                 };
                 $.ajax({

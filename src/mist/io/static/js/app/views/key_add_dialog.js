@@ -63,23 +63,6 @@ define('app/views/key_add_dialog', [
                     return;
                 }
                 
-                var publicKey = $('#textarea-public-key').val().trim();
-                if (publicKey) {
-                    var publicKeyType = "";
-                    if (publicKey.indexOf('ssh-rsa') == 0) {
-                        publicKeyType = 'RSA';
-                    } else if (publicKey.indexOf('ssh-dss') == 0) {
-                        publicKeyType = 'DSA';
-                    } else {
-                        Mist.notificationController.notify('Public key should begin with "ssh-rsa" or "ssh-dss"');
-                        return;
-                    }
-                    if (publicKeyType != privateKeyType) {
-                        Mist.notificationController.notify("Ssh types of public and private key don't match");
-                        return;
-                    }
-                }
-                
                 Mist.keyAddController.newKey(this.getAssociatedMachine());
                 try {
                     $('#manage-keys').panel('open');
