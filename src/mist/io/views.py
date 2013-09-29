@@ -1137,44 +1137,37 @@ def delete_key(request):
 
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
+    
     params = request.json_body
-    key_id = params.get('name', '')
-    old_id = params.get('oldname', '')
+    key_id = params.get('newName', '')
+    old_id = params.get('oldName', '')
     
     if not old_id:
-        ret = Response('Old key name not provided', 400)
+        return Response('Old key name not provided', 400)
     
     if not key_id:
-        ret = Response('New key name not provided', 400)
+        return Response('New key name not provided', 400)
+    
+    if old_id == key_id:
+        return Response('New key name is same as the old one', 400)
     
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
-        keypairs = request.registry.settings.get('keypairs', {})    
+        keypairs = request.registry.settings.get('keypairs', {})
     
-    key = {'public' : params.get('pub', ''),
-            'private' : params.get('priv', ''),
-             'default' : keypairs[old_id].get('default', False),
-              'machines' : keypairs[old_id].get('machines', [])}
-
-    if old_id != key_id:
-        if key_id in keypairs:
-            return Response('Key "%s" already exists' % key_id, 400)
-        keypairs.pop(old_id)
+    key = {'public' : keypairs[old_id]['public'],
+            'private' : keypairs[old_id]['private'],
+             'default' : keypairs[old_id]['default'],
+              'machines' : keypairs[old_id]['machines']}
     
-    if key['public'] and key['private']:
-        if not validate_key_pair(key['public'], key['private']):
-            return Response('Key pair is not valid', 400)
+    keypairs.pop(old_id)
     
     keypairs[key_id] = key
     
     save_settings(request)
     
-    return {'name': key_id,
-             'pub': key['public'],
-              'priv': key['private'],
-               'default': key['default'],
-                'machines': key['machines']}
+    return Response('OK', 200)
 
 
 @view_config(route_name='key_action', request_method='POST', renderer='json')

@@ -59,10 +59,8 @@ define('app/views/key', [
             
             editClicked: function() {
                 var key = this.get('controller').get('model');
-                Mist.keysController.getPrivKey(key.name, "#textarea-private-key");
-                $("#textarea-public-key").val(key.pub).trigger('change');
-                $("#create-key-name").val(key.name).trigger('change');
-                $("#create-key-dialog").popup("open");
+                $("#new-key-name").val(key.name).trigger('change');
+                $("#edit-key-dialog").popup("open");
             },
 
             deleteClicked: function() {

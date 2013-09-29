@@ -35,13 +35,6 @@ define('app/controllers/key_add', [
                                             machine);
             },
 
-            editKey: function(oldKeyName) {
-                Mist.keysController.editKey(oldKeyName,
-                                             this.get('newKeyName'),
-                                             this.get('newKeyPublic'),
-                                             this.get('newKeyPrivate'));
-            },
-
             newKeyClear: function() {
                 this.set('newKeyName', null);
                 this.set('newKeyPublic', null);

@@ -69,6 +69,7 @@ define( 'app', [
     'app/views/key_list',
     'app/views/key',
     'app/views/key_add_dialog',
+    'app/views/key_edit_dialog',
     'app/views/key_priv_dialog',
     'app/views/rule',
     'app/views/user_menu',
@@ -110,6 +111,7 @@ define( 'app', [
                 KeyListView,
                 SingleKeyView,
                 KeyAddDialog,
+                KeyEditDialog,
                 KeyPrivDialog,
                 RuleView,
                 UserMenuView,
@@ -230,6 +232,7 @@ define( 'app', [
         App.ImageListView = ImageListView;
         App.SingleKeyView = SingleKeyView;
         App.AddKeyView = KeyAddDialog;
+        App.EditKeyView = KeyEditDialog;
         App.KeyPrivDialog = KeyPrivDialog;
         App.MachineAddView = MachineAddDialog;
         App.MachineManageKeysView = MachineManageKeysView;

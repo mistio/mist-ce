@@ -102,30 +102,21 @@ define('app/controllers/keys', [
                 });
             },
 
-            editKey: function(oldName, name, publicKey, privateKey) {
-                name = name.trim();
+            editKey: function(oldName, newName) {
+                newName = newName.trim();
                 item = {
-                    'oldname': oldName,
-                    'name': name,
-                    'pub': publicKey,
-                    'priv': privateKey
+                    'oldName': oldName,
+                    'newName': newName,
                 };
-                var that = this;
                 $.ajax({
-                    url: '/keys/' + name,
+                    url: '/keys/' + newName,
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(item),
                     success: function() {
-                        info('Successfully edited key: ', name);
-                        item.priv = null; // don't keep private key on the client
-                        var key = that.getKeyByName(oldName);
-                        key.set('name', name);
-                        key.set('pub', publicKey);
-                        Ember.run.next(function() {
-                            $("#create-key-dialog").popup("close");
-                            Mist.keyAddController.newKeyClear();
-                        });
+                        info('Successfully edited key: ', oldName);
+                        Mist.keysController.getKeyByName(oldName).set('name', newName);
+                        $("#edit-key-dialog").popup("close");
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while editting key: ' + jqXHR.responseText);
