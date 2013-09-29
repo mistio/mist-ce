@@ -12,10 +12,6 @@ define('app/views/key_add_dialog', [
 
             attributeBindings: ['data-role'],
 
-            notEditMode: function() {
-                return this.get('parentView').toString().indexOf('SingleKeyView') == -1;
-            }.property(),
-
             generateClicked: function() {
                 Mist.keyAddController.generateKey();
             },
@@ -84,14 +80,11 @@ define('app/views/key_add_dialog', [
                     }
                 }
                 
-                if (this.get('notEditMode')) {
-                    Mist.keyAddController.newKey(this.getAssociatedMachine());
-                    try {
-                        $('#manage-keys').panel('open');
-                    } catch (e) {}
-                } else {
-                    Mist.keyAddController.editKey(this.get('parentView').get('controller').get('model').name);
-                }
+                Mist.keyAddController.newKey(this.getAssociatedMachine());
+                try {
+                    $('#manage-keys').panel('open');
+                } catch (e) {}
+                
             },
             
             getAssociatedMachine: function() {

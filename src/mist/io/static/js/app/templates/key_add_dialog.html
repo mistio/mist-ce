@@ -4,10 +4,8 @@
         valueBinding="Mist.keyAddController.newKeyName"
         id="create-key-name"}}
 
-    {{#if view.notEditMode}}
     <button data-theme="b" data-icon="gear" {{action generateClicked target="view"}}>Generate</button>
     <div class="ajax-loader"></div>
-    {{/if}}
 
     <label for="textarea-public-key">Public Key:</label>
     {{view Ember.TextArea
@@ -32,6 +30,6 @@
     <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
         <a href="#" data-role="button" id="create-key-cancel" {{action backClicked target="view"}}>Back</a>
         <a href="#" data-role="button" id="create-key-ok" class="ui-disabled" data-theme="b" {{action createClicked target="view"}}>
-        {{#if view.notEditMode}}Create{{else}}Save{{/if}}
+        Create
         </a>
     </div>
