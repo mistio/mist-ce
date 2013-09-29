@@ -29,9 +29,9 @@ define('app/controllers/key_add', [
             }.observes('newKeyName', 'newKeyPrivate'),
 
             newKey: function(machine) {
-                Mist.keysController.newKey(this.get('newKeyName'),
-                                            this.get('newKeyPublic'),
-                                            this.get('newKeyPrivate'),
+                Mist.keysController.newKey(this.get('newKeyName').trim(),
+                                            this.get('newKeyPublic').trim(),
+                                            this.get('newKeyPrivate').trim(),
                                             machine);
             },
 
