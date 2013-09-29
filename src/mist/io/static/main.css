@@ -289,22 +289,19 @@ li.node .tag {
     width: 250px;
 }
 
-#textarea-public-key, #textarea-private-key {
+#textarea-private-key {
     height: 80px;
     max-height: 100px;
 }
 
-#create-key-dialog .upload-key {
+.upload-bundle .upload-button {
     width: 100%;
 }
 
-#upload-input .ui-input-text{
+.upload-bundle .ui-input-text {
     display: none;
 }
 
-#upload-input {
-    margin-bottom: 20px;
-}
 
 /* Machines Icons and their colors. */
 

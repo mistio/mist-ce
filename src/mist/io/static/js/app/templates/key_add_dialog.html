@@ -4,33 +4,33 @@
         valueBinding="Mist.keyAddController.newKeyName"
         id="create-key-name"}}
 
-    <button data-theme="b" data-icon="gear" {{action generateClicked target="view"}}>Generate</button>
-    <div class="ajax-loader"></div>
-    
-    <div id="upload-input">
-        <a class="upload-key" 
-           data-role="button" 
-           data-mini="true" 
-           {{action uploadClicked target="view"}}>Upload</a>
-           
-        <input type="file" id="upload-key-input" name="file"{{action uploadInputChanged on="change" target="view"}}/>
-    </div>
-
     <label for="textarea-private-key">Private Key:</label>
     {{view Ember.TextArea
         valueBinding="Mist.keyAddController.newKeyPrivate"
         id="textarea-private-key"}}
 
+    <button data-icon="gear" {{action generateClicked target="view"}}>Generate</button>
+    <div class="ajax-loader"></div>
+
+    <div class="upload-bundle">
+        <a class="upload-button"
+           data-role="button"
+           data-icon="arrow-u"
+           {{action uploadClicked target="view"}}>Upload</a>
+
+        <input type="file" class="upload-input" name="file"{{action uploadInputChanged on="change" target="view"}}/>
+    </div>
+
     <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-        <a href="#" 
-           data-role="button" 
-           id="create-key-cancel" 
+        <a href="#"
+           data-role="button"
+           id="create-key-cancel"
            {{action backClicked target="view"}}>Back</a>
-           
-        <a href="#" 
-           data-role="button" 
-           id="create-key-ok" 
+
+        <a href="#"
+           data-role="button"
+           id="create-key-ok"
            class="ui-disabled"
-           data-theme="b" 
+           data-theme="b"
            {{action createClicked target="view"}}>Create</a>
     </div>

@@ -1166,9 +1166,7 @@ def edit_key(request):
               'machines' : keypairs[old_id]['machines']}
     
     keypairs.pop(old_id)
-    
     keypairs[key_id] = key
-    
     save_settings(request)
     
     return Response('OK', 200)

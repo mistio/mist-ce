@@ -18,9 +18,12 @@ define('app/views/key_list', [
             selectedKeysObserver: function() {
                 var that = this;
                 var selectedKeysCount = 0;
-                Mist.keysController.keys.forEach(function(key) {
+                Mist.keysController.keys.some(function(key) {
                     if (key.selected) {
-                        selectedKeysCount++;
+                        if(++selectedKeysCount == 2) {
+                            that.selectedKey = null;
+                            return true;
+                        }
                         that.selectedKey = key;
                     }
                 });
@@ -60,7 +63,7 @@ define('app/views/key_list', [
                 Mist.confirmationController.set('callback', function() {
                     Mist.keysController.deleteKey(keyName);
                 });
-                Mist.confirmationController.set('fromDialog', true);
+                //Mist.confirmationController.set('fromDialog', true);
                 Mist.confirmationController.show();
             },
 

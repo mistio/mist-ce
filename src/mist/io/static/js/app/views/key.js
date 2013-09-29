@@ -13,24 +13,24 @@ define('app/views/key', [
         return MistScreen.extend({
             
             associatedMachines: null,
+            key: null,
+            
+            template: Ember.Handlebars.compile(key_html), // cannot have template in home.pt as pt complains
             
             init: function() {
                 this._super();
-                // cannot have template in home.pt as pt complains
-                this.set('template', Ember.Handlebars.compile(key_html));
-                var that=this;
-                // TODO: This observer shouldn't be called explicitly.
-                // There must be an inproper set of key.machines when mist loads.
+                this.set('key', this.get('controller').get('model'));
+                
+                var that = this;
                 Ember.run.next(function() {
                     that.machinesObserver();
                 });
             },
 
             machinesObserver: function() {
-        	    var key = this.get('controller').get('model');
                 machineList = new Array();
-                if (key.machines) {
-                    key.machines.forEach(function(key_machine) {
+                if (this.key.machines) {
+                    this.key.machines.forEach(function(key_machine) {
                         var machine = Mist.backendsController.getMachineById(key_machine[0], key_machine[1]);
                         if (machine) {
                             machineList.push(machine);
@@ -50,21 +50,23 @@ define('app/views/key', [
                     });
                 }
                 this.set('associatedMachines', machineList);
+                Ember.run.next(function() {
+                    $('#machines-list').listview('refresh');
+                });
             }.observes('controller.model.machines'),
             
             displayPrivateClicked: function() {
-                Mist.keysController.getPrivKey(this.get('controller').get('model').name, "#private-key");
+                Mist.keysController.getPrivKey(this.key.name, "#private-key");
                 $("#key-private-dialog").popup("open");
             },
             
             editClicked: function() {
-                var key = this.get('controller').get('model');
-                $("#new-key-name").val(key.name).trigger('change');
+                $("#new-key-name").val(this.key.name).trigger('change');
                 $("#edit-key-dialog").popup("open");
             },
 
             deleteClicked: function() {
-                var key = this.get('controller').get('model');
+                var key = this.key;
                 Mist.confirmationController.set('title', 'Delete key');
                 Mist.confirmationController.set('text', 'Are you sure you want to delete "' + key.name + '" ?');
                 Mist.confirmationController.set('callback', function() {
