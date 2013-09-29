@@ -457,8 +457,8 @@ def generate_keypair():
     """Generates a random keypair."""
     key = RSA.generate(2048, os.urandom)
     return {
-        'public': key.exportKey('OpenSSH'),
-        'private': key.exportKey()
+        #'pub': key.exportKey('OpenSSH'),
+        'priv': key.exportKey()
     }
 
 
