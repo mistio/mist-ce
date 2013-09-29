@@ -1087,7 +1087,8 @@ def add_key(request):
     
     key = {'public' : generate_public_key(private_key),
             'private' : private_key,
-             'default' : not len(keypairs)}
+             'default' : not len(keypairs),
+              'machines': []}
     
     if not validate_keypair(key['public'], key['private']):
         # User probably gave an invalid private key
@@ -1163,7 +1164,7 @@ def edit_key(request):
     key = {'public' : keypairs[old_id]['public'],
             'private' : keypairs[old_id]['private'],
              'default' : keypairs[old_id]['default'],
-              'machines' : keypairs[old_id]['machines']}
+              'machines' : keypairs[old_id].get('machines',[])}
     
     keypairs.pop(old_id)
     keypairs[key_id] = key
