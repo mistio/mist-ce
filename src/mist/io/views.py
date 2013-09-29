@@ -1138,9 +1138,8 @@ def delete_key(request):
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
     
-    params = request.json_body
-    key_id = params.get('newName', '')
-    old_id = params.get('oldName', '')
+    old_id = request.matchdict.get('key', '')
+    key_id = request.json_body.get('newName', '')
     
     if not old_id:
         return Response('Old key name not provided', 400)
