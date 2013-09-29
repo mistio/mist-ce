@@ -32,7 +32,8 @@ from mist.io.helpers import import_key, create_security_group
 from mist.io.helpers import get_keypair, get_keypair_by_name, get_preferred_keypairs
 from mist.io.helpers import run_command
 
-from mist.io.helpers import generate_keypair, generate_public_key, set_default_key, get_private_key, get_ssh_user_from_keypair
+from mist.io.helpers import generate_keypair, generate_public_key, validate_keypair
+from mist.io.helpers import set_default_key, get_private_key, get_ssh_user_from_keypair
 
 try:
     from mist.core.helpers import save_settings
@@ -1087,6 +1088,10 @@ def add_key(request):
     key = {'public' : generate_public_key(private_key),
             'private' : private_key,
              'default' : not len(keypairs)}
+    
+    if not validate_keypair(key['public'], key['private']):
+        # User probably gave an invalid private key
+        return Response('Invalid key', 400)
     
     keypairs[key_id] = key
     save_settings(request)

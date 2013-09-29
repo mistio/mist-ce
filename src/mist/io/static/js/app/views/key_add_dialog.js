@@ -45,16 +45,10 @@ define('app/views/key_add_dialog', [
             },
 
             createClicked: function() {
-                
                 var privateKey = $('#textarea-private-key').val().trim();
-                var privateKeyType = privateKey.substring('-----BEGIN '.length , '-----BEGIN '.length + 3);
+                var beginning = '-----BEGIN RSA PRIVATE KEY-----';
+                var ending = '-----END RSA PRIVATE KEY-----';
                 
-                if (privateKeyType != 'RSA' && privateKeyType != 'DSA') {
-                    Mist.notificationController.notify('Unknown ssh type of private key');
-                    return;
-                }
-                var beginning = '-----BEGIN ' + privateKeyType + ' PRIVATE KEY-----';
-                var ending = '-----END ' + privateKeyType + ' PRIVATE KEY-----';
                 if (privateKey.indexOf(beginning) != 0) {
                     Mist.notificationController.notify('Private key should begin with ' + beginning);
                     return;
