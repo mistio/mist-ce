@@ -162,7 +162,7 @@ define('app/controllers/keys', [
             disassociateKey: function(keyName, machine) {
                 payload = {
                     'key_id': keyName,
-                    'backend_id': machine.isGhost ? machine.bakend : machine.backend.id,
+                    'backend_id': machine.isGhost ? machine.backend : machine.backend.id,
                     'machine_id': machine.id,
                     'host': machine.isGhost ? null : machine.getHost(),
                 };
