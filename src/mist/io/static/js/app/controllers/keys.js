@@ -160,15 +160,21 @@ define('app/controllers/keys', [
             },
 
             disassociateKey: function(keyName, machine) {
+                var backend_id = null;
+                if (machine.isGhost && (!machine.backend.id)) {
+                    backend_id = machine.backend.id;
+                } else {
+                    backend_id = machines.backend;
+                }
                 payload = {
                     'key_id': keyName,
-                    'backend_id': machine.isGhost ? machine.backend : machine.backend.id,
+                    'backend_id': backend_id,
                     'machine_id': machine.id,
                     'host': machine.isGhost ? null : machine.getHost(),
                 };
                 warn(payload);
                 $.ajax({
-                    url: '/backends/' + payload.backend_id + '/machines/' + machine.id + '/keys/' + keyName,
+                    url: '/backends/' + backend_id + '/machines/' + machine.id + '/keys/' + keyName,
                     type: 'DELETE',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
