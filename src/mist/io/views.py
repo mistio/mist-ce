@@ -466,21 +466,21 @@ def create_machine(request):
         #get the id of the ssh key if it exists, otherwise add the key
         try:
             server_key = ''        
-            keys = conn.list_keypairs(ssh=True)
+            keys = conn.ex_list_keypairs(ssh=True, key_group=1)
             for k in keys:
                 if key == k.public_key:
                     server_key = k.id
                     break
             if not server_key:
-                server_key = conn.create_ssh_key(machine_name, key)
+                server_key = conn.ex_create_keypair(machine_name, public_key=key)
         except:
-            server_key = conn.create_ssh_key('mistio'+str(random.randint(1,100000)), key)                          
+            server_key = conn.ex_create_keypair('mistio'+str(random.randint(1,100000)), public_key=key)                          
 
         #mist.io does not support console key add through the wizzard. Try to add one    
         try:
-            console_key = conn.create_password_key('mistio'+str(random.randint(1,100000)))
+            console_key = conn.ex_create_keypair('mistio'+str(random.randint(1,100000)), key_group=4)
         except:
-            console_keys = conn.list_keypairs(key_group=4)
+            console_keys = conn.ex_list_keypairs(key_group=4)
             if console_keys:
                 console_key = console_keys[0].id
         try:
