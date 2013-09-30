@@ -39,15 +39,8 @@ define('app/views/machine_manage_keys_list_item', [
             }.observes('this.key.probing', 'this.key.machines'),
 
             keyClicked: function() {
-                this.get('parentView').set('selectedKey', this.key);
-                if (this.key.priv) {
-                    $('#key-action-upload').parent().hide();
-                    $('#key-action-probe').parent().show();
-                } else {
-                    $('#key-action-upload').parent().show();
-                    $('#key-action-probe').parent().hide();
-                }
                 $('#key-actions').popup('open');
+                this.get('parentView').set('selectedKey', this.key);
             }
         });
     }

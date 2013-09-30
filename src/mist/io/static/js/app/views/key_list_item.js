@@ -12,7 +12,7 @@ define('app/views/key_list_item', [
 
             template: Ember.Handlebars.compile(key_list_item_html),
 
-            tagName:'li',
+            tagName:'li'
         });
     }
 );

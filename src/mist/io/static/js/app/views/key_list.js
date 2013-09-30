@@ -39,7 +39,7 @@ define('app/views/key_list', [
             }.observes('Mist.keysController.keys.@each.selected'),
 
             createClicked: function() {
-               $("#create-key-dialog").popup("open");
+                $("#create-key-dialog").popup("open");
             },
 
             selectClicked: function() {
@@ -63,7 +63,6 @@ define('app/views/key_list', [
                 Mist.confirmationController.set('callback', function() {
                     Mist.keysController.deleteKey(keyName);
                 });
-                //Mist.confirmationController.set('fromDialog', true);
                 Mist.confirmationController.show();
             },
 

@@ -38,7 +38,7 @@ define('app/controllers/keys', [
             },
 
             newKey: function(name, privateKey, machine, autoSelect) {
-                item = {
+                var item = {
                     'name': name,
                     'priv': privateKey
                 };
@@ -93,7 +93,7 @@ define('app/controllers/keys', [
             },
 
             editKey: function(oldName, newName) {
-                item = {
+                var item = {
                     'newName': newName,
                 };
                 $.ajax({
@@ -135,7 +135,7 @@ define('app/controllers/keys', [
             },
 
             associateKey: function(keyName, machine) {
-                payload = {
+                var payload = {
                     'key_id': keyName,
                     'backend_id': machine.backend.id,
                     'machine_id': machine.id,
@@ -166,13 +166,12 @@ define('app/controllers/keys', [
                 } else {
                     backend_id = machine.backend.id;
                 }
-                payload = {
+                var payload = {
                     'key_id': keyName,
                     'backend_id': backend_id,
                     'machine_id': machine.id,
                     'host': machine.isGhost ? null : machine.getHost(),
                 };
-                warn(payload);
                 $.ajax({
                     url: '/backends/' + backend_id + '/machines/' + machine.id + '/keys/' + keyName,
                     type: 'DELETE',

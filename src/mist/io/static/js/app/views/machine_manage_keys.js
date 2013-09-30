@@ -13,9 +13,9 @@ define('app/views/machine_manage_keys', [
             template: Ember.Handlebars.compile(machine_manage_keys_html),
 
             selectedKey: null,
+            parentMachine: null,
             associatedKeys: null,
             nonAssociatedKeys: null,
-            parentMachine: null,
 
             keysObserver: function() {
                 var newAssociatedKeys = new Array();
@@ -46,8 +46,8 @@ define('app/views/machine_manage_keys', [
                                                    'Mist.keysController.keys.@each.probeState'),
 
             didInsertElement: function() {
+                this.set('parentMachine', this.get('controller').get('model'));
                 var that = this;
-                that.set('parentMachine', that.get('controller').get('model'));
                 Ember.run.next(function() {
                     that.keysObserver();
                 });
@@ -57,14 +57,13 @@ define('app/views/machine_manage_keys', [
                 $('#non-associated-keys').listview('refresh');
                 $('#associate-key-dialog').popup('option', 'positionTo', '#associate-key-button').popup('open');
             },
-            
+
             backClicked: function() {
                 $('#manage-keys').panel("close");
             },
-            
+
             actionRemoveClicked: function() {
                 $('#key-actions').popup('close');
-                var machine = this.parentMachine;
                 if (this.associatedKeys.length == 1) {
                     var that = this;
                     Mist.confirmationController.set('title', 'Remove last key?');
@@ -72,56 +71,31 @@ define('app/views/machine_manage_keys', [
                                                              You will not be able to login through mist.io. Are you sure you want to do this?');
                     Mist.confirmationController.set('callback', function() {
                         $('#manage-keys .ajax-loader').fadeIn(200);
-                        Mist.keysController.disassociateKey(that.selectedKey.name, machine);      
+                        Mist.keysController.disassociateKey(that.selectedKey.name, that.parentMachine);      
                     });
                     Mist.confirmationController.show();
                 } else {
                     $('#manage-keys .ajax-loader').fadeIn(200);
-                    Mist.keysController.disassociateKey(this.selectedKey.name, machine); 
+                    Mist.keysController.disassociateKey(this.selectedKey.name, this.parentMachine); 
                 }         
             },
-            
-            actionUploadClicked: function() {
-                if (window.File && window.FileReader && window.FileList) {
-                    $("#key-action-upload-key").click();
-                } else {
-                    alert('The File APIs are not fully supported in this browser.');
-                }
-            },
-            
+
             actionProbeClicked: function() {
                 $('#key-actions').popup('close');
-                this.get('controller').get('model').probe(this.selectedKey.name);
+                this.parentMachine.probe(this.selectedKey.name);
             },
-            
+
             actionBackClicked: function() {
                 $('#key-actions').popup('close');
             },
-            
-            uploadInputChanged: function() {
-                $('#manage-keys .ajax-loader').fadeIn(200);
-                var reader = new FileReader();
-                var key = this.selectedKey;
-                reader.onloadend = function(evt) {
-                    if (evt.target.readyState == FileReader.DONE) {
-                        $('#key-actions').popup('close');
-                        Mist.keysController.editKey(key.name,
-                                                     key.name,
-                                                     key.pub,
-                                                     evt.target.result);
-                    }
-               };
-               reader.readAsText($('#key-action-upload-key')[0].files[0], 'UTF-8');  
-            },
-            
+
             associateKeyClicked: function(key) {
                 $('#associate-key-dialog').popup('close');
                 $('#manage-keys').panel('open');
                 $('#manage-keys .ajax-loader').fadeIn(200);
-                var machine = this.get('controller').get('model');
-                Mist.keysController.associateKey(key.name, machine);
+                Mist.keysController.associateKey(key.name, this.parentMachine);
             },
-            
+
             createKeyClicked: function() {
                 $('#associate-key-dialog').popup('close');
                 var that = this;
