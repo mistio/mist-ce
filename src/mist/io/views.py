@@ -1054,30 +1054,27 @@ def add_key(request):
     if not key_id:
         ret = Response('Key name not provided', 400)
     
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    with get_user(request) as user:
+        keypairs = user.get('keypairs',{})
+            
+        if key_id in keypairs:
+            return Response('Key "%s" already exists' % key_id, 400)
         
-    if key_id in keypairs:
-        return Response('Key "%s" already exists' % key_id, 400)
-    
-    key = {'public' : params.get('pub', ''),
-            'private' : params.get('priv', ''),
-             'default' : not len(keypairs) }
-    
-    if key['public'] and key['private']:
-        if not validate_key_pair(key['public'], key['private']):
-            return Response('Key pair is not valid', 400)
-    
-    keypairs[key_id] = key
-    save_settings(request)
-    
-    return {'name': key_id,
-             'pub': key['public'],
-              'priv': key['private'],
-               'default_key': key['default'],
-                'machines': []}
+        key = {'public' : params.get('pub', ''),
+                'private' : params.get('priv', ''),
+                 'default' : not len(keypairs) }
+        
+        if key['public'] and key['private']:
+            if not validate_key_pair(key['public'], key['private']):
+                return Response('Key pair is not valid', 400)
+        
+        keypairs[key_id] = key
+        
+        return {'name': key_id,
+                 'pub': key['public'],
+                  'priv': key['private'],
+                   'default_key': key['default'],
+                    'machines': []}
 
 
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
@@ -1098,23 +1095,22 @@ def delete_key(request):
     if not key_id:
         return Response('Key name not provided', 400)
     
-    keypairs = request.registry.settings.get('keypairs', {})
-    
-    key = keypairs.pop(key_id)
-    
-    if key.get('default', False):
-        if len(keypairs):
-            new_default_key = keypairs.keys()[0]
-            keypairs[new_default_key]['default'] = True
-    
-    save_settings(request)
-    
-    return [{'name': key,
-              'machines': keypairs[key].get('machines', []),
-               'pub': keypairs[key]['public'],
-                'priv': keypairs[key]['private'] and True,
-                 'default_key': keypairs[key].get('default', False)}
-             for key in keypairs.keys()]
+    with get_user(request) as user:
+        keypairs = user.get('keypairs',{})
+        
+        key = keypairs.pop(key_id)
+        
+        if key.get('default', False):
+            if len(keypairs):
+                new_default_key = keypairs.keys()[0]
+                keypairs[new_default_key]['default'] = True
+        
+        return [{'name': key,
+                  'machines': keypairs[key].get('machines', []),
+                   'pub': keypairs[key]['public'],
+                    'priv': keypairs[key]['private'] and True,
+                     'default_key': keypairs[key].get('default', False)}
+                 for key in keypairs.keys()]
 
 
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
@@ -1129,34 +1125,30 @@ def edit_key(request):
     if not key_id:
         ret = Response('New key name not provided', 400)
     
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})    
-    
-    key = {'public' : params.get('pub', ''),
-            'private' : params.get('priv', ''),
-             'default' : keypairs[old_id].get('default', False),
-              'machines' : keypairs[old_id].get('machines', [])}
+    with get_user(request) as user:
+        keypairs = user.get('keypairs',{})
+        
+        key = {'public' : params.get('pub', ''),
+                'private' : params.get('priv', ''),
+                 'default' : keypairs[old_id].get('default', False),
+                  'machines' : keypairs[old_id].get('machines', [])}
 
-    if old_id != key_id:
-        if key_id in keypairs:
-            return Response('Key "%s" already exists' % key_id, 400)
-        keypairs.pop(old_id)
-    
-    if key['public'] and key['private']:
-        if not validate_key_pair(key['public'], key['private']):
-            return Response('Key pair is not valid', 400)
-    
-    keypairs[key_id] = key
-    
-    save_settings(request)
-    
-    return {'name': key_id,
-             'pub': key['public'],
-              'priv': key['private'],
-               'default': key['default'],
-                'machines': key['machines']}
+        if old_id != key_id:
+            if key_id in keypairs:
+                return Response('Key "%s" already exists' % key_id, 400)
+            keypairs.pop(old_id)
+        
+        if key['public'] and key['private']:
+            if not validate_key_pair(key['public'], key['private']):
+                return Response('Key pair is not valid', 400)
+        
+        keypairs[key_id] = key
+        
+        return {'name': key_id,
+                 'pub': key['public'],
+                  'priv': key['private'],
+                   'default': key['default'],
+                    'machines': key['machines']}
 
 
 @view_config(route_name='key_action', request_method='POST', renderer='json')
@@ -1410,49 +1402,45 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
     if not key_id or not machine_id or not backend_id:
         return Response('Keypair, machine or backend not provided', 400)
 
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    with get_user(request) as user:
+        keypairs = user.get('keypairs',{})
 
-    try:
-        keypair = keypairs[key_id]
-    except KeyError:
-        return Response('Keypair not found', 404)
+        try:
+            keypair = keypairs[key_id]
+        except KeyError:
+            return Response('Keypair not found', 404)
 
-    machine_uid = [backend_id, machine_id]
-    machines = keypair.get('machines', [])
-    
-    for machine in machines:
-        if machine[:2] == machine_uid:
-            return Response('Keypair already associated to machine', 304)
+        machine_uid = [backend_id, machine_id]
+        machines = keypair.get('machines', [])
+        
+        for machine in machines:
+            if machine[:2] == machine_uid:
+                return Response('Keypair already associated to machine', 304)
 
-    try:
-        keypair['machines'].append(machine_uid)
-    except KeyError: 
-        # initialize machine associations array if it does not exist
-        keypair['machines'] = [machine_uid]
+        try:
+            keypair['machines'].append(machine_uid)
+        except KeyError: 
+            # initialize machine associations array if it does not exist
+            keypair['machines'] = [machine_uid]
 
-    if deploy:
-        ret = deploy_key(request, keypair)
-    
-        if ret:
-            keypair['machines'][-1] += [int(time()), ret.get('ssh_user', ''), ret.get('sudoer', False)]
-            log.debug('save settings (associate key)')
-            save_settings(request)
-            log.debug("Associate key, %s" % keypair['machines'])
-            return keypair['machines']
+        if deploy:
+            ret = deploy_key(request, keypair)
+        
+            if ret:
+                keypair['machines'][-1] += [int(time()), ret.get('ssh_user', ''), ret.get('sudoer', False)]
+                log.debug('save settings (associate key)')
+                log.debug("Associate key, %s" % keypair['machines'])
+                return keypair['machines']
+            else:
+                if machine_uid in keypair['machines']:
+                    keypair['machines'].remove(machine_uid)
+                log.debug("Associate key, %s" % keypair['machines'])
+                
+                return Response('Failed to deploy key', 412)
         else:
-            if machine_uid in keypair['machines']:
-                keypair['machines'].remove(machine_uid)
-            log.debug("Associate key, %s" % keypair['machines'])
-            
-            return Response('Failed to deploy key', 412)
-    else:
-        log.debug('save settings (associate key2)')
-        log.debug("deploy false")
-        save_settings(request)
-        return keypair['machines']
+            log.debug('save settings (associate key2)')
+            log.debug("deploy false")
+            return keypair['machines']
 
 
 def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
@@ -1465,37 +1453,33 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
     if not key_id or not machine_id or not backend_id:
         return Response('Keypair, machine or backend not provided', 400)
 
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    with get_user(request) as user:
+        keypairs = user.get('keypairs',{})
+        try:
+            keypair = keypairs[key_id]
+        except KeyError:
+            return Response('Keypair not found', 404)
 
-    try:
-        keypair = keypairs[key_id]
-    except KeyError:
-        return Response('Keypair not found', 404)
+        machine_uid = [backend_id, machine_id]
+        machines = keypair.get('machines', [])
 
-    machine_uid = [backend_id, machine_id]
-    machines = keypair.get('machines', [])
+        key_found = False
+        for machine in machines:
+            if machine[:2] == machine_uid:
+                keypair['machines'].remove(machine)
+                key_found = True
+                break
 
-    key_found = False
-    for machine in machines:
-        if machine[:2] == machine_uid:
-            keypair['machines'].remove(machine)
-            key_found = True
-            break
+        #key not associated
+        if not key_found: 
+            return Response('Keypair is not associated to this machine', 304)
 
-    #key not associated
-    if not key_found: 
-        return Response('Keypair is not associated to this machine', 304)
+        if undeploy:
+            ret = undeploy_key(request, keypair)
 
-    if undeploy:
-        ret = undeploy_key(request, keypair)
+        log.debug('save settings (disassociate key)')
 
-    log.debug('save settings (disassociate key)')
-    save_settings(request)
-
-    return keypair['machines']
+        return keypair['machines']
 
 
 def deploy_key(request, keypair):
@@ -1517,27 +1501,24 @@ def deploy_key(request, keypair):
         pass
 
     # Maybe the deployment failed but let's try to connect with the new key and see what happens
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
-    
-    key_name = None
-    for key_name, k in keypairs.items():
-        if k == keypair:
-            break
+    with get_user(request) as user:
+        keypairs = user.get('keypairs',{})    
+        key_name = None
+        for key_name, k in keypairs.items():
+            if k == keypair:
+                break
 
-    if key_name:
-        log.warn('probing with key %s' % key_name)
+        if key_name:
+            log.warn('probing with key %s' % key_name)
 
-    if ret:
-        ssh_user = ret.get('ssh_user', None)
-    else:
-        ssh_user = None
+        if ret:
+            ssh_user = ret.get('ssh_user', None)
+        else:
+            ssh_user = None
 
-    test = shell_command(request, backend_id, machine_id, host, 'whoami', ssh_user, key = key_name)
+        test = shell_command(request, backend_id, machine_id, host, 'whoami', ssh_user, key = key_name)
 
-    return test
+        return test
 
 
 def undeploy_key(request, keypair):
