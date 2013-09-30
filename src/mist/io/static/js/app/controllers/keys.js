@@ -166,8 +166,9 @@ define('app/controllers/keys', [
                     'machine_id': machine.id,
                     'host': machine.isGhost ? null : machine.getHost(),
                 };
+                warn(payload);
                 $.ajax({
-                    url: '/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + keyName,
+                    url: '/backends/' + payload.backend_id + '/machines/' + machine.id + '/keys/' + keyName,
                     type: 'DELETE',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
