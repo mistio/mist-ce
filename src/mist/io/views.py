@@ -468,8 +468,8 @@ def create_machine(request):
             server_key = ''        
             keys = conn.list_ssh_keys()
             for k in keys:
-                if key == k.get('public_key'):
-                    server_key = k.get('id')
+                if key == k.public_key:
+                    server_key = k.id
                     break
             if not server_key:
                 server_key = conn.add_ssh_key(machine_name, key)
@@ -482,7 +482,7 @@ def create_machine(request):
         except:
             console_keys = conn.list_all_keys(key_group=4)
             if console_keys:
-                console_key = console_keys[0].get('id')        
+                console_key = console_keys[0].id
         try:
             node = conn.deploy_node(name=machine_name,
                              hostname=machine_name[:15],
