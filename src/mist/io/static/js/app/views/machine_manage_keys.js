@@ -24,16 +24,13 @@ define('app/views/machine_manage_keys', [
                 var found = false;
                 Mist.keysController.keys.forEach(function(key) {
                     found = false;
-                    if (key.machines) {
-                        for (var m = 0; m < key.machines.length; ++m) {
-                            k_machine = key.machines[m];
-                            if (machine.id == k_machine[1] && machine.backend.id == k_machine[0]) {
-                                newAssociatedKeys.push(key);
-                                found = true;
-                                break;
-                            } 
-                        }
-                    }
+                    key.machines.some(function(k_machine) {
+                        if (machine.id == k_machine[1] && machine.backend.id == k_machine[0]) {
+                            newAssociatedKeys.push(key);
+                            found = true;
+                            return true;
+                        } 
+                    });
                     if (!found) {
                         newNonAssociatedKeys.push(key);
                     }

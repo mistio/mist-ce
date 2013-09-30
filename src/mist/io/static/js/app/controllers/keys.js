@@ -162,9 +162,9 @@ define('app/controllers/keys', [
             disassociateKey: function(keyName, machine) {
                 var backend_id = null;
                 if (machine.isGhost && (!machine.backend.id)) {
-                    backend_id = machine.backend.id;
+                    backend_id = machine.backend;
                 } else {
-                    backend_id = machines.backend;
+                    backend_id = machine.backend.id;
                 }
                 payload = {
                     'key_id': keyName,
@@ -232,7 +232,7 @@ define('app/controllers/keys', [
             updateKeyMachineList: function(keyName, data) {
                 this.keys.some(function(key) {
                     if(key.name == keyName) {
-                        key.set('machines', data);
+                        key.set('machines', data ? data : new Array());
                         return true;
                     }
                 });
