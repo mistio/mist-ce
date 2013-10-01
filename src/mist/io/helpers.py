@@ -472,11 +472,14 @@ def set_default_key(request):
     key_id = request.matchdict['key']
     
     if not key_id:
-        return Response('Keypair not found', 404)
+        return Response('Key name not provided', 400)
 
     keypairs = request.registry.settings['keypairs']
+    
+    if not key_id in keypairs.keys():
+        return Response('Keypair not found', 404)
 
-    for key in keypairs:
+    for key in keypairs.keys():
         keypairs[key]['default'] = False
 
     keypairs[key_id]['default'] = True
@@ -501,9 +504,9 @@ def get_private_key(request):
     key_id = request.matchdict['key']
 
     if key_id in keypairs.keys():
-        return keypairs[key_id].get('private', '')
+        return keypairs[key_id]['private']
     else:
-        return Response('Keypair not found', 404)
+        return Response('Keypair "%s" not found' % key_id, 404)
 
 
 def validate_keypair(public_key, private_key):

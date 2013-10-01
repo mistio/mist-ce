@@ -99,6 +99,7 @@ def check_auth(request):
     else:
         return Response('Unauthorized', 401)
 
+
 @view_config(route_name='account', request_method='POST', renderer='json')
 def update_user_settings(request, renderer='json'):
     """try free plan, by communicating to the mist.core service
@@ -131,8 +132,6 @@ def update_user_settings(request, renderer='json'):
         return ret
     else:
         return Response('Unauthorized', 401)
-
-
 
 
 @view_config(route_name='backends', request_method='GET', renderer='json')
@@ -1059,10 +1058,10 @@ def list_keys(request):
         keypairs = request.registry.settings.get('keypairs', {})
     
     return [{'name': key,
-              'machines': keypairs[key].get('machines', []),
-               'pub': keypairs[key]['public'],
-                'priv': keypairs[key]['private'] and True or False,
-                 'default_key': keypairs[key].get('default', False)}
+              'pub': keypairs[key]['public'],
+               'priv': keypairs[key]['private'] and True,
+                'machines': keypairs[key]['machines'],
+                 'default_key': keypairs[key]['default']}
              for key in keypairs.keys()]
 
 
@@ -1073,7 +1072,7 @@ def add_key(request):
     private_key = params.get('priv', '')
     
     if not key_id:
-        return Response('Key name not provided', 400)
+        return Response('Keypair name not provided', 400)
     
     if not private_key:
         return Response('Private key not provided', 400)
@@ -1083,8 +1082,8 @@ def add_key(request):
     except:
         keypairs = request.registry.settings.get('keypairs', {})
     
-    if key_id in keypairs:
-        return Response('Key "%s" already exists' % key_id, 400)
+    if key_id in keypairs.keys():
+        return Response('Keypair "%s" exists' % key_id, 400)
     
     key = {'public' : generate_public_key(private_key),
             'private' : private_key,
@@ -1093,7 +1092,7 @@ def add_key(request):
     
     if not validate_keypair(key['public'], key['private']):
         # User probably gave an invalid private key
-        return Response('Invalid key', 400)
+        return Response('Invalid private key', 400)
     
     keypairs[key_id] = key
     save_settings(request)
@@ -1121,25 +1120,22 @@ def delete_key(request):
     key_id = request.matchdict.get('key', '')
     
     if not key_id:
-        return Response('Key name not provided', 400)
+        return Response('Keypair name not provided', 400)
     
     keypairs = request.registry.settings.get('keypairs', {})
     
+    if not key_id in keypairs.keys():
+        return Response('Keypair "%s" not found', 404)
+    
     key = keypairs.pop(key_id)
     
-    if key.get('default', False):
+    if key['default']:
         if len(keypairs):
-            new_default_key = keypairs.keys()[0]
-            keypairs[new_default_key]['default'] = True
+            keypairs[keypairs.keys()[0]]['default'] = True
     
     save_settings(request)
     
-    return [{'name': key,
-              'machines': keypairs[key].get('machines', []),
-               'pub': keypairs[key]['public'],
-                'priv': keypairs[key]['private'] and True,
-                 'default_key': keypairs[key].get('default', False)}
-             for key in keypairs.keys()]
+    return list_keys(request)
 
 
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
@@ -1149,23 +1145,29 @@ def edit_key(request):
     key_id = request.json_body.get('newName', '')
     
     if not old_id:
-        return Response('Old key name not provided', 400)
+        return Response('Old keypair name not provided', 400)
     
     if not key_id:
-        return Response('New key name not provided', 400)
+        return Response('New keypair name not provided', 400)
     
     if old_id == key_id:
-        return Response('New key name is same as the old one', 400)
+        return Response('Keypair is already named: %s' % key_id, 304)
     
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs', {})
     
-    key = {'public' : keypairs[old_id]['public'],
-            'private' : keypairs[old_id]['private'],
-             'default' : keypairs[old_id]['default'],
-              'machines' : keypairs[old_id].get('machines',[])}
+    if not old_id in keypairs.keys():
+        return Response('Keypair "%s" not found' % old_id, 404)
+    
+    if key_id in keypairs.keys():
+        return Response('Keypair "%s" exists' % key_id, 400)
+    
+    key = {'public': keypairs[old_id]['public'],
+            'private': keypairs[old_id]['private'],
+             'default': keypairs[old_id]['default'],
+              'machines': keypairs[old_id]['machines']}
     
     keypairs.pop(old_id)
     keypairs[key_id] = key
@@ -1449,26 +1451,31 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
 
     """
     log.debug("Associate key, deploy = %s" % deploy)
-    if not key_id or not machine_id or not backend_id:
-        return Response('Keypair, machine or backend not provided', 400)
+    
+    if not key_id:
+        return Response('Keypair name not provided', 400)
+    
+    if not machine_id:
+        return Response('Machine id not provided', 400)
+    
+    if not backend_id:
+        return Response('Backend id not provided', 400)
 
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs', {})
-
-    try:
-        keypair = keypairs[key_id]
-    except KeyError:
-        return Response('Keypair not found', 404)
-
+    
+    if not key_id in keypairs.keys():
+        return Response('Keypair "%s" not found' % key_id, 404)
+    
+    keypair = keypairs[key_id]
     machine_uid = [backend_id, machine_id]
-    machines = keypair.get('machines', [])
+    machines = keypair['machines']
     
     for machine in machines:
         if machine[:2] == machine_uid:
-            return Response('Keypair already associated to machine', 304)
-
+            return Response('Keypair "%s" already associated with machine "%d"' % (key_id, machine_id), 304)
     try:
         keypair['machines'].append(machine_uid)
     except KeyError: 
@@ -1490,11 +1497,11 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
             log.debug("Associate key, %s" % keypair['machines'])
             
             return Response('Failed to deploy key', 412)
-    else:
-        log.debug('save settings (associate key2)')
-        log.debug("deploy false")
-        save_settings(request)
-        return keypair['machines']
+    
+    log.debug('save settings (associate key2)')
+    log.debug("deploy false")
+    save_settings(request)
+    return keypair['machines']
 
 
 def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
@@ -1504,21 +1511,26 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
     the machine.
 
     """
-    if not key_id or not machine_id or not backend_id:
-        return Response('Keypair, machine or backend not provided', 400)
+    if not key_id:
+        return Response('Keypair name not provided', 400)
+    
+    if not machine_id:
+        return Response('Machine id not provided', 400)
+    
+    if not backend_id:
+        return Response('Backend id not provided', 400)
 
     try:
         keypairs = request.environ['beaker.session']['keypairs']
     except:
         keypairs = request.registry.settings.get('keypairs', {})
-
-    try:
-        keypair = keypairs[key_id]
-    except KeyError:
-        return Response('Keypair not found', 404)
-
+    
+    if not key_id in keypairs.keys():
+        return Response('Keypair "%s" not found' % key_id, 404)
+    
+    keypair = keypairs[key_id]
     machine_uid = [backend_id, machine_id]
-    machines = keypair.get('machines', [])
+    machines = keypair['machines']
 
     key_found = False
     for machine in machines:
@@ -1529,7 +1541,7 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
 
     #key not associated
     if not key_found: 
-        return Response('Keypair is not associated to this machine', 304)
+        return Response('Keypair "%s" is not associated with machine "%s"' % (key_id, machine_id), 304)
 
     if undeploy:
         ret = undeploy_key(request, keypair)
