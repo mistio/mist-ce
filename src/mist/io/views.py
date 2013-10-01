@@ -33,7 +33,7 @@ from mist.io.helpers import get_keypair, get_keypair_by_name, get_preferred_keyp
 from mist.io.helpers import run_command
 
 from mist.io.helpers import generate_keypair, generate_public_key, validate_keypair
-from mist.io.helpers import set_default_key, get_private_key, get_ssh_user_from_keypair
+from mist.io.helpers import set_default_key, get_private_key, get_public_key, get_ssh_user_from_keypair
 
 try:
     from mist.core.helpers import save_settings
@@ -1058,10 +1058,8 @@ def list_keys(request):
         keypairs = request.registry.settings.get('keypairs', {})
     
     return [{'name': key,
-              'pub': keypairs[key]['public'],
-               'priv': keypairs[key]['private'] and True,
-                'machines': keypairs[key]['machines'],
-                 'default_key': keypairs[key]['default']}
+              'machines': keypairs[key]['machines'],
+               'default_key': keypairs[key]['default']}
              for key in keypairs.keys()]
 
 
@@ -1098,10 +1096,8 @@ def add_key(request):
     save_settings(request)
     
     return {'name': key_id,
-             'pub': key['public'],
-              'priv': key['private'],
-               'default_key': key['default'],
-                'machines': []}
+             'machines': [],
+              'default_key': key['default'],}
 
 
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
@@ -1181,9 +1177,14 @@ def set_default_key_request(request):
     return set_default_key(request)
 
 
-@view_config(route_name='key_action', request_method='GET', renderer='json')
+@view_config(route_name='key_action', request_method='GET', request_param='action=private', renderer='json')
 def get_private_key_request(request):
     return get_private_key(request)
+
+
+@view_config(route_name='key_action', request_method='GET', request_param='action=public', renderer='json')
+def get_public_key_request(request):
+    return get_public_key(request)
 
 
 @view_config(route_name='keys', request_method='POST', renderer='json')

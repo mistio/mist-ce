@@ -505,9 +505,21 @@ def get_private_key(request):
 
     if key_id in keypairs.keys():
         return keypairs[key_id]['private']
-    else:
-        return Response('Keypair "%s" not found' % key_id, 404)
+    return Response('Keypair "%s" not found' % key_id, 404)
 
+
+def get_public_key(request):
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
+    
+    key_id = request.matchdict['key']
+
+    if key_id in keypairs.keys():
+        return keypairs[key_id]['public']
+    return Response('Keypair "%s" not found' % key_id, 404)
+    
 
 def validate_keypair(public_key, private_key):
     """ Validates a pair of RSA keys """

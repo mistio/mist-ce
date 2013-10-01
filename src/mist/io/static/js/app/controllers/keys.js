@@ -194,6 +194,7 @@ define('app/controllers/keys', [
                 $.ajax({
                     url: '/keys/' + keyName,
                     type: 'GET',
+                    data: 'action=private',
                     success: function(data) {
                         info('Successfully got private key: ' + keyName);
                         $(element).val(data).trigger('change');
@@ -201,6 +202,22 @@ define('app/controllers/keys', [
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while getting private key: ' + keyName);
                         error(textstate, errorThrown, ' while getting private key: ', keyName, '. ', jqXHR.responseText);
+                    }
+                });
+            },
+            
+            getPubKey: function(keyName, element) {
+                $.ajax({
+                    url: '/keys/' + keyName,
+                    type: 'GET',
+                    data: 'action=public',
+                    success: function(data) {
+                        info('Successfully got public key: ' + keyName);
+                        $(element).val(data).trigger('change');
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while getting public key: ' + keyName);
+                        error(textstate, errorThrown, ' while getting public key: ', keyName, '. ', jqXHR.responseText);
                     }
                 });
             },

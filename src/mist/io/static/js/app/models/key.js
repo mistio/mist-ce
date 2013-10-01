@@ -9,13 +9,11 @@ define('app/models/key', [
     function() {
         return Ember.Object.extend({
 
-            pub: null,
-            priv: null,
             name: null,
+            probing: null,
             machines: null,
             selected: null,
             default_key: null,
-            probing: null,
 
             updateMachineUptimeChecked: function(machine, timeStamp) {
                 this.machines.some(function(machineToUpdate) {

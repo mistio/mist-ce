@@ -23,6 +23,7 @@ define('app/views/key', [
                 var that = this;
                 Ember.run.next(function() {
                     that.machinesObserver();
+                    Mist.keysController.getPubKey(that.key.name, '.public-key input');
                 });
             },
 
