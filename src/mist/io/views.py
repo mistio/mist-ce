@@ -461,7 +461,7 @@ def create_machine(request):
         key_fd = os.fdopen(tmp_key, 'w+b')
         key_fd.write(private_key)
         key_fd.close()
-        
+
         #NephoScale has 2 keys that need be specified, console and ssh key
         #get the id of the ssh key if it exists, otherwise add the key
         try:
@@ -488,7 +488,7 @@ def create_machine(request):
                              hostname=machine_name[:15],
                              image=image,
                              size=size,
-                             location=location.id,                             
+                             zone=location.id,                             
                              server_key=server_key,
                              console_key=console_key,
                              ssh_key=tmp_key_path,
