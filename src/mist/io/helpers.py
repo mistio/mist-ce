@@ -219,6 +219,7 @@ def connect(request, backend_id=False):
     """
     with get_user(request, readonly=True) as user:
         backends = user['backends']
+        #~ log.error(backends.keys())
 
     if not backend_id:
         backend_id = request.matchdict['backend']

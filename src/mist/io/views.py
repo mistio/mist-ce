@@ -811,85 +811,86 @@ def delete_machine_metadata(request):
 def shell_command(request, backend_id, machine_id, host, command, ssh_user = None, key = None):
     """ Sends a command over ssh, using fabric """
     
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    with get_user(request, readonly=True) as user:
+        keypairs = user.get('keypairs', {})
+        # we don't need to lock the user since the only writes are
+        # performed by save_key which takes care of locking the user
+        # at the moment
 
-    if not key:
-        preferred_keypairs = get_preferred_keypairs(keypairs, backend_id, machine_id)
-    else:
-        preferred_keypairs = [key]
+        if not key:
+            preferred_keypairs = get_preferred_keypairs(keypairs, backend_id, machine_id)
+        else:
+            preferred_keypairs = [key]
 
-    for k in preferred_keypairs:
-        keypair = keypairs[k]
-        private_key = keypair.get('private', None)
-        if private_key:
-            if ssh_user == 'undefined':
-                ssh_user = None
-            ssh_user = ssh_user or get_ssh_user_from_keypair(keypair, 
-                                                 backend_id, 
-                                                 machine_id) or 'root'
-              
-            log.debug("before run command %s" % ssh_user)
-            response = run_command(machine_id, 
-                                   host, 
-                                   ssh_user, 
-                                   private_key, 
-                                   command)
-            cmd_output = response.text
-            new_ssh_user = False
-            if 'Please login as the user ' in cmd_output:
-                new_ssh_user = cmd_output.split()[5].strip('"')
-            elif 'Please login as the' in cmd_output:
-                # for EC2 Amazon Linux machines, usually with ec2-user
-                new_ssh_user = cmd_output.split()[4].strip('"')
-
-            sudoer = False
-
-            if new_ssh_user:
+        for k in preferred_keypairs:
+            keypair = keypairs[k]
+            private_key = keypair.get('private', None)
+            if private_key:
+                if ssh_user == 'undefined':
+                    ssh_user = None
+                ssh_user = ssh_user or get_ssh_user_from_keypair(keypair, 
+                                                     backend_id, 
+                                                     machine_id) or 'root'
+                  
+                log.debug("before run command %s" % ssh_user)
                 response = run_command(machine_id, 
                                        host, 
-                                       new_ssh_user, 
+                                       ssh_user, 
                                        private_key, 
                                        command)
                 cmd_output = response.text
-                ssh_user = new_ssh_user # update username in key-machine association
-            
-            if response.status_code != 200:
-                # Mark key failure
+                new_ssh_user = False
+                if 'Please login as the user ' in cmd_output:
+                    new_ssh_user = cmd_output.split()[5].strip('"')
+                elif 'Please login as the' in cmd_output:
+                    # for EC2 Amazon Linux machines, usually with ec2-user
+                    new_ssh_user = cmd_output.split()[4].strip('"')
+
+                sudoer = False
+
+                if new_ssh_user:
+                    response = run_command(machine_id, 
+                                           host, 
+                                           new_ssh_user, 
+                                           private_key, 
+                                           command)
+                    cmd_output = response.text
+                    ssh_user = new_ssh_user # update username in key-machine association
+                
+                if response.status_code != 200:
+                    # Mark key failure
+                    save_keypair(request, 
+                                 k, 
+                                 backend_id, 
+                                 machine_id, 
+                                 -1*int(time()), # minus means failure
+                                 ssh_user,
+                                 sudoer) 
+                    continue
+                
+                # TODO: Test if user is sudoer
+                if command.startswith('sudo -n uptime 2>&1'):
+                    split_output = cmd_output.split('--------')
+                    try:
+                        if int(split_output[0]) > 0:
+                            sudoer = True
+                    except ValueError:
+                        pass
+                
+                # Mark key success
                 save_keypair(request, 
                              k, 
                              backend_id, 
                              machine_id, 
-                             -1*int(time()), # minus means failure
-                             ssh_user,
-                             sudoer) 
-                continue
+                             int(time()), 
+                             ssh_user, 
+                             sudoer)
+                
+                return {'output': cmd_output,
+                        'ssh_user': ssh_user,
+                        'sudoer': sudoer}
             
-            # TODO: Test if user is sudoer
-            if command.startswith('sudo -n uptime 2>&1'):
-                split_output = cmd_output.split('--------')
-                try:
-                    if int(split_output[0]) > 0:
-                        sudoer = True
-                except ValueError:
-                    pass
-            
-            # Mark key success
-            save_keypair(request, 
-                         k, 
-                         backend_id, 
-                         machine_id, 
-                         int(time()), 
-                         ssh_user, 
-                         sudoer)
-            
-            return {'output': cmd_output,
-                    'ssh_user': ssh_user,
-                    'sudoer': sudoer}
-        
-    return False
+        return False
 
 
 @view_config(route_name='probe', request_method='POST',
