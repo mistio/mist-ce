@@ -29,8 +29,7 @@ define('app/controllers/key_add', [
 
             newKey: function(machine) {
                 Mist.keysController.newKey(this.get('newKeyName').trim(),
-                                           this.get('newKeyPrivate').trim(),
-                                           machine);
+                                           this.get('newKeyPrivate').trim(), machine);
             },
 
             newKeyClear: function() {
@@ -40,14 +39,13 @@ define('app/controllers/key_add', [
 
             generateKey: function() {
                 $('#create-key-dialog .ajax-loader').fadeIn(200);
-                var that = this;
                 $.ajax({
                     url: '/keys',
                     type: 'POST',
                     success: function(data) {
                         info('Successfully generated key');
                         $('#create-key-dialog .ajax-loader').fadeOut(200);
-                        that.set('newKeyPrivate', data.priv);
+                        Mist.keyAddController.set('newKeyPrivate', data.priv);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while generating key: ' + jqXHR.responseText);

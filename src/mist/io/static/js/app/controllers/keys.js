@@ -103,8 +103,8 @@ define('app/controllers/keys', [
                     data: JSON.stringify(item),
                     success: function() {
                         info('Successfully edited key: ', oldName);
-                        Mist.keysController.getKeyByName(oldName).set('name', newName);
                         $("#edit-key-dialog").popup("close");
+                        Mist.keysController.getKeyByName(oldName).set('name', newName);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while editting key: ' + jqXHR.responseText);
@@ -149,7 +149,7 @@ define('app/controllers/keys', [
                     success: function(data) {
                         info('Successfully associated key: ', keyName, ', with machine: ', machine.id);
                         $('#manage-keys .ajax-loader').fadeOut(200);
-                        Mist.keysController.updateKeyMachineList(keyName, data);
+                        Mist.keysController.updateKeyMachinesList(keyName, data);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while associating key: ' + keyName);
@@ -180,7 +180,7 @@ define('app/controllers/keys', [
                     success: function(data) {
                         info('Successfully disassociated key: ', keyName, ' with machine: ', machine.id);
                         $('#manage-keys .ajax-loader').fadeOut(200);
-                        Mist.keysController.updateKeyMachineList(keyName, data);
+                        Mist.keysController.updateKeyMachinesList(keyName, data);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while disassociating key: ' + keyName);
@@ -232,11 +232,11 @@ define('app/controllers/keys', [
             },
 
             updateKeysList: function(data) {
-                var keys = new Array();
+                var newKeys = new Array();
                 data.forEach(function(key) {
-                    keys.push(Key.create(key));
+                    newKeys.push(Key.create(key));
                 });
-                this.set('keys', keys);
+                this.set('keys', newKeys);
                 Ember.run.next(function(){
                     try {
                         $('#keys-list').listview('refresh');
@@ -245,7 +245,7 @@ define('app/controllers/keys', [
                 });
             },
 
-            updateKeyMachineList: function(keyName, data) {
+            updateKeyMachinesList: function(keyName, data) {
                 this.keys.some(function(key) {
                     if(key.name == keyName) {
                         key.set('machines', data ? data : new Array());
