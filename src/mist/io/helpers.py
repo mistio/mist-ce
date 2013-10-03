@@ -47,19 +47,16 @@ def get_user(request, readonly=False, refresh=False, ext_auth=False):
         user = settings['user']
         user_before = deepcopy(user)
         yield user
-    except:
+    except Exception as e:
         # An exception occured. Returning False will reraise it.
-        log.error('Get_user io got an exception')
-        raise
+        log.error("Get_user io got an exception: '%s'" % e)
+        raise e
     else:
         # All went fine. Save.
         if not readonly and user_before and user != user_before:
             save_settings(request)
-    finally:
-        if not readonly:
-            # release lock
-            pass
 
+####FIXME: This is UGLY!!!!
 try:
     from mist.core.helpers import get_user
 except:
