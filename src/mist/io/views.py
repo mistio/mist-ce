@@ -1027,9 +1027,9 @@ def add_key(request):
         if key_id in keypairs:
             return Response('Key "%s" already exists' % key_id, 400)
         
-        key = {'public' : params.get('pub', ''),
+        key = { 'public' : params.get('pub', ''),
                 'private' : params.get('priv', ''),
-                 'default' : not len(keypairs) }
+                'default' : not len(keypairs) }
         
         if key['public'] and key['private']:
             if not validate_key_pair(key['public'], key['private']):
@@ -1038,10 +1038,10 @@ def add_key(request):
         keypairs[key_id] = key
         
         return {'name': key_id,
-                 'pub': key['public'],
-                  'priv': key['private'],
-                   'default_key': key['default'],
-                    'machines': []}
+                'pub': key['public'],
+                'priv': key['private'],
+                'default_key': key['default'],
+                'machines': []}
 
 
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
@@ -1073,11 +1073,11 @@ def delete_key(request):
                 keypairs[new_default_key]['default'] = True
         
         return [{'name': key,
-                  'machines': keypairs[key].get('machines', []),
-                   'pub': keypairs[key]['public'],
-                    'priv': keypairs[key]['private'] and True,
-                     'default_key': keypairs[key].get('default', False)}
-                 for key in keypairs.keys()]
+                'machines': keypairs[key].get('machines', []),
+                'pub': keypairs[key]['public'],
+                'priv': keypairs[key]['private'] and True,
+                'default_key': keypairs[key].get('default', False)}
+                    for key in keypairs.keys()]
 
 
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
@@ -1097,8 +1097,8 @@ def edit_key(request):
         
         key = {'public' : params.get('pub', ''),
                 'private' : params.get('priv', ''),
-                 'default' : keypairs[old_id].get('default', False),
-                  'machines' : keypairs[old_id].get('machines', [])}
+                'default' : keypairs[old_id].get('default', False),
+                'machines' : keypairs[old_id].get('machines', [])}
 
         if old_id != key_id:
             if key_id in keypairs:
@@ -1112,10 +1112,10 @@ def edit_key(request):
         keypairs[key_id] = key
         
         return {'name': key_id,
-                 'pub': key['public'],
-                  'priv': key['private'],
-                   'default': key['default'],
-                    'machines': key['machines']}
+                'pub': key['public'],
+                'priv': key['private'],
+                'default': key['default'],
+                'machines': key['machines']}
 
 
 @view_config(route_name='key_action', request_method='POST', renderer='json')
