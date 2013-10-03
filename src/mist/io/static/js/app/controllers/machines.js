@@ -172,7 +172,6 @@ define('app/controllers/machines', [
                 item.id = -1;
 
                 var machine = Machine.create(item);
-                machine.keys.addObject(key);
                 
                 this.addObject(machine);
                 Ember.run.next(function(){

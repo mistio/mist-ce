@@ -1539,7 +1539,7 @@ div.info {
     text-align: center;
 }
 
-#single-machines-keys #machines-list fieldset {
+#single-key-machines #machines-list fieldset {
     display:none;
 }
 

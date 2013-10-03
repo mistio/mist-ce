@@ -15,12 +15,18 @@ define('app/views/key_list', [
 
             selectedKey: null,
 
+            inti: function() {
+                this._super();
+                $("input[type='checkbox']").checkboxradio("refresh");
+            },
+
             selectedKeysObserver: function() {
                 var that = this;
                 var selectedKeysCount = 0;
                 Mist.keysController.keys.some(function(key) {
                     if (key.selected) {
                         if(++selectedKeysCount == 2) {
+                            $('#keys-footer a').addClass('ui-disabled');
                             that.selectedKey = null;
                             return true;
                         }
@@ -29,12 +35,9 @@ define('app/views/key_list', [
                 });
                 if (selectedKeysCount == 0) {
                     $('#keys-footer').fadeOut(200);
-                }
-                else if (selectedKeysCount == 1) {
+                } else if (selectedKeysCount == 1) {
                     $('#keys-footer').fadeIn(200);
                     $('#keys-footer a').removeClass('ui-disabled');
-                } else {
-                    $('#keys-footer a').addClass('ui-disabled');
                 }
             }.observes('Mist.keysController.keys.@each.selected'),
 
@@ -59,7 +62,7 @@ define('app/views/key_list', [
             deleteClicked: function() {
                 var keyName = this.selectedKey.name;
                 Mist.confirmationController.set('title', 'Delete key');
-                Mist.confirmationController.set('text', 'Are you sure you want to delete ' + keyName +' ?');
+                Mist.confirmationController.set('text', 'Are you sure you want to delete "' + keyName +'" ?');
                 Mist.confirmationController.set('callback', function() {
                     Mist.keysController.deleteKey(keyName);
                 });

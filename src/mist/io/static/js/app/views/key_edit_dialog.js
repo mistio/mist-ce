@@ -1,7 +1,7 @@
 define('app/views/key_edit_dialog', [
     'text!app/templates/key_edit_dialog.html','ember'],
     /**
-     * Add Edit dialog
+     * Key Edit dialog
      *
      * @returns Class
      */
@@ -16,9 +16,9 @@ define('app/views/key_edit_dialog', [
 
             newNameObserver: function() {
                 if (this.newName) {
-                    $('#edit-key-ok').removeClass('ui-disabled');
+                    $('#edit-key-ok').button('enable');
                 } else {
-                    $('#edit-key-ok').addClass('ui-disabled');
+                    $('#edit-key-ok').button('disable');
                 }
             }.observes('newName'),
 
@@ -31,7 +31,7 @@ define('app/views/key_edit_dialog', [
                 if (oldName != this.newName) {
                     Mist.keysController.editKey(oldName, this.newName.trim());
                 } else {
-                    Mist.notificationController.notify('Please give a new name.');
+                    Mist.notificationController.notify('Please give a new name');
                 }
             }
         });

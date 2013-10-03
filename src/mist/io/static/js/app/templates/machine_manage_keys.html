@@ -3,11 +3,12 @@
         <h1>Manage Keys</h1>
     </div>
     <div data-role="content">
-        <button id="associate-key-button" 
-                data-theme="b" 
-                data-icon="plus" 
-                data-iconpos="right" 
+        <button id="associate-key-button"
+                data-theme="b"
+                data-icon="plus"
+                data-iconpos="right"
                 {{action associateButtonClicked target="view"}}>Associate</button>
+
         {{#if view.associatedKeys}}
         <div id="associated-keys" data-role="listview">
             {{#each view.associatedKeys}}
@@ -15,13 +16,14 @@
             {{/each}}
         </div>
         {{/if}}
+        
         <div class="ajax-loader"></div>
         <button {{action backClicked target="view"}}>Back</button>
     </div>
 
     <div id="key-actions" data-role="popup" data-position-to="#associated-keys">
         <div data-role="header">
-            <h1>Actions</h1>
+            <h1>Key Actions</h1>
         </div>
         <div id="key-actions-container">
             <button id="key-action-remove" {{action actionRemoveClicked target="view"}}>Remove</button>
@@ -29,7 +31,7 @@
             <button id="key-action-back" {{action actionBackClicked target="view"}}>Back</button>
         </div>
     </div>
-    
+
     <div id="associate-key-dialog" data-role="popup" data-corners="false">
         <ul id="non-associated-keys" data-role="listview">
             {{#each view.nonAssociatedKeys}}
@@ -42,7 +44,7 @@
             </li>
         </ul>
     </div>
-    
+
     <div id="create-key-dialog" data-role="popup" class="mist-dialog" data-transition="pop">
         <div data-role="header">
             <h1>Create key</h1>

@@ -18,10 +18,10 @@
     </div>
 
     <div class="upload-bundle">
-        <input type="file" class="upload-input" name="file"{{action uploadInputChanged on="change" target="view"}}/>
+        <input type="file" class="upload-input" name="file" {{action uploadInputChanged on="change" target="view"}}/>
     </div>
 
     <div id="create-key-actions" class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-        <a href="#" data-role="button" id="create-key-cancel" {{action backClicked target="view"}}>Back</a>
+        <a href="#" data-role="button" {{action backClicked target="view"}}>Back</a>
         <button id="create-key-ok" data-theme="b" disabled {{action createClicked target="view"}}>Create</button>
     </div>

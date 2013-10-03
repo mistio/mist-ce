@@ -1373,24 +1373,7 @@ def update_available_keys(request, backend_id, machine_id, ssh_user, host, autho
             if exists:
                 break
                     
-        # if public key does not exist in our keypairs, add a new entry
-        if not exists:
-            if len(pub_key)>2:
-                key_name = pub_key[2].strip('\r')
-            else:
-                key_name = "%s@%s" % (ssh_user, host)
-                if key_name in keypairs:
-                    i = 0
-                    while True:
-                        key_name = '%s@%s-%d' % (ssh_user, host, i)
-                        i+=1
-                        if key_name not in keypairs:
-                            break
-            keypairs[key_name] = {'public': ' '.join(pk.split(' ')[:2]),
-                                  'private': '',
-                                  'machines': [[backend_id, machine_id, 0, ssh_user]]}
-            updated_keypairs[key_name] = keypairs[key_name]
-
+    
     if updated_keypairs:
         log.debug('update keypairs')
         save_settings(request)

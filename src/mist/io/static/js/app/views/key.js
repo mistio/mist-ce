@@ -20,11 +20,10 @@ define('app/views/key', [
             init: function() {
                 this._super();
                 this.set('key', this.get('controller').get('model'));
-                var that = this;
-                Ember.run.next(function() {
-                    that.machinesObserver();
-                    Mist.keysController.getPubKey(that.key.name, '.public-key input');
-                });
+                if (this.key) {
+                    this.machinesObserver();
+                    Mist.keysController.getPubKey(this.key.name, '.public-key input');
+                }
             },
 
             machinesObserver: function() {

@@ -197,7 +197,7 @@ define( 'app', [
         App.KeysRoute = Ember.Route.extend({
           //clear selected keys when exiting view           
           exit: function(){
-              Mist.keysController.forEach(function(key){
+              Mist.keysController.keys.forEach(function(key){
                    log('deselecting key: ' + key.name);
                    key.set('selected', false);
               });

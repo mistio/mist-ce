@@ -5,10 +5,5 @@
 
 <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
     <a href="#" data-role="button" {{action backClicked target="view"}}>Back</a>
-    <a href="#"
-       data-role="button"
-       id="edit-key-ok"
-       class="ui-disabled"
-       data-theme="b"
-       {{action saveClicked target="view"}}>Save</a>
+    <button id="edit-key-ok" data-theme="b" disabled {{action saveClicked target="view"}}>Save</button>
 </div>
