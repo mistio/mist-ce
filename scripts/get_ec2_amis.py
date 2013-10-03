@@ -30,16 +30,16 @@ for provider in ['us-east-1', 'us-west-2', 'us-west-1', 'eu-west-1', 'ap-southea
     #wait to load otherwise it fails
     browser.find_by_css('.gwt-Button').click()
     time.sleep(6)
-    browser.find_by_css('.option_scenario').click()
+    browser.find_by_css('#scenario').click()
     browser.find_by_name('key-pair-method')[2].click()
     #select no key, because for example ap-southeast-2 does not have the existing keys, 
     #and this asks for a key without letting you to proceed with the images
 
     provider_images = []
     for i in range (1, len(browser.find_by_css('tr.scenario_description'))):
-        browser.find_by_css('tr.scenario_description')[i].click()
-        browser.find_by_css('.navigation_buttons')[0].click()
-        line = browser.find_by_css('.wizard_review h1.ami_name')[0].text
+        browser.execute_script("$('tr.scenario_description').eq(%d).click()" % i)
+        browser.execute_script("$('#qs_continue_scenario .elasticbig-container').click()")
+        line = browser.evaluate_script("$('.wizard_review h1.ami_name').eq(0).text()")
         ami = line.split(' (')[1].replace(')','')
         title = line.split(' (')[0]
         if browser.find_by_css('.wizard_review .details dd')[1].text == 'i386':
@@ -49,11 +49,11 @@ for provider in ['us-east-1', 'us-west-2', 'us-west-1', 'eu-west-1', 'ap-southea
         new_pair = (ami, title)
         if new_pair not in provider_images:
             provider_images.append(new_pair)
-        browser.find_by_css('.wizardBackButton')[1].click()
+        browser.execute_script("$('.wizardReview .wizardBackButton').eq(0).find('a').click()")
         browser.find_by_css('tr.scenario_description')[i].find_by_css('input#i386')[0].click()
         #select the i386 also
         
-        browser.find_by_css('.navigation_buttons')[0].click()
+        browser.execute_script("$('#qs_continue_scenario .elasticbig-container').click()")
         line = browser.find_by_css('.wizard_review h1.ami_name')[0].text
         ami = line.split(' (')[1].replace(')','')
         title = line.split(' (')[0]
