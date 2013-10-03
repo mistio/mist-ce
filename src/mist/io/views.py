@@ -1097,7 +1097,7 @@ def add_key(request):
     
     return {'name': key_id,
              'machines': [],
-              'default_key': key['default'],}
+              'default_key': key['default']}
 
 
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
