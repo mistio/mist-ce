@@ -248,6 +248,7 @@ define('app/views/machine', [
                 if (!machine || !machine.hasMonitoring) {
                     if (this.context) {
                         this.context.stop();
+                        $('#dummyGraph').empty();
                         $('#cpuGraph').empty();
                         $('#memoryGraph').empty();
                         $('#diskGraph').empty();
@@ -276,7 +277,7 @@ define('app/views/machine', [
                     var memoryTotal = false;
                     var loaded = false;
 
-                    function drawCpu() {
+                    function drawDummy() {
                         return context.metric(function(start, stop, step, callback) {
                             start = +start;
                             stop = +stop;
@@ -311,6 +312,9 @@ define('app/views/machine', [
                                             if (!disks) {
                                                 configureDiskGraphs();
                                             }
+                                            configureMemory();
+                                            configureLoad();
+                                            configureCpu();
                                         }
                                         machine.set('pendingStats', false);
                                     },
@@ -319,7 +323,6 @@ define('app/views/machine', [
                                         //Mist.context.stop();
                                     }
                                 });
-
                                 if (localData && machine.hasMonitoring && cores) {
                                     return callback(null, localData['cpu']['utilization'].map(function(d) {
                                         return (d / cores) * 100;
@@ -327,11 +330,10 @@ define('app/views/machine', [
                                 } else {
                                     return callback(new Error('unable to load data'));
                                 }
-
                             } else {
                                 return callback(new Error('monitoring disabled'));
                             }
-                        }, 'CPU (%)');
+                        }, 'CPU');
                     }
 
                     function drawMemory() {
@@ -344,6 +346,57 @@ define('app/views/machine', [
                                 return callback(new Error('unable to load data'));
                             }
                         }, 'RAM (%)');
+                    }
+
+                    function drawCpu() {
+                        return context.metric(function(start, stop, step, callback) {
+                            if (localData && machine.hasMonitoring && cores) {
+                                return callback(null, localData['cpu']['utilization'].map(function(d) {
+                                    return (d / cores) * 100;
+                                }));
+                            } else {
+                                return callback(new Error('unable to load data'));
+                            }
+                        }, 'CPU (%)');
+                    }
+
+                    function configureMemory() {
+                        var memory = drawMemory();
+                        d3.select('#memoryGraph').call(function(div) {
+                            div.selectAll('.horizon')
+                               .data([memory])
+                               .enter()
+                               .append('div')
+                               .attr('class', 'horizon')
+                               .call(context.horizon());
+                            div.append('div').attr('class', 'rule').call(context.rule());
+                        });
+                    }
+
+                    function configureLoad() {
+                        var load = drawLoad();
+                        d3.select('#loadGraph').call(function(div) {
+                            div.selectAll('.horizon')
+                               .data([load])
+                               .enter()
+                               .append('div')
+                               .attr('class', 'horizon')
+                               .call(context.horizon());
+                            div.append('div').attr('class', 'rule').call(context.rule());
+                        });
+                    }
+
+                    function configureCpu() {
+                        var cpu = drawCpu();
+                        d3.select('#cpuGraph').call(function(div) {
+                            div.selectAll('.horizon')
+                               .data([cpu])
+                               .enter()
+                               .append('div')
+                               .attr('class', 'horizon')
+                               .call(context.horizon());
+                            div.append('div').attr('class', 'rule').call(context.rule());
+                        });
                     }
 
                     function drawDisk(disk, ioMethod) {
@@ -435,34 +488,13 @@ define('app/views/machine', [
                         });
                     }
 
-                    var cpu = drawCpu();
-                    var memory = drawMemory();
-                    var load = drawLoad();
-
-                    d3.select('#cpuGraph').call(function(div) {
+                    var dummy = drawDummy();
+                    d3.select('#cpuGraph').call(function(div) {                    
                         div.append('div').attr('class', 'axis').call(context.axis().orient('top'));
-                        div.selectAll('.horizon')
-                           .data([cpu])
-                           .enter()
-                           .append('div')
-                           .attr('class', 'horizon')
-                           .call(context.horizon());
-                        div.append('div').attr('class', 'rule').call(context.rule());
                     });
-
-                    d3.select('#memoryGraph').call(function(div) {
+                    d3.select('#dummyGraph').call(function(div) {
                         div.selectAll('.horizon')
-                           .data([memory])
-                           .enter()
-                           .append('div')
-                           .attr('class', 'horizon')
-                           .call(context.horizon());
-                        div.append('div').attr('class', 'rule').call(context.rule());
-                    });
-
-                    d3.select('#loadGraph').call(function(div) {
-                        div.selectAll('.horizon')
-                           .data([load])
+                           .data([dummy])
                            .enter()
                            .append('div')
                            .attr('class', 'horizon')
