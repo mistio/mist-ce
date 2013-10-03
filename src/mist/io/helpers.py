@@ -67,7 +67,10 @@ except:
     
 def get_auth_key(request):
     with get_user(request, readonly=True) as user:
-        return "%s:%s" % (user['email'], user['password'])
+        from base64 import urlsafe_b64encode
+        auth_key = "%s:%s" % (user['email'], user['password'])
+        auth_key = urlsafe_b64encode(auth_key)
+        return auth_key
     #~ auth_key = request.settings.get('auth_key', '')
     #~ if not auth_key:
         #~ with get_user(request, readonly=True) as user:
