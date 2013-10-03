@@ -6,6 +6,7 @@ import yaml
 import subprocess
 import struct
 import binascii
+import requests
 
 from time import time
 from hashlib import sha1
@@ -67,6 +68,22 @@ except:
 def get_auth_key(request):
     with get_user(request, readonly=True) as user:
         return "%s:%s" % (user['email'], user['password'])
+    #~ auth_key = request.settings.get('auth_key', '')
+    #~ if not auth_key:
+        #~ with get_user(request, readonly=True) as user:
+            #~ email = user.get('email', '')
+            #~ password = user.get('password', '')
+        #~ if email and password:
+            #~ payload = {'email':email, 'password':password}
+            #~ ret = requests.post(request.settings['core_uri'] + '/auth',
+                                #~ params=payload,
+                                #~ verify=False)
+            #~ if ret.status_code == 200:
+#~ 
+    #~ return request.settings['auth_key']
+    #~ 
+    #~ payload = {'email': settings['user'].get('email'),
+                   #~ 'password': settings['user'].get('password')}
     
 def load_settings(settings):
     """Gets settings from settings.yaml local file.

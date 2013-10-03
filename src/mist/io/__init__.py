@@ -31,6 +31,7 @@ def main(global_config, **settings):
             settings['auth'] = 1
             ret = json.loads(ret.content)
             settings['current_plan'] = ret.get('current_plan',{})
+            settings['auth_key'] = ret.get('auth_key', '')
             user_details = ret.get('user_details', {})
             settings['user']['name'] = user_details.get('name', '')
             settings['user']['company_name'] = user_details.get('company_name', '')            
