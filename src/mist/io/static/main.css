@@ -286,7 +286,31 @@ li.node .tag {
 /* Create Key Dialog */
 
 #create-key-dialog-popup {
-    width: 250px;
+    width: 300px;
+}
+
+#create-key-dialog label {
+    display: inline;
+    
+}
+
+#create-key-dialog .ajax-loader {
+    width: 20px;
+    float: right;
+    margin-right: 1px;
+}
+
+#private-key-header {
+    margin-top: 22px;
+}
+
+#create-key-actions {
+    margin-top: 22px;
+}
+
+#private-key-actions {
+    margin-top: -2px;
+    width: 270px;
 }
 
 #textarea-private-key {

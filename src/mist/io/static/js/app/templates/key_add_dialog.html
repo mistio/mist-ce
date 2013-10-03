@@ -3,34 +3,25 @@
     {{view Mist.TextField
         valueBinding="Mist.keyAddController.newKeyName"
         id="create-key-name"}}
-
-    <label for="textarea-private-key">Private Key:</label>
+    
+    <div id="private-key-header">
+        <label for="textarea-private-key">Private Key:</label>
+        <div class="ajax-loader"></div>
+    </div>
     {{view Ember.TextArea
         valueBinding="Mist.keyAddController.newKeyPrivate"
         id="textarea-private-key"}}
 
-    <button data-icon="gear" {{action generateClicked target="view"}}>Generate</button>
-    <div class="ajax-loader"></div>
+    <div id="private-key-actions" class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+        <button data-icon="gear" {{action generateClicked target="view"}}>Generate</button>
+        <button class="upload-button" data-icon="arrow-u" data-iconpos="right" {{action uploadClicked target="view"}}>Upload</button>
+    </div>
 
     <div class="upload-bundle">
-        <a class="upload-button"
-           data-role="button"
-           data-icon="arrow-u"
-           {{action uploadClicked target="view"}}>Upload</a>
-
         <input type="file" class="upload-input" name="file"{{action uploadInputChanged on="change" target="view"}}/>
     </div>
 
-    <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-        <a href="#"
-           data-role="button"
-           id="create-key-cancel"
-           {{action backClicked target="view"}}>Back</a>
-
-        <a href="#"
-           data-role="button"
-           id="create-key-ok"
-           class="ui-disabled"
-           data-theme="b"
-           {{action createClicked target="view"}}>Create</a>
+    <div id="create-key-actions" class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+        <a href="#" data-role="button" id="create-key-cancel" {{action backClicked target="view"}}>Back</a>
+        <button id="create-key-ok" data-theme="b" disabled {{action createClicked target="view"}}>Create</button>
     </div>

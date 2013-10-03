@@ -20,10 +20,10 @@ define('app/controllers/key_add', [
             newKeyObserver: function() {
                 if (this.newKeyName && this.newKeyPrivate) {
                     this.set('newKeyReady', true);
-                    $('#create-key-ok').removeClass('ui-disabled');
+                    $('#create-key-ok').button('enable');
                 } else {
                     this.set('newKeyReady', false);
-                    $('#create-key-ok').addClass('ui-disabled');
+                    $('#create-key-ok').button('disable');
                 }
             }.observes('newKeyName', 'newKeyPrivate'),
 
