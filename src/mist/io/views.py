@@ -1502,7 +1502,7 @@ def deploy_key(request, keypair):
         pass
 
     # Maybe the deployment failed but let's try to connect with the new key and see what happens
-    with get_user(request) as user:
+    with get_user(request, readonly=True) as user:
         keypairs = user.get('keypairs',{})    
         key_name = None
         for key_name, k in keypairs.items():
