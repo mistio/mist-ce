@@ -15,11 +15,6 @@ define('app/views/key_list', [
 
             selectedKey: null,
 
-            inti: function() {
-                this._super();
-                $("input[type='checkbox']").checkboxradio("refresh");
-            },
-
             selectedKeysObserver: function() {
                 var that = this;
                 var selectedKeysCount = 0;
