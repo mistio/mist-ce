@@ -35,17 +35,11 @@ from mist.io.helpers import run_command
 from mist.io.helpers import generate_keypair, set_default_key, get_private_key, validate_key_pair, get_ssh_user_from_keypair
 
 try:
-    from mist.core.helpers import save_settings
-except ImportError:
-    from mist.io.helpers import save_settings
-
-log = logging.getLogger('mist.io')
-
-try:
     from mist.core.helpers import get_user
 except ImportError:
     from mist.io.helpers import get_user
 
+log = logging.getLogger('mist.io')
 
 @view_config(route_name='home', request_method='GET',
              renderer='templates/home.pt')
@@ -68,30 +62,6 @@ def home(request):
             'js_build': js_build,
             'js_log_level': js_log_level}
 
-
-#~ @view_config(route_name="check_auth", request_method='POST', renderer="json")
-#~ def check_auth(request):
-    #~ "Check on the mist.core service if authenticated"
-    #~ params = request.json_body
-    #~ email = params.get('email', '').lower()
-    #~ password = params.get('password', '')
-    #~ timestamp = params.get('timestamp', '')
-    #~ hash_key = params.get('hash', '')
-#~ 
-    #~ payload = {'email': email, 'password': password, 'timestamp': timestamp, 'hash_key': hash_key}
-    #~ core_uri = request.registry.settings['core_uri']
-    #~ ret = requests.post(core_uri + '/auth', params=payload, verify=False)
-#~ 
-    #~ if ret.status_code == 200:
-        #~ ret = json.loads(ret.content)
-        #~ request.registry.settings['email'] = email
-        #~ request.registry.settings['password'] = password
-        #~ request.registry.settings['auth'] = 1
-        #~ log.debug('save settings (check auth)')
-        #~ save_settings(request)
-        #~ return ret
-    #~ else:
-        #~ return Response('Unauthorized', 401)
 
 @view_config(route_name='account', request_method='POST', renderer='json')
 def update_user_settings(request, renderer='json'):
@@ -658,11 +628,9 @@ def destroy_machine(request, backend_id=None, machine_id=None):
     machine.destroy()
 
     pair = [backend_id, machine_id]
-
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    
+    with get_user(request, readonly=True) as user:
+        keypairs = user.get('keypairs', {})
 
     for key in keypairs:
         machines = keypairs[key].get('machines', [])
@@ -1034,17 +1002,15 @@ def list_keys(request):
     keys are returned.
     
     """
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    with get_user(request, readonly=True) as user:
+        keypairs = user.get('keypairs', {})
     
     return [{'name': key,
-              'machines': keypairs[key].get('machines', []),
-               'pub': keypairs[key]['public'],
-                'priv': keypairs[key]['private'] and True or False,
-                 'default_key': keypairs[key].get('default', False)}
-             for key in keypairs.keys()]
+            'machines': keypairs[key].get('machines', []),
+            'pub': keypairs[key]['public'],
+            'priv': keypairs[key]['private'] and True or False,
+            'default_key': keypairs[key].get('default', False)}
+                for key in keypairs.keys()]
 
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
@@ -1542,4 +1508,3 @@ def undeploy_key(request, keypair):
         return False
 
     return ret
-
