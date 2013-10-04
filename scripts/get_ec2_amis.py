@@ -37,36 +37,48 @@ for provider in ['us-east-1', 'us-west-2', 'us-west-1', 'eu-west-1', 'ap-southea
 
     provider_images = []
     for i in range (1, len(browser.find_by_css('tr.scenario_description'))):
-        browser.execute_script("$('tr.scenario_description').eq(%d).click()" % i)
-        browser.execute_script("$('#qs_continue_scenario .elasticbig-container').click()")
-        line = browser.evaluate_script("$('.wizard_review h1.ami_name').eq(0).text()")
-        ami = line.split(' (')[1].replace(')','')
-        title = line.split(' (')[0]
-        if browser.find_by_css('.wizard_review .details dd')[1].text == 'i386':
-            title += ' 32bit'
-        else:
-            title += ' 64bit'
-        new_pair = (ami, title)
-        if new_pair not in provider_images:
-            provider_images.append(new_pair)
-        browser.execute_script("$('.wizardReview .wizardBackButton').eq(0).find('a').click()")
-        browser.find_by_css('tr.scenario_description')[i].find_by_css('input#i386')[0].click()
-        #select the i386 also
         
-        browser.execute_script("$('#qs_continue_scenario .elasticbig-container').click()")
-        line = browser.evaluate_script("$('.wizard_review h1.ami_name').eq(0).text()")
-        ami = line.split(' (')[1].replace(')','')
-        import pdb; pdb.set_trace()
-        title = line.split(' (')[0]
-        if browser.find_by_css('.wizard_review .details dd')[1].text == 'i386':
-            title += ' 32bit'
-        else:
-            title += ' 64bit'
-        new_pair = (ami, title)
-        if new_pair not in provider_images:
-            provider_images.append(new_pair)
-        browser.find_by_css('.wizardBackButton')[1].click()
-    
+        # Check if next image is windows (to ignore it)
+        if 'Windows' in browser.evaluate_script("$('tr.scenario_description').eq(%d).text()" % i):
+            continue
+        
+        # Click image list item
+        browser.execute_script("$('tr.scenario_description').eq(%d).click()" % i)
+        
+        # If 64-bit is available
+        if not browser.evaluate_script("$('tr.scenario_description').eq(%d).find('input#x86_64').attr('disabled')" % i):
+            # Click 64-bit radio button
+            browser.execute_script("$('tr.scenario_description').eq(%d).find('input#x86_64').click()" % i)
+            # Click continue
+            browser.execute_script("$('#qs_continue_scenario .elasticbig-container').click()")
+            # Get image ami
+            line = browser.evaluate_script("$('.wizard_review h1.ami_name').eq(0).text()")
+            ami = 'ami' + line.split(' (ami')[1].replace(')','')
+            title = line.split(' (ami')[0] + ' 64bit'
+            # Save ami
+            new_pair = (ami, title)
+            if new_pair not in provider_images:
+                provider_images.append(new_pair)
+            # Go back
+            browser.execute_script("$('.wizardReview .wizardBackButton').eq(0).find('a').click()")
+
+        # If 32-bit is available
+        if not browser.evaluate_script("$('tr.scenario_description').eq(%d).find('input#i386').attr('disabled')" % i):
+            # Click 32-bit radio button
+            browser.execute_script("$('tr.scenario_description').eq(%d).find('input#i386').click()" % i)
+            # Click continue
+            browser.execute_script("$('#qs_continue_scenario .elasticbig-container').click()")
+            # Get image ami
+            line = browser.evaluate_script("$('.wizard_review h1.ami_name').eq(0).text()")
+            ami = 'ami' + line.split(' (ami')[1].replace(')','')
+            title = line.split(' (ami')[0] + ' 32bit'
+            # Save ami
+            new_pair = (ami, title)
+            if new_pair not in provider_images:
+                provider_images.append(new_pair)
+            # Go back
+            browser.execute_script("$('.wizardReview .wizardBackButton').eq(0).find('a').click()")
+            
     print '    \'%s\': {' % provider      
     for ami, image in provider_images: 
         print '        \'%s\': \'%s\',' % (ami, image)
