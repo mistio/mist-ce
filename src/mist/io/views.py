@@ -802,7 +802,7 @@ def shell_command(request, backend_id, machine_id, host, command, ssh_user = Non
     """ Sends a command over ssh, using fabric """
     
     with get_user(request, readonly=True) as user:
-        log.error("shell command from user '%s'" % user)
+        #log.error("shell command from user '%s'" % user)
         keypairs = user.get('keypairs', {})
         # we don't need to lock the user since the only writes are
         # performed by save_key which takes care of locking the user
