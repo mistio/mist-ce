@@ -933,28 +933,24 @@ def list_images(request):
 
     backend_id = request.matchdict['backend']
 
-    try:
-        backends = request.environ['beaker.session']['backends']
-    except:
-        backends = request.registry.settings.get('backends', {})
-    
     term = request.params.get('search_term')
     
+    with get_user(request, readonly=True) as user:
+        backends = user.get('backends', {})
+
     if term:
         if conn.type in EC2_PROVIDERS:
             images=[]
-            #import pdb; pdb.set_trace()            
             community_images = conn.list_images(ex_owner="aws-marketplace")
             for i in community_images:
                 if term in i.id or term.lower() in i.name.lower():
                     images.append(i)
-            #import pdb;prb.set_trace()
             for image in images:
                 image.name = EC2_IMAGES[conn.type].get(image.id, image.name)                          
     else:
         try:
             if conn.type in EC2_PROVIDERS:
-                starred_images = backends[backend_id].get('starred', [])
+                starred_images = backends.get(backend_id, {}).get('starred', [])
                 images = []
                 if starred_images:
                     images = conn.list_images(ex_image_ids = starred_images)
@@ -977,7 +973,7 @@ def list_images(request):
 
     ret = []
     for image in images:
-        if image.id in backends[backend_id].get('starred', []):
+        if image.id in backends.get(backend_id, {}).get('starred', []):
             star = True
         else:
             star = False
@@ -999,11 +995,12 @@ def star_image(request):
     backend_id = request.matchdict['backend']
     image_id = request.matchdict['image']
 
-    try:
-        backends = request.environ['beaker.session']['backends']
-    except:
-        backends = request.registry.settings.get('backends', {})
-    
+    with get_user(request, readonly=True) as user:
+        backends = user.get('backends', {})
+
+    if not backend_id in backends:
+        return Response('Backend id not found %s' % backend_id, 400)
+
     if backends[backend_id].get('starred', None):
         if image_id in backends[backend_id]['starred']:
             backends[backend_id]['starred'].remove(image_id)
