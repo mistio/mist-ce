@@ -115,7 +115,8 @@ define('app/views/image_list', [
                         success: function(data) {
                             var counter = 0;
                             for (var j =0; j< data.length; j ++){
-                                var backend = Mist.backendsController.getBackendById(backend_id);
+                                var backend = Mist.backendsController.getBackendById(data[j].backend_id);
+                                if (backend){
                                 data[j].backend = backend;
                                 var found = false;
                                 backend.images.content.some (function (image) {
@@ -129,6 +130,7 @@ define('app/views/image_list', [
                                     counter ++;
                                 }
                             }
+                          }
                             $("#images .ajax-loader").fadeOut();
                             $('#images-advanced-search span').text('Continue search on server...');
                         },
