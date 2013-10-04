@@ -1094,8 +1094,8 @@ def list_keys(request):
         keypairs = user.get('keypairs', {})
     
     return [{'name': key,
-              'machines': keypairs[key]['machines'],
-               'default_key': keypairs[key]['default']}
+              'machines': keypairs[key].get('machines',[]),
+               'default_key': keypairs[key].get('default', False)}
              for key in keypairs.keys()]
 
 
