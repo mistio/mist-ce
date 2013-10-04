@@ -105,6 +105,8 @@ def list_backends(request):
 
     """
     with get_user(request, readonly=True) as user:
+        if not user:
+            return Response('Unauthorized', 401)
         ret = []
         for backend_id in user['backends']:
             backend = user['backends'][backend_id]
@@ -137,6 +139,8 @@ def add_backend(request, renderer='json'):
     apiurl = params.get('apiurl', '')
     tenant_name = params.get('tenant_name', '')
     with get_user(request) as user:
+        if not user:
+            return Response('Unauthorized', 401)
         backends = user['backends']
         
         if apisecret == 'getsecretfromdb':
@@ -170,19 +174,19 @@ def add_backend(request, renderer='json'):
                   }
 
         backends[backend_id] = backend
-        log.debug('save settings (add backend')
 
-        ret = {'id'           : backend_id,
-               'apikey'       : backend['apikey'],
-               'apiurl'       : backend['apiurl'],
-               'tenant_name'  : backend['tenant_name'],
-               'title'        : backend['title'],
-               'provider'     : backend['provider'],
-               'poll_interval': backend['poll_interval'],
-               'region'       : backend['region'],
-               'status'       : 'off',
-               'enabled'      : True,
-              }
+        ret = {'index'        : len(user['backends']) - 1,
+                'id'           : backend_id,
+                'apikey'       : backend['apikey'],
+                'apiurl'       : backend['apiurl'],
+                'tenant_name'  : backend['tenant_name'],
+                'title'        : backend['title'],
+                'provider'     : backend['provider'],
+                'poll_interval': backend['poll_interval'],
+                'region'       : backend['region'],
+                'status'       : 'off',
+                'enabled'      : True,
+                }
         
         return ret
 
@@ -197,20 +201,35 @@ def delete_backend(request, renderer='json'):
 
     """
     with get_user(request) as user:
-        user['backends'].pop(request.matchdict['backend'])
-        log.debug('save settings (del backend)')
+        if not user:
+            return Response('Unauthorized', 401)
+
+        backend_id = request.matchdict['backend']
+        backends = user.get('backends', None)
+
+        if not backends or not backend_id or not backend_id in backends:
+            return Response('Bad Request', 400)
+
+        del backends[backend_id]
 
     return Response('OK', 200)
 
 
 @view_config(route_name='backend_action', request_method='POST', request_param="action=toggle", renderer='json')
 def toggle_backend(request):
-    
-    backend_id = request.matchdict['backend']
     with get_user(request) as user:
-        state = user['backends'][backend_id]['enabled']
+        if not user:
+            return Response('Unauthorized', 401)
+        
+        backend_id = request.matchdict['backend']
+        backends = user.get('backends', None)
+
+        if not backends or not backend_id or not backend_id in backends:
+            return Response('Bad Request', 400)
+
+        state = backends[backend_id]['enabled']
         user['backends'][backend_id]['enabled'] = not state
-    
+        
     return {'state': not state,}
 
 
