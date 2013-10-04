@@ -54,8 +54,9 @@ for provider in ['us-east-1', 'us-west-2', 'us-west-1', 'eu-west-1', 'ap-southea
         #select the i386 also
         
         browser.execute_script("$('#qs_continue_scenario .elasticbig-container').click()")
-        line = browser.find_by_css('.wizard_review h1.ami_name')[0].text
+        line = browser.evaluate_script("$('.wizard_review h1.ami_name').eq(0).text()")
         ami = line.split(' (')[1].replace(')','')
+        import pdb; pdb.set_trace()
         title = line.split(' (')[0]
         if browser.find_by_css('.wizard_review .details dd')[1].text == 'i386':
             title += ' 32bit'
