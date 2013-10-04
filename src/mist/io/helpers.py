@@ -549,7 +549,7 @@ def get_private_key(request):
 
     """    
     with get_user(request, readonly=True) as user:
-        keypairs = user['keypairs']
+        keypairs = user.get('keypairs', {})
         key_id = request.matchdict['key']
         
         if not key_id:
@@ -565,13 +565,15 @@ def get_public_key(request):
     
     with get_user(request, readonly=True) as user:
         keypairs = user.get('keypairs', {})
-    
         key_id = request.matchdict['key']
+        
+        if not key_id:
+            return Response('Key id not provided', 400)
 
         if key_id in keypairs:
-            return keypairs[key_id]['public']
-        
-        return Response('Keypair "%s" not found' % key_id, 404)
+            return keypairs[key_id].get('public', '')
+        else:
+            return Response('Keypair not found %s' % key_id, 404)
     
 
 def validate_keypair(public_key, private_key):
