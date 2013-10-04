@@ -38,6 +38,8 @@ define('app/controllers/keys', [
             },
 
             newKey: function(name, privateKey, machine, autoSelect) {
+                $('#create-loader').fadeIn(200);
+                $('#create-key-ok').button('disable');
                 var item = {
                     'name': name,
                     'priv': privateKey
@@ -49,6 +51,7 @@ define('app/controllers/keys', [
                     data: JSON.stringify(item),
                     success: function(data) {
                         info('Successfully created key: ', name);
+                        $('#create-loader').fadeOut(200);
                         $('#create-key-dialog').popup('close');
                         Mist.keyAddController.newKeyClear();
                         Mist.keysController.keys.addObject(Key.create(data));
@@ -72,6 +75,8 @@ define('app/controllers/keys', [
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while creating key: ' + jqXHR.responseText);
                         error(textstate, errorThrown, ' while creating key: ', name, '. ', jqXHR.responseText);
+                        $('#create-loader').fadeOut(200);
+                        $('#create-key-ok').button('enable');
                     }
                 });
                 item.priv = privateKey = null; // Don't keep private key on client

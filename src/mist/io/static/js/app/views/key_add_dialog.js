@@ -26,10 +26,10 @@ define('app/views/key_add_dialog', [
 
             uploadInputChanged: function() {
                 if ($('.upload-input')[0].files[0]) {
-                    $('#create-key-dialog .ajax-loader').fadeIn(200);
+                    $('#action-loader').fadeIn(200);
                     var reader = new FileReader();
                     reader.onloadend = function(evt) {
-                        $('#create-key-dialog .ajax-loader').fadeOut(200);
+                        $('#action-loader').fadeOut(200);
                         if (evt.target.readyState == FileReader.DONE) {
                             $('#textarea-private-key').val(evt.target.result).trigger('change');
                          } else {

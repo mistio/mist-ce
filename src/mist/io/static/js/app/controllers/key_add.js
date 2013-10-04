@@ -38,19 +38,19 @@ define('app/controllers/key_add', [
             },
 
             generateKey: function() {
-                $('#create-key-dialog .ajax-loader').fadeIn(200);
+                $('#action-loader').fadeIn(200);
                 $.ajax({
                     url: '/keys',
                     type: 'POST',
                     success: function(data) {
                         info('Successfully generated key');
-                        $('#create-key-dialog .ajax-loader').fadeOut(200);
+                        $('#action-loader').fadeOut(200);
                         Mist.keyAddController.set('newKeyPrivate', data.priv);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while generating key: ' + jqXHR.responseText);
                         error(textstate, errorThrown, ', while generating key. ', jqXHR.responseText);
-                        $('#create-key-dialog .ajax-loader').fadeOut(200);
+                        $('#action-loader').fadeOut(200);
                     }
                 });
             }
