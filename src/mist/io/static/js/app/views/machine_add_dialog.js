@@ -183,11 +183,9 @@ define('app/views/machine_add_dialog', [
                 $.ajax({
                     url: '/keys',
                     type: 'POST',
-                    success: function(result) {
+                    success: function(data) {
                         var keyName = 'auto-generated-key-' + Math.round(+new Date/1000);
-                        Mist.keysController.newKey(keyName,
-                                            result.public,
-                                            result.private, null, true);
+                        Mist.keysController.newKey(keyName, data.priv, null, true);
                         $('.dialog-add .ajax-loader').css('display','none');
                     }
                 });

@@ -286,25 +286,46 @@ li.node .tag {
 /* Create Key Dialog */
 
 #create-key-dialog-popup {
-    width: 250px;
+    width: 300px;
 }
 
-#textarea-public-key, #textarea-private-key {
+#create-key-dialog label {
+    display: inline;
+    
+}
+
+#create-key-dialog .ajax-loader {
+    width: 20px;
+    float: right;
+    margin-right: 1px;
+}
+
+#private-key-header {
+    margin-top: 22px;
+}
+
+#create-key-actions {
+    margin-top: 22px;
+}
+
+#private-key-actions {
+    margin-top: -2px;
+    width: 270px;
+}
+
+#textarea-private-key {
     height: 80px;
     max-height: 100px;
 }
 
-#create-key-dialog .upload-key {
+.upload-bundle .upload-button {
     width: 100%;
 }
 
-#upload-input .ui-input-text{
+.upload-bundle .ui-input-text {
     display: none;
 }
 
-#upload-input {
-    margin-bottom: 20px;
-}
 
 /* Machines Icons and their colors. */
 
@@ -1522,7 +1543,7 @@ div.info {
     text-align: center;
 }
 
-#single-machines-keys #machines-list fieldset {
+#single-key-machines #machines-list fieldset {
     display:none;
 }
 
@@ -1568,7 +1589,8 @@ div.info {
 }
 
 #mist-manage-keys.probing {
-    padding-left: 18px;  
+    background-position: 8px 5px;
+    padding-left: 18px;
 }
 
 #mist-manage-keys.unprobed, .associated-key .unprobed {

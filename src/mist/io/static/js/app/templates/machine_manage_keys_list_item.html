@@ -1,0 +1,5 @@
+<span class='associated-key'> <!-- doing this nesting to deal with ember's bindAttr helper >:( -->
+    <div {{bindAttr class="view.keyIcon"}} {{action keyClicked this target="view"}}>
+          {{this.name}}
+    </div>
+</span>

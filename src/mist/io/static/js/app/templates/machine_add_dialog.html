@@ -81,12 +81,10 @@
             <h2>Select Key</h2>
             <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
                 {{#each Mist.keysController.keys}}
-                    {{#if this.priv}}
-                    <li data-icon="false" data-corners="true">
+                    <li data-icon="false" data-corners="true" data-theme="d">
                         <a href="#" {{bindAttr title="name"}} 
                                     {{action selectKey this target="view"}}>{{this.name}}</a>
                     </li>
-                    {{/if}}
                 {{/each}}
             </ul>
         </div>

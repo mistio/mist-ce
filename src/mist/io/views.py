@@ -32,7 +32,8 @@ from mist.io.helpers import import_key, create_security_group
 from mist.io.helpers import get_keypair, get_keypair_by_name, get_preferred_keypairs
 from mist.io.helpers import run_command
 
-from mist.io.helpers import generate_keypair, set_default_key, get_private_key, validate_key_pair, get_ssh_user_from_keypair
+from mist.io.helpers import generate_keypair, generate_public_key, validate_keypair
+from mist.io.helpers import set_default_key, get_private_key, get_public_key, get_ssh_user_from_keypair
 
 try:
     from mist.core.helpers import get_user
@@ -1096,42 +1097,43 @@ def list_keys(request):
         keypairs = user.get('keypairs', {})
     
     return [{'name': key,
-            'machines': keypairs[key].get('machines', []),
-            'pub': keypairs[key]['public'],
-            'priv': keypairs[key]['private'] and True or False,
-            'default_key': keypairs[key].get('default', False)}
-                for key in keypairs.keys()]
+              'machines': keypairs[key]['machines'],
+               'default_key': keypairs[key]['default']}
+             for key in keypairs.keys()]
 
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
 def add_key(request):
     params = request.json_body
     key_id = params.get('name', '')
+    private_key = params.get('priv', '')
     
     if not key_id:
-        ret = Response('Key name not provided', 400)
+        return Response('Keypair name not provided', 400)
+    
+    if not private_key:
+        return Response('Private key not provided', 400)
     
     with get_user(request) as user:
         keypairs = user.get('keypairs',{})
             
         if key_id in keypairs:
-            return Response('Key "%s" already exists' % key_id, 400)
+            return Response('Keypair "%s" exists' % key_id, 400)
         
-        key = { 'public' : params.get('pub', ''),
-                'private' : params.get('priv', ''),
-                'default' : not len(keypairs) }
+        key = {'public' : generate_public_key(private_key),
+               'private' : private_key,
+               'default' : not len(keypairs),
+               'machines': []}
         
-        if key['public'] and key['private']:
-            if not validate_key_pair(key['public'], key['private']):
-                return Response('Key pair is not valid', 400)
+        if not validate_keypair(key['public'], key['private']):
+            # User probably gave an invalid private key
+            return Response('Invalid private key', 400)
         
         keypairs[key_id] = key
         
         return {'name': key_id,
-                'pub': key['public'],
-                'priv': key['private'],
-                'default_key': key['default'],
-                'machines': []}
+                'machines': [],
+                'default_key': key['default']}
 
 
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
@@ -1150,11 +1152,14 @@ def delete_key(request):
     key_id = request.matchdict.get('key', '')
     
     if not key_id:
-        return Response('Key name not provided', 400)
+        return Response('Keypair name not provided', 400)
     
     with get_user(request) as user:
         keypairs = user.get('keypairs',{})
         
+        if not key_id in keypairs.keys():
+            return Response('Keypair "%s" not found', 404)
+
         key = keypairs.pop(key_id)
         
         if key.get('default', False):
@@ -1162,25 +1167,23 @@ def delete_key(request):
                 new_default_key = keypairs.keys()[0]
                 keypairs[new_default_key]['default'] = True
         
-        return [{'name': key,
-                'machines': keypairs[key].get('machines', []),
-                'pub': keypairs[key]['public'],
-                'priv': keypairs[key]['private'] and True,
-                'default_key': keypairs[key].get('default', False)}
-                    for key in keypairs.keys()]
+    return list_keys(request)
 
 
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
-    params = request.json_body
-    key_id = params.get('name', '')
-    old_id = params.get('oldname', '')
+    
+    old_id = request.matchdict.get('key', '')
+    key_id = request.json_body.get('newName', '')
     
     if not old_id:
-        ret = Response('Old key name not provided', 400)
+        return Response('Old keypair name not provided', 400)
     
     if not key_id:
-        ret = Response('New key name not provided', 400)
+        return Response('New keypair name not provided', 400)
+    
+    if old_id == key_id:
+        return Response('Keypair is already named: %s' % key_id, 304)
     
     with get_user(request) as user:
         keypairs = user.get('keypairs',{})
@@ -1196,47 +1199,44 @@ def edit_key(request):
             keypairs.pop(old_id)
         
         if key['public'] and key['private']:
-            if not validate_key_pair(key['public'], key['private']):
+            if not validate_keypair(key['public'], key['private']):
                 return Response('Key pair is not valid', 400)
         
         keypairs[key_id] = key
         
-        return {'name': key_id,
-                'pub': key['public'],
-                'priv': key['private'],
-                'default': key['default'],
-                'machines': key['machines']}
+    return Response('OK', 200)
 
 
 @view_config(route_name='key_action', request_method='POST', renderer='json')
 def set_default_key_request(request):
     return set_default_key(request)
 
-
-@view_config(route_name='key_action', request_method='GET', renderer='json')
+@view_config(route_name='key_action', request_method='GET', request_param='action=private', renderer='json')
 def get_private_key_request(request):
     return get_private_key(request)
 
+@view_config(route_name='key_action', request_method='GET', request_param='action=public', renderer='json')
+def get_public_key_request(request):
+    return get_public_key(request)
 
 @view_config(route_name='keys', request_method='POST', renderer='json')
 def generate_keypair_request(request):
     return generate_keypair()
 
-
 @view_config(route_name='key_association', request_method='PUT', renderer='json')
 def associate_key_request(request):
     return associate_key(request,
-                          request.matchdict['key'],
-                           request.matchdict['backend'],
-                            request.matchdict['machine'])
+                         request.matchdict['key'],
+                         request.matchdict['backend'],
+                         request.matchdict['machine'])
 
 
 @view_config(route_name='key_association', request_method='DELETE', renderer='json')
 def disassociate_key_request(request):
     return disassociate_key(request,
-                             request.matchdict['key'],
-                              request.matchdict['backend'],
-                               request.matchdict['machine'])
+                            request.matchdict['key'],
+                            request.matchdict['backend'],
+                            request.matchdict['machine'])
 
 
 @view_config(route_name='monitoring', request_method='GET', renderer='json')
@@ -1351,8 +1351,8 @@ def delete_rule(request):
 
 def update_available_keys(request, backend_id, machine_id, ssh_user, host, authorized_keys):
     with get_user(request) as user:
-        keypairs = user['keypairs']
-    
+        keypairs = user.get('keypairs', {})
+
         # track which keypairs will be updated
         updated_keypairs = {}
         
@@ -1381,24 +1381,6 @@ def update_available_keys(request, backend_id, machine_id, ssh_user, host, autho
                 if exists:
                     break
                         
-            # if public key does not exist in our keypairs, add a new entry
-            if not exists:
-                if len(pub_key)>2:
-                    key_name = pub_key[2].strip('\r')
-                else:
-                    key_name = "%s@%s" % (ssh_user, host)
-                    if key_name in keypairs:
-                        i = 0
-                        while True:
-                            key_name = '%s@%s-%d' % (ssh_user, host, i)
-                            i+=1
-                            if key_name not in keypairs:
-                                break
-                keypairs[key_name] = {'public': ' '.join(pk.split(' ')[:2]),
-                                      'private': '',
-                                      'machines': [[backend_id, machine_id, 0, ssh_user]]}
-                updated_keypairs[key_name] = keypairs[key_name]
-
         if updated_keypairs:
             log.debug('update keypairs')
 
@@ -1456,47 +1438,50 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
 
     """
     log.debug("Associate key, deploy = %s" % deploy)
-    if not key_id or not machine_id or not backend_id:
-        return Response('Keypair, machine or backend not provided', 400)
+    
+    if not key_id:
+        return Response('Keypair name not provided', 400)
+    
+    if not machine_id:
+        return Response('Machine id not provided', 400)
+    
+    if not backend_id:
+        return Response('Backend id not provided', 400)
 
     with get_user(request) as user:
         keypairs = user.get('keypairs',{})
 
-        try:
-            keypair = keypairs[key_id]
-        except KeyError:
-            return Response('Keypair not found', 404)
+        if not key_id in keypairs.keys():
+            return Response('Keypair "%s" not found' % key_id, 404)
+
+        keypair = keypairs[key_id]
 
         machine_uid = [backend_id, machine_id]
         machines = keypair.get('machines', [])
         
         for machine in machines:
             if machine[:2] == machine_uid:
-                return Response('Keypair already associated to machine', 304)
-
+                return Response('Keypair "%s" already associated with machine "%d"' % (key_id, machine_id), 304)
         try:
             keypair['machines'].append(machine_uid)
         except KeyError: 
             # initialize machine associations array if it does not exist
             keypair['machines'] = [machine_uid]
-
+            
         if deploy:
             ret = deploy_key(request, keypair)
         
             if ret:
                 keypair['machines'][-1] += [int(time()), ret.get('ssh_user', ''), ret.get('sudoer', False)]
-                log.debug('save settings (associate key)')
                 log.debug("Associate key, %s" % keypair['machines'])
                 return keypair['machines']
             else:
                 if machine_uid in keypair['machines']:
                     keypair['machines'].remove(machine_uid)
-                log.debug("Associate key, %s" % keypair['machines'])
+                log.debug("Disassociate key, %s" % keypair['machines'])
                 
                 return Response('Failed to deploy key', 412)
         else:
-            log.debug('save settings (associate key2)')
-            log.debug("deploy false")
             return keypair['machines']
 
 
@@ -1507,8 +1492,14 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
     the machine.
 
     """
-    if not key_id or not machine_id or not backend_id:
-        return Response('Keypair, machine or backend not provided', 400)
+    if not key_id:
+        return Response('Keypair name not provided', 400)
+    
+    if not machine_id:
+        return Response('Machine id not provided', 400)
+    
+    if not backend_id:
+        return Response('Backend id not provided', 400)
 
     with get_user(request) as user:
         keypairs = user.get('keypairs',{})
@@ -1529,12 +1520,10 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
 
         #key not associated
         if not key_found: 
-            return Response('Keypair is not associated to this machine', 304)
+            return Response('Keypair "%s" is not associated with machine "%s"' % (key_id, machine_id), 304)
 
         if undeploy:
             ret = undeploy_key(request, keypair)
-
-        log.debug('save settings (disassociate key)')
 
         return keypair['machines']
 

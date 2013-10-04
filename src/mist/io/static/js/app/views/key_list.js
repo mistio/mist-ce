@@ -16,54 +16,54 @@ define('app/views/key_list', [
             selectedKey: null,
 
             selectedKeysObserver: function() {
-                var selectedKeysCount = 0;
                 var that = this;
-                Mist.keysController.keys.forEach(function(key) {
+                var selectedKeysCount = 0;
+                Mist.keysController.keys.some(function(key) {
                     if (key.selected) {
-                        selectedKeysCount++;
+                        if(++selectedKeysCount == 2) {
+                            $('#keys-footer a').addClass('ui-disabled');
+                            that.selectedKey = null;
+                            return true;
+                        }
                         that.selectedKey = key;
                     }
                 });
                 if (selectedKeysCount == 0) {
                     $('#keys-footer').fadeOut(200);
-                }
-                else if (selectedKeysCount == 1) {
+                } else if (selectedKeysCount == 1) {
                     $('#keys-footer').fadeIn(200);
                     $('#keys-footer a').removeClass('ui-disabled');
-                } else {
-                    $('#keys-footer a').addClass('ui-disabled');
                 }
             }.observes('Mist.keysController.keys.@each.selected'),
 
             createClicked: function() {
-               $("#create-key-dialog").popup("open");
+                $("#create-key-dialog").popup("open");
             },
 
             selectClicked: function() {
                 $('#select-keys-dialog').popup('open');
             },
 
-            selectModeClicked: function(mode) {
-                Mist.keysController.keys.forEach(function(key){
+            selectionModeClicked: function(mode) {
+                Mist.keysController.keys.forEach(function(key) {
                     key.set('selected', mode);
                 });
-                Ember.run.next(function(){
+                Ember.run.next(function() {
                     $("input[type='checkbox']").checkboxradio("refresh");
                 });
                 $('#select-keys-dialog').popup('close');
             },
 
             deleteClicked: function() {
-                var that = this;
+                var keyName = this.selectedKey.name;
                 Mist.confirmationController.set('title', 'Delete key');
-                Mist.confirmationController.set('text', 'Are you sure you want to delete "' + that.selectedKey.name +'" ?');
+                Mist.confirmationController.set('text', 'Are you sure you want to delete "' + keyName +'" ?');
                 Mist.confirmationController.set('callback', function() {
-                    Mist.keysController.deleteKey(that.selectedKey.name);                
+                    Mist.keysController.deleteKey(keyName);
                 });
-                Mist.confirmationController.set('fromDialog', true);
                 Mist.confirmationController.show();
             },
-            
+
             setDefaultClicked: function() {
                 Mist.keysController.setDefaultKey(this.selectedKey.name);
             }

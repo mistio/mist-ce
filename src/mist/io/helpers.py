@@ -510,8 +510,8 @@ def generate_keypair():
     """Generates a random keypair."""
     key = RSA.generate(2048, os.urandom)
     return {
-        'public': key.exportKey('OpenSSH'),
-        'private': key.exportKey()
+        #'pub': key.exportKey('OpenSSH'),
+        'priv': key.exportKey()
     }
 
 
@@ -525,10 +525,13 @@ def set_default_key(request):
     key_id = request.matchdict['key']
     
     if not key_id:
-        return Response('Keypair not found', 404)
+        return Response('Key name not provided', 400)
 
     with get_user(request) as user:
-        keypairs = user['keypairs']
+        keypairs = user.get('keypairs', {})
+
+        if not key_id in keypairs:
+            return Response('Keypair not found', 404)
 
         for key in keypairs:
             keypairs[key]['default'] = False
@@ -549,54 +552,34 @@ def get_private_key(request):
         keypairs = user['keypairs']
         key_id = request.matchdict['key']
         
-        if key_id in keypairs.keys():
+        if not key_id:
+            return Response('Key id not provided', 400)
+
+        if key_id in keypairs:
             return keypairs[key_id].get('private', '')
         else:
-            return Response('Keypair not found', 404)
+            return Response('Keypair not found %s' % key_id, 404)
 
 
-def validate_dsa_key_pair(public_key, private_key):
-    """ Validates a pair of dsa keys """
+def get_public_key(request):
+    try:
+        keypairs = request.environ['beaker.session']['keypairs']
+    except:
+        keypairs = request.registry.settings.get('keypairs', {})
     
-    # FIXME: Make this function validate private key too
-    
-    # Construct DSA key
-    keystring = binascii.a2b_base64(public_key.split(' ')[1])
-    keyparts = []
-    
-    while len(keystring) > 4:
-        length = struct.unpack('>I', keystring[:4])[0]
-        keyparts.append(keystring[4:4 + length])
-        keystring = keystring[4 + length:]
-        
-    if keyparts[0] == 'ssh-dss':
-        tup = [bytes_to_long(keyparts[x]) for x in (4, 3, 1, 2)]
-    else:
-        return False
-    
-    key = DSA.construct(tup)
-    
-    # Validate DSA key
-    fmt_error = not isPrime(key.p)
-    fmt_error |= ((key.p-1) % key.q)!=0 
-    fmt_error |= key.g<=1 or key.g>=key.p
-    fmt_error |= pow(key.g, key.q, key.p)!=1 
-    fmt_error |= key.y<=0 or key.y>=key.p 
-    
-    # The following piece of code is currently useless, because 'x' attribute is the private key
-    #if hasattr(key, 'x'):
-    #    fmt_error |= key.x<=0 or key.x>=key.q 
-    #    fmt_error |= pow(key.g, key.x, key.p)!=key.y 
-        
-    return not fmt_error
+    key_id = request.matchdict['key']
 
-def validate_key_pair(public_key, private_key):
-    """ Validates a pair of keys """
+    if key_id in keypairs.keys():
+        return keypairs[key_id]['public']
+    return Response('Keypair "%s" not found' % key_id, 404)
     
-    message = 'Encrypted message 1234567890'
+
+def validate_keypair(public_key, private_key):
+    """ Validates a pair of RSA keys """
+    
+    message = 'Message 1234567890'
     
     if 'ssh-rsa' in public_key:
-        
         public_key_container = RSA.importKey(public_key)
         private_key_container = RSA.importKey(private_key)
         encrypted_message = public_key_container.encrypt(message, 0)
@@ -604,12 +587,16 @@ def validate_key_pair(public_key, private_key):
         
         if message == decrypted_message:
             return True
-        
-    elif 'ssh-dss' in public_key:
-    
-        return validate_dsa_key_pair(public_key, private_key)
     
     return False
+
+
+def generate_public_key(private_key):
+    try:
+        key = RSA.importKey(private_key)
+        return key.publickey().exportKey('OpenSSH')
+    except:
+        return ''
 
 def get_preferred_keypairs(keypairs, backend_id, machine_id):
     """ Returns a list with the preferred keypairs for this machine
