@@ -411,6 +411,7 @@ def run_command(machine_id, host, ssh_user, private_key, command):
         of this message.
 
     """
+    log.error("runcommand(%s,%s,%s,%s,%s)" % (machine_id, host, ssh_user, private_key, command))
     if not host:
         log.error('Host not provided, exiting.')
         return Response('Host not set', 400)
