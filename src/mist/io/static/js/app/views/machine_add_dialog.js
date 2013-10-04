@@ -178,6 +178,7 @@ define('app/views/machine_add_dialog', [
             },
 
             generateKey: function() {
+                $('.generate-key-collapsible').addClass('ui-disabled');
                 $('.generate-key-collapsible .ui-icon').hide();
                 $('.dialog-add .ajax-loader').show();
                 $.ajax({
@@ -187,6 +188,12 @@ define('app/views/machine_add_dialog', [
                         var keyName = 'auto-generated-key-' + Math.round(+new Date/1000);
                         Mist.keysController.newKey(keyName, data.priv, null, true);
                         $('.dialog-add .ajax-loader').css('display','none');
+                        $('.generate-key-collapsible').removeClass('ui-disabled');
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while generating key');
+                        error(textstate, errorThrown, ' while getting public key. ', jqXHR.responseText);
+                        $('.generate-key-collapsible').removeClass('ui-disabled');
                     }
                 });
                 return false;
