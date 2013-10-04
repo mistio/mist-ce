@@ -170,6 +170,7 @@ def add_backend(request, renderer='json'):
                    'tenant_name': tenant_name,
                    'region': region,
                    'poll_interval': request.registry.settings['default_poll_interval'],
+                   'starred': provider in EC2_PROVIDERS and EC2_IMAGES[provider].keys() or [],
                    'enabled': True,
                   }
 
@@ -432,38 +433,39 @@ def create_machine(request):
         key_fd = os.fdopen(tmp_key, 'w+b')
         key_fd.write(private_key)
         key_fd.close()
-        
+
         #NephoScale has 2 keys that need be specified, console and ssh key
         #get the id of the ssh key if it exists, otherwise add the key
         try:
             server_key = ''        
-            keys = conn.list_ssh_keys()
+            keys = conn.ex_list_keypairs(ssh=True, key_group=1)
             for k in keys:
-                if key == k.get('public_key'):
-                    server_key = k.get('id')
+                if key == k.public_key:
+                    server_key = k.id
                     break
             if not server_key:
-                server_key = conn.add_ssh_key(machine_name, key)
+                server_key = conn.ex_create_keypair(machine_name, public_key=key)
         except:
-            server_key = conn.add_ssh_key('mistio'+str(random.randint(1,100000)), key)                          
+            server_key = conn.ex_create_keypair('mistio'+str(random.randint(1,100000)), public_key=key)                          
 
         #mist.io does not support console key add through the wizzard. Try to add one    
         try:
-            console_key = conn.add_password_key('mistio'+str(random.randint(1,100000)))
+            console_key = conn.ex_create_keypair('mistio'+str(random.randint(1,100000)), key_group=4)
         except:
-            console_keys = conn.list_all_keys(key_group=4)
+            console_keys = conn.ex_list_keypairs(key_group=4)
             if console_keys:
-                console_key = console_keys[0].get('id')        
+                console_key = console_keys[0].id
         try:
             node = conn.deploy_node(name=machine_name,
                              hostname=machine_name[:15],
                              image=image,
                              size=size,
-                             location=location.id,                             
+                             zone=location.id,                             
                              server_key=server_key,
                              console_key=console_key,
                              ssh_key=tmp_key_path,
                              connect_attempts=20,
+                             ex_wait=True,
                              deploy=deploy_script)
             associate_key(request, key_id, backend_id, node.id, deploy=False)
         except Exception as e:
@@ -919,29 +921,99 @@ def probe(request):
 
 @view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
-    """List images from each backend."""
+    """List images from each backend. 
+    Furthermore if a search_term is provided, we loop through each
+    backend and search for that term in the ids and the names of 
+    the community images"""
     try:
         conn = connect(request)
     except:
         return Response('Backend not found', 404)
 
+    backend_id = request.matchdict['backend']
+
     try:
-        if conn.type in EC2_PROVIDERS:
-            images = conn.list_images(None, EC2_IMAGES[conn.type].keys())
-            for image in images:
-                image.name = EC2_IMAGES[conn.type][image.id]
-        else:
-            images = conn.list_images()
+        backends = request.environ['beaker.session']['backends']
     except:
-        return Response('Backend unavailable', 503)
+        backends = request.registry.settings.get('backends', {})
+    
+    term = request.params.get('search_term')
+    
+    if term:
+        if conn.type in EC2_PROVIDERS:
+            images=[]
+            #import pdb; pdb.set_trace()            
+            community_images = conn.list_images(ex_owner="aws-marketplace")
+            for i in community_images:
+                if term in i.id or term.lower() in i.name.lower():
+                    images.append(i)
+            #import pdb;prb.set_trace()
+            for image in images:
+                image.name = EC2_IMAGES[conn.type].get(image.id, image.name)                          
+    else:
+        try:
+            if conn.type in EC2_PROVIDERS:
+                starred_images = backends[backend_id].get('starred', [])
+                images = []
+                if starred_images:
+                    images = conn.list_images(ex_image_ids = starred_images)
+                my_images = conn.list_images(ex_owner = "self")
+                amazon_images = conn.list_images(ex_owner="amazon")
+                for i in amazon_images+my_images:
+                    if i not in images: 
+                        images.append(i)
+                        
+                for image in images:
+                    #image.name = EC2_IMAGES[conn.type][image.id]
+                    #if not image.name:
+                    #    image.name = EC2_IMAGES[conn.type].get(image.id, image.id)
+                    image.name = EC2_IMAGES[conn.type].get(image.id, image.name)
+            else:
+                images = conn.list_images()
+        except:
+            return Response('Backend unavailable', 503)
+    
 
     ret = []
     for image in images:
+        if image.id in backends[backend_id].get('starred', []):
+            star = True
+        else:
+            star = False
         ret.append({'id'    : image.id,
                     'extra' : image.extra,
                     'name'  : image.name,
+                    'star'  : star, 
                     })
     return ret
+
+@view_config(route_name='image', request_method='POST', renderer='json')
+def star_image(request):
+    """Toggle image as starred."""
+    try:
+        conn = connect(request)
+    except:
+        return Response('Backend not found', 404)
+
+    backend_id = request.matchdict['backend']
+    image_id = request.matchdict['image']
+
+    try:
+        backends = request.environ['beaker.session']['backends']
+    except:
+        backends = request.registry.settings.get('backends', {})
+    
+    if backends[backend_id].get('starred', None):
+        if image_id in backends[backend_id]['starred']:
+            backends[backend_id]['starred'].remove(image_id)
+        else:
+            backends[backend_id]['starred'].append(image_id)
+    else:
+        backends[backend_id]['starred'] = [image_id]
+        
+    save_settings(request)
+
+    return {}
 
 
 @view_config(route_name='sizes', request_method='GET', renderer='json')
@@ -1146,7 +1218,7 @@ def get_private_key_request(request):
     return get_private_key(request)
 
 
-@view_config(route_name='key_generate', request_method='GET', renderer='json')
+@view_config(route_name='keys', request_method='POST', renderer='json')
 def generate_keypair_request(request):
     return generate_keypair()
 

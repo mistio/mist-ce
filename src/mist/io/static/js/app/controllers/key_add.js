@@ -52,8 +52,8 @@ define('app/controllers/key_add', [
                 $('#create-key-dialog .ajax-loader').fadeIn(200);
                 var that = this;
                 $.ajax({
-                    url: '/key_generate',
-                    type: 'GET',
+                    url: '/keys',
+                    type: 'POST',
                     success: function(result) {
                         info('Successfully generated key');
                         $('#create-key-dialog .ajax-loader').fadeOut(200);

@@ -50,9 +50,21 @@ define('app/controllers/images', [
                         return;
                     }
                     var content = new Array();
+                    
+                    that.set('renderIndex', 0);
                     data.forEach(function(item){
                         item.backend = that.backend;
-                        content.push(Image.create(item));
+                        var image = Image.create(item);
+                        content.push(image);
+                        if ((item.star && that.renderIndex < 20) || Mist.renderedImages.content.length < 10) {
+                            if (item.star){
+                            	Mist.renderedImages.content.unshiftObject(image);
+                            }
+                            else {
+                            	Mist.renderedImages.content.pushObject(image);                            	
+                            }
+                            that.set('renderIndex', content.indexOf(image));
+                        }
                     });
                     that.set('content', content);
                     Mist.backendsController.getImageCount();
