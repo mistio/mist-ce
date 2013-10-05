@@ -6,7 +6,7 @@
     
     <div id="private-key-header">
         <label for="textarea-private-key">Private Key:</label>
-        <div class="ajax-loader"></div>
+        <div id="action-loader" class="ajax-loader"></div>
     </div>
     {{view Ember.TextArea
         valueBinding="Mist.keyAddController.newKeyPrivate"
@@ -20,6 +20,8 @@
     <div class="upload-bundle">
         <input type="file" class="upload-input" name="file" {{action uploadInputChanged on="change" target="view"}}/>
     </div>
+
+    <div id="create-loader" class="ajax-loader"></div>
 
     <div id="create-key-actions" class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
         <a href="#" data-role="button" {{action backClicked target="view"}}>Back</a>

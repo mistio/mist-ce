@@ -294,10 +294,15 @@ li.node .tag {
     
 }
 
-#create-key-dialog .ajax-loader {
+#create-key-dialog #action-loader {
     width: 20px;
     float: right;
     margin-right: 1px;
+}
+
+#create-key-dialog #create-loader {
+    margin-top: 10px;
+    margin-bottom: -9px;
 }
 
 #private-key-header {

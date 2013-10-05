@@ -1185,20 +1185,18 @@ def edit_key(request):
     with get_user(request) as user:
         keypairs = user.get('keypairs',{})
         
-        key = {'public' : params.get('pub', ''),
-                'private' : params.get('priv', ''),
-                'default' : keypairs[old_id].get('default', False),
-                'machines' : keypairs[old_id].get('machines', [])}
-
-        if old_id != key_id:
-            if key_id in keypairs:
-                return Response('Key "%s" already exists' % key_id, 400)
-            keypairs.pop(old_id)
+        if not old_id in keypairs:
+            return Response('Keypair "%s" not found' % old_id, 404)
         
-        if key['public'] and key['private']:
-            if not validate_keypair(key['public'], key['private']):
-                return Response('Key pair is not valid', 400)
+        if key_id in keypairs:
+            return Response('Keypair "%s" exists' % key_id, 400)
         
+        key = {'public': keypairs[old_id]['public'],
+                'private': keypairs[old_id]['private'],
+                'default': keypairs[old_id]['default'],
+                'machines': keypairs[old_id]['machines']}
+        
+        keypairs.pop(old_id)
         keypairs[key_id] = key
         
     return Response('OK', 200)
