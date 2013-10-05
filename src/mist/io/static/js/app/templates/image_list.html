@@ -31,7 +31,7 @@
         data-inset="true"
         data-theme="c"
         data-filter-placeholder="Filter images...">
-            {{#each Mist.renderedImages}}
+            {{#each view.renderedImages}}
                 {{view Mist.ImageListItemView imageBinding="this" class="node" }}
             {{/each}}            
         </ul>

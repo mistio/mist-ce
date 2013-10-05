@@ -13,6 +13,7 @@ define('app/controllers/backends', [
             content: [],
             machineCount: 0,
             imageCount: 0,
+            loadingImages: true,
             
             // TODO make this property dynamic according to all backends states
             state: "waiting",
@@ -27,14 +28,15 @@ define('app/controllers/backends', [
                 return false;
             }.property('@each.loadingMachines'),
             
-            loadingImages: function() {
+            loadingImagesObserver: function() {
                 for (var i = 0; i < this.content.length; i++) {
                     if (this.content[i].loadingImages) {
-                        return true;
+                        this.set('loadingImages', true);
+                        return;
                     }
                 }
-                return false;
-            }.property('@each.loadingImages'),
+                this.set('loadingImages', false);
+            }.observes('content.@each.loadingImages'),
             
             isOK: function() {
                 if(this.state == 'state-ok') {

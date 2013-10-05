@@ -38,7 +38,7 @@ define('app/controllers/images', [
                 if (!this.backend.enabled) {
                     return;
                 }
-                else if (this.backend.error && this.backend.state == 'offline'){
+                else if (this.backend.error && this.backend.state == 'offline') {
                     return;
                 }
                 
@@ -47,22 +47,14 @@ define('app/controllers/images', [
                 var that = this;
                 $.getJSON('/backends/' + this.backend.id + '/images', function(data) {
                     if (!that.backend.enabled) {
+                        that.backend.set('loadingImages', false);
                         return;
                     }
                     var content = new Array();
-                    
-                    data.forEach(function(item){
-                        item.backend = that.backend;
+                    data.forEach(function(item) {
                         var image = Image.create(item);
+                        image.backend = that.backend;
                         content.push(image);
-                        if ((item.star || Mist.renderedImages.content.length < 10) && Mist.renderedImages.content.indexOf(item) ==-1) {
-                            if (item.star){
-                            	Mist.renderedImages.content.unshiftObject(image);
-                            }
-                            else {
-                            	Mist.renderedImages.content.pushObject(image);                            	
-                            }
-                        }
                     });
                     that.set('content', content);
                     Mist.backendsController.getImageCount();

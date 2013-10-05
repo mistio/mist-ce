@@ -920,24 +920,33 @@ def probe(request):
     return Response('No valid keys for server', 405)
 
 
+@view_config(route_name='images', request_method='POST', renderer='json')
+def list_specific_images(request):
+    return list_images(request)
+
 @view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
     """List images from each backend. 
     Furthermore if a search_term is provided, we loop through each
     backend and search for that term in the ids and the names of 
     the community images"""
+    
     try:
         conn = connect(request)
     except:
         return Response('Backend not found', 404)
-
+    
     backend_id = request.matchdict['backend']
-
-    term = request.params.get('search_term')
+    
+    term = ''
+    try:
+        term = request.json_body.get('search_term', '')
+    except:
+        pass
     
     with get_user(request, readonly=True) as user:
         backends = user.get('backends', {})
-
+    
     if term:
         if conn.type in EC2_PROVIDERS:
             images=[]

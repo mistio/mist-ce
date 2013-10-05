@@ -478,7 +478,7 @@ a#mist-select-machines-button span.ui-btn-text {
 }
 
 #images-advanced-search {
-	display: none;
+	display: block;
 }
 
 #machines-list .alert-icon {
