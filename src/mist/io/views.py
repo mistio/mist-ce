@@ -1446,7 +1446,7 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
     with get_user(request) as user:
         keypairs = user.get('keypairs',{})
 
-        if not key_id in keypairs.keys():
+        if not key_id in keypairs:
             return Response('Keypair "%s" not found' % key_id, 404)
 
         keypair = keypairs[key_id]
@@ -1463,21 +1463,21 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
             # initialize machine associations array if it does not exist
             keypair['machines'] = [machine_uid]
             
-        if deploy:
-            ret = deploy_key(request, keypair)
-        
-            if ret:
-                keypair['machines'][-1] += [int(time()), ret.get('ssh_user', ''), ret.get('sudoer', False)]
-                log.debug("Associate key, %s" % keypair['machines'])
-                return keypair['machines']
-            else:
-                if machine_uid in keypair['machines']:
-                    keypair['machines'].remove(machine_uid)
-                log.debug("Disassociate key, %s" % keypair['machines'])
-                
-                return Response('Failed to deploy key', 412)
-        else:
+    if deploy:
+        ret = deploy_key(request, keypair)
+    
+        if ret:
+            keypair['machines'][-1] += [int(time()), ret.get('ssh_user', ''), ret.get('sudoer', False)]
+            log.debug("Associate key, %s" % keypair['machines'])
             return keypair['machines']
+        else:
+            if machine_uid in keypair['machines']:
+                keypair['machines'].remove(machine_uid)
+            log.debug("Disassociate key, %s" % keypair['machines'])
+            
+            return Response('Failed to deploy key', 412)
+    else:
+        return keypair['machines']
 
 
 def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
@@ -1513,12 +1513,12 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
                 key_found = True
                 break
 
-        #key not associated
-        if not key_found: 
-            return Response('Keypair "%s" is not associated with machine "%s"' % (key_id, machine_id), 304)
+    #key not associated
+    if not key_found: 
+        return Response('Keypair "%s" is not associated with machine "%s"' % (key_id, machine_id), 304)
 
-        if undeploy:
-            ret = undeploy_key(request, keypair)
+    if undeploy:
+        ret = undeploy_key(request, keypair)
 
         return keypair['machines']
 
