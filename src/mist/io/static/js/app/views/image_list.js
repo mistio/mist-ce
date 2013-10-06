@@ -118,7 +118,7 @@ define('app/views/image_list', [
                 $(".ajax-loader").fadeIn();
                 $('#images-advanced-search span').text('Loading...');
                 that.set('renderedImages', new Array());
-                Mist.backendsController.content.some(function(backend) {
+                Mist.backendsController.content.forEach(function(backend, index) {
                     $.ajax({
                         url: '/backends/' + backend.id + '/images',
                         type: 'POST',
@@ -137,14 +137,18 @@ define('app/views/image_list', [
                                     that.renderedImages.pushObject(image);
                                 }
                             });
-                            $('#images .ajax-loader').fadeOut();
-                            $('#images-advanced-search span').text('Continue search on server...');
+                            if (index == Mist.backendsController.content.length - 1) {
+                                $('#images .ajax-loader').fadeOut();
+                                $('#images-advanced-search span').text('Continue search on server...');                          
+                            }
                         },
                         error: function(jqXHR, textstate, errorThrown) {
                             Mist.notificationController.notify('Error while searching for term: ' + jqXHR.responseText);
                             error(textstate, errorThrown, ' while searching term');
-                            $('#images .ajax-loader').fadeOut();
-                            $('#images-advanced-search span').text('Continue search on server...');
+                            if (index == Mist.backendsController.content.length - 1) {
+                                $('#images .ajax-loader').fadeOut();
+                                $('#images-advanced-search span').text('Continue search on server...');                          
+                            }
                         }
                     });
                 });
