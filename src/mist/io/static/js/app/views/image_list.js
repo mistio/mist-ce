@@ -19,8 +19,8 @@ define('app/views/image_list', [
                 this._super();
                 var that=this;
                 Ember.run.next(function() {
-                    $("#images-advanced-search").css('display', 'none');
-                    $(".ajax-loader").fadeIn();
+                    $('#images-advanced-search').css('display', 'none');
+                    $('#images .ajax-loader').fadeIn();
                 });
                 Ember.run.later(function(){
                     that.renderImages();
@@ -88,7 +88,7 @@ define('app/views/image_list', [
                         }
                     });
                 });
-                $(".ajax-loader").fadeOut();
+                $('#images .ajax-loader').fadeOut();
                 this.set('renderedImages', newRenderedImages);
             },
 
@@ -137,13 +137,13 @@ define('app/views/image_list', [
                                     that.renderedImages.pushObject(image);
                                 }
                             });
-                            $(".ajax-loader").fadeOut();
+                            $('#images .ajax-loader').fadeOut();
                             $('#images-advanced-search span').text('Continue search on server...');
                         },
                         error: function(jqXHR, textstate, errorThrown) {
                             Mist.notificationController.notify('Error while searching for term: ' + jqXHR.responseText);
                             error(textstate, errorThrown, ' while searching term');
-                            $(".ajax-loader").fadeOut();
+                            $('#images .ajax-loader').fadeOut();
                             $('#images-advanced-search span').text('Continue search on server...');
                         }
                     });
