@@ -33,11 +33,6 @@ define('app/views/image_list', [
             scrollHandler: function() {
                 var that = this;
                 $(window).on('scroll', function() {
-                    /**
-                     * If the search field is empty we load the next 30 random images,
-                     * if it contains a string we append the next 20 who have the string
-                     * in the name of the image
-                     */
                     if (that.isScrolledToBottom()) {
                         var searchText = $('input.ui-input-text').eq(2).val();
                         var counter = 0;
@@ -138,7 +133,7 @@ define('app/views/image_list', [
                                 if (backend.images.content.indexOf(image) == -1) {
                                     backend.images.content.pushObject(image);
                                 }
-                                if (++counter < 20) {
+                                if (++counter < 30) {
                                     that.renderedImages.pushObject(image);
                                 }
                             });
