@@ -65,7 +65,8 @@ define('app/views/backend_edit', [
             },
 
             toggleBackend: function() {
-                var newState = $('.backend-toggle').val() == "1" ? "True" : "False";
+                var newStateToNum = $('.backend-toggle').val();
+                var newState = newStateToNum == "1" ? "True" : "False";
                 var payload = {
                     'newState': newState
                 };
@@ -89,7 +90,8 @@ define('app/views/backend_edit', [
                         error(textstate, errorThrown, ' while toggling backend');
                         that.backend.set('enabled', !newState);
                         that.backend.toggle();
-                        Ember.run.next(function(){
+                        Ember.run.next(function() {
+                            $('.backend-toggle').val(newStateToNum == "1" ? "0" : "1");
                             $('.backend-toggle').slider('refresh');
                         });
                     }
