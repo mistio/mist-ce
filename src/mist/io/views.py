@@ -130,12 +130,14 @@ def list_backends(request):
     .. note:: Currently, this is only used by the backend controller in js.
 
     """
-    with get_user(request, readonly=True) as user:
+    with get_user(request) as user:
         if not user:
             return Response('Unauthorized', 401)
         ret = []
         for backend_id in user['backends']:
             backend = user['backends'][backend_id]
+            if not backend.get('starred', None):
+                backend['starred'] = backend['provider'] in EC2_PROVIDERS and EC2_IMAGES[backend['provider']].keys() or []
             ret.append({'id': backend_id,
                         'apikey': backend.get('apikey', None),
                         'title': backend.get('title', backend['provider']),
