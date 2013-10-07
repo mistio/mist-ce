@@ -1127,9 +1127,10 @@ def list_keys(request):
     with get_user(request, readonly=True) as user:
         keypairs = user.get('keypairs', {})
     
-    return [{'name': key,
-              'machines': keypairs[key].get('machines',[]),
-               'default_key': keypairs[key].get('default', False)}
+    return [{'id': key.replace(' ', ''),
+             'name': key,
+             'machines': keypairs[key].get('machines',[]),
+             'default_key': keypairs[key].get('default', False)}
              for key in keypairs.keys()]
 
 
@@ -1484,7 +1485,8 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
         
         for machine in machines:
             if machine[:2] == machine_uid:
-                return Response('Keypair "%s" already associated with machine "%d"' % (key_id, machine_id), 304)
+                log.debug('Keypair "%s" already associated with machine "%s"' % (key_id, machine_id))
+                return keypair['machines']
         try:
             keypair['machines'].append(machine_uid)
         except KeyError: 

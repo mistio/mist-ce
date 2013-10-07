@@ -9,6 +9,7 @@ define('app/models/key', [
     function() {
         return Ember.Object.extend({
 
+            id: null,
             name: null,
             probing: null,
             machines: null,
