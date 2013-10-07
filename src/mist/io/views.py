@@ -33,7 +33,7 @@ from mist.io.helpers import get_keypair, get_keypair_by_name, get_preferred_keyp
 from mist.io.helpers import run_command
 
 from mist.io.helpers import generate_keypair, generate_public_key, validate_keypair
-from mist.io.helpers import set_default_key, get_private_key, get_public_key, get_ssh_user_from_keypair
+from mist.io.helpers import set_default_key, get_private_key, get_public_key, get_ssh_user_from_keypair, get_auth_key
 
 try:
     from mist.core.helpers import get_user
@@ -63,6 +63,31 @@ def home(request):
             'js_build': js_build,
             'js_log_level': js_log_level}
 
+
+@view_config(route_name="check_auth", request_method='POST', renderer="json")
+def check_auth(request):
+    "Check on the mist.core service if authenticated"
+    params = request.json_body
+    email = params.get('email', '').lower()
+    password = params.get('password', '')
+    timestamp = params.get('timestamp', '')
+    hash_key = params.get('hash', '')
+
+    payload = {'email': email, 'password': password, 'timestamp': timestamp, 'hash_key': hash_key}
+    core_uri = request.registry.settings['core_uri']
+    ret = requests.post(core_uri + '/auth', params=payload, verify=False)
+
+    if ret.status_code == 200:
+        ret = json.loads(ret.content)
+        with get_user(request) as user:
+            user['email'] = email
+            user['password'] = password
+        request.registry.settings['auth'] = 1
+        log.info("succesfully check_authed")
+        return ret
+    else:
+        return Response('Unauthorized', 401)
+        
 
 @view_config(route_name='account', request_method='POST', renderer='json')
 def update_user_settings(request, renderer='json'):
@@ -1249,14 +1274,14 @@ def check_monitoring(request):
 
     """
     core_uri = request.registry.settings['core_uri']
-    email = request.registry.settings.get('email','')
-    password = request.registry.settings.get('password','')
+    with get_user(request, readonly=True) as user:
+        email = user.get('email', '')
+        password = user.get('password', '')
 
     timestamp = datetime.utcnow().strftime("%s")
     auth_key = get_auth_key(request)
 
     payload = {'auth_key': auth_key}
-
     ret = requests.get(core_uri+request.path, params=payload, verify=False)
     if ret.status_code == 200:
         return ret.json()
@@ -1418,19 +1443,13 @@ def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, s
         if default != None:
             keypair['default'] = default
 
-        log.debug("Keypair is : %s" % keypair)
+        #~ log.debug("Keypair is : %s" % keypair)
         for machine in keypair.get('machines',[]):
             if [backend_id, machine_id] == machine[:2]:
                 keypairs[key_id]['machines'][keypair['machines'].index(machine)] = [backend_id, machine_id, timestamp, ssh_user, sudoer]
             else:
                 log.debug("Machines are : %s" % keypair.get('machines', []))
 
-        try:
-            log.debug('save settings (save keypair)')
-        except Exception, e:
-            log.error('Error saving keypair %s: %s' % (key_id, e))
-            return False
-            
         return True
 
 

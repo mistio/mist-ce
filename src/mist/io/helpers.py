@@ -209,7 +209,7 @@ def get_keypair(keypairs, backend_id=None, machine_id=None):
 def get_ssh_user_from_keypair(keypair, backend_id=None, machine_id=None):
     """get ssh user for key pair given the key pair"""
     machines = keypair.get('machines', [])
-    log.debug("Machines in keypair %s: %s" % (keypair, machines))
+    #~ log.debug("Machines in keypair %s: %s" % (keypair, machines))
     for machine in machines:
         log.debug("Machine: %s" % machine)
         if machine[:2] == [backend_id, machine_id]:
@@ -411,7 +411,7 @@ def run_command(machine_id, host, ssh_user, private_key, command):
         of this message.
 
     """
-    log.error("runcommand(%s,%s,%s,%s,%s)" % (machine_id, host, ssh_user, private_key, command))
+    #~ log.error("runcommand(%s,%s,%s,%s,%s)" % (machine_id, host, ssh_user, private_key, command))
     if not host:
         log.error('Host not provided, exiting.')
         return Response('Host not set', 400)
