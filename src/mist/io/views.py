@@ -1163,7 +1163,8 @@ def add_key(request):
         
         keypairs[key_id] = key
         
-        return {'name': key_id,
+        return {'id': key_id,
+                'name': key_id,
                 'machines': [],
                 'default_key': key['default']}
 
