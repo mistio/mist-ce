@@ -1025,27 +1025,26 @@ def star_image(request):
         conn = connect(request)
     except:
         return Response('Backend not found', 404)
-
+    
     backend_id = request.matchdict['backend']
     image_id = request.matchdict['image']
+    
 
-    with get_user(request, readonly=True) as user:
+    with get_user(request) as user:
         backends = user.get('backends', {})
 
-    if not backend_id in backends:
-        return Response('Backend id not found %s' % backend_id, 400)
-
-    if backends[backend_id].get('starred', None):
-        if image_id in backends[backend_id]['starred']:
-            backends[backend_id]['starred'].remove(image_id)
+        if not backend_id in backends:
+            return Response('Backend id not found %s' % backend_id, 400)
+    
+        if backends[backend_id].get('starred', None):
+            if image_id in backends[backend_id]['starred']:
+                backends[backend_id]['starred'].remove(image_id)
+            else:
+                backends[backend_id]['starred'].append(image_id)
         else:
-            backends[backend_id]['starred'].append(image_id)
-    else:
-        backends[backend_id]['starred'] = [image_id]
+            backends[backend_id]['starred'] = [image_id]
         
-    save_settings(request)
-
-    return {}
+    return Response('OK', 200)
 
 
 @view_config(route_name='sizes', request_method='GET', renderer='json')

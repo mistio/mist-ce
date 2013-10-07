@@ -33,7 +33,7 @@ define('app/views/image_list', [
             scrollHandler: function() {
                 var that = this;
                 $(window).on('scroll', function() {
-                    if (that.isScrolledToBottom()) {
+                    if (Mist.isScrolledToBottom()) {
                         var searchText = $('input.ui-input-text').eq(2).val();
                         var counter = 0;
                         Mist.backendsController.content.some(function(backend) {
@@ -43,15 +43,15 @@ define('app/views/image_list', [
                                         return false;
                                     }
                                     // Filter out Windows
-                                    if (image.name.indexOf('Windows') != -1 || image.name.indexOf('windows') != -1) {
+                                    if (image.name.toLowerCase().indexOf('windows') != -1) {
                                         return false;
                                     }
                                     that.renderedImages.pushObject(image);
-                                    if (++counter == 30)
+                                    if (++counter == 20)
                                         return true;
                                 }
                             });
-                            if (counter == 30)
+                            if (counter == 20)
                                 return true;
                         });
                     }
@@ -65,6 +65,7 @@ define('app/views/image_list', [
                         $("#images-advanced-search").show();
                     }else {
                         $("#images-advanced-search").hide();
+                        that.renderImages();
                     }
                 });
             },
@@ -103,12 +104,6 @@ define('app/views/image_list', [
                 $(window).off('scroll');
             },
 
-            isScrolledToBottom: function() {
-                var distanceToTop = $(document).height() - $(window).height();
-                top = $(document).scrollTop();
-                return top === distanceToTop;
-            },
-
             advancedSearchClicked: function() {
                 var searchText = $('input.ui-input-text').eq(2).val();
                 var payload = {
@@ -127,14 +122,15 @@ define('app/views/image_list', [
                         success: function(data) {
                             var counter = 0;
                             var exists = false;
-                            data.forEach(function(item) {
+                            data.some(function(item) {
                                 image = Image.create(item);
                                 image.backend = backend;
                                 if (backend.images.content.indexOf(image) == -1) {
                                     backend.images.content.pushObject(image);
                                 }
-                                if (++counter < 30) {
-                                    that.renderedImages.pushObject(image);
+                                that.renderedImages.pushObject(image);
+                                if (++counter == 15) {
+                                    return true;
                                 }
                             });
                             if (index == Mist.backendsController.content.length - 1) {

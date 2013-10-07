@@ -223,6 +223,21 @@ define( 'app', [
               this.target = 'keys';
           } 
         });  
+        
+            // we check if we are at the bottom of the page
+        App.isScrolledToBottom = function(){
+            var distanceToViewportTop = (
+                $(document).height() - $(window).height());
+            var viewPortTop = $(document).scrollTop();
+        
+            if (viewPortTop === 0) {
+                // if we are at the top of the page, don't do
+                // the infinite scroll thing
+                return false;
+            }
+        
+            return (viewPortTop - distanceToViewportTop === 0);
+        };        
 
         App.SingleMachineView = SingleMachineView;
         App.MachineListView = MachineListView;
@@ -367,6 +382,7 @@ define( 'app', [
         window.Mist = App;
         return App
     }
+    
 
     var allImgs = [],
         imgUrls = [],
