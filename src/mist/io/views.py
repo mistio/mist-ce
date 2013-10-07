@@ -244,8 +244,19 @@ def delete_backend(request, renderer='json'):
     return Response('OK', 200)
 
 
-@view_config(route_name='backend_action', request_method='POST', request_param="action=toggle", renderer='json')
+@view_config(route_name='backend_action', request_method='POST', renderer='json')
 def toggle_backend(request):
+    new_state = request.json_body.get('newState', '')
+    if not new_state:
+        return Response('New backend state not provided', 400)
+    
+    if new_state == "True":
+        new_state = True
+    elif new_state == "False":
+        new_state = False
+    else:
+        return Response('Invalid backend state', 400)
+    
     with get_user(request) as user:
         if not user:
             return Response('Unauthorized', 401)
@@ -256,10 +267,9 @@ def toggle_backend(request):
         if not backends or not backend_id or not backend_id in backends:
             return Response('Bad Request', 400)
 
-        state = backends[backend_id]['enabled']
-        user['backends'][backend_id]['enabled'] = not state
+        user['backends'][backend_id]['enabled'] = new_state
         
-    return {'state': not state,}
+    return Response('OK', 200)
 
 
 @view_config(route_name='machines', request_method='GET', renderer='json')
