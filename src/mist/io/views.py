@@ -974,16 +974,15 @@ def list_images(request):
     with get_user(request, readonly=True) as user:
         backends = user.get('backends', {})
     
-    if term:
-        if conn.type in EC2_PROVIDERS:
-            images=[]
-            community_images = conn.list_images(ex_owner="aws-marketplace")
-            amazon_images = conn.list_images(ex_owner="amazon")
-            for i in community_images+amazon_images:
-                if term in i.id or term.lower() in i.name.lower():
-                    images.append(i)
-            for image in images:
-                image.name = EC2_IMAGES[conn.type].get(image.id, image.name)                          
+    if term and conn.type in EC2_PROVIDERS:
+        images=[]
+        community_images = conn.list_images(ex_owner="aws-marketplace")
+        amazon_images = conn.list_images(ex_owner="amazon")
+        for i in community_images+amazon_images:
+            if term in i.id or term.lower() in i.name.lower():
+                images.append(i)
+        for image in images:
+            image.name = EC2_IMAGES[conn.type].get(image.id, image.name)                          
     else:
         try:
             if conn.type in EC2_PROVIDERS:
