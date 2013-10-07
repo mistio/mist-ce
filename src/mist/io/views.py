@@ -978,7 +978,8 @@ def list_images(request):
         if conn.type in EC2_PROVIDERS:
             images=[]
             community_images = conn.list_images(ex_owner="aws-marketplace")
-            for i in community_images:
+            amazon_images = conn.list_images(ex_owner="amazon")
+            for i in community_images+amazon_images:
                 if term in i.id or term.lower() in i.name.lower():
                     images.append(i)
             for image in images:
@@ -991,8 +992,7 @@ def list_images(request):
                 if starred_images:
                     images = conn.list_images(ex_image_ids = starred_images)
                 my_images = conn.list_images(ex_owner = "self")
-                amazon_images = conn.list_images(ex_owner="amazon")
-                for i in amazon_images+my_images:
+                for i in my_images:
                     if i not in images: 
                         images.append(i)
                         

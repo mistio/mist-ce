@@ -128,7 +128,11 @@ define('app/views/image_list', [
                                 if (backend.images.content.indexOf(image) == -1) {
                                     backend.images.content.pushObject(image);
                                 }
-                                that.renderedImages.pushObject(image);
+                                if (image.star){
+                                    that.renderedImages.unshiftObject(image);                                    
+                                }else {
+                                    that.renderedImages.pushObject(image);
+                                }
                                 if (++counter == 15) {
                                     return true;
                                 }
