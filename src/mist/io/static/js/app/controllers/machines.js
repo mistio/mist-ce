@@ -50,6 +50,14 @@ define('app/controllers/machines', [
                                     machine_id = machine_tuple[1];
                                     if (that.backend.id == backend_id && machine.id == machine_id && machine.hasMonitoring == false) {
                                         machine.set('hasMonitoring', true);
+                                        Mist.rulesController.content.forEach(function(rule) {
+                                            if ($.isArray(rule['machine'])) {
+                                                warn('Yeay!');
+                                                if (rule['machine'][0] == backend_id && rule['machine'][1] == machine_id) {
+                                                    rule['machine'] = that;
+                                                }
+                                            } 
+                                        });
                                         return false;
                                     }
                                  });

@@ -161,6 +161,12 @@ define('app/controllers/backends', [
                                 var rule = {};
                                 rule['id'] = ruleId;
                                 rule['machine'] = that.getMachineById(rules[ruleId]['backend'], rules[ruleId]['machine']);
+                                if (!rule['machine']) {
+                                    // Mist hasn't loaded this machine yet
+                                    rule['machine'] = new Array();
+                                    rule['machine'][0] = rules[ruleId]['backend'];
+                                    rule['machine'][1] = rules[ruleId]['machine'];
+                                }
                                 rule['metric'] = rules[ruleId]['metric'];
                                 rule['operator'] = Mist.rulesController.getOperatorByTitle(rules[ruleId]['operator']);
                                 rule['value'] = rules[ruleId]['value'];
