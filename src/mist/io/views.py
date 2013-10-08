@@ -986,52 +986,30 @@ def list_images(request):
         starred = backends.get(backend_id, {}).get('starred', [])
         # Initialize arrays
         starred_images = []
-        hardcoded_images = []
+        ec2_images = []
         rest_images = []
         images = []
-        # Get ec2 images
         if conn.type in EC2_PROVIDERS:
-            if starred:
-                starred_images = conn.list_images(ex_image_ids = starred)
-                for image in starred_images:
-                    image.name = EC2_IMAGES[conn.type].get(image.id, image.name)
-            hardcoded_images = conn.list_images(None, EC2_IMAGES[conn.type].keys())
-            for image in hardcoded_images:
-                image.name = EC2_IMAGES[conn.type][image.id]
-        # Get rest images
+            ec2_images = conn.list_images(None, EC2_IMAGES[conn.type].keys() + starred)
+            for image in ec2_images:
+                image.name = EC2_IMAGES[conn.type].get(image.id, image.name)
         else:
             rest_images = conn.list_images()
-            for image in rest_images:
-                if image.id in starred:
-                    starred_images.append(image)
-        # If user wants to search images
-        if term:
-            # Get ec2 extensive list of images
-            if conn.type in EC2_PROVIDERS:
-                rest_images += conn.list_images(ex_owner="self")
-                rest_images += conn.list_images(ex_owner="aws-marketplace")
-                rest_images += conn.list_images(ex_owner="amazon")
-            # Seach in images
-            counter = 0
-            for image in starred_images + hardcoded_images + rest_images:
-                if 'aki-' in image.id or 'ari-' in image.id or 'windows' or 'hvm' in image.name.lower():
-                    continue
-                if term in image.id.lower() or term in image.name.lower():
-                    if not image.id in images:
-                        images.append(image)
-                        counter += 1
-                        if counter == 20:
-                            break
-        # Else user just wants a list of images
-        else:
-            for image in starred_images + hardcoded_images + rest_images:
-                if 'aki-' in image.id or 'ari-' in image.id or 'windows' in image.name.lower():
-                    continue
-                if not image.id in images:
-                    images.append(image)
+            starred_images = [image for image in rest_images if image.id in starred]
+            
+        if term and conn.type in EC2_PROVIDERS:
+            ec2_images += conn.list_images(ex_owner="self")
+            ec2_images += conn.list_images(ex_owner="aws-marketplace")
+            ec2_images += conn.list_images(ex_owner="amazon")
+        
+        images = [ image for image in starred_images + ec2_images + rest_images 
+            if not (image.id[:3] in ['aki', 'ari'] or 'windows' in image.name.lower() or 'hvm' in image.name.lower())]
+        
+        if term: 
+            images = [ image for image in images if term in image.id.lower() or term in image.name.lower() ][:20]
+        
     except:
         return Response('Backend unavailable', 503)
-    
     
     ret = []
     for image in images:
