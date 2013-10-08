@@ -1236,7 +1236,7 @@ def edit_key(request):
         
         key = {'public': keypairs[old_id]['public'],
                 'private': keypairs[old_id]['private'],
-                'default': keypairs[old_id]['default'],
+                'default': keypairs[old_id].get('default', False),
                 'machines': keypairs[old_id]['machines']}
         
         keypairs.pop(old_id)
@@ -1436,7 +1436,7 @@ def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, s
 
     """
     with get_user(request) as user:
-        keypairs = user['keypairs']
+        keypairs = user.get('keypairs', {})
 
         if key_id not in keypairs:
             keypairs[key_id] = {'machines': []}
