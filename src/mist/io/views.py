@@ -1008,12 +1008,13 @@ def list_images(request):
         if term:
             # Get ec2 extensive list of images
             if conn.type in EC2_PROVIDERS:
+                rest_images += conn.list_images(ex_owner="self")
                 rest_images += conn.list_images(ex_owner="aws-marketplace")
                 rest_images += conn.list_images(ex_owner="amazon")
             # Seach in images
             counter = 0
             for image in starred_images + hardcoded_images + rest_images:
-                if 'aki-' in image.id or 'ari-' in image.id or 'windows' in image.name.lower():
+                if 'aki-' in image.id or 'ari-' in image.id or 'windows' or 'hvm' in image.name.lower():
                     continue
                 if term in image.id.lower() or term in image.name.lower():
                     if not image.id in images:
