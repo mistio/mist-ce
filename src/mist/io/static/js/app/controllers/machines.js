@@ -51,9 +51,9 @@ define('app/controllers/machines', [
                                     if (that.backend.id == backend_id && machine.id == machine_id && machine.hasMonitoring == false) {
                                         machine.set('hasMonitoring', true);
                                         Mist.rulesController.content.forEach(function(rule) {
-                                            if ($.isArray(rule['machine'])) {
+                                            if (!rule['machine']) {
                                                 warn('Yeay!');
-                                                if (rule['machine'][0] == backend_id && rule['machine'][1] == machine_id) {
+                                                if (rule['backend_id'] == backend_id && rule['machine_id'] == machine_id) {
                                                     warn('In');
                                                     rule['machine'] = Mist.backendsController.getMachineById(backend_id, machine_id);
                                                 }
