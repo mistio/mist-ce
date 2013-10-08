@@ -54,7 +54,7 @@ define('app/controllers/machines', [
                                             if ($.isArray(rule['machine'])) {
                                                 warn('Yeay!');
                                                 if (rule['machine'][0] == backend_id && rule['machine'][1] == machine_id) {
-                                                    rule['machine'] = that;
+                                                    rule['machine'] = Mist.backendsController.getMachineById(backend_id, machine_id);
                                                 }
                                             } 
                                         });
