@@ -14,17 +14,15 @@ define('app/views/image_list_item', [
                     var payload = {
                         'action': 'star'
                     };
-                    
-                    var backend_id = this.image.backend.id,
-                        image_id = this.image.id;
-                    
+                    var backend_id = this.image.backend.id
+                    var image_id = this.image.id;
                     $.ajax({
                         url: '/backends/' + backend_id + '/images/' + image_id,
                         type: "POST",
                         data: JSON.stringify(payload),
                         contentType: "application/json",
                         headers: { "cache-control": "no-cache" },
-                        dataType: "json",
+                        dataType: "json"
                     });    
                 },
                 

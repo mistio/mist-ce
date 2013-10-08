@@ -42,10 +42,6 @@ define('app/views/image_list', [
                                     if (searchText && image.name.indexOf(searchText) == -1) {
                                         return false;
                                     }
-                                    // Filter out Windows
-                                    if (image.name.toLowerCase().indexOf('windows') != -1) {
-                                        return false;
-                                    }
                                     that.renderedImages.pushObject(image);
                                     if (++counter == 20)
                                         return true;
@@ -125,16 +121,10 @@ define('app/views/image_list', [
                             data.some(function(item) {
                                 image = Image.create(item);
                                 image.backend = backend;
-                                if (backend.images.content.indexOf(image) == -1) {
-                                    backend.images.content.pushObject(image);
-                                }
                                 if (image.star){
                                     that.renderedImages.unshiftObject(image);                                    
                                 }else {
                                     that.renderedImages.pushObject(image);
-                                }
-                                if (++counter == 15) {
-                                    return true;
                                 }
                             });
                             if (index == Mist.backendsController.content.length - 1) {

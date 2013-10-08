@@ -136,8 +136,6 @@ def list_backends(request):
         ret = []
         for backend_id in user['backends']:
             backend = user['backends'][backend_id]
-            if not backend.get('starred', None):
-                backend['starred'] = backend['provider'] in EC2_PROVIDERS and EC2_IMAGES[backend['provider']].keys() or []
             ret.append({'id': backend_id,
                         'apikey': backend.get('apikey', None),
                         'title': backend.get('title', backend['provider']),
@@ -198,7 +196,7 @@ def add_backend(request, renderer='json'):
                    'tenant_name': tenant_name,
                    'region': region,
                    'poll_interval': request.registry.settings['default_poll_interval'],
-                   'starred': provider in EC2_PROVIDERS and EC2_IMAGES[provider].keys() or [],
+                   'starred': [],
                    'enabled': True,
                   }
 
@@ -975,57 +973,76 @@ def list_images(request):
     
     backend_id = request.matchdict['backend']
     
-    term = ''
+    term = None
     try:
-        term = request.json_body.get('search_term', '')
+        term = request.json_body.get('search_term', '').lower()
     except:
         pass
     
     with get_user(request, readonly=True) as user:
         backends = user.get('backends', {})
     
-    if term and conn.type in EC2_PROVIDERS:
-        images=[]
-        community_images = conn.list_images(ex_owner="aws-marketplace")
-        amazon_images = conn.list_images(ex_owner="amazon")
-        for i in community_images+amazon_images:
-            if term in i.id or term.lower() in i.name.lower():
-                images.append(i)
-        for image in images:
-            image.name = EC2_IMAGES[conn.type].get(image.id, image.name)                          
-    else:
-        try:
-            if conn.type in EC2_PROVIDERS:
-                starred_images = backends.get(backend_id, {}).get('starred', [])
-                images = []
-                if starred_images:
-                    images = conn.list_images(ex_image_ids = starred_images)
-                my_images = conn.list_images(ex_owner = "self")
-                for i in my_images:
-                    if i not in images: 
-                        images.append(i)
-                        
-                for image in images:
-                    #image.name = EC2_IMAGES[conn.type][image.id]
-                    #if not image.name:
-                    #    image.name = EC2_IMAGES[conn.type].get(image.id, image.id)
+    try:
+        starred = backends.get(backend_id, {}).get('starred', [])
+        # Initialize arrays
+        starred_images = []
+        hardcoded_images = []
+        rest_images = []
+        images = []
+        # Get ec2 images
+        if conn.type in EC2_PROVIDERS:
+            if starred:
+                starred_images = conn.list_images(ex_image_ids = starred)
+                for image in starred_images:
                     image.name = EC2_IMAGES[conn.type].get(image.id, image.name)
-            else:
-                images = conn.list_images()
-        except:
-            return Response('Backend unavailable', 503)
+            hardcoded_images = conn.list_images(None, EC2_IMAGES[conn.type].keys())
+            for image in hardcoded_images:
+                image.name = EC2_IMAGES[conn.type][image.id]
+        # Get rest images
+        else:
+            rest_images = conn.list_images()
+            for image in rest_images:
+                if image.id in starred:
+                    starred_images.append(image)
+        # If user wants to search images
+        if term:
+            # Get ec2 extensive list of images
+            if conn.type in EC2_PROVIDERS:
+                rest_images += conn.list_images(ex_owner="aws-marketplace")
+                rest_images += conn.list_images(ex_owner="amazon")
+            # Seach in images
+            counter = 0
+            for image in starred_images + hardcoded_images + rest_images:
+                if 'aki-' in image.id or 'ari-' in image.id or 'windows' in image.name.lower():
+                    continue
+                if term in image.id.lower() or term in image.name.lower():
+                    if not image.id in images:
+                        images.append(image)
+                        counter += 1
+                        if counter == 20:
+                            break
+        # Else user just wants a list of images
+        else:
+            for image in starred_images + hardcoded_images + rest_images:
+                if 'aki-' in image.id or 'ari-' in image.id or 'windows' in image.name.lower():
+                    continue
+                if not image.id in images:
+                    images.append(image)
+    except:
+        return Response('Backend unavailable', 503)
     
-
+    
     ret = []
     for image in images:
-        if image.id in backends.get(backend_id, {}).get('starred', []):
+        if image.id in starred:
             star = True
+            starred.remove(image.id)
         else:
             star = False
         ret.append({'id'    : image.id,
                     'extra' : image.extra,
                     'name'  : image.name,
-                    'star'  : star, 
+                    'star'  : star,
                     })
     return ret
 
@@ -1040,7 +1057,7 @@ def star_image(request):
     backend_id = request.matchdict['backend']
     image_id = request.matchdict['image']
     
-
+    starred = True
     with get_user(request) as user:
         backends = user.get('backends', {})
 
@@ -1050,12 +1067,13 @@ def star_image(request):
         if backends[backend_id].get('starred', None):
             if image_id in backends[backend_id]['starred']:
                 backends[backend_id]['starred'].remove(image_id)
+                starred = False
             else:
                 backends[backend_id]['starred'].append(image_id)
         else:
             backends[backend_id]['starred'] = [image_id]
         
-    return Response('OK', 200)
+    return starred
 
 
 @view_config(route_name='sizes', request_method='GET', renderer='json')

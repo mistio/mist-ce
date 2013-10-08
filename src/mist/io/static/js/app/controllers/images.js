@@ -63,8 +63,9 @@ define('app/controllers/images', [
                         that.backend.set('error', false);
                     }
                     that.backend.set('loadingImages', false);
-                }).error(function() {
-                    Mist.notificationController.notify("Error loading images for backend: " + that.backend.title);
+                }).error(function(jqXHR, textstate, errorThrown) {
+                    Mist.notificationController.notify('Error while loading images for backend ' + that.backend.title);
+                    error(textstate, errorThrown, ' while loading images. ', jqXHR.responseText);
                     if (that.backend.error){
                         // This backend seems hopeless, disabling it                            
                         that.backend.set('state', 'offline');
