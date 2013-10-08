@@ -37,20 +37,6 @@ define('app/models/machine', [
                 });
             }.observes('probed', 'probing'),
 
-            calculateProbed: function() {
-                var probed = false;
-                Mist.keysController.some(function(key) {
-                    key.machines.some(function(machine) {
-                        if (machine[2] > 0) {
-                            probed = true;
-                        }
-                        return probed;
-                    });
-                    return probed;
-                });
-                this.set('probed', probed);
-            },
-
             image: function() {
                 return this.backend.images.getImage(this.imageId);
             }.property('imageId'),
@@ -288,8 +274,6 @@ define('app/models/machine', [
                                             key.updateMachineUptimeChecked(that, -Date.now());
                                             key.set('probing', false);
                                         }
-                                        that.calculateProbed();
-                                        
                                         if (!that.backend.create_pending){
                                              retry(that);
                                         }
@@ -302,8 +286,6 @@ define('app/models/machine', [
                                         key.updateMachineUptimeChecked(that, -Date.now());
                                         key.set('probing', false);
                                     }
-                                    that.calculateProbed();
-                                    that.set('probing', false);
                                     that.set('probeInterval', 2*that.get('probeInterval'));
                                     
                                     if (!that.backend.create_pending){
