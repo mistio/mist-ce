@@ -13,7 +13,7 @@ define('app/controllers/backends', [
             content: [],
             machineCount: 0,
             imageCount: 0,
-            loadingImages: true,
+            loadingImages: false,
             
             // TODO make this property dynamic according to all backends states
             state: "waiting",
