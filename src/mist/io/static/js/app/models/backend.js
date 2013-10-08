@@ -84,7 +84,9 @@ define('app/models/backend', [
                 this.locations = LocationsController.create({backend: this});
                 var that = this;
                 Ember.run.next(function() {
-                    that.toggle();
+                    if (!that.enabled) {
+                        that.toggle();
+                    }
                 });
             },
             

@@ -17,7 +17,6 @@ define('app/views/backend_add', [
             pendingCreation: false,
             
             pendingCreationObserver: function() {
-                warn('Yeay1');
                 if (this.pendingCreation) {
                     $('#create-backend-ok').addClass('ui-disabled');
                 } else {

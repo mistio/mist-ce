@@ -38,7 +38,7 @@ define('app/controllers/images', [
                 if (!this.backend.enabled) {
                     return;
                 }
-                else if (this.backend.error && this.backend.state == 'offline'){
+                else if (this.backend.error && this.backend.state == 'offline') {
                     return;
                 }
                 
@@ -47,12 +47,14 @@ define('app/controllers/images', [
                 var that = this;
                 $.getJSON('/backends/' + this.backend.id + '/images', function(data) {
                     if (!that.backend.enabled) {
+                        that.backend.set('loadingImages', false);
                         return;
                     }
                     var content = new Array();
-                    data.forEach(function(item){
-                        item.backend = that.backend;
-                        content.push(Image.create(item));
+                    data.forEach(function(item) {
+                        var image = Image.create(item);
+                        image.backend = that.backend;
+                        content.push(image);
                     });
                     that.set('content', content);
                     Mist.backendsController.getImageCount();
@@ -61,8 +63,9 @@ define('app/controllers/images', [
                         that.backend.set('error', false);
                     }
                     that.backend.set('loadingImages', false);
-                }).error(function() {
-                    Mist.notificationController.notify("Error loading images for backend: " + that.backend.title);
+                }).error(function(jqXHR, textstate, errorThrown) {
+                    Mist.notificationController.notify('Error while loading images for backend ' + that.backend.title);
+                    error(textstate, errorThrown, ' while loading images. ', jqXHR.responseText);
                     if (that.backend.error){
                         // This backend seems hopeless, disabling it                            
                         that.backend.set('state', 'offline');

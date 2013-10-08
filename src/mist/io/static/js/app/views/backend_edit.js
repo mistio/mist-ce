@@ -64,20 +64,36 @@ define('app/views/backend_edit', [
                 });
             },
 
-            toggleBackend: function(){
+            toggleBackend: function() {
+                var newStateToNum = $('.backend-toggle').val();
+                var newState = newStateToNum == "1" ? "True" : "False";
+                var payload = {
+                    'newState': newState
+                };
+                newState = newState == "True" ? true : false;
+                var that = this;
                 $.ajax({
                     url: '/backends/' + this.backend.id,
                     type: 'POST',
-                    data: 'action=toggle',
-                    success: function(data) {
-                        Mist.backend.set('enabled', data.state);
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function() {
+                        info('Successfully toggled backend');
+                        that.backend.set('enabled', newState);
+                        that.backend.toggle();
                         Ember.run.next(function(){
                             $('.backend-toggle').slider('refresh');
-                        });               
+                        });
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while toggling backend: ' + jqXHR.responseText);
                         error(textstate, errorThrown, ' while toggling backend');
+                        that.backend.set('enabled', !newState);
+                        that.backend.toggle();
+                        Ember.run.next(function() {
+                            $('.backend-toggle').val(newStateToNum == "1" ? "0" : "1");
+                            $('.backend-toggle').slider('refresh');
+                        });
                     }
                 });
             },

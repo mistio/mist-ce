@@ -286,25 +286,51 @@ li.node .tag {
 /* Create Key Dialog */
 
 #create-key-dialog-popup {
-    width: 250px;
+    width: 300px;
 }
 
-#textarea-public-key, #textarea-private-key {
+#create-key-dialog label {
+    display: inline;
+    
+}
+
+#create-key-dialog #action-loader {
+    width: 20px;
+    float: right;
+    margin-right: 1px;
+}
+
+#create-key-dialog #create-loader {
+    margin-top: 10px;
+    margin-bottom: -9px;
+}
+
+#private-key-header {
+    margin-top: 22px;
+}
+
+#create-key-actions {
+    margin-top: 22px;
+}
+
+#private-key-actions {
+    margin-top: -2px;
+    width: 270px;
+}
+
+#textarea-private-key {
     height: 80px;
     max-height: 100px;
 }
 
-#create-key-dialog .upload-key {
+.upload-bundle .upload-button {
     width: 100%;
 }
 
-#upload-input .ui-input-text{
+.upload-bundle .ui-input-text {
     display: none;
 }
 
-#upload-input {
-    margin-bottom: 20px;
-}
 
 /* Machines Icons and their colors. */
 
@@ -449,6 +475,10 @@ a#mist-select-machines-button span.ui-btn-text {
 .caption-wrapper h3 {
     font-weight: normal;
     font-size: 16px;
+}
+
+#images-advanced-search {
+	display: block;
 }
 
 #machines-list .alert-icon {
@@ -1416,7 +1446,7 @@ div.logout-placeholder, div.account-placeholder, div.support-placeholder {
 #trial-user-details .ajax-loader, #monitoring-dialog .ajax-loader, 
 #login-dialog .ajax-loader, #edit-backend .ajax-loader, 
 #keys-wrapper .ajax-loader, #keys-container .ajax-loader, 
-#home-menu .ajax-loader, #manage-keys .ajax-loader {
+#home-menu .ajax-loader, #manage-keys .ajax-loader, #images .ajax-loader {
     background-image: url(images/spinner.gif);
     background-position: center !important;
     background-repeat: no-repeat;
@@ -1518,8 +1548,32 @@ div.info {
     text-align: center;
 }
 
-#single-machines-keys #machines-list fieldset {
+#single-key-machines #machines-list fieldset {
     display:none;
+}
+
+#images .ui-icon-checkbox-off {
+    background-image: url(images/staroff.png);
+    background-position: 0 0;
+}
+
+#images  span.ui-icon-checkbox-off:hover {
+    background-image: url(images/staroff_hov.png);
+    /*background-image: url(images/star_off_o.png);*/
+    /*background-image: url(images/medium_star_outline.png);*/
+    background-position: 0 0;
+}
+
+#images .ui-icon-checkbox-on {
+    background-image: url(images/staron.png);
+    
+    background-position: 0 0;
+    background-color: transparent;
+}
+
+#images  span.ui-icon-checkbox-on:hover {
+    background-image: url(images/staron_hov.png);
+    background-position: 0 0;
 }
 
 #mist-manage-keys {
@@ -1540,7 +1594,8 @@ div.info {
 }
 
 #mist-manage-keys.probing {
-    padding-left: 18px;  
+    background-position: 8px 5px;
+    padding-left: 18px;
 }
 
 #mist-manage-keys.unprobed, .associated-key .unprobed {

@@ -10,9 +10,9 @@ define('app/views/key_list_item', [
     function(key_list_item_html) {
         return Ember.View.extend({
 
-                template: Ember.Handlebars.compile(key_list_item_html),
+            template: Ember.Handlebars.compile(key_list_item_html),
 
-                tagName:'li',
+            tagName:'li'
         });
     }
 );

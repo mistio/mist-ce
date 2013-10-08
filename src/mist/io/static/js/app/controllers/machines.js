@@ -172,7 +172,6 @@ define('app/controllers/machines', [
                 item.id = -1;
 
                 var machine = Machine.create(item);
-                machine.keys.addObject(key);
                 
                 this.addObject(machine);
                 Ember.run.next(function(){
@@ -197,7 +196,7 @@ define('app/controllers/machines', [
                         machine.set("private_ips", data.private_ips);
                         machine.set("extra", data.extra);
                         that.backend.set('create_pending', false);
-                        var key_machines = key.machines;
+                        var key_machines = key.get('machines', new Array());
                         key_machines.push([machine.backend.id, machine.id]);
                         key.set('machines', key_machines);
                         machine.probe(key.name);

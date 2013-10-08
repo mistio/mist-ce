@@ -3,35 +3,27 @@
     {{view Mist.TextField
         valueBinding="Mist.keyAddController.newKeyName"
         id="create-key-name"}}
-
-    {{#if view.notEditMode}}
-    <button data-theme="b" data-icon="gear" {{action generateClicked target="view"}}>Generate</button>
-    <div class="ajax-loader"></div>
-    {{/if}}
-
-    <label for="textarea-public-key">Public Key:</label>
-    {{view Ember.TextArea
-        valueBinding="Mist.keyAddController.newKeyPublic"
-        id="textarea-public-key"}}
-
-    <div id="upload-input">
-        <a class="upload-key" data-role="button" data-mini="true" {{action uploadClicked "public" target="view"}}>Upload</a>
-        <input type="file" id="upload-public-key-input" name="file" {{action uploadInputChanged "public" on="change" target="view"}}/>
+    
+    <div id="private-key-header">
+        <label for="textarea-private-key">Private Key:</label>
+        <div id="action-loader" class="ajax-loader"></div>
     </div>
-
-    <label for="textarea-private-key">Private Key:</label>
     {{view Ember.TextArea
         valueBinding="Mist.keyAddController.newKeyPrivate"
         id="textarea-private-key"}}
 
-    <div id="upload-input">
-        <a class="upload-key" data-role="button" data-mini="true" {{action uploadClicked "private" target="view"}}>Upload</a>
-        <input type="file" id="upload-private-key-input" name="file"{{action uploadInputChanged "private" on="change" target="view"}}/>
+    <div id="private-key-actions" class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+        <button data-icon="gear" {{action generateClicked target="view"}}>Generate</button>
+        <button class="upload-button" data-icon="arrow-u" data-iconpos="right" {{action uploadClicked target="view"}}>Upload</button>
     </div>
 
-    <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-        <a href="#" data-role="button" id="create-key-cancel" {{action backClicked target="view"}}>Back</a>
-        <a href="#" data-role="button" id="create-key-ok" class="ui-disabled" data-theme="b" {{action createClicked target="view"}}>
-        {{#if view.notEditMode}}Create{{else}}Save{{/if}}
-        </a>
+    <div class="upload-bundle">
+        <input type="file" class="upload-input" name="file" {{action uploadInputChanged on="change" target="view"}}/>
+    </div>
+
+    <div id="create-loader" class="ajax-loader"></div>
+
+    <div id="create-key-actions" class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+        <a href="#" data-role="button" {{action backClicked target="view"}}>Back</a>
+        <button id="create-key-ok" data-theme="b" disabled {{action createClicked target="view"}}>Create</button>
     </div>

@@ -32,15 +32,15 @@ from mist.io.helpers import import_key, create_security_group
 from mist.io.helpers import get_keypair, get_keypair_by_name, get_preferred_keypairs
 from mist.io.helpers import run_command
 
-from mist.io.helpers import generate_keypair, set_default_key, get_private_key, validate_key_pair, get_ssh_user_from_keypair
+from mist.io.helpers import generate_keypair, generate_public_key, validate_keypair
+from mist.io.helpers import set_default_key, get_private_key, get_public_key, get_ssh_user_from_keypair, get_auth_key
 
 try:
-    from mist.core.helpers import save_settings
+    from mist.core.helpers import get_user
 except ImportError:
-    from mist.io.helpers import save_settings
+    from mist.io.helpers import get_user
 
 log = logging.getLogger('mist.io')
-
 
 @view_config(route_name='home', request_method='GET',
              renderer='templates/home.pt')
@@ -48,24 +48,14 @@ def home(request):
     """Gets all the basic data for backends, project name and session status.
 
     """
-    try:
-        email = request.environ['beaker.session']['email']
-        session = True
-    except:
-        session = False
-        try:
-            email = request.registry.settings['email']
-            password = request.registry.settings['password']
-        except:
-            email = ''
-
+    with get_user(request, readonly=True) as user:
+        email = user.get('email', '')
     core_uri = request.registry.settings['core_uri']
     auth = request.registry.settings.get('auth', 0)
     js_build = request.registry.settings['js_build']
     js_log_level = request.registry.settings['js_log_level']
 
     return {'project': 'mist.io',
-            'session': session,
             'email': email,
             'supported_providers': SUPPORTED_PROVIDERS,
             'core_uri': core_uri,
@@ -89,14 +79,15 @@ def check_auth(request):
 
     if ret.status_code == 200:
         ret = json.loads(ret.content)
-        request.registry.settings['email'] = email
-        request.registry.settings['password'] = password
+        with get_user(request) as user:
+            user['email'] = email
+            user['password'] = password
         request.registry.settings['auth'] = 1
-        log.debug('save settings (check auth)')
-        save_settings(request)
+        log.info("succesfully check_authed")
         return ret
     else:
         return Response('Unauthorized', 401)
+        
 
 @view_config(route_name='account', request_method='POST', renderer='json')
 def update_user_settings(request, renderer='json'):
@@ -105,7 +96,7 @@ def update_user_settings(request, renderer='json'):
     params = request.json_body
     action = params.get('action', '').lower()
     plan = params.get('plan', '')
-    auth_key = params.get('auth_key', '')
+    auth_key = get_auth_key(request)
     name = params.get('name', '')    
     company_name = params.get('company_name', '')
     country = params.get('country', '') 
@@ -120,7 +111,7 @@ def update_user_settings(request, renderer='json'):
                'country': country,
                'number_of_servers': number_of_servers,
                'number_of_people': number_of_people
-    }
+    }    
 
     core_uri = request.registry.settings['core_uri']
     ret = requests.post(core_uri + '/account', params=payload, verify=False)
@@ -132,8 +123,6 @@ def update_user_settings(request, renderer='json'):
         return Response('Unauthorized', 401)
 
 
-
-
 @view_config(route_name='backends', request_method='GET', renderer='json')
 def list_backends(request):
     """Gets the available backends.
@@ -141,28 +130,26 @@ def list_backends(request):
     .. note:: Currently, this is only used by the backend controller in js.
 
     """
-    try:
-        backends = request.environ['beaker.session']['backends']
-    except:
-        backends = request.registry.settings['backends']
+    with get_user(request) as user:
+        if not user:
+            return Response('Unauthorized', 401)
+        ret = []
+        for backend_id in user['backends']:
+            backend = user['backends'][backend_id]
+            ret.append({'id': backend_id,
+                        'apikey': backend.get('apikey', None),
+                        'title': backend.get('title', backend['provider']),
+                        'provider': backend['provider'],
+                        'poll_interval': backend.get('poll_interval', 10000),
+                        'state': 'wait',
+                        # for Provider.RACKSPACE_FIRST_GEN
+                        'region': backend.get('region', None),
+                        # for Provider.RACKSPACE (the new Nova provider)
+                        'datacenter': backend.get('datacenter', None),
+                        'enabled': backend.get('enabled', True),
+                         })
 
-    ret = []
-    for backend_id in backends:
-        backend = backends[backend_id]
-        ret.append({'id': backend_id,
-                    'apikey': backend.get('apikey', None),
-                    'title': backend.get('title', backend['provider']),
-                    'provider': backend['provider'],
-                    'poll_interval': backend.get('poll_interval', 10000),
-                    'state': 'wait',
-                    # for Provider.RACKSPACE_FIRST_GEN
-                    'region': backend.get('region', None),
-                    # for Provider.RACKSPACE (the new Nova provider)
-                    'datacenter': backend.get('datacenter', None),
-                    'enabled': backend.get('enabled', True),
-                     })
-
-    return ret
+        return ret
 
 
 @view_config(route_name='backends', request_method='POST', renderer='json')
@@ -170,11 +157,6 @@ def add_backend(request, renderer='json'):
     """Adds a new backend.
     
     """
-    try:
-        backends = request.environ['beaker.session']['backends']
-    except:
-        backends = request.registry.settings['backends']
-        
     params = request.json_body
     title = params.get('title', '0')
     provider = params.get('provider', '0')
@@ -182,54 +164,58 @@ def add_backend(request, renderer='json'):
     apisecret = params.get('apisecret', '')
     apiurl = params.get('apiurl', '')
     tenant_name = params.get('tenant_name', '')
-    
-    if apisecret == 'getsecretfromdb':
-        for backend_id in backends:
-            backend = backends[backend_id]
-            if backend.get('apikey', None) == apikey:
-                apisecret = backend.get('apisecret', None)
-                
-    region = ''
-    if not provider.__class__ is int and ':' in provider:
-        region = provider.split(':')[1]
-        provider = provider.split(':')[0]
+    with get_user(request) as user:
+        if not user:
+            return Response('Unauthorized', 401)
+        backends = user['backends']
+        
+        if apisecret == 'getsecretfromdb':
+            for backend_id in backends:
+                backend = backends[backend_id]
+                if backend.get('apikey', None) == apikey:
+                    apisecret = backend.get('apisecret', None)
+                    
+        region = ''
+        if not provider.__class__ is int and ':' in provider:
+            region = provider.split(':')[1]
+            provider = provider.split(':')[0]
 
-    if not provider or not apikey or not apisecret:
-        return Response('Invalid backend data', 400)
+        if not provider or not apikey or not apisecret:
+            return Response('Invalid backend data', 400)
 
-    backend_id = generate_backend_id(provider, region, apikey)
-    
-    if backend_id in backends:
-        return Response('Backend exists', 409)
+        backend_id = generate_backend_id(provider, region, apikey)
+        
+        if backend_id in backends:
+            return Response('Backend exists', 409)
 
-    backend = {'title': title,
-               'provider': provider,
-               'apikey': apikey,
-               'apisecret': apisecret,
-               'apiurl': apiurl,
-               'tenant_name': tenant_name,
-               'region': region,
-               'poll_interval': request.registry.settings['default_poll_interval'],
-               'enabled': True,
-              }
+        backend = {'title': title,
+                   'provider': provider,
+                   'apikey': apikey,
+                   'apisecret': apisecret,
+                   'apiurl': apiurl,
+                   'tenant_name': tenant_name,
+                   'region': region,
+                   'poll_interval': request.registry.settings['default_poll_interval'],
+                   'starred': [],
+                   'enabled': True,
+                  }
 
-    request.registry.settings['backends'][backend_id] = backend
-    log.debug('save settings (add backend')
-    save_settings(request)
+        backends[backend_id] = backend
 
-    ret = {'id'           : backend_id,
-           'apikey'       : backend['apikey'],
-           'apiurl'       : backend['apiurl'],
-           'tenant_name'  : backend['tenant_name'],
-           'title'        : backend['title'],
-           'provider'     : backend['provider'],
-           'poll_interval': backend['poll_interval'],
-           'region'       : backend['region'],
-           'status'       : 'off',
-           'enabled'      : True,
-          }
-    
-    return ret
+        ret = {'index'        : len(user['backends']) - 1,
+                'id'           : backend_id,
+                'apikey'       : backend['apikey'],
+                'apiurl'       : backend['apiurl'],
+                'tenant_name'  : backend['tenant_name'],
+                'title'        : backend['title'],
+                'provider'     : backend['provider'],
+                'poll_interval': backend['poll_interval'],
+                'region'       : backend['region'],
+                'status'       : 'off',
+                'enabled'      : True,
+                }
+        
+        return ret
 
 
 @view_config(route_name='backend_action', request_method='DELETE',
@@ -241,23 +227,47 @@ def delete_backend(request, renderer='json'):
               any key associations.
 
     """
-    request.registry.settings['backends'].pop(request.matchdict['backend'])
-    log.debug('save settings (del backend)')
-    save_settings(request)
+    with get_user(request) as user:
+        if not user:
+            return Response('Unauthorized', 401)
+
+        backend_id = request.matchdict['backend']
+        backends = user.get('backends', None)
+
+        if not backends or not backend_id or not backend_id in backends:
+            return Response('Bad Request', 400)
+
+        del backends[backend_id]
 
     return Response('OK', 200)
 
 
-@view_config(route_name='backend_action', request_method='POST', request_param="action=toggle", renderer='json')
+@view_config(route_name='backend_action', request_method='POST', renderer='json')
 def toggle_backend(request):
+    new_state = request.json_body.get('newState', '')
+    if not new_state:
+        return Response('New backend state not provided', 400)
     
-    backend_id = request.matchdict['backend']
-    state = request.registry.settings['backends'][backend_id]['enabled']
-    request.registry.settings['backends'][backend_id]['enabled'] = not state
+    if new_state == "True":
+        new_state = True
+    elif new_state == "False":
+        new_state = False
+    else:
+        return Response('Invalid backend state', 400)
     
-    save_settings(request)
-    
-    return {'state': not state,}
+    with get_user(request) as user:
+        if not user:
+            return Response('Unauthorized', 401)
+        
+        backend_id = request.matchdict['backend']
+        backends = user.get('backends', None)
+
+        if not backends or not backend_id or not backend_id in backends:
+            return Response('Bad Request', 400)
+
+        user['backends'][backend_id]['enabled'] = new_state
+        
+    return Response('OK', 200)
 
 
 @view_config(route_name='machines', request_method='GET', renderer='json')
@@ -361,10 +371,8 @@ def create_machine(request):
     except:
         key_id = None
 
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    with get_user(request, readonly=True) as user:
+        keypairs = user['keypairs']
 
     if key_id:
         keypair = get_keypair_by_name(keypairs, key_id)
@@ -677,11 +685,9 @@ def destroy_machine(request, backend_id=None, machine_id=None):
     machine.destroy()
 
     pair = [backend_id, machine_id]
-
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    
+    with get_user(request, readonly=True) as user:
+        keypairs = user.get('keypairs', {})
 
     for key in keypairs:
         machines = keypairs[key].get('machines', [])
@@ -830,85 +836,85 @@ def delete_machine_metadata(request):
 def shell_command(request, backend_id, machine_id, host, command, ssh_user = None, key = None):
     """ Sends a command over ssh, using fabric """
     
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    with get_user(request, readonly=True) as user:
+        #log.error("shell command from user '%s'" % user)
+        keypairs = user.get('keypairs', {})
+        # we don't need to lock the user since the only writes are
+        # performed by save_key which takes care of locking the user
+        # at the moment
 
-    if not key:
-        preferred_keypairs = get_preferred_keypairs(keypairs, backend_id, machine_id)
-    else:
-        preferred_keypairs = [key]
-
-    for k in preferred_keypairs:
-        keypair = keypairs[k]
-        private_key = keypair.get('private', None)
-        if private_key:
-            if ssh_user == 'undefined':
-                ssh_user = None
-            ssh_user = ssh_user or get_ssh_user_from_keypair(keypair, 
-                                                 backend_id, 
-                                                 machine_id) or 'root'
-              
-            log.debug("before run command %s" % ssh_user)
-            response = run_command(machine_id, 
-                                   host, 
-                                   ssh_user, 
-                                   private_key, 
-                                   command)
-            cmd_output = response.text
-            new_ssh_user = False
-            if 'Please login as the user ' in cmd_output:
-                new_ssh_user = cmd_output.split()[5].strip('"')
-            elif 'Please login as the' in cmd_output:
-                # for EC2 Amazon Linux machines, usually with ec2-user
-                new_ssh_user = cmd_output.split()[4].strip('"')
-
-            sudoer = False
-
-            if new_ssh_user:
+        if not key:
+            preferred_keypairs = get_preferred_keypairs(keypairs, backend_id, machine_id)
+        else:
+            preferred_keypairs = [key]
+        for k in preferred_keypairs:
+            keypair = keypairs[k]
+            private_key = keypair.get('private', None)
+            if private_key:
+                if ssh_user == 'undefined':
+                    ssh_user = None
+                ssh_user = ssh_user or get_ssh_user_from_keypair(keypair, 
+                                                     backend_id, 
+                                                     machine_id) or 'root'
+                  
+                log.error("before run command %s" % ssh_user)
                 response = run_command(machine_id, 
                                        host, 
-                                       new_ssh_user, 
+                                       ssh_user, 
                                        private_key, 
                                        command)
                 cmd_output = response.text
-                ssh_user = new_ssh_user # update username in key-machine association
-            
-            if response.status_code != 200:
-                # Mark key failure
+                new_ssh_user = False
+                if 'Please login as the user ' in cmd_output:
+                    new_ssh_user = cmd_output.split()[5].strip('"')
+                elif 'Please login as the' in cmd_output:
+                    # for EC2 Amazon Linux machines, usually with ec2-user
+                    new_ssh_user = cmd_output.split()[4].strip('"')
+
+                sudoer = False
+                if new_ssh_user:
+                    response = run_command(machine_id, 
+                                           host, 
+                                           new_ssh_user, 
+                                           private_key, 
+                                           command)
+                    cmd_output = response.text
+                    ssh_user = new_ssh_user # update username in key-machine association
+                
+                if response.status_code != 200:
+                    # Mark key failure
+                    save_keypair(request, 
+                                 k, 
+                                 backend_id, 
+                                 machine_id, 
+                                 -1*int(time()), # minus means failure
+                                 ssh_user,
+                                 sudoer) 
+                    continue
+                
+                # TODO: Test if user is sudoer
+                if command.startswith('sudo -n uptime 2>&1'):
+                    split_output = cmd_output.split('--------')
+                    try:
+                        if int(split_output[0]) > 0:
+                            sudoer = True
+                    except ValueError:
+                        pass
+                
+                # Mark key success
                 save_keypair(request, 
                              k, 
                              backend_id, 
                              machine_id, 
-                             -1*int(time()), # minus means failure
-                             ssh_user,
-                             sudoer) 
-                continue
+                             int(time()), 
+                             ssh_user, 
+                             sudoer)
+                
+                return {'output': cmd_output,
+                        'ssh_user': ssh_user,
+                        'sudoer': sudoer}
             
-            # TODO: Test if user is sudoer
-            if command.startswith('sudo -n uptime 2>&1'):
-                split_output = cmd_output.split('--------')
-                try:
-                    if int(split_output[0]) > 0:
-                        sudoer = True
-                except ValueError:
-                    pass
-            
-            # Mark key success
-            save_keypair(request, 
-                         k, 
-                         backend_id, 
-                         machine_id, 
-                         int(time()), 
-                         ssh_user, 
-                         sudoer)
-            
-            return {'output': cmd_output,
-                    'ssh_user': ssh_user,
-                    'sudoer': sudoer}
-        
-    return False
+        return False
 
 
 @view_config(route_name='probe', request_method='POST',
@@ -949,31 +955,125 @@ def probe(request):
     return Response('No valid keys for server', 405)
 
 
+@view_config(route_name='images', request_method='POST', renderer='json')
+def list_specific_images(request):
+    return list_images(request)
+
 @view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
-    """List images from each backend."""
+    """List images from each backend. 
+    Furthermore if a search_term is provided, we loop through each
+    backend and search for that term in the ids and the names of 
+    the community images"""
+    
     try:
         conn = connect(request)
     except:
         return Response('Backend not found', 404)
-
+    
+    backend_id = request.matchdict['backend']
+    
+    term = None
     try:
+        term = request.json_body.get('search_term', '').lower()
+    except:
+        pass
+    
+    with get_user(request, readonly=True) as user:
+        backends = user.get('backends', {})
+    
+    try:
+        starred = backends.get(backend_id, {}).get('starred', [])
+        # Initialize arrays
+        starred_images = []
+        hardcoded_images = []
+        rest_images = []
+        images = []
+        # Get ec2 images
         if conn.type in EC2_PROVIDERS:
-            images = conn.list_images(None, EC2_IMAGES[conn.type].keys())
-            for image in images:
+            if starred:
+                starred_images = conn.list_images(ex_image_ids = starred)
+                for image in starred_images:
+                    image.name = EC2_IMAGES[conn.type].get(image.id, image.name)
+            hardcoded_images = conn.list_images(None, EC2_IMAGES[conn.type].keys())
+            for image in hardcoded_images:
                 image.name = EC2_IMAGES[conn.type][image.id]
+        # Get rest images
         else:
-            images = conn.list_images()
+            rest_images = conn.list_images()
+            for image in rest_images:
+                if image.id in starred:
+                    starred_images.append(image)
+        # If user wants to search images
+        if term:
+            # Get ec2 extensive list of images
+            if conn.type in EC2_PROVIDERS:
+                rest_images += conn.list_images(ex_owner="aws-marketplace")
+                rest_images += conn.list_images(ex_owner="amazon")
+            # Seach in images
+            counter = 0
+            for image in starred_images + hardcoded_images + rest_images:
+                if 'aki-' in image.id or 'ari-' in image.id or 'windows' in image.name.lower():
+                    continue
+                if term in image.id.lower() or term in image.name.lower():
+                    if not image.id in images:
+                        images.append(image)
+                        counter += 1
+                        if counter == 20:
+                            break
+        # Else user just wants a list of images
+        else:
+            for image in starred_images + hardcoded_images + rest_images:
+                if 'aki-' in image.id or 'ari-' in image.id or 'windows' in image.name.lower():
+                    continue
+                if not image.id in images:
+                    images.append(image)
     except:
         return Response('Backend unavailable', 503)
-
+    
+    
     ret = []
     for image in images:
+        if image.id in starred:
+            star = True
+            starred.remove(image.id)
+        else:
+            star = False
         ret.append({'id'    : image.id,
                     'extra' : image.extra,
                     'name'  : image.name,
+                    'star'  : star,
                     })
     return ret
+
+@view_config(route_name='image', request_method='POST', renderer='json')
+def star_image(request):
+    """Toggle image as starred."""
+    try:
+        conn = connect(request)
+    except:
+        return Response('Backend not found', 404)
+    
+    backend_id = request.matchdict['backend']
+    image_id = request.matchdict['image']
+    
+    starred = True
+    with get_user(request) as user:
+        backends = user.get('backends', {})
+
+        if not backend_id in backends:
+            return Response('Backend id not found %s' % backend_id, 400)
+    
+        if backends[backend_id].get('starred', None):
+            if image_id in backends[backend_id]['starred']:
+                backends[backend_id]['starred'].remove(image_id)
+                starred = False
+            else:
+                backends[backend_id]['starred'].append(image_id)
+        else:
+            backends[backend_id]['starred'] = [image_id]
+        
+    return starred
 
 
 @view_config(route_name='sizes', request_method='GET', renderer='json')
@@ -1052,16 +1152,13 @@ def list_keys(request):
     keys are returned.
     
     """
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    with get_user(request, readonly=True) as user:
+        keypairs = user.get('keypairs', {})
     
-    return [{'name': key,
-              'machines': keypairs[key].get('machines', []),
-               'pub': keypairs[key]['public'],
-                'priv': keypairs[key]['private'] and True or False,
-                 'default_key': keypairs[key].get('default', False)}
+    return [{'id': key.replace(' ', ''),
+             'name': key,
+             'machines': keypairs[key].get('machines',[]),
+             'default_key': keypairs[key].get('default', False)}
              for key in keypairs.keys()]
 
 
@@ -1069,34 +1166,35 @@ def list_keys(request):
 def add_key(request):
     params = request.json_body
     key_id = params.get('name', '')
+    private_key = params.get('priv', '')
     
     if not key_id:
-        ret = Response('Key name not provided', 400)
+        return Response('Keypair name not provided', 400)
     
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    if not private_key:
+        return Response('Private key not provided', 400)
+    
+    with get_user(request) as user:
+        keypairs = user.get('keypairs',{})
+            
+        if key_id in keypairs:
+            return Response('Keypair "%s" exists' % key_id, 400)
         
-    if key_id in keypairs:
-        return Response('Key "%s" already exists' % key_id, 400)
-    
-    key = {'public' : params.get('pub', ''),
-            'private' : params.get('priv', ''),
-             'default' : not len(keypairs) }
-    
-    if key['public'] and key['private']:
-        if not validate_key_pair(key['public'], key['private']):
-            return Response('Key pair is not valid', 400)
-    
-    keypairs[key_id] = key
-    save_settings(request)
-    
-    return {'name': key_id,
-             'pub': key['public'],
-              'priv': key['private'],
-               'default_key': key['default'],
-                'machines': []}
+        key = {'public' : generate_public_key(private_key),
+               'private' : private_key,
+               'default' : not len(keypairs),
+               'machines': []}
+        
+        if not validate_keypair(key['public'], key['private']):
+            # User probably gave an invalid private key
+            return Response('Invalid private key', 400)
+        
+        keypairs[key_id] = key
+        
+        return {'id': key_id,
+                'name': key_id,
+                'machines': [],
+                'default_key': key['default']}
 
 
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
@@ -1115,98 +1213,89 @@ def delete_key(request):
     key_id = request.matchdict.get('key', '')
     
     if not key_id:
-        return Response('Key name not provided', 400)
+        return Response('Keypair name not provided', 400)
     
-    keypairs = request.registry.settings.get('keypairs', {})
-    
-    key = keypairs.pop(key_id)
-    
-    if key.get('default', False):
-        if len(keypairs):
-            new_default_key = keypairs.keys()[0]
-            keypairs[new_default_key]['default'] = True
-    
-    save_settings(request)
-    
-    return [{'name': key,
-              'machines': keypairs[key].get('machines', []),
-               'pub': keypairs[key]['public'],
-                'priv': keypairs[key]['private'] and True,
-                 'default_key': keypairs[key].get('default', False)}
-             for key in keypairs.keys()]
+    with get_user(request) as user:
+        keypairs = user.get('keypairs',{})
+        
+        if not key_id in keypairs.keys():
+            return Response('Keypair "%s" not found', 404)
+
+        key = keypairs.pop(key_id)
+        
+        if key.get('default', False):
+            if len(keypairs):
+                new_default_key = keypairs.keys()[0]
+                keypairs[new_default_key]['default'] = True
+        
+    return list_keys(request)
 
 
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
-    params = request.json_body
-    key_id = params.get('name', '')
-    old_id = params.get('oldname', '')
+    
+    old_id = request.matchdict.get('key', '')
+    key_id = request.json_body.get('newName', '')
     
     if not old_id:
-        ret = Response('Old key name not provided', 400)
+        return Response('Old keypair name not provided', 400)
     
     if not key_id:
-        ret = Response('New key name not provided', 400)
+        return Response('New keypair name not provided', 400)
     
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})    
+    if old_id == key_id:
+        return Response('Keypair is already named: %s' % key_id, 304)
     
-    key = {'public' : params.get('pub', ''),
-            'private' : params.get('priv', ''),
-             'default' : keypairs[old_id].get('default', False),
-              'machines' : keypairs[old_id].get('machines', [])}
-
-    if old_id != key_id:
+    with get_user(request) as user:
+        keypairs = user.get('keypairs',{})
+        
+        if not old_id in keypairs:
+            return Response('Keypair "%s" not found' % old_id, 404)
+        
         if key_id in keypairs:
-            return Response('Key "%s" already exists' % key_id, 400)
+            return Response('Keypair "%s" exists' % key_id, 400)
+        
+        key = {'public': keypairs[old_id]['public'],
+                'private': keypairs[old_id]['private'],
+                'default': keypairs[old_id]['default'],
+                'machines': keypairs[old_id]['machines']}
+        
         keypairs.pop(old_id)
-    
-    if key['public'] and key['private']:
-        if not validate_key_pair(key['public'], key['private']):
-            return Response('Key pair is not valid', 400)
-    
-    keypairs[key_id] = key
-    
-    save_settings(request)
-    
-    return {'name': key_id,
-             'pub': key['public'],
-              'priv': key['private'],
-               'default': key['default'],
-                'machines': key['machines']}
+        keypairs[key_id] = key
+        
+    return Response('OK', 200)
 
 
 @view_config(route_name='key_action', request_method='POST', renderer='json')
 def set_default_key_request(request):
     return set_default_key(request)
 
-
-@view_config(route_name='key_action', request_method='GET', renderer='json')
+@view_config(route_name='key_action', request_method='GET', request_param='action=private', renderer='json')
 def get_private_key_request(request):
     return get_private_key(request)
 
+@view_config(route_name='key_action', request_method='GET', request_param='action=public', renderer='json')
+def get_public_key_request(request):
+    return get_public_key(request)
 
 @view_config(route_name='keys', request_method='POST', renderer='json')
 def generate_keypair_request(request):
     return generate_keypair()
 
-
 @view_config(route_name='key_association', request_method='PUT', renderer='json')
 def associate_key_request(request):
     return associate_key(request,
-                          request.matchdict['key'],
-                           request.matchdict['backend'],
-                            request.matchdict['machine'])
+                         request.matchdict['key'],
+                         request.matchdict['backend'],
+                         request.matchdict['machine'])
 
 
 @view_config(route_name='key_association', request_method='DELETE', renderer='json')
 def disassociate_key_request(request):
     return disassociate_key(request,
-                             request.matchdict['key'],
-                              request.matchdict['backend'],
-                               request.matchdict['machine'])
+                            request.matchdict['key'],
+                            request.matchdict['backend'],
+                            request.matchdict['machine'])
 
 
 @view_config(route_name='monitoring', request_method='GET', renderer='json')
@@ -1215,17 +1304,14 @@ def check_monitoring(request):
 
     """
     core_uri = request.registry.settings['core_uri']
-    email = request.registry.settings.get('email','')
-    password = request.registry.settings.get('password','')
+    with get_user(request, readonly=True) as user:
+        email = user.get('email', '')
+        password = user.get('password', '')
 
     timestamp = datetime.utcnow().strftime("%s")
-    hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
+    auth_key = get_auth_key(request)
 
-    payload = {'email': email,
-               'timestamp': timestamp,
-               'hash': hash,
-               }
-
+    payload = {'auth_key': auth_key}
     ret = requests.get(core_uri+request.path, params=payload, verify=False)
     if ret.status_code == 200:
         return ret.json()
@@ -1239,54 +1325,50 @@ def update_monitoring(request):
     service.
 
     """
-    core_uri = request.registry.settings['core_uri']
-    try:
-        email = request.json_body['email']
-        password = request.json_body['pass']
-        timestamp = request.json_body['timestamp']
-        hash = request.json_body['hash']       
-    except:
-        email = request.registry.settings.get('email','')
-        password = request.registry.settings.get('password','')
-        timestamp =  datetime.utcnow().strftime("%s")
-        hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
+    with get_user(request) as user:
+        core_uri = request.registry.settings['core_uri']
+        try:
+            email = request.json_body['email']
+            password = request.json_body['pass']
+            payload = {'email': email, 'password': password}
+            ret = requests.post(settings['core_uri'] + '/auth', params=payload, verify=False)
+            if ret.status_code == 200:
+                request.settings['auth'] = 1
+                user['email'] = email
+                user['password'] = password
+        except:
+            pass   
+        auth_key = get_auth_key(request)
 
-    name = request.json_body.get('name','')
-    public_ips = request.json_body.get('public_ips', [])
-    dns_name = request.json_body.get('dns_name', '')
-    
-    action = request.json_body['action'] or 'enable'
-    payload = {'email': email,
-               'timestamp': timestamp,
-               'hash': hash,
-               'action': action,
-               'name': name,
-               'public_ips': public_ips,
-               'dns_name': dns_name,
-               }
+        name = request.json_body.get('name','')
+        public_ips = request.json_body.get('public_ips', [])
+        dns_name = request.json_body.get('dns_name', '')
+        
+        action = request.json_body['action'] or 'enable'
+        payload = {'auth_key': auth_key,
+                   'action': action,
+                   'name': name,
+                   'public_ips': public_ips,
+                   'dns_name': dns_name,
+                   }
 
-    if action == 'enable':
-        backend = request.registry.settings['backends'][request.matchdict['backend']]
-        payload['backend_title'] = backend['title']
-        payload['backend_provider'] = backend['provider']
-        payload['backend_region'] = backend['region']
-        payload['backend_apikey'] = backend['apikey']
-        payload['backend_apisecret'] = backend['apisecret']
+        if action == 'enable':
+            backend = user['backends'][request.matchdict['backend']]
+            payload['backend_title'] = backend['title']
+            payload['backend_provider'] = backend['provider']
+            payload['backend_region'] = backend['region']
+            payload['backend_apikey'] = backend['apikey']
+            payload['backend_apisecret'] = backend['apisecret']
 
-    #TODO: make ssl verification configurable globally, set to true by default
-    ret = requests.post(core_uri+request.path, params=payload, verify=False)
+        #TODO: make ssl verification configurable globally, set to true by default
+        ret = requests.post(core_uri+request.path, params=payload, verify=False)
 
-    if ret.status_code == 402:
-        return Response(ret.text, 402)
-    elif ret.status_code != 200:
-        return Response('Service unavailable', 503)
+        if ret.status_code == 402:
+            return Response(ret.text, 402)
+        elif ret.status_code != 200:
+            return Response('Service unavailable', 503)
 
-    request.registry.settings['email'] = email
-    request.registry.settings['password'] = password
-    request.registry.settings['auth'] = 1
-    log.debug('saving settings (update monitoring)')
-    save_settings(request)
-    return ret.json()
+        return ret.json()
 
 
 @view_config(route_name='rules', request_method='POST', renderer='json')
@@ -1295,15 +1377,8 @@ def update_rule(request):
 
     """
     core_uri = request.registry.settings['core_uri']
-    email = request.registry.settings.get('email','')
-    password = request.registry.settings.get('password','')
-    timestamp =  datetime.utcnow().strftime("%s")
-    hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
-
     payload = request.json_body.copy()
-    payload['email'] = email
-    payload['hash'] = hash
-    payload['timestamp'] = timestamp
+    payload['auth_key'] = get_auth_key(request)
 
     #TODO: make ssl verification configurable globally, set to true by default
     ret = requests.post(core_uri+request.path, params=payload, verify=False)
@@ -1321,15 +1396,8 @@ def delete_rule(request):
     """
     # TODO: factor out common code in a shared function
     core_uri = request.registry.settings['core_uri']
-    email = request.registry.settings.get('email','')
-    password = request.registry.settings.get('password','')
-    timestamp =  datetime.utcnow().strftime("%s")
-    hash = sha256("%s:%s:%s" % (email, timestamp, password)).hexdigest()
-
     payload = {}
-    payload['email'] = email
-    payload['hash'] = hash
-    payload['timestamp'] = timestamp
+    payload['auth_key'] = get_auth_key(request)
 
     #TODO: make ssl verification configurable globally, set to true by default
     ret = requests.delete(core_uri+request.path, params=payload, verify=False)
@@ -1341,108 +1409,78 @@ def delete_rule(request):
 
 
 def update_available_keys(request, backend_id, machine_id, ssh_user, host, authorized_keys):
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
-    
-    # track which keypairs will be updated
-    updated_keypairs = {}
-    
-    # get the actual public keys from the blob
-    ak = [k for k in authorized_keys.split('\n') if k.startswith('ssh')]
+    with get_user(request) as user:
+        keypairs = user.get('keypairs', {})
 
-    # for each public key
-    for pk in ak:
-        exists = False
-        pub_key = pk.strip().split(' ')
-        for k in keypairs:
-            # check if the public key already exists in our keypairs 
-            if keypairs[k]['public'].strip().split(' ')[:2] == pub_key[:2]:
-                exists = True
-                associated = False
-                # check if it is already associated with this machine
-                for m in keypairs[k].get('machines', []):
-                    if m[:2] == [backend_id, machine_id]:
-                        associated = True
-                        break
-                if not associated:
-                    if not keypairs[k].get('machines', None):
-                        keypairs[k]['machines'] = []
-                    keypairs[k]['machines'].append([backend_id, machine_id])
-                    updated_keypairs[k] = keypairs[k]
-            if exists:
-                break
-                    
-        # if public key does not exist in our keypairs, add a new entry
-        if not exists:
-            if len(pub_key)>2:
-                key_name = pub_key[2].strip('\r')
-            else:
-                key_name = "%s@%s" % (ssh_user, host)
-                if key_name in keypairs:
-                    i = 0
-                    while True:
-                        key_name = '%s@%s-%d' % (ssh_user, host, i)
-                        i+=1
-                        if key_name not in keypairs:
+        # track which keypairs will be updated
+        updated_keypairs = {}
+        
+        # get the actual public keys from the blob
+        ak = [k for k in authorized_keys.split('\n') if k.startswith('ssh')]
+
+        # for each public key
+        for pk in ak:
+            exists = False
+            pub_key = pk.strip().split(' ')
+            for k in keypairs:
+                # check if the public key already exists in our keypairs 
+                if keypairs[k]['public'].strip().split(' ')[:2] == pub_key[:2]:
+                    exists = True
+                    associated = False
+                    # check if it is already associated with this machine
+                    for m in keypairs[k].get('machines', []):
+                        if m[:2] == [backend_id, machine_id]:
+                            associated = True
                             break
-            keypairs[key_name] = {'public': ' '.join(pk.split(' ')[:2]),
-                                  'private': '',
-                                  'machines': [[backend_id, machine_id, 0, ssh_user]]}
-            updated_keypairs[key_name] = keypairs[key_name]
+                    if not associated:
+                        if not keypairs[k].get('machines', None):
+                            keypairs[k]['machines'] = []
+                        keypairs[k]['machines'].append([backend_id, machine_id])
+                        updated_keypairs[k] = keypairs[k]
+                if exists:
+                    break
+                        
+        if updated_keypairs:
+            log.debug('update keypairs')
 
-    if updated_keypairs:
-        log.debug('update keypairs')
-        save_settings(request)
-
-    ret = [{'name': key,
-            'machines': keypairs[key].get('machines', []),
-            'pub': keypairs[key]['public'],
-            'default_key': keypairs[key].get('default', False)}
-           for key in updated_keypairs.keys()]
-     
-    return ret
+        ret = [{'name': key,
+                'machines': keypairs[key].get('machines', []),
+                'pub': keypairs[key]['public'],
+                'default_key': keypairs[key].get('default', False)}
+               for key in updated_keypairs.keys()]
+         
+        return ret
 
 
 def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, sudoer, public_key = False, private_key = False, default = None):
     """ Updates an ssh keypair or associates an ssh user for a machine with a key.
 
     """
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    with get_user(request) as user:
+        keypairs = user['keypairs']
 
-    if key_id not in keypairs:
-        keypairs[key_id] = {'machines': []}
-    
-    keypair = keypairs[key_id]
-
-    if public_key:
-        keypair['public'] = public_key
-
-    if private_key:
-        keypair['private'] = private_key
-
-    if default != None:
-        keypair['default'] = default
-
-    log.debug("Keypair is : %s" % keypair)
-    for machine in keypair.get('machines',[]):
-        if [backend_id, machine_id] == machine[:2]:
-            keypairs[key_id]['machines'][keypair['machines'].index(machine)] = [backend_id, machine_id, timestamp, ssh_user, sudoer]
-        else:
-            log.debug("Machines are : %s" % keypair.get('machines', []))
-
-    try:
-        log.debug('save settings (save keypair)')
-        save_settings(request)
-    except Exception, e:
-        log.error('Error saving keypair %s: %s' % (key_id, e))
-        return False
+        if key_id not in keypairs:
+            keypairs[key_id] = {'machines': []}
         
-    return True
+        keypair = keypairs[key_id]
+
+        if public_key:
+            keypair['public'] = public_key
+
+        if private_key:
+            keypair['private'] = private_key
+
+        if default != None:
+            keypair['default'] = default
+
+        #~ log.debug("Keypair is : %s" % keypair)
+        for machine in keypair.get('machines',[]):
+            if [backend_id, machine_id] == machine[:2]:
+                keypairs[key_id]['machines'][keypair['machines'].index(machine)] = [backend_id, machine_id, timestamp, ssh_user, sudoer]
+            else:
+                log.debug("Machines are : %s" % keypair.get('machines', []))
+
+        return True
 
 
 def associate_key(request, key_id, backend_id, machine_id, deploy=True):
@@ -1453,51 +1491,51 @@ def associate_key(request, key_id, backend_id, machine_id, deploy=True):
 
     """
     log.debug("Associate key, deploy = %s" % deploy)
-    if not key_id or not machine_id or not backend_id:
-        return Response('Keypair, machine or backend not provided', 400)
-
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
-
-    try:
-        keypair = keypairs[key_id]
-    except KeyError:
-        return Response('Keypair not found', 404)
-
-    machine_uid = [backend_id, machine_id]
-    machines = keypair.get('machines', [])
     
-    for machine in machines:
-        if machine[:2] == machine_uid:
-            return Response('Keypair already associated to machine', 304)
+    if not key_id:
+        return Response('Keypair name not provided', 400)
+    
+    if not machine_id:
+        return Response('Machine id not provided', 400)
+    
+    if not backend_id:
+        return Response('Backend id not provided', 400)
 
-    try:
-        keypair['machines'].append(machine_uid)
-    except KeyError: 
-        # initialize machine associations array if it does not exist
-        keypair['machines'] = [machine_uid]
+    with get_user(request) as user:
+        keypairs = user.get('keypairs',{})
 
+        if not key_id in keypairs:
+            return Response('Keypair "%s" not found' % key_id, 404)
+
+        keypair = keypairs[key_id]
+
+        machine_uid = [backend_id, machine_id]
+        machines = keypair.get('machines', [])
+        
+        for machine in machines:
+            if machine[:2] == machine_uid:
+                log.debug('Keypair "%s" already associated with machine "%s"' % (key_id, machine_id))
+                return keypair['machines']
+        try:
+            keypair['machines'].append(machine_uid)
+        except KeyError: 
+            # initialize machine associations array if it does not exist
+            keypair['machines'] = [machine_uid]
+            
     if deploy:
         ret = deploy_key(request, keypair)
     
         if ret:
             keypair['machines'][-1] += [int(time()), ret.get('ssh_user', ''), ret.get('sudoer', False)]
-            log.debug('save settings (associate key)')
-            save_settings(request)
             log.debug("Associate key, %s" % keypair['machines'])
             return keypair['machines']
         else:
             if machine_uid in keypair['machines']:
                 keypair['machines'].remove(machine_uid)
-            log.debug("Associate key, %s" % keypair['machines'])
+            log.debug("Disassociate key, %s" % keypair['machines'])
             
             return Response('Failed to deploy key', 412)
     else:
-        log.debug('save settings (associate key2)')
-        log.debug("deploy false")
-        save_settings(request)
         return keypair['machines']
 
 
@@ -1508,40 +1546,40 @@ def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
     the machine.
 
     """
-    if not key_id or not machine_id or not backend_id:
-        return Response('Keypair, machine or backend not provided', 400)
+    if not key_id:
+        return Response('Keypair name not provided', 400)
+    
+    if not machine_id:
+        return Response('Machine id not provided', 400)
+    
+    if not backend_id:
+        return Response('Backend id not provided', 400)
 
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
+    with get_user(request) as user:
+        keypairs = user.get('keypairs',{})
+        try:
+            keypair = keypairs[key_id]
+        except KeyError:
+            return Response('Keypair not found', 404)
 
-    try:
-        keypair = keypairs[key_id]
-    except KeyError:
-        return Response('Keypair not found', 404)
+        machine_uid = [backend_id, machine_id]
+        machines = keypair.get('machines', [])
 
-    machine_uid = [backend_id, machine_id]
-    machines = keypair.get('machines', [])
-
-    key_found = False
-    for machine in machines:
-        if machine[:2] == machine_uid:
-            keypair['machines'].remove(machine)
-            key_found = True
-            break
+        key_found = False
+        for machine in machines:
+            if machine[:2] == machine_uid:
+                keypair['machines'].remove(machine)
+                key_found = True
+                break
 
     #key not associated
     if not key_found: 
-        return Response('Keypair is not associated to this machine', 304)
+        return Response('Keypair "%s" is not associated with machine "%s"' % (key_id, machine_id), 304)
 
     if undeploy:
         ret = undeploy_key(request, keypair)
 
-    log.debug('save settings (disassociate key)')
-    save_settings(request)
-
-    return keypair['machines']
+        return keypair['machines']
 
 
 def deploy_key(request, keypair):
@@ -1563,27 +1601,24 @@ def deploy_key(request, keypair):
         pass
 
     # Maybe the deployment failed but let's try to connect with the new key and see what happens
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
-    
-    key_name = None
-    for key_name, k in keypairs.items():
-        if k == keypair:
-            break
+    with get_user(request, readonly=True) as user:
+        keypairs = user.get('keypairs',{})    
+        key_name = None
+        for key_name, k in keypairs.items():
+            if k == keypair:
+                break
 
-    if key_name:
-        log.warn('probing with key %s' % key_name)
+        if key_name:
+            log.warn('probing with key %s' % key_name)
 
-    if ret:
-        ssh_user = ret.get('ssh_user', None)
-    else:
-        ssh_user = None
+        if ret:
+            ssh_user = ret.get('ssh_user', None)
+        else:
+            ssh_user = None
 
-    test = shell_command(request, backend_id, machine_id, host, 'whoami', ssh_user, key = key_name)
+        test = shell_command(request, backend_id, machine_id, host, 'whoami', ssh_user, key = key_name)
 
-    return test
+        return test
 
 
 def undeploy_key(request, keypair):
@@ -1606,4 +1641,3 @@ def undeploy_key(request, keypair):
         return False
 
     return ret
-

@@ -15,7 +15,7 @@ from StringIO import StringIO
 
 from pyramid.request import Request
 from pyramid.response import Response
-from mist.io.helpers import connect, run_command, get_keypair, get_ssh_user_from_keypair
+from mist.io.helpers import connect, run_command, get_keypair, get_ssh_user_from_keypair, get_user
 from mist.io.views import get_preferred_keypairs
 
 log = logging.getLogger('mistshell')
@@ -44,10 +44,8 @@ class ShellMiddleware(object):
                     log.debug("Will select root as the ssh-user as we don't know who we are")
                     ssh_user = 'root'
 
-                try:
-                    keypairs = environ['beaker.session']['keypairs']
-                except:
-                    keypairs = request.registry.settings.get('keypairs', {})
+                with get_user(request, readonly=True) as user:
+                    keypairs = user['keypairs']
 
                 preferred_keypairs = get_preferred_keypairs(keypairs, backend, machine)
                 log.debug("preferred keypairs = %s" % preferred_keypairs)
@@ -62,6 +60,8 @@ class ShellMiddleware(object):
                         log.debug("Will select %s as the ssh-user" % ssh_user)
                 else:
                     private_key = None
+                    log.error("Missing private key")
+                    raise Exception("Missing private key")
 
                 conn = connect(request, backend)
                 if conn:

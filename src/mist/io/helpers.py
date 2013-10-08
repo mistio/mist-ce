@@ -6,11 +6,14 @@ import yaml
 import subprocess
 import struct
 import binascii
+import requests
 
 from time import time
 from hashlib import sha1
 from Crypto.PublicKey import RSA , DSA
 from Crypto.Util.number import bytes_to_long, long_to_bytes, isPrime
+from contextlib import contextmanager
+from copy import deepcopy
 
 from pyramid.response import Response
 
@@ -31,7 +34,57 @@ libcloud.security.CA_CERTS_PATH.append('/usr/share/curl/ca-bundle.crt')
 
 log = logging.getLogger('mist.io')
 
+@contextmanager
+def get_user(request, readonly=False, refresh=False, ext_auth=False):
+    """Use it like this:
+        with get_user(request) as user:
+            code....
+    It will automagically clean up and save the data to the session and the database
+    """
+    
+    try:
+        settings = request.registry.settings
+        user = settings['user']
+        user_before = deepcopy(user)
+        yield user
+    except Exception as e:
+        # An exception occured. Returning False will reraise it.
+        log.error("Get_user io got an exception: '%s'" % e)
+        raise e
+    else:
+        # All went fine. Save.
+        if not readonly and user_before and user != user_before:
+            save_settings(request)
 
+####FIXME: This is UGLY!!!!
+try:
+    from mist.core.helpers import get_user
+except:
+    pass
+    
+def get_auth_key(request):
+    with get_user(request, readonly=True) as user:
+        from base64 import urlsafe_b64encode
+        auth_key = "%s:%s" % (user['email'], user['password'])
+        auth_key = urlsafe_b64encode(auth_key)
+        return auth_key
+    #~ auth_key = request.settings.get('auth_key', '')
+    #~ if not auth_key:
+        #~ with get_user(request, readonly=True) as user:
+            #~ email = user.get('email', '')
+            #~ password = user.get('password', '')
+        #~ if email and password:
+            #~ payload = {'email':email, 'password':password}
+            #~ ret = requests.post(request.settings['core_uri'] + '/auth',
+                                #~ params=payload,
+                                #~ verify=False)
+            #~ if ret.status_code == 200:
+#~ 
+    #~ return request.settings['auth_key']
+    #~ 
+    #~ payload = {'email': settings['user'].get('email'),
+                   #~ 'password': settings['user'].get('password')}
+    
 def load_settings(settings):
     """Gets settings from settings.yaml local file.
 
@@ -61,11 +114,11 @@ def load_settings(settings):
         log.error('Error parsing settings.yaml')
         config_file.close()
         raise
-
-    settings['keypairs'] = user_config.get('keypairs', {})
-    settings['backends'] = user_config.get('backends', {})
-    settings['email'] = user_config.get('email', '')
-    settings['password'] = user_config.get('password', '')
+    settings['user'] = {}
+    settings['user']['keypairs'] = user_config.get('keypairs', {})
+    settings['user']['backends'] = user_config.get('backends', {})
+    settings['user']['email'] = user_config.get('email', '')
+    settings['user']['password'] = user_config.get('password', '')
     settings['js_build'] = user_config.get('js_build', settings.get('js_build', True))
     settings['js_log_level'] = user_config.get('js_log_level', 3)
     settings['default_poll_interval'] = user_config.get('default_poll_interval',
@@ -105,25 +158,25 @@ def save_settings(request):
     settings = request.registry.settings
 
     keypairs = {}
-    for key in settings['keypairs'].keys():
+    for key in settings['user']['keypairs'].keys():
         keypairs[key] = {
-            'public': literal_unicode(settings['keypairs'][key]['public']),
-            'private': literal_unicode(settings['keypairs'][key]['private']),
-            'machines': settings['keypairs'][key].get('machines',[]),
-            'default': settings['keypairs'][key].get('default', False)
+            'public': literal_unicode(settings['user']['keypairs'][key]['public']),
+            'private': literal_unicode(settings['user']['keypairs'][key]['private']),
+            'machines': settings['user']['keypairs'][key].get('machines',[]),
+            'default': settings['user']['keypairs'][key].get('default', False)
         }
 
     payload = {
         'keypairs': keypairs,
-        'backends': settings['backends'],
+        'backends': settings['user']['backends'],
         'core_uri': settings['core_uri'],
         'js_build': settings['js_build'],
         'js_log_level': settings['js_log_level'],
         }
 
-    if settings.get('email', False) and settings.get('password', False):
-        payload['email'] = settings['email']
-        payload['password'] = settings['password']
+    if settings['user'].get('email', False) and settings['user'].get('password', False):
+        payload['email'] = settings['user']['email']
+        payload['password'] = settings['user']['password']
 
     yaml.dump(payload, config_file, default_flow_style=False, )
 
@@ -156,7 +209,7 @@ def get_keypair(keypairs, backend_id=None, machine_id=None):
 def get_ssh_user_from_keypair(keypair, backend_id=None, machine_id=None):
     """get ssh user for key pair given the key pair"""
     machines = keypair.get('machines', [])
-    log.debug("Machines in keypair %s: %s" % (keypair, machines))
+    #~ log.debug("Machines in keypair %s: %s" % (keypair, machines))
     for machine in machines:
         log.debug("Machine: %s" % machine)
         if machine[:2] == [backend_id, machine_id]:
@@ -181,10 +234,9 @@ def connect(request, backend_id=False):
         * Linode
 
     """
-    try:
-        backends = request.environ['beaker.session']['backends']
-    except KeyError:
-        backends = request.registry.settings['backends']
+    with get_user(request, readonly=True) as user:
+        backends = user['backends']
+        #~ log.error(backends.keys())
 
     if not backend_id:
         backend_id = request.matchdict['backend']
@@ -359,6 +411,7 @@ def run_command(machine_id, host, ssh_user, private_key, command):
         of this message.
 
     """
+    #~ log.error("runcommand(%s,%s,%s,%s,%s)" % (machine_id, host, ssh_user, private_key, command))
     if not host:
         log.error('Host not provided, exiting.')
         return Response('Host not set', 400)
@@ -457,8 +510,8 @@ def generate_keypair():
     """Generates a random keypair."""
     key = RSA.generate(2048, os.urandom)
     return {
-        'public': key.exportKey('OpenSSH'),
-        'private': key.exportKey()
+        #'pub': key.exportKey('OpenSSH'),
+        'priv': key.exportKey()
     }
 
 
@@ -472,16 +525,18 @@ def set_default_key(request):
     key_id = request.matchdict['key']
     
     if not key_id:
-        return Response('Keypair not found', 404)
+        return Response('Key name not provided', 400)
 
-    keypairs = request.registry.settings['keypairs']
+    with get_user(request) as user:
+        keypairs = user.get('keypairs', {})
 
-    for key in keypairs:
-        keypairs[key]['default'] = False
+        if not key_id in keypairs:
+            return Response('Keypair not found', 404)
 
-    keypairs[key_id]['default'] = True
+        for key in keypairs:
+            keypairs[key]['default'] = False
 
-    save_settings(request)
+        keypairs[key_id]['default'] = True
 
     return Response('OK', 200)
 
@@ -493,61 +548,40 @@ def get_private_key(request):
     button.
 
     """    
-    try:
-        keypairs = request.environ['beaker.session']['keypairs']
-    except:
-        keypairs = request.registry.settings.get('keypairs', {})
-    
-    key_id = request.matchdict['key']
-
-    if key_id in keypairs.keys():
-        return keypairs[key_id].get('private', '')
-    else:
-        return Response('Keypair not found', 404)
-
-
-def validate_dsa_key_pair(public_key, private_key):
-    """ Validates a pair of dsa keys """
-    
-    # FIXME: Make this function validate private key too
-    
-    # Construct DSA key
-    keystring = binascii.a2b_base64(public_key.split(' ')[1])
-    keyparts = []
-    
-    while len(keystring) > 4:
-        length = struct.unpack('>I', keystring[:4])[0]
-        keyparts.append(keystring[4:4 + length])
-        keystring = keystring[4 + length:]
+    with get_user(request, readonly=True) as user:
+        keypairs = user.get('keypairs', {})
+        key_id = request.matchdict['key']
         
-    if keyparts[0] == 'ssh-dss':
-        tup = [bytes_to_long(keyparts[x]) for x in (4, 3, 1, 2)]
-    else:
-        return False
-    
-    key = DSA.construct(tup)
-    
-    # Validate DSA key
-    fmt_error = not isPrime(key.p)
-    fmt_error |= ((key.p-1) % key.q)!=0 
-    fmt_error |= key.g<=1 or key.g>=key.p
-    fmt_error |= pow(key.g, key.q, key.p)!=1 
-    fmt_error |= key.y<=0 or key.y>=key.p 
-    
-    # The following piece of code is currently useless, because 'x' attribute is the private key
-    #if hasattr(key, 'x'):
-    #    fmt_error |= key.x<=0 or key.x>=key.q 
-    #    fmt_error |= pow(key.g, key.x, key.p)!=key.y 
-        
-    return not fmt_error
+        if not key_id:
+            return Response('Key id not provided', 400)
 
-def validate_key_pair(public_key, private_key):
-    """ Validates a pair of keys """
+        if key_id in keypairs:
+            return keypairs[key_id].get('private', '')
+        else:
+            return Response('Keypair not found %s' % key_id, 404)
+
+
+def get_public_key(request):
     
-    message = 'Encrypted message 1234567890'
+    with get_user(request, readonly=True) as user:
+        keypairs = user.get('keypairs', {})
+        key_id = request.matchdict['key']
+        
+        if not key_id:
+            return Response('Key id not provided', 400)
+
+        if key_id in keypairs:
+            return keypairs[key_id].get('public', '')
+        else:
+            return Response('Keypair not found %s' % key_id, 404)
+    
+
+def validate_keypair(public_key, private_key):
+    """ Validates a pair of RSA keys """
+    
+    message = 'Message 1234567890'
     
     if 'ssh-rsa' in public_key:
-        
         public_key_container = RSA.importKey(public_key)
         private_key_container = RSA.importKey(private_key)
         encrypted_message = public_key_container.encrypt(message, 0)
@@ -555,12 +589,16 @@ def validate_key_pair(public_key, private_key):
         
         if message == decrypted_message:
             return True
-        
-    elif 'ssh-dss' in public_key:
-    
-        return validate_dsa_key_pair(public_key, private_key)
     
     return False
+
+
+def generate_public_key(private_key):
+    try:
+        key = RSA.importKey(private_key)
+        return key.publickey().exportKey('OpenSSH')
+    except:
+        return ''
 
 def get_preferred_keypairs(keypairs, backend_id, machine_id):
     """ Returns a list with the preferred keypairs for this machine

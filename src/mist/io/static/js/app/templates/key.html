@@ -16,11 +16,10 @@
          <div data-role="collapsible" data-collapsed="false">
             <h3>Public Key</h3>
             <div class="public-key">
-                <input type="text" readonly="readonly" {{bindAttr value="pub"}}/>
+                <input type="text" readonly="readonly" val="Loading public key..."/>
             </div>
         </div>
 
-        {{#if priv}}
         <div data-role="collapsible" data-collapsed="false">
             <h3>Private key</h3>
             <div class="private-key">
@@ -33,10 +32,9 @@
                 </div>
             </div>
         </div>
-        {{/if}}
 
         {{#if machines}}
-        <div data-role="collapsible" id="single-machines-keys" data-collapsed="false">
+        <div data-role="collapsible" id="single-key-machines" data-collapsed="false">
             <h3>Machines</h3>
             <ul id="machines-list"
                 data-role="listview"
@@ -57,11 +55,11 @@
         {{view Mist.ConfirmationDialog data-role="content"}}
     </div>
 
-    <div data-role="popup" id="create-key-dialog" data-overlay-theme="a" data-transition="pop">
+    <div data-role="popup" id="edit-key-dialog" data-overlay-theme="a" data-transition="pop">
         <div data-role="header">
-            <h1>Edit key</h1>
+            <h1>Rename key</h1>
         </div>
-        {{view Mist.AddKeyView data-role="content"}}
+        {{view Mist.EditKeyView data-role="content"}}
     </div>
 
     <div data-role="footer" id="single-key-footer" data-theme="a">
@@ -69,7 +67,7 @@
             <a id="keys-button-edit"
                data-role="button"
                data-icon="edit"
-               {{action editClicked target="view"}}>Edit</a>
+               {{action editClicked target="view"}}>Rename</a>
 
             <a id="keys-button-delete"
                data-role="button"

@@ -64,10 +64,12 @@ define( 'app', [
     'app/views/delete_tag',
     'app/views/machine_tags_dialog',
     'app/views/machine_manage_keys',
+    'app/views/machine_manage_keys_list_item',
     'app/views/key_list_item',
     'app/views/key_list',
     'app/views/key',
     'app/views/key_add_dialog',
+    'app/views/key_edit_dialog',
     'app/views/key_priv_dialog',
     'app/views/rule',
     'app/views/user_menu',
@@ -103,11 +105,13 @@ define( 'app', [
                 ImageListView,
                 DeleteTagView,
                 MachineTagsDialog,
-                MachineManageKeys,
+                MachineManageKeysView,
+                MachineManageKeysListItemView,
                 KeyListItemView,
                 KeyListView,
                 SingleKeyView,
                 KeyAddDialog,
+                KeyEditDialog,
                 KeyPrivDialog,
                 RuleView,
                 UserMenuView,
@@ -193,7 +197,7 @@ define( 'app', [
         App.KeysRoute = Ember.Route.extend({
           //clear selected keys when exiting view           
           exit: function(){
-              Mist.keysController.forEach(function(key){
+              Mist.keysController.keys.forEach(function(key){
                    log('deselecting key: ' + key.name);
                    key.set('selected', false);
               });
@@ -217,9 +221,24 @@ define( 'app', [
           model: function(){
               // set redirect target if the user visits directly the URL
               this.target = 'keys';
-          }
+          } 
         });  
         
+            // we check if we are at the bottom of the page
+        App.isScrolledToBottom = function(){
+            var distanceToViewportTop = (
+                $(document).height() - $(window).height());
+            var viewPortTop = $(document).scrollTop();
+        
+            if (viewPortTop === 0) {
+                // if we are at the top of the page, don't do
+                // the infinite scroll thing
+                return false;
+            }
+        
+            return (viewPortTop - distanceToViewportTop === 0);
+        };        
+
         App.SingleMachineView = SingleMachineView;
         App.MachineListView = MachineListView;
         App.UserMenuView = UserMenuView;
@@ -228,9 +247,11 @@ define( 'app', [
         App.ImageListView = ImageListView;
         App.SingleKeyView = SingleKeyView;
         App.AddKeyView = KeyAddDialog;
+        App.EditKeyView = KeyEditDialog;
         App.KeyPrivDialog = KeyPrivDialog;
         App.MachineAddView = MachineAddDialog;
-        App.MachineManageKeys = MachineManageKeys;
+        App.MachineManageKeysView = MachineManageKeysView;
+        App.MachineManageKeysListItemView = MachineManageKeysListItemView;
         
         App.set('backendAddController', BackendAddController.create());
         App.set('backendsController', BackendsController.create());
@@ -356,9 +377,12 @@ define( 'app', [
         App.MachineActionsDialog = MachineActionsDialog;
         App.MachineListView = MachineListView;
 
+        App.set('renderedImages', Ember.ArrayController.create());
+        
         window.Mist = App;
         return App
     }
+    
 
     var allImgs = [],
         imgUrls = [],

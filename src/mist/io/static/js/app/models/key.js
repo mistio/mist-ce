@@ -8,30 +8,22 @@ define('app/models/key', [
      */
     function() {
         return Ember.Object.extend({
-            
-            pub: null,
-            priv: null,
+
+            id: null,
             name: null,
+            probing: null,
             machines: null,
             selected: null,
             default_key: null,
-            probeState: 'unprobed',
-            
-            updateProbeState: function(machine, timeStamp) {
-                for (var m = 0; m < this.machines.length; ++m) {
-                    if (this.machines[m][1] == machine.id && 
-                        this.machines[m][0] == machine.backend.id) {
-                            this.machines[m][2] = timeStamp;
-                            if (timeStamp > 0) {
-                                this.set('probeState', 'probed');
-                                Mist.backendsController.getMachineById(this.machines[m][0],
-                                                                       this.machines[m][1]).set('probed', true);
-                            } else {
-                                this.set('probeState', 'unprobed');
-                            }
-                            return;
+
+            updateMachineUptimeChecked: function(machine, timeStamp) {
+                this.machines.some(function(machineToUpdate) {
+                    if (machineToUpdate[1] == machine.id &&
+                        machineToUpdate[0] == machine.backend.id) {
+                            machineToUpdate[2] = timeStamp;
+                            return true;
                     }
-                }
+                });
             }
         });
     }

@@ -31,13 +31,15 @@
         data-inset="true"
         data-theme="c"
         data-filter-placeholder="Filter images...">
-            {{#each Mist.backendsController}}
-                {{#each images}}
-                    {{view Mist.ImageListItemView imageBinding="this" class="node" }}
-                {{/each}}
-            {{/each}}
+            {{#each view.renderedImages}}
+                {{view Mist.ImageListItemView imageBinding="this" class="node" }}
+            {{/each}}            
         </ul>
-
+        <div class="ajax-loader"></div>        
+        <a id="images-advanced-search" 
+           data-role="button" 
+           data-theme="b"
+           {{action advancedSearchClicked target="view"}}><span>Continue search on server...</span></a>
         <div class="bottom-padding"></div>
 
     </div>

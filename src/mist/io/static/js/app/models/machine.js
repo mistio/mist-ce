@@ -36,13 +36,27 @@ define('app/models/machine', [
                     }
                 });
             }.observes('probed', 'probing'),
-            
+
+            calculateProbed: function() {
+                var probed = false;
+                Mist.keysController.some(function(key) {
+                    key.machines.some(function(machine) {
+                        if (machine[2] > 0) {
+                            probed = true;
+                        }
+                        return probed;
+                    });
+                    return probed;
+                });
+                this.set('probed', probed);
+            },
+
             image: function() {
                 return this.backend.images.getImage(this.imageId);
             }.property('imageId'),
             
             isNotGhost: function() {                
-                return ! this.isGhost;
+                return !this.isGhost;
             }.property('isGhost'),
 
             reboot: function() {
@@ -221,8 +235,7 @@ define('app/models/machine', [
                             var key = Mist.keysController.getKeyByName(keyName);
                             if (keyName != undefined){
                                 that.set('probing', keyName);
-                                key.set('probeState', 'probing');
-                                warn('yeay!');
+                                key.set('probing', that);
                             } else {
                                 that.set('probing', true);
                             }
@@ -236,15 +249,15 @@ define('app/models/machine', [
                                 success: function(data, textStatus, jqXHR) {
                                        // got it fine, also means it has a key
                                     if (jqXHR.status === 200) {
-                                        if(key) {
-                                            key.updateProbeState(that, Date.now());
-                                        } else {
-                                            that.set('probed', true);
-                                        }
                                         var uptime = parseFloat(data['uptime'].split(' ')[0]) * 1000;
                                         that.set('uptimeChecked', Date.now());
                                         that.set('uptimeFromServer', uptime);
                                         info('Successfully got uptime', uptime, 'from machine', that.name);
+                                        if(key) {
+                                            key.updateMachineUptimeChecked(that, that.uptimeChecked);
+                                            key.set('probing', false);
+                                        }
+                                        that.set('probed', true);
                                         /*
                                         data.updated_keys.forEach(function(updatedKey) {
                                             for (var i=0; i < Mist.keysController.keys.length; ++i) {
@@ -270,12 +283,13 @@ define('app/models/machine', [
                                         */
                                     } else {
                                         // in every other case there is a problem
-                                        if(key) {
-                                            key.updateProbeState(that, -Date.now());
-                                        } else {
-                                            that.set('probed', false);
-                                        }
                                         info('Got response other than 200 while probing machine', that.name);
+                                        if(key) {
+                                            key.updateMachineUptimeChecked(that, -Date.now());
+                                            key.set('probing', false);
+                                        }
+                                        that.calculateProbed();
+                                        
                                         if (!that.backend.create_pending){
                                              retry(that);
                                         }
@@ -283,20 +297,18 @@ define('app/models/machine', [
                                     that.set('probing', false);
                                 },
                                 error: function(jqXHR, textstate, errorThrown) {
+                                    error(textstate, errorThrown, ' when probing machine: ', that.name);
                                     if(key) {
-                                        key.updateProbeState(that, -Date.now());
-                                    } else {
-                                        that.set('probed', false);
+                                        key.updateMachineUptimeChecked(that, -Date.now());
+                                        key.set('probing', false);
                                     }
-                                    //Mist.notificationController.notify('Error getting uptime from machine ' +
-                                    //    that.name);
-                                    //error(textstate, errorThrown, 'when probing machine',
-                                    //    that.name);
+                                    that.calculateProbed();
+                                    that.set('probing', false);
                                     that.set('probeInterval', 2*that.get('probeInterval'));
+                                    
                                     if (!that.backend.create_pending){
                                          retryProbe(that.get('probeInterval'));
                                     }
-                                    that.set('probing', false);
                                 }
                             });
                         }
@@ -315,9 +327,11 @@ define('app/models/machine', [
                         }
                     }
                 }
-                if (!that.backend.create_pending){
-                     setTimeout(sendProbe, 2000);
-                }               
+                if (that.backend) {
+                    if (!that.backend.create_pending){
+                         setTimeout(sendProbe, 2000);
+                    }   
+                }
             },
 
             reProbe: function() {
@@ -469,21 +483,7 @@ define('app/models/machine', [
 
             init: function() {
                 this._super();
-
                 this.tags = Ember.ArrayController.create();
-                this.keys = Ember.ArrayController.create();
-                
-                var that = this;
-                Mist.keysController.content.forEach(function(key){
-                    if (key.machines && key.machines.length > 0){
-                        key.machines.forEach(function(item){
-                            if (item[1] == that.id && item[0] == that.backend.id) {
-                                that.keys.addObject(key);
-                            }
-                        });
-                    }
-                });
-
                 this.startUptimeTimer();
                 this.probe();
             }

@@ -21,70 +21,65 @@ define('app/controllers/keys', [
 
             loadKeys: function() {
                 this.set('loadingKeys', true);
-                var that = this;
                 $.ajax({
                     url: '/keys',
                     type: 'GET',
                     success: function(data) {
                         info('Successfully loaded keys');
-                        that.set('loadingKeys', false);
-                        that.updateKeyList(data);
+                        Mist.keysController.set('loadingKeys', false);
+                        Mist.keysController.updateKeysList(data);
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        Mist.notificationController.notify('Error while loading key: ' + jqXHR.responseText);
+                        Mist.notificationController.notify('Error while loading keys: ' + jqXHR.responseText);
                         error(textstate, errorThrown, ' while loading keys. ', jqXHR.responseText);
-                        that.set('loadingKeys', false);
+                        Mist.keysController.set('loadingKeys', false);
                     }
                 });
             },
 
-            newKey: function(name, publicKey, privateKey, machine, autoSelect) {
-                name = name.trim();
-                item = {
+            newKey: function(name, privateKey, machine, autoSelect) {
+                $('#create-loader').fadeIn(200);
+                $('#create-key-ok').button('disable');
+                var item = {
                     'name': name,
-                    'pub': publicKey,
                     'priv': privateKey
                 };
-                var that = this;
                 $.ajax({
                     url: '/keys',
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(item),
                     success: function(data) {
-                        info('Successfully created key : ', name);
-                        item.priv = null; // don't keep private key on the client
-                        $("#create-key-dialog").popup("close");
+                        info('Successfully created key: ', name);
+                        $('#create-loader').fadeOut(200);
+                        $('#create-key-dialog').popup('close');
                         Mist.keyAddController.newKeyClear();
+                        Mist.keysController.keys.addObject(Key.create(data));
                         if (autoSelect) {
-                            that.keys.addObject(Key.create(data));
                             Ember.run.next(function(){
                                 $('.select-key-collapsible .select-listmenu').listview();
                                 $('.select-key-collapsible').parent().trigger('create');
                                 $('.select-key-collapsible li a').eq(0).click();
                                 $('.select-key-collapsible').removeClass('ui-disabled');
                             });
-                        } else {
-                            $('#keys-list').fadeOut(200);
-                            Ember.run.later(function() {
-                                that.keys.addObject(Key.create(data));
-                                Ember.run.next(function() {
-                                    $('#keys-list').listview('refresh');
-                                    $('#keys-list input.ember-checkbox').checkboxradio();
-                                    $('#keys-list').fadeIn(200);
-                                });
-                            }, 200);
-                        }
-                        if (machine) {
-                            that.associateKey(name, machine);
+                        } else if (machine) {
+                            Mist.keysController.associateKey(name, machine);
                             $('#manage-keys .ajax-loader').fadeIn(200);
+                        } else {
+                            Ember.run.next(function() {
+                                $('#keys-list').listview('refresh');
+                                $('#keys-list input.ember-checkbox').checkboxradio();
+                            });
                         }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while creating new key: ' + jqXHR.responseText);
+                        Mist.notificationController.notify('Error while creating key: ' + jqXHR.responseText);
                         error(textstate, errorThrown, ' while creating key: ', name, '. ', jqXHR.responseText);
+                        $('#create-loader').fadeOut(200);
+                        $('#create-key-ok').button('enable');
                     }
                 });
+                item.priv = privateKey = null; // Don't keep private key on client
             },
 
             deleteKey: function(name) {
@@ -93,7 +88,7 @@ define('app/controllers/keys', [
                     type: 'DELETE',
                     success: function(data) {
                         info('Successfully deleted key: ', name);
-                        Mist.keysController.updateKeyList(data);
+                        Mist.keysController.updateKeysList(data);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while deleting key: ' + jqXHR.responseText);
@@ -102,34 +97,23 @@ define('app/controllers/keys', [
                 });
             },
 
-            editKey: function(oldName, name, publicKey, privateKey) {
-                name = name.trim();
-                item = {
-                    'oldname': oldName,
-                    'name': name,
-                    'pub': publicKey,
-                    'priv': privateKey
+            editKey: function(oldName, newName) {
+                var item = {
+                    'newName': newName,
                 };
-                var that = this;
                 $.ajax({
-                    url: '/keys/' + name,
+                    url: '/keys/' + oldName,
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(item),
                     success: function() {
-                        info('Successfully edited key: ', name);
-                        item.priv = null; // don't keep private key on the client
-                        var key = that.getKeyByName(oldName);
-                        key.set('name', name);
-                        key.set('pub', publicKey);
-                        Ember.run.next(function() {
-                            $("#create-key-dialog").popup("close");
-                            Mist.keyAddController.newKeyClear();
-                        });
+                        info('Successfully edited key: ', oldName);
+                        $("#edit-key-dialog").popup("close");
+                        Mist.keysController.getKeyByName(oldName).set('name', newName);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while editting key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ' while editting key: ', name, '. ', jqXHR.responseText);
+                        error(textstate, errorThrown, ' while editting key: ', oldName, '. ', jqXHR.responseText);
                     }
                 });
             },
@@ -150,111 +134,129 @@ define('app/controllers/keys', [
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while setting default key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ' while setting default key: ', name, ', ', jqXHR.responseText);
+                        error(textstate, errorThrown, ' while setting default key: ', name, '. ', jqXHR.responseText);
                     }
                 });
             },
 
-            associateKey: function(key_name, machine) {
-                payload = {
-                    'key_id': key_name,
+            associateKey: function(keyName, machine) {
+                var payload = {
+                    'key_id': keyName,
                     'backend_id': machine.backend.id,
                     'machine_id': machine.id,
                     'host': machine.getHost()
                 };
-                var that = this;
                 $.ajax({
-                    url: '/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + key_name,
+                    url: '/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + keyName,
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     success: function(data) {
-                        info('Successfully associated key: ', key_name, ' with machine: ', machine.id);
+                        info('Successfully associated key: ', keyName, ', with machine: ', machine.id);
                         $('#manage-keys .ajax-loader').fadeOut(200);
-                        that.updateKeyMachineList(key_name, data);
+                        Mist.keysController.updateKeyMachinesList(keyName, data);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while associating key: ' + key_name);
-                        error(textstate, errorThrown, ' while associating key', key_name, '. ', jqXHR.responseText);
+                        Mist.notificationController.notify('Error while associating key: ' + keyName);
+                        error(textstate, errorThrown, ' while associating key: ', keyName, '. ', jqXHR.responseText);
                         $('#manage-keys .ajax-loader').fadeOut(200);
                     }
                 });
             },
 
-            disassociateKey: function(key_name, machine) {
-                payload = {
-                    'key_id': key_name,
-                    'backend_id': machine.backend.id,
+            disassociateKey: function(keyName, machine) {
+                var backend_id = null;
+                if (machine.isGhost && (!machine.backend.id)) {
+                    backend_id = machine.backend;
+                } else {
+                    backend_id = machine.backend.id;
+                }
+                var payload = {
+                    'key_id': keyName,
+                    'backend_id': backend_id,
                     'machine_id': machine.id,
-                    'host': machine.getHost()
+                    'host': machine.isGhost ? null : machine.getHost(),
                 };
-                var that = this;
                 $.ajax({
-                    url: '/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + key_name,
+                    url: '/backends/' + backend_id + '/machines/' + machine.id + '/keys/' + keyName,
                     type: 'DELETE',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     success: function(data) {
-                        info('Successfully disassociated key: ', key_name, ' with machine: ', machine.id);
+                        info('Successfully disassociated key: ', keyName, ' with machine: ', machine.id);
                         $('#manage-keys .ajax-loader').fadeOut(200);
-                        that.updateKeyMachineList(key_name, data);
+                        Mist.keysController.updateKeyMachinesList(keyName, data);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while disassociating key: ' + key_name);
-                        error(textstate, errorThrown, ' while disassociating key ', key_name, '. ', jqXHR.responseText);
+                        Mist.notificationController.notify('Error while disassociating key: ' + keyName);
+                        error(textstate, errorThrown, ' while disassociating key: ', keyName, '. ', jqXHR.responseText);
                         $('#manage-keys .ajax-loader').fadeOut(200);
                     }
                 });
             },
 
-            getPrivKey: function(key_name, element) {
+            getPrivKey: function(keyName, element) {
                 $.ajax({
-                    url: '/keys/' + key_name,
+                    url: '/keys/' + keyName,
                     type: 'GET',
+                    data: 'action=private',
                     success: function(data) {
-                        info('Successfully got private key: ' + key_name);
+                        info('Successfully got private key: ' + keyName);
                         $(element).val(data).trigger('change');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while getting private key: ' + key_name);
-                        error(textstate, errorThrown, ' while getting private key. ', jqXHR.responseText);
+                        Mist.notificationController.notify('Error while getting private key: ' + keyName);
+                        error(textstate, errorThrown, ' while getting private key: ', keyName, '. ', jqXHR.responseText);
+                    }
+                });
+            },
+            
+            getPubKey: function(keyName, element) {
+                $.ajax({
+                    url: '/keys/' + keyName,
+                    type: 'GET',
+                    data: 'action=public',
+                    success: function(data) {
+                        info('Successfully got public key: ' + keyName);
+                        $(element).val(data).trigger('change');
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while getting public key: ' + keyName);
+                        error(textstate, errorThrown, ' while getting public key: ', keyName, '. ', jqXHR.responseText);
                     }
                 });
             },
 
-            getKeyByName: function(key_name) {
-                for (var i = 0; i < this.keys.length; ++i) {
-                    if (this.keys[i].name == key_name) {
-                        return this.keys[i];
+            getKeyByName: function(keyName) {
+                for (var k = 0; k < this.keys.length; ++k) {
+                    if (this.keys[k].name == keyName) {
+                        return this.keys[k];
                     }
                 }
                 return null;
             },
 
-            updateKeyList: function(data) {
-                $('#keys-list').fadeOut(200);
-                var keys = new Array();
+            updateKeysList: function(data) {
+                var newKeys = new Array();
                 data.forEach(function(key) {
-                    keys.push(Key.create(key));
+                    newKeys.push(Key.create(key));
                 });
-                var that = this;
-                Ember.run.later(function(){
-                    that.set('keys', keys);
-                    Ember.run.next(function(){
+                this.set('keys', newKeys);
+                Ember.run.next(function(){
+                    try {
                         $('#keys-list').listview('refresh');
                         $('#keys-list input.ember-checkbox').checkboxradio();
-                        $('#keys-list').fadeIn(200);
-                    });
-                }, 200);
+                    } catch (e) {}
+                });
             },
 
-            updateKeyMachineList: function(keyName, data) {
-                for (var k = 0; k < this.keys.length; ++k) {
-                    if (this.keys[k].name == keyName) {
-                        this.keys[k].set('machines', data);
-                        return;
+            updateKeyMachinesList: function(keyName, data) {
+                this.keys.some(function(key) {
+                    if(key.name == keyName) {
+                        key.set('machines', data ? data : new Array());
+                        return true;
                     }
-                }
+                });
             }
         });
     }

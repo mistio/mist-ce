@@ -1,6 +1,13 @@
-<a>
+<fieldset class="list-item" {{action starImage target="view"}}>
+    <label>
+        {{view Mist.Checkbox checkedBinding="view.image.star"}}
+    </label>
+</fieldset>
+
+<a {{action launchImage target="view"}}>
     <h3 class="name">{{view.image.name}}</h3>
     <p class="description">
+        <span class="tag ui-btn-corner-all">{{view.image.id}}</span>                    
         <span class="tag backend ui-btn-corner-all prov-{{unbound view.image.backend.provider}}">{{view.image.backend.title}}</span>            
-    </p> 
+    </p>
 </a>
