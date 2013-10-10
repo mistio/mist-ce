@@ -60,7 +60,7 @@ define('app/views/machine', [
                     }
                 });
                 return ret;
-            }.property('Mist.rulesController.@each'),
+            }.property('Mist.rulesController.@each', 'Mist.rulesController.@each.machine'),
 
             disabledShellClass: function() {
                 var machine = this.get('controller').get('model');

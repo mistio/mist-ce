@@ -50,20 +50,20 @@ define('app/controllers/machines', [
                                     machine_id = machine_tuple[1];
                                     if (that.backend.id == backend_id && machine.id == machine_id && machine.hasMonitoring == false) {
                                         machine.set('hasMonitoring', true);
-                                        Mist.rulesController.content.forEach(function(rule) {
-                                            if (!rule['machine']) {
-                                                warn('Yeay!');
-                                                if (rule['backend_id'] == backend_id && rule['machine_id'] == machine_id) {
-                                                    warn('In');
-                                                    rule['machine'] = Mist.backendsController.getMachineById(backend_id, machine_id);
-                                                }
-                                            } 
-                                        });
                                         return false;
                                     }
                                  });
                             }
-
+                            Mist.rulesController.content.forEach(function(rule) {
+                                if (!rule['machine']) {
+                                    if (rule['backend_id'] == that.backend.id  && rule['machine_id'] == machine.id) {
+                                        rule.set('machine', Mist.backendsController.getMachineById(backend_id, machine_id));
+                                        Ember.run.next(function() {
+                                             $('.rule-box').trigger('create');
+                                        });
+                                    }
+                                }
+                            });
                             if (machine.id == item.id || (machine.id == -1 && machine.name == item.name)) {
                                 found = true;
                                 // machine.set(item); //FIXME this does not change anything;
