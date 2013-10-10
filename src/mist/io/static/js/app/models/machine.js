@@ -286,6 +286,7 @@ define('app/models/machine', [
                                         key.updateMachineUptimeChecked(that, -Date.now());
                                         key.set('probing', false);
                                     }
+                                    that.set('probing', false);
                                     that.set('probeInterval', 2*that.get('probeInterval'));
                                     
                                     if (!that.backend.create_pending){
