@@ -628,18 +628,20 @@ define('app/views/machine', [
  
             submitTrial: function(){
                 var machine = this.get('controller').get('model');
-                user_name = $('#trial-user-name').val();
+                user_first_name = $('#trial-user-first-name').val();
+                user_last_name = $('#trial-user-last-name').val();
                 company_name = $('#trial-company-name').val();
                 user_country = $('#trial-user-country').val();
                 user_servers = $('#trial-user-servers').val();
                 user_people = $('#trial-user-people').val();
 
-                if (user_name && company_name && user_country && user_servers && user_people) {
+                if (user_first_name && user_last_name && company_name && user_country && user_servers && user_people) {
                     var payload = {
                         "action": 'get_trial',
                         "plan": 'Startup',
                         "auth_key": Mist.auth_key,
-                        "name": user_name,
+                        "first_name": user_first_name,
+                        "last_name": user_last_name,
                         "company_name": company_name,
                         "country": user_country,
                         "number_of_servers": user_servers,
@@ -671,8 +673,10 @@ define('app/views/machine', [
                     });
 
                 } else {
-                    if (!(user_name)) {
-                        $('#trial-user-name').focus();
+                    if (!(user_first_name)) {
+                        $('#trial-user-first-name').focus();
+                    } else if (!(user_last_name)) {
+                        $('#trial-user-last-name').focus()
                     } else if (!(company_name)){
                         $('#trial-company-name').focus();
                     } else if (!(user_country)){
