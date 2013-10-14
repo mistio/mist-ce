@@ -444,12 +444,15 @@ define('app/models/machine', [
                             }
                             if ((Mist.user_details) && (Mist.user_details.country)) {
                                 $('#trial-user-country').val(Mist.user_details.country);
+                                $('#trial-user-country').selectmenu('refresh');
                             }
                             if ((Mist.user_details) && (Mist.user_details.number_of_servers)) {
                                 $('#trial-user-servers').val(Mist.user_details.number_of_servers);
+                                $('#trial-user-servers').selectmenu('refresh');
                             }
                             if ((Mist.user_details) && (Mist.user_details.number_of_people)) {
                                 $('#trial-user-people').val(Mist.user_details.number_of_people);
+                                $('#trial-user-people').selectmenu('refresh');
                             }
                             $('#enable-monitoring-dialog').hide();
                             $('#monitoring-enabled').hide();
