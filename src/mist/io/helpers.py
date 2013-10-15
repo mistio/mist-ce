@@ -126,6 +126,9 @@ def load_settings(settings):
     if not 'core_uri' in settings:
         settings['core_uri'] = user_config.get('core_uri', 'https://mist.io')
 
+    if not 'google_analytics_id' in settings:
+        settings['google_analytics_id'] = user_config.get('google_analytics_id','')
+
 
 def save_settings(request):
     """Stores settings to settings.yaml local file.
