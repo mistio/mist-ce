@@ -179,6 +179,7 @@ define('app/controllers/machines', [
                 item.name = name;
                 item.image = image;
                 item.id = -1;
+                item.pendingCreation = true;
 
                 var machine = Machine.create(item);
                 
@@ -204,6 +205,7 @@ define('app/controllers/machines', [
                         machine.set("public_ips", data.public_ips);
                         machine.set("private_ips", data.private_ips);
                         machine.set("extra", data.extra);
+                        machine.set('pendingCreation', false);
                         that.backend.set('create_pending', false);
                         var key_machines = key.get('machines', new Array());
                         key_machines.push([machine.backend.id, machine.id]);

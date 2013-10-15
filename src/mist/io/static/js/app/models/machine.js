@@ -22,6 +22,7 @@ define('app/models/machine', [
             pendingAddTag: false,
             pendingDeleteTag: false,
             pendingStats: false,
+            pendingCreation: false,
             keysCount: 0,
             state: 'stopped',
             stats:{'cpu': [], 'load': [], 'disk': []},

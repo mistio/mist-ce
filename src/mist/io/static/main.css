@@ -1446,12 +1446,19 @@ div.logout-placeholder, div.account-placeholder, div.support-placeholder {
 #trial-user-details .ajax-loader, #monitoring-dialog .ajax-loader, 
 #login-dialog .ajax-loader, #edit-backend .ajax-loader, 
 #keys-wrapper .ajax-loader, #keys-container .ajax-loader, 
-#home-menu .ajax-loader, #manage-keys .ajax-loader, #images .ajax-loader {
+#home-menu .ajax-loader, #manage-keys .ajax-loader, #images .ajax-loader,
+.bubble-container .ajax-loader {
     background-image: url(images/spinner.gif);
     background-position: center !important;
     background-repeat: no-repeat;
     display: none;
     height: 16px;
+}
+
+.bubble-container .ajax-loader {
+    display: block;
+    width: 20px;
+    height: 20px;
 }
 
 
