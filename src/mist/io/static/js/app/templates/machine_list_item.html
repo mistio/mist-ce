@@ -30,13 +30,17 @@
             
     
             <span class="bubble-container">
-                {{#if probing}}
-                    <span class="ui-li-count node-icon probing-icon ui-btn-corner-all"></span>                
+                {{#if pendingCreation}}
+                        <div class='ajax-loader'></div>
                 {{else}}
-                    {{#if probed}}
-                    <span class="ui-li-count node-icon key-icon ui-btn-corner-all"></span>
+                    {{#if probing}}
+                        <span class="ui-li-count node-icon probing-icon ui-btn-corner-all"></span>                
                     {{else}}
-                    <span class="ui-li-count node-icon no-key-icon ui-btn-corner-all"></span>
+                        {{#if probed}}
+                        <span class="ui-li-count node-icon key-icon ui-btn-corner-all"></span>
+                        {{else}}
+                        <span class="ui-li-count node-icon no-key-icon ui-btn-corner-all"></span>
+                        {{/if}}
                     {{/if}}
                 {{/if}}
             </span>
