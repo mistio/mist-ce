@@ -3,7 +3,6 @@
 
     <a href="#"
         class="rule-button metric"
-        data-theme="d"
         data-role="button"
         data-icon="arrow-d"
         data-iconpos="right"
@@ -12,7 +11,6 @@
 
     <a href="#"
         class="rule-button operator"
-        data-theme="d"
         data-role="button"
         data-icon="false"
         data-inline="true"
@@ -31,19 +29,21 @@
 
     <a href="#"
         class="rule-button action"
-        data-theme="d"
         data-role="button"
         data-icon="false"
         data-inline="true"
         {{action openActionPopup target="view"}}>{{actionToTake}}</a>
 
+    {{#if pendingAction}}
     <div class="ajax-loader"></div>
+    {{else}}
     <div class="delete-rule-container">
         <button class="delete-rule-button"
                 data-role="button"
                 data-icon="delete"
-                data-theme="d"
                 data-mini="true"
                 {{action deleteRuleClicked target="view"}}>&nbsp;</button>
     </div>
+    {{/if}}
+
 </div>

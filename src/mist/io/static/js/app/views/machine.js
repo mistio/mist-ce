@@ -11,6 +11,8 @@ define('app/views/machine', [
         return MistScreen.extend({
 
             template: Ember.Handlebars.compile(machine_html),
+            
+            rules: null,
 
             init: function() {
                 this._super();
@@ -520,7 +522,7 @@ define('app/views/machine', [
             backClicked: function() {
                 this.stopPolling();
                 // then get back to machines' list
-                Mist.Router.router.transitionTo('machines')
+                Mist.Router.router.transitionTo('machines');
             },
 
             handlePendingMonitoring: function() {
@@ -676,7 +678,7 @@ define('app/views/machine', [
                     if (!(user_first_name)) {
                         $('#trial-user-first-name').focus();
                     } else if (!(user_last_name)) {
-                        $('#trial-user-last-name').focus()
+                        $('#trial-user-last-name').focus();
                     } else if (!(company_name)){
                         $('#trial-company-name').focus();
                     } else if (!(user_country)){
