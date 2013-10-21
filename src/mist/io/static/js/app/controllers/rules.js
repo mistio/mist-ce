@@ -54,11 +54,11 @@ define('app/controllers/rules', [
                 });
                 return ret;
             },
-            
+
             creationPendingObserver: function() {
                 $('#add-rule-button').button(this.creationPending ? 'disable' : 'enable');
             }.observes('creationPending'),
-            
+
             newRule: function(machine, metric, operator, value, actionToTake) {
                 
                 var payload = {
@@ -172,13 +172,6 @@ define('app/controllers/rules', [
 
             saveCommand: function() {
                 $('.rule-command-popup').popup('close');
-                // Check if command did not actually change
-                var oldCommand = this.commandRule.get('command');
-                if (this.command == oldCommand) {
-                    if (this.commandRule.get('actionToTake') == 'command') {
-                        return;
-                    }
-                }
                 this.updateRule(this.commandRule.id, null, null, null, 'command', this.command);
             },
 
@@ -188,7 +181,7 @@ define('app/controllers/rules', [
                 this.updateRule(rule_id, null, null, rule_value);
             },
 
-            handleRuleSliders: function() {
+            setSliderEventHandlers: function() {
                 function showSlider(event) {
                     $(event.currentTarget).addClass('open');
                     $(event.currentTarget).find('.ui-slider-track').fadeIn();
@@ -205,7 +198,7 @@ define('app/controllers/rules', [
                 $('.rule-box').on('mouseleave', hideSlider);
             },
 
-            unhandleRuleSliders: function() {
+            removeSliderEventHandlers: function() {
                 $('.ui-slider').off('tap');
                 $('.ui-slider').off('click');
                 $('.ui-slider').off('mouseover');
@@ -216,9 +209,9 @@ define('app/controllers/rules', [
             redrawRules: function() {
                 var that = this;
                 Ember.run.next(function() {
-                    that.unhandleRuleSliders();
+                    that.removeSliderEventHandlers();
                     $('.rule-box').trigger('create');
-                    that.handleRuleSliders();
+                    that.setSliderEventHandlers();
                 });
             },
         });
