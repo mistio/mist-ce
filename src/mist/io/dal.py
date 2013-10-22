@@ -50,40 +50,50 @@ class Field(object):
         """Return the data as it should be saved in the storage."""
 
 
+class StrField(str, Field):
+    """Sets a string field, inherits from str. Default: ''"""
+    _type = str
+    def back_type(self):
+        return unicode
+    def front_type(self):
+        return str
+
+
 class TypeField(Field):
     """Class for fields that subclass a builtin type."""
 
+    _type = None
+
     def back_type(self):
-        return type(self)
+        return self._type
 
     def front_type(self):
-        return type(self)
+        return self._type
 
     def raw(self):
-        return self
-
-
-class StrField(str, TypeField):
-    """Sets a string field, inherits from str. Default: ''"""
+        return self._type(self)
 
 
 class IntField(int, TypeField):
     """Sets an int field, inherits from int. Default: 0"""
+    _type = int
 
 
 class FloatField(float, TypeField):
     """Sets a floating point number field, inherits from float.
     Default: 0.0
     """
+    _type = float
 
 
 class ListField(list, TypeField):
     """Sets a list field. Default: []"""
+    _type = list
 
 
 class DictField(dict, TypeField):
     """Sets a dict field. Default: {}"""
-
+    _type = dict
 
 class BoolField(Field):
     """Sets a boolean field. Default: False"""
@@ -186,9 +196,10 @@ class ListModelField(SeqModelField):
 
 class DictModelField(SeqModelField):
     seq_type = dict
-    
+
     def __repr__(self):
-        items = ("%s: %s" % (key, self.seq[key].__repr__()) for key in self.seq)
+        items = ("%s: %s" % (key, self.seq[key].__repr__())
+                 for key in self.seq)
         return "{%s}" % ','.join(items)
 
 
@@ -268,6 +279,7 @@ class BaseModel(object):
             # reload and cast before returning
             dict_value = self._dict[name]
             if type(dict_value) is not attr.front_type():
+                logging.warn("casting from %s to %s for %s", type(dict_value), attr.front_type(), name)
                 return attr.front_type()(self._dict[name])
             return dict_value
         return attr
@@ -289,8 +301,11 @@ class BaseModel(object):
                 self._dict[name] = value
             else:
                 self._dict[name] = bt(value)
-        elif issubclass(t, ft):
-            self._dict[name] = value.raw()
+        elif t is ft:
+            if issubclass(t, Field):
+                self._dict[name] = value.raw()
+            else:
+                self._dict[name] = value
         elif issubclass(t, bt):
             logging.warn("You are trying to write using the \
                 backend value instead of the frontend one.")
