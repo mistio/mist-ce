@@ -125,7 +125,7 @@ define('app/controllers/rules', [
                 }
                 
                 // Fix value on metric change
-                if ((metric != 'network-tx') || (metric != 'disk-write')) {
+                if ((metric != 'network-tx') && (metric != 'disk-write')) {
                     if (value > 100) {
                         value = 100;
                     }
