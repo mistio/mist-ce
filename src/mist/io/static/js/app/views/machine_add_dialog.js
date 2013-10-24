@@ -159,9 +159,10 @@ define('app/views/machine_add_dialog', [
                 var providerName = $('.select-provider-collapsible span.ui-btn-text').text();
                 var machineSize = $('.select-size-collapsible span.ui-btn-text').text();                
                 var machineImage = $('.select-image-collapsible span.ui-btn-text').text();                                
-                var machineName = $('#create-machine-name').val();
+                var machineName = $('#create-machine-name').val();                                
                 if (providerName == 'NephoScale') {
-                    if ((machineName.length > 64)||(machineName.indexOf(' ') >= 0)) {
+                    var re = /^[0-9a-zA-Z-_]*$/;                 
+                    if ((machineName.length > 64)||(!(re.test(machineName)))) {
                         Mist.notificationController.timeNotify("Server name in NephoScale must start with a letter, can contain mixed alpha-numeric characters, hyphen ('-') and underscore ('_') characters, cannot exceed 64 characters, and can end with a letter or a number.", 7000);
                         return false;                        
                     } else if (machineSize.indexOf('CS025') != -1) {
