@@ -127,23 +127,9 @@ define('app/controllers/backends', [
                         Mist.set('user_details', data.user_details);
                         //now loop on backend_id, machine_id  list of lists and check if pair found
                         machines.forEach(function(machine_tuple){
-                            var b,m;
-                            var backend_id = machine_tuple[0];
-                            var machine_id = machine_tuple[1];
-
-                            for (b=0; b < Mist.backendsController.content.length; b++) {
-                                if (Mist.backendsController.content[b]['id'] == backend_id) {
-                                    break;
-                                }
-                            }
-
-                            if (b != Mist.backendsController.content.length) {
-                                for (m=0; m < Mist.backendsController.content[b].machines.content.length; m++) {
-                                    if (Mist.backendsController.content[b]['machines'].content[m]['id'] == machine_id) {
-                                        Mist.backendsController.content[b].machines.content[m].set('hasMonitoring', true);
-                                        break;
-                                    }
-                                }
+                            var machine = Mist.backendsController.getMachineById(machine_tuple[0], machine_tuple[1]);
+                            if (machine) {
+                                machine.set('hasMonitoring', true);
                             }
                         });
 

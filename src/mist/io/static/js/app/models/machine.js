@@ -79,6 +79,7 @@ define('app/models/machine', [
                     success: function(data) {
                         that.set('state', 'pending');
                         that.set('hasMonitoring', false);
+                        that.set('pendingCreation', false);
                         info('Successfully sent destroy to machine', that.name);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
