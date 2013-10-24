@@ -149,39 +149,33 @@ define('app/controllers/backends', [
 
                         var rules = data.rules;
 
-                        for (ruleId in rules){
-                            var isInController = false;
-                            for (r=0; r < Mist.rulesController.content.length; r++) {
-                                if (Mist.rulesController.content[r]['id'] == ruleId) {
-                                    isInController = true;
-                                    break;
-                                }
+                        for (ruleId in rules) {
+                            
+                            var rule = {};
+                            rule.id = ruleId;
+                            rule.value = rules[ruleId].value;
+                            rule.metric = rules[ruleId].metric;
+                            rule.command = rules[ruleId].command;
+                            rule.maxValue = rules[ruleId].max_value;
+                            rule.actionToTake = rules[ruleId].action;
+                            rule.operator = Mist.rulesController.getOperatorByTitle(rules[ruleId].operator);
+                            rule.machine = that.getMachineById(rules[ruleId].backend, rules[ruleId].machine);
+                            
+                            if (!rule.machine) {
+                                rule.backend_id = rules[ruleId].backend;
+                                rule.machine_id = rules[ruleId].machine;
                             }
-                            if (!(isInController)) {
-                                var rule = {};
-                                rule['id'] = ruleId;
-                                rule['machine'] = that.getMachineById(rules[ruleId]['backend'], rules[ruleId]['machine']);
-                                if (!rule['machine']) {
-                                    // Mist hasn't loaded this machine yet
-                                    rule['backend_id'] = rules[ruleId]['backend'];
-                                    rule['machine_id'] = rules[ruleId]['machine'];
-                                }
-                                rule['metric'] = rules[ruleId]['metric'];
-                                rule['operator'] = Mist.rulesController.getOperatorByTitle(rules[ruleId]['operator']);
-                                rule['value'] = rules[ruleId]['value'];
-                                rule['actionToTake'] = rules[ruleId]['action'];
-                                rule['command'] = rules[ruleId]['command'];
-                                rule['maxValue'] = rules[ruleId]['max_value'];
-                                if (rule['maxValue'] > 100) {
-                                    rule['unit'] = 'KB/s';
-                                } else if (rule['metric'] == 'cpu' || rule['metric'] == 'ram') {
-                                        rule['unit'] = '%';
-                                } else {
-                                        rule['unit'] = '';
-                                }
-
-                                Mist.rulesController.pushObject(Rule.create(rule));
+                            
+                            var metric = rule.metric;
+                            if (metric == 'network-tx' || metric == 'disk-write') {
+                                rule.unit = 'KB/s';
+                            } else if (metric == 'cpu' || metric == 'ram') {
+                                rule.unit = '%';
+                            } else {
+                                rule.unit = '';
                             }
+                            
+                            Mist.rulesController.pushObject(Rule.create(rule));
                         }
                         Mist.rulesController.redrawRules();
                     },

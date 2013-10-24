@@ -23,7 +23,8 @@ define('app/models/rule', ['ember'],
             machineSize: null,
             machineLocation: null,
             machineKey: null,
-            machineScript: null
+            machineScript: null,
+            pendingAction: false,
         });
     }
 );

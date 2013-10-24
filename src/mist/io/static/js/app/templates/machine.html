@@ -81,37 +81,12 @@
                 {{#each view.rules}}
                     {{view Mist.RuleView ruleBinding="this"}}
                 {{/each}}
-
-                <div class="rule-metric-popup" data-role="popup" data-position-to="origin">
-                    <ul class="rule-metric-list" data-role="listview">
-                        {{#each Mist.rulesController.metricList}}
-                        <li data-icon="false">
-                            <a href="#" title="{{unbound this}}">{{this}}</a>
-                        </li>
-                        {{/each}}
-                    </ul>
+                
+                {{#if Mist.rulesController.creationPending}}
+                <div class="rule-box" id="creation-rule">
+                    <div class="ajax-loader"></div>
                 </div>
-                <div class="rule-operator-popup" data-role="popup">
-                    <ul class="rule-operator-list" data-role="listview">
-                        {{#each Mist.rulesController.operatorList}}
-                        <li data-icon="false">
-                            <a href="#" title="{{unbound this.title}}">{{this.symbol}}</a>
-                        </li>
-                        {{/each}}
-                    </ul>
-                </div>
-                <div class="rule-action-popup" data-role="popup">
-                    <ul class="rule-action-list" data-role="listview">
-                        {{#each Mist.rulesController.actionList}}
-                        <li data-icon="false">
-                            <a href="#" title="{{unbound this}}">{{this}}</a>
-                        </li>
-                        {{/each}}
-                        <li data-icon="false" class="ui-disabled">
-                            <a href="#" title="launch">launch</a>
-                        </li>
-                    </ul>
-                </div>                
+                {{/if}}
             </div>
             
             <div class="add-rule-container">
@@ -148,22 +123,6 @@
             </div>
 
             {{/if}}
-            
-            <div class="mist-dialog rule-command-popup" data-role="popup" data-overlay-theme="a">
-                <div data-role="header">
-                    <h1>Command</h1>
-                </div>
-                <div data-role="content">
-                    {{view Ember.TextArea
-                        valueBinding="Mist.rulesController.command"
-                        name="rule-command-content"}}            
-                    <div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
-                        <a data-role="button" data-theme="c" data-rel="back">Back</a>
-                        <a data-role="button" data-theme="b" {{action saveCommand target="Mist.rulesController"}}>Save</a>
-                    </div>
-                    <div class="ajax-loader"></div>
-                </div>
-            </div>            
 
         </div>
     </div>
@@ -221,6 +180,53 @@
     <div class="bottom-padding"></div>
 
 </div>
+
+<div class="rule-metric-popup" data-role="popup">
+    <ul class="rule-metric-list" data-role="listview">
+        {{#each Mist.rulesController.metricList}}
+        <li data-icon="false">
+            <a href="#" title="{{unbound this}}">{{this}}</a>
+        </li>
+        {{/each}}
+    </ul>
+</div>
+<div class="rule-operator-popup" data-role="popup">
+    <ul class="rule-operator-list" data-role="listview">
+        {{#each Mist.rulesController.operatorList}}
+        <li data-icon="false">
+            <a href="#" title="{{unbound this.title}}">{{this.symbol}}</a>
+        </li>
+        {{/each}}
+    </ul>
+</div>
+<div class="rule-action-popup" data-role="popup">
+    <ul class="rule-action-list" data-role="listview">
+        {{#each Mist.rulesController.actionList}}
+        <li data-icon="false">
+            <a href="#" title="{{unbound this}}">{{this}}</a>
+        </li>
+        {{/each}}
+        <li data-icon="false" class="ui-disabled">
+            <a href="#" title="launch">launch</a>
+        </li>
+    </ul>
+</div>
+
+<div class="mist-dialog rule-command-popup" data-role="popup" data-overlay-theme="a">
+    <div data-role="header">
+        <h1>Command</h1>
+    </div>
+    <div data-role="content">
+        {{view Ember.TextArea
+            valueBinding="Mist.rulesController.command"
+            name="rule-command-content"}}            
+        <div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
+            <a data-role="button" data-theme="c" data-rel="back">Back</a>
+            <a data-role="button" data-theme="b" {{action saveCommand target="Mist.rulesController"}}>Save</a>
+        </div>
+        <div class="ajax-loader"></div>
+    </div>
+</div>  
 
 {{view Mist.MachineManageKeysView}}
 
@@ -327,6 +333,7 @@
             <label for="user-country">4. Where is your business located?</label>
             <span class="required">*</span>
             <select name="user-country" id="trial-user-country">
+                <option value="">-- Select --</option>
                 <option value="Afghanistan">Afghanistan</option>
                 <option value="Εland Islands">Εland Islands</option>
                 <option value="Albania">Albania</option>
@@ -575,6 +582,7 @@
             <label for="user-people">5. How many people work there?</label>
             <span class="required">*</span>
             <select name="user-people" id="trial-user-people">
+                <option value="">-- Select --</option>
                 <option vale="1-5">1-5</option>
                 <option vale="6-20">6-20</option>
                 <option vale="21-100">21-100</option>
@@ -583,6 +591,7 @@
             <label for="user-servers">6. How many servers do you have?</label>
             <span class="required">*</span>
             <select name="user-servers" id="trial-user-servers">
+                <option value="">-- Select --</option>
                 <option vale="1-5">1-5</option>
                 <option vale="6-20">6-20</option>
                 <option vale="21-100">21-100</option>

@@ -33,10 +33,6 @@ define('app/controllers/machines', [
                     if (!that.backend.enabled) {
                         return;
                     }
-                    if (typeof Mist.monitored_machines === 'undefined') {
-                        //check monitoring failed, re-run. This shall be moved though, since here it gets executed just 2 times
-                        Mist.backendsController.checkMonitoring();
-                    }
 
                     data.forEach(function(item){
                         var found = false;
@@ -54,16 +50,6 @@ define('app/controllers/machines', [
                                     }
                                  });
                             }
-                            Mist.rulesController.content.forEach(function(rule) {
-                                if (!rule['machine']) {
-                                    if (rule['backend_id'] == that.backend.id  && rule['machine_id'] == machine.id) {
-                                        rule.set('machine', Mist.backendsController.getMachineById(backend_id, machine_id));
-                                        Ember.run.next(function() {
-                                             $('.rule-box').trigger('create');
-                                        });
-                                    }
-                                }
-                            });
                             if (machine.id == item.id || (machine.id == -1 && machine.name == item.name)) {
                                 found = true;
                                 // machine.set(item); //FIXME this does not change anything;
@@ -81,6 +67,19 @@ define('app/controllers/machines', [
                                 machine.set('public_ips', item.public_ips);
                                 machine.set('extra', item.extra);
                                 return false;
+                            }
+                        });
+                        
+                        Mist.rulesController.content.forEach(function(rule) {
+                            if (!rule.machine) {
+                                if (rule.backend_id == that.backend.id) {
+                                    rule.set('machine', Mist.backendsController.getMachineById(rule.backend_id,
+                                                                                               rule.machine_id));
+                                    if (rule.machine) {
+                                        rule.backend_id = '';
+                                        rule.machine_id = '';
+                                    }
+                                }
                             }
                         });
 
@@ -125,9 +124,8 @@ define('app/controllers/machines', [
                     if (that.backend.error) {
                         that.backend.set('error', false);
                     }
-                    
+                    Mist.rulesController.redrawRules();
                     that.backend.set('loadingMachines', false);
-                    
                 }).error(function(e) {
                     Mist.notificationController.notify("Error loading machines for backend: " +
                                                         that.backend.title);

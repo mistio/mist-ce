@@ -4,15 +4,16 @@ define('app/controllers/rules', [
     'jquery'
     ],
     /**
-     *
      * Rules controller
      *
      * @returns Class
      */
     function(Rule) {
         return Ember.ArrayController.extend({
+
             command: null,
             commandRule: null,
+            creationPending: false,
 
             metricList: [
                 'load',
@@ -35,17 +36,18 @@ define('app/controllers/rules', [
                 'command'
             ],
 
-            getRuleById: function(ruleId){
-                for (var i = 0; i < this.content.length; i++){
+            getRuleById: function(ruleId) {
+                for (var i = 0; i < this.content.length; i++) {
                     if (this.content[i].id == ruleId) {
                         return this.content[i];
                     }
                 }
+                return null;
             },
-            
-            getOperatorByTitle: function(title){
+
+            getOperatorByTitle: function(title) {
                 var ret = null;
-                this.operatorList.forEach(function(op){
+                this.operatorList.forEach(function(op) {
                     if (op.title == title){
                         ret = op;
                     }
@@ -53,198 +55,163 @@ define('app/controllers/rules', [
                 return ret;
             },
 
-            newRule: function(machine, metric, operator, value, actionToTake) {
-                var rule = Rule.create({
-                    'machine': machine,
-                    'metric': metric,
-                    'operator': operator,
-                    'value': value,
-                    'actionToTake': actionToTake
-                });
-                var that = this;
-                rule.set('id', 'new');
-                that.pushObject(rule);
-                that.redrawRules();
-                setTimeout(function() {
-                        $('#new .delete-rule-container').hide();
-                        $('#new .ajax-loader').show();
-                    }, 100)
+            creationPendingObserver: function() {
+                $('#add-rule-button').button(this.creationPending ? 'disable' : 'enable');
+            }.observes('creationPending'),
 
-                payload = {
+            newRule: function(machine, metric, operator, value, actionToTake) {
+                
+                var payload = {
                     'backendId': machine.backend.id,
                     'machineId': machine.id,
                     'metric': metric,
                     'operator': operator.title,
                     'value': value,
                     'action': actionToTake
-                }
-                $('#add-rule-button').button('disable');
-                $('#add-rule-button').button('refresh');
+                };
+                this.set('creationPending', true);
+                
+                var that = this;
                 $.ajax({
                     url: 'rules',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     success: function(data) {
-                        info('Successfully created rule ', data['id']);
-                        rule.set('id', data['id']);
-                        $('#new').attr('id', data['id']);
-                        $('.rule-box').last().find('.delete-rule-container').show();
-                        $('.rule-box').last().find('.ajax-loader').hide();
-                        $('#add-rule-button').button('enable');
-                        $('#add-rule-button').button('refresh');
-                        rule.set('maxValue', data['max_value']);
+                        info('Successfully created rule ', data.id);
+                        that.set('creationPending', false);
+                        var rule = Rule.create({
+                            'id': data.id,
+                            'value': value,
+                            'metric': metric,
+                            'machine': machine,
+                            'operator': operator,
+                            'maxValue': data.max_value,
+                            'actionToTake': actionToTake,
+                        });
+                        that.pushObject(rule);
+                        that.redrawRules();
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while creating rule');
                         error(textstate, errorThrown, 'while creating rule');
-                        that.removeObject(rule);
-                        that.redrawRules();
-                        $('#add-rule-button').button('enable');
-                        $('#add-rule-button').button('refresh');
+                        that.set('creationPending', false);
                     }
                 });
-
-                return rule.id;
-
             },
 
-            saveCommand: function() {
-                var oldAction = this.commandRule.get('actionToTake');
-                var oldCommand = this.commandRule.get('command');
-
-                $('.rule-command-popup').popup('close');
-
-                if (this.command == oldCommand) {
+            updateRule: function(id, metric, operator, value, actionToTake, command) {
+                
+                var rule = this.getRuleById(id);
+                
+                if (!rule) {
                     return false;
                 }
                 
-                warn('setting command for '+ this.commandRule.id + ' to ' + this.command);
+                // Make sure parameters are not null
+                if (!value) { value = rule.value; }
+                if (!metric) { metric = rule.metric; }
+                if (!command) { command = rule.command; }
+                if (!operator) { operator = rule.operator; }
+                if (!actionToTake) { actionToTake = rule.actionToTake; }
                 
-                this.commandRule.set('actionToTake', 'command');
-                this.commandRule.set('command', this.command);
-
-                var payload = {
-                    'id' : this.commandRule.id,
-                    'action' : 'command',
-                    'command': this.command
+                // Check if anything changed
+                if (value == rule.value &&
+                    metric == rule.metric &&
+                    command == rule.command &&
+                    actionToTake == rule.actionToTake &&
+                    operator.title == rule.operator.title ) {
+                        return false;
                 }
-                var that = this;
+                
+                // Fix value on metric change
+                if ((metric != 'network-tx') && (metric != 'disk-write')) {
+                    if (value > 100) {
+                        value = 100;
+                    }
+                }
+                
+                var payload = {
+                    'id': id,
+                    'value': value,
+                    'metric': metric,
+                    'command': command,
+                    'operator': operator.title,
+                    'action': actionToTake,
+                };
+                
+                rule.set('pendingAction', true);
                 $.ajax({
                     url: 'rules',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     success: function(data) {
-                        info('Successfully updated rule', that.commandRule.id);
+                        info('Successfully updated rule ', id);
+                        rule.set('pendingAction', false);
+                        rule.set('value', value);
+                        rule.set('metric', metric);
+                        rule.set('command', command);
+                        rule.set('operator', operator);
+                        rule.set('actionToTake', actionToTake);
+                        rule.set('maxValue', data.max_value);
+                        
+                        var maxvalue = parseInt(rule.maxValue);
+                        var curvalue = parseInt(rule.value);
+                        if (curvalue > maxvalue) {
+                            rule.set('value', maxvalue);
+                        }
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while updating rule');
                         error(textstate, errorThrown, 'while updating rule');
-                        that.commandRule.set('actionToTake', oldAction);
-                        that.commandRule.set('command', oldCommand);
-                        that.command.set(oldCommand);
+                        rule.set('pendingAction', false);
                     }
                 });
             },
-            
-            redrawRules: function(){
+
+            saveCommand: function() {
+                $('.rule-command-popup').popup('close');
+                this.updateRule(this.commandRule.id, null, null, null, 'command', this.command);
+            },
+
+            changeRuleValue: function(event) {
+                var rule_id = $(event.currentTarget).attr('id');
+                var rule_value = $(event.currentTarget).find('.ui-slider-handle').attr('aria-valuenow');
+                this.updateRule(rule_id, null, null, rule_value);
+            },
+
+            setSliderEventHandlers: function() {
+                function showSlider(event) {
+                    $(event.currentTarget).addClass('open');
+                    $(event.currentTarget).find('.ui-slider-track').fadeIn();
+                }
+                function hideSlider(event) {
+                    $(event.currentTarget).find('.ui-slider-track').fadeOut();
+                    $(event.currentTarget).find('.ui-slider').removeClass('open');
+                    Mist.rulesController.changeRuleValue(event);
+                }
+                $('.ui-slider').on('tap', showSlider);
+                $('.ui-slider').on('click', showSlider);
+                $('.ui-slider').on('mouseover', showSlider);
+                $('#single-machine').on('tap', hideSlider);
+                $('.rule-box').on('mouseleave', hideSlider);
+            },
+
+            removeSliderEventHandlers: function() {
+                $('.ui-slider').off('tap');
+                $('.ui-slider').off('click');
+                $('.ui-slider').off('mouseover');
+                $('#single-machine').off('tap');
+                $('.rule-box').off('mouseleave');
+            },
+
+            redrawRules: function() {
                 var that = this;
                 Ember.run.next(function() {
-                    $('.rule-button.metric').each(function(i, el){
-                        $(el).button();
-                    });
-                    $('.rule-metric-popup').each(function(i, el){
-                        $(el).popup();
-                    });
-                    $('.rule-metric-list').each(function(i, el){
-                        $(el).listview();
-                    });
-                    $('.rule-button.operator').each(function(i, el){
-                        $(el).button();
-                    });
-                    $('.rule-operator-popup').each(function(i, el){
-                        $(el).popup();
-                    });
-                    $('.rule-operator-list').each(function(i, el){
-                        $(el).listview();
-                    });
-                    $('.rule-value').each(function(i, el){
-                        $(el).slider();
-                    });
-                    $('input.rule-value').each(function(i, el){
-                        $(el).textinput();
-                    });
-                    $('.rule-button.action').each(function(i, el){
-                        $(el).button();
-                    });
-                    $('.rule-action-popup').each(function(i, el){
-                        $(el).popup();
-                    });
-                    $('.rule-command-content').each(function(i, el){
-                        $(el).textinput();
-                    });
-                    $('.rule-command-popup a').each(function(i, el){
-                        $(el).button();
-                    });
-                    $('.rule-command-popup').each(function(i, el){
-                        $(el).popup();
-                    });
-                    $('.rule-action-list').each(function(i, el){
-                        $(el).listview();
-                    });
-                    $('.rules-container .delete-rule-button').each(function(i, el){
-                        $(el).button();
-                    });
-
-                    function showRuleSlider(event) {
-                        $(event.currentTarget).find('.ui-slider-track').css('width', $(window).width()*0.3);
-                        $(event.currentTarget).find('.ui-slider-track').fadeIn(100);
-                    }
-
-                    function hideRuleSlider(event){
-                        $(event.currentTarget).find('.ui-slider-track').css('width','');
-                        $(event.currentTarget).find('.ui-slider-track').fadeOut(100);
-
-                        if (($(event.currentTarget).attr('id') != 'new') && ($(event.currentTarget).attr('id'))) {
-                            var rule_id = $(event.currentTarget).attr('id');
-                            var rule_value = $(event.currentTarget).find('.ui-slider-handle').attr('aria-valuenow');
-                            var rule = that.getRuleById(rule_id);
-                            if (rule.value != rule_value) {
-                                var payload = {
-                                    'id' : rule.id,
-                                    'value' : rule_value
-                                }
-                                $('#' + rule.id + ' .delete-rule-container').hide();
-                                $('#' + rule.id + ' .ajax-loader').show();
-                                $.ajax({
-                                    url: 'rules',
-                                    type: 'POST',
-                                    contentType: 'application/json',
-                                    data: JSON.stringify(payload),
-                                    success: function(data) {
-                                        info('Successfully updated rule ', rule.id);
-                                        rule.set('value', rule_value);
-                                        $('#' + rule.id + ' .ajax-loader').hide();
-                                        $('#' + rule.id + ' .delete-rule-container').show();
-                                    },
-                                    error: function(jqXHR, textstate, errorThrown) {
-                                        Mist.notificationController.notify('Error while updating rule');
-                                        error(textstate, errorThrown, 'while updating rule');
-                                        $('#' + rule.id + ' .ajax-loader').hide();
-                                        $('#' + rule.id + ' .delete-rule-container').show();
-                                    }
-                                });
-                            }
-                        }
-                    }
-
-                    $('.ui-slider').off('mouseover');
-                    $('.ui-slider').on('mouseover', showRuleSlider);
-                    $('.ui-slider').on('click', showRuleSlider);
-                    $('.ui-slider').on('tap', showRuleSlider);
-                    $('.rule-box').on('mouseleave', hideRuleSlider);
-                    $('#single-machine').on('tap', hideRuleSlider);
+                    that.removeSliderEventHandlers();
+                    $('.rule-box').trigger('create');
+                    that.setSliderEventHandlers();
                 });
             },
         });

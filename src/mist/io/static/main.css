@@ -882,7 +882,7 @@ div.loading-monitoring {
     float: left;
     position: relative;
     top: 21px;
-    left: 50px;
+    left: 52px;
     font-size: 14px;
     font-weight: bold;
     width: 0px;
@@ -897,6 +897,10 @@ div.loading-monitoring {
     height:40px;
 }
 
+.rule-then {
+    margin-left: 25px;
+}
+
 .rule-if, .rule-then, .rule-value {
     float: left;
     height: 24px;
@@ -908,6 +912,14 @@ div.loading-monitoring {
     width: auto;
 }
 
+.rule-box .ui-slider.open {
+    width: 40%;
+}
+
+.rule-box div.ui-slider-track {
+    width: 80%;
+}
+
 .rule-box .rule-button {
     float: left;
 }
@@ -916,13 +928,20 @@ div.loading-monitoring {
     height: 32px;
     margin-top: -8px;
     margin-left: -8px;
-    margin-right: 20px;
+    margin-right: -8px;
 }
 
 .ui-slider-track {
     display: none;
     min-width: 100px;
     margin-left: 85px;
+}
+
+#creation-rule .ajax-loader {
+    margin-top: 0 !important;
+    float: none !important;
+    position: relative;
+    left: 43%;
 }
 
 #machine-basic-table, #machine-metadata {
@@ -1501,6 +1520,7 @@ div.logout-placeholder, div.account-placeholder, div.support-placeholder {
 }
 
 .rule-box .ajax-loader {
+    display: block !important;
     float: left;
     width: 100px;
 }
@@ -1712,6 +1732,13 @@ div.info {
     #machines .ui-listview-filter-inset, #keys .ui-listview-filter-inset {
         margin: -52px 80px 0;
     }
+    
+    #creation-rule .ajax-loader {
+        margin-top: 0 !important;
+        float: none !important;
+        position: relative;
+        left: 41%;
+    }
 }
 
 /* Conditional for < 480px */
@@ -1771,5 +1798,12 @@ div.info {
 
     #shell-return {
         overflow-x: scroll;
+    }
+    
+    #creation-rule .ajax-loader {
+        margin-top: 0 !important;
+        float: none !important;
+        position: relative;
+        left: 31%;
     }
 }
