@@ -206,8 +206,11 @@ define('app/controllers/machines', [
                         machine.set('pendingCreation', false);
                         that.backend.set('create_pending', false);
                         var key_machines = key.get('machines', new Array());
-                        key_machines.push([machine.backend.id, machine.id]);
-                        key.set('machines', key_machines);
+                        key_machines.pushObject([machine.backend.id, machine.id]);
+                        machine.set('keysCount', 1);
+                        Ember.run.next(function() {
+                            $('#mist-manage-keys').parent().trigger('create')
+                        });
                         machine.probe(key.name);
                     },
                     error: function(jqXHR, textstate, errorThrown) {

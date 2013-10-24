@@ -22,26 +22,38 @@
     </span>
 
     <h3 id="single-view-state" {{bindAttr class="state"}}>{{state}}</h3>
+    {{#if pendingCreation}}
+    <div class="ajax-loader"></div>
+    {{/if}}
     
     <span class="key-icon-wrapper">
-        {{#if keysCount}}
-            <a href="#"
-                id="mist-manage-keys"
-                {{bindAttr class="probed probing"}}
-                data-theme="c"
-                data-role="button"               
-                {{action manageKeysClicked target="view"}}>
-                {{keysCount}} keys</a>
-        {{else}}
-            <a href="#"
+        {{#if pendingCreation}}
+            <a class="ui-disabled"
                 id="mist-manage-keys"
                 data-theme="b"
                 data-role="button"
                 data-icon="plus"
-                data-iconpos="right"
-                {{action addKeyClicked target="view"}}>Add key</a>
+                data-iconpos="right">Add key</a>
+        {{else}}
+            {{#if keysCount}}
+                <a href="#"
+                    id="mist-manage-keys"
+                    {{bindAttr class="probed probing"}}
+                    data-theme="c"
+                    data-role="button"
+                    {{action manageKeysClicked target="view"}}>
+                    {{keysCount}} keys</a>
+            {{else}}
+                <a href="#"
+                    id="mist-manage-keys"
+                    data-theme="b"
+                    data-role="button"
+                    data-icon="plus"
+                    data-iconpos="right"
+                    {{action addKeyClicked target="view"}}>Add key</a>
+            {{/if}}
         {{/if}}
-    </span>    
+    </span>
 </div>
 
 <div data-role="content">
