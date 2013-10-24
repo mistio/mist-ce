@@ -198,6 +198,7 @@ define('app/controllers/machines', [
                         if (that.backend.error) {
                             that.backend.set('error', false);
                         }
+
                         machine.set("id", data.id);
                         machine.set("name", data.name);
                         machine.set("public_ips", data.public_ips);
@@ -205,17 +206,24 @@ define('app/controllers/machines', [
                         machine.set("extra", data.extra);
                         machine.set('pendingCreation', false);
                         that.backend.set('create_pending', false);
-                        var key_machines = key.get('machines', new Array());
-                        key_machines.pushObject([machine.backend.id, machine.id]);
+                        
+                        var key_machines = new Array();
+                        key.machines.forEach(function(machine) {
+                            key_machines.push(machine); 
+                        });
+                        key_machines.push([machine.backend.id, machine.id, Date.now()]);
+                        Mist.keysController.updateKeyMachinesList(key.name, key_machines);
+                        
                         machine.set('keysCount', 1);
                         Ember.run.next(function() {
-                            $('#mist-manage-keys').parent().trigger('create')
+                            $('#mist-manage-keys').parent().trigger('create');
                         });
                         machine.probe(key.name);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.timeNotify(jqXHR.responseText, 15000);
                         error(textstate, errorThrown, 'while creating machine', that.name);
+                        machine.set('pendingCreation', false);
                         that.removeObject(machine);
                         that.backend.set('error', textstate);
                         that.backend.set('create_pending', false);
