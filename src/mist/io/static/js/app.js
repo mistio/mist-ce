@@ -10,7 +10,7 @@ require.config({
         text: 'lib/require/text',
         ember: 'lib/ember-1.0.0-rc.3',
         handlebars: 'lib/handlebars-1.0.0-rc.3',
-        mobile: 'lib/jquery.mobile-1.3.0',
+        mobile: 'lib/jquery.mobile-1.4.0-rc.1',
         d3: 'lib/d3-2.10.1',
         cubism: 'lib/cubism-1.2.2',
         md5: 'lib/md5',
