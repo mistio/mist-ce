@@ -13,19 +13,20 @@ as class methods.
 from mist.io.dal import StrField, IntField
 from mist.io.dal import FloatField, BoolField
 from mist.io.dal import ListField, DictField
-from mist.io.dal import getModelField, getSeqFieldsField
-from mist.io.dal import BaseModel
+from mist.io.dal import getOODictField
+from mist.io.dal import getFieldsListField, getFieldsDictField
+from mist.io.dal import OODict
 from mist.io.dal import UserEngine
 
 
-class Machine(BaseModel):
+class Machine(OODict):
     """A vm in a backend"""
     hasMonitoring = BoolField()
     uuid = StrField()
     monitor_server = DictField()
 
 
-class Backend(BaseModel):
+class Backend(OODict):
     """A cloud vm provider backend"""
     enabled = BoolField()
     machine_count = IntField()
@@ -39,10 +40,10 @@ class Backend(BaseModel):
     provider = StrField()
 
     starred = ListField()
-    machines = getSeqFieldsField(list, getModelField(Machine))()
+    machines = getFieldsListField(getOODictField(Machine))()
 
 
-class Keypair(BaseModel):
+class Keypair(OODict):
     """An ssh keypair."""
     public = StrField()
     private = StrField()
@@ -59,5 +60,5 @@ class User(UserEngine):
 
     email = StrField()
     password = StrField()
-    backends = getSeqFieldsField(dict, getModelField(Backend))()
-    keypairs = getSeqFieldsField(dict, getModelField(Keypair))()
+    backends = getFieldsDictField(getOODictField(Backend))()
+    keypairs = getFieldsDictField(getOODictField(Keypair))()

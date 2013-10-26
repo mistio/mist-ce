@@ -12,14 +12,16 @@ Mist io uses yaml files as its storage backend. We store data using a
 main dict consisting of nested dicts, lists, ints, strs etc. This
 module provides an object oriented interface on those dicts.
 
-Classes that inherit BaseModel are initiated using a dict. Dict keys are
+A basic class here is OODict that defines a dict to object mapper.
+Classes that inherit OODict are initiated using a dict. Dict keys are
 on the fly transformed to object attributes, based on predefined fields.
-A BaseModel subclass can have fields that are themselves BaseModel
-derivatives or collections of BaseModel derivatives.
+These fields (subclasses of Field) can be of a certain type and may have
+a default value. They can also be instances of other OODict subclasses
+or collections there of.
 
 From here you should import:
 StrField, IntField, FloatField, BoolField, ListField, DictField,
-getModelField, getSeqFieldsField, BaseModel, UserEngine
+getOODictField, getFieldsListField, getFieldsDictField, OODict, UserEngine
 """
 
 import logging
@@ -32,207 +34,161 @@ log = logging.getLogger()
 
 
 class Field(object):
-    """Dummy class. All field elements must inherit it so that they
+    """Field is an abstract base class meant to be subclassed.
+
+    All field elements must inherit it so that they
     can be distinguished from other instance attributes.
+
+    front_types and back_types must be lists of new style classes. They
+    represent the valid types a field may have in the frontend (python)
+    and in the backend (mongo). The first element takes precedence.
+    Values will always be casted based on the first type. The rest just
+    declare that they are also accepted inputs and should not raise
+    errors.
+
+    cast2front and cast2back must be methods that take as input a value
+    from one end and cast it to the other, replacing it with the default
+    value of the field if no value or None is given.
     """
 
-    def back_type(self):
-        """Return the type (class) with wich the data in the storage
-        will be saved.
-        """
+    front_types = []
+    back_types = []
+    default = None
 
-    def front_type(self):
-        """Return the type (class) with wich the data will be displayed
-        through this layer to the app.
-        """
+    def cast2front(self, back_value=None):
+        log.debug("%s casting to front value %s (%s)",
+                  type(self), back_value, type(back_value))
+        return self._cast(back_value, back=False)
 
-    def raw(self):
-        """Return the data as it should be saved in the storage."""
+    def cast2back(self, front_value=None):
+        log.debug("%s casting to back value %s (%s)",
+                  type(self), front, type(front_value))
+        return self._cast(front_value, back=True)
+
+    def _cast(self, val, back=False, dry=False):
+        import pdb;pdb.set_trace()
+        if back:
+            atypes, btypes = self.front_types, self.back_types
+        else:
+            atypes, btypes = self.back_types, self.front_types
+        btype = btypes[0]
+        if val is None:
+            val = self.default
+        if type(val) not in atypes and type(val) not in btypes:
+            log.error("%s value: '%s' is %s, should be in %s"
+                      "will try to cast and see what happens...",
+                      type(self), val, type(val), atypes)
+        if type(val) is not btype and not dry:
+            return btype(val)
+        return val
+
+    def __init__(self, val=None):
+        if val is not None:
+            val = self.front_types[0](val)
+        else:
+            val = self.front_types[0]()
+        self.default = val
+
+    def __repr__(self):
+        return self.default.__repr__()
 
 
-class StrField(str, Field):
+class StrField(Field):
     """Sets a string field, inherits from str. Default: ''"""
-    _type = str
-    def back_type(self):
-        return unicode
-    def front_type(self):
-        return str
+    front_types = back_types = [str, unicode]
 
 
-class TypeField(Field):
-    """Class for fields that subclass a builtin type."""
-
-    _type = None
-
-    def back_type(self):
-        return self._type
-
-    def front_type(self):
-        return self._type
-
-    def raw(self):
-        return self._type(self)
-
-
-class IntField(int, TypeField):
+class IntField(Field):
     """Sets an int field, inherits from int. Default: 0"""
-    _type = int
+    front_types = back_types = [int, float]
 
 
-class FloatField(float, TypeField):
+class FloatField(Field):
     """Sets a floating point number field, inherits from float.
     Default: 0.0
     """
-    _type = float
+    front_types = back_types = [float]
 
 
-class ListField(list, TypeField):
+class ListField(Field):
     """Sets a list field. Default: []"""
-    _type = list
+    front_types = back_types = [list, tuple]
 
 
-class DictField(dict, TypeField):
+class DictField(Field):
     """Sets a dict field. Default: {}"""
-    _type = dict
+    front_types = back_types = [dict]
+
 
 class BoolField(Field):
     """Sets a boolean field. Default: False"""
-
-    # We cannot inherit bool, so we mimic one
-    def __init__(self, value=False):
-        self.value = bool(value)
-
-    def __nonzero__(self):
-        """Evaluate as bool"""
-        return self.value
-
-    def __repr__(self):
-        """Print as bool"""
-        return str(self.value)
-
-    def back_type(self):
-        return bool
-
-    def front_type(self):
-        return bool
-
-    def raw(self):
-        return self.value
+    front_types = back_types = [bool]
 
 
-def getModelField(model):
-    """Returns a Field type that inherits model. Model must be a
-    subclass of BaseModel.
+class ObjectField(Field):
+    """This is an abstract base class that inherits from Field. It
+    assumes that front type is a subclass of BaseObject and changes
+    the way values are casted to backend accordingly.
     """
 
-    if not issubclass(model, BaseModel):
-        raise TypeError("%s is not subclass of BaseModel" % model)
+    def cast2back(self, front_value=None):
+        ftype, btype = self.front_types[0], self.back_types[0]
+        log.debug("%s casting to back value %s (%s)",
+                  type(self), front_value, type(front_value))
+        val = self._cast(front_value, back=True, dry=True)
+        if type(val) not in [ftype, btype]:
+            raise TypeError("%s is not %s or %s" % (val, ftype, btype))
+        val = self.cast2front(val)
+        return val.get_raw()
 
-    class ModelField(model, Field):
+
+def getOODictField(oodict):
+    """Returns a Field type. oodict must be a subclass of OODict.
+    """
+
+    if type(oodict) is not type:
+        raise TypeError("oodict must be a class, subclass of OODict")
+    if not issubclass(oodict, OODict):
+        raise TypeError("oodict must be a class, subclass of OODict")
+
+    class OODictField(ObjectField):
         """Sets a dict field that will be parsed by a
-        BaseModel subclass.
+        BaseObject subclass.
         """
 
-        def back_type(self):
-            return dict
+        front_types, back_types = [oodict], [dict]
 
-        def front_type(self):
-            return model
-
-        def raw(self):
-            return self._dict
-
-    return ModelField
+    return OODictField
 
 
-class SeqModelField(Field):
-    """Sets up a basic Sequence field, whose items are being parsed by
-    some Field subclass. That means you can have a list or dict with
-    str values, or int, or bool, or some derivative of BaseModel.
-    This class and its subclasses interface upon an existing sequence,
-    without copying it.
-    """
+def getFieldsListField(field):
 
-    seq = None          # the actual seq being interfaced
-    seq_type = None     # must be a type, either list or dict
-    item_type = None    # must be a type, subclass of Field
+    if type(field) is not type:
+        raise TypeError("field arg must be a class, subclass of Field.")
+    if not issubclass(field, Field):
+        raise TypeError("field arg must be a class, subclass of Field.")
 
-    def __init__(self, seq=None):
-        """Argument 'seq'  can be a sequence of type self.seq_type.
-        This class will operate directly on this seq, without copying it.
-        If a seq is not passed, a new sequence will be created.
-        """
-
-        if seq is not None and type(seq) is not self.seq_type:
-            raise TypeError("%s is type %s, should be type %s"
-                            % (seq, type(seq), self.seq_type))
-        if seq is None:
-            seq = self.seq_type()
-        self.seq = seq
-
-    def __getitem__(self, key):
-        value = self.seq[key]
-        if type(value) is not self.item_type.back_type():
-            logging.warn("Invalid type %s detected on storage. Should be %s"
-                    % (type(value), self.item_type.back_type()))
-            value = self.item_type.back_type()(value)
-        if self.item_type.back_type() is not self.item_type.front_type():
-            value = self.item_type.front_type()(value)
-        return value
-
-    def front_type(self):
-        return type(self)
-
-    def back_type(self):
-        return self.seq_type
-
-    def raw(self):
-        return self.seq
+    class FieldsListField(ObjectField):
+        front_types, back_types = [getFieldsList(field)], [list]
+    return FieldsListField
 
 
-class ListModelField(SeqModelField):
-    seq_type = list
+def getFieldsDictField(field):
+    if type(field) is not type:
+        raise TypeError("field arg must be a class, subclass of Field.")
+    if not issubclass(field, Field):
+        raise TypeError("field arg must be a class, subclass of Field.")
+
+    class FieldsDictField(ObjectField):
+        front_types, back_types = [getFieldsDict(field)], [dict]
+    return FieldsDictField
 
 
-class DictModelField(SeqModelField):
-    seq_type = dict
-
-    def __repr__(self):
-        items = ("%s: %s" % (key, self.seq[key].__repr__())
-                 for key in self.seq)
-        return "{%s}" % ','.join(items)
+class BaseObject(object):
+    pass
 
 
-def getSeqFieldsField(seq_type, field_type):
-    type_err = ''
-    if type(seq_type) is type:
-        if seq_type not in (list, dict):
-            type_err += ("seq_type argument %s should be list or dict. "
-                    % seq_type)
-    else:
-        type_err += ("seq_type argument %s should be of type 'type'. "
-                    % seq_type)
-    if type(field_type) is type:
-        if not issubclass(field_type, Field):
-            type_err += ("field_type argument %s should be subclass of \
-                        Field. " % seq_type)
-    else:
-        type_err += ("field_type argument %s should be of type 'type'. "
-                    % field_type)
-    if type_err:
-        raise TypeError(type_err)
-
-    if seq_type is list:
-        class ListModel(ListModelField):
-            item_type = field_type
-        return ListModel
-    if seq_type is dict:
-        class DictModel(DictModelField):
-            item_type = field_type
-        return DictModel
-
-
-class BaseModel(object):
+class OODict(BaseObject):
     """Base model class"""
 
     _fields = []
@@ -267,20 +223,23 @@ class BaseModel(object):
             dict_value = self._dict.get(name)
             # if real value not set or wrong type:
             if dict_value is None:
-                logging.warn("Missing field '%s' on storage. Setting to default" % name)
+                logging.warn("Missing field '%s' on storage. "
+                             "Setting to default" % name)
                 # set to default
                 self.__setattr__(name, attr)
-            elif type(dict_value) is not attr.back_type():
+            elif type(dict_value) not in attr.back_types:
                 # set dict value
-                logging.warn("Invalid type %s detected on storage for field '%s'. Should be %s. Changing type."
-                    % (type(dict_value), name, attr.back_type()))
+                logging.warn("Invalid type %s detected on storage for "
+                             "field '%s'. Should be %s. Changing type."
+                           % (type(dict_value), name, attr.back_types))
                 # resetting will fix type issue
                 self.__setattr__(name, dict_value)
             # reload and cast before returning
             dict_value = self._dict[name]
-            if type(dict_value) is not attr.front_type():
-                logging.warn("casting from %s to %s for %s", type(dict_value), attr.front_type(), name)
-                return attr.front_type()(self._dict[name])
+            if type(dict_value) is not attr.front_types[0]:
+                logging.warn("casting from %s to %s for %s",
+                            type(dict_value), attr.front_types[0], name)
+                return attr.front_types[0](self._dict[name])
             return dict_value
         return attr
 
@@ -293,8 +252,8 @@ class BaseModel(object):
             return object.__setattr__(self, name, value)
 
         attr = object.__getattribute__(self, name)
-        bt = attr.back_type()
-        ft = attr.front_type()
+        bt = attr.back_types[0]
+        ft = attr.front_types[0]
         t = type(value)
         if ft is bt and issubclass(t, bt):
             if t is bt:
@@ -314,9 +273,10 @@ class BaseModel(object):
             else:
                 self._dict[name] = bt(value)
         else:
-            logging.error("Invalid value '%s' for field '%s', type is %s", value, name, t)
+            logging.error("Invalid value '%s' for field "
+                          "'%s', type is %s", value, name, t)
             self._dict[name] = bt(value)
-            #~ raise TypeError("You are trying to write using an invalid value.")
+#~ raise TypeError("You are trying to write using an invalid value.")
 
     def __str__(self):
         """Overide string conversion to print nicely."""
@@ -329,10 +289,73 @@ class BaseModel(object):
         return bool(self._dict)
 
 
+class FieldsSequence(BaseObject):
+    """Sets up a basic Sequence field, whose items are being parsed by
+    some Field subclass. That means you can have a list or dict with
+    str values, or int, or bool, or some derivative of BaseObject.
+    This class and its subclasses interface upon an existing sequence,
+    without copying it.
+    """
+
+    seq = None          # the actual seq being interfaced
+    seq_type = None     # must be a type, either list or dict
+    item_type = None    # must be a type, subclass of Field
+
+    def __init__(self, seq=None):
+        """Argument 'seq'  can be a sequence of type self.seq_type.
+        This class will operate directly on this seq, without copying it.
+        If a seq is not passed, a new sequence will be created.
+        """
+
+        if seq is not None and type(seq) is not self.seq_type:
+            raise TypeError("%s is type %s, should be type %s"
+                            % (seq, type(seq), self.seq_type))
+        if seq is None:
+            seq = self.seq_type()
+        self.seq = seq
+
+    def __getitem__(self, key):
+        value = self.seq[key]
+        if type(value) not in self.item_type.back_types:
+            logging.warn("Invalid type %s detected on "
+                         "storage. Should be in %s",
+                         type(value), self.item_type.back_types)
+            value = self.item_type(value).cast2back()
+        if type(value) is not self.item_type.front_types[0]:
+            value = self.item_type(value).cast2front()
+        return value
+
+    def __len__(self):
+        return len(self.seq)
+
+
+def getFieldsList(field):
+    class FieldsList(FieldsSequence):
+        seq_type = list
+        item_type = field
+    return FieldsList
+
+
+def getFieldsDict(field):
+    class FieldsDict(FieldsSequence):
+        seq_type = dict
+        item_type = field
+
+        def keys(self):
+            return self.seq.keys()
+
+        def __repr__(self):
+            items = ("%s: %s" % (key, self.seq[key].__repr__())
+                     for key in self.seq)
+            return "{%s}" % ','.join(items)
+
+    return FieldsDict
+
+
 ### Persistence handling ###
 
 
-class UserEngine(BaseModel):
+class UserEngine(OODict):
 
     def __init__(self, _dict={}):
         """Set the storage resources and initiate the user.
