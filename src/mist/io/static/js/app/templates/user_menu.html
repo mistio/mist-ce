@@ -1,11 +1,10 @@
-<button
-    id="me-btn"
+<a id="me-btn"
     class="ui-btn-right"
     data-role="button"
     data-icon="check"
     data-iconpos="right"
     {{bindAttr class="Mist.backendsController.state :state-providers"}}
-    {{action click target="view"}}>me</button>
+    {{action click target="view"}}>me</a>
 
 <div id="user-dialog" class="mist-dialog" data-role="popup" data-transition="pop" data-position-to="#me-btn">
     <div data-role="content" data-theme="b">
