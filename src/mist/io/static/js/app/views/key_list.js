@@ -36,36 +36,39 @@ define('app/views/key_list', [
                 }
             }.observes('Mist.keysController.keys.@each.selected'),
 
-            createClicked: function() {
-                $("#create-key-dialog").popup("open");
-            },
+            actions: {
 
-            selectClicked: function() {
-                $('#select-keys-dialog').popup('open');
-            },
+                createClicked: function() {
+                    $("#create-key-dialog").popup("open");
+                },
 
-            selectionModeClicked: function(mode) {
-                Mist.keysController.keys.forEach(function(key) {
-                    key.set('selected', mode);
-                });
-                Ember.run.next(function() {
-                    $("input[type='checkbox']").checkboxradio("refresh");
-                });
-                $('#select-keys-dialog').popup('close');
-            },
+                selectClicked: function() {
+                    $('#select-keys-dialog').popup('open');
+                },
 
-            deleteClicked: function() {
-                var keyName = this.selectedKey.name;
-                Mist.confirmationController.set('title', 'Delete key');
-                Mist.confirmationController.set('text', 'Are you sure you want to delete "' + keyName +'" ?');
-                Mist.confirmationController.set('callback', function() {
-                    Mist.keysController.deleteKey(keyName);
-                });
-                Mist.confirmationController.show();
-            },
+                selectionModeClicked: function(mode) {
+                    Mist.keysController.keys.forEach(function(key) {
+                        key.set('selected', mode);
+                    });
+                    Ember.run.next(function() {
+                        $("input[type='checkbox']").checkboxradio("refresh");
+                    });
+                    $('#select-keys-dialog').popup('close');
+                },
 
-            setDefaultClicked: function() {
-                Mist.keysController.setDefaultKey(this.selectedKey.name);
+                deleteClicked: function() {
+                    var keyName = this.selectedKey.name;
+                    Mist.confirmationController.set('title', 'Delete key');
+                    Mist.confirmationController.set('text', 'Are you sure you want to delete "' + keyName +'" ?');
+                    Mist.confirmationController.set('callback', function() {
+                        Mist.keysController.deleteKey(keyName);
+                    });
+                    Mist.confirmationController.show();
+                },
+
+                setDefaultClicked: function() {
+                    Mist.keysController.setDefaultKey(this.selectedKey.name);
+                }
             }
         });
     }
