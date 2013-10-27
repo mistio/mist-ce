@@ -24,28 +24,28 @@
         class="ui-listview ui-listview-inset ui-corner-all ui-shadow"
         id="home-menu">
         <li>
-            {{#linkTo machines}}Machines
+            {{#link-to "machines"}}Machines
                 {{#if Mist.backendsController.loadingMachines}}
                 <div class="ajax-loader"></div>
                 {{/if}}    
                 <span class="ui-li-count">{{Mist.backendsController.machineCount}}</span>
-            {{/linkTo}}
+            {{/link-to}}
         </li>
         <li>
-            {{#linkTo images}}Images
+            {{#link-to "images"}}Images
                 {{#if Mist.backendsController.loadingImages}}
                 <div class="ajax-loader"></div>
                 {{/if}}
                 <span class="ui-li-count">{{Mist.backendsController.imageCount}}</span>
-            {{/linkTo}}
+            {{/link-to}}
         </li>
         <li>
-            {{#linkTo keys}}Keys
+            {{#link-to "keys"}}Keys
                 {{#if Mist.keysController.loadingKeys}}
                 <div class="ajax-loader"></div>
                 {{/if}}
                 <span class="ui-li-count">{{Mist.keysController.keys.length}}</span>
-            {{/linkTo}}
+            {{/link-to}}
         </li>
     </ul>
 

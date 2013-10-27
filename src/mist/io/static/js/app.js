@@ -5,12 +5,12 @@ require.config({
     paths: {
         mocha: 'lib/mocha-1.4.2',
         chai: 'lib/chai-1.2.0',
-        jquery: 'lib/jquery-1.9.1',
+        jquery: 'lib/jquery-1.10.2',
         jqueryUi: 'lib/jquery-ui-1.9.1.custom',
         text: 'lib/require/text',
-        ember: 'lib/ember-1.0.0-rc.3',
-        handlebars: 'lib/handlebars-1.0.0-rc.3',
         mobile: 'lib/jquery.mobile-1.4.0-rc.1',
+        ember: 'lib/ember-1.1.2',
+        handlebars: 'lib/handlebars-1.0.0',
         d3: 'lib/d3-2.10.1',
         cubism: 'lib/cubism-1.2.2',
         md5: 'lib/md5',
@@ -134,11 +134,11 @@ define( 'app', [
 
         App = Ember.Application.create({
             rootElement: 'body',
-            LOG_TRANSITIONS: false,
+            LOG_TRANSITIONS: true,
             LOG_STATE_TRANSITIONS: false,
             email: null,
             password: null,
-
+            
             ready: function(){
                 Em.run.next(function(){
                     var id = false;
@@ -152,7 +152,7 @@ define( 'app', [
                         require(['mobile'], function(){console.log('jqm loaded');});
                     }
                 });
-            }           
+            }  
         });
 
         App.Router.map(function() {
@@ -201,7 +201,7 @@ define( 'app', [
                    log('deselecting key: ' + key.name);
                    key.set('selected', false);
               });
-            }  
+            }
         });       
 
         App.KeyRoute = Ember.Route.extend({
@@ -380,7 +380,7 @@ define( 'app', [
         App.set('renderedImages', Ember.ArrayController.create());
         
         window.Mist = App;
-        return App
+        return App;
     }
     
 
