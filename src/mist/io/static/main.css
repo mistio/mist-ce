@@ -548,12 +548,8 @@ div.actions div.ui-controlgroup-controls {
     width: 33%;
 }
 
-#keys-footer.ui-footer div.actions a {
-    width: 49%;
-}
-
-#single-key-footer.ui-footer div.actions a {
-    width:49%;
+#keys-footer.ui-footer div.actions a, #single-key-footer.ui-footer div.actions a {
+    width: 46%;
 }
 
 #single-key-footer {

@@ -1,4 +1,4 @@
-    <div data-role="header">
+    <div data-role="header" data-theme="b">
         <a href="#/keys"
             data-icon="arrow-l"
             data-direction="reverse"
@@ -11,7 +11,7 @@
         <h3 class="single-view-name">{{name}}</h3>
     </div>
 
-    <div data-role="content">
+    <div data-role="content" data-theme="c">
 
          <div data-role="collapsible" data-collapsed="false">
             <h3>Public Key</h3>
@@ -25,7 +25,7 @@
             <div class="private-key">
                 <a data-role="button" {{action displayPrivateClicked target="view"}}>Display</a>
                 <div data-role="popup" id="key-private-dialog" data-overlay-theme="a" data-transition="pop">
-                    <div data-role="header">
+                    <div data-role="header" data-theme="b">
                         <h1>Private Key</h1>
                     </div>
                     {{view Mist.KeyPrivDialog data-role="content"}}
@@ -45,6 +45,8 @@
             </ul>
         </div>
         {{/if}}
+        
+        <div class="bottom-padding"></div>
 
     </div>
 
@@ -56,13 +58,13 @@
     </div>
 
     <div data-role="popup" id="edit-key-dialog" data-overlay-theme="a" data-transition="pop">
-        <div data-role="header">
+        <div data-role="header" data-theme="b">
             <h1>Rename key</h1>
         </div>
         {{view Mist.EditKeyView data-role="content"}}
     </div>
 
-    <div data-role="footer" id="single-key-footer" data-theme="a">
+    <div data-role="footer" id="single-key-footer" data-theme="b">
         <div class="actions" data-role="controlgroup" data-type="horizontal">
             <a id="keys-button-edit"
                data-role="button"

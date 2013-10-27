@@ -1,5 +1,4 @@
-
-<div data-role="header">
+<div data-role="header" data-theme="b">
 
     <a href="#"
         data-icon="home"
@@ -12,13 +11,12 @@
 
 </div>
 
-<div data-role="content" id="machines">
+<div data-role="content" id="machines" data-theme="c">
 
     {{view Mist.MachineAddView}}
 
     <a href="#"
         class="select-machines"
-        data-theme="d"
         data-role="button"
         data-icon="arrow-d"
         {{action openMachineSelectPopup target="view"}}>Select</a>
@@ -37,7 +35,6 @@
         data-role="listview"
         data-filter="true"
         data-inset="true"
-        data-theme="c"
         data-filter-placeholder="Filter...">
         {{#each Mist.backendsController}}
             {{#each machines}}
@@ -57,7 +54,7 @@
     {{view Mist.ConfirmationDialog data-role="content"}}
 </div>
 
-<div class="machines-footer" data-role="footer" data-theme="a">
+<div class="machines-footer" data-role="footer" data-theme="b">
 
     <div class="actions" data-role="controlgroup" data-type="horizontal">
         <a href="#"

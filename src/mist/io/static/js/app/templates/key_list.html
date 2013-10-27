@@ -1,4 +1,4 @@
-    <div data-role="header">
+    <div data-role="header" data-theme="b">
         <a href="#"
            data-icon="home"
            data-role="button"
@@ -8,7 +8,7 @@
         {{view Mist.UserMenuView}}
     </div>
 
-    <div data-role="content" id="keys">
+    <div data-role="content" id="keys" data-theme="c">
 
         <a class="add-button"
            data-theme="b"
@@ -36,7 +36,7 @@
     </div>
 
     <div data-role="popup" id="create-key-dialog" data-transition="pop" data-overlay-theme="a">
-        <div data-role="header">
+        <div data-role="header" data-theme="b">
             <h1>Create key</h1>
         </div>
         {{view Mist.AddKeyView data-role="content"}}
@@ -60,7 +60,7 @@
         {{view Mist.ConfirmationDialog data-role="content"}}
     </div>
 
-    <div data-role="footer" id="keys-footer" data-theme="a">
+    <div data-role="footer" id="keys-footer" data-theme="b">
         <div class="actions" data-role="controlgroup" data-type="horizontal">
             <a id="keys-button-delete"
                data-role="button"
