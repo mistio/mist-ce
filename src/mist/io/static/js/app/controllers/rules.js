@@ -11,6 +11,7 @@ define('app/controllers/rules', [
     function(Rule) {
         return Ember.ArrayController.extend({
 
+            content: [],
             command: null,
             commandRule: null,
             creationPending: false,

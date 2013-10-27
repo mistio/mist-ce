@@ -5,7 +5,7 @@
                 {{view Mist.Checkbox checkedBinding="view.machine.selected"}}
             </label>
         </fieldset>
-        {{#linkTo machine view.machine}}
+        {{#link-to "machine" view.machine}}
             <h3 class="name">{{view.machine.name}}</h3>
     
             <span class="caption-wrapper">
@@ -44,7 +44,7 @@
                     {{/if}}
                 {{/if}}
             </span>
-        {{/linkTo}}
+        {{/link-to}}
     </li>
 {{else}}
     <li class="node ghost" data-icon="delete">
