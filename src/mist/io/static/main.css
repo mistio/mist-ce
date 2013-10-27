@@ -25,20 +25,6 @@ div#splash div.mist-logo {
     margin-top: -140px;
 }
 
-/* Home View */
-
-#home-menu {
-    clear: both;
-}
-
-#me-btn {
-    width: 2em;
-}
-
-.ui-controlgroup-controls a {
-    color: black;
-}
-
 /* Buttons */
 
 .btn-full {
@@ -59,6 +45,26 @@ div#splash div.mist-logo {
 
 #home .ui-content {
     overflow-y: hidden;
+}
+
+#home-menu {
+    clear: both;
+}
+
+#me-btn {
+    width: 2em;
+}
+
+.ui-controlgroup-controls a, .ui-controlgroup-controls a:hover {
+    color: black;
+}
+
+#backend-buttons .ui-controlgroup-controls .ui-btn a {
+    padding: 10px 10px 10px 40px !important;
+}
+
+#backend-buttons .ui-controlgroup-controls .ui-btn {
+    padding: 10px 0 9px !important;
 }
 
 /* Select Button */
