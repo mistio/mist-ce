@@ -56,30 +56,41 @@ class Field(object):
     default = None
 
     def cast2front(self, back_value=None):
-        log.debug("%s casting to front value %s (%s)",
+        log.debug("%s: casting value %s (%s) to front",
                   type(self), back_value, type(back_value))
         return self._cast(back_value, back=False)
 
     def cast2back(self, front_value=None):
-        log.debug("%s casting to back value %s (%s)",
+        log.debug("%s: casting value %s (%s) to back",
                   type(self), front, type(front_value))
         return self._cast(front_value, back=True)
 
     def _cast(self, val, back=False, dry=False):
-        import pdb;pdb.set_trace()
         if back:
             atypes, btypes = self.front_types, self.back_types
         else:
             atypes, btypes = self.back_types, self.front_types
-        btype = btypes[0]
+        atype, btype = atypes[0], btypes[0]
+        # if val is None (not set), use default value
         if val is None:
             val = self.default
-        if type(val) not in atypes and type(val) not in btypes:
-            log.error("%s value: '%s' is %s, should be in %s"
-                      "will try to cast and see what happens...",
+        if type(val) is not atype:
+            log.warn("%s: value %s is %s, should preferably be %s",
+                      type(self), val, type(val), atype)
+        if type(val) not in atypes:
+            log.error("%s: value %s is %s, should be in %s",
                       type(self), val, type(val), atypes)
+            if type(val) not in btypes:
+                log.error("it's not even in %s!!! will try to cast "
+                          "and see what happens.", btypes)
+            else:
+                log.error("at least the value is in "
+                          "the group to be casted")
         if type(val) is not btype and not dry:
-            return btype(val)
+            log.debug("actually casting value")
+            val = btype(val)
+        else:
+            log.debug("no need to cast value, already of type %s" % btype)
         return val
 
     def __init__(self, val=None):
@@ -90,7 +101,9 @@ class Field(object):
         self.default = val
 
     def __repr__(self):
-        return self.default.__repr__()
+        default = self.default.__repr__()
+        mytype = self.__class__
+        return "%s(%s)" % (mytype, default)
 
 
 class StrField(Field):
@@ -217,31 +230,32 @@ class OODict(BaseObject):
 
         # get real object attribute
         attr = object.__getattribute__(self, name)
-        # if it's a field
-        if issubclass(type(attr), Field):
-            # get real dict value
-            dict_value = self._dict.get(name)
-            # if real value not set or wrong type:
-            if dict_value is None:
-                logging.warn("Missing field '%s' on storage. "
-                             "Setting to default" % name)
-                # set to default
-                self.__setattr__(name, attr)
-            elif type(dict_value) not in attr.back_types:
-                # set dict value
-                logging.warn("Invalid type %s detected on storage for "
-                             "field '%s'. Should be %s. Changing type."
-                           % (type(dict_value), name, attr.back_types))
-                # resetting will fix type issue
-                self.__setattr__(name, dict_value)
-            # reload and cast before returning
-            dict_value = self._dict[name]
-            if type(dict_value) is not attr.front_types[0]:
-                logging.warn("casting from %s to %s for %s",
-                            type(dict_value), attr.front_types[0], name)
-                return attr.front_types[0](self._dict[name])
-            return dict_value
-        return attr
+        # if it's not a field, just return
+        if not issubclass(type(attr), Field):
+            return attr
+
+        # get real dict value
+        dict_value = self._dict.get(name)
+        # if real value not set or wrong type:
+        if dict_value is None:
+            logging.warn("Missing field '%s' on storage. "
+                         "Setting to default" % name)
+            # set to default
+            self.__setattr__(name, attr)
+        elif type(dict_value) not in attr.back_types:
+            # set dict value
+            logging.warn("Invalid type %s detected on storage for "
+                         "field '%s'. Should be %s. Changing type."
+                       % (type(dict_value), name, attr.back_types))
+            # resetting will fix type issue
+            self.__setattr__(name, dict_value)
+        # reload and cast before returning
+        dict_value = self._dict[name]
+        if type(dict_value) is not attr.front_types[0]:
+            logging.warn("casting from %s to %s for %s",
+                        type(dict_value), attr.front_types[0], name)
+            return attr.front_types[0](self._dict[name])
+        return dict_value
 
     def __setattr__(self, name, value):
         """Overide attributes to handle dict keys as instance
@@ -353,6 +367,8 @@ def getFieldsDict(field):
 
 
 ### Persistence handling ###
+# Completely untested, just POC
+# Shoud be easy though to make it work
 
 
 class UserEngine(OODict):
