@@ -1317,19 +1317,19 @@ div.loading-monitoring {
 }
 
 #dialog-shell.dialog-shell .shell-return {
-    display: inline-block;
     width: 100%;
     border: 1px solid #AAA;
     height: 60ex;
     font-family: monospace;
     font-size: 11px;
     min-height: 150px;
+    max-height: 40% !important;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-    margin-bottom: 5px;
+    margin-bottom: 20px;
     background: #dfe1e2;
-    height: 100% !important;
+    overflow-y: auto;
 }
 
 #dialog-shell.dialog-shell .shell-return .command {

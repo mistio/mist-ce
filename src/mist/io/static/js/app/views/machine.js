@@ -539,6 +539,12 @@ define('app/views/machine', [
             showShell: function() {
                 $("#dialog-shell").popup('option', 'positionTo', '#machines-button-shell')
                                   .popup('open', {transition: 'slideup', });
+                $("#dialog-shell").on('popupafteropen', 
+                    function(){
+                        $('.shell-input input').focus();
+                    }
+                );
+                
                 $("#dialog-shell").on('popupafterclose', 
                     function(){
                         $(window).off('resize');
