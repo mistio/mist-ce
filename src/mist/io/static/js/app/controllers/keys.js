@@ -20,7 +20,7 @@ define('app/controllers/keys', [
                 this._super();
                 this.loadKeys();
             },
-            
+
             singleKeyRequestObserver: function() {
                 if (this.singleKeyRequest) {
                     if (this.loadingKeys) {
@@ -33,7 +33,6 @@ define('app/controllers/keys', [
                     this.set('singleKeyRequest', false);
                 }
             }.observes('singleKeyRequest'),
-            
 
             loadKeys: function() {
                 var that = this;
@@ -252,7 +251,7 @@ define('app/controllers/keys', [
                 }
                 return null;
             },
-            
+
             getKeyByUrlName: function(keyName) {
                 for (var k = 0; k < this.keys.length; ++k) {
                     if (this.keys[k].name.replace(/ /g,'') == keyName) {

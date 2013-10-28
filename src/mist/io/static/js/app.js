@@ -200,7 +200,7 @@ define( 'app', [
                    key.set('selected', false);
               });
             }
-        });       
+        });
 
         App.KeyRoute = Ember.Route.extend({
 
@@ -220,13 +220,13 @@ define( 'app', [
                     machines: [],
                     selected: false,
                     default_key: false,
-                  };               
+                  };
               }
               var pathArray = window.location.href.split( '/' );
               return Mist.keysController.getKeyByUrlName(pathArray[5]);
           } 
-        });  
-        
+        });
+
             // we check if we are at the bottom of the page
         App.isScrolledToBottom = function(){
             var distanceToViewportTop = (
