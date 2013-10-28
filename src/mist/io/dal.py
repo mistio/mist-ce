@@ -56,13 +56,13 @@ class Field(object):
     default = None
 
     def cast2front(self, back_value=None):
-        log.debug("%s: casting value %s (%s) to front",
-                  type(self), back_value, type(back_value))
+        log.debug("%s: casting value (%s) to front",
+                  type(self), type(back_value))
         return self._cast(back_value, back=False)
 
     def cast2back(self, front_value=None):
-        log.debug("%s: casting value %s (%s) to back",
-                  type(self), front_value, type(front_value))
+        log.debug("%s: casting value (%s) to back",
+                  type(self), type(front_value))
         return self._cast(front_value, back=True)
 
     def _cast(self, val, back=False, dry=False):
@@ -74,18 +74,18 @@ class Field(object):
         # if val is None (not set), use default value
         if val is None:
             val = self.default
-        if type(val) is not atype:
-            log.warn("%s: value %s is %s, should preferably be %s",
-                      type(self), val, type(val), atype)
-        if type(val) not in atypes:
-            log.error("%s: value %s is %s, should be in %s",
-                      type(self), val, type(val), atypes)
-            if type(val) not in btypes:
-                log.error("it's not even in %s!!! will try to cast "
-                          "and see what happens.", btypes)
-            else:
-                log.error("at least the value is in "
-                          "the group to be casted")
+        if type(val) not in [atype, btype]:
+            log.warn("%s: value is %s, should preferably be %s",
+                      type(self), type(val), atype)
+            if type(val) not in atypes:
+                log.error("%s: value is %s, should be in %s",
+                          type(self), type(val), atypes)
+                if type(val) not in btypes:
+                    log.error("it's not even in %s!!! will try to cast "
+                              "and see what happens.", btypes)
+                else:
+                    log.error("at least the value is in "
+                              "the group to be casted %s", btypes)
         if type(val) is not btype and not dry:
             log.debug("actually casting value")
             val = btype(val)
@@ -271,18 +271,31 @@ class FieldsSequence(BaseObject):
     _seq_type = None     # must be a type, either list or dict
     _item_type = None    # must be a type, subclass of Field
 
-    def __init__(self, seq=None):
+    def __init__(self, *args, **kwargs):
         """Argument 'seq'  can be a sequence of type self.seq_type.
         This class will operate directly on this seq, without copying it.
         If a seq is not passed, a new sequence will be created.
         """
 
-        if seq is not None and type(seq) is not self._seq_type:
-            raise TypeError("%s is type %s, should be type %s"
-                            % (seq, type(seq), self._seq_type))
+        seq = None
+        if not kwargs and len(args) == 1:
+            arg = args[0]
+            if arg is None:
+                seq = self._seq_type()
+            elif type(arg) is type(self):
+                seq = arg._seq
+            elif type(arg) is self._seq_type:
+                seq = arg
         if seq is None:
-            seq = self.seq_type()
+            seq = self._seq_type(*args, **kwargs)
         self._seq = seq
+
+        #~ if seq is not None and type(seq) is not self._seq_type:
+            #~ raise TypeError("%s is type %s, should be type %s"
+                            #~ % (seq, type(seq), self._seq_type))
+        #~ if seq is None:
+            #~ seq = self._seq_type()
+        #~ self._seq = seq
 
     def __getitem__(self, key):
         value = self._seq[key]
