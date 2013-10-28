@@ -37,7 +37,6 @@ define('app/views/key_list', [
             }.observes('Mist.keysController.keys.@each.selected'),
 
             actions: {
-
                 createClicked: function() {
                     $("#create-key-dialog").popup("open");
                 },

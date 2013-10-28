@@ -70,7 +70,6 @@ define( 'app', [
     'app/views/key',
     'app/views/key_add_dialog',
     'app/views/key_edit_dialog',
-    'app/views/key_priv_dialog',
     'app/views/rule',
     'app/views/user_menu',
     'text!app/templates/machine.html',
@@ -112,7 +111,6 @@ define( 'app', [
                 SingleKeyView,
                 KeyAddDialog,
                 KeyEditDialog,
-                KeyPrivDialog,
                 RuleView,
                 UserMenuView,
                 machine_html,
@@ -134,7 +132,7 @@ define( 'app', [
 
         App = Ember.Application.create({
             rootElement: 'body',
-            LOG_TRANSITIONS: true,
+            LOG_TRANSITIONS: false,
             LOG_STATE_TRANSITIONS: false,
             email: null,
             password: null,
@@ -205,22 +203,27 @@ define( 'app', [
         });       
 
         App.KeyRoute = Ember.Route.extend({
-          // Ember.js mindfuck warning            
-          redirect: function(){
-              // redirect if the user visited the URL directly
-              if (this.target != undefined){
-                  var target = this.target;
-                  // clear redirect target
-                  this.target = undefined;
-                  var that = this;
-                  Ember.run.next(function(){
-                      that.transitionTo(target);
-                  });
+
+          redirect: function() {
+              if (Mist.keysController.loadingKeys) {
+                  var pathArray = window.location.href.split( '/' );
+                  Mist.keysController.set('singleKeyRequest', pathArray[5]);
               }
           },
+
           model: function(){
-              // set redirect target if the user visits directly the URL
-              this.target = 'keys';
+              if (Mist.keysController.loadingKeys) {
+                  return {
+                    id: 'Please wait',
+                    name: 'Please wait',
+                    probing: false,
+                    machines: [],
+                    selected: false,
+                    default_key: false,
+                  };               
+              }
+              var pathArray = window.location.href.split( '/' );
+              return Mist.keysController.getKeyByUrlName(pathArray[5]);
           } 
         });  
         
@@ -248,7 +251,6 @@ define( 'app', [
         App.SingleKeyView = SingleKeyView;
         App.AddKeyView = KeyAddDialog;
         App.EditKeyView = KeyEditDialog;
-        App.KeyPrivDialog = KeyPrivDialog;
         App.MachineAddView = MachineAddDialog;
         App.MachineManageKeysView = MachineManageKeysView;
         App.MachineManageKeysListItemView = MachineManageKeysListItemView;

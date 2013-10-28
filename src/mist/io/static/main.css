@@ -1069,7 +1069,7 @@ div.loading-monitoring {
     border: none;
 }
 
-#key div.public-key {
+#key #public-key {
     width: 100%;
     word-wrap: break-word;
     white-space: pre-wrap;

@@ -13,21 +13,38 @@ define('app/controllers/keys', [
 
             keys: null,
             loadingKeys: null,
+            singleKeyRequest: false,
+            singleKeyResponse: null,
 
             init: function() {
                 this._super();
                 this.loadKeys();
             },
+            
+            singleKeyRequestObserver: function() {
+                if (this.singleKeyRequest) {
+                    if (this.loadingKeys) {
+                        Ember.run.later(this, function() {
+                            this.singleKeyRequestObserver();
+                        }, 1000);
+                        return true;
+                    }
+                    this.set('singleKeyResponse', this.getKeyByUrlName(this.singleKeyRequest));
+                    this.set('singleKeyRequest', false);
+                }
+            }.observes('singleKeyRequest'),
+            
 
             loadKeys: function() {
+                var that = this;
                 this.set('loadingKeys', true);
                 $.ajax({
                     url: '/keys',
                     type: 'GET',
                     success: function(data) {
                         info('Successfully loaded keys');
-                        Mist.keysController.set('loadingKeys', false);
-                        Mist.keysController.updateKeysList(data);
+                        that.set('loadingKeys', false);
+                        that.updateKeysList(data);
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         Mist.notificationController.notify('Error while loading keys: ' + jqXHR.responseText);
@@ -39,7 +56,7 @@ define('app/controllers/keys', [
 
             newKey: function(name, privateKey, machine, autoSelect) {
                 $('#create-loader').fadeIn(200);
-                $('#create-key-ok').button('disable');
+                $('#create-key-ok').addClass('ui-disabled');
                 var item = {
                     'name': name,
                     'priv': privateKey
@@ -76,7 +93,7 @@ define('app/controllers/keys', [
                         Mist.notificationController.notify('Error while creating key: ' + jqXHR.responseText);
                         error(textstate, errorThrown, ' while creating key: ', name, '. ', jqXHR.responseText);
                         $('#create-loader').fadeOut(200);
-                        $('#create-key-ok').button('enable');
+                        $('#create-key-ok').removeClass('ui-disabled');
                     }
                 });
                 item.priv = privateKey = null; // Don't keep private key on client
@@ -234,6 +251,15 @@ define('app/controllers/keys', [
                     }
                 }
                 return null;
+            },
+            
+            getKeyByUrlName: function(keyName) {
+                for (var k = 0; k < this.keys.length; ++k) {
+                    if (this.keys[k].name.replace(/ /g,'') == keyName) {
+                        return this.keys[k];
+                    }
+                }
+                return null; 
             },
 
             updateKeysList: function(data) {

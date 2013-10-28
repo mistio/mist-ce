@@ -13,17 +13,13 @@ define('app/controllers/key_add', [
             newKeyReady: null,
             newKeyPrivate: null,
 
-            init: function() {
-                this._super();
-            },
-
             newKeyObserver: function() {
                 if (this.newKeyName && this.newKeyPrivate) {
                     this.set('newKeyReady', true);
-                    $('#create-key-ok').button('enable');
+                    $('#create-key-ok').removeClass('ui-disabled');
                 } else {
                     this.set('newKeyReady', false);
-                    $('#create-key-ok').button('disable');
+                    $('#create-key-ok').addClass('ui-disabled');
                 }
             }.observes('newKeyName', 'newKeyPrivate'),
 
