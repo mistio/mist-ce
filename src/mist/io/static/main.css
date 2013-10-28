@@ -1506,6 +1506,10 @@ div.logout-placeholder, div.account-placeholder, div.support-placeholder {
     width: 20px;
 }
 
+#single-key-loader {
+    display: none;
+}
+
 .single-view-header.single-key-header .ajax-loader{
     top: 23px;
     left: 42%;

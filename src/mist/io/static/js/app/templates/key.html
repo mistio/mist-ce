@@ -6,9 +6,7 @@
 
     <div class="single-view-header single-key-header">
         <h3 class="single-view-name">{{name}}</h3>
-        {{#if Mist.keysController.singleKeyRequest}}
-        <div class="ajax-loader"></div>
-        {{/if}}
+        <div id="single-key-loader" class="ajax-loader"></div>
     </div>
 
     <div data-role="content" data-theme="c">
