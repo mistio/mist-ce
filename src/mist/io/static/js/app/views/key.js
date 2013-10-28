@@ -53,8 +53,10 @@ define('app/views/key', [
                 });
                 this.set('associatedMachines', machineList);
                 Ember.run.next(function() {
+                    try {
                         $('#single-key-machines').trigger('create');
                         $('#single-key-machines').collapsible('refresh');
+                    } catch (e) {}
                 });
             }.observes('key.machines', 'key.machines.@each'),
 
