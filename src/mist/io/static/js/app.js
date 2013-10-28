@@ -205,24 +205,21 @@ define( 'app', [
         App.KeyRoute = Ember.Route.extend({
 
           redirect: function() {
-              if (Mist.keysController.loadingKeys) {
-                  var pathArray = window.location.href.split( '/' );
-                  Mist.keysController.set('singleKeyRequest', pathArray[5]);
-              }
+              var pathArray = window.location.href.split('/');
+              Mist.keysController.set('singleKeyRequest', pathArray[5]);
           },
 
           model: function(){
               if (Mist.keysController.loadingKeys) {
                   return {
-                    id: 'Please wait',
-                    name: 'Please wait',
+                    name: ' ',
                     probing: false,
                     machines: [],
                     selected: false,
                     default_key: false,
                   };
               }
-              var pathArray = window.location.href.split( '/' );
+              var pathArray = window.location.href.split('/');
               return Mist.keysController.getKeyByUrlName(pathArray[5]);
           } 
         });

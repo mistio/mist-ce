@@ -27,7 +27,7 @@ define('app/controllers/keys', [
                         Ember.run.later(this, function() {
                             this.singleKeyRequestObserver();
                         }, 1000);
-                        return true;
+                        return;
                     }
                     this.set('singleKeyResponse', this.getKeyByUrlName(this.singleKeyRequest));
                     this.set('singleKeyRequest', false);

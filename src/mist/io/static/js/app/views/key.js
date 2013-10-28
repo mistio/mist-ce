@@ -24,8 +24,10 @@ define('app/views/key', [
 
             renderKey: function() {
                 this.set('key', this.get('controller').get('model'));
-                this.machinesObserver();
-                Mist.keysController.getPubKey(this.key.name, '#public-key input');
+                if (this.key.name != ' ') { // This is the dummy key. It exists when key hasn't loaded yet
+                    this.machinesObserver();
+                    Mist.keysController.getPubKey(this.key.name, '#public-key input');
+                }
             },
 
             singleKeyResponseObserver: function() {
@@ -55,15 +57,20 @@ define('app/views/key', [
                 Ember.run.next(function() {
                     try {
                         $('#single-key-machines').trigger('create');
-                        $('#single-key-machines').collapsible('refresh');
+                        $('#single-key-machines').collapsible();
                     } catch (e) {}
                 });
-            }.observes('key.machines', 'key.machines.@each'),
+            }.observes('key.machines'),
 
             actions: {
                 displayPrivateClicked: function() {
                     Mist.keysController.getPrivKey(this.key.name, '#private-key');
                     $('#private-key-dialog').popup('open');
+                },
+
+                backClicked: function() {
+                    $('#private-key').val('');
+                    $('#private-key-dialog').popup('close');
                 },
 
                 editClicked: function() {
@@ -80,11 +87,6 @@ define('app/views/key', [
                         Mist.keysController.deleteKey(key.name);
                     });
                     Mist.confirmationController.show();
-                },
-
-                back: function() {
-                    $('#private-key').val('');
-                    $('#private-key-dialog').popup('close');
                 }
             }
         });

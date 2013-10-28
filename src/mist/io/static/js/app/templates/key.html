@@ -4,8 +4,11 @@
         {{view Mist.UserMenuView}}
     </div>
 
-    <div class="single-view-header">
+    <div class="single-view-header single-key-header">
         <h3 class="single-view-name">{{name}}</h3>
+        {{#if Mist.keysController.singleKeyRequest}}
+        <div class="ajax-loader"></div>
+        {{/if}}
     </div>
 
     <div data-role="content" data-theme="c">
@@ -23,7 +26,7 @@
         </div>
 
         {{#if machines}}
-        <div data-role="collapsible" id="single-key-machines" data-collapsed="false">
+        <div id="single-key-machines" data-role="collapsible" data-collapsed="false">
             <h3>Machines</h3>
             <ul id="machines-list"
                 data-role="listview"
@@ -38,32 +41,32 @@
         <div class="bottom-padding"></div>
 
     </div>
-    
-    <div data-role="popup" id="private-key-dialog" data-overlay-theme="a" data-transition="pop">
+
+    <div id="private-key-dialog" data-role="popup" data-overlay-theme="a" data-transition="pop">
         <div data-role="header" data-theme="b">
             <h1>Private Key</h1>
         </div>
         <div data-role="content">
             <textarea id="private-key" readonly="readonly">Loading key...</textarea>
-            <button {{action back target="view"}}>Back</button>
+            <button {{action backClicked target="view"}}>Back</button>
         </div>
     </div>
 
-    <div data-role="popup" id="dialog-confirm" data-overlay-theme="a" data-transition="pop">
-        <div data-role="header">
+    <div id="dialog-confirm" data-role="popup" data-overlay-theme="a" data-transition="pop">
+        <div data-role="header" data-theme="b">
             <h1>{{Mist.confirmationController.title}}</h1>
         </div>
         {{view Mist.ConfirmationDialog data-role="content"}}
     </div>
 
-    <div data-role="popup" id="edit-key-dialog" data-overlay-theme="a" data-transition="pop">
+    <div id="edit-key-dialog" data-role="popup" data-overlay-theme="a" data-transition="pop">
         <div data-role="header" data-theme="b">
             <h1>Rename key</h1>
         </div>
         {{view Mist.EditKeyView data-role="content"}}
     </div>
 
-    <div data-role="footer" id="single-key-footer" data-theme="b">
+    <div id="single-key-footer" data-role="footer" data-theme="b">
         <div class="actions" data-role="controlgroup" data-type="horizontal">
             <a id="keys-button-edit"
                data-role="button"

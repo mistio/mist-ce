@@ -38,7 +38,7 @@ div#splash div.mist-logo {
 }
 
 .ok-cancel .ui-btn {
-    width: 49%;
+    width: 33%;
 }
 
 /* Home Page */
@@ -332,6 +332,14 @@ li.node .tag {
 #private-key-actions {
     margin-top: -2px;
     width: 270px;
+}
+
+#private-key-actions .ui-btn {
+    width: 28%;
+}
+
+#create-key-actions .ui-btn {
+    width: 36%;
 }
 
 #textarea-private-key {
@@ -1498,6 +1506,11 @@ div.logout-placeholder, div.account-placeholder, div.support-placeholder {
     width: 20px;
 }
 
+.single-view-header.single-key-header .ajax-loader{
+    top: 23px;
+    left: 42%;
+}
+
 .bubble-container .ajax-loader {
     display: block;
     width: 20px;
@@ -1691,6 +1704,20 @@ div.info {
     }
 }
 
+/* Conditional for < 1140px */
+@media only screen and (max-width: 1140px) {
+    #keys-footer.ui-footer div.actions a, #single-key-footer.ui-footer div.actions a {
+        width: 44%;
+    }
+}
+
+/* Conditional for < 790px */
+@media only screen and (max-width: 790px) {
+    #keys-footer.ui-footer div.actions a, #single-key-footer.ui-footer div.actions a {
+        width: 43%;
+    }
+}
+
 /* Conditional for < 720px */
 @media only screen and (max-width: 720px) {
 
@@ -1767,6 +1794,10 @@ div.info {
     .single-view-header .ajax-loader {
         left: 41%;
     }
+    
+    #keys-footer.ui-footer div.actions a, #single-key-footer.ui-footer div.actions a {
+        width: 40%;
+    }
 }
 
 /* Conditional for < 480px */
@@ -1837,5 +1868,9 @@ div.info {
 
     .single-view-header .ajax-loader {
         left: 37%;
+    }
+
+    #keys-footer.ui-footer div.actions a, #single-key-footer.ui-footer div.actions a {
+        width: 37%;
     }
 }
