@@ -2,6 +2,12 @@
     display: none;
 }
 
+/* Less rounded corners */
+.ui-corner-all, .ui-btn-corner-all {
+    border-radius: 0.3em;
+}
+
+
 /* Splash (loading) page */
 
 div#splash {
