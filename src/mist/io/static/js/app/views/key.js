@@ -21,13 +21,13 @@ define('app/views/key', [
                 this._super();
                 this.renderKey();
             },
-            
+
             renderKey: function() {
                 this.set('key', this.get('controller').get('model'));
                 this.machinesObserver();
-                Mist.keysController.getPubKey(this.key.name, '#public-key input');   
+                Mist.keysController.getPubKey(this.key.name, '#public-key input');
             },
-                   
+
             singleKeyResponseObserver: function() {
                 if (Mist.keysController.singleKeyResponse) {
                     this.get('controller').set('model', Mist.keysController.singleKeyResponse);
@@ -65,12 +65,12 @@ define('app/views/key', [
                     Mist.keysController.getPrivKey(this.key.name, '#private-key');
                     $('#private-key-dialog').popup('open');
                 },
-    
+
                 editClicked: function() {
                     $('#new-key-name').val(this.key.name).trigger('change');
                     $('#edit-key-dialog').popup('open');
                 },
-    
+
                 deleteClicked: function() {
                     var key = this.key;
                     Mist.confirmationController.set('title', 'Delete key');
