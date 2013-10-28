@@ -41,6 +41,10 @@ div#splash div.mist-logo {
     width: 33%;
 }
 
+#create-key-actions .ui-btn {
+    width: 37% !important;
+}
+
 /* Home Page */
 
 #home .ui-content {

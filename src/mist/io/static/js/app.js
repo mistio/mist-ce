@@ -189,44 +189,48 @@ define( 'app', [
           model: function(){
               // set redirect target if the user visits directly the URL
               this.target = 'machines';
-          }          
-        });   
-        
+          }
+        });
+
         App.KeysRoute = Ember.Route.extend({
-          //clear selected keys when exiting view           
-          exit: function(){
-              Mist.keysController.keys.forEach(function(key){
-                   log('deselecting key: ' + key.name);
-                   key.set('selected', false);
-              });
+            activate: function() {
+                document.title = 'mist.io - Keys';
+            },
+
+            exit: function() {
+                Mist.keysController.keys.forEach(function(key){
+                     key.set('selected', false);
+                });
             }
         });
 
         App.KeyRoute = Ember.Route.extend({
+            activate: function() {
+                Ember.run.next(function() {
+                    document.title = 'mist.io - ' + Mist.getKeyNameByUrl();
+                });
+            },
 
-          redirect: function() {
-              var pathArray = window.location.href.split('/');
-              Mist.keysController.set('singleKeyRequest', pathArray[5]);
-          },
+            redirect: function() {
+                Mist.keysController.set('singleKeyRequest', Mist.getKeyNameByUrl());
+            },
 
-          model: function(){
-              if (Mist.keysController.loadingKeys) {
-                  $('#single-key-loader').fadeIn();
-                  return {
-                    name: ' ',
-                    probing: false,
-                    machines: [],
-                    selected: false,
-                    default_key: false,
-                  };
-              }
-              var pathArray = window.location.href.split('/');
-              return Mist.keysController.getKeyByUrlName(pathArray[5]);
-          } 
+            model: function(){
+                if (Mist.keysController.loadingKeys) {
+                    $('#single-key-loader').fadeIn();
+                    return {
+                      name: ' ',
+                      probing: false,
+                      machines: [],
+                      selected: false,
+                      default_key: false,
+                    };
+                }
+                return Mist.keysController.getKeyByUrlName(Mist.getKeyNameByUrl());
+            }
         });
 
-            // we check if we are at the bottom of the page
-        App.isScrolledToBottom = function(){
+        App.isScrolledToBottom = function() {
             var distanceToViewportTop = (
                 $(document).height() - $(window).height());
             var viewPortTop = $(document).scrollTop();
@@ -238,7 +242,11 @@ define( 'app', [
             }
         
             return (viewPortTop - distanceToViewportTop === 0);
-        };        
+        };  
+
+        App.getKeyNameByUrl = function() {
+            return window.location.href.split('/')[5];
+        };
 
         App.SingleMachineView = SingleMachineView;
         App.MachineListView = MachineListView;
