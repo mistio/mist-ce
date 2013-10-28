@@ -62,7 +62,7 @@ class Field(object):
 
     def cast2back(self, front_value=None):
         log.debug("%s: casting value %s (%s) to back",
-                  type(self), front, type(front_value))
+                  type(self), front_value, type(front_value))
         return self._cast(front_value, back=True)
 
     def _cast(self, val, back=False, dry=False):
@@ -209,94 +209,50 @@ class OODict(BaseObject):
     def __init__(self, _dict={}):
         """Initiate user by given dict."""
         self._dict = _dict
-        self._fields = []
-        for name in dir(self):
-            attr = object.__getattribute__(self, name)
-            t = type(attr)
-            if issubclass(t, Field):
-                # find fields
-                self._fields.append(name)
-                # reset fields to their default values
-                #~ if t in [FieldList, FieldDict]:
-                    #~ new = t(attr._model, attr)
-                #~ else:
-                    #~ new = t(attr)
-                #~ object.__setattr__(self, name, new)
+        self._fields = [name for name in dir(self)
+            if isinstance(object.__getattribute__(self, name), Field)]
 
     def __getattribute__(self, name):
         """Overide attributes to handle dict keys as instance
         attributes.
         """
 
-        # get real object attribute
-        attr = object.__getattribute__(self, name)
-        # if it's not a field, just return
-        if not issubclass(type(attr), Field):
-            return attr
+        # if it's not a field, just return the attribute
+        keys = object.__getattribute__(self, 'keys')()
+        if name not in keys:
+            return object.__getattribute__(self, name)
 
+        field = object.__getattribute__(self, name)
         # get real dict value
         dict_value = self._dict.get(name)
-        # if real value not set or wrong type:
-        if dict_value is None:
-            logging.warn("Missing field '%s' on storage. "
-                         "Setting to default" % name)
-            # set to default
-            self.__setattr__(name, attr)
-        elif type(dict_value) not in attr.back_types:
-            # set dict value
-            logging.warn("Invalid type %s detected on storage for "
-                         "field '%s'. Should be %s. Changing type."
-                       % (type(dict_value), name, attr.back_types))
-            # resetting will fix type issue
-            self.__setattr__(name, dict_value)
-        # reload and cast before returning
-        dict_value = self._dict[name]
-        if type(dict_value) is not attr.front_types[0]:
-            logging.warn("casting from %s to %s for %s",
-                        type(dict_value), attr.front_types[0], name)
-            return attr.front_types[0](self._dict[name])
-        return dict_value
+        # sanitize/cast/set default
+        val = field.cast2front(dict_value)
+        # if that changed the value, save it
+        if val != dict_value:
+            self.__setattr__(name, val)
+        return val
 
     def __setattr__(self, name, value):
         """Overide attributes to handle dict keys as instance
         attributes.
         """
 
-        if name not in self._fields:
+        # if it's not a field, just set the attribute
+        if name not in self.keys():
             return object.__setattr__(self, name, value)
 
-        attr = object.__getattribute__(self, name)
-        bt = attr.back_types[0]
-        ft = attr.front_types[0]
-        t = type(value)
-        if ft is bt and issubclass(t, bt):
-            if t is bt:
-                self._dict[name] = value
-            else:
-                self._dict[name] = bt(value)
-        elif t is ft:
-            if issubclass(t, Field):
-                self._dict[name] = value.raw()
-            else:
-                self._dict[name] = value
-        elif issubclass(t, bt):
-            logging.warn("You are trying to write using the \
-                backend value instead of the frontend one.")
-            if t is bt:
-                self._dict[name] = value
-            else:
-                self._dict[name] = bt(value)
-        else:
-            logging.error("Invalid value '%s' for field "
-                          "'%s', type is %s", value, name, t)
-            self._dict[name] = bt(value)
-#~ raise TypeError("You are trying to write using an invalid value.")
+        field = object.__getattribute__(self, name)
+        val = field.cast2back(value)
+        self._dict[name] = val
+
+    def keys(self):
+        return object.__getattribute__(self, '_fields')[:]
 
     def __str__(self):
         """Overide string conversion to print nicely."""
         s = ""
-        for name in self._fields:
-            s += "%s: %s\n" % (name, self.__getattribute__(name))
+        for name in self.keys():
+            s += "%s: %r\n" % (name, self.__getattribute__(name))
         return s
 
     def __nonzero__(self):
@@ -311,9 +267,9 @@ class FieldsSequence(BaseObject):
     without copying it.
     """
 
-    seq = None          # the actual seq being interfaced
-    seq_type = None     # must be a type, either list or dict
-    item_type = None    # must be a type, subclass of Field
+    _seq = None          # the actual seq being interfaced
+    _seq_type = None     # must be a type, either list or dict
+    _item_type = None    # must be a type, subclass of Field
 
     def __init__(self, seq=None):
         """Argument 'seq'  can be a sequence of type self.seq_type.
@@ -321,46 +277,49 @@ class FieldsSequence(BaseObject):
         If a seq is not passed, a new sequence will be created.
         """
 
-        if seq is not None and type(seq) is not self.seq_type:
+        if seq is not None and type(seq) is not self._seq_type:
             raise TypeError("%s is type %s, should be type %s"
-                            % (seq, type(seq), self.seq_type))
+                            % (seq, type(seq), self._seq_type))
         if seq is None:
             seq = self.seq_type()
-        self.seq = seq
+        self._seq = seq
 
     def __getitem__(self, key):
-        value = self.seq[key]
-        if type(value) not in self.item_type.back_types:
+        value = self._seq[key]
+        if type(value) not in self._item_type.back_types:
             logging.warn("Invalid type %s detected on "
                          "storage. Should be in %s",
-                         type(value), self.item_type.back_types)
-            value = self.item_type(value).cast2back()
-        if type(value) is not self.item_type.front_types[0]:
-            value = self.item_type(value).cast2front()
+                         type(value), self._item_type.back_types)
+            value = self._item_type(value).cast2back()
+        if type(value) is not self._item_type.front_types[0]:
+            value = self._item_type(value).cast2front()
         return value
 
     def __len__(self):
-        return len(self.seq)
+        return len(self._seq)
+
+    def get_raw(self):
+        return self._seq
 
 
 def getFieldsList(field):
     class FieldsList(FieldsSequence):
-        seq_type = list
-        item_type = field
+        _seq_type = list
+        _item_type = field
     return FieldsList
 
 
 def getFieldsDict(field):
     class FieldsDict(FieldsSequence):
-        seq_type = dict
-        item_type = field
+        _seq_type = dict
+        _item_type = field
 
         def keys(self):
-            return self.seq.keys()
+            return self._seq.keys()
 
         def __repr__(self):
-            items = ("%s: %s" % (key, self.seq[key].__repr__())
-                     for key in self.seq)
+            items = ("%s: %s" % (key, self._seq[key].__repr__())
+                     for key in self._seq)
             return "{%s}" % ','.join(items)
 
     return FieldsDict

@@ -50,6 +50,10 @@ class Keypair(OODict):
     default = BoolField()
     machines = ListField()
 
+    def __repr__(self):
+        return "Keypair(default=%s, machines=%s)" \
+                % (self.default, self.machines)
+
 
 class User(UserEngine):
     """The basic model class is User. It contains all the methods
