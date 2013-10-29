@@ -213,8 +213,12 @@ def add_backend(request, renderer='json'):
                 keypairs[machine_key]['machines'] = [key_machine]                   
 
             if backend:
-                backend['list_of_machines'].append(machine_dict)
                 backends[backend_id] = backend
+                if machine_dict in backend['list_of_machines']:
+                    return Response('Bare metal machine already exists', 400)                
+                else:             
+                    backend['list_of_machines'].append(machine_dict)
+
                 return {'provider': 'bare_metal', 'exists': True,'id': backend_id}
             else:   
                 backend = {'title': title,
