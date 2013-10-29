@@ -60,7 +60,7 @@ define('app/views/backend_add', [
                 } else if (event.target.title.indexOf("bare_metal") != -1) {
                     $('#addBackendInfo').hide();
                     $('#addBackendBareMetal').show();                    
-                    $('#addBackendOpenstack').hide();
+                    $('#addBackendOpenstack').hide();                   
                 } else if (event.target.title.indexOf("openstack") != -1) {
                     $('#addBackendInfo').show();                                
                     $('#ApiKeylabel').text('2. Username:');
@@ -107,6 +107,17 @@ define('app/views/backend_add', [
             addBackend: function() {
                 $('.select-listmenu li').on('click', this.selectBackend);              
                 $('#add-backend').panel('open');
+            },
+
+            addKey: function() {
+                $('.select-key-listmenu li').on('click', this.selectKey);              
+            },
+
+            selectKey: function(key){
+                $('.select-key-collapsible').collapsible('option','collapsedIcon','check');
+                $('.select-key-collapsible span.ui-btn-text').text(key.name);
+                Mist.backendAddController.set('newBareServerKey', key.name);       
+                $('.select-key-collapsible').trigger('collapse');
             },
 
             backClicked: function() {
@@ -165,7 +176,7 @@ define('app/views/backend_add', [
 
             providerList: function() {
                 return SUPPORTED_PROVIDERS;
-            }.property('providerList')
+            }.property('providerList')                        
         });
     }
 );
