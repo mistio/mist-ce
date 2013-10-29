@@ -2,6 +2,12 @@
     display: none;
 }
 
+/* Less rounded corners */
+.ui-corner-all, .ui-btn-corner-all {
+    border-radius: 0.3em;
+}
+
+
 /* Splash (loading) page */
 
 div#splash {
@@ -1322,13 +1328,14 @@ div.loading-monitoring {
     height: 60ex;
     font-family: monospace;
     font-size: 11px;
-    max-height: 40% !important;
     min-height: 150px;
+    max-height: 40% !important;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
     margin-bottom: 20px;
     background: #dfe1e2;
+    overflow-y: auto;
 }
 
 #dialog-shell.dialog-shell .shell-return .command {

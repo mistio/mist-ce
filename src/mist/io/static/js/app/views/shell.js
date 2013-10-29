@@ -83,6 +83,7 @@ function(shell_html) {
                     }
                     $($.mobile.activePage).find(".shell-return .command").first().addClass('pending');
                     $($.mobile.activePage).find("a.shell-send").addClass('ui-disabled');
+                    $('.shell-input input').focus();
                 });
 
             });

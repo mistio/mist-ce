@@ -17,7 +17,7 @@ define('app/views/machine_add_dialog', [
             openMachineAddDialog: function(){
                 var that = this;
                 
-                $('.select-listmenu').listview('refresh');
+                $('.select-listmenu').listview();
                 $('.dialog-add').panel('open');
                 if (Mist.keysController.content.length > 0) {
                     $('div.create-key').hide();
@@ -25,7 +25,7 @@ define('app/views/machine_add_dialog', [
                     $('#machines .select-key-collapsible').css('width', '100%');
                 }
                 // resize dismiss div TODO: reset on window resize
-                $('.ui-panel-dismiss-position-right').css('left',(0-$('.ui-panel-position-right.ui-panel-open').width()));        
+                $('.ui-panel-dismiss-position-right').css('left',(0-$('.ui-panel-position-right.ui-panel-open').width()));
             },
             
             selectProvider: function(backend){

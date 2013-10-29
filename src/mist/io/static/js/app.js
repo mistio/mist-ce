@@ -316,6 +316,10 @@ define( 'app', [
                         }
                         $(inputField).val(parent.commandHistory[parent.commandHistoryIndex]);
                     }
+                } else if (event.keyCode == 13) { // Enter key
+                    this._parentView.submit();
+                } else if (event.keyCode == 1) {
+                    $('.shell-input input').focus();  
                 } else if (event.keyCode == 9) { // Tab key
                     // TODO: Autocomplete stuff...
                 } else { 
