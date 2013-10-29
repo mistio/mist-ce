@@ -173,6 +173,10 @@ define('app/views/backend_add', [
                     }
                 });
             },
+            
+            createBareMetalKeyClicked: function() {
+                $('#create-key-dialog').popup('open');
+            },
 
             providerList: function() {
                 return SUPPORTED_PROVIDERS;

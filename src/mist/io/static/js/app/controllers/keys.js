@@ -67,6 +67,10 @@ define('app/controllers/keys', [
                             $('#manage-keys .ajax-loader').fadeIn(200);
                         } else {
                             Ember.run.next(function() {
+                                // < Baremetal
+                                $('.select-key-collapsible').trigger('create');
+                                $('.select-key-collapsible').collapsible();
+                                // Baremetal />
                                 $('#keys-list').listview('refresh');
                                 $('#keys-list input.ember-checkbox').checkboxradio();
                             });
