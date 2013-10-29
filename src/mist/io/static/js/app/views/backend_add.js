@@ -152,7 +152,7 @@ define('app/views/backend_add', [
                             //add bare metal backend if it does not exist already                            
                             var machines_url = window.location.href + "/machines"; 
                             window.location.href = machines_url;    
-                            //FIXME 2: refresh the backend controller so the machine appears
+                            Mist.backendsController.getBackendById(result.id).machines.refresh();
                         } else {
                             Mist.backendsController.pushObject(Backend.create(result));                        
                         }

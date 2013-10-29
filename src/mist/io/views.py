@@ -202,7 +202,7 @@ def add_backend(request, renderer='json'):
             if backend:
                 backend['list_of_machines'].append(machine_dict)
                 backends[backend_id] = backend
-                return {'provider': 'bare_metal', 'exists': True}                                                                            
+                return {'provider': 'bare_metal', 'exists': True,'id': backend_id}
             else:   
                 backend_id = generate_backend_id(provider, '', provider)
                 backend = {'title': title,
