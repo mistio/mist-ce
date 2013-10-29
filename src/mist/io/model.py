@@ -10,6 +10,9 @@ as class methods.
 """
 
 
+import logging
+
+
 from mist.io.dal import StrField, IntField
 from mist.io.dal import FloatField, BoolField
 from mist.io.dal import ListField, DictField
@@ -17,6 +20,9 @@ from mist.io.dal import getOODictField
 from mist.io.dal import getFieldsListField, getFieldsDictField
 from mist.io.dal import OODict
 from mist.io.dal import UserEngine
+
+
+log = logging.getLogger(__name__)
 
 
 class Machine(OODict):

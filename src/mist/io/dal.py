@@ -27,7 +27,7 @@ getOODictField, getFieldsListField, getFieldsDictField, OODict, UserEngine
 import logging
 
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 ### Data Access Object ###
@@ -108,7 +108,8 @@ class Field(object):
 
 class StrField(Field):
     """Sets a string field, inherits from str. Default: ''"""
-    front_types = back_types = [str, unicode]
+    front_types = [str, unicode]
+    back_types = [unicode, str]
 
 
 class IntField(Field):
