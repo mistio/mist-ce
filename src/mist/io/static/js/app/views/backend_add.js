@@ -128,7 +128,6 @@ define('app/views/backend_add', [
                     "machine_name": Mist.backendAddController.newBareServerName,                    
                     "machine_ip_address": Mist.backendAddController.newBareServeIp,                    
                     "machine_key": Mist.backendAddController.newBareServerKey,                    
-                    "machine_port": Mist.backendAddController.newBareServerPort,                    
                     "machine_user": Mist.backendAddController.newBareServerUser                                                           
                 };
                 $.ajax({

@@ -18,7 +18,6 @@ define('app/controllers/backend_add', [
                 this.set('newBareServerName', null);                
                 this.set('newBareServeIp', null);
                 this.set('newBareServerKey', null);
-                this.set('newBareServerPort', null);
                 this.set('newBareServerUser', null);    
                 $('#addBackendOpenstack').hide();
                 $('#addBackendBareMetal').hide();                    
@@ -50,7 +49,6 @@ define('app/controllers/backend_add', [
                 } else if (this.get('newBareServerName') &&
                     this.get('newBareServeIp') &&
                     this.get('newBareServerKey') &&                
-                    this.get('newBareServerPort') &&                
                     this.get('newBareServerUser')) {                                                                                        
                         this.set('newBackendReady', true);
                         $('#create-backend-ok').button('enable');                                                             
@@ -68,7 +66,6 @@ define('app/controllers/backend_add', [
                 this.addObserver('newBareServerName', this, this.updateNewBackendReady);
                 this.addObserver('newBareServeIp', this, this.updateNewBackendReady);                
                 this.addObserver('newBareServerKey', this, this.updateNewBackendReady);                
-                this.addObserver('newBareServerPort', this, this.updateNewBackendReady);                
                 this.addObserver('newBareServerUser', this, this.updateNewBackendReady);                                
                                                                 
                 /* OpenStack support

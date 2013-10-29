@@ -51,7 +51,7 @@ class BareMetalDriver(object):
         return result in VALID_RESPONSE_CODES
 
     def _to_node(self, machine):
-        state = self.check_host(machine.get('ip_address'), machine.get('port'))
+        state = self.check_host(machine.get('ip_address'), machine.get('port', 22))
         public_ips = [machine.get('ip_address')]
         private_ips = []
         extra = {}
