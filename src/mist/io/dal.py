@@ -74,6 +74,7 @@ class Field(object):
         # if val is None (not set), use default value
         if val is None:
             val = self.default
+            log.debug("Just set default value '%s'", self.default)
         if type(val) not in [atype, btype]:
             log.warn("%s: value is %s, should preferably be %s",
                       type(self), type(val), atype)
@@ -147,8 +148,8 @@ class ObjectField(Field):
 
     def cast2back(self, front_value=None):
         ftype, btype = self.front_types[0], self.back_types[0]
-        log.debug("%s casting to back value %s (%s)",
-                  type(self), front_value, type(front_value))
+        log.debug("%s casting to back value (%s)",
+                  type(self), type(front_value))
         val = self._cast(front_value, back=True, dry=True)
         if type(val) not in [ftype, btype]:
             raise TypeError("%s is not %s or %s" % (val, ftype, btype))
@@ -223,6 +224,7 @@ class OODict(BaseObject):
         if name not in keys:
             return object.__getattribute__(self, name)
 
+        log.debug("OODict getattr %s.", name)
         field = object.__getattribute__(self, name)
         # get real dict value
         dict_value = self._dict.get(name)
@@ -242,6 +244,7 @@ class OODict(BaseObject):
         if name not in self.keys():
             return object.__setattr__(self, name, value)
 
+        log.debug("OODict setattr %s", name)
         field = object.__getattribute__(self, name)
         val = field.cast2back(value)
         self._dict[name] = val
