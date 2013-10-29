@@ -230,9 +230,9 @@ class OODict(BaseObject):
         dict_value = self._dict.get(name)
         # sanitize/cast/set default
         val = field.cast2front(dict_value)
-        # if that changed the value, save it
-        if val != dict_value:
-            self.__setattr__(name, val)
+        #~ # if that changed the value, save it
+        #~ if val != dict_value:
+            #~ self.__setattr__(name, val)
         return val
 
     def __setattr__(self, name, value):
