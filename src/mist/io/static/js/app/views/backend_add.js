@@ -39,22 +39,40 @@ define('app/views/backend_add', [
             },
             
             selectBackend: function(event) {
-                if (event.target.title.indexOf("rackspace") != -1 || event.target.title.indexOf("linode") != -1) {
+                if (event.target.title.indexOf("rackspace") != -1 || event.target.title.indexOf("linode") != -1 || event.target.title.indexOf("softlayer") !== -1) {
+                    $('#addBackendInfo').show();                
                     $('#ApiKeylabel').text('2. Username:');
                     $('#ApiSecretlabel').text('3. API Key:');
                     $('#addBackendOpenstack').hide();
+                    $('#addBackendBareMetal').hide();                    
                 } else if (event.target.title.indexOf("nephoscale") !== -1) {
+                    $('#addBackendInfo').show();                                
                     $('#ApiKeylabel').text('2. Username:');
                     $('#ApiSecretlabel').text('3. Password:');
                     $('#addBackendOpenstack').hide();
+                    $('#addBackendBareMetal').hide();                                        
+                } else if (event.target.title.indexOf("digitalocean") !== -1) {
+                    $('#addBackendInfo').show();                                
+                    $('#ApiKeylabel').text('2. Client ID:');
+                    $('#ApiSecretlabel').text('3. API Key:');
+                    $('#addBackendOpenstack').hide();
+                    $('#addBackendBareMetal').hide();                                        
+                } else if (event.target.title.indexOf("bare_metal") != -1) {
+                    $('#addBackendInfo').hide();
+                    $('#addBackendBareMetal').show();                    
+                    $('#addBackendOpenstack').hide();
                 } else if (event.target.title.indexOf("openstack") != -1) {
+                    $('#addBackendInfo').show();                                
                     $('#ApiKeylabel').text('2. Username:');
                     $('#ApiSecretlabel').text('3. Password:');
                     $('#addBackendOpenstack').show();
+                    $('#addBackendBareMetal').hide();                                        
                 } else {
+                    $('#addBackendInfo').show();                                
                     $('#ApiKeylabel').text('2. API Key:');
                     $('#ApiSecretlabel').text('3. API Secret:');
                     $('#addBackendOpenstack').hide();
+                    $('#addBackendBareMetal').hide();                                        
                 }
                 $('.select-backend-collapsible').collapsible('option','collapsedIcon','check');
                 $('.select-backend-collapsible span.ui-btn-text').text(event.target.text);
@@ -106,7 +124,12 @@ define('app/views/backend_add', [
                     "apikey" : Mist.backendAddController.newBackendKey,
                     "apisecret": Mist.backendAddController.newBackendSecret,
                     "apiurl": Mist.backendAddController.newBackendUrl,
-                    "tenant_name": Mist.backendAddController.newBackendTenant
+                    "tenant_name": Mist.backendAddController.newBackendTenant,
+                    "machine_name": Mist.backendAddController.newBareServerName,                    
+                    "machine_ip_address": Mist.backendAddController.newBareServeIp,                    
+                    "machine_key": Mist.backendAddController.newBareServerKey,                    
+                    "machine_port": Mist.backendAddController.newBareServerPort,                    
+                    "machine_user": Mist.backendAddController.newBareServerUser                                                           
                 };
                 $.ajax({
                     url: '/backends',
@@ -116,12 +139,23 @@ define('app/views/backend_add', [
                     headers: { "cache-control": "no-cache" },
                     data: JSON.stringify(payload),
                     success: function(result) {
-                        that.set('pendingCreation', false);
-                        Mist.backendsController.pushObject(Backend.create(result));
-                        info('added backend ' + result.id);
+                        that.set('pendingCreation', false);                    
                         Mist.backendAddController.newBackendClear();
                         $("#add-backend").panel("close");
                         $('.select-listmenu li').off('click', this.selectBackend);
+                        info('added backend ' + result.id);
+
+                        if (result.provider == 'bare_metal') {
+                            if (!result.exists) {
+                                Mist.backendsController.pushObject(Backend.create(result));                                                    
+                            }
+                            //add bare metal backend if it does not exist already                            
+                            var machines_url = window.location.href + "/machines"; 
+                            window.location.href = machines_url;    
+                            //FIXME 2: refresh the backend controller so the machine appears
+                        } else {
+                            Mist.backendsController.pushObject(Backend.create(result));                        
+                        }
                     },
                     error: function(request){
                         that.set('pendingCreation', false);

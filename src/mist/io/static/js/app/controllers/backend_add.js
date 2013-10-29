@@ -15,6 +15,14 @@ define('app/controllers/backend_add', [
                 this.set('newBackendProvider', null);
                 this.set('newBackendKey', null);
                 this.set('newBackendSecret', null);
+                this.set('newBareServerName', null);                
+                this.set('newBareServeIp', null);
+                this.set('newBareServerKey', null);
+                this.set('newBareServerPort', null);
+                this.set('newBareServerUser', null);    
+                $('#addBackendOpenstack').hide();
+                $('#addBackendBareMetal').hide();                    
+                $('#addBackendInfo').show();                                                                            
                 /* OpenStack support
                 this.set('newBackendURL', null);
                 this.set('newBackendTenant', null);
@@ -39,6 +47,13 @@ define('app/controllers/backend_add', [
                         */
                         this.set('newBackendReady', true);
                         $('#create-backend-ok').button('enable');
+                } else if (this.get('newBareServerName') &&
+                    this.get('newBareServeIp') &&
+                    this.get('newBareServerKey') &&                
+                    this.get('newBareServerPort') &&                
+                    this.get('newBareServerUser')) {                                                                                        
+                        this.set('newBackendReady', true);
+                        $('#create-backend-ok').button('enable');                                                             
                 } else {
                     this.set('newBackendReady', false);
                     $('#create-backend-ok').button('disable');
@@ -50,6 +65,12 @@ define('app/controllers/backend_add', [
                 this.addObserver('newBackendProvider', this, this.updateNewBackendReady);
                 this.addObserver('newBackendKey', this, this.updateNewBackendReady);
                 this.addObserver('newBackendSecret', this, this.updateNewBackendReady);
+                this.addObserver('newBareServerName', this, this.updateNewBackendReady);
+                this.addObserver('newBareServeIp', this, this.updateNewBackendReady);                
+                this.addObserver('newBareServerKey', this, this.updateNewBackendReady);                
+                this.addObserver('newBareServerPort', this, this.updateNewBackendReady);                
+                this.addObserver('newBareServerUser', this, this.updateNewBackendReady);                                
+                                                                
                 /* OpenStack support
                 this.addObserver('newBackendURL', this, this.updateNewBackendReady);
                 this.addObserver('newBackendTenant', this, this.updateNewBackendTenant);

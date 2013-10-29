@@ -1173,6 +1173,10 @@ div.loading-monitoring {
     display: none;
 }
 
+#addBackendBareMetal {
+    display: none;
+}
+
 #add-backend label {
     display: block;
     margin: 14px 0 4px 0;

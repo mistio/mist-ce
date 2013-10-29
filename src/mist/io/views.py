@@ -159,6 +159,7 @@ def add_backend(request, renderer='json'):
     """Adds a new backend.
     
     """
+    #import pdb; pdb.set_trace()
     params = request.json_body
     title = params.get('title', '0')
     provider = params.get('provider', '0')
@@ -170,39 +171,88 @@ def add_backend(request, renderer='json'):
         if not user:
             return Response('Unauthorized', 401)
         backends = user['backends']
-        
-        if apisecret == 'getsecretfromdb':
+
+        if provider == 'bare_metal':
+            machine_name = params.get('machine_name', '')
+            machine_ip_address = params.get('machine_ip_address', '')
+            machine_key = params.get('machine_key', '')
+            machine_port = params.get('machine_port', 22)
+            machine_user = params.get('machine_user', 'root')
+            keypairs = user.get('keypairs', {})
+            keypair = get_keypair_by_name(keypairs, machine_key)
+            machine_key = keypair.get('private')
+            #FIXME: add check_connect
+            #connect = check_connect(machine_ip_address, machine_key, machine_port, machine_user)
+            connect = True
+            if not connect:
+                return Response('Invalid machine data', 400)
+
+            machine_dict = {'name': machine_name,
+                            'ip_address': machine_ip_address,
+                            'port': int(machine_port),
+                            'user': machine_user
+                            }         
+
+            backend = False
             for backend_id in backends:
-                backend = backends[backend_id]
-                if backend.get('apikey', None) == apikey:
-                    apisecret = backend.get('apisecret', None)
-                    
-        region = ''
-        if not provider.__class__ is int and ':' in provider:
-            region = provider.split(':')[1]
-            provider = provider.split(':')[0]
+                if backends[backend_id].get('provider') == 'bare_metal':
+                    backend = backends[backend_id]
+                    break
 
-        if not provider or not apikey or not apisecret:
-            return Response('Invalid backend data', 400)
-
-        backend_id = generate_backend_id(provider, region, apikey)
-        
-        if backend_id in backends:
-            return Response('Backend exists', 409)
-
-        backend = {'title': title,
+            if backend:
+                backend['list_of_machines'].append(machine_dict)
+                backends[backend_id] = backend
+                return {'provider': 'bare_metal', 'exists': True}                                                                            
+            else:   
+                backend_id = generate_backend_id(provider, '', provider)
+                backend = {'title': title,
+                   'list_of_machines': [machine_dict],
                    'provider': provider,
                    'apikey': apikey,
                    'apisecret': apisecret,
                    'apiurl': apiurl,
                    'tenant_name': tenant_name,
-                   'region': region,
+                   'region': '',
                    'poll_interval': request.registry.settings['default_poll_interval'],
                    'starred': [],
                    'enabled': True,
-                  }
+                  }       
+                backends[backend_id] = backend                                                            
 
-        backends[backend_id] = backend
+            #FIXME: save the association of the key/machine and set the key as probed
+        else:
+            if apisecret == 'getsecretfromdb':
+                for backend_id in backends:
+                    backend = backends[backend_id]
+                    if backend.get('apikey', None) == apikey:
+                        apisecret = backend.get('apisecret', None)
+                        
+            region = ''
+            if not provider.__class__ is int and ':' in provider:
+                region = provider.split(':')[1]
+                provider = provider.split(':')[0]
+
+            if not provider or not apikey or not apisecret:
+                return Response('Invalid backend data', 400)
+
+            backend_id = generate_backend_id(provider, region, apikey)
+            
+            if backend_id in backends:
+                return Response('Backend exists', 409)
+
+            backend = {'title': title,
+                       'provider': provider,
+                       'apikey': apikey,
+                       'apisecret': apisecret,
+                       'apiurl': apiurl,
+                       'tenant_name': tenant_name,
+                       'region': region,
+                       'poll_interval': request.registry.settings['default_poll_interval'],
+                       'starred': [],
+                       'enabled': True,
+                      }
+
+            backends[backend_id] = backend
 
         ret = {'index'        : len(user['backends']) - 1,
                 'id'           : backend_id,

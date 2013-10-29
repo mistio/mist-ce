@@ -25,19 +25,21 @@
             </ul>
         </div>
 
-        <label for="create-backend-key" id="ApiKeylabel">2. API Key:</label>
-        {{view Mist.TextField
-            valueBinding="Mist.backendAddController.newBackendKey"
-            name="create-backend-key"
-            id="create-backend-key"}}
+        <div id="addBackendInfo">
+            <label for="create-backend-key" id="ApiKeylabel">2. API Key:</label>
+            {{view Mist.TextField
+                valueBinding="Mist.backendAddController.newBackendKey"
+                name="create-backend-key"
+                id="create-backend-key"}}
 
-        <label for="create-backend-secret" id="ApiSecretlabel">3. API Secret:</label>
-        {{view Mist.TextField
-            type="password"
-            valueBinding="Mist.backendAddController.newBackendSecret"
-            name="create-backend-secret"
-            id="create-backend-secret"}}
-
+            <label for="create-backend-secret" id="ApiSecretlabel">3. API Secret:</label>
+            {{view Mist.TextField
+                type="password"
+                valueBinding="Mist.backendAddController.newBackendSecret"
+                name="create-backend-secret"
+                id="create-backend-secret"}}
+        </div>
+        
         <div id="addBackendOpenstack">
             <label for="create-backend-url" id="URLlabel">4. Auth URL:</label>
             {{view Mist.TextField
@@ -52,6 +54,38 @@
                 id="create-backend-tenant"}}
         </div>
         
+        <div id="addBackendBareMetal">
+            <label for="create-bareserver-name" id="Namelabel">2. Name:</label>
+            {{view Mist.TextField
+                valueBinding="Mist.backendAddController.newBareServerName"
+                name="create-bareserver-name"
+                id="create-bareserver-name"}}
+
+            <label for="create-bareserver-ip" id="Iplabel">3. Ip address:</label>
+            {{view Mist.TextField
+                valueBinding="Mist.backendAddController.newBareServeIp"
+                name="create-bareserver-ip"
+                id="create-bareserver-ip"}}
+
+            <label for="create-bareserver-key" id="Keylabel">4. Ssh Key:</label>
+            {{view Mist.TextField
+                valueBinding="Mist.backendAddController.newBareServerKey"
+                name="create-bareserver-key"
+                id="create-bareserver-key"}}
+
+            <label for="create-bareserver-port" id="Portlabel">5. Port:</label>
+            {{view Mist.TextField
+                valueBinding="Mist.backendAddController.newBareServerPort"
+                name="create-bareserver-port"
+                id="create-bareserver-port"}}
+
+            <label for="create-bareserver-user" id="Userlabel">6. User:</label>
+            {{view Mist.TextField
+                valueBinding="Mist.backendAddController.newBareServerUser"
+                name="create-bareserver-user"
+                id="create-bareserver-user"}}
+        </div>
+
         {{#if view.pendingCreation}}
         <div class="ajax-loader"></div>
         {{/if}}
