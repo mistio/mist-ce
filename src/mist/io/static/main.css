@@ -685,6 +685,11 @@ div.ember-view div.ui-panel-content-wrap {
     background-image: url(images/nephoscale_sm.png);
 }
 
+/* BareMetal */
+#single-view-provider-icon.provider-bare_metal  {
+    background-image: url(images/monitor.png);
+}
+
 /* Linode */
 #single-view-provider-icon.provider-linode  {
     background-image: url(images/p7_sm.png);
