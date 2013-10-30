@@ -48,7 +48,7 @@ LINODE_DATACENTERS = {
 
 SUPPORTED_PROVIDERS = [
                        # BareMetal
-                       {'title': 'BareMetal',
+                       {'title': 'Single server',
                         'provider': 'bare_metal',
                         },
                        # EC2

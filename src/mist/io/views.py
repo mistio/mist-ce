@@ -201,7 +201,7 @@ def add_backend(request, renderer='json'):
                     break
 
             if not backend:
-                backend_id = generate_backend_id(provider, '', provider)            
+                backend_id = generate_backend_id(provider, '', '')
             
             machines = keypair.get('machines', [])   
             sudoer = False 
