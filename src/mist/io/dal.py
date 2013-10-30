@@ -24,7 +24,9 @@ StrField, IntField, FloatField, BoolField, ListField, DictField,
 getOODictField, getFieldsListField, getFieldsDictField, OODict, UserEngine
 """
 
+
 import logging
+from collections import MutableSequence, MutableMapping
 
 
 log = logging.getLogger(__name__)
@@ -199,17 +201,15 @@ def getFieldsDictField(field):
     return FieldsDictField
 
 
-class BaseObject(object):
-    pass
-
-
-class OODict(BaseObject):
+class OODict(object):
     """Base model class"""
 
     _fields = []
 
     def __init__(self, _dict={}):
         """Initiate user by given dict."""
+        if type(_dict) is not dict:
+            raise TypeError("%s is %s, should be dict" % (_dict, type(_dict)))
         self._dict = _dict
         self._fields = [name for name in dir(self)
             if isinstance(object.__getattribute__(self, name), Field)]
@@ -230,9 +230,6 @@ class OODict(BaseObject):
         dict_value = self._dict.get(name)
         # sanitize/cast/set default
         val = field.cast2front(dict_value)
-        #~ # if that changed the value, save it
-        #~ if val != dict_value:
-            #~ self.__setattr__(name, val)
         return val
 
     def __setattr__(self, name, value):
@@ -263,7 +260,7 @@ class OODict(BaseObject):
         return bool(self._dict)
 
 
-class FieldsSequence(BaseObject):
+class FieldsSequence(object):
     """Sets up a basic Sequence field, whose items are being parsed by
     some Field subclass. That means you can have a list or dict with
     str values, or int, or bool, or some derivative of BaseObject.
@@ -272,34 +269,25 @@ class FieldsSequence(BaseObject):
     """
 
     _seq = None          # the actual seq being interfaced
-    _seq_type = None     # must be a type, either list or dict
     _item_type = None    # must be a type, subclass of Field
 
-    def __init__(self, *args, **kwargs):
-        """Argument 'seq'  can be a sequence of type self.seq_type.
-        This class will operate directly on this seq, without copying it.
-        If a seq is not passed, a new sequence will be created.
+    def __init__(self, seq_type, *args, **kwargs):
+        """Argument 'seq_type' must be either dict or list.
+        This class will operate directly on a sequence, without copying it.
         """
 
         seq = None
         if not kwargs and len(args) == 1:
             arg = args[0]
             if arg is None:
-                seq = self._seq_type()
+                seq = seq_type()
             elif type(arg) is type(self):
                 seq = arg._seq
-            elif type(arg) is self._seq_type:
+            elif type(arg) is seq_type:
                 seq = arg
         if seq is None:
-            seq = self._seq_type(*args, **kwargs)
+            seq = seq_type(*args, **kwargs)
         self._seq = seq
-
-        #~ if seq is not None and type(seq) is not self._seq_type:
-            #~ raise TypeError("%s is type %s, should be type %s"
-                            #~ % (seq, type(seq), self._seq_type))
-        #~ if seq is None:
-            #~ seq = self._seq_type()
-        #~ self._seq = seq
 
     def __getitem__(self, key):
         value = self._seq[key]
@@ -307,10 +295,16 @@ class FieldsSequence(BaseObject):
             logging.warn("Invalid type %s detected on "
                          "storage. Should be in %s",
                          type(value), self._item_type.back_types)
-            value = self._item_type(value).cast2back()
+            value = self._item_type().cast2back(value)
         if type(value) is not self._item_type.front_types[0]:
-            value = self._item_type(value).cast2front()
+            value = self._item_type().cast2front(value)
         return value
+
+    def __setitem__(self, key, value):
+        raise NotImplementedError()
+
+    def __delitem__(self, key):
+        raise NotImplementedError()
 
     def __len__(self):
         return len(self._seq)
@@ -320,31 +314,33 @@ class FieldsSequence(BaseObject):
 
 
 def getFieldsList(field):
-    class FieldsList(FieldsSequence):
-        _seq_type = list
+    class FieldsList(FieldsSequence, MutableSequence):
         _item_type = field
+
+        def __init__(self, *args, **kwargs):
+            super(FieldsList, self).__init__(list, *args, **kwargs)
+
+        def insert(self, value):
+            raise NotImplementedError()
+
     return FieldsList
 
 
 def getFieldsDict(field):
-    class FieldsDict(FieldsSequence):
-        _seq_type = dict
+    class FieldsDict(FieldsSequence, MutableMapping):
         _item_type = field
 
-        def keys(self):
-            return self._seq.keys()
+        def __init__(self, *args, **kwargs):
+            super(FieldsDict, self).__init__(dict, *args, **kwargs)
 
-        def __repr__(self):
-            items = ("%s: %s" % (key, self._seq[key].__repr__())
-                     for key in self._seq)
-            return "{%s}" % ','.join(items)
+        def __iter__(self):
+            return (key for key in self._seq.keys())
 
     return FieldsDict
 
 
 ### Persistence handling ###
-# Completely untested, just POC
-# Shoud be easy though to make it work
+# Completely untested, just POC. Shoud be easy though to make it work
 
 
 class UserEngine(OODict):
@@ -384,5 +380,5 @@ class UserEngine(OODict):
         "with user.lock_n_load():" code block.
         """
         if not self._lock:
-            raise Exception("Attempting to save without prior lock. \
-                             You should be ashamed of yourself.")
+            raise Exception("Attempting to save without prior lock. "
+                            "You should be ashamed of yourself.")
