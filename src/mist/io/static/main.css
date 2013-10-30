@@ -57,6 +57,10 @@ div#splash div.mist-logo {
     overflow-y: hidden;
 }
 
+#backend-buttons .ui-controlgroup-controls {
+    display: inline;
+}
+
 /* Select Button */
 
 #machines #mist-select-machines-button {
