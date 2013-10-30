@@ -290,21 +290,23 @@ class FieldsSequence(object):
         self._seq = seq
 
     def __getitem__(self, key):
-        value = self._seq[key]
-        if type(value) not in self._item_type.back_types:
-            logging.warn("Invalid type %s detected on "
-                         "storage. Should be in %s",
-                         type(value), self._item_type.back_types)
-            value = self._item_type().cast2back(value)
-        if type(value) is not self._item_type.front_types[0]:
-            value = self._item_type().cast2front(value)
-        return value
+        val = self._seq[key]
+        return self._item_type().cast2front(val)
+        #~ if type(val) not in self._item_type.back_types:
+            #~ logging.warn("Invalid type %s detected on "
+                         #~ "storage. Should be in %s",
+                         #~ type(val), self._item_type.back_types)
+            #~ val = self._item_type().cast2back(val)
+        #~ if type(val) is not self._item_type.front_types[0]:
+            #~ val = self._item_type().cast2front(val)
+        #~ return val
 
     def __setitem__(self, key, value):
-        raise NotImplementedError()
+        val = self._item_type().cast2back(value)
+        self._seq[key] = val
 
     def __delitem__(self, key):
-        raise NotImplementedError()
+        del self._seq[key]
 
     def __len__(self):
         return len(self._seq)
@@ -320,8 +322,9 @@ def getFieldsList(field):
         def __init__(self, *args, **kwargs):
             super(FieldsList, self).__init__(list, *args, **kwargs)
 
-        def insert(self, value):
-            raise NotImplementedError()
+        def insert(self, index, value):
+            val = self._item_type().cast2back(value)
+            self._seq.insert(index, item)
 
     return FieldsList
 
