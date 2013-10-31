@@ -237,7 +237,6 @@ define( 'app', [
 
             model: function() {
                 if (Mist.keysController.loadingKeys) {
-                    $('#single-key-loader').fadeIn();
                     return {
                       name: ' ',
                       probing: false,

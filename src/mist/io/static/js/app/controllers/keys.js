@@ -31,7 +31,6 @@ define('app/controllers/keys', [
                     }
                     this.set('singleKeyResponse', this.getKeyByUrlName(this.singleKeyRequest));
                     this.set('singleKeyRequest', false);
-                    $('#single-key-loader').fadeOut();
                 }
             }.observes('singleKeyRequest'),
 
