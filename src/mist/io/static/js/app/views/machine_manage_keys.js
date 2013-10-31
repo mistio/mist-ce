@@ -18,6 +18,10 @@ define('app/views/machine_manage_keys', [
             nonAssociatedKeys: null,
 
             keysObserver: function() {
+                if (this.parentMachine.id == ' ') {
+                    return;
+                }
+                
                 var newAssociatedKeys = new Array();
                 var newNonAssociatedKeys = new Array();
                 var machine = this.parentMachine;
@@ -46,12 +50,24 @@ define('app/views/machine_manage_keys', [
                                                    'Mist.keysController.keys.@each.probeState'),
 
             didInsertElement: function() {
-                this.set('parentMachine', this.get('controller').get('model'));
-                var that = this;
-                Ember.run.next(function() {
-                    that.keysObserver();
-                });
+                this.renderMachineKeysManager();
             },
+
+            renderMachineKeysManager: function() {
+                this.set('parentMachine', this.get('controller').get('model'));
+                if (this.parentMachine.id != ' ') { // This is the dummy machine. It exists when machine hasn't loaded yet
+                    warn('hello world');
+                    var that = this;
+                    Ember.run.next(function() {
+                        that.keysObserver();
+                    });
+                } else {
+                    Ember.run.later(this, function() {
+                        this.renderMachineKeysManager();
+                    }, 2000);
+                }
+            },
+
 
             associateButtonClicked: function() {
                 $('#non-associated-keys').listview('refresh');

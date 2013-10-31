@@ -11,7 +11,7 @@ define('app/controllers/keys', [
     function(Key) {
         return Ember.ArrayController.extend({
 
-            keys: null,
+            keys: [],
             loadingKeys: null,
             singleKeyRequest: false,
             singleKeyResponse: null,
@@ -258,7 +258,7 @@ define('app/controllers/keys', [
                         return this.keys[k];
                     }
                 }
-                return null; 
+                return null;
             },
 
             updateKeysList: function(data) {

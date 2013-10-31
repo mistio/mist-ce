@@ -180,18 +180,38 @@ define( 'app', [
         }); 
         
         App.MachineRoute = Ember.Route.extend({
-          // Ember.js mindfuck warning
-          redirect: function(){
-              // redirect if the user visited the URL directly
-              if (this.target != undefined){
-                  window.location.replace(window.location.href.split('#')[0]+ '#machines');
-                  window.location.reload();
-              }
-          },
-          model: function(){
-              // set redirect target if the user visits directly the URL
-              this.target = 'machines';
-          }          
+            activate: function() {
+                Ember.run.next(function() {
+                    document.title = 'mist.io - ' + Mist.getMachineIdByUrl();
+                });
+            },
+
+            redirect: function() {
+                Mist.backendsController.set('singleMachineRequest', Mist.getMachineIdByUrl());
+            },
+
+            model: function() {
+                if (Mist.backendsController.get('loadingMachines')) {
+                    return {
+                        id: ' ',
+                        imageId: ' ',
+                        name: ' ',
+                        backend: ' ',
+                        selected: false,
+                        probed: false,
+                        probing: false,
+                        hasMonitoring: false,
+                        pendingMonitoring: false,
+                        pendingShell: false,
+                        pendingAddTag: false,
+                        pendingDeleteTag: false,
+                        pendingStats: false,
+                        pendingCreation: false,
+                        keysCount: 0,
+                    };
+                }
+                return Mist.backendsController.getMachineByUrlId(Mist.getMachineIdByUrl());
+            }        
         });   
         
         App.KeysRoute = Ember.Route.extend({
@@ -215,7 +235,7 @@ define( 'app', [
                 Mist.keysController.set('singleKeyRequest', Mist.getKeyNameByUrl());
             },
 
-            model: function(){
+            model: function() {
                 if (Mist.keysController.loadingKeys) {
                     $('#single-key-loader').fadeIn();
                     return {
@@ -246,6 +266,10 @@ define( 'app', [
         };
 
         App.getKeyNameByUrl = function() {
+            return window.location.href.split('/')[5];
+        };
+
+        App.getMachineIdByUrl = function() {
             return window.location.href.split('/')[5];
         };
 
