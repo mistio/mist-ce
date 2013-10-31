@@ -205,25 +205,31 @@ define( 'app', [
         });       
 
         App.KeyRoute = Ember.Route.extend({
-          // Ember.js mindfuck warning            
-          redirect: function(){
-              // redirect if the user visited the URL directly
-              if (this.target != undefined){
-                  var target = this.target;
-                  // clear redirect target
-                  this.target = undefined;
-                  var that = this;
-                  Ember.run.next(function(){
-                      that.transitionTo(target);
-                  });
-              }
-          },
-          model: function(){
-              // set redirect target if the user visits directly the URL
-              this.target = 'keys';
-          } 
-        });  
-        
+            activate: function() {
+                Ember.run.next(function() {
+                    document.title = 'mist.io - ' + Mist.getKeyNameByUrl();
+                });
+            },
+
+            redirect: function() {
+                Mist.keysController.set('singleKeyRequest', Mist.getKeyNameByUrl());
+            },
+
+            model: function(){
+                if (Mist.keysController.loadingKeys) {
+                    $('#single-key-loader').fadeIn();
+                    return {
+                      name: ' ',
+                      probing: false,
+                      machines: [],
+                      selected: false,
+                      default_key: false,
+                    };
+                }
+                return Mist.keysController.getKeyByUrlName(Mist.getKeyNameByUrl());
+            }
+        });
+
             // we check if we are at the bottom of the page
         App.isScrolledToBottom = function(){
             var distanceToViewportTop = (
@@ -237,7 +243,11 @@ define( 'app', [
             }
         
             return (viewPortTop - distanceToViewportTop === 0);
-        };        
+        };
+
+        App.getKeyNameByUrl = function() {
+            return window.location.href.split('/')[5];
+        };
 
         App.SingleMachineView = SingleMachineView;
         App.MachineListView = MachineListView;
