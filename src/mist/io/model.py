@@ -48,6 +48,9 @@ class Backend(OODict):
     starred = ListField()
     machines = getFieldsDictField(getOODictField(Machine))()
 
+    def __repr__(self):
+        return super(Backend, self).__repr__(['title', 'provider', 'region'])
+
 
 class Keypair(OODict):
     """An ssh keypair."""
@@ -57,8 +60,7 @@ class Keypair(OODict):
     machines = ListField()
 
     def __repr__(self):
-        return "Keypair(default=%s, machines=%s)" \
-                % (self.default, self.machines)
+        return super(Keypair, self).__repr__(['default', 'machines'])
 
 
 class User(UserEngine):
@@ -72,3 +74,6 @@ class User(UserEngine):
     password = StrField()
     backends = getFieldsDictField(getOODictField(Backend))()
     keypairs = getFieldsDictField(getOODictField(Keypair))()
+
+    def __repr__(self):
+        return super(User, self).__repr__(['email'])
