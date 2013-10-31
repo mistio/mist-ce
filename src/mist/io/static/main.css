@@ -77,6 +77,10 @@ div#splash div.mist-logo {
     padding: 10px 0 9px !important;
 }
 
+#backend-buttons .ui-controlgroup-controls {
+    display: inline;
+}
+
 /* Select Button */
 
 #machines #mist-select-machines-button {
