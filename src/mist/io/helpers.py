@@ -307,7 +307,8 @@ def get_machine_actions(machine, backend):
         can_reboot = False
     elif machine.state is NodeState.UNKNOWN:
         # We assume uknown state mean stopped
-        if backend.type in (Provider.NEPHOSCALE, Provider.SOFTLAYER, Provider.DIGITAL_OCEAN, EC2_PROVIDERS):
+        if backend.type in (Provider.NEPHOSCALE, Provider.SOFTLAYER, Provider.DIGITAL_OCEAN) or \
+            backend.type in EC2_PROVIDERS:
             can_stop = False
             can_start = True
         can_reboot = False
