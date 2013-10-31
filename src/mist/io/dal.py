@@ -1,7 +1,7 @@
 """Mist Io DAL
 
-DAL can stand for 'Database Abstraction Layer', 'Data Access Layer' and
-several more similar combinations.
+DAL can stand for 'Database Abstraction Layer', 'Data Access Layer' or
+any of several more similar combinations.
 
 The role of this DAL is to take control over all persistence related
 operations like reading from and writing to some storage. The rest of
@@ -16,8 +16,7 @@ A basic class here is OODict that defines a dict to object mapper.
 Classes that inherit OODict are initiated using a dict. Dict keys are
 on the fly transformed to object attributes, based on predefined fields.
 These fields (subclasses of Field) can be of a certain type and may have
-a default value. They can also be instances of other OODict subclasses
-or collections there of.
+a default value.
 
 From here you should import:
 StrField, IntField, FloatField, BoolField, ListField, DictField,
@@ -247,13 +246,13 @@ class OODict(object):
         self._dict[name] = val
 
     def keys(self):
-        return object.__getattribute__(self, '_fields')[:]
+        return object.__getattribute__(self, '_fields')
 
     def __str__(self):
         """Overide string conversion to print nicely."""
-        s = ""
+        s = str(type(self)) + "\n"
         for name in self.keys():
-            s += "%s: %r\n" % (name, self.__getattribute__(name))
+            s += "  %s: %r\n" % (name, self.__getattribute__(name))
         return s
 
     def __nonzero__(self):
@@ -326,6 +325,14 @@ def getFieldsList(field):
             val = self._item_type().cast2back(value)
             self._seq.insert(index, item)
 
+        def __str__(self):
+            """Overide string conversion to print nicely."""
+            s = str(type(self)) + "\n"
+            for item in self.keys():
+                s += "  %s: %r\n" % (name, self.__getattribute__(name))
+            return s
+
+
     return FieldsList
 
 
@@ -337,7 +344,25 @@ def getFieldsDict(field):
             super(FieldsDict, self).__init__(dict, *args, **kwargs)
 
         def __iter__(self):
-            return (key for key in self._seq.keys())
+            for key in self._seq.keys():
+                # if key is unicode, try to transform to str
+                if type(key) is unicode:
+                    try:
+                        key = str(key)
+                    except:
+                        pass
+                yield key
+
+        def __repr__(self):
+            d = {key: self[key] for key in self.keys()}
+            return "%s: %r" % (type(self), d)
+
+        def __str__(self):
+            d = {key: self[key] for key in self.keys()}
+            lines = [str(type(self)),]
+            lines += ["%r: %r" % (key, self[key]) for key in self.keys()]
+            return "\n  ".join(lines)
+            #~ return str({key: self[key] for key in self.keys()})
 
     return FieldsDict
 

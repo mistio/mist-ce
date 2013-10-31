@@ -46,7 +46,7 @@ class Backend(OODict):
     provider = StrField()
 
     starred = ListField()
-    machines = getFieldsListField(getOODictField(Machine))()
+    machines = getFieldsDictField(getOODictField(Machine))()
 
 
 class Keypair(OODict):
