@@ -319,6 +319,9 @@ class FieldsSequence(object):
         return self._item_type().cast2front(val)
 
     def __setitem__(self, key, value):
+        if type(value) is not self._item_type:
+            log.error("Trying to set item in FieldsSequence of wrong type. "
+                "(Shoud be %s.Will try and see what happens.", self._item_type)
         val = self._item_type().cast2back(value)
         self._seq[key] = val
 
