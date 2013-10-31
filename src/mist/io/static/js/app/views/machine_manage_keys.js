@@ -56,7 +56,6 @@ define('app/views/machine_manage_keys', [
             renderMachineKeysManager: function() {
                 this.set('parentMachine', this.get('controller').get('model'));
                 if (this.parentMachine.id != ' ') { // This is the dummy machine. It exists when machine hasn't loaded yet
-                    warn('hello world');
                     var that = this;
                     Ember.run.next(function() {
                         that.keysObserver();

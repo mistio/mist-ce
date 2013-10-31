@@ -1496,6 +1496,11 @@ div.logout-placeholder, div.account-placeholder, div.support-placeholder {
     width: 20px;
 }
 
+.single-view-header .ajax-loader.machine-loader {
+    top: 18px;
+}
+
+
 .bubble-container .ajax-loader {
     display: block;
     width: 20px;
