@@ -77,6 +77,10 @@ SUPPORTED_PROVIDERS = [
                        {'title': 'NephoScale',
                         'provider' : Provider.NEPHOSCALE},
 
+                       # DigitalOcean
+                       {'title': 'DigitalOcean',
+                        'provider' : Provider.DIGITAL_OCEAN},
+
                        # Linode
                        {'title': 'Linode',
                         'provider' : Provider.LINODE},
@@ -105,6 +109,10 @@ SUPPORTED_PROVIDERS = [
                        {'title': 'Rackspace AU',
                         'provider' : "%s:%s" % (Provider.RACKSPACE,'syd')
                         },
+                        # Softlayer
+                       {'title': 'SoftLayer',
+                        'provider' : Provider.SOFTLAYER
+                       } 
                        ]
 
 # Base AMIs
