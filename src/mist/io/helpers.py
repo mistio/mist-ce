@@ -260,7 +260,7 @@ def connect(request, backend_id=False):
                       region=backend['region'])
     elif backend['provider'] == Provider.RACKSPACE:
         conn = driver(backend['apikey'], backend['apisecret'],
-                      datacenter=backend['region'])
+                      region=backend['region'])
     elif backend['provider'] in [Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN]:
         conn = driver(backend['apikey'], backend['apisecret'])
     elif backend['provider'] == Provider.SOFTLAYER:
