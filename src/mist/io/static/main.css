@@ -1530,6 +1530,10 @@ div.logout-placeholder, div.account-placeholder, div.support-placeholder {
     left: 42%;
 }
 
+.single-view-header .ajax-loader.machine-loader {
+    top: 18px;
+}
+
 .bubble-container .ajax-loader {
     display: block;
     width: 20px;
