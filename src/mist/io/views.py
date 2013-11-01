@@ -1308,12 +1308,6 @@ def add_key(request):
     params = request.json_body
     key_id = params.get('name', '')
     private_key = params.get('priv', '')
-    
-    if not key_id:
-        return Response('Keypair name not provided', 400)
-    
-    if not private_key:
-        return Response('Private key not provided', 400)
 
     user = user_from_request(request)
     key_id = methods.add_key(user, key_id, private_key)

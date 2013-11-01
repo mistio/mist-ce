@@ -114,7 +114,7 @@ class Field(object):
 class StrField(Field):
     """Sets a string field. Default: ''"""
     front_types = [str, unicode]
-    back_types = [unicode, str]
+    back_types = [str, unicode]
 
 
 class IntField(Field):

@@ -64,8 +64,14 @@ def delete_backend(user, backend_id):
 def add_key(user, key_id, private_key):
     """Adds a new keypair and returns the new key_id"""
 
+    if not key_id:
+        raise NotFoundError("Key_id could not be found")
+
+    if not private_key:
+        raise NotFoundError("Private key is not provided")
+
     if key_id in user.keypairs:
-        raise ConflictError("Key Exists")
+        raise ConflictError("Key with the same name already exists")
 
     keypair = Keypair()
     keypair.private = private_key

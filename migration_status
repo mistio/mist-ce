@@ -23,7 +23,7 @@ Functions in views.py
     def list_sizes(request):
     def list_locations(request):
     def list_keys(request):
-    def add_key(request):					OK
+    def add_key(request):					    OK
     def delete_key(request):					OK
     def edit_key(request):
     def set_default_key_request(request):
