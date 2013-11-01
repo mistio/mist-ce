@@ -149,26 +149,54 @@ def list_backends(request):
     .. note:: Currently, this is only used by the backend controller in js.
 
     """
-    with get_user(request) as user:
-        if not user:
-            return Response('Unauthorized', 401)
-        ret = []
-        for backend_id in user['backends']:
-            backend = user['backends'][backend_id]
-            ret.append({'id': backend_id,
-                        'apikey': backend.get('apikey', None),
-                        'title': backend.get('title', backend['provider']),
-                        'provider': backend['provider'],
-                        'poll_interval': backend.get('poll_interval', 10000),
-                        'state': 'wait',
-                        # for Provider.RACKSPACE_FIRST_GEN
-                        'region': backend.get('region', None),
-                        # for Provider.RACKSPACE (the new Nova provider)
-                        'datacenter': backend.get('datacenter', None),
-                        'enabled': backend.get('enabled', True),
-                         })
-
+    user = user_from_request(request)
+    if user is None:
+        raise UnauthorizedError()
+    ret = []
+    for backend_id in user.backends:
+        backend = user.backends[backend_id]
+        ret.append({'id': backend_id,
+                    'apikey': backend.apikey,
+                    'title': backend.title or backend.provider,
+                    'provider': backend.provider,
+                    'poll_interval': backend.poll_interval,
+                    'state': 'wait',
+                    # for Provider.RACKSPACE_FIRST_GEN
+                    'region': backend.region,
+                    # for Provider.RACKSPACE (the new Nova provider)
+                    'datacenter': backend.datacenter,
+                    'enabled': backend.enabled,
+                     })
         return ret
+
+#~  OLD
+#~ @view_config(route_name='backends', request_method='GET', renderer='json')
+#~ def list_backends(request):
+    #~ """Gets the available backends.
+#~ 
+    #~ .. note:: Currently, this is only used by the backend controller in js.
+#~ 
+    #~ """
+    #~ with get_user(request) as user:
+        #~ if not user:
+            #~ return Response('Unauthorized', 401)
+        #~ ret = []
+        #~ for backend_id in user['backends']:
+            #~ backend = user['backends'][backend_id]
+            #~ ret.append({'id': backend_id,
+                        #~ 'apikey': backend.get('apikey', None),
+                        #~ 'title': backend.get('title', backend['provider']),
+                        #~ 'provider': backend['provider'],
+                        #~ 'poll_interval': backend.get('poll_interval', 10000),
+                        #~ 'state': 'wait',
+                        #~ # for Provider.RACKSPACE_FIRST_GEN
+                        #~ 'region': backend.get('region', None),
+                        #~ # for Provider.RACKSPACE (the new Nova provider)
+                        #~ 'datacenter': backend.get('datacenter', None),
+                        #~ 'enabled': backend.get('enabled', True),
+                         #~ })
+#~ 
+        #~ return ret
 
 
 @view_config(route_name='backends', request_method='POST', renderer='json')

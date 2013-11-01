@@ -57,4 +57,4 @@ def delete_backend(user, backend_id):
     with user.lock_n_load():
         del user.backends[backend_id]
         user.save()
-        
+
