@@ -204,6 +204,29 @@ def add_backend(request, renderer='json'):
 
         backends[backend_id] = backend
 
+    #validate newly added backend, else remove
+    try:
+        conn = connect(request, backend_id = backend_id)
+    except Exception as e:
+        with get_user(request) as user:
+            backends = user.get('backends', {})
+            backends.pop(backend_id)
+        return Response('Invalid Credentials', 404)
+
+    try:
+        nodes = conn.list_nodes()        
+    except Exception as e:    
+        with get_user(request) as user:
+            backends = user.get('backends', {})
+            backends.pop(backend_id)        
+        return Response('Error adding Backend %s: %s' % (title, e), 404)
+
+
+    with get_user(request, readonly=True) as user:
+        backends = user.get('backends', {})
+        backend = backends.get(backend_id)
+        if not backend:
+            return Response('Service unavailable', 503)
         ret = {'index'        : len(user['backends']) - 1,
                 'id'           : backend_id,
                 'apikey'       : backend['apikey'],
@@ -217,7 +240,7 @@ def add_backend(request, renderer='json'):
                 'enabled'      : True,
                 }
         
-        return ret
+    return ret
 
 
 @view_config(route_name='backend_action', request_method='DELETE',
@@ -299,10 +322,8 @@ def list_machines(request):
 
     try:
         machines = conn.list_nodes()
-    except InvalidCredsError:
-        return Response('Invalid credentials', 401)
-    except:
-        return Response('Backend unavailable', 503)
+    except Exception as e:
+        return Response('Error loading nodes for backend %s: %s' % (conn.name, e), 503)        
 
     ret = []
     for m in machines:
@@ -1060,8 +1081,8 @@ def list_images(request):
         if term: 
             images = [ image for image in images if term in image.id.lower() or term in image.name.lower() ][:20]
         
-    except:
-        return Response('Backend unavailable', 503)
+    except Exception as e:
+        return Response('Error loading images for backend %s: %s' % (conn.name, e), 503)    
     
     ret = []
     for image in images:
@@ -1116,9 +1137,9 @@ def list_sizes(request):
         return Response('Backend not found', 404)
 
     try:
-        sizes = conn.list_sizes()
-    except:
-        return Response('Backend unavailable', 503)
+        sizes = conn.list_sizes()        
+    except Exception as e:    
+        return Response('Error loading sizes for backend %s: %s' % (conn.name, e), 503)
 
     ret = []
     for size in sizes:
