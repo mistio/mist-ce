@@ -1,5 +1,4 @@
 define('app/views/backend_add', [
-    'app/models/backend',
     'text!app/templates/backend_add.html',
     'ember'],
     /**
@@ -7,7 +6,7 @@ define('app/views/backend_add', [
      *
      * @returns Class
      */
-    function(Backend, backend_add_html) {
+    function(backend_add_html) {
 
         return Ember.View.extend({
 

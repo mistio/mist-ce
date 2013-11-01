@@ -1,4 +1,5 @@
 define('app/controllers/backend_add', [
+    'app/models/backend',
     'ember'
     ],
     /**
@@ -6,7 +7,7 @@ define('app/controllers/backend_add', [
      *
      * @returns Class
      */
-    function() {
+    function(Backend) {
         return Ember.Object.extend({
 
             pendingCreation: null,
@@ -48,11 +49,11 @@ define('app/controllers/backend_add', [
                     headers: { "cache-control": "no-cache" },
                     data: JSON.stringify(payload),
                     success: function(result) {
+                        that.clear();
+                        $("#add-backend").panel("close");
                         that.set('pendingCreation', false);
                         info('Successfully added backend ' + result.id);
                         Mist.backendsController.pushObject(Backend.create(result));
-                        Mist.backendAddController.newBackendClear();
-                        $("#add-backend").panel("close");
                     },
                     error: function(request){
                         that.set('pendingCreation', false);
