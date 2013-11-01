@@ -42,6 +42,18 @@ except ImportError:
 
 log = logging.getLogger('mist.io')
 
+
+def user_from_request(request):
+    return None
+
+
+@view_config(context=Exception)
+def exception_handler(exc, request):
+    if not isinstance(exc, BaseError):
+        return Response(503, "Internal Server Error")
+    pass
+
+
 @view_config(route_name='home', request_method='GET',
              renderer='templates/home.pt')
 def home(request):
