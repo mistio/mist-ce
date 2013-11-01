@@ -142,6 +142,10 @@ define('app/controllers/backends', [
             	}
             },
 
+            providerList: function() {
+                return SUPPORTED_PROVIDERS;
+            }.property('providerList'),
+
             checkMonitoring: function() {
                 if (!Mist.authenticated) {
                     return;

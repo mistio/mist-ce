@@ -1197,7 +1197,7 @@ div.loading-monitoring {
 
 /* Add backend dialog */
 
-#addBackendOpenstack {
+#openstack-bundle {
     display: none;
 }
 

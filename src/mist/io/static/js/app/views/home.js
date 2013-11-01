@@ -2,7 +2,6 @@ define('app/views/home', [
     'app/views/mistscreen',
     'text!app/templates/home.html','ember'],
     /**
-     *
      * Home page
      *
      * @returns Class

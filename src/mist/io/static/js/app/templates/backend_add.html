@@ -1,64 +1,67 @@
-<a id="add-backend-button"
-    href="#"
-    class="add-button"
-    data-theme="b"
-    data-role="button"
-    data-icon="plus"
-    data-iconpos="right"
-    {{action addBackend target="view"}}>Add backend</a>
+<a href="#"
+   id="add-backend-button"
+   class="add-button"
+   data-role="button"
+   data-iconpos="right"
+   ata-icon="plus"
+   data-theme="b"
+   {{action "addBackend" target="view"}}>Add backend</a>
 
 <div data-role="panel" id="add-backend" data-position="right" data-display="overlay" data-theme="a">
+
     <div data-role="header" data-theme="b">
         <h1>Add backend</h1>
     </div>
+
     <div data-role="content">
         <label>1. Provider:</label>
-        <div class="select-backend-collapsible" data-role="collapsible" data-iconpos="right"
+        <div id="new-backend-provider" data-role="collapsible" data-iconpos="right"
             data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
-            <h2>Select provider</h2>
+            <h2>{{Mist.backendAddController.newBackendProvider.title}}</h2>
             <ul class="select-listmenu" data-role="listview">
-                {{#each view.providerList}}
+                {{#each Mist.backendsController.providerList}}
                 <li data-icon="false">
-                    <a href="#" title="{{unbound this.provider}}">{{this.title}}</a>
+                    <a href="#" {{action "selectProvider" this target="view"}}>{{this.title}}</a>
                 </li>
                 {{/each}}
             </ul>
         </div>
 
-        <label for="create-backend-key" id="ApiKeylabel">2. API Key:</label>
+        <label for="new-backend-first-field">2. {{view.firstFieldLabel}}:</label>
         {{view Mist.TextField
-            valueBinding="Mist.backendAddController.newBackendKey"
-            name="create-backend-key"
-            id="create-backend-key"}}
+               id="new-backend-first-field"
+               valueBinding="Mist.backendAddController.newBackendFirstField"}}
 
-        <label for="create-backend-secret" id="ApiSecretlabel">3. API Secret:</label>
+        <label for="new-backend-second-field">3. {{view.secondFieldLabel}}:</label>
         {{view Mist.TextField
-            type="password"
-            valueBinding="Mist.backendAddController.newBackendSecret"
-            name="create-backend-secret"
-            id="create-backend-secret"}}
+               type="password"
+               id="new-backend-second-field"
+               valueBinding="Mist.backendAddController.newBackendSecondField"}}
 
-        <div id="addBackendOpenstack">
-            <label for="create-backend-url" id="URLlabel">4. Auth URL:</label>
+        <div id="openstack-bundle">
+            <label for="new-backend-openstack-url">4. Auth URL:</label>
             {{view Mist.TextField
-                valueBinding="Mist.backendAddController.newBackendURL"
-                name="create-backend-url"
-                id="create-backend-url"}}
+                   id="new-backend-openstack-url"
+                   valueBinding="Mist.backendAddController.newBackendOpenStackURL"}}
 
-            <label for="create-backend-tenant" id="Tenantlabel">5. Tenant Name:</label>
+            <label for="new-backend-openstack-tenant">5. Tenant Name:</label>
             {{view Mist.TextField
-                valueBinding="Mist.backendAddController.newBackendTenant"
-                name="create-backend-tenant"
-                id="create-backend-tenant"}}
+                   id="new-backend-openstack-tenant"
+                   valueBinding="Mist.backendAddController.newBackendOpenStackTenant"}}
         </div>
-        
-        {{#if view.pendingCreation}}
+
+        {{#if Mist.backendAddController.pendingCreation}}
         <div class="ajax-loader"></div>
         {{/if}}
 
         <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <button id="create-backend-cancel" {{action "backClicked" target="view"}}>Back</button>
-            <button id="create-backend-ok" data-theme="b" disabled {{action "addButtonClick" target="view"}}>Add</button>
+            <a data-role="button"
+               {{action "backClicked" target="view"}}>Back</a>
+
+            <a id="new-backend-ok"
+               data-role="button"
+               data-theme="b"
+               {{action "addClicked" target="view"}}>Add</a>
         </div>
     </div>
 </div>

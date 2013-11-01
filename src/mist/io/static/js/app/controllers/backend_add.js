@@ -9,52 +9,76 @@ define('app/controllers/backend_add', [
     function() {
         return Ember.Object.extend({
 
-            newBackendReady: false,
+            pendingCreation: null,
+            newBackendReady: null,
+            newBackendProvider: null,
+            newBackendFirstField: null,
+            newBackendSecondField: null,
+            newBackendOpenStackURL: null,
+            newBackendOpenStackTenant: null,
 
-            newBackendClear: function() {
-                this.set('newBackendProvider', null);
-                this.set('newBackendKey', null);
-                this.set('newBackendSecret', null);
-                /* OpenStack support
-                this.set('newBackendURL', null);
-                this.set('newBackendTenant', null);
-                */
-                $('.select-backend-collapsible .ui-icon').removeClass('ui-icon-check').addClass('ui-icon-arrow-d');
-                $('.select-backend-collapsible span.ui-btn-text').text('Select provider');
+            clear: function() {
+                this.set('newBackendReady', null);
+                this.set('newBackendProvider', {title: 'Select provider'});
+                this.set('newBackendFirstField', null);
+                this.set('newBackendSecondField', null);
+                this.set('newBackendOpenStackURL', null);
+                this.set('newBackendOpenStackTenant', null);
+                
+                $('#new-backend-provider').collapsible('collapse');
+                $('#new-backend-provider').collapsible('option','collapsedIcon','arrow-d');
             },
 
-            updateNewBackendReady: function() {
-                if (this.get('newBackendProvider') &&
-                    this.get('newBackendKey') &&
-                    this.get('newBackendSecret')) {
-                        /* OpenStack support
-                        if (this.get('newBackendProvider').title == 'OpenStack') {
-                            if (!(this.get('newBackendURL') &&
-                                  this.get('newBackendTenant'))) {
-                                      this.set('newBackendReady', false);
-                                      $('#create-backend-ok').button('disable');
-                                      return;
-                                  }
+            addBackend: function() {
+                this.set('pendingCreation', true);
+                var payload = {
+                    'title'      : this.newBackendProvider.title,
+                    'provider'   : this.newBackendProvider.provider,
+                    'apikey'     : this.newBackendFirstField,
+                    'apisecret'  : this.newBackendSecondField,
+                    'apiurl'     : this.newBackendOpenStackURL,
+                    'tenant_name': this.newBackendOpenStackTenant
+                };
+                var that = this;
+                $.ajax({
+                    url: '/backends',
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    headers: { "cache-control": "no-cache" },
+                    data: JSON.stringify(payload),
+                    success: function(result) {
+                        that.set('pendingCreation', false);
+                        info('Successfully added backend ' + result.id);
+                        Mist.backendsController.pushObject(Backend.create(result));
+                        Mist.backendAddController.newBackendClear();
+                        $("#add-backend").panel("close");
+                    },
+                    error: function(request){
+                        that.set('pendingCreation', false);
+                        Mist.notificationController.notify(request.responseText);
+                    }
+                });  
+            },
+
+            newBackendObserver: function() {
+                var ready = false;
+                if ('provider' in this.newBackendProvider) { // Filters out the "Select provider" dummy provider
+                    if (this.newBackendFirstField && this.newBackendSecondField) {
+                        ready = true;
+                        if (this.newBackendProvider.title == 'OpenStack') {
+                            if (!(this.newBackendOpenStackURL && this.newBackendOpenStackTenant)) {
+                                ready = false;
+                            }
                         }
-                        */
-                        this.set('newBackendReady', true);
-                        $('#create-backend-ok').button('enable');
-                } else {
-                    this.set('newBackendReady', false);
-                    $('#create-backend-ok').button('disable');
+                    }
                 }
-            },
-
-            init: function() {
-                this._super();
-                this.addObserver('newBackendProvider', this, this.updateNewBackendReady);
-                this.addObserver('newBackendKey', this, this.updateNewBackendReady);
-                this.addObserver('newBackendSecret', this, this.updateNewBackendReady);
-                /* OpenStack support
-                this.addObserver('newBackendURL', this, this.updateNewBackendReady);
-                this.addObserver('newBackendTenant', this, this.updateNewBackendTenant);
-                */
-            }
+                this.set('newBackendReady', ready);
+            }.observes('newBackendProvider',
+                       'newBackendFirstField',
+                       'newBackendSecondField',
+                       'newBackendOpenStackURL',
+                       'newBackendOpenStackTenant')
         });
     }
 );
