@@ -38,7 +38,7 @@ class MonMachine(OODict):
     uuid = StrField()
     monitor_server = getOODictField(MonitorServer)
     dns_name = StrField()
-    public_ips = getFieldListField(StrField)
+    public_ips = getFieldsListField(StrField)
     collectd_password = StrField()
     name = StrField()
 

@@ -33,7 +33,7 @@ from mist.io.helpers import get_keypair, get_keypair_by_name, get_preferred_keyp
 from mist.io.helpers import run_command
 
 from mist.io.helpers import generate_keypair, generate_public_key, validate_keypair
-from mist.io.helpers import set_default_key, get_private_key, get_public_key, get_ssh_user_from_keypair, get_auth_key
+from mist.io.helpers import get_private_key, get_public_key, get_ssh_user_from_keypair, get_auth_key #set_default_key,
 
 from mist.io import methods
 from mist.io.exceptions import *
