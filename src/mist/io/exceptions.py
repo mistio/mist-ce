@@ -26,6 +26,10 @@ class NotFoundError(BaseError):
     msg = "Not Found"
 
 
+class BackendNotFoundError(NotFoundError):
+    msg = "Backend not found."
+
+
 class MethodNotAllowedError(BaseError):
     msg = "Method Not Allowed"
 

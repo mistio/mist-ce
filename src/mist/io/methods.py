@@ -49,3 +49,12 @@ def add_backend(user, title, provider, apikey,
         user.backends[backend_id] = backend
         user.save()
     return backend_id
+
+
+def delete_backend(user, backend_id):
+    if backend_id not in user.backends:
+        raise BackendNotFoundError()
+    with user.lock_n_load():
+        del user.backends[backend_id]
+        user.save()
+        

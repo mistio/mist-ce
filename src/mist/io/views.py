@@ -172,7 +172,7 @@ def list_backends(request):
 
 
 @view_config(route_name='backends', request_method='POST', renderer='json')
-def add_backend(request, renderer='json'):
+def add_backend(request):
     """Adds a new backend."""
 
     params = request.json_body
@@ -266,28 +266,44 @@ def add_backend(request, renderer='json'):
         #~ return ret
 
 
-@view_config(route_name='backend_action', request_method='DELETE',
-             renderer='json')
-def delete_backend(request, renderer='json'):
+@view_config(route_name='backend_action', request_method='DELETE')
+def delete_backend(request):
     """Deletes a backend.
 
     .. note:: It assumes the user may re-add it later so it does not remove
               any key associations.
 
     """
-    with get_user(request) as user:
-        if not user:
-            return Response('Unauthorized', 401)
+    backend_id = request.matchdict['backend']
+    user = user_from_request(request)
+    if user is None:
+        raise UnauthorizedError()
+    methods.delete_backends(user, backend_id)
+    return Response("OK", 200)
 
-        backend_id = request.matchdict['backend']
-        backends = user.get('backends', None)
-
-        if not backends or not backend_id or not backend_id in backends:
-            return Response('Bad Request', 400)
-
-        del backends[backend_id]
-
-    return Response('OK', 200)
+    #~ @view_config(route_name='backend_action', request_method='DELETE',
+             #~ renderer='json')
+#~  OLD
+#~ def delete_backend(request):
+    #~ """Deletes a backend.
+#~ 
+    #~ .. note:: It assumes the user may re-add it later so it does not remove
+              #~ any key associations.
+#~ 
+    #~ """
+    #~ with get_user(request) as user:
+        #~ if not user:
+            #~ return Response('Unauthorized', 401)
+#~ 
+        #~ backend_id = request.matchdict['backend']
+        #~ backends = user.get('backends', None)
+#~ 
+        #~ if not backends or not backend_id or not backend_id in backends:
+            #~ return Response('Bad Request', 400)
+#~ 
+        #~ del backends[backend_id]
+#~ 
+    #~ return Response('OK', 200)
 
 
 @view_config(route_name='backend_action', request_method='POST', renderer='json')
