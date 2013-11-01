@@ -4,9 +4,10 @@ define('app/views/backend_button', ['ember'],
      *
      * @returns Class
      */
-    function(backend_button_html) {
-
+    function() {
         return Ember.View.extend({
+
+            template: Ember.Handlebars.compile("{{title}}"),
 
             tagName: 'a',
 
@@ -14,13 +15,9 @@ define('app/views/backend_button', ['ember'],
 
             didInsertElement: function() {
                 if ('button' in $("#"+this.elementId)) {
-                    $("#"+this.elementId).button();
-                    /*
-                     *  WARNING: The following line of code is a quick fix 
-                     *  for a bug caused by jqm-1.4.0.rc.1.js 
-                     *  TODO: Remove code when bug get's fixed by jqm
-                     */
-                    $("#" + this.elementId).removeClass('ui-link ui-btn ui-icon-check ui-btn-icon-left ui-shadow ui-corner-all');
+                    Ember.run.next(this, function() {
+                        $("#"+this.elementId).button();
+                    });
                 }
                 if ('controlgroup' in $('#backend-buttons')) {
                     $('#backend-buttons').controlgroup('refresh');
@@ -33,9 +30,7 @@ define('app/views/backend_button', ['ember'],
                 $('select.ui-slider-switch option[value=1]')[0].selected = backend.enabled;
                 $('select.ui-slider-switch').slider('refresh');
                 $("#edit-backend").popup('option', 'positionTo', '#' + this.elementId).popup('open', {transition: 'pop'});
-            },
-
-            template: Ember.Handlebars.compile("{{title}}")
+            }
         });
     }
 );
