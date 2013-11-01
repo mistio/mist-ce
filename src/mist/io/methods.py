@@ -20,7 +20,7 @@ def add_backend(user, title, provider, apikey,
     # if api secret not given, search if we already know it
     if apisecret == 'getsecretfromdb':
         for backend_id in user.backends:
-            if backend.apikey == user.backends[backend_id].apikey:
+            if apikey == user.backends[backend_id].apikey:
                 apisecret = user.backends[backend_id].apisecret
                 break
 
@@ -81,3 +81,29 @@ def add_key(user, key_id, private_key):
         user.save()
 
     return key_id
+
+
+def delete_key(user, key_id):
+    """
+    Deletes given keypair. If key was default, then it checks
+    if there are still keys left and assignes another one as default.
+
+    @param user: The User
+    @param key_id: The key_id to be deleted
+    @return: Returns nothing
+    """
+    if key_id not in user.keypairs:
+        raise KeyNotFoundError()
+
+    keypair = user.keypairs[key_id]
+    if keypair.default:
+
+    with user.lock_n_load():
+        keypair = user.keypairs[key_id]
+        del user.keypairs[key_id]
+
+        if keypair.default and len(user.keypairs):
+            otherKey = user.keypairs.keys()[0]
+            user.keypairs[otherKey].default = True
+
+        user.save()

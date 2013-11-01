@@ -1365,19 +1365,24 @@ def delete_key(request):
     
     if not key_id:
         return Response('Keypair name not provided', 400)
-    
-    with get_user(request) as user:
-        keypairs = user.get('keypairs',{})
-        
-        if not key_id in keypairs.keys():
-            return Response('Keypair "%s" not found', 404)
 
-        key = keypairs.pop(key_id)
-        
-        if key.get('default', False):
-            if len(keypairs):
-                new_default_key = keypairs.keys()[0]
-                keypairs[new_default_key]['default'] = True
+    if user is None:
+        raise UnauthorizedError()
+
+    methods.delete_key(user, key_id)
+    #OLD
+    #with get_user(request) as user:
+    #    keypairs = user.get('keypairs',{})
+    #
+    #    if not key_id in keypairs.keys():
+    #        return Response('Keypair "%s" not found', 404)
+    #
+    #    key = keypairs.pop(key_id)
+    #
+    #    if key.get('default', False):
+    #        if len(keypairs):
+    #            new_default_key = keypairs.keys()[0]
+    #            keypairs[new_default_key]['default'] = True
         
     return list_keys(request)
 

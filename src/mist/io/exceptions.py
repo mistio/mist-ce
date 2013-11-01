@@ -40,3 +40,7 @@ class InternalServerError(BaseError):
 
 class KeyValidationError(BadRequestError):
     msg = "Keypair could not be validated"
+
+
+class KeyNotFoundError(NotFoundError):
+    msg = "Key not found"
