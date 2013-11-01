@@ -41,22 +41,54 @@ def get_user(request, readonly=False, refresh=False, ext_auth=False):
             code....
     It will automagically clean up and save the data to the session and the database
     """
-    
+#OLD
+#    try:
+#        settings = request.registry.settings
+#        user = settings['user']
+#        user_before = deepcopy(user)
+#        yield user
+#    except Exception as e:
+#        # An exception occured. Returning False will reraise it.
+#        log.error("Get_user io got an exception: '%s'" % e)
+#        raise e
+#    else:
+#        # All went fine. Save.
+#        if not readonly and user_before and user != user_before:
+#            save_settings(request)
+#
+
+    yaml_db = os.getcwd() + "/db.yaml"
     try:
-        settings = request.registry.settings
-        user = settings['user']
+        config_file = open(yaml_db, 'r')
+    except IOError:
+        log.warn('settings.yaml does not exist.')
+        config_file = open(yaml_db, 'w')
+        config_file.close()
+        config_file = open(yaml_db, 'r')
+
+    try:
+        user_config = yaml.load(config_file) or {}
+        config_file.close()
+    except:
+        log.error('Error parsing settings.yaml')
+        config_file.close()
+        raise
+
+    try:
+        user = {}
+        user['keypairs'] = user_config.get('keypairs', {})
+        user['backends'] = user_config.get('backends', {})
+        user['email'] = user_config.get('email', '')
+        user['password'] = user_config.get('password', '')
         user_before = deepcopy(user)
         yield user
     except Exception as e:
-        # An exception occured. Returning False will reraise it.
-        log.error("Get_user io got an exception: '%s'" % e)
+        log.error("Get user io got an exception: '%s'" % e)
         raise e
     else:
-        # All went fine. Save.
         if not readonly and user_before and user != user_before:
             save_settings(request)
-
-####FIXME: This is UGLY!!!!
+#####FIXME: This is UGLY!!!!
 try:
     from mist.core.helpers import get_user
 except:

@@ -25,6 +25,8 @@ getOODictField, getFieldsListField, getFieldsDictField, OODict, UserEngine
 
 
 import logging
+import os
+import yaml
 from collections import MutableSequence, MutableMapping
 
 
@@ -413,6 +415,37 @@ class UserEngine(OODict):
         _dict should be a user dict, as returned by mongo
         """
         super(UserEngine, self).__init__(_dict)
+        self._load_from_settings()
+
+    def _load_from_settings(self):
+        """Load user settings from db.yaml We have seperated
+        user-pecific settings from general settings
+        and everything regarding the user dict is
+        now in db.yaml (as if it were a database). General
+        settings like js_build etc remain in settings.yaml file"""
+
+        yaml_db = os.getcwd() + "/db.yaml"
+        try:
+            config_file = open(yaml_db, 'r')
+        except IOError:
+            log.warn('settings.yaml does not exist.')
+            config_file = open(yaml_db, 'w')
+            config_file.close()
+            config_file = open(yaml_db, 'r')
+
+        try:
+            user_config = yaml.load(config_file) or {}
+            config_file.close()
+        except:
+            log.error('Error parsing settings.yaml')
+            config_file.close()
+            raise
+
+        user = {}
+        user['keypairs'] = user_config.get('keypairs', {})
+        user['backends'] = user_config.get('backends', {})
+        user['email'] = user_config.get('email', '')
+        user['password'] = user_config.get('password', '')
 
     def refresh(self, flush=False):
         """Dummy method, doesn't really do anything."""
