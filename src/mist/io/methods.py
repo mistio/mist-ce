@@ -96,7 +96,6 @@ def delete_key(user, key_id):
         raise KeyNotFoundError()
 
     keypair = user.keypairs[key_id]
-    if keypair.default:
 
     with user.lock_n_load():
         keypair = user.keypairs[key_id]

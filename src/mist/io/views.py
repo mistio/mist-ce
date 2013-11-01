@@ -1366,8 +1366,7 @@ def delete_key(request):
     if not key_id:
         return Response('Keypair name not provided', 400)
 
-    if user is None:
-        raise UnauthorizedError()
+    user = user_from_request(request)
 
     methods.delete_key(user, key_id)
     #OLD
