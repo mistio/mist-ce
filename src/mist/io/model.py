@@ -44,6 +44,7 @@ class Backend(OODict):
     region = StrField()
     poll_interval = IntField()
     provider = StrField()
+    datacenter = StrField()
 
     starred = ListField()
     machines = getFieldsDictField(getOODictField(Machine))()
