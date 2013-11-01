@@ -25,11 +25,22 @@ from mist.io.dal import UserEngine
 log = logging.getLogger(__name__)
 
 
-class Machine(OODict):
+class MonitorServer(OODict):
+    """A monitor server's details in a machine in a backend."""
+    status = StrField()
+    uri = StrField()
+    users = IntField()
+
+
+class MonMachine(OODict):
     """A vm in a backend"""
     hasMonitoring = BoolField()
     uuid = StrField()
-    monitor_server = DictField()
+    monitor_server = getOODictField(MonitorServer)
+    dns_name = StrField()
+    public_ips = getFieldListField(StrField)
+    collectd_password = StrField()
+    name = StrField()
 
 
 class Backend(OODict):
@@ -46,11 +57,12 @@ class Backend(OODict):
     provider = StrField()
     datacenter = StrField()
 
-    starred = ListField()
-    machines = getFieldsDictField(getOODictField(Machine))()
+    starred = getFieldsListField(StrField)
+    machines = getFieldsDictField(getOODictField(MonMachine))()
 
     def __repr__(self):
-        return super(Backend, self).__repr__(['title', 'provider', 'region'])
+        print_fields = ['title', 'provider', 'region']
+        return super(Backend, self).__repr__(print_fields)
 
 
 class Keypair(OODict):
