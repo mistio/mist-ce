@@ -28,6 +28,7 @@ import logging
 import os
 import yaml
 from collections import MutableSequence, MutableMapping
+from contextlib import contextmanager
 
 
 log = logging.getLogger(__name__)
@@ -445,6 +446,7 @@ class UserEngine(OODict):
     def refresh(self, flush=False):
         """Dummy method, doesn't really do anything."""
 
+    @contextmanager
     def lock_n_load(self):
         """Dummy lock, doesn't actually do anything.
         It must be used with a 'with' statement as follows:

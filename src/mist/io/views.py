@@ -35,23 +35,28 @@ from mist.io.helpers import run_command
 from mist.io.helpers import generate_keypair, generate_public_key, validate_keypair
 from mist.io.helpers import set_default_key, get_private_key, get_public_key, get_ssh_user_from_keypair, get_auth_key
 
+from mist.io import methods
+from mist.io.exceptions import *
+from mist.io.model import User
+
 try:
     from mist.core.helpers import get_user
 except ImportError:
     from mist.io.helpers import get_user
 
-log = logging.getLogger('mist.io')
+log = logging.getLogger(__name__)
 
 
 def user_from_request(request):
-    return None
+   return User()
 
 
-@view_config(context=Exception)
-def exception_handler(exc, request):
-    if not isinstance(exc, BaseError):
-        return Response(503, "Internal Server Error")
-    pass
+#~ @view_config(context=Exception)
+#~ def exception_handler(exc, request):
+    #~ log.error("Exception: %r", exc)
+    #~ if not isinstance(exc, BaseError):
+        #~ return Response("Internal Server Error", 503)
+    #~ pass
 
 
 @view_config(route_name='home', request_method='GET',
@@ -168,68 +173,97 @@ def list_backends(request):
 
 @view_config(route_name='backends', request_method='POST', renderer='json')
 def add_backend(request, renderer='json'):
-    """Adds a new backend.
-    
-    """
+    """Adds a new backend."""
+
     params = request.json_body
-    title = params.get('title', '0')
-    provider = params.get('provider', '0')
+    title = params.get('title', '')
+    provider = params.get('provider', '')
     apikey = params.get('apikey', '')
     apisecret = params.get('apisecret', '')
     apiurl = params.get('apiurl', '')
     tenant_name = params.get('tenant_name', '')
-    with get_user(request) as user:
-        if not user:
-            return Response('Unauthorized', 401)
-        backends = user['backends']
-        
-        if apisecret == 'getsecretfromdb':
-            for backend_id in backends:
-                backend = backends[backend_id]
-                if backend.get('apikey', None) == apikey:
-                    apisecret = backend.get('apisecret', None)
-                    
-        region = ''
-        if not provider.__class__ is int and ':' in provider:
-            region = provider.split(':')[1]
-            provider = provider.split(':')[0]
 
-        if not provider or not apikey or not apisecret:
-            return Response('Invalid backend data', 400)
+    user = user_from_request(request)
+    if user is None:
+        raise UnauthorizedError()
+    backend_id = methods.add_backend(user, title, provider, apikey,
+                                     apisecret, apiurl, tenant_name)
 
-        backend_id = generate_backend_id(provider, region, apikey)
-        
-        if backend_id in backends:
-            return Response('Backend exists', 409)
+    backend = user.backends[backend_id]
+    ret = {'index': len(user.backends) - 1,
+           'id': backend_id,
+           'apikey': backend.apikey,
+           'apiurl': backend.apiurl,
+           'tenant_name': backend.tenant_name,
+           'title': backend.title,
+           'provider': backend.provider,
+           'poll_interval': backend.poll_interval,
+           'region': backend.region,
+           'status': 'off',
+           'enabled': backend.enabled,
+    }
+    return ret
 
-        backend = {'title': title,
-                   'provider': provider,
-                   'apikey': apikey,
-                   'apisecret': apisecret,
-                   'apiurl': apiurl,
-                   'tenant_name': tenant_name,
-                   'region': region,
-                   'poll_interval': request.registry.settings['default_poll_interval'],
-                   'starred': [],
-                   'enabled': True,
-                  }
-
-        backends[backend_id] = backend
-
-        ret = {'index'        : len(user['backends']) - 1,
-                'id'           : backend_id,
-                'apikey'       : backend['apikey'],
-                'apiurl'       : backend['apiurl'],
-                'tenant_name'  : backend['tenant_name'],
-                'title'        : backend['title'],
-                'provider'     : backend['provider'],
-                'poll_interval': backend['poll_interval'],
-                'region'       : backend['region'],
-                'status'       : 'off',
-                'enabled'      : True,
-                }
-        
-        return ret
+    #~  OLD
+    #~ params = request.json_body
+    #~ title = params.get('title', '0')
+    #~ provider = params.get('provider', '0')
+    #~ apikey = params.get('apikey', '')
+    #~ apisecret = params.get('apisecret', '')
+    #~ apiurl = params.get('apiurl', '')
+    #~ tenant_name = params.get('tenant_name', '')
+    #~ with get_user(request) as user:
+        #~ if not user:
+            #~ return Response('Unauthorized', 401)
+        #~ backends = user['backends']
+        #~ 
+        #~ if apisecret == 'getsecretfromdb':
+            #~ for backend_id in backends:
+                #~ backend = backends[backend_id]
+                #~ if backend.get('apikey', None) == apikey:
+                    #~ apisecret = backend.get('apisecret', None)
+                    #~ 
+        #~ region = ''
+        #~ if not provider.__class__ is int and ':' in provider:
+            #~ region = provider.split(':')[1]
+            #~ provider = provider.split(':')[0]
+#~ 
+        #~ if not provider or not apikey or not apisecret:
+            #~ return Response('Invalid backend data', 400)
+#~ 
+        #~ backend_id = generate_backend_id(provider, region, apikey)
+        #~ 
+        #~ if backend_id in backends:
+            #~ return Response('Backend exists', 409)
+#~ 
+        #~ backend = {'title': title,
+                   #~ 'provider': provider,
+                   #~ 'apikey': apikey,
+                   #~ 'apisecret': apisecret,
+                   #~ 'apiurl': apiurl,
+                   #~ 'tenant_name': tenant_name,
+                   #~ 'region': region,
+                   #~ 'poll_interval': request.registry.settings['default_poll_interval'],
+                   #~ 'starred': [],
+                   #~ 'enabled': True,
+                  #~ }
+#~ 
+        #~ backends[backend_id] = backend
+#~ 
+        #~ ret = {'index'        : len(user['backends']) - 1,
+                #~ 'id'           : backend_id,
+                #~ 'apikey'       : backend['apikey'],
+                #~ 'apiurl'       : backend['apiurl'],
+                #~ 'tenant_name'  : backend['tenant_name'],
+                #~ 'title'        : backend['title'],
+                #~ 'provider'     : backend['provider'],
+                #~ 'poll_interval': backend['poll_interval'],
+                #~ 'region'       : backend['region'],
+                #~ 'status'       : 'off',
+                #~ 'enabled'      : True,
+                #~ }
+        #~ 
+        #~ return ret
 
 
 @view_config(route_name='backend_action', request_method='DELETE',
