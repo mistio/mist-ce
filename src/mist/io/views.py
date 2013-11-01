@@ -1385,34 +1385,39 @@ def edit_key(request):
     
     old_id = request.matchdict.get('key', '')
     key_id = request.json_body.get('newName', '')
-    
-    if not old_id:
-        return Response('Old keypair name not provided', 400)
-    
-    if not key_id:
-        return Response('New keypair name not provided', 400)
-    
-    if old_id == key_id:
-        return Response('Keypair is already named: %s' % key_id, 304)
-    
-    with get_user(request) as user:
-        keypairs = user.get('keypairs',{})
-        
-        if not old_id in keypairs:
-            return Response('Keypair "%s" not found' % old_id, 404)
-        
-        if key_id in keypairs:
-            return Response('Keypair "%s" exists' % key_id, 400)
-        
-        key = {'public': keypairs[old_id]['public'],
-                'private': keypairs[old_id]['private'],
-                'default': keypairs[old_id].get('default', False),
-                'machines': keypairs[old_id]['machines']}
-        
-        keypairs.pop(old_id)
-        keypairs[key_id] = key
-        
+
+    user = user_from_request(request)
+    methods.edit_key(user, key_id, old_id)
+
     return Response('OK', 200)
+    #OLD
+    #if not old_id:
+    #    return Response('Old keypair name not provided', 400)
+    #
+    #if not key_id:
+    #    return Response('New keypair name not provided', 400)
+    #
+    #if old_id == key_id:
+    #    return Response('Keypair is already named: %s' % key_id, 304)
+    #
+    #with get_user(request) as user:
+    #    keypairs = user.get('keypairs',{})
+    #
+    #    if not old_id in keypairs:
+    #        return Response('Keypair "%s" not found' % old_id, 404)
+    #
+    #    if key_id in keypairs:
+    #        return Response('Keypair "%s" exists' % key_id, 400)
+    #
+    #    key = {'public': keypairs[old_id]['public'],
+    #            'private': keypairs[old_id]['private'],
+    #            'default': keypairs[old_id].get('default', False),
+    #            'machines': keypairs[old_id]['machines']}
+    #
+    #    keypairs.pop(old_id)
+    #    keypairs[key_id] = key
+    #
+    #return Response('OK', 200)
 
 
 @view_config(route_name='key_action', request_method='POST', renderer='json')

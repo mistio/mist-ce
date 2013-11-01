@@ -44,3 +44,6 @@ class KeyValidationError(BadRequestError):
 
 class KeyNotFoundError(NotFoundError):
     msg = "Key not found"
+
+class KeyParameterNotProvided(NotFoundError):
+    msg  = "Given Key-parameter not provided"

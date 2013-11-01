@@ -98,6 +98,7 @@ def delete_key(user, key_id):
     @param key_id: The key_id to be deleted
     @return: Returns nothing
     """
+
     if key_id not in user.keypairs:
         raise KeyNotFoundError()
 
@@ -121,6 +122,7 @@ def set_default_key(user, key_id):
     @param key_id: The id of the key we want to set as default
     @return: Nothing. Raises only exceptions if needed.
     """
+
     if not key_id:
         return NotFoundError("Key_id could not be found")
 
@@ -134,4 +136,29 @@ def set_default_key(user, key_id):
             if keypairs[key].default:
                 keypairs[key].default = False
         keypairs[key_id].default = True
+        user.save()
+
+def edit_key(user, new_key, old_key):
+    """
+    Edits a given key's name from old_key ---> new_key
+    @param user: The User
+    @param new_key: The new Key name
+    @param old_key: The old key name
+    @return: Nothing, only raises exceptions if needed
+    """
+
+    if not new_key:
+        raise KeyParameterNotProvided("New key name not provided")
+
+    if not old_key:
+        raise KeyParameterNotProvided("Key to be edited not provided")
+
+    if old_key == new_key:
+        log.warning("Same name provided, will not edit key.No reason")
+        return
+
+    old_keypair = user.keypairs[old_key]
+    with user.lock_n_load():
+        del user.keypairs[old_key]
+        user.keypairs[new_key] = old_keypair
         user.save()
