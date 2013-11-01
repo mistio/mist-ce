@@ -68,8 +68,7 @@ def home(request):
     """Gets all the basic data for backends, project name and session status.
 
     """
-    with get_user(request, readonly=True) as user:
-        email = user.get('email', '')
+    user = user_from_request(request)
     core_uri = request.registry.settings['core_uri']
     auth = request.registry.settings.get('auth', 0)
     js_build = request.registry.settings['js_build']
@@ -77,7 +76,7 @@ def home(request):
     google_analytics_id = request.registry.settings['google_analytics_id']
 
     return {'project': 'mist.io',
-            'email': email,
+            'email': user.email,
             'supported_providers': SUPPORTED_PROVIDERS,
             'core_uri': core_uri,
             'auth': auth,
@@ -85,6 +84,30 @@ def home(request):
             'js_log_level': js_log_level,
             'google_analytics_id': google_analytics_id}
 
+#~ OLD
+#~ @view_config(route_name='home', request_method='GET',
+             #~ renderer='templates/home.pt')
+#~ def home(request):
+    #~ """Gets all the basic data for backends, project name and session status.
+#~ 
+    #~ """
+    #~ with get_user(request, readonly=True) as user:
+        #~ email = user.get('email', '')
+    #~ core_uri = request.registry.settings['core_uri']
+    #~ auth = request.registry.settings.get('auth', 0)
+    #~ js_build = request.registry.settings['js_build']
+    #~ js_log_level = request.registry.settings['js_log_level']
+    #~ google_analytics_id = request.registry.settings['google_analytics_id']
+#~ 
+    #~ return {'project': 'mist.io',
+            #~ 'email': email,
+            #~ 'supported_providers': SUPPORTED_PROVIDERS,
+            #~ 'core_uri': core_uri,
+            #~ 'auth': auth,
+            #~ 'js_build': js_build,
+            #~ 'js_log_level': js_log_level,
+            #~ 'google_analytics_id': google_analytics_id}
+            #~ 
 
 @view_config(route_name="check_auth", request_method='POST', renderer="json")
 def check_auth(request):
