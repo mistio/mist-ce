@@ -1,6 +1,6 @@
 define('app/views/backend_button', ['ember'],
     /**
-     * Backend button view
+     * Backend Button View
      *
      * @returns Class
      */

@@ -14,7 +14,7 @@ define('app/views/backend_add', [
             secondFieldLabel: 'API Secret',
 
             template: Ember.Handlebars.compile(backend_add_html),
-            
+
             enableAddButtonObserver: function() {
                 if (Mist.backendAddController.newBackendReady && 
                    !Mist.backendAddController.pendingCreation) {
@@ -58,17 +58,17 @@ define('app/views/backend_add', [
                             }
                     });
                 },
-                
+
                 addBackend: function() {
                     Mist.backendAddController.clear();
                     $('#add-backend').panel('open');
                 },
-    
+
                 backClicked: function() {
                     $("#add-backend").panel("close");
-                    Mist.backendAddController.clear();  
+                    Mist.backendAddController.clear();
                 },
-    
+
                 addClicked: function() {
                     Mist.backendAddController.addBackend();
                 }
