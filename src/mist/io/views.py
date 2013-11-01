@@ -1417,7 +1417,11 @@ def edit_key(request):
 
 @view_config(route_name='key_action', request_method='POST', renderer='json')
 def set_default_key_request(request):
-    return set_default_key(request)
+    key_id = request.matchdict['key']
+    user = user_from_request(request)
+
+    methods.set_default_key(user, key_id)
+    return Response('OK', 200)
 
 @view_config(route_name='key_action', request_method='GET', request_param='action=private', renderer='json')
 def get_private_key_request(request):

@@ -548,31 +548,34 @@ def generate_keypair():
         'priv': key.exportKey()
     }
 
-
-def set_default_key(request):
-    """Sets a key as default.
-
-    After all changes take place, it updates the configuration and saves the
-    updated yaml.
-
-    """
-    key_id = request.matchdict['key']
-    
-    if not key_id:
-        return Response('Key name not provided', 400)
-
-    with get_user(request) as user:
-        keypairs = user.get('keypairs', {})
-
-        if not key_id in keypairs:
-            return Response('Keypair not found', 404)
-
-        for key in keypairs:
-            keypairs[key]['default'] = False
-
-        keypairs[key_id]['default'] = True
-
-    return Response('OK', 200)
+#OLD
+#-----------CHAOS COMMENT------------------
+#From now on, set_default_key_request() from views.py
+#calls the method.set_default_key(user, key_id)
+#def set_default_key(request):
+#    """Sets a key as default.
+#
+#    After all changes take place, it updates the configuration and saves the
+#    updated yaml.
+#
+#    """
+#    key_id = request.matchdict['key']
+#
+#    if not key_id:
+#        return Response('Key name not provided', 400)
+#
+#    with get_user(request) as user:
+#        keypairs = user.get('keypairs', {})
+#
+#        if not key_id in keypairs:
+#            return Response('Keypair not found', 404)
+#
+#        for key in keypairs:
+#            keypairs[key]['default'] = False
+#
+#        keypairs[key_id]['default'] = True
+#
+#    return Response('OK', 200)
 
 
 def get_private_key(request):

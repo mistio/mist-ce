@@ -112,3 +112,26 @@ def delete_key(user, key_id):
             user.keypairs[otherKey].default = True
 
         user.save()
+
+def set_default_key(user, key_id):
+    """
+    Sets a new default key
+
+    @param user: The user
+    @param key_id: The id of the key we want to set as default
+    @return: Nothing. Raises only exceptions if needed.
+    """
+    if not key_id:
+        return NotFoundError("Key_id could not be found")
+
+    keypairs = user.keypairs
+
+    if not key_id in keypairs:
+        raise KeyNotFoundError()
+
+    with user.lock_n_load():
+        for key in keypairs:
+            if keypairs[key].default:
+                keypairs[key].default = False
+        keypairs[key_id].default = True
+        user.save()
