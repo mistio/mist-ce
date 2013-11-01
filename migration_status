@@ -1,13 +1,13 @@
 Functions in views.py
-    def user_from_request(request):				STUB
-    def home(request):						OK
-    def check_auth(request):
+    def user_from_request(request):                             STUB
+    def home(request):                                          OK
+    def check_auth(request):                        
     def update_user_settings(request, renderer='json'):
-    def list_backends(request):					OK
-    def add_backend(request):					OK
-    def delete_backend(request):				OK
+    def list_backends(request):                                 OK
+    def add_backend(request):                                   OK
+    def delete_backend(request):                                OK
     def toggle_backend(request):
-    def list_machines(request):
+    def list_machines(request):                                 OK
     def create_machine(request):
     def start_machine(request):
     def stop_machine(request):
@@ -23,10 +23,10 @@ Functions in views.py
     def list_sizes(request):
     def list_locations(request):
     def list_keys(request):
-    def add_key(request):					    OK
-    def delete_key(request):					OK
-    def edit_key(request):                      OK
-    def set_default_key_request(request):       OK
+    def add_key(request):                                       OK
+    def delete_key(request):                                    OK
+    def edit_key(request):                                      OK
+    def set_default_key_request(request):                       OK
     def get_private_key_request(request):
     def get_public_key_request(request):
     def generate_keypair_request(request):

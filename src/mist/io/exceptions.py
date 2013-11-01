@@ -14,6 +14,10 @@ class UnauthorizedError(BaseError):
     msg = "Not authorized"
 
 
+class BackendUnauthorizedError(UnauthorizedError):
+    msg = "Invalid credentials for backend"
+
+
 class ForbiddenError(BaseError):
     msg = "Forbidden"
 
@@ -44,6 +48,3 @@ class KeyValidationError(BadRequestError):
 
 class KeyNotFoundError(NotFoundError):
     msg = "Key not found"
-
-class KeyParameterNotProvided(NotFoundError):
-    msg  = "Given Key-parameter not provided"

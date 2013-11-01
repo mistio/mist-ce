@@ -399,55 +399,76 @@ def list_machines(request):
           an extra.flavorId. however we also expect to get size attribute.
 
     """
-    try:
-        conn = connect(request)
-    except RuntimeError as e:
-        log.error(e)
-        return Response('Internal server error: %s' % e, 503)
-    except:
-        return Response('Backend not found', 404)
+    user = user_from_request(request)
+    backend_id = request.matchdict['backend']
+    return methods.list_machines(user, backend_id)
 
-    try:
-        machines = conn.list_nodes()
-    except InvalidCredsError:
-        return Response('Invalid credentials', 401)
-    except:
-        return Response('Backend unavailable', 503)
-
-    ret = []
-    for m in machines:
-        tags = m.extra.get('tags', None) or m.extra.get('metadata', None)
-        tags = tags or {}
-        tags = [value for key, value in tags.iteritems() if key != 'Name']
-
-        if m.extra.get('availability', None):
-            # for EC2
-            tags.append(m.extra['availability'])
-        elif m.extra.get('DATACENTERID', None):
-            # for Linode
-            tags.append(LINODE_DATACENTERS[m.extra['DATACENTERID']])
-
-        image_id = m.image or m.extra.get('imageId', None)
-
-        size = m.size or m.extra.get('flavorId', None)
-        size = size or m.extra.get('instancetype', None)
-
-        machine = {'id'            : m.id,
-                   'uuid'          : m.get_uuid(),
-                   'name'          : m.name,
-                   'imageId'       : image_id,
-                   'size'          : size,
-                   'state'         : STATES[m.state],
-                   'private_ips'   : m.private_ips,
-                   'public_ips'    : m.public_ips,
-                   'tags'          : tags,
-                   'extra'         : m.extra,
-                  }
-        machine.update(get_machine_actions(m, conn))
-        ret.append(machine)
-    
-    return ret
-
+#~ OLD
+#~ @view_config(route_name='machines', request_method='GET', renderer='json')
+#~ def list_machines(request):
+    #~ """Gets machines and their metadata from a backend.
+#~ 
+    #~ Several checks are needed, because each backend stores metadata
+    #~ differently.
+#~ 
+    #~ The folowing are considered:::
+#~ 
+        #~ * For tags, Rackspace stores them in extra.metadata.tags while EC2 in
+          #~ extra.tags.tags.
+        #~ * For images, both EC2 and Rackpace have an image and an etra.imageId
+          #~ attribute
+        #~ * For flavors, EC2 has an extra.instancetype attribute while Rackspace
+          #~ an extra.flavorId. however we also expect to get size attribute.
+#~ 
+    #~ """
+    #~ try:
+        #~ conn = connect(request)
+    #~ except RuntimeError as e:
+        #~ log.error(e)
+        #~ return Response('Internal server error: %s' % e, 503)
+    #~ except:
+        #~ return Response('Backend not found', 404)
+#~ 
+    #~ try:
+        #~ machines = conn.list_nodes()
+    #~ except InvalidCredsError:
+        #~ return Response('Invalid credentials', 401)
+    #~ except:
+        #~ return Response('Backend unavailable', 503)
+#~ 
+    #~ ret = []
+    #~ for m in machines:
+        #~ tags = m.extra.get('tags', None) or m.extra.get('metadata', None)
+        #~ tags = tags or {}
+        #~ tags = [value for key, value in tags.iteritems() if key != 'Name']
+#~ 
+        #~ if m.extra.get('availability', None):
+            #~ # for EC2
+            #~ tags.append(m.extra['availability'])
+        #~ elif m.extra.get('DATACENTERID', None):
+            #~ # for Linode
+            #~ tags.append(LINODE_DATACENTERS[m.extra['DATACENTERID']])
+#~ 
+        #~ image_id = m.image or m.extra.get('imageId', None)
+#~ 
+        #~ size = m.size or m.extra.get('flavorId', None)
+        #~ size = size or m.extra.get('instancetype', None)
+#~ 
+        #~ machine = {'id'            : m.id,
+                   #~ 'uuid'          : m.get_uuid(),
+                   #~ 'name'          : m.name,
+                   #~ 'imageId'       : image_id,
+                   #~ 'size'          : size,
+                   #~ 'state'         : STATES[m.state],
+                   #~ 'private_ips'   : m.private_ips,
+                   #~ 'public_ips'    : m.public_ips,
+                   #~ 'tags'          : tags,
+                   #~ 'extra'         : m.extra,
+                  #~ }
+        #~ machine.update(get_machine_actions(m, conn))
+        #~ ret.append(machine)
+    #~ 
+    #~ return ret
 
 @view_config(route_name='machines', request_method='POST', renderer='json')
 def create_machine(request):
