@@ -48,7 +48,10 @@ log = logging.getLogger(__name__)
 
 
 def user_from_request(request):
-   return User()
+    user = User()
+    if user is None:
+        raise UnauthorizedError()
+    return User()
 
 
 #~ @view_config(context=Exception)
@@ -150,8 +153,6 @@ def list_backends(request):
 
     """
     user = user_from_request(request)
-    if user is None:
-        raise UnauthorizedError()
     ret = []
     for backend_id in user.backends:
         backend = user.backends[backend_id]
@@ -212,8 +213,6 @@ def add_backend(request):
     tenant_name = params.get('tenant_name', '')
 
     user = user_from_request(request)
-    if user is None:
-        raise UnauthorizedError()
     backend_id = methods.add_backend(user, title, provider, apikey,
                                      apisecret, apiurl, tenant_name)
 
@@ -304,8 +303,6 @@ def delete_backend(request):
     """
     backend_id = request.matchdict['backend']
     user = user_from_request(request)
-    if user is None:
-        raise UnauthorizedError()
     methods.delete_backends(user, backend_id)
     return Response("OK", 200)
 
@@ -1296,8 +1293,6 @@ def add_key(request):
         return Response('Private key not provided', 400)
 
     user = user_from_request(request)
-    if user is None:
-        raise UnauthorizedError()
     key_id = methods.add_key(user, key_id, private_key)
 
     keypair = user.keypairs[key_id]
