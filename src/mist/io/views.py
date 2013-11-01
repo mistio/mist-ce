@@ -1294,28 +1294,40 @@ def add_key(request):
     
     if not private_key:
         return Response('Private key not provided', 400)
-    
-    with get_user(request) as user:
-        keypairs = user.get('keypairs',{})
-            
-        if key_id in keypairs:
-            return Response('Keypair "%s" exists' % key_id, 400)
-        
-        key = {'public' : generate_public_key(private_key),
-               'private' : private_key,
-               'default' : not len(keypairs),
-               'machines': []}
-        
-        if not validate_keypair(key['public'], key['private']):
-            # User probably gave an invalid private key
-            return Response('Invalid private key', 400)
-        
-        keypairs[key_id] = key
-        
-        return {'id': key_id,
-                'name': key_id,
-                'machines': [],
-                'default_key': key['default']}
+
+    user = user_from_request(request)
+    if user is None:
+        raise UnauthorizedError()
+    key_id = methods.add_key(user, key_id, private_key)
+
+    keypair = user.keypairs[key_id]
+
+    return {'id': key_id,
+            'name': key_id,
+            'machines': keypair.machines,
+            'default': keypair.default}
+    #OLD
+    #with get_user(request) as user:
+    #    keypairs = user.get('keypairs',{})
+    #
+    #    if key_id in keypairs:
+    #        return Response('Keypair "%s" exists' % key_id, 400)
+    #
+    #    key = {'public' : generate_public_key(private_key),
+    #           'private' : private_key,
+    #           'default' : not len(keypairs),
+    #           'machines': []}
+    #
+    #    if not validate_keypair(key['public'], key['private']):
+    #        # User probably gave an invalid private key
+    #        return Response('Invalid private key', 400)
+    #
+    #    keypairs[key_id] = key
+    #
+    #    return {'id': key_id,
+    #            'name': key_id,
+    #            'machines': [],
+    #            'default_key': key['default']}
 
 
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')

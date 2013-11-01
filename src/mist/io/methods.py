@@ -7,6 +7,8 @@ from mist.io.helpers import generate_backend_id
 from mist.io.model import User, Backend, Keypair
 from mist.io.exceptions import *
 
+from mist.io.helpers import generate_public_key, validate_keypair
+
 
 log = logging.getLogger(__name__)
 
@@ -58,3 +60,24 @@ def delete_backend(user, backend_id):
         del user.backends[backend_id]
         user.save()
 
+
+def add_key(user, key_id, private_key):
+    """Adds a new keypair and returns the new key_id"""
+
+    if key_id in user.keypairs:
+        raise ConflictError("Key Exists")
+
+    keypair = Keypair()
+    keypair.private = private_key
+    keypair.public = generate_public_key(private_key)
+    keypair.default = not len(user.keypairs)
+    keypair.machines = []
+
+    if not validate_keypair(keypair.public, keypair.private):
+        raise KeyValidationError("Keypair could not be validated")
+
+    with user.lock_n_load():
+        user.keypairs[key_id] = keypair
+        user.save()
+
+    return key_id

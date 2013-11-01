@@ -37,3 +37,6 @@ class MethodNotAllowedError(BaseError):
 class InternalServerError(BaseError):
     msg = "Internal Server Error"
 
+
+class KeyValidationError(BadRequestError):
+    msg = "Keypair could not be validated"
