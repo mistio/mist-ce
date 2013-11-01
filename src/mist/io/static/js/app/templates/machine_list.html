@@ -36,8 +36,8 @@
         data-filter="true"
         data-inset="true"
         data-filter-placeholder="Filter...">
-        {{#each Mist.backendsController}}
-            {{#each machines}}
+        {{#each Mist.backendsController.content}}
+            {{#each this.machines.content}}
                 {{view Mist.MachineListItemView machineBinding="this"}}
             {{/each}}
         {{/each}}
