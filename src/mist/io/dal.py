@@ -475,3 +475,7 @@ class UserEngine(OODict):
         if not self._lock:
             raise Exception("Attempting to save without prior lock. "
                             "You should be ashamed of yourself.")
+
+        yaml_db = os.getcwd() + "/db.yaml"
+        config_file = open(yaml_db, 'w')
+        yaml.dump(self._dict, config_file, default_flow_style=False, )
