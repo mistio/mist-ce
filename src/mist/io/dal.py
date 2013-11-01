@@ -476,6 +476,25 @@ class UserEngine(OODict):
             raise Exception("Attempting to save without prior lock. "
                             "You should be ashamed of yourself.")
 
+        class folded_unicode(unicode):
+            pass
+
+        class literal_unicode(unicode):
+            pass
+
+        def literal_unicode_representer(dumper, data):
+            return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='|')
+
+        def folded_unicode_representer(dumper, data):
+            return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='>')
+
+        def unicode_representer(dumper, uni):
+            node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
+            return node
+
+        yaml.add_representer(unicode, unicode_representer)
+        yaml.add_representer(literal_unicode, literal_unicode_representer)
         yaml_db = os.getcwd() + "/db.yaml"
         config_file = open(yaml_db, 'w')
         yaml.dump(self._dict, config_file, default_flow_style=False, )
+        config_file.close()

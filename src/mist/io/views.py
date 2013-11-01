@@ -21,6 +21,7 @@ from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
 from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider
 from libcloud.common.types import InvalidCredsError
+from mist.io.shell import Shell
 
 from mist.io.config import STATES, SUPPORTED_PROVIDERS
 from mist.io.config import EC2_IMAGES, EC2_PROVIDERS, EC2_SECURITYGROUP

@@ -170,8 +170,10 @@ def save_settings(request):
     to be in a valid string format.
 
     """
-    class folded_unicode(unicode): pass
-    class literal_unicode(unicode): pass
+    class folded_unicode(unicode):
+        pass
+    class literal_unicode(unicode):
+        pass
 
     def literal_unicode_representer(dumper, data):
         return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='|')
