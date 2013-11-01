@@ -1,0 +1,45 @@
+Functions in views.py
+    def user_from_request(request):				STUB
+    def home(request):						OK
+    def check_auth(request):
+    def update_user_settings(request, renderer='json'):
+    def list_backends(request):					OK
+    def add_backend(request):					OK
+    def delete_backend(request):				OK
+    def toggle_backend(request):
+    def list_machines(request):
+    def create_machine(request):
+    def start_machine(request):
+    def stop_machine(request):
+    def reboot_machine(request, backend_id=None, machine_id=None):
+    def destroy_machine(request, backend_id=None, machine_id=None):
+    def set_machine_metadata(request):
+    def delete_machine_metadata(request):
+    def shell_command(request, backend_id, machine_id, host, command, ssh_user = None, key = None):
+    def probe(request):
+    def list_specific_images(request):
+    def list_images(request):
+    def star_image(request):
+    def list_sizes(request):
+    def list_locations(request):
+    def list_keys(request):
+    def add_key(request):					OK
+    def delete_key(request):					OK
+    def edit_key(request):
+    def set_default_key_request(request):
+    def get_private_key_request(request):
+    def get_public_key_request(request):
+    def generate_keypair_request(request):
+    def associate_key_request(request):
+    def disassociate_key_request(request):
+    def check_monitoring(request):
+    def update_monitoring(request):
+    def update_rule(request):
+    def delete_rule(request):
+    def update_available_keys(request, backend_id, machine_id, ssh_user, host, authorized_keys):
+    def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, sudoer, public_key = False, private_key = False, default = None):
+    def associate_key(request, key_id, backend_id, machine_id, deploy=True):
+    def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
+    def deploy_key(request, keypair):
+    def undeploy_key(request, keypair):
+
