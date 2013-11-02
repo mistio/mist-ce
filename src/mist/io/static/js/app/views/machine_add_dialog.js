@@ -172,6 +172,27 @@ define('app/views/machine_add_dialog', [
                           }
                     }                                         
                 } 
+                if (providerName == 'DigitalOcean') {                
+                    var re = /^[0-9a-zA-Z-.]*$/; 
+                    if (!re.test(machineName)) {
+                        Mist.notificationController.timeNotify("Characters allowed are a-z, A-Z, 0-9, . and -", 7000);
+                        return false; 
+                    }                       
+                }
+                if (providerName == 'Linode') {                
+                    var re = /^[0-9a-zA-Z-_]*$/; 
+                    if (!re.test(machineName)) {
+                        Mist.notificationController.timeNotify("A Linode label may only contain ASCII letters or numbers, dashes, and underscores, must begin and end with letters or numbers, and be at least 3 characters in length.", 7000);
+                        return false; 
+                    }                       
+                }
+                if (providerName == 'SoftLayer') {
+                    var re = /^[0-9a-zA-Z.-]*$/;
+                    if ((machineName.length > 253)||(!(re.test(machineName)))) {              
+                        Mist.notificationController.timeNotify("Server name must be an alphanumeric string, that may contain period ('.') and dash ('-') special characters.", 7000);
+                        return false;
+                    }
+                }              
                 Mist.machineAddController.newMachine();
                 $('.dialog-add').panel('close');
                 Mist.Router.router.transitionTo('machines');
