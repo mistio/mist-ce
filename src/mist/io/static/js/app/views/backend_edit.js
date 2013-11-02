@@ -18,7 +18,7 @@ define('app/views/backend_edit', [
                 },
 
                 deleteClicked: function( ){
-                    if (Mist.backendEditController.backend.getMonitoredMachines) {
+                    if (Mist.backendEditController.backend.getMonitoredMachines.length) {
                         $('#monitoring-message').show();
                     } else {
                         $('#monitoring-message').hide();

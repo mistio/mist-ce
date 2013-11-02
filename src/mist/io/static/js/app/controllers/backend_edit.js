@@ -48,7 +48,7 @@ define('app/controllers/backend_edit', [
             },
 
             toggleBackend: function() {
-                var newStateToNum = $('.backend-toggle').val();
+                var newStateToNum = $('#backend-toggle').val();
                 var newState = newStateToNum == "1" ? "True" : "False";
                 var payload = {
                     'newState': newState
