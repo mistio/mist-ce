@@ -21,12 +21,13 @@ define('app/controllers/backend_edit', [
                         machine.changeMonitoring();
                     });
                 }
-               
+                
+                var that = this;                
                 $.ajax({
                     url: '/backends/' + this.backend.id,
                     type: 'DELETE',
                     success: function() {
-                        info('Successfully deleted backend:', this.backend.id);
+                        info('Successfully deleted backend:', that.backend.id);
                         $('#backend-delete-confirm').slideUp();
                         $('#edit-backend .ajax-loader').fadeOut(200);
                         $('#button-confirm-disable').removeClass('ui-disabled');

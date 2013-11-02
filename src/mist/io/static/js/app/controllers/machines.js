@@ -10,18 +10,23 @@ define('app/controllers/machines', [
      */
     function(Machine) {
         return Ember.ArrayController.extend({
-            backend: null,
-            content: null,
 
+            content: [],
+            backend: null,
+            
             init: function() {
                 this._super();
                 this.set('content', []);
-                this.refresh();
+                this.refresh();         
             },
+            
+            machineCountObserver: function() {
+                Mist.backendsController.updateMachineCount();
+            }.observes('content.length'),
 
-            refresh: function(){
+            refresh: function() {
 
-                if(!this.backend.enabled){
+                if(!this.backend.enabled) {
                     return;
                 }
 
@@ -33,13 +38,9 @@ define('app/controllers/machines', [
                     if (!that.backend.enabled) {
                         return;
                     }
-
                     data.forEach(function(item){
                         var found = false;
-
-                        log("item id: " + item.id);
-
-                        that.content.forEach(function(machine){
+                        that.content.forEach(function(machine) {
                             if (typeof Mist.monitored_machines !== 'undefined') {
                                 Mist.monitored_machines.forEach(function(machine_tuple){
                                     backend_id = machine_tuple[0];
@@ -87,7 +88,9 @@ define('app/controllers/machines', [
                             item.backend = that.backend;
                             var machine = Machine.create(item);
                             machine.tags.set('content', item.tags);
+                            that.arrayContentWillChange();
                             that.pushObject(machine);
+                            that.arrayContentDidChange();
                         }
                     });
                     
@@ -108,14 +111,6 @@ define('app/controllers/machines', [
                             that.removeObject(item);
                         }
                     });
-
-                    if(that.backend.enabled){
-                        that.backend.set('state', 'online');
-                    } else {
-                        that.backend.set('state', 'offline');
-                    }
-
-                    Mist.backendsController.getMachineCount();
                     
                     Ember.run.later(that, function(){
                         this.refresh();
@@ -131,7 +126,7 @@ define('app/controllers/machines', [
                                                         that.backend.title);
                     error(textstate, errorThrown, 'while loading machines for:', that.backend.title);
                     
-                    if (that.backend.error){
+                    if (that.backend.error) {
                         // This backend seems hopeless, disabling it                            
                         that.backend.set('state', 'offline');
                         that.backend.set('enabled', false);

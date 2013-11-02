@@ -206,7 +206,6 @@ define('app/models/machine', [
 
             probe: function(keyName) {
                 var that = this;
-                if (that.get)
                 
                 function sendProbe() {
                     if (!that.backend) {
@@ -283,7 +282,6 @@ define('app/models/machine', [
                                     that.set('probing', false);
                                 },
                                 error: function(jqXHR, textstate, errorThrown) {
-                                    error(textstate, errorThrown, ' when probing machine: ', that.name);
                                     if(key) {
                                         key.updateMachineUptimeChecked(that, -Date.now());
                                         key.set('probing', false);

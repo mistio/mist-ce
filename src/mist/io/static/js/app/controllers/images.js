@@ -4,14 +4,19 @@ define('app/controllers/images', [
     'jquery'
     ],
     /**
-     * Images controller
-     *
+     * Images Controller
      *
      * @returns Class
      */
     function(Image) {
         return Ember.ArrayController.extend({
+
             backend: null,
+            content: [],
+
+            imageCountObserver: function() {
+                Mist.backendsController.updateImageCount();
+            }.observes('content.length'),
 
             getImage: function(id, callback) {
                 // Linode will pass null, so don't bother
@@ -34,7 +39,7 @@ define('app/controllers/images', [
 
             init: function() {
                 this._super();
-                
+                this.set('content', []);
                 if (!this.backend.enabled) {
                     return;
                 }
@@ -57,18 +62,12 @@ define('app/controllers/images', [
                         content.push(image);
                     });
                     that.set('content', content);
-                    Mist.backendsController.getImageCount();
-                    that.backend.set('state', 'online');
-                    if (that.backend.error){
-                        that.backend.set('error', false);
-                    }
                     that.backend.set('loadingImages', false);
                 }).error(function(jqXHR, textstate, errorThrown) {
                     Mist.notificationController.notify('Error while loading images for backend ' + that.backend.title);
                     error(textstate, errorThrown, ' while loading images. ', jqXHR.responseText);
                     if (that.backend.error){
                         // This backend seems hopeless, disabling it                            
-                        that.backend.set('state', 'offline');
                         that.backend.set('enabled', false);
                     } else {
                         // Mark error but try once again

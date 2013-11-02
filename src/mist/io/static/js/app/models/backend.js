@@ -25,7 +25,7 @@ define('app/models/backend', [
             enabled: null,
             machines: null,
             sizes: [],
-            images: null,
+            images: [],
             locations: [],
             error: false,
             create_pending: false,
@@ -73,7 +73,7 @@ define('app/models/backend', [
                     if (this.machines.content[i].id == machineId) {
                         return this.machines.content[i];
                     }
-                }    
+                }
             },
                                     
             init: function() {
@@ -82,10 +82,9 @@ define('app/models/backend', [
                 this.machines = MachinesController.create({backend: this});
                 this.sizes = SizesController.create({backend: this});
                 this.locations = LocationsController.create({backend: this});
-                var that = this;
-                Ember.run.next(function() {
-                    if (!that.enabled) {
-                        that.toggle();
+                Ember.run.next(this, function() {
+                    if (!this.enabled) {
+                        this.toggle();
                     }
                 });
             },
