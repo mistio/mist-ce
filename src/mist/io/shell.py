@@ -17,7 +17,7 @@ import socket
 
 from pyramid.request import Request
 from pyramid.response import Response
-from mist.io.helpers import connect, run_command, get_keypair, get_ssh_user_from_keypair, get_user
+from mist.io.helpers import connect, run_command, get_ssh_user_from_keypair, get_user
 #from mist.io.views import get_preferred_keypairs
 
 log = logging.getLogger('mistshell')

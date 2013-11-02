@@ -1,8 +1,8 @@
 """mist.io views"""
-import os
-import tempfile
+#~ import os
+#~ import tempfile
 import logging
-import random
+#~ import random
 from time import time
 
 from datetime import datetime
@@ -10,35 +10,34 @@ from datetime import datetime
 import requests
 import json
 
-from hashlib import sha256
+#~ from hashlib import sha256
 
 from pyramid.response import Response
 from pyramid.view import view_config
 
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
-from libcloud.compute.base import NodeAuthSSHKey
-from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
-from libcloud.compute.deployment import SSHKeyDeployment
+#~ from libcloud.compute.base import NodeAuthSSHKey
+#~ from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
+#~ from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider
-from libcloud.common.types import InvalidCredsError
+#~ from libcloud.common.types import InvalidCredsError
 from mist.io.shell import Shell
 
 from mist.io.config import STATES, SUPPORTED_PROVIDERS
-from mist.io.config import EC2_IMAGES, EC2_PROVIDERS, EC2_SECURITYGROUP
-from mist.io.config import LINODE_DATACENTERS
+from mist.io.config import EC2_IMAGES, EC2_PROVIDERS
+#~ from mist.io.config import EC2_SECURITYGROUP
+#~ from mist.io.config import LINODE_DATACENTERS
 
 from mist.io.helpers import connect
-from mist.io.helpers import generate_backend_id, get_machine_actions
-from mist.io.helpers import import_key, create_security_group
-from mist.io.helpers import get_keypair, get_keypair_by_name, get_preferred_keypairs
+#~ from mist.io.helpers import generate_backend_id
+from mist.io.helpers import get_preferred_keypairs
 from mist.io.helpers import run_command
 
-from mist.io.helpers import generate_keypair, generate_public_key, validate_keypair
-from mist.io.helpers import get_private_key, get_public_key, get_ssh_user_from_keypair, get_auth_key #set_default_key,
+from mist.io.helpers import get_ssh_user_from_keypair, get_auth_key #set_default_key,
 
 from mist.io import methods
 from mist.io.exceptions import *
-from mist.io.model import User
+from mist.io.model import User, Keypair
 
 try:
     from mist.core.helpers import get_user
@@ -52,15 +51,26 @@ def user_from_request(request):
     user = User()
     if user is None:
         raise UnauthorizedError()
-    return User()
+    return user
 
 
-#~ @view_config(context=Exception)
-#~ def exception_handler(exc, request):
-    #~ log.error("Exception: %r", exc)
-    #~ if not isinstance(exc, BaseError):
-        #~ return Response("Internal Server Error", 503)
-    #~ pass
+@view_config(context=BaseError)
+def exception_handler(exc, request):
+    """Here we catch exceptions and transform them to proper http responses
+
+    This is a special pyramid view that gets triggered whenever an exception
+    is raised from any other view. It catches all exceptions exc where
+    isinstance(exc, context) is True.
+
+    """
+
+    log.error("Exception: %r", exc)
+    if isinstance(exc, NotFoundError):
+        return Response(str(exc), 401)
+    elif isinstance(exc, BadRequestError):
+        return Response(str(exc), 502)
+    else:
+        return Response("Internal Server Error", 503)
 
 
 @view_config(route_name='home', request_method='GET',
@@ -355,30 +365,26 @@ def delete_backend(request):
     #~ return Response('OK', 200)
 
 
-@view_config(route_name='backend_action', request_method='POST', renderer='json')
+@view_config(route_name='backend_action', request_method='POST')
 def toggle_backend(request):
+    backend_id = request.matchdict['backend']
     new_state = request.json_body.get('newState', '')
     if not new_state:
-        return Response('New backend state not provided', 400)
-    
+        raise BadRequestError('New backend state not provided')
+
+    #FIXME
     if new_state == "True":
         new_state = True
     elif new_state == "False":
         new_state = False
     else:
-        return Response('Invalid backend state', 400)
-    
-    with get_user(request) as user:
-        if not user:
-            return Response('Unauthorized', 401)
-        
-        backend_id = request.matchdict['backend']
-        backends = user.get('backends', None)
+        raise BadRequestError('Invalid backend state')
 
-        if not backends or not backend_id or not backend_id in backends:
-            return Response('Bad Request', 400)
-
-        user['backends'][backend_id]['enabled'] = new_state
+    user = user_from_request(request)
+    if backend_id not in user.backends:
+        raise BackendNotFound()
+    with user.lock_n_load():
+        user.backends[backend_id].enabled = new_state
         
     return Response('OK', 200)
 
@@ -473,53 +479,12 @@ def list_machines(request):
 
 @view_config(route_name='machines', request_method='POST', renderer='json')
 def create_machine(request):
-    """Creates a new virtual machine on the specified backend.
-
-    If the backend is Rackspace it attempts to deploy the node with an ssh key
-    provided in config. the method used is the only one working in the old
-    Rackspace backend. create_node(), from libcloud.compute.base, with 'auth'
-    kwarg doesn't do the trick. Didn't test if you can upload some ssh related
-    files using the 'ex_files' kwarg from openstack 1.0 driver.
-
-    In Linode creation is a bit different. There you can pass the key file
-    directly during creation. The Linode API also requires to set a disk size
-    and doesn't get it from size.id. So, send size.disk from the client and
-    use it in all cases just to avoid provider checking. Finally, Linode API
-    does not support association between a machine and the image it came from.
-    We could set this, at least for machines created through mist.io in
-    ex_comment, lroot or lconfig. lroot seems more appropriate. However,
-    liblcoud doesn't support linode.config.list at the moment, so no way to
-    get them. Also, it will create inconsistencies for machines created
-    through mist.io and those from the Linode interface.
-
-    """
-    try:
-        conn = connect(request)
-    except:
-        return Response('Backend not found', 404)
+    """Creates a new virtual machine on the specified backend."""
 
     backend_id = request.matchdict['backend']
 
     try:
-        key_id = request.json_body['key']
-    except:
-        key_id = None
-
-    with get_user(request, readonly=True) as user:
-        keypairs = user['keypairs']
-
-    if key_id:
-        keypair = get_keypair_by_name(keypairs, key_id)
-    else:
-        keypair = get_keypair(keypairs)
-
-    if keypair:
-        private_key = keypair['private']
-        public_key = keypair['public']
-    else:
-        private_key = public_key = None
-
-    try:
+        key_id = request.json_body.get('key')
         machine_name = request.json_body['name']
         location_id = request.json_body.get('location', None)
         image_id = request.json_body['image']
@@ -530,205 +495,253 @@ def create_machine(request):
         image_extra = request.json_body['image_extra']
         disk = request.json_body['disk']
     except Exception as e:
-        return Response('Invalid payload', 400)
+        raise RequiredParameterNotProvidedError()
 
-    size = NodeSize(size_id, name='', ram='', disk=disk, bandwidth='',
-                    price='', driver=conn)
-    image = NodeImage(image_id, name='', extra=image_extra, driver=conn)
+    user = user_from_request(request)
+    ret = methods.create_machine(user, backend_id, key_id, machine_name,
+                                 location_id, image_id, size_id, script,
+                                 image_extra, disk)
+    return ret
 
-    location = NodeLocation(location_id, name='', country='', driver=conn)
-    if conn.type in EC2_PROVIDERS:
-        locations = conn.list_locations()
-        for loc in locations:
-            if loc.id == location_id:
-                location = loc
-                break
+#OLD
 
-    if conn.type in [Provider.RACKSPACE_FIRST_GEN, 
-                     Provider.RACKSPACE, 
-                     Provider.OPENSTACK] and public_key:
-        key = SSHKeyDeployment(str(public_key))
-        deploy_script = ScriptDeployment(script)
-        msd = MultiStepDeployment([key, deploy_script])
-        try:
-            node = conn.deploy_node(name=machine_name,
-                             image=image,
-                             size=size,
-                             location=location,
-                             deploy=msd)
-            associate_key(request, key_id, backend_id, node.id, deploy=False)
-        except Exception as e:
-            return Response('Failed to create machine in Rackspace: %s' % e, 500)
-    elif conn.type in EC2_PROVIDERS and public_key and private_key:
-        imported_key = import_key(conn, public_key, key_id)
-        created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
-        deploy_script = ScriptDeployment(script)
-
-        (tmp_key, tmp_key_path) = tempfile.mkstemp()
-        key_fd = os.fdopen(tmp_key, 'w+b')
-        key_fd.write(private_key)
-        key_fd.close()
-        #deploy_node wants path for ssh private key
-        if imported_key and created_security_group:
-            try:
-                node = conn.deploy_node(name=machine_name,
-                                 image=image,
-                                 size=size,
-                                 deploy=deploy_script,
-                                 location=location,
-                                 ssh_key=tmp_key_path,
-                                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
-                                 max_tries=1,
-                                 ex_keyname=key_id,
-                                 ex_securitygroup=EC2_SECURITYGROUP['name'])
-                associate_key(request, key_id, backend_id, node.id, deploy=False)
-            except Exception as e:
-                return Response('Failed to create machine in EC2: %s' % e, 500)
-    elif conn.type is Provider.NEPHOSCALE and public_key:
-        machine_name = machine_name[:64].replace(' ','-')
-        #name in NephoScale must start with a letter, can contain mixed 
-        #alpha-numeric characters, hyphen ('-') and underscore ('_')
-        # characters, cannot exceed 64 characters, and can end with a 
-        #letter or a number."
-
-        #Hostname must start with a letter, can contain mixed alpha-numeric
-        # characters and the hyphen ('-') character, cannot exceed 15 characters,
-        # and can end with a letter or a number.
-        key = str(public_key).replace('\n','')
-        deploy_script = ScriptDeployment(script)        
-        
-        (tmp_key, tmp_key_path) = tempfile.mkstemp()
-        key_fd = os.fdopen(tmp_key, 'w+b')
-        key_fd.write(private_key)
-        key_fd.close()
-
-        #NephoScale has 2 keys that need be specified, console and ssh key
-        #get the id of the ssh key if it exists, otherwise add the key
-        try:
-            server_key = ''        
-            keys = conn.ex_list_keypairs(ssh=True, key_group=1)
-            for k in keys:
-                if key == k.public_key:
-                    server_key = k.id
-                    break
-            if not server_key:
-                server_key = conn.ex_create_keypair(machine_name, public_key=key)
-        except:
-            server_key = conn.ex_create_keypair('mistio'+str(random.randint(1,100000)), public_key=key)                          
-
-        #mist.io does not support console key add through the wizzard. Try to add one    
-        try:
-            console_key = conn.ex_create_keypair('mistio'+str(random.randint(1,100000)), key_group=4)
-        except:
-            console_keys = conn.ex_list_keypairs(key_group=4)
-            if console_keys:
-                console_key = console_keys[0].id
-        try:
-            node = conn.deploy_node(name=machine_name,
-                             hostname=machine_name[:15],
-                             image=image,
-                             size=size,
-                             zone=location.id,                             
-                             server_key=server_key,
-                             console_key=console_key,
-                             ssh_key=tmp_key_path,
-                             connect_attempts=20,
-                             ex_wait=True,
-                             deploy=deploy_script)
-            associate_key(request, key_id, backend_id, node.id, deploy=False)
-        except Exception as e:
-            return Response('Failed to create machine in NephoScale: %s' % e, 500)
-    elif conn.type is Provider.SOFTLAYER and public_key:
-        (tmp_key, tmp_key_path) = tempfile.mkstemp()
-        key_fd = os.fdopen(tmp_key, 'w+b')
-        key_fd.write(private_key)
-        key_fd.close()
-        key = SSHKeyDeployment(str(public_key))
-        deploy_script = ScriptDeployment(script)
-        msd = MultiStepDeployment([key, deploy_script])
-        if '.' in machine_name:
-            domain = '.'.join(machine_name.split('.')[1:])
-            name=machine_name.split('.')[0]
-        else:
-            domain = None
-            name=machine_name
-        try:
-            node = conn.deploy_node(name=name,
-                             ex_domain=domain,
-                             image=image,
-                             size=size,
-                             deploy=msd,
-                             location=location,
-                             ssh_key=tmp_key_path)
-            associate_key(request, key_id, backend_id, node.id, deploy=False)
-        except Exception as e:
-            return Response('Failed to create machine in SoftLayer: %s' % e, 500)
-    elif conn.type is Provider.DIGITAL_OCEAN and public_key:
-        key = str(public_key).replace('\n','')
-        deploy_script = ScriptDeployment(script)
-        
-        (tmp_key, tmp_key_path) = tempfile.mkstemp()
-        key_fd = os.fdopen(tmp_key, 'w+b')
-        key_fd.write(private_key)
-        key_fd.close()
-
-        try:
-            key = conn.ex_create_ssh_key(machine_name, key)
-        except:
-            key = conn.ex_create_ssh_key('mist.io', key)
-
-        try:
-            node = conn.deploy_node(name=machine_name,
-                             image=image,
-                             size=size,
-                             ex_ssh_key_ids=[str(key.id)],
-                             location=location,
-                             ssh_key=tmp_key_path,
-                             ssh_alternate_usernames=['root']*5,
-                             #attempt to fix the Connection reset by peer exception
-                             #that is (most probably) created due to a race condition
-                             #while deploy_node establishes a connection and the 
-                             #ssh server is restarted on the created node
-                             private_networking=True,
-                             deploy=deploy_script)
-            associate_key(request, key_id, backend_id, node.id, deploy=False)
-        except Exception as e:
-            return Response('Failed to create machine in DigitalOcean: %s' % e, 500)            
-    elif conn.type is Provider.LINODE and public_key and private_key:
-        auth = NodeAuthSSHKey(public_key)
-
-        (tmp_key, tmp_key_path) = tempfile.mkstemp()
-        key_fd = os.fdopen(tmp_key, 'w+b')
-        key_fd.write(private_key)
-        key_fd.close()
-
-        deploy_script = ScriptDeployment(script)
-        try:
-            node = conn.deploy_node(name=machine_name,
-                             image=image,
-                             size=size,
-                             deploy=deploy_script,
-                             location=location,
-                             auth=auth,
-                             ssh_key=tmp_key_path)
-            associate_key(request, key_id, backend_id, node.id, deploy=True)
-        except Exception as e:
-            return Response('Failed to create machine in Linode: %s' % e, 500)
-    else:
-        return Response('Cannot create a machine without a keypair', 400)
-
-    #remove temp file with private key
-    try:
-        os.remove(tmp_key_path)
-    except:
-        pass
-
-    return {'id': node.id,
-            'name': node.name,
-            'extra': node.extra,
-            'public_ips': node.public_ips,
-            'private_ips': node.private_ips,
-            }
+    #~ try:
+        #~ conn = connect(request)
+    #~ except:
+        #~ return Response('Backend not found', 404)
+#~ 
+    #~ backend_id = request.matchdict['backend']
+#~ 
+    #~ try:
+        #~ key_id = request.json_body['key']
+    #~ except:
+        #~ key_id = None
+#~ 
+    #~ with get_user(request, readonly=True) as user:
+        #~ keypairs = user['keypairs']
+#~ 
+    #~ if key_id:
+        #~ keypair = get_keypair_by_name(keypairs, key_id)
+    #~ else:
+        #~ keypair = get_keypair(keypairs)
+#~ 
+    #~ if keypair:
+        #~ private_key = keypair['private']
+        #~ public_key = keypair['public']
+    #~ else:
+        #~ private_key = public_key = None
+#~ 
+    #~ try:
+        #~ machine_name = request.json_body['name']
+        #~ location_id = request.json_body.get('location', None)
+        #~ image_id = request.json_body['image']
+        #~ size_id = request.json_body['size']
+        #~ #deploy_script received as unicode, but ScriptDeployment wants str
+        #~ script = str(request.json_body.get('script', ''))
+        #~ # these are required only for Linode, passing them anyway
+        #~ image_extra = request.json_body['image_extra']
+        #~ disk = request.json_body['disk']
+    #~ except Exception as e:
+        #~ return Response('Invalid payload', 400)
+#~ 
+    #~ size = NodeSize(size_id, name='', ram='', disk=disk, bandwidth='',
+                    #~ price='', driver=conn)
+    #~ image = NodeImage(image_id, name='', extra=image_extra, driver=conn)
+#~ 
+    #~ location = NodeLocation(location_id, name='', country='', driver=conn)
+    #~ if conn.type in EC2_PROVIDERS:
+        #~ locations = conn.list_locations()
+        #~ for loc in locations:
+            #~ if loc.id == location_id:
+                #~ location = loc
+                #~ break
+#~ 
+    #~ if conn.type in [Provider.RACKSPACE_FIRST_GEN, 
+                     #~ Provider.RACKSPACE, 
+                     #~ Provider.OPENSTACK] and public_key:
+        #~ key = SSHKeyDeployment(str(public_key))
+        #~ deploy_script = ScriptDeployment(script)
+        #~ msd = MultiStepDeployment([key, deploy_script])
+        #~ try:
+            #~ node = conn.deploy_node(name=machine_name,
+                             #~ image=image,
+                             #~ size=size,
+                             #~ location=location,
+                             #~ deploy=msd)
+            #~ associate_key(request, key_id, backend_id, node.id, deploy=False)
+        #~ except Exception as e:
+            #~ return Response('Failed to create machine in Rackspace: %s' % e, 500)
+    #~ elif conn.type in EC2_PROVIDERS and public_key and private_key:
+        #~ imported_key = import_key(conn, public_key, key_id)
+        #~ created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
+        #~ deploy_script = ScriptDeployment(script)
+#~ 
+        #~ (tmp_key, tmp_key_path) = tempfile.mkstemp()
+        #~ key_fd = os.fdopen(tmp_key, 'w+b')
+        #~ key_fd.write(private_key)
+        #~ key_fd.close()
+        #~ #deploy_node wants path for ssh private key
+        #~ if imported_key and created_security_group:
+            #~ try:
+                #~ node = conn.deploy_node(name=machine_name,
+                                 #~ image=image,
+                                 #~ size=size,
+                                 #~ deploy=deploy_script,
+                                 #~ location=location,
+                                 #~ ssh_key=tmp_key_path,
+                                 #~ ssh_alternate_usernames=['ec2-user', 'ubuntu'],
+                                 #~ max_tries=1,
+                                 #~ ex_keyname=key_id,
+                                 #~ ex_securitygroup=EC2_SECURITYGROUP['name'])
+                #~ associate_key(request, key_id, backend_id, node.id, deploy=False)
+            #~ except Exception as e:
+                #~ return Response('Failed to create machine in EC2: %s' % e, 500)
+    #~ elif conn.type is Provider.NEPHOSCALE and public_key:
+        #~ machine_name = machine_name[:64].replace(' ','-')
+        #~ #name in NephoScale must start with a letter, can contain mixed 
+        #~ #alpha-numeric characters, hyphen ('-') and underscore ('_')
+        #~ # characters, cannot exceed 64 characters, and can end with a 
+        #~ #letter or a number."
+#~ 
+        #~ #Hostname must start with a letter, can contain mixed alpha-numeric
+        #~ # characters and the hyphen ('-') character, cannot exceed 15 characters,
+        #~ # and can end with a letter or a number.
+        #~ key = str(public_key).replace('\n','')
+        #~ deploy_script = ScriptDeployment(script)        
+        #~ 
+        #~ (tmp_key, tmp_key_path) = tempfile.mkstemp()
+        #~ key_fd = os.fdopen(tmp_key, 'w+b')
+        #~ key_fd.write(private_key)
+        #~ key_fd.close()
+#~ 
+        #~ #NephoScale has 2 keys that need be specified, console and ssh key
+        #~ #get the id of the ssh key if it exists, otherwise add the key
+        #~ try:
+            #~ server_key = ''        
+            #~ keys = conn.ex_list_keypairs(ssh=True, key_group=1)
+            #~ for k in keys:
+                #~ if key == k.public_key:
+                    #~ server_key = k.id
+                    #~ break
+            #~ if not server_key:
+                #~ server_key = conn.ex_create_keypair(machine_name, public_key=key)
+        #~ except:
+            #~ server_key = conn.ex_create_keypair('mistio'+str(random.randint(1,100000)), public_key=key)                          
+#~ 
+        #~ #mist.io does not support console key add through the wizzard. Try to add one    
+        #~ try:
+            #~ console_key = conn.ex_create_keypair('mistio'+str(random.randint(1,100000)), key_group=4)
+        #~ except:
+            #~ console_keys = conn.ex_list_keypairs(key_group=4)
+            #~ if console_keys:
+                #~ console_key = console_keys[0].id
+        #~ try:
+            #~ node = conn.deploy_node(name=machine_name,
+                             #~ hostname=machine_name[:15],
+                             #~ image=image,
+                             #~ size=size,
+                             #~ zone=location.id,                             
+                             #~ server_key=server_key,
+                             #~ console_key=console_key,
+                             #~ ssh_key=tmp_key_path,
+                             #~ connect_attempts=20,
+                             #~ ex_wait=True,
+                             #~ deploy=deploy_script)
+            #~ associate_key(request, key_id, backend_id, node.id, deploy=False)
+        #~ except Exception as e:
+            #~ return Response('Failed to create machine in NephoScale: %s' % e, 500)
+    #~ elif conn.type is Provider.SOFTLAYER and public_key:
+        #~ (tmp_key, tmp_key_path) = tempfile.mkstemp()
+        #~ key_fd = os.fdopen(tmp_key, 'w+b')
+        #~ key_fd.write(private_key)
+        #~ key_fd.close()
+        #~ key = SSHKeyDeployment(str(public_key))
+        #~ deploy_script = ScriptDeployment(script)
+        #~ msd = MultiStepDeployment([key, deploy_script])
+        #~ if '.' in machine_name:
+            #~ domain = '.'.join(machine_name.split('.')[1:])
+            #~ name=machine_name.split('.')[0]
+        #~ else:
+            #~ domain = None
+            #~ name=machine_name
+        #~ try:
+            #~ node = conn.deploy_node(name=name,
+                             #~ ex_domain=domain,
+                             #~ image=image,
+                             #~ size=size,
+                             #~ deploy=msd,
+                             #~ location=location,
+                             #~ ssh_key=tmp_key_path)
+            #~ associate_key(request, key_id, backend_id, node.id, deploy=False)
+        #~ except Exception as e:
+            #~ return Response('Failed to create machine in SoftLayer: %s' % e, 500)
+    #~ elif conn.type is Provider.DIGITAL_OCEAN and public_key:
+        #~ key = str(public_key).replace('\n','')
+        #~ deploy_script = ScriptDeployment(script)
+        #~ 
+        #~ (tmp_key, tmp_key_path) = tempfile.mkstemp()
+        #~ key_fd = os.fdopen(tmp_key, 'w+b')
+        #~ key_fd.write(private_key)
+        #~ key_fd.close()
+#~ 
+        #~ try:
+            #~ key = conn.ex_create_ssh_key(machine_name, key)
+        #~ except:
+            #~ key = conn.ex_create_ssh_key('mist.io', key)
+#~ 
+        #~ try:
+            #~ node = conn.deploy_node(name=machine_name,
+                             #~ image=image,
+                             #~ size=size,
+                             #~ ex_ssh_key_ids=[str(key.id)],
+                             #~ location=location,
+                             #~ ssh_key=tmp_key_path,
+                             #~ ssh_alternate_usernames=['root']*5,
+                             #~ #attempt to fix the Connection reset by peer exception
+                             #~ #that is (most probably) created due to a race condition
+                             #~ #while deploy_node establishes a connection and the 
+                             #~ #ssh server is restarted on the created node
+                             #~ private_networking=True,
+                             #~ deploy=deploy_script)
+            #~ associate_key(request, key_id, backend_id, node.id, deploy=False)
+        #~ except Exception as e:
+            #~ return Response('Failed to create machine in DigitalOcean: %s' % e, 500)            
+    #~ elif conn.type is Provider.LINODE and public_key and private_key:
+        #~ auth = NodeAuthSSHKey(public_key)
+#~ 
+        #~ (tmp_key, tmp_key_path) = tempfile.mkstemp()
+        #~ key_fd = os.fdopen(tmp_key, 'w+b')
+        #~ key_fd.write(private_key)
+        #~ key_fd.close()
+#~ 
+        #~ deploy_script = ScriptDeployment(script)
+        #~ try:
+            #~ node = conn.deploy_node(name=machine_name,
+                             #~ image=image,
+                             #~ size=size,
+                             #~ deploy=deploy_script,
+                             #~ location=location,
+                             #~ auth=auth,
+                             #~ ssh_key=tmp_key_path)
+            #~ associate_key(request, key_id, backend_id, node.id, deploy=True)
+        #~ except Exception as e:
+            #~ return Response('Failed to create machine in Linode: %s' % e, 500)
+    #~ else:
+        #~ return Response('Cannot create a machine without a keypair', 400)
+#~ 
+    #~ #remove temp file with private key
+    #~ try:
+        #~ os.remove(tmp_key_path)
+    #~ except:
+        #~ pass
+#~ 
+    #~ return {'id': node.id,
+            #~ 'name': node.name,
+            #~ 'extra': node.extra,
+            #~ 'public_ips': node.public_ips,
+            #~ 'private_ips': node.private_ips,
+            #~ }
+    #~ 
 
 
 @view_config(route_name='machine', request_method='POST',
@@ -1452,15 +1465,36 @@ def set_default_key_request(request):
 
 @view_config(route_name='key_action', request_method='GET', request_param='action=private', renderer='json')
 def get_private_key_request(request):
-    return get_private_key(request)
+    """Gets private key from keypair name.
+
+    It is used in single key view when the user clicks the display private key
+    button.
+
+    """
+
+    user = user_from_request(request)
+    key_id = request.matchdict['key']
+    if not key_id:
+        raise RequiredParameterNotProvidedError("key_id")
+    if not key_id in user.keypairs:
+        raise KeypairNotFoundError(key_id)
+    return user.keypairs[key_id].private
 
 @view_config(route_name='key_action', request_method='GET', request_param='action=public', renderer='json')
 def get_public_key_request(request):
-    return get_public_key(request)
+    user = user_from_request(request)
+    key_id = request.matchdict['key']
+    if not key_id:
+        raise RequiredParameterNotProvidedError("key_id")
+    if not key_id in user.keypairs:
+        raise KeypairNotFoundError(key_id)
+    return user.keypairs[key_id].public
 
 @view_config(route_name='keys', request_method='POST', renderer='json')
 def generate_keypair_request(request):
-    return generate_keypair()
+    keypair = Keypair()
+    keypair.generate()
+    return {'priv': keypair.private}
 
 @view_config(route_name='key_association', request_method='PUT', renderer='json')
 def associate_key_request(request):

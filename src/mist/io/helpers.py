@@ -2,37 +2,41 @@
 import os
 import tempfile
 import logging
-import yaml
-import subprocess
-import struct
-import binascii
-import requests
+#~ import yaml
+#~ import subprocess
+#~ import struct
+#~ import binascii
+#~ import requests
 
 from time import time
 from hashlib import sha1
-from Crypto.PublicKey import RSA , DSA
-from Crypto.Util.number import bytes_to_long, long_to_bytes, isPrime
+#~ from Crypto.PublicKey import RSA , DSA
+#~ from Crypto.Util.number import bytes_to_long, long_to_bytes, isPrime
 from contextlib import contextmanager
-from copy import deepcopy
+#~ from copy import deepcopy
 
 from pyramid.response import Response
 
 from libcloud.compute.types import Provider
-from libcloud.compute.types import NodeState
+#~ from libcloud.compute.types import NodeState
 from libcloud.compute.providers import get_driver
-from libcloud.compute.base import Node
-from libcloud.compute.types import Provider
+#~ from libcloud.compute.base import Node
 
 from fabric.api import env
 from fabric.api import run
 
-from mist.io.config import EC2_PROVIDERS, COMMAND_TIMEOUT
+#~ from mist.io.config import EC2_PROVIDERS
+from mist.io.config import COMMAND_TIMEOUT
 
 # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
 libcloud.security.CA_CERTS_PATH.append('/usr/share/curl/ca-bundle.crt')
 
-log = logging.getLogger('mist.io')
+
+from mist.io.model import User
+
+
+log = logging.getLogger(__name__)
 
 @contextmanager
 def get_user(request, readonly=False, refresh=False, ext_auth=False):
@@ -41,53 +45,69 @@ def get_user(request, readonly=False, refresh=False, ext_auth=False):
             code....
     It will automagically clean up and save the data to the session and the database
     """
-#OLD
-#    try:
-#        settings = request.registry.settings
-#        user = settings['user']
-#        user_before = deepcopy(user)
-#        yield user
-#    except Exception as e:
-#        # An exception occured. Returning False will reraise it.
-#        log.error("Get_user io got an exception: '%s'" % e)
-#        raise e
-#    else:
-#        # All went fine. Save.
-#        if not readonly and user_before and user != user_before:
-#            save_settings(request)
-#
 
-    yaml_db = os.getcwd() + "/db.yaml"
-    try:
-        config_file = open(yaml_db, 'r')
-    except IOError:
-        log.warn('settings.yaml does not exist.')
-        config_file = open(yaml_db, 'w')
-        config_file.close()
-        config_file = open(yaml_db, 'r')
 
-    try:
-        user_config = yaml.load(config_file) or {}
-        config_file.close()
-    except:
-        log.error('Error parsing settings.yaml')
-        config_file.close()
-        raise
 
-    try:
-        user = {}
-        user['keypairs'] = user_config.get('keypairs', {})
-        user['backends'] = user_config.get('backends', {})
-        user['email'] = user_config.get('email', '')
-        user['password'] = user_config.get('password', '')
-        user_before = deepcopy(user)
-        yield user
-    except Exception as e:
-        log.error("Get user io got an exception: '%s'" % e)
-        raise e
-    else:
-        if not readonly and user_before and user != user_before:
-            save_settings(request)
+    # FIXME: This is a temporary hack until migration is completed. get_user
+    # will then be deleted
+
+    user = User()
+    if user is None:
+        raise UnauthorizedError()
+    with user.lock_n_load():
+        yield user._dict
+        user.save()
+
+    #~  OLD
+#~ #OLD
+#~ #    try:
+#~ #        settings = request.registry.settings
+#~ #        user = settings['user']
+#~ #        user_before = deepcopy(user)
+#~ #        yield user
+#~ #    except Exception as e:
+#~ #        # An exception occured. Returning False will reraise it.
+#~ #        log.error("Get_user io got an exception: '%s'" % e)
+#~ #        raise e
+#~ #    else:
+#~ #        # All went fine. Save.
+#~ #        if not readonly and user_before and user != user_before:
+#~ #            save_settings(request)
+#~ #
+#~ 
+    #~ yaml_db = os.getcwd() + "/db.yaml"
+    #~ try:
+        #~ config_file = open(yaml_db, 'r')
+    #~ except IOError:
+        #~ log.warn('settings.yaml does not exist.')
+        #~ config_file = open(yaml_db, 'w')
+        #~ config_file.close()
+        #~ config_file = open(yaml_db, 'r')
+#~ 
+    #~ try:
+        #~ user_config = yaml.load(config_file) or {}
+        #~ config_file.close()
+    #~ except:
+        #~ log.error('Error parsing settings.yaml')
+        #~ config_file.close()
+        #~ raise
+#~ 
+    #~ try:
+        #~ user = {}
+        #~ user['keypairs'] = user_config.get('keypairs', {})
+        #~ user['backends'] = user_config.get('backends', {})
+        #~ user['email'] = user_config.get('email', '')
+        #~ user['password'] = user_config.get('password', '')
+        #~ user_before = deepcopy(user)
+        #~ yield user
+    #~ except Exception as e:
+        #~ log.error("Get user io got an exception: '%s'" % e)
+        #~ raise e
+    #~ else:
+        #~ if not readonly and user_before and user != user_before:
+            #~ save_settings(request)
+
+
 #####FIXME: This is UGLY!!!!
 try:
     from mist.core.helpers import get_user
@@ -116,131 +136,133 @@ def get_auth_key(request):
     #~ 
     #~ payload = {'email': settings['user'].get('email'),
                    #~ 'password': settings['user'].get('password')}
-    
-def load_settings(settings):
-    """Gets settings from settings.yaml local file.
 
-    The settings argument gets updated. It is the global_config of pyramid. If
-    there is no such file, it creates one for later use and sets some sensible
-    defaults without writing them in file.
+# OLD deprecated, functionality in user engine and __init__
+#~ def load_settings(settings):
+    #~ """Gets settings from settings.yaml local file.
+#~ 
+    #~ The settings argument gets updated. It is the global_config of pyramid. If
+    #~ there is no such file, it creates one for later use and sets some sensible
+    #~ defaults without writing them in file.
+#~ 
+    #~ settings.yaml is saved either in Opensift's data dir, in order to have
+    #~ write access, or to the current path.
+#~ 
+    #~ """
+    #~ base_path = os.environ.get('OPENSHIFT_DATA_DIR', '')
+    #~ yaml_path = base_path + 'settings.yaml'
+#~ 
+    #~ try:
+        #~ config_file = open(yaml_path, 'r')
+    #~ except IOError:
+        #~ log.warn('settings.yaml does not exist.')
+        #~ config_file = open(yaml_path, 'w')
+        #~ config_file.close()
+        #~ config_file = open(yaml_path, 'r')
+#~ 
+    #~ try:
+        #~ user_config = yaml.load(config_file) or {}
+        #~ config_file.close()
+    #~ except:
+        #~ log.error('Error parsing settings.yaml')
+        #~ config_file.close()
+        #~ raise
+    #~ settings['user'] = {}
+    #~ settings['user']['keypairs'] = user_config.get('keypairs', {})
+    #~ settings['user']['backends'] = user_config.get('backends', {})
+    #~ settings['user']['email'] = user_config.get('email', '')
+    #~ settings['user']['password'] = user_config.get('password', '')
+    #~ settings['js_build'] = user_config.get('js_build', settings.get('js_build', True))
+    #~ settings['js_log_level'] = user_config.get('js_log_level', 3)
+    #~ settings['default_poll_interval'] = user_config.get('default_poll_interval',
+                                                         #~ 10000)
+    #~ if not 'core_uri' in settings:
+        #~ settings['core_uri'] = user_config.get('core_uri', 'https://mist.io')
+#~ 
+    #~ if not 'google_analytics_id' in settings:
+        #~ settings['google_analytics_id'] = user_config.get('google_analytics_id','')
 
-    settings.yaml is saved either in Opensift's data dir, in order to have
-    write access, or to the current path.
-
-    """
-    base_path = os.environ.get('OPENSHIFT_DATA_DIR', '')
-    yaml_path = base_path + 'settings.yaml'
-
-    try:
-        config_file = open(yaml_path, 'r')
-    except IOError:
-        log.warn('settings.yaml does not exist.')
-        config_file = open(yaml_path, 'w')
-        config_file.close()
-        config_file = open(yaml_path, 'r')
-
-    try:
-        user_config = yaml.load(config_file) or {}
-        config_file.close()
-    except:
-        log.error('Error parsing settings.yaml')
-        config_file.close()
-        raise
-    settings['user'] = {}
-    settings['user']['keypairs'] = user_config.get('keypairs', {})
-    settings['user']['backends'] = user_config.get('backends', {})
-    settings['user']['email'] = user_config.get('email', '')
-    settings['user']['password'] = user_config.get('password', '')
-    settings['js_build'] = user_config.get('js_build', settings.get('js_build', True))
-    settings['js_log_level'] = user_config.get('js_log_level', 3)
-    settings['default_poll_interval'] = user_config.get('default_poll_interval',
-                                                         10000)
-    if not 'core_uri' in settings:
-        settings['core_uri'] = user_config.get('core_uri', 'https://mist.io')
-
-    if not 'google_analytics_id' in settings:
-        settings['google_analytics_id'] = user_config.get('google_analytics_id','')
-
-
-def save_settings(request):
-    """Stores settings to settings.yaml local file.
-
-    This is useful for using mist.io UI to configure your installation. It
-    includes some yaml dump magic in order for the dumped private ssh keys
-    to be in a valid string format.
-
-    """
-    class folded_unicode(unicode):
-        pass
-    class literal_unicode(unicode):
-        pass
-
-    def literal_unicode_representer(dumper, data):
-        return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='|')
-
-    def folded_unicode_representer(dumper, data):
-        return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='>')
-
-    def unicode_representer(dumper, uni):
-        node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
-        return node
-
-    yaml.add_representer(unicode, unicode_representer)
-    yaml.add_representer(literal_unicode, literal_unicode_representer)
-
-    base_path = os.environ.get('OPENSHIFT_DATA_DIR', '')
-    yaml_path = base_path + 'settings.yaml'
-    config_file = open(yaml_path, 'w')
-
-    settings = request.registry.settings
-
-    keypairs = {}
-    for key in settings['user']['keypairs'].keys():
-        keypairs[key] = {
-            'public': literal_unicode(settings['user']['keypairs'][key]['public']),
-            'private': literal_unicode(settings['user']['keypairs'][key]['private']),
-            'machines': settings['user']['keypairs'][key].get('machines',[]),
-            'default': settings['user']['keypairs'][key].get('default', False)
-        }
-
-    payload = {
-        'keypairs': keypairs,
-        'backends': settings['user']['backends'],
-        'core_uri': settings['core_uri'],
-        'js_build': settings['js_build'],
-        'js_log_level': settings['js_log_level'],
-        }
-
-    if settings['user'].get('email', False) and settings['user'].get('password', False):
-        payload['email'] = settings['user']['email']
-        payload['password'] = settings['user']['password']
-
-    yaml.dump(payload, config_file, default_flow_style=False, )
-
-    config_file.close()
-
-
-def get_keypair_by_name(keypairs, name):
-    """get key pair by name."""
-    for key in keypairs:
-        if name == key:
-            return keypairs[key]
-    return {}
+# OLD deprecated, functionality in user engine
+#~ def save_settings(request):
+    #~ """Stores settings to settings.yaml local file.
+#~ 
+    #~ This is useful for using mist.io UI to configure your installation. It
+    #~ includes some yaml dump magic in order for the dumped private ssh keys
+    #~ to be in a valid string format.
+#~ 
+    #~ """
+    #~ class folded_unicode(unicode):
+        #~ pass
+    #~ class literal_unicode(unicode):
+        #~ pass
+#~ 
+    #~ def literal_unicode_representer(dumper, data):
+        #~ return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='|')
+#~ 
+    #~ def folded_unicode_representer(dumper, data):
+        #~ return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='>')
+#~ 
+    #~ def unicode_representer(dumper, uni):
+        #~ node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
+        #~ return node
+#~ 
+    #~ yaml.add_representer(unicode, unicode_representer)
+    #~ yaml.add_representer(literal_unicode, literal_unicode_representer)
+#~ 
+    #~ base_path = os.environ.get('OPENSHIFT_DATA_DIR', '')
+    #~ yaml_path = base_path + 'settings.yaml'
+    #~ config_file = open(yaml_path, 'w')
+#~ 
+    #~ settings = request.registry.settings
+#~ 
+    #~ keypairs = {}
+    #~ for key in settings['user']['keypairs'].keys():
+        #~ keypairs[key] = {
+            #~ 'public': literal_unicode(settings['user']['keypairs'][key]['public']),
+            #~ 'private': literal_unicode(settings['user']['keypairs'][key]['private']),
+            #~ 'machines': settings['user']['keypairs'][key].get('machines',[]),
+            #~ 'default': settings['user']['keypairs'][key].get('default', False)
+        #~ }
+#~ 
+    #~ payload = {
+        #~ 'keypairs': keypairs,
+        #~ 'backends': settings['user']['backends'],
+        #~ 'core_uri': settings['core_uri'],
+        #~ 'js_build': settings['js_build'],
+        #~ 'js_log_level': settings['js_log_level'],
+        #~ }
+#~ 
+    #~ if settings['user'].get('email', False) and settings['user'].get('password', False):
+        #~ payload['email'] = settings['user']['email']
+        #~ payload['password'] = settings['user']['password']
+#~ 
+    #~ yaml.dump(payload, config_file, default_flow_style=False, )
+#~ 
+    #~ config_file.close()
 
 
-def get_keypair(keypairs, backend_id=None, machine_id=None):
-    """get key pair for machine, else get default key pair."""
-    for key in keypairs:
-        machines = keypairs[key].get('machines', [])
-        if machines:
-            for machine in machines:
-                if machine[:2] == [backend_id, machine_id]:
-                    return keypairs[key]
-    for key in keypairs:
-        if keypairs[key].get('default', False):
-            return keypairs[key]
+# OLD and UTTERLY FUCKING USELESS, i mean seriously? keypairs.get(name, {}) ?
+#~ def get_keypair_by_name(keypairs, name):
+    #~ """get key pair by name."""
+    #~ for key in keypairs:
+        #~ if name == key:
+            #~ return keypairs[key]
+    #~ return {}
 
-    return {}
+
+#~ def get_keypair(keypairs, backend_id=None, machine_id=None):
+    #~ """get key pair for machine, else get default key pair."""
+    #~ for key in keypairs:
+        #~ machines = keypairs[key].get('machines', [])
+        #~ if machines:
+            #~ for machine in machines:
+                #~ if machine[:2] == [backend_id, machine_id]:
+                    #~ return keypairs[key]
+    #~ for key in keypairs:
+        #~ if keypairs[key].get('default', False):
+            #~ return keypairs[key]
+#~ 
+    #~ return {}
 
 
 def get_ssh_user_from_keypair(keypair, backend_id=None, machine_id=None):
@@ -260,6 +282,7 @@ def get_ssh_user_from_keypair(keypair, backend_id=None, machine_id=None):
     return ''
 
 
+# functionality already transfered to methods connect
 def connect(request, backend_id=False):
     """Establishes backend connection using the credentials specified.
 
@@ -307,116 +330,119 @@ def connect(request, backend_id=False):
     return conn
 
 
-def get_machine_actions(machine, backend):
-    """Returns available machine actions based on backend type.
-
-    Rackspace, Linode and openstack support the same options, but EC2 also
-    supports start/stop.
-
-    The available actions are based on the machine state. The state
-    codes supported by mist.io are those of libcloud, check config.py.
-
-    """
-    # defaults for running state
-    can_start = False
-    can_stop = False
-    can_destroy = True
-    can_reboot = True
-    can_tag = True
-
-    if backend.type in EC2_PROVIDERS:
-        can_stop = True
-
-    if backend.type in [Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN, Provider.SOFTLAYER]:
-        can_stop = True
-
-    if backend.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE, 
-                        Provider.NEPHOSCALE, Provider.SOFTLAYER, Provider.DIGITAL_OCEAN):
-        can_tag = False
-
-    # for other states
-    if machine.state in (NodeState.REBOOTING, NodeState.PENDING):
-        can_start = False
-        can_stop = False
-        can_reboot = False
-    elif machine.state is NodeState.UNKNOWN:
-        # We assume uknown state mean stopped
-        if backend.type in (Provider.NEPHOSCALE, Provider.SOFTLAYER, Provider.DIGITAL_OCEAN) or \
-            backend.type in EC2_PROVIDERS:
-            can_stop = False
-            can_start = True
-        can_reboot = False
-    elif machine.state in (NodeState.TERMINATED,):
-        can_start = False
-        can_destroy = False
-        can_stop = False
-        can_reboot = False
-        can_tag = False
-
-    return {'can_stop': can_stop,
-            'can_start': can_start,
-            'can_destroy': can_destroy,
-            'can_reboot': can_reboot,
-            'can_tag': can_tag}
-
-
-def import_key(conn, public_key, name):
-    """Imports a public ssh key to a machine.
-
-    If a key with a the selected name already exists it leaves it as is and
-    considers it a success.
-
-    This is supported only for EC2 at the moment.
-
-    """
-    if conn.type in EC2_PROVIDERS:
-        (tmp_key, tmp_path) = tempfile.mkstemp()
-        key_fd = os.fdopen(tmp_key, 'w+b')
-        key_fd.write(public_key)
-        key_fd.close()
-        try:
-            conn.ex_import_keypair(name=name, keyfile=tmp_path)
-            os.remove(tmp_path)
-            return True
-        except Exception as exc:
-            if 'Duplicate' in exc.message:
-                log.warn('Key already exists, not importing anything.')
-                os.remove(tmp_path)
-                return True
-            else:
-                log.error('Failed to import key.')
-                os.remove(tmp_path)
-                return False
-    else:
-        log.warn('This provider does not support key importing.')
-        return False
+# OLD transferred to methods
+#~ def get_machine_actions(machine, backend):
+    #~ """Returns available machine actions based on backend type.
+#~ 
+    #~ Rackspace, Linode and openstack support the same options, but EC2 also
+    #~ supports start/stop.
+#~ 
+    #~ The available actions are based on the machine state. The state
+    #~ codes supported by mist.io are those of libcloud, check config.py.
+#~ 
+    #~ """
+    #~ # defaults for running state
+    #~ can_start = False
+    #~ can_stop = False
+    #~ can_destroy = True
+    #~ can_reboot = True
+    #~ can_tag = True
+#~ 
+    #~ if backend.type in EC2_PROVIDERS:
+        #~ can_stop = True
+#~ 
+    #~ if backend.type in [Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN, Provider.SOFTLAYER]:
+        #~ can_stop = True
+#~ 
+    #~ if backend.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE, 
+                        #~ Provider.NEPHOSCALE, Provider.SOFTLAYER, Provider.DIGITAL_OCEAN):
+        #~ can_tag = False
+#~ 
+    #~ # for other states
+    #~ if machine.state in (NodeState.REBOOTING, NodeState.PENDING):
+        #~ can_start = False
+        #~ can_stop = False
+        #~ can_reboot = False
+    #~ elif machine.state is NodeState.UNKNOWN:
+        #~ # We assume uknown state mean stopped
+        #~ if backend.type in (Provider.NEPHOSCALE, Provider.SOFTLAYER, Provider.DIGITAL_OCEAN) or \
+            #~ backend.type in EC2_PROVIDERS:
+            #~ can_stop = False
+            #~ can_start = True
+        #~ can_reboot = False
+    #~ elif machine.state in (NodeState.TERMINATED,):
+        #~ can_start = False
+        #~ can_destroy = False
+        #~ can_stop = False
+        #~ can_reboot = False
+        #~ can_tag = False
+#~ 
+    #~ return {'can_stop': can_stop,
+            #~ 'can_start': can_start,
+            #~ 'can_destroy': can_destroy,
+            #~ 'can_reboot': can_reboot,
+            #~ 'can_tag': can_tag}
 
 
-def create_security_group(conn, info):
-    """Creates a security group based on the info dictionary provided.
+# OLD: moved inside create_machine_ec2 in methods
+#~ def import_key(conn, public_key, name):
+    #~ """Imports a public ssh key to a machine.
+#~ 
+    #~ If a key with a the selected name already exists it leaves it as is and
+    #~ considers it a success.
+#~ 
+    #~ This is supported only for EC2 at the moment.
+#~ 
+    #~ """
+    #~ if conn.type in EC2_PROVIDERS:
+        #~ (tmp_key, tmp_path) = tempfile.mkstemp()
+        #~ key_fd = os.fdopen(tmp_key, 'w+b')
+        #~ key_fd.write(public_key)
+        #~ key_fd.close()
+        #~ try:
+            #~ conn.ex_import_keypair(name=name, keyfile=tmp_path)
+            #~ os.remove(tmp_path)
+            #~ return True
+        #~ except Exception as exc:
+            #~ if 'Duplicate' in exc.message:
+                #~ log.warn('Key already exists, not importing anything.')
+                #~ os.remove(tmp_path)
+                #~ return True
+            #~ else:
+                #~ log.error('Failed to import key.')
+                #~ os.remove(tmp_path)
+                #~ return False
+    #~ else:
+        #~ log.warn('This provider does not support key importing.')
+        #~ return False
 
-    This is supported only for EC2 at the moment. Info should be a dictionary
-    with 'name' and 'description' keys.
 
-    """
-    name = info.get('name', None)
-    description = info.get('description', None)
-
-    if conn.type in EC2_PROVIDERS and name and description:
-        try:
-            conn.ex_create_security_group(name=name, description=description)
-            conn.ex_authorize_security_group_permissive(name=name)
-            return True
-        except Exception as exc:
-            if 'Duplicate' in exc.message:
-                log.warn('Security group already exists, not doing anything.')
-                return True
-            else:
-                log.error('Create and configure security group.')
-                return False
-    else:
-        log.warn('This provider does not support security group creation.')
-        return False
+# OLD: moved inside create_machine_ec2 in methods
+#~ def create_security_group(conn, info):
+    #~ """Creates a security group based on the info dictionary provided.
+#~ 
+    #~ This is supported only for EC2 at the moment. Info should be a dictionary
+    #~ with 'name' and 'description' keys.
+#~ 
+    #~ """
+    #~ name = info.get('name', None)
+    #~ description = info.get('description', None)
+#~ 
+    #~ if conn.type in EC2_PROVIDERS and name and description:
+        #~ try:
+            #~ conn.ex_create_security_group(name=name, description=description)
+            #~ conn.ex_authorize_security_group_permissive(name=name)
+            #~ return True
+        #~ except Exception as exc:
+            #~ if 'Duplicate' in exc.message:
+                #~ log.warn('Security group already exists, not doing anything.')
+                #~ return True
+            #~ else:
+                #~ log.error('Create and configure security group.')
+                #~ return False
+    #~ else:
+        #~ log.warn('This provider does not support security group creation.')
+        #~ return False
 
 
 def run_command(machine_id, host, ssh_user, private_key, command):
@@ -542,13 +568,14 @@ def b58_decode(s):
     return decoded
 
 
-def generate_keypair():
-    """Generates a random keypair."""
-    key = RSA.generate(2048, os.urandom)
-    return {
-        #'pub': key.exportKey('OpenSSH'),
-        'priv': key.exportKey()
-    }
+# OLD : became a keypair method
+#~ def generate_keypair():
+    #~ """Generates a random keypair."""
+    #~ key = RSA.generate(2048, os.urandom)
+    #~ return {
+        #~ #'pub': key.exportKey('OpenSSH'),
+        #~ 'priv': key.exportKey()
+    #~ }
 
 #OLD
 #-----------CHAOS COMMENT------------------
@@ -579,65 +606,67 @@ def generate_keypair():
 #
 #    return Response('OK', 200)
 
+#~ 
+#~ def get_private_key(request):
+    #~ """Gets private key from keypair name.
+#~ 
+    #~ It is used in single key view when the user clicks the display private key
+    #~ button.
+#~ 
+    #~ """    
+    #~ with get_user(request, readonly=True) as user:
+        #~ keypairs = user.get('keypairs', {})
+        #~ key_id = request.matchdict['key']
+        #~ 
+        #~ if not key_id:
+            #~ return Response('Key id not provided', 400)
+#~ 
+        #~ if key_id in keypairs:
+            #~ return keypairs[key_id].get('private', '')
+        #~ else:
+            #~ return Response('Keypair not found %s' % key_id, 404)
 
-def get_private_key(request):
-    """Gets private key from keypair name.
-
-    It is used in single key view when the user clicks the display private key
-    button.
-
-    """    
-    with get_user(request, readonly=True) as user:
-        keypairs = user.get('keypairs', {})
-        key_id = request.matchdict['key']
-        
-        if not key_id:
-            return Response('Key id not provided', 400)
-
-        if key_id in keypairs:
-            return keypairs[key_id].get('private', '')
-        else:
-            return Response('Keypair not found %s' % key_id, 404)
-
-
-def get_public_key(request):
+#~  OLD and USELESS
+#~ def get_public_key(request):
+    #~ 
+    #~ with get_user(request, readonly=True) as user:
+        #~ keypairs = user.get('keypairs', {})
+        #~ key_id = request.matchdict['key']
+        #~ 
+        #~ if not key_id:
+            #~ return Response('Key id not provided', 400)
+#~ 
+        #~ if key_id in keypairs:
+            #~ return keypairs[key_id].get('public', '')
+        #~ else:
+            #~ return Response('Keypair not found %s' % key_id, 404)
     
-    with get_user(request, readonly=True) as user:
-        keypairs = user.get('keypairs', {})
-        key_id = request.matchdict['key']
-        
-        if not key_id:
-            return Response('Key id not provided', 400)
 
-        if key_id in keypairs:
-            return keypairs[key_id].get('public', '')
-        else:
-            return Response('Keypair not found %s' % key_id, 404)
-    
-
-def validate_keypair(public_key, private_key):
-    """ Validates a pair of RSA keys """
-    
-    message = 'Message 1234567890'
-    
-    if 'ssh-rsa' in public_key:
-        public_key_container = RSA.importKey(public_key)
-        private_key_container = RSA.importKey(private_key)
-        encrypted_message = public_key_container.encrypt(message, 0)
-        decrypted_message = private_key_container.decrypt(encrypted_message)
-        
-        if message == decrypted_message:
-            return True
-    
-    return False
+#~ OLD: became a keypair method
+#~ def validate_keypair(public_key, private_key):
+    #~ """ Validates a pair of RSA keys """
+    #~ 
+    #~ message = 'Message 1234567890'
+    #~ 
+    #~ if 'ssh-rsa' in public_key:
+        #~ public_key_container = RSA.importKey(public_key)
+        #~ private_key_container = RSA.importKey(private_key)
+        #~ encrypted_message = public_key_container.encrypt(message, 0)
+        #~ decrypted_message = private_key_container.decrypt(encrypted_message)
+        #~ 
+        #~ if message == decrypted_message:
+            #~ return True
+    #~ 
+    #~ return False
 
 
-def generate_public_key(private_key):
-    try:
-        key = RSA.importKey(private_key)
-        return key.publickey().exportKey('OpenSSH')
-    except:
-        return ''
+#~ OLD: became a keypair method
+#~ def generate_public_key(private_key):
+    #~ try:
+        #~ key = RSA.importKey(private_key)
+        #~ return key.publickey().exportKey('OpenSSH')
+    #~ except:
+        #~ return ''
 
 def get_preferred_keypairs(keypairs, backend_id, machine_id):
     """ Returns a list with the preferred keypairs for this machine
@@ -681,3 +710,23 @@ def get_preferred_keypairs(keypairs, backend_id, machine_id):
         preferred_keypairs.append(default_keypair[0])
         
     return preferred_keypairs
+
+def get_temp_file(content):
+    """Creates a temporary file on disk and saves 'content' in it.
+
+    It is meant to be used like this:
+    with get_temp_file(my_string) as filepath:
+        do_stuff()
+
+    Once the with block is exited, the file is deleted.
+
+    """
+
+    (tmp_key, tmp_path) = tempfile.mkstemp()
+    tmp_fd = os.fdopen(tmp_key, 'w+b')
+    key_fd.write(content)
+    key_fd.close()
+    try:
+        yield tmp_key, tmp_path
+    finally:
+        os.remove(tmp_path)

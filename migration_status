@@ -1,45 +1,73 @@
 Functions in views.py
-    def user_from_request(request):                             STUB
-    def home(request):                                          OK
-    def check_auth(request):                        
-    def update_user_settings(request, renderer='json'):
-    def list_backends(request):                                 OK
-    def add_backend(request):                                   OK
-    def delete_backend(request):                                OK
-    def toggle_backend(request):
-    def list_machines(request):                                 OK
-    def create_machine(request):
-    def start_machine(request):
-    def stop_machine(request):
-    def reboot_machine(request, backend_id=None, machine_id=None):
-    def destroy_machine(request, backend_id=None, machine_id=None):
-    def set_machine_metadata(request):
-    def delete_machine_metadata(request):
-    def shell_command(request, backend_id, machine_id, host, command, ssh_user = None, key = None):
-    def probe(request):
-    def list_specific_images(request):
-    def list_images(request):
-    def star_image(request):
-    def list_sizes(request):
-    def list_locations(request):
-    def list_keys(request):
-    def add_key(request):                                       OK
-    def delete_key(request):                                    OK
-    def edit_key(request):                                      OK
-    def set_default_key_request(request):                       OK
-    def get_private_key_request(request):
-    def get_public_key_request(request):
-    def generate_keypair_request(request):
-    def associate_key_request(request):
-    def disassociate_key_request(request):
-    def check_monitoring(request):
-    def update_monitoring(request):
-    def update_rule(request):
-    def delete_rule(request):
-    def update_available_keys(request, backend_id, machine_id, ssh_user, host, authorized_keys):
-    def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, sudoer, public_key = False, private_key = False, default = None):
-    def associate_key(request, key_id, backend_id, machine_id, deploy=True):
-    def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
-    def deploy_key(request, keypair):
-    def undeploy_key(request, keypair):
+    def user_from_request():            STUB
+    def home():                         OK
+    def check_auth():                   
+    def update_user_settings():
+    def list_backends():                OK
+    def add_backend():                  OK
+    def delete_backend():               OK
+    def toggle_backend():
+    def list_machines():                OK
+    def create_machine():               IN PROGRESS: DR
+    def start_machine():
+    def stop_machine():
+    def reboot_machine():
+    def destroy_machine():
+    def set_machine_metadata():
+    def delete_machine_metadata():
+    def shell_command():
+    def probe():
+    def list_specific_images():
+    def list_images():
+    def star_image():
+    def list_sizes():
+    def list_locations():
+    def list_keys():
+    def add_key():                      OK
+    def delete_key():                   OK
+    def edit_key():                     OK
+    def set_default_key_request():      OK
+    def get_private_key_request():      OK
+    def get_public_key_request():       OK
+    def generate_keypair_request():     OK
+    def associate_key_request():        IN PROGRESS: DR
+    def disassociate_key_request():     TODO: DR
+    def check_monitoring():
+    def update_monitoring():
+    def update_rule():
+    def delete_rule():
+    def update_available_keys():
+    def save_keypair():
+    def associate_key():                IN PROGRESS: DR - almost ready
+    def disassociate_key():             TODO: DR
+    def deploy_key():                   TODO: DR
+    def undeploy_key():                 TODO: DR
 
+Functions in helpers.py
+    def get_user():                     STUB: to be deprecated and removed
+    def get_auth_key():
+    def load_settings():                OK: deprecated, func moved in __init__
+                                            and user_engine
+    def save_settings():                OK: deprecated, func moved in __init__
+                                            and user_engine
+    def get_keypair_by_name():          OK: useless, removed
+    def get_keypair():                  OK: useless, removed
+    def get_ssh_user_from_keypair():
+    def connect():                      IN PROGRESS: func moved to methods
+                                            migration incomplete
+    def get_machine_actions():          OK: moved in methods
+    def import_key():                   OK: moved inside create_machine_ec2 in
+                                            methods
+    def create_security_group():        OK: moved inside create_machine_ec2 in
+                                            methods
+    def run_command():
+    def generate_backend_id():
+    def b58_encode():
+    def b58_decode():
+    def generate_keypair():             OK: became a keypair method in model
+    def set_default_key():              OK: moved in methods
+    def get_private_key():              OK: useless, removed
+    def get_public_key():               OK: useless, removed
+    def validate_keypair():             OK: became a keypair method in model
+    def generate_public_key():          OK: became a keypair method in model
+    def get_preferred_keypairs():

@@ -411,6 +411,8 @@ def getFieldsDict(field):
 class UserEngine(OODict):
     """This takes care of all storage related operations."""
 
+    _lock = None
+
     def __init__(self, _dict={}):
         """Set the storage resources and initiate the user.
         _dict should be a user dict, as returned by mongo
@@ -437,10 +439,9 @@ class UserEngine(OODict):
             user_config = yaml.load(config_file) or {}
             config_file.close()
         except:
-            log.error('Error parsing settings.yaml')
+            log.error('Error parsing db.yaml.')
             config_file.close()
-            raise Exception
-
+            raise
         return user_config
 
     def refresh(self, flush=False):
@@ -455,18 +456,20 @@ class UserEngine(OODict):
                 user.save()
         Lock is automatically released after exiting the 'with' block.
         """
-
-        try:
-            self._lock = True
-            yield   # here execution returns to the with statement
-        except Exception as e:
-            # This block is executed if an exception is raised in the try
-            # block above or inside the with statement that called this.
-            # Returning False will reraise it.
-            logging.error("lock_n_load got an exception: %s", e)
-            raise e
-        finally:
-            self._lock = False
+        self._lock = True
+        yield
+        self.lock = False
+        #~ try:
+            #~ self._lock = True
+            #~ yield   # here execution returns to the with statement
+        #~ except Exception as e:
+            #~ # This block is executed if an exception is raised in the try
+            #~ # block above or inside the with statement that called this.
+            #~ # Returning False will reraise it.
+            #~ logging.error("lock_n_load got an exception: %s", e)
+            #~ raise e
+        #~ finally:
+            #~ self._lock = False
 
     def save(self):
         """Save user data to storage. Raises exception if not in a
@@ -476,24 +479,24 @@ class UserEngine(OODict):
             raise Exception("Attempting to save without prior lock. "
                             "You should be ashamed of yourself.")
 
-        class folded_unicode(unicode):
-            pass
-
-        class literal_unicode(unicode):
-            pass
-
-        def literal_unicode_representer(dumper, data):
-            return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='|')
-
-        def folded_unicode_representer(dumper, data):
-            return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='>')
-
-        def unicode_representer(dumper, uni):
-            node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
-            return node
-
-        yaml.add_representer(unicode, unicode_representer)
-        yaml.add_representer(literal_unicode, literal_unicode_representer)
+        #~ class folded_unicode(unicode):
+            #~ pass
+#~ 
+        #~ class literal_unicode(unicode):
+            #~ pass
+#~ 
+        #~ def literal_unicode_representer(dumper, data):
+            #~ return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='|')
+#~ 
+        #~ def folded_unicode_representer(dumper, data):
+            #~ return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='>')
+#~ 
+        #~ def unicode_representer(dumper, uni):
+            #~ node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
+            #~ return node
+#~ 
+        #~ yaml.add_representer(unicode, unicode_representer)
+        #~ yaml.add_representer(literal_unicode, literal_unicode_representer)
         yaml_db = os.getcwd() + "/db.yaml"
         config_file = open(yaml_db, 'w')
         yaml.dump(self._dict, config_file, default_flow_style=False, )

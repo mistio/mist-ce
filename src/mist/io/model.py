@@ -10,7 +10,11 @@ as class methods.
 """
 
 
+import os
 import logging
+
+
+from Crypto.PublicKey import RSA
 
 
 from mist.io.dal import StrField, IntField
@@ -27,6 +31,7 @@ log = logging.getLogger(__name__)
 
 class MonitorServer(OODict):
     """A monitor server's details in a machine in a backend."""
+
     status = StrField()
     uri = StrField()
     users = IntField()
@@ -34,6 +39,7 @@ class MonitorServer(OODict):
 
 class MonMachine(OODict):
     """A vm in a backend"""
+
     hasMonitoring = BoolField()
     uuid = StrField()
     monitor_server = getOODictField(MonitorServer)
@@ -45,6 +51,7 @@ class MonMachine(OODict):
 
 class Backend(OODict):
     """A cloud vm provider backend"""
+
     enabled = BoolField()
     machine_count = IntField()
     apiurl = StrField()
@@ -67,10 +74,47 @@ class Backend(OODict):
 
 class Keypair(OODict):
     """An ssh keypair."""
+
     public = StrField()
     private = StrField()
     default = BoolField()
     machines = ListField()
+
+    def generate(self):
+        """Generates a new RSA keypair and assignes to self."""
+
+        key = RSA.generate(2048, os.urandom)
+        self.private = key.exportKey()
+        self.public = key.exportKey('OpenSSH')
+
+    def isvalid(self):
+        """Checks if self is a valid RSA keypair."""
+
+        message = 'Message 1234567890'
+        if 'ssh-rsa' in self.public:
+            public_key_container = RSA.importKey(self.public)
+            private_key_container = RSA.importKey(self.private)
+            encrypted_message = public_key_container.encrypt(message, 0)
+            decrypted_message = private_key_container.decrypt(encrypted_message)
+            if message == decrypted_message:
+                return True
+        return False
+
+    def construct_public_from_private(self):
+        """Constructs pub key from self.private and assignes to self.public.
+        Only works for RSA.
+
+        """
+
+        if 'RSA' in self.private:
+            try:
+                key = RSA.importKey(self.private)
+                public = key.publickey().exportKey('OpenSSH')
+                self.public = public
+                return True
+            except:
+                pass
+        return False
 
     def __repr__(self):
         return super(Keypair, self).__repr__(['default', 'machines'])
@@ -81,6 +125,7 @@ class User(UserEngine):
     necessary to find and save users in memcache and in mongo.
     It transforms the user dict into an object with consistent
     attributes instead of inconsistent dict with missing keys.
+
     """
 
     email = StrField()
