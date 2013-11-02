@@ -17,18 +17,18 @@ define('app/controllers/backend_edit', [
                 
                 var monitoredMachines = this.backend.getMonitoredMachines();
                 if (monitoredMachines.length) {
-                    monitoredMachines.forEach(function(monitored_machine) {
-                        monitored_machine.changeMonitoring();
+                    monitoredMachines.forEach(function(machine) {
+                        machine.changeMonitoring();
                     });
                 }
                
-                var that = this;
                 $.ajax({
                     url: '/backends/' + this.backend.id,
                     type: 'DELETE',
                     success: function() {
-                        $('#edit-backend .ajax-loader').fadeOut(200);
+                        info('Successfully deleted backend:', this.backend.id);
                         $('#backend-delete-confirm').slideUp();
+                        $('#edit-backend .ajax-loader').fadeOut(200);
                         $('#button-confirm-disable').removeClass('ui-disabled');
                         Mist.backendsController.arrayContentWillChange();
                         Mist.backendsController.removeObject(that.backend);
@@ -39,21 +39,20 @@ define('app/controllers/backend_edit', [
                         $("#edit-backend").popup("close");
                     },
                     error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while deleting backend: ' + jqXHR.responseText);
                         $('#edit-backend .ajax-loader').fadeOut(200);
                         $('#button-confirm-disable').removeClass('ui-disabled');
-                        Mist.notificationController.notify('Error while deleting backend: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ' while deleting backend');
                     }
                 });
             },
 
             toggleBackend: function() {
-                var newStateToNum = $('#backend-toggle').val();
-                var newState = newStateToNum == "1" ? "True" : "False";
+                var newState = $('#backend-toggle').val();
+                var newStateToBoolean = (newState == "1" ? true : false);
+                var newStateToString = (newState == "1" ? "True" : "False");
                 var payload = {
-                    'newState': newState
+                    'newState': newStateToString
                 };
-                newState = newState == "True" ? true : false;
                 var that = this;
                 $.ajax({
                     url: '/backends/' + this.backend.id,
@@ -62,20 +61,12 @@ define('app/controllers/backend_edit', [
                     data: JSON.stringify(payload),
                     success: function() {
                         info('Successfully toggled backend');
-                        that.backend.set('enabled', newState);
-                        that.backend.toggle();
-                        Ember.run.next(function(){
-                            $('.backend-toggle').slider('refresh');
-                        });
+                        that.backend.set('enabled', newStateToBoolean);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while toggling backend: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ' while toggling backend');
-                        that.backend.set('enabled', !newState);
-                        that.backend.toggle();
                         Ember.run.next(function() {
-                            $('.backend-toggle').val(newStateToNum == "1" ? "0" : "1");
-                            $('.backend-toggle').slider('refresh');
+                            $('#backend-toggle').val(newState == "1" ? "0" : "1").slider('refresh');
                         });
                     }
                 });
