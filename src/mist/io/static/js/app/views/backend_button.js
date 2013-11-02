@@ -28,9 +28,11 @@ define('app/views/backend_button', ['ember'],
 
             click: function() {
                 var backend = this.backend;
+                $('#monitoring-message').hide();
+                $('#backend-delete-confirm').hide();
                 Mist.backendEditController.set('backend', backend);
-                $('select.ui-slider-switch option[value=1]')[0].selected = backend.enabled;
-                $('select.ui-slider-switch').slider('refresh');
+                $('#backend-toggle option[value=1]')[0].selected = backend.enabled;
+                $('#backend-toggle').slider('refresh');
                 $("#edit-backend").popup('option', 'positionTo', '#' + this.elementId).popup('open', {transition: 'pop'});
             }
         });
