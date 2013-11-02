@@ -41,6 +41,7 @@ define( 'app', [
     'app/controllers/confirmation',
     'app/controllers/notification',
     'app/controllers/backend_add',
+    'app/controllers/backend_edit',
     'app/controllers/machine_add',
     'app/controllers/key_add',
     'app/controllers/select_machines',
@@ -82,6 +83,7 @@ define( 'app', [
                 ConfirmationController,
                 NotificationController,
                 BackendAddController,
+                BackendEditController,
                 MachineAddController,
                 KeyAddController,
                 SelectMachinesController,
@@ -286,6 +288,7 @@ define( 'app', [
         App.MachineManageKeysListItemView = MachineManageKeysListItemView;
         
         App.set('backendAddController', BackendAddController.create());
+        App.set('backendEditController', BackendEditController.create());
         App.set('backendsController', BackendsController.create());
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());

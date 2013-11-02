@@ -17,16 +17,18 @@ define('app/views/backend_button', ['ember'],
                 if ('button' in $("#"+this.elementId)) {
                     Ember.run.next(this, function() {
                         $("#"+this.elementId).button();
+                        $('#backend-buttons').controlgroup('refresh');
                     });
-                }
-                if ('controlgroup' in $('#backend-buttons')) {
-                    $('#backend-buttons').controlgroup('refresh');
+                } else {
+                    Ember.run.later(this, function() {
+                        this.didInsertElement();
+                    }, 100);
                 }
             },
 
             click: function() {
-                var backend = this.get('backend');
-                Mist.set('backend', backend);
+                var backend = this.backend;
+                Mist.backendEditController.set('backend', backend);
                 $('select.ui-slider-switch option[value=1]')[0].selected = backend.enabled;
                 $('select.ui-slider-switch').slider('refresh');
                 $("#edit-backend").popup('option', 'positionTo', '#' + this.elementId).popup('open', {transition: 'pop'});

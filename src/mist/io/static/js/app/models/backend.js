@@ -109,8 +109,17 @@ define('app/models/backend', [
                 Ember.run.next(function() {
                     $('.backend-toggle').slider('refresh');
                 });
-            }.observes('enabled')
-        
+            }.observes('enabled'),
+
+            getMonitoredMachines: function(){
+                var monitoredMachines = [];
+                this.machines.forEach(function(machine_iter) {
+                    if (machine_iter.hasMonitoring) {
+                        monitoredMachines.push(machine_iter);
+                    }
+                });
+                return monitoredMachines;
+            },
         });
     }
 );

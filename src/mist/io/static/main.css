@@ -81,6 +81,10 @@ div#splash div.mist-logo {
     display: inline;
 }
 
+#backend-buttons .ui-controlgroup-controls .ui-btn {
+    border: 1px solid #C0C0C0;
+}
+
 /* Select Button */
 
 #machines #mist-select-machines-button {
@@ -1183,8 +1187,19 @@ div.loading-monitoring {
     display: none;
 }
 
-#edit-backend #backend-has-monitoring {
+#edit-backend #monitoring-message {
     margin-bottom: 1em;
+    margin-top: 1em;
+    display: block;
+}
+
+#backend-delete-confirm {
+    border-bottom: 1px solid #D0D0D0;
+    border-radius: 0;
+}
+
+#backend-delete-confirm .ui-btn {
+    width: 35%;
 }
 
 #edit-backend .btn-full {

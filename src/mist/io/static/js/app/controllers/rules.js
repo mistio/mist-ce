@@ -192,19 +192,19 @@ define('app/controllers/rules', [
                     $(event.currentTarget).find('.ui-slider').removeClass('open');
                     Mist.rulesController.changeRuleValue(event);
                 }
-                $('.ui-slider').on('tap', showSlider);
-                $('.ui-slider').on('click', showSlider);
-                $('.ui-slider').on('mouseover', showSlider);
+                $('.rules-container .ui-slider').on('tap', showSlider);
+                $('.rules-container .ui-slider').on('click', showSlider);
+                $('.rules-container .ui-slider').on('mouseover', showSlider);
                 $('#single-machine').on('tap', hideSlider);
-                $('.rule-box').on('mouseleave', hideSlider);
+                $('.rules-container .rule-box').on('mouseleave', hideSlider);
             },
 
             removeSliderEventHandlers: function() {
-                $('.ui-slider').off('tap');
-                $('.ui-slider').off('click');
-                $('.ui-slider').off('mouseover');
+                $('.rules-container .ui-slider').off('tap');
+                $('.rules-container .ui-slider').off('click');
+                $('.rules-container .ui-slider').off('mouseover');
                 $('#single-machine').off('tap');
-                $('.rule-box').off('mouseleave');
+                $('.rules-container .rule-box').off('mouseleave');
             },
 
             redrawRules: function() {
