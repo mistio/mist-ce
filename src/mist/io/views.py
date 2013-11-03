@@ -10,11 +10,11 @@ import json
 from pyramid.response import Response
 from pyramid.view import view_config
 
-from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
+from libcloud.compute.base import Node, NodeLocation
 from libcloud.compute.types import Provider
 from mist.io.shell import Shell
 
-from mist.io.config import STATES, SUPPORTED_PROVIDERS
+from mist.io.config import SUPPORTED_PROVIDERS
 from mist.io.config import EC2_IMAGES, EC2_PROVIDERS
 
 from mist.io.helpers import connect
@@ -193,7 +193,7 @@ def add_backend(request):
                                      apisecret, apiurl, tenant_name)
 
     backend = user.backends[backend_id]
-    return = {
+    return {
         'index': len(user.backends) - 1,
         'id': backend_id,
         'apikey': backend.apikey,
@@ -206,7 +206,6 @@ def add_backend(request):
         'status': 'off',
         'enabled': backend.enabled,
     }
-    return ret
 
 
 @view_config(route_name='backend_action', request_method='DELETE')
@@ -881,7 +880,7 @@ def generate_keypair(request):
 def associate_key(request):
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
-    machine_id =  = request.matchdict['machine']
+    machine_id = request.matchdict['machine']
     user = user_from_request(user)
     methods.associate_key(user, key_id, backend_id, machine_id)
     return user.keypairs[key_id].machines
@@ -891,7 +890,7 @@ def associate_key(request):
 def disassociate_key(request):
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
-    machine_id =  = request.matchdict['machine']
+    machine_id = request.matchdict['machine']
     user = user_from_request(user)
     methods.disassociate_key(user, key_id, backend_id, machine_id)
     return user.keypairs[key_id].machines
