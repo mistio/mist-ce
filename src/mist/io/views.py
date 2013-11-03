@@ -1,4 +1,5 @@
 """mist.io views"""
+
 import logging
 from time import time
 
@@ -219,7 +220,7 @@ def delete_backend(request):
 
     backend_id = request.matchdict['backend']
     user = user_from_request(request)
-    methods.delete_backends(user, backend_id)
+    methods.delete_backend(user, backend_id)
     return OK
 
 
@@ -243,7 +244,7 @@ def toggle_backend(request):
 
     user = user_from_request(request)
     if backend_id not in user.backends:
-        raise BackendNotFound()
+        raise BackendNotFoundError()
     with user.lock_n_load():
         user.backends[backend_id].enabled = new_state
         
@@ -881,7 +882,7 @@ def associate_key(request):
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-    user = user_from_request(user)
+    user = user_from_request(request)
     methods.associate_key(user, key_id, backend_id, machine_id)
     return user.keypairs[key_id].machines
 
@@ -891,7 +892,7 @@ def disassociate_key(request):
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-    user = user_from_request(user)
+    user = user_from_request(request)
     methods.disassociate_key(user, key_id, backend_id, machine_id)
     return user.keypairs[key_id].machines
 

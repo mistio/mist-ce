@@ -18,7 +18,7 @@ from mist.io.config import EC2_IMAGES, EC2_PROVIDERS, EC2_SECURITYGROUP
 from mist.io.config import LINODE_DATACENTERS
 
 
-from mist.io.model import User, Backend, Keypair
+from mist.io.model import Backend, Keypair
 from mist.io.exceptions import *
 
 
@@ -536,13 +536,21 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         node = create_machine_ec2(conn, key_id, private_key, public_key,
                                   script, machine_name, image, size, location)
     elif conn.type is Provider.NEPHOSCALE:
-        node = create_machine_nephoscale()
+        node = create_machine_nephoscale(conn, key_id, private_key, public_key,
+                                         script, machine_name, image, size,
+                                         location)
     elif conn.type is Provider.SOFTLAYER:
-        node = create_machine_softlayer()
+        node = create_machine_softlayer(conn, key_id, private_key, public_key,
+                                        script, machine_name, image, size,
+                                        location)
     elif conn.type is Provider.DIGITAL_OCEAN:
-        node = create_machine_digital_ocean()
+        node = create_machine_digital_ocean(conn, key_id, private_key,
+                                            public_key, script, machine_name,
+                                            image, size, location)
     elif conn.type is Provider.LINODE and private_key:
-        node = create_machine_linode()
+        node = create_machine_linode(conn, key_id, private_key, public_key,
+                                     script, machine_name, image, size,
+                                     location)
     else:
         raise BadRequestError()
 
@@ -559,7 +567,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
 
 def create_machine_openstack(conn, public_key, script, machine_name,
                              image, size, location):
-    """Create a machine in openstack.
+    """Create a machine in Openstack.
 
     Here there is no checking done, all parameters are expected to be
     sanitized by create_machine.
@@ -579,7 +587,7 @@ def create_machine_openstack(conn, public_key, script, machine_name,
 
 def create_machine_ec2(conn, key_name, private_key, public_key, script,
                        machine_name, image, size, location):
-    """Create a machine in amazon ec2.
+    """Create a machine in Amazon EC2.
 
     Here there is no checking done, all parameters are expected to be
     sanitized by create_machine.
@@ -587,13 +595,13 @@ def create_machine_ec2(conn, key_name, private_key, public_key, script,
     """
 
     # import key. This is supported only for EC2 at the moment.
-    (tmp_key, tmp_path) = tempfile.mkstemp()
-    key_fd = os.fdopen(tmp_key, 'w+b')
+    (tmp_key_fd, tmp_key_path) = tempfile.mkstemp()
+    key_fd = os.fdopen(tmp_key_fd, 'w+b')
     key_fd.write(public_key)
     key_fd.close()
     try:
         log.info("Attempting to import key (ec2-only)")
-        conn.ex_import_keypair(name=key_name, keyfile=tmp_path)
+        conn.ex_import_keypair(name=key_name, keyfile=tmp_key_path)
     except Exception as exc:
         if 'Duplicate' in exc.message:
             log.debug('Key already exists, not importing anything.')
@@ -601,7 +609,7 @@ def create_machine_ec2(conn, key_name, private_key, public_key, script,
             log.error('Failed to import key.')
             raise InternalServerError("Failed to import key (ec2-only)")
     finally:
-        os.remove(tmp_path)
+        os.remove(tmp_key_path)
 
     # create security group
     name = EC2_SECURITYGROUP.get('name', '')
@@ -618,8 +626,8 @@ def create_machine_ec2(conn, key_name, private_key, public_key, script,
             raise InternalServerError("Couldn't create security group")
 
     deploy_script = ScriptDeployment(script)
-    (tmp_key, tmp_key_path) = tempfile.mkstemp()
-    key_fd = os.fdopen(tmp_key, 'w+b')
+    (tmp_key_fd, tmp_key_path) = tempfile.mkstemp()
+    key_fd = os.fdopen(tmp_key_fd, 'w+b')
     key_fd.write(private_key)
     key_fd.close()
     #deploy_node wants path for ssh private key
@@ -639,156 +647,198 @@ def create_machine_ec2(conn, key_name, private_key, public_key, script,
     except Exception as e:
         raise MachineCreationError("EC2, got exception %s" % e)
     finally:
-        os.remove(tmp_path)
+        os.remove(tmp_key_path)
     return node
 
 
-def create_machine_nephoscale():
-    raise NotImplementedError()
+def create_machine_nephoscale(conn, key_name, private_key, public_key, script,
+                              machine_name, image, size, location):
+    """Create a machine in Nephoscale.
 
-    #~ machine_name = machine_name[:64].replace(' ','-')
-    #~ #name in NephoScale must start with a letter, can contain mixed 
-    #~ #alpha-numeric characters, hyphen ('-') and underscore ('_')
-    #~ # characters, cannot exceed 64 characters, and can end with a 
-    #~ # letter or a number."
-#~ 
-    #~ # Hostname must start with a letter, can contain mixed alpha-numeric
-    #~ # characters and the hyphen ('-') character, cannot exceed 15 characters,
-    #~ # and can end with a letter or a number.
-    #~ key = str(public_key).replace('\n','')
-    #~ deploy_script = ScriptDeployment(script)        
-    #~ 
-    #~ (tmp_key, tmp_key_path) = tempfile.mkstemp()
-    #~ key_fd = os.fdopen(tmp_key, 'w+b')
-    #~ key_fd.write(private_key)
-    #~ key_fd.close()
-#~ 
-    #~ #NephoScale has 2 keys that need be specified, console and ssh key
-    #~ #get the id of the ssh key if it exists, otherwise add the key
-    #~ try:
-        #~ server_key = ''        
-        #~ keys = conn.ex_list_keypairs(ssh=True, key_group=1)
-        #~ for k in keys:
-            #~ if key == k.public_key:
-                #~ server_key = k.id
-                #~ break
-        #~ if not server_key:
-            #~ server_key = conn.ex_create_keypair(machine_name, public_key=key)
-    #~ except:
-        #~ server_key = conn.ex_create_keypair('mistio'+str(random.randint(1,100000)), public_key=key)                          
-#~ 
-    #~ #mist.io does not support console key add through the wizzard. Try to add one    
-    #~ try:
-        #~ console_key = conn.ex_create_keypair('mistio'+str(random.randint(1,100000)), key_group=4)
-    #~ except:
-        #~ console_keys = conn.ex_list_keypairs(key_group=4)
-        #~ if console_keys:
-            #~ console_key = console_keys[0].id
-    #~ try:
-        #~ node = conn.deploy_node(name=machine_name,
-                         #~ hostname=machine_name[:15],
-                         #~ image=image,
-                         #~ size=size,
-                         #~ zone=location.id,                             
-                         #~ server_key=server_key,
-                         #~ console_key=console_key,
-                         #~ ssh_key=tmp_key_path,
-                         #~ connect_attempts=20,
-                         #~ ex_wait=True,
-                         #~ deploy=deploy_script)
-        #~ associate_key(request, key_id, backend_id, node.id, deploy=False)
-    #~ except Exception as e:
-        #~ return Response('Failed to create machine in NephoScale: %s' % e, 500)
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
 
+    """
 
-def create_machine_softlayer():
-    raise NotImplementedError()
-    #~ elif conn.type is Provider.SOFTLAYER and public_key:
-        #~ (tmp_key, tmp_key_path) = tempfile.mkstemp()
-        #~ key_fd = os.fdopen(tmp_key, 'w+b')
-        #~ key_fd.write(private_key)
-        #~ key_fd.close()
-        #~ key = SSHKeyDeployment(str(public_key))
-        #~ deploy_script = ScriptDeployment(script)
-        #~ msd = MultiStepDeployment([key, deploy_script])
-        #~ if '.' in machine_name:
-            #~ domain = '.'.join(machine_name.split('.')[1:])
-            #~ name=machine_name.split('.')[0]
-        #~ else:
-            #~ domain = None
-            #~ name=machine_name
-        #~ try:
-            #~ node = conn.deploy_node(name=name,
-                             #~ ex_domain=domain,
-                             #~ image=image,
-                             #~ size=size,
-                             #~ deploy=msd,
-                             #~ location=location,
-                             #~ ssh_key=tmp_key_path)
-            #~ associate_key(request, key_id, backend_id, node.id, deploy=False)
-        #~ except Exception as e:
-            #~ return Response('Failed to create machine in SoftLayer: %s' % e, 500)
+    machine_name = machine_name[:64].replace(' ', '-')
+    # name in NephoScale must start with a letter, can contain mixed 
+    # alpha-numeric characters, hyphen ('-') and underscore ('_')
+    # characters, cannot exceed 64 characters, and can end with a 
+    # letter or a number."
+
+    # Hostname must start with a letter, can contain mixed alpha-numeric
+    # characters and the hyphen ('-') character, cannot exceed 15 characters,
+    # and can end with a letter or a number.
+    key = public_key.replace('\n','')
+    deploy_script = ScriptDeployment(script)        
+
+    # NephoScale has 2 keys that need be specified, console and ssh key
+    # get the id of the ssh key if it exists, otherwise add the key
+    try:
+        server_key = ''        
+        keys = conn.ex_list_keypairs(ssh=True, key_group=1)
+        for k in keys:
+            if key == k.public_key:
+                server_key = k.id
+                break
+        if not server_key:
+            server_key = conn.ex_create_keypair(machine_name, public_key=key)
+    except:
+        server_key = conn.ex_create_keypair(
+            'mistio' + str(random.randint(1,100000)),
+            public_key=key)                          
+
+    # mist.io does not support console key add through the wizzard.
+    # Try to add one    
+    try:
+        console_key = conn.ex_create_keypair(
+            'mistio' + str(random.randint(1,100000)),
+            key_group=4)
+    except:
+        console_keys = conn.ex_list_keypairs(key_group=4)
+        if console_keys:
+            console_key = console_keys[0].id
+
+    (tmp_key_fd, tmp_key_path) = tempfile.mkstemp()
+    key_fd = os.fdopen(tmp_key_fd, 'w+b')
+    key_fd.write(private_key)
+    key_fd.close()
+
+    try:
+        node = conn.deploy_node(
+            name=machine_name,
+            hostname=machine_name[:15],
+            image=image,
+            size=size,
+            zone=location.id,                             
+            server_key=server_key,
+            console_key=console_key,
+            ssh_key=tmp_key_path,
+            connect_attempts=20,
+            ex_wait=True,
+            deploy=deploy_script
+        )
+    except Exception as e:
+        raise MachineCreationError("Nephoscale, got exception %s" % e)
+    finally:
+        os.remove(tmp_key_path)
+    return node
 
 
-def create_machine_digital_ocean():
-    raise NotImplementedError()
-    #~ elif conn.type is Provider.DIGITAL_OCEAN and public_key:
-        #~ key = str(public_key).replace('\n','')
-        #~ deploy_script = ScriptDeployment(script)
-        #~ 
-        #~ (tmp_key, tmp_key_path) = tempfile.mkstemp()
-        #~ key_fd = os.fdopen(tmp_key, 'w+b')
-        #~ key_fd.write(private_key)
-        #~ key_fd.close()
-#~ 
-        #~ try:
-            #~ key = conn.ex_create_ssh_key(machine_name, key)
-        #~ except:
-            #~ key = conn.ex_create_ssh_key('mist.io', key)
-#~ 
-        #~ try:
-            #~ node = conn.deploy_node(name=machine_name,
-                             #~ image=image,
-                             #~ size=size,
-                             #~ ex_ssh_key_ids=[str(key.id)],
-                             #~ location=location,
-                             #~ ssh_key=tmp_key_path,
-                             #~ ssh_alternate_usernames=['root']*5,
-                             #~ #attempt to fix the Connection reset by peer exception
-                             #~ #that is (most probably) created due to a race condition
-                             #~ #while deploy_node establishes a connection and the 
-                             #~ #ssh server is restarted on the created node
-                             #~ private_networking=True,
-                             #~ deploy=deploy_script)
-            #~ associate_key(request, key_id, backend_id, node.id, deploy=False)
-        #~ except Exception as e:
-            #~ return Response('Failed to create machine in DigitalOcean: %s' % e, 500)
+def create_machine_softlayer(conn, key_name, private_key, public_key, script,
+                             machine_name, image, size, location):
+    """Create a machine in Softlayer.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+
+    key = SSHKeyDeployment(public_key)
+    deploy_script = ScriptDeployment(script)
+    msd = MultiStepDeployment([key, deploy_script])
+    if '.' in machine_name:
+        domain = '.'.join(machine_name.split('.')[1:])
+        name=machine_name.split('.')[0]
+    else:
+        domain = None
+        name=machine_name
+    (tmp_key_fd, tmp_key_path) = tempfile.mkstemp()
+    key_fd = os.fdopen(tmp_key_fd, 'w+b')
+    key_fd.write(private_key)
+    key_fd.close()
+    try:
+        node = conn.deploy_node(
+            name=name,
+            ex_domain=domain,
+            image=image,
+            size=size,
+            deploy=msd,
+            location=location,
+            ssh_key=tmp_key_path
+        )
+    except Exception as e:
+        raise MachineCreationError("Softlayer, got exception %s" % e)
+    finally:
+        os.remove(tmp_key_path)
+    return node
 
 
-def create_machine_linode():
-    raise NotImplementedError()
-        #~ elif conn.type is Provider.LINODE and public_key and private_key:
-        #~ auth = NodeAuthSSHKey(public_key)
-#~ 
-        #~ (tmp_key, tmp_key_path) = tempfile.mkstemp()
-        #~ key_fd = os.fdopen(tmp_key, 'w+b')
-        #~ key_fd.write(private_key)
-        #~ key_fd.close()
-#~ 
-        #~ deploy_script = ScriptDeployment(script)
-        #~ try:
-            #~ node = conn.deploy_node(name=machine_name,
-                             #~ image=image,
-                             #~ size=size,
-                             #~ deploy=deploy_script,
-                             #~ location=location,
-                             #~ auth=auth,
-                             #~ ssh_key=tmp_key_path)
-            #~ associate_key(request, key_id, backend_id, node.id, deploy=True)
-        #~ except Exception as e:
-            #~ return Response('Failed to create machine in Linode: %s' % e, 500)
-    #~ else:
-        #~ return Response('Cannot create a machine without a keypair', 400)
+def create_machine_digital_ocean(conn, key_name, private_key, public_key,
+                                 script, machine_name, image, size, location):
+    """Create a machine in Digital Ocean.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+
+    key = public_key.replace('\n','')
+    deploy_script = ScriptDeployment(script)
+
+    try:
+        key = conn.ex_create_ssh_key(machine_name, key)
+    except:
+        key = conn.ex_create_ssh_key('mist.io', key)
+
+    (tmp_key_fd, tmp_key_path) = tempfile.mkstemp()
+    key_fd = os.fdopen(tmp_key_fd, 'w+b')
+    key_fd.write(private_key)
+    key_fd.close()
+    try:
+        node = conn.deploy_node(
+            name=machine_name,
+            image=image,
+            size=size,
+            ex_ssh_key_ids=[str(key.id)],
+            location=location,
+            ssh_key=tmp_key_path,
+            ssh_alternate_usernames=['root']*5,
+            #attempt to fix the Connection reset by peer exception
+            #that is (most probably) created due to a race condition
+            #while deploy_node establishes a connection and the 
+            #ssh server is restarted on the created node
+            private_networking=True,
+            deploy=deploy_script
+        )
+    except Exception as e:
+        raise MachineCreationError("Digital Ocean, got exception %s" % e)
+    finally:
+        os.remove(tmp_key_path)
+    return node
+
+
+def create_machine_linode(conn, key_name, private_key, public_key, script,
+                          machine_name, image, size, location):
+    """Create a machine in Linode.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+
+    auth = NodeAuthSSHKey(public_key)
+    deploy_script = ScriptDeployment(script)
+
+    (tmp_key_fd, tmp_key_path) = tempfile.mkstemp()
+    key_fd = os.fdopen(tmp_key_fd, 'w+b')
+    key_fd.write(private_key)
+    key_fd.close()
+    try:
+        node = conn.deploy_node(
+            name=machine_name,
+            image=image,
+            size=size,
+            deploy=deploy_script,
+            location=location,
+            auth=auth,
+            ssh_key=tmp_key_path
+        )
+    except Exception as e:
+        raise MachineCreationError("Linode, got exception %s" % e)
+    finally:
+        os.remove(tmp_key_path)
+    return node
 
 
 def _machine_action(user, backend_id, machine_id, action):
@@ -859,7 +909,7 @@ def stop_machine(user, backend_id, machine_id):
 def reboot_machine(user, backend_id, machine_id):
     """Reboots a machine on a certain backend."""
 
-    _machine_action(user, backend_id, machind_id, 'reboot')
+    _machine_action(user, backend_id, machine_id, 'reboot')
 
 
 def destroy_machine(user, backend_id, machine_id):

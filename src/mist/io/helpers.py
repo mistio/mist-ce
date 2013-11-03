@@ -26,6 +26,7 @@ from mist.io.model import User
 
 log = logging.getLogger(__name__)
 
+
 @contextmanager
 def get_user(request, readonly=False, refresh=False, ext_auth=False):
     """Use it like this:
@@ -33,8 +34,6 @@ def get_user(request, readonly=False, refresh=False, ext_auth=False):
             code....
     It will automagically clean up and save the data to the session and the database
     """
-
-
 
     # FIXME: This is a temporary hack until migration is completed. get_user
     # will then be deleted
