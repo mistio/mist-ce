@@ -168,10 +168,10 @@ def edit_key(user, new_key, old_key):
     """
 
     if not new_key:
-        raise RequiredParameterNotProvidedError("New key name not provided")
+        raise RequiredParameterMissingError("New key name not provided")
 
     if not old_key:
-        raise RequiredParameterNotProvidedError("Key to be edited not provided")
+        raise RequiredParameterMissingError("Key to be edited not provided")
 
     if old_key == new_key:
         log.warning("Same name provided, will not edit key.No reason")
@@ -332,10 +332,105 @@ def undeploy_key(request, keypair):
     #~ return ret
 
 
+def connect_provider(backend):
+    """Establishes backend connection using the credentials specified.
+
+    It has been tested with:
+
+        * EC2, and the alternative providers like EC2_EU,
+        * Rackspace, old style and the new Nova powered one,
+        * Openstack Diablo through Trystack, should also try Essex,
+        * Linode
+
+    """
+
+    driver = get_driver(backend.provider)
+    if backend.provider == Provider.OPENSTACK:
+        conn = driver(
+            backend.apikey,
+            backend.apisecret,
+            ex_force_auth_version=backend.auth_version or '2.0_password',
+            ex_force_auth_url=backend.apiurl,
+            ex_tenant_name=backend.tenant_name)
+    elif backend.provider == Provider.LINODE:
+        conn = driver(backend.apisecret)
+    elif backend.provider in [Provider.RACKSPACE_FIRST_GEN,
+                              Provider.RACKSPACE]:
+        conn = driver(backend.apikey, backend.apisecret,
+                      region=backend.region)
+    elif backend.provider in [Provider.NEPHOSCALE,
+                              Provider.DIGITAL_OCEAN,
+                              Provider.SOFTLAYER]:
+        conn = driver(backend.apikey, backend.apisecret)
+    else:
+        # ec2
+        conn = driver(backend.apikey, backend.apisecret)
+        # Account for sub-provider regions (EC2_US_WEST, EC2_US_EAST etc.)
+        conn.type = backend.provider
+    return conn
+
+
+def get_machine_actions(machine_from_api, conn):
+    """Returns available machine actions based on backend type.
+
+    Rackspace, Linode and openstack support the same options, but EC2 also
+    supports start/stop.
+
+    The available actions are based on the machine state. The state
+    codes supported by mist.io are those of libcloud, check config.py.
+
+    """
+
+    # defaults for running state
+    can_start = False
+    can_stop = False
+    can_destroy = True
+    can_reboot = True
+    can_tag = True
+
+    if conn.type in EC2_PROVIDERS:
+        can_stop = True
+
+    if conn.type in [Provider.NEPHOSCALE,
+                     Provider.DIGITAL_OCEAN,
+                     Provider.SOFTLAYER]:
+        can_stop = True
+
+    if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE, 
+                     Provider.NEPHOSCALE, Provider.SOFTLAYER,
+                     Provider.DIGITAL_OCEAN):
+        can_tag = False
+
+    # for other states
+    if machine_from_api.state in (NodeState.REBOOTING, NodeState.PENDING):
+        can_start = False
+        can_stop = False
+        can_reboot = False
+    elif machine_from_api.state is NodeState.UNKNOWN:
+        # We assume uknown state mean stopped
+        if conn.type in (Provider.NEPHOSCALE, Provider.SOFTLAYER,
+                         Provider.DIGITAL_OCEAN) or conn.type in EC2_PROVIDERS:
+            can_stop = False
+            can_start = True
+        can_reboot = False
+    elif machine_from_api.state in (NodeState.TERMINATED,):
+        can_start = False
+        can_destroy = False
+        can_stop = False
+        can_reboot = False
+        can_tag = False
+
+    return {'can_stop': can_stop,
+            'can_start': can_start,
+            'can_destroy': can_destroy,
+            'can_reboot': can_reboot,
+            'can_tag': can_tag}
+
+
 def list_machines(user, backend_id):
     if backend_id not in user.backends:
         raise BackendNotFoundError()
-    conn = connect(user.backends[backend_id])
+    conn = connect_provider(user.backends[backend_id])
 
     try:
         machines = conn.list_nodes()
@@ -404,7 +499,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
 
     if backend_id not in user.backends:
         raise BackendNotFoundError()
-    conn = connect(user.backends[backend_id])
+    conn = connect_provider(user.backends[backend_id])
 
     if key_id and key_id not in user.keypairs:
         raise KeypairNotFoundError()
@@ -696,96 +791,93 @@ def create_machine_linode():
         #~ return Response('Cannot create a machine without a keypair', 400)
 
 
-def get_machine_actions(machine_from_api, conn):
-    """Returns available machine actions based on backend type.
-
-    Rackspace, Linode and openstack support the same options, but EC2 also
-    supports start/stop.
-
-    The available actions are based on the machine state. The state
-    codes supported by mist.io are those of libcloud, check config.py.
+def _machine_action(user, backend_id, machine_id, action):
+    """Start, stop, reboot and destroy have the same logic underneath, the only
+    thing that changes is the action. This helper function saves us some code.
 
     """
 
-    # defaults for running state
-    can_start = False
-    can_stop = False
-    can_destroy = True
-    can_reboot = True
-    can_tag = True
+    actions = ('start', 'stop', 'reboot', 'destroy')
+    if action not in actions:
+        raise BadRequestError("Action '%s' should be one of %s" % (action,
+                                                                   actions))
 
-    if conn.type in EC2_PROVIDERS:
-        can_stop = True
-
-    if conn.type in [Provider.NEPHOSCALE,
-                     Provider.DIGITAL_OCEAN,
-                     Provider.SOFTLAYER]:
-        can_stop = True
-
-    if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE, 
-                     Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                     Provider.DIGITAL_OCEAN):
-        can_tag = False
-
-    # for other states
-    if machine_from_api.state in (NodeState.REBOOTING, NodeState.PENDING):
-        can_start = False
-        can_stop = False
-        can_reboot = False
-    elif machine_from_api.state is NodeState.UNKNOWN:
-        # We assume uknown state mean stopped
-        if conn.type in (Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                         Provider.DIGITAL_OCEAN) or conn.type in EC2_PROVIDERS:
-            can_stop = False
-            can_start = True
-        can_reboot = False
-    elif machine_from_api.state in (NodeState.TERMINATED,):
-        can_start = False
-        can_destroy = False
-        can_stop = False
-        can_reboot = False
-        can_tag = False
-
-    return {'can_stop': can_stop,
-            'can_start': can_start,
-            'can_destroy': can_destroy,
-            'can_reboot': can_reboot,
-            'can_tag': can_tag}
+    if backend_id not in user.backends:
+        raise BackendNotFoundError()
+    conn = connect_provider(user.backends[backend_id])
+    machine = Node(machine_id,
+                   name=machine_id,
+                   state=0,
+                   public_ips=[],
+                   private_ips=[],
+                   driver=conn)
+    try:
+        if action is 'start':
+            # In liblcoud it is not possible to call this with machine.start()
+            conn.ex_start_node(machine)
+        elif action is 'stop':
+            # In libcloud it is not possible to call this with machine.stop()
+            conn.ex_stop_node(machine)
+        elif action is 'reboot':
+            machine.reboot()
+        elif action is 'destroy':
+            machine.destroy()
+    except AttributeError:
+        raise BadRequestError("Action %s not supported for this machine"
+                              % action)
+    except Exception as e:
+        raise InternalServerError("Error while attempting to %s machine"
+                                  % action)
 
 
-def connect(backend):
-    """Establishes backend connection using the credentials specified.
+def start_machine(user, backend_id, machine_id):
+    """Starts a machine on backends that support it.
 
-    It has been tested with:
-
-        * EC2, and the alternative providers like EC2_EU,
-        * Rackspace, old style and the new Nova powered one,
-        * Openstack Diablo through Trystack, should also try Essex,
-        * Linode
+    Currently only EC2 supports that.
+    .. note:: Normally try won't get an AttributeError exception because this
+              action is not allowed for machines that don't support it. Check
+              helpers.get_machine_actions.
 
     """
 
-    driver = get_driver(backend.provider)
-    if backend.provider == Provider.OPENSTACK:
-        conn = driver(
-            backend.apikey,
-            backend.apisecret,
-            ex_force_auth_version=backend.auth_version or '2.0_password',
-            ex_force_auth_url=backend.apiurl,
-            ex_tenant_name=backend.tenant_name)
-    elif backend.provider == Provider.LINODE:
-        conn = driver(backend.apisecret)
-    elif backend.provider in [Provider.RACKSPACE_FIRST_GEN,
-                              Provider.RACKSPACE]:
-        conn = driver(backend.apikey, backend.apisecret,
-                      region=backend.region)
-    elif backend.provider in [Provider.NEPHOSCALE,
-                              Provider.DIGITAL_OCEAN,
-                              Provider.SOFTLAYER]:
-        conn = driver(backend.apikey, backend.apisecret)
-    else:
-        # ec2
-        conn = driver(backend.apikey, backend.apisecret)
-        # Account for sub-provider regions (EC2_US_WEST, EC2_US_EAST etc.)
-        conn.type = backend.provider
-    return conn
+    _machine_action(user, backend_id, machine_id, 'start')
+
+
+def stop_machine(user, backend_id, machine_id):
+    """Stops a machine on backends that support it.
+
+    Currently only EC2 supports that.
+    .. note:: Normally try won't get an AttributeError exception because this
+              action is not allowed for machines that don't support it. Check
+              helpers.get_machine_actions.
+
+    """
+
+    _machine_action(user, backend_id, machine_id, 'stop')
+
+
+def reboot_machine(user, backend_id, machine_id):
+    """Reboots a machine on a certain backend."""
+
+    _machine_action(user, backend_id, machind_id, 'reboot')
+
+
+def destroy_machine(user, backend_id, machine_id):
+    """Destroys a machine on a certain backend.
+
+    After destroying a machine it also deletes all key associations. However,
+    it doesn't undeploy the keypair. There is no need to do it because the
+    machine will be destroyed.
+
+    """
+
+    _machine_action(user, backend_id, machine_id, 'destroy')
+
+    pair = [backend_id, machine_id]
+    with user.lock_n_load():
+        for key_id in user.keypairs:
+            keypair = user.keypairs[key_id]
+            for machine in keypair.machines:
+                if machine[:2] == pair:
+                    disassociate_key(user, key_id, backend_id,
+                                     machine_id, undeploy=False)

@@ -9,10 +9,10 @@ Functions in views.py
     def toggle_backend():
     def list_machines():                OK
     def create_machine():               IN PROGRESS: DR
-    def start_machine():
-    def stop_machine():
-    def reboot_machine():
-    def destroy_machine():
+    def start_machine():                OK? untested
+    def stop_machine():                 OK? untested
+    def reboot_machine():               OK? untested
+    def destroy_machine():              OK? untested
     def set_machine_metadata():
     def delete_machine_metadata():
     def shell_command():
@@ -22,16 +22,14 @@ Functions in views.py
     def star_image():
     def list_sizes():
     def list_locations():
-    def list_keys():
+    def list_keys():                    OK? untested
     def add_key():                      OK
     def delete_key():                   OK
     def edit_key():                     OK
-    def set_default_key_request():      OK
-    def get_private_key_request():      OK
-    def get_public_key_request():       OK
-    def generate_keypair_request():     OK
-    def associate_key_request():        IN PROGRESS: DR
-    def disassociate_key_request():     TODO: DR
+    def set_default_key():              OK
+    def get_private_key():              OK
+    def get_public_key():               OK
+    def generate_keypair():             OK
     def check_monitoring():
     def update_monitoring():
     def update_rule():

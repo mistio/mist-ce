@@ -23,6 +23,9 @@ transformed to appropriate http responses.
 
 All exceptions should be named CamelCase and always use the Error suffix.
 
+Using proper subclassing allows for selective handling, logging etc in the
+exception handler.
+
 """
 
 
@@ -41,14 +44,16 @@ class BaseError(Exception):
         super(BaseError, self).__init__(msg)
 
 
+# BAD REQUESTS
 class BadRequestError(BaseError):
     msg = "Bad Request"
 
 
-class RequiredParameterNotProvidedError(BaseError):
+class RequiredParameterMissingError(BadRequestError):
     msg = "Required parameter not provided"
 
 
+# UNAUTHORIZED
 class UnauthorizedError(BaseError):
     msg = "Not authorized"
 
@@ -61,14 +66,17 @@ class MachineUnauthorizedError(UnauthorizedError):
     msg = "Couldn't authenticate to machine"
 
 
+# FORBIDDEN
 class ForbiddenError(BaseError):
     msg = "Forbidden"
 
 
+# CONFLICT
 class ConflictError(BaseError):
     msg = "Conflict"
 
 
+# NOT FOUND
 class NotFoundError(BaseError):
     msg = "Not Found"
 
@@ -85,10 +93,12 @@ class MachineNotFoundError(NotFoundError):
     msg = "Machine not found"
 
 
+# NOT ALLOWED
 class MethodNotAllowedError(BaseError):
     msg = "Method Not Allowed"
 
 
+# INTERNAL ERROR
 class InternalServerError(BaseError):
     msg = "Internal Server Error"
 

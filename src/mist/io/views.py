@@ -36,10 +36,10 @@ log = logging.getLogger(__name__)
 
 
 def user_from_request(request):
-    user = User()
-    if user is None:
-        raise UnauthorizedError()
-    return user
+    return User()
+
+
+OK = Response("OK", 200)
 
 
 @view_config(context=BaseError)
@@ -87,32 +87,36 @@ def home(request):
 @view_config(route_name="check_auth", request_method='POST', renderer="json")
 def check_auth(request):
     "Check on the mist.core service if authenticated"
+
     params = request.json_body
     email = params.get('email', '').lower()
     password = params.get('password', '')
     timestamp = params.get('timestamp', '')
     hash_key = params.get('hash', '')
 
-    payload = {'email': email, 'password': password, 'timestamp': timestamp, 'hash_key': hash_key}
+    payload = {'email': email, 'password': password,
+               'timestamp': timestamp, 'hash_key': hash_key}
     core_uri = request.registry.settings['core_uri']
     ret = requests.post(core_uri + '/auth', params=payload, verify=False)
 
     if ret.status_code == 200:
         ret = json.loads(ret.content)
-        with get_user(request) as user:
-            user['email'] = email
-            user['password'] = password
+        user = user_from_request(request)
+        with user.lock_n_load():
+            user.email = email
+            user.password = password
+            user.save()
         request.registry.settings['auth'] = 1
         log.info("succesfully check_authed")
         return ret
     else:
-        return Response('Unauthorized', 401)
-        
+        raise UnauthorizedError()
+
 
 @view_config(route_name='account', request_method='POST', renderer='json')
 def update_user_settings(request, renderer='json'):
-    """try free plan, by communicating to the mist.core service
-    """
+    """try free plan, by communicating to the mist.core service"""
+
     params = request.json_body
     action = params.get('action', '').lower()
     plan = params.get('plan', '')
@@ -140,7 +144,7 @@ def update_user_settings(request, renderer='json'):
         ret = json.loads(ret.content)
         return ret
     else:
-        return Response('Unauthorized', 401)
+        raise UnauthorizedError()
 
 
 @view_config(route_name='backends', request_method='GET', renderer='json')
@@ -150,6 +154,7 @@ def list_backends(request):
     .. note:: Currently, this is only used by the backend controller in js.
 
     """
+
     user = user_from_request(request)
     ret = []
     for backend_id in user.backends:
@@ -166,7 +171,7 @@ def list_backends(request):
                     'datacenter': backend.datacenter,
                     'enabled': backend.enabled,
                      })
-        return ret
+    return ret
 
 
 @view_config(route_name='backends', request_method='POST', renderer='json')
@@ -181,22 +186,25 @@ def add_backend(request):
     apiurl = params.get('apiurl', '')
     tenant_name = params.get('tenant_name', '')
 
+    # TODO: check if all necessary information was provided in the request
+
     user = user_from_request(request)
     backend_id = methods.add_backend(user, title, provider, apikey,
                                      apisecret, apiurl, tenant_name)
 
     backend = user.backends[backend_id]
-    ret = {'index': len(user.backends) - 1,
-           'id': backend_id,
-           'apikey': backend.apikey,
-           'apiurl': backend.apiurl,
-           'tenant_name': backend.tenant_name,
-           'title': backend.title,
-           'provider': backend.provider,
-           'poll_interval': backend.poll_interval,
-           'region': backend.region,
-           'status': 'off',
-           'enabled': backend.enabled,
+    return = {
+        'index': len(user.backends) - 1,
+        'id': backend_id,
+        'apikey': backend.apikey,
+        'apiurl': backend.apiurl,
+        'tenant_name': backend.tenant_name,
+        'title': backend.title,
+        'provider': backend.provider,
+        'poll_interval': backend.poll_interval,
+        'region': backend.region,
+        'status': 'off',
+        'enabled': backend.enabled,
     }
     return ret
 
@@ -209,10 +217,11 @@ def delete_backend(request):
               any key associations.
 
     """
+
     backend_id = request.matchdict['backend']
     user = user_from_request(request)
     methods.delete_backends(user, backend_id)
-    return Response("OK", 200)
+    return OK
 
 
 @view_config(route_name='backend_action', request_method='POST')
@@ -220,15 +229,18 @@ def toggle_backend(request):
     backend_id = request.matchdict['backend']
     new_state = request.json_body.get('newState', '')
     if not new_state:
-        raise BadRequestError('New backend state not provided')
+        raise RequiredParameterMissingError('new_state')
 
-    #FIXME
+    # FIXME
     if new_state == "True":
         new_state = True
     elif new_state == "False":
         new_state = False
     else:
-        raise BadRequestError('Invalid backend state')
+        #~ raise BadRequestError('Invalid backend state')
+        log.warning("something funcky going on with state toggling, "
+                    "what's '%r' supposed to mean?", new_state)
+        new_state = True
 
     user = user_from_request(request)
     if backend_id not in user.backends:
@@ -241,21 +253,8 @@ def toggle_backend(request):
 
 @view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
-    """Gets machines and their metadata from a backend.
+    """Gets machines and their metadata from a backend."""
 
-    Several checks are needed, because each backend stores metadata
-    differently.
-
-    The folowing are considered:::
-
-        * For tags, Rackspace stores them in extra.metadata.tags while EC2 in
-          extra.tags.tags.
-        * For images, both EC2 and Rackpace have an image and an etra.imageId
-          attribute
-        * For flavors, EC2 has an extra.instancetype attribute while Rackspace
-          an extra.flavorId. however we also expect to get size attribute.
-
-    """
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
     return methods.list_machines(user, backend_id)
@@ -279,7 +278,7 @@ def create_machine(request):
         image_extra = request.json_body['image_extra']
         disk = request.json_body['disk']
     except Exception as e:
-        raise RequiredParameterNotProvidedError()
+        raise RequiredParameterMissingError(e)
 
     user = user_from_request(request)
     ret = methods.create_machine(user, backend_id, key_id, machine_name,
@@ -291,70 +290,22 @@ def create_machine(request):
 @view_config(route_name='machine', request_method='POST',
              request_param='action=start', renderer='json')
 def start_machine(request):
-    """Starts a machine on backends that support it.
-
-    Currently only EC2 supports that.
-
-    .. note:: Normally try won't get an AttributeError exception because this
-              action is not allowed for machines that don't support it. Check
-              helpers.get_machine_actions.
-
-    """
-    try:
-        conn = connect(request)
-    except:
-        return Response('Backend not found', 404)
-
+    """Starts a machine on backends that support it."""
+    backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-    machine = Node(machine_id,
-                   name=machine_id,
-                   state=0,
-                   public_ips=[],
-                   private_ips=[],
-                   driver=conn)
-    try:
-        # In liblcoud it is not possible to call this with machine.start()
-        conn.ex_start_node(machine)
-        return Response('Success', 200)
-    except AttributeError:
-        return Response('Action not supported for this machine', 404)
-    except:
-        return []
+    user = user_from_request(request)
+    methods.start_machine(user, backend_id, machine_id)
+    return OK
 
 
 @view_config(route_name='machine', request_method='POST',
              request_param='action=stop', renderer='json')
 def stop_machine(request):
-    """Stops a machine on backends that support it.
-
-    Currently only EC2 supports that.
-
-    .. note:: Normally try won't get an AttributeError exception because this
-              action is not allowed for machines that don't support it. Check
-              helpers.get_machine_actions.
-
-    """
-    try:
-        conn = connect(request)
-    except:
-        return Response('Backend not found', 404)
-
+    backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-    machine = Node(machine_id,
-                   name=machine_id,
-                   state=0,
-                   public_ips=[],
-                   private_ips=[],
-                   driver=conn)
-
-    try:
-        # In libcloud it is not possible to call this with machine.stop()
-        conn.ex_stop_node(machine)
-        return Response('Success', 200)
-    except AttributeError:
-        return Response('Action not supported for this machine', 404)
-    except:
-        return []
+    user = user_from_request(request)
+    methods.stop_machine(user, backend_id, machine_id)
+    return OK
 
 
 @view_config(route_name='machine', request_method='POST',
@@ -362,32 +313,11 @@ def stop_machine(request):
 def reboot_machine(request, backend_id=None, machine_id=None):
     """Reboots a machine on a certain backend."""
 
-    if not backend_id:
-        try:
-            backend_id = request.matchdict['backend']
-        except:
-            Response('Bad Request', 400)
-    try:
-        conn = connect(request, backend_id=backend_id)
-    except:
-        return Response('Backend not found', 404)
-
-    if not machine_id:
-        try:
-            machine_id = request.matchdict['machine']
-        except:
-            Response('Bad Request', 400)
-
-    machine = Node(machine_id,
-                   name=machine_id,
-                   state=0,
-                   public_ips=[],
-                   private_ips=[],
-                   driver=conn)
-
-    machine.reboot()
-
-    return Response('Success', 200)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    user = user_from_request(request)
+    methods.reboot_machine(user, backend_id, machine_id)
+    return OK
 
 
 @view_config(route_name='machine', request_method='POST',
@@ -395,48 +325,15 @@ def reboot_machine(request, backend_id=None, machine_id=None):
 def destroy_machine(request, backend_id=None, machine_id=None):
     """Destroys a machine on a certain backend.
 
-    After destroying a machine it also deletes all key associations. However,
-    it doesn't undeploy the keypair. There is no need to do it because the
-    machine will be destroyed.
+    After destroying a machine it also deletes all key associations.
 
     """
-    if not backend_id:
-        try:
-            backend_id = request.matchdict['backend']
-        except:
-            Response('Bad Request', 400)
-    try:
-        conn = connect(request, backend_id=backend_id)
-    except:
-        return Response('Backend not found', 404)
 
-    if not machine_id:
-        try:
-            machine_id = request.matchdict['machine']
-        except:
-            Response('Bad Request', 400)
-
-    machine = Node(machine_id,
-                   name=machine_id,
-                   state=0,
-                   public_ips=[],
-                   private_ips=[],
-                   driver=conn)
-
-    machine.destroy()
-
-    pair = [backend_id, machine_id]
-    
-    with get_user(request, readonly=True) as user:
-        keypairs = user.get('keypairs', {})
-
-    for key in keypairs:
-        machines = keypairs[key].get('machines', [])
-        for machine in machines:
-            if pair==machine[:2]:
-                disassociate_key(request, key, backend_id, machine_id, undeploy=False)
-
-    return Response('Success', 200)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    user = user_from_request(request)
+    methods.destroy_machine(user, backend_id, machine_id)
+    return OK
 
 
 @view_config(route_name='machine_metadata', request_method='POST',
@@ -872,14 +769,14 @@ def list_keys(request):
     keys are returned.
     
     """
-    with get_user(request, readonly=True) as user:
-        keypairs = user.get('keypairs', {})
+
+    user = user_from_request(request)
     
     return [{'id': key.replace(' ', ''),
              'name': key,
-             'machines': keypairs[key].get('machines',[]),
-             'default_key': keypairs[key].get('default', False)}
-             for key in keypairs.keys()]
+             'machines': user.keypairs[key].machines,
+             'default_key': user.keypairs[key].default}
+             for key in user.keypairs]
 
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
@@ -955,10 +852,11 @@ def get_private_key(request):
     user = user_from_request(request)
     key_id = request.matchdict['key']
     if not key_id:
-        raise RequiredParameterNotProvidedError("key_id")
+        raise RequiredParameterMissingError("key_id")
     if not key_id in user.keypairs:
         raise KeypairNotFoundError(key_id)
     return user.keypairs[key_id].private
+
 
 @view_config(route_name='key_action', request_method='GET',
              request_param='action=public', renderer='json')
@@ -966,10 +864,11 @@ def get_public_key(request):
     user = user_from_request(request)
     key_id = request.matchdict['key']
     if not key_id:
-        raise RequiredParameterNotProvidedError("key_id")
+        raise RequiredParameterMissingError("key_id")
     if not key_id in user.keypairs:
         raise KeypairNotFoundError(key_id)
     return user.keypairs[key_id].public
+
 
 @view_config(route_name='keys', request_method='POST', renderer='json')
 def generate_keypair(request):
