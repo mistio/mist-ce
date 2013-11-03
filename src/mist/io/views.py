@@ -1,8 +1,5 @@
 """mist.io views"""
-#~ import os
-#~ import tempfile
 import logging
-#~ import random
 from time import time
 
 from datetime import datetime
@@ -10,30 +7,21 @@ from datetime import datetime
 import requests
 import json
 
-#~ from hashlib import sha256
-
 from pyramid.response import Response
 from pyramid.view import view_config
 
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
-#~ from libcloud.compute.base import NodeAuthSSHKey
-#~ from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
-#~ from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider
-#~ from libcloud.common.types import InvalidCredsError
 from mist.io.shell import Shell
 
 from mist.io.config import STATES, SUPPORTED_PROVIDERS
 from mist.io.config import EC2_IMAGES, EC2_PROVIDERS
-#~ from mist.io.config import EC2_SECURITYGROUP
-#~ from mist.io.config import LINODE_DATACENTERS
 
 from mist.io.helpers import connect
-#~ from mist.io.helpers import generate_backend_id
 from mist.io.helpers import get_preferred_keypairs
 from mist.io.helpers import run_command
 
-from mist.io.helpers import get_ssh_user_from_keypair, get_auth_key #set_default_key,
+from mist.io.helpers import get_ssh_user_from_keypair, get_auth_key
 
 from mist.io import methods
 from mist.io.exceptions import *
@@ -95,30 +83,6 @@ def home(request):
             'js_log_level': js_log_level,
             'google_analytics_id': google_analytics_id}
 
-#~ OLD
-#~ @view_config(route_name='home', request_method='GET',
-             #~ renderer='templates/home.pt')
-#~ def home(request):
-    #~ """Gets all the basic data for backends, project name and session status.
-#~ 
-    #~ """
-    #~ with get_user(request, readonly=True) as user:
-        #~ email = user.get('email', '')
-    #~ core_uri = request.registry.settings['core_uri']
-    #~ auth = request.registry.settings.get('auth', 0)
-    #~ js_build = request.registry.settings['js_build']
-    #~ js_log_level = request.registry.settings['js_log_level']
-    #~ google_analytics_id = request.registry.settings['google_analytics_id']
-#~ 
-    #~ return {'project': 'mist.io',
-            #~ 'email': email,
-            #~ 'supported_providers': SUPPORTED_PROVIDERS,
-            #~ 'core_uri': core_uri,
-            #~ 'auth': auth,
-            #~ 'js_build': js_build,
-            #~ 'js_log_level': js_log_level,
-            #~ 'google_analytics_id': google_analytics_id}
-            #~ 
 
 @view_config(route_name="check_auth", request_method='POST', renderer="json")
 def check_auth(request):
@@ -204,35 +168,6 @@ def list_backends(request):
                      })
         return ret
 
-#~  OLD
-#~ @view_config(route_name='backends', request_method='GET', renderer='json')
-#~ def list_backends(request):
-    #~ """Gets the available backends.
-#~ 
-    #~ .. note:: Currently, this is only used by the backend controller in js.
-#~ 
-    #~ """
-    #~ with get_user(request) as user:
-        #~ if not user:
-            #~ return Response('Unauthorized', 401)
-        #~ ret = []
-        #~ for backend_id in user['backends']:
-            #~ backend = user['backends'][backend_id]
-            #~ ret.append({'id': backend_id,
-                        #~ 'apikey': backend.get('apikey', None),
-                        #~ 'title': backend.get('title', backend['provider']),
-                        #~ 'provider': backend['provider'],
-                        #~ 'poll_interval': backend.get('poll_interval', 10000),
-                        #~ 'state': 'wait',
-                        #~ # for Provider.RACKSPACE_FIRST_GEN
-                        #~ 'region': backend.get('region', None),
-                        #~ # for Provider.RACKSPACE (the new Nova provider)
-                        #~ 'datacenter': backend.get('datacenter', None),
-                        #~ 'enabled': backend.get('enabled', True),
-                         #~ })
-#~ 
-        #~ return ret
-
 
 @view_config(route_name='backends', request_method='POST', renderer='json')
 def add_backend(request):
@@ -265,67 +200,6 @@ def add_backend(request):
     }
     return ret
 
-    #~  OLD
-    #~ params = request.json_body
-    #~ title = params.get('title', '0')
-    #~ provider = params.get('provider', '0')
-    #~ apikey = params.get('apikey', '')
-    #~ apisecret = params.get('apisecret', '')
-    #~ apiurl = params.get('apiurl', '')
-    #~ tenant_name = params.get('tenant_name', '')
-    #~ with get_user(request) as user:
-        #~ if not user:
-            #~ return Response('Unauthorized', 401)
-        #~ backends = user['backends']
-        #~ 
-        #~ if apisecret == 'getsecretfromdb':
-            #~ for backend_id in backends:
-                #~ backend = backends[backend_id]
-                #~ if backend.get('apikey', None) == apikey:
-                    #~ apisecret = backend.get('apisecret', None)
-                    #~ 
-        #~ region = ''
-        #~ if not provider.__class__ is int and ':' in provider:
-            #~ region = provider.split(':')[1]
-            #~ provider = provider.split(':')[0]
-#~ 
-        #~ if not provider or not apikey or not apisecret:
-            #~ return Response('Invalid backend data', 400)
-#~ 
-        #~ backend_id = generate_backend_id(provider, region, apikey)
-        #~ 
-        #~ if backend_id in backends:
-            #~ return Response('Backend exists', 409)
-#~ 
-        #~ backend = {'title': title,
-                   #~ 'provider': provider,
-                   #~ 'apikey': apikey,
-                   #~ 'apisecret': apisecret,
-                   #~ 'apiurl': apiurl,
-                   #~ 'tenant_name': tenant_name,
-                   #~ 'region': region,
-                   #~ 'poll_interval': request.registry.settings['default_poll_interval'],
-                   #~ 'starred': [],
-                   #~ 'enabled': True,
-                  #~ }
-#~ 
-        #~ backends[backend_id] = backend
-#~ 
-        #~ ret = {'index'        : len(user['backends']) - 1,
-                #~ 'id'           : backend_id,
-                #~ 'apikey'       : backend['apikey'],
-                #~ 'apiurl'       : backend['apiurl'],
-                #~ 'tenant_name'  : backend['tenant_name'],
-                #~ 'title'        : backend['title'],
-                #~ 'provider'     : backend['provider'],
-                #~ 'poll_interval': backend['poll_interval'],
-                #~ 'region'       : backend['region'],
-                #~ 'status'       : 'off',
-                #~ 'enabled'      : True,
-                #~ }
-        #~ 
-        #~ return ret
-
 
 @view_config(route_name='backend_action', request_method='DELETE')
 def delete_backend(request):
@@ -339,30 +213,6 @@ def delete_backend(request):
     user = user_from_request(request)
     methods.delete_backends(user, backend_id)
     return Response("OK", 200)
-
-    #~ @view_config(route_name='backend_action', request_method='DELETE',
-             #~ renderer='json')
-#~  OLD
-#~ def delete_backend(request):
-    #~ """Deletes a backend.
-#~ 
-    #~ .. note:: It assumes the user may re-add it later so it does not remove
-              #~ any key associations.
-#~ 
-    #~ """
-    #~ with get_user(request) as user:
-        #~ if not user:
-            #~ return Response('Unauthorized', 401)
-#~ 
-        #~ backend_id = request.matchdict['backend']
-        #~ backends = user.get('backends', None)
-#~ 
-        #~ if not backends or not backend_id or not backend_id in backends:
-            #~ return Response('Bad Request', 400)
-#~ 
-        #~ del backends[backend_id]
-#~ 
-    #~ return Response('OK', 200)
 
 
 @view_config(route_name='backend_action', request_method='POST')
@@ -410,72 +260,6 @@ def list_machines(request):
     backend_id = request.matchdict['backend']
     return methods.list_machines(user, backend_id)
 
-#~ OLD
-#~ @view_config(route_name='machines', request_method='GET', renderer='json')
-#~ def list_machines(request):
-    #~ """Gets machines and their metadata from a backend.
-#~ 
-    #~ Several checks are needed, because each backend stores metadata
-    #~ differently.
-#~ 
-    #~ The folowing are considered:::
-#~ 
-        #~ * For tags, Rackspace stores them in extra.metadata.tags while EC2 in
-          #~ extra.tags.tags.
-        #~ * For images, both EC2 and Rackpace have an image and an etra.imageId
-          #~ attribute
-        #~ * For flavors, EC2 has an extra.instancetype attribute while Rackspace
-          #~ an extra.flavorId. however we also expect to get size attribute.
-#~ 
-    #~ """
-    #~ try:
-        #~ conn = connect(request)
-    #~ except RuntimeError as e:
-        #~ log.error(e)
-        #~ return Response('Internal server error: %s' % e, 503)
-    #~ except:
-        #~ return Response('Backend not found', 404)
-#~ 
-    #~ try:
-        #~ machines = conn.list_nodes()
-    #~ except InvalidCredsError:
-        #~ return Response('Invalid credentials', 401)
-    #~ except:
-        #~ return Response('Backend unavailable', 503)
-#~ 
-    #~ ret = []
-    #~ for m in machines:
-        #~ tags = m.extra.get('tags', None) or m.extra.get('metadata', None)
-        #~ tags = tags or {}
-        #~ tags = [value for key, value in tags.iteritems() if key != 'Name']
-#~ 
-        #~ if m.extra.get('availability', None):
-            #~ # for EC2
-            #~ tags.append(m.extra['availability'])
-        #~ elif m.extra.get('DATACENTERID', None):
-            #~ # for Linode
-            #~ tags.append(LINODE_DATACENTERS[m.extra['DATACENTERID']])
-#~ 
-        #~ image_id = m.image or m.extra.get('imageId', None)
-#~ 
-        #~ size = m.size or m.extra.get('flavorId', None)
-        #~ size = size or m.extra.get('instancetype', None)
-#~ 
-        #~ machine = {'id'            : m.id,
-                   #~ 'uuid'          : m.get_uuid(),
-                   #~ 'name'          : m.name,
-                   #~ 'imageId'       : image_id,
-                   #~ 'size'          : size,
-                   #~ 'state'         : STATES[m.state],
-                   #~ 'private_ips'   : m.private_ips,
-                   #~ 'public_ips'    : m.public_ips,
-                   #~ 'tags'          : tags,
-                   #~ 'extra'         : m.extra,
-                  #~ }
-        #~ machine.update(get_machine_actions(m, conn))
-        #~ ret.append(machine)
-    #~ 
-    #~ return ret
 
 @view_config(route_name='machines', request_method='POST', renderer='json')
 def create_machine(request):
@@ -502,246 +286,6 @@ def create_machine(request):
                                  location_id, image_id, size_id, script,
                                  image_extra, disk)
     return ret
-
-#OLD
-
-    #~ try:
-        #~ conn = connect(request)
-    #~ except:
-        #~ return Response('Backend not found', 404)
-#~ 
-    #~ backend_id = request.matchdict['backend']
-#~ 
-    #~ try:
-        #~ key_id = request.json_body['key']
-    #~ except:
-        #~ key_id = None
-#~ 
-    #~ with get_user(request, readonly=True) as user:
-        #~ keypairs = user['keypairs']
-#~ 
-    #~ if key_id:
-        #~ keypair = get_keypair_by_name(keypairs, key_id)
-    #~ else:
-        #~ keypair = get_keypair(keypairs)
-#~ 
-    #~ if keypair:
-        #~ private_key = keypair['private']
-        #~ public_key = keypair['public']
-    #~ else:
-        #~ private_key = public_key = None
-#~ 
-    #~ try:
-        #~ machine_name = request.json_body['name']
-        #~ location_id = request.json_body.get('location', None)
-        #~ image_id = request.json_body['image']
-        #~ size_id = request.json_body['size']
-        #~ #deploy_script received as unicode, but ScriptDeployment wants str
-        #~ script = str(request.json_body.get('script', ''))
-        #~ # these are required only for Linode, passing them anyway
-        #~ image_extra = request.json_body['image_extra']
-        #~ disk = request.json_body['disk']
-    #~ except Exception as e:
-        #~ return Response('Invalid payload', 400)
-#~ 
-    #~ size = NodeSize(size_id, name='', ram='', disk=disk, bandwidth='',
-                    #~ price='', driver=conn)
-    #~ image = NodeImage(image_id, name='', extra=image_extra, driver=conn)
-#~ 
-    #~ location = NodeLocation(location_id, name='', country='', driver=conn)
-    #~ if conn.type in EC2_PROVIDERS:
-        #~ locations = conn.list_locations()
-        #~ for loc in locations:
-            #~ if loc.id == location_id:
-                #~ location = loc
-                #~ break
-#~ 
-    #~ if conn.type in [Provider.RACKSPACE_FIRST_GEN, 
-                     #~ Provider.RACKSPACE, 
-                     #~ Provider.OPENSTACK] and public_key:
-        #~ key = SSHKeyDeployment(str(public_key))
-        #~ deploy_script = ScriptDeployment(script)
-        #~ msd = MultiStepDeployment([key, deploy_script])
-        #~ try:
-            #~ node = conn.deploy_node(name=machine_name,
-                             #~ image=image,
-                             #~ size=size,
-                             #~ location=location,
-                             #~ deploy=msd)
-            #~ associate_key(request, key_id, backend_id, node.id, deploy=False)
-        #~ except Exception as e:
-            #~ return Response('Failed to create machine in Rackspace: %s' % e, 500)
-    #~ elif conn.type in EC2_PROVIDERS and public_key and private_key:
-        #~ imported_key = import_key(conn, public_key, key_id)
-        #~ created_security_group = create_security_group(conn, EC2_SECURITYGROUP)
-        #~ deploy_script = ScriptDeployment(script)
-#~ 
-        #~ (tmp_key, tmp_key_path) = tempfile.mkstemp()
-        #~ key_fd = os.fdopen(tmp_key, 'w+b')
-        #~ key_fd.write(private_key)
-        #~ key_fd.close()
-        #~ #deploy_node wants path for ssh private key
-        #~ if imported_key and created_security_group:
-            #~ try:
-                #~ node = conn.deploy_node(name=machine_name,
-                                 #~ image=image,
-                                 #~ size=size,
-                                 #~ deploy=deploy_script,
-                                 #~ location=location,
-                                 #~ ssh_key=tmp_key_path,
-                                 #~ ssh_alternate_usernames=['ec2-user', 'ubuntu'],
-                                 #~ max_tries=1,
-                                 #~ ex_keyname=key_id,
-                                 #~ ex_securitygroup=EC2_SECURITYGROUP['name'])
-                #~ associate_key(request, key_id, backend_id, node.id, deploy=False)
-            #~ except Exception as e:
-                #~ return Response('Failed to create machine in EC2: %s' % e, 500)
-    #~ elif conn.type is Provider.NEPHOSCALE and public_key:
-        #~ machine_name = machine_name[:64].replace(' ','-')
-        #~ #name in NephoScale must start with a letter, can contain mixed 
-        #~ #alpha-numeric characters, hyphen ('-') and underscore ('_')
-        #~ # characters, cannot exceed 64 characters, and can end with a 
-        #~ #letter or a number."
-#~ 
-        #~ #Hostname must start with a letter, can contain mixed alpha-numeric
-        #~ # characters and the hyphen ('-') character, cannot exceed 15 characters,
-        #~ # and can end with a letter or a number.
-        #~ key = str(public_key).replace('\n','')
-        #~ deploy_script = ScriptDeployment(script)        
-        #~ 
-        #~ (tmp_key, tmp_key_path) = tempfile.mkstemp()
-        #~ key_fd = os.fdopen(tmp_key, 'w+b')
-        #~ key_fd.write(private_key)
-        #~ key_fd.close()
-#~ 
-        #~ #NephoScale has 2 keys that need be specified, console and ssh key
-        #~ #get the id of the ssh key if it exists, otherwise add the key
-        #~ try:
-            #~ server_key = ''        
-            #~ keys = conn.ex_list_keypairs(ssh=True, key_group=1)
-            #~ for k in keys:
-                #~ if key == k.public_key:
-                    #~ server_key = k.id
-                    #~ break
-            #~ if not server_key:
-                #~ server_key = conn.ex_create_keypair(machine_name, public_key=key)
-        #~ except:
-            #~ server_key = conn.ex_create_keypair('mistio'+str(random.randint(1,100000)), public_key=key)                          
-#~ 
-        #~ #mist.io does not support console key add through the wizzard. Try to add one    
-        #~ try:
-            #~ console_key = conn.ex_create_keypair('mistio'+str(random.randint(1,100000)), key_group=4)
-        #~ except:
-            #~ console_keys = conn.ex_list_keypairs(key_group=4)
-            #~ if console_keys:
-                #~ console_key = console_keys[0].id
-        #~ try:
-            #~ node = conn.deploy_node(name=machine_name,
-                             #~ hostname=machine_name[:15],
-                             #~ image=image,
-                             #~ size=size,
-                             #~ zone=location.id,                             
-                             #~ server_key=server_key,
-                             #~ console_key=console_key,
-                             #~ ssh_key=tmp_key_path,
-                             #~ connect_attempts=20,
-                             #~ ex_wait=True,
-                             #~ deploy=deploy_script)
-            #~ associate_key(request, key_id, backend_id, node.id, deploy=False)
-        #~ except Exception as e:
-            #~ return Response('Failed to create machine in NephoScale: %s' % e, 500)
-    #~ elif conn.type is Provider.SOFTLAYER and public_key:
-        #~ (tmp_key, tmp_key_path) = tempfile.mkstemp()
-        #~ key_fd = os.fdopen(tmp_key, 'w+b')
-        #~ key_fd.write(private_key)
-        #~ key_fd.close()
-        #~ key = SSHKeyDeployment(str(public_key))
-        #~ deploy_script = ScriptDeployment(script)
-        #~ msd = MultiStepDeployment([key, deploy_script])
-        #~ if '.' in machine_name:
-            #~ domain = '.'.join(machine_name.split('.')[1:])
-            #~ name=machine_name.split('.')[0]
-        #~ else:
-            #~ domain = None
-            #~ name=machine_name
-        #~ try:
-            #~ node = conn.deploy_node(name=name,
-                             #~ ex_domain=domain,
-                             #~ image=image,
-                             #~ size=size,
-                             #~ deploy=msd,
-                             #~ location=location,
-                             #~ ssh_key=tmp_key_path)
-            #~ associate_key(request, key_id, backend_id, node.id, deploy=False)
-        #~ except Exception as e:
-            #~ return Response('Failed to create machine in SoftLayer: %s' % e, 500)
-    #~ elif conn.type is Provider.DIGITAL_OCEAN and public_key:
-        #~ key = str(public_key).replace('\n','')
-        #~ deploy_script = ScriptDeployment(script)
-        #~ 
-        #~ (tmp_key, tmp_key_path) = tempfile.mkstemp()
-        #~ key_fd = os.fdopen(tmp_key, 'w+b')
-        #~ key_fd.write(private_key)
-        #~ key_fd.close()
-#~ 
-        #~ try:
-            #~ key = conn.ex_create_ssh_key(machine_name, key)
-        #~ except:
-            #~ key = conn.ex_create_ssh_key('mist.io', key)
-#~ 
-        #~ try:
-            #~ node = conn.deploy_node(name=machine_name,
-                             #~ image=image,
-                             #~ size=size,
-                             #~ ex_ssh_key_ids=[str(key.id)],
-                             #~ location=location,
-                             #~ ssh_key=tmp_key_path,
-                             #~ ssh_alternate_usernames=['root']*5,
-                             #~ #attempt to fix the Connection reset by peer exception
-                             #~ #that is (most probably) created due to a race condition
-                             #~ #while deploy_node establishes a connection and the 
-                             #~ #ssh server is restarted on the created node
-                             #~ private_networking=True,
-                             #~ deploy=deploy_script)
-            #~ associate_key(request, key_id, backend_id, node.id, deploy=False)
-        #~ except Exception as e:
-            #~ return Response('Failed to create machine in DigitalOcean: %s' % e, 500)            
-    #~ elif conn.type is Provider.LINODE and public_key and private_key:
-        #~ auth = NodeAuthSSHKey(public_key)
-#~ 
-        #~ (tmp_key, tmp_key_path) = tempfile.mkstemp()
-        #~ key_fd = os.fdopen(tmp_key, 'w+b')
-        #~ key_fd.write(private_key)
-        #~ key_fd.close()
-#~ 
-        #~ deploy_script = ScriptDeployment(script)
-        #~ try:
-            #~ node = conn.deploy_node(name=machine_name,
-                             #~ image=image,
-                             #~ size=size,
-                             #~ deploy=deploy_script,
-                             #~ location=location,
-                             #~ auth=auth,
-                             #~ ssh_key=tmp_key_path)
-            #~ associate_key(request, key_id, backend_id, node.id, deploy=True)
-        #~ except Exception as e:
-            #~ return Response('Failed to create machine in Linode: %s' % e, 500)
-    #~ else:
-        #~ return Response('Cannot create a machine without a keypair', 400)
-#~ 
-    #~ #remove temp file with private key
-    #~ try:
-        #~ os.remove(tmp_key_path)
-    #~ except:
-        #~ pass
-#~ 
-    #~ return {'id': node.id,
-            #~ 'name': node.name,
-            #~ 'extra': node.extra,
-            #~ 'public_ips': node.public_ips,
-            #~ 'private_ips': node.private_ips,
-            #~ }
-    #~ 
 
 
 @view_config(route_name='machine', request_method='POST',
@@ -1353,28 +897,6 @@ def add_key(request):
             'name': key_id,
             'machines': keypair.machines,
             'default': keypair.default}
-    #OLD
-    #with get_user(request) as user:
-    #    keypairs = user.get('keypairs',{})
-    #
-    #    if key_id in keypairs:
-    #        return Response('Keypair "%s" exists' % key_id, 400)
-    #
-    #    key = {'public' : generate_public_key(private_key),
-    #           'private' : private_key,
-    #           'default' : not len(keypairs),
-    #           'machines': []}
-    #
-    #    if not validate_keypair(key['public'], key['private']):
-    #        # User probably gave an invalid private key
-    #        return Response('Invalid private key', 400)
-    #
-    #    keypairs[key_id] = key
-    #
-    #    return {'id': key_id,
-    #            'name': key_id,
-    #            'machines': [],
-    #            'default_key': key['default']}
 
 
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
@@ -1396,21 +918,7 @@ def delete_key(request):
         return Response('Keypair name not provided', 400)
 
     user = user_from_request(request)
-
     methods.delete_key(user, key_id)
-    #OLD
-    #with get_user(request) as user:
-    #    keypairs = user.get('keypairs',{})
-    #
-    #    if not key_id in keypairs.keys():
-    #        return Response('Keypair "%s" not found', 404)
-    #
-    #    key = keypairs.pop(key_id)
-    #
-    #    if key.get('default', False):
-    #        if len(keypairs):
-    #            new_default_key = keypairs.keys()[0]
-    #            keypairs[new_default_key]['default'] = True
         
     return list_keys(request)
 
@@ -1425,34 +933,6 @@ def edit_key(request):
     methods.edit_key(user, key_id, old_id)
 
     return Response('OK', 200)
-    #OLD
-    #if not old_id:
-    #    return Response('Old keypair name not provided', 400)
-    #
-    #if not key_id:
-    #    return Response('New keypair name not provided', 400)
-    #
-    #if old_id == key_id:
-    #    return Response('Keypair is already named: %s' % key_id, 304)
-    #
-    #with get_user(request) as user:
-    #    keypairs = user.get('keypairs',{})
-    #
-    #    if not old_id in keypairs:
-    #        return Response('Keypair "%s" not found' % old_id, 404)
-    #
-    #    if key_id in keypairs:
-    #        return Response('Keypair "%s" exists' % key_id, 400)
-    #
-    #    key = {'public': keypairs[old_id]['public'],
-    #            'private': keypairs[old_id]['private'],
-    #            'default': keypairs[old_id].get('default', False),
-    #            'machines': keypairs[old_id]['machines']}
-    #
-    #    keypairs.pop(old_id)
-    #    keypairs[key_id] = key
-    #
-    #return Response('OK', 200)
 
 
 @view_config(route_name='key_action', request_method='POST', renderer='json')
@@ -1464,7 +944,7 @@ def set_default_key_request(request):
     return Response('OK', 200)
 
 @view_config(route_name='key_action', request_method='GET', request_param='action=private', renderer='json')
-def get_private_key_request(request):
+def get_private_key(request):
     """Gets private key from keypair name.
 
     It is used in single key view when the user clicks the display private key
@@ -1480,8 +960,9 @@ def get_private_key_request(request):
         raise KeypairNotFoundError(key_id)
     return user.keypairs[key_id].private
 
-@view_config(route_name='key_action', request_method='GET', request_param='action=public', renderer='json')
-def get_public_key_request(request):
+@view_config(route_name='key_action', request_method='GET',
+             request_param='action=public', renderer='json')
+def get_public_key(request):
     user = user_from_request(request)
     key_id = request.matchdict['key']
     if not key_id:
@@ -1491,25 +972,30 @@ def get_public_key_request(request):
     return user.keypairs[key_id].public
 
 @view_config(route_name='keys', request_method='POST', renderer='json')
-def generate_keypair_request(request):
+def generate_keypair(request):
     keypair = Keypair()
     keypair.generate()
     return {'priv': keypair.private}
 
+
 @view_config(route_name='key_association', request_method='PUT', renderer='json')
-def associate_key_request(request):
-    return associate_key(request,
-                         request.matchdict['key'],
-                         request.matchdict['backend'],
-                         request.matchdict['machine'])
+def associate_key(request):
+    key_id = request.matchdict['key']
+    backend_id = request.matchdict['backend']
+    machine_id =  = request.matchdict['machine']
+    user = user_from_request(user)
+    methods.associate_key(user, key_id, backend_id, machine_id)
+    return user.keypairs[key_id].machines
 
 
 @view_config(route_name='key_association', request_method='DELETE', renderer='json')
-def disassociate_key_request(request):
-    return disassociate_key(request,
-                            request.matchdict['key'],
-                            request.matchdict['backend'],
-                            request.matchdict['machine'])
+def disassociate_key(request):
+    key_id = request.matchdict['key']
+    backend_id = request.matchdict['backend']
+    machine_id =  = request.matchdict['machine']
+    user = user_from_request(user)
+    methods.disassociate_key(user, key_id, backend_id, machine_id)
+    return user.keypairs[key_id].machines
 
 
 @view_config(route_name='monitoring', request_method='GET', renderer='json')
@@ -1695,105 +1181,6 @@ def save_keypair(request, key_id, backend_id, machine_id, timestamp, ssh_user, s
                 log.debug("Machines are : %s" % keypair.get('machines', []))
 
         return True
-
-
-def associate_key(request, key_id, backend_id, machine_id, deploy=True):
-    """Associates a key with a machine.
-
-    If deploy is set to True it will also attempt to actually deploy it to the
-    machine.
-
-    """
-    log.debug("Associate key, deploy = %s" % deploy)
-    
-    if not key_id:
-        return Response('Keypair name not provided', 400)
-    
-    if not machine_id:
-        return Response('Machine id not provided', 400)
-    
-    if not backend_id:
-        return Response('Backend id not provided', 400)
-
-    with get_user(request) as user:
-        keypairs = user.get('keypairs',{})
-
-        if not key_id in keypairs:
-            return Response('Keypair "%s" not found' % key_id, 404)
-
-        keypair = keypairs[key_id]
-
-        machine_uid = [backend_id, machine_id]
-        machines = keypair.get('machines', [])
-        
-        for machine in machines:
-            if machine[:2] == machine_uid:
-                log.debug('Keypair "%s" already associated with machine "%s"' % (key_id, machine_id))
-                return keypair['machines']
-        try:
-            keypair['machines'].append(machine_uid)
-        except KeyError: 
-            # initialize machine associations array if it does not exist
-            keypair['machines'] = [machine_uid]
-            
-    if deploy:
-        ret = deploy_key(request, keypair)
-    
-        if ret:
-            keypair['machines'][-1] += [int(time()), ret.get('ssh_user', ''), ret.get('sudoer', False)]
-            log.debug("Associate key, %s" % keypair['machines'])
-            return keypair['machines']
-        else:
-            if machine_uid in keypair['machines']:
-                keypair['machines'].remove(machine_uid)
-            log.debug("Disassociate key, %s" % keypair['machines'])
-            
-            return Response('Failed to deploy key', 412)
-    else:
-        return keypair['machines']
-
-
-def disassociate_key(request, key_id, backend_id, machine_id, undeploy=True):
-    """Disassociates a key from a machine.
-
-    If undeploy is set to True it will also attempt to actually remove it from
-    the machine.
-
-    """
-    if not key_id:
-        return Response('Keypair name not provided', 400)
-    
-    if not machine_id:
-        return Response('Machine id not provided', 400)
-    
-    if not backend_id:
-        return Response('Backend id not provided', 400)
-
-    with get_user(request) as user:
-        keypairs = user.get('keypairs',{})
-        try:
-            keypair = keypairs[key_id]
-        except KeyError:
-            return Response('Keypair not found', 404)
-
-        machine_uid = [backend_id, machine_id]
-        machines = keypair.get('machines', [])
-
-        key_found = False
-        for machine in machines:
-            if machine[:2] == machine_uid:
-                keypair['machines'].remove(machine)
-                key_found = True
-                break
-
-    #key not associated
-    if not key_found: 
-        return Response('Keypair "%s" is not associated with machine "%s"' % (key_id, machine_id), 304)
-
-    if undeploy:
-        ret = undeploy_key(request, keypair)
-
-        return keypair['machines']
 
 
 def deploy_key(request, keypair):

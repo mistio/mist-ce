@@ -105,8 +105,9 @@ def add_key(user, key_id, private_key):
 
 
 def delete_key(user, key_id):
-    """
-    Deletes given keypair. If key was default, then it checks
+    """Deletes given keypair.
+
+    If key was default, then it checks
     if there are still keys left and assignes another one as default.
 
     @param user: The User
@@ -132,12 +133,12 @@ def delete_key(user, key_id):
 
 
 def set_default_key(user, key_id):
-    """
-    Sets a new default key
+    """Sets a new default key
 
     @param user: The user
     @param key_id: The id of the key we want to set as default
     @return: Nothing. Raises only exceptions if needed.
+
     """
 
     if not key_id:
@@ -233,59 +234,39 @@ def associate_key(user, key_id, backend_id, machine_id, deploy=True):
 
 
 def disassociate_key(user, key_id, backend_id, machine_id, undeploy=True):
-    raise NotImplementedError()
-    #~ """Disassociates a key from a machine.
-#~ 
-    #~ If undeploy is set to True it will also attempt to actually remove it from
-    #~ the machine.
-#~ 
-    #~ """
-#~ 
-    #~ log.info("Disassociate key, undeploy = %s" % undeploy)
-    #~ 
-    #~ if key_id not in user.keypairs:
-        #~ raise KeypairNotFoundError(key_id)
-    #~ if backend_id not in user.backends:
-        #~ raise BackendNotFoundError(backend_id)
-#~ 
-    #~ keypair = user.keypairs[key_id]
-    #~ machine_uid = [backend_id, machine_id]
-#~ 
-#~ 
-    #~ if not key_id:
-        #~ return Response('Keypair name not provided', 400)
-    #~ 
-    #~ if not machine_id:
-        #~ return Response('Machine id not provided', 400)
-    #~ 
-    #~ if not backend_id:
-        #~ return Response('Backend id not provided', 400)
-#~ 
-    #~ with get_user(request) as user:
-        #~ keypairs = user.get('keypairs',{})
-        #~ try:
-            #~ keypair = keypairs[key_id]
-        #~ except KeyError:
-            #~ return Response('Keypair not found', 404)
-#~ 
-        #~ machine_uid = [backend_id, machine_id]
-        #~ machines = keypair.get('machines', [])
-#~ 
-        #~ key_found = False
-        #~ for machine in machines:
-            #~ if machine[:2] == machine_uid:
-                #~ keypair['machines'].remove(machine)
-                #~ key_found = True
-                #~ break
-#~ 
-    #~ #key not associated
-    #~ if not key_found: 
-        #~ return Response('Keypair "%s" is not associated with machine "%s"' % (key_id, machine_id), 304)
-#~ 
-    #~ if undeploy:
-        #~ ret = undeploy_key(request, keypair)
-#~ 
-        #~ return keypair['machines']
+    """Disassociates a key from a machine.
+
+    If undeploy is set to True it will also attempt to actually remove it from
+    the machine.
+
+    """
+
+    log.info("Disassociate key, undeploy = %s" % undeploy)
+    
+    if key_id not in user.keypairs:
+        raise KeypairNotFoundError(key_id)
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+
+    keypair = user.keypairs[key_id]
+    machine_uid = [backend_id, machine_id]
+    key_found = False
+    with user.lock_n_load():
+        keypair = user.keypairs[key_id]
+        for machine in keypair.machines:
+            if machine[:2] == machine_uid:
+                keypair.machines.remove(machine)
+                user.save()
+                key_found = True
+                break
+
+    #key not associated
+    if not key_found: 
+        raise BadRequestError("Keypair '%s' is not associated with "
+                              "machine '%s'" % (key_id, machine_id), 304)
+
+    if undeploy:
+        pass
 
 
 def deploy_key(user, keypair):
