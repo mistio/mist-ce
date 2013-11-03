@@ -4,7 +4,7 @@ define('app/controllers/machines', [
     'jquery'
     ],
     /**
-     * Machines controller
+     * Machines Controller
      *
      * @returns Class
      */
@@ -13,10 +13,9 @@ define('app/controllers/machines', [
 
             content: [],
             backend: null,
-            
+
             init: function() {
                 this._super();
-                this.set('content', []);
                 this.refresh();
             },
             
@@ -25,13 +24,13 @@ define('app/controllers/machines', [
             }.observes('content.length'),
 
             refresh: function() {
-
+                
                 if(!this.backend.enabled) {
                     return;
                 }
-
+                
                 var that = this;
-
+                
                 this.backend.set('state', 'waiting');
                 this.backend.set('loadingMachines', true);
                 $.getJSON('/backends/' + this.backend.id + '/machines', function(data) {
@@ -83,7 +82,7 @@ define('app/controllers/machines', [
                                 }
                             }
                         });
-
+                        
                         if (!found && !that.backend.create_pending) {
                             item.backend = that.backend;
                             var machine = Machine.create(item);
@@ -96,16 +95,16 @@ define('app/controllers/machines', [
                     
                     that.content.forEach(function(item) {
                         var found = false;
-
+                        
                         data.forEach(function(machine) {
                             log("machine id: " + machine.id);
-
+                            
                             if (machine.id == item.id) {
                                 found = true;
                                 return false;
                             }
                         });
-
+                        
                         if (!found && item.id != -1) {
                             log("not found, deleting");
                             that.removeObject(item);
@@ -127,7 +126,7 @@ define('app/controllers/machines', [
                     error(textstate, errorThrown, 'while loading machines for:', that.backend.title);
                     
                     if (that.backend.error) {
-                        // This backend seems hopeless, disabling it                            
+                        // This backend seems hopeless, disabling it
                         that.backend.set('state', 'offline');
                         that.backend.set('enabled', false);
                     } else {
@@ -143,10 +142,10 @@ define('app/controllers/machines', [
 
             newMachine: function(name, image, size, location, key, script) {
                 log('Creating machine', this.name, 'to backend', this.backend.title);
-
+                
                 this.backend.set('create_pending', true);
                 
-                if (this.backend.provider.search('rackspace_first_gen') > -1){
+                if (this.backend.provider.search('rackspace_first_gen') > -1) {
                     // Rackspace (first gen) does not support spaces in names
                     name = name.replace(/ /g,'');
                 }
@@ -162,7 +161,7 @@ define('app/controllers/machines', [
                         'key': key.name,
                         'script': script,
                 };
-
+                
                 var item = {};
                 item.state = 'pending';
                 item.can_stop = false;
@@ -175,7 +174,7 @@ define('app/controllers/machines', [
                 item.image = image;
                 item.id = -1;
                 item.pendingCreation = true;
-
+                
                 var machine = Machine.create(item);
                 
                 this.addObject(machine);

@@ -14,28 +14,30 @@ define('app/models/backend', [
             BACKENDSTATES: ['offline', 'online', 'waiting'],
 
             id: null,
-            sizes: [],
-            images: [],
             host: null,
             title: null,
             apikey: null,
-            error: false,
-            machines: [],
-            locations: [],
             enabled: null,
             provider: null,
             state: 'unknown',
             poll_interval: null,
-            loadingImages: false,
             create_pending: false,
+
+            sizes: [],
+            images: [],
+            machines: [],
+            locations: [],
+            loadingSizes: false,
+            loadingImages: false,
             loadingMachines: false,
+            loadingLocations: false,
 
             init: function() {
                 this._super();
-                this.images = ImagesController.create({backend: this});
-                this.machines = MachinesController.create({backend: this});
-                this.sizes = SizesController.create({backend: this});
-                this.locations = LocationsController.create({backend: this});
+                this.images = ImagesController.create({backend: this, content: []});
+                this.machines = MachinesController.create({backend: this, content: []});
+                this.sizes = SizesController.create({backend: this, content: []});
+                this.locations = LocationsController.create({backend: this, content: []});
                 Ember.run.next(this, function() {
                     if (!this.enabled) {
                         this.toggle();
@@ -45,7 +47,7 @@ define('app/models/backend', [
 
             stateObserver: function() {
                 if (this.enabled) {
-                    if (this.loadingMachines || this.loadingImages) {
+                    if (this.loadingMachines || this.loadingImages || this.loadingSizes || this.loadingLocations) {
                         this.set('state', 'waiting');
                     } else {
                         this.set('state', 'online');
@@ -53,7 +55,7 @@ define('app/models/backend', [
                 } else {
                     this.set('state', 'offline');
                 }
-            }.observes('loadingMachines', 'loadingImages', 'enabled'),
+            }.observes('loadingMachines', 'loadingImages', 'loadingSizes', 'loadingLocations', 'enabled'),
 
             getSizeById: function(sizeId){
                 for (var i = 0; i < this.sizes.content.length; i++) {

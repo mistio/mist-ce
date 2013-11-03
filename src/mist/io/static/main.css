@@ -135,7 +135,7 @@ div#splash div.mist-logo {
 }
 
 .ui-icon-offline:after, .ui-icon-waiting:after {
-    background-color: rgba(0,0,0,1);
+    background-color: rgba(0,0,0,0);
 }
 
 /*
