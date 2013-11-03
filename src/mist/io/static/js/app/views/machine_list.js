@@ -146,6 +146,29 @@ function(MistScreen, machine_list_html) {
             return false;
         },
 
+        getSelectedMachineCount: function() {
+            var count = 0;
+            this.content.forEach(function(backend) {
+                count += backend.machines.filterProperty('selected', true).get('length');
+            });
+            this.set('selectedMachineCount', count);
+        },
+
+        getSelectedMachine: function() {
+            if(this.selectedMachineCount == 1) {
+                var that = this;
+                this.content.forEach(function(item) {
+                    var machines = item.machines.filterProperty('selected', true);
+                    if(machines.get('length') == 1) {
+                       that.set('selectedMachine', machines[0]);
+                       return;
+                    }
+                });
+            } else {
+                this.set('selectedMachine', null);
+            }
+        },
+
         openMachineSelectPopup: function() {
             $('#select-machines-listmenu').listview('refresh');
             $('#select-machines-popup').popup('option', 'positionTo', '.select-machines').popup('open', {transition: 'pop'});

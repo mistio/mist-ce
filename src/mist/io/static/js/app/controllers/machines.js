@@ -17,7 +17,7 @@ define('app/controllers/machines', [
             init: function() {
                 this._super();
                 this.set('content', []);
-                this.refresh();         
+                this.refresh();
             },
             
             machineCountObserver: function() {

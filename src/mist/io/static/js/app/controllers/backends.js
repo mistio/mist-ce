@@ -24,7 +24,6 @@ define('app/controllers/backends', [
                 var that = this;
                 $(document).bind('ready', function() {
                     Ember.run.next(function() {
-                        
                         $.getJSON('/backends', function(data) {
                             data.forEach(function(item){
                                 that.pushObject(Backend.create(item));
@@ -35,7 +34,6 @@ define('app/controllers/backends', [
                         Ember.run.later(that, function() {
                             this.checkMonitoring();
                         }, 5000);
-                        
                     });
                 });
             },
@@ -75,6 +73,22 @@ define('app/controllers/backends', [
                 this.set('loadingImages', loadingImages);
             }.observes('@each.loadingImages'),
 
+            updateMachineCount: function() {
+                var count = 0;
+                this.content.forEach(function(backend) {
+                    count += backend.machines.content.length;
+                });
+                this.set('machineCount', count);
+            }.observes('content.length'),
+
+            updateImageCount: function() {
+                var count = 0;
+                this.content.forEach(function(backend){
+                    count += backend.images.content.length;
+                });
+                this.set('imageCount', count);
+            }.observes('content.length'),
+
             getBackendById: function(backendId) {
                 var backendToFind = null;
                 this.content.some(function(backend) {
@@ -102,68 +116,24 @@ define('app/controllers/backends', [
                 return machineToFind;
             },
 
-            getSelectedMachineCount: function() {
-                var count = 0;
-                this.content.forEach(function(backend) {
-                    count += backend.machines.filterProperty('selected', true).get('length');
-                });
-                this.set('selectedMachineCount', count);
-            },
-
-            updateMachineCount: function() {
-                var count = 0;
-                this.content.forEach(function(backend) {
-                    count += backend.machines.content.length;
-                });
-                this.set('machineCount', count);
-            }.observes('content.length'),
-
-            updateImageCount: function() {
-                var count = 0;
-                this.content.forEach(function(backend){
-                    count += backend.images.content.length;
-                });
-                this.set('imageCount', count);
-            }.observes('content.length'),
-            
-            getSelectedMachine: function() {
-            	if(this.selectedMachineCount == 1) {
-                    var that = this;
-                    this.content.forEach(function(item) {
-                        var machines = item.machines.filterProperty('selected', true);
-                        if(machines.get('length') == 1) {
-                	       that.set('selectedMachine', machines[0]);
-                	       return;
-                        }
-                    });
-            	} else {
-            	    this.set('selectedMachine', null);
-            	}
-            },
-
-            providerList: function() {
-                return SUPPORTED_PROVIDERS;
-            }.property('providerList'),
-
             checkMonitoring: function() {
                 if (!Mist.authenticated) {
                     return;
                 }
                 var that = this;
                 $.getJSON('/monitoring', function(data) {
-                    machines = data.machines;
                     Mist.set('auth_key', data.auth_key);
                     Mist.set('monitored_machines', data.machines);
                     Mist.set('current_plan', data.current_plan);
                     Mist.set('user_details', data.user_details);
-                    //now loop on backend_id, machine_id  list of lists and check if pair found
-                    machines.forEach(function(machine_tuple){
-                        var machine = Mist.backendsController.getMachineById(machine_tuple[0], machine_tuple[1]);
+                    
+                    data.machines.forEach(function(machine_tuple){
+                        var machine = that.getMachineById(machine_tuple[0], machine_tuple[1]);
                         if (machine) {
                             machine.set('hasMonitoring', true);
                         }
                     });
-
+                    
                     var rules = data.rules;
                     for (ruleId in rules) {
                         var rule = {};
@@ -179,21 +149,17 @@ define('app/controllers/backends', [
                             rule.backend_id = rules[ruleId].backend;
                             rule.machine_id = rules[ruleId].machine;
                         }
-                        var metric = rule.metric;
-                        if (metric == 'network-tx' || metric == 'disk-write') {
-                            rule.unit = 'KB/s';
-                        } else if (metric == 'cpu' || metric == 'ram') {
-                            rule.unit = '%';
-                        } else {
-                            rule.unit = '';
-                        }
                         Mist.rulesController.pushObject(Rule.create(rule));
                     }
                     Mist.rulesController.redrawRules();
                 }).error( function() {
-                    Mist.notificationController.notify('Error checking monitoring');
+                    Mist.notificationController.notify('Error while checking monitoring');
                 });
-            }
+            },
+
+            providerList: function() {
+                return SUPPORTED_PROVIDERS;
+            }.property('providerList')
 
            /* Caclculates controller state based
             * on all backends. Currently commented
@@ -203,7 +169,6 @@ define('app/controllers/backends', [
             backendsStateObserver: function() {
                 var state = 'ok';
                 var waiting = false;
-                
                 this.content.some(function(backend) {
                     if (backend.error) {
                         state = 'error';
@@ -216,13 +181,11 @@ define('app/controllers/backends', [
                         state = 'down';
                     }
                 });
-                
                 if (waiting) {
                     state = 'state-wait-' + state;
                 } else {
                     state = 'state-' + state;
                 }
-                
                 this.set('state', state);
             }.observes('@each.state'),
             */

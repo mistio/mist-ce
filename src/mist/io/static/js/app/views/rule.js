@@ -12,6 +12,12 @@ define('app/views/rule', [
 
             template: Ember.Handlebars.compile(rule_html),
 
+            didInsertElement: function() {
+                Ember.run.next(this, function() {
+                    this.metricObserver();
+                });
+            },
+
             valueObserver: function() {
                 $('#' + this.rule.id + ' .rule-value').val(this.rule.value);
                 $('#' + this.rule.id + ' .rule-value').slider('refresh');
