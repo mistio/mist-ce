@@ -46,9 +46,8 @@ define('app/controllers/keys', [
                         that.set('loadingKeys', false);
                         that.updateKeysList(data);
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function(jqXHR) {
                         Mist.notificationController.notify('Error while loading keys: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ' while loading keys. ', jqXHR.responseText);
                         Mist.keysController.set('loadingKeys', false);
                     }
                 });
@@ -89,9 +88,8 @@ define('app/controllers/keys', [
                             });
                         }
                     },
-                    error: function(jqXHR, textstate, errorThrown) {
+                    error: function(jqXHR) {
                         Mist.notificationController.notify('Error while creating key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ' while creating key: ', name, '. ', jqXHR.responseText);
                         $('#create-loader').fadeOut(200);
                         $('#create-key-ok').removeClass('ui-disabled');
                     }
@@ -107,9 +105,8 @@ define('app/controllers/keys', [
                         info('Successfully deleted key: ', name);
                         Mist.keysController.updateKeysList(data);
                     },
-                    error: function(jqXHR, textstate, errorThrown) {
+                    error: function(jqXHR) {
                         Mist.notificationController.notify('Error while deleting key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ' while deleting key: ', name, '. ', jqXHR.responseText);
                     }
                 });
             },
@@ -128,9 +125,8 @@ define('app/controllers/keys', [
                         $("#edit-key-dialog").popup("close");
                         Mist.keysController.getKeyByName(oldName).set('name', newName);
                     },
-                    error: function(jqXHR, textstate, errorThrown) {
+                    error: function(jqXHR) {
                         Mist.notificationController.notify('Error while editting key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ' while editting key: ', oldName, '. ', jqXHR.responseText);
                     }
                 });
             },
@@ -149,9 +145,8 @@ define('app/controllers/keys', [
                             }
                         });
                     },
-                    error: function(jqXHR, textstate, errorThrown) {
+                    error: function(jqXHR) {
                         Mist.notificationController.notify('Error while setting default key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ' while setting default key: ', name, '. ', jqXHR.responseText);
                     }
                 });
             },
@@ -173,9 +168,8 @@ define('app/controllers/keys', [
                         $('#manage-keys .ajax-loader').fadeOut(200);
                         Mist.keysController.updateKeyMachinesList(keyName, data);
                     },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while associating key: ' + keyName);
-                        error(textstate, errorThrown, ' while associating key: ', keyName, '. ', jqXHR.responseText);
+                    error: function(jqXHR) {
+                        Mist.notificationController.notify('Error while associating key: ' + keyName +'. ' + jqXHR.responseText);
                         $('#manage-keys .ajax-loader').fadeOut(200);
                     }
                 });
@@ -204,9 +198,8 @@ define('app/controllers/keys', [
                         $('#manage-keys .ajax-loader').fadeOut(200);
                         Mist.keysController.updateKeyMachinesList(keyName, data);
                     },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while disassociating key: ' + keyName);
-                        error(textstate, errorThrown, ' while disassociating key: ', keyName, '. ', jqXHR.responseText);
+                    error: function(jqXHR) {
+                        Mist.notificationController.notify('Error while disassociating key: ' + keyName +'. ' + jqXHR.responseText);
                         $('#manage-keys .ajax-loader').fadeOut(200);
                     }
                 });
@@ -221,9 +214,8 @@ define('app/controllers/keys', [
                         info('Successfully got private key: ' + keyName);
                         $(element).val(data).trigger('change');
                     },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while getting private key: ' + keyName);
-                        error(textstate, errorThrown, ' while getting private key: ', keyName, '. ', jqXHR.responseText);
+                    error: function(jqXHR) {
+                        Mist.notificationController.notify('Error while getting private key: ' + keyName +'. ' + jqXHR.responseText);
                     }
                 });
             },
@@ -237,9 +229,8 @@ define('app/controllers/keys', [
                         info('Successfully got public key: ' + keyName);
                         $(element).val(data).trigger('change');
                     },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while getting public key: ' + keyName);
-                        error(textstate, errorThrown, ' while getting public key: ', keyName, '. ', jqXHR.responseText);
+                    error: function(jqXHR) {
+                        Mist.notificationController.notify('Error while getting public key: ' + keyName +'. ' + jqXHR.responseText);
                     }
                 });
             },

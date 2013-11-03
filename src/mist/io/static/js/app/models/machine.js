@@ -2,13 +2,14 @@ define('app/models/machine', [
     'ember'
     ],
     /**
-     * Machine model
+     * Machine Model
      *
      * Also check state mapping in config.py
      * @returns Class
      */
     function() {
         return Ember.Object.extend({
+
             id: null,
             imageId: null,
             name: null,
@@ -208,11 +209,7 @@ define('app/models/machine', [
                 var that = this;
                 
                 function sendProbe() {
-                    if (!that.backend) {
-                        return false;
-                    }
-                    
-                    if (that.backend.create_pending) {
+                    if (!that.backend || that.backend.create_pending) {
                         return false;
                     }
 
@@ -245,7 +242,10 @@ define('app/models/machine', [
                                             key.set('probing', false);
                                         }
                                         that.set('probed', true);
-                                        /*
+                                       /* This piece of code displays fetched keys from 
+                                        * the machine. Curently commented out as it 
+                                        * causes some bugs
+                                        *
                                         data.updated_keys.forEach(function(updatedKey) {
                                             for (var i=0; i < Mist.keysController.keys.length; ++i) {
                                                 existingKey = Mist.keysController.keys[i];
@@ -289,7 +289,7 @@ define('app/models/machine', [
                                     that.set('probing', false);
                                     that.set('probeInterval', 2*that.get('probeInterval'));
                                     
-                                    if (!that.backend.create_pending){
+                                    if (that.backend.enabled && !that.backend.create_pending) {
                                          retryProbe(that.get('probeInterval'));
                                     }
                                 }
@@ -310,10 +310,8 @@ define('app/models/machine', [
                         }
                     }
                 }
-                if (that.backend) {
-                    if (!that.backend.create_pending){
-                         setTimeout(sendProbe, 2000);
-                    }   
+                if (that.backend && !that.backend.create_pending) {
+                    setTimeout(sendProbe, 2000);
                 }
             },
 
