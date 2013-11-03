@@ -1,12 +1,12 @@
 Functions in views.py
-    def user_from_request():            STUB
+    def user_from_request():            WORKS for now, will change
     def home():                         OK
     def check_auth():                   
     def update_user_settings():
     def list_backends():                OK
     def add_backend():                  OK
     def delete_backend():               OK
-    def toggle_backend():
+    def toggle_backend():               OK? untested
     def list_machines():                OK
     def create_machine():               IN PROGRESS: DR
     def start_machine():                OK? untested
@@ -36,10 +36,10 @@ Functions in views.py
     def delete_rule():
     def update_available_keys():
     def save_keypair():
-    def associate_key():                IN PROGRESS: DR - almost ready
-    def disassociate_key():             TODO: DR
-    def deploy_key():                   TODO: DR
-    def undeploy_key():                 TODO: DR
+    def associate_key():                OK: untested, deployment missing
+    def disassociate_key():             OK: untested, deployment missing
+    def deploy_key():                   
+    def undeploy_key():                 
 
 Functions in helpers.py
     def get_user():                     STUB: to be deprecated and removed

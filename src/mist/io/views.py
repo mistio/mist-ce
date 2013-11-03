@@ -248,7 +248,7 @@ def toggle_backend(request):
     with user.lock_n_load():
         user.backends[backend_id].enabled = new_state
         
-    return Response('OK', 200)
+    return OK
 
 
 @view_config(route_name='machines', request_method='GET', renderer='json')
