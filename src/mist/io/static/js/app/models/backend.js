@@ -61,14 +61,6 @@ define('app/models/backend', [
                 }
             },
 
-            getMachineById: function(machineId) {
-                for (var i = 0; i < this.machines.content.length; i++) {
-                    if (this.machines.content[i].id == machineId) {
-                        return this.machines.content[i];
-                    }
-                }
-            },
-
             toggle: function() {
                 if (this.enabled) {
                     this.set('state', 'waiting');

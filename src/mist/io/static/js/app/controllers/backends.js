@@ -25,7 +25,7 @@ define('app/controllers/backends', [
                 $(document).bind('ready', function() {
                     Ember.run.next(function() {
                         $.getJSON('/backends', function(data) {
-                            data.forEach(function(item){
+                            data.forEach(function(item) {
                                 that.pushObject(Backend.create(item));
                             });
                         }).error(function() {

@@ -304,7 +304,7 @@ define('app/models/machine', [
                         interval = 10000;
                     }
                     // retry only if the machine is still here and it's running
-                    if (that.backend.getMachineById(that.id) && that.state == 'running'){
+                    if (Mist.backendsController.getMachineById(that.backend.id, that.id) && that.state == 'running'){
                         if (!that.backend.create_pending){
                              setTimeout(sendProbe, interval);
                         }

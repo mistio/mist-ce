@@ -168,10 +168,15 @@ define( 'app', [
         });
 
         App.MachinesRoute = Ember.Route.extend({
-            //clear selected machines when exiting view
-            exit: function(){
-              Mist.backendsController.forEach(function(backend){
-                  backend.machines.forEach(function(machine){
+            activate: function() {
+                Ember.run.next(function() {
+                    document.title = 'mist.io - Machines';
+                });
+            },
+
+            exit: function() {
+              Mist.backendsController.forEach(function(backend) {
+                  backend.machines.forEach(function(machine) {
                       log('deselecting machine: ' + machine.name);
                       machine.set('selected', false);
                   });
