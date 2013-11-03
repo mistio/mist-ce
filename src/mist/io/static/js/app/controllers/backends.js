@@ -29,7 +29,7 @@ define('app/controllers/backends', [
                                 that.pushObject(Backend.create(item));
                             });
                         }).error(function() {
-                            Mist.notificationController.notify("Error loading backends");
+                            Mist.notificationController.notify("Error while loading backends");
                         });
                         Ember.run.later(that, function() {
                             this.checkMonitoring();
@@ -163,7 +163,7 @@ define('app/controllers/backends', [
 
            /* Caclculates controller state based
             * on all backends. Currently commented
-            * out as it is not clear weather it will 
+            * out as it is not clear weather it shall 
             * be used or not.
             * 
             backendsStateObserver: function() {

@@ -14,10 +14,11 @@ define('app/views/backend_button', ['ember'],
             attributeBindings: ['data-role', 'data-theme', 'data-inline', 'data-role', 'data-icon'],
 
             didInsertElement: function() {
-                if ('button' in $("#"+this.elementId)) {
+                if ('button' in $('#'+this.elementId)) {
                     Ember.run.next(this, function() {
-                        $("#"+this.elementId).button();
+                        $('#'+this.elementId).button();
                         $('#backend-buttons').controlgroup('refresh');
+                        this.stateObserver();
                     });
                 } else {
                     Ember.run.later(this, function() {
@@ -25,6 +26,17 @@ define('app/views/backend_button', ['ember'],
                     }, 100);
                 }
             },
+
+            stateObserver: function() {
+                $('#' + this.elementId).parent().removeClass('ui-icon-check ui-icon-offline ui-icon-waiting');
+                  if (this.backend.state == 'online') {
+                      $('#' + this.elementId).parent().addClass('ui-icon-check');
+                  } else if (this.backend.state == 'offline') {
+                      $('#' + this.elementId).parent().addClass('ui-icon-offline');
+                  } else if (this.backend.state == 'waiting') {
+                      $('#' + this.elementId).parent().addClass('ui-icon-waiting');
+                  }
+            }.observes('backend.state'),
 
             click: function() {
                 var backend = this.backend;

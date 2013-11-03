@@ -39,6 +39,10 @@ div#splash div.mist-logo {
     margin-top: 2em;
 }
 
+#add-backend .btn-full {
+    width: 110%;
+}
+
 .ok-cancel .ui-controlgroup-controls {
     width: 100%;
 }
@@ -71,6 +75,8 @@ div#splash div.mist-logo {
 
 #backend-buttons .ui-controlgroup-controls .ui-btn a {
     padding: 10px 10px 10px 40px !important;
+    position: relative;
+    top: 1px;
 }
 
 #backend-buttons .ui-controlgroup-controls .ui-btn {
@@ -116,7 +122,23 @@ div#splash div.mist-logo {
 }
 
 /* Provider Icons */
+.ui-icon-offline {
+    background-image: url(states/state-yellow-solid.png) !important;
+    background-position: 10px 10px !important;
+    background-repeat: no-repeat !important;
+}
 
+.ui-icon-waiting {
+    background-image: url(states/load-white-solid.gif) !important;
+    background-position: 9px 9px !important;
+    background-repeat: no-repeat !important;
+}
+
+.ui-icon-offline:after, .ui-icon-waiting:after {
+    background-color: rgba(0,0,0,1);
+}
+
+/*
 .state-providers .ui-icon, .backend-button .ui-icon {
     width: 18px;
     height: 18px;
@@ -147,6 +169,7 @@ div#splash div.mist-logo {
 .state-providers.state-error .ui-icon, .backend-button.offline .ui-icon {
     background-image: url(states/state-yellow.png);
 }
+*/
 
 /* Provider state dialog */
 

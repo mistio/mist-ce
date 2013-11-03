@@ -4,33 +4,31 @@ define('app/models/backend', [
     'app/controllers/sizes',
     'app/controllers/locations', 'ember'],
     /**
-     * Backend model
+     * Backend Model
      *
      * @returns Class
      */
-    function(MachinesController, ImagesController,
-            SizesController, LocationsController) {
+    function(MachinesController, ImagesController, SizesController, LocationsController) {
         return Ember.Object.extend({
 
             BACKENDSTATES: ['offline', 'online', 'waiting'],
 
             id: null,
-            apikey: null,
-            title: null,
-            provider: null,
-            poll_interval: null,
-            host: null,
-            state: 'unknown',
-            waiting: false,
-            enabled: null,
-            machines: null,
             sizes: [],
             images: [],
-            locations: [],
+            host: null,
+            title: null,
+            apikey: null,
             error: false,
+            machines: [],
+            locations: [],
+            enabled: null,
+            provider: null,
+            state: 'unknown',
+            poll_interval: null,
+            loadingImages: false,
             create_pending: false,
             loadingMachines: false,
-            loadingImages: false,
 
             init: function() {
                 this._super();
@@ -44,6 +42,18 @@ define('app/models/backend', [
                     }
                 });
             },
+
+            stateObserver: function() {
+                if (this.enabled) {
+                    if (this.loadingMachines || this.loadingImages) {
+                        this.set('state', 'waiting');
+                    } else {
+                        this.set('state', 'online');
+                    }
+                } else {
+                    this.set('state', 'offline');
+                }
+            }.observes('loadingMachines', 'loadingImages', 'enabled'),
 
             getSizeById: function(sizeId){
                 for (var i = 0; i < this.sizes.content.length; i++) {
