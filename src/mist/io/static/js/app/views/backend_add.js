@@ -149,7 +149,7 @@ define('app/views/backend_add', [
                     headers: { "cache-control": "no-cache" },
                     data: JSON.stringify(payload),
                     success: function(result) {
-                        that.set('pendingCreation', false);                    
+                        that.set('pendingCreation', false);
                         Mist.backendAddController.newBackendClear();
                         $("#add-backend").panel("close");
                         $('.select-listmenu li').off('click', this.selectBackend);
@@ -159,10 +159,10 @@ define('app/views/backend_add', [
                             if (!result.exists) {
                                 Mist.backendsController.pushObject(Backend.create(result));                                                    
                             }
-                            //add bare metal backend if it does not exist already                            
-                            var machines_url = window.location.href + "/machines"; 
-                            window.location.href = machines_url;    
-                            Mist.backendsController.getBackendById(result.id).machines.refresh();
+                            Ember.run.later(function() {
+                                //Mist.backendsController.getBackendById(result.id).machines.refresh();
+                                $('#home-menu li').eq(0).find('a').click(); // Manually click machines button
+                            }, 500);
                         } else {
                             Mist.backendsController.pushObject(Backend.create(result));                        
                         }
