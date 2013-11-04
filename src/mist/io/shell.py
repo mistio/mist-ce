@@ -145,6 +145,7 @@ class Shell(object):
         self.host = host
         self.username = username
         self.pkey = None
+        self.sudo = False
         if password:
             self.password = password
         if pkey:
@@ -173,13 +174,21 @@ class Shell(object):
         except:
             self.close_connection()
 
+    def checkSudo(self):
+        """
+        Checks if sudo is installed. In case it is self.sudo = True,
+        else self.sudo = False
+        """
+        stdin, stdout, stderr = self.ssh.exec_command("which sudo")
+        if not stderr.read():
+            self.sudo = True
+
     def command(self, cmd):
         try:
             stdin, stdout, stderr = self.ssh.exec_command(cmd)
             self.stdout = stdout.read()
             return self.stdout
-        except Exception as e:
-            print "In connect, exception %s" % e
+        except:
             self.close_connection()
 
     def command_stream(self, cmd):
