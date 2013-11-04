@@ -160,7 +160,7 @@ define('app/views/backend_add', [
                                 Mist.backendsController.pushObject(Backend.create(result));                                                    
                             }
                             Ember.run.later(function() {
-                                //Mist.backendsController.getBackendById(result.id).machines.refresh();
+                                Mist.backendsController.getBackendById(result.id).machines.refresh();
                                 $('#home-menu li').eq(0).find('a').click(); // Manually click machines button
                             }, 500);
                         } else {
