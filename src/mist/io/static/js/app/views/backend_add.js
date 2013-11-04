@@ -46,33 +46,33 @@ define('app/views/backend_add', [
                     $('#addBackendOpenstack').hide();
                     $('#addBackendBareMetal').hide();                    
                 } else if (event.target.title.indexOf("nephoscale") !== -1) {
-                    $('#addBackendInfo').show();                                
+                    $('#addBackendInfo').show();                 
                     $('#ApiKeylabel').text('2. Username:');
                     $('#ApiSecretlabel').text('3. Password:');
                     $('#addBackendOpenstack').hide();
-                    $('#addBackendBareMetal').hide();                                        
+                    $('#addBackendBareMetal').hide();                    
                 } else if (event.target.title.indexOf("digitalocean") !== -1) {
-                    $('#addBackendInfo').show();                                
+                    $('#addBackendInfo').show();                 
                     $('#ApiKeylabel').text('2. Client ID:');
                     $('#ApiSecretlabel').text('3. API Key:');
                     $('#addBackendOpenstack').hide();
-                    $('#addBackendBareMetal').hide();                                        
-                } else if (event.target.title.indexOf("bare_metal") != -1) {
-                    $('#addBackendInfo').hide();
-                    $('#addBackendBareMetal').show();                    
-                    $('#addBackendOpenstack').hide();                   
+                    $('#addBackendBareMetal').hide();                    
                 } else if (event.target.title.indexOf("openstack") != -1) {
-                    $('#addBackendInfo').show();                                
+                    $('#addBackendInfo').show();                 
                     $('#ApiKeylabel').text('2. Username:');
                     $('#ApiSecretlabel').text('3. Password:');
                     $('#addBackendOpenstack').show();
-                    $('#addBackendBareMetal').hide();                                        
+                    $('#addBackendBareMetal').hide();                    
+                } else if (event.target.title.indexOf("bare_metal") != -1) {
+                    $('#addBackendInfo').hide();
+                    $('#addBackendBareMetal').show();
+                    $('#addBackendOpenstack').hide();                    
                 } else {
-                    $('#addBackendInfo').show();                                
+                    $('#addBackendInfo').show();                 
                     $('#ApiKeylabel').text('2. API Key:');
                     $('#ApiSecretlabel').text('3. API Secret:');
                     $('#addBackendOpenstack').hide();
-                    $('#addBackendBareMetal').hide();                                        
+                    $('#addBackendBareMetal').hide();                    
                 }
                 $('.select-backend-collapsible').collapsible('option','collapsedIcon','check');
                 $('.select-backend-collapsible span.ui-btn-text').text(event.target.text);

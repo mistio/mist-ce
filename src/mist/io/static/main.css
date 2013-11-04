@@ -57,6 +57,10 @@ div#splash div.mist-logo {
     overflow-y: hidden;
 }
 
+#backend-buttons .ui-controlgroup-controls {
+    display: inline;
+}
+
 /* Select Button */
 
 #machines #mist-select-machines-button {
@@ -680,14 +684,24 @@ div.ember-view div.ui-panel-content-wrap {
     background-image: url(images/p1_sm.png);
 }
 
+/* BareMetal */
+#single-view-provider-icon.provider-bare_metal  {
+    background-image: url(images/monitor.png);
+}
+
 /* NephoScale */
 #single-view-provider-icon.provider-nephoscale  {
     background-image: url(images/nephoscale_sm.png);
 }
 
-/* BareMetal */
-#single-view-provider-icon.provider-bare_metal  {
-    background-image: url(images/monitor.png);
+/* DigitalOcean */
+#single-view-provider-icon.provider-digitalocean  {
+    background-image: url(images/digitalocean.png);
+}
+
+/* SoftLayer */
+#single-view-provider-icon.provider-softlayer  {
+    background-image: url(images/softlayer.png);
 }
 
 /* Linode */
