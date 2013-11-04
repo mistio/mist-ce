@@ -213,7 +213,7 @@ define( 'app', [
                         keysCount: 0,
                     };
                 }
-                return Mist.backendsController.getMachineById(Mist.getMachineIdByUrl());
+                return Mist.backendsController.getMachineByUrlId(Mist.getMachineIdByUrl());
             }        
         });   
         

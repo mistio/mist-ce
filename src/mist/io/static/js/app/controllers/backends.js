@@ -15,7 +15,7 @@ define('app/controllers/backends', [
             imageCount: 0,
             machineCount: 0,
             loadingImages: null,
-            loadingMachines: null,
+            loadingMachines: true,
             singleMachineRequest: null,
             singleMachineResponse: null,
 
@@ -46,7 +46,7 @@ define('app/controllers/backends', [
                         }, 1000);
                         return;
                     }
-                    this.set('singleMachineResponse', this.getMachineById(this.singleMachineRequest));
+                    this.set('singleMachineResponse', this.getMachineByUrlId(this.singleMachineRequest));
                     this.set('singleMachineRequest', false);
                 }
             }.observes('singleMachineRequest'),
@@ -110,6 +110,21 @@ define('app/controllers/backends', [
                                 return true;
                             }
                         });
+                        return true;
+                    }
+                });
+                return machineToFind;
+            },
+
+            getMachineByUrlId: function(machineId) {
+                var machineToFind = null;
+                this.content.some(function(backend) {
+                    backend.machines.content.some(function(machine) {
+                        if (machine.id == machineId) {
+                            return machineToFind = machine;
+                        }
+                    });
+                    if(machineToFind) {
                         return true;
                     }
                 });
