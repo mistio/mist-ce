@@ -1,9 +1,9 @@
 <div data-role="header" data-theme="b">
 
     <a href="#"
-        data-icon="home"
-        data-direction="reverse"
-        class="ui-btn-left">Home</a>
+       data-icon="home"
+       data-direction="reverse"
+       class="ui-btn-left">Home</a>
 
     <h1>Machines</h1>
 
@@ -19,13 +19,19 @@
         class="select-machines"
         data-role="button"
         data-icon="arrow-d"
-        {{action openMachineSelectPopup target="view"}}>Select</a>
+        {{action "openMachineSelectPopup" target="view"}}>Select</a>
 
     <div id="select-machines-popup" data-role="popup">
         <ul id="select-machines-listmenu" data-role="listview">
-            {{#each Mist.selectMachinesController.content}}
             <li data-icon="false">
-                <a href="#" title="{{unbound this.id}}">{{this.name}}</a>
+                <a href="#" title="All">All</a>
+            </li>
+            <li data-icon="false">
+                <a href="#" title="None">None</a>
+            </li>
+            {{#each Mist.backendsController.content}}
+            <li data-icon="false">
+                <a href="#" title="{{unbound this.id}}">{{this.title}}</a>
             </li>
             {{/each}}
         </ul>

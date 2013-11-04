@@ -44,7 +44,6 @@ define( 'app', [
     'app/controllers/backend_edit',
     'app/controllers/machine_add',
     'app/controllers/key_add',
-    'app/controllers/select_machines',
     'app/controllers/select_images',
     'app/controllers/keys',
     'app/controllers/rules',
@@ -86,7 +85,6 @@ define( 'app', [
                 BackendEditController,
                 MachineAddController,
                 KeyAddController,
-                SelectMachinesController,
                 SelectImagesController,
                 KeysController,
                 RulesController,
@@ -298,7 +296,6 @@ define( 'app', [
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
         App.set('machineAddController', MachineAddController.create());
-        App.set('selectMachinesController', SelectMachinesController.create());
         App.set('selectImagesController', SelectImagesController.create());
         App.set('keysController', KeysController.create());
         App.set('rulesController', RulesController.create());

@@ -83,7 +83,7 @@ define('app/controllers/backends', [
 
             updateImageCount: function() {
                 var count = 0;
-                this.content.forEach(function(backend){
+                this.content.forEach(function(backend) {
                     count += backend.images.content.length;
                 });
                 this.set('imageCount', count);
@@ -127,7 +127,7 @@ define('app/controllers/backends', [
                     Mist.set('current_plan', data.current_plan);
                     Mist.set('user_details', data.user_details);
                     
-                    data.machines.forEach(function(machine_tuple){
+                    data.machines.forEach(function(machine_tuple) {
                         var machine = that.getMachineById(machine_tuple[0], machine_tuple[1]);
                         if (machine) {
                             machine.set('hasMonitoring', true);
