@@ -543,7 +543,7 @@ a#mist-select-machines-button span.ui-btn-text {
 }
 
 #images-advanced-search {
-	display: block;
+    display: block;
 }
 
 #machines-list .alert-icon {
@@ -577,7 +577,7 @@ a#mist-select-machines-button span.ui-btn-text {
     width: 100%;
 }
 
-.machines-footer, #keys-footer, #single-key-footer {
+#machines-footer, #keys-footer, #single-key-footer {
     display: none;
 }
 
@@ -595,7 +595,7 @@ div.actions div.ui-controlgroup-controls {
     padding-left: 0.5%;
 }
 
-#keys-footer.ui-footer div.actions, #single-key-footer.ui-footer div.actions {
+#keys-footer.ui-footer div.actions, #single-key-footer.ui-footer div.actions, #machines-footer.ui-footer div.actions {
     padding-left: 0.5%;
 }
 
@@ -603,8 +603,16 @@ div.actions div.ui-controlgroup-controls {
     width: 33%;
 }
 
-#keys-footer.ui-footer div.actions a, #single-key-footer.ui-footer div.actions a {
-    width: 46%;
+#keys-footer.ui-footer div.actions a {
+    width: 49%;
+}
+
+#machines-footer.ui-footer div.actinos a {
+    width: 32% !important;
+}
+
+#single-key-footer.ui-footer div.actions a {
+    width:49%;
 }
 
 #single-key-footer {
