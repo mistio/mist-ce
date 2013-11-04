@@ -1,6 +1,7 @@
 import os
 import tempfile
 import logging
+from time import time
 
 
 from libcloud.compute.providers import get_driver
@@ -24,7 +25,7 @@ from mist.io.exceptions import *
 
 from mist.io.shell import Shell
 
-from mist.io.helpers import generate_backend_id
+from mist.io.helpers import generate_backend_id, get_preferred_keypairs, get_ssh_user_from_keypair
 
 
 log = logging.getLogger(__name__)
@@ -269,7 +270,6 @@ def disassociate_key(user, key_id, backend_id, machine_id, undeploy=True):
 
     if undeploy:
         pass
-
 
 def deploy_key(user, keypair):
     raise NotImplementedError()
@@ -935,7 +935,7 @@ def destroy_machine(user, backend_id, machine_id):
                                      machine_id, undeploy=False)
 
 
-def run_command(host, ssh_user, command, private_key=None, password=None):
+def run_command(user, backend_id, machine_id, host, command, key_id=None, password=None):
     """
     We initialize a Shell instant (for mist.io.shell).
 
@@ -950,13 +950,45 @@ def run_command(host, ssh_user, command, private_key=None, password=None):
     private_key in case it needs password.
     @return:
     """
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    if key_id is not None and key_id not in user.keypairs:
+        raise KeypairNotFoundError(key_id)
 
-    shell = Shell(host=host, username=ssh_user, pkey=private_key, password=password)
+    keypairs = user.keypairs
+    pref_keys = [key_id] or get_preferred_keypairs(keypairs)
+    shell = None
+
+    for key_id in pref_keys:
+        private_key = keypairs[key_id].private
+        ssh_user = get_ssh_user_from_keypair(pref_keys[key_id], backend_id, machine_id)
+        try:
+            shell = Shell(host=host, username=ssh_user, pkey=private_key, password=password)
+            break
+        except Exception as e:
+            log.warning(e)
+
+    if shell is None:
+        raise MachineUnauthorizedError()
+
     try:
         output, error = shell.command(command)
+        shell.checkSudo()
+        sudoer = shell.sudo
         shell.close_connection()
-        return output
-    except:
+
+        with user.lock_n_load():
+            for i in tange(len(user.keypairs[key_id].machines)):
+                machine = user.keypairs[key_id].machines[i]
+                if [backend_id, machine_id] == machine[:2]:
+                    assoc = [backend_id, machine_id, time(), ssh_user, sudoer]
+                    user.keypairs[key_id].machines[i] = assoc
+            user.save()
+
+        return {'output': output, 'ssh_user': ssh_user, 'sudoer': sudoer}
+    except Exception as e:
+        log.warning(e)
+    finally:
         shell.close_connection()
 
 
