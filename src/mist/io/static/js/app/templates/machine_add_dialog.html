@@ -23,7 +23,7 @@
             data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
             <h2>Select Provider</h2>
             <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
-                {{#each Mist.backendsController}}
+                {{#each Mist.backendsController.getCloudProvidersProperty}}
                 <li data-icon="false" data-corners="true">
                     <a href="#" {{bindAttr title="title"}} 
                                 {{action selectProvider this target="view"}}>{{this.title}}</a>

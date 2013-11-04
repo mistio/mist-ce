@@ -68,6 +68,20 @@ define('app/controllers/backends', [
                 return null;
             },
 
+            getCloudProviders: function() {
+                var providers = [];
+                this.content.forEach(function(backend) {
+                    if (backend.provider != 'bare_metal') {
+                        providers.push(backend);
+                    }
+                });
+                return providers;
+            },
+
+            getCloudProvidersProperty: function() {
+                return this.getCloudProviders();
+            }.property('@each'),
+
             getMachineCount: function() {
                 var count = 0;
                 this.content.forEach(function(item) {
