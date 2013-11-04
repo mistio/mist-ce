@@ -15,6 +15,7 @@ define('app/controllers/backend_edit', [
                 $('#edit-backend .ajax-loader').fadeIn(200);
                 $('#button-confirm-disable').addClass('ui-disabled');
                 
+                // TODO: This should be done by the server.
                 var monitoredMachines = this.backend.getMonitoredMachines();
                 if (monitoredMachines.length) {
                     monitoredMachines.forEach(function(machine) {
@@ -22,38 +23,38 @@ define('app/controllers/backend_edit', [
                     });
                 }
                 
-                var that = this;                
+                var that = this;
                 $.ajax({
                     url: '/backends/' + this.backend.id,
                     type: 'DELETE',
                     success: function() {
-                        info('Successfully deleted backend:', that.backend.id);
+                        $('#edit-backend').popup('close');
                         $('#backend-delete-confirm').slideUp();
                         $('#edit-backend .ajax-loader').fadeOut(200);
                         $('#button-confirm-disable').removeClass('ui-disabled');
-                        Mist.backendsController.arrayContentWillChange();
+                        
                         Mist.backendsController.removeObject(that.backend);
-                        Mist.backendsController.arrayContentDidChange();
-                        Ember.run.next(function(){
+                        Ember.run.next(function() {
                             $('#backend-buttons').controlgroup('refresh');
                         });
-                        $("#edit-backend").popup("close");
                     },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while deleting backend: ' + jqXHR.responseText);
-                        $('#edit-backend .ajax-loader').fadeOut(200);
+                    error: function(jqXHR) {
+                        Mist.notificationController.notify('Error deleting backend: ' + jqXHR.responseText);
                         $('#button-confirm-disable').removeClass('ui-disabled');
+                        $('#edit-backend .ajax-loader').fadeOut(200);
                     }
                 });
             },
 
             toggleBackend: function() {
                 var newState = $('#backend-toggle').val();
-                var newStateToBoolean = (newState == "1" ? true : false);
-                var newStateToString = (newState == "1" ? "True" : "False");
+                var newStateToBoolean = (newState == '1' ? true : false);
+                var newStateToString = (newState == '1' ? 'True' : 'False');
+                
                 var payload = {
                     'newState': newStateToString
                 };
+                
                 var that = this;
                 $.ajax({
                     url: '/backends/' + this.backend.id,
@@ -64,10 +65,10 @@ define('app/controllers/backend_edit', [
                         info('Successfully toggled backend');
                         that.backend.set('enabled', newStateToBoolean);
                     },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while toggling backend: ' + jqXHR.responseText);
+                    error: function(jqXHR) {
+                        Mist.notificationController.notify('Error toggling backend: ' + jqXHR.responseText);
                         Ember.run.next(function() {
-                            $('#backend-toggle').val(newState == "1" ? "0" : "1").slider('refresh');
+                            $('#backend-toggle').val(newState == '1' ? '0' : '1').slider('refresh');
                         });
                     }
                 });

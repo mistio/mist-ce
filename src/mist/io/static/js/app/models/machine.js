@@ -34,7 +34,7 @@ define('app/models/machine', [
                     try {
                         $('#mist-manage-keys').button();
                     } catch (e) {
-                        $('#mist-manage-keys').button('refresh');
+                        //$('#mist-manage-keys').button('refresh');
                     }
                 });
             }.observes('probed', 'probing'),

@@ -43,23 +43,20 @@ define('app/controllers/backend_add', [
                 var that = this;
                 $.ajax({
                     url: '/backends',
-                    type: "POST",
-                    contentType: "application/json",
-                    dataType: "json",
-                    headers: { "cache-control": "no-cache" },
+                    type: 'POST',
+                    contentType: 'application/json',
                     data: JSON.stringify(payload),
-                    success: function(result) {
+                    success: function(data) {
+                        that.set('pendingCreation', false);
+                        $('#add-backend').panel('close');
                         that.clear();
-                        $("#add-backend").panel("close");
-                        that.set('pendingCreation', false);
-                        info('Successfully added backend ' + result.id);
-                        Mist.backendsController.pushObject(Backend.create(result));
+                        Mist.backendsController.pushObject(Backend.create(data));
                     },
-                    error: function(request){
+                    error: function(jqXHR) {
                         that.set('pendingCreation', false);
-                        Mist.notificationController.notify(request.responseText);
+                        Mist.notificationController.notify('Error adding backend: ' + jqXHR.responseText);
                     }
-                });  
+                });
             },
 
             newBackendObserver: function() {

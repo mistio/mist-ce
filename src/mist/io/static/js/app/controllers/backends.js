@@ -14,33 +14,40 @@ define('app/controllers/backends', [
             content: [],
             imageCount: 0,
             machineCount: 0,
-            loadingImages: null,
+            loadingImages: true,
             loadingMachines: true,
+            loadingBackends: true,
             singleMachineRequest: null,
             singleMachineResponse: null,
 
             init: function() {
                 this._super();
+                this.loadBackends();
+                Ember.run.later(this, function() {
+                    this.checkMonitoring();
+                }, 5000);
+            },
+
+            loadBackends: function() {
                 var that = this;
-                $(document).bind('ready', function() {
-                    Ember.run.next(function() {
-                        $.getJSON('/backends', function(data) {
-                            data.forEach(function(item) {
-                                that.pushObject(Backend.create(item));
-                            });
-                        }).error(function() {
-                            Mist.notificationController.notify("Error while loading backends");
-                        });
-                        Ember.run.later(that, function() {
-                            this.checkMonitoring();
-                        }, 5000);
+                this.set('loadingBackends', true);
+                $.getJSON('/backends', function(data) {
+                    data.forEach(function(backend) {
+                        that.pushObject(Backend.create(backend));
                     });
+                    this.set('loadingBackends', false);
+                }).error(function() {
+                    Mist.notificationController.notify('Error loading backends');
+                    this.set('loadingBackends', false);
+                    Ember.run.later(function() {
+                        that.loadBackends();
+                    }, 5000);
                 });
             },
 
             singleMachineRequestObserver: function() {
                 if (this.singleMachineRequest) {
-                    if (this.loadingMachines) {
+                    if (this.loadingBackends || this.loadingMachines) {
                         Ember.run.later(this, function() {
                             this.singleMachineRequestObserver();
                         }, 1000);
@@ -55,23 +62,21 @@ define('app/controllers/backends', [
                 var loadingMachines = false;
                 this.content.some(function(backend) {
                     if (backend.loadingMachines) {
-                        loadingMachines = true;
-                        return true;
+                        return loadingMachines = true;
                     }
                 });
                 this.set('loadingMachines', loadingMachines);
-            }.observes('@each.loadingMachines'),
+            }.observes('@each.loadingMachines', 'loadingBackends'),
 
             loadingImagesObserver: function() {
                 var loadingImages = false;
                 this.content.some(function(backend) {
                     if (backend.loadingImages) {
-                        loadingImages = true;
-                        return true;
+                        return loadingImages = true;
                     }
                 });
                 this.set('loadingImages', loadingImages);
-            }.observes('@each.loadingImages'),
+            }.observes('@each.loadingImages', 'loadingBackends'),
 
             updateMachineCount: function() {
                 var count = 0;
@@ -93,8 +98,7 @@ define('app/controllers/backends', [
                 var backendToFind = null;
                 this.content.some(function(backend) {
                     if (backend.id == backendId) {
-                        backendToFind = backend;
-                        return true;
+                        return backendToFind = backend;
                     }
                 });
                 return backendToFind;
@@ -106,8 +110,7 @@ define('app/controllers/backends', [
                     if (backend.id == backendId) {
                         backend.machines.content.some(function(machine) {
                             if (machine.id == machineId) {
-                                machineToFind = machine;
-                                return true;
+                                return machineToFind = machine;
                             }
                         });
                         return true;
@@ -149,8 +152,13 @@ define('app/controllers/backends', [
                         }
                     });
                     
+                   /* TODO: These rules should be returned properly from
+                    *       the server, so that we can use a forEach loop
+                    *       to make this world a better place.
+                    */
                     var rules = data.rules;
                     for (ruleId in rules) {
+                        info(ruleId);
                         var rule = {};
                         rule.id = ruleId;
                         rule.value = rules[ruleId].value;
@@ -164,46 +172,18 @@ define('app/controllers/backends', [
                             rule.backend_id = rules[ruleId].backend;
                             rule.machine_id = rules[ruleId].machine;
                         }
+                        info(rule);
                         Mist.rulesController.pushObject(Rule.create(rule));
                     }
                     Mist.rulesController.redrawRules();
                 }).error( function() {
-                    Mist.notificationController.notify('Error while checking monitoring');
+                    Mist.notificationController.notify('Error checking monitoring');
                 });
             },
 
             providerList: function() {
                 return SUPPORTED_PROVIDERS;
             }.property('providerList')
-
-           /* Caclculates controller state based
-            * on all backends. Currently commented
-            * out as it is not clear weather it shall 
-            * be used or not.
-            * 
-            backendsStateObserver: function() {
-                var state = 'ok';
-                var waiting = false;
-                this.content.some(function(backend) {
-                    if (backend.error) {
-                        state = 'error';
-                        return true;
-                    } else if(backend.state == 'waiting') {
-                        return true;
-                        waiting = true;
-                    } else if(backend.state == 'offline') {
-                        return true;
-                        state = 'down';
-                    }
-                });
-                if (waiting) {
-                    state = 'state-wait-' + state;
-                } else {
-                    state = 'state-' + state;
-                }
-                this.set('state', state);
-            }.observes('@each.state'),
-            */
         });
     }
 );
