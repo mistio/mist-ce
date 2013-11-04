@@ -60,21 +60,21 @@ def get_auth_key(request):
         return auth_key
 
 
-def get_ssh_user_from_keypair(keypair, backend_id=None, machine_id=None):
+def get_ssh_user_from_keypair(keypair, backend_id, machine_id):
     """get ssh user for key pair given the key pair"""
-    machines = keypair.get('machines', [])
-    #~ log.debug("Machines in keypair %s: %s" % (keypair, machines))
-    for machine in machines:
+
+    user = ''
+    for machine in keypair.machines:
         log.debug("Machine: %s" % machine)
         if machine[:2] == [backend_id, machine_id]:
             try:
-                #this should be the user, since machine = [backend_id, machine_id, timestamp, ssh_user, sudoer]
-                log.debug("user %s" % machine[3])
-                return machine[3]
+                # this should be the user, since machine =
+                # [backend_id, machine_id, timestamp, ssh_user, sudoer]
+                user = machine[3]
             except:
-                log.debug("user is None")
-                return ''
-    return ''
+                pass
+    log.debug("get_ssh_user_from_keypair: %s", user)
+    return user
 
 
 # functionality already transfered to methods connect
@@ -249,47 +249,28 @@ def b58_decode(s):
 
 
 def get_preferred_keypairs(keypairs, backend_id, machine_id):
-    """ Returns a list with the preferred keypairs for this machine
-    """
+    """ Returns a list with the preferred keypairs for this machine."""
 
-    default_keypair = [k for k in keypairs if keypairs[k].get('default', False)]
-    associated_keypairs = [k for k in keypairs \
-                           for m in keypairs[k].get('machines',[]) \
-                           if m[0] == backend_id and m[1] == machine_id]
-    recently_tested_keypairs = [k for k in associated_keypairs \
-                                for m in keypairs[k].get('machines',[]) \
-                                if len(m) > 2 and int(time()) - int(m[2]) < 7*24*3600]
-    
-    # Try to find a recently tested root keypair
-    root_keypairs = [k for k in recently_tested_keypairs \
-                     for m in keypairs[k].get('machines',[]) \
-                     if len(m) > 3 and m[3] == 'root']
-    
-    if not root_keypairs:
-        # If not try to get a recently tested sudoer keypair
-        sudo_keypairs = [k for k in recently_tested_keypairs \
-                         for m in keypairs[k].get('machines',[]) \
-                         if len(m) > 4 and m[4] == True]
-        if not sudo_keypairs:
-            # If there is none just try to get a root or sudoer associated keypair even if not recently tested
-            preferred_keypairs = [k for k in associated_keypairs \
-                                  for m in keypairs[k].get('machines',[]) \
-                                  if len(m) > 3 and m[3] == 'root'] or \
-                                 [k for k in associated_keypairs \
-                                  for m in keypairs[k].get('machines',[]) \
-                                  if len(m) > 4 and m[4] == True]
-            if not preferred_keypairs:
-                # If there is none of the above then just use whatever keys are available
-                preferred_keypairs = associated_keypairs
-        else:
-            preferred_keypairs = sudo_keypairs
-    else:
-        preferred_keypairs = root_keypairs
-    
-    if len(default_keypair) and default_keypair[0] not in preferred_keypairs:
-        preferred_keypairs.append(default_keypair[0])
-        
-    return preferred_keypairs
+    default_keys = filter(lambda key_id: keypairs[key_id].default, keypairs)
+    assoc_keys = []
+    recent_keys = []
+    root_keys = []
+    sudo_keys = []
+    for key_id in keypairs:
+        for machine in keypairs[key_id].machines:
+            if [backend_id, machine_id] == machine[:2]:
+                assoc_keys.append(key_id)
+                if len(machine) > 2 and int(time() - machine[2]) < 7*24*3600:
+                    recent_keys.append(key_id)
+                if len(machine) > 3 and machine[3] == 'root':
+                    root_keys.append(key_id)
+                if len(machine) > 4 and machine[4] == True:
+                    sudo_keys.append(key_id) 
+
+    pref_keys = root_keys or sudo_keys or assoc_keys
+    if default_keys and default_keys[0] not in pref_keys:
+        pref_keys.append(default_keys[0])
+    return pref_keys
 
 
 def get_temp_file(content):
