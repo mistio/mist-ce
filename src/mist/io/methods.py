@@ -953,7 +953,7 @@ def run_command(host, ssh_user, command, private_key=None, password=None):
 
     shell = Shell(host=host, username=ssh_user, pkey=private_key, password=password)
     try:
-        output = shell.command(command)
+        output, error = shell.command(command)
         shell.close_connection()
         return output
     except:

@@ -179,15 +179,20 @@ class Shell(object):
         Checks if sudo is installed. In case it is self.sudo = True,
         else self.sudo = False
         """
-        stdin, stdout, stderr = self.ssh.exec_command("which sudo")
-        if not stderr.read():
+        stdout, stderr = self.command("which sudo")
+        if not stderr:
             self.sudo = True
 
     def command(self, cmd):
+        """
+        @param cmd: Command to run
+        @return: Returns a tuple with the stdout and stderr
+        """
         try:
             stdin, stdout, stderr = self.ssh.exec_command(cmd)
             self.stdout = stdout.read()
-            return self.stdout
+            self.stderr = stderr.read()
+            return self.stdout, self.stderr
         except:
             self.close_connection()
 
