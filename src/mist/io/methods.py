@@ -1,6 +1,7 @@
 import os
 import tempfile
 import logging
+import random
 from time import time
 
 
@@ -950,13 +951,14 @@ def run_command(user, backend_id, machine_id, host, command, key_id=None, passwo
     private_key in case it needs password.
     @return:
     """
+
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
     if key_id is not None and key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
 
     keypairs = user.keypairs
-    pref_keys = [key_id] or get_preferred_keypairs(keypairs)
+    pref_keys = [key_id] or get_preferred_keypairs(keypairs, backend_id, machine_id)
     shell = None
 
     for key_id in pref_keys:
@@ -978,7 +980,7 @@ def run_command(user, backend_id, machine_id, host, command, key_id=None, passwo
         shell.close_connection()
 
         with user.lock_n_load():
-            for i in tange(len(user.keypairs[key_id].machines)):
+            for i in range(len(user.keypairs[key_id].machines)):
                 machine = user.keypairs[key_id].machines[i]
                 if [backend_id, machine_id] == machine[:2]:
                     assoc = [backend_id, machine_id, time(), ssh_user, sudoer]

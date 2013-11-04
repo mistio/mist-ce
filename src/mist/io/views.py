@@ -74,7 +74,7 @@ def exception_handler_general(exc, request):
 
     """
 
-    log.error("Exception handler caught non-mist exception %s", e)
+    log.error("Exception handler caught non-mist exception %s", exc)
     return Response("Internal Server Error", 503)
 
 
@@ -806,7 +806,7 @@ def update_monitoring(request):
             email = request.json_body['email']
             password = request.json_body['pass']
             payload = {'email': email, 'password': password}
-            ret = requests.post(settings['core_uri'] + '/auth', params=payload, verify=False)
+            ret = requests.post(request.settings['core_uri'] + '/auth', params=payload, verify=False)
             if ret.status_code == 200:
                 request.settings['auth'] = 1
                 user['email'] = email

@@ -28,7 +28,7 @@ import logging
 import os
 import yaml
 from time import sleep
-from copy import deepcopy
+from copy import copy, deepcopy
 from collections import MutableSequence, MutableMapping
 from contextlib import contextmanager
 
