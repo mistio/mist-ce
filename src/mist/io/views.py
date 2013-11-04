@@ -44,7 +44,7 @@ OK = Response("OK", 200)
 
 
 @view_config(context=BaseError)
-def exception_handler(exc, request):
+def exception_handler_mist(exc, request):
     """Here we catch exceptions and transform them to proper http responses
 
     This is a special pyramid view that gets triggered whenever an exception
@@ -53,13 +53,29 @@ def exception_handler(exc, request):
 
     """
 
-    log.error("Exception: %r", exc)
+    log.warning("Exception: %r", exc)
     if isinstance(exc, NotFoundError):
-        return Response(str(exc), 401)
+        return Response(str(exc), 404)
     elif isinstance(exc, BadRequestError):
         return Response(str(exc), 502)
+    elif isinstance(exc, UnauthorizedError):
+        return Response(str(exc), 401)
     else:
         return Response("Internal Server Error", 503)
+
+
+#~ @view_config(context=Exception)
+def exception_handler_general(exc, request):
+    """This simply catches all exceptions that don't subclass BaseError and
+    returns an Internal Server Error status code.
+
+    When debugging it may be useful to comment out this function or its
+    @view decorator.
+
+    """
+
+    log.error("Exception handler caught non-mist exception %s", e)
+    return Response("Internal Server Error", 503)
 
 
 @view_config(route_name='home', request_method='GET',
@@ -87,7 +103,7 @@ def home(request):
 
 @view_config(route_name="check_auth", request_method='POST', renderer="json")
 def check_auth(request):
-    "Check on the mist.core service if authenticated"
+    """Check on the mist.core service if authenticated"""
 
     params = request.json_body
     email = params.get('email', '').lower()
@@ -287,53 +303,23 @@ def create_machine(request):
     return ret
 
 
-@view_config(route_name='machine', request_method='POST',
-             request_param='action=start', renderer='json')
-def start_machine(request):
-    """Starts a machine on backends that support it."""
+@view_config(route_name='machine', request_method='POST')
+def machine_actions(request):
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     user = user_from_request(request)
-    methods.start_machine(user, backend_id, machine_id)
-    return OK
-
-
-@view_config(route_name='machine', request_method='POST',
-             request_param='action=stop', renderer='json')
-def stop_machine(request):
-    backend_id = request.matchdict['backend']
-    machine_id = request.matchdict['machine']
-    user = user_from_request(request)
-    methods.stop_machine(user, backend_id, machine_id)
-    return OK
-
-
-@view_config(route_name='machine', request_method='POST',
-             request_param='action=reboot', renderer='json')
-def reboot_machine(request, backend_id=None, machine_id=None):
-    """Reboots a machine on a certain backend."""
-
-    backend_id = request.matchdict['backend']
-    machine_id = request.matchdict['machine']
-    user = user_from_request(request)
-    methods.reboot_machine(user, backend_id, machine_id)
-    return OK
-
-
-@view_config(route_name='machine', request_method='POST',
-             request_param='action=destroy', renderer='json')
-def destroy_machine(request, backend_id=None, machine_id=None):
-    """Destroys a machine on a certain backend.
-
-    After destroying a machine it also deletes all key associations.
-
-    """
-
-    backend_id = request.matchdict['backend']
-    machine_id = request.matchdict['machine']
-    user = user_from_request(request)
-    methods.destroy_machine(user, backend_id, machine_id)
-    return OK
+    action = request.params.get('action')
+    if action in ('start', 'stop', 'reboot', 'destroy'):
+        if action == 'start':
+            methods.start_machine(user, backend_id, machine_id)
+        elif action == 'stop':
+            methods.stop_machine(user, backend_id, machine_id)
+        elif action == 'reboot':
+            methods.reboot_machine(user, backend_id, machine_id)
+        elif action == 'destroy':
+            methods.destroy_machine(user, backend_id, machine_id)
+        return OK
+    raise BadRequestError()
 
 
 @view_config(route_name='machine_metadata', request_method='POST',
@@ -595,7 +581,9 @@ def probe(request):
 
 @view_config(route_name='images', request_method='POST', renderer='json')
 def list_specific_images(request):
+    # FIXME: 1) i shouldn't exist, 2) i shouldn't be a post
     return list_images(request)
+
 
 @view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
@@ -603,162 +591,51 @@ def list_images(request):
     Furthermore if a search_term is provided, we loop through each
     backend and search for that term in the ids and the names of 
     the community images"""
-    
-    try:
-        conn = connect(request)
-    except:
-        return Response('Backend not found', 404)
-    
+
     backend_id = request.matchdict['backend']
-    
-    term = None
     try:
         term = request.json_body.get('search_term', '').lower()
     except:
-        pass
-    
-    with get_user(request, readonly=True) as user:
-        backends = user.get('backends', {})
-    
-    try:
-        starred = backends.get(backend_id, {}).get('starred', [])
-        # Initialize arrays
-        starred_images = []
-        ec2_images = []
-        rest_images = []
-        images = []
-        if conn.type in EC2_PROVIDERS:
-            ec2_images = conn.list_images(None, EC2_IMAGES[conn.type].keys() + starred)
-            for image in ec2_images:
-                image.name = EC2_IMAGES[conn.type].get(image.id, image.name)
-        else:
-            rest_images = conn.list_images()
-            starred_images = [image for image in rest_images if image.id in starred]
-            
-        if term and conn.type in EC2_PROVIDERS:
-            ec2_images += conn.list_images(ex_owner="self")
-            ec2_images += conn.list_images(ex_owner="aws-marketplace")
-            ec2_images += conn.list_images(ex_owner="amazon")
-        
-        images = [ image for image in starred_images + ec2_images + rest_images 
-            if not (image.id[:3] in ['aki', 'ari'] or 'windows' in image.name.lower() or 'hvm' in image.name.lower())]
-        
-        if term: 
-            images = [ image for image in images if term in image.id.lower() or term in image.name.lower() ][:20]
-        
-    except:
-        return Response('Backend unavailable', 503)
-    
-    ret = []
-    for image in images:
-        if image.id in starred:
-            star = True
-            starred.remove(image.id)
-        else:
-            star = False
-        ret.append({'id'    : image.id,
-                    'extra' : image.extra,
-                    'name'  : image.name,
-                    'star'  : star,
-                    })
-    return ret
+        term = None
+    user = user_from_request(request)
+    return methods.list_images(user, backend_id, term)
+
 
 @view_config(route_name='image', request_method='POST', renderer='json')
 def star_image(request):
     """Toggle image as starred."""
-    try:
-        conn = connect(request)
-    except:
-        return Response('Backend not found', 404)
-    
+
     backend_id = request.matchdict['backend']
     image_id = request.matchdict['image']
-    
-    starred = True
-    with get_user(request) as user:
-        backends = user.get('backends', {})
-
-        if not backend_id in backends:
-            return Response('Backend id not found %s' % backend_id, 400)
-    
-        if backends[backend_id].get('starred', None):
-            if image_id in backends[backend_id]['starred']:
-                backends[backend_id]['starred'].remove(image_id)
-                starred = False
-            else:
-                backends[backend_id]['starred'].append(image_id)
+    user = user_from_request(request)
+    with user.lock_n_load():
+        if backend_id not in user.backends:
+            raise BackendNotFoundError(backend_id)
+        backend = user.backends[backend_id]
+        if image_id not in backend.starred:
+            backend.starred.append(image_id)
         else:
-            backends[backend_id]['starred'] = [image_id]
-        
-    return starred
+            backend.starred.remove(image_id)
+        user.save()
+    return image_id in backend.starred
 
 
 @view_config(route_name='sizes', request_method='GET', renderer='json')
 def list_sizes(request):
     """List sizes (aka flavors) from each backend."""
-    try:
-        conn = connect(request)
-    except:
-        return Response('Backend not found', 404)
 
-    try:
-        sizes = conn.list_sizes()
-    except:
-        return Response('Backend unavailable', 503)
-
-    ret = []
-    for size in sizes:
-        ret.append({'id'        : size.id,
-                    'bandwidth' : size.bandwidth,
-                    'disk'      : size.disk,
-                    'driver'    : size.driver.name,
-                    'name'      : size.name,
-                    'price'     : size.price,
-                    'ram'       : size.ram,
-                    })
-
-    return ret
+    backend_id = request.matchdict['backend']
+    user = user_from_request(request)
+    return methods.list_sizes(user, backend_id)
 
 
 @view_config(route_name='locations', request_method='GET', renderer='json')
 def list_locations(request):
-    """List locations from each backend.
+    """List locations from each backend."""
 
-    Locations mean different things in each backend. e.g. EC2 uses it as a
-    datacenter in a given availability zone, whereas Linode lists availability
-    zones. However all responses share id, name and country eventhough in some
-    cases might be empty, e.g. Openstack.
-
-    In EC2 all locations by a provider have the same name, so the availability
-    zones are listed instead of name.
-
-    """
-    try:
-        conn = connect(request)
-    except:
-        return Response('Backend not found', 404)
-
-    try:
-        locations = conn.list_locations()
-    except:
-        locations = [NodeLocation('', name='default', country='', driver=conn)]
-
-    ret = []
-    for location in locations:
-        if conn.type in EC2_PROVIDERS:
-            try:
-                name = location.availability_zone.name
-            except:
-                name = location.name
-        else:
-            name = location.name
-
-        ret.append({'id'        : location.id,
-                    'name'      : name,
-                    'country'   : location.country,
-                    })
-
-    return ret
+    backend_id = request.matchdict['backend']
+    user = user_from_request(request)
+    return methods.list_locations(user, backend_id)
 
 
 @view_config(route_name='keys', request_method='GET', renderer='json')
@@ -771,7 +648,6 @@ def list_keys(request):
     """
 
     user = user_from_request(request)
-    
     return [{'id': key.replace(' ', ''),
              'name': key,
              'machines': user.keypairs[key].machines,
@@ -829,7 +705,7 @@ def edit_key(request):
     user = user_from_request(request)
     methods.edit_key(user, key_id, old_id)
 
-    return Response('OK', 200)
+    return OK
 
 
 @view_config(route_name='key_action', request_method='POST', renderer='json')
@@ -838,7 +714,7 @@ def set_default_key_request(request):
     user = user_from_request(request)
 
     methods.set_default_key(user, key_id)
-    return Response('OK', 200)
+    return OK
 
 @view_config(route_name='key_action', request_method='GET', request_param='action=private', renderer='json')
 def get_private_key(request):
@@ -1004,7 +880,7 @@ def delete_rule(request):
     if ret.status_code != 200:
         return Response('Service unavailable', 503)
 
-    return Response('OK', 200)
+    return OK
 
 
 def update_available_keys(request, backend_id, machine_id, ssh_user, host, authorized_keys):

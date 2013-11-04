@@ -27,6 +27,8 @@ getOODictField, getFieldsListField, getFieldsDictField, OODict, UserEngine
 import logging
 import os
 import yaml
+from time import sleep
+from copy import deepcopy
 from collections import MutableSequence, MutableMapping
 from contextlib import contextmanager
 
@@ -77,7 +79,7 @@ class Field(object):
         atype, btype = atypes[0], btypes[0]
         # if val is None (not set), use default value
         if val is None:
-            val = self.default
+            val = deepcopy(self.default)
             log.debug("Just set default value '%s'", self.default)
         if type(val) not in [atype, btype]:
             log.warn("%s: value is %s, should preferably be %s",
@@ -284,6 +286,12 @@ class OODict(object):
     def get_raw(self):
         return self._dict
 
+    def __copy__(self):
+        return type(self)(copy(self._dict))
+
+    def __deepcopy__(self, memo):
+        return type(self)(deepcopy(self._dict, memo))
+
 
 class FieldsSequence(object):
     """Sets up a basic Sequence field, whose items are being parsed by
@@ -337,6 +345,12 @@ class FieldsSequence(object):
 
     def get_raw(self):
         return self._seq
+
+    def __copy__(self):
+        return type(self)(copy(self._seq))
+
+    def __deepcopy__(self, memo):
+        return type(self)(deepcopy(self._seq, memo))
 
 
 def getFieldsList(field):
@@ -414,15 +428,13 @@ class UserEngine(OODict):
 
     _lock = None
 
-    def __init__(self, _dict={}):
-        """Set the storage resources and initiate the user.
-        _dict should be a user dict, as returned by mongo
-        """
+    def __init__(self):
+        """Loads user from db.yaml"""
         super(UserEngine, self).__init__(self._load_from_settings())
 
     def _load_from_settings(self):
         """Load user settings from db.yaml We have seperated
-        user-pecific settings from general settings
+        user-specific settings from general settings
         and everything regarding the user dict is
         now in db.yaml (as if it were a database). General
         settings like js_build etc remain in settings.yaml file"""
@@ -445,8 +457,11 @@ class UserEngine(OODict):
             raise
         return user_config
 
+
     def refresh(self, flush=False):
         """Dummy method, doesn't really do anything."""
+        self.__init__()
+
 
     @contextmanager
     def lock_n_load(self):
@@ -457,9 +472,34 @@ class UserEngine(OODict):
                 user.save()
         Lock is automatically released after exiting the 'with' block.
         """
+
+        #~ sleep_interval = 0.1
+        #~ max_wait = 10
+        #~ lock_dir = os.getcwd() + "/db.yaml.lock"
+        #~ times = 0
+        #~ while True:
+            #~ try:
+                #~ os.mkdir(lock_dir)
+            #~ except:
+                #~ log.debug("Lock set, sleeping")
+                #~ if times * sleep_interval > max_wait:
+                    #~ log.critical("DEAD LOCK: Breaking lock")
+                    #~ os.rmdir(lock_dir)
+                #~ sleep(sleep_interval)
+                #~ times += 1
+            #~ else:
+                #~ log.info("Acquired lock")
+                #~ break
         self._lock = True
-        yield
-        self.lock = False
+        try:
+            yield
+        except:
+            raise
+        finally:
+            log.info("Releasing lock")
+            self.lock = False
+            #~ os.rmdir(lock_dir)
+            
         #~ try:
             #~ self._lock = True
             #~ yield   # here execution returns to the with statement
@@ -480,24 +520,28 @@ class UserEngine(OODict):
             raise Exception("Attempting to save without prior lock. "
                             "You should be ashamed of yourself.")
 
-        #~ class folded_unicode(unicode):
-            #~ pass
-#~ 
-        #~ class literal_unicode(unicode):
-            #~ pass
-#~ 
-        #~ def literal_unicode_representer(dumper, data):
-            #~ return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='|')
-#~ 
-        #~ def folded_unicode_representer(dumper, data):
-            #~ return dumper.represent_scalar(u'tag:yaml.org,2002:str', data, style='>')
-#~ 
-        #~ def unicode_representer(dumper, uni):
-            #~ node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
-            #~ return node
-#~ 
-        #~ yaml.add_representer(unicode, unicode_representer)
-        #~ yaml.add_representer(literal_unicode, literal_unicode_representer)
+        class folded_unicode(unicode): pass
+        class literal_unicode(unicode): pass
+        class literal_string(str): pass
+
+        def literal_unicode_representer(dumper, data):
+            return dumper.represent_scalar(u'tag:yaml.org,2002:str',
+                                           data, style='|')
+
+        def literal_string_representer(dumper, data):
+            return dumper.represent_scalar(u'tag:yaml.org,2002:str',
+                                           data, style='|')
+
+        def folded_unicode_representer(dumper, data):
+            return dumper.represent_scalar(u'tag:yaml.org,2002:str',
+                                           data, style='>')
+
+        def unicode_representer(dumper, uni):
+            return yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
+
+        yaml.add_representer(unicode, unicode_representer)
+        yaml.add_representer(literal_unicode, literal_unicode_representer)
+        yaml.add_representer(literal_string, literal_string_representer)
         yaml_db = os.getcwd() + "/db.yaml"
         config_file = open(yaml_db, 'w')
         yaml.dump(self._dict, config_file, default_flow_style=False, )

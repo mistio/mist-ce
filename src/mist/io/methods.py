@@ -11,6 +11,7 @@ from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider
 from libcloud.common.types import InvalidCredsError
 from libcloud.compute.types import NodeState
+from pyramid.response import Response    # temp
 
 
 from mist.io.config import STATES, SUPPORTED_PROVIDERS
@@ -933,6 +934,7 @@ def destroy_machine(user, backend_id, machine_id):
                     disassociate_key(user, key_id, backend_id,
                                      machine_id, undeploy=False)
 
+
 def run_command(host, ssh_user, command, private_key=None, password=None):
     """
     We initialize a Shell instant (for mist.io.shell).
@@ -956,3 +958,127 @@ def run_command(host, ssh_user, command, private_key=None, password=None):
         return output
     except:
         shell.close_connection()
+
+
+def list_images(user, backend_id, term=None):
+    """List images from each backend. 
+    Furthermore if a search_term is provided, we loop through each
+    backend and search for that term in the ids and the names of 
+    the community images"""
+
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+
+    backend = user.backends[backend_id]
+    conn = connect_provider(backend)
+    #~ try:
+    starred = list(backend.starred)
+    # Initialize arrays
+    starred_images = []
+    ec2_images = []
+    rest_images = []
+    images = []
+    if conn.type in EC2_PROVIDERS:
+        imgs = EC2_IMAGES[conn.type].keys() + starred
+        ec2_images = conn.list_images(None, imgs)
+        for image in ec2_images:
+            image.name = EC2_IMAGES[conn.type].get(image.id, image.name)
+    else:
+        rest_images = conn.list_images()
+        starred_images = [image for image in rest_images if image.id in starred]
+
+    if term and conn.type in EC2_PROVIDERS:
+        ec2_images += conn.list_images(ex_owner="self")
+        ec2_images += conn.list_images(ex_owner="aws-marketplace")
+        ec2_images += conn.list_images(ex_owner="amazon")
+
+    images = starred_images + ec2_images + rest_images
+    images = [img for img in images
+                    if img.id[:3] not in ['aki', 'ari']
+                    and img.id[:3] not in ['aki', 'ari']
+                    and 'windows' not in img.name.lower()
+                    and 'hvm' not in img.name.lower()
+    ]
+
+    if term: 
+        images = [img for img in images
+                        if term in img.id.lower()
+                        or term in img.name.lower()
+        ][:20]
+    #~ except Exception as e:
+        #~ log.error(e)
+        #~ return Response('Backend unavailable', 503)
+    
+    ret = []
+    for image in images:
+        ret.append({'id': image.id, 'extra': image.extra,
+                    'name': image.name, 'star': image.id in starred})
+    return ret
+
+
+def list_sizes(user, backend_id):
+    """List sizes (aka flavors) from each backend."""
+
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+    conn = connect_provider(backend)
+
+    try:
+        sizes = conn.list_sizes()
+    except:
+        return Response('Backend unavailable', 503)
+
+    ret = []
+    for size in sizes:
+        ret.append({'id'        : size.id,
+                    'bandwidth' : size.bandwidth,
+                    'disk'      : size.disk,
+                    'driver'    : size.driver.name,
+                    'name'      : size.name,
+                    'price'     : size.price,
+                    'ram'       : size.ram,
+                    })
+
+    return ret
+
+
+def list_locations(user, backend_id):
+    """List locations from each backend.
+
+    Locations mean different things in each backend. e.g. EC2 uses it as a
+    datacenter in a given availability zone, whereas Linode lists availability
+    zones. However all responses share id, name and country eventhough in some
+    cases might be empty, e.g. Openstack.
+
+    In EC2 all locations by a provider have the same name, so the availability
+    zones are listed instead of name.
+
+    """
+
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+    conn = connect_provider(backend)
+
+    try:
+        locations = conn.list_locations()
+    except:
+        locations = [NodeLocation('', name='default', country='', driver=conn)]
+
+    ret = []
+    for location in locations:
+        if conn.type in EC2_PROVIDERS:
+            try:
+                name = location.availability_zone.name
+            except:
+                name = location.name
+        else:
+            name = location.name
+
+        ret.append({'id'        : location.id,
+                    'name'      : name,
+                    'country'   : location.country,
+                    })
+
+    return ret

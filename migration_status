@@ -8,7 +8,7 @@ Functions in views.py
     def delete_backend():               OK
     def toggle_backend():               OK? untested
     def list_machines():                OK
-    def create_machine():               IN PROGRESS: DR
+    def create_machine():               OK? untested
     def start_machine():                OK? untested
     def stop_machine():                 OK? untested
     def reboot_machine():               OK? untested
@@ -17,11 +17,11 @@ Functions in views.py
     def delete_machine_metadata():
     def shell_command():                IN PROGRESS: New run_command in methods.py
     def probe():
-    def list_specific_images():
-    def list_images():
-    def star_image():
-    def list_sizes():
-    def list_locations():
+    def list_specific_images():         OK? untested
+    def list_images():                  OK? untested
+    def star_image():                   OK? untested
+    def list_sizes():                   OK? untested
+    def list_locations():               OK? untested
     def list_keys():                    OK? untested
     def add_key():                      OK
     def delete_key():                   OK

@@ -64,7 +64,7 @@ class Backend(OODict):
     provider = StrField()
     datacenter = StrField()
 
-    starred = getFieldsListField(StrField)
+    starred = getFieldsListField(StrField)()
     machines = getFieldsDictField(getOODictField(MonMachine))()
 
     def __repr__(self):
@@ -94,9 +94,9 @@ class Keypair(OODict):
         if 'ssh-rsa' in self.public:
             public_key_container = RSA.importKey(self.public)
             private_key_container = RSA.importKey(self.private)
-            encrypted_message = public_key_container.encrypt(message, 0)
-            decrypted_message = private_key_container.decrypt(encrypted_message)
-            if message == decrypted_message:
+            encr_message = public_key_container.encrypt(message, 0)
+            decr_message = private_key_container.decrypt(encr_message)
+            if message == decr_message:
                 return True
         return False
 
