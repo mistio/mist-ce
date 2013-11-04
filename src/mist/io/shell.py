@@ -134,7 +134,7 @@ class Shell(object):
     def __init__(self, host, username="root", password=None, pkey=None, autoConnect=True):
         """
         @param host: The host to be connected to
-        @param username: Username
+        @param username: Username to be used, by default it is root.
         @param password: By default password is None. This means that we'll use
         the private key by default. However, password can be useful in two cases.
         Either with bare-metal support or when needed as passphrase by a private key
@@ -143,7 +143,12 @@ class Shell(object):
         connection. It will just create a Shell object
         """
         self.host = host
+
         self.username = username
+        usernames = [username, 'ec2-user', 'ubuntu', 'amazon']
+        if self.username != 'root':
+            usernames.append('root')
+
         self.pkey = None
         self.sudo = False
         if password:
@@ -160,19 +165,23 @@ class Shell(object):
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
         if autoConnect:
+            for name in usernames:
+                try:
+                    self.username = name
+                    self.connect()
+                    break
+                except paramiko.SSHException:
+                    log.error("Could not connect as %s" % self.username)
             self.connect()
 
         self.stdout = ""
         self.stderr = ""
 
     def connect(self):
-        try:
-            if self.pkey:
-                self.ssh.connect(self.host, username=self.username, pkey=self.pkey)
-            else:
-                self.ssh.connect(self.host, username=self.username, password=self.password)
-        except:
-            self.close_connection()
+        if self.pkey:
+            self.ssh.connect(self.host, username=self.username, pkey=self.pkey)
+        else:
+            self.ssh.connect(self.host, username=self.username, password=self.password)
 
     def checkSudo(self):
         """
