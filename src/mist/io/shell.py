@@ -131,7 +131,7 @@ class Shell(object):
     password or private key for connecting and authorizing.
     """
 
-    def __init__(self, host, username="root", password=None, pkey=None, connect=True):
+    def __init__(self, host, username="root", password=None, pkey=None, autoConnect=True):
         """
         @param host: The host to be connected to
         @param username: Username
@@ -144,6 +144,7 @@ class Shell(object):
         """
         self.host = host
         self.username = username
+        self.pkey = None
         if password:
             self.password = password
         if pkey:
@@ -152,13 +153,16 @@ class Shell(object):
             key_fd.write(pkey)
             key_fd.close()
             self.pkey = paramiko.RSAKey.from_private_key_file(key_path)
+            os.remove(key_path)
 
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        os.remove(key_path)
 
-        if connect:
+        if autoConnect:
             self.connect()
+
+        self.stdout = ""
+        self.stderr = ""
 
     def connect(self):
         try:
@@ -173,8 +177,9 @@ class Shell(object):
         try:
             stdin, stdout, stderr = self.ssh.exec_command(cmd)
             self.stdout = stdout.read()
-            return self.output()
-        except:
+            return self.stdout
+        except Exception as e:
+            print "In connect, exception %s" % e
             self.close_connection()
 
     def command_stream(self, cmd):

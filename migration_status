@@ -15,7 +15,7 @@ Functions in views.py
     def destroy_machine():              OK? untested
     def set_machine_metadata():
     def delete_machine_metadata():
-    def shell_command():
+    def shell_command():                IN PROGRESS: New run_command in methods.py
     def probe():
     def list_specific_images():
     def list_images():

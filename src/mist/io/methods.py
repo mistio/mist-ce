@@ -21,6 +21,7 @@ from mist.io.config import LINODE_DATACENTERS
 from mist.io.model import Backend, Keypair
 from mist.io.exceptions import *
 
+from mist.io.shell import Shell
 
 from mist.io.helpers import generate_backend_id
 
@@ -931,3 +932,27 @@ def destroy_machine(user, backend_id, machine_id):
                 if machine[:2] == pair:
                     disassociate_key(user, key_id, backend_id,
                                      machine_id, undeploy=False)
+
+def run_command(host, ssh_user, command, private_key=None, password=None):
+    """
+    We initialize a Shell instant (for mist.io.shell).
+
+    @param host: The host to connect to
+    @param ssh_user: Username
+    @param private_key: The private_key. We may not need to put one, as we may
+    want to connect only with password (e.g. bare-metal server)
+    @param command: Command to run
+    @param password: Password. By default password is none, as we use private_key.
+    However we may need to connect only with password (e.g. bare-metal server). In
+    case both password and private_key are given, then the password is used for the
+    private_key in case it needs password.
+    @return:
+    """
+
+    shell = Shell(host=host, username=ssh_user, pkey=private_key, password=password)
+    try:
+        output = shell.command(command)
+        shell.close_connection()
+        return output
+    except:
+        shell.close_connection()
