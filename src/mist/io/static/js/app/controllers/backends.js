@@ -40,10 +40,10 @@ define('app/controllers/backends', [
                     data.forEach(function(backend) {
                         that.pushObject(Backend.create(backend));
                     });
-                    this.set('loadingBackends', false);
+                    that.set('loadingBackends', false);
                 }).error(function() {
                     Mist.notificationController.notify('Error loading backends');
-                    this.set('loadingBackends', false);
+                    that.set('loadingBackends', false);
                     Ember.run.later(function() {
                         that.loadBackends();
                     }, 5000);
