@@ -163,7 +163,6 @@ define('app/controllers/backends', [
                     */
                     var rules = data.rules;
                     for (ruleId in rules) {
-                        info(ruleId);
                         var rule = {};
                         rule.id = ruleId;
                         rule.value = rules[ruleId].value;
@@ -177,7 +176,6 @@ define('app/controllers/backends', [
                             rule.backend_id = rules[ruleId].backend;
                             rule.machine_id = rules[ruleId].machine;
                         }
-                        info(rule);
                         Mist.rulesController.pushObject(Rule.create(rule));
                     }
                     Mist.rulesController.redrawRules();
