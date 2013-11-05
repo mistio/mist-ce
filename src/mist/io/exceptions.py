@@ -110,3 +110,6 @@ class MachineCreationError(InternalServerError):
 class KeyValidationError(BadRequestError):
     msg = "Keypair could not be validated"
 
+
+class BackendUnavailableError(BaseError):
+    msg = "Backend unavailable"

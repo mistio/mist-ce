@@ -46,20 +46,6 @@ def get_user(request, readonly=False, refresh=False, ext_auth=False):
         user.save()
 
 
-#####FIXME: This is UGLY!!!!
-try:
-    from mist.core.helpers import get_user
-except:
-    pass
-    
-def get_auth_key(request):
-    with get_user(request, readonly=True) as user:
-        from base64 import urlsafe_b64encode
-        auth_key = "%s:%s" % (user['email'], user['password'])
-        auth_key = urlsafe_b64encode(auth_key)
-        return auth_key
-
-
 def get_ssh_user_from_keypair(keypair, backend_id, machine_id):
     """get ssh user for key pair given the key pair"""
 
