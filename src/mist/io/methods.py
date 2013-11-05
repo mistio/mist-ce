@@ -27,7 +27,8 @@ from mist.io.exceptions import *
 
 from mist.io.shell import Shell
 
-from mist.io.helpers import generate_backend_id, get_preferred_keypairs, get_ssh_user_from_keypair
+from mist.io.helpers import generate_backend_id, get_preferred_keypairs
+from mist.io.helpers import get_ssh_user_from_keypair
 
 
 log = logging.getLogger(__name__)
@@ -199,7 +200,7 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
     """
 
     log.info("Associate key, deploy = %s" % host)
-    
+
     if key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
     if backend_id not in user.backends:
@@ -222,9 +223,6 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
 
     #TODO
     if host:
-
-
-
         grep_output = '`grep \'%s\' ~/.ssh/authorized_keys`' % keypair.public
         command = 'if [ -z "%s" ]; then echo "%s" >> ~/.ssh/authorized_keys; fi' \
                   % (grep_output, keypair.public)
@@ -232,44 +230,42 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
             ret = ssh_command(user, backend_id, machine_id, host, command)
         except:
             pass
-#~ 
-    #~ # Maybe the deployment failed but let's try to connect with the new key and see what happens
+#~
+    #~ # Maybe the deployment failed but let's try to connect with the
+    #~ new key and see what happens
     #~ with get_user(request, readonly=True) as user:
-        #~ keypairs = user.get('keypairs',{})    
+        #~ keypairs = user.get('keypairs',{})
         #~ key_name = None
         #~ for key_name, k in keypairs.items():
             #~ if k == keypair:
                 #~ break
-#~ 
+#~
         #~ if key_name:
             #~ log.warn('probing with key %s' % key_name)
-#~ 
+#~
         #~ if ret:
             #~ ssh_user = ret.get('ssh_user', None)
         #~ else:
             #~ ssh_user = None
-#~ 
-        #~ test = shell_command(request, backend_id, machine_id, host, 'whoami', ssh_user, key = key_name)
-#~ 
+#~
+        #~ test = shell_command(request, backend_id, machine_id, host,
+        #~                      'whoami', ssh_user, key = key_name)
+#~
         #~ return test
-
-
-
-
-
-
-        pass
+########
         #~ ret = deploy_key(request, keypair)
-    #~ 
+    #~
         #~ if ret:
-            #~ keypair['machines'][-1] += [int(time()), ret.get('ssh_user', ''), ret.get('sudoer', False)]
+            #~ keypair['machines'][-1] += [int(time()),
+            #~                             ret.get('ssh_user', ''),
+            #~                             ret.get('sudoer', False)]
             #~ log.debug("Associate key, %s" % keypair['machines'])
             #~ return keypair['machines']
         #~ else:
             #~ if machine_uid in keypair['machines']:
                 #~ keypair['machines'].remove(machine_uid)
             #~ log.debug("Disassociate key, %s" % keypair['machines'])
-            #~ 
+            #~
             #~ return Response('Failed to deploy key', 412)
     #~ else:
         #~ return keypair['machines']
@@ -284,7 +280,7 @@ def disassociate_key(user, key_id, backend_id, machine_id, host=None):
     """
 
     log.info("Disassociate key, undeploy = %s" % host)
-    
+
     if key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
     if backend_id not in user.backends:
@@ -303,12 +299,13 @@ def disassociate_key(user, key_id, backend_id, machine_id, host=None):
                 break
 
     #key not associated
-    if not key_found: 
+    if not key_found:
         raise BadRequestError("Keypair '%s' is not associated with "
                               "machine '%s'" % (key_id, machine_id), 304)
 
     if host:
-        command = 'grep -v "' + keypair['public'] + '" ~/.ssh/authorized_keys ' +\
+        command = 'grep -v "' + keypair['public'] +\
+                  '" ~/.ssh/authorized_keys ' +\
                   '> ~/.ssh/authorized_keys.tmp && ' +\
                   'mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys ' +\
                   '&& chmod go-w ~/.ssh/authorized_keys'
@@ -384,7 +381,7 @@ def get_machine_actions(machine_from_api, conn):
                      Provider.SOFTLAYER]:
         can_stop = True
 
-    if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE, 
+    if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
                      Provider.DIGITAL_OCEAN):
         can_tag = False
@@ -453,11 +450,10 @@ def list_machines(user, backend_id):
                    'private_ips': m.private_ips,
                    'public_ips': m.public_ips,
                    'tags': tags,
-                   'extra': m.extra,
-                  }
+                   'extra': m.extra}
         machine.update(get_machine_actions(m, conn))
         ret.append(machine)
-    
+
     return ret
 
 
@@ -510,8 +506,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     image = NodeImage(image_id, name='', extra=image_extra, driver=conn)
     location = NodeLocation(location_id, name='', country='', driver=conn)
 
-    if conn.type in [Provider.RACKSPACE_FIRST_GEN, 
-                     Provider.RACKSPACE, 
+    if conn.type in [Provider.RACKSPACE_FIRST_GEN,
+                     Provider.RACKSPACE,
                      Provider.OPENSTACK]:
         node = create_machine_openstack(conn, public_key, script, machine_name,
                                         image, size, location)
@@ -649,21 +645,21 @@ def create_machine_nephoscale(conn, key_name, private_key, public_key, script,
     """
 
     machine_name = machine_name[:64].replace(' ', '-')
-    # name in NephoScale must start with a letter, can contain mixed 
+    # name in NephoScale must start with a letter, can contain mixed
     # alpha-numeric characters, hyphen ('-') and underscore ('_')
-    # characters, cannot exceed 64 characters, and can end with a 
+    # characters, cannot exceed 64 characters, and can end with a
     # letter or a number."
 
     # Hostname must start with a letter, can contain mixed alpha-numeric
     # characters and the hyphen ('-') character, cannot exceed 15 characters,
     # and can end with a letter or a number.
-    key = public_key.replace('\n','')
-    deploy_script = ScriptDeployment(script)        
+    key = public_key.replace('\n', '')
+    deploy_script = ScriptDeployment(script)
 
     # NephoScale has 2 keys that need be specified, console and ssh key
     # get the id of the ssh key if it exists, otherwise add the key
     try:
-        server_key = ''        
+        server_key = ''
         keys = conn.ex_list_keypairs(ssh=True, key_group=1)
         for k in keys:
             if key == k.public_key:
@@ -673,15 +669,17 @@ def create_machine_nephoscale(conn, key_name, private_key, public_key, script,
             server_key = conn.ex_create_keypair(machine_name, public_key=key)
     except:
         server_key = conn.ex_create_keypair(
-            'mistio' + str(random.randint(1,100000)),
-            public_key=key)                          
+            'mistio' + str(random.randint(1, 100000)),
+            public_key=key
+        )
 
     # mist.io does not support console key add through the wizzard.
-    # Try to add one    
+    # Try to add one
     try:
         console_key = conn.ex_create_keypair(
-            'mistio' + str(random.randint(1,100000)),
-            key_group=4)
+            'mistio' + str(random.randint(1, 100000)),
+            key_group=4
+        )
     except:
         console_keys = conn.ex_list_keypairs(key_group=4)
         if console_keys:
@@ -698,7 +696,7 @@ def create_machine_nephoscale(conn, key_name, private_key, public_key, script,
             hostname=machine_name[:15],
             image=image,
             size=size,
-            zone=location.id,                             
+            zone=location.id,
             server_key=server_key,
             console_key=console_key,
             ssh_key=tmp_key_path,
@@ -727,10 +725,10 @@ def create_machine_softlayer(conn, key_name, private_key, public_key, script,
     msd = MultiStepDeployment([key, deploy_script])
     if '.' in machine_name:
         domain = '.'.join(machine_name.split('.')[1:])
-        name=machine_name.split('.')[0]
+        name = machine_name.split('.')[0]
     else:
         domain = None
-        name=machine_name
+        name = machine_name
     (tmp_key_fd, tmp_key_path) = tempfile.mkstemp()
     key_fd = os.fdopen(tmp_key_fd, 'w+b')
     key_fd.write(private_key)
@@ -761,7 +759,7 @@ def create_machine_digital_ocean(conn, key_name, private_key, public_key,
 
     """
 
-    key = public_key.replace('\n','')
+    key = public_key.replace('\n', '')
     deploy_script = ScriptDeployment(script)
 
     try:
@@ -784,7 +782,7 @@ def create_machine_digital_ocean(conn, key_name, private_key, public_key,
             ssh_alternate_usernames=['root']*5,
             #attempt to fix the Connection reset by peer exception
             #that is (most probably) created due to a race condition
-            #while deploy_node establishes a connection and the 
+            #while deploy_node establishes a connection and the
             #ssh server is restarted on the created node
             private_networking=True,
             deploy=deploy_script
@@ -920,7 +918,8 @@ def destroy_machine(user, backend_id, machine_id):
                     disassociate_key(user, key_id, backend_id, machine_id)
 
 
-def ssh_command(user, backend_id, machine_id, host, command, key_id=None, password=None):
+def ssh_command(user, backend_id, machine_id, host, command,
+                key_id=None, password=None):
     """
     We initialize a Shell instant (for mist.io.shell).
 
@@ -929,10 +928,10 @@ def ssh_command(user, backend_id, machine_id, host, command, key_id=None, passwo
     @param private_key: The private_key. We may not need to put one, as we may
     want to connect only with password (e.g. bare-metal server)
     @param command: Command to run
-    @param password: Password. By default password is none, as we use private_key.
-    However we may need to connect only with password (e.g. bare-metal server). In
-    case both password and private_key are given, then the password is used for the
-    private_key in case it needs password.
+    @param password: Password. By default none, as we use private_key.
+    However we may need to connect only with password (e.g. bare-metal server).
+    In case both password and private_key are given, then the password is used
+    for the private_key in case it needs password.
     @return:
     """
 
@@ -953,7 +952,8 @@ def ssh_command(user, backend_id, machine_id, host, command, key_id=None, passwo
         keypair = user.keypairs[key_id]
         ssh_user = get_ssh_user_from_keypair(keypair, backend_id, machine_id)
         try:
-            shell = Shell(host=host, username=ssh_user, pkey=private_key, password=password)
+            shell = Shell(host=host, username=ssh_user,
+                          pkey=private_key, password=password)
             break
         except Exception as e:
             log.warning(e)
@@ -983,10 +983,13 @@ def ssh_command(user, backend_id, machine_id, host, command, key_id=None, passwo
 
 
 def list_images(user, backend_id, term=None):
-    """List images from each backend. 
+    """List images from each backend.
+    
     Furthermore if a search_term is provided, we loop through each
-    backend and search for that term in the ids and the names of 
-    the community images"""
+    backend and search for that term in the ids and the names of
+    the community images
+
+    """
 
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
@@ -1022,7 +1025,7 @@ def list_images(user, backend_id, term=None):
                     and 'hvm' not in img.name.lower()
     ]
 
-    if term: 
+    if term:
         images = [img for img in images
                         if term in img.id.lower()
                         or term in img.name.lower()
@@ -1030,7 +1033,7 @@ def list_images(user, backend_id, term=None):
     #~ except Exception as e:
         #~ log.error(e)
         #~ return Response('Backend unavailable', 503)
-    
+
     ret = []
     for image in images:
         ret.append({'id': image.id, 'extra': image.extra,
@@ -1053,14 +1056,13 @@ def list_sizes(user, backend_id):
 
     ret = []
     for size in sizes:
-        ret.append({'id'        : size.id,
-                    'bandwidth' : size.bandwidth,
-                    'disk'      : size.disk,
-                    'driver'    : size.driver.name,
-                    'name'      : size.name,
-                    'price'     : size.price,
-                    'ram'       : size.ram,
-                    })
+        ret.append({'id': size.id,
+                    'bandwidth': size.bandwidth,
+                    'disk': size.disk,
+                    'driver': size.driver.name,
+                    'name': size.name,
+                    'price': size.price,
+                    'ram': size.ram})
 
     return ret
 
@@ -1098,10 +1100,9 @@ def list_locations(user, backend_id):
         else:
             name = location.name
 
-        ret.append({'id'        : location.id,
-                    'name'      : name,
-                    'country'   : location.country,
-                    })
+        ret.append({'id': location.id,
+                    'name': name,
+                    'country': location.country})
 
     return ret
 
@@ -1124,7 +1125,8 @@ def set_machine_metadata(user, backend_id, machine_id, tag):
     conn = connect_provider(backend)
 
     if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
-        raise ForbiddenError("Adding metadata is not supported in this provider")
+        raise ForbiddenError("Adding metadata is not supported in %s"
+                             % conn.type)
 
     unique_key = 'mist.io_tag-' + datetime.now().isoformat()
     pair = {unique_key: tag}
@@ -1178,7 +1180,8 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
     conn = connect_provider(backend)
 
     if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
-        raise ForbiddenError("Deleting metadata is not supported in this provider")
+        raise ForbiddenError("Deleting metadata is not supported in %s"
+                             % conn.type)
 
     machine = None
     try:
@@ -1204,7 +1207,7 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
         try:
             conn.ex_delete_tags(machine, pair)
         except:
-            raise BackendUnavailableError("Error while deleting metadata in EC2")
+            raise BackendUnavailableError("Error deleting metadata in EC2")
 
     else:
         tags = machine.extra.get('metadata', None)

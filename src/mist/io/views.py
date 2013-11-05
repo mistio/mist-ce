@@ -1,7 +1,6 @@
 """mist.io views"""
 
 import logging
-from time import time
 
 from datetime import datetime
 
@@ -11,27 +10,12 @@ import json
 from pyramid.response import Response
 from pyramid.view import view_config
 
-from libcloud.compute.base import Node, NodeLocation
-from libcloud.compute.types import Provider
-from mist.io.shell import Shell
-
 from mist.io.config import SUPPORTED_PROVIDERS
-from mist.io.config import EC2_IMAGES, EC2_PROVIDERS
-
-from mist.io.helpers import connect
-from mist.io.helpers import get_preferred_keypairs
-from mist.io.helpers import run_command
-
-from mist.io.helpers import get_ssh_user_from_keypair
 
 from mist.io import methods
 from mist.io.exceptions import *
 from mist.io.model import User, Keypair
 
-try:
-    from mist.core.helpers import get_user
-except ImportError:
-    from mist.io.helpers import get_user
 
 log = logging.getLogger(__name__)
 
@@ -81,9 +65,7 @@ def exception_handler_general(exc, request):
 @view_config(route_name='home', request_method='GET',
              renderer='templates/home.pt')
 def home(request):
-    """Gets all the basic data for backends, project name and session status.
-
-    """
+    """Home page view"""
     user = user_from_request(request)
     core_uri = request.registry.settings['core_uri']
     auth = request.registry.settings.get('auth', 0)
@@ -131,28 +113,27 @@ def check_auth(request):
 
 
 @view_config(route_name='account', request_method='POST', renderer='json')
-def update_user_settings(request, renderer='json'):
+def update_user_settings(request):
     """try free plan, by communicating to the mist.core service"""
 
     params = request.json_body
     action = params.get('action', '').lower()
     plan = params.get('plan', '')
     auth_key = get_auth_key(request)
-    name = params.get('name', '')    
+    name = params.get('name', '')
     company_name = params.get('company_name', '')
-    country = params.get('country', '') 
-    number_of_servers = params.get('number_of_servers', '') 
-    number_of_people = params.get('number_of_people', '')            
+    country = params.get('country', '')
+    number_of_servers = params.get('number_of_servers', '')
+    number_of_people = params.get('number_of_people', '')
 
     payload = {'auth_key': auth_key,
-               'action': action, 
-               'plan': plan, 
-               'name': name, 
-               'company_name': company_name, 
+               'action': action,
+               'plan': plan,
+               'name': name,
+               'company_name': company_name,
                'country': country,
                'number_of_servers': number_of_servers,
-               'number_of_people': number_of_people
-    }    
+               'number_of_people': number_of_people}
 
     core_uri = request.registry.settings['core_uri']
     ret = requests.post(core_uri + '/account', params=payload, verify=False)
@@ -186,8 +167,7 @@ def list_backends(request):
                     'region': backend.region,
                     # for Provider.RACKSPACE (the new Nova provider)
                     'datacenter': backend.datacenter,
-                    'enabled': backend.enabled,
-                     })
+                    'enabled': backend.enabled})
     return ret
 
 
@@ -263,7 +243,7 @@ def toggle_backend(request):
         raise BackendNotFoundError()
     with user.lock_n_load():
         user.backends[backend_id].enabled = new_state
-        
+
     return OK
 
 
@@ -385,14 +365,13 @@ cat /proc/uptime && echo -------- && cat ~/`grep '^AuthorizedKeysFile' \
     if ret:
         cmd_output = ret['output'].split('--------')
 
-        updated_keys = update_available_keys(user, backend_id, 
+        updated_keys = update_available_keys(user, backend_id,
                                              machine_id, cmd_output[2]),
 
         if len(cmd_output) > 2:
             return {'uptime': cmd_output[1],
-                    'updated_keys': updated_keys
-                   }
-    
+                    'updated_keys': updated_keys}
+
     return Response('No valid keys for server', 405)
 
 
@@ -409,7 +388,7 @@ def update_available_keys(user, backend_id, machine_id, authorized_keys):
         exists = False
         pub_key = pk.strip().split(' ')
         for k in keypairs:
-            # check if the public key already exists in our keypairs 
+            # check if the public key already exists in our keypairs
             if keypairs[k].public.strip().split(' ')[:2] == pub_key[:2]:
                 exists = True
                 associated = False
@@ -425,7 +404,7 @@ def update_available_keys(user, backend_id, machine_id, authorized_keys):
                     updated_keypairs[k] = keypairs[k]
             if exists:
                 break
-                    
+
     if updated_keypairs:
         log.debug('update keypairs')
 
@@ -434,7 +413,7 @@ def update_available_keys(user, backend_id, machine_id, authorized_keys):
             'pub': keypairs[key].public,
             'default_key': keypairs[key].default
             } for key in updated_keypairs]
-     
+
     return ret
 
 
@@ -446,9 +425,9 @@ def list_specific_images(request):
 
 @view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
-    """List images from each backend. 
+    """List images from each backend.
     Furthermore if a search_term is provided, we loop through each
-    backend and search for that term in the ids and the names of 
+    backend and search for that term in the ids and the names of
     the community images"""
 
     backend_id = request.matchdict['backend']
@@ -498,10 +477,10 @@ def list_locations(request):
 @view_config(route_name='keys', request_method='GET', renderer='json')
 def list_keys(request):
     """List keys.
-    
+
     List all key pairs that are configured on this server. Only the public
     keys are returned.
-    
+
     """
 
     user = user_from_request(request)
@@ -509,7 +488,7 @@ def list_keys(request):
              'name': key,
              'machines': user.keypairs[key].machines,
              'default_key': user.keypairs[key].default}
-             for key in user.keypairs]
+                 for key in user.keypairs]
 
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
@@ -532,30 +511,30 @@ def add_key(request):
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
 def delete_key(request):
     """Delete key.
-    
-    When a keypair gets deleted, it takes its asociations with it so just need to
-    remove from the server too.
-    
+
+    When a keypair gets deleted, it takes its asociations with it so just need
+    to remove from the server too.
+
     If the default key gets deleted, it sets the next one as default, provided
     that at least another key exists. It returns the list of all keys after
     the deletion, excluding the private keys (check also list_keys).
-    
+
     """
-    
+
     key_id = request.matchdict.get('key', '')
-    
+
     if not key_id:
         return Response('Keypair name not provided', 400)
 
     user = user_from_request(request)
     methods.delete_key(user, key_id)
-        
+
     return list_keys(request)
 
 
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
-    
+
     old_id = request.matchdict.get('key', '')
     key_id = request.json_body.get('newName', '')
 
@@ -573,7 +552,9 @@ def set_default_key_request(request):
     methods.set_default_key(user, key_id)
     return OK
 
-@view_config(route_name='key_action', request_method='GET', request_param='action=private', renderer='json')
+
+@view_config(route_name='key_action', request_method='GET',
+             request_param='action=private', renderer='json')
 def get_private_key(request):
     """Gets private key from keypair name.
 
@@ -610,7 +591,8 @@ def generate_keypair(request):
     return {'priv': keypair.private}
 
 
-@view_config(route_name='key_association', request_method='PUT', renderer='json')
+@view_config(route_name='key_association', request_method='PUT',
+             renderer='json')
 def associate_key(request):
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
@@ -624,7 +606,8 @@ def associate_key(request):
     return user.keypairs[key_id].machines
 
 
-@view_config(route_name='key_association', request_method='DELETE', renderer='json')
+@view_config(route_name='key_association', request_method='DELETE',
+             renderer='json')
 def disassociate_key(request):
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
@@ -655,7 +638,8 @@ def check_monitoring(request):
         return Response('Service unavailable', 503)
 
 
-@view_config(route_name='update_monitoring', request_method='POST', renderer='json')
+@view_config(route_name='update_monitoring', request_method='POST',
+             renderer='json')
 def update_monitoring(request):
     """Enable/disable monitoring for this machine using the hosted mist.io
     service.
@@ -677,13 +661,13 @@ def update_monitoring(request):
                 user.password = password
                 user.save()
     except:
-        pass   
+        pass
     auth_key = get_auth_key(request)
 
-    name = request.json_body.get('name','')
+    name = request.json_body.get('name', '')
     public_ips = request.json_body.get('public_ips', [])
     dns_name = request.json_body.get('dns_name', '')
-    
+
     action = request.json_body['action'] or 'enable'
     payload = {'auth_key': auth_key,
                'action': action,
