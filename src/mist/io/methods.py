@@ -237,7 +237,7 @@ def associate_key(user, key_id, backend_id, machine_id, deploy=True):
         #~ return keypair['machines']
 
 
-def disassociate_key(user, key_id, backend_id, machine_id, undeploy=True):
+def disassociate_key(user, key_id, backend_id, machine_id, host=None):
     """Disassociates a key from a machine.
 
     If undeploy is set to True it will also attempt to actually remove it from
@@ -269,27 +269,21 @@ def disassociate_key(user, key_id, backend_id, machine_id, undeploy=True):
         raise BadRequestError("Keypair '%s' is not associated with "
                               "machine '%s'" % (key_id, machine_id), 304)
 
-    if undeploy:
-        pass
+    if host:
+        undeploy_key(keypair, host)
 
-def deploy_key(user, keypair):
-    raise NotImplementedError()
-    #~ """Deploys the provided keypair to the machine.
-#~ 
-    #~ To do that it requires another keypair (existing_key) that can connect to
-    #~ the machine.
-#~ 
-    #~ """
-    #~ grep_output = '`grep \'%s\' ~/.ssh/authorized_keys`' % keypair['public']
-    #~ command = 'if [ -z "%s" ]; then echo "%s" >> ~/.ssh/authorized_keys; fi' % (grep_output, keypair['public'])
-    #~ host = request.json_body.get('host', None)
-    #~ backend_id = request.json_body.get('backend_id', None)
-    #~ machine_id = request.json_body.get('machine_id', None)
-    #~ 
-    #~ try:
-        #~ ret = shell_command(request, backend_id, machine_id, host, command)
-    #~ except:
-        #~ pass
+def deploy_key(user, keypair, backend_id, machine_id, host):
+    """Deploys the provided keypair to the machine.
+
+    To do that it requires another keypair (existing_key) that can connect to
+    the machine.
+    """
+    grep_output = '`grep \'%s\' ~/.ssh/authorized_keys`' % keypair['public']
+    command = 'if [ -z "%s" ]; then echo "%s" >> ~/.ssh/authorized_keys; fi' % (grep_output, keypair['public'])
+    try:
+        ret = ssh_command(user, backend_id, machine_id, host, command)
+    except:
+        pass
 #~ 
     #~ # Maybe the deployment failed but let's try to connect with the new key and see what happens
     #~ with get_user(request, readonly=True) as user:
@@ -312,27 +306,22 @@ def deploy_key(user, keypair):
         #~ return test
 
 
-def undeploy_key(request, keypair):
-    raise NotImplementedError()
-    #~ """Removes the provided keypair from the machine.
-#~ 
-    #~ It connects to the server with the key that is supposed to be deleted.
-#~ 
-    #~ """
-    #~ command = 'grep -v "' + keypair['public'] + '" ~/.ssh/authorized_keys ' +\
-              #~ '> ~/.ssh/authorized_keys.tmp && ' +\
-              #~ 'mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys ' +\
-              #~ '&& chmod go-w ~/.ssh/authorized_keys'
-    #~ host = request.json_body.get('host', None)
-    #~ backend_id = request.json_body.get('backend_id', None)
-    #~ machine_id = request.json_body.get('machine_id', None)
-                  #~ 
-    #~ try:
-        #~ ret = shell_command(request, backend_id, machine_id, host, command)
-    #~ except:
-        #~ return False
-#~ 
-    #~ return ret
+def undeploy_key(user, keypair, backend_id, machine_id, host):
+    """Removes the provided keypair from the machine.
+
+    It connects to the server with the key that is supposed to be deleted.
+
+    """
+    command = 'grep -v "' + keypair['public'] + '" ~/.ssh/authorized_keys ' +\
+              '> ~/.ssh/authorized_keys.tmp && ' +\
+              'mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys ' +\
+              '&& chmod go-w ~/.ssh/authorized_keys'
+    try:
+        ret = ssh_command(user, backend_id, machine_id, host, command)
+    except:
+        return False
+
+    return ret
 
 
 def connect_provider(backend):
@@ -936,7 +925,7 @@ def destroy_machine(user, backend_id, machine_id):
                                      machine_id, undeploy=False)
 
 
-def run_command(user, backend_id, machine_id, host, command, key_id=None, password=None):
+def ssh_command(user, backend_id, machine_id, host, command, key_id=None, password=None):
     """
     We initialize a Shell instant (for mist.io.shell).
 
