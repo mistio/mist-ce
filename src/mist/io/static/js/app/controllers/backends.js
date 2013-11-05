@@ -22,10 +22,15 @@ define('app/controllers/backends', [
 
             init: function() {
                 this._super();
-                this.loadBackends();
-                Ember.run.later(this, function() {
-                    this.checkMonitoring();
-                }, 5000);
+                var that = this;
+                $(document).bind('ready', function() {
+                    Ember.run.next(function() {
+                        that.loadBackends();
+                        Ember.run.later(function() {
+                            that.checkMonitoring();
+                        }, 5000);
+                    });
+                });
             },
 
             loadBackends: function() {
