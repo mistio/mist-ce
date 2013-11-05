@@ -331,7 +331,7 @@ def set_machine_metadata(request):
     try:
         tag = request.json_body['tag']
     except:
-        raised RequiredParameterMissingError('tag')
+        raise RequiredParameterMissingError('tag')
     user = user_from_request(request)
     methods.set_machine_metadata(user, backend_id, machine_id, tag)
     return OK
@@ -349,7 +349,7 @@ def delete_machine_metadata(request):
     try:
         tag = request.json_body['tag']
     except:
-        raised RequiredParameterMissingError('tag')
+        raise RequiredParameterMissingError('tag')
     user = user_from_request(request)
     methods.delete_machine_metadata(user, backend_id, machine_id, tag)
     return OK
@@ -375,7 +375,9 @@ def probe(request):
     if key:
         log.warn('probing with key %s' % key)
 
-    ret = shell_command(request, backend_id, machine_id, host, command, ssh_user, key)
+    user = user_from_request(request)
+    ret = methods.ssh_command(user, backend_id, machine_id, host, command, key_id=key)
+    #ret = shell_command(request, backend_id, machine_id, host, command, ssh_user, key)
     if ret:
         cmd_output = ret['output'].split('--------')
 

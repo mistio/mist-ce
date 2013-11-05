@@ -948,12 +948,16 @@ def ssh_command(user, backend_id, machine_id, host, command, key_id=None, passwo
         raise KeypairNotFoundError(key_id)
 
     keypairs = user.keypairs
-    pref_keys = [key_id] or get_preferred_keypairs(keypairs, backend_id, machine_id)
+    if key_id:
+        pref_keys = [key_id]
+    else:
+        pref_keys = get_preferred_keypairs(keypairs, backend_id, machine_id)
     shell = None
 
     for key_id in pref_keys:
         private_key = keypairs[key_id].private
-        ssh_user = get_ssh_user_from_keypair(pref_keys[key_id], backend_id, machine_id)
+        keypair = user.keypairs[key_id]
+        ssh_user = get_ssh_user_from_keypair(keypair, backend_id, machine_id)
         try:
             shell = Shell(host=host, username=ssh_user, pkey=private_key, password=password)
             break
@@ -1206,7 +1210,7 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
         try:
             conn.ex_delete_tags(machine, pair)
         except:
-            raise BackendUnavailableError("Error while deleting metadata in EC2"
+            raise BackendUnavailableError("Error while deleting metadata in EC2")
 
     else:
         tags = machine.extra.get('metadata', None)
