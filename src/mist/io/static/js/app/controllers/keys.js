@@ -69,7 +69,7 @@ define('app/controllers/keys', [
                         info('Successfully created key: ', name);
                         $('#create-loader').fadeOut(200);
                         $('#create-key-dialog').popup('close');
-                        Mist.keyAddController.newKeyClear();
+                        Mist.keyAddController.clear();
                         Mist.keysController.keys.addObject(Key.create(data));
                         if (autoSelect) {
                             Ember.run.next(function(){

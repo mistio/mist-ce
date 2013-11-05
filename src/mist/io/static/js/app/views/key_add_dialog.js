@@ -48,8 +48,8 @@ define('app/views/key_add_dialog', [
                 },
 
                 backClicked: function() {
-                    $("#create-key-dialog").popup("close");
-                    Mist.keyAddController.newKeyClear();
+                    $('#create-key-dialog').popup('close');
+                    Mist.keyAddController.clear();
                     
                     // Reopen associate key popup (works only in single machine view)
                     if (this.getAssociatedMachine()) {

@@ -38,7 +38,8 @@ define('app/views/key_list', [
 
             actions: {
                 createClicked: function() {
-                    $("#create-key-dialog").popup("open");
+                    Mist.keyAddController.clear();
+                    $('#create-key-dialog').popup("open");
                 },
 
                 selectClicked: function() {
