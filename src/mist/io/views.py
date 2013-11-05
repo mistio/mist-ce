@@ -325,61 +325,16 @@ def machine_actions(request):
 @view_config(route_name='machine_metadata', request_method='POST',
              renderer='json')
 def set_machine_metadata(request):
-    """Sets metadata for a machine, given the backend and machine id.
-
-    Libcloud handles this differently for each provider. Linode and Rackspace,
-    at least the old Rackspace providers, don't support metadata adding.
-
-    machine_id comes as u'...' but the rest are plain strings so use == when
-    comparing in ifs. u'f' is 'f' returns false and 'in' is too broad.
-
-    """
-    try:
-        conn = connect(request)
-    except:
-        return Response('Backend not found', 404)
-
-    if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
-        return Response('Adding metadata is not supported in this provider',
-                        501)
-
+    """Sets metadata for a machine, given the backend and machine id."""
+    backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-
     try:
         tag = request.json_body['tag']
-        unique_key = 'mist.io_tag-' + datetime.now().isoformat()
-        pair = {unique_key: tag}
     except:
-        return Response('Malformed metadata format', 400)
-
-    if conn.type in EC2_PROVIDERS:
-        try:
-            machine = Node(machine_id,
-                           name='',
-                           state=0,
-                           public_ips=[],
-                           private_ips=[],
-                           driver=conn)
-            conn.ex_create_tags(machine, pair)
-        except:
-            return Response('Error while creating tag in EC2', 503)
-    else:
-        try:
-            nodes = conn.list_nodes()
-            for node in nodes:
-                if node.id == machine_id:
-                    machine = node
-                    break
-        except:
-            return Response('Machine not found', 404)
-
-        try:
-            machine.extra['metadata'].update(pair)
-            conn.ex_set_metadata(machine, machine.extra['metadata'])
-        except:
-            return Response('Error while creating tag', 503)
-
-    return Response('Success', 200)
+        raised RequiredParameterMissingError('tag')
+    user = user_from_request(request)
+    methods.set_machine_metadata(user, backend_id, machine_id, tag)
+    return OK
 
 
 @view_config(route_name='machine_metadata', request_method='DELETE',
@@ -388,77 +343,19 @@ def delete_machine_metadata(request):
     """Deletes metadata for a machine, given the machine id and the tag to be
     deleted.
 
-    Libcloud handles this differently for each provider. Linode and Rackspace,
-    at least the old Rackspace providers, don't support metadata updating. In
-    EC2 you can delete just the tag you like. In Openstack you can only set a
-    new list and not delete from the existing.
-
-    Mist.io client knows only the value of the tag and not it's key so it
-    has to loop through the machine list in order to find it.
-
-    Don't forget to check string encoding before using them in ifs.
-    u'f' is 'f' returns false.
-
     """
-    try:
-        conn = connect(request)
-    except:
-        return Response('Backend not found', 404)
-
-    if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
-        return Response('Updating metadata is not supported in this provider',
-                        501)
-
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
     try:
         tag = request.json_body['tag']
     except:
-        return Response('Malformed metadata format', 400)
-
-    machine_id = request.matchdict['machine']
-
-    try:
-        nodes = conn.list_nodes()
-        for node in nodes:
-            if node.id == machine_id:
-                machine = node
-                break
-    except:
-        return Response('Machine not found', 404)
-
-    if conn.type in EC2_PROVIDERS:
-        tags = machine.extra.get('tags', None)
-        try:
-            for mkey, mdata in tags.iteritems():
-                if tag == mdata:
-                    pair = {mkey: tag}
-                    break
-        except:
-            return Response('Tag not found', 404)
-
-        try:
-            conn.ex_delete_tags(machine, pair)
-        except:
-            return Response('Error while deleting metadata in EC2', 503)
-    else:
-        tags = machine.extra.get('metadata', None)
-        try:
-            for mkey, mdata in tags.iteritems():
-                if tag == mdata:
-                    tags.pop(mkey)
-                    break
-        except:
-            return Response('Tag not found', 404)
-
-        try:
-            conn.ex_set_metadata(machine, tags)
-        except:
-            return Response('Error while updating metadata', 503)
-
-    return Response('Success', 200)
+        raised RequiredParameterMissingError('tag')
+    user = user_from_request(request)
+    methods.delete_machine_metadata(user, backend_id, machine_id, tag)
+    return OK
 
 
-@view_config(route_name='probe', request_method='POST',
-             renderer='json')
+@view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
     """Probes a machine over ssh, using fabric.
 

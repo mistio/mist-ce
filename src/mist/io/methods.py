@@ -3,6 +3,7 @@ import tempfile
 import logging
 import random
 from time import time
+from datetime import datetime
 
 
 from libcloud.compute.providers import get_driver
@@ -1105,3 +1106,120 @@ def list_locations(user, backend_id):
                     })
 
     return ret
+
+
+def set_machine_metadata(user, backend_id, machine_id, tag):
+    """Sets metadata for a machine, given the backend and machine id.
+
+    Libcloud handles this differently for each provider. Linode and Rackspace,
+    at least the old Rackspace providers, don't support metadata adding.
+
+    machine_id comes as u'...' but the rest are plain strings so use == when
+    comparing in ifs. u'f' is 'f' returns false and 'in' is too broad.
+
+    """
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+    if not tag:
+        raise BadRequestError("tag is empty")
+    conn = connect_provider(backend)
+
+    if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
+        raise ForbiddenError("Adding metadata is not supported in this provider")
+
+    unique_key = 'mist.io_tag-' + datetime.now().isoformat()
+    pair = {unique_key: tag}
+
+    if conn.type in EC2_PROVIDERS:
+        try:
+            machine = Node(machine_id, name='', state=0, public_ips=[],
+                           private_ips=[], driver=conn)
+            conn.ex_create_tags(machine, pair)
+        except:
+            raise BackendUnavailableError(backend_id)
+    else:
+        machine = None
+        try:
+            for node in conn.list_nodes():
+                if node.id == machine_id:
+                    machine = node
+                    break
+        except:
+            raise BackendUnavailableError(backend_id)
+        if not machine:
+            raise MachineNotFoundError(machine_id)
+        try:
+            machine.extra['metadata'].update(pair)
+            conn.ex_set_metadata(machine, machine.extra['metadata'])
+        except:
+            raise InternalServerError("error creating tag")
+
+
+def delete_machine_metadata(user, backend_id, machine_id, tag):
+    """Deletes metadata for a machine, given the machine id and the tag to be
+    deleted.
+
+    Libcloud handles this differently for each provider. Linode and Rackspace,
+    at least the old Rackspace providers, don't support metadata updating. In
+    EC2 you can delete just the tag you like. In Openstack you can only set a
+    new list and not delete from the existing.
+
+    Mist.io client knows only the value of the tag and not it's key so it
+    has to loop through the machine list in order to find it.
+
+    Don't forget to check string encoding before using them in ifs.
+    u'f' is 'f' returns false.
+
+    """
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    backend = user.backends[backend_id]
+    if not tag:
+        raise BadRequestError("tag is empty")
+    conn = connect_provider(backend)
+
+    if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
+        raise ForbiddenError("Deleting metadata is not supported in this provider")
+
+    machine = None
+    try:
+        for node in conn.list_nodes():
+            if node.id == machine_id:
+                machine = node
+                break
+    except:
+        raise BackendUnavailableError(backend_id)
+    if not machine:
+        raise MachineNotFoundError(machine_id)
+
+    if conn.type in EC2_PROVIDERS:
+        tags = machine.extra.get('tags', None)
+        pair = None
+        for mkey, mdata in tags.iteritems():
+            if tag == mdata:
+                pair = {mkey: tag}
+                break
+        if not pair:
+            raise NotFoundError("tag not found")
+
+        try:
+            conn.ex_delete_tags(machine, pair)
+        except:
+            raise BackendUnavailableError("Error while deleting metadata in EC2"
+
+    else:
+        tags = machine.extra.get('metadata', None)
+        key = None
+        for mkey, mdata in tags.iteritems():
+            if tag == mdata:
+                key = mkey
+        if key:
+            tags.pop(key)
+        else:
+            raise NotFoundError("tag not found")
+
+        try:
+            conn.ex_set_metadata(machine, tags)
+        except:
+            BackendUnavailableError("Error while updating metadata")
