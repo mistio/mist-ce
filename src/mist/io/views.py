@@ -61,7 +61,7 @@ def exception_handler_mist(exc, request):
     }
 
     log.warning("Exception: %r", exc)
-    for exc_typ in mapping:
+    for exc_type in mapping:
         if isinstance(exc, exc_type):
             return Response(str(exc), mapping[exc_type])
     else:
@@ -782,7 +782,7 @@ def shell_stream(request):
         yield "<html><body>\n"
         js = "<script type='text/javascript'>"
         js += "parent.appendShell('%s');</script>\n"
-        for line in stdout_lines:
+        for line in lines:
             # get commands output, line by line
             clear_line = line.replace('\'','\\\'')
             clear_line = clear_line.replace('\n','<br/>')
