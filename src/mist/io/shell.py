@@ -27,6 +27,7 @@ class ShellMiddleware(object):
     def __call__(self, environ, start_response):
         request = Request(environ)
         if request.path.endswith('shell') and request.method == 'GET':
+            log.info("got shell request", )
             try:
                 backend_id = self.app.routes_mapper(request)['match']['backend']
                 machine_id = self.app.routes_mapper(request)['match']['machine']
@@ -35,18 +36,14 @@ class ShellMiddleware(object):
                 command = request.params.get('command', None)
                 request.registry = self.app.registry
 
-                #~ if not ssh_user or ssh_user == 'undefined':
-                    #~ log.debug("Will select root as the ssh-user as we don't know who we are")
-                    #~ ssh_user = 'root'
                 user = user_from_request(request)
                 keypairs = user.keypairs
                 shell = Shell(host)
                 ret = shell.autoconfigure(user, backend_id, machine_id)
-                if ret is None:
-                    return
                 stdout_lines = shell.command_stream(command)
-                start_response('200 OK', [('Content-Type','text/html')])
-                return self.stream_command(stdout_lines)
+                if ret is None:
+                    return None
+                return self.stream_command(stdout_lines, start_response)
             except:
                 # leave error handling up to the app
                 return self.app(environ, start_response)
@@ -54,11 +51,13 @@ class ShellMiddleware(object):
             return self.app(environ, start_response)
 
         
-    def stream_command(self, stdout_lines):
+    def stream_command(self, stdout_lines, start_response):
         """ 
             Generator function that streams the output of the remote command 
             using the hidden iframe web pattern
         """
+
+        start_response('200 OK', [('Content-Type','text/html')])
 
         # send some blank data to get webkit browsers to display what's sent
         yield 1024*'\0'
@@ -68,9 +67,14 @@ class ShellMiddleware(object):
 
         for line in stdout_lines:
             # get commands output, line by line
-            yield "<script type='text/javascript'>parent.appendShell('%s');</script>\n" % line.replace('\'','\\\'').replace('\n','<br/>') #.replace('<','&lt;').replace('>', '&gt;')
+            clear_line = line.replace('\'','\\\'')
+            clear_line = clear_line.replace('\n','<br/>')
+            clear_line = clear_line.replace('\r','')
+            #.replace('<','&lt;').replace('>', '&gt;')
+            js = "<script type='text/javascript'>parent.appendShell('%s');</script>\n"
+            yield js % clear_line
         # FIXME
-        yield "<script type='text/javascript'>parent.completeShell(%s);</script>\n" % 0        
+        yield "<script type='text/javascript'>parent.completeShell(%s);</script>\n" % 1        
         yield '</body></html>\n'   
 
 
@@ -104,6 +108,12 @@ class Shell(object):
             self.connect(username, key, password, port)
 
     def connect(self, username, key=None, password=None, port=22):
+        """Initialize an SSH connection.
+
+        Tries to connect and configure self, returns True upon success, False
+        otherwise.
+
+        """
         try:
             if key:
                 tmp_key_fd, tmp_key_path = tempfile.mkstemp()
@@ -126,21 +136,25 @@ class Shell(object):
             return False
 
     def disconnect(self):
+        """Close the SSH connection."""
         try:
             self.ssh.close()
         except:
             pass
 
     def checkSudo(self):
+        """Checks if sudo is installed.
+
+        In case it is self.sudo = True, else self.sudo = False
+        
         """
-        Checks if sudo is installed. In case it is self.sudo = True,
-        else self.sudo = False
-        """
+        # FIXME
         stdout, stderr = self.command("which sudo", pty=False)
         if not stderr:
             self.sudo = True
 
     def _command(self, cmd, pty=True):
+        """Helper method used by command and stream_command."""
         channel = self.ssh.get_transport().open_session()
         channel.settimeout(10800)
         stdout = channel.makefile()
@@ -154,9 +168,14 @@ class Shell(object):
         return stdout, stderr
 
     def command(self, cmd, pty=True):
-        """
-        @param cmd: Command to run
-        @return: Returns a tuple with the stdout and stderr
+        """Run command and return output.
+
+        If pty is True, then it returns a string object that contains the
+        combined streams of stdout and stderr, like they would appear in a pty.
+
+        If pty is False, then it returns a two string tupple, consisting of
+        stdout and stderr.
+
         """
         stdout, stderr = self._command(cmd, pty)
         if pty:
@@ -165,13 +184,27 @@ class Shell(object):
             return stdout.read(), stderr.read()
 
     def command_stream(self, cmd):
+        """Run command and stream output line by line.
+
+        This function is a generator that returns the commands output line
+        by line. Use like: for line in command_stream(cmd): print line.
+
+        """
         stdout, stderr = self._command(cmd)
         line = stdout.readline()
         while line:
             yield line
             line = stdout.readline()
 
-    def autoconfigure(self, user, backend_id, machine_id, key_id=None, password=None):
+    def autoconfigure(self, user, backend_id, machine_id,
+                      key_id=None, password=None):
+        """Autoconfigure SSH client.
+
+        This will do its best effort to find a suitable keypair and username
+        and will try to connect. If it fails it returns None, otherwise it
+        initializes self and returns a (key_id, ssh_user) tupple.
+
+        """
         if backend_id not in user.backends:
             raise BackendNotFoundError(backend_id)
         if key_id is not None and key_id not in user.keypairs:
