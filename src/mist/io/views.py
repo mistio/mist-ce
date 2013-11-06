@@ -25,6 +25,7 @@ from mist.io import methods
 import mist.io.exceptions
 from mist.io.exceptions import *
 from mist.io.model import User, Keypair
+from mist.io.shell import Shell
 
 
 log = logging.getLogger(__name__)
@@ -759,3 +760,54 @@ def get_auth_key(request):
     auth_key = "%s:%s" % (user.email, user.password)
     auth_key = urlsafe_b64encode(auth_key)
     return auth_key
+
+
+@view_config(route_name='shell', request_method='GET')
+def shell_stream(request):
+    """Execute command via SSH and stream output
+
+    Streams output using the hidden iframe technique.
+    
+    """
+
+    def parse(lines):
+        """Generator function that converts stdout_lines to html with
+        js which it streams in a hidden iframe.
+
+        """
+        # send some blank data to get webkit browsers
+        # to display what's sent
+        yield 1024*'\0'  # really necessary?
+        # start the html response
+        yield "<html><body>\n"
+        js = "<script type='text/javascript'>"
+        js += "parent.appendShell('%s');</script>\n"
+        for line in stdout_lines:
+            # get commands output, line by line
+            clear_line = line.replace('\'','\\\'')
+            clear_line = clear_line.replace('\n','<br/>')
+            clear_line = clear_line.replace('\r','')
+            #.replace('<','&lt;').replace('>', '&gt;')
+            yield js % clear_line
+        js = "<script type='text/javascript'>"
+        js += "parent.completeShell(%s);</script>\n"
+        yield js % 1  # FIXME
+        yield "</body></html>\n"
+
+    log.info("got shell_stream request")
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    cmd = request.params.get('command')
+    host = request.params.get('host')
+    if not cmd:
+        raise RequiredParameterMissingError("command")
+    if not host:
+        raise RequiredParameterMissingError("host")
+
+    user = user_from_request(request)
+    shell = Shell(host)
+    shell.autoconfigure(user, backend_id, machine_id)
+    # stdout_lines is a generator that spits out lines of combined
+    # stdout and stderr output
+    stdout_lines = shell.command_stream(cmd)
+    return Response(status=200, app_iter=parse(stdout_lines))
