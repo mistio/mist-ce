@@ -36,7 +36,6 @@ class BaseError(Exception):
     the message provided during exception initialization, if provided.
 
     """
-
     msg = "Error"
 
     def __init__(self, msg=None):
@@ -44,7 +43,7 @@ class BaseError(Exception):
         super(BaseError, self).__init__(msg)
 
 
-# BAD REQUESTS
+# BAD REQUESTS (translated as 400 in views)
 class BadRequestError(BaseError):
     msg = "Bad Request"
 
@@ -53,7 +52,11 @@ class RequiredParameterMissingError(BadRequestError):
     msg = "Required parameter not provided"
 
 
-# UNAUTHORIZED
+class KeypairParameterMissingError(RequiredParameterMissingError):
+    msg = "Keypair id parameter missing"
+
+
+# UNAUTHORIZED (translated as 401 in views)
 class UnauthorizedError(BaseError):
     msg = "Not authorized"
 
@@ -66,17 +69,17 @@ class MachineUnauthorizedError(UnauthorizedError):
     msg = "Couldn't authenticate to machine"
 
 
-# FORBIDDEN
+# PAYMENT REQUIRED (translated as 402 in views)
+class PaymentRequiredError(BaseError):
+    msg = "Payment required"
+
+
+# FORBIDDEN (translated as 403 in views)
 class ForbiddenError(BaseError):
     msg = "Forbidden"
 
 
-# CONFLICT
-class ConflictError(BaseError):
-    msg = "Conflict"
-
-
-# NOT FOUND
+# NOT FOUND (translated as 404 in views)
 class NotFoundError(BaseError):
     msg = "Not Found"
 
@@ -93,12 +96,25 @@ class MachineNotFoundError(NotFoundError):
     msg = "Machine not found"
 
 
-# NOT ALLOWED
+# NOT ALLOWED (translated as 405 in views)
 class MethodNotAllowedError(BaseError):
     msg = "Method Not Allowed"
 
 
-# INTERNAL ERROR
+# CONFLICT (translated as 409 in views)
+class ConflictError(BaseError):
+    msg = "Conflict"
+
+
+class BackendExistsError(ConflictError):
+    msg = "Backend exists"
+
+
+class KeypairExistsError(ConflictError):
+    msg = "Keypair exists"
+
+
+# INTERNAL ERROR (translated as 500 in views)
 class InternalServerError(BaseError):
     msg = "Internal Server Error"
 
@@ -111,5 +127,10 @@ class KeyValidationError(BadRequestError):
     msg = "Keypair could not be validated"
 
 
-class BackendUnavailableError(BaseError):
+# SERVICE UNAVAILABLE (translated as 503 in views)
+class ServiceUnavailableError(BaseError):
+    msg = "Sercvice unavailable"
+
+
+class BackendUnavailableError(ServiceUnavailableError):
     msg = "Backend unavailable"

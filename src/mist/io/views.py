@@ -1,4 +1,13 @@
-"""mist.io views"""
+"""mist.io.views
+
+Here we define the HTTP API of the app. The view functions here are
+responsible for taking parameters from the web requests, passing them on to
+functions defined in methods and properly formatting the output. This is the
+only source file where we import things from pyramid. View functions should
+only check that all required params are provided. Any further checking should
+be performed inside the corresponding method functions.
+
+"""
 
 import logging
 
@@ -13,6 +22,7 @@ from pyramid.view import view_config
 from mist.io.config import SUPPORTED_PROVIDERS
 
 from mist.io import methods
+import mist.io.exceptions
 from mist.io.exceptions import *
 from mist.io.model import User, Keypair
 
@@ -37,15 +47,24 @@ def exception_handler_mist(exc, request):
 
     """
 
+    mapping = {
+        mist.io.exceptions.BadRequestError: 400,
+        mist.io.exceptions.UnauthorizedError: 401,
+        mist.io.exceptions.PaymentRequiredError: 402,
+        mist.io.exceptions.ForbiddenError: 403,
+        mist.io.exceptions.NotFoundError: 404,
+        mist.io.exceptions.MethodNotAllowedError: 405,
+        mist.io.exceptions.ConflictError: 409,
+        mist.io.exceptions.InternalServerError: 500,
+        mist.io.exceptions.ServiceUnavailableError: 503,
+    }
+
     log.warning("Exception: %r", exc)
-    if isinstance(exc, NotFoundError):
-        return Response(str(exc), 404)
-    elif isinstance(exc, BadRequestError):
-        return Response(str(exc), 502)
-    elif isinstance(exc, UnauthorizedError):
-        return Response(str(exc), 401)
+    for exc_typ in mapping:
+        if isinstance(exc, exc_type):
+            return Response(str(exc), mapping[exc_type])
     else:
-        return Response("Internal Server Error", 503)
+        return Response(str(exc), 500)
 
 
 #~ @view_config(context=Exception)

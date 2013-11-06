@@ -38,7 +38,10 @@ def add_backend(user, title, provider, apikey,
                 apisecret, apiurl, tenant_name):
     """Adds a new backend to the user and returns the new backend_id."""
 
+    log.info("Adding new backend in provider '%s'", provider)
+
     # if api secret not given, search if we already know it
+    # FIXME: just pass along an empty apisecret
     if apisecret == 'getsecretfromdb':
         for backend_id in user.backends:
             if apikey == user.backends[backend_id].apikey:
@@ -49,13 +52,17 @@ def add_backend(user, title, provider, apikey,
     if not provider.__class__ is int and ':' in provider:
         provider, region = provider.split(':')[0], provider.split(':')[1]
 
-    if not provider or not apikey or not apisecret:
-        raise BadRequestError("Invalid backend data")
+    if not provider:
+        raise RequiredParameterMissingError("provider")
+    if not apikey:
+        raise RequiredParameterMissingError("apikey")
+    if not apisecret:
+        raise RequiredParameterMissingError("apisecret")
 
     backend_id = generate_backend_id(provider, region, apikey)
 
     if backend_id in user.backends:
-        raise ConflictError("Backend exists")
+        raise BackendExistsError(backend_id)
 
     backend = Backend()
     backend.title = title
@@ -70,28 +77,33 @@ def add_backend(user, title, provider, apikey,
     with user.lock_n_load():
         user.backends[backend_id] = backend
         user.save()
+    log.info("Backend with id '%s' added succesfully.", backend_id)
     return backend_id
 
 
 def delete_backend(user, backend_id):
+    """Deletes backend with given backend_id."""
+
+    log.info("Deleting backend: %s", backend_id)
     if backend_id not in user.backends:
-        raise BackendNotFoundError()
+        raise BackendNotFoundError(backend_id)
     with user.lock_n_load():
         del user.backends[backend_id]
         user.save()
+    log.info("Succesfully deleted backend '%s'", backend_id)
 
 
 def add_key(user, key_id, private_key):
     """Adds a new keypair and returns the new key_id"""
 
+    log.info("Adding key with id '%s'.", key_id)
     if not key_id:
-        raise NotFoundError("Key_id could not be found")
-
+        raise KeypairParameterMissingError(key_id)
     if not private_key:
-        raise NotFoundError("Private key is not provided")
+        raise RequiredParameterMissingError("Private key is not provided")
 
     if key_id in user.keypairs:
-        raise ConflictError("Key with the same name already exists")
+        raise KeypairExistsError(key_id)
 
     keypair = Keypair()
     keypair.private = private_key
@@ -106,6 +118,7 @@ def add_key(user, key_id, private_key):
         user.keypairs[key_id] = keypair
         user.save()
 
+    log.info("Added key with id '%s'", key_id)
     return key_id
 
 
@@ -121,8 +134,9 @@ def delete_key(user, key_id):
 
     """
 
+    log.info("Deleting key with id '%s'.", key_id)
     if key_id not in user.keypairs:
-        raise KeypairNotFoundError()
+        raise KeypairNotFoundError(key_id)
 
     keypair = user.keypairs[key_id]
 
@@ -131,10 +145,11 @@ def delete_key(user, key_id):
         del user.keypairs[key_id]
 
         if keypair.default and len(user.keypairs):
-            otherKey = user.keypairs.keys()[0]
-            user.keypairs[otherKey].default = True
+            other_key = user.keypairs.keys()[0]
+            user.keypairs[other_key].default = True
 
         user.save()
+    log.info("Deleted key with id '%s'.", key_id)
 
 
 def set_default_key(user, key_id):
@@ -146,13 +161,14 @@ def set_default_key(user, key_id):
 
     """
 
+    log.info("Setting key with id '%s' as default.", key_id)
     if not key_id:
-        return NotFoundError("Key_id could not be found")
+        return KeypairParameterMissingError(key_id)
 
     keypairs = user.keypairs
 
     if not key_id in keypairs:
-        raise KeypairNotFoundError()
+        raise KeypairNotFoundError(key_id)
 
     with user.lock_n_load():
         for key in keypairs:
@@ -160,26 +176,27 @@ def set_default_key(user, key_id):
                 keypairs[key].default = False
         keypairs[key_id].default = True
         user.save()
+    log.info("Succesfully set key with id '%s' as default.", key_id)
 
 
 def edit_key(user, new_key, old_key):
     """
     Edits a given key's name from old_key ---> new_key
     @param user: The User
-    @param new_key: The new Key name
-    @param old_key: The old key name
+    @param new_key: The new Key name (id)
+    @param old_key: The old key name (id)
     @return: Nothing, only raises exceptions if needed
 
     """
 
+    log.info("Renaming key '%s' to '%s'.", old_key, new_key)
     if not new_key:
-        raise RequiredParameterMissingError("New key name not provided")
-
-    if not old_key:
-        raise RequiredParameterMissingError("Key to be edited not provided")
+        raise KeypairParameterMissingError("new name")
+    if old_key not in user.keypairs:
+        raise KeypairNotFoundError(old_key)
 
     if old_key == new_key:
-        log.warning("Same name provided, will not edit key.No reason")
+        log.warning("Same name provided, will not edit key. No reason")
         return
 
     old_keypair = user.keypairs[old_key]
@@ -187,6 +204,7 @@ def edit_key(user, new_key, old_key):
         del user.keypairs[old_key]
         user.keypairs[new_key] = old_keypair
         user.save()
+    log.info("Renamed key '%s' to '%s'.", old_key, new_key)
 
 
 def associate_key(user, key_id, backend_id, machine_id, host=None):
@@ -198,8 +216,7 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
 
     """
 
-    log.info("Associate key, deploy = %s" % host)
-
+    log.info("Associating key, deploy = %s" % host)
     if key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
     if backend_id not in user.backends:
@@ -211,8 +228,8 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
     # check if key already associated
     for machine in keypair.machines:
         if machine[:2] == machine_uid:
-            log.info("Keypair '%s' already associated with machine '%s'"
-                     % (key_id, machine_id))
+            log.warning("Keypair '%s' already associated with machine '%s'"
+                        % (key_id, machine_id))
             return
 
     # add machine to keypair's associated machines list
@@ -278,7 +295,7 @@ def disassociate_key(user, key_id, backend_id, machine_id, host=None):
 
     """
 
-    log.info("Disassociate key, undeploy = %s" % host)
+    log.info("Disassociating key, undeploy = %s" % host)
 
     if key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
@@ -335,7 +352,8 @@ def connect_provider(backend):
             backend.apisecret,
             ex_force_auth_version=backend.auth_version or '2.0_password',
             ex_force_auth_url=backend.apiurl,
-            ex_tenant_name=backend.tenant_name)
+            ex_tenant_name=backend.tenant_name
+        )
     elif backend.provider == Provider.LINODE:
         conn = driver(backend.apisecret)
     elif backend.provider in [Provider.RACKSPACE_FIRST_GEN,
@@ -413,7 +431,7 @@ def get_machine_actions(machine_from_api, conn):
 
 def list_machines(user, backend_id):
     if backend_id not in user.backends:
-        raise BackendNotFoundError()
+        raise BackendNotFoundError(backend_id)
     conn = connect_provider(user.backends[backend_id])
 
     try:
@@ -481,7 +499,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     """
 
     if backend_id not in user.backends:
-        raise BackendNotFoundError()
+        raise BackendNotFoundError(backend_id)
     conn = connect_provider(user.backends[backend_id])
 
     if key_id and key_id not in user.keypairs:

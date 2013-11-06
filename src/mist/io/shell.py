@@ -52,11 +52,12 @@ class ShellMiddleware(object):
 
         
     def stream_command(self, stdout_lines, start_response):
-        """ 
-            Generator function that streams the output of the remote command 
-            using the hidden iframe web pattern
-        """
+        """Stream SSH command output to javascript via iframe
 
+        Generator function that streams the output of the remote command 
+        using the hidden iframe web pattern.
+
+        """
         start_response('200 OK', [('Content-Type','text/html')])
 
         # send some blank data to get webkit browsers to display what's sent
@@ -65,23 +66,26 @@ class ShellMiddleware(object):
         # start the html response
         yield '<html><body>\n'
 
+        js = "<script type='text/javascript'>parent.appendShell('%s');</script>\n"
         for line in stdout_lines:
             # get commands output, line by line
+            
             clear_line = line.replace('\'','\\\'')
             clear_line = clear_line.replace('\n','<br/>')
             clear_line = clear_line.replace('\r','')
             #.replace('<','&lt;').replace('>', '&gt;')
-            js = "<script type='text/javascript'>parent.appendShell('%s');</script>\n"
             yield js % clear_line
         # FIXME
-        yield "<script type='text/javascript'>parent.completeShell(%s);</script>\n" % 1        
-        yield '</body></html>\n'   
+        js = "<script type='text/javascript'>parent.completeShell(%s);</script>\n"
+        yield js % 1
+        yield '</body></html>\n'
 
 
 class Shell(object):
     """ This is a new Shell class. Rather generic, all it does is initialize a new
     Shell object. Its main attributes are host, username. You can either user
     password or private key for connecting and authorizing.
+    
     """
 
     def __init__(self, host, username=None, key=None, password=None, port=22):
