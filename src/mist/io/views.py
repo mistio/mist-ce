@@ -203,20 +203,30 @@ def add_backend(request, renderer='json'):
                   }
 
         backends[backend_id] = backend
-        #validate newly added backend, else remove
-        try:
-            conn = connect(request, backend_id = backend_id)
-        except:
+
+    #validate newly added backend, else remove
+    try:
+        conn = connect(request, backend_id = backend_id)
+    except Exception as e:
+        with get_user(request) as user:
+            backends = user.get('backends', {})
             backends.pop(backend_id)
-            return Response('Invalid Credentials', 404)
+        return Response('Invalid Credentials', 404)
 
-        try:
-            nodes = conn.list_nodes()        
-        except Exception as e:    
+    try:
+        nodes = conn.list_nodes()        
+    except Exception as e:    
+        with get_user(request) as user:
+            backends = user.get('backends', {})
             backends.pop(backend_id)        
-            return Response('Error adding Backend %s: %s' % (title, e), 404)
+        return Response('Error adding Backend %s: %s' % (title, e), 404)
 
 
+    with get_user(request, readonly=True) as user:
+        backends = user.get('backends', {})
+        backend = backends.get(backend_id)
+        if not backend:
+            return Response('Service unavailable', 503)
         ret = {'index'        : len(user['backends']) - 1,
                 'id'           : backend_id,
                 'apikey'       : backend['apikey'],
@@ -230,7 +240,7 @@ def add_backend(request, renderer='json'):
                 'enabled'      : True,
                 }
         
-        return ret
+    return ret
 
 
 @view_config(route_name='backend_action', request_method='DELETE',
