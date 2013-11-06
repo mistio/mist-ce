@@ -496,7 +496,7 @@ class UserEngine(OODict):
         except:
             raise
         finally:
-            log.info("Releasing lock")
+            #~ log.info("Releasing lock")
             self.lock = False
             #~ os.rmdir(lock_dir)
             
@@ -515,6 +515,7 @@ class UserEngine(OODict):
     def save(self):
         """Save user data to storage. Raises exception if not in a
         "with user.lock_n_load():" code block.
+
         """
         if not self._lock:
             raise Exception("Attempting to save without prior lock. "

@@ -1,8 +1,5 @@
-import os
-import tempfile
 import logging
 import random
-from time import time
 from datetime import datetime
 
 
@@ -14,22 +11,20 @@ from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider
 from libcloud.common.types import InvalidCredsError
 from libcloud.compute.types import NodeState
-from pyramid.response import Response    # temp
 
 
-from mist.io.config import STATES, SUPPORTED_PROVIDERS
+from mist.io.config import STATES
 from mist.io.config import EC2_IMAGES, EC2_PROVIDERS, EC2_SECURITYGROUP
 from mist.io.config import LINODE_DATACENTERS
-
-
-from mist.io.model import Backend, Keypair
 from mist.io.exceptions import *
-
+from mist.io.model import Backend, Keypair
 from mist.io.shell import Shell
+from mist.io.helpers import get_temp_file, generate_backend_id
 
-from mist.io.helpers import generate_backend_id, get_preferred_keypairs
-from mist.io.helpers import get_ssh_user_from_keypair
 
+#~ # add curl ca-bundle default path to prevent libcloud certificate error
+#~ import libcloud.security
+#~ libcloud.security.CA_CERTS_PATH.append('/usr/share/curl/ca-bundle.crt')
 
 log = logging.getLogger(__name__)
 
@@ -94,7 +89,7 @@ def delete_backend(user, backend_id):
 
 
 def add_key(user, key_id, private_key):
-    """Adds a new keypair and returns the new key_id"""
+    """Adds a new keypair and returns the new key_id."""
 
     log.info("Adding key with id '%s'.", key_id)
     if not key_id:
@@ -162,9 +157,6 @@ def set_default_key(user, key_id):
     """
 
     log.info("Setting key with id '%s' as default.", key_id)
-    if not key_id:
-        return KeypairParameterMissingError(key_id)
-
     keypairs = user.keypairs
 
     if not key_id in keypairs:
@@ -228,63 +220,38 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
     # check if key already associated
     for machine in keypair.machines:
         if machine[:2] == machine_uid:
-            log.warning("Keypair '%s' already associated with machine '%s'"
-                        % (key_id, machine_id))
-            return
+            log.warning("Keypair '%s' already associated with machine '%s' "
+                        "in backend '%s'", key_id, backend_id, machine_id)
+            # if host given, check if it is actually deployed
+            if host:
+                try:
+                    ssh_command(user, backend_id, machine_id, host,
+                                'uptime', key_id=key_id)
+                except MachineUnauthorizedError:
+                    log.warning("Keypair isn't actually deployed, "
+                                "will try to redeploy.")
+                else:
+                    return
 
-    # add machine to keypair's associated machines list
-    with user.lock_n_load():
-        keypair.machines.append(machine_uid)
-        user.save()
-
-    #TODO
+    # if host is specified, try to actually deploy
     if host:
+        log.info("Deploying key to machine.")
         grep_output = '`grep \'%s\' ~/.ssh/authorized_keys`' % keypair.public
-        command = 'if [ -z "%s" ]; then echo "%s" >> ~/.ssh/authorized_keys; fi' \
-                  % (grep_output, keypair.public)
+        command = ('if [ -z "%s" ]; then echo "%s" >> '
+                   '~/.ssh/authorized_keys; fi'
+                   % (grep_output, keypair.public))
         try:
-            ret = ssh_command(user, backend_id, machine_id, host, command)
-        except:
-            pass
-#~
-    #~ # Maybe the deployment failed but let's try to connect with the
-    #~ new key and see what happens
-    #~ with get_user(request, readonly=True) as user:
-        #~ keypairs = user.get('keypairs',{})
-        #~ key_name = None
-        #~ for key_name, k in keypairs.items():
-            #~ if k == keypair:
-                #~ break
-#~
-        #~ if key_name:
-            #~ log.warn('probing with key %s' % key_name)
-#~
-        #~ if ret:
-            #~ ssh_user = ret.get('ssh_user', None)
-        #~ else:
-            #~ ssh_user = None
-#~
-        #~ test = shell_command(request, backend_id, machine_id, host,
-        #~                      'whoami', ssh_user, key = key_name)
-#~
-        #~ return test
-########
-        #~ ret = deploy_key(request, keypair)
-    #~
-        #~ if ret:
-            #~ keypair['machines'][-1] += [int(time()),
-            #~                             ret.get('ssh_user', ''),
-            #~                             ret.get('sudoer', False)]
-            #~ log.debug("Associate key, %s" % keypair['machines'])
-            #~ return keypair['machines']
-        #~ else:
-            #~ if machine_uid in keypair['machines']:
-                #~ keypair['machines'].remove(machine_uid)
-            #~ log.debug("Disassociate key, %s" % keypair['machines'])
-            #~
-            #~ return Response('Failed to deploy key', 412)
-    #~ else:
-        #~ return keypair['machines']
+            ssh_command(user, backend_id, machine_id, host, command)
+        except MachineUnauthorizedError:
+            raise MachineUnauthorizedError("Couldn't connect to "
+                                           "deploy new SSH keypair.")
+
+    # attemp to connect with new key
+    # if it fails to connect it'll raise exception
+    # there is no need to manually set the association in keypair.machines
+    # that is automatically handled by Shell, if it is configured by
+    # shell.autoconfigure (which ssh_command does)
+    ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
 
 
 def disassociate_key(user, key_id, backend_id, machine_id, host=None):
@@ -314,23 +281,22 @@ def disassociate_key(user, key_id, backend_id, machine_id, host=None):
                 key_found = True
                 break
 
-    #key not associated
+    # key not associated
     if not key_found:
         raise BadRequestError("Keypair '%s' is not associated with "
                               "machine '%s'" % (key_id, machine_id), 304)
 
     if host:
+        log.info("Trying to actually remove key from authorized_keys.")
         command = 'grep -v "' + keypair['public'] +\
                   '" ~/.ssh/authorized_keys ' +\
                   '> ~/.ssh/authorized_keys.tmp && ' +\
                   'mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys ' +\
                   '&& chmod go-w ~/.ssh/authorized_keys'
         try:
-            ret = ssh_command(user, backend_id, machine_id, host, command)
+            ssh_command(user, backend_id, machine_id, host, command)
         except:
-            return False
-
-        return ret
+            pass
 
 
 def connect_provider(backend):
@@ -342,6 +308,8 @@ def connect_provider(backend):
         * Rackspace, old style and the new Nova powered one,
         * Openstack Diablo through Trystack, should also try Essex,
         * Linode
+
+    Backend is expected to be a mist.io.model.Backend
 
     """
 
@@ -430,6 +398,8 @@ def get_machine_actions(machine_from_api, conn):
 
 
 def list_machines(user, backend_id):
+    """List all machines in this backend via API call to the provider."""
+
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
     conn = connect_provider(user.backends[backend_id])
@@ -439,7 +409,7 @@ def list_machines(user, backend_id):
     except InvalidCredsError:
         raise BackendUnauthorizedError()
     except:
-        raise InternalServerError("Backend unavailable")
+        raise BackendUnavailableError()
 
     ret = []
     for m in machines:
@@ -454,7 +424,6 @@ def list_machines(user, backend_id):
             tags.append(LINODE_DATACENTERS[m.extra['DATACENTERID']])
 
         image_id = m.image or m.extra.get('imageId', None)
-
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
 
@@ -503,7 +472,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     conn = connect_provider(user.backends[backend_id])
 
     if key_id and key_id not in user.keypairs:
-        raise KeypairNotFoundError()
+        raise KeypairNotFoundError(key_id)
 
     # if key_id not provided, search for default key
     if not key_id:
@@ -553,9 +522,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                                      script, machine_name, image, size,
                                      location)
     else:
-        raise BadRequestError()
+        raise BadRequestError("Provider unknown.")
 
-    # TODO associate key
     associate_key(user, key_id, backend_id, node.id)
 
     return {'id': node.id,
@@ -596,21 +564,17 @@ def create_machine_ec2(conn, key_name, private_key, public_key, script,
     """
 
     # import key. This is supported only for EC2 at the moment.
-    (tmp_key_fd, tmp_key_path) = tempfile.mkstemp()
-    key_fd = os.fdopen(tmp_key_fd, 'w+b')
-    key_fd.write(public_key)
-    key_fd.close()
-    try:
-        log.info("Attempting to import key (ec2-only)")
-        conn.ex_import_keypair(name=key_name, keyfile=tmp_key_path)
-    except Exception as exc:
-        if 'Duplicate' in exc.message:
-            log.debug('Key already exists, not importing anything.')
-        else:
-            log.error('Failed to import key.')
-            raise InternalServerError("Failed to import key (ec2-only)")
-    finally:
-        os.remove(tmp_key_path)
+    with get_temp_file(public_key) as tmp_key_path:
+        try:
+            log.info("Attempting to import key (ec2-only)")
+            conn.ex_import_keypair(name=key_name, keyfile=tmp_key_path)
+        except Exception as exc:
+            if 'Duplicate' in exc.message:
+                log.debug('Key already exists, not importing anything.')
+            else:
+                log.error('Failed to import key.')
+                raise BackendUnavailableError("Failed to import key "
+                                              "(ec2-only): %r" % exc)
 
     # create security group
     name = EC2_SECURITYGROUP.get('name', '')
@@ -627,28 +591,23 @@ def create_machine_ec2(conn, key_name, private_key, public_key, script,
             raise InternalServerError("Couldn't create security group")
 
     deploy_script = ScriptDeployment(script)
-    (tmp_key_fd, tmp_key_path) = tempfile.mkstemp()
-    key_fd = os.fdopen(tmp_key_fd, 'w+b')
-    key_fd.write(private_key)
-    key_fd.close()
-    #deploy_node wants path for ssh private key
-    try:
-        node = conn.deploy_node(
-            name=machine_name,
-            image=image,
-            size=size,
-            deploy=deploy_script,
-            location=location,
-            ssh_key=tmp_key_path,
-            ssh_alternate_usernames=['ec2-user', 'ubuntu'],
-            max_tries=1,
-            ex_keyname=key_name,
-            ex_securitygroup=EC2_SECURITYGROUP['name']
-        )
-    except Exception as e:
-        raise MachineCreationError("EC2, got exception %s" % e)
-    finally:
-        os.remove(tmp_key_path)
+    with get_temp_file(private_key) as tmp_key_path:
+        #deploy_node wants path for ssh private key
+        try:
+            node = conn.deploy_node(
+                name=machine_name,
+                image=image,
+                size=size,
+                deploy=deploy_script,
+                location=location,
+                ssh_key=tmp_key_path,
+                ssh_alternate_usernames=['ec2-user', 'ubuntu'],
+                max_tries=1,
+                ex_keyname=key_name,
+                ex_securitygroup=EC2_SECURITYGROUP['name']
+            )
+        except Exception as e:
+            raise MachineCreationError("EC2, got exception %s" % e)
     return node
 
 
@@ -702,29 +661,23 @@ def create_machine_nephoscale(conn, key_name, private_key, public_key, script,
         if console_keys:
             console_key = console_keys[0].id
 
-    (tmp_key_fd, tmp_key_path) = tempfile.mkstemp()
-    key_fd = os.fdopen(tmp_key_fd, 'w+b')
-    key_fd.write(private_key)
-    key_fd.close()
-
-    try:
-        node = conn.deploy_node(
-            name=machine_name,
-            hostname=machine_name[:15],
-            image=image,
-            size=size,
-            zone=location.id,
-            server_key=server_key,
-            console_key=console_key,
-            ssh_key=tmp_key_path,
-            connect_attempts=20,
-            ex_wait=True,
-            deploy=deploy_script
-        )
-    except Exception as e:
-        raise MachineCreationError("Nephoscale, got exception %s" % e)
-    finally:
-        os.remove(tmp_key_path)
+    with get_temp_file(private_key) as tmp_key_path:
+        try:
+            node = conn.deploy_node(
+                name=machine_name,
+                hostname=machine_name[:15],
+                image=image,
+                size=size,
+                zone=location.id,
+                server_key=server_key,
+                console_key=console_key,
+                ssh_key=tmp_key_path,
+                connect_attempts=20,
+                ex_wait=True,
+                deploy=deploy_script
+            )
+        except Exception as e:
+            raise MachineCreationError("Nephoscale, got exception %s" % e)
     return node
 
 
@@ -746,24 +699,19 @@ def create_machine_softlayer(conn, key_name, private_key, public_key, script,
     else:
         domain = None
         name = machine_name
-    (tmp_key_fd, tmp_key_path) = tempfile.mkstemp()
-    key_fd = os.fdopen(tmp_key_fd, 'w+b')
-    key_fd.write(private_key)
-    key_fd.close()
-    try:
-        node = conn.deploy_node(
-            name=name,
-            ex_domain=domain,
-            image=image,
-            size=size,
-            deploy=msd,
-            location=location,
-            ssh_key=tmp_key_path
-        )
-    except Exception as e:
-        raise MachineCreationError("Softlayer, got exception %s" % e)
-    finally:
-        os.remove(tmp_key_path)
+    with get_temp_file(private_key) as tmp_key_path:
+        try:
+            node = conn.deploy_node(
+                name=name,
+                ex_domain=domain,
+                image=image,
+                size=size,
+                deploy=msd,
+                location=location,
+                ssh_key=tmp_key_path
+            )
+        except Exception as e:
+            raise MachineCreationError("Softlayer, got exception %s" % e)
     return node
 
 
@@ -784,30 +732,25 @@ def create_machine_digital_ocean(conn, key_name, private_key, public_key,
     except:
         key = conn.ex_create_ssh_key('mist.io', key)
 
-    (tmp_key_fd, tmp_key_path) = tempfile.mkstemp()
-    key_fd = os.fdopen(tmp_key_fd, 'w+b')
-    key_fd.write(private_key)
-    key_fd.close()
-    try:
-        node = conn.deploy_node(
-            name=machine_name,
-            image=image,
-            size=size,
-            ex_ssh_key_ids=[str(key.id)],
-            location=location,
-            ssh_key=tmp_key_path,
-            ssh_alternate_usernames=['root']*5,
-            #attempt to fix the Connection reset by peer exception
-            #that is (most probably) created due to a race condition
-            #while deploy_node establishes a connection and the
-            #ssh server is restarted on the created node
-            private_networking=True,
-            deploy=deploy_script
-        )
-    except Exception as e:
-        raise MachineCreationError("Digital Ocean, got exception %s" % e)
-    finally:
-        os.remove(tmp_key_path)
+    with get_temp_file(private_key) as tmp_key_path:
+        try:
+            node = conn.deploy_node(
+                name=machine_name,
+                image=image,
+                size=size,
+                ex_ssh_key_ids=[str(key.id)],
+                location=location,
+                ssh_key=tmp_key_path,
+                ssh_alternate_usernames=['root']*5,
+                #attempt to fix the Connection reset by peer exception
+                #that is (most probably) created due to a race condition
+                #while deploy_node establishes a connection and the
+                #ssh server is restarted on the created node
+                private_networking=True,
+                deploy=deploy_script
+            )
+        except Exception as e:
+            raise MachineCreationError("Digital Ocean, got exception %s" % e)
     return node
 
 
@@ -823,24 +766,19 @@ def create_machine_linode(conn, key_name, private_key, public_key, script,
     auth = NodeAuthSSHKey(public_key)
     deploy_script = ScriptDeployment(script)
 
-    (tmp_key_fd, tmp_key_path) = tempfile.mkstemp()
-    key_fd = os.fdopen(tmp_key_fd, 'w+b')
-    key_fd.write(private_key)
-    key_fd.close()
-    try:
-        node = conn.deploy_node(
-            name=machine_name,
-            image=image,
-            size=size,
-            deploy=deploy_script,
-            location=location,
-            auth=auth,
-            ssh_key=tmp_key_path
-        )
-    except Exception as e:
-        raise MachineCreationError("Linode, got exception %s" % e)
-    finally:
-        os.remove(tmp_key_path)
+    with get_temp_file(private_key) as tmp_key_path:
+        try:
+            node = conn.deploy_node(
+                name=machine_name,
+                image=image,
+                size=size,
+                deploy=deploy_script,
+                location=location,
+                auth=auth,
+                ssh_key=tmp_key_path
+            )
+        except Exception as e:
+            raise MachineCreationError("Linode, got exception %s" % e)
     return node
 
 
@@ -940,50 +878,22 @@ def ssh_command(user, backend_id, machine_id, host, command,
     """
     We initialize a Shell instant (for mist.io.shell).
 
-    @param host: The host to connect to
-    @param ssh_user: Username
-    @param private_key: The private_key. We may not need to put one, as we may
-    want to connect only with password (e.g. bare-metal server)
-    @param command: Command to run
-    @param password: Password. By default none, as we use private_key.
-    However we may need to connect only with password (e.g. bare-metal server).
-    In case both password and private_key are given, then the password is used
-    for the private_key in case it needs password.
-    @return:
+    Autoconfigures shell and returns command's output as string.
+    Raises MachineUnauthorizedError if it doesn't manage to connect.
+
     """
 
     shell = Shell(host)
-    ret = shell.autoconfigure(user, backend_id, machine_id,
-                              key_id, password)
-    if ret is None:
-        raise MachineUnauthorizedError("%s, %s" % (backend_id, machine_id))
-    else:
-        key_id, ssh_user = ret
-
-    #~ try:
+    key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
+                                           key_id, password)
     output = shell.command(command)
-    shell.checkSudo()
-    sudoer = shell.sudo
     shell.disconnect()
-
-    with user.lock_n_load():
-        for i in range(len(user.keypairs[key_id].machines)):
-            machine = user.keypairs[key_id].machines[i]
-            if [backend_id, machine_id] == machine[:2]:
-                assoc = [backend_id, machine_id, time(), ssh_user, False]
-                user.keypairs[key_id].machines[i] = assoc
-        user.save()
-
-    return {'output': output, 'ssh_user': ssh_user, 'sudoer': sudoer}
-    #~ except Exception as e:
-        #~ log.warning(e)
-    #~ finally:
-        #~ shell.disconnect()
+    return output
 
 
 def list_images(user, backend_id, term=None):
     """List images from each backend.
-    
+
     Furthermore if a search_term is provided, we loop through each
     backend and search for that term in the ids and the names of
     the community images
@@ -995,43 +905,42 @@ def list_images(user, backend_id, term=None):
 
     backend = user.backends[backend_id]
     conn = connect_provider(backend)
-    #~ try:
-    starred = list(backend.starred)
-    # Initialize arrays
-    starred_images = []
-    ec2_images = []
-    rest_images = []
-    images = []
-    if conn.type in EC2_PROVIDERS:
-        imgs = EC2_IMAGES[conn.type].keys() + starred
-        ec2_images = conn.list_images(None, imgs)
-        for image in ec2_images:
-            image.name = EC2_IMAGES[conn.type].get(image.id, image.name)
-    else:
-        rest_images = conn.list_images()
-        starred_images = [image for image in rest_images if image.id in starred]
+    try:
+        starred = list(backend.starred)
+        # Initialize arrays
+        starred_images = []
+        ec2_images = []
+        rest_images = []
+        images = []
+        if conn.type in EC2_PROVIDERS:
+            imgs = EC2_IMAGES[conn.type].keys() + starred
+            ec2_images = conn.list_images(None, imgs)
+            for image in ec2_images:
+                image.name = EC2_IMAGES[conn.type].get(image.id, image.name)
+        else:
+            rest_images = conn.list_images()
+            starred_images = [image for image in rest_images
+                              if image.id in starred]
 
-    if term and conn.type in EC2_PROVIDERS:
-        ec2_images += conn.list_images(ex_owner="self")
-        ec2_images += conn.list_images(ex_owner="aws-marketplace")
-        ec2_images += conn.list_images(ex_owner="amazon")
+        if term and conn.type in EC2_PROVIDERS:
+            ec2_images += conn.list_images(ex_owner="self")
+            ec2_images += conn.list_images(ex_owner="aws-marketplace")
+            ec2_images += conn.list_images(ex_owner="amazon")
 
-    images = starred_images + ec2_images + rest_images
-    images = [img for img in images
-                    if img.id[:3] not in ['aki', 'ari']
-                    and img.id[:3] not in ['aki', 'ari']
-                    and 'windows' not in img.name.lower()
-                    and 'hvm' not in img.name.lower()
-    ]
-
-    if term:
+        images = starred_images + ec2_images + rest_images
         images = [img for img in images
-                        if term in img.id.lower()
-                        or term in img.name.lower()
-        ][:20]
-    #~ except Exception as e:
-        #~ log.error(e)
-        #~ return Response('Backend unavailable', 503)
+                  if img.id[:3] not in ['aki', 'ari']
+                  and img.id[:3] not in ['aki', 'ari']
+                  and 'windows' not in img.name.lower()
+                  and 'hvm' not in img.name.lower()]
+
+        if term:
+            images = [img for img in images
+                      if term in img.id.lower()
+                      or term in img.name.lower()][:20]
+    except Exception as e:
+        log.error(repr(e))
+        return BackendUnavailableError(backend_id)
 
     ret = []
     for image in images:
@@ -1051,7 +960,7 @@ def list_sizes(user, backend_id):
     try:
         sizes = conn.list_sizes()
     except:
-        return Response('Backend unavailable', 503)
+        raise BackendUnavailableError(backend_id)
 
     ret = []
     for size in sizes:
@@ -1116,16 +1025,17 @@ def set_machine_metadata(user, backend_id, machine_id, tag):
     comparing in ifs. u'f' is 'f' returns false and 'in' is too broad.
 
     """
+
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
     backend = user.backends[backend_id]
     if not tag:
-        raise BadRequestError("tag is empty")
+        raise RequiredParameterMissingError("tag")
     conn = connect_provider(backend)
 
     if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
-        raise ForbiddenError("Adding metadata is not supported in %s"
-                             % conn.type)
+        raise MethodNotAllowedError("Adding metadata is not supported in %s"
+                                    % conn.type)
 
     unique_key = 'mist.io_tag-' + datetime.now().isoformat()
     pair = {unique_key: tag}
@@ -1171,16 +1081,17 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
     u'f' is 'f' returns false.
 
     """
+
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
     backend = user.backends[backend_id]
     if not tag:
-        raise BadRequestError("tag is empty")
+        raise RequiredParameterMissingError("tag")
     conn = connect_provider(backend)
 
     if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
-        raise ForbiddenError("Deleting metadata is not supported in %s"
-                             % conn.type)
+        raise MethodNotAllowedError("Deleting metadata is not supported in %s"
+                                    % conn.type)
 
     machine = None
     try:

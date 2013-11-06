@@ -379,20 +379,18 @@ cat /proc/uptime && echo -------- && cat ~/`grep '^AuthorizedKeysFile' \
     log.warn('probing with key %s' % key)
 
     user = user_from_request(request)
-    ret = methods.ssh_command(user, backend_id, machine_id,
-                              host, command, key_id=key)
+    cmd_output = methods.ssh_command(user, backend_id, machine_id,
+                                     host, command, key_id=key)
 
-    if ret:
-        cmd_output = ret['output'].split('--------')
+    if cmd_output:
+        cmd_output = cmd_output.split('--------')
         if len(cmd_output) > 2:
             updated_keys = update_available_keys(user, backend_id,
                                                  machine_id, cmd_output[2])
             return {'uptime': cmd_output[1],
                     'updated_keys': updated_keys}
         else:
-            return ret
-
-    return Response('No valid keys for server', 405)
+            return {'uptime': cmd_output[1]}
 
 
 def update_available_keys(user, backend_id, machine_id, authorized_keys):
@@ -508,7 +506,7 @@ def list_keys(request):
              'name': key,
              'machines': user.keypairs[key].machines,
              'default_key': user.keypairs[key].default}
-                 for key in user.keypairs]
+            for key in user.keypairs]
 
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
@@ -541,26 +539,25 @@ def delete_key(request):
 
     """
 
-    key_id = request.matchdict.get('key', '')
-
+    key_id = request.matchdict.get('key')
     if not key_id:
-        return Response('Keypair name not provided', 400)
+        raise KeypairParameterMissingError()
 
     user = user_from_request(request)
     methods.delete_key(user, key_id)
-
     return list_keys(request)
 
 
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
 
-    old_id = request.matchdict.get('key', '')
-    key_id = request.json_body.get('newName', '')
+    old_id = request.matchdict['key']
+    key_id = request.json_body.get('newName')
+    if not key_id:
+        raise RequiredParameterMissingError("new key name")
 
     user = user_from_request(request)
     methods.edit_key(user, key_id, old_id)
-
     return OK
 
 
@@ -655,7 +652,7 @@ def check_monitoring(request):
     if ret.status_code == 200:
         return ret.json()
     else:
-        return Response('Service unavailable', 503)
+        raise ServiceUnavailableError()
 
 
 @view_config(route_name='update_monitoring', request_method='POST',
@@ -710,9 +707,9 @@ def update_monitoring(request):
                         params=payload,
                         verify=False)
     if ret.status_code == 402:
-        return Response(ret.text, 402)
+        raise PaymentRequiredError(ret.text)
     elif ret.status_code != 200:
-        return Response('Service unavailable', 503)
+        raise ServiceUnavailableError()
 
     return ret.json()
 
@@ -730,7 +727,7 @@ def update_rule(request):
     ret = requests.post(core_uri+request.path, params=payload, verify=False)
 
     if ret.status_code != 200:
-        return Response('Service unavailable', 503)
+        raise ServiceUnavailableError()
 
     return ret.json()
 
@@ -749,17 +746,9 @@ def delete_rule(request):
     ret = requests.delete(core_uri+request.path, params=payload, verify=False)
 
     if ret.status_code != 200:
-        return Response('Service unavailable', 503)
+        raise ServiceUnavailableError()
 
     return OK
-
-
-def get_auth_key(request):
-    user = user_from_request(request)
-    from base64 import urlsafe_b64encode
-    auth_key = "%s:%s" % (user.email, user.password)
-    auth_key = urlsafe_b64encode(auth_key)
-    return auth_key
 
 
 @view_config(route_name='shell', request_method='GET')
@@ -767,7 +756,7 @@ def shell_stream(request):
     """Execute command via SSH and stream output
 
     Streams output using the hidden iframe technique.
-    
+
     """
 
     def parse(lines):
@@ -784,9 +773,9 @@ def shell_stream(request):
         js += "parent.appendShell('%s');</script>\n"
         for line in lines:
             # get commands output, line by line
-            clear_line = line.replace('\'','\\\'')
-            clear_line = clear_line.replace('\n','<br/>')
-            clear_line = clear_line.replace('\r','')
+            clear_line = line.replace('\'', '\\\'')
+            clear_line = clear_line.replace('\n', '<br/>')
+            clear_line = clear_line.replace('\r', '')
             #.replace('<','&lt;').replace('>', '&gt;')
             yield js % clear_line
         js = "<script type='text/javascript'>"
@@ -811,3 +800,12 @@ def shell_stream(request):
     # stdout and stderr output
     stdout_lines = shell.command_stream(cmd)
     return Response(status=200, app_iter=parse(stdout_lines))
+
+
+# FIXME
+def get_auth_key(request):
+    user = user_from_request(request)
+    from base64 import urlsafe_b64encode
+    auth_key = "%s:%s" % (user.email, user.password)
+    auth_key = urlsafe_b64encode(auth_key)
+    return auth_key

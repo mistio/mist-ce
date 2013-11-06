@@ -1,39 +1,59 @@
-import os
+"""mist.io.shell
+
+This module contains everything that is need to communicate with machines via
+SSH.
+
+"""
+
+
 import logging
-import tempfile
 from time import time
+
 
 import paramiko
 
-from pyramid.request import Request
 
-from mist.io.model import User
 from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
+from mist.io.exceptions import MachineUnauthorizedError
+from mist.io.exceptions import RequiredParameterMissingError
+from mist.io.helpers import get_temp_file
+
 log = logging.getLogger(__name__)
 
 
 class Shell(object):
-    """ This is a new Shell class. Rather generic, all it does is initialize a new
-    Shell object. Its main attributes are host, username. You can either user
-    password or private key for connecting and authorizing.
-    
+    """sHell
+
+    This class takes care of all SSH related issues. It initiates a connection
+    to a given host and can send commands whose output can be treated in
+    different ways. It can search a user's data and autoconfigure itself for
+    a given machine by finding the right private key and username. Under the
+    hood it uses paramiko.
+
+    Use it like:
+        shell = Shell('localhost', username='root', password='123')
+        print shell.command('uptime')
+    Or:
+        shell = Shell('localhost')
+        shell.autoconfigure(user, backend_id, machine_id)
+        for line in shell.command_stream('ps -fe'):
+            print line
+
     """
 
     def __init__(self, host, username=None, key=None, password=None, port=22):
-        """
-        @param host: The host to be connected to
-        @param username: Username to be used, by default it is root.
-        @param password: By default password is None. This means that we'll use
-        the private key by default. However, password can be useful in two cases.
-        Either with bare-metal support or when needed as passphrase by a private key
-        @param pkey: Pkey is given as a string when provided by users.keypairs[keypair].private
-        @param connect: If connect is set to False, then Shell object will not initialize the
-        connection. It will just create a Shell object
+        """Initialize a Shell instance
+
+        Initializes a Shell instance for host. If username is provided, then
+        it tries to actually initiate the connection, by calling connect().
+        Check out the docstring of connect().
 
         """
+
         if not host:
-            raise Exception('host not given')
+            raise RequiredParameterMissingError('host not given')
         self.host = host
+        self.sudo = False
 
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -45,48 +65,52 @@ class Shell(object):
     def connect(self, username, key=None, password=None, port=22):
         """Initialize an SSH connection.
 
-        Tries to connect and configure self, returns True upon success, False
-        otherwise.
+        Tries to connect and configure self. If only password is provided, it
+        will be used for authentication. If key is provided, it is treated as
+        and OpenSSH private RSA key and used for authentication. If both key
+        and password are provided, password is used as a passphrase to unlock
+        the private key.
+
+        Raises MachineUnauthorizedError if it fails to connect.
 
         """
+
+        log.info("Attempting to connect to %s@%s:%s.",
+                 username, self.host, port)
         try:
             if key:
-                tmp_key_fd, tmp_key_path = tempfile.mkstemp()
-                key_fd = os.fdopen(tmp_key_fd, 'w+b')
-                key_fd.write(key)
-                key_fd.close()
-                rsa_key = paramiko.RSAKey.from_private_key_file(tmp_key_path)
-                os.remove(tmp_key_path)
+                with get_temp_file(key) as key_path:
+                    rsa_key = paramiko.RSAKey.from_private_key_file(key_path)
                 self.ssh.connect(self.host, username=username, pkey=rsa_key,
                                  password=password, port=port)
             else:
                 self.ssh.connect(self.host, username=username,
                                  password=password, port=port)
             log.info("Succesfully connected to %s@%s:%s.",
-                      username, self.host, port)
-            return True
+                     username, self.host, port)
         except paramiko.SSHException as e:
-            log.error("Couldn't connect to %s@%s:%s.",
-                       username, self.host, port)
-            return False
+            raise MachineUnauthorizedError("Couldn't connect to %s@%s:%s. %s"
+                                           % (username, self.host, port, e))
 
     def disconnect(self):
         """Close the SSH connection."""
+        log.info("Closing ssh connection to %s", self.host)
         try:
             self.ssh.close()
         except:
             pass
 
-    def checkSudo(self):
+    def check_sudo(self):
         """Checks if sudo is installed.
 
         In case it is self.sudo = True, else self.sudo = False
-        
+
         """
         # FIXME
         stdout, stderr = self.command("which sudo", pty=False)
         if not stderr:
             self.sudo = True
+            return True
 
     def _command(self, cmd, pty=True):
         """Helper method used by command and stream_command."""
@@ -99,6 +123,7 @@ class Shell(object):
             # if enabled both streams are combined in stdout and stderr file
             # descriptor isn't used
             channel.get_pty()
+        # command starts being executed in the background
         channel.exec_command(cmd)
         return stdout, stderr
 
@@ -112,6 +137,7 @@ class Shell(object):
         stdout and stderr.
 
         """
+        log.info("running command: '%s'", cmd)
         stdout, stderr = self._command(cmd, pty)
         if pty:
             return stdout.read()
@@ -125,6 +151,7 @@ class Shell(object):
         by line. Use like: for line in command_stream(cmd): print line.
 
         """
+        log.info("running command: '%s'", cmd)
         stdout, stderr = self._command(cmd)
         line = stdout.readline()
         while line:
@@ -136,10 +163,16 @@ class Shell(object):
         """Autoconfigure SSH client.
 
         This will do its best effort to find a suitable keypair and username
-        and will try to connect. If it fails it returns None, otherwise it
-        initializes self and returns a (key_id, ssh_user) tupple.
+        and will try to connect. If it fails it raises
+        MachineUnauthorizedError, otherwise it initializes self and returns a
+        (key_id, ssh_user) tupple. If connection succeeds, it updates the
+        association information in the key with the current timestamp and the
+        username used to connect.
 
         """
+
+        log.info("autoconfiguring Shell for machine %s:%s",
+                 backend_id, machine_id)
         if backend_id not in user.backends:
             raise BackendNotFoundError(backend_id)
         if key_id is not None and key_id not in user.keypairs:
@@ -150,7 +183,8 @@ class Shell(object):
         if key_id:
             pref_keys = [key_id]
         else:
-            default_keys = filter(lambda key_id: keypairs[key_id].default, keypairs)
+            default_keys = [key_id for key_id in keypairs
+                            if keypairs[key_id].default]
             assoc_keys = []
             recent_keys = []
             root_keys = []
@@ -159,12 +193,13 @@ class Shell(object):
                 for machine in keypairs[key_id].machines:
                     if [backend_id, machine_id] == machine[:2]:
                         assoc_keys.append(key_id)
-                        if len(machine) > 2 and int(time() - machine[2]) < 7*24*3600:
+                        if len(machine) > 2 and \
+                                int(time() - machine[2]) < 7*24*3600:
                             recent_keys.append(key_id)
                         if len(machine) > 3 and machine[3] == 'root':
                             root_keys.append(key_id)
-                        if len(machine) > 4 and machine[4] == True:
-                            sudo_keys.append(key_id) 
+                        if len(machine) > 4 and machine[4] is True:
+                            sudo_keys.append(key_id)
             pref_keys = root_keys or sudo_keys or assoc_keys
             if default_keys and default_keys[0] not in pref_keys:
                 pref_keys.append(default_keys[0])
@@ -189,23 +224,49 @@ class Shell(object):
             else:
                 users = ['root']
             for ssh_user in users:
-                # if connection succesfull, return!
-                if self.connect(username=ssh_user,
-                                key=keypair.private,
-                                password=password):
-                    resp = self.command('uptime')
-                    new_ssh_user = None
-                    if 'Please login as the user ' in resp:
-                        new_ssh_user = resp.split()[5].strip('"')
-                    elif 'Please login as the' in resp:
-                        # for EC2 Amazon Linux machines, usually with ec2-user
-                        new_ssh_user = resp.split()[4].strip('"')
-                    if new_ssh_user:
-                        log.info("retrying as %s", new_ssh_user)
+                try:
+                    self.connect(username=ssh_user,
+                                 key=keypair.private,
+                                 password=password)
+                except MachineUnauthorizedError:
+                    continue
+                # this is a hack: if you try to login to ec2 with the wrong
+                # username, it won't fail the connection, so a
+                # MachineUnauthorizedException won't be raised. Instead, it
+                # will prompt you to login as some other user.
+                # This hack tries to identify when such a thing is happening
+                # and then tries to connect with the username suggested in
+                # the prompt.
+                resp = self.command('uptime')
+                new_ssh_user = None
+                if 'Please login as the user ' in resp:
+                    new_ssh_user = resp.split()[5].strip('"')
+                elif 'Please login as the' in resp:
+                    # for EC2 Amazon Linux machines, usually with ec2-user
+                    new_ssh_user = resp.split()[4].strip('"')
+                if new_ssh_user:
+                    log.info("retrying as %s", new_ssh_user)
+                    try:
                         self.disconnect()
                         self.connect(username=new_ssh_user,
-                                      key=keypair.private,
-                                      password=password)
+                                     key=keypair.private,
+                                     password=password)
                         ssh_user = new_ssh_user
-                    return key_id, ssh_user
-        return None
+                    except MachineUnauthorizedError:
+                        continue
+                # we managed to connect succesfully, return
+                # but first update key
+                    with user.lock_n_load():
+                        for i in range(len(user.keypairs[key_id].machines)):
+                            machine = user.keypairs[key_id].machines[i]
+                            if [backend_id, machine_id] == machine[:2]:
+                                assoc = [backend_id,
+                                         machine_id,
+                                         time(),
+                                         ssh_user,
+                                         self.check_sudo()]
+                                user.keypairs[key_id].machines[i] = assoc
+                        user.save()
+                return key_id, ssh_user
+
+        raise MachineUnauthorizedError("%s:%s" % (backend_id, machine_id))

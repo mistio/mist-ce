@@ -56,6 +56,10 @@ class KeypairParameterMissingError(RequiredParameterMissingError):
     msg = "Keypair id parameter missing"
 
 
+class KeyValidationError(BadRequestError):
+    msg = "Keypair could not be validated"
+
+
 # UNAUTHORIZED (translated as 401 in views)
 class UnauthorizedError(BaseError):
     msg = "Not authorized"
@@ -121,10 +125,6 @@ class InternalServerError(BaseError):
 
 class MachineCreationError(InternalServerError):
     msg = "Machine creation failed"
-
-
-class KeyValidationError(BadRequestError):
-    msg = "Keypair could not be validated"
 
 
 # SERVICE UNAVAILABLE (translated as 503 in views)
