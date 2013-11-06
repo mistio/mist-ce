@@ -490,12 +490,12 @@ span.bubble-monitoring {
     clear: left;
 }
 
-.select-machines, #select-keys {
+#select-machines, #select-keys {
     max-width: 110px;
     font-weight: normal;
 }
 
-.select-machines .ui-icon, #select-keys .ui-icon {
+#select-machines .ui-icon, #select-keys .ui-icon {
     margin-left: 5px;
 }
 
@@ -1828,13 +1828,13 @@ div.info {
 
     /* Select machines button */
 
-    #machines .select-machines, #select-keys {
+    #machines #select-machines, #select-keys {
         width: 60px;
         right: -6px;
         padding: 9px 0;
     }
 
-    #machines .select-machines .ui-btn-text, #select-keys .ui-btn-text {
+    #machines #select-machines .ui-btn-text, #select-keys .ui-btn-text {
         display: none;
     }
 

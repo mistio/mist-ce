@@ -16,45 +16,44 @@
     {{view Mist.MachineAddView}}
 
     <a href="#"
-        class="select-machines"
-        data-role="button"
-        data-icon="arrow-d"
-        {{action "openMachineSelectPopup" target="view"}}>Select</a>
-
-    <div id="select-machines-popup" data-role="popup">
-        <ul id="select-machines-listmenu" data-role="listview">
-            <li data-icon="false">
-                <a href="#" title="All">All</a>
-            </li>
-            <li data-icon="false">
-                <a href="#" title="None">None</a>
-            </li>
-            {{#each Mist.backendsController.content}}
-            <li data-icon="false">
-                <a href="#" title="{{unbound this.id}}">{{this.title}}</a>
-            </li>
-            {{/each}}
-        </ul>
-    </div>
+       id="select-machines"
+       data-role="button"
+       data-icon="arrow-d"
+       {{action "selectClicked" target="view"}}>Select</a>
 
     <ul id="machines-list"
         data-role="listview"
         data-filter="true"
         data-inset="true"
         data-filter-placeholder="Filter...">
-        {{#each Mist.backendsController.content}}
-            {{#each this.machines.content}}
+        {{#each Mist.backendsController}}
+            {{#each this.machines}}
                 {{view Mist.MachineListItemView machineBinding="this"}}
             {{/each}}
         {{/each}}
     </ul>
 
     <div class="bottom-padding"></div>
-
 </div>
 
-<div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog">
-    <div data-role="header">
+<div id="select-machines-popup" data-role="popup" data-transition="pop" data-position-to="#select-machines">
+    <ul id="select-machines-listmenu" data-role="listview">
+        <li data-icon="false">
+            <a href="#" {{action "selectOptionClicked" "all" target="view"}}>All</a>
+        </li>
+        <li data-icon="false">
+            <a href="#" {{action "selectOptionClicked" "none" target="view"}}>None</a>
+        </li>
+        {{#each Mist.backendsController.content}}
+        <li data-icon="false">
+            <a href="#" {{action "selectOptionClicked" this target="view"}}>{{this.title}}</a>
+        </li>
+        {{/each}}
+    </ul>
+</div>
+
+<div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog" data-theme="a">
+    <div data-role="header" data-theme="b">
         <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
     </div>
     {{view Mist.ConfirmationDialog data-role="content"}}
@@ -72,7 +71,6 @@
 
         <a href="#"
             id="machines-button-shell"
-            {{bindAttr class=":action-links view.disabledShellClass"}}
             data-role="button"
             data-icon="gear"
             {{action openShell target="view"}}>Shell</a>

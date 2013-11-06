@@ -17,6 +17,8 @@ define('app/controllers/backends', [
             loadingImages: true,
             loadingMachines: true,
             loadingBackends: true,
+            selectedMachine: null,
+            selectedMachineCount: 0,
             singleMachineRequest: null,
             singleMachineResponse: null,
 
@@ -42,7 +44,7 @@ define('app/controllers/backends', [
                     });
                     that.set('loadingBackends', false);
                 }).error(function() {
-                    Mist.notificationController.notify('Error loading backends');
+                    Mist.notificationController.notify('Error loading backends. Will try again in 5 seconds');
                     that.set('loadingBackends', false);
                     Ember.run.later(function() {
                         that.loadBackends();
@@ -65,7 +67,7 @@ define('app/controllers/backends', [
 
             loadingMachinesObserver: function() {
                 var loadingMachines = false;
-                this.content.some(function(backend) {
+                this.some(function(backend) {
                     if (backend.loadingMachines) {
                         return loadingMachines = true;
                     }
@@ -75,7 +77,7 @@ define('app/controllers/backends', [
 
             loadingImagesObserver: function() {
                 var loadingImages = false;
-                this.content.some(function(backend) {
+                this.some(function(backend) {
                     if (backend.loadingImages) {
                         return loadingImages = true;
                     }
@@ -85,7 +87,7 @@ define('app/controllers/backends', [
 
             updateMachineCount: function() {
                 var count = 0;
-                this.content.forEach(function(backend) {
+                this.forEach(function(backend) {
                     count += backend.machines.content.length;
                 });
                 this.set('machineCount', count);
@@ -93,15 +95,65 @@ define('app/controllers/backends', [
 
             updateImageCount: function() {
                 var count = 0;
-                this.content.forEach(function(backend) {
+                this.forEach(function(backend) {
                     count += backend.images.content.length;
                 });
                 this.set('imageCount', count);
             }.observes('content.length'),
 
+            updateSelectedMachineCount: function() {
+                var that = this;
+                var selectedMachineCount = 0;
+                Mist.backendsController.forEach(function(backend) {
+                    backend.machines.forEach(function(machine) {
+                        if (machine.selected) {
+                            if (++selectedMachineCount == 1) {
+                                that.set('selectedMachine', machine);
+                            } else {
+                                that.set('selectedMachine', null);
+                            }
+                        }
+                    });
+                });
+                
+                if (selectedMachineCount == 0) {
+                    $('#machines-footer').fadeOut(200);
+                } else if (selectedMachineCount == 1) {
+                    $('#machines-footer').fadeIn(200);
+                    $('#machines-button-power').removeClass('ui-disabled');
+                    // Enable shell
+                    if (this.selectedMachine && this.selectedMachine.probed && this.selectedMachine.state == 'running') {
+                        $('#machines-button-shell').removeClass('ui-disabled');
+                    } else {
+                        $('#machines-button-shell').addClass('ui-disabled');
+                    }
+                    // Enable tags
+                    if (this.selectedMachine && this.selectedMachine.can_tag) {
+                        $('#machines-button-tags').removeClass('ui-disabled');
+                    } else {
+                        $('#machines-button-tags').addClass('ui-disabled');
+                    }
+                } else {
+                    $('#machines-footer').fadeIn(200);
+                    $('#machines-button-shell').addClass('ui-disabled');
+                    $('#machines-button-tags').addClass('ui-disabled');
+                }
+                
+                // Enable power
+                Mist.backendsController.forEach(function(backend) {
+                    backend.machines.forEach(function(machine) {
+                        if (machine.selected && machine.state == 'terminated') {
+                            $('#machines-button-power').addClass('ui-disabled');
+                        }
+                    });
+                });
+
+                this.set('selectedMachineCount', selectedMachineCount);
+            },
+
             getBackendById: function(backendId) {
                 var backendToFind = null;
-                this.content.some(function(backend) {
+                this.some(function(backend) {
                     if (backend.id == backendId) {
                         return backendToFind = backend;
                     }
@@ -111,9 +163,9 @@ define('app/controllers/backends', [
 
             getMachineById: function(backendId, machineId) {
                 var machineToFind = null;
-                this.content.some(function(backend) {
+                this.some(function(backend) {
                     if (backend.id == backendId) {
-                        backend.machines.content.some(function(machine) {
+                        backend.machines.some(function(machine) {
                             if (machine.id == machineId) {
                                 return machineToFind = machine;
                             }
@@ -126,8 +178,8 @@ define('app/controllers/backends', [
 
             getMachineByUrlId: function(machineId) {
                 var machineToFind = null;
-                this.content.some(function(backend) {
-                    backend.machines.content.some(function(machine) {
+                this.some(function(backend) {
+                    backend.machines.some(function(machine) {
                         if (machine.id == machineId) {
                             return machineToFind = machine;
                         }

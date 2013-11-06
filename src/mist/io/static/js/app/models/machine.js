@@ -39,6 +39,10 @@ define('app/models/machine', [
                 });
             }.observes('probed', 'probing'),
 
+            selectedObserver: function() {
+                Mist.backendsController.updateSelectedMachineCount();
+            }.observes('selected'),
+
             image: function() {
                 return this.backend.images.getImage(this.imageId);
             }.property('imageId'),
