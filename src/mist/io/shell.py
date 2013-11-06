@@ -1,26 +1,19 @@
 import os
-import sys
-import socket
 import logging
-import subprocess
 import tempfile
+from time import time
 
-#import gevent
-#import gevent.socket
-
-#from gevent import monkey
-#monkey.patch_socket()
-
-import StringIO
 import paramiko
-import socket
 
 from pyramid.request import Request
-from pyramid.response import Response
-from mist.io.helpers import connect, run_command, get_ssh_user_from_keypair, get_user
-#from mist.io.views import get_preferred_keypairs
 
-log = logging.getLogger('mistshell')
+from mist.io.model import User
+from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
+log = logging.getLogger(__name__)
+
+def user_from_request(request):
+    return User()
+
 
 class ShellMiddleware(object):
     """Shell middleware that intercepts requests for shell commands and streams 
@@ -35,43 +28,25 @@ class ShellMiddleware(object):
         request = Request(environ)
         if request.path.endswith('shell') and request.method == 'GET':
             try:
-                backend = self.app.routes_mapper(request)['match']['backend']
-                machine = self.app.routes_mapper(request)['match']['machine']
+                backend_id = self.app.routes_mapper(request)['match']['backend']
+                machine_id = self.app.routes_mapper(request)['match']['machine']
                 host = request.params.get('host', None)
-                ssh_user = request.params.get('ssh_user', None)
+                #~ ssh_user = request.params.get('ssh_user', None)
                 command = request.params.get('command', None)
                 request.registry = self.app.registry
 
-                if not ssh_user or ssh_user == 'undefined':
-                    log.debug("Will select root as the ssh-user as we don't know who we are")
-                    ssh_user = 'root'
-
-                with get_user(request, readonly=True) as user:
-                    keypairs = user['keypairs']
-
-                preferred_keypairs = get_preferred_keypairs(keypairs, backend, machine)
-                log.debug("preferred keypairs = %s" % preferred_keypairs)
-              
-                if preferred_keypairs:
-                    keypair = keypairs[preferred_keypairs[0]]
-                    private_key = keypair['private']
-                    s_user = get_ssh_user_from_keypair(keypair, backend, machine)
-                    log.debug("get user from keypair returned: %s" % s_user)
-                    if s_user:
-                        ssh_user = s_user
-                        log.debug("Will select %s as the ssh-user" % ssh_user)
-                else:
-                    private_key = None
-                    log.error("Missing private key")
-                    raise Exception("Missing private key")
-
-                conn = connect(request, backend)
-                if conn:
-                    return self.stream_command(conn, machine, host, ssh_user, 
-                                               private_key, command, 
-                                               start_response)
-                else:
-                    raise
+                #~ if not ssh_user or ssh_user == 'undefined':
+                    #~ log.debug("Will select root as the ssh-user as we don't know who we are")
+                    #~ ssh_user = 'root'
+                user = user_from_request(request)
+                keypairs = user.keypairs
+                shell = Shell(host)
+                ret = shell.autoconfigure(user, backend_id, machine_id)
+                if ret is None:
+                    return
+                stdout_lines = shell.command_stream(command)
+                start_response('200 OK', [('Content-Type','text/html')])
+                return self.stream_command(stdout_lines)
             except:
                 # leave error handling up to the app
                 return self.app(environ, start_response)
@@ -79,51 +54,25 @@ class ShellMiddleware(object):
             return self.app(environ, start_response)
 
         
-    def stream_command(self, conn, machine, host, ssh_user, private_key, command, start_response):
+    def stream_command(self, stdout_lines):
         """ 
             Generator function that streams the output of the remote command 
             using the hidden iframe web pattern
         """
-        #TODO: add timeout
-        outputPrefix = u'[%s] out:' % host
-        
-        # save private key in temp file
-        (tmp_key, key_path) = tempfile.mkstemp()
-        key_fd = os.fdopen(tmp_key, 'w+b')
-        key_fd.write(private_key)
-        key_fd.close()
-        
-        # start the http response
-        start_response('200 OK', [('Content-Type','text/html')])
+
         # send some blank data to get webkit browsers to display what's sent
         yield 1024*'\0'
         
         # start the html response
         yield '<html><body>\n'
 
-        # run the command as a seperate process using fab
-        cmd = ['./bin/fab','-H', host , '-u', ssh_user, '-k', '-i', key_path, '--', command]
-        proc = subprocess.Popen(cmd, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        while True:
+        for line in stdout_lines:
             # get commands output, line by line
-            line = proc.stdout.readline()
-            if line == '' and proc.poll() != None:
-                break
-            if line != '':
-                sys.stdout.write(line)
-                sys.stdout.flush()
-                if outputPrefix.encode('utf-8','ignore') in line: # remove logging decorators
-                    line = line[len(outputPrefix):]
-                    # send the actual output
-                    yield "<script type='text/javascript'>parent.appendShell('%s');</script>\n" % line.replace('\'','\\\'').replace('\n','<br/>') #.replace('<','&lt;').replace('>', '&gt;')
-        # wait for child
-        stdout, stderr = proc.communicate()
-        
-        # remove temp key
-        os.remove(key_path)
-        
-        yield "<script type='text/javascript'>parent.completeShell(%s);</script>\n" % proc.returncode        
+            yield "<script type='text/javascript'>parent.appendShell('%s');</script>\n" % line.replace('\'','\\\'').replace('\n','<br/>') #.replace('<','&lt;').replace('>', '&gt;')
+        # FIXME
+        yield "<script type='text/javascript'>parent.completeShell(%s);</script>\n" % 0        
         yield '</body></html>\n'   
+
 
 class Shell(object):
     """ This is a new Shell class. Rather generic, all it does is initialize a new
@@ -131,7 +80,7 @@ class Shell(object):
     password or private key for connecting and authorizing.
     """
 
-    def __init__(self, host, username="root", password=None, pkey=None, autoConnect=True):
+    def __init__(self, host, username=None, key=None, password=None, port=22):
         """
         @param host: The host to be connected to
         @param username: Username to be used, by default it is root.
@@ -141,110 +90,154 @@ class Shell(object):
         @param pkey: Pkey is given as a string when provided by users.keypairs[keypair].private
         @param connect: If connect is set to False, then Shell object will not initialize the
         connection. It will just create a Shell object
+
         """
+        if not host:
+            raise Exception('host not given')
         self.host = host
-
-        self.username = username
-        usernames = [username, 'ec2-user', 'ubuntu', 'amazon']
-        if self.username != 'root':
-            usernames.append('root')
-
-        self.pkey = None
-        self.sudo = False
-        if password:
-            self.password = password
-        if pkey:
-            (tmp_key, key_path) = tempfile.mkstemp()
-            key_fd = os.fdopen(tmp_key, 'w+b')
-            key_fd.write(pkey)
-            key_fd.close()
-            self.pkey = paramiko.RSAKey.from_private_key_file(key_path)
-            os.remove(key_path)
 
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        if autoConnect:
-            for name in usernames:
-                try:
-                    self.username = name
-                    self.connect()
-                    break
-                except paramiko.SSHException:
-                    log.error("Could not connect as %s" % self.username)
-            self.connect()
+        # if username provided, try to connect
+        if username:
+            self.connect(username, key, password, port)
 
-        self.stdout = ""
-        self.stderr = ""
+    def connect(self, username, key=None, password=None, port=22):
+        try:
+            if key:
+                tmp_key_fd, tmp_key_path = tempfile.mkstemp()
+                key_fd = os.fdopen(tmp_key_fd, 'w+b')
+                key_fd.write(key)
+                key_fd.close()
+                rsa_key = paramiko.RSAKey.from_private_key_file(tmp_key_path)
+                os.remove(tmp_key_path)
+                self.ssh.connect(self.host, username=username, pkey=rsa_key,
+                                 password=password, port=port)
+            else:
+                self.ssh.connect(self.host, username=username,
+                                 password=password, port=port)
+            log.info("Succesfully connected to %s@%s:%s.",
+                      username, self.host, port)
+            return True
+        except paramiko.SSHException as e:
+            log.error("Couldn't connect to %s@%s:%s.",
+                       username, self.host, port)
+            return False
 
-    def connect(self):
-        if self.pkey:
-            self.ssh.connect(self.host, username=self.username, pkey=self.pkey)
-        else:
-            self.ssh.connect(self.host, username=self.username, password=self.password)
+    def disconnect(self):
+        try:
+            self.ssh.close()
+        except:
+            pass
 
     def checkSudo(self):
         """
         Checks if sudo is installed. In case it is self.sudo = True,
         else self.sudo = False
         """
-        stdout, stderr = self.command("which sudo")
+        stdout, stderr = self.command("which sudo", pty=False)
         if not stderr:
             self.sudo = True
 
-    def command(self, cmd):
+    def _command(self, cmd, pty=True):
+        channel = self.ssh.get_transport().open_session()
+        channel.settimeout(10800)
+        stdout = channel.makefile()
+        stderr = channel.makefile_stderr()
+        if pty:
+            # this combines the stdout and stderr streams as if in a pty
+            # if enabled both streams are combined in stdout and stderr file
+            # descriptor isn't used
+            channel.get_pty()
+        channel.exec_command(cmd)
+        return stdout, stderr
+
+    def command(self, cmd, pty=True):
         """
         @param cmd: Command to run
         @return: Returns a tuple with the stdout and stderr
         """
-        try:
-            stdin, stdout, stderr = self.ssh.exec_command(cmd)
-            self.stdout = stdout.read()
-            self.stderr = stderr.read()
-            return self.stdout, self.stderr
-        except:
-            self.close_connection()
+        stdout, stderr = self._command(cmd, pty)
+        if pty:
+            return stdout.read()
+        else:
+            return stdout.read(), stderr.read()
 
     def command_stream(self, cmd):
-        self.channel = self.ssh.get_transport().open_session()
-        self.channel.settimeout(10800)
+        stdout, stderr = self._command(cmd)
+        line = stdout.readline()
+        while line:
+            yield line
+            line = stdout.readline()
 
-        try:
-            self.channel.exec_command(cmd)
-            contents = StringIO.StringIO()
-            error = StringIO.StringIO()
+    def autoconfigure(self, user, backend_id, machine_id, key_id=None, password=None):
+        if backend_id not in user.backends:
+            raise BackendNotFoundError(backend_id)
+        if key_id is not None and key_id not in user.keypairs:
+            raise KeypairNotFoundError(key_id)
 
-            while not self.channel.exit_status_ready():
+        # get candidate keypairs if key_id not provided
+        keypairs = user.keypairs
+        if key_id:
+            pref_keys = [key_id]
+        else:
+            default_keys = filter(lambda key_id: keypairs[key_id].default, keypairs)
+            assoc_keys = []
+            recent_keys = []
+            root_keys = []
+            sudo_keys = []
+            for key_id in keypairs:
+                for machine in keypairs[key_id].machines:
+                    if [backend_id, machine_id] == machine[:2]:
+                        assoc_keys.append(key_id)
+                        if len(machine) > 2 and int(time() - machine[2]) < 7*24*3600:
+                            recent_keys.append(key_id)
+                        if len(machine) > 3 and machine[3] == 'root':
+                            root_keys.append(key_id)
+                        if len(machine) > 4 and machine[4] == True:
+                            sudo_keys.append(key_id) 
+            pref_keys = root_keys or sudo_keys or assoc_keys
+            if default_keys and default_keys[0] not in pref_keys:
+                pref_keys.append(default_keys[0])
 
-                if self.channel.recv_ready():
-                    data = self.channel.recv(1024)
-                    while data:
-                        contents.write(data)
-                        #output = contents.getvalue()
-                        #print output
-                        yield data.strip()
-                        data = self.channel.recv(1024)
+        # try to connect
+        for key_id in pref_keys:
+            keypair = user.keypairs[key_id]
 
-                if self.channel.recv_stderr_ready():
-                    error_buff = self.channel.recv_stderr(1024)
-                    while error_buff:
-                        error.write(error_buff)
-                        error_buff = self.channel.recv_stderr(1024)
-            #exist_status = self.channel.recv_exit_status()
-        except socket.timeout:
-            raise socket.timeout
-
-        #output = contents.getvalue()
-        #error_value = error.getvalue()
-
-        #print output, error_value, exist_status
-
-    def output(self, stream=False):
-        for line in self.stdout.splitlines():
-            print line
-
-    def close_connection(self):
-        try:
-            self.ssh.close()
-        except:
-            pass
+            # find username
+            saved_ssh_user = ''
+            for machine in keypair.machines:
+                if machine[:2] == [backend_id, machine_id]:
+                    try:
+                        # this should be the user, since machine =
+                        # [backend_id, machine_id, timestamp, ssh_user, sudoer]
+                        saved_ssh_user = machine[3]
+                    except:
+                        pass
+            # if username not found, try several alternatives
+            if saved_ssh_user:
+                users = [saved_ssh_user]
+            else:
+                users = ['root']
+            for ssh_user in users:
+                # if connection succesfull, return!
+                if self.connect(username=ssh_user,
+                                key=keypair.private,
+                                password=password):
+                    resp = self.command('uptime')
+                    new_ssh_user = None
+                    if 'Please login as the user ' in resp:
+                        new_ssh_user = resp.split()[5].strip('"')
+                    elif 'Please login as the' in resp:
+                        # for EC2 Amazon Linux machines, usually with ec2-user
+                        new_ssh_user = resp.split()[4].strip('"')
+                    if new_ssh_user:
+                        log.info("retrying as %s", new_ssh_user)
+                        self.disconnect()
+                        self.connect(username=new_ssh_user,
+                                      key=keypair.private,
+                                      password=password)
+                        ssh_user = new_ssh_user
+                    return key_id, ssh_user
+        return None

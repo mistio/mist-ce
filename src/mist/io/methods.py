@@ -46,9 +46,8 @@ def add_backend(user, title, provider, apikey,
                 break
 
     region = ''
-    if not isinstance(provider, int) and ':' in provider:
-        provider = provider.split(':')[0]
-        region = provider.split(':')[1]
+    if not provider.__class__ is int and ':' in provider:
+        provider, region = provider.split(':')[0], provider.split(':')[1]
 
     if not provider or not apikey or not apisecret:
         raise BadRequestError("Invalid backend data")
@@ -935,51 +934,33 @@ def ssh_command(user, backend_id, machine_id, host, command,
     @return:
     """
 
-    if backend_id not in user.backends:
-        raise BackendNotFoundError(backend_id)
-    if key_id is not None and key_id not in user.keypairs:
-        raise KeypairNotFoundError(key_id)
-
-    keypairs = user.keypairs
-    if key_id:
-        pref_keys = [key_id]
+    shell = Shell(host)
+    ret = shell.autoconfigure(user, backend_id, machine_id,
+                              key_id, password)
+    if ret is None:
+        raise MachineUnauthorizedError("%s, %s" % (backend_id, machine_id))
     else:
-        pref_keys = get_preferred_keypairs(keypairs, backend_id, machine_id)
-    shell = None
+        key_id, ssh_user = ret
 
-    for key_id in pref_keys:
-        private_key = keypairs[key_id].private
-        keypair = user.keypairs[key_id]
-        ssh_user = get_ssh_user_from_keypair(keypair, backend_id, machine_id)
-        try:
-            shell = Shell(host=host, username=ssh_user,
-                          pkey=private_key, password=password)
-            break
-        except Exception as e:
-            log.warning(e)
+    #~ try:
+    output = shell.command(command)
+    shell.checkSudo()
+    sudoer = shell.sudo
+    shell.disconnect()
 
-    if shell is None:
-        raise MachineUnauthorizedError()
+    with user.lock_n_load():
+        for i in range(len(user.keypairs[key_id].machines)):
+            machine = user.keypairs[key_id].machines[i]
+            if [backend_id, machine_id] == machine[:2]:
+                assoc = [backend_id, machine_id, time(), ssh_user, False]
+                user.keypairs[key_id].machines[i] = assoc
+        user.save()
 
-    try:
-        output, error = shell.command(command)
-        shell.checkSudo()
-        sudoer = shell.sudo
-        shell.close_connection()
-
-        with user.lock_n_load():
-            for i in range(len(user.keypairs[key_id].machines)):
-                machine = user.keypairs[key_id].machines[i]
-                if [backend_id, machine_id] == machine[:2]:
-                    assoc = [backend_id, machine_id, time(), ssh_user, sudoer]
-                    user.keypairs[key_id].machines[i] = assoc
-            user.save()
-
-        return {'output': output, 'ssh_user': ssh_user, 'sudoer': sudoer}
-    except Exception as e:
-        log.warning(e)
-    finally:
-        shell.close_connection()
+    return {'output': output, 'ssh_user': ssh_user, 'sudoer': sudoer}
+    #~ except Exception as e:
+        #~ log.warning(e)
+    #~ finally:
+        #~ shell.disconnect()
 
 
 def list_images(user, backend_id, term=None):

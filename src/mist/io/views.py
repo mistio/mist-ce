@@ -364,13 +364,13 @@ cat /proc/uptime && echo -------- && cat ~/`grep '^AuthorizedKeysFile' \
 
     if ret:
         cmd_output = ret['output'].split('--------')
-
-        updated_keys = update_available_keys(user, backend_id,
-                                             machine_id, cmd_output[2]),
-
         if len(cmd_output) > 2:
+            updated_keys = update_available_keys(user, backend_id,
+                                                 machine_id, cmd_output[2])
             return {'uptime': cmd_output[1],
                     'updated_keys': updated_keys}
+        else:
+            return ret
 
     return Response('No valid keys for server', 405)
 
