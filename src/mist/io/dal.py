@@ -227,8 +227,10 @@ class OODict(object):
 
     _fields = []
 
-    def __init__(self, _dict={}):
+    def __init__(self, _dict=None):
         """Initiate user by given dict."""
+        if _dict is None:
+            _dict = {}
         if type(_dict) is not dict:
             raise TypeError("%s is %s, should be dict" % (_dict, type(_dict)))
         self._dict = _dict
