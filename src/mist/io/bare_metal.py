@@ -56,7 +56,7 @@ class BareMetalDriver(object):
         private_ips = []
         extra = {}
 
-        node = Node(id=machine.get('name'), name=machine.get('name'), state=state,
+        node = Node(id=machine.get('id'), name=machine.get('name'), state=state,
                     public_ips=public_ips, private_ips=private_ips,
                     driver=self, extra=extra)
         return node

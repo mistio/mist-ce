@@ -189,7 +189,9 @@ def add_backend(request, renderer='json'):
             if response.status_code != 200:
                 return Response('Could not ssh to machine, please make sure settings are correct', 400)
 
-            machine_dict = {'name': machine_name,
+            machine_id = machine_name.replace('.', '').replace(' ', '')
+            machine_dict = {'id': machine_id, 
+                            'name': machine_name,
                             'ip_address': machine_ip_address,
                             'user': machine_user
                             }         
@@ -205,7 +207,7 @@ def add_backend(request, renderer='json'):
             
             machines = keypair.get('machines', [])   
             sudoer = False 
-            key_machine = [backend_id, machine_name, int(time()), machine_user, sudoer]                        
+            key_machine = [backend_id, machine_id, int(time()), machine_user, sudoer]                        
 
             if machines:
                 keypairs[machine_key]['machines'].append(key_machine)    
