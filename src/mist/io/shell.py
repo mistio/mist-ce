@@ -81,14 +81,22 @@ class Shell(object):
             if key:
                 with get_temp_file(key) as key_path:
                     rsa_key = paramiko.RSAKey.from_private_key_file(key_path)
+            if key and password:
                 self.ssh.connect(self.host, username=username, pkey=rsa_key,
                                  password=password, port=port)
-            else:
+            elif key:
+                self.ssh.connect(self.host, username=username,
+                                 pkey=rsa_key, port=port)
+            elif password:
                 self.ssh.connect(self.host, username=username,
                                  password=password, port=port)
+            else:
+                raise RequiredParameterMissingError("neither key nor password "
+                                                    "provided.")
             log.info("Succesfully connected to %s@%s:%s.",
                      username, self.host, port)
         except paramiko.SSHException as e:
+            log.error("ssh exception %r", e)
             raise MachineUnauthorizedError("Couldn't connect to %s@%s:%s. %s"
                                            % (username, self.host, port, e))
 
@@ -219,10 +227,11 @@ class Shell(object):
                     except:
                         pass
             # if username not found, try several alternatives
+            users = []
             if saved_ssh_user:
-                users = [saved_ssh_user]
-            else:
-                users = ['root']
+                users.append(saved_ssh_user)
+            if 'root' not in users:
+                users.append('root')
             for ssh_user in users:
                 try:
                     self.connect(username=ssh_user,
@@ -256,17 +265,22 @@ class Shell(object):
                         continue
                 # we managed to connect succesfully, return
                 # but first update key
-                    with user.lock_n_load():
-                        for i in range(len(user.keypairs[key_id].machines)):
-                            machine = user.keypairs[key_id].machines[i]
-                            if [backend_id, machine_id] == machine[:2]:
-                                assoc = [backend_id,
-                                         machine_id,
-                                         time(),
-                                         ssh_user,
-                                         self.check_sudo()]
-                                user.keypairs[key_id].machines[i] = assoc
-                        user.save()
+                assoc = [backend_id,
+                         machine_id,
+                         time(),
+                         ssh_user,
+                         self.check_sudo()]
+                with user.lock_n_load():
+                    updated = False
+                    for i in range(len(user.keypairs[key_id].machines)):
+                        machine = user.keypairs[key_id].machines[i]
+                        if [backend_id, machine_id] == machine[:2]:
+                            user.keypairs[key_id].machines[i] = assoc
+                            updated = True
+                    # if association didn't exist, create it!
+                    if not updated:
+                        user.keypairs[key_id].append(assoc)
+                    user.save()
                 return key_id, ssh_user
 
         raise MachineUnauthorizedError("%s:%s" % (backend_id, machine_id))

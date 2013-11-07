@@ -1,21 +1,10 @@
 """Helper functions used in views and WSGI initialization"""
+
 import os
 import tempfile
 import logging
-from time import time
 from hashlib import sha1
 from contextlib import contextmanager
-
-from pyramid.response import Response
-
-from libcloud.compute.types import Provider
-from libcloud.compute.providers import get_driver
-
-from mist.io.config import COMMAND_TIMEOUT
-
-# add curl ca-bundle default path to prevent libcloud certificate error
-import libcloud.security
-libcloud.security.CA_CERTS_PATH.append('/usr/share/curl/ca-bundle.crt')
 
 
 log = logging.getLogger(__name__)

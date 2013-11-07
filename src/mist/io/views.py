@@ -9,9 +9,10 @@ be performed inside the corresponding method functions.
 
 """
 
-import logging
 
+import logging
 from datetime import datetime
+
 
 import requests
 import json
@@ -19,26 +20,25 @@ import json
 from pyramid.response import Response
 from pyramid.view import view_config
 
-from mist.io.config import SUPPORTED_PROVIDERS
 
+from mist.io.config import SUPPORTED_PROVIDERS
 from mist.io import methods
-import mist.io.exceptions
-from mist.io.exceptions import *
 from mist.io.model import User, Keypair
 from mist.io.shell import Shell
 
+import mist.io.exceptions as exceptions
+from mist.io.exceptions import *
+
 
 log = logging.getLogger(__name__)
+OK = Response("OK", 200)
 
 
 def user_from_request(request):
     return User()
 
 
-OK = Response("OK", 200)
-
-
-@view_config(context=BaseError)
+@view_config(context=exceptions.BaseError)
 def exception_handler_mist(exc, request):
     """Here we catch exceptions and transform them to proper http responses
 
@@ -49,15 +49,15 @@ def exception_handler_mist(exc, request):
     """
 
     mapping = {
-        mist.io.exceptions.BadRequestError: 400,
-        mist.io.exceptions.UnauthorizedError: 401,
-        mist.io.exceptions.PaymentRequiredError: 402,
-        mist.io.exceptions.ForbiddenError: 403,
-        mist.io.exceptions.NotFoundError: 404,
-        mist.io.exceptions.MethodNotAllowedError: 405,
-        mist.io.exceptions.ConflictError: 409,
-        mist.io.exceptions.InternalServerError: 500,
-        mist.io.exceptions.ServiceUnavailableError: 503,
+        exceptions.BadRequestError: 400,
+        exceptions.UnauthorizedError: 401,
+        exceptions.PaymentRequiredError: 402,
+        exceptions.ForbiddenError: 403,
+        exceptions.NotFoundError: 404,
+        exceptions.MethodNotAllowedError: 405,
+        exceptions.ConflictError: 409,
+        exceptions.InternalServerError: 500,
+        exceptions.ServiceUnavailableError: 503,
     }
 
     log.warning("Exception: %r", exc)
@@ -797,7 +797,10 @@ def shell_stream(request):
     shell = Shell(host)
     shell.autoconfigure(user, backend_id, machine_id)
     # stdout_lines is a generator that spits out lines of combined
-    # stdout and stderr output
+    # stdout and stderr output. cmd is executed via the shell on the background
+    # and the stdout_lines generator is immediately available. stdout_lines
+    # will block if no line is in the buffer and will stop iterating once the
+    # command is completed and the pipe is closed.
     stdout_lines = shell.command_stream(cmd)
     return Response(status=200, app_iter=parse(stdout_lines))
 
