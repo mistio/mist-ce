@@ -7,6 +7,21 @@ Simple, low level, helper functions can also be added to the
 following classes. (eg user.get_num_mon_machines(), user.keys.unused()).
 It is recommended that only pure functions (no side-effects) are used
 as class methods.
+
+How this works:
+The basic class is the OODict. This defines a dict to object mapper.
+When we need a new data structure, we define a new subclass of OODict.
+Class properties that are instances of Field subclasses are considered to be
+OODict fields. These are the keys in the underlying dict that will be used.
+There is a large variety of standard type fields.
+One can create an OODict that has a field which is also parsed by some OODict.
+To do so, you define a field on the outer OODict that is created by make_field.
+Finally, list or dict like collections can be created by subclassing FieldsList
+and FieldsDict. The items of these collections will be parsed according to
+the field type defined in the class. This collection can be used as a field
+in some OODict by use of make_field. If it sounds too complicated, just look
+the code below, it should be pretty self-explanatory.
+
 """
 
 
@@ -17,15 +32,10 @@ import logging
 from Crypto.PublicKey import RSA
 
 
-from mist.io.dal import StrField, IntField
-from mist.io.dal import FloatField, BoolField
+from mist.io.dal import StrField, IntField, FloatField, BoolField
 from mist.io.dal import ListField, DictField
-from mist.io.dal import getOODictField
-from mist.io.dal import getFieldsListField, getFieldsDictField
-from mist.io.dal import OODict
+from mist.io.dal import OODict, FieldsDict, FieldsList, make_field
 from mist.io.dal import UserEngine
-
-from mist.io.dal import FieldsDict, FieldsList, make_field
 
 
 log = logging.getLogger(__name__)
@@ -40,15 +50,21 @@ class MonitorServer(OODict):
 
 
 class MonMachine(OODict):
-    """A vm in a backend"""
+    """A monitored machine in the machines list of some backend"""
 
     hasMonitoring = BoolField()
     uuid = StrField()
-    monitor_server = getOODictField(MonitorServer)
+    monitor_server = make_field(MonitorServer)
     dns_name = StrField()
-    public_ips = getFieldsListField(StrField)
+    public_ips = ListField()
     collectd_password = StrField()
     name = StrField()
+
+
+class MonMachines(FieldsDict):
+    """Collection of monitored machines of a certain backend."""
+
+    _item_type = make_field(MonMachine)
 
 
 class Backend(OODict):
@@ -66,8 +82,8 @@ class Backend(OODict):
     provider = StrField()
     datacenter = StrField()
 
-    starred = getFieldsListField(StrField)()
-    machines = getFieldsDictField(getOODictField(MonMachine))()
+    starred = ListField()
+    machines = make_field(MonMachines)()
 
     def __repr__(self):
         print_fields = ['title', 'provider', 'region']

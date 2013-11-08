@@ -24,10 +24,12 @@ getOODictField, getFieldsListField, getFieldsDictField, OODict, UserEngine
 """
 
 
-import logging
 import os
 import yaml
+import logging
 from time import sleep
+
+import abc
 from copy import copy, deepcopy
 from collections import MutableSequence, MutableMapping
 from contextlib import contextmanager
@@ -51,17 +53,41 @@ class Field(object):
     Values will always be casted based on the first type. The rest just
     declare that they are also accepted inputs and should not raise
     errors.
+
+    What is a field? A field object doesn't actually hold the value
+    corresponding to that field. It just contains the information of how
+    this value should look like, what type it should have in the storage
+    backend and what in the python frontend plus a default value, should
+    there be no corresponding value set. It is used by OODict's and
+    FieldSequence's to appropriately handle the values fetched from storage.
+
     """
 
-    front_types = []
-    back_types = []
-    default = None
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractproperty
+    def front_types(self):
+        """Must be a list of new style classes. These classes represent the
+        valid types a field may have in the python side. Values will always be
+        casted based on the first type. The rest just declare that they are
+        also accepted inputs and should not raise errors.
+
+        """
+
+    @abc.abstractproperty
+    def back_types(self):
+        """Must be a list of new style classes. These classes represent the
+        valid types a field may have in the storage side. Values will always be
+        casted based on the first type. The rest just declare that they are
+        also accepted inputs and should not raise errors.
+
+        """
 
     def cast2front(self, back_value=None):
         """Take a value from the backend and cast to frontend, replacing with
         default if None.
-        """
 
+        """
         log.debug("%s: casting value (%s) to front",
                   type(self), type(back_value))
         return self._cast(back_value, self.back_types, self.front_types)
@@ -69,6 +95,7 @@ class Field(object):
     def cast2back(self, front_value=None):
         """Take a value from the frontend and cast to backend, replacing with
         default if None.
+
         """
         log.debug("%s: casting value (%s) to back",
                   type(self), type(front_value))
@@ -83,7 +110,7 @@ class Field(object):
             log.debug("Just set default value '%s'", self.default)
         if type(val) not in [atype, btype]:
             log.warn("%s: value is %s, should preferably be %s",
-                      type(self), type(val), atype)
+                     type(self), type(val), atype)
             if type(val) not in atypes:
                 log.error("%s: value is %s, should be in %s",
                           type(self), type(val), atypes)
@@ -114,33 +141,33 @@ class Field(object):
 
 
 class StrField(Field):
-    """Sets a string field. Default: ''"""
+    """Sets a string field. Default value: ''"""
     front_types = [str, unicode]
     back_types = [str, unicode]
 
 
 class IntField(Field):
-    """Sets an integer field. Default: 0"""
+    """Sets an integer field. Default value: 0"""
     front_types = back_types = [int, float]
 
 
 class FloatField(Field):
-    """Sets a floating point number field. Default: 0.0"""
+    """Sets a floating point number field. Default value: 0.0"""
     front_types = back_types = [float]
 
 
 class ListField(Field):
-    """Sets a list field. Default: []"""
+    """Sets a list field. Default value: []"""
     front_types = back_types = [list, tuple]
 
 
 class DictField(Field):
-    """Sets a dictionary field. Default: {}"""
+    """Sets a dictionary field. Default value: {}"""
     front_types = back_types = [dict]
 
 
 class BoolField(Field):
-    """Sets a boolean field. Default: False"""
+    """Sets a boolean field. Default value: False"""
     front_types = back_types = [bool]
 
 
@@ -148,6 +175,7 @@ class ObjectField(Field):
     """This is an abstract base class that inherits from Field. It
     assumes that front type is a subclass of BaseObject and changes
     the way values are casted to backend accordingly.
+
     """
 
     def cast2back(self, front_value=None):
@@ -162,29 +190,20 @@ class ObjectField(Field):
         return val.get_raw()
 
 
-def getOODictField(oodict):
-    """Returns a Field type that is stored as a dict in the backend and handled
-    as an OODict in the frontend. oodict must be a subclass of OODict."""
-
-    if type(oodict) is not type:
-        raise TypeError("oodict must be a class, subclass of OODict")
-    if not issubclass(oodict, OODict):
-        raise TypeError("oodict must be a class, subclass of OODict")
-
-    class OODictField(ObjectField):
-        """Sets a dict field that will be parsed by a OODict subclass."""
-
-        front_types, back_types = [oodict], [dict]
-
-    return OODictField
-
-
 def make_field(obj_type):
+    """Create a Field subclass out of some obj_type.
+
+    This works for any obj_type that subclasses OODict or FieldsSequence.
+
+    """
 
     if issubclass(obj_type, OODict):
 
         class OODictField(ObjectField):
-            """Sets a dict field that will be parsed by a OODict subclass."""
+            """Field subtype that is stored as a dict in the backend and
+            handled as an OODict in the frontend.
+
+            """
             front_types, back_types = [obj_type], [dict]
 
         return OODictField
@@ -192,7 +211,10 @@ def make_field(obj_type):
     if issubclass(obj_type, FieldsList):
 
         class FieldsListField(ObjectField):
+            """Field subtype that is stored as a list in the backend and
+            handled as a FieldsList in the frontend.
 
+            """
             front_types, back_types = [obj_type], [list]
 
         return FieldsListField
@@ -200,41 +222,15 @@ def make_field(obj_type):
     if issubclass(obj_type, FieldsDict):
 
         class FieldsDictField(ObjectField):
+            """Field subtype that is stored as a dict in the backend and
+            handled as a FieldsDict in the frontend.
 
+            """
             front_types, back_types = [obj_type], [dict]
 
         return FieldsDictField
 
-    raise TypeError()
-
-
-def getFieldsListField(field):
-    """Returns a Field type that is stored as a list in the backend and handled
-    as an FieldsList in the frontend. field must be a subclass of Field."""
-
-    if type(field) is not type:
-        raise TypeError("field arg must be a class, subclass of Field.")
-    if not issubclass(field, Field):
-        raise TypeError("field arg must be a class, subclass of Field.")
-
-    class FieldsListField(ObjectField):
-
-        front_types, back_types = [getFieldsList(field)], [list]
-    return FieldsListField
-
-
-def getFieldsDictField(field):
-    """Returns a Field type that is stored as a dict in the backend and handled
-    as an FieldsDict in the frontend. field must be a subclass of Field."""
-
-    if type(field) is not type:
-        raise TypeError("field arg must be a class, subclass of Field.")
-    if not issubclass(field, Field):
-        raise TypeError("field arg must be a class, subclass of Field.")
-
-    class FieldsDictField(ObjectField):
-        front_types, back_types = [getFieldsDict(field)], [dict]
-    return FieldsDictField
+    raise TypeError("obj_type not valid: %s" % obj_type)
 
 
 class OODict(object):
@@ -254,6 +250,8 @@ class OODict(object):
     interfaces.
     """
 
+    __metaclass__ = abc.ABCMeta
+
     _fields = []
 
     def __init__(self, _dict=None):
@@ -264,7 +262,8 @@ class OODict(object):
             raise TypeError("%s is %s, should be dict" % (_dict, type(_dict)))
         self._dict = _dict
         self._fields = [name for name in dir(self)
-            if isinstance(object.__getattribute__(self, name), Field)]
+                        if isinstance(object.__getattribute__(self, name),
+                                      Field)]
 
     def __getattribute__(self, name):
         """Overide attributes to handle dict keys as instance attributes."""
@@ -303,12 +302,12 @@ class OODict(object):
     def __str__(self):
         """Overide string conversion to print nicely."""
         lines = ["%s: %r" % (field, self.__getattribute__(field))
-                for field in self.keys()]
+                 for field in self.keys()]
         return "\n * ".join([str(type(self))] + lines)
 
     def __repr__(self, fields=[]):
         s = ", ".join(["%s: %s" % (field, self.__getattribute__(field))
-                        for field in fields])
+                       for field in fields])
         return "%s (%s)" % (type(self), s)
 
     def __nonzero__(self):
@@ -338,25 +337,31 @@ class FieldsSequence(object):
     containers. These methods are complemented by others in the subclasses.
     """
 
-    _seq = None          # the actual seq being interfaced
-    _item_type = None    # must be a type, subclass of Field
+    __metaclass__ = abc.ABCMeta
 
-    def __init__(self, seq_type, *args, **kwargs):
-        """Argument 'seq_type' must be either dict or list.
-        This class will operate directly on a sequence, without copying it.
+    @abc.abstractproperty
+    def _seq_type(self):
+        """The type of the sequence. Can be either dict or list."""
+
+    @abc.abstractproperty
+    def _item_type(self):
+        """Must be a type, subclass of Field."""
+
+    def __init__(self, *args, **kwargs):
+        """This class will operate directly on a sequence, without copying it.
         """
 
         seq = None
         if not kwargs and len(args) == 1:
             arg = args[0]
             if arg is None:
-                seq = seq_type()
+                seq = self._seq_type()
             elif type(arg) is type(self):
                 seq = arg.get_raw()
-            elif type(arg) is seq_type:
+            elif type(arg) is self._seq_type:
                 seq = arg
         if seq is None:
-            seq = seq_type(*args, **kwargs)
+            seq = self._seq_type(*args, **kwargs)
         self._seq = seq
 
     def __getitem__(self, key):
@@ -366,8 +371,8 @@ class FieldsSequence(object):
     def __setitem__(self, key, value):
         if type(value) is not self._item_type:
             log.error("Trying to set item in FieldsSequence of %s. "
-                "(Should be %s.Will try and see what happens.",
-                type(value), self._item_type)
+                      "(Should be %s.Will try and see what happens.",
+                      type(value), self._item_type)
         val = self._item_type().cast2back(value)
         self._seq[key] = val
 
@@ -396,10 +401,7 @@ class FieldsList(FieldsSequence, MutableSequence):
     this container just as you would do with a list (append, pop etc).
     """
 
-    #~ _item_type = field
-
-    def __init__(self, *args, **kwargs):
-        super(FieldsList, self).__init__(list, *args, **kwargs)
+    _seq_type = list
 
     def insert(self, index, value):
         val = self._item_type().cast2back(value)
@@ -422,10 +424,7 @@ class FieldsDict(FieldsSequence, MutableMapping):
     this container just as you would do with a dict(clear, setdefault etc).
     """
 
-    #~ _item_type = field
-
-    def __init__(self, *args, **kwargs):
-        super(FieldsDict, self).__init__(dict, *args, **kwargs)
+    _seq_type = dict
 
     def __iter__(self):
         for key in self._seq.keys():
@@ -445,74 +444,6 @@ class FieldsDict(FieldsSequence, MutableMapping):
         lines = [str(type(self))]
         lines += ["%r: %r" % (key, self[key]) for key in self.keys()]
         return "\n  * ".join(lines)
-
-
-
-
-def getFieldsList(field):
-    class FieldsList(FieldsSequence, MutableSequence):
-        """This defines a list like container object that parses the real list
-        in the backend by treating the items as fields. It inherits basic
-        container methods getitem, setitem, delitem and len from FieldsSequence
-        and adds the insert method. Based on these basic container methods, the
-        MutableSequence ABC provides the rest of the list api, so you can use
-        this container just as you would do with a list (append, pop etc).
-        """
-
-        _item_type = field
-
-        def __init__(self, *args, **kwargs):
-            super(FieldsList, self).__init__(list, *args, **kwargs)
-
-        def insert(self, index, value):
-            val = self._item_type().cast2back(value)
-            self._seq.insert(index, val)
-
-        def __str__(self):
-            """Overide string conversion to print nicely."""
-            s = str(type(self)) + "\n"
-            for item in self:
-                s += "  %r\n" % item
-            return s
-
-    return FieldsList
-
-
-def getFieldsDict(field):
-    class FieldsDict(FieldsSequence, MutableMapping):
-        """This defines a dict like container object that parses the real dict
-        in the backend by treating the items as fields. It inherits basic
-        container methods getitem, setitem, delitem and len from FieldsSequence
-        and adds the iter method. Based on these basic container methods, the
-        MutableMapping ABC provides the rest of the dict api, so you can use
-        this container just as you would do with a dict(clear, setdefault etc).
-        """
-
-        _item_type = field
-
-        def __init__(self, *args, **kwargs):
-            super(FieldsDict, self).__init__(dict, *args, **kwargs)
-
-        def __iter__(self):
-            for key in self._seq.keys():
-                # if key is unicode, try to transform to str
-                if type(key) is unicode:
-                    try:
-                        key = str(key)
-                    except:
-                        pass
-                yield key
-
-        def __repr__(self):
-            d = {key: self[key] for key in self.keys()}
-            return "%s: %r" % (type(self), d)
-
-        def __str__(self):
-            lines = [str(type(self))]
-            lines += ["%r: %r" % (key, self[key]) for key in self.keys()]
-            return "\n  * ".join(lines)
-
-    return FieldsDict
 
 
 ### Persistence handling ###
@@ -553,64 +484,35 @@ class UserEngine(OODict):
             raise
         return user_config
 
-
     def refresh(self, flush=False):
         """Dummy method, doesn't really do anything."""
         self.__init__()
 
-
     @contextmanager
     def lock_n_load(self):
         """Dummy lock, doesn't actually do anything.
+
         It must be used with a 'with' statement as follows:
             with user.lock_n_load():
                 # edit user
                 user.save()
         Lock is automatically released after exiting the 'with' block.
-        """
+        Attempting to save without first acquiring the lock will raise an
+        exception.
 
-        #~ sleep_interval = 0.1
-        #~ max_wait = 10
-        #~ lock_dir = os.getcwd() + "/db.yaml.lock"
-        #~ times = 0
-        #~ while True:
-            #~ try:
-                #~ os.mkdir(lock_dir)
-            #~ except:
-                #~ log.debug("Lock set, sleeping")
-                #~ if times * sleep_interval > max_wait:
-                    #~ log.critical("DEAD LOCK: Breaking lock")
-                    #~ os.rmdir(lock_dir)
-                #~ sleep(sleep_interval)
-                #~ times += 1
-            #~ else:
-                #~ log.info("Acquired lock")
-                #~ break
+        """
         self._lock = True
         try:
             yield
         except:
             raise
         finally:
-            #~ log.info("Releasing lock")
             self.lock = False
-            #~ os.rmdir(lock_dir)
-            
-        #~ try:
-            #~ self._lock = True
-            #~ yield   # here execution returns to the with statement
-        #~ except Exception as e:
-            #~ # This block is executed if an exception is raised in the try
-            #~ # block above or inside the with statement that called this.
-            #~ # Returning False will reraise it.
-            #~ logging.error("lock_n_load got an exception: %s", e)
-            #~ raise e
-        #~ finally:
-            #~ self._lock = False
 
     def save(self):
-        """Save user data to storage. Raises exception if not in a
-        "with user.lock_n_load():" code block.
+        """Save user data to storage.
+
+        Raises exception if not in a "with user.lock_n_load():" code block.
 
         """
         if not self._lock:
@@ -641,5 +543,5 @@ class UserEngine(OODict):
         yaml.add_representer(literal_string, literal_string_representer)
         yaml_db = os.getcwd() + "/db.yaml"
         config_file = open(yaml_db, 'w')
-        yaml.dump(self._dict, config_file, default_flow_style=False, )
+        yaml.dump(self._dict, config_file, default_flow_style=False)
         config_file.close()
