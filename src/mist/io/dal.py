@@ -179,6 +179,35 @@ def getOODictField(oodict):
     return OODictField
 
 
+def make_field(obj_type):
+
+    if issubclass(obj_type, OODict):
+
+        class OODictField(ObjectField):
+            """Sets a dict field that will be parsed by a OODict subclass."""
+            front_types, back_types = [obj_type], [dict]
+
+        return OODictField
+
+    if issubclass(obj_type, FieldsList):
+
+        class FieldsListField(ObjectField):
+
+            front_types, back_types = [obj_type], [list]
+
+        return FieldsListField
+
+    if issubclass(obj_type, FieldsDict):
+
+        class FieldsDictField(ObjectField):
+
+            front_types, back_types = [obj_type], [dict]
+
+        return FieldsDictField
+
+    raise TypeError()
+
+
 def getFieldsListField(field):
     """Returns a Field type that is stored as a list in the backend and handled
     as an FieldsList in the frontend. field must be a subclass of Field."""
@@ -296,7 +325,10 @@ class OODict(object):
 
 
 class FieldsSequence(object):
-    """Sets up a basic Sequence field, whose items are being parsed by
+    """Abstract Base Class providing part of the required methods for a
+    custom container type to work.
+
+    Sets up a basic Sequence field, whose items are being parsed by
     some Field subclass. That means you can have a list or dict with
     str values, or int, or bool, or etc. This is an abstract base class.
     It interfaces upon an existing sequence without copying it and treats its
@@ -353,6 +385,68 @@ class FieldsSequence(object):
 
     def __deepcopy__(self, memo):
         return type(self)(deepcopy(self._seq, memo))
+
+
+class FieldsList(FieldsSequence, MutableSequence):
+    """This defines a list like container object that parses the real list
+    in the backend by treating the items as fields. It inherits basic
+    container methods getitem, setitem, delitem and len from FieldsSequence
+    and adds the insert method. Based on these basic container methods, the
+    MutableSequence ABC provides the rest of the list api, so you can use
+    this container just as you would do with a list (append, pop etc).
+    """
+
+    #~ _item_type = field
+
+    def __init__(self, *args, **kwargs):
+        super(FieldsList, self).__init__(list, *args, **kwargs)
+
+    def insert(self, index, value):
+        val = self._item_type().cast2back(value)
+        self._seq.insert(index, val)
+
+    def __str__(self):
+        """Overide string conversion to print nicely."""
+        s = str(type(self)) + "\n"
+        for item in self:
+            s += "  %r\n" % item
+        return s
+
+
+class FieldsDict(FieldsSequence, MutableMapping):
+    """This defines a dict like container object that parses the real dict
+    in the backend by treating the items as fields. It inherits basic
+    container methods getitem, setitem, delitem and len from FieldsSequence
+    and adds the iter method. Based on these basic container methods, the
+    MutableMapping ABC provides the rest of the dict api, so you can use
+    this container just as you would do with a dict(clear, setdefault etc).
+    """
+
+    #~ _item_type = field
+
+    def __init__(self, *args, **kwargs):
+        super(FieldsDict, self).__init__(dict, *args, **kwargs)
+
+    def __iter__(self):
+        for key in self._seq.keys():
+            # if key is unicode, try to transform to str
+            if type(key) is unicode:
+                try:
+                    key = str(key)
+                except:
+                    pass
+            yield key
+
+    def __repr__(self):
+        d = {key: self[key] for key in self.keys()}
+        return "%s: %r" % (type(self), d)
+
+    def __str__(self):
+        lines = [str(type(self))]
+        lines += ["%r: %r" % (key, self[key]) for key in self.keys()]
+        return "\n  * ".join(lines)
+
+
 
 
 def getFieldsList(field):

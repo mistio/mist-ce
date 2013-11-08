@@ -25,6 +25,8 @@ from mist.io.dal import getFieldsListField, getFieldsDictField
 from mist.io.dal import OODict
 from mist.io.dal import UserEngine
 
+from mist.io.dal import FieldsDict, FieldsList, make_field
+
 
 log = logging.getLogger(__name__)
 
@@ -70,6 +72,11 @@ class Backend(OODict):
     def __repr__(self):
         print_fields = ['title', 'provider', 'region']
         return super(Backend, self).__repr__(print_fields)
+
+
+class Backends(FieldsDict):
+
+    _item_type = make_field(Backend)
 
 
 class Keypair(OODict):
@@ -120,6 +127,11 @@ class Keypair(OODict):
         return super(Keypair, self).__repr__(['default', 'machines'])
 
 
+class Keypairs(FieldsDict):
+
+    _item_type = make_field(Keypair)
+
+
 class User(UserEngine):
     """The basic model class is User. It contains all the methods
     necessary to find and save users in memcache and in mongo.
@@ -130,8 +142,8 @@ class User(UserEngine):
 
     email = StrField()
     password = StrField()
-    backends = getFieldsDictField(getOODictField(Backend))()
-    keypairs = getFieldsDictField(getOODictField(Keypair))()
+    backends = make_field(Backends)()
+    keypairs = make_field(Keypairs)()
 
     def __repr__(self):
         return super(User, self).__repr__(['email'])
