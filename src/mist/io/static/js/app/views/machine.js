@@ -412,7 +412,7 @@ define('app/views/machine', [
                             var timeToDisplay = new Date();
                             timeToDisplay.setHours(0,30,0);
 
-                            var cpuGraph = new mistIOGraph('cpuGraph',1286,160,timeToDisplay);
+                            var cpuGraph = new mistIOGraph('cpuGraph',window.innerWidth,160,timeToDisplay);
 
                             if(!movingGraph.enabled){
                             // Temporary Data For Debbuging
