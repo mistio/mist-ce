@@ -827,33 +827,35 @@ div.loading-monitoring {
     border: 1px solid #ccc;
     display: block;
 }
-    .grid .tick {
-        stroke: black;
-        opacity: 0.7;
-    }
-    .grid path {
-        stroke-width: 1;    
-    }
-    
-    svg {
-        background-color: white;
-        font: 10px Arial;
-        font-weight: bold;
-        color : #363636;
-        }
 
-    path {
-        stroke: #6CE0BA;
-        stroke-width: 3;
-        fill: none;
-    }
+/* To Be Added Again When Grid Added
+.graph .grid .tick {
+    stroke: black;
+    opacity: 0.7;
+}
+.graph .grid path {
+    stroke-width: 1;    
+}*/
+    
+.graph svg {
+    background-color: white;
+    font: 10px Arial;
+    font-weight: bold;
+    color : #363636;
+}
+
+.graph path {
+    stroke: #6CE0BA;
+    stroke-width: 3;
+    fill: none;
+}
     /*, .x-axis line*/
-    .x-axis path {
-        fill: none;
-        stroke: #363636;
-        stroke-width: 2;
-        /*shape-rendering: crispEdges;*/
-    }
+.graph .x-axis path {
+    fill: none;
+    stroke: #363636;
+    stroke-width: 2;
+    /*shape-rendering: crispEdges;*/
+}
 /*----------------------------- TEMP ------------------------- */
 #machineGraph span {
     font-size: 12px;

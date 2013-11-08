@@ -250,7 +250,6 @@ define('app/views/machine', [
                                         timeToDisplay.getSeconds() ) /6); // 6 Is Labels To Display (TODO Add it as constant)
                     this.data = [];
                     var margin = {top: 30, right: 0, bottom: 30, left: 0};
-                    console.log(this.secondsStep);
                     
                     // May Be Removed TODO (Working On Minute And Second Step)
                     if(this.secondsStep == 0) this.secondsStep = 1; // Fix For Science Fixion Request Of 6 Seconds To Display.
@@ -316,8 +315,14 @@ define('app/views/machine', [
                         .tickFormat(d3.time.format("%I:%M%p")));
 
                     };
-                    // Clone Of updateView For Virtual Moving Graph TODO remove it
-                    /*this.updateViewTest = function() {
+
+                    // Part Of Graph Demonstration. TODO remove It
+                    this.updateVirtualData = function(newData) {
+                        this.data = newData;
+                        this.updateVirtual();
+                    };
+                    // Part Of Graph Demonstration. TODO Remove it
+                    this.updateVirtual = function() {
 
                         // Fix Our Values
                         var fixedData = [];
@@ -351,33 +356,29 @@ define('app/views/machine', [
                         // Add the valueline path.
                         d3valueLine.attr("d", valueline(fixedData));
             
-                        // Update xAxis // TODO Possible Remove It
+                        
                         d3xAxis.call(d3.svg.axis()
                         .scale(xScale)
                         .orient("bottom")
-                        .ticks(d3.time.seconds, this.secondsStep)
-                        .tickFormat(d3.time.format("%M:%S")));
+                        .ticks(d3.time.seconds, 5)
+                        .tickFormat(d3.time.format("%I:%S%p")));
 
-                    };*/
+                    };
 
                     this.changeWidth = function (width) {
-                        this.width = width;
 
-                        // Change SVG Attributes
+                        this.width = width;
                         d3svg.attr('width',this.width);
 
-                        // Update x Axis Scale
                         xScale = d3.time.scale().range([0, this.width - margin.left - margin.right]);
 
-                        // Update ValuePoint
                         this.updateView();
                     };
 
                     this.changeHeight = function(height) {
+
                         this.height = height;
-
                         d3svg.attr('height',this.height);
-
                         d3xAxis.attr("transform", "translate(0," + (this.height - margin.bottom) + ")");
 
                         yScale = d3.scale.linear().range([this.height - margin.top - margin.bottom, 0]);
@@ -386,8 +387,99 @@ define('app/views/machine', [
                     };
                 }
 
-                // Initialize Button
-                // Must be run so rules and disable button be displayed correctly
+
+
+                /* Demonstrate Info: - TODO To be removed When Done Graphs
+                *  Create A Graph With Virtual Values That Shows How A Graph Will Be When Showing Last 30 Minutes.
+                *  -- Arguments -- 
+                * isMoving: set True For A Moving Graph or False For A Static One
+                * hasPrevData: Set True To Virtualize A Machine That Is Turned On More Than 30 Minutes 
+                                Else Set False For A Just Turned On Machine
+                */
+                function demonstrateGraph(isMoving,hasPrevData)
+                {
+
+                    var movingGraph = {enabled: isMoving, hasPrevData:hasPrevData};
+
+                    Em.run.next(function() {
+                
+                        // Check Monitoring because it may run twice
+                        if(machine.hasMonitoring){
+
+                            machine.set('pendingStats', true);
+
+                            // Set time To Display (Last 30 Minutes)
+                            var timeToDisplay = new Date();
+                            timeToDisplay.setHours(0,30,0);
+
+                            var cpuGraph = new mistIOGraph('cpuGraph',1286,160,timeToDisplay);
+
+                            if(!movingGraph.enabled){
+                            // Temporary Data For Debbuging
+                                var data= [
+
+                                {time: "15:35:00", close: "0.10"},
+                                {time: "15:36:00", close: "0.15"},
+                                {time: "15:37:00", close: "0.09"},
+                                {time: "15:38:00", close: "0.25"},
+                                {time: "15:39:00", close: "0.49"},
+
+                                {time: "15:40:00", close: "0.80"},
+                                {time: "15:41:00", close: "0.20"},
+                                {time: "15:42:00", close: "0.40"},
+                                {time: "15:43:00", close: "0.10"},
+                                {time: "15:44:00", close: "0.50"},
+
+                                {time: "15:45:00", close: "0.45"},
+                                {time: "15:50:00", close: "0.10"},
+                                {time: "15:55:00", close: "0.70"},
+                                {time: "16:00:00", close: "0.80"},
+                                {time: "16:05:00", close: "0.90"}
+                                ]
+
+                                machine.set('pendingStats', false);
+                                // This function must run every time we have new data
+                                cpuGraph.updateData(data);
+                            }
+                            else{
+                                var liveData = [];
+
+                                    if(movingGraph.hasPrevData){
+                                        // give Last 30 Second values
+                                        var oldTime = new Date();
+                                        for(var i=0; i<30; i++)
+                                        {
+                                            oldTime = new Date(oldTime.getTime() - 1000);
+                                            var tempObj = {};
+                                            tempObj.time = oldTime.getHours() + ":" + oldTime.getMinutes() + ":" + oldTime.getSeconds();
+                                            tempObj.close = Math.random();
+                                            liveData.push(tempObj);
+                                        }
+                                        liveData.reverse();
+
+                                        machine.set('pendingStats', false);
+
+                                        cpuGraph.updateVirtualData(liveData);
+                                    }
+                                
+                                    // Create random time and values, Update every Second
+                                    window.setInterval(function(){
+                                        var date = new Date();
+                                        var tempObj = {};
+                                        tempObj.time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                                        tempObj.close = Math.random();
+                                        liveData.push(tempObj);
+                                        cpuGraph.updateVirtualData(liveData);
+                                    },1000);
+                            }
+                        }
+                    });
+                }
+
+
+                // Execuation Starts Here
+
+
                 Em.run.next(function() {
                     try{
                         $('.monitoring-button').button();
@@ -399,51 +491,13 @@ define('app/views/machine', [
                 });
 
                 var machine = this.get('controller').get('model');
-                
-                // Em.run must be used to make d3 work (maybe waits until some ember code runs)
-                // Also d3 must be run after document is ready
-                Em.run.next(function() {
-                
-                    // Check Monitoring because it may run twice
-                    if(machine.hasMonitoring){
-                        info("Graph Initialized"); // TODO remove it
-                        machine.set('pendingStats', false);
 
-                        // Set time To Display (Last 30 Minutes)
-                        var timeToDisplay = new Date();
-                        timeToDisplay.setHours(0,30,0);
-
-                        // Temporary Data For Debbuging
-                        var data= [
-
-                        {time: "15:35:00", close: "0.10"},
-                        {time: "15:36:00", close: "0.15"},
-                        {time: "15:37:00", close: "0.09"},
-                        {time: "15:38:00", close: "0.25"},
-                        {time: "15:39:00", close: "0.49"},
-
-                        {time: "15:40:00", close: "0.80"},
-                        {time: "15:41:00", close: "0.20"},
-                        {time: "15:42:00", close: "0.40"},
-                        {time: "15:43:00", close: "0.10"},
-                        {time: "15:44:00", close: "0.50"},
-
-                        {time: "15:45:00", close: "0.45"},
-                        {time: "15:50:00", close: "0.10"},
-                        {time: "15:55:00", close: "0.70"},
-                        {time: "16:00:00", close: "0.80"},
-                        {time: "16:05:00", close: "0.90"}
-                    ]
-                    var cpuGraph = new mistIOGraph('cpuGraph',1286,160,timeToDisplay);
-
-                    // This function must run every time we have new data
-                    cpuGraph.updateData(data);
-                    }
+                    // Arguments: isMoving, hasPrevData (Check Declaration's Comment For More Info)
+                    demonstrateGraph(true,true);
 
                     Mist.rulesController.redrawRules();
-                });
-
             }.observes('controller.model.hasMonitoring'),
+
 
             /* Old Graph Function TODO Remove It
             setGraph: function() {
