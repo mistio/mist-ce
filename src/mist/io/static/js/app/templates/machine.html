@@ -78,13 +78,17 @@
                     <h1>Fetching stats...</h1>
                 </div>
             </div>
-            
-            <div id="dummyGraph" style="display:none;"></div>
-            <div id="cpuGraph"></div>
+                        
+            <div id="cpuGraph" class="graph">
+            	<!-- TEMP, Title will be added by js -->
+            	<br><strong>CPU%</strong></br>
+            </div>
+            <!-- Commented For Debugging Graph
             <div id="loadGraph"></div>
             <div id="networkGraph"></div>
             <div id="diskGraph"></div>
             <div id="memoryGraph"></div>
+            -->
             <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring"  style="display:none;">
                 <span class="ui-icon ui-icon-loading"></span>
                 <h1>Disabling monitoring</h1>

@@ -16,7 +16,8 @@ define('app/views/machine', [
 
             init: function() {
                 this._super();
-                this.setGraph();
+                this.setNewGraph(); // TODO Update function name
+                //this.setGraph();
             },
             
             enableMonitoringClick: function() {
@@ -236,6 +237,215 @@ define('app/views/machine', [
                 Mist.rulesController.newRule(machine, metric, operator, value, actionToTake);
             },
 
+            setNewGraph: function() {
+                
+                // Graph Constructor
+                function mistIOGraph(divID,width,height,timeToDisplay){
+
+                    this.id = divID;
+                    this.width = width;
+                    this.height = height;
+                    this.secondsStep =  Math.floor((timeToDisplay.getHours()*60*60 + 
+                                        timeToDisplay.getMinutes()*60 + 
+                                        timeToDisplay.getSeconds() ) /6); // 6 Is Labels To Display (TODO Add it as constant)
+                    this.data = [];
+                    var margin = {top: 30, right: 0, bottom: 30, left: 0};
+                    console.log(this.secondsStep);
+                    
+                    // May Be Removed TODO (Working On Minute And Second Step)
+                    if(this.secondsStep == 0) this.secondsStep = 1; // Fix For Science Fixion Request Of 6 Seconds To Display.
+
+                    var xScale = d3.time.scale().range([0, this.width - margin.left - margin.right]);
+                    var yScale = d3.scale.linear().range([this.height - margin.top - margin.bottom, 0]);
+                    var valueline = d3.svg.line()
+                    .x(function(d) {return xScale(d.time); })
+                    .y(function(d) {return yScale(d.close); });
+
+                    // Create Main Graph
+                    var d3svg = d3.select("#"+this.id)
+                    .append('svg')
+                    .attr('width',this.width)
+                    .attr('height',this.height);
+
+                    var d3valueLine = d3svg.append('g')
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                    .append('path'); 
+
+                    var d3xAxis = d3svg.append('g')
+                    .attr('class','x-axis')
+                    .attr("transform", "translate(0," + (this.height - margin.bottom) + ")");
+    
+                    d3xAxis.call(d3.svg.axis()
+                    .scale(xScale)
+                    .orient("bottom")
+                    .ticks(d3.time.minutes, this.secondsStep/60)
+                    .tickFormat(d3.time.format("%I:%M%p")));
+
+                    //-------------------End Of Constructor------------------------- 
+
+                    this.updateData = function(newData) {
+                        this.data = newData;
+                        this.updateView();
+                    };
+
+                    this.updateView = function() {
+
+                        // Fix Our Values
+                        var fixedData = [];
+                        this.data.forEach(function(d) {
+
+                            var format = d3.time.format("%X");
+                            var tempObj = {};
+                            tempObj.time = format.parse(d.time);
+                            tempObj.close = +d.close;
+                            fixedData.push(tempObj);
+
+                        });
+
+                        xScale.domain(d3.extent(fixedData, function(d) { return d.time; }));
+                        yScale.domain([0, d3.max(fixedData, function(d) { return d.close; })]);
+
+                        // Set the valueline path.
+                        d3valueLine.attr("d", valueline(fixedData));
+            
+                        // Update xAxis - TODO Fix secondsStep
+                        d3xAxis.call(d3.svg.axis()
+                        .scale(xScale)
+                        .orient("bottom")
+                        .ticks(d3.time.minutes, this.secondsStep/60)
+                        .tickFormat(d3.time.format("%I:%M%p")));
+
+                    };
+                    // Clone Of updateView For Virtual Moving Graph TODO remove it
+                    /*this.updateViewTest = function() {
+
+                        // Fix Our Values
+                        var fixedData = [];
+                        if(this.data.length > 30)
+                        {
+                            for(var i= this.data.length-30; i < this.data.length ;i++ )
+                            {
+                                var d = this.data[i];
+                                var format = d3.time.format("%X");
+                                var tempObj = {};
+                                tempObj.time = format.parse(d.time);
+                                tempObj.close = +d.close;
+                                fixedData.push(tempObj);
+                            }
+
+                        }
+                        else
+                        {
+                            this.data.forEach(function(d) {
+                                var format = d3.time.format("%X");
+                                var tempObj = {};
+                                tempObj.time = format.parse(d.time);
+                                tempObj.close = +d.close;
+                                fixedData.push(tempObj);
+                            });
+                        }
+
+                        xScale.domain(d3.extent(fixedData, function(d) { return d.time; }));
+                        yScale.domain([0, d3.max(fixedData, function(d) { return d.close; })]);
+
+                        // Add the valueline path.
+                        d3valueLine.attr("d", valueline(fixedData));
+            
+                        // Update xAxis // TODO Possible Remove It
+                        d3xAxis.call(d3.svg.axis()
+                        .scale(xScale)
+                        .orient("bottom")
+                        .ticks(d3.time.seconds, this.secondsStep)
+                        .tickFormat(d3.time.format("%M:%S")));
+
+                    };*/
+
+                    this.changeWidth = function (width) {
+                        this.width = width;
+
+                        // Change SVG Attributes
+                        d3svg.attr('width',this.width);
+
+                        // Update x Axis Scale
+                        xScale = d3.time.scale().range([0, this.width - margin.left - margin.right]);
+
+                        // Update ValuePoint
+                        this.updateView();
+                    };
+
+                    this.changeHeight = function(height) {
+                        this.height = height;
+
+                        d3svg.attr('height',this.height);
+
+                        d3xAxis.attr("transform", "translate(0," + (this.height - margin.bottom) + ")");
+
+                        yScale = d3.scale.linear().range([this.height - margin.top - margin.bottom, 0]);
+
+                        this.updateView();
+                    };
+                }
+
+                // Initialize Button
+                // Must be run so rules and disable button be displayed correctly
+                Em.run.next(function() {
+                    try{
+                        $('.monitoring-button').button();
+                        $('#add-rule-button').button();
+                        $('#monitoring-dialog').popup();                        
+                    } catch(err){
+                        // TODO check what error may produce
+                    }
+                });
+
+                var machine = this.get('controller').get('model');
+                
+                // Em.run must be used to make d3 work (maybe waits until some ember code runs)
+                // Also d3 must be run after document is ready
+                Em.run.next(function() {
+                
+                    // Check Monitoring because it may run twice
+                    if(machine.hasMonitoring){
+                        info("Graph Initialized"); // TODO remove it
+                        machine.set('pendingStats', false);
+
+                        // Set time To Display (Last 30 Minutes)
+                        var timeToDisplay = new Date();
+                        timeToDisplay.setHours(0,30,0);
+
+                        // Temporary Data For Debbuging
+                        var data= [
+
+                        {time: "15:35:00", close: "0.10"},
+                        {time: "15:36:00", close: "0.15"},
+                        {time: "15:37:00", close: "0.09"},
+                        {time: "15:38:00", close: "0.25"},
+                        {time: "15:39:00", close: "0.49"},
+
+                        {time: "15:40:00", close: "0.80"},
+                        {time: "15:41:00", close: "0.20"},
+                        {time: "15:42:00", close: "0.40"},
+                        {time: "15:43:00", close: "0.10"},
+                        {time: "15:44:00", close: "0.50"},
+
+                        {time: "15:45:00", close: "0.45"},
+                        {time: "15:50:00", close: "0.10"},
+                        {time: "15:55:00", close: "0.70"},
+                        {time: "16:00:00", close: "0.80"},
+                        {time: "16:05:00", close: "0.90"}
+                    ]
+                    var cpuGraph = new mistIOGraph('cpuGraph',1286,160,timeToDisplay);
+
+                    // This function must run every time we have new data
+                    cpuGraph.updateData(data);
+                    }
+
+                    Mist.rulesController.redrawRules();
+                });
+
+            }.observes('controller.model.hasMonitoring'),
+
+            /* Old Graph Function TODO Remove It
             setGraph: function() {
                 Em.run.next(function() {
                     try{
@@ -244,7 +454,6 @@ define('app/views/machine', [
                         $('#monitoring-dialog').popup();                        
                     } catch(err){}
                 });
-
                 var machine = this.get('controller').get('model');
 
                 if (!machine || !machine.hasMonitoring) {
@@ -510,7 +719,7 @@ define('app/views/machine', [
                 });
 
                 Mist.rulesController.redrawRules();
-            }.observes('controller.model.hasMonitoring'),
+            }.observes('controller.model.hasMonitoring'),*/
 
             stopPolling: function() {
                 // if it polls for stats, stop it

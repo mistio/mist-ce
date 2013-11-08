@@ -819,6 +819,42 @@ div.loading-monitoring {
     margin: 0px auto;
 }
 
+
+/*----------------------------- TEMP For Graph Debbuging ------------------------- */
+
+.graph {
+    margin-top: 30px;
+    border: 1px solid #ccc;
+    display: block;
+}
+    .grid .tick {
+        stroke: black;
+        opacity: 0.7;
+    }
+    .grid path {
+        stroke-width: 1;    
+    }
+    
+    svg {
+        background-color: white;
+        font: 10px Arial;
+        font-weight: bold;
+        color : #363636;
+        }
+
+    path {
+        stroke: #6CE0BA;
+        stroke-width: 3;
+        fill: none;
+    }
+    /*, .x-axis line*/
+    .x-axis path {
+        fill: none;
+        stroke: #363636;
+        stroke-width: 2;
+        /*shape-rendering: crispEdges;*/
+    }
+/*----------------------------- TEMP ------------------------- */
 #machineGraph span {
     font-size: 12px;
     vertical-align: middle;
