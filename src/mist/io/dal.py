@@ -369,7 +369,7 @@ class FieldsSequence(object):
         return self._item_type().cast2front(val)
 
     def __setitem__(self, key, value):
-        if type(value) is not self._item_type:
+        if type(value) is not self._item_type().front_types[0]:
             log.error("Trying to set item in FieldsSequence of %s. "
                       "(Should be %s.Will try and see what happens.",
                       type(value), self._item_type)
@@ -390,6 +390,9 @@ class FieldsSequence(object):
 
     def __deepcopy__(self, memo):
         return type(self)(deepcopy(self._seq, memo))
+
+    def __nonzero__(self):
+        return bool(self._seq)
 
 
 class FieldsList(FieldsSequence, MutableSequence):

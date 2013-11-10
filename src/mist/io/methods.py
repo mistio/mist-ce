@@ -1,6 +1,7 @@
 import logging
 import random
 from datetime import datetime
+from hashlib import sha256
 
 
 from libcloud.compute.providers import get_driver
@@ -54,11 +55,6 @@ def add_backend(user, title, provider, apikey,
     if not apisecret:
         raise RequiredParameterMissingError("apisecret")
 
-    backend_id = generate_backend_id(provider, region, apikey)
-
-    if backend_id in user.backends:
-        raise BackendExistsError(backend_id)
-
     backend = Backend()
     backend.title = title
     backend.provider = provider
@@ -68,6 +64,11 @@ def add_backend(user, title, provider, apikey,
     backend.tenant_name = tenant_name
     backend.region = region
     backend.enabled = True
+
+    backend_id = backend.get_id()
+    if backend_id in user.backends:
+        raise BackendExistsError(backend_id)
+
     #~ FIXME backend.poll_interval
     with user.lock_n_load():
         user.backends[backend_id] = backend

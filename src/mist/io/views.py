@@ -51,7 +51,6 @@ def exception_handler_mist(exc, request):
     mapping = {
         exceptions.BadRequestError: 400,
         exceptions.UnauthorizedError: 401,
-        exceptions.PaymentRequiredError: 402,
         exceptions.ForbiddenError: 403,
         exceptions.NotFoundError: 404,
         exceptions.MethodNotAllowedError: 405,
@@ -87,20 +86,17 @@ def exception_handler_general(exc, request):
 def home(request):
     """Home page view"""
     user = user_from_request(request)
-    core_uri = request.registry.settings['core_uri']
-    auth = request.registry.settings.get('auth', 0)
-    js_build = request.registry.settings['js_build']
-    js_log_level = request.registry.settings['js_log_level']
-    google_analytics_id = request.registry.settings['google_analytics_id']
-
-    return {'project': 'mist.io',
-            'email': user.email,
-            'supported_providers': SUPPORTED_PROVIDERS,
-            'core_uri': core_uri,
-            'auth': auth,
-            'js_build': js_build,
-            'js_log_level': js_log_level,
-            'google_analytics_id': google_analytics_id}
+    settings = request.registry.settings
+    return {
+        'project': 'mist.io',
+        'email': user.email,
+        'supported_providers': SUPPORTED_PROVIDERS,
+        'core_uri': settings['core_uri'],
+        'auth': settings.get('auth', 0),
+        'js_build': settings['js_build'],
+        'js_log_level': settings['js_log_level'],
+        'google_analytics_id': settings['google_analytics_id']
+    }
 
 
 @view_config(route_name="check_auth", request_method='POST', renderer="json")
@@ -267,6 +263,149 @@ def toggle_backend(request):
     return OK
 
 
+@view_config(route_name='keys', request_method='GET', renderer='json')
+def list_keys(request):
+    """List keys.
+
+    List all key pairs that are configured on this server. Only the public
+    keys are returned.
+
+    """
+
+    user = user_from_request(request)
+    return [{'id': key.replace(' ', ''),
+             'name': key,
+             'machines': user.keypairs[key].machines,
+             'default_key': user.keypairs[key].default}
+            for key in user.keypairs]
+
+
+@view_config(route_name='keys', request_method='PUT', renderer='json')
+def add_key(request):
+    params = request.json_body
+    key_id = params.get('name', '')
+    private_key = params.get('priv', '')
+
+    user = user_from_request(request)
+    key_id = methods.add_key(user, key_id, private_key)
+
+    keypair = user.keypairs[key_id]
+
+    return {'id': key_id,
+            'name': key_id,
+            'machines': keypair.machines,
+            'default': keypair.default}
+
+
+@view_config(route_name='key_action', request_method='DELETE', renderer='json')
+def delete_key(request):
+    """Delete key.
+
+    When a keypair gets deleted, it takes its asociations with it so just need
+    to remove from the server too.
+
+    If the default key gets deleted, it sets the next one as default, provided
+    that at least another key exists. It returns the list of all keys after
+    the deletion, excluding the private keys (check also list_keys).
+
+    """
+
+    key_id = request.matchdict.get('key')
+    if not key_id:
+        raise KeypairParameterMissingError()
+
+    user = user_from_request(request)
+    methods.delete_key(user, key_id)
+    return list_keys(request)
+
+
+@view_config(route_name='key_action', request_method='PUT')
+def edit_key(request):
+
+    old_id = request.matchdict['key']
+    key_id = request.json_body.get('newName')
+    if not key_id:
+        raise RequiredParameterMissingError("new key name")
+
+    user = user_from_request(request)
+    methods.edit_key(user, key_id, old_id)
+    return OK
+
+
+@view_config(route_name='key_action', request_method='POST')
+def set_default_key(request):
+    key_id = request.matchdict['key']
+    user = user_from_request(request)
+
+    methods.set_default_key(user, key_id)
+    return OK
+
+
+@view_config(route_name='key_action', request_method='GET',
+             request_param='action=private', renderer='json')
+def get_private_key(request):
+    """Gets private key from keypair name.
+
+    It is used in single key view when the user clicks the display private key
+    button.
+
+    """
+
+    user = user_from_request(request)
+    key_id = request.matchdict['key']
+    if not key_id:
+        raise RequiredParameterMissingError("key_id")
+    if not key_id in user.keypairs:
+        raise KeypairNotFoundError(key_id)
+    return user.keypairs[key_id].private
+
+
+@view_config(route_name='key_action', request_method='GET',
+             request_param='action=public', renderer='json')
+def get_public_key(request):
+    user = user_from_request(request)
+    key_id = request.matchdict['key']
+    if not key_id:
+        raise RequiredParameterMissingError("key_id")
+    if not key_id in user.keypairs:
+        raise KeypairNotFoundError(key_id)
+    return user.keypairs[key_id].public
+
+
+@view_config(route_name='keys', request_method='POST', renderer='json')
+def generate_keypair(request):
+    keypair = Keypair()
+    keypair.generate()
+    return {'priv': keypair.private}
+
+
+@view_config(route_name='key_association', request_method='PUT',
+             renderer='json')
+def associate_key(request):
+    key_id = request.matchdict['key']
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    try:
+        host = request.json_body.get('host')
+    except:
+        host = None
+    user = user_from_request(request)
+    methods.associate_key(user, key_id, backend_id, machine_id, host)
+    return user.keypairs[key_id].machines
+
+
+@view_config(route_name='key_association', request_method='DELETE',
+             renderer='json')
+def disassociate_key(request):
+    key_id = request.matchdict['key']
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    user = user_from_request(request)
+    methods.disassociate_key(user, key_id, backend_id, machine_id)
+    return user.keypairs[key_id].machines
+
+
+
 @view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
     """Gets machines and their metadata from a backend."""
@@ -355,6 +494,63 @@ def delete_machine_metadata(request):
     return OK
 
 
+@view_config(route_name='images', request_method='POST', renderer='json')
+def list_specific_images(request):
+    # FIXME: 1) i shouldn't exist, 2) i shouldn't be a post
+    return list_images(request)
+
+
+@view_config(route_name='images', request_method='GET', renderer='json')
+def list_images(request):
+    """List images from each backend.
+    Furthermore if a search_term is provided, we loop through each
+    backend and search for that term in the ids and the names of
+    the community images"""
+
+    backend_id = request.matchdict['backend']
+    try:
+        term = request.json_body.get('search_term', '').lower()
+    except:
+        term = None
+    user = user_from_request(request)
+    return methods.list_images(user, backend_id, term)
+
+
+@view_config(route_name='image', request_method='POST', renderer='json')
+def star_image(request):
+    """Toggle image as starred."""
+
+    backend_id = request.matchdict['backend']
+    image_id = request.matchdict['image']
+    user = user_from_request(request)
+    with user.lock_n_load():
+        if backend_id not in user.backends:
+            raise BackendNotFoundError(backend_id)
+        backend = user.backends[backend_id]
+        if image_id not in backend.starred:
+            backend.starred.append(image_id)
+        else:
+            backend.starred.remove(image_id)
+        user.save()
+    return image_id in backend.starred
+
+
+@view_config(route_name='sizes', request_method='GET', renderer='json')
+def list_sizes(request):
+    """List sizes (aka flavors) from each backend."""
+    backend_id = request.matchdict['backend']
+    user = user_from_request(request)
+    return methods.list_sizes(user, backend_id)
+
+
+@view_config(route_name='locations', request_method='GET', renderer='json')
+def list_locations(request):
+    """List locations from each backend."""
+    backend_id = request.matchdict['backend']
+    user = user_from_request(request)
+    return methods.list_locations(user, backend_id)
+
+
 @view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
     """Probes a machine over ssh, using fabric.
@@ -433,205 +629,6 @@ def update_available_keys(user, backend_id, machine_id, authorized_keys):
             } for key in updated_keypairs]
 
     return ret
-
-
-@view_config(route_name='images', request_method='POST', renderer='json')
-def list_specific_images(request):
-    # FIXME: 1) i shouldn't exist, 2) i shouldn't be a post
-    return list_images(request)
-
-
-@view_config(route_name='images', request_method='GET', renderer='json')
-def list_images(request):
-    """List images from each backend.
-    Furthermore if a search_term is provided, we loop through each
-    backend and search for that term in the ids and the names of
-    the community images"""
-
-    backend_id = request.matchdict['backend']
-    try:
-        term = request.json_body.get('search_term', '').lower()
-    except:
-        term = None
-    user = user_from_request(request)
-    return methods.list_images(user, backend_id, term)
-
-
-@view_config(route_name='image', request_method='POST', renderer='json')
-def star_image(request):
-    """Toggle image as starred."""
-
-    backend_id = request.matchdict['backend']
-    image_id = request.matchdict['image']
-    user = user_from_request(request)
-    with user.lock_n_load():
-        if backend_id not in user.backends:
-            raise BackendNotFoundError(backend_id)
-        backend = user.backends[backend_id]
-        if image_id not in backend.starred:
-            backend.starred.append(image_id)
-        else:
-            backend.starred.remove(image_id)
-        user.save()
-    return image_id in backend.starred
-
-
-@view_config(route_name='sizes', request_method='GET', renderer='json')
-def list_sizes(request):
-    """List sizes (aka flavors) from each backend."""
-    backend_id = request.matchdict['backend']
-    user = user_from_request(request)
-    return methods.list_sizes(user, backend_id)
-
-
-@view_config(route_name='locations', request_method='GET', renderer='json')
-def list_locations(request):
-    """List locations from each backend."""
-    backend_id = request.matchdict['backend']
-    user = user_from_request(request)
-    return methods.list_locations(user, backend_id)
-
-
-@view_config(route_name='keys', request_method='GET', renderer='json')
-def list_keys(request):
-    """List keys.
-
-    List all key pairs that are configured on this server. Only the public
-    keys are returned.
-
-    """
-
-    user = user_from_request(request)
-    return [{'id': key.replace(' ', ''),
-             'name': key,
-             'machines': user.keypairs[key].machines,
-             'default_key': user.keypairs[key].default}
-            for key in user.keypairs]
-
-
-@view_config(route_name='keys', request_method='PUT', renderer='json')
-def add_key(request):
-    params = request.json_body
-    key_id = params.get('name', '')
-    private_key = params.get('priv', '')
-
-    user = user_from_request(request)
-    key_id = methods.add_key(user, key_id, private_key)
-
-    keypair = user.keypairs[key_id]
-
-    return {'id': key_id,
-            'name': key_id,
-            'machines': keypair.machines,
-            'default': keypair.default}
-
-
-@view_config(route_name='key_action', request_method='DELETE', renderer='json')
-def delete_key(request):
-    """Delete key.
-
-    When a keypair gets deleted, it takes its asociations with it so just need
-    to remove from the server too.
-
-    If the default key gets deleted, it sets the next one as default, provided
-    that at least another key exists. It returns the list of all keys after
-    the deletion, excluding the private keys (check also list_keys).
-
-    """
-
-    key_id = request.matchdict.get('key')
-    if not key_id:
-        raise KeypairParameterMissingError()
-
-    user = user_from_request(request)
-    methods.delete_key(user, key_id)
-    return list_keys(request)
-
-
-@view_config(route_name='key_action', request_method='PUT', renderer='json')
-def edit_key(request):
-
-    old_id = request.matchdict['key']
-    key_id = request.json_body.get('newName')
-    if not key_id:
-        raise RequiredParameterMissingError("new key name")
-
-    user = user_from_request(request)
-    methods.edit_key(user, key_id, old_id)
-    return OK
-
-
-@view_config(route_name='key_action', request_method='POST', renderer='json')
-def set_default_key_request(request):
-    key_id = request.matchdict['key']
-    user = user_from_request(request)
-
-    methods.set_default_key(user, key_id)
-    return OK
-
-
-@view_config(route_name='key_action', request_method='GET',
-             request_param='action=private', renderer='json')
-def get_private_key(request):
-    """Gets private key from keypair name.
-
-    It is used in single key view when the user clicks the display private key
-    button.
-
-    """
-
-    user = user_from_request(request)
-    key_id = request.matchdict['key']
-    if not key_id:
-        raise RequiredParameterMissingError("key_id")
-    if not key_id in user.keypairs:
-        raise KeypairNotFoundError(key_id)
-    return user.keypairs[key_id].private
-
-
-@view_config(route_name='key_action', request_method='GET',
-             request_param='action=public', renderer='json')
-def get_public_key(request):
-    user = user_from_request(request)
-    key_id = request.matchdict['key']
-    if not key_id:
-        raise RequiredParameterMissingError("key_id")
-    if not key_id in user.keypairs:
-        raise KeypairNotFoundError(key_id)
-    return user.keypairs[key_id].public
-
-
-@view_config(route_name='keys', request_method='POST', renderer='json')
-def generate_keypair(request):
-    keypair = Keypair()
-    keypair.generate()
-    return {'priv': keypair.private}
-
-
-@view_config(route_name='key_association', request_method='PUT',
-             renderer='json')
-def associate_key(request):
-    key_id = request.matchdict['key']
-    backend_id = request.matchdict['backend']
-    machine_id = request.matchdict['machine']
-    try:
-        host = request.json_body.get('host')
-    except:
-        host = None
-    user = user_from_request(request)
-    methods.associate_key(user, key_id, backend_id, machine_id, host)
-    return user.keypairs[key_id].machines
-
-
-@view_config(route_name='key_association', request_method='DELETE',
-             renderer='json')
-def disassociate_key(request):
-    key_id = request.matchdict['key']
-    backend_id = request.matchdict['backend']
-    machine_id = request.matchdict['machine']
-    user = user_from_request(request)
-    methods.disassociate_key(user, key_id, backend_id, machine_id)
-    return user.keypairs[key_id].machines
 
 
 @view_config(route_name='monitoring', request_method='GET', renderer='json')

@@ -73,11 +73,6 @@ class MachineUnauthorizedError(UnauthorizedError):
     msg = "Couldn't authenticate to machine"
 
 
-# PAYMENT REQUIRED (translated as 402 in views)
-class PaymentRequiredError(BaseError):
-    msg = "Payment required"
-
-
 # FORBIDDEN (translated as 403 in views)
 class ForbiddenError(BaseError):
     msg = "Forbidden"
