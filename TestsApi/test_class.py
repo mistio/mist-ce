@@ -132,7 +132,7 @@ class TestClass(unittest.TestCase):
                 backend = backends.add_backend(self.uri, title, provider, apikey, apisecret)
                 self.test_config['BACKENDS'][backend['id']] = backend
                 #TODO erase the break
-                #break
+                break
 
         print"\nList all backends:"
         for back in backends.list_backends(self.uri):
@@ -159,7 +159,7 @@ class TestClass(unittest.TestCase):
                 backend = backends.add_backend(self.uri, title, provider, apikey, apisecret)
                 self.test_config['BACKENDS'][backend['id']] = backend
                 #TODO erase the break
-                #break
+                break
 
         print"\nList all backends:"
         for back in backends.list_backends(self.uri):
