@@ -48,6 +48,7 @@ def delete_key(uri, key_id):
     except Exception as e:
         assert False, u'Exception: %s' %e
 
+
 def generate_keypair(uri):
     response = requests.post(uri+"/keys")
     assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
@@ -57,4 +58,36 @@ def generate_keypair(uri):
         print params
         return params
     except Exception as e:
+        assert False, u'Exception: %s' %e
+
+
+def get_private_key(uri, key_id):
+    payload = {
+        'action': 'private',
+        'key': key_id
+    }
+    response = requests.get(uri+"/#/keys/"+key_id, data=payload)
+    assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
+
+    try:
+        params = response.json()
+        return params
+    except Exception as e:
+        print response.text
+        assert False, u'Exception: %s' %e
+
+
+def get_public_key(uri, key_id):
+    payload = {
+        'action': 'public',
+        'key': key_id
+    }
+    response = requests.get(uri+"/#/keys/"+key_id, data=payload)
+    assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
+
+    try:
+        params = response.json()
+        return params
+    except Exception as e:
+        print response.text
         assert False, u'Exception: %s' %e

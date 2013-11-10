@@ -70,6 +70,7 @@ def list_images(uri, backend_id, search_term = None):
     except Exception as e:
         assert False, u'Exception: %s' % e
 
+
 def list_sizes(uri, backend_id):
     response = requests.get(uri+"/backends/"+backend_id+"/sizes")
     assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
@@ -79,6 +80,7 @@ def list_sizes(uri, backend_id):
         return params
     except Exception as e:
         assert False, u'Exception: %s' % e
+
 
 def list_locations(uri, backend_id):
     response = requests.get(uri+"/backends/"+backend_id+"/locations")
