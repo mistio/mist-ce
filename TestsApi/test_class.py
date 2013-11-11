@@ -266,7 +266,8 @@ class TestClass(unittest.TestCase):
         print "\n>>>Asking mist.io to generate private key"
         priv_key = keypairs.generate_keypair(self.uri)
         private = priv_key['priv']
-        name = self.test_config['KEY_NAME']
+        seq = range(30)
+        name = self.test_config['KEY_NAME'] + str(random.choice(seq))
         print "\n>>>Creating Key with name: %s" % name
         keypair = keypairs.add_key(self.uri, name, private.strip('\n'))
         self.test_config['KEYPAIRS'][keypair['id']] = keypair
@@ -280,8 +281,8 @@ class TestClass(unittest.TestCase):
         key_id = self.test_config['KEYPAIRS'][key]['id']
         print "\n>>>Asking for private key for Key: %s" % key_id
         key = keypairs.get_private_key(self.uri, key_id)
-        print "Got: %s" % key['private']
-        self.test_config['KEYPAIRS'][key_id]['private'] = key['private']
+        print "Got: %s" % key
+        self.test_config['KEYPAIRS'][key_id]['private'] = key
 
     def test_033_get_public_key(self):
         """
@@ -291,12 +292,15 @@ class TestClass(unittest.TestCase):
         key_id = self.test_config['KEYPAIRS'].keys()[0]
         print "\n>>>Asking for public key for Key: %s" % key_id
         key = keypairs.get_public_key(self.uri, key_id)
-        print "Got: %s" % key['public']
-        self.test_config['KEYPAIRS'][key_id]['public'] = key['public']
+        print "Got: %s" % key
+        self.test_config['KEYPAIRS'][key_id]['public'] = key
 
     def test_034_edit_key(self):
         """--->Edit Key"""
-        key_id = self.test_config['KEY_NAME']
+        for key_id in self.test_config['KEYPAIRS']:
+            if self.test_config['KEY_NAME'] in key_id:
+                break
+        #key_id = self.test_config['KEY_NAME']
         seq = range(30)
         new_name = self.test_config['KEY_NAME'] + str(random.choice(seq))
         print"\n>>>Renaming '%s' Key to '%s'" % (key_id, new_name)
@@ -329,7 +333,7 @@ class TestClass(unittest.TestCase):
         keypairs.delete_key(self.uri, key_id)
         del self.test_config['KEYPAIRS'][key_id]
 
-###########IMAGES LOCATIONS SIZES ACTIONS##################
+##########IMAGES LOCATIONS SIZES ACTIONS##################
     def test_040_list_images(self):
         """
         --->List Images
@@ -456,9 +460,12 @@ class TestClass(unittest.TestCase):
                 backend_id = b_id
                 break
 
+        for key_id in self.test_config['KEYPAIRS']:
+            if self.test_config['KEY_NAME'] in key_id:
+                break
         #key_id = self.test_config['KEYPAIRS'].keys()[0]
         #key_id = "Universal"
-        key_id = None
+        #key_id = None
 
         #If the randomly generated name already exists, generate another one
         while True:
@@ -476,7 +483,7 @@ class TestClass(unittest.TestCase):
         print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
         print "Name: %s" % name
         print "Backend: %s" % self.test_config['BACKENDS'][backend_id]['title']
-        print "With Key: Let Mist decide"
+        print "With Key: %s" % key_id
         print "Image Id: %s" % image_id
         print "Size Id: %s" % size
         print "Location Id: %s" % location

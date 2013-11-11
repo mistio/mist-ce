@@ -62,11 +62,7 @@ def generate_keypair(uri):
 
 
 def get_private_key(uri, key_id):
-    payload = {
-        'action': 'private',
-        'key': key_id
-    }
-    response = requests.get(uri+"/#/keys/"+key_id, data=payload)
+    response = requests.get(uri+"/keys/"+key_id+"?action=private")
     assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
 
     try:
@@ -78,11 +74,7 @@ def get_private_key(uri, key_id):
 
 
 def get_public_key(uri, key_id):
-    payload = {
-        'action': 'public',
-        'key': key_id
-    }
-    response = requests.get(uri+"/#/keys/"+key_id, data=payload)
+    response = requests.get(uri+"/keys/"+key_id+"?action=public")
     assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
 
     try:
