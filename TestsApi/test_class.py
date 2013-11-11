@@ -266,7 +266,7 @@ class TestClass(unittest.TestCase):
         print "\n>>>Asking mist.io to generate private key"
         priv_key = keypairs.generate_keypair(self.uri)
         private = priv_key['priv']
-        seq = range(30)
+        seq = range(300)
         name = self.test_config['KEY_NAME'] + str(random.choice(seq))
         print "\n>>>Creating Key with name: %s" % name
         keypair = keypairs.add_key(self.uri, name, private.strip('\n'))
@@ -277,8 +277,9 @@ class TestClass(unittest.TestCase):
         --> Get Private Key
         """
 
-        key = self.test_config['KEYPAIRS'].keys()[0]
-        key_id = self.test_config['KEYPAIRS'][key]['id']
+        for key_id in self.test_config['KEYPAIRS']:
+            if self.test_config['KEY_NAME'] in key_id:
+                break
         print "\n>>>Asking for private key for Key: %s" % key_id
         key = keypairs.get_private_key(self.uri, key_id)
         print "Got: %s" % key
@@ -289,7 +290,9 @@ class TestClass(unittest.TestCase):
         --> Get Public Key
         """
 
-        key_id = self.test_config['KEYPAIRS'].keys()[0]
+        for key_id in self.test_config['KEYPAIRS']:
+            if self.test_config['KEY_NAME'] in key_id:
+                break
         print "\n>>>Asking for public key for Key: %s" % key_id
         key = keypairs.get_public_key(self.uri, key_id)
         print "Got: %s" % key
@@ -301,7 +304,7 @@ class TestClass(unittest.TestCase):
             if self.test_config['KEY_NAME'] in key_id:
                 break
         #key_id = self.test_config['KEY_NAME']
-        seq = range(30)
+        seq = range(300)
         new_name = self.test_config['KEY_NAME'] + str(random.choice(seq))
         print"\n>>>Renaming '%s' Key to '%s'" % (key_id, new_name)
         keypairs.edit_key(self.uri, key_id, new_name)
@@ -317,7 +320,7 @@ class TestClass(unittest.TestCase):
 
         #If the randomly generated key name already exists, generate another one
         while True:
-            seq = range(30)
+            seq = range(300)
             name = self.test_config['KEY_NAME'] + str(random.choice(seq))
             if name not in self.test_config['KEYPAIRS']:
                 break
@@ -469,7 +472,7 @@ class TestClass(unittest.TestCase):
 
         #If the randomly generated name already exists, generate another one
         while True:
-            seq = range(30)
+            seq = range(300)
             name = self.test_config['MACHINE_NAME'] + str(random.choice(seq))
             if name not in self.test_config['BACKENDS'][backend_id]['machines']:
                 break
