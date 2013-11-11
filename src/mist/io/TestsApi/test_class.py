@@ -2,9 +2,9 @@ import os
 import unittest
 import random
 
-import TestsApi.backends as backends
-import TestsApi.keypairs as keypairs
-import TestsApi.machines as machines
+import backends as backends
+import keypairs as keypairs
+import machines as machines
 
 import yaml
 from Crypto.PublicKey import RSA
@@ -37,7 +37,7 @@ class TestClass(unittest.TestCase):
         a test is run the self.test_config dict is a replica of the
         yaml file.
         """
-        self.path = os.getcwd() + "/TestsApi/tests_config.yaml"
+        self.path = os.getcwd() + "/tests_config.yaml"
         config_file = open(self.path, 'r')
         self.test_config = yaml.load(config_file) or {}
         config_file.close()
