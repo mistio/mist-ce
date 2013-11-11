@@ -21,9 +21,21 @@ from pyramid.response import Response
 from pyramid.view import view_config
 
 
-from mist.io.config import SUPPORTED_PROVIDERS
+try:
+    from mist.core.config import SUPPORTED_PROVIDERS, CORE_URI
+
+    from mist.core.config import GOOGLE_ANALYTICS_ID
+    from mist.core.helpers import user_from_request
+except ImportError:
+    import mist.io.config as config
+
+    from mist.io.model import User
+    def user_from_request(request):
+        return User()
+
 from mist.io import methods
-from mist.io.model import User, Keypair
+
+from mist.io.model import Keypair
 from mist.io.shell import Shell
 
 import mist.io.exceptions as exceptions
@@ -34,8 +46,11 @@ log = logging.getLogger(__name__)
 OK = Response("OK", 200)
 
 
-def user_from_request(request):
-    return User()
+try:
+    from mist.core.helpers import user_from_request
+except:
+    def user_from_request(request):
+        return User()
 
 
 @view_config(context=exceptions.BaseError)
@@ -86,16 +101,15 @@ def exception_handler_general(exc, request):
 def home(request):
     """Home page view"""
     user = user_from_request(request)
-    settings = request.registry.settings
     return {
         'project': 'mist.io',
         'email': user.email,
-        'supported_providers': SUPPORTED_PROVIDERS,
-        'core_uri': settings['core_uri'],
-        'auth': settings.get('auth', 0),
-        'js_build': settings['js_build'],
-        'js_log_level': settings['js_log_level'],
-        'google_analytics_id': settings['google_analytics_id']
+        'supported_providers': config.SUPPORTED_PROVIDERS,
+        'core_uri': config.CORE_URI,
+        'auth': request.registry.settings.get('auth', 0),        #FIXME
+        'js_build': config.JS_BUILD,
+        'js_log_level': config.JS_LOG_LEVEL,
+        'google_analytics_id': config.GOOGLE_ANALYTICS_ID
     }
 
 

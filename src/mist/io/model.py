@@ -58,7 +58,6 @@ class Backend(OODict):
     datacenter = StrField()
 
     starred = ListField()
-    machines = make_field(MonMachines)()
 
     def __repr__(self):
         print_fields = ['title', 'provider', 'region']

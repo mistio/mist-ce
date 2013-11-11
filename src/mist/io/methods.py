@@ -20,7 +20,7 @@ from mist.io.config import LINODE_DATACENTERS
 from mist.io.exceptions import *
 from mist.io.model import Backend, Keypair
 from mist.io.shell import Shell
-from mist.io.helpers import get_temp_file, generate_backend_id
+from mist.io.helpers import get_temp_file
 
 
 #~ # add curl ca-bundle default path to prevent libcloud certificate error
