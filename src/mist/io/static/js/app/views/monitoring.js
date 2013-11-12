@@ -12,26 +12,34 @@ define('app/views/monitoring', [
 
             template: Ember.Handlebars.compile(monitoring_html),
 
+            cpuGraph: null,
+            loadGraph: null,
+            //other Graphs to be added (TODO)
 
             init: function() {
                 this._super();
-                this.setNewGraph(); // TODO Update function name
-                //this.setGraph();
+                this.setUpGraphs();
             },
 
-            setNewGraph: function() {
+            // Graph Constructor
+            setUpGraphs: function() {
                 
                 // Graph Constructor
-                function mistIOGraph(divID,width,height,timeToDisplay){
+                function Graph(divID,width,timeToDisplay){
 
                     this.id = divID;
                     this.width = width;
-                    this.height = height;
+                    // Calculate Aspect Ratio Of Height
+                    var fixedHeight = 160 / 1280 * width;
+                    this.height = (fixedHeight < 85 ? 85 : fixedHeight);
+                    this.height = fixedHeight;
+
+                    // Calculate The step  of the time axis
                     this.secondsStep =  Math.floor((timeToDisplay.getHours()*60*60 + 
                                         timeToDisplay.getMinutes()*60 + 
                                         timeToDisplay.getSeconds() ) /6); // 6 Is Labels To Display (TODO Add it as constant)
                     this.data = [];
-                    var margin = {top: 30, right: 0, bottom: 30, left: 0};
+                    var margin = {top: 30, right: 0, bottom: 30, left: 0}; // TODO Fix Margin Based On Aspect Ratio
                     
                     // May Be Removed TODO (Working On Minute And Second Step)
                     if(this.secondsStep == 0) this.secondsStep = 1; // Fix For Science Fixion Request Of 6 Seconds To Display.
@@ -98,6 +106,7 @@ define('app/views/monitoring', [
 
                     };
 
+                    /* TODO Remove Demonstration When Have A Working Graph
                     // Part Of Graph Demonstration. TODO remove It
                     this.updateVirtualData = function(newData) {
                         this.data = newData;
@@ -146,18 +155,24 @@ define('app/views/monitoring', [
                                      .tickFormat(d3.time.format("%I:%S%p")));
 
                     };
-
+                    */
                     this.changeWidth = function (width) {
 
+                        // Change Width CSS Attribute And Set New Scale Values
                         this.width = width;
                         d3svg.attr('width',this.width);
-
                         xScale = d3.time.scale().range([0, this.width - margin.left - margin.right]);
 
-                        this.updateView();
+                        // Create An Aspect Ratio
+                        var newHeight = 160 / 1280 * width;
+                        newHeight = (newHeight < 85 ? 85 : newHeight);
+                        this.changeHeight(newHeight);
+
+                        // Update View Will Be Done Within changeHeight
                     };
 
-                    this.changeHeight = function(height) {
+                    // This one will only be called Only From changeWidth TODO Possibly Merge
+                    function changeHeight(height) {
 
                         this.height = height;
                         d3svg.attr('height',this.height);
@@ -178,7 +193,7 @@ define('app/views/monitoring', [
                 * hasPrevData: Set True To Virtualize A Machine That Is Turned On More Than 30 Minutes 
                                 Else Set False For A Just Turned On Machine
                 */
-                function demonstrateGraph(isMoving,hasPrevData)
+                /*function demonstrateGraph(isMoving,hasPrevData)
                 {
 
                     var movingGraph = {enabled: isMoving, hasPrevData:hasPrevData};
@@ -269,12 +284,10 @@ define('app/views/monitoring', [
                             }
                         }
                     });
-                }
+                }*/
 
 
                 // Execuation Starts Here
-
-
                 Em.run.next(function() {
                     try{
                         $('.monitoring-button').button();
@@ -284,11 +297,24 @@ define('app/views/monitoring', [
                         // TODO check what error may produce
                     }
                 });
-                
-                var machine = this.get('controller').get('model');
-                
 
-                demonstrateGraph(true,true);
+                var machine = this.get('controller').get('model');
+
+                Em.run.next(function() {
+
+                    console.log("Setting Up Graphs");       // DEBUG TODO Remove It
+                    var width = $('#cpuGraph').width();     // Get Current Width
+
+                    // Create Graphs
+                    if(machine.hasMonitoring)
+                        this.cpuGraph = new Graph('cpuGraph',width,new Date());
+
+                    // Set Up Resolution Change Event
+                    $(window).resize(function(){
+
+                                this.cpuGraph.changeWidth($('#cpuGraph').width());
+                    })
+                });
 
                 Mist.rulesController.redrawRules();
             }.observes('controller.model.hasMonitoring'),
