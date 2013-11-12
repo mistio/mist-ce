@@ -33,3 +33,10 @@ def get_temp_file(content):
             os.remove(tmp_path)
         except:
             pass
+
+
+def core_wrapper(func):
+    """Dummy decorator for compatibility with core."""
+    def wrapped_func(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapped_func

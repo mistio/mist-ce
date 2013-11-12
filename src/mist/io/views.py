@@ -93,7 +93,7 @@ def exception_handler_general(exc, request):
     """
 
     log.error("Exception handler caught non-mist exception %s", exc)
-    return Response("Internal Server Error", 503)
+    return Response("Internal Server Error", 500)
 
 
 @view_config(route_name='home', request_method='GET',

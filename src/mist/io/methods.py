@@ -22,6 +22,10 @@ from mist.io.model import Backend, Keypair
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
 
+try:
+    from mist.core.helpers import core_wrapper
+except ImportError:
+    from mist.io.helpers import core_wrapper
 
 #~ # add curl ca-bundle default path to prevent libcloud certificate error
 #~ import libcloud.security
@@ -30,6 +34,7 @@ from mist.io.helpers import get_temp_file
 log = logging.getLogger(__name__)
 
 
+@core_wrapper
 def add_backend(user, title, provider, apikey,
                 apisecret, apiurl, tenant_name):
     """Adds a new backend to the user and returns the new backend_id."""
@@ -77,6 +82,7 @@ def add_backend(user, title, provider, apikey,
     return backend_id
 
 
+@core_wrapper
 def delete_backend(user, backend_id):
     """Deletes backend with given backend_id."""
 
@@ -89,6 +95,7 @@ def delete_backend(user, backend_id):
     log.info("Succesfully deleted backend '%s'", backend_id)
 
 
+@core_wrapper
 def add_key(user, key_id, private_key):
     """Adds a new keypair and returns the new key_id."""
 
@@ -118,6 +125,7 @@ def add_key(user, key_id, private_key):
     return key_id
 
 
+@core_wrapper
 def delete_key(user, key_id):
     """Deletes given keypair.
 
@@ -200,6 +208,7 @@ def edit_key(user, new_key, old_key):
     log.info("Renamed key '%s' to '%s'.", old_key, new_key)
 
 
+@core_wrapper
 def associate_key(user, key_id, backend_id, machine_id, host=None):
     """Associates a key with a machine.
 
@@ -255,6 +264,7 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
     ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
 
 
+@core_wrapper
 def disassociate_key(user, key_id, backend_id, machine_id, host=None):
     """Disassociates a key from a machine.
 
@@ -444,6 +454,7 @@ def list_machines(user, backend_id):
     return ret
 
 
+@core_wrapper
 def create_machine(user, backend_id, key_id, machine_name, location_id,
                    image_id, size_id, script, image_extra, disk):
 
@@ -854,6 +865,7 @@ def reboot_machine(user, backend_id, machine_id):
     _machine_action(user, backend_id, machine_id, 'reboot')
 
 
+@core_wrapper
 def destroy_machine(user, backend_id, machine_id):
     """Destroys a machine on a certain backend.
 
