@@ -26,30 +26,32 @@ define('app/controllers/monitoring', [
             // TODO Change Name When Is Fully Working
             demoGetData: function(){
 
+                var self = this;
                 //Debug TODO Remove It
                 // Get Stats For the last hour
 
                 // Just Started Take Last 30 minutes
                 if(this.data.load.length == 0)
                 {
+                    self.machine.set('pendingStats', true);
                     var stop = (new Date()).getTime() - 20 * 1000;
                     var start = stop - 1801*1000; // Substract Half Hour Of The Stop Date
                     var step = 10000;
                     console.log("- Get First data");
                     console.log("  From : " + (new Date(start)));
                     console.log("  Until: " + (new Date(stop)));
-                    Mist.monitoringController.receiveData(start, stop, step);
+                    self.receiveData(start, stop, step);
                 }
 
-
-                window.setInterval(function(){
+                // TODO Set Interval In Object variable maybe Or Find Another Way For The Loop
+                window.monitoringInterval = window.setInterval(function(){
                     var start = (new Date()).getTime() - 30 * 1000   //3600000 / 2; // minus 1 hour
                     var stop =  (new Date()).getTime() - 20 * 1000; //- 10 *1000;
                     var step = 10000; // 10 Second Step
                     console.log("- Getting Data");
                     console.log("  From : " + (new Date(start)));
                     console.log("  Until: " + (new Date(stop)));
-                    Mist.monitoringController.receiveData(start, stop, step);
+                    self.receiveData(start, stop, step);
                     
                 },10000);
             },
@@ -76,6 +78,7 @@ define('app/controllers/monitoring', [
                     timeout: 4000,
                     success: function (data, status, xhr){
                         
+                        var monitoringController = Mist.monitoringController;
                         // TODO , Possible Remove It
                         if(data.load.length == 0) // No Data Returned
                         {
@@ -107,13 +110,13 @@ define('app/controllers/monitoring', [
                                 };
 
                                 // Push Object Into Data Object
-                                var monitoringController = Mist.monitoringController;
                                 monitoringController.data.cpu.push(cpuObj);
                                 monitoringController.data.load.push(loadObj);
                                 monitoringController.data.memory.push(memObj);
 
                                 metricTime = new Date(metricTime.getTime()+10000);// Substract 10 second from every object
                             }
+                            monitoringController.machine.set('pendingStats', false);
                             console.log("- Sets Data Updated, Graph Must Be Updated")
                             monitoringController.set('dataUpdated',true);
                             //console.log(Mist.monitoringController.data);

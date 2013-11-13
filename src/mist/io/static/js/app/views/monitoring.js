@@ -28,6 +28,11 @@ define('app/views/monitoring', [
                 this.set('viewRendered',true);
             },
 
+            willDestroyElement: function(){
+                console.log("- Ember Monitoring View Is Being Destroyed");
+                window.clearInterval(window.monitoringInterval);
+            },
+
             gotNewData: function(){
                 if(Mist.monitoringController.dataUpdated == true)
                 {
