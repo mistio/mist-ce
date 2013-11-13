@@ -14,6 +14,7 @@ define('app/views/monitoring', [
 
             cpuGraph: null,
             loadGraph: null,
+            memGraph: null,
             viewRendered: false,
             //other Graphs to be added (TODO)
 
@@ -23,7 +24,7 @@ define('app/views/monitoring', [
             },
             didInsertElement: function(){
                 // Wait Until DOM Is Ready
-                console.log("- Monitoring View Rendered");
+                console.log("- Ember Monitoring View Rendered");
                 this.set('viewRendered',true);
             },
 
@@ -31,7 +32,9 @@ define('app/views/monitoring', [
                 if(Mist.monitoringController.dataUpdated == true)
                 {
                     console.log("- We Have New Data At: " + (new Date()).toTimeString());
-                    this.cpuGraph.updateData(Mist.monitoringController.data);
+                    this.cpuGraph.updateData(Mist.monitoringController.data.cpu);
+                    this.loadGraph.updateData(Mist.monitoringController.data.load);
+                    this.memGraph.updateData(Mist.monitoringController.data.memory);
                     Mist.monitoringController.set('dataUpdated',false);
                 }
             }.observes('Mist.monitoringController.dataUpdated'),
@@ -55,7 +58,7 @@ define('app/views/monitoring', [
                                         timeToDisplay.getMinutes()*60 + 
                                         timeToDisplay.getSeconds() ) /6); // 6 Is Labels To Display (TODO Add it as constant)
                     this.data = [];
-                    var margin = {top: 30, right: 0, bottom: 30, left: 0}; // TODO Fix Margin Based On Aspect Ratio
+                    var margin = {top: 20, right: 0, bottom: 30, left: 0}; // TODO Fix Margin Based On Aspect Ratio
                     
                     // May Be Removed TODO (Working On Minute And Second Step)
                     if(this.secondsStep == 0) this.secondsStep = 1; // Fix For Science Fixion Request Of 6 Seconds To Display.
@@ -79,7 +82,7 @@ define('app/views/monitoring', [
 
                     var d3xAxis = d3svg.append('g')
                                   .attr('class','x-axis')
-                                  .attr("transform", "translate(0," + (this.height - margin.bottom) + ")");
+                                  .attr("transform", "translate(0," + (this.height - margin.bottom +2) + ")");
     
                     d3xAxis.call(d3.svg.axis()
                                  .scale(xScale)
@@ -107,6 +110,16 @@ define('app/views/monitoring', [
                             this.data = this.data.slice(this.data.length-NUM_OF_MEASUREMENTS,this.data.length);
                             console.log("--- After  Slice - Data Lenght: " + this.data.length);
                         }
+
+                        // DEBUG Max And Min Value
+                        var values = [];
+                        this.data.forEach(function(d){
+                                values.push(d.close);
+                        });
+                        var max = Math.max.apply(Math,values);
+                        var min = Math.min.apply(Math,values);
+                        console.log("--- Max: " + max);
+                        console.log("--- Min: " + min);
 
                         // Fix Our Values
                         var fixedData = [];
@@ -192,15 +205,21 @@ define('app/views/monitoring', [
                         var tempDate = new Date();
                         tempDate.setHours(0,30,0);
                         this.cpuGraph = new Graph('cpuGraph',width,tempDate);
+                        this.loadGraph = new Graph('loadGraph',width,tempDate);
+                        this.memGraph = new Graph('memGraph',width,tempDate);
                         console.log(this.cpuGraph);
                         console.log("- cpuGraph Created, demoGetData running after"); // DEBUG TODO Remove It
                         Mist.monitoringController.demoGetData();
 
                     var cpuGraph = this.cpuGraph;
+                    var loadGraph = this.loadGraph;
+                    var memGraph = this.memGraph;
                     // Set Up Resolution Change Event
                     $(window).resize(function(){
 
                                 cpuGraph.changeWidth($('#cpuGraph').width());
+                                loadGraph.changeWidth($('#loadGraph').width());
+                                memGraph.changeWidth($('#memGraph').width());
                     })
 
                      Mist.rulesController.redrawRules();

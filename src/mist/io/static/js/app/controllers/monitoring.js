@@ -11,12 +11,16 @@ define('app/controllers/monitoring', [
 
             machine : null,
             machineNotResponding: false, // TODO Add Something if server does not return new data
-            data: [], 
+            data: null,
             dataUpdated: false,
 
             setMachine: function(machine){
                 this.machine = machine;
-                this.data = new Array();
+                this.data = {
+                    cpu: [],
+                    load: [],
+                    memory: []
+                };
             },
 
             // TODO Change Name When Is Fully Working
@@ -26,12 +30,14 @@ define('app/controllers/monitoring', [
                 // Get Stats For the last hour
 
                 // Just Started Take Last 30 minutes
-                if(this.data.length == 0)
+                if(this.data.load.length == 0)
                 {
-                    console.log("- Get First data");
                     var stop = (new Date()).getTime() - 20 * 1000;
                     var start = stop - 1801*1000; // Substract Half Hour Of The Stop Date
                     var step = 10000;
+                    console.log("- Get First data");
+                    console.log("  From : " + (new Date(start)));
+                    console.log("  Until: " + (new Date(stop)));
                     Mist.monitoringController.receiveData(start, stop, step);
                 }
 
@@ -41,6 +47,8 @@ define('app/controllers/monitoring', [
                     var stop =  (new Date()).getTime() - 20 * 1000; //- 10 *1000;
                     var step = 10000; // 10 Second Step
                     console.log("- Getting Data");
+                    console.log("  From : " + (new Date(start)));
+                    console.log("  Until: " + (new Date(stop)));
                     Mist.monitoringController.receiveData(start, stop, step);
                     
                 },10000);
@@ -76,20 +84,33 @@ define('app/controllers/monitoring', [
                         }
                         else
                         {
-                            console.log("- Successful Got Data")
-                            console.log("- Pushing Data To Array")
+                            console.log("- Successful Got " + data.load.length + " Data");
+                            console.log("- Pushing Data To Array");
 
                             // For X CPU Objects That Exist Create Object And Add Push Them
                             // Add A CPU Objects
                             var metricTime = new Date(start);
                             for(var i=0; i < data.load.length; i++ )
                             {
-                                var tempObj = {
+                                // Create New Data Objects
+                                var cpuObj = {
                                     time : (metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds()),
                                     close: data.cpu.utilization[i]
                                 };
+                                var loadObj = {
+                                    time : (metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds()),
+                                    close: data.load[i]
+                                };
+                                var memObj = {
+                                    time : (metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds()),
+                                    close: data.memory[i]
+                                };
+
+                                // Push Object Into Data Object
                                 var monitoringController = Mist.monitoringController;
-                                monitoringController.data.push(tempObj);
+                                monitoringController.data.cpu.push(cpuObj);
+                                monitoringController.data.load.push(loadObj);
+                                monitoringController.data.memory.push(memObj);
 
                                 metricTime = new Date(metricTime.getTime()+10000);// Substract 10 second from every object
                             }
