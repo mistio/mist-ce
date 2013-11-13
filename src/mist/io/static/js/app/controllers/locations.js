@@ -41,9 +41,9 @@ define('app/controllers/locations', [
                     if (that.backend.error){
                         that.backend.set('error', false);
                     }
-                }).error(function() {
+                }).error(function(jqXHR, textstate, errorThrown) {
                     Mist.notificationController.notify("Error loading locations for backend: " +
-                                                        that.backend.title);
+                                                        that.backend.title + ':' + jqXHR.responseText);
                     if (that.backend.error){
                         // This backend seems hopeless, disabling it                            
                         that.backend.set('state', 'offline');

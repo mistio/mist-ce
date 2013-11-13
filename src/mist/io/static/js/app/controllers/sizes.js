@@ -38,9 +38,9 @@ define('app/controllers/sizes', [
                     if (that.backend.error){
                         that.backend.set('error', false);
                     }
-                }).error(function() {
-                    Mist.notificationController.notify("Error loading sizes for backend: " +
-                                                        that.backend.title);
+                }).error(function(jqXHR, textstate, errorThrown) {
+                    Mist.notificationController.notify(jqXHR.responseText);
+                    error(jqXHR.responseText);
                     if (that.backend.error){
                         // This backend seems hopeless, disabling it                            
                         that.backend.set('state', 'offline');
