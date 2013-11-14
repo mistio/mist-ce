@@ -172,8 +172,7 @@ def add_backend(request, renderer='json'):
         backends = user['backends']
 
         if provider == 'bare_metal':
-            machine_name = params.get('machine_name', '')
-            machine_ip_address = params.get('machine_ip_address', '')
+            machine_hostname = params.get('machine_ip_address', '')
             machine_key = params.get('machine_key', '')
             machine_user = params.get('machine_user', 'root')
             
@@ -183,16 +182,15 @@ def add_backend(request, renderer='json'):
                 return Response('Could not ssh to machine, please make sure settings are correct', 400)
             
             machine_priv_key = keypair.get('private')
+            machine_id = machine_hostname.replace('.', '').replace(' ', '')
             
             #check connection
-            response = run_command(machine_name, machine_ip_address, machine_user, machine_priv_key, 'uptime')
+            response = run_command(machine_id, machine_hostname, machine_user, machine_priv_key, 'uptime')
             if response.status_code != 200:
                 return Response('Could not ssh to machine, please make sure settings are correct', 400)
 
-            machine_id = machine_name.replace('.', '').replace(' ', '')
             machine_dict = {'id': machine_id, 
-                            'name': machine_name,
-                            'ip_address': machine_ip_address,
+                            'hostname': machine_hostname,
                             'user': machine_user
                             }         
 

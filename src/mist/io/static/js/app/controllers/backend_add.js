@@ -15,7 +15,6 @@ define('app/controllers/backend_add', [
                 this.set('newBackendProvider', null);
                 this.set('newBackendKey', null);
                 this.set('newBackendSecret', null);
-                this.set('newBareServerName', null);                
                 this.set('newBareServeIp', null);
                 this.set('newBareServerKey', null);
                 this.set('newBareServerUser', null);    
@@ -46,8 +45,7 @@ define('app/controllers/backend_add', [
                         */
                         this.set('newBackendReady', true);
                         $('#create-backend-ok').button('enable');
-                } else if (this.get('newBareServerName') &&
-                    this.get('newBareServeIp') &&
+                } else if (this.get('newBareServeIp') &&
                     this.get('newBareServerKey') &&                
                     this.get('newBareServerUser')) {                                                                                        
                         this.set('newBackendReady', true);
@@ -63,7 +61,6 @@ define('app/controllers/backend_add', [
                 this.addObserver('newBackendProvider', this, this.updateNewBackendReady);
                 this.addObserver('newBackendKey', this, this.updateNewBackendReady);
                 this.addObserver('newBackendSecret', this, this.updateNewBackendReady);
-                this.addObserver('newBareServerName', this, this.updateNewBackendReady);
                 this.addObserver('newBareServeIp', this, this.updateNewBackendReady);                
                 this.addObserver('newBareServerKey', this, this.updateNewBackendReady);                
                 this.addObserver('newBareServerUser', this, this.updateNewBackendReady);                                

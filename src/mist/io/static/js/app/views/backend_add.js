@@ -136,7 +136,6 @@ define('app/views/backend_add', [
                     "apisecret": Mist.backendAddController.newBackendSecret,
                     "apiurl": Mist.backendAddController.newBackendUrl,
                     "tenant_name": Mist.backendAddController.newBackendTenant,
-                    "machine_name": Mist.backendAddController.newBareServerName,                    
                     "machine_ip_address": Mist.backendAddController.newBareServeIp,                    
                     "machine_key": Mist.backendAddController.newBareServerKey,                    
                     "machine_user": Mist.backendAddController.newBareServerUser                                                           

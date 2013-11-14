@@ -51,22 +51,23 @@ class BareMetalDriver(object):
         return result in VALID_RESPONSE_CODES
 
     def _to_node(self, machine):
-        state = self.check_host(machine.get('ip_address'), machine.get('port', 22))
-        public_ips = [machine.get('ip_address')]
+        state = self.check_host(machine.get('hostname'), machine.get('port', 22))
+        public_ips = [machine.get('hostname')]
         private_ips = []
         extra = {}
 
-        node = Node(id=machine.get('id'), name=machine.get('name'), state=state,
+        node = Node(id=machine.get('id'), name=machine.get('hostname'), state=state,
                     public_ips=public_ips, private_ips=private_ips,
                     driver=self, extra=extra)
         return node
 
-    def check_host(self, ip_address, port=22):
+    def check_host(self, hostname, port=22):
         "Perform a check if port is open"
+        #FIXME: needs more thinking here!!!
         socket.setdefaulttimeout(5)       
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            s.connect((ip_address, port))
+            s.connect((hostname, port))
             s.shutdown(2)
             state = NODE_STATE_MAP['on']
         except:

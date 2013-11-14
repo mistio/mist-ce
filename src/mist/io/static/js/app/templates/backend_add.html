@@ -55,19 +55,13 @@
         </div>
         
         <div id="addBackendBareMetal">
-            <label for="create-bareserver-name" id="Namelabel">2. Name:</label>
-            {{view Mist.TextField
-                valueBinding="Mist.backendAddController.newBareServerName"
-                name="create-bareserver-name"
-                id="create-bareserver-name"}}
-
-            <label for="create-bareserver-ip" id="Iplabel">3. Ip address:</label>
+            <label for="create-bareserver-ip" id="Iplabel">2. Hostname:</label>
             {{view Mist.TextField
                 valueBinding="Mist.backendAddController.newBareServeIp"
                 name="create-bareserver-ip"
                 id="create-bareserver-ip"}}
 
-            <label for="create-bareserver-key" id="Keylabel">4. SSH Key:</label>    
+            <label for="create-bareserver-key" id="Keylabel">3. SSH Key:</label>    
             {{#if Mist.keysController.keys}}                    
             <div class="select-key-collapsible" data-role="collapsible" data-iconpos="right"
                 data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u" data-theme="d">
@@ -87,11 +81,11 @@
                {{action createBareMetalKeyClicked target="view"}}>Create key</a>         
             {{/if}}
             
-            <label for="create-bareserver-user" id="Userlabel">5. User:</label>
+            <label for="create-bareserver-user" id="Userlabel">4. User:</label>
             {{view Mist.TextField
                 valueBinding="Mist.backendAddController.newBareServerUser"
                 name="create-bareserver-user"
-                id="create-bareserver-user"}}
+                id="ROOTcreate-bareserver-user"}}
         </div>
 
         {{#if view.pendingCreation}}
