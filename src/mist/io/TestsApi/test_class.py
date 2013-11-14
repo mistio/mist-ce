@@ -45,6 +45,7 @@ class TestClass(unittest.TestCase):
         self.uri = self.test_config['MIST_URI']
         self.credentials = self.test_config['BACKEND_KEYS']
         self.machine_name = self.test_config['MACHINE_NAME']
+        self.cookie = self.test_config['COOKIE']
 
         try:
             self.supported_providers = self.test_config['SUPPORTED_PROVIDERS']

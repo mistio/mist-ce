@@ -1,8 +1,9 @@
-import requests
+from MyRequestsClass import MyRequests
 import json
 
-def list_machines(uri, backend_id):
-    response = requests.get(uri+'/backends/'+backend_id+"/machines")
+def list_machines(uri, backend_id, cookie=None):
+    req = MyRequests(uri=uri+'/backends/'+backend_id+"/machines", cookie=cookie)
+    response = req.get()
     assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
     try:
         params = response.json()
@@ -11,7 +12,7 @@ def list_machines(uri, backend_id):
         assert False, u'Exception: %s' % e
 
 #! disk and image_extra are required only for Linode
-def create_machine(uri, backend_id, key_id, name, location, image, size, script=None, disk=None, image_extra=None):
+def create_machine(uri, backend_id, key_id, name, location, image, size, script=None, disk=None, image_extra=None, cookie=None):
     payload = {
         #'backend': backend_id,
         'key': key_id,
@@ -23,7 +24,8 @@ def create_machine(uri, backend_id, key_id, name, location, image, size, script=
         'disk': disk,
         'image_extra': image_extra
     }
-    response = requests.post(uri+"/backends/"+backend_id+"/machines", data=json.dumps(payload), timeout=600)
+    req = MyRequests(uri=uri+"/backends/"+backend_id+"/machines", cookie=cookie, data=json.dumps(payload), timeout=600)
+    response = req.post()
     assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
 
     try:
@@ -34,35 +36,39 @@ def create_machine(uri, backend_id, key_id, name, location, image, size, script=
         assert False, u'Exception: %s' % e
 
 #!Our API does not accept json in this post!
-def destroy_machine(uri, backend_id, machine_id):
+def destroy_machine(uri, backend_id, machine_id, cookie=None):
     payload = {
         'action': 'destroy'
     }
-    response = requests.post(uri+"/backends/"+backend_id+"/machines/"+machine_id, data=payload)
+    req = MyRequests(uri=uri+"/backends/"+backend_id+"/machines/"+machine_id, data=payload, cookie=cookie)
+    response = req.post()
     assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
     print "Destroyed machine with id: %s" % machine_id
 
 
-def reboot_machine(uri, backend_id, machine_id):
+def reboot_machine(uri, backend_id, machine_id, cookie=None):
     payload = {
         'action': 'reboot'
     }
-    response = requests.post(uri+"/backends/"+backend_id+"/machines/"+machine_id, data=payload)
+    req = MyRequests(uri=uri+"/backends/"+backend_id+"/machines/"+machine_id, cookie=cookie, data=payload)
+    response = req.post()
     assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
     print "Rebooted machine with id: %s" % machine_id
 
-def stop_machine(uri, backend_id, machine_id):
+def stop_machine(uri, backend_id, machine_id, cookie=None):
     payload = {
         'action': 'stop'
     }
-    response = requests.post(uri+"/backends/"+backend_id+"/machines/"+machine_id, data=payload)
+    req = MyRequests(uri=uri+"/backends/"+backend_id+"/machines/"+machine_id, data=payload, cookie=cookie)
+    response = req.post()
     assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
     print "Stopped machine with id: %s" % machine_id
 
-def start_machine(uri, backend_id, machine_id):
+def start_machine(uri, backend_id, machine_id, cookie=None):
     payload = {
         'action':'start'
     }
-    response = requests.post(uri+"/backends/"+backend_id+"/machines/"+machine_id, data=payload)
+    req = MyRequests(uri=uri+"/backends/"+backend_id+"/machines/"+machine_id, data=payload, cookie=cookie)
+    response = req.post()
     assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
     print "Started machine with id: %s" % machine_id
