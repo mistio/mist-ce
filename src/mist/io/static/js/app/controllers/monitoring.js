@@ -124,8 +124,9 @@ define('app/controllers/monitoring', [
                         }
 
                     },
-                    error: function (){
-                        info("Error Produced While Retrieving Data For Monitoring");
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        Mist.notificationController.notify('Error while retrieving Monitoring Data: ' + jqXHR.responseText);
+                        error(textstate, errorThrown, ' while retrieving monitoring data. ', jqXHR.responseText);
                     }
                 });
             }

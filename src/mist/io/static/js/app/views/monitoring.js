@@ -27,12 +27,14 @@ define('app/views/monitoring', [
             didInsertElement: function(){
                 console.log("- Ember Monitoring View Rendered");
                 this.set('viewRendered',true);
+                this._super();
             },
 
             // Check If Ember View Is Destroyed
             willDestroyElement: function(){
                 console.log("- Ember Monitoring View Is Being Destroyed");
                 window.clearInterval(window.monitoringInterval);
+                this._super();
             },
 
             gotNewData: function(){
@@ -53,8 +55,11 @@ define('app/views/monitoring', [
                 function Graph(divID,width,timeToDisplay){
 
                     var NUM_OF_MEASUREMENTS = 180; // TODO Change It OR Remove It
+                    var NUM_OF_LABELS = 6;
+
                     this.id = divID;
                     this.width = width;
+                    
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = 160 / 1280 * width;
                     this.height = (fixedHeight < 85 ? 85 : fixedHeight);
@@ -63,7 +68,7 @@ define('app/views/monitoring', [
                     // Calculate The step  of the time axis
                     this.secondsStep =  Math.floor((timeToDisplay.getHours()*60*60 + 
                                         timeToDisplay.getMinutes()*60 + 
-                                        timeToDisplay.getSeconds() ) /6); // 6 Is Labels To Display (TODO Add it as constant)
+                                        timeToDisplay.getSeconds() ) / NUM_OF_LABELS); 
                     this.data = [];
                     var margin = {top: 20, right: 0, bottom: 30, left: 0}; // TODO Fix Margin Based On Aspect Ratio
                     
@@ -95,7 +100,10 @@ define('app/views/monitoring', [
                                  .scale(xScale)
                                  .orient("bottom")
                                  .ticks(d3.time.minutes, this.secondsStep/60)
-                                 .tickFormat(d3.time.format("%I:%M%p")));
+                                 .tickFormat(d3.time.format("%I:%M%p")))
+                                 .selectAll("text") 
+                                 .style("text-anchor", "end")
+                                 .attr('x','-10');
 
 
                     this.updateData = function(newData) {
@@ -150,8 +158,11 @@ define('app/views/monitoring', [
                         d3xAxis.call(d3.svg.axis()
                                      .scale(xScale)
                                      .orient("bottom")
-                                     .ticks(d3.time.minutes, this.secondsStep/60)
-                                     .tickFormat(d3.time.format("%I:%M%p")));
+                                     .ticks(d3.time.minutes, this.secondsStep/60) // TODO Fix SecondsStep
+                                     .tickFormat(d3.time.format("%I:%M%p")))
+                                     .selectAll("text") 
+                                    .style("text-anchor", "end")
+                                    .attr('x','-10');
                         // DEBUG TODO REMOVE IT
                         console.log("");
                     };
@@ -184,56 +195,59 @@ define('app/views/monitoring', [
                     };
                 }
 
+                // --- End Of Graph Constructor -- //
+
                 // Execuation Starts Here
                 var machine = this.get('controller').get('model');
+                console.log("- Machine Still Probing ?:" + machine.probing);
+                console.log("- Machine Set To Probed ?:" + machine.probed);
 
-                if(this.viewRendered && machine.hasMonitoring && machine.probed){
+                if(this.viewRendered && machine.hasMonitoring && !machine.probing && machine.probed){
 
-                console.log("- Runned setUpGraphs");
-                Em.run.next(function() {
-                    try{
-                        $('.monitoring-button').button();
-                        $('#add-rule-button').button();
-                        $('#monitoring-dialog').popup();                        
-                    } catch(err){
-                        // TODO check what error may produce
-                    }
-                });
-                var monitoringController = Mist.monitoringController;
-                monitoringController.setMachine(machine);
+                    var monitoringController = Mist.monitoringController;
+                    var self = this;
+
+                    console.log("- Runned setUpGraphs");
+                    Em.run.next(function() {
+                        try{
+                            $('.monitoring-button').button();
+                            $('#add-rule-button').button();
+                            $('#monitoring-dialog').popup();                        
+                        } catch(err){
+                            // TODO check what error may produce
+                        }
+                    });
+
+                    monitoringController.setMachine(machine);
 
                 
+                    Em.run.next(function() {
 
-                    console.log("- Asks For #cpuGraph");       // DEBUG TODO Remove It
-                    var width = $('#cpuGraph').width();     // Get Current Width
+                        console.log("- Asks For #cpuGraph");       // DEBUG TODO Remove It
+                        var width = $('#cpuGraph').width();     // Get Current Width
 
-                    // Create Graphs
-
+                        // Create Graphs
                         var tempDate = new Date();
                         tempDate.setHours(0,30,0);
-                        this.cpuGraph = new Graph('cpuGraph',width,tempDate);
-                        this.loadGraph = new Graph('loadGraph',width,tempDate);
-                        this.memGraph = new Graph('memGraph',width,tempDate);
-                        console.log(this.cpuGraph);
+                        self.cpuGraph = new Graph('cpuGraph',width,tempDate);
+                        self.loadGraph = new Graph('loadGraph',width,tempDate);
+                        self.memGraph = new Graph('memGraph',width,tempDate);
+                        console.log(self.cpuGraph);
                         console.log("- cpuGraph Created, demoGetData running after"); // DEBUG TODO Remove It
                         Mist.monitoringController.demoGetData();
 
-                    var cpuGraph = this.cpuGraph;
-                    var loadGraph = this.loadGraph;
-                    var memGraph = this.memGraph;
-                    // Set Up Resolution Change Event
-                    $(window).resize(function(){
+                        // Set Up Resolution Change Event
+                        $(window).resize(function(){
 
-                                cpuGraph.changeWidth($('#cpuGraph').width());
-                                loadGraph.changeWidth($('#loadGraph').width());
-                                memGraph.changeWidth($('#memGraph').width());
-                    })
-
-                     Mist.rulesController.redrawRules();
-                
-
+                                    self.cpuGraph.changeWidth($('#cpuGraph').width());
+                                    self.loadGraph.changeWidth($('#loadGraph').width());
+                                    self.memGraph.changeWidth($('#memGraph').width());
+                        })
+                    });
+                    
+                    Mist.rulesController.redrawRules();
                 } // Machine Probed
-            }.observes('controller.model.hasMonitoring','controller.model.probed','viewRendered'),
+            }.observes('controller.model.hasMonitoring','controller.model.probing','viewRendered'),
 
     
         });
