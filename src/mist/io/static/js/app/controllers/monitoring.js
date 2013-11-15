@@ -27,6 +27,7 @@ define('app/controllers/monitoring', [
             demoGetData: function(){
 
                 var self = this;
+                var timeGap = 60; // Seconds Between Requested Time And Current
                 //Debug TODO Remove It
                 // Get Stats For the last hour
 
@@ -34,8 +35,8 @@ define('app/controllers/monitoring', [
                 if(this.data.load.length == 0)
                 {
                     self.machine.set('pendingStats', true);
-                    var stop = (new Date()).getTime() - 20 * 1000;
-                    var start = stop - 1801*1000; // Substract Half Hour Of The Stop Date
+                    var stop = (new Date()).getTime() - timeGap * 1000;
+                    var start = stop - 1800*1000; // Substract Half Hour Of The Stop Date
                     var step = 10000;
                     console.log("- Get First data");
                     console.log("  From : " + (new Date(start)));
@@ -45,8 +46,8 @@ define('app/controllers/monitoring', [
 
                 // TODO Set Interval In Object variable maybe Or Find Another Way For The Loop
                 window.monitoringInterval = window.setInterval(function(){
-                    var start = (new Date()).getTime() - 30 * 1000   //3600000 / 2; // minus 1 hour
-                    var stop =  (new Date()).getTime() - 20 * 1000; //- 10 *1000;
+                    var start = (new Date()).getTime() - (timeGap+10) * 1000;
+                    var stop =  (new Date()).getTime() - timeGap * 1000; 
                     var step = 10000; // 10 Second Step
                     console.log("- Getting Data");
                     console.log("  From : " + (new Date(start)));
@@ -98,7 +99,7 @@ define('app/controllers/monitoring', [
                                 // Create New Data Objects
                                 var cpuObj = {
                                     time : (metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds()),
-                                    close: data.cpu.utilization[i]
+                                    close: (data.cpu.utilization[i] * 100)
                                 };
                                 var loadObj = {
                                     time : (metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds()),

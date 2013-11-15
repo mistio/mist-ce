@@ -22,12 +22,14 @@ define('app/views/monitoring', [
                 this._super();
                 this.setUpGraphs();
             },
+
+            // Check If Ember View Rendered
             didInsertElement: function(){
-                // Wait Until DOM Is Ready
                 console.log("- Ember Monitoring View Rendered");
                 this.set('viewRendered',true);
             },
 
+            // Check If Ember View Is Destroyed
             willDestroyElement: function(){
                 console.log("- Ember Monitoring View Is Being Destroyed");
                 window.clearInterval(window.monitoringInterval);
