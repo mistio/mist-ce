@@ -92,7 +92,7 @@ class TestClass(unittest.TestCase):
         so a view '/providers' was made in views.py
         """
         print ">>>Getting supported providers:"
-        self.test_config['SUPPORTED_PROVIDERS'] = backends.supported_providers(self.uri)
+        self.test_config['SUPPORTED_PROVIDERS'] = backends.supported_providers(self.uri, cookie=self.cookie)
         for provider in self.test_config['SUPPORTED_PROVIDERS']:
             print "Provider: %s --> Title: %s " % (provider['provider'], provider['title'])
 
@@ -106,7 +106,7 @@ class TestClass(unittest.TestCase):
         if our information agrees with the information sent from the API
         """
         print "\n>>>List of Backends:"
-        self.test_config['BACKENDS'] = backends.list_backends(self.uri) or {}
+        self.test_config['BACKENDS'] = backends.list_backends(self.uri, cookie=self.cookie) or {}
         for back in self.test_config['BACKENDS']:
             print back['title']
 
@@ -130,13 +130,13 @@ class TestClass(unittest.TestCase):
                 title = prov['title']
                 provider = prov['provider']
                 print "\n>>>Adding %s backend" % title
-                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret)
+                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
                 self.test_config['BACKENDS'][backend['id']] = backend
                 #TODO erase the break
                 break
 
         print"\nList all backends:"
-        for back in backends.list_backends(self.uri):
+        for back in backends.list_backends(self.uri, cookie=self.cookie):
             print back['title']
 
     def test_021_add_Rackspace_backend(self):
@@ -157,13 +157,13 @@ class TestClass(unittest.TestCase):
                 title = prov['title']
                 provider = prov['provider']
                 print "\n>>>Adding %s backend" % title
-                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret)
+                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
                 self.test_config['BACKENDS'][backend['id']] = backend
                 #TODO erase the break
                 break
 
         print"\nList all backends:"
-        for back in backends.list_backends(self.uri):
+        for back in backends.list_backends(self.uri, cookie=self.cookie):
             print back['title']
 
     def test_022_add_Nephoscale_backend(self):
@@ -184,11 +184,11 @@ class TestClass(unittest.TestCase):
                 title = prov['title']
                 provider = prov['provider']
                 print "\n>>>Addind %s backend" % title
-                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret)
+                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
                 self.test_config['BACKENDS'][backend['id']] = backend
 
         print"\nList all backends:"
-        for back in backends.list_backends(self.uri):
+        for back in backends.list_backends(self.uri, cookie=self.cookie):
             print back['title']
 
     def test_023_add_DigitalOcean_backend(self):
@@ -209,11 +209,11 @@ class TestClass(unittest.TestCase):
                 title = prov['title']
                 provider = prov['provider']
                 print "\n>>>Addind %s backend" % title
-                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret)
+                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
                 self.test_config['BACKENDS'][backend['id']] = backend
 
         print"\nList all backends:"
-        for back in backends.list_backends(self.uri):
+        for back in backends.list_backends(self.uri, cookie=self.cookie):
             print back['title']
 
     def test_024_add_SoftLayer_backend(self):
@@ -234,11 +234,11 @@ class TestClass(unittest.TestCase):
                 title = prov['title']
                 provider = prov['provider']
                 print "\n>>>Addind %s backend" % title
-                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret)
+                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
                 self.test_config['BACKENDS'][backend['id']] = backend
 
         print"\nList all backends:"
-        for back in backends.list_backends(self.uri):
+        for back in backends.list_backends(self.uri, cookie=self.cookie):
             print back['title']
 
 
@@ -250,7 +250,7 @@ class TestClass(unittest.TestCase):
         Sends a request to our API to return all our added keys
         """
         print "\n>>>List of Keys:"
-        keys = keypairs.list_keys(self.uri) or {}
+        keys = keypairs.list_keys(self.uri, cookie=self.cookie) or {}
         if keys == {}:
             self.test_config['KEYPAIRS'] = {}
         else:
@@ -265,12 +265,12 @@ class TestClass(unittest.TestCase):
         is the one found in the yaml file in the KEY_NAME:
         """
         print "\n>>>Asking mist.io to generate private key"
-        priv_key = keypairs.generate_keypair(self.uri)
+        priv_key = keypairs.generate_keypair(self.uri, cookie=self.cookie)
         private = priv_key['priv']
         seq = range(300)
         name = self.test_config['KEY_NAME'] + str(random.choice(seq))
         print "\n>>>Creating Key with name: %s" % name
-        keypair = keypairs.add_key(self.uri, name, private.strip('\n'))
+        keypair = keypairs.add_key(self.uri, name, private.strip('\n'), cookie=self.cookie)
         self.test_config['KEYPAIRS'][keypair['id']] = keypair
 
     def test_032_get_private_key(self):
@@ -282,7 +282,7 @@ class TestClass(unittest.TestCase):
             if self.test_config['KEY_NAME'] in key_id:
                 break
         print "\n>>>Asking for private key for Key: %s" % key_id
-        key = keypairs.get_private_key(self.uri, key_id)
+        key = keypairs.get_private_key(self.uri, key_id, cookie=self.cookie)
         print "Got: %s" % key
         self.test_config['KEYPAIRS'][key_id]['private'] = key
 
@@ -295,7 +295,7 @@ class TestClass(unittest.TestCase):
             if self.test_config['KEY_NAME'] in key_id:
                 break
         print "\n>>>Asking for public key for Key: %s" % key_id
-        key = keypairs.get_public_key(self.uri, key_id)
+        key = keypairs.get_public_key(self.uri, key_id, cookie=self.cookie)
         print "Got: %s" % key
         self.test_config['KEYPAIRS'][key_id]['public'] = key
 
@@ -308,7 +308,7 @@ class TestClass(unittest.TestCase):
         seq = range(300)
         new_name = self.test_config['KEY_NAME'] + str(random.choice(seq))
         print"\n>>>Renaming '%s' Key to '%s'" % (key_id, new_name)
-        keypairs.edit_key(self.uri, key_id, new_name)
+        keypairs.edit_key(self.uri, key_id, new_name, cookie=self.cookie)
         self.test_config['KEYPAIRS'][new_name] = self.test_config['KEYPAIRS'][key_id]
         self.test_config['KEYPAIRS'][new_name]['id'] = self.test_config['KEYPAIRS'][key_id]['id']
         del self.test_config['KEYPAIRS'][key_id]
@@ -327,14 +327,14 @@ class TestClass(unittest.TestCase):
                 break
 
         print "\n>>>Creating Second Key with name: %s" % name
-        keypair = keypairs.add_key(self.uri, name, private)
+        keypair = keypairs.add_key(self.uri, name, private, cookie=self.cookie)
         self.test_config['KEYPAIRS'][keypair['id']] = keypair
 
     def test_036_delete_key(self):
         """Delete Key"""
         key_id = self.test_config['KEYPAIRS'].keys()[0]
         print "\n>>>Deleting Key %s" % key_id
-        keypairs.delete_key(self.uri, key_id)
+        keypairs.delete_key(self.uri, key_id, cookie=self.cookie)
         del self.test_config['KEYPAIRS'][key_id]
 
 ##########IMAGES LOCATIONS SIZES ACTIONS##################
@@ -347,7 +347,7 @@ class TestClass(unittest.TestCase):
             #backend_id = self.test_config['BACKENDS'].keys()[0]
             print "\n>>>List of images for Backend %s" % \
                   self.test_config['BACKENDS'][backend_id]['title']
-            images = backends.list_images(self.uri, backend_id)
+            images = backends.list_images(self.uri, backend_id, cookie=self.cookie)
             self.test_config['BACKENDS'][backend_id]['images'] = images
             for image in images:
                 print image['name']
@@ -365,7 +365,7 @@ class TestClass(unittest.TestCase):
         search_term = "Ubuntu"
         print "\n>>>Searching for %s image " % search_term
 
-        images = backends.list_images(self.uri, backend_id, search_term=search_term)
+        images = backends.list_images(self.uri, backend_id, search_term=search_term, cookie=self.cookie)
         for image in images:
             print image['name']
 
@@ -378,7 +378,7 @@ class TestClass(unittest.TestCase):
             print "\n>>>List of sizes for Backend %s" % \
                   self.test_config['BACKENDS'][backend_id]['title']
 
-            sizes = backends.list_sizes(self.uri, backend_id)
+            sizes = backends.list_sizes(self.uri, backend_id, cookie=self.cookie)
             self.test_config['BACKENDS'][backend_id]['sizes'] = sizes
             for size in sizes:
                 print size['name']
@@ -392,7 +392,7 @@ class TestClass(unittest.TestCase):
             print "\n>>>List of locations for Backend %s" % \
                   self.test_config['BACKENDS'][backend_id]['title']
 
-            locations = backends.list_locations(self.uri, backend_id)
+            locations = backends.list_locations(self.uri, backend_id, cookie=self.cookie)
             self.test_config['BACKENDS'][backend_id]['locations'] = locations
             for location in locations:
                 print location['name']
@@ -415,7 +415,7 @@ class TestClass(unittest.TestCase):
             print "\n>>>List of machines for Backend %s" % \
                   self.test_config['BACKENDS'][backend_id]['title']
 
-            mach = machines.list_machines(self.uri, backend_id)
+            mach = machines.list_machines(self.uri, backend_id, cookie=self.cookie)
             if mach == {} or mach == []:
                 self.test_config['BACKENDS'][backend_id]['machines'] = {}
             else:
@@ -493,7 +493,7 @@ class TestClass(unittest.TestCase):
         print "Location Id: %s" % location
         print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 
-        machine = machines.create_machine(self.uri, backend_id, key_id, name, location, image_id, size)
+        machine = machines.create_machine(self.uri, backend_id, key_id, name, location, image_id, size, cookie=self.cookie)
         print "Created Machine %s" % machine['name']
         self.test_050_list_machines()
 
@@ -506,7 +506,7 @@ class TestClass(unittest.TestCase):
                 if self.test_config['MACHINE_NAME'] in machine and \
                         self.test_config['BACKENDS'][backend_id]['machines'][machine]['can_reboot']:
                     machine_id = self.test_config['BACKENDS'][backend_id]['machines'][machine]['id']
-                    machines.reboot_machine(self.uri, backend_id, machine_id)
+                    machines.reboot_machine(self.uri, backend_id, machine_id, cookie=self.cookie)
                     return True
 
     def test_053_stop_machine(self):
@@ -518,7 +518,7 @@ class TestClass(unittest.TestCase):
                 if self.test_config['MACHINE_NAME'] in machine and \
                         self.test_config['BACKENDS'][backend_id]['machines'][machine]['can_reboot']:
                     machine_id = self.test_config['BACKENDS'][backend_id]['machines'][machine]['id']
-                    machines.stop_machine(self.uri, backend_id, machine_id)
+                    machines.stop_machine(self.uri, backend_id, machine_id, cookie=self.cookie)
                     return True
 
     def test_054_start_machine(self):
@@ -530,7 +530,7 @@ class TestClass(unittest.TestCase):
                 if self.test_config['MACHINE_NAME'] in machine and \
                         self.test_config['BACKENDS'][backend_id]['machines'][machine]['can_start']:
                     machine_id = self.test_config['BACKENDS'][backend_id]['machines'][machine]['id']
-                    machines.start_machine(self.uri, backend_id, machine_id)
+                    machines.start_machine(self.uri, backend_id, machine_id, cookie=self.cookie)
                     return True
 
 ###########CLEANING UP#####################################
@@ -542,7 +542,7 @@ class TestClass(unittest.TestCase):
             for machine in self.test_config['BACKENDS'][backend_id]['machines']:
                 if self.test_config['MACHINE_NAME'] in machine and self.test_config['BACKENDS'][backend_id]['machines'][machine]['can_destroy']:
                     machine_id = self.test_config['BACKENDS'][backend_id]['machines'][machine]['id']
-                    machines.destroy_machine(self.uri, backend_id, machine_id)
+                    machines.destroy_machine(self.uri, backend_id, machine_id, cookie=self.cookie)
                     return True
 
     def test_935_delete_all_keys(self):
