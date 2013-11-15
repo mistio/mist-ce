@@ -14,19 +14,36 @@ define('app/controllers/backends', [
             machineCount: 0,
             imageCount: 0,
             loadingImages: false,
+            loadingMachines: true,
+            singleMachineRequest: null,
+            singleMachineResponse: null,
+
+            singleMachineRequestObserver: function() {
+                if (this.singleMachineRequest) {
+                    if (this.loadingMachines) {
+                        Ember.run.later(this, function() {
+                            this.singleMachineRequestObserver();
+                        }, 1000);
+                        return;
+                    }
+                    this.set('singleMachineResponse', this.getMachineByUrlId(this.singleMachineRequest));
+                    this.set('singleMachineRequest', false);
+                }
+            }.observes('singleMachineRequest'),
             
             // TODO make this property dynamic according to all backends states
             state: "waiting",
             ok: false,
             
-            loadingMachines: function() {
+            loadingMachinesObserver: function() {
                 for (var i = 0; i < this.content.length; i++) {
                     if (this.content[i].loadingMachines) {
-                        return true;
+                        this.set('loadingMachines', true);
+                        return;
                     }
                 }
-                return false;
-            }.property('@each.loadingMachines'),
+                this.set('loadingMachines', false);
+            }.observes('@each.loadingMachines'),
             
             loadingImagesObserver: function() {
                 for (var i = 0; i < this.content.length; i++) {
@@ -66,6 +83,24 @@ define('app/controllers/backends', [
                     }
                 }
                 return null;
+            },
+
+            getMachineByUrlId: function(urlId) {
+                var machineToFind = null;
+                this.content.some(function(backend) {
+                    backend.machines.content.some(function(machine) {
+                        if (machine.id == urlId) {
+                            machineToFind = machine;
+                        }
+                        if (machineToFind) {
+                            return true;
+                        }
+                    });
+                    if (machineToFind) {
+                        return true;
+                    }
+                });
+                return machineToFind;
             },
 
             getMachineCount: function() {
