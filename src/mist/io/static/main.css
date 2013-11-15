@@ -59,6 +59,8 @@ div#splash div.mist-logo {
 
 #backend-buttons .ui-controlgroup-controls {
     display: inline;
+    float: left;
+    margin-bottom: 18px;
 }
 
 /* Select Button */
@@ -687,6 +689,16 @@ div.ember-view div.ui-panel-content-wrap {
 /* NephoScale */
 #single-view-provider-icon.provider-nephoscale  {
     background-image: url(images/nephoscale_sm.png);
+}
+
+/* DigitalOcean */
+#single-view-provider-icon.provider-digitalocean  {
+    background-image: url(images/digitalocean.png);
+}
+
+/* SoftLayer */
+#single-view-provider-icon.provider-softlayer  {
+    background-image: url(images/softlayer.png);
 }
 
 /* Linode */

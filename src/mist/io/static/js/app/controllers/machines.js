@@ -126,9 +126,9 @@ define('app/controllers/machines', [
                     }
                     Mist.rulesController.redrawRules();
                     that.backend.set('loadingMachines', false);
-                }).error(function(e) {
-                    Mist.notificationController.notify("Error loading machines for backend: " +
-                                                        that.backend.title);
+                }).error(function(jqXHR, textstate, errorThrown) {
+                    Mist.notificationController.notify(jqXHR.responseText);
+                    error(jqXHR.responseText);
                     if (that.backend.error){
                         // This backend seems hopeless, disabling it                            
                         that.backend.set('state', 'offline');

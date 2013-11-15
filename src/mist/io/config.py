@@ -12,7 +12,8 @@ STATES = {
     NodeState.TERMINATED: 'terminated',
     NodeState.PENDING: 'pending',
     # we assume unknown means stopped, especially for the EC2 case
-    NodeState.UNKNOWN: 'stopped'
+    NodeState.UNKNOWN: 'stopped',
+    NodeState.STOPPED: 'stopped'
 }
 
 
@@ -77,6 +78,10 @@ SUPPORTED_PROVIDERS = [
                        {'title': 'NephoScale',
                         'provider' : Provider.NEPHOSCALE},
 
+                       # DigitalOcean
+                       {'title': 'DigitalOcean',
+                        'provider' : Provider.DIGITAL_OCEAN},
+
                        # Linode
                        {'title': 'Linode',
                         'provider' : Provider.LINODE},
@@ -93,8 +98,14 @@ SUPPORTED_PROVIDERS = [
                        {'title': 'Rackspace ORD',
                         'provider' : "%s:%s" % (Provider.RACKSPACE,'ord')
                         },
+                       {'title': 'Rackspace IAD',
+                        'provider' : "%s:%s" % (Provider.RACKSPACE,'iad')
+                        },
                        {'title': 'Rackspace LON',
                         'provider' : "%s:%s" % (Provider.RACKSPACE,'lon')
+                        },
+                       {'title': 'Rackspace AU',
+                        'provider' : "%s:%s" % (Provider.RACKSPACE,'syd')
                         },
                        {'title': 'Rackspace US (OLD)',
                         'provider' : "%s:%s" % (Provider.RACKSPACE_FIRST_GEN,'us')
@@ -102,9 +113,10 @@ SUPPORTED_PROVIDERS = [
                        {'title': 'Rackspace UK (OLD)',
                         'provider' : "%s:%s" % (Provider.RACKSPACE_FIRST_GEN,'uk')
                         },
-                       {'title': 'Rackspace AU',
-                        'provider' : "%s:%s" % (Provider.RACKSPACE,'syd')
-                        },
+                        # Softlayer
+                       {'title': 'SoftLayer',
+                        'provider' : Provider.SOFTLAYER
+                       } 
                        ]
 
 # Base AMIs

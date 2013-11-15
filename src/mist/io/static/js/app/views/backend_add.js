@@ -39,13 +39,17 @@ define('app/views/backend_add', [
             },
             
             selectBackend: function(event) {
-                if (event.target.title.indexOf("rackspace") != -1 || event.target.title.indexOf("linode") != -1) {
+                if (event.target.title.indexOf("rackspace") != -1 || event.target.title.indexOf("linode") != -1 || event.target.title.indexOf("softlayer") !== -1) {
                     $('#ApiKeylabel').text('2. Username:');
                     $('#ApiSecretlabel').text('3. API Key:');
                     $('#addBackendOpenstack').hide();
                 } else if (event.target.title.indexOf("nephoscale") !== -1) {
                     $('#ApiKeylabel').text('2. Username:');
                     $('#ApiSecretlabel').text('3. Password:');
+                    $('#addBackendOpenstack').hide();
+                } else if (event.target.title.indexOf("digitalocean") !== -1) {
+                    $('#ApiKeylabel').text('2. Client ID:');
+                    $('#ApiSecretlabel').text('3. API Key:');
                     $('#addBackendOpenstack').hide();
                 } else if (event.target.title.indexOf("openstack") != -1) {
                     $('#ApiKeylabel').text('2. Username:');
@@ -125,7 +129,7 @@ define('app/views/backend_add', [
                     },
                     error: function(request){
                         that.set('pendingCreation', false);
-                        Mist.notificationController.notify(request.responseText);
+                        Mist.notificationController.timeNotify(request.responseText, 5000);
                     }
                 });
             },

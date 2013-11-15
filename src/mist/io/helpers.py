@@ -260,8 +260,10 @@ def connect(request, backend_id=False):
                       region=backend['region'])
     elif backend['provider'] == Provider.RACKSPACE:
         conn = driver(backend['apikey'], backend['apisecret'],
-                      datacenter=backend['region'])
-    elif backend['provider'] == Provider.NEPHOSCALE:
+                      region=backend['region'])
+    elif backend['provider'] in [Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN]:
+        conn = driver(backend['apikey'], backend['apisecret'])
+    elif backend['provider'] == Provider.SOFTLAYER:
         conn = driver(backend['apikey'], backend['apisecret'])
     else:
         # ec2
@@ -291,12 +293,11 @@ def get_machine_actions(machine, backend):
     if backend.type in EC2_PROVIDERS:
         can_stop = True
 
-    if backend.type == Provider.NEPHOSCALE:
+    if backend.type in [Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN, Provider.SOFTLAYER]:
         can_stop = True
-        can_tag = False
 
-    if backend.type == Provider.RACKSPACE_FIRST_GEN or \
-                       backend.type == Provider.LINODE:
+    if backend.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE, 
+                        Provider.NEPHOSCALE, Provider.SOFTLAYER, Provider.DIGITAL_OCEAN):
         can_tag = False
 
     # for other states
@@ -305,13 +306,11 @@ def get_machine_actions(machine, backend):
         can_stop = False
         can_reboot = False
     elif machine.state is NodeState.UNKNOWN:
-        # We assume uknown state in EC2 mean stopped
-        if backend.type in EC2_PROVIDERS:
+        # We assume uknown state mean stopped
+        if backend.type in (Provider.NEPHOSCALE, Provider.SOFTLAYER, Provider.DIGITAL_OCEAN) or \
+            backend.type in EC2_PROVIDERS:
             can_stop = False
             can_start = True
-        if backend.type == Provider.NEPHOSCALE:
-            can_stop = False
-            can_start = True        
         can_reboot = False
     elif machine.state in (NodeState.TERMINATED,):
         can_start = False
