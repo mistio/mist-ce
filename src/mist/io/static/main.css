@@ -827,14 +827,16 @@ div.loading-monitoring {
     border: 1px solid #ccc;
 }
 
-/* To Be Added Again When Grid Added
-.graph .grid .tick {
-    stroke: black;
-    opacity: 0.7;
+/* To Be Added Again When Grid Added*/
+.graph .grid-x .tick {
+    stroke: #BABABA;
 }
-.graph .grid path {
+.graph .grid-y .tick {
+    stroke: #EDEDED;
+}
+.graph .grid-x path,.graph .grid-y path {
     stroke-width: 1;    
-}*/
+}
 
 #graphBar{
     margin-top: 10px;
@@ -981,7 +983,7 @@ div.loading-monitoring {
     fill: none;
 }
     /*, .x-axis line*/
-.graph .x-axis path,.graph .x-axis line {
+.graph .x-axis path {
     fill: none;
     stroke: #333333;
     stroke-width: 1;

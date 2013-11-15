@@ -106,6 +106,15 @@ define('app/views/monitoring', [
                                 .attr('width',this.width)
                                 .attr('height',this.height);
 
+                    var d3GridX = d3.select("#"+this.id).select('svg')
+                                                        .append("g")         
+                                                        .attr("class", "grid-x")
+                                                        .attr("transform", "translate(0," + this.height + ")");
+
+                    var d3GridY = d3.select("#"+this.id).select('svg')
+                                                        .append("g")         
+                                                        .attr("class", "grid-y");
+
                     var d3valueLine = d3svg.append('g')
                                       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
                                       .append('path'); 
@@ -179,8 +188,19 @@ define('app/views/monitoring', [
                                      .ticks(d3.time.minutes, this.secondsStep/60) // TODO Fix SecondsStep
                                      .tickFormat(d3.time.format("%I:%M%p")))
                                      .selectAll("text") 
-                                    .style("text-anchor", "end")
-                                    .attr('x','-10');
+                                     .style("text-anchor", "end")
+                                     .attr('x','-10');
+
+
+                        
+                            d3GridX.call(make_x_grid()
+                            .tickSize(-this.height, 0, 0)
+                            .tickFormat(""));
+
+                        
+                            d3GridY.call(make_y_grid()
+                            .tickSize(-this.width, 0, 0)
+                            .tickFormat(""));
                         // DEBUG TODO REMOVE IT
                         console.log("");
                     };
@@ -210,6 +230,20 @@ define('app/views/monitoring', [
 
                         this.updateView();
                     };
+
+                    function make_x_grid() {        
+                        return d3.svg.axis()
+                            .scale(xScale)
+                            .orient("bottom")
+                            .ticks(5);
+                    }
+
+                    function make_y_grid() {        
+                        return d3.svg.axis()
+                            .scale(yScale)
+                            .orient("left")
+                            .ticks(5);
+                    }
                 }
 
                 // --- End Of Graph Constructor -- //
