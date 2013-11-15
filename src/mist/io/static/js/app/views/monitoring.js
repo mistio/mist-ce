@@ -48,6 +48,24 @@ define('app/views/monitoring', [
                 }
             }.observes('Mist.monitoringController.dataUpdated'),
 
+            clickedCollapse: function(graph){
+
+                $("#" + graph.id).hide(400);
+                $("#" + graph.id + "Btn").show(400);
+                // DEBUG Todo REMOVE IT
+                console.log(graph);
+                console.log("clickedCollapse");
+            },
+
+            clickedExpand: function(graph){
+                
+                $("#" + graph.id).show(400);
+                $("#" + graph.id + "Btn").hide(400);
+                // DEBUG Todo REMOVE IT
+                console.log(graph);
+                console.log("clickedCollapse");
+            },
+
             // Graph Constructor
             setUpGraphs: function() {
                 
@@ -178,7 +196,6 @@ define('app/views/monitoring', [
                         var newHeight = 160 / 1280 * width;
                         newHeight = (newHeight < 85 ? 85 : newHeight);
                         this.changeHeight(newHeight);
-
                         // Update View Will Be Done Within changeHeight
                     };
 
@@ -212,7 +229,10 @@ define('app/views/monitoring', [
                         try{
                             $('.monitoring-button').button();
                             $('#add-rule-button').button();
-                            $('#monitoring-dialog').popup();                        
+                            $('#monitoring-dialog').popup();         
+                            $('#cpuGraphBtn').hide(0);
+                            $('#loadGraphBtn').hide(0);
+                            $('#memGraphBtn').hide(0);               
                         } catch(err){
                             // TODO check what error may produce
                         }

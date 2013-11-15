@@ -2,21 +2,36 @@
             	<!-- TEMP, Title will be added by js -->
             	<div class='header'>
                         <div class="title">CPU (%)</div>
-                        <div class='closeBtn'>-</div>
+                        <div class='closeBtn' {{action "clickedCollapse" view.cpuGraph target="view"}}>-</div>
                   </div>
             </div>
             <div id="loadGraph" class="graph">
                   <!-- TEMP, Title will be added by js -->
                   <div class='header'>
                         <div class="title">Load</div>
-                        <div class='closeBtn'>-</div>
+                        <div class='closeBtn' {{action "clickedCollapse" view.loadGraph target="view"}}>-</div>
                   </div>
             </div>
             <div id="memGraph" class="graph">
                   <!-- TEMP, Title will be added by js -->
                   <div class='header'>
                         <div class="title">Memory</div>
-                        <div class='closeBtn'>-</div>
+                        <div class='closeBtn' {{action "clickedCollapse" view.memGraph target="view"}}>-</div>
+                  </div>
+            </div>
+
+            <div id="graphBar">
+                  <div id ="cpuGraphBtn" class="graphBtn" {{action "clickedExpand" view.cpuGraph target="view"}}>
+                        <div class="leftPart">+</div>
+                        <div class="rightPart">CPU</div>
+                  </div>
+                  <div id ="loadGraphBtn" class="graphBtn" {{action "clickedExpand" view.loadGraph target="view"}}>
+                        <div class="leftPart">+</div>
+                        <div class="rightPart">Load</div>
+                  </div>
+                  <div id ="memGraphBtn" class="graphBtn" {{action "clickedExpand" view.memGraph target="view"}}>
+                        <div class="leftPart">+</div>
+                        <div class="rightPart">Memory</div>
                   </div>
             </div>
             <!-- Commented For Debugging Graph
