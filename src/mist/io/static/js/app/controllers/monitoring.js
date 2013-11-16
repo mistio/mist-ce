@@ -12,7 +12,6 @@ define('app/controllers/monitoring', [
             machine : null,
             machineNotResponding: false, // TODO Add Something if server does not return new data
             data: null,
-            dataUpdated: false,
             view: null,
 
             // This one is called from view
@@ -26,37 +25,44 @@ define('app/controllers/monitoring', [
                 };
             },
 
-            // TODO Change Name When Is Fully Working
-            demoGetData: function(){
+            /**
+            * Method: setupDataRequest
+            * Receives first data and set time interval for
+            * next reuqests
+            */
+            setupDataRequest: function(){
+
+                var SECONDS_INTERVAL = 10000;
 
                 var self = this;
-                var timeGap = 60; // Seconds Between Requested Time And Current
-                //Debug TODO Remove It
-                // Get Stats For the last hour
-                // Just Started Take Last 30 minutes
+                var timeGap = 60;
+
+                // First Data Request
                 if(this.data.load.length == 0)
                 {
                     self.machine.set('pendingStats', true);
+
                     var stop = (new Date()).getTime() - timeGap * 1000;
                     var start = stop - 1800*1000; // Substract Half Hour Of The Stop Date
                     var step = 10000;
+
                     console.log("- Get First data");
                     console.log("  From : " + (new Date(start)));
                     console.log("  Until: " + (new Date(stop)));
+
                     self.receiveData(start, stop, step);
                 }
 
-                // TODO Set Interval In Object variable maybe Or Find Another Way For The Loop
-                window.monitoringInterval = window.setInterval(function(){
+                // Update Request Every SECONDS_INTERVAL miliseconds
+                window.monitoringInterval = window.setInterval(function() {
+
                     var start = (new Date()).getTime() - (timeGap+10) * 1000;
                     var stop =  (new Date()).getTime() - timeGap * 1000; 
                     var step = 10000; // 10 Second Step
-                    console.log("- Getting Data");
-                    console.log("  From : " + (new Date(start)));
-                    console.log("  Until: " + (new Date(stop)));
+
                     self.receiveData(start, stop, step);
-                    
-                },10000);
+
+                },SECONDS_INTERVAL);
             },
 
             finishedGraphUpdate: function(){
@@ -65,7 +71,11 @@ define('app/controllers/monitoring', [
             },
 
 
-
+            /**
+            * Method: receiveData
+            * Makes an ajax request to served, receives measurements
+            * creates custom data objects and updates graphs
+            */
             receiveData: function(start,stop,step){
 
                 var self = this;
@@ -87,26 +97,24 @@ define('app/controllers/monitoring', [
                     timeout: 4000,
                     success: function (data, status, xhr){
                         
-                        var monitoringController = Mist.monitoringController;
-                        // TODO , Possible Remove It
-                        if(data.load.length == 0) // No Data Returned
-                        {
-                            console.log("- Oops Data Returned Are Null... Run Again");
-                            Mist.monitoringController.receiveData(start,stop,step);
-                        }
-                        else
-                        {
+                        var controller = Mist.monitoringController;
+
+                        try {
+
+                            if(data.load.length == 0)
+                                throw "Received Wrong Server Response";
+
                             console.log("- Successful Got " + data.load.length + " Data");
-                            console.log("- Pushing Data To Array");
 
                             var receivedData = {
-                                cpu: [],
-                                load: [],
+                                cpu:    [],
+                                load:   [],
                                 memory: []
                             };
 
-                            // Create New Objects From Data
                             var metricTime = new Date(start);
+
+                            // Create Custom Objects From Data
                             for(var i=0; i < data.load.length; i++ )
                             {
                                 // Create New Data Objects
@@ -128,14 +136,17 @@ define('app/controllers/monitoring', [
                                 receivedData.load.push(loadObj);
                                 receivedData.memory.push(memObj);
 
-                                metricTime = new Date(metricTime.getTime()+10000);// Substract 10 second from every object
+                                // Substract 10 second from every object
+                                metricTime = new Date(metricTime.getTime()+10000);
                             }
 
-                            monitoringController.machine.set('pendingStats', false);
-                            console.log("- Sets Data Updated, Graph Must Be Updated")
-                            // Send Data To View
+                            controller.machine.set('pendingStats', false);
                             self.view.updateGraphs(receivedData);
                             self.finishedGraphUpdate();
+                        }
+                        catch(err) {
+                            Mist.notificationController.notify(err);
+                            error(err);
                         }
 
                     },

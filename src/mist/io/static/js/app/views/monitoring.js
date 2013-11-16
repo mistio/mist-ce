@@ -74,71 +74,68 @@ define('app/views/monitoring', [
                     var NUM_OF_MIN_MEASUREMENTS = 180;  // 30 Minutes
                     var NUM_OF_MAX_MEASUREMENTS = 8640; // 24 Hours
 
-                    this.id = divID;
-                    this.width = width;
-                    
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = 160 / 1280 * width;
+                    var margin = {top: 20, right: 0, bottom: 30, left: 0}; // TODO Fix Margin Based On Aspect Ratio
+
+                    this.id = divID;
+                    this.width = width;
                     this.height = (fixedHeight < 85 ? 85 : fixedHeight);
-                    this.height = fixedHeight;
+                    this.data = [];
                     this.timeDisplayed = timeToDisplay;
+                    this.realDataIndex = -1;
 
                     // Calculate The step  of the time axis
                     this.secondsStep =  Math.floor((timeToDisplay.getHours()*60*60 + 
                                         timeToDisplay.getMinutes()*60 + 
                                         timeToDisplay.getSeconds() ) / NUM_OF_LABELS); 
-                    this.data = [];
-                    this.realDataIndex = -1;
-
-                    var margin = {top: 20, right: 0, bottom: 30, left: 0}; // TODO Fix Margin Based On Aspect Ratio
                     
-                    // May Be Removed TODO (Working On Minute And Second Step)
-                    if(this.secondsStep == 0) this.secondsStep = 1; // Fix For Science Fixion Request Of 6 Seconds To Display.
 
+                    // Scale Functions will scale graph to defined width and height
                     var xScale = d3.time.scale().range([0, this.width - margin.left - margin.right]);
                     var yScale = d3.scale.linear().range([this.height - margin.top - margin.bottom, 0]);
+
+                    // valueline is function that creates the main line based on data
                     var valueline = d3.svg.line()
                                     .x(function(d) {return xScale(d.time); })
                                     .y(function(d) {return yScale(d.value); });
 
                     
-                    // Create Main Graph (SVG Element)
-                    var d3svg = d3.select("#"+this.id)
-                                .append('svg')
-                                .attr('width',this.width)
-                                .attr('height',this.height);
+                    // Create main graph, append svg and other elements
+                    var d3svg =   d3.select("#"+this.id)
+                                    .append('svg')
+                                    .attr('width',this.width)
+                                    .attr('height',this.height);
 
-                    var d3GridX = d3.select("#"+this.id).select('svg')
-                                                        .append("g")         
-                                                        .attr("class", "grid-x")
-                                                        .attr("transform", "translate(0," + this.height + ")");
+                    var d3GridX = d3.select("#"+this.id)
+                                    .select('svg')
+                                    .append("g")         
+                                    .attr("class", "grid-x")
+                                    .attr("transform", "translate(0," + this.height + ")");
 
-                    var d3GridY = d3.select("#"+this.id).select('svg')
-                                                        .append("g")         
-                                                        .attr("class", "grid-y");
+                    var d3GridY = d3.select("#"+this.id)
+                                    .select('svg')
+                                    .append("g")         
+                                    .attr("class", "grid-y");
 
-                    var d3valueLine = d3svg.append('g')
-                                      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                                      .append('path'); 
+                    var d3vLine = d3svg.append('g')
+                                       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                                       .append('path'); 
 
                     var d3xAxis = d3svg.append('g')
                                   .attr('class','x-axis')
                                   .attr("transform", "translate(0," + (this.height - margin.bottom +2) + ")");
     
-                    d3xAxis.call(d3.svg.axis()
-                                 .scale(xScale)
-                                 .orient("bottom")
-                                 .ticks(d3.time.minutes, this.secondsStep/60)
-                                 .tickFormat(d3.time.format("%I:%M%p")))
-                                 .selectAll("text") 
-                                 .style("text-anchor", "end")
-                                 .attr('x','-10');
+
+                    //--------------------------------------------------------------------------------------------
 
 
+                    /**
+                    * Method: updateData
+                    * Gets Data From Controller, checks for overflow or less data received
+                    * fixes them and then updates Graph
+                    */
                     this.updateData = function(newData) {
-                        /*console.log("-- Updating Data In Graph #" + this.id);
-                        this.data = newData;
-                        this.updateView();*/
 
                         if(this.data.length == 0)
                         {
@@ -180,9 +177,10 @@ define('app/views/monitoring', [
                             // Fix Values, TypeCaste To Date And Number
                             var fixedData = [];
                             dataBuffer.forEach(function(d) {
-                                var format = d3.time.format("%X");
-                                var tempObj = {};
-                                tempObj.time = format.parse(d.time);
+                                
+                                var format    = d3.time.format("%X");
+                                var tempObj   = {};
+                                tempObj.time  = format.parse(d.time);
                                 tempObj.value = +d.value;
                                 fixedData.push(tempObj);
                             });
@@ -219,11 +217,16 @@ define('app/views/monitoring', [
                         }
 
                         this.updateView();
-
                     };
                     
+
+                    /**
+                    * Method: updateView
+                    * Updates graph by selecting data from data instance
+                    * redraws value line, x-axis, labels and grid
+                    */
                     this.updateView = function() {
-                        // DEBUG
+                        
                         console.log("-- Updating View")
                         
                         var displayedData = [];
@@ -243,90 +246,87 @@ define('app/views/monitoring', [
                         }
 
                         // Set Possible min/max x & y values
-                        xScale.domain(d3.extent(displayedData, function(d) { return d.time; }));
+                        xScale.domain(d3.extent(displayedData , function(d) { return d.time;  }));
                         yScale.domain([0, d3.max(displayedData, function(d) { return d.value; })]);
 
                         // Update value line
-                        d3valueLine.attr("d", valueline(displayedData));
+                        d3vLine.attr("d", valueline(displayedData));
             
                         // Update xAxis - TODO Fix secondsStep
                         d3xAxis.call(d3.svg.axis()
-                                     .scale(xScale)
-                                     .orient("bottom")
-                                     .ticks(d3.time.minutes, this.secondsStep/60) // TODO Fix SecondsStep
-                                     .tickFormat(d3.time.format("%I:%M%p")))
-                                     .selectAll("text") 
-                                     .style("text-anchor", "end")
-                                     .attr('x','-10');
+                                           .scale(xScale)
+                                           .orient("bottom")
+                                           .ticks(d3.time.minutes, this.secondsStep/60) // TODO Fix SecondsStep
+                                           .tickFormat(d3.time.format("%I:%M%p")))
+                                           .selectAll("text") 
+                                           .style("text-anchor", "end")
+                                           .attr('x','-10');
 
+                        // Create Grid
+                        d3GridX.call(d3.svg.axis()
+                                           .scale(xScale)
+                                           .orient("bottom")
+                                           .ticks(5)
+                                           .tickSize(-this.height, 0, 0)
+                                           .tickFormat(""));
 
                         
-                            d3GridX.call(make_x_grid()
-                            .tickSize(-this.height, 0, 0)
-                            .tickFormat(""));
-
-                        
-                            d3GridY.call(make_y_grid()
-                            .tickSize(-this.width, 0, 0)
-                            .tickFormat(""));
-                        // DEBUG TODO REMOVE IT
-                        console.log("");
+                        d3GridY.call(d3.svg.axis()
+                                           .scale(yScale)
+                                           .orient("left")
+                                           .ticks(5)
+                                           .tickSize(-this.width, 0, 0)
+                                           .tickFormat(""));
                     };
 
+
+                    /**
+                    * Method: changeWidth
+                    * Changes the width of svg element, sets new scale values
+                    * and updates height to keep aspect ratio
+                    */
                     this.changeWidth = function (width) {
 
-                        // Change Width CSS Attribute And Set New Scale Values
+                        // Create an aspect ratio
+                        var newHeight = 160 / 1280 * width;
+
+                        this.height = (newHeight < 85 ? 85 : newHeight);
                         this.width = width;
-                        d3svg.attr('width',this.width);
+
+                        // Set new values to SVG element
+                        d3svg.attr('width',this.width)
+                             .attr('height',this.height);
+
+                        // Update scale to new values
+                        yScale = d3.scale.linear().range([this.height - margin.top - margin.bottom, 0]);
                         xScale = d3.time.scale().range([0, this.width - margin.left - margin.right]);
 
-                        // Create An Aspect Ratio
-                        var newHeight = 160 / 1280 * width;
-                        newHeight = (newHeight < 85 ? 85 : newHeight);
-                        this.changeHeight(newHeight);
-                        // Update View Will Be Done Within changeHeight
-                    };
-
-                    // This one will only be called Only From changeWidth TODO Possibly Merge
-                    this.changeHeight = function(height) {
-
-                        this.height = height;
-                        d3svg.attr('height',this.height);
+                        // Update x-axis based on new height
                         d3xAxis.attr("transform", "translate(0," + (this.height - margin.bottom) + ")");
 
-                        yScale = d3.scale.linear().range([this.height - margin.top - margin.bottom, 0]);
+                        // Update TODO update Grid
 
                         this.updateView();
                     };
 
+
+                    /**
+                    * Method: getLastMeasurementTime
+                    * Returns null if there are no data
+                    * else last measurements time as Date object
+                    */
                     this.getLastMeasurementTime = function(){
 
                         if(this.data.length == 0)
                             return null;
-                        else
-                        {
+                        else {
                             var lastObject = this.data[this.data.length-1];
                             return lastObject.time;
                         }   
-                        
                     };
-
-                    function make_x_grid() {        
-                        return d3.svg.axis()
-                            .scale(xScale)
-                            .orient("bottom")
-                            .ticks(5);
-                    }
-
-                    function make_y_grid() {        
-                        return d3.svg.axis()
-                            .scale(yScale)
-                            .orient("left")
-                            .ticks(5);
-                    }
                 }
 
-                // --- End Of Graph Constructor -- //
+                // -------------------------------------------------------------------------------------
 
                 // Execuation Starts Here
                 var machine = this.get('controller').get('model');
@@ -335,40 +335,33 @@ define('app/views/monitoring', [
 
                 if(this.viewRendered && machine.hasMonitoring && !machine.probing && machine.probed){
 
-                    var monitoringController = Mist.monitoringController;
                     var self = this;
+                    var controller = Mist.monitoringController;
 
-                    console.log("- Runned setUpGraphs");
-                    Em.run.next(function() {
-                        try{
-                            $('.monitoring-button').button();
-                            $('#add-rule-button').button();
-                            $('#monitoring-dialog').popup();         
-                            $('#cpuGraphBtn').hide(0);
-                            $('#loadGraphBtn').hide(0);
-                            $('#memGraphBtn').hide(0);               
-                        } catch(err){
-                            // TODO check what error may produce
-                        }
-                    });
-
-                    monitoringController.initController(machine,this);
+                    controller.initController(machine,this);
 
                 
                     Em.run.next(function() {
 
+                        // Re-Initialize Jquery Mobile Buttons, Hide Graph Buttons
+                        $('.monitoring-button').button();
+                        $('#add-rule-button').button();
+                        $('#monitoring-dialog').popup();         
+                        $('#cpuGraphBtn').hide(0);
+                        $('#loadGraphBtn').hide(0);
+                        $('#memGraphBtn').hide(0);  
+
                         console.log("- Asks For #cpuGraph");       // DEBUG TODO Remove It
                         var width = $('#cpuGraph').width();     // Get Current Width
 
-                        // Create Graphs
+                        // Create Graphs // TODO change tempDate
                         var tempDate = new Date();
                         tempDate.setHours(0,30,0);
                         self.cpuGraph = new Graph('cpuGraph',width,tempDate);
                         self.loadGraph = new Graph('loadGraph',width,tempDate);
                         self.memGraph = new Graph('memGraph',width,tempDate);
-                        console.log(self.cpuGraph);
-                        console.log("- cpuGraph Created, demoGetData running after"); // DEBUG TODO Remove It
-                        Mist.monitoringController.demoGetData();
+
+                        controller.setupDataRequest();
 
                         // Set Up Resolution Change Event
                         $(window).resize(function(){
@@ -380,7 +373,7 @@ define('app/views/monitoring', [
                     });
                     
                     Mist.rulesController.redrawRules();
-                } // Machine Probed
+                } 
             }.observes('controller.model.hasMonitoring','controller.model.probing','viewRendered'),
 
     
