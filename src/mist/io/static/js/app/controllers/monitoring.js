@@ -13,9 +13,12 @@ define('app/controllers/monitoring', [
             machineNotResponding: false, // TODO Add Something if server does not return new data
             data: null,
             dataUpdated: false,
+            view: null,
 
-            setMachine: function(machine){
+            // This one is called from view
+            initController: function(machine,view){
                 this.machine = machine;
+                this.view = view;
                 this.data = {
                     cpu: [],
                     load: [],
@@ -30,7 +33,6 @@ define('app/controllers/monitoring', [
                 var timeGap = 60; // Seconds Between Requested Time And Current
                 //Debug TODO Remove It
                 // Get Stats For the last hour
-
                 // Just Started Take Last 30 minutes
                 if(this.data.load.length == 0)
                 {
@@ -57,10 +59,16 @@ define('app/controllers/monitoring', [
                 },10000);
             },
 
+            finishedGraphUpdate: function(){
+                // Runs After All Graphs Are Updated
+                // Do Some Stuff Here                
+            },
+
 
 
             receiveData: function(start,stop,step){
 
+                var self = this;
                 // Ajax Call For Data Receive
                 // Data We Send:
                 // start: date/time we want to receive data from
@@ -91,42 +99,49 @@ define('app/controllers/monitoring', [
                             console.log("- Successful Got " + data.load.length + " Data");
                             console.log("- Pushing Data To Array");
 
-                            // For X CPU Objects That Exist Create Object And Add Push Them
-                            // Add A CPU Objects
+                            var receivedData = {
+                                cpu: [],
+                                load: [],
+                                memory: []
+                            };
+
+                            // Create New Objects From Data
                             var metricTime = new Date(start);
                             for(var i=0; i < data.load.length; i++ )
                             {
                                 // Create New Data Objects
                                 var cpuObj = {
                                     time : (metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds()),
-                                    close: (data.cpu.utilization[i] * 100)
+                                    value: (data.cpu.utilization[i] * 100)
                                 };
                                 var loadObj = {
                                     time : (metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds()),
-                                    close: data.load[i]
+                                    value: data.load[i]
                                 };
                                 var memObj = {
                                     time : (metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds()),
-                                    close: data.memory[i]
+                                    value: data.memory[i]
                                 };
 
-                                // Push Object Into Data Object
-                                monitoringController.data.cpu.push(cpuObj);
-                                monitoringController.data.load.push(loadObj);
-                                monitoringController.data.memory.push(memObj);
+                                // Push Objects Into Data Object
+                                receivedData.cpu.push(cpuObj);
+                                receivedData.load.push(loadObj);
+                                receivedData.memory.push(memObj);
 
                                 metricTime = new Date(metricTime.getTime()+10000);// Substract 10 second from every object
                             }
+
                             monitoringController.machine.set('pendingStats', false);
                             console.log("- Sets Data Updated, Graph Must Be Updated")
-                            monitoringController.set('dataUpdated',true);
-                            //console.log(Mist.monitoringController.data);
+                            // Send Data To View
+                            self.view.updateGraphs(receivedData);
+                            self.finishedGraphUpdate();
                         }
 
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         Mist.notificationController.notify('Error while retrieving Monitoring Data: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ' while retrieving monitoring data. ', jqXHR.responseText);
+                        error(textStatus, errorThrown, ' while retrieving monitoring data. ', jqXHR.responseText);
                     }
                 });
             }

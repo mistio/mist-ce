@@ -37,16 +37,13 @@ define('app/views/monitoring', [
                 this._super();
             },
 
-            gotNewData: function(){
-                if(Mist.monitoringController.dataUpdated == true)
-                {
+            updateGraphs: function(data){
                     console.log("- We Have New Data At: " + (new Date()).toTimeString());
-                    this.cpuGraph.updateData(Mist.monitoringController.data.cpu);
-                    this.loadGraph.updateData(Mist.monitoringController.data.load);
-                    this.memGraph.updateData(Mist.monitoringController.data.memory);
-                    Mist.monitoringController.set('dataUpdated',false);
-                }
-            }.observes('Mist.monitoringController.dataUpdated'),
+
+                    this.cpuGraph.updateData(data.cpu);
+                    this.loadGraph.updateData(data.load);
+                    this.memGraph.updateData(data.memory);
+            },
 
             clickedCollapse: function(graph){
 
@@ -72,8 +69,10 @@ define('app/views/monitoring', [
                 // Graph Constructor
                 function Graph(divID,width,timeToDisplay){
 
-                    var NUM_OF_MEASUREMENTS = 180; // TODO Change It OR Remove It
                     var NUM_OF_LABELS = 6;
+                    var STEP_SECONDS = 10;
+                    var NUM_OF_MIN_MEASUREMENTS = 180;  // 30 Minutes
+                    var NUM_OF_MAX_MEASUREMENTS = 8640; // 24 Hours
 
                     this.id = divID;
                     this.width = width;
@@ -82,12 +81,15 @@ define('app/views/monitoring', [
                     var fixedHeight = 160 / 1280 * width;
                     this.height = (fixedHeight < 85 ? 85 : fixedHeight);
                     this.height = fixedHeight;
+                    this.timeDisplayed = timeToDisplay;
 
                     // Calculate The step  of the time axis
                     this.secondsStep =  Math.floor((timeToDisplay.getHours()*60*60 + 
                                         timeToDisplay.getMinutes()*60 + 
                                         timeToDisplay.getSeconds() ) / NUM_OF_LABELS); 
                     this.data = [];
+                    this.realDataIndex = -1;
+
                     var margin = {top: 20, right: 0, bottom: 30, left: 0}; // TODO Fix Margin Based On Aspect Ratio
                     
                     // May Be Removed TODO (Working On Minute And Second Step)
@@ -97,7 +99,7 @@ define('app/views/monitoring', [
                     var yScale = d3.scale.linear().range([this.height - margin.top - margin.bottom, 0]);
                     var valueline = d3.svg.line()
                                     .x(function(d) {return xScale(d.time); })
-                                    .y(function(d) {return yScale(d.close); });
+                                    .y(function(d) {return yScale(d.value); });
 
                     
                     // Create Main Graph (SVG Element)
@@ -134,52 +136,118 @@ define('app/views/monitoring', [
 
 
                     this.updateData = function(newData) {
-                        console.log("-- Updating Data In Graph #" + this.id);
+                        /*console.log("-- Updating Data In Graph #" + this.id);
                         this.data = newData;
+                        this.updateView();*/
+
+                        if(this.data.length == 0)
+                        {
+                            info("-- Received First Data");
+
+                            var dataBuffer = [];
+                            var measurements_received = newData.length;
+                            if(measurements_received < NUM_OF_MIN_MEASUREMENTS)
+                            {
+                                info("-- Measurement Are Less Than Expected, Filling With 0");
+                                // Get First Measurement Time
+                                var format = d3.time.format("%X");
+                                var metricTime = format.parse(newData[0].time);
+                                metricTime = new Date(metricTime.getTime() - STEP_SECONDS*1000);
+
+                                // Fill Data With Zeros
+                                for(var i= 0; i < (NUM_OF_MIN_MEASUREMENTS - measurements_received); i++)
+                                {
+                                    var zeroObject = {
+                                        time: (metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds()),
+                                        value: 0
+                                    }
+
+                                    dataBuffer.push(zeroObject);
+                                    metricTime = new Date(metricTime.getTime() - STEP_SECONDS*1000);
+                                }
+                                // Set Real Data Start Index
+                                this.realDataIndex = dataBuffer.length;
+                                dataBuffer.reverse();
+
+                                // Join New Data With Zero Value Array
+                                dataBuffer = dataBuffer.concat(newData);
+                            }
+                            else{
+
+                                dataBuffer = newData;
+                            }
+
+                            // Fix Values, TypeCaste To Date And Number
+                            var fixedData = [];
+                            dataBuffer.forEach(function(d) {
+                                var format = d3.time.format("%X");
+                                var tempObj = {};
+                                tempObj.time = format.parse(d.time);
+                                tempObj.value = +d.value;
+                                fixedData.push(tempObj);
+                            });
+
+                            // Set Our Final Data
+                            this.data = fixedData;
+                        }
+                        else{
+                            info("-- Received Data Update, Num Of New Data: " + newData.length);
+
+                            // Check If We Have Overflow , Clip Older Measurement
+                            if(this.data.length + newData.length > NUM_OF_MAX_MEASUREMENTS)
+                            {
+                                info("-- Overflow, Max Data: " + NUM_OF_MAX_MEASUREMENTS + " , Current: " + (this.data.length + newData.length));
+
+                                // Clip Old Data
+                                var num_of_overflow_Objs = this.data.length + newData.length - NUM_OF_MAX_MEASUREMENTS;
+                                this.data = this.data.slice(num_of_overflow_Objs);
+                            }
+
+                            // Fix Values, TypeCaste To Date And Number
+                            var fixedData = [];
+                            newData.forEach(function(d) {
+                                var format = d3.time.format("%X");
+                                var tempObj = {};
+                                tempObj.time = format.parse(d.time);
+                                tempObj.value = +d.value;
+                                fixedData.push(tempObj);
+                            });
+
+                            // Set Our Final Data
+                            this.data = this.data.concat(fixedData);
+                            info("-- Updated Data Lenght: " + this.data.length);
+                        }
+
                         this.updateView();
+
                     };
                     
                     this.updateView = function() {
                         // DEBUG
                         console.log("-- Updating View")
                         
+                        var displayedData = [];
+                        var num_of_displayed_measurements = (this.timeDisplayed.getHours()*60*60 +
+                                                            this.timeDisplayed.getMinutes()*60   +
+                                                            this.timeDisplayed.getSeconds()) / STEP_SECONDS;
 
-                        // TEMP TODO Fix It For Optimize
-                        // Get Last NUM_OF_MEASUREMENTS Values
-                        if(this.data.length > NUM_OF_MEASUREMENTS)
+                        // Get only data that will be displayed
+                        if(this.data.length > num_of_displayed_measurements)
                         {
-                            console.log("--- Before Slice - Data Lenght: " + this.data.length);
-                            this.data = this.data.slice(this.data.length-NUM_OF_MEASUREMENTS,this.data.length);
-                            console.log("--- After  Slice - Data Lenght: " + this.data.length);
+                            displayedData = this.data.slice(this.data.length - num_of_displayed_measurements);
+                            console.log("--- After  Slice - Data Lenght: " + displayedData.length);
+                        }
+                        else
+                        {
+                            displayedData = this.data;
                         }
 
-                        // DEBUG Max And Min Value
-                        var values = [];
-                        this.data.forEach(function(d){
-                                values.push(d.close);
-                        });
-                        var max = Math.max.apply(Math,values);
-                        var min = Math.min.apply(Math,values);
-                        console.log("--- Max: " + max);
-                        console.log("--- Min: " + min);
+                        // Set Possible min/max x & y values
+                        xScale.domain(d3.extent(displayedData, function(d) { return d.time; }));
+                        yScale.domain([0, d3.max(displayedData, function(d) { return d.value; })]);
 
-                        // Fix Our Values
-                        var fixedData = [];
-                        this.data.forEach(function(d) {
-
-                            var format = d3.time.format("%X");
-                            var tempObj = {};
-                            tempObj.time = format.parse(d.time);
-                            tempObj.close = +d.close;
-                            fixedData.push(tempObj);
-
-                        });
-                        
-                        xScale.domain(d3.extent(fixedData, function(d) { return d.time; }));
-                        yScale.domain([0, d3.max(fixedData, function(d) { return d.close; })]);
-
-                        // Set the valueline path.
-                        d3valueLine.attr("d", valueline(fixedData));
+                        // Update value line
+                        d3valueLine.attr("d", valueline(displayedData));
             
                         // Update xAxis - TODO Fix secondsStep
                         d3xAxis.call(d3.svg.axis()
@@ -231,6 +299,18 @@ define('app/views/monitoring', [
                         this.updateView();
                     };
 
+                    this.getLastMeasurementTime = function(){
+
+                        if(this.data.length == 0)
+                            return null;
+                        else
+                        {
+                            var lastObject = this.data[this.data.length-1];
+                            return lastObject.time;
+                        }   
+                        
+                    };
+
                     function make_x_grid() {        
                         return d3.svg.axis()
                             .scale(xScale)
@@ -272,7 +352,7 @@ define('app/views/monitoring', [
                         }
                     });
 
-                    monitoringController.setMachine(machine);
+                    monitoringController.initController(machine,this);
 
                 
                     Em.run.next(function() {
