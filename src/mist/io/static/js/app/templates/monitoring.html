@@ -2,6 +2,12 @@
             	<!-- TEMP, Title will be added by js -->
             	<div class='header'>
                         <div class="title">CPU (%)</div>
+                        <select data-role="none" {{action "selectPressed" view.cpuGraph target="view"}}>
+                              <option>30 Minutes</option>
+                              <option>15 Minutes</option>
+                              <option>5  Minutes</option>
+                              <option>1  Minute </option>
+                        </select>
                         <div class='closeBtn' {{action "clickedCollapse" view.cpuGraph target="view"}}>-</div>
                   </div>
             </div>
@@ -9,6 +15,12 @@
                   <!-- TEMP, Title will be added by js -->
                   <div class='header'>
                         <div class="title">Load</div>
+                        <select data-role="none" {{action "selectPressed" view.loadGraph target="view"}}>
+                              <option>30 Minutes</option>
+                              <option>15 Minutes</option>
+                              <option>5  Minutes</option>
+                              <option>1  Minute </option>
+                        </select>
                         <div class='closeBtn' {{action "clickedCollapse" view.loadGraph target="view"}}>-</div>
                   </div>
             </div>
@@ -16,9 +28,17 @@
                   <!-- TEMP, Title will be added by js -->
                   <div class='header'>
                         <div class="title">Memory</div>
+                        <select data-role="none" {{action "selectPressed" view.memGraph target="view"}}>
+                              <option>30 Minutes</option>
+                              <option>15 Minutes</option>
+                              <option>5  Minutes</option>
+                              <option>1  Minute </option>
+                        </select>
                         <div class='closeBtn' {{action "clickedCollapse" view.memGraph target="view"}}>-</div>
                   </div>
             </div>
+
+
 
             <div id="graphBar">
                   <div id ="cpuGraphBtn" class="graphBtn" {{action "clickedExpand" view.cpuGraph target="view"}}>
@@ -34,9 +54,3 @@
                         <div class="rightPart">Memory</div>
                   </div>
             </div>
-            <!-- Commented For Debugging Graph
-            <div id="loadGraph"></div>
-            <div id="networkGraph"></div>
-            <div id="diskGraph"></div>
-            <div id="memoryGraph"></div>
-            -->

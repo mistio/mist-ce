@@ -49,18 +49,25 @@ define('app/views/monitoring', [
 
                 $("#" + graph.id).hide(400);
                 $("#" + graph.id + "Btn").show(400);
-                // DEBUG Todo REMOVE IT
-                console.log(graph);
-                console.log("clickedCollapse");
             },
 
             clickedExpand: function(graph){
                 
                 $("#" + graph.id).show(400);
                 $("#" + graph.id + "Btn").hide(400);
-                // DEBUG Todo REMOVE IT
-                console.log(graph);
-                console.log("clickedCollapse");
+            },
+
+            selectPressed: function(graph){
+
+                var selectValue = $("#" + graph.id + " select").val();
+                if(selectValue.toLowerCase().search("minutes") || selectValue.toLowerCase().search("minute"))
+                {
+                    selectValue = selectValue.replace(/\D+/g, '' );
+                    var newTime = new Date();
+                    newTime.setHours(0,+selectValue,0);
+                    graph.changeTimeToDisplay(newTime);
+                }
+                // ELSE add Hours/Hour TODO
             },
 
             // Graph Constructor
@@ -84,6 +91,7 @@ define('app/views/monitoring', [
                     this.data = [];
                     this.timeDisplayed = timeToDisplay;
                     this.realDataIndex = -1;
+                    this.timeUpdated = false;
 
                     // Distance of two values in graph (pixels), Important For Animation
                     this.valuesDistance = 0;
@@ -330,7 +338,7 @@ define('app/views/monitoring', [
 
 
                         // Animate line, axis and grid
-                        if(this.isAnimated)
+                        if(this.isAnimated && !this.timeUpdated)
                         {
 
                             var animationDuration = STEP_SECONDS*1000;
@@ -359,7 +367,26 @@ define('app/views/monitoring', [
                         else {
 
                             // Update Non-Animated value line
-                            d3vLine.attr("d", valueline(displayedData));
+                            d3vLine.attr("d", valueline(displayedData))
+
+                            // Fix For Animation
+                            if(this.timeUpdated)
+                            {
+                                this.timeUpdated = false;
+
+
+                                d3vLine.transition()
+                                       .duration( 0 )
+                                       .attr("transform", "translate(" + 0 + ")");
+
+                                d3xAxis.transition()
+                                       .duration( 0 )
+                                       .attr("transform", "translate(0," + (this.height - margin.bottom +2) + ")");
+
+                                d3GridX.transition()
+                                       .duration( 0 )
+                                       .attr("transform", "translate(0," + this.height + ")");
+                            }
                         }
                     };
 
@@ -428,9 +455,13 @@ define('app/views/monitoring', [
 
                     this.changeTimeToDisplay = function(newTime){
 
+                        this.timeDisplayed = newTime;
                         this.secondsStep =  Math.floor((newTime.getHours()*60*60 + 
                                                         newTime.getMinutes()*60 + 
                                                         newTime.getSeconds() ) / NUM_OF_LABELS);
+
+                        this.timeUpdated = true;
+                        this.updateView();
                     };
 
                 }

@@ -932,6 +932,14 @@ div.loading-monitoring {
     box-shadow: 0px 2px 2px #888888;
 }
 
+.graph > .header > .title{
+    position: absolute;
+    left: 10px;
+    bottom: 5px;
+    font-weight:bold;
+    color: #404040;
+}
+
 .graph > .header > .closeBtn{
     position: absolute;
     cursor: default;
@@ -962,12 +970,45 @@ div.loading-monitoring {
 
 }
 
-.graph > .header > .title{
+
+.graph > .header > select{
     position: absolute;
-    left: 10px;
-    bottom: 5px;
-    font-weight:bold;
+    display: block;
+    cursor: default;
+
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+
+    border-left: 1px solid #ccc;
+    
+    right: 60px;
+    bottom: 0px;
+    width: 110px;
+    height: 30px;
+    line-height: 30px;
+
     color: #404040;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    text-indent: 22px;
+    -moz-appearance:none;
+    -webkit-appearance: none;
+
+
+}
+
+.graph > .header > select:hover{
+    background: rgb(224,224,224); /* Old browsers */
+    background: -moz-linear-gradient(top,  rgba(224,224,224,1) 0%, rgba(206,206,206,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(224,224,224,1)), color-stop(100%,rgba(206,206,206,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba(224,224,224,1) 0%,rgba(206,206,206,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba(224,224,224,1) 0%,rgba(206,206,206,1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba(224,224,224,1) 0%,rgba(206,206,206,1) 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  rgba(224,224,224,1) 0%,rgba(206,206,206,1) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e0e0e0', endColorstr='#cecece',GradientType=0 ); /* IE6-9 */
+
 }
     
 .graph svg {
