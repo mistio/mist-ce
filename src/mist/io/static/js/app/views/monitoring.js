@@ -85,6 +85,10 @@ define('app/views/monitoring', [
                     this.timeDisplayed = timeToDisplay;
                     this.realDataIndex = -1;
 
+                    // Distance of two values in graph (pixels), Important For Animation
+                    this.valuesDistance = 0;
+                    this.isAnimated = true;
+
                     // Calculate The step  of the time axis
                     this.secondsStep =  Math.floor((timeToDisplay.getHours()*60*60 + 
                                         timeToDisplay.getMinutes()*60 + 
@@ -249,9 +253,30 @@ define('app/views/monitoring', [
                         xScale.domain(d3.extent(displayedData , function(d) { return d.time;  }));
                         yScale.domain([0, d3.max(displayedData, function(d) { return d.value; })]);
 
-                        // Update value line
-                        d3vLine.attr("d", valueline(displayedData));
-            
+
+                        if(this.isAnimated)
+                        {
+                            // For Animated Graph
+                            // After we have our values we can calculate the distance and set new range
+                            this.calcValueDistance();
+                            xScale.range([-this.valuesDistance, this.width - margin.left - margin.right]);
+                            
+                            // Update Animated Line
+                            d3vLine.attr("transform", "translate(" + this.valuesDistance + ")")
+                                   .attr("d", valueline(displayedData)) 
+                                   .transition() 
+                                   .ease("linear")
+                                   .duration(STEP_SECONDS*1000)
+                                   .attr("transform", "translate(" + 0 + ")");
+                        }
+                        else {
+                            xScale.range([0, this.width - margin.left - margin.right]);
+
+                            // Update value line
+                            d3vLine.attr("d", valueline(displayedData));
+                        }
+
+
                         // Update xAxis - TODO Fix secondsStep
                         d3xAxis.call(d3.svg.axis()
                                            .scale(xScale)
@@ -324,6 +349,24 @@ define('app/views/monitoring', [
                             return lastObject.time;
                         }   
                     };
+
+
+                    /**
+                    * Method: calcValueDistance
+                    * Calculates the distance between the last two points
+                    * Important for animated graph
+                    */
+                    this.calcValueDistance = function() {
+                        
+                        // Get last 2 data
+                        if(this.data.length >= 2)
+                        {
+                            var xValueA = xScale(this.data[this.data.length-2].time);
+                            var xValueB = xScale(this.data[this.data.length-1].time);
+                            this.valuesDistance = xValueB - xValueA;
+                        }
+                    };
+
                 }
 
                 // -------------------------------------------------------------------------------------
