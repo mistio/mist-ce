@@ -76,7 +76,7 @@ define('app/views/monitoring', [
 
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = 160 / 1280 * width;
-                    var margin = {top: 20, right: 0, bottom: 30, left: 0}; // TODO Fix Margin Based On Aspect Ratio
+                    var margin = {top: 20, right: 0, bottom: 24, left: 0}; // TODO Fix Margin Based On Aspect Ratio
 
                     this.id = divID;
                     this.width = width;
@@ -256,6 +256,8 @@ define('app/views/monitoring', [
 
                         if(this.isAnimated)
                         {
+
+                            var animationDuration = STEP_SECONDS*1000;
                             // For Animated Graph
                             // After we have our values we can calculate the distance and set new range
                             this.calcValueDistance();
@@ -266,19 +268,12 @@ define('app/views/monitoring', [
                                    .attr("d", valueline(displayedData)) 
                                    .transition() 
                                    .ease("linear")
-                                   .duration(STEP_SECONDS*1000)
+                                   .duration(animationDuration)
                                    .attr("transform", "translate(" + 0 + ")");
-                        }
-                        else {
-                            xScale.range([0, this.width - margin.left - margin.right]);
-
-                            // Update value line
-                            d3vLine.attr("d", valueline(displayedData));
-                        }
 
 
-                        // Update xAxis - TODO Fix secondsStep
-                        d3xAxis.call(d3.svg.axis()
+                            // Update xAxis And Grid Offset- TODO Fix secondsStep
+                            d3xAxis.call(d3.svg.axis()
                                            .scale(xScale)
                                            .orient("bottom")
                                            .ticks(d3.time.minutes, this.secondsStep/60) // TODO Fix SecondsStep
@@ -287,8 +282,51 @@ define('app/views/monitoring', [
                                            .style("text-anchor", "end")
                                            .attr('x','-10');
 
-                        // Create Grid
-                        d3GridX.call(d3.svg.axis()
+                            d3GridX.call(d3.svg.axis()
+                                           .scale(xScale)
+                                           .orient("bottom")
+                                           .ticks(5)
+                                           .tickSize(-this.height, 0, 0)
+                                           .tickFormat(""));
+
+                            d3GridY.call(d3.svg.axis()
+                                           .scale(yScale)
+                                           .orient("left")
+                                           .ticks(5)
+                                           .tickSize(-this.width, 0, 0)
+                                           .tickFormat(""));
+                        
+
+                            // Animate Axis And Grid
+                            d3xAxis.attr("transform", "translate(" + this.valuesDistance + ","+ (this.height - margin.bottom +2) +")")
+                                   .transition() 
+                                   .ease("linear")
+                                   .duration(animationDuration)
+                                   .attr("transform", "translate(0," + (this.height - margin.bottom +2) + ")");
+
+                            d3GridX.attr("transform", "translate(" + this.valuesDistance + ","+ this.height +")")
+                                   .transition() 
+                                   .ease("linear")
+                                   .duration(animationDuration)
+                                   .attr("transform", "translate(0," + this.height + ")");
+                        }
+                        else {
+                            xScale.range([0, this.width - margin.left - margin.right]);
+
+                            // Update value line
+                            d3vLine.attr("d", valueline(displayedData));
+
+                            // Update xAxis And grid - TODO Fix secondsStep
+                            d3xAxis.call(d3.svg.axis()
+                                           .scale(xScale)
+                                           .orient("bottom")
+                                           .ticks(d3.time.minutes, this.secondsStep/60) // TODO Fix SecondsStep
+                                           .tickFormat(d3.time.format("%I:%M%p")))
+                                           .selectAll("text") 
+                                           .style("text-anchor", "end")
+                                           .attr('x','-10');
+
+                            d3GridX.call(d3.svg.axis()
                                            .scale(xScale)
                                            .orient("bottom")
                                            .ticks(5)
@@ -296,12 +334,13 @@ define('app/views/monitoring', [
                                            .tickFormat(""));
 
                         
-                        d3GridY.call(d3.svg.axis()
+                            d3GridY.call(d3.svg.axis()
                                            .scale(yScale)
                                            .orient("left")
                                            .ticks(5)
                                            .tickSize(-this.width, 0, 0)
                                            .tickFormat(""));
+                        }
                     };
 
 
