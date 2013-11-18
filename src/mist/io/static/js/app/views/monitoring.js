@@ -69,7 +69,7 @@ define('app/views/monitoring', [
                 // Graph Constructor
                 function Graph(divID,width,timeToDisplay){
 
-                    var NUM_OF_LABELS = 6;
+                    var NUM_OF_LABELS = 5;
                     var STEP_SECONDS = 10;
                     var NUM_OF_MIN_MEASUREMENTS = 180;  // 30 Minutes
                     var NUM_OF_MAX_MEASUREMENTS = 8640; // 24 Hours
@@ -249,19 +249,91 @@ define('app/views/monitoring', [
                             displayedData = this.data;
                         }
 
+
                         // Set Possible min/max x & y values
                         xScale.domain(d3.extent(displayedData , function(d) { return d.time;  }));
                         yScale.domain([0, d3.max(displayedData, function(d) { return d.value; })]);
 
+                        // Set the range
+                        if(this.isAnimated) {
+                            this.calcValueDistance();
+                            xScale.range([-this.valuesDistance, this.width - margin.left - margin.right]);
+                        }
+                        else{
+                            xScale.range([0, this.width - margin.left - margin.right]);
+                        }
 
+
+                        // Change axis labels and grid position based on time that will display
+                        // TODO Reduce Code
+                        if (this.secondsStep <= 60) {
+                            d3xAxis.call(d3.svg.axis()
+                                               .scale(xScale)
+                                               .orient("bottom")
+                                               .ticks(d3.time.seconds, this.secondsStep) // TODO Fix SecondsStep
+                                               .tickFormat(d3.time.format("%I:%M:%S%p")))
+                                               .selectAll("text") 
+                                               .style("text-anchor", "end")
+                                               .attr('x','-10');
+
+                            d3GridX.call(d3.svg.axis()
+                                               .scale(xScale)
+                                               .orient("bottom")
+                                               .ticks(d3.time.seconds, this.secondsStep)
+                                               .tickSize(-this.height, 0, 0)
+                                               .tickFormat(""));
+                        }
+                        else if (this.secondsStep <= 18000) {
+
+                            d3xAxis.call(d3.svg.axis()
+                                               .scale(xScale)
+                                               .orient("bottom")
+                                               .ticks(d3.time.minutes, this.secondsStep/60) // TODO Fix SecondsStep
+                                               .tickFormat(d3.time.format("%I:%M%p")))
+                                               .selectAll("text") 
+                                               .style("text-anchor", "end")
+                                               .attr('x','-10');
+
+                            d3GridX.call(d3.svg.axis()
+                                               .scale(xScale)
+                                               .orient("bottom")
+                                               .ticks(d3.time.minutes, this.secondsStep/60)
+                                               .tickSize(-this.height, 0, 0)
+                                               .tickFormat(""));
+                        }
+                        else {
+                            d3xAxis.call(d3.svg.axis()
+                                               .scale(xScale)
+                                               .orient("bottom")
+                                               .ticks(d3.time.hours, this.secondsStep/60/60) // TODO Fix SecondsStep
+                                               .tickFormat(d3.time.format("%I:%M%p")))
+                                               .selectAll("text") 
+                                               .style("text-anchor", "end")
+                                               .attr('x','-10');
+
+                            d3GridX.call(d3.svg.axis()
+                                               .scale(xScale)
+                                               .orient("bottom")
+                                               .ticks(d3.time.hours, this.secondsStep/60/60)
+                                               .tickSize(-this.height, 0, 0)
+                                               .tickFormat(""));
+                        }
+
+
+                       // Horizontal grid lines will not change on time change
+                       d3GridY.call(d3.svg.axis()
+                                          .scale(yScale)
+                                          .orient("left")
+                                          .ticks(5)
+                                          .tickSize(-this.width, 0, 0)
+                                          .tickFormat(""));
+
+
+                        // Animate line, axis and grid
                         if(this.isAnimated)
                         {
 
                             var animationDuration = STEP_SECONDS*1000;
-                            // For Animated Graph
-                            // After we have our values we can calculate the distance and set new range
-                            this.calcValueDistance();
-                            xScale.range([-this.valuesDistance, this.width - margin.left - margin.right]);
                             
                             // Update Animated Line
                             d3vLine.attr("transform", "translate(" + this.valuesDistance + ")")
@@ -270,32 +342,6 @@ define('app/views/monitoring', [
                                    .ease("linear")
                                    .duration(animationDuration)
                                    .attr("transform", "translate(" + 0 + ")");
-
-
-                            // Update xAxis And Grid Offset- TODO Fix secondsStep
-                            d3xAxis.call(d3.svg.axis()
-                                           .scale(xScale)
-                                           .orient("bottom")
-                                           .ticks(d3.time.minutes, this.secondsStep/60) // TODO Fix SecondsStep
-                                           .tickFormat(d3.time.format("%I:%M%p")))
-                                           .selectAll("text") 
-                                           .style("text-anchor", "end")
-                                           .attr('x','-10');
-
-                            d3GridX.call(d3.svg.axis()
-                                           .scale(xScale)
-                                           .orient("bottom")
-                                           .ticks(5)
-                                           .tickSize(-this.height, 0, 0)
-                                           .tickFormat(""));
-
-                            d3GridY.call(d3.svg.axis()
-                                           .scale(yScale)
-                                           .orient("left")
-                                           .ticks(5)
-                                           .tickSize(-this.width, 0, 0)
-                                           .tickFormat(""));
-                        
 
                             // Animate Axis And Grid
                             d3xAxis.attr("transform", "translate(" + this.valuesDistance + ","+ (this.height - margin.bottom +2) +")")
@@ -311,35 +357,9 @@ define('app/views/monitoring', [
                                    .attr("transform", "translate(0," + this.height + ")");
                         }
                         else {
-                            xScale.range([0, this.width - margin.left - margin.right]);
 
-                            // Update value line
+                            // Update Non-Animated value line
                             d3vLine.attr("d", valueline(displayedData));
-
-                            // Update xAxis And grid - TODO Fix secondsStep
-                            d3xAxis.call(d3.svg.axis()
-                                           .scale(xScale)
-                                           .orient("bottom")
-                                           .ticks(d3.time.minutes, this.secondsStep/60) // TODO Fix SecondsStep
-                                           .tickFormat(d3.time.format("%I:%M%p")))
-                                           .selectAll("text") 
-                                           .style("text-anchor", "end")
-                                           .attr('x','-10');
-
-                            d3GridX.call(d3.svg.axis()
-                                           .scale(xScale)
-                                           .orient("bottom")
-                                           .ticks(5)
-                                           .tickSize(-this.height, 0, 0)
-                                           .tickFormat(""));
-
-                        
-                            d3GridY.call(d3.svg.axis()
-                                           .scale(yScale)
-                                           .orient("left")
-                                           .ticks(5)
-                                           .tickSize(-this.width, 0, 0)
-                                           .tickFormat(""));
                         }
                     };
 
@@ -404,6 +424,13 @@ define('app/views/monitoring', [
                             var xValueB = xScale(this.data[this.data.length-1].time);
                             this.valuesDistance = xValueB - xValueA;
                         }
+                    };
+
+                    this.changeTimeToDisplay = function(newTime){
+
+                        this.secondsStep =  Math.floor((newTime.getHours()*60*60 + 
+                                                        newTime.getMinutes()*60 + 
+                                                        newTime.getSeconds() ) / NUM_OF_LABELS);
                     };
 
                 }
