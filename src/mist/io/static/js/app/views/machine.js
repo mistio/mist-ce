@@ -16,9 +16,23 @@ define('app/views/machine', [
 
             init: function() {
                 this._super();
-                this.setGraph();
+                this.renderMachine();
             },
-            
+
+            renderMachine: function() {
+                var machine = this.get('controller').get('model');
+                if (machine.id != ' ') { // This is the dummy machine. It exists when machine hasn't loaded yet
+                    this.setGraph();
+                }
+            },
+
+            singleMachineResponseObserver: function() {
+                if (Mist.backendsController.singleMachineResponse) {
+                    this.get('controller').set('model', Mist.backendsController.singleMachineResponse);
+                    this.setGraph();
+                }
+            }.observes('Mist.backendsController.singleMachineResponse'),
+
             enableMonitoringClick: function() {
                 if (Mist.authenticated) {
                     var machine = this.get('controller').get('model');
