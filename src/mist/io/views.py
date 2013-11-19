@@ -124,7 +124,15 @@ def update_user_settings(request, renderer='json'):
     else:
         return Response('Unauthorized', 401)
 
-
+@view_config(route_name='providers', request_method='GET', renderer='json')
+def list_supported_provides(request):
+    """
+    @param request: A simple GET request
+    @return: Return all of our SUPPORTED PROVIDERS
+    """
+    return {
+        'supported_providers': SUPPORTED_PROVIDERS
+    }
 @view_config(route_name='backends', request_method='GET', renderer='json')
 def list_backends(request):
     """Gets the available backends.
