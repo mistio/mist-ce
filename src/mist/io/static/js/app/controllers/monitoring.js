@@ -120,7 +120,7 @@ define('app/controllers/monitoring', [
                                 // Create New Data Objects
                                 var cpuObj = {
                                     time : (metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds()),
-                                    value: (data.cpu.utilization[i] * 100)
+                                    value: (data.cpu.utilization[i] * data.cpu.cores * 100)
                                 };
                                 var loadObj = {
                                     time : (metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds()),
