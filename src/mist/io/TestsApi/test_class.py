@@ -81,7 +81,7 @@ class TestClass(unittest.TestCase):
         yaml.dump(self.test_config, config_file, default_flow_style=False, )
         config_file.close()
 
-###########GETTING SUPPORTED PROVIDERS#####################
+    ###########GETTING SUPPORTED PROVIDERS#####################
 
     def test_00_supported_providers(self):
         """
@@ -96,7 +96,7 @@ class TestClass(unittest.TestCase):
         for provider in self.test_config['SUPPORTED_PROVIDERS']:
             print "Provider: %s --> Title: %s " % (provider['provider'], provider['title'])
 
-###########BACKENDS ACTIONS ###############################
+    ###########BACKENDS ACTIONS ###############################
 
     def test_01_list_backends(self):
         """
@@ -242,7 +242,7 @@ class TestClass(unittest.TestCase):
             print back['title']
 
 
-###########KEYS ACTIONS#####################################
+    ###########KEYS ACTIONS#####################################
 
     def test_030_list_keys(self):
         """
@@ -337,7 +337,7 @@ class TestClass(unittest.TestCase):
         keypairs.delete_key(self.uri, key_id, cookie=self.cookie)
         del self.test_config['KEYPAIRS'][key_id]
 
-##########IMAGES LOCATIONS SIZES ACTIONS##################
+    ##########IMAGES LOCATIONS SIZES ACTIONS##################
     def test_040_list_images(self):
         """
         --->List Images
@@ -397,7 +397,7 @@ class TestClass(unittest.TestCase):
             for location in locations:
                 print location['name']
 
-###########MACHINES ACTIONS################################
+    ###########MACHINES ACTIONS################################
     def test_050_list_machines(self):
         """
         --->List Machines
@@ -533,7 +533,7 @@ class TestClass(unittest.TestCase):
                     machines.start_machine(self.uri, backend_id, machine_id, cookie=self.cookie)
                     return True
 
-###########CLEANING UP#####################################
+    ###########CLEANING UP#####################################
 
     def test_055_destroy_machines(self):
         """--->Destroy Machines"""
