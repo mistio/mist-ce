@@ -38,7 +38,6 @@ define('app/views/monitoring', [
             },
 
             updateGraphs: function(data){
-                    console.log("- We Have New Data At: " + (new Date()).toTimeString());
 
                     this.cpuGraph.updateData(data.cpu);
                     this.loadGraph.updateData(data.load);
@@ -73,7 +72,10 @@ define('app/views/monitoring', [
             // Graph Constructor
             setUpGraphs: function() {
                 
-                // Graph Constructor
+                /* Class: Graph
+                * 
+                * 
+                */
                 function Graph(divID,width,timeToDisplay){
 
                     var NUM_OF_LABELS = 5;
@@ -113,54 +115,17 @@ define('app/views/monitoring', [
                                     .y(function(d) {return yScale(d.value); });
 
                     
-                    // Create main graph, append svg and other elements
-                    var d3svg =   d3.select("#"+this.id)
-                                    .append('svg')
-                                    .attr('width',this.width)
-                                    .attr('height',this.height);
-
-                    var d3GridX = d3.select("#"+this.id)
-                                    .select('svg')
-                                    .append("g")         
-                                    .attr("class", "grid-x")
-                                    .attr("transform", "translate(" + margin.left + "," + this.height + ")");
-
-                    var d3GridY = d3.select("#"+this.id)
-                                    .select('svg')
-                                    .append("g")         
-                                    .attr("class", "grid-y")
-                                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-                    var d3vLine = d3svg.append('g')
-                                       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                                       .append('path'); 
-
-                    var d3xAxis = d3svg.append('g')
-                                       .attr('class','x-axis')
-                                       .attr("transform", "translate(" + margin.left + "," + (this.height - margin.bottom +2) + ")");
-
-                    var d3HideAnimeLine = d3svg.append('rect')
-                                               .attr('class','hideAnimeLine')
-                                               .attr('width',margin.left-1)
-                                               .attr('height',this.height+margin.top);
-
-                    var d3xAxisLine = d3svg.append('line')
-                                           .attr('class','axisLine')
-                                           .attr('x1',"" + margin.left)
-                                           .attr('y1',""+ (this.height - margin.bottom +2) )
-                                           .attr('x2', this.width + margin.left + margin.right)
-                                           .attr('y2',""+ (this.height - margin.bottom +2));
-
-                    var d3yAxisLine = d3svg.append('line')
-                                           .attr('class','axisLine')
-                                           .attr('x1',"" + margin.left)
-                                           .attr('y1',"0" )
-                                           .attr('x2',"" + margin.left)
-                                           .attr('y2',""+ (this.height - margin.bottom +3));
-
-                    var d3yAxis = d3svg.append('g')
-                                       .attr('class','y-axis')
-                                       .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
+                    // SVG elements for graph manipulation.
+                    // Elements will be added to the dom after first updateData().
+                    var d3svg;            // Main SVG element where the graph will be rendered
+                    var d3GridX;          // Horizontal grid lines g element
+                    var d3GridY;          // Vertical   grid lines g element
+                    var d3vLine;          // Main Line that will show the values
+                    var d3xAxis;          // Vertical/X Axis With Text(Time)
+                    var d3HideAnimeLine;  // A Rectangle that hides the valueline when it's animated
+                    var d3xAxisLine;      // The line of the x axis
+                    var d3yAxisLine;      // The line of the y axis
+                    var d3yAxis;          // Horizontal/Y Axis With Text(Values)
     
 
                     //--------------------------------------------------------------------------------------------
@@ -169,7 +134,8 @@ define('app/views/monitoring', [
                     /**
                     * Method: updateData
                     * Gets Data From Controller, checks for overflow or less data received
-                    * fixes them and then updates Graph
+                    * fixes them and then updates Graph. If it is the first data data received
+                    * It appends Graph into div and then calls onInitialized
                     */
                     this.updateData = function(newData) {
 
@@ -223,6 +189,11 @@ define('app/views/monitoring', [
 
                             // Set Our Final Data
                             this.data = fixedData;
+
+                            // Append SVG Elements And Call onInitialized When Finish
+                            appendGraph(this.id,this.width,this.height);
+                            // Do staff after Graph is in the dom and we have data
+                            onInitialized();
                         }
                         else{
                             info("-- Received Data Update, Num Of New Data: " + newData.length);
@@ -271,13 +242,12 @@ define('app/views/monitoring', [
                                                             this.timeDisplayed.getSeconds()) / STEP_SECONDS;
 
                         // Get only data that will be displayed
-                        if(this.data.length > num_of_displayed_measurements)
-                        {
+                        if(this.data.length > num_of_displayed_measurements) {
+
                             displayedData = this.data.slice(this.data.length - num_of_displayed_measurements);
-                            console.log("--- After  Slice - Data Lenght: " + displayedData.length);
                         }
-                        else
-                        {
+                        else {
+
                             displayedData = this.data;
                         }
 
@@ -417,6 +387,8 @@ define('app/views/monitoring', [
                                        .attr("transform", "translate(0," + this.height + ")");
                             }
                         }
+
+                      console.log("");
                     };
 
 
@@ -479,18 +451,24 @@ define('app/views/monitoring', [
                     this.calcValueDistance = function() {
                         
                         // Get last 2 data
-                        if(this.data.length >= 2)
-                        {
+                        if(this.data.length >= 2) {
+
                             var xValueA = xScale(this.data[this.data.length-2].time);
                             var xValueB = xScale(this.data[this.data.length-1].time);
                             this.valuesDistance = xValueB - xValueA;
                         }
                     };
 
+
+                    /*
+                    * Method: changeTimeToDisplay
+                    * Changes data that will be displayed and time of x-axis
+                    *
+                    */
                     this.changeTimeToDisplay = function(newTime){
 
                         this.timeDisplayed = newTime;
-                        this.secondsStep =  Math.floor((newTime.getHours()*60*60 + 
+                        this.secondsStep   = Math.floor((newTime.getHours()*60*60 + 
                                                         newTime.getMinutes()*60 + 
                                                         newTime.getSeconds() ) / NUM_OF_LABELS);
 
@@ -498,14 +476,80 @@ define('app/views/monitoring', [
                         this.updateView();
                     };
 
+
+                    /*
+                    * Method: appendGraph
+                    * Appends the graph into the div id specified 
+                    * by constructor
+                    */
+                    function appendGraph(id,width,height){
+                      
+                      d3svg =   d3.select("#"+id)
+                                  .append('svg')
+                                  .attr('width',width)
+                                  .attr('height',height);
+
+                      d3GridX = d3.select("#"+id)
+                                  .select('svg')
+                                  .append("g")         
+                                  .attr("class", "grid-x")
+                                  .attr("transform", "translate(" + margin.left + "," + height + ")");
+
+                      d3GridY = d3.select("#"+id)
+                                  .select('svg')
+                                  .append("g")         
+                                  .attr("class", "grid-y")
+                                  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                      d3vLine = d3svg.append('g')
+                                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                                     .append('path'); 
+
+                      d3xAxis = d3svg.append('g')
+                                     .attr('class','x-axis')
+                                     .attr("transform", "translate(" + margin.left + "," + (height - margin.bottom +2) + ")");
+
+                      d3HideAnimeLine = d3svg.append('rect')
+                                             .attr('class','hideAnimeLine')
+                                             .attr('width',margin.left-1)
+                                             .attr('height',height+margin.top);
+
+                      d3xAxisLine = d3svg.append('line')
+                                         .attr('class','axisLine')
+                                         .attr('x1',"" + margin.left)
+                                         .attr('y1',""+ (height - margin.bottom +2) )
+                                         .attr('x2', width + margin.left + margin.right)
+                                         .attr('y2',""+ (height - margin.bottom +2));
+
+                      d3yAxisLine = d3svg.append('line')
+                                         .attr('class','axisLine')
+                                         .attr('x1',"" + margin.left)
+                                         .attr('y1',"0" )
+                                         .attr('x2',"" + margin.left)
+                                         .attr('y2',""+ (height - margin.bottom +3));
+
+                      d3yAxis = d3svg.append('g')
+                                     .attr('class','y-axis')
+                                     .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
+                    }
+
+
+                    /*
+                    * Method: onInitialized
+                    * Is being called after first data received and 
+                    * svg elements are in the dom
+                    */
+                    function onInitialized(){
+                      // Run Stuff When Graph is appended and has first data
+                      info("Finished Init, Now Graph Will Be Rendered");
+                    }
+
                 }
 
                 // -------------------------------------------------------------------------------------
 
                 // Execuation Starts Here
                 var machine = this.get('controller').get('model');
-                console.log("- Machine Still Probing ?:" + machine.probing);
-                console.log("- Machine Set To Probed ?:" + machine.probed);
 
                 if(this.viewRendered && machine.hasMonitoring && !machine.probing && machine.probed){
 
@@ -525,7 +569,6 @@ define('app/views/monitoring', [
                         $('#loadGraphBtn').hide(0);
                         $('#memGraphBtn').hide(0);  
 
-                        console.log("- Asks For #cpuGraph");       // DEBUG TODO Remove It
                         var width = $('#cpuGraph').width();     // Get Current Width
 
                         // Create Graphs // TODO change tempDate
