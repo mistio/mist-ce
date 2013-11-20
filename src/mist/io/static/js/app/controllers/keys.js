@@ -13,7 +13,7 @@ define('app/controllers/keys', [
 
             keys: [],
             loadingKeys: null,
-            singleKeyRequest: false,
+            singleKeyRequest: null,
             singleKeyResponse: null,
 
             init: function() {
@@ -29,9 +29,9 @@ define('app/controllers/keys', [
                         }, 1000);
                         return;
                     }
+                    $('.ajax-loader.key-loader').hide();
                     this.set('singleKeyResponse', this.getKeyByUrlName(this.singleKeyRequest));
                     this.set('singleKeyRequest', false);
-                    $('#single-key-loader').fadeOut();
                 }
             }.observes('singleKeyRequest'),
 

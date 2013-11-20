@@ -85,6 +85,8 @@ div#splash div.mist-logo {
 
 #backend-buttons .ui-controlgroup-controls {
     display: inline;
+    float: left;
+    margin-bottom: 18px;
 }
 
 #backend-buttons .ui-controlgroup-controls .ui-btn {
