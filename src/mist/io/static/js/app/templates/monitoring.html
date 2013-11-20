@@ -1,45 +1,25 @@
+            <!-- Graphs -->
             <div id="cpuGraph" class="graph">
-            	<!-- TEMP, Title will be added by js -->
             	<div class='header'>
                         <div class="title">CPU (%)</div>
-                        <select data-role="none" {{action "selectPressed" view.cpuGraph target="view"}}>
-                              <option>30 Minutes</option>
-                              <option>15 Minutes</option>
-                              <option>5  Minutes</option>
-                              <option>1  Minute </option>
-                        </select>
                         <div class='closeBtn' {{action "clickedCollapse" view.cpuGraph target="view"}}>-</div>
                   </div>
             </div>
             <div id="loadGraph" class="graph">
-                  <!-- TEMP, Title will be added by js -->
                   <div class='header'>
                         <div class="title">Load</div>
-                        <select data-role="none" {{action "selectPressed" view.loadGraph target="view"}}>
-                              <option>30 Minutes</option>
-                              <option>15 Minutes</option>
-                              <option>5  Minutes</option>
-                              <option>1  Minute </option>
-                        </select>
                         <div class='closeBtn' {{action "clickedCollapse" view.loadGraph target="view"}}>-</div>
                   </div>
             </div>
             <div id="memGraph" class="graph">
-                  <!-- TEMP, Title will be added by js -->
                   <div class='header'>
                         <div class="title">Memory</div>
-                        <select data-role="none" {{action "selectPressed" view.memGraph target="view"}}>
-                              <option>30 Minutes</option>
-                              <option>15 Minutes</option>
-                              <option>5  Minutes</option>
-                              <option>1  Minute </option>
-                        </select>
                         <div class='closeBtn' {{action "clickedCollapse" view.memGraph target="view"}}>-</div>
                   </div>
             </div>
 
 
-
+            <!-- Graph Buttons -->
             <div id="graphBar">
                   <div id ="cpuGraphBtn" class="graphBtn" {{action "clickedExpand" view.cpuGraph target="view"}}>
                         <div class="leftPart">+</div>
