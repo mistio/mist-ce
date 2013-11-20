@@ -150,7 +150,7 @@ define('app/views/monitoring', [
                                            .attr('y1',""+ (this.height - margin.bottom +2) )
                                            .attr('x2', this.width + margin.left + margin.right)
                                            .attr('y2',""+ (this.height - margin.bottom +2));
-                                           
+
                     var d3yAxisLine = d3svg.append('line')
                                            .attr('class','axisLine')
                                            .attr('x1',"" + margin.left)
@@ -444,6 +444,11 @@ define('app/views/monitoring', [
                         // Update x-axis based on new height
                         d3xAxis.attr("transform", "translate(0," + (this.height - margin.bottom) + ")");
 
+                        // Update y-axis line
+                        d3xAxisLine.attr('y1',""+(this.height - margin.bottom +2))
+                                   .attr('y2',""+(this.height - margin.bottom +2));
+                                   
+                        d3yAxisLine.attr('y2',""+ (this.height - margin.bottom +3));
                         // Update TODO update Grid
 
                         this.updateView();
