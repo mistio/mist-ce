@@ -83,7 +83,7 @@ define('app/views/monitoring', [
 
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = 160 / 1280 * width;
-                    var margin = {top: 20, right: 0, bottom: 24, left: 0}; // TODO Fix Margin Based On Aspect Ratio
+                    var margin = {top: 10, right: 0, bottom: 24, left: 33}; // TODO Fix Margin Based On Aspect Ratio
 
                     this.id = divID;
                     this.width = width;
@@ -123,20 +123,44 @@ define('app/views/monitoring', [
                                     .select('svg')
                                     .append("g")         
                                     .attr("class", "grid-x")
-                                    .attr("transform", "translate(0," + this.height + ")");
+                                    .attr("transform", "translate(" + margin.left + "," + this.height + ")");
 
                     var d3GridY = d3.select("#"+this.id)
                                     .select('svg')
                                     .append("g")         
-                                    .attr("class", "grid-y");
+                                    .attr("class", "grid-y")
+                                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
                     var d3vLine = d3svg.append('g')
                                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
                                        .append('path'); 
 
                     var d3xAxis = d3svg.append('g')
-                                  .attr('class','x-axis')
-                                  .attr("transform", "translate(0," + (this.height - margin.bottom +2) + ")");
+                                       .attr('class','x-axis')
+                                       .attr("transform", "translate(" + margin.left + "," + (this.height - margin.bottom +2) + ")");
+
+                    var d3HideAnimeLine = d3svg.append('rect')
+                                               .attr('class','hideAnimeLine')
+                                               .attr('width',margin.left-1)
+                                               .attr('height',this.height+margin.top);
+
+                    var d3xAxisLine = d3svg.append('line')
+                                           .attr('class','axisLine')
+                                           .attr('x1',"" + margin.left)
+                                           .attr('y1',""+ (this.height - margin.bottom +2) )
+                                           .attr('x2', this.width + margin.left + margin.right)
+                                           .attr('y2',""+ (this.height - margin.bottom +2));
+                                           
+                    var d3yAxisLine = d3svg.append('line')
+                                           .attr('class','axisLine')
+                                           .attr('x1',"" + margin.left)
+                                           .attr('y1',"0" )
+                                           .attr('x2',"" + margin.left)
+                                           .attr('y2',""+ (this.height - margin.bottom +3));
+
+                    var d3yAxis = d3svg.append('g')
+                                       .attr('class','y-axis')
+                                       .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
     
 
                     //--------------------------------------------------------------------------------------------
@@ -278,7 +302,7 @@ define('app/views/monitoring', [
                             d3xAxis.call(d3.svg.axis()
                                                .scale(xScale)
                                                .orient("bottom")
-                                               .ticks(d3.time.seconds, this.secondsStep) // TODO Fix SecondsStep
+                                               .ticks(d3.time.seconds, this.secondsStep)
                                                .tickFormat(d3.time.format("%I:%M:%S%p")))
                                                .selectAll("text") 
                                                .style("text-anchor", "end")
@@ -296,7 +320,7 @@ define('app/views/monitoring', [
                             d3xAxis.call(d3.svg.axis()
                                                .scale(xScale)
                                                .orient("bottom")
-                                               .ticks(d3.time.minutes, this.secondsStep/60) // TODO Fix SecondsStep
+                                               .ticks(d3.time.minutes, this.secondsStep/60)
                                                .tickFormat(d3.time.format("%I:%M%p")))
                                                .selectAll("text") 
                                                .style("text-anchor", "end")
@@ -313,7 +337,7 @@ define('app/views/monitoring', [
                             d3xAxis.call(d3.svg.axis()
                                                .scale(xScale)
                                                .orient("bottom")
-                                               .ticks(d3.time.hours, this.secondsStep/60/60) // TODO Fix SecondsStep
+                                               .ticks(d3.time.hours, this.secondsStep/60/60)
                                                .tickFormat(d3.time.format("%I:%M%p")))
                                                .selectAll("text") 
                                                .style("text-anchor", "end")
@@ -336,6 +360,11 @@ define('app/views/monitoring', [
                                           .tickSize(-this.width, 0, 0)
                                           .tickFormat(""));
 
+                       d3yAxis.call(d3.svg.axis()
+                                          .scale(yScale)
+                                          .orient("left")
+                                          .ticks(5));
+
 
                         // Animate line, axis and grid
                         if(this.isAnimated && !this.timeUpdated)
@@ -352,24 +381,24 @@ define('app/views/monitoring', [
                                    .attr("transform", "translate(" + 0 + ")");
 
                             // Animate Axis And Grid
-                            d3xAxis.attr("transform", "translate(" + this.valuesDistance + ","+ (this.height - margin.bottom +2) +")")
+                            d3xAxis.attr("transform", "translate(" + ( margin.left + this.valuesDistance) + ","+ (this.height - margin.bottom +2) +")")
                                    .transition() 
                                    .ease("linear")
                                    .duration(animationDuration)
-                                   .attr("transform", "translate(0," + (this.height - margin.bottom +2) + ")");
+                                   .attr("transform", "translate(" +  margin.left + "," + (this.height - margin.bottom +2) + ")");
 
-                            d3GridX.attr("transform", "translate(" + this.valuesDistance + ","+ this.height +")")
+                            d3GridX.attr("transform", "translate(" + (margin.left + this.valuesDistance) + ","+ this.height +")")
                                    .transition() 
                                    .ease("linear")
                                    .duration(animationDuration)
-                                   .attr("transform", "translate(0," + this.height + ")");
+                                   .attr("transform", "translate(" + margin.left + "," + this.height + ")");
                         }
                         else {
 
                             // Update Non-Animated value line
                             d3vLine.attr("d", valueline(displayedData))
 
-                            // Fix For Animation
+                            // Fix For Animation after time displayed changed
                             if(this.timeUpdated)
                             {
                                 this.timeUpdated = false;

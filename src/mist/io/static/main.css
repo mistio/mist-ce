@@ -1018,23 +1018,36 @@ div.loading-monitoring {
     color : #363636;
 }
 
+.graph .hideAnimeLine{
+    /* Must be same color as svg bg */
+    fill: white;
+}
+
 .graph path {
     stroke: #6CE0BA;
     stroke-width: 3;
     fill: none;
 }
     /*, .x-axis line*/
-.graph .x-axis path {
+.graph .x-axis path, .graph .y-axis path {
     fill: none;
-    stroke: #333333;
+    stroke: none;
+    /*stroke: #333333;
     stroke-width: 1;
     /*shape-rendering: crispEdges;*/
 }
 
-.graph .x-axis text{
+.graph .x-axis text, .graph .y-axis text{
+    cursor: default;
     stroke: none;
     text-anchor: end;
     fill: #333333;
+}
+
+.graph .axisLine{
+    fill:none;
+    stroke: #333333;
+    stroke-width: 1;
 }
 
 /*----------------------------- TEMP ------------------------- */
