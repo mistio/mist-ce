@@ -1,5 +1,4 @@
 define('app/views/monitoring', [
-    'app/views/mistscreen',
     'text!app/templates/monitoring.html', 'ember'],
     /**
      *
@@ -7,8 +6,8 @@ define('app/views/monitoring', [
      *
      * @returns Class
      */
-    function(MistScreen, monitoring_html) {
-        return MistScreen.extend({
+    function(monitoring_html) {
+        return Ember.View.extend({
 
             template: Ember.Handlebars.compile(monitoring_html),
 
