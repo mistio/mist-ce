@@ -14,6 +14,11 @@ define('app/views/monitoring', [
             cpuGraph: null,
             loadGraph: null,
             memGraph: null,
+            diskReadGraph: null,
+            diskWriteGraph: null,
+            networkTXGraph: null,
+            networkRXGraph: null,
+
             viewRendered: false,
             //other Graphs to be added (TODO)
 
@@ -41,6 +46,11 @@ define('app/views/monitoring', [
                     this.cpuGraph.updateData(data.cpu);
                     this.loadGraph.updateData(data.load);
                     this.memGraph.updateData(data.memory);
+
+                    this.diskReadGraph.updateData(data.diskRead);
+                    this.diskWriteGraph.updateData(data.diskWrite);
+                    this.networkRXGraph.updateData(data.netRX);
+                    this.networkTXGraph.updateData(data.netTX);
             },
 
             clickedCollapse: function(graph){
@@ -585,18 +595,28 @@ define('app/views/monitoring', [
                         // Create Graphs // TODO change tempDate
                         var tempDate = new Date();
                         tempDate.setHours(0,30,0);
-                        self.cpuGraph = new Graph('cpuGraph',width,tempDate);
+                        self.cpuGraph  = new Graph('cpuGraph',width,tempDate);
                         self.loadGraph = new Graph('loadGraph',width,tempDate);
-                        self.memGraph = new Graph('memGraph',width,tempDate);
+                        self.memGraph  = new Graph('memGraph',width,tempDate);
+                        self.diskReadGraph  = new Graph('diskReadGraph' ,width,tempDate);
+                        self.diskWriteGraph = new Graph('diskWriteGraph',width,tempDate);
+                        self.networkRXGraph = new Graph('networkRXGraph',width,tempDate);
+                        self.networkTXGraph = new Graph('networkTXGraph',width,tempDate);
 
                         controller.setupDataRequest();
 
                         // Set Up Resolution Change Event
                         $(window).resize(function(){
 
-                                    self.cpuGraph.changeWidth($('#cpuGraph').width());
-                                    self.loadGraph.changeWidth($('#loadGraph').width());
-                                    self.memGraph.changeWidth($('#memGraph').width());
+                                    var newWidth = $('#cpuGraph').width();
+                                    self.cpuGraph.changeWidth(newWidth);
+                                    self.loadGraph.changeWidth(newWidth);
+                                    self.memGraph.changeWidth(newWidth);
+                                    self.diskReadGraph.changeWidth(newWidth);
+                                    self.diskWriteGraph.changeWidth(newWidth);
+                                    self.networkRXGraph.changeWidth(newWidth);
+                                    self.networkTXGraph.changeWidth(newWidth);
+
                         })
                     });
                     
