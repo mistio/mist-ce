@@ -17,14 +17,12 @@
                         <div class='closeBtn' {{action "clickedCollapse" view.memGraph target="view"}}>-</div>
                   </div>
             </div>
-
             <div id="diskReadGraph" class="graph">
                   <div class='header'>
                         <div class="title">Disk Read (B/s)</div>
                         <div class='closeBtn' {{action "clickedCollapse" view.diskReadGraph target="view"}}>-</div>
                   </div>
             </div>
-
             <div id="diskWriteGraph" class="graph">
                   <div class='header'>
                         <div class="title">Disk Write (B/s)</div>
@@ -34,14 +32,14 @@
 
             <div id="networkTXGraph" class="graph">
                   <div class='header'>
-                        <div class="title">Network tx (B/s)</div>
+                        <div class="title">Network Tx (B/s)</div>
                         <div class='closeBtn' {{action "clickedCollapse" view.networkTXGraph target="view"}}>-</div>
                   </div>
             </div>
 
             <div id="networkRXGraph" class="graph">
                   <div class='header'>
-                        <div class="title">Network rx (B/s)</div>
+                        <div class="title">Network Rx (B/s)</div>
                         <div class='closeBtn' {{action "clickedCollapse" view.networkRXGraph target="view"}}>-</div>
                   </div>
             </div>
@@ -60,5 +58,21 @@
                   <div id ="memGraphBtn" class="graphBtn" {{action "clickedExpand" view.memGraph target="view"}}>
                         <div class="leftPart">+</div>
                         <div class="rightPart">Memory</div>
+                  </div>
+                  <div id ="diskReadGraphBtn" class="graphBtn" {{action "clickedExpand" view.diskReadGraph target="view"}}>
+                        <div class="leftPart">+</div>
+                        <div class="rightPart">Disk Read</div>
+                  </div>
+                  <div id ="diskWriteGraphBtn" class="graphBtn" {{action "clickedExpand" view.diskWriteGraph target="view"}}>
+                        <div class="leftPart">+</div>
+                        <div class="rightPart">Disk Write</div>
+                  </div>
+                  <div id ="networkTXGraphBtn" class="graphBtn" {{action "clickedExpand" view.networkTXGraph target="view"}}>
+                        <div class="leftPart">+</div>
+                        <div class="rightPart">Network Tx</div>
+                  </div>
+                  <div id ="networkRXGraphBtn" class="graphBtn" {{action "clickedExpand" view.networkRXGraph target="view"}}>
+                        <div class="leftPart">+</div>
+                        <div class="rightPart">Network Rx</div>
                   </div>
             </div>

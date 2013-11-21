@@ -112,9 +112,6 @@ define('app/controllers/monitoring', [
                                  netInterfaces.push(netInterface);
                             }
 
-                            console.log(netInterfaces);
-                            console.log(disks);
-
 
                             var receivedData = {
                                 cpu:       [],
