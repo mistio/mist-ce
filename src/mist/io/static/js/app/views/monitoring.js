@@ -45,14 +45,26 @@ define('app/views/monitoring', [
 
             clickedCollapse: function(graph){
 
-                $("#" + graph.id).hide(400);
-                $("#" + graph.id + "Btn").show(400);
+                var hideDuration = 400;
+                if (Mist.isClientMobile) {
+                    
+                    hideDuration = 0;
+                }
+
+                $("#" + graph.id).hide(hideDuration);
+                $("#" + graph.id + "Btn").show(hideDuration);
             },
 
             clickedExpand: function(graph){
                 
-                $("#" + graph.id).show(400);
-                $("#" + graph.id + "Btn").hide(400);
+                var hideDuration = 400;
+                if (Mist.isClientMobile) {
+                    
+                    hideDuration = 0;
+                }
+
+                $("#" + graph.id).show(hideDuration);
+                $("#" + graph.id + "Btn").hide(hideDuration);
             },
 
             selectPressed: function(graph){

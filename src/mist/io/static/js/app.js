@@ -268,6 +268,8 @@ define( 'app', [
         App.set('email', EMAIL);
         App.set('password', '');
 
+        App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/).test(navigator.userAgent) )
+
         App.Select = Ember.Select.extend({
             attributeBindings: [
                 'name',
