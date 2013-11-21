@@ -53,6 +53,14 @@ define('app/views/monitoring', [
                     this.networkTXGraph.updateData(data.netTX);
             },
 
+            hideGraphs: function(){
+                $('#GraphsArea').hide(0);
+            },
+
+            showGraphs: function(){
+                $('#GraphsArea').show(0);
+            },
+
             clickedCollapse: function(graph){
 
                 var hideDuration = 400;
@@ -106,7 +114,7 @@ define('app/views/monitoring', [
 
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = 160 / 1280 * width;
-                    var margin = {top: 10, right: 0, bottom: 24, left: 33}; // TODO Fix Margin Based On Aspect Ratio
+                    var margin = {top: 10, right: 0, bottom: 24, left: 40}; // TODO Fix Margin Based On Aspect Ratio
 
                     this.id = divID;
                     this.width = width;
@@ -586,11 +594,20 @@ define('app/views/monitoring', [
                         $('.monitoring-button').button();
                         $('#add-rule-button').button();
                         $('#monitoring-dialog').popup();         
-                        $('#cpuGraphBtn').hide(0);
+                        
+                        // Show only load Graph at start
+                        
                         $('#loadGraphBtn').hide(0);
-                        $('#memGraphBtn').hide(0);  
 
-                        var width = $('#cpuGraph').width();     // Get Current Width
+                        $('#cpuGraph').hide(0);
+                        $('#memGraph').hide(0);  
+                        $('#diskReadGraph').hide(0); 
+                        $('#diskWriteGraph').hide(0); 
+                        $('#networkRXGraph').hide(0); 
+                        $('#networkTXGraph').hide(0); 
+
+                        // Get Width From the only shown graph
+                        var width = $('#loadGraph').width();     
 
                         // Create Graphs // TODO change tempDate
                         var tempDate = new Date();
