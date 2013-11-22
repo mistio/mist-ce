@@ -63,11 +63,15 @@ define('app/views/monitoring', [
 
             clickedCollapse: function(graph){
 
+                // Mobile Hide Animation is slow, disabling animation
                 var hideDuration = 400;
                 if (Mist.isClientMobile) {
                     
                     hideDuration = 0;
                 }
+
+                // Add button to the end of the row
+                $("#" + graph.id + "Btn").insertAfter($('.graphBtn').last());
 
                 $("#" + graph.id).hide(hideDuration);
                 $("#" + graph.id + "Btn").show(0);
@@ -75,11 +79,15 @@ define('app/views/monitoring', [
 
             clickedExpand: function(graph){
                 
+                // Mobile Hide Animation is slow, disabling animation
                 var hideDuration = 400;
                 if (Mist.isClientMobile) {
                     
                     hideDuration = 0;
                 }
+
+                // Add graph to the end of the list
+                $("#" + graph.id).insertAfter($('.graph').last());
 
                 $("#" + graph.id).show(hideDuration);
                 $("#" + graph.id + "Btn").hide(0);
