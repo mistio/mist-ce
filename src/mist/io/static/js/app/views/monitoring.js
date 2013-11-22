@@ -105,7 +105,7 @@ define('app/views/monitoring', [
                 * 
                 * 
                 */
-                function Graph(divID,width,timeToDisplay){
+                function Graph(divID,width,timeToDisplay,valueFormat){
 
                     var NUM_OF_LABELS = 5;
                     var STEP_SECONDS = 10;
@@ -123,6 +123,7 @@ define('app/views/monitoring', [
                     this.timeDisplayed = timeToDisplay;
                     this.realDataIndex = -1;
                     this.timeUpdated = false;
+                    this.valueFormat = valueFormat;
 
                     // Distance of two values in graph (pixels), Important For Animation
                     this.valuesDistance = 0;
@@ -362,7 +363,8 @@ define('app/views/monitoring', [
                        d3yAxis.call(d3.svg.axis()
                                           .scale(yScale)
                                           .orient("left")
-                                          .ticks(5));
+                                          .ticks(5)
+                                          .tickFormat(d3.format(this.valueFormat)));
 
 
                         // Animate line, axis and grid
@@ -610,15 +612,15 @@ define('app/views/monitoring', [
                         var width = $('#loadGraph').width();     
 
                         // Create Graphs // TODO change tempDate
-                        var tempDate = new Date();
-                        tempDate.setHours(0,30,0);
-                        self.cpuGraph  = new Graph('cpuGraph',width,tempDate);
-                        self.loadGraph = new Graph('loadGraph',width,tempDate);
-                        self.memGraph  = new Graph('memGraph',width,tempDate);
-                        self.diskReadGraph  = new Graph('diskReadGraph' ,width,tempDate);
-                        self.diskWriteGraph = new Graph('diskWriteGraph',width,tempDate);
-                        self.networkRXGraph = new Graph('networkRXGraph',width,tempDate);
-                        self.networkTXGraph = new Graph('networkTXGraph',width,tempDate);
+                        var timeToDisplay = new Date();
+                        timeToDisplay.setHours(0,30,0);
+                        self.cpuGraph  = new Graph('cpuGraph',width,timeToDisplay),"";
+                        self.loadGraph = new Graph('loadGraph',width,timeToDisplay,"");
+                        self.memGraph  = new Graph('memGraph',width,timeToDisplay, "");
+                        self.diskReadGraph  = new Graph('diskReadGraph' ,width,timeToDisplay,".0f");
+                        self.diskWriteGraph = new Graph('diskWriteGraph',width,timeToDisplay,".0f");
+                        self.networkRXGraph = new Graph('networkRXGraph',width,timeToDisplay,".0f");
+                        self.networkTXGraph = new Graph('networkTXGraph',width,timeToDisplay,".0f");
 
                         controller.setupDataRequest();
 
