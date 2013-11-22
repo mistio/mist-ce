@@ -70,7 +70,7 @@ define('app/views/monitoring', [
                 }
 
                 $("#" + graph.id).hide(hideDuration);
-                $("#" + graph.id + "Btn").show(hideDuration);
+                $("#" + graph.id + "Btn").show(0);
             },
 
             clickedExpand: function(graph){
@@ -82,7 +82,7 @@ define('app/views/monitoring', [
                 }
 
                 $("#" + graph.id).show(hideDuration);
-                $("#" + graph.id + "Btn").hide(hideDuration);
+                $("#" + graph.id + "Btn").hide(0);
             },
 
             selectPressed: function(graph){
