@@ -20,7 +20,9 @@ define('app/views/monitoring', [
             networkRXGraph: null,
 
             viewRendered: false,
-            //other Graphs to be added (TODO)
+
+            graphsListCookie: null,
+            graphsBtnListCookie: null,
 
             init: function() {
                 this._super();
@@ -54,15 +56,40 @@ define('app/views/monitoring', [
             },
 
             hideGraphs: function(){
-                $('#GraphsArea').hide(0);
+
+                $('.graph').each(function(){
+
+                    if( $(this).css('display') != 'none' )
+                        $(this).hide(0);
+                });
+
+                // Get Visible Button List
+                $('.graphBtn').each(function(){
+
+                    if( $(this).css('display') != 'none' )
+                        $(this).hide(0);
+                });
             },
 
             showGraphs: function(){
-                $('#GraphsArea').show(0);
+
+                $('.graph').each(function(){
+
+                    if( $(this).css('display') == 'none' )
+                        $(this).show(0);
+                });
+
+                // Get Visible Button List
+                $('.graphBtn').each(function(){
+
+                    if( $(this).css('display') == 'none' )
+                        $(this).show(0);
+                });
             },
 
             clickedCollapse: function(graph){
 
+                var self = this;
                 // Mobile Hide Animation is slow, disabling animation
                 var hideDuration = 400;
                 if (Mist.isClientMobile) {
@@ -73,12 +100,18 @@ define('app/views/monitoring', [
                 // Add button to the end of the row
                 $("#" + graph.id + "Btn").insertAfter($('.graphBtn').last());
 
-                $("#" + graph.id).hide(hideDuration);
-                $("#" + graph.id + "Btn").show(0);
+                // When graph is hidden show button and set new coockie 
+                $("#" + graph.id).hide(hideDuration, function(){
+                    
+                    $("#" + graph.id + "Btn").show(0);
+                    self.setGraphsCookie();
+                });
+                
             },
 
             clickedExpand: function(graph){
                 
+                var self = this;
                 // Mobile Hide Animation is slow, disabling animation
                 var hideDuration = 400;
                 if (Mist.isClientMobile) {
@@ -89,8 +122,14 @@ define('app/views/monitoring', [
                 // Add graph to the end of the list
                 $("#" + graph.id).insertAfter($('.graph').last());
 
-                $("#" + graph.id).show(hideDuration);
+                // When graph is visible set new coockie 
                 $("#" + graph.id + "Btn").hide(0);
+                $("#" + graph.id).show(hideDuration, function(){
+
+                    self.setGraphsCookie();
+                });
+                
+                
             },
 
             selectPressed: function(graph){
@@ -104,6 +143,77 @@ define('app/views/monitoring', [
                     graph.changeTimeToDisplay(newTime);
                 }
                 // ELSE add Hours/Hour TODO
+            },
+
+            setGraphsCookie: function(){
+
+                var cookieExpire = new Date();
+                    cookieExpire.setFullYear(cookieExpire.getFullYear() + 2);
+                var graphIdList    = [];
+                var graphBtnIdList = [];
+
+                // Get Visible Graphs List
+                $('.graph').each(function(){
+
+                    if( $(this).css('display') != 'none' )
+                        graphIdList.push($(this).attr('id'));
+                });
+
+                // Get Visible Button List
+                $('.graphBtn').each(function(){
+
+                    if( $(this).css('display') != 'none' )
+                        graphBtnIdList.push($(this).attr('id'));
+                });
+
+                // Set graph list and graph button list cookies
+                document.cookie = "graphsList=" + graphIdList.join('|') + "; " +
+                                "expires=" + cookieExpire.toUTCString() +"; " +
+                                "path=/";
+                document.cookie = "graphsBtnList=" + graphBtnIdList.join('|') + "; " +
+                                "expires=" + cookieExpire.toUTCString() +"; " +
+                                "path=/";
+            },
+
+            getGraphsCookie: function(){
+                
+                var cookieValue   = "";
+                var graphsList    = [];
+                var graphsBtnList = [];
+
+                // Get Graph List Cookie
+                var parts = document.cookie.split("graphsList=");
+                if (parts.length == 2) 
+                    cookieValue = parts.pop().split(";").shift();
+                
+                if(cookieValue.length > 0){
+                    
+                    // Create Array Of IDs
+                    graphsList = cookieValue.split('|');
+                    graphsList.forEach(function(value,index){
+                        graphsList[index] = "#" + value;
+                    });
+                }
+                
+
+                // Get Graph Button List Cookie
+                var parts = document.cookie.split("graphsBtnList=");
+                if (parts.length == 2) 
+                    cookieValue = parts.pop().split(";").shift();
+                
+                if(cookieValue.length > 0){
+
+                    // Create Array Of IDs
+                    graphsBtnList = cookieValue.split('|');
+                    graphsBtnList.forEach(function(value,index){
+                        graphsBtnList[index] = "#" + value;
+                    });
+                }
+
+                this.graphsListCookie    = graphsList;
+                this.graphsBtnListCookie = graphsBtnList;
+
+
             },
 
             // Graph Constructor
@@ -600,24 +710,54 @@ define('app/views/monitoring', [
                 
                     Em.run.next(function() {
 
-                        // Re-Initialize Jquery Mobile Buttons, Hide Graph Buttons
+                        // Re-Initialize Jquery Mobile Buttons
                         $('.monitoring-button').button();
                         $('#add-rule-button').button();
                         $('#monitoring-dialog').popup();         
                         
-                        // Show only load Graph at start
-                        
-                        $('#loadGraphBtn').hide(0);
+                        self.getGraphsCookie();
 
-                        $('#cpuGraph').hide(0);
-                        $('#memGraph').hide(0);  
-                        $('#diskReadGraph').hide(0); 
-                        $('#diskWriteGraph').hide(0); 
-                        $('#networkRXGraph').hide(0); 
-                        $('#networkTXGraph').hide(0); 
+                        // Show Graphs And Buttons Based On Last Session or show only load Graph
+                        if(self.graphsListCookie.length > 0 && self.graphsBtnListCookie.length > 0) {
 
-                        // Get Width From the only shown graph
-                        var width = $('#loadGraph').width();     
+                            // First Hide All Elements
+                            self.hideGraphs();
+
+                            // Re-Arrange And Show Graphs And Buttons
+                            for(var i=0; i < self.graphsListCookie.length; i++) 
+                            {
+                                
+                                var id = self.graphsListCookie[i];
+                                $(id).insertAfter($('.graph').last());
+                                $(id).show(0);
+
+                            }
+
+                            for(var i=0; i < self.graphsBtnListCookie.length; i++) 
+                            {
+                                
+                                var id = self.graphsBtnListCookie[i];
+                                $(id).insertAfter($('.graphBtn').last());
+                                $(id).show(0);
+
+                            }
+
+                        }
+                        else {
+
+                            // Show only load Graph at start
+                            $('#loadGraphBtn').hide(0);
+
+                            $('#cpuGraph').hide(0);
+                            $('#memGraph').hide(0);  
+                            $('#diskReadGraph').hide(0); 
+                            $('#diskWriteGraph').hide(0); 
+                            $('#networkRXGraph').hide(0); 
+                            $('#networkTXGraph').hide(0); 
+                        }
+
+                        // Get Width, -2 left & right border
+                        var width = $("#GraphsArea").width() -2;  
 
                         // Create Graphs // TODO change tempDate
                         var timeToDisplay = new Date();
@@ -635,7 +775,7 @@ define('app/views/monitoring', [
                         // Set Up Resolution Change Event
                         $(window).resize(function(){
 
-                                    var newWidth = $('#cpuGraph').width();
+                                    var newWidth = $("#GraphsArea").width() -2;
                                     self.cpuGraph.changeWidth(newWidth);
                                     self.loadGraph.changeWidth(newWidth);
                                     self.memGraph.changeWidth(newWidth);
