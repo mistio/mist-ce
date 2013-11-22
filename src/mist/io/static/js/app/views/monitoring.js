@@ -718,7 +718,7 @@ define('app/views/monitoring', [
                         self.getGraphsCookie();
 
                         // Show Graphs And Buttons Based On Last Session or show only load Graph
-                        if(self.graphsListCookie.length > 0 && self.graphsBtnListCookie.length > 0) {
+                        if(self.graphsListCookie.length > 0 || self.graphsBtnListCookie.length > 0) {
 
                             // First Hide All Elements
                             self.hideGraphs();
