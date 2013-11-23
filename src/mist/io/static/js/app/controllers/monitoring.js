@@ -145,7 +145,7 @@ define('app/controllers/monitoring', [
 
                                 var cpuObj = {
                                     time : measurementTime,
-                                    value: ( (data['cpu']['utilization'][i] / data['cpu']['cores']) * 100)
+                                    value: ( (data['cpu']['utilization'][i] * data['cpu']['cores']) * 100)
                                 };
                                 var loadObj = {
                                     time : measurementTime,
