@@ -32,6 +32,7 @@ define('app/controllers/monitoring', [
                 var self = this;
                 var timeGap = 60;
 
+
                 // First Data Request
                 self.machine.set('pendingStats', true);
 
@@ -39,11 +40,8 @@ define('app/controllers/monitoring', [
                 var start = stop - 1800*1000; // Substract Half Hour Of The Stop Date
                 var step = 10000;
 
-                console.log("- Get First data");
-                console.log("  From : " + (new Date(start)));
-                console.log("  Until: " + (new Date(stop)));
-
                 self.receiveData(start, stop, step);
+
 
                 // Update Request Every SECONDS_INTERVAL miliseconds
                 window.monitoringInterval = window.setInterval(function() {
@@ -81,8 +79,7 @@ define('app/controllers/monitoring', [
             receiveData: function(start,stop,step){
 
                 var self = this;
-                // Ajax Call For Data Receive
-                // Data We Send:
+
                 // start: date/time we want to receive data from
                 // stop:  date/time we want to receeive data until
                 // step:  miliseconds we want to split data
@@ -106,7 +103,6 @@ define('app/controllers/monitoring', [
                             if(data.load.length == 0)
                                 throw "Received Wrong Server Response";
 
-                            console.log("- Successful Got " + data.load.length + " Data");
 
                             var disks = [];
                             var netInterfaces = [];
@@ -140,7 +136,7 @@ define('app/controllers/monitoring', [
                             // Create Custom Objects From Data
                             for(var i=0; i < data.load.length; i++ )
                             {
-                                
+
                                 var measurementTime = metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds();
 
                                 var cpuObj = {
@@ -197,6 +193,7 @@ define('app/controllers/monitoring', [
                         catch(err) {
                             Mist.notificationController.notify(err);
                             error(err);
+                            self.machineNotResponding = true;
                         }
 
                     },

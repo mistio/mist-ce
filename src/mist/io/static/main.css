@@ -819,21 +819,19 @@ div.loading-monitoring {
     margin: 0px auto;
 }
 
-
-/*----------------------------- TEMP For Graph Debbuging ------------------------- */
-
 .graph {
     margin-top: 30px;
     border: 1px solid #ccc;
 }
 
-/* To Be Added Again When Grid Added*/
 .graph .grid-x .tick {
     stroke: #BABABA;
 }
+
 .graph .grid-y .tick {
     stroke: #EDEDED;
 }
+
 .graph .grid-x path,.graph .grid-y path {
     stroke-width: 1;    
 }
@@ -1050,7 +1048,6 @@ div.loading-monitoring {
     stroke-width: 1;
 }
 
-/*----------------------------- TEMP ------------------------- */
 #machineGraph span {
     font-size: 12px;
     vertical-align: middle;

@@ -31,16 +31,15 @@ define('app/views/monitoring', [
 
             // Check If Ember View Rendered
             didInsertElement: function(){
-                console.log("- Ember Monitoring View Rendered");
-                this.set('viewRendered',true);
                 this._super();
+                this.set('viewRendered',true);
             },
 
             // Check If Ember View Is Destroyed
             willDestroyElement: function(){
-                console.log("- Ember Monitoring View Is Being Destroyed");
-                window.clearInterval(window.monitoringInterval);
+
                 this._super();
+                window.clearInterval(window.monitoringInterval);
             },
 
             updateGraphs: function(data){
@@ -220,7 +219,7 @@ define('app/views/monitoring', [
             setUpGraphs: function() {
                 
                 /* Class: Graph
-                * 
+                *  
                 * 
                 */
                 function Graph(divID,width,timeToDisplay,yAxisValueFormat){
@@ -290,13 +289,12 @@ define('app/views/monitoring', [
 
                         if(this.data.length == 0)
                         {
-                            info("-- Received First Data");
 
                             var dataBuffer = [];
                             var measurements_received = newData.length;
                             if(measurements_received < NUM_OF_MIN_MEASUREMENTS)
                             {
-                                info("-- Measurement Are Less Than Expected, Filling With 0");
+
                                 // Get First Measurement Time
                                 var format = d3.time.format("%X");
                                 var metricTime = format.parse(newData[0].time);
@@ -345,12 +343,10 @@ define('app/views/monitoring', [
                             onInitialized();
                         }
                         else{
-                            info("-- Received Data Update, Num Of New Data: " + newData.length);
 
                             // Check If We Have Overflow , Clip Older Measurement
                             if(this.data.length + newData.length > NUM_OF_MAX_MEASUREMENTS)
                             {
-                                info("-- Overflow, Max Data: " + NUM_OF_MAX_MEASUREMENTS + " , Current: " + (this.data.length + newData.length));
 
                                 // Clip Old Data
                                 var num_of_overflow_Objs = this.data.length + newData.length - NUM_OF_MAX_MEASUREMENTS;
@@ -369,7 +365,6 @@ define('app/views/monitoring', [
 
                             // Set Our Final Data
                             this.data = this.data.concat(fixedData);
-                            info("-- Updated Data Lenght: " + this.data.length);
                         }
 
                         this.updateView();
@@ -382,8 +377,6 @@ define('app/views/monitoring', [
                     * redraws value line, x-axis, labels and grid
                     */
                     this.updateView = function() {
-                        
-                        console.log("-- Updating View")
                         
                         var displayedData = [];
                         var num_of_displayed_measurements = (this.timeDisplayed.getHours()*60*60 +
@@ -547,8 +540,6 @@ define('app/views/monitoring', [
                                        .attr("transform", "translate(0," + this.height + ")");
                             }
                         }
-
-                      console.log("");
                     };
 
 
@@ -701,7 +692,6 @@ define('app/views/monitoring', [
                     */
                     function onInitialized(){
                       // Run Stuff When Graph is appended and has first data
-                      info("Finished Init, Now Graph Will Be Rendered");
                     }
 
                 }
