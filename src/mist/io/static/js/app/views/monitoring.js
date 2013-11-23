@@ -223,7 +223,7 @@ define('app/views/monitoring', [
                 * 
                 * 
                 */
-                function Graph(divID,width,timeToDisplay,valueFormat){
+                function Graph(divID,width,timeToDisplay,yAxisValueFormat){
 
                     var NUM_OF_LABELS = 5;
                     var STEP_SECONDS = 10;
@@ -241,7 +241,7 @@ define('app/views/monitoring', [
                     this.timeDisplayed = timeToDisplay;
                     this.realDataIndex = -1;
                     this.timeUpdated = false;
-                    this.valueFormat = valueFormat;
+                    this.yAxisValueFormat = yAxisValueFormat;
 
                     // Distance of two values in graph (pixels), Important For Animation
                     this.valuesDistance = 0;
@@ -252,6 +252,7 @@ define('app/views/monitoring', [
                                         timeToDisplay.getMinutes()*60 + 
                                         timeToDisplay.getSeconds() ) / NUM_OF_LABELS); 
                     
+                    var self = this;
 
                     // Scale Functions will scale graph to defined width and height
                     var xScale = d3.time.scale().range([0, this.width - margin.left - margin.right]);
@@ -482,7 +483,17 @@ define('app/views/monitoring', [
                                           .scale(yScale)
                                           .orient("left")
                                           .ticks(5)
-                                          .tickFormat(d3.format(this.valueFormat)));
+                                          .tickFormat(function(d){
+                                            // Custom Y-Axis label formater
+                                            if(d>=1000*1000)
+                                                return (d/1000/1000) +"M";
+                                            else if(d>=1000)
+                                                return (d/1000) + "K";
+                                            else if(yAxisValueFormat == "%")
+                                                return d + "%";
+                                            else 
+                                                return d;
+                                          }));
 
 
                         // Animate line, axis and grid
@@ -762,13 +773,13 @@ define('app/views/monitoring', [
                         // Create Graphs // TODO change tempDate
                         var timeToDisplay = new Date();
                         timeToDisplay.setHours(0,30,0);
-                        self.cpuGraph  = new Graph('cpuGraph',width,timeToDisplay),"";
-                        self.loadGraph = new Graph('loadGraph',width,timeToDisplay,"");
-                        self.memGraph  = new Graph('memGraph',width,timeToDisplay, "");
-                        self.diskReadGraph  = new Graph('diskReadGraph' ,width,timeToDisplay,".0f");
-                        self.diskWriteGraph = new Graph('diskWriteGraph',width,timeToDisplay,".0f");
-                        self.networkRXGraph = new Graph('networkRXGraph',width,timeToDisplay,".0f");
-                        self.networkTXGraph = new Graph('networkTXGraph',width,timeToDisplay,".0f");
+                        self.cpuGraph  = new Graph('cpuGraph',width,timeToDisplay,"%");
+                        self.loadGraph = new Graph('loadGraph',width,timeToDisplay);
+                        self.memGraph  = new Graph('memGraph',width,timeToDisplay,"%");
+                        self.diskReadGraph  = new Graph('diskReadGraph' ,width,timeToDisplay);
+                        self.diskWriteGraph = new Graph('diskWriteGraph',width,timeToDisplay);
+                        self.networkRXGraph = new Graph('networkRXGraph',width,timeToDisplay);
+                        self.networkTXGraph = new Graph('networkTXGraph',width,timeToDisplay);
 
                         controller.setupDataRequest();
 

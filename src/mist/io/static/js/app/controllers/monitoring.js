@@ -140,7 +140,7 @@ define('app/controllers/monitoring', [
                             // Create Custom Objects From Data
                             for(var i=0; i < data.load.length; i++ )
                             {
-                                // Create New Data Objects
+                                
                                 var measurementTime = metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds();
 
                                 var cpuObj = {
