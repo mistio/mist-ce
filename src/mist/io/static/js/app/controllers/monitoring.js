@@ -10,7 +10,8 @@ define('app/controllers/monitoring', [
         return Ember.ObjectController.extend({
 
             machine : null,
-            machineNotResponding: false, // TODO Add Something if server does not return new data
+            machineNotResponding: false,
+            lastMeasurmentTime: null,
             view: null,
 
             // This one is called from view
@@ -50,6 +51,16 @@ define('app/controllers/monitoring', [
                     var start = (new Date()).getTime() - (timeGap+10) * 1000;
                     var stop =  (new Date()).getTime() - timeGap * 1000; 
                     var step = 10000; // 10 Second Step
+
+                    // Ask all the datat that we didn't receive
+                    if(self.machineNotResponding){
+
+                        // Get last time from a graph
+                        if(self.lastMeasurmentTime.getTime() < start)
+                            start = self.lastMeasurmentTime.getTime();
+
+                        machineNotResponding = false;
+                    }
 
                     self.receiveData(start, stop, step);
 
@@ -123,6 +134,7 @@ define('app/controllers/monitoring', [
                                 netTX:     []
                             };
 
+                            // Create a date with first measurement time
                             var metricTime = new Date(start);
 
                             // Create Custom Objects From Data
@@ -173,11 +185,12 @@ define('app/controllers/monitoring', [
                                 receivedData.netRX.push(netRXObj);
                                 receivedData.netTX.push(netTXObj);
 
-                                // Substract 10 second from every object
+                                // Increase time by step for every new measurement
                                 metricTime = new Date(metricTime.getTime()+10000);
                             }
 
                             controller.machine.set('pendingStats', false);
+                            self.lastMeasurmentTime = new Date(metricTime.getTime()-10000);
                             self.view.updateGraphs(receivedData);
                             self.finishedGraphUpdate();
                         }
@@ -188,8 +201,16 @@ define('app/controllers/monitoring', [
 
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        Mist.notificationController.notify('Error while retrieving Monitoring Data: ' + jqXHR.responseText);
-                        error(textStatus, errorThrown, ' while retrieving monitoring data. ', jqXHR.responseText);
+                        
+                        if(errorThrown == 'timeout'){
+                            Mist.notificationController.timeNotify("Data request timed out. " +
+                                                               "Internet is down or server doesn't respond",4000);
+
+                            self.machineNotResponding = true;
+                        }
+                        else{
+                            Mist.notificationController.timeNotify("An error occurred while retrieving data",4000);
+                        };
                     }
                 });
             }
