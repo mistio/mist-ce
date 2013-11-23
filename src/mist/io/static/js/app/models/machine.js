@@ -434,6 +434,10 @@ define('app/models/machine', [
                                     //Everything ok, show monitoring-dialog, hide plan-dialog
                                     $('#enable-monitoring-dialog').show();
                                     $('#plan-dialog').hide();
+                                    if (!(machine.probed)) {
+                                        $('#enable-confirmation').hide();
+                                        $('#button-enable-monitoring').button('disable');
+                                    }
                                 }
                             }
                         } else {
