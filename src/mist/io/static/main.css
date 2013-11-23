@@ -1681,14 +1681,6 @@ div.info {
     display: block;
 }
 
-.monitoring-collapsible {
-    display: none;
-}
-
-.probed.monitoring-collapsible {
-    display: block;
-}
-
 /* Conditional for < 600px */
 @media only screen and  (max-width: 600px) {
     
