@@ -701,7 +701,8 @@ define('app/views/monitoring', [
                 // Execuation Starts Here
                 var machine = this.get('controller').get('model');
 
-                if(this.viewRendered && machine.hasMonitoring && !machine.probing && machine.probed){
+                if(this.viewRendered && machine.hasMonitoring && 
+                    !machine.probing && machine.probed && machine.id != ' '){
 
                     var self = this;
                     var controller = Mist.monitoringController;

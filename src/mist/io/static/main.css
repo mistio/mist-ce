@@ -59,6 +59,8 @@ div#splash div.mist-logo {
 
 #backend-buttons .ui-controlgroup-controls {
     display: inline;
+    float: left;
+    margin-bottom: 18px;
 }
 
 /* Select Button */
@@ -1734,6 +1736,16 @@ div.logout-placeholder, div.account-placeholder, div.support-placeholder {
     top: -16px;
     width: 20px;
 }
+
+.single-view-header .ajax-loader.key-loader {
+    top: 9px;
+    left: 48%;
+}
+
+.single-view-header .ajax-loader.machine-loader {
+    top: 18px;
+}
+
 
 .bubble-container .ajax-loader {
     display: block;

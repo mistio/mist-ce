@@ -13,7 +13,17 @@ define('app/views/machine', [
             template: Ember.Handlebars.compile(machine_html),
             
             rules: null,
-            
+
+            init: function() {
+                this._super();
+            },
+
+            singleMachineResponseObserver: function() {
+                if (Mist.backendsController.singleMachineResponse) {
+                    this.get('controller').set('model', Mist.backendsController.singleMachineResponse);
+                }
+            }.observes('Mist.backendsController.singleMachineResponse'),
+
             enableMonitoringClick: function() {
                 if (Mist.authenticated) {
                     var machine = this.get('controller').get('model');

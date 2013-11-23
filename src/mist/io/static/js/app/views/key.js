@@ -19,38 +19,48 @@ define('app/views/key', [
 
             init: function() {
                 this._super();
+                this.renderKey();
+            },
+
+            renderKey: function() {
                 this.set('key', this.get('controller').get('model'));
-                if (this.key) {
+                if (this.key.name != ' ') { // This is the dummy key. It exists when key hasn't loaded yet
                     this.machinesObserver();
                     Mist.keysController.getPubKey(this.key.name, '.public-key input');
                 }
             },
 
+            singleKeyResponseObserver: function() {
+                if (Mist.keysController.singleKeyResponse) {
+                    this.get('controller').set('model', Mist.keysController.singleKeyResponse);
+                    this.renderKey();
+                }
+            }.observes('Mist.keysController.singleKeyResponse'),
+
             machinesObserver: function() {
                 var machineList = new Array();
-                if (this.key.machines) {
-                    this.key.machines.forEach(function(key_machine) {
-                        var machine = Mist.backendsController.getMachineById(key_machine[0], key_machine[1]);
-                        if (machine) {
-                            machineList.push(machine);
-                        } else {
-                            var backend = Mist.backendsController.getBackendById(key_machine[0]);
-                            var item = {
-                                id: key_machine[1],
-                                name: key_machine[1],
-                                state: backend ? 'terminated' : 'unknown',
-                                backend: backend ? backend : key_machine[0],
-                                isGhost: true,
-                            };
-                            machineList.push(Machine.create(item));
-                        }
-                    });
-                }
+                this.key.machines.forEach(function(key_machine) {
+                    var machine = Mist.backendsController.getMachineById(key_machine[0], key_machine[1]);
+                    if (!machine) {
+                        var backend = Mist.backendsController.getBackendById(key_machine[0]);
+                        machine = Machine.create({
+                            id: key_machine[1],
+                            name: key_machine[1],
+                            state: backend ? 'terminated' : 'unknown',
+                            backend: backend ? backend : key_machine[0],
+                            isGhost: true,
+                        });
+                    }
+                    machineList.push(machine);
+                });
                 this.set('associatedMachines', machineList);
                 Ember.run.next(function() {
-                    $('#machines-list').listview('refresh');
+                    try {
+                        $('#single-key-machines').trigger('create');
+                        $('#single-key-machines').collapsible();
+                    } catch (e) {}
                 });
-            }.observes('controller.model.machines'),
+            }.observes('key.machines'),
 
             displayPrivateClicked: function() {
                 Mist.keysController.getPrivKey(this.key.name, '#private-key');
