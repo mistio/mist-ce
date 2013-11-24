@@ -52,7 +52,17 @@ define('app/controllers/notification', [
                             theme: $.mobile.pageLoadErrorMessageTheme
                 });
                 this.timeout = setTimeout("$.mobile.loading( 'hide' )", miliseconds);
-            },            
+            },
+
+            showMessagebox: function() {
+                $('#message-box').popup('open').popup('reposition', {positionTo: 'window'});
+                Ember.run.next(function() {
+                    $('#message-box').popup('reposition', {positionTo: 'window'});
+                    Ember.run.later(function() {
+                        $('#message-box').popup('reposition', {positionTo: 'window'});
+                    }, 300);
+                });
+            }        
         });
     }
 );

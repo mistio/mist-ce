@@ -63,6 +63,27 @@ div#splash div.mist-logo {
     margin-bottom: 18px;
 }
 
+
+#message-box .ui-btn {
+    margin-left: 3%;
+    margin-right: 3%;
+    margin-bottom: 3%;
+}
+
+#message-box {
+    max-width: 480px;
+}
+
+#message-ps {
+    font-size: 14px;
+    margin: 36px 0 -10px !important;
+}
+
+#message-box p {
+    margin-bottom: 20px;
+    margin-top: 5px;
+}
+
 /* Select Button */
 
 #machines #mist-select-machines-button {

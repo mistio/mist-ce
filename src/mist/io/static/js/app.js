@@ -73,6 +73,7 @@ define( 'app', [
     'app/views/key_priv_dialog',
     'app/views/rule',
     'app/views/user_menu',
+    'app/views/messagebox', 
     'text!app/templates/machine.html',
     'cubism',
     'ember'
@@ -115,6 +116,7 @@ define( 'app', [
                 KeyPrivDialog,
                 RuleView,
                 UserMenuView,
+                MessageBoxView,
                 machine_html,
                 cubism
                 ) {
@@ -285,6 +287,7 @@ define( 'app', [
         App.MachineAddView = MachineAddDialog;
         App.MachineManageKeysView = MachineManageKeysView;
         App.MachineManageKeysListItemView = MachineManageKeysListItemView;
+        App.MessageBoxView = MessageBoxView;
         
         App.set('backendAddController', BackendAddController.create());
         App.set('backendsController', BackendsController.create());
