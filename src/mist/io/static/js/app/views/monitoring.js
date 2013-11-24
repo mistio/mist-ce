@@ -231,7 +231,7 @@ define('app/views/monitoring', [
 
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = 160 / 1280 * width;
-                    var margin = {top: 10, right: 0, bottom: 24, left: 40}; // TODO Fix Margin Based On Aspect Ratio
+                    var margin = {top: 10, right: 0, bottom: 24, left: 40};
 
                     this.id = divID;
                     this.width = width;
@@ -569,10 +569,11 @@ define('app/views/monitoring', [
 
                         // Update y-axis line
                         d3xAxisLine.attr('y1',""+(this.height - margin.bottom +2))
-                                   .attr('y2',""+(this.height - margin.bottom +2));
+                                   .attr('y2',""+(this.height - margin.bottom +2))
+                                   .attr('x2',""+(this.width + margin.left + margin.right));
                                    
                         d3yAxisLine.attr('y2',""+ (this.height - margin.bottom +3));
-                        // Update TODO update Grid
+                        
 
                         this.updateView();
                     };
@@ -761,7 +762,7 @@ define('app/views/monitoring', [
                         // Get Width, -2 left & right border
                         var width = $("#GraphsArea").width() -2;  
 
-                        // Create Graphs // TODO change tempDate
+                        // Create Graphs 
                         var timeToDisplay = new Date();
                         timeToDisplay.setHours(0,30,0);
                         self.cpuGraph  = new Graph('cpuGraph',width,timeToDisplay,"%");
