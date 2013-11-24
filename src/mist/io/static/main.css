@@ -838,10 +838,14 @@ div.loading-monitoring {
     stroke-width: 1;    
 }
 
+#GraphsArea{
+    white-space: normal;
+}
+
 #graphBar{
     margin-top: 10px;
     margin-bottom: 10px;
-    height: 50px;
+    min-height: 50px;
     background: #e0e0e1;
 }
 
