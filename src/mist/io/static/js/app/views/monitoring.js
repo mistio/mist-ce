@@ -702,7 +702,14 @@ define('app/views/monitoring', [
                 // Execuation Starts Here
                 var machine = this.get('controller').get('model');
 
-                if(this.viewRendered && machine.hasMonitoring && 
+                // Check if disable button pressed
+                // Then check if everything is ok to render the graphs
+                if(machine.id != ' ' && this.viewRendered && !machine.hasMonitoring){
+
+                    // Stop receiving Graph data
+                    window.clearInterval(window.monitoringInterval);
+                }
+                else if(this.viewRendered && machine.hasMonitoring && 
                     !machine.probing && machine.probed && machine.id != ' '){
 
                     var self = this;
