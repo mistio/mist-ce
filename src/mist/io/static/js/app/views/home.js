@@ -23,7 +23,6 @@ define('app/views/home', [
                     var promo = null;
                     var selectedPlan = data.selectedPlan; // Selected plans are only "Lite" and "Trial" at this point
                     var hasPromo = data.hasPromo;
-                    
                     var controller = Mist.notificationController;
                     controller.set('msgHeader', 'Welcome to Mist.io!');
                     
@@ -34,24 +33,24 @@ define('app/views/home', [
                                                     Make sure to use it before it\'s expiration!');
                     } else if (selectedPlan == 'Lite' && hasPromo) {
                         controller.set('msgPart1', 'You have chosen the "Lite" plan, but in order to give you a taste \
-                                                    of our monitoring services, we assinged you a trial.');
+                                                    of our monitoring services, we assigned you a trial.');
                         controller.set('msgPart2', 'It is completely free and lasts for 15 days, enjoy!');
                         
-                        controller.set('msgPart2', 'Don\'t forget that there is a discount waiting just for you on the "account-settings" page. \
+                        controller.set('msgPart3', 'Don\'t forget that there is a discount waiting just for you on the "account-settings" page. \
                                                     Make sure to use it before it\'s expiration!');
                     } else if (selectedPlan == 'Trial') {
                         controller.set('msgPart1', 'Enjoy your 15-day trial, it\'s totaly free!');
                     } else if (selectedPlan == 'Lite') {
                         controller.set('msgPart1', 'You have chosen the "Lite" plan, but in order to give you a taste \
-                                                    of our monitoring services, we assinged you a trial.');
+                                                    of our monitoring services, we assigned you a trial.');
                         controller.set('msgPart2', 'It is completely free and lasts for 15 days, enjoy!');
                     } else if (hasPromo) {
-                        controller.set('msgPart1', 'In order to give you a taste of our monitoring services, we assinged you a trial.');
+                        controller.set('msgPart1', 'In order to give you a taste of our monitoring services, we assigned you a trial.');
                         controller.set('msgPart2', 'It is completely free and lasts for 15 days, enjoy!');
                         controller.set('msgPart3', 'Don\'t forget that there is a discount waiting just for you on the "account-settings" page. \
                                                     Make sure to use it before it\'s expiration!');
                     } else {
-                        controller.set('msgPart1', 'In order to give you a taste of our monitoring services, we assinged you a trial.');
+                        controller.set('msgPart1', 'In order to give you a taste of our monitoring services, we assigned you a trial.');
                         controller.set('msgPart2', 'It is completely free and lasts for 15 days, enjoy!');
                     }
                     
