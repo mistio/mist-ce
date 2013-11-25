@@ -35,11 +35,16 @@ define('app/views/monitoring', [
                 this.set('viewRendered',true);
             },
 
-            // Check If Ember View Is Destroyed
+            // Check If Ember View Is Destroyed Or Disable Pressed
             willDestroyElement: function(){
 
                 this._super();
                 window.clearInterval(window.monitoringInterval);
+
+                // Re-Initialize Enable Button Of Jquery Mobile
+                Em.run.next(function() {
+                    $('.monitoring-button').button();
+                });
             },
 
             updateGraphs: function(data){
