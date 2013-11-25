@@ -394,9 +394,13 @@ define('app/views/monitoring', [
                         }
 
 
+                        // If min & max == 0 y axis will not display values. max=1 fixes this.
+                        var maxValue = d3.max(displayedData, function(d) { return d.value; });
+                        var fixedMaxValue =  maxValue == 0 ? 1 : maxValue ;
+
                         // Set Possible min/max x & y values
                         xScale.domain(d3.extent(displayedData , function(d) { return d.time;  }));
-                        yScale.domain([0, d3.max(displayedData, function(d) { return d.value; })]);
+                        yScale.domain([0, fixedMaxValue]);
 
                         // Set the range
                         if(this.isAnimated) {
