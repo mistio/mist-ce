@@ -771,7 +771,7 @@ define('app/views/monitoring', [
 
                         // Create Graphs 
                         var timeToDisplay = new Date();
-                        timeToDisplay.setHours(0,30,0);
+                        timeToDisplay.setHours(0,10,0);
                         self.cpuGraph  = new Graph('cpuGraph',width,timeToDisplay,"%");
                         self.loadGraph = new Graph('loadGraph',width,timeToDisplay);
                         self.memGraph  = new Graph('memGraph',width,timeToDisplay,"%");
