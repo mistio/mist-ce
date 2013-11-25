@@ -11,13 +11,29 @@ define('app/controllers/keys', [
     function(Key) {
         return Ember.ArrayController.extend({
 
-            keys: null,
+            keys: [],
             loadingKeys: null,
+            singleKeyRequest: null,
+            singleKeyResponse: null,
 
             init: function() {
                 this._super();
                 this.loadKeys();
             },
+
+            singleKeyRequestObserver: function() {
+                if (this.singleKeyRequest) {
+                    if (this.loadingKeys) {
+                        Ember.run.later(this, function() {
+                            this.singleKeyRequestObserver();
+                        }, 1000);
+                        return;
+                    }
+                    $('.ajax-loader.key-loader').hide();
+                    this.set('singleKeyResponse', this.getKeyByUrlName(this.singleKeyRequest));
+                    this.set('singleKeyRequest', false);
+                }
+            }.observes('singleKeyRequest'),
 
             loadKeys: function() {
                 this.set('loadingKeys', true);
@@ -234,6 +250,15 @@ define('app/controllers/keys', [
             getKeyByName: function(keyName) {
                 for (var k = 0; k < this.keys.length; ++k) {
                     if (this.keys[k].name == keyName) {
+                        return this.keys[k];
+                    }
+                }
+                return null;
+            },
+
+            getKeyByUrlName: function(keyName) {
+                for (var k = 0; k < this.keys.length; ++k) {
+                    if (this.keys[k].name.replace(/ /g,'') == keyName) {
                         return this.keys[k];
                     }
                 }

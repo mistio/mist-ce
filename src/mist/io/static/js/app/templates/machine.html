@@ -16,7 +16,11 @@
     <span class="single-view-icon-wrapper">
         <span id="single-view-provider-icon" {{bindAttr class="view.providerIconClass"}}></span>
     </span>
-
+    
+    {{#if Mist.backendsController.singleMachineRequest}}
+    <div class="ajax-loader machine-loader"></div>
+    {{/if}}
+    
     <span {{bindAttr class=":single-view-icon-wrapper image.type"}}>
         <span id="single-view-image-icon"></span>
     </span>
