@@ -847,11 +847,14 @@ div.loading-monitoring {
     margin-top: 10px;
     margin-bottom: 10px;
     min-height: 50px;
+    border:1px solid #ccc;
     background: #e0e0e1;
 }
 
 .graphBtn{
     display: inline-block;
+    margin: 0 5px;
+    width: 150px;
 }
 
 .graph > .header{
