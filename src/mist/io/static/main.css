@@ -852,71 +852,6 @@ div.loading-monitoring {
 
 .graphBtn{
     display: inline-block;
-    cursor: default;
-
-    background: rgb(245,242,242); /* Old browsers */
-    background: -moz-linear-gradient(top,  rgba(245,242,242,1) 0%, rgba(234,232,232,1) 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(245,242,242,1)), color-stop(100%,rgba(234,232,232,1))); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  rgba(245,242,242,1) 0%,rgba(234,232,232,1) 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  rgba(245,242,242,1) 0%,rgba(234,232,232,1) 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  rgba(245,242,242,1) 0%,rgba(234,232,232,1) 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  rgba(245,242,242,1) 0%,rgba(234,232,232,1) 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f2f2', endColorstr='#eae8e8',GradientType=0 ); /* IE6-9 */
-
-
-    border-top: 1px solid #EDEDED;
-    border-left: 1px solid #EDEDED;
-    border-right: 1px solid #EDEDED;
-    margin: 10px;
-    height: 30px;
-
-    box-shadow: 2px 2px 2px #888888;
-}
-
-.graphBtn:hover{
-
-    background: rgb(229,229,229); /* Old browsers */
-    background: -moz-linear-gradient(top,  rgba(229,229,229,1) 0%, rgba(221,221,221,1) 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(229,229,229,1)), color-stop(100%,rgba(221,221,221,1))); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  rgba(229,229,229,1) 0%,rgba(221,221,221,1) 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  rgba(229,229,229,1) 0%,rgba(221,221,221,1) 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  rgba(229,229,229,1) 0%,rgba(221,221,221,1) 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  rgba(229,229,229,1) 0%,rgba(221,221,221,1) 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e5e5e5', endColorstr='#dddddd',GradientType=0 ); /* IE6-9 */
-    
-    border-top: 1px solid #dddddd;
-    border-left: 1px solid #dddddd;
-    border-right: 1px solid #dddddd;
-}
-
-.graphBtn > .leftPart{
-    float: left;
-
-    width: 40px;
-    height: 30px;
-    line-height: 30px;
-
-    border-right: 1px solid #ccc;
-
-    color: #404040;
-    font-size: 1.45em;
-    text-align: center;
-}
-
-.graphBtn > .rightPart{
-    display: inline-block;
-   
-    min-width: 60px;
-    height: 30px;
-    line-height: 30px;
-
-    margin-left: 5px;
-    margin-right: 5px;
-
-    color: #404040;
-    font-size: 0.95em;
-    font-weight: bold;
-    text-align: center;
 }
 
 .graph > .header{
@@ -947,7 +882,7 @@ div.loading-monitoring {
 
 .graph > .header > .closeBtn{
     position: absolute;
-    cursor: default;
+    cursor: pointer;
 
     border-left: 1px solid #ccc;
     

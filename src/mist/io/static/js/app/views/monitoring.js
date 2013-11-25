@@ -215,6 +215,16 @@ define('app/views/monitoring', [
 
             },
 
+            redrawGraphButtons: function(){
+                $('#cpuGraphBtn > button').button();
+                $('#loadGraphBtn > button').button();
+                $('#memGraphBtn > button').button();
+                $('#diskReadGraphBtn > button').button();
+                $('#diskWriteGraphBtn > button').button();
+                $('#networkTXGraphBtn > button').button();
+                $('#networkRXGraphBtn > button').button();
+            },
+
             // Graph Constructor
             setUpGraphs: function() {
                 
@@ -697,6 +707,7 @@ define('app/views/monitoring', [
                     */
                     function onInitialized(){
                       // Run Stuff When Graph is appended and has first data
+
                     }
 
                 }
@@ -727,7 +738,8 @@ define('app/views/monitoring', [
                         // Re-Initialize Jquery Mobile Buttons
                         $('.monitoring-button').button();
                         $('#add-rule-button').button();
-                        $('#monitoring-dialog').popup();         
+                        $('#monitoring-dialog').popup();   
+                        self.redrawGraphButtons();      
                         
                         self.getGraphsCookie();
 
