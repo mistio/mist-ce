@@ -200,10 +200,15 @@ define('app/controllers/monitoring', [
                     error: function(jqXHR, textStatus, errorThrown) {
                         
                         if(errorThrown == 'timeout'){
-                            Mist.notificationController.timeNotify("Data request timed out. " +
-                                                               "Internet is down or server doesn't respond",4000);
 
-                            self.machineNotResponding = true;
+                            // When monitoring is disabled ajax call may be still run one time.
+                            // So we won't display error if it is disabled
+                            if(self.machine.hasMonitoring){
+                                Mist.notificationController.timeNotify("Data request timed out. " +
+                                                                       "Internet is down or server doesn't respond",4000);
+
+                                self.machineNotResponding = true;
+                            }
                         }
                         else{
                             Mist.notificationController.timeNotify("An error occurred while retrieving data",4000);
