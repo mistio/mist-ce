@@ -70,7 +70,7 @@
             </div>
         </div>        
     {{/if}}
-    <div data-role="collapsible" data-collapsed="false" {{bindAttr class="probed :monitoring-collapsible"}}>
+    <div data-role="collapsible" data-collapsed="false">
         <h3>Monitoring</h3>
         <div id="monitoring-wrapper" {{bindAttr class=":ui-btn-inner :ui-corner-top :ui-corner-bottom pendingStats"}}>
 
@@ -82,13 +82,9 @@
                     <h1>Fetching stats...</h1>
                 </div>
             </div>
-            
-            <div id="dummyGraph" style="display:none;"></div>
-            <div id="cpuGraph"></div>
-            <div id="loadGraph"></div>
-            <div id="networkGraph"></div>
-            <div id="diskGraph"></div>
-            <div id="memoryGraph"></div>
+                        
+                {{view Mist.MonitoringView}}      
+                    
             <div class="ui-loader ui-corner-all ui-body-a ui-loader-verbose pending-monitoring"  style="display:none;">
                 <span class="ui-icon ui-icon-loading"></span>
                 <h1>Disabling monitoring</h1>
@@ -304,11 +300,11 @@
         </div>
         <div id="monitoring-disabled">
             <div id="enable-monitoring-dialog">
-                <div>Are you sure you wish to enable monitoring for {{name}}?</div>
+                <div id="enable-confirmation">Are you sure you wish to enable monitoring for {{name}}?</div>
 
                 {{#unless probed}}
-                    <p>The collectd daemon can't be installed automatically because there is no key pair set.</p>
-                    <p>You will have to configure it manually by following the instructions after pressing enable.</p>
+                    <p>The collectd daemon can't be installed automatically because Mist.io can not connect to this machine.</p>
+                    <p>To connect a machine with Mist.io you can follow the instructions on the <a href="https://mistio.zendesk.com/hc/en-us/articles/200996166" target="_blank">help page</a>.</p>
                 {{/unless}}
 
                 <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
