@@ -10,11 +10,12 @@ define('app/controllers/backends', [
      */
     function(Backend, Rule) {
         return Ember.ArrayController.extend({
+
             content: [],
             machineCount: 0,
             imageCount: 0,
             loadingImages: false,
-            loadingMachines: true,
+            loadingMachines: null,
             singleMachineRequest: null,
             singleMachineResponse: null,
 
