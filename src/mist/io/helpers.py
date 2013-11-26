@@ -294,12 +294,6 @@ def get_machine_actions(machine, backend):
     can_reboot = True
     can_tag = True
 
-    if backend.type == 'bare_metal':
-        can_tag = False
-        can_start = False
-        can_destroy  = False
-        can_stop = True
-
     if backend.type in EC2_PROVIDERS:
         can_stop = True
 
@@ -328,6 +322,13 @@ def get_machine_actions(machine, backend):
         can_stop = False
         can_reboot = False
         can_tag = False
+
+    if backend.type == 'bare_metal':
+        can_tag = False
+        can_start = False
+        can_destroy  = False
+        can_stop = False
+        can_reboot = False
 
     return {'can_stop': can_stop,
             'can_start': can_start,
