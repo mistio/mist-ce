@@ -25,7 +25,7 @@ define('app/controllers/monitoring', [
             * Receives first data and set time interval for
             * next reuqests
             */
-            setupDataRequest: function(){
+            setupDataRequest: function(timeToRequest){
 
                 var SECONDS_INTERVAL = 10000;
 
@@ -37,9 +37,12 @@ define('app/controllers/monitoring', [
                 self.machine.set('pendingStats', true);
 
                 var stop = (new Date()).getTime() - timeGap * 1000;
-                var start = stop - 1800*1000; // Substract Half Hour Of The Stop Date
+                var start = stop - (timeToRequest.getHours()*60*60 + timeToRequest.getMinutes()*60 + timeToRequest.getSeconds())*1000;//1800*1000; // Substract Half Hour Of The Stop Date
                 var step = 10000;
 
+
+                console.log("Stop: " + (new Date(stop)));
+                console.log("Start: " + (new Date(start)));
                 self.receiveData(start, stop, step);
 
 
@@ -93,7 +96,7 @@ define('app/controllers/monitoring', [
                             'stop': Math.floor(stop / 1000),
                             'step': step,
                             'auth_key': Mist.auth_key},
-                    timeout: 4000,
+                    timeout: 10000,
                     success: function (data, status, xhr){
                         
                         var controller = Mist.monitoringController;
@@ -102,7 +105,6 @@ define('app/controllers/monitoring', [
 
                             if(data.load.length == 0)
                                 throw "Received Wrong Server Response";
-
 
                             var disks = [];
                             var netInterfaces = [];
@@ -129,7 +131,7 @@ define('app/controllers/monitoring', [
                                 netRX:     [],
                                 netTX:     []
                             };
-
+                            console.log("Received: " + data.load.length + " measurements");
                             // Create a date with first measurement time
                             var metricTime = new Date(start);
 

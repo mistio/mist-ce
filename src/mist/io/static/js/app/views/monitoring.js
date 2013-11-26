@@ -139,9 +139,22 @@ define('app/views/monitoring', [
             selectPressed: function(){
 
                 var selectValue = $("#timeWindowSelect").val();
+                
                 var newTime = new Date();
-                newTime.setHours(0,+selectValue,0);
+                if(selectValue.toLowerCase().search("minutes") != -1)
+                {
+                    selectValue = selectValue.replace(/\D+/g, '' );
+                    console.log("Minutes To Display:" + selectValue);
+                    newTime.setHours(0,+selectValue,0);
+                }
+                else if(selectValue.toLowerCase().search("hours") != 1 || selectValue.toLowerCase().search("hour") != 1)
+                {
+                    selectValue = selectValue.replace(/\D+/g, '' );
+                    console.log("Hours To Display:" + selectValue);
+                    newTime.setHours(+selectValue,0,0); 
+                }
 
+                // Update Graph Time
                 this.cpuGraph.changeTimeToDisplay(newTime);
                 this.loadGraph.changeTimeToDisplay(newTime);
                 this.memGraph.changeTimeToDisplay(newTime);
@@ -149,17 +162,6 @@ define('app/views/monitoring', [
                 this.diskWriteGraph.changeTimeToDisplay(newTime);
                 this.networkTXGraph.changeTimeToDisplay(newTime);
                 this.networkRXGraph.changeTimeToDisplay(newTime);
-
-                // For Dedicated Graph TODO Remove It
-                /*if(selectValue.toLowerCase().search("minutes") || selectValue.toLowerCase().search("minute"))
-                {
-                    selectValue = selectValue.replace(/\D+/g, '' );
-                    var newTime = new Date();
-                    newTime.setHours(0,+selectValue,0);
-                    graph.changeTimeToDisplay(newTime);
-                }
-                // ELSE add Hours/Hour TODO
-                */
             },
 
             setGraphsCookie: function(){
@@ -257,7 +259,7 @@ define('app/views/monitoring', [
 
                     var NUM_OF_LABELS = 5;
                     var STEP_SECONDS = 10;
-                    var NUM_OF_MIN_MEASUREMENTS = 180;  // 30 Minutes
+                    var NUM_OF_MIN_MEASUREMENTS = 8640; // 24 Hours
                     var NUM_OF_MAX_MEASUREMENTS = 8640; // 24 Hours
 
                     // Calculate Aspect Ratio Of Height
@@ -424,6 +426,11 @@ define('app/views/monitoring', [
                             displayedData = this.data;
                         }
 
+
+                        // DEBUG TODO REMOVE IT
+                        console.log("Number Of Measurements Graph Has: " + this.data.length);
+                        console.log("Number Of Measurements Displayed: " + displayedData.length);
+                        // DEBUG TODO REMOVE IT
 
                         // If min & max == 0 y axis will not display values. max=1 fixes this.
                         var maxValue = d3.max(displayedData, function(d) { return d.value; });
@@ -808,7 +815,9 @@ define('app/views/monitoring', [
 
                         // Create Graphs 
                         var timeToDisplay = new Date();
+                        var timeToReceive = new Date();
                         timeToDisplay.setHours(0,10,0);
+                        timeToReceive.setHours(12,0,0);
                         self.cpuGraph  = new Graph('cpuGraph',width,timeToDisplay,"%");
                         self.loadGraph = new Graph('loadGraph',width,timeToDisplay);
                         self.memGraph  = new Graph('memGraph',width,timeToDisplay,"%");
@@ -817,7 +826,7 @@ define('app/views/monitoring', [
                         self.networkRXGraph = new Graph('networkRXGraph',width,timeToDisplay);
                         self.networkTXGraph = new Graph('networkTXGraph',width,timeToDisplay);
 
-                        controller.setupDataRequest();
+                        controller.setupDataRequest(timeToReceive);
 
                         // Set Up Resolution Change Event
                         $(window).resize(function(){
