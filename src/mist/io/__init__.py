@@ -78,7 +78,22 @@ def main(global_config, **settings):
         #~ settings['auth'] = 0
 
     config = Configurator(root_factory=Root, settings=settings)
+    config.include(add_routes)
+    config.scan()
+    app = config.make_wsgi_app()
 
+    return app
+
+
+def add_routes(config):
+    """This function defines pyramid routes.
+
+    Takes a Configurator instance as argument and changes it's configuration.
+    Any return value is ignored. This was put in a separate function so that it
+    can easily be imported and extended upon.
+    Just use: config.include(add_routes)
+
+    """
     config.add_static_view('resources', 'mist.io:static')
 
     config.add_route('home', '/')
@@ -110,9 +125,3 @@ def main(global_config, **settings):
     config.add_route('rule', '/rules/{rule}')
     config.add_route('check_auth', '/auth')
     config.add_route('account', '/account')
-
-    config.scan()
-
-    app = config.make_wsgi_app()
-
-    return app

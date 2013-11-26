@@ -322,6 +322,9 @@ class OODict(object):
     def __deepcopy__(self, memo):
         return type(self)(deepcopy(self._dict, memo))
 
+    def as_dict(self):
+        return {key: self.__getitem__(key) for key in self.keys()}
+
 
 class FieldsSequence(object):
     """Abstract Base Class providing part of the required methods for a
