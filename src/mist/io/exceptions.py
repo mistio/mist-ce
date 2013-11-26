@@ -83,11 +83,11 @@ class NotFoundError(BaseError):
     msg = "Not Found"
 
 
-class BackendNotFoundError(NotFoundError):
+class BackendNotFoundError(NotFoundError, KeyError):
     msg = "Backend not found"
 
 
-class KeypairNotFoundError(NotFoundError):
+class KeypairNotFoundError(NotFoundError, KeyError):
     msg = "Keypair not found"
 
 

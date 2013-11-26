@@ -218,7 +218,6 @@ def add_backend(request):
     user = user_from_request(request)
     backend_id = methods.add_backend(user, title, provider, apikey,
                                      apisecret, apiurl, tenant_name)
-
     backend = user.backends[backend_id]
     return {
         'index': len(user.backends) - 1,

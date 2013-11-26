@@ -40,7 +40,6 @@ def add_backend(user, title, provider, apikey,
     """Adds a new backend to the user and returns the new backend_id."""
 
     log.info("Adding new backend in provider '%s'", provider)
-
     # if api secret not given, search if we already know it
     # FIXME: just pass along an empty apisecret
     if apisecret == 'getsecretfromdb':

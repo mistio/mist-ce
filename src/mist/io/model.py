@@ -30,7 +30,7 @@ import logging
 
 
 from Crypto.PublicKey import RSA
-
+from hashlib import sha256
 
 from mist.io.dal import StrField, IntField, FloatField, BoolField
 from mist.io.dal import ListField, DictField
