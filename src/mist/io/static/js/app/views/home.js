@@ -50,8 +50,8 @@ define('app/views/home', [
                         controller.set('msgPart3', 'Don\'t forget that there is a discount waiting just for you on the "account-settings" page. \
                                                     Make sure to use it before it\'s expiration!');
                     } else {
-                        controller.set('msgPart1', 'In order to give you a taste of our monitoring services, we assigned you a trial.');
-                        controller.set('msgPart2', 'It is completely free and lasts for 15 days, enjoy!');
+                        //controller.set('msgPart1', 'In order to give you a taste of our monitoring services, we assigned you a trial.');
+                        //controller.set('msgPart2', 'It is completely free and lasts for 15 days, enjoy!');
                     }
                     
                     controller.set('msgPart4', 'To manage your account settings click "Me" > "My account".');
