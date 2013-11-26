@@ -64,9 +64,11 @@ define('app/views/backend_add', [
                     $('#addBackendOpenstack').show();
                     $('#addBackendBareMetal').hide();                    
                 } else if (event.target.title.indexOf("bare_metal") != -1) {
+                    // TODO: Render keys...
                     $('#addBackendInfo').hide();
                     $('#addBackendBareMetal').show();
-                    $('#addBackendOpenstack').hide();                    
+                    $('#addBackendOpenstack').hide();
+                    Mist.backendAddController.set('newBareServerUser', 'root');       
                 } else {
                     $('#addBackendInfo').show();                 
                     $('#ApiKeylabel').text('2. API Key:');
