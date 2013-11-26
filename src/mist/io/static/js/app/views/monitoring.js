@@ -136,10 +136,22 @@ define('app/views/monitoring', [
                 
             },
 
-            selectPressed: function(graph){
+            selectPressed: function(){
 
-                var selectValue = $("#" + graph.id + " select").val();
-                if(selectValue.toLowerCase().search("minutes") || selectValue.toLowerCase().search("minute"))
+                var selectValue = $("#timeWindowSelect").val();
+                var newTime = new Date();
+                newTime.setHours(0,+selectValue,0);
+
+                this.cpuGraph.changeTimeToDisplay(newTime);
+                this.loadGraph.changeTimeToDisplay(newTime);
+                this.memGraph.changeTimeToDisplay(newTime);
+                this.diskReadGraph.changeTimeToDisplay(newTime);
+                this.diskWriteGraph.changeTimeToDisplay(newTime);
+                this.networkTXGraph.changeTimeToDisplay(newTime);
+                this.networkRXGraph.changeTimeToDisplay(newTime);
+
+                // For Dedicated Graph TODO Remove It
+                /*if(selectValue.toLowerCase().search("minutes") || selectValue.toLowerCase().search("minute"))
                 {
                     selectValue = selectValue.replace(/\D+/g, '' );
                     var newTime = new Date();
@@ -147,6 +159,7 @@ define('app/views/monitoring', [
                     graph.changeTimeToDisplay(newTime);
                 }
                 // ELSE add Hours/Hour TODO
+                */
             },
 
             setGraphsCookie: function(){
@@ -228,6 +241,9 @@ define('app/views/monitoring', [
                 $('#diskWriteGraphBtn > button').button();
                 $('#networkTXGraphBtn > button').button();
                 $('#networkRXGraphBtn > button').button();
+
+                // DEBUG TODO Possible Remove It
+                $('#timeWindowSelect').selectmenu();
             },
 
             // Graph Constructor
