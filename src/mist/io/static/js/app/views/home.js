@@ -11,13 +11,7 @@ define('app/views/home', [
         return MistScreen.extend({
             template: Ember.Handlebars.compile(home_html),
             
-            willInsertElement: function() {
-                try {
-                    $('.ui-popup').popup('destroy').remove();
-                } catch(e){}
-            },
-            
-            didInsertElement: function() {
+            didInsertElement: function() { // Overrides mistscreen
                 
                 try {
                     $("[data-role=page]").page('destroy').page();
