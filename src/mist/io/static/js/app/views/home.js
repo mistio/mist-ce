@@ -11,7 +11,18 @@ define('app/views/home', [
         return MistScreen.extend({
             template: Ember.Handlebars.compile(home_html),
             
+            willInsertElement: function() {
+                try {
+                    $('.ui-popup').popup('destroy').remove();
+                } catch(e){}
+            },
+            
             didInsertElement: function() {
+                
+                try {
+                    $("[data-role=page]").page('destroy').page();
+                } catch(e){}
+                
                 // Welcome message to the new users
                 
                 // Get data from registration
