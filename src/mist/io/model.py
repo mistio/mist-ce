@@ -35,7 +35,10 @@ from hashlib import sha256
 from mist.io.dal import StrField, IntField, FloatField, BoolField
 from mist.io.dal import ListField, DictField
 from mist.io.dal import OODict, FieldsDict, FieldsList, make_field
-from mist.io.dal import UserEngine
+try:
+    from mist.core.dal import UserEngine
+except ImportError:
+    from mist.io.dal import UserEngine
 from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
 
 

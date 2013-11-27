@@ -253,6 +253,7 @@ class OODict(object):
     __metaclass__ = abc.ABCMeta
 
     _fields = []
+    _dict = {}
 
     def __init__(self, _dict=None):
         """Initiate user by given dict."""

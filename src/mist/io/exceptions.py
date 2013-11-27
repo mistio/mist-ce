@@ -91,7 +91,7 @@ class KeypairNotFoundError(NotFoundError, KeyError):
     msg = "Keypair not found"
 
 
-class MachineNotFoundError(NotFoundError):
+class MachineNotFoundError(NotFoundError, KeyError):
     msg = "Machine not found"
 
 
