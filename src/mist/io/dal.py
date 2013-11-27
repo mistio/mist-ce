@@ -431,6 +431,7 @@ class FieldsDict(FieldsSequence, MutableMapping):
     """
 
     _seq_type = dict
+    _key_error = KeyError
 
     def __iter__(self):
         for key in self._seq.keys():
@@ -450,6 +451,18 @@ class FieldsDict(FieldsSequence, MutableMapping):
         lines = [str(type(self))]
         lines += ["%r: %r" % (key, self[key]) for key in self.keys()]
         return "\n  * ".join(lines)
+
+    def __getitem__(self, key):
+        try:
+            return super(FieldsDict, self).__getitem__(key)
+        except KeyError:
+            raise self._key_error(key)
+
+    def __delitem__(self, key):
+        try:
+            return super(FieldsDict, self).__delitem__(key)
+        except KeyError:
+            raise self._key_error(key)
 
 
 ### Persistence handling ###

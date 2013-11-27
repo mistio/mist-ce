@@ -822,3 +822,14 @@ def get_auth_key(request):
     auth_key = "%s:%s" % (user.email, user.password)
     auth_key = urlsafe_b64encode(auth_key)
     return auth_key
+
+
+@view_config(route_name='providers', request_method='GET', renderer='json')
+def list_supported_providers(request):
+    """
+    @param request: A simple GET request
+    @return: Return all of our SUPPORTED PROVIDERS
+    """
+    return {
+        'supported_providers': config.SUPPORTED_PROVIDERS
+    }

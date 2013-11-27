@@ -71,24 +71,7 @@ class Backend(OODict):
 class Backends(FieldsDict):
 
     _item_type = make_field(Backend)
-
-    def __getitem__(self, key):
-        try:
-            return super(Backends, self).__getitem__(key)
-        except KeyError:
-            raise BackendNotFoundError(key)
-
-    def __setitem__(self, key, value):
-        try:
-            return super(Backends, self).__setitem__(key, value)
-        except KeyError:
-            raise BackendNotFoundError(key)
-
-    def __delitem__(self, key):
-        try:
-            return super(Backends, self).__delitem__(key)
-        except KeyError:
-            raise BackendNotFoundError(key)
+    _key_error = BackendNotFoundError
 
 
 class Keypair(OODict):
@@ -142,24 +125,7 @@ class Keypair(OODict):
 class Keypairs(FieldsDict):
 
     _item_type = make_field(Keypair)
-
-    def __getitem__(self, key):
-        try:
-            return super(Keypairs, self).__getitem__(key)
-        except KeyError:
-            raise KeypairNotFoundError(key)
-
-    def __setitem__(self, key, value):
-        try:
-            return super(Keypairs, self).__setitem__(key, value)
-        except KeyError:
-            raise KeypairNotFoundError(key)
-
-    def __delitem__(self, key):
-        try:
-            return super(Keypairs, self).__delitem__(key)
-        except KeyError:
-            raise KeypairNotFoundError(key)
+    _key_error = KeypairNotFoundError
 
 
 class User(UserEngine):

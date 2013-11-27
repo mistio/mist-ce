@@ -14,6 +14,7 @@ requires = [
     'pyyaml',
     'pycrypto',
     'requests',
+    'nose'
 ]
 
 setup(name='mist.io',

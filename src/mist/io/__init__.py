@@ -97,6 +97,7 @@ def add_routes(config):
     config.add_static_view('resources', 'mist.io:static')
 
     config.add_route('home', '/')
+    config.add_route('providers', '/providers')
     config.add_route('backends', '/backends')
     config.add_route('backend_action', '/backends/{backend}')
 

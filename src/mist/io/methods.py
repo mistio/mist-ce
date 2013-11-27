@@ -260,7 +260,8 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
     # there is no need to manually set the association in keypair.machines
     # that is automatically handled by Shell, if it is configured by
     # shell.autoconfigure (which ssh_command does)
-    ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
+    if host:
+        ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
 
 
 @core_wrapper
