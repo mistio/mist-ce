@@ -1,0 +1,88 @@
+
+            <div id="GraphsArea">
+                        
+                  <!-- Graphs -->
+                  <div id="cpuGraph" class="graph">
+            	     <div class='header'>
+                              <div class="title">CPU</div>
+                              <div class='closeBtn' {{action "clickedCollapse" view.cpuGraph target="view"}}>-</div>
+                        </div>
+                  </div>
+                  <div id="loadGraph" class="graph">
+                        <div class='header'>
+                              <div class="title">Load</div>
+                              <div class='closeBtn' {{action "clickedCollapse" view.loadGraph target="view"}}>-</div>
+                        </div>
+                  </div>
+                  <div id="memGraph" class="graph">
+                        <div class='header'>
+                              <div class="title">Memory</div>
+                              <div class='closeBtn' {{action "clickedCollapse" view.memGraph target="view"}}>-</div>
+                        </div>
+                  </div>
+                  <div id="diskReadGraph" class="graph">
+                        <div class='header'>
+                              <div class="title">Disk Read (B/s)</div>
+                              <div class='closeBtn' {{action "clickedCollapse" view.diskReadGraph target="view"}}>-</div>
+                        </div>
+                  </div>
+                  <div id="diskWriteGraph" class="graph">
+                        <div class='header'>
+                              <div class="title">Disk Write (B/s)</div>
+                              <div class='closeBtn' {{action "clickedCollapse" view.diskWriteGraph target="view"}}>-</div>
+                        </div>
+                  </div>
+
+                  <div id="networkTXGraph" class="graph">
+                        <div class='header'>
+                              <div class="title">Network Tx (B/s)</div>
+                              <div class='closeBtn' {{action "clickedCollapse" view.networkTXGraph target="view"}}>-</div>
+                        </div>
+                  </div>
+
+                  <div id="networkRXGraph" class="graph">
+                        <div class='header'>
+                              <div class="title">Network Rx (B/s)</div>
+                              <div class='closeBtn' {{action "clickedCollapse" view.networkRXGraph target="view"}}>-</div>
+                        </div>
+                  </div>
+
+
+                  <!-- Graph Buttons -->
+                  <div id="graphBar">
+                        <div id="cpuGraphBtn" class="graphBtn">
+                        <button data-icon="plus" data-theme="c" 
+                                    {{action "clickedExpand" view.cpuGraph target="view"}}>CPU</button>
+                        </div>
+
+                        <div id="loadGraphBtn" class="graphBtn">
+                        <button data-icon="plus" data-theme="c"
+                                    {{action "clickedExpand" view.loadGraph target="view"}}>Load</button>
+                        </div>
+                        
+                        <div id="memGraphBtn" class="graphBtn">
+                        <button data-icon="plus" data-theme="c"
+                                    {{action "clickedExpand" view.memGraph target="view"}}>Memory</button>
+                        </div>
+                        
+                        <div id="diskReadGraphBtn" class="graphBtn">
+                        <button data-icon="plus" data-theme="c"
+                                    {{action "clickedExpand" view.diskReadGraph target="view"}}>Disk Read</button>
+                        </div>
+                        
+                        <div id="diskWriteGraphBtn" class="graphBtn">
+                        <button data-icon="plus" data-theme="c"
+                                    {{action "clickedExpand" view.diskWriteGraph target="view"}}>Disk Write</button>
+                        </div>
+                        
+                        <div id="networkTXGraphBtn" class="graphBtn">
+                        <button data-icon="plus" data-theme="c"
+                                    {{action "clickedExpand" view.networkTXGraph target="view"}}>Network Tx</button>
+                        </div>
+                        
+                        <div  id="networkRXGraphBtn" class="graphBtn">
+                        <button data-icon="plus" data-theme="c"
+                                    {{action "clickedExpand" view.networkRXGraph target="view"}}>Network Rx</button>
+                        </div>
+                  </div>
+            </div>

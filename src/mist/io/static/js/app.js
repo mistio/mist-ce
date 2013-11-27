@@ -12,7 +12,6 @@ require.config({
         handlebars: 'lib/handlebars-1.0.0-rc.3',
         mobile: 'lib/jquery.mobile-1.3.0',
         d3: 'lib/d3-2.10.1',
-        cubism: 'lib/cubism-1.2.2',
         md5: 'lib/md5',
         sha256: 'lib/sha256',
     },
@@ -25,9 +24,6 @@ require.config({
         },
         'd3': {
             deps: ['jquery']
-        },
-        'cubism':{
-            deps: ['d3']
         }
     }
 });
@@ -42,6 +38,7 @@ define( 'app', [
     'app/controllers/notification',
     'app/controllers/backend_add',
     'app/controllers/machine_add',
+    'app/controllers/monitoring',
     'app/controllers/key_add',
     'app/controllers/select_machines',
     'app/controllers/select_images',
@@ -55,6 +52,7 @@ define( 'app', [
     'app/views/image_list_item',
     'app/views/machine_add_dialog',
     'app/views/machine',
+    'app/views/monitoring',
     'app/views/machine_list',
     'app/views/confirmation_dialog',
     'app/views/machine_actions_dialog',
@@ -73,8 +71,8 @@ define( 'app', [
     'app/views/key_priv_dialog',
     'app/views/rule',
     'app/views/user_menu',
+    'app/views/messagebox', 
     'text!app/templates/machine.html',
-    'cubism',
     'ember'
     ], function($,
                 jQueryUI,
@@ -84,6 +82,7 @@ define( 'app', [
                 NotificationController,
                 BackendAddController,
                 MachineAddController,
+                MonitoringController,
                 KeyAddController,
                 SelectMachinesController,
                 SelectImagesController,
@@ -97,6 +96,7 @@ define( 'app', [
                 ImageListItem,
                 MachineAddDialog,
                 SingleMachineView,
+                MonitoringView,
                 MachineListView,
                 ConfirmationDialog,
                 MachineActionsDialog,
@@ -115,8 +115,8 @@ define( 'app', [
                 KeyPrivDialog,
                 RuleView,
                 UserMenuView,
-                machine_html,
-                cubism
+                MessageBoxView,
+                machine_html
                 ) {
 
     function initialize() {
@@ -273,6 +273,7 @@ define( 'app', [
         };
 
         App.SingleMachineView = SingleMachineView;
+        App.MonitoringView = MonitoringView;
         App.MachineListView = MachineListView;
         App.UserMenuView = UserMenuView;
         App.KeyListView = KeyListView;
@@ -285,12 +286,14 @@ define( 'app', [
         App.MachineAddView = MachineAddDialog;
         App.MachineManageKeysView = MachineManageKeysView;
         App.MachineManageKeysListItemView = MachineManageKeysListItemView;
+        App.MessageBoxView = MessageBoxView;
         
         App.set('backendAddController', BackendAddController.create());
         App.set('backendsController', BackendsController.create());
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
         App.set('machineAddController', MachineAddController.create());
+        App.set('monitoringController', MonitoringController.create());
         App.set('selectMachinesController', SelectMachinesController.create());
         App.set('selectImagesController', SelectImagesController.create());
         App.set('keysController', KeysController.create());
@@ -300,6 +303,8 @@ define( 'app', [
         App.set('authenticated', AUTH || URL_PREFIX == '' ? true : false);
         App.set('email', EMAIL);
         App.set('password', '');
+
+        App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/).test(navigator.userAgent) )
 
         App.Select = Ember.Select.extend({
             attributeBindings: [
