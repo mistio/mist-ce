@@ -1,4 +1,25 @@
-"""Basic configuration and mappings"""
+"""Basic configuration and mappings
+
+Note:
+Provider.EC2_EU_WEST etc naming is deprecated by libcloud. 
+
+Now we call driver = get_driver(Providers.EC2_EU_WEST) in helpers.connect which
+calls the default EC2 driver passing datacenter argument. Instead we should
+call the default driver of EC2 passing the datacenter, example 
+
+driver = get_driver(Providers.EC2)
+conn = driver(key, secret, datacenter='eu-west-1')
+
+What we gain:
+1 Avoid using libcloud deprecated code
+2 No need to keep a separate mapping of ec2 providers
+
+EC2 datacenters are ['us-east-1', 'us-west-2', 'us-west-1', 'eu-west-1',
+            'ap-southeast-1', 'ap-northeast-1', 'ap-southeast-2','sa-east-1']
+
+"""
+
+
 from libcloud.compute.types import Provider
 from libcloud.compute.types import NodeState
 
@@ -53,76 +74,95 @@ LINODE_DATACENTERS = {
 
 
 SUPPORTED_PROVIDERS = [
-                       # EC2
-                       {'title': 'EC2 AP NORTHEAST',
-                        'provider': Provider.EC2_AP_NORTHEAST,
-                        },
-                       {'title': 'EC2 AP SOUTHEAST',
-                        'provider': Provider.EC2_AP_SOUTHEAST,
-                        },
-                       {'title': 'EC2 AP Sydney',
-                        'provider': Provider.EC2_AP_SOUTHEAST2,
-                        },
-                       {'title': 'EC2 EU Ireland',
-                        'provider': Provider.EC2_EU_WEST,
-                        },
-                       {'title': 'EC2 SA EAST',
-                        'provider': Provider.EC2_SA_EAST,
-                        },
-                       {'title': 'EC2 US EAST',
-                        'provider': Provider.EC2_US_EAST,
-                        },
-                       {'title': 'EC2 US WEST',
-                        'provider': Provider.EC2_US_WEST,
-                        },
-                       {'title': 'EC2 US WEST OREGON',
-                        'provider': Provider.EC2_US_WEST_OREGON,
-                        },
+    # EC2
+    {
+        'title': 'EC2 AP NORTHEAST',
+        'provider': Provider.EC2_AP_NORTHEAST
+    },
+   {
+        'title': 'EC2 AP SOUTHEAST',
+        'provider': Provider.EC2_AP_SOUTHEAST
+    },
+    {
+        'title': 'EC2 AP Sydney',
+        'provider': Provider.EC2_AP_SOUTHEAST2
+    },
+    {
+        'title': 'EC2 EU Ireland',
+        'provider': Provider.EC2_EU_WEST
+    },
+    {
+        'title': 'EC2 SA EAST',
+        'provider': Provider.EC2_SA_EAST
+    },
+    {
+        'title': 'EC2 US EAST',
+        'provider': Provider.EC2_US_EAST
+    },
+    {
+        'title': 'EC2 US WEST',
+        'provider': Provider.EC2_US_WEST
+    },
+    {
+        'title': 'EC2 US WEST OREGON',
+        'provider': Provider.EC2_US_WEST_OREGON
+    },
+    # NephoScale
+    {
+        'title': 'NephoScale',
+        'provider' : Provider.NEPHOSCALE
+    },
+    # DigitalOcean
+    {
+        'title': 'DigitalOcean',
+        'provider' : Provider.DIGITAL_OCEAN
+    },
+    # Linode
+    {
+        'title': 'Linode',
+        'provider' : Provider.LINODE
+    },
+    # OpenStack TODO: re-enable & test
+    {
+        'title': 'OpenStack',
+        'provider': Provider.OPENSTACK
+    },
+    # Rackspace
+    {
+        'title': 'Rackspace DFW',
+        'provider': "%s:dfw" % Provider.RACKSPACE
+    },
+    {
+        'title': 'Rackspace ORD',
+        'provider' : "%s:ord" % Provider.RACKSPACE
+    },
+    {
+        'title': 'Rackspace IAD',
+        'provider' : "%s:iad" % Provider.RACKSPACE
+    },
+    {
+        'title': 'Rackspace LON',
+        'provider' : "%s:lon" % Provider.RACKSPACE
+    },
+    {
+        'title': 'Rackspace AU',
+        'provider' : "%s:syd" % Provider.RACKSPACE
+    },
+    {
+        'title': 'Rackspace US (OLD)',
+        'provider' : "%s:us" % Provider.RACKSPACE_FIRST_GEN
+    },
+    {
+        'title': 'Rackspace UK (OLD)',
+        'provider' : "%s:uk" % Provider.RACKSPACE_FIRST_GEN
+    },
+    # Softlayer
+    {
+        'title': 'SoftLayer',
+        'provider' : Provider.SOFTLAYER
+    } 
+]
 
-                       # NephoScale
-                       {'title': 'NephoScale',
-                        'provider' : Provider.NEPHOSCALE},
-
-                       # DigitalOcean
-                       {'title': 'DigitalOcean',
-                        'provider' : Provider.DIGITAL_OCEAN},
-
-                       # Linode
-                       {'title': 'Linode',
-                        'provider' : Provider.LINODE},
-
-                       # OpenStack TODO: re-enable & test
-                       {'title': 'OpenStack',
-                        'provider': Provider.OPENSTACK,
-                       },
-
-                       # Rackspace
-                       {'title': 'Rackspace DFW',
-                        'provider': "%s:%s" % (Provider.RACKSPACE,'dfw')
-                        },
-                       {'title': 'Rackspace ORD',
-                        'provider' : "%s:%s" % (Provider.RACKSPACE,'ord')
-                        },
-                       {'title': 'Rackspace IAD',
-                        'provider' : "%s:%s" % (Provider.RACKSPACE,'iad')
-                        },
-                       {'title': 'Rackspace LON',
-                        'provider' : "%s:%s" % (Provider.RACKSPACE,'lon')
-                        },
-                       {'title': 'Rackspace AU',
-                        'provider' : "%s:%s" % (Provider.RACKSPACE,'syd')
-                        },
-                       {'title': 'Rackspace US (OLD)',
-                        'provider' : "%s:%s" % (Provider.RACKSPACE_FIRST_GEN,'us')
-                        },
-                       {'title': 'Rackspace UK (OLD)',
-                        'provider' : "%s:%s" % (Provider.RACKSPACE_FIRST_GEN,'uk')
-                        },
-                        # Softlayer
-                       {'title': 'SoftLayer',
-                        'provider' : Provider.SOFTLAYER
-                       } 
-                       ]
 
 # Base AMIs
 EC2_IMAGES = {
