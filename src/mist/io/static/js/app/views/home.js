@@ -13,9 +13,7 @@ define('app/views/home', [
             
             didInsertElement: function() { // Overrides mistscreen
                 
-                try {
-                    $("[data-role=page]").page('destroy').page();
-                } catch(e){}
+                this._super();
                 
                 // Welcome message to the new users
                 
