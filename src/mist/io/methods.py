@@ -73,6 +73,16 @@ def add_backend(user, title, provider, apikey,
     if backend_id in user.backends:
         raise BackendExistsError(backend_id)
 
+    # validate backend before adding
+    # TODO: is this good enough?
+    conn = connect_provider(backend)
+    try:
+        machines = conn.list_nodes()
+    except InvalidCredsError:
+        raise BackendUnauthorizedError()
+    except:
+        raise BackendUnavailableError()
+
     #~ FIXME backend.poll_interval
     with user.lock_n_load():
         user.backends[backend_id] = backend

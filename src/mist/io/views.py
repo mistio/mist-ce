@@ -284,7 +284,6 @@ def list_keys(request):
     keys are returned.
 
     """
-
     user = user_from_request(request)
     return [{'id': key.replace(' ', ''),
              'name': key,

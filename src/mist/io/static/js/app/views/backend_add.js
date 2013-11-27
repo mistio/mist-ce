@@ -129,7 +129,7 @@ define('app/views/backend_add', [
                     },
                     error: function(request){
                         that.set('pendingCreation', false);
-                        Mist.notificationController.notify(request.responseText);
+                        Mist.notificationController.timeNotify(request.responseText, 5000);
                     }
                 });
             },
