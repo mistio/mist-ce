@@ -1,6 +1,4 @@
-define('app/controllers/key_add', [
-    'ember'
-    ],
+define('app/controllers/key_add', ['ember'],
     /**
      * Key Add Controller
      *
@@ -47,7 +45,52 @@ define('app/controllers/key_add', [
                         $('#action-loader').fadeOut(200);
                     }
                 });
-            }
+            },
+            
+            createKey: function(callback) {
+                $('#create-loader').fadeIn(200);
+                $('#create-key-ok').addClass('ui-disabled');
+                var item = {
+                    'name': name,
+                    'priv': privateKey
+                };
+                $.ajax({
+                    url: '/keys',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(item),
+                    success: function(key) {
+                        $('#create-loader').fadeOut(200);
+                        $('#create-key-dialog').popup('close');
+                        Mist.keyAddController.clear();
+                        Mist.keysController.keys.addObject(Key.create(key));
+                        /*
+                        if (autoSelect) {
+                            Ember.run.next(function(){
+                                $('.select-key-collapsible .select-listmenu').listview();
+                                $('.select-key-collapsible').parent().trigger('create');
+                                $('.select-key-collapsible li a').eq(0).click();
+                                $('.select-key-collapsible').removeClass('ui-disabled');
+                            });
+                        } else if (machine) {
+                            Mist.keysController.associateKey(name, machine);
+                            $('#manage-keys .ajax-loader').fadeIn(200);
+                        } else {
+                            Ember.run.next(function() {
+                                $('#keys-list').listview('refresh');
+                                $('#keys-list input.ember-checkbox').checkboxradio();
+                            });
+                        }
+                        */
+                    },
+                    error: function(jqXHR) {
+                        Mist.notificationController.notify('Error while creating key: ' + jqXHR.responseText);
+                        $('#create-loader').fadeOut(200);
+                        $('#create-key-ok').removeClass('ui-disabled');
+                    }
+                });
+                item.priv = privateKey = null; // Don't keep private key on client
+            },
         });
     }
 );

@@ -1,51 +1,54 @@
-<div data-role="header" data-theme="b">
-
-    <h1>mist.io</h1>
-
-    {{view Mist.UserMenuView}}
-
-</div>
-
-<div data-role="content" data-theme="c">
-
-    {{view Mist.BackendAddView}}
-
-    <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
-        {{#each Mist.backendsController}}
-            {{view Mist.BackendButtonView backendBinding="this"
-               data-icon="check" classBinding="state" class="backend-button"}}
-        {{/each}}
+<div id="home-page">
+    
+    <div data-role="header" data-theme="b">
+    
+        <h1>mist.io</h1>
+    
+        {{view Mist.UserMenuView}}
+    
     </div>
     
-    {{view Mist.EditBackendView backendBinding="Mist.backend"}}
-
-    <ul data-role="listview"
-        class="ui-listview ui-listview-inset ui-corner-all ui-shadow"
-        id="home-menu">
-        <li>
-            {{#link-to "machines"}}Machines
-                {{#if Mist.backendsController.loadingMachines}}
-                <div class="ajax-loader"></div>
-                {{/if}}    
-                <span class="ui-li-count">{{Mist.backendsController.machineCount}}</span>
-            {{/link-to}}
-        </li>
-        <li>
-            {{#link-to "images"}}Images
-                {{#if Mist.backendsController.loadingImages}}
-                <div class="ajax-loader"></div>
-                {{/if}}
-                <span class="ui-li-count">{{Mist.backendsController.imageCount}}</span>
-            {{/link-to}}
-        </li>
-        <li>
-            {{#link-to "keys"}}Keys
-                {{#if Mist.keysController.loadingKeys}}
-                <div class="ajax-loader"></div>
-                {{/if}}
-                <span class="ui-li-count">{{Mist.keysController.keys.length}}</span>
-            {{/link-to}}
-        </li>
-    </ul>
-
+    <div data-role="content" data-theme="c">
+    
+        {{view Mist.BackendAddView}}
+    
+        <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
+            {{#each Mist.backendsController}}
+                {{view Mist.BackendButtonView backendBinding="this"
+                   data-icon="check" classBinding="state" class="backend-button"}}
+            {{/each}}
+        </div>
+        
+        {{view Mist.EditBackendView backendBinding="Mist.backend"}}
+    
+        <ul data-role="listview"
+            class="ui-listview ui-listview-inset ui-corner-all ui-shadow"
+            id="home-menu">
+            <li>
+                {{#link-to "machines"}}Machines
+                    {{#if Mist.backendsController.loadingMachines}}
+                    <div class="ajax-loader"></div>
+                    {{/if}}    
+                    <span class="ui-li-count">{{Mist.backendsController.machineCount}}</span>
+                {{/link-to}}
+            </li>
+            <li>
+                {{#link-to "images"}}Images
+                    {{#if Mist.backendsController.loadingImages}}
+                    <div class="ajax-loader"></div>
+                    {{/if}}
+                    <span class="ui-li-count">{{Mist.backendsController.imageCount}}</span>
+                {{/link-to}}
+            </li>
+            <li>
+                {{#link-to "keys"}}Keys
+                    {{#if Mist.keysController.loading}}
+                    <div class="ajax-loader"></div>
+                    {{/if}}
+                    <span class="ui-li-count">{{Mist.keysController.content.length}}</span>
+                {{/link-to}}
+            </li>
+        </ul>
+    
+    </div>
 </div>

@@ -27,7 +27,7 @@
             data-filter="true"
             data-inset="true"
             data-filter-placeholder="Filter...">
-            {{#each Mist.keysController.keys}}
+            {{#each Mist.keysController.content}}
                 {{view Mist.KeyListItemView keyBinding="this" class="node"}}
             {{/each}}
         </ul>

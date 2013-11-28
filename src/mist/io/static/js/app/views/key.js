@@ -1,44 +1,60 @@
-define('app/views/key', [
-    'app/models/machine',
-    'app/views/mistscreen',
-    'text!app/templates/key.html',
-    'ember'
-    ],
+define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app/templates/key.html'],
     /**
      * Single Key View
      *
      * @returns Class
      */
-    function(Machine, MistScreen, key_html) {
+    function(MistScreen, Machine, key_html) {
         return MistScreen.extend({
+            
+
+
+            /**
+             * 
+             *  Properties
+             * 
+             */
 
             key: null,
             associatedMachines: null,
-
             template: Ember.Handlebars.compile(key_html),
-
-            init: function() {
-                this._super();
-                this.renderKey();
-            },
+            
+            
+            
+            /**
+             * 
+             *  Initialization
+             * 
+             */
 
             renderKey: function() {
                 this.set('key', this.get('controller').get('model'));
                 if (this.key.name != ' ') { // This is the dummy key. It exists when key hasn't loaded yet
                     this.machinesObserver();
-                    Mist.keysController.getPubKey(this.key.name, '#public-key input');
+                    Mist.keysController.getPublicKey(this.key.name, function(publicKey) {
+                        $('#public-key').val(publicKey);
+                    });
                 }
-            },
+            }.on('init'),
+
+
+
+            /**
+             * 
+             *  Observers
+             * 
+             */
 
             singleKeyResponseObserver: function() {
                 if (Mist.keysController.singleKeyResponse) {
+                    info('here it is!');
                     this.get('controller').set('model', Mist.keysController.singleKeyResponse);
                     this.renderKey();
                 }
             }.observes('Mist.keysController.singleKeyResponse'),
 
             machinesObserver: function() {
-                var machineList = new Array();
+                var machineList = [];
                 this.key.machines.forEach(function(key_machine) {
                     var machine = Mist.backendsController.getMachineById(key_machine[0], key_machine[1]);
                     if (!machine) {
@@ -62,10 +78,21 @@ define('app/views/key', [
                 });
             }.observes('key.machines'),
 
+
+
+            /**
+             * 
+             *  Actions
+             * 
+             */
+            
             actions: {
-                displayPrivateClicked: function() {
-                    Mist.keysController.getPrivKey(this.key.name, '#private-key');
-                    $('#private-key-dialog').popup('open');
+
+                displayClicked: function() {
+                    Mist.keysController.getPrivateKey(this.key.name, function(privateKey) {
+                        $('#private-key').text(privateKey);
+                        $('#private-key-dialog').popup('open');
+                    });
                 },
 
                 backClicked: function() {
@@ -73,9 +100,9 @@ define('app/views/key', [
                     $('#private-key-dialog').popup('close');
                 },
 
-                editClicked: function() {
+                renameClicked: function() {
                     $('#new-key-name').val(this.key.name).trigger('change');
-                    $('#edit-key-dialog').popup('open');
+                    $('#rename-key-popup').popup('open');
                 },
 
                 deleteClicked: function() {

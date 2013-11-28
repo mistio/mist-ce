@@ -1,5 +1,15 @@
-<p>{{Mist.confirmationController.text}}</p>
-<div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
-    <a data-role="button" data-theme="c" {{action "noClicked" target="view"}}>No</a>
-    <a data-role="button" data-theme="b" {{action "yesClicked" target="view"}}>Yes</a>
+<div id="confirmation-dialog" data-role="popup" data-overlay-theme="a" data-transition="pop">
+
+    <div data-role="header" data-theme="b">
+        <h1>{{Mist.confirmationController.title}}</h1>
+    </div>
+
+    <div data-role="content">
+        <p>{{Mist.confirmationController.text}}</p>
+        <div data-role="controlgroup" class="btn-full ok-cancel" data-type="horizontal">
+            <a data-role="button" data-theme="c" {{action "noClicked" target="view"}}>No</a>
+            <a data-role="button" data-theme="b" {{action "yesClicked" target="view"}}>Yes</a>
+        </div>
+    </div>
+
 </div>

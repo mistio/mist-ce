@@ -119,7 +119,7 @@ define( 'app', [
 
     function initialize() {
 
-        $(document).bind("mobileinit", function(){
+        $(document).bind("mobileinit", function() {
             $.mobile.ajaxEnabled = false;
             $.mobile.hashListeningEnabled = false;
             $.mobile.linkBindingEnabled = false;
@@ -223,7 +223,7 @@ define( 'app', [
             },
 
             exit: function() {
-                Mist.keysController.keys.forEach(function(key){
+                Mist.keysController.content.forEach(function(key){
                      key.set('selected', false);
                 });
             }
@@ -241,7 +241,7 @@ define( 'app', [
             },
 
             model: function() {
-                if (Mist.keysController.loadingKeys) {
+                if (Mist.keysController.loading) {
                     return {
                       name: ' ',
                       probing: false,
@@ -398,7 +398,7 @@ define( 'app', [
                 'name',
                 'id',
                 'data-inline'
-            ],
+            ]
         });
 
         App.HomeView = Home;

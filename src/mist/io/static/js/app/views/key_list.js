@@ -1,8 +1,4 @@
-define('app/views/key_list', [
-     'app/views/mistscreen',
-    'text!app/templates/key_list.html',
-    'ember'
-    ],
+define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_list.html'],
     /**
      * Key List View
      *
@@ -14,6 +10,10 @@ define('app/views/key_list', [
             template: Ember.Handlebars.compile(key_list_html),
 
             selectedKey: null,
+            
+            hello: function() {
+                info('did!');
+            }.on('didInsertElement'),
 
             selectedKeysObserver: function() {
                 var that = this;
@@ -51,7 +51,7 @@ define('app/views/key_list', [
                         key.set('selected', mode);
                     });
                     Ember.run.next(function() {
-                        $("input[type='checkbox']").checkboxradio("refresh");
+                        $("input[type='checkbox']").checkboxradio('refresh');
                     });
                     $('#select-keys-dialog').popup('close');
                 },
