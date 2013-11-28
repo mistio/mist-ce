@@ -56,6 +56,7 @@ define('app/views/home', [
                     } else {
                         //controller.set('msgPart1', 'In order to give you a taste of our monitoring services, we assigned you a trial.');
                         //controller.set('msgPart2', 'It is completely free and lasts for 15 days, enjoy!');
+                        return;
                     }
                     
                     controller.set('msgPart4', 'To manage your account settings click "Me" > "My account".');
