@@ -230,6 +230,7 @@ define( 'app', [
         });
 
         App.KeyRoute = Ember.Route.extend({
+            
             activate: function() {
                 Ember.run.next(function() {
                     document.title = 'mist.io - ' + Mist.getKeyNameByUrl();
@@ -237,17 +238,14 @@ define( 'app', [
             },
 
             redirect: function() {
-                Mist.keysController.set('singleKeyRequest', Mist.getKeyNameByUrl());
+                Mist.keysController.set('keyRequest', Mist.getKeyNameByUrl());
             },
 
             model: function() {
                 if (Mist.keysController.loading) {
                     return {
-                      name: ' ',
-                      probing: false,
-                      machines: [],
-                      selected: false,
-                      default_key: false,
+                        name: ' ',
+                        machines: []
                     };
                 }
                 return Mist.keysController.getKeyByUrlName(Mist.getKeyNameByUrl());

@@ -32,6 +32,16 @@ define('app/models/key', [
              * 
              */
             
+            destroy: function() {
+                var that = this;
+                Mist.confirmationController.set('title', 'Delete key');
+                Mist.confirmationController.set('text', 'Are you sure you want to delete "' + this.name + '" ?');
+                Mist.confirmationController.set('callback', function() {
+                    Mist.Router.router.transitionTo('keys');
+                    Mist.keysController.deleteKey(that.name);
+                });
+                Mist.confirmationController.show();
+            },
 
             updateMachineUptimeChecked: function(machine, timeStamp) {
                 this.machines.some(function(machineToUpdate) {

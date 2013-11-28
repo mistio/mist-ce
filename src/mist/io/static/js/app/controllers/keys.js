@@ -7,21 +7,17 @@ define(['app/models/key'],
     function(Key) {
         return Ember.ArrayController.extend({
 
-
-
             /**
              * 
              *  Properties
              * 
              */
 
-
-
             content: [],
             loading: false,
+            keyRequest: false,
+            keyResponse: false,
             creatingKey: false,
-            singleKeyRequest: false,
-            singleKeyResponse: false,
             gettingPublicKey: false,
             gettingPrivateKey: false,
 
@@ -33,13 +29,12 @@ define(['app/models/key'],
              * 
              */
 
-
-
             load: function() {
                 var that = this;
                 this.set('loading', true);
                 $.getJSON('/keys', function(keys) {
                     that.setContent(keys);
+                    that.sendKeyResponse();
                 }).error(function() {
                     that.reload();
                 }).complete(function() {
@@ -62,20 +57,11 @@ define(['app/models/key'],
              * 
              */
 
-
-
-            singleKeyRequestObserver: function() {
-                if (this.singleKeyRequest) {
-                    if (this.loading) {
-                        Ember.run.later(this, function() {
-                            this.singleKeyRequestObserver();
-                        }, 1000);
-                        return;
-                    }
-                    this.set('singleKeyResponse', this.getKeyByUrlName(this.singleKeyRequest));
-                    this.set('singleKeyRequest', false);
+            keyRequestObserver: function() {
+                if (this.keyRequest && !this.loading) {
+                    this.sendKeyResponse();
                 }
-            }.observes('singleKeyRequest'),
+            }.observes('keyRequest'),
 
 
 
@@ -85,20 +71,19 @@ define(['app/models/key'],
              * 
              */
 
-
-
-            renameKey: function(name, newName) {
+            renameKey: function(name, newName, callback) {
+                this.set('renamingKey', true);
                 $.ajax({
                     url: '/keys/' + name,
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify({'newName': newName}),
-                    success: function() {
-                        $('#edit-key-dialog').popup('close');
-                        Mist.keysController.getKeyByName(name).set('name', newName);
-                    },
                     error: function(jqXHR) {
                         Mist.notificationController.notify('Failed to edit key: ' + jqXHR.responseText);
+                    },
+                    complete: function() {
+                        this.set('renamingKey', false);
+                        if (callback) { callback(); }
                     }
                 });
             },
@@ -203,10 +188,10 @@ define(['app/models/key'],
                     type: 'GET',
                     data: 'action=private',
                     success: function(privateKey) {
-                        if (callback) { callback(privateKey); }
+                        if (callback) {callback(privateKey);}
                     },
                     error: function() {
-                        if (callback) { callback(); }
+                        if (callback) {callback();}
                     },
                     complete: function() {
                         Mist.keysController.set('gettingPrivateKey', false);
@@ -224,7 +209,7 @@ define(['app/models/key'],
                     success: function(publicKey) {
                         if (callback) { callback(publicKey); }
                     },
-                    error: function(jqXHR) {
+                    error: function() {
                         if (callback) { callback(); }
                     },
                     complete: function() {
@@ -266,7 +251,15 @@ define(['app/models/key'],
                     newKeys.push(Key.create(key));
                 });
                 this.set('content', newKeys);
-            }     
+            },
+
+
+            sendKeyResponse: function() {
+                if (this.keyRequest) {
+                    this.set('keyResponse', this.getKeyByUrlName(this.keyRequest));
+                    this.set('keyRequest', false);
+                }
+            }  
         });
     }
 );
