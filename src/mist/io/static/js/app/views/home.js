@@ -9,9 +9,13 @@ define('app/views/home', [
      */
     function(MistScreen, home_html) {
         return MistScreen.extend({
+
             template: Ember.Handlebars.compile(home_html),
             
-            didInsertElement: function() {
+            didInsertElement: function() { // Overrides mistscreen
+                
+                this._super();
+                
                 // Welcome message to the new users
                 
                 // Get data from registration
