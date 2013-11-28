@@ -18,6 +18,7 @@ define(['app/models/key'],
             keyRequest: false,
             keyResponse: false,
             creatingKey: false,
+            renamingKey: false,
             gettingPublicKey: false,
             gettingPrivateKey: false,
 
@@ -78,23 +79,24 @@ define(['app/models/key'],
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify({'newName': newName}),
-                    error: function(jqXHR) {
-                        Mist.notificationController.notify('Failed to edit key: ' + jqXHR.responseText);
+                    success: function() {
+                        if (callback) callback();
+                    },
+                    error: function() {
+                        Mist.notificationController.notify('Failed to rename key');
                     },
                     complete: function() {
                         this.set('renamingKey', false);
-                        if (callback) { callback(); }
                     }
                 });
             },
 
 
-            deleteKey: function(name) {
+            deleteKey: function(name, callback) {
                 $.ajax({
                     url: '/keys/' + name,
                     type: 'DELETE',
-                    success: function(data) {
-                        info('Successfully deleted key: ', name);
+                    success: function() {
                         Mist.keysController.updateKeysList(data);
                     },
                     error: function(jqXHR) {
