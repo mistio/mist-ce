@@ -154,9 +154,9 @@ define('app/models/machine', [
                         });
                         return ips_v4[0];
                     } catch (error) {
-                        Mist.notificationController.notify('No host available for machine ' + this.name);
-                        error('No host available for machine ' + this.name);
-                        return false;
+                        //Mist.notificationController.notify('No host available for machine ' + this.name);
+                        //error('No host available for machine ' + this.name);
+                        return null;
                     }
                 }
             },

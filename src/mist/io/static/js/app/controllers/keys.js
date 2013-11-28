@@ -17,11 +17,14 @@ define(['app/models/key'],
             loading: false,
             keyRequest: false,
             keyResponse: false,
-            creatingKey: false,
-            renamingKey: false,
             gettingPublicKey: false,
             gettingPrivateKey: false,
 
+            creatingKey: false,
+            renamingKey: false,
+            associatingKey: false,
+            disassociatingKey: false,
+            settingDefaultKey: false,
 
 
             /**
@@ -86,98 +89,81 @@ define(['app/models/key'],
                         Mist.notificationController.notify('Failed to rename key');
                     },
                     complete: function() {
-                        this.set('renamingKey', false);
+                        Mist.keysController.set('renamingKey', false);
                     }
                 });
             },
 
 
             deleteKey: function(name, callback) {
+                this.set('deletingKey', true);
                 $.ajax({
                     url: '/keys/' + name,
                     type: 'DELETE',
                     success: function() {
-                        Mist.keysController.updateKeysList(data);
+                        if (callback) callback();
                     },
-                    error: function(jqXHR) {
-                        Mist.notificationController.notify('Error while deleting key: ' + jqXHR.responseText);
+                    error: function() {
+                        Mist.notificationController.notify('Failed to delete key');
+                    },
+                    complete: function() {
+                        Mist.keysController.set('deletingkey', false);
                     }
                 });
             },
            
             
-            setDefaultKey: function(name) {
+            setDefaultKey: function(name, callback) {
+                this.set('settingDefaultKey', true);
                 $.ajax({
                     url: '/keys/' + name,
                     type: 'POST',
                     success: function() {
-                        info('Successfully set default key: ', name);
-                        Mist.keysController.keys.forEach(function(key) {
-                            if (key.name == name) {
-                                key.set('default_key', true);
-                            } else {
-                                key.set('default_key', false);
-                            }
-                        });
+                        if (callback) callback();
                     },
-                    error: function(jqXHR) {
-                        Mist.notificationController.notify('Error while setting default key: ' + jqXHR.responseText);
+                    error: function() {
+                        Mist.notificationController.notify('Failed to set default key');
+                    },
+                    complete: function() {
+                        Mist.keysController.set('settingDefaultKey', false);
                     }
                 });
             },
           
             
-            associateKey: function(keyName, machine) {
-                var payload = {
-                    'key_id': keyName,
-                    'backend_id': machine.backend.id,
-                    'machine_id': machine.id,
-                    'host': machine.getHost()
-                };
+            associateKey: function(keyName, backendId, machineId, callback) {
+                this.set('associatingKey', true);
                 $.ajax({
-                    url: '/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + keyName,
+                    url: '/backends/' + backendId + '/machines/' + machineId + '/keys/' + keyName,
                     type: 'PUT',
                     contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    success: function(data) {
-                        info('Successfully associated key: ', keyName, ', with machine: ', machine.id);
-                        $('#manage-keys .ajax-loader').fadeOut(200);
-                        Mist.keysController.updateKeyMachinesList(keyName, data);
+                    success: function() {
+                        if (callback) callback();
                     },
-                    error: function(jqXHR) {
-                        Mist.notificationController.notify('Error while associating key: ' + keyName +'. ' + jqXHR.responseText);
-                        $('#manage-keys .ajax-loader').fadeOut(200);
+                    error: function() {
+                        Mist.notificationController.notify('Failed to associate key');
+                    },
+                    complete: function() {
+                        Mist.keysController.set('associatingKey', false);
                     }
                 });
             },
 
 
-            disassociateKey: function(keyName, machine) {
-                var backend_id = null;
-                if (machine.isGhost && (!machine.backend.id)) {
-                    backend_id = machine.backend;
-                } else {
-                    backend_id = machine.backend.id;
-                }
-                var payload = {
-                    'key_id': keyName,
-                    'backend_id': backend_id,
-                    'machine_id': machine.id,
-                    'host': machine.isGhost ? null : machine.getHost(),
-                };
+            disassociateKey: function(keyName, backendId, machineId, callback) {
+                this.set('disassociatingKey', true);
                 $.ajax({
-                    url: '/backends/' + backend_id + '/machines/' + machine.id + '/keys/' + keyName,
+                    url: '/backends/' + backendId + '/machines/' + machineId + '/keys/' + keyName,
                     type: 'DELETE',
                     contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    success: function(data) {
-                        info('Successfully disassociated key: ', keyName, ' with machine: ', machine.id);
-                        $('#manage-keys .ajax-loader').fadeOut(200);
-                        Mist.keysController.updateKeyMachinesList(keyName, data);
+                    success: function() {
+                        if (callback) callback();
                     },
-                    error: function(jqXHR) {
-                        Mist.notificationController.notify('Error while disassociating key: ' + keyName +'. ' + jqXHR.responseText);
-                        $('#manage-keys .ajax-loader').fadeOut(200);
+                    error: function() {
+                        Mist.notificationController.notify('Failed to disassociate key');
+                    },
+                    complete: function() {
+                        Mist.keysController.set('disassociatingKey', false);
                     }
                 });
             },
@@ -185,38 +171,24 @@ define(['app/models/key'],
 
             getPrivateKey: function(name, callback) {
                 this.set('gettingPrivateKey', true);
-                $.ajax({
-                    url: '/keys/' + name,
-                    type: 'GET',
-                    data: 'action=private',
-                    success: function(privateKey) {
-                        if (callback) {callback(privateKey);}
-                    },
-                    error: function() {
-                        if (callback) {callback();}
-                    },
-                    complete: function() {
-                        Mist.keysController.set('gettingPrivateKey', false);
-                    }
+                $.getJSON('/keys/' + name + '/private', function(key) {
+                    if (callback) callback(key);
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to get private key');
+                }).complete(function() {
+                    Mist.keysController.set('gettingPrivateKey', true);
                 });
             },
             
             
             getPublicKey: function(name, callback) {
                 this.set('gettingPublicKey', true);
-                $.ajax({
-                    url: '/keys/' + name,
-                    type: 'GET',
-                    data: 'action=public',
-                    success: function(publicKey) {
-                        if (callback) { callback(publicKey); }
-                    },
-                    error: function() {
-                        if (callback) { callback(); }
-                    },
-                    complete: function() {
-                        Mist.keysController.set('gettingPublicKey', false);
-                    }
+                $.getJSON('/keys/' + name + '/public', function(key) {
+                    if (callback) callback(key);
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to get public key');
+                }).complete(function() {
+                    Mist.keysController.set('gettingPublicKey', true);
                 });
             },
 
