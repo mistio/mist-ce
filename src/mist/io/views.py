@@ -22,22 +22,15 @@ from pyramid.view import view_config
 
 
 try:
-    from mist.core.config import SUPPORTED_PROVIDERS, CORE_URI
-
-    from mist.core.config import GOOGLE_ANALYTICS_ID
+    from mist.core import config
     from mist.core.helpers import user_from_request
 except ImportError:
-    import mist.io.config as config
-
-    from mist.io.model import User
-    def user_from_request(request):
-        return User()
+    from mist.io import config
+    from mist.io.helpers import user_from_request
 
 from mist.io import methods
-
 from mist.io.model import Keypair
 from mist.io.shell import Shell
-
 import mist.io.exceptions as exceptions
 from mist.io.exceptions import *
 
@@ -46,14 +39,7 @@ log = logging.getLogger(__name__)
 OK = Response("OK", 200)
 
 
-try:
-    from mist.core.helpers import user_from_request
-except:
-    def user_from_request(request):
-        return User()
-
-
-@view_config(context=exceptions.BaseError)
+@view_config(context=exceptions.MistError)
 def exception_handler_mist(exc, request):
     """Here we catch exceptions and transform them to proper http responses
 
@@ -74,7 +60,7 @@ def exception_handler_mist(exc, request):
         exceptions.ServiceUnavailableError: 503,
     }
 
-    log.warning("Exception: %r", exc)
+    log.warning("MistError: %r", exc)
     for exc_type in mapping:
         if isinstance(exc, exc_type):
             return Response(str(exc), mapping[exc_type])
@@ -84,7 +70,7 @@ def exception_handler_mist(exc, request):
 
 #~ @view_config(context=Exception)
 def exception_handler_general(exc, request):
-    """This simply catches all exceptions that don't subclass BaseError and
+    """This simply catches all exceptions that don't subclass MistError and
     returns an Internal Server Error status code.
 
     When debugging it may be useful to comment out this function or its

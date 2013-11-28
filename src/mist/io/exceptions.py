@@ -3,10 +3,10 @@
 Error handling in mist is done via exceptions. In this file we define a large
 variety of exceptions.
 
-There is BaseError which every other exception should subclass so that it is
+There is MistError which every other exception should subclass so that it is
 distinguished from other kind of exceptions not raised explicitly by mist code.
 
-Then there are a few more basic exceptions that directly subclass BaseError,
+Then there are a few more basic exceptions that directly subclass MistError,
 like BadRequestError, NotAuthorizedError, NotFoundError etc. Think of them as
 basic or category exceptions. All the other exceptions subclass one of these
 basic ones. This umbrella exceptions are mainly used to make the mapping to
@@ -29,7 +29,7 @@ exception handler.
 """
 
 
-class BaseError(Exception):
+class MistError(Exception):
     """All custom mist exceptions should subclass this one.
 
     When printed, this class will always print its default message plus
@@ -40,11 +40,11 @@ class BaseError(Exception):
 
     def __init__(self, msg=None):
         msg = "%s: %s" % (self.msg, msg) if msg is not None else self.msg
-        super(BaseError, self).__init__(msg)
+        super(MistError, self).__init__(msg)
 
 
 # BAD REQUESTS (translated as 400 in views)
-class BadRequestError(BaseError):
+class BadRequestError(MistError):
     msg = "Bad Request"
 
 
@@ -61,7 +61,7 @@ class KeyValidationError(BadRequestError):
 
 
 # UNAUTHORIZED (translated as 401 in views)
-class UnauthorizedError(BaseError):
+class UnauthorizedError(MistError):
     msg = "Not authorized"
 
 
@@ -74,12 +74,12 @@ class MachineUnauthorizedError(UnauthorizedError):
 
 
 # FORBIDDEN (translated as 403 in views)
-class ForbiddenError(BaseError):
+class ForbiddenError(MistError):
     msg = "Forbidden"
 
 
 # NOT FOUND (translated as 404 in views)
-class NotFoundError(BaseError):
+class NotFoundError(MistError):
     msg = "Not Found"
 
 
@@ -96,12 +96,12 @@ class MachineNotFoundError(NotFoundError, KeyError):
 
 
 # NOT ALLOWED (translated as 405 in views)
-class MethodNotAllowedError(BaseError):
+class MethodNotAllowedError(MistError):
     msg = "Method Not Allowed"
 
 
 # CONFLICT (translated as 409 in views)
-class ConflictError(BaseError):
+class ConflictError(MistError):
     msg = "Conflict"
 
 
@@ -114,7 +114,7 @@ class KeypairExistsError(ConflictError):
 
 
 # INTERNAL ERROR (translated as 500 in views)
-class InternalServerError(BaseError):
+class InternalServerError(MistError):
     msg = "Internal Server Error"
 
 
@@ -123,7 +123,7 @@ class MachineCreationError(InternalServerError):
 
 
 # SERVICE UNAVAILABLE (translated as 503 in views)
-class ServiceUnavailableError(BaseError):
+class ServiceUnavailableError(MistError):
     msg = "Sercvice unavailable"
 
 

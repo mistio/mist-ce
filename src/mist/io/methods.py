@@ -9,27 +9,25 @@ from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
 from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
 from libcloud.compute.deployment import SSHKeyDeployment
-from libcloud.compute.types import Provider
+from libcloud.compute.types import Provider, NodeState
 from libcloud.common.types import InvalidCredsError
-from libcloud.compute.types import NodeState
 
-
-from mist.io.config import STATES
-from mist.io.config import EC2_IMAGES, EC2_PROVIDERS, EC2_SECURITYGROUP
-from mist.io.config import LINODE_DATACENTERS
-from mist.io.exceptions import *
-from mist.io.model import Backend, Keypair
-from mist.io.shell import Shell
-from mist.io.helpers import get_temp_file
 
 try:
+    from mist.core import config, model
     from mist.core.helpers import core_wrapper
 except ImportError:
+    from mist.io import config, model
     from mist.io.helpers import core_wrapper
+
+from mist.io.shell import Shell
+from mist.io.helpers import get_temp_file
+from mist.io.exceptions import *
 
 #~ # add curl ca-bundle default path to prevent libcloud certificate error
 #~ import libcloud.security
 #~ libcloud.security.CA_CERTS_PATH.append('/usr/share/curl/ca-bundle.crt')
+
 
 log = logging.getLogger(__name__)
 
@@ -59,7 +57,7 @@ def add_backend(user, title, provider, apikey,
     if not apisecret:
         raise RequiredParameterMissingError("apisecret")
 
-    backend = Backend()
+    backend = model.Backend()
     backend.title = title
     backend.provider = provider
     backend.apikey = apikey
@@ -117,7 +115,7 @@ def add_key(user, key_id, private_key):
     if key_id in user.keypairs:
         raise KeypairExistsError(key_id)
 
-    keypair = Keypair()
+    keypair = model.Keypair()
     keypair.private = private_key
     keypair.construct_public_from_private()
     keypair.default = not len(user.keypairs)
@@ -379,7 +377,7 @@ def get_machine_actions(machine_from_api, conn):
     can_reboot = True
     can_tag = True
 
-    if conn.type in EC2_PROVIDERS:
+    if conn.type in config.EC2_PROVIDERS:
         can_stop = True
 
     if conn.type in [Provider.NEPHOSCALE,
@@ -400,7 +398,7 @@ def get_machine_actions(machine_from_api, conn):
     elif machine_from_api.state is NodeState.UNKNOWN:
         # We assume uknown state mean stopped
         if conn.type in (Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                         Provider.DIGITAL_OCEAN) or conn.type in EC2_PROVIDERS:
+                         Provider.DIGITAL_OCEAN) or conn.type in config.EC2_PROVIDERS:
             can_stop = False
             can_start = True
         can_reboot = False
@@ -442,7 +440,7 @@ def list_machines(user, backend_id):
             tags.append(m.extra['availability'])
         elif m.extra.get('DATACENTERID', None):
             # for Linode
-            tags.append(LINODE_DATACENTERS[m.extra['DATACENTERID']])
+            tags.append(config.LINODE_DATACENTERS[m.extra['DATACENTERID']])
 
         image_id = m.image or m.extra.get('imageId', None)
         size = m.size or m.extra.get('flavorId', None)
@@ -453,7 +451,7 @@ def list_machines(user, backend_id):
                    'name': m.name,
                    'imageId': image_id,
                    'size': size,
-                   'state': STATES[m.state],
+                   'state': config.STATES[m.state],
                    'private_ips': m.private_ips,
                    'public_ips': m.public_ips,
                    'tags': tags,
@@ -519,7 +517,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                      Provider.OPENSTACK]:
         node = create_machine_openstack(conn, public_key, script, machine_name,
                                         image, size, location)
-    elif conn.type in EC2_PROVIDERS and private_key:
+    elif conn.type in config.EC2_PROVIDERS and private_key:
         locations = conn.list_locations()
         for loc in locations:
             if loc.id == location_id:
@@ -599,8 +597,8 @@ def create_machine_ec2(conn, key_name, private_key, public_key, script,
                                               "(ec2-only): %r" % exc)
 
     # create security group
-    name = EC2_SECURITYGROUP.get('name', '')
-    description = EC2_SECURITYGROUP.get('description', '')
+    name = config.EC2_SECURITYGROUP.get('name', '')
+    description = config.EC2_SECURITYGROUP.get('description', '')
     try:
         log.info("Attempting to create security group")
         conn.ex_create_security_group(name=name, description=description)
@@ -626,7 +624,7 @@ def create_machine_ec2(conn, key_name, private_key, public_key, script,
                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                 max_tries=1,
                 ex_keyname=key_name,
-                ex_securitygroup=EC2_SECURITYGROUP['name']
+                ex_securitygroup=config.EC2_SECURITYGROUP['name']
             )
         except Exception as e:
             raise MachineCreationError("EC2, got exception %s" % e)
@@ -935,17 +933,17 @@ def list_images(user, backend_id, term=None):
         ec2_images = []
         rest_images = []
         images = []
-        if conn.type in EC2_PROVIDERS:
-            imgs = EC2_IMAGES[conn.type].keys() + starred
+        if conn.type in config.EC2_PROVIDERS:
+            imgs = config.EC2_IMAGES[conn.type].keys() + starred
             ec2_images = conn.list_images(None, imgs)
             for image in ec2_images:
-                image.name = EC2_IMAGES[conn.type].get(image.id, image.name)
+                image.name = config.EC2_IMAGES[conn.type].get(image.id, image.name)
         else:
             rest_images = conn.list_images()
             starred_images = [image for image in rest_images
                               if image.id in starred]
 
-        if term and conn.type in EC2_PROVIDERS:
+        if term and conn.type in config.EC2_PROVIDERS:
             ec2_images += conn.list_images(ex_owner="self")
             ec2_images += conn.list_images(ex_owner="aws-marketplace")
             ec2_images += conn.list_images(ex_owner="amazon")
@@ -963,7 +961,7 @@ def list_images(user, backend_id, term=None):
                       or term in img.name.lower()][:20]
     except Exception as e:
         log.error(repr(e))
-        return BackendUnavailableError(backend_id)
+        raise BackendUnavailableError(backend_id)
 
     ret = []
     for image in images:
@@ -1023,7 +1021,7 @@ def list_locations(user, backend_id):
 
     ret = []
     for location in locations:
-        if conn.type in EC2_PROVIDERS:
+        if conn.type in config.EC2_PROVIDERS:
             try:
                 name = location.availability_zone.name
             except:
@@ -1063,7 +1061,7 @@ def set_machine_metadata(user, backend_id, machine_id, tag):
     unique_key = 'mist.io_tag-' + datetime.now().isoformat()
     pair = {unique_key: tag}
 
-    if conn.type in EC2_PROVIDERS:
+    if conn.type in config.EC2_PROVIDERS:
         try:
             machine = Node(machine_id, name='', state=0, public_ips=[],
                            private_ips=[], driver=conn)
@@ -1127,7 +1125,7 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
     if not machine:
         raise MachineNotFoundError(machine_id)
 
-    if conn.type in EC2_PROVIDERS:
+    if conn.type in config.EC2_PROVIDERS:
         tags = machine.extra.get('tags', None)
         pair = None
         for mkey, mdata in tags.iteritems():

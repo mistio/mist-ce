@@ -7,6 +7,9 @@ from hashlib import sha1
 from contextlib import contextmanager
 
 
+from mist.io.model import User
+
+
 log = logging.getLogger(__name__)
 
 
@@ -40,3 +43,7 @@ def core_wrapper(func):
     def wrapped_func(*args, **kwargs):
         return func(*args, **kwargs)
     return wrapped_func
+
+
+def user_from_request(request):
+    return User()

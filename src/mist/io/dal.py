@@ -109,8 +109,10 @@ class Field(object):
             val = deepcopy(self.default)
             log.debug("Just set default value '%s'", self.default)
         if type(val) not in [atype, btype]:
-            log.warn("%s: value is %s, should preferably be %s",
-                     type(self), type(val), atype)
+            # don't spam about unicode to str conversions
+            if type(val) not in (str, unicode) or atype not in (str, unicode):
+                log.warn("%s: value is %s, should preferably be %s",
+                         type(self), type(val), atype)
             if type(val) not in atypes:
                 log.error("%s: value is %s, should be in %s",
                           type(self), type(val), atypes)
