@@ -25,7 +25,7 @@ define('app/controllers/monitoring', [
             * Receives first data and set time interval for
             * next reuqests
             */
-            setupDataRequest: function(timeToRequest){
+            setupDataRequest: function(timeToRequestms){
 
                 var SECONDS_INTERVAL = 10000;
 
@@ -37,7 +37,7 @@ define('app/controllers/monitoring', [
                 self.machine.set('pendingStats', true);
 
                 var stop = (new Date()).getTime() - timeGap * 1000;
-                var start = stop - (timeToRequest.getHours()*60*60 + timeToRequest.getMinutes()*60 + timeToRequest.getSeconds())*1000;//1800*1000; // Substract Half Hour Of The Stop Date
+                var start = stop - timeToRequestms;
                 var step = 10000;
 
 
@@ -138,8 +138,13 @@ define('app/controllers/monitoring', [
                             // Create Custom Objects From Data
                             for(var i=0; i < data.load.length; i++ )
                             {
-
-                                var measurementTime = metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds();
+                                // DD/MM/YY-HH:MM:SS
+                                var measurementTime = metricTime.getDate()      + "/" + 
+                                                      (metricTime.getMonth()+1) + "/" +
+                                                      metricTime.getFullYear()  + "-" +
+                                                      metricTime.getHours()     + ":" + 
+                                                      metricTime.getMinutes()   + ":" + 
+                                                      metricTime.getSeconds();
 
                                 var cpuObj = {
                                     time : measurementTime,
@@ -186,7 +191,7 @@ define('app/controllers/monitoring', [
                                 // Increase time by step for every new measurement
                                 metricTime = new Date(metricTime.getTime()+10000);
                             }
-
+                            
                             controller.machine.set('pendingStats', false);
                             self.lastMeasurmentTime = new Date(metricTime.getTime()-10000);
                             self.view.updateGraphs(receivedData);

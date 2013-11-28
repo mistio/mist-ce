@@ -322,14 +322,12 @@ define('app/views/monitoring', [
 
                         if(this.data.length == 0)
                         {
-
                             var dataBuffer = [];
                             var measurements_received = newData.length;
                             if(measurements_received < NUM_OF_MIN_MEASUREMENTS)
                             {
-
                                 // Get First Measurement Time
-                                var format = d3.time.format("%X");
+                                var format = d3.time.format("%d/%m/%Y-%X");
                                 var metricTime = format.parse(newData[0].time);
                                 metricTime = new Date(metricTime.getTime() - STEP_SECONDS*1000);
 
@@ -360,7 +358,7 @@ define('app/views/monitoring', [
                             var fixedData = [];
                             dataBuffer.forEach(function(d) {
                                 
-                                var format    = d3.time.format("%X");
+                                var format    = d3.time.format("%d/%m/%Y-%X");
                                 var tempObj   = {};
                                 tempObj.time  = format.parse(d.time);
                                 tempObj.value = +d.value;
@@ -389,7 +387,7 @@ define('app/views/monitoring', [
                             // Fix Values, TypeCaste To Date And Number
                             var fixedData = [];
                             newData.forEach(function(d) {
-                                var format = d3.time.format("%X");
+                                var format = d3.time.format("%d/%m/%Y-%X");
                                 var tempObj = {};
                                 tempObj.time = format.parse(d.time);
                                 tempObj.value = +d.value;
@@ -815,9 +813,7 @@ define('app/views/monitoring', [
 
                         // Create Graphs 
                         var timeToDisplay = new Date();
-                        var timeToReceive = new Date();
-                        timeToDisplay.setHours(0,10,0);
-                        timeToReceive.setHours(12,0,0);
+                        timeToDisplay.setHours(0,30,0);
                         self.cpuGraph  = new Graph('cpuGraph',width,timeToDisplay,"%");
                         self.loadGraph = new Graph('loadGraph',width,timeToDisplay);
                         self.memGraph  = new Graph('memGraph',width,timeToDisplay,"%");
@@ -826,7 +822,8 @@ define('app/views/monitoring', [
                         self.networkRXGraph = new Graph('networkRXGraph',width,timeToDisplay);
                         self.networkTXGraph = new Graph('networkTXGraph',width,timeToDisplay);
 
-                        controller.setupDataRequest(timeToReceive);
+                        // Debug Ask For 7 Days
+                        controller.setupDataRequest(60*60*1000);
 
                         // Set Up Resolution Change Event
                         $(window).resize(function(){
