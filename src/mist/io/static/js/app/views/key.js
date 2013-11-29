@@ -81,7 +81,7 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
              *
              */
 
-            requestedKey: function() {
+            requestedKeyObserver: function() {
                 var key = Mist.keysController.keyResponse;
                 if (key) {
                     this.get('controller').set('model', key);

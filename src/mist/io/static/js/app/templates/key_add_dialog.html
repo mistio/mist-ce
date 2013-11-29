@@ -1,29 +1,39 @@
-
-    <label for="create-key-name">Name:</label>
-    {{view Mist.TextField
-        valueBinding="Mist.keyAddController.newKeyName"
-        id="create-key-name"}}
+<div data-role="popup" id="create-key-popup">
     
-    <div id="private-key-header">
-        <label for="textarea-private-key">Private Key:</label>
-        <div id="action-loader" class="ajax-loader"></div>
+    <div data-role="header">
+        <h1>Create key</h1>
     </div>
-    {{view Ember.TextArea
-        valueBinding="Mist.keyAddController.newKeyPrivate"
-        id="textarea-private-key"}}
-
-    <div id="private-key-actions" class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-        <button data-icon="gear" {{action generateClicked target="view"}}>Generate</button>
-        <button class="upload-button" data-icon="arrow-u" data-iconpos="right" {{action uploadClicked target="view"}}>Upload</button>
+    
+    <div data-role="content">
+        <label for="create-key-name">Name:</label>
+        {{view Mist.TextField
+            valueBinding="Mist.keyAddController.newKeyName"
+            id="create-key-name"}}
+        
+        <div id="private-key-header">
+            <label for="textarea-private-key">Private Key:</label>
+            <div id="action-loader" class="ajax-loader"></div>
+        </div>
+        {{view Ember.TextArea
+            valueBinding="Mist.keyAddController.newKeyPrivate"
+            id="textarea-private-key"}}
+    
+        <div id="private-key-actions" class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <button data-icon="gear" {{action generateClicked target="view"}}>Generate</button>
+            <button class="upload-button" data-icon="arrow-u" data-iconpos="right" {{action uploadClicked target="view"}}>Upload</button>
+        </div>
+    
+        <div class="upload-bundle">
+            <input type="file" class="upload-input" name="file" {{action uploadInputChanged on="change" target="view"}}/>
+        </div>
+    
+        <div id="create-loader" class="ajax-loader"></div>
+    
+        <div id="create-key-actions" class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <a href="#" data-role="button" {{action backClicked target="view"}}>Back</a>
+            <a href="#" data-role="button" id="create-key-ok" class="ui-disabled" data-theme="b" {{action createClicked target="view"}}>Create</a>
+        </div>
+        
     </div>
-
-    <div class="upload-bundle">
-        <input type="file" class="upload-input" name="file" {{action uploadInputChanged on="change" target="view"}}/>
-    </div>
-
-    <div id="create-loader" class="ajax-loader"></div>
-
-    <div id="create-key-actions" class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-        <a href="#" data-role="button" {{action backClicked target="view"}}>Back</a>
-        <a href="#" data-role="button" id="create-key-ok" class="ui-disabled" data-theme="b" {{action createClicked target="view"}}>Create</a>
-    </div>
+    
+</div>

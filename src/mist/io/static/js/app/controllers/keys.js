@@ -14,15 +14,15 @@ define(['app/models/key'],
              */
 
             content: [],
-            loading: false,
             keyRequest: false,
             keyResponse: false,
-            gettingPublicKey: false,
-            gettingPrivateKey: false,
 
+            loading: false,
             creatingKey: false,
             renamingKey: false,
             associatingKey: false,
+            gettingPublicKey: false,
+            gettingPrivateKey: false,
             disassociatingKey: false,
             settingDefaultKey: false,
 
@@ -117,6 +117,7 @@ define(['app/models/key'],
                     url: '/keys/' + name,
                     type: 'POST',
                     success: function() {
+                        that._setDefaultKey(name);
                         if (callback) callback();
                     },
                     error: function() {
@@ -215,6 +216,7 @@ define(['app/models/key'],
             },
 
 
+
             /**
              * 
              *  Psudo-Private Methods
@@ -267,6 +269,19 @@ define(['app/models/key'],
                     }
                 }
                 this.set('content', newKeys);
+            },
+
+
+            _setDefaultKey: function(name) {
+                var content = this.content;
+                var contentLength = this.content.length;
+                for (var k = 0; k < contentLength; ++k) {
+                    if (content[k].name == name) {
+                        content[k].set('default_key', true);
+                    } else {
+                        content[k].set('default_key', false);
+                    }
+                }
             }
         });
     }
