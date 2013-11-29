@@ -63,12 +63,21 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html','
                     
                     // Get current and new name
                     var newName = this.newName.trim();
-                    var name = this.get('controller').get('model').name;
+                    var name = this.get('controller').get('model');
+                    if (!name) {
+                        name = Mist.keysController.getSelectedKeyName();
+                    } else {
+                        name = name.name;
+                    }
                     
                     if (name != newName) {
                         var that = this;
                         Mist.keysController.renameKey(name, newName, function() {
-                            window.location.hash = '/keys/' + newName;
+                            
+                            // Redirect to new key location only if user is in single key view
+                            if (window.location.hash == '#/keys/' + name) {
+                                window.location.hash = '#/keys/' + newName.replace(/ /g, '');
+                            }
                             that.close();
                         });
                     } else {

@@ -42,7 +42,7 @@ define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_lis
                             break;
                     }
                 });
-            }.observes('Mist.keysController.content.@each.selected').on('init'),
+            }.observes('Mist.keysController.content.@each.selected').on('didInsertElement'),
 
 
 
@@ -64,13 +64,16 @@ define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_lis
                 },
 
                 selectionModeClicked: function(mode) {
+                    $('#select-keys-dialog').popup('close');
                     Mist.keysController.content.forEach(function(key) {
                         key.set('selected', mode);
                     });
-                    Ember.run.next(function() {
-                        $("input[type='checkbox']").checkboxradio('refresh');
-                    });
-                    $('#select-keys-dialog').popup('close');
+                    $("input[type='checkbox']").checkboxradio('refresh');
+                },
+
+                renameClicked: function() {
+                    $('#rename-key-popup').popup('open');
+                    $('#new-key-name').val(this.selectedKey).trigger('change');
                 },
 
                 deleteClicked: function() {

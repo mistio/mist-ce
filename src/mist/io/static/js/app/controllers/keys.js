@@ -272,6 +272,7 @@ define(['app/models/key'],
                 for (var k = 0; k < contentLength; ++k) {
                     if (content[k].name == name) {
                         content[k].set('name', newName);
+                        content[k].set('id', newName.replace(/ /g,''));
                         return;
                     }
                 }
