@@ -90,6 +90,7 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
             }.observes('Mist.keysController.keyResponse'),
 
 
+
             /**
              *
              *  Actions

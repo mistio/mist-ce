@@ -27,6 +27,7 @@ define(['app/models/key'],
             settingDefaultKey: false,
 
 
+
             /**
              * 
              *  Initialization
@@ -37,21 +38,14 @@ define(['app/models/key'],
                 var that = this;
                 this.set('loading', true);
                 $.getJSON('/keys', function(keys) {
-                    that.setContent(keys);
-                    that.sendKeyResponse();
+                    that._setContent(keys);
+                    that._sendKeyResponse();
                 }).error(function() {
-                    that.reload();
+                    that._reload();
                 }).complete(function() {
                     that.set('loading', false);
                 });
             }.on('init'),
-
-
-            reload: function() {
-                Ember.run.later(this, function() {
-                    this.load();
-                }, 5000);
-            },
 
 
 
@@ -62,8 +56,8 @@ define(['app/models/key'],
              */
 
             keyRequestObserver: function() {
-                if (this.keyRequest && !this.loading) {
-                    this.sendKeyResponse();
+                if (!this.loading && this.keyRequest) {
+                    this._sendKeyResponse();
                 }
             }.observes('keyRequest'),
 
@@ -221,16 +215,22 @@ define(['app/models/key'],
             },
 
 
-            setContent: function(keys) {
+            /**
+             * 
+             *  Psudo-Private Methods
+             * 
+             */
+
+            _setContent: function(keys) {
                 var newKeys = [];
-                keys.forEach(function(key) {
-                    newKeys.push(Key.create(key));
-                });
+                var keysLength = keys.length;
+                for (var k = 0; k < keysLength; ++k) {
+                    newKeys.push(Key.create(keys[k]));
+                }
                 this.set('content', newKeys);
             },
 
-
-            sendKeyResponse: function() {
+            _sendKeyResponse: function() {
                 if (this.keyRequest) {
                     this.set('keyResponse', this.getKeyByUrlName(this.keyRequest));
                     this.set('keyRequest', false);
@@ -238,14 +238,10 @@ define(['app/models/key'],
             },
 
 
-            _deleteKey: function(name) {
-                var newKeys = [];
-                this.content.forEach(function(key) {
-                    if (key.name != name) {
-                        newKeys.push(key);
-                    }
-                });
-                this.set('content', newKeys);
+            _reload: function() {
+                Ember.run.later(this, function() {
+                    this.load();
+                }, 5000);
             },
 
 
@@ -258,6 +254,19 @@ define(['app/models/key'],
                         return;
                     }
                 }
+            },
+
+
+            _deleteKey: function(name) {
+                var newKeys = [];
+                var content = this.content;
+                var contentLength = this.content.length;
+                for (var k = 0; k < contentLength; ++k) {
+                    if (content[k].name != name) {
+                        newKeys.push(content[k]);
+                    }
+                }
+                this.set('content', newKeys);
             }
         });
     }
