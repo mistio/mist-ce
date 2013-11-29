@@ -12,12 +12,9 @@
     <div data-role="content">
 
         <a data-role="button" data-icon="arrow-d" {{action "selectClicked" target="view"}}>Select</a>
-        
         <a data-role="button" data-icon="plus" data-iconpos="right" {{action "createClicked" target="view"}}>Create</a>
 
-        <ul data-role="listview"
-            data-filter="true"
-            data-filter-placeholder="Filter...">
+        <ul data-role="listview" data-filter="true" data-filter-placeholder="Filter...">
             {{#each Mist.keysController.content}}
                 {{view Mist.KeyListItemView keyBinding="this"}}
             {{/each}}
@@ -29,7 +26,7 @@
     
     {{view Mist.ConfirmationDialog}}
 
-    <div data-role="popup" id="select-keys-dialog">
+    <div data-role="popup">
         <ul data-role='listview'>
             <li data-icon="false">
                 <a {{action "selectionModeClicked" true target="view"}}>All</a>
@@ -40,7 +37,7 @@
         </ul>
     </div>
 
-    <div data-role="footer">
+    <div id="keys-footer" data-role="footer">
         <div data-role="controlgroup" data-type="horizontal">
             <a data-role="button" data-icon="edit" {{action "renameClicked" target="view"}}>Rename</a>
             <a data-role="button" data-icon="delete" {{action "deleteClicked" target="view"}}>Delete</a>

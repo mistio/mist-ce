@@ -216,6 +216,25 @@ define(['app/models/key'],
             },
 
 
+            getSelectedKeysCount: function() {
+                var counter = 0;
+                var content = this.content;
+                var contentLength = this.content.length;
+                for (var k = 0; k < contentLength; ++k) {
+                    if (content[k].selected) ++counter;
+                }
+                return counter;
+            },
+
+
+            getSelectedKeyName: function() {
+                var content = this.content;
+                var contentLength = this.content.length;
+                for (var k = 0; k < contentLength; ++k) {
+                    if (content[k].selected) return content[k].name;
+                }
+            },
+
 
             /**
              * 

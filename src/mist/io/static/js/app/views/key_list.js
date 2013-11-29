@@ -1,49 +1,70 @@
 define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_list.html'],
     /**
-     * Key List View
+     *  Key List View
      *
-     * @returns Class
+     *  @returns Class
      */
     function(MistScreen, key_list_html) {
         return MistScreen.extend({
 
-            template: Ember.Handlebars.compile(key_list_html),
+            /**
+             * 
+             *  Properties
+             * 
+             */
 
             selectedKey: null,
+            template: Ember.Handlebars.compile(key_list_html),
+
+
+
+            /**
+             * 
+             *  Observers
+             * 
+             */
 
             selectedKeysObserver: function() {
                 var that = this;
-                var selectedKeysCount = 0;
-                Mist.keysController.keys.some(function(key) {
-                    if (key.selected) {
-                        if(++selectedKeysCount == 2) {
-                            $('#keys-footer a').addClass('ui-disabled');
-                            that.selectedKey = null;
-                            return true;
-                        }
-                        that.selectedKey = key;
+                Ember.run.once(function() {
+                    switch (Mist.keysController.getSelectedKeysCount()) {
+                        case 0:
+                            $('#keys-footer').hide();
+                            break;
+                        case 1:
+                            $('#keys-footer').show();
+                            $('#keys-footer a').removeClass('ui-state-disabled');
+                            that.set('selectedKey', Mist.keysController.getSelectedKeyName());
+                            break;
+                        default:
+                            $('#keys-footer').show();
+                            $('#keys-footer a').addClass('ui-state-disabled');
+                            break;
                     }
                 });
-                if (selectedKeysCount == 0) {
-                    $('#keys-footer').fadeOut(200);
-                } else if (selectedKeysCount == 1) {
-                    $('#keys-footer').fadeIn(200);
-                    $('#keys-footer a').removeClass('ui-disabled');
-                }
-            }.observes('Mist.keysController.keys.@each.selected'),
+            }.observes('Mist.keysController.content.@each.selected').on('init'),
+
+
+
+            /**
+             *
+             *  Actions
+             *
+             */
 
             actions: {
+
                 createClicked: function() {
                     Mist.keyAddController.clear();
-                    $('#create-key-dialog').popup("open");
+                    $('#create-key-popup').popup('open');
                 },
 
                 selectClicked: function() {
-                    $('#select-keys-dialog').popup('open');
+                    $('#select-keys-popup').popup('open');
                 },
 
                 selectionModeClicked: function(mode) {
-                    Mist.keysController.keys.forEach(function(key) {
+                    Mist.keysController.content.forEach(function(key) {
                         key.set('selected', mode);
                     });
                     Ember.run.next(function() {
@@ -53,9 +74,9 @@ define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_lis
                 },
 
                 deleteClicked: function() {
-                    var keyName = this.selectedKey.name;
+                    var keyName = this.selectedKey;
                     Mist.confirmationController.set('title', 'Delete key');
-                    Mist.confirmationController.set('text', 'Are you sure you want to delete "' + keyName +'" ?');
+                    Mist.confirmationController.set('text', 'Are you sure you want to delete "' + keyName + '" ?');
                     Mist.confirmationController.set('callback', function() {
                         Mist.keysController.deleteKey(keyName);
                     });
@@ -63,7 +84,7 @@ define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_lis
                 },
 
                 setDefaultClicked: function() {
-                    Mist.keysController.setDefaultKey(this.selectedKey.name);
+                    Mist.keysController.setDefaultKey(this.selectedKey);
                 }
             }
         });
