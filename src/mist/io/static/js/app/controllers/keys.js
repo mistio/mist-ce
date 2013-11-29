@@ -76,6 +76,7 @@ define(['app/models/key'],
              */
 
             renameKey: function(name, newName, callback) {
+                var that = this;
                 this.set('renamingKey', true);
                 $.ajax({
                     url: '/keys/' + name,
@@ -83,31 +84,34 @@ define(['app/models/key'],
                     contentType: 'application/json',
                     data: JSON.stringify({'newName': newName}),
                     success: function() {
+                        that._renameKey(name, newName);
                         if (callback) callback();
                     },
                     error: function() {
                         Mist.notificationController.notify('Failed to rename key');
                     },
                     complete: function() {
-                        Mist.keysController.set('renamingKey', false);
+                        that.set('renamingKey', false);
                     }
                 });
             },
 
 
             deleteKey: function(name, callback) {
+                var that = this;
                 this.set('deletingKey', true);
                 $.ajax({
                     url: '/keys/' + name,
                     type: 'DELETE',
                     success: function() {
+                        that._deleteKey(name);
                         if (callback) callback();
                     },
                     error: function() {
                         Mist.notificationController.notify('Failed to delete key');
                     },
                     complete: function() {
-                        Mist.keysController.set('deletingkey', false);
+                        that.set('deletingKey', false);
                     }
                 });
             },
@@ -131,12 +135,13 @@ define(['app/models/key'],
             },
           
             
-            associateKey: function(keyName, backendId, machineId, callback) {
+            associateKey: function(keyName, backendId, machineId, host, callback) {
                 this.set('associatingKey', true);
                 $.ajax({
                     url: '/backends/' + backendId + '/machines/' + machineId + '/keys/' + keyName,
                     type: 'PUT',
                     contentType: 'application/json',
+                    data: JSON.stringify({'host': host}),
                     success: function() {
                         if (callback) callback();
                     },
@@ -150,12 +155,13 @@ define(['app/models/key'],
             },
 
 
-            disassociateKey: function(keyName, backendId, machineId, callback) {
+            disassociateKey: function(keyName, backendId, machineId, host, callback) {
                 this.set('disassociatingKey', true);
                 $.ajax({
                     url: '/backends/' + backendId + '/machines/' + machineId + '/keys/' + keyName,
                     type: 'DELETE',
                     contentType: 'application/json',
+                    data: JSON.stringify({'host': host}),
                     success: function() {
                         if (callback) callback();
                     },
@@ -194,10 +200,8 @@ define(['app/models/key'],
 
 
             getKeyByName: function(name) {
-                
                 var content = this.content;
                 var contentLength = this.content.length;
-                
                 for (var k = 0; k < contentLength; ++k) {
                     if (content[k].name == name) {
                         return content[k];
@@ -207,12 +211,10 @@ define(['app/models/key'],
 
 
             getKeyByUrlName: function(name) {
-                
                 var content = this.content;
                 var contentLength = this.content.length;
-                
                 for (var k = 0; k < contentLength; ++k) {
-                    if (content[k].name.replace(/ /g,'') == name) {
+                    if (content[k].id == name) {
                         return content[k];
                     }
                 }
@@ -233,7 +235,30 @@ define(['app/models/key'],
                     this.set('keyResponse', this.getKeyByUrlName(this.keyRequest));
                     this.set('keyRequest', false);
                 }
-            }  
+            },
+
+
+            _deleteKey: function(name) {
+                var newKeys = [];
+                this.content.forEach(function(key) {
+                    if (key.name != name) {
+                        newKeys.push(key);
+                    }
+                });
+                this.set('content', newKeys);
+            },
+
+
+            _renameKey: function(name, newName) {
+                var content = this.content;
+                var contentLength = this.content.length;
+                for (var k = 0; k < contentLength; ++k) {
+                    if (content[k].name == name) {
+                        content[k].set('name', newName);
+                        return;
+                    }
+                }
+            }
         });
     }
 );

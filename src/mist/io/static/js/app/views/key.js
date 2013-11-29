@@ -116,7 +116,14 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
                 },
 
                 deleteClicked: function() {
-                    this.key.destroy();
+                    var key = this.key;
+                    Mist.confirmationController.set('title', 'Delete key');
+                    Mist.confirmationController.set('text', 'Are you sure you want to delete "' + key.name + '" ?');
+                    Mist.confirmationController.set('callback', function() {
+                        Mist.Router.router.transitionTo('keys');
+                        Mist.keysController.deleteKey(key.name);
+                    });
+                    Mist.confirmationController.show();
                 }
             }
         });

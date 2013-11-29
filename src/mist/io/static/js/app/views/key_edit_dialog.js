@@ -1,38 +1,78 @@
-define('app/views/key_edit_dialog', [
-    'text!app/templates/key_edit_dialog.html','ember'],
+define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html','ember'],
     /**
-     * Key Edit dialog
+     *  Key Edit dialog
      *
-     * @returns Class
+     *  @returns Class
      */
     function(key_edit_dialog_html) {
         return Ember.View.extend({
 
-            newName: null,
+            /**
+             *
+             *  Properties
+             *
+             */
 
+            newName: null,
             template: Ember.Handlebars.compile(key_edit_dialog_html),
 
-            attributeBindings: ['data-role'],
+
+
+            /**
+             *
+             *  Observers
+             *
+             */
 
             newNameObserver: function() {
                 if (this.newName) {
-                    $('#edit-key-ok').removeClass('ui-disabled');
+                    $('#rename-key-ok').removeClass('ui-state-disabled');
                 } else {
-                    $('#edit-key-ok').addClass('ui-disabled');
+                    $('#rename-key-ok').addClass('ui-state-disabled');
                 }
             }.observes('newName'),
 
+
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+
+            close: function() {
+                $('#new-key-name').val('');
+                $('#rename-key-popup').popup('close');
+            },
+
+
+
+            /**
+             *
+             *  Actions
+             *
+             */
+
             actions: {
+
                 backClicked: function() {
-                    $('#edit-key-dialog').popup('close');
+                    this.close();
                 },
-    
+
                 saveClicked: function() {
-                    var oldName = this.get('controller').get('model').name;
-                    if (oldName != this.newName) {
-                        Mist.keysController.editKey(oldName, this.newName.trim());
+                    
+                    // Get current and new name
+                    var newName = this.newName.trim();
+                    var name = this.get('controller').get('model').name;
+                    
+                    if (name != newName) {
+                        var that = this;
+                        Mist.keysController.renameKey(name, newName, function() {
+                            window.location.hash = '/keys/' + newName;
+                            that.close();
+                        });
                     } else {
-                        Mist.notificationController.notify('Please give a new name');
+                        this.close();
                     }
                 }
             }

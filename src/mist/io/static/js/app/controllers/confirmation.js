@@ -11,11 +11,11 @@ define('app/controllers/confirmation', [
         return Ember.Object.extend({
 
             show: function(){
-                $('#dialog-confirm').popup('open');
+                $('#confirmation-popup').popup('open');
             },
 
             confirm: function() {
-                $('#dialog-confirm').popup('close');
+                $('#confirmation-popup').popup('close');
                 this.callback();
                 this.set('callback', function(){});
             }

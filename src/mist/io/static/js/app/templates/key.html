@@ -23,9 +23,9 @@
         </div>
 
         {{#if machines}}
-        <div id="single-key-machines" data-role="collapsible">
+        <div data-role="collapsible">
             <h3>Machines</h3>
-            <ul id="single-key-machines-list" data-role="listview">
+            <ul data-role="listview">
                 {{#each view.associatedMachines}}
                     {{view Mist.MachineListItemView machineBinding="this"}}
                 {{/each}}
@@ -49,8 +49,8 @@
         </div>
     </div>
 
-    <div class="footer dual-btn-footer" data-role="footer">
-        <div class="actions" data-role="controlgroup" data-type="horizontal">
+    <div data-role="footer">
+        <div data-role="controlgroup" data-type="horizontal">
             <a data-role="button" data-icon="edit" {{action "renameClicked" target="view"}}>Rename</a>
             <a data-role="button" data-icon="delete" {{action "deleteClicked" target="view"}}>Delete</a>
         </div>

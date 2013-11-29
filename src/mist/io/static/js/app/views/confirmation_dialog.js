@@ -18,7 +18,7 @@ define('app/views/confirmation_dialog', [
                 },
                 
                 noClicked: function() {
-            	   $('#dialog-confirm').popup('close');
+            	   $('#confirmation-popup').popup('close');
                 }
             }
         });
