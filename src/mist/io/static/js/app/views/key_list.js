@@ -64,11 +64,13 @@ define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_lis
                 },
 
                 selectionModeClicked: function(mode) {
-                    $('#select-keys-dialog').popup('close');
+                    $('#select-keys-popup').popup('close');
                     Mist.keysController.content.forEach(function(key) {
                         key.set('selected', mode);
                     });
-                    $("input[type='checkbox']").checkboxradio('refresh');
+                    Ember.run.next(function() {
+                        $("input[type='checkbox']").checkboxradio('refresh');
+                    });
                 },
 
                 renameClicked: function() {

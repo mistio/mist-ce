@@ -251,6 +251,7 @@ define(['app/models/key'],
                 this.set('content', newKeys);
             },
 
+
             _sendKeyResponse: function() {
                 if (this.keyRequest) {
                     this.set('keyResponse', this.getKeyByUrlName(this.keyRequest));
