@@ -69,6 +69,29 @@ define(['app/models/key'],
              * 
              */
 
+            createKey: function(name, privateKey, callback) {
+                var that = this;
+                this.set('creatingKey', true);
+                $.ajax({
+                    url: '/keys',
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({'name': name, 'priv': privateKey}),
+                    success: function(key) {
+                        that._createKey(key);
+                        if (callback) callback();
+                    },
+                    error: function(jqXHR) {
+                        Mist.notificationController.notify('Failed to create key');
+                    },
+                    complete: function() {
+                        that.set('creatingKey', false);
+                    }
+                });
+                privateKey = null; // Don't keep private key on client
+            },
+
+
             renameKey: function(name, newName, callback) {
                 var that = this;
                 this.set('renamingKey', true);
@@ -171,6 +194,24 @@ define(['app/models/key'],
             },
 
 
+            generateKey: function(callback) {
+                this.set('generatingKey', true);
+                $.ajax({
+                    url: '/keys',
+                    type: 'POST',
+                    success: function(key) {
+                        if (callback) callback(key.priv);
+                    },
+                    error: function() {
+                        Mist.notificationController.notify('Failed to generate key');
+                    },
+                    complete: function() {
+                        Mist.keysController.set('generatingKey', false);
+                    }
+                });
+            },
+
+
             getPrivateKey: function(name, callback) {
                 this.set('gettingPrivateKey', true);
                 $.getJSON('/keys/' + name + '/private', function(key) {
@@ -265,6 +306,11 @@ define(['app/models/key'],
                 Ember.run.later(this, function() {
                     this.load();
                 }, 5000);
+            },
+
+
+            _createKey: function(key) {
+                this.content.pushObject(Key.create(key));
             },
 
 

@@ -1,15 +1,11 @@
-define('app/models/key', [
-    'ember'
-    ],
+define('app/models/key', ['ember'],
     /**
-     * Key model
+     *  Key model
      *
-     * @returns Class
+     *  @returns Class
      */
     function() {
         return Ember.Object.extend({
-
-
 
             /**
              * 
@@ -23,7 +19,7 @@ define('app/models/key', [
             machines: null,
             selected: null,
             default_key: null,
-            
+
 
 
             /**
@@ -31,7 +27,7 @@ define('app/models/key', [
              *  Methods
              * 
              */
-            
+
             updateMachineUptimeChecked: function(machine, timeStamp) {
                 this.machines.some(function(machineToUpdate) {
                     if (machineToUpdate[1] == machine.id &&
@@ -41,6 +37,7 @@ define('app/models/key', [
                     }
                 });
             },
+
 
             updateMachineList: function(keyName, data) {
                 this.content.some(function(key) {

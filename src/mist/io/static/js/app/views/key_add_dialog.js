@@ -1,24 +1,32 @@
-define('app/views/key_add_dialog', [
-    'text!app/templates/key_add_dialog.html','ember'],
+define('app/views/key_add_dialog', ['text!app/templates/key_add_dialog.html','ember'],
     /**
-     * Key Add Dialog
+     *  Key Add Dialog
      *
-     * @returns Class
+     *  @returns Class
      */
     function(key_add_dialog_html) {
         return Ember.View.extend({
 
+            /**
+             * 
+             *  Properties
+             * 
+             */
+
             template: Ember.Handlebars.compile(key_add_dialog_html),
 
-            attributeBindings: ['data-role'],
-
-            getAssociatedMachine: function() {
-                return this.get('parentView').get('controller').get('model');
-            },
+            /**
+             * 
+             *  Actions
+             * 
+             */
 
             actions: {
+
                 generateClicked: function() {
-                    Mist.keyAddController.generateKey();
+                    Mist.keysController.generateKey(function(key) {
+                        $('#textarea-private-key').val(key).trigger('change');
+                    });
                 },
 
                 uploadClicked: function() {
@@ -48,15 +56,8 @@ define('app/views/key_add_dialog', [
                 },
 
                 backClicked: function() {
-                    $('#create-key-dialog').popup('close');
+                    $('#create-key-popup').popup('close');
                     Mist.keyAddController.clear();
-                    
-                    // Reopen associate key popup (works only in single machine view)
-                    if (this.getAssociatedMachine()) {
-                        Ember.run.later(function() {
-                            $('#associate-key-dialog').popup('option', 'positionTo', '#associate-key-button').popup('open');
-                        }, 150);
-                    }
                 },
 
                 createClicked: function() {
@@ -70,10 +71,16 @@ define('app/views/key_add_dialog', [
                         Mist.notificationController.notify('Private key should end with: ' + ending);
                         return;
                     }
-                    Mist.keyAddController.newKey(this.getAssociatedMachine());
-                    
-                    // Reopen machine manage keys dialog (works only in single machine view)
-                    $('#manage-keys').panel('open');
+                    var that = this;
+                    Mist.keysController.createKey(
+                        Mist.keyAddController.newKeyName,
+                        Mist.keyAddController.newKeyPrivate, 
+                        function() {
+                            $('#create-key-popup').popup('close');
+                            Mist.keyAddController.clear();
+                            // Reopen machine manage keys dialog (works only in single machine view)
+                            $('#manage-keys').panel('open');
+                    });
                 }
             }
         });

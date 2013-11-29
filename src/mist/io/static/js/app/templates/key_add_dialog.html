@@ -1,37 +1,31 @@
-<div data-role="popup" id="create-key-popup">
+<div id="create-key-popup" data-role="popup">
     
     <div data-role="header">
         <h1>Create key</h1>
     </div>
     
     <div data-role="content">
+
         <label for="create-key-name">Name:</label>
         {{view Mist.TextField
-            valueBinding="Mist.keyAddController.newKeyName"
-            id="create-key-name"}}
+               id="create-key-name"
+               valueBinding="Mist.keyAddController.newKeyName"}}
         
-        <div id="private-key-header">
-            <label for="textarea-private-key">Private Key:</label>
-            <div id="action-loader" class="ajax-loader"></div>
-        </div>
+        <label for="textarea-private-key">Private Key:</label>
         {{view Ember.TextArea
-            valueBinding="Mist.keyAddController.newKeyPrivate"
-            id="textarea-private-key"}}
+               id="textarea-private-key"
+               valueBinding="Mist.keyAddController.newKeyPrivate"}}
     
-        <div id="private-key-actions" class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <button data-icon="gear" {{action generateClicked target="view"}}>Generate</button>
-            <button class="upload-button" data-icon="arrow-u" data-iconpos="right" {{action uploadClicked target="view"}}>Upload</button>
+        <div data-role="controlgroup" data-type="horizontal">
+            <button data-icon="gear" {{action "generateClicked" target="view"}}>Generate</button>
+            <button data-icon="arrow-u" data-iconpos="right" {{action "uploadClicked" target="view"}}>Upload</button>
         </div>
     
-        <div class="upload-bundle">
-            <input type="file" class="upload-input" name="file" {{action uploadInputChanged on="change" target="view"}}/>
-        </div>
+        <input class="upload-input" type="file" name="file" {{action "uploadInputChanged" on="change" target="view"}}/>
     
-        <div id="create-loader" class="ajax-loader"></div>
-    
-        <div id="create-key-actions" class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a href="#" data-role="button" {{action backClicked target="view"}}>Back</a>
-            <a href="#" data-role="button" id="create-key-ok" class="ui-disabled" data-theme="b" {{action createClicked target="view"}}>Create</a>
+        <div data-role="controlgroup" data-type="horizontal">
+            <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
+            <button id="create-key-ok" {{action "createClicked" target="view"}}>Create</button>
         </div>
         
     </div>
