@@ -20,6 +20,7 @@ define('app/views/monitoring', [
             networkRXGraph: null,
 
             viewRendered: false,
+            graphsCreated: false,
 
             graphsListCookie: null,
             graphsBtnListCookie: null,
@@ -729,7 +730,7 @@ define('app/views/monitoring', [
                     // Stop receiving Graph data
                     window.clearInterval(window.monitoringInterval);
                 }
-                else if(this.viewRendered && machine.hasMonitoring && 
+                else if(this.viewRendered && machine.hasMonitoring && !this.graphsCreated &&
                     !machine.probing && machine.probed && machine.id != ' '){
 
                     var self = this;
@@ -800,6 +801,8 @@ define('app/views/monitoring', [
                         self.diskWriteGraph = new Graph('diskWriteGraph',width,timeToDisplay);
                         self.networkRXGraph = new Graph('networkRXGraph',width,timeToDisplay);
                         self.networkTXGraph = new Graph('networkTXGraph',width,timeToDisplay);
+
+                        self.graphsCreated = true;
 
                         controller.setupDataRequest();
 
