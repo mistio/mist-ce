@@ -588,18 +588,17 @@ define('app/views/monitoring', [
                             {
                                 this.timeUpdated = false;
 
-
                                 d3vLine.transition()
                                        .duration( 0 )
                                        .attr("transform", "translate(" + 0 + ")");
 
                                 d3xAxis.transition()
                                        .duration( 0 )
-                                       .attr("transform", "translate(0," + (this.height - margin.bottom +2) + ")");
+                                       .attr("transform", "translate(" +  margin.left + "," + (this.height - margin.bottom +2) + ")");
 
                                 d3GridX.transition()
                                        .duration( 0 )
-                                       .attr("transform", "translate(0," + this.height + ")");
+                                       .attr("transform", "translate(" + margin.left + "," + this.height + ")");
                             }
                         }
                     };
@@ -855,7 +854,7 @@ define('app/views/monitoring', [
                         self.networkTXGraph = new Graph('networkTXGraph',width,timeToDisplay);
 
                         // Debug Ask For 7 Days
-                        controller.setupDataRequest(10*60*1000);
+                        controller.setupDataRequest(timeToDisplay);
 
                         // Set Up Resolution Change Event
                         $(window).resize(function(){
