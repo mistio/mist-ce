@@ -112,6 +112,7 @@ define(['app/models/key'],
            
             
             setDefaultKey: function(name, callback) {
+                var that = this;
                 this.set('settingDefaultKey', true);
                 $.ajax({
                     url: '/keys/' + name,
@@ -124,7 +125,7 @@ define(['app/models/key'],
                         Mist.notificationController.notify('Failed to set default key');
                     },
                     complete: function() {
-                        Mist.keysController.set('settingDefaultKey', false);
+                        that.set('settingDefaultKey', false);
                     }
                 });
             },
