@@ -139,7 +139,8 @@ define('app/views/monitoring', [
             selectPressed: function(){
 
                 var selectValue = $("#timeWindowSelect").val();
-                
+                console.log("time Window");
+                console.log(this.cpuGraph.getTimeWindow());
                 var newTime = 0;
                 if(selectValue.toLowerCase().search("minutes") != -1)
                 {
@@ -154,14 +155,20 @@ define('app/views/monitoring', [
                     newTime = selectValue * 60 * 60 * 1000;
                 }
 
-                // Update Graph Time
-                this.cpuGraph.changeTimeToDisplay(newTime);
-                this.loadGraph.changeTimeToDisplay(newTime);
-                this.memGraph.changeTimeToDisplay(newTime);
-                this.diskReadGraph.changeTimeToDisplay(newTime);
-                this.diskWriteGraph.changeTimeToDisplay(newTime);
-                this.networkTXGraph.changeTimeToDisplay(newTime);
-                this.networkRXGraph.changeTimeToDisplay(newTime);
+                // Update Graph Time If selection is not the same
+                // TODO Make it cpugraph independent
+                if(newTime/1000 != this.cpuGraph.getTimeWindow())
+                {
+                    this.cpuGraph.changeTimeToDisplay(newTime);
+                    this.loadGraph.changeTimeToDisplay(newTime);
+                    this.memGraph.changeTimeToDisplay(newTime);
+                    this.diskReadGraph.changeTimeToDisplay(newTime);
+                    this.diskWriteGraph.changeTimeToDisplay(newTime);
+                    this.networkTXGraph.changeTimeToDisplay(newTime);
+                    this.networkRXGraph.changeTimeToDisplay(newTime);
+
+                    Mist.monitoringController.updateDataRequest(newTime);
+                }
             },
 
             setGraphsCookie: function(){
@@ -332,8 +339,14 @@ define('app/views/monitoring', [
                                 // Fill Data With Zeros
                                 for(var i= 0; i < (NUM_OF_MIN_MEASUREMENTS - measurements_received); i++)
                                 {
+                                    var measurementTime = metricTime.getDate()      + "/" + 
+                                                          (metricTime.getMonth()+1) + "/" +
+                                                          metricTime.getFullYear()  + "-" +
+                                                          metricTime.getHours()     + ":" + 
+                                                          metricTime.getMinutes()   + ":" + 
+                                                          metricTime.getSeconds();
                                     var zeroObject = {
-                                        time: (metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds()),
+                                        time: measurementTime,
                                         value: 0
                                     }
 
@@ -366,10 +379,13 @@ define('app/views/monitoring', [
                             // Set Our Final Data
                             this.data = fixedData;
 
-                            // Append SVG Elements And Call onInitialized When Finish
-                            appendGraph(this.id,this.width,this.height);
-                            // Do staff after Graph is in the dom and we have data
-                            onInitialized();
+                            // On first run append the Graph
+                            if(!this.timeUpdated){
+                                // Append SVG Elements And Call onInitialized When Finish
+                                appendGraph(this.id,this.width,this.height);
+                                // Do staff after Graph is in the dom and we have data
+                                onInitialized();
+                            }
                         }
                         else{
 
@@ -397,6 +413,16 @@ define('app/views/monitoring', [
                         }
 
                         this.updateView();
+                    };
+
+
+                   /**
+                    * Method: clearData
+                    * Deletes current graph data
+                    * 
+                    */
+                    this.clearData = function() {
+                        this.data = [];
                     };
                     
 
@@ -632,6 +658,17 @@ define('app/views/monitoring', [
 
 
                     /**
+                    * Method: getLastMeasurementTime
+                    * Returns graph's time window in seconds
+                    * 
+                    */
+                    this.getTimeWindow = function(){
+
+                        return this.timeDisplayed;
+                    };
+
+
+                    /**
                     * Method: calcValueDistance
                     * Calculates the distance between the last two points
                     * Important for animated graph
@@ -659,7 +696,9 @@ define('app/views/monitoring', [
                         this.secondsStep   = Math.floor((newTimems / 1000) / NUM_OF_LABELS);
 
                         this.timeUpdated = true;
-                        this.updateView();
+                        
+                        this.clearData();
+                        //this.updateView();
                     };
 
 
@@ -806,7 +845,7 @@ define('app/views/monitoring', [
                         var width = $("#GraphsArea").width() -2;  
 
                         // Create Graphs 
-                        var timeToDisplay = 10*60*1000;
+                        var timeToDisplay = 10*60*1000; // 10 minutes
                         self.cpuGraph  = new Graph('cpuGraph',width,timeToDisplay,"%");
                         self.loadGraph = new Graph('loadGraph',width,timeToDisplay);
                         self.memGraph  = new Graph('memGraph',width,timeToDisplay,"%");
@@ -816,7 +855,7 @@ define('app/views/monitoring', [
                         self.networkTXGraph = new Graph('networkTXGraph',width,timeToDisplay);
 
                         // Debug Ask For 7 Days
-                        controller.setupDataRequest(5*60*60*1000);
+                        controller.setupDataRequest(10*60*1000);
 
                         // Set Up Resolution Change Event
                         $(window).resize(function(){

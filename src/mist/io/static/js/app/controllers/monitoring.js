@@ -68,6 +68,11 @@ define('app/controllers/monitoring', [
                 },SECONDS_INTERVAL);
             },
 
+            updateDataRequest: function(timeToRequestms){
+                window.clearInterval(window.monitoringInterval);
+                this.setupDataRequest(timeToRequestms);
+            },
+
             finishedGraphUpdate: function(){
                 // Runs After All Graphs Are Updated
                 // Do Some Stuff Here                
@@ -191,7 +196,7 @@ define('app/controllers/monitoring', [
                                 // Increase time by step for every new measurement
                                 metricTime = new Date(metricTime.getTime()+10000);
                             }
-                            
+
                             controller.machine.set('pendingStats', false);
                             self.lastMeasurmentTime = new Date(metricTime.getTime()-10000);
                             self.view.updateGraphs(receivedData);
