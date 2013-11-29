@@ -140,18 +140,18 @@ define('app/views/monitoring', [
 
                 var selectValue = $("#timeWindowSelect").val();
                 
-                var newTime = new Date();
+                var newTime = 0;
                 if(selectValue.toLowerCase().search("minutes") != -1)
                 {
                     selectValue = selectValue.replace(/\D+/g, '' );
                     console.log("Minutes To Display:" + selectValue);
-                    newTime.setHours(0,+selectValue,0);
+                    newTime = selectValue * 60 * 1000;
                 }
                 else if(selectValue.toLowerCase().search("hours") != 1 || selectValue.toLowerCase().search("hour") != 1)
                 {
                     selectValue = selectValue.replace(/\D+/g, '' );
                     console.log("Hours To Display:" + selectValue);
-                    newTime.setHours(+selectValue,0,0); 
+                    newTime = selectValue * 60 * 60 * 1000;
                 }
 
                 // Update Graph Time
@@ -255,7 +255,7 @@ define('app/views/monitoring', [
                 *  
                 * 
                 */
-                function Graph(divID,width,timeToDisplay,yAxisValueFormat){
+                function Graph(divID,width,timeToDisplayms,yAxisValueFormat){
 
                     var NUM_OF_LABELS = 5;
                     var STEP_SECONDS = 10;
@@ -270,7 +270,7 @@ define('app/views/monitoring', [
                     this.width = width;
                     this.height = (fixedHeight < 85 ? 85 : fixedHeight);
                     this.data = [];
-                    this.timeDisplayed = timeToDisplay;
+                    this.timeDisplayed = timeToDisplayms/1000;
                     this.realDataIndex = -1;
                     this.timeUpdated = false;
                     this.yAxisValueFormat = yAxisValueFormat;
@@ -280,9 +280,7 @@ define('app/views/monitoring', [
                     this.isAnimated = true;
 
                     // Calculate The step  of the time axis
-                    this.secondsStep =  Math.floor((timeToDisplay.getHours()*60*60 + 
-                                        timeToDisplay.getMinutes()*60 + 
-                                        timeToDisplay.getSeconds() ) / NUM_OF_LABELS); 
+                    this.secondsStep =  Math.floor((timeToDisplayms / 1000) / NUM_OF_LABELS); 
                     
                     var self = this;
 
@@ -410,9 +408,7 @@ define('app/views/monitoring', [
                     this.updateView = function() {
                         
                         var displayedData = [];
-                        var num_of_displayed_measurements = (this.timeDisplayed.getHours()*60*60 +
-                                                            this.timeDisplayed.getMinutes()*60   +
-                                                            this.timeDisplayed.getSeconds()) / STEP_SECONDS;
+                        var num_of_displayed_measurements = this.timeDisplayed / STEP_SECONDS;
 
                         // Get only data that will be displayed
                         if(this.data.length > num_of_displayed_measurements) {
@@ -657,12 +653,10 @@ define('app/views/monitoring', [
                     * Changes data that will be displayed and time of x-axis
                     *
                     */
-                    this.changeTimeToDisplay = function(newTime){
+                    this.changeTimeToDisplay = function(newTimems){
 
-                        this.timeDisplayed = newTime;
-                        this.secondsStep   = Math.floor((newTime.getHours()*60*60 + 
-                                                        newTime.getMinutes()*60 + 
-                                                        newTime.getSeconds() ) / NUM_OF_LABELS);
+                        this.timeDisplayed = newTimems/1000;
+                        this.secondsStep   = Math.floor((newTimems / 1000) / NUM_OF_LABELS);
 
                         this.timeUpdated = true;
                         this.updateView();
@@ -812,8 +806,7 @@ define('app/views/monitoring', [
                         var width = $("#GraphsArea").width() -2;  
 
                         // Create Graphs 
-                        var timeToDisplay = new Date();
-                        timeToDisplay.setHours(0,30,0);
+                        var timeToDisplay = 10*60*1000;
                         self.cpuGraph  = new Graph('cpuGraph',width,timeToDisplay,"%");
                         self.loadGraph = new Graph('loadGraph',width,timeToDisplay);
                         self.memGraph  = new Graph('memGraph',width,timeToDisplay,"%");
@@ -823,7 +816,7 @@ define('app/views/monitoring', [
                         self.networkTXGraph = new Graph('networkTXGraph',width,timeToDisplay);
 
                         // Debug Ask For 7 Days
-                        controller.setupDataRequest(60*60*1000);
+                        controller.setupDataRequest(5*60*60*1000);
 
                         // Set Up Resolution Change Event
                         $(window).resize(function(){
