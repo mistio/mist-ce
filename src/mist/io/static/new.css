@@ -4,6 +4,13 @@
 @import url("css/key.css");
 
 
+/* Text fields
+-----------------------------------------------------------------------------------------------------------*/
+textarea {
+    height: 75px !important;
+}
+
+
 /* Ajax loader
 -----------------------------------------------------------------------------------------------------------*/
 .ajax-loader {
@@ -19,7 +26,6 @@
 /* Buttons
 -----------------------------------------------------------------------------------------------------------*/
 .ok-cancel {
-    margin-top: 20px;
     width: 100%;
 }
 
@@ -67,19 +73,68 @@
 .ui-footer.dual-action-footer a {
     width: 48%;
 }
+.ui-footer.tri-action-footer a {
+    width: 32%;
+}
+@media only screen and  (max-width: 1070px) {
+    .ui-footer.tri-action-footer a {
+        width: 31.5%;
+    }
+}
 @media only screen and  (max-width: 790px) {
     .ui-footer.dual-action-footer a {
         width: 47%;
     }
+    .ui-footer.tri-action-footer a {
+        width: 31%;
+    }
+}
+@media only screen and  (max-width: 630px) {
+    .ui-footer.tri-action-footer a {
+        width: 30.5%;
+    }
 }
 @media only screen and  (max-width: 510px) {
     .ui-footer.dual-action-footer a {
-        width: 46%;
+        width: 30%;
+    }
+    .ui-footer.tri-action-footer a {
+        width: 30%;
     }
 }
-@media only screen and  (max-width: 360px) {
+@media only screen and  (max-width: 470px) {
+    .ui-footer.dual-action-footer a {
+        width: 30%;
+    }
+    .ui-footer.tri-action-footer a {
+        width: 29.5%;
+    }
+}
+@media only screen and  (max-width: 410px) {
+    .ui-footer a {
+        padding-left: 2.5em !important;
+    }
+    .ui-footer.dual-action-footer a {
+        width: 30%;
+    }
+    .ui-footer.tri-action-footer a {
+        width: 21.5%;
+    }
+}
+@media only screen and  (max-width: 385px) {
+    .ui-footer.dual-action-footer a {
+        width: 30%;
+    }
+    .ui-footer.tri-action-footer a {
+        width: 19.5%;
+    }
+}
+@media only screen and  (max-width: 340px) {
     .ui-footer.dual-action-footer a {
         width: 45%;
+    }
+    .ui-footer.tri-action-footer a {
+        width: 19%;
     }
 }
 

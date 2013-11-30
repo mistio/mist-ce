@@ -1,6 +1,6 @@
 <div id="key-list-page">
 
-    <div data-role="header">
+    <div data-role="header" data-theme="b">
 
         <a href="#" data-icon="home">Home</a>
 
@@ -10,7 +10,7 @@
 
     </div>
 
-    <div data-role="content">
+    <div data-role="content" data-theme="c">
 
         <a data-role="button" data-icon="arrow-d" {{action "selectClicked" target="view"}}>Select</a>
         <a data-role="button" data-icon="plus" data-iconpos="right" {{action "createClicked" target="view"}}>Create</a>
@@ -40,7 +40,7 @@
         </ul>
     </div>
 
-    <div id="keys-footer" data-role="footer">
+    <div class="tri-action-footer" data-role="footer" data-theme="b">
         <div data-role="controlgroup" data-type="horizontal">
             <a data-role="button" data-icon="edit" {{action "renameClicked" target="view"}}>Rename</a>
             <a data-role="button" data-icon="delete" {{action "deleteClicked" target="view"}}>Delete</a>

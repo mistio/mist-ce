@@ -9,9 +9,6 @@ define('app/controllers/confirmation', ['ember'],
 
             show: function() {
                 $('#confirmation-popup').popup('open');
-                Ember.run.later(function() {
-                    $('#confirmation-popup').popup('reposition', {positionTo: 'window'});
-                }, 10);
             },
 
             confirm: function() {

@@ -1,11 +1,6 @@
 
 /* Single Key Page CSS
 -----------------------------------------------------------------------------------------------------------*/
-
-#private-key {
-    height: 100px !important;
-}
-
 #single-key-page .ajax-loader {
     display: inline;
     float: right;
@@ -16,8 +11,3 @@
         margin-top: -20px;
     }
 }
-
-#rename-key-popup .ajax-loader {
-    margin: 0 auto;
-}
-

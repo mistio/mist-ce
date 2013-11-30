@@ -16,8 +16,6 @@ define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_lis
             selectedKey: null,
             template: Ember.Handlebars.compile(key_list_html),
 
-
-
             /**
              * 
              *  Observers
