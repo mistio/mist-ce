@@ -115,12 +115,12 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
                 },
 
                 deleteClicked: function() {
-                    var key = this.key;
+                    var keyName = this.key.name;
                     Mist.confirmationController.set('title', 'Delete key');
-                    Mist.confirmationController.set('text', 'Are you sure you want to delete "' + key.name + '" ?');
+                    Mist.confirmationController.set('text', 'Are you sure you want to delete "' + keyName + '" ?');
                     Mist.confirmationController.set('callback', function() {
                         Mist.Router.router.transitionTo('keys');
-                        Mist.keysController.deleteKey(key.name);
+                        Mist.keysController.deleteKey(keyName);
                     });
                     Mist.confirmationController.show();
                 }

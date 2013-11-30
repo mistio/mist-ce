@@ -16,14 +16,14 @@
                id="textarea-private-key"
                valueBinding="Mist.keyAddController.newKeyPrivate"}}
     
-        <div data-role="controlgroup" data-type="horizontal">
+        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <button data-icon="gear" {{action "generateClicked" target="view"}}>Generate</button>
             <button data-icon="arrow-u" data-iconpos="right" {{action "uploadClicked" target="view"}}>Upload</button>
         </div>
     
         <input class="upload-input" type="file" name="file" {{action "uploadInputChanged" on="change" target="view"}}/>
     
-        <div data-role="controlgroup" data-type="horizontal">
+        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
             <button id="create-key-ok" {{action "createClicked" target="view"}}>Create</button>
         </div>
