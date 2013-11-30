@@ -25,7 +25,7 @@
             <h3>Private key
                 {{#if Mist.keysController.gettingPrivateKey}}
                 <div class="ajax-loader"></div>
-                {{/if}}            
+                {{/if}}
             </h3>
             <a data-role="button" {{action "displayClicked" target="view"}}>Display</a>
         </div>
@@ -49,7 +49,7 @@
 
     {{view Mist.ConfirmationDialog}}
 
-    <div id="private-key-popup" data-role="popup">
+    <div id="private-key-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
         <div data-role="header">
             <h1>Private Key</h1>
         </div>

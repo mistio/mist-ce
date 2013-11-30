@@ -13,31 +13,27 @@ define('app/controllers/notification', [
             timeout: false,
 
             notify: function(message){
-                if(this.timeout){
-                    clearTimeout(this.timeout);
-                }
-                log("notification: " + message);
                 $.mobile.loading( 'show', {
                             text: message,
                             textVisible: true,
                             textonly: true,
-                            theme: $.mobile.pageLoadErrorMessageTheme
+                            theme: 'b'
                 });
-                this.timeout = setTimeout("$.mobile.loading( 'hide' )", 2000);
+                Ember.run.later(function() {
+                    $.mobile.loading('hide');
+                }, this.timeout ? this.timeout : 2000);
             },
             
             warn: function(message){
-                if(this.timeout){
-                    clearTimeout(this.timeout);
-                }
-                log("warning: " + message);
                 $.mobile.loading( 'show', {
                             text: message,
                             textVisible: true,
                             textonly: true,
-                            theme: $.mobile.pageLoadErrorMessageTheme
+                            theme: 'b'
                 });
-                this.timeout = setTimeout("$.mobile.loading( 'hide' )", 5000);
+                Ember.run.later(function() {
+                    $.mobile.loading('hide');
+                }, this.timeout ? this.timeout : 5000);
             },
 
             timeNotify: function(message, miliseconds){

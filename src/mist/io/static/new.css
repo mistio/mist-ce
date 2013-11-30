@@ -2,6 +2,7 @@
 /* Import css files
 -----------------------------------------------------------------------------------------------------------*/
 @import url("css/key.css");
+@import url("css/key_create.css");
 
 
 /* Text fields
@@ -33,14 +34,28 @@ textarea {
 /* Small popup
 -----------------------------------------------------------------------------------------------------------*/
 .small-popup {
-    width: 250px !important;
+    width: 240px !important;
 }
 .small-popup .ok-cancel > .ui-controlgroup-controls {
     width: 100%;
 }
 .small-popup .ok-cancel a,
 .small-popup .ok-cancel button {
-    width: 75px !important;
+    width: 70px !important;
+}
+
+
+/* Large popup
+-----------------------------------------------------------------------------------------------------------*/
+.large-popup {
+    width: 290px !important;
+}
+.large-popup .ok-cancel > .ui-controlgroup-controls {
+    width: 100%;
+}
+.large-popup .ok-cancel a,
+.large-popup .ok-cancel button {
+    width: 95px !important;
 }
 
 
@@ -55,6 +70,7 @@ textarea {
 -----------------------------------------------------------------------------------------------------------*/
 .ui-footer {
     position: fixed;
+    display: none;
     z-index: 2000;
     width: 100%;
     bottom: 0;
@@ -96,16 +112,13 @@ textarea {
 }
 @media only screen and  (max-width: 510px) {
     .ui-footer.dual-action-footer a {
-        width: 30%;
+        width: 46%;
     }
     .ui-footer.tri-action-footer a {
         width: 30%;
     }
 }
 @media only screen and  (max-width: 470px) {
-    .ui-footer.dual-action-footer a {
-        width: 30%;
-    }
     .ui-footer.tri-action-footer a {
         width: 29.5%;
     }
@@ -115,7 +128,7 @@ textarea {
         padding-left: 2.5em !important;
     }
     .ui-footer.dual-action-footer a {
-        width: 30%;
+        width: 38%;
     }
     .ui-footer.tri-action-footer a {
         width: 21.5%;
@@ -123,7 +136,7 @@ textarea {
 }
 @media only screen and  (max-width: 385px) {
     .ui-footer.dual-action-footer a {
-        width: 30%;
+        width: 36%;
     }
     .ui-footer.tri-action-footer a {
         width: 19.5%;
@@ -131,7 +144,7 @@ textarea {
 }
 @media only screen and  (max-width: 340px) {
     .ui-footer.dual-action-footer a {
-        width: 45%;
+        width: 34%;
     }
     .ui-footer.tri-action-footer a {
         width: 19%;

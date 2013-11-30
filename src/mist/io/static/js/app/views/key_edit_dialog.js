@@ -16,8 +16,6 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html','
             newName: null,
             template: Ember.Handlebars.compile(key_edit_dialog_html),
 
-
-
             /**
              *
              *  Observers
@@ -25,6 +23,12 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html','
              */
 
             newNameObserver: function() {
+
+                // Remove whitespaces from key name
+                if (this.newName) {
+                    this.set('newKeyName', this.newName.replace(/ /g, ''));
+                }
+
                 if (this.newName) {
                     $('#rename-key-ok').removeClass('ui-state-disabled');
                 } else {
@@ -41,8 +45,8 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html','
              */
 
             close: function() {
-                $('#new-key-name').val('');
                 $('#rename-key-popup').popup('close');
+                $('#new-key-name').val('');
             },
 
 
@@ -60,29 +64,27 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html','
                 },
 
                 saveClicked: function() {
-                    
+
                     // Get current and new name
-                    var newName = this.newName.trim();
+                    var newName = this.newName;
                     var name = this.get('controller').get('model');
                     if (!name) {
+                        // Occurs in key list page
                         name = Mist.keysController.getSelectedKeyName();
                     } else {
+                        // Occurs in single key page
                         name = name.name;
                     }
-                    
+
                     if (name != newName) {
-                        
-                        // Check if name exists already
-                        var found = false;
-                        Mist.keysController.content.some(function(key) {
-                            if (key.name == newName) {
-                                Mist.notificationController.notify('There is a key named "' + newName +'" already');
-                                return found = true;
-                            }
-                        });
-                        if (found) return;
-                        
-                        // Create key
+
+                        // Check if key name exist already
+                        if (Mist.keysController.keyNameExists(newName)) {
+                            Mist.notificationController.notify('Key name exists already');
+                            return;
+                        }
+
+                        // Rename key
                         var that = this;
                         Mist.keysController.renameKey(name, newName, function() {
                             

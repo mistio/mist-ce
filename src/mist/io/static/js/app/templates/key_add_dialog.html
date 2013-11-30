@@ -1,33 +1,40 @@
-<div id="create-key-popup" data-role="popup">
-    
+<div id="create-key-popup" class="large-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
+
     <div data-role="header">
         <h1>Create key</h1>
     </div>
-    
+
     <div data-role="content">
 
         <label for="create-key-name">Name:</label>
         {{view Mist.TextField
                id="create-key-name"
                valueBinding="Mist.keyAddController.newKeyName"}}
-        
-        <label for="textarea-private-key">Private Key:</label>
+
+        <label for="textarea-private-key">Private Key:
+            {{#if Mist.keysController.generatingKey}}
+                <div class="ajax-loader"></div>
+            {{/if}}
+            {{#if Mist.keysController.uploadingKey}}
+                <div class="ajax-loader"></div>
+            {{/if}}
+        </label>
         {{view Ember.TextArea
-               id="textarea-private-key"
+               id="create-key-private"
                valueBinding="Mist.keyAddController.newKeyPrivate"}}
-    
+
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <button data-icon="gear" {{action "generateClicked" target="view"}}>Generate</button>
-            <button data-icon="arrow-u" data-iconpos="right" {{action "uploadClicked" target="view"}}>Upload</button>
+            <button {{action "generateClicked" target="view"}}>Generate</button>
+            <button {{action "uploadClicked" target="view"}}>Upload</button>
         </div>
-    
-        <input class="upload-input" type="file" name="file" {{action "uploadInputChanged" on="change" target="view"}}/>
-    
+
+        <input id="create-key-upload" type="file" name="file" {{action "uploadInputChanged" on="change" target="view"}}/>
+
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
-            <button id="create-key-ok" {{action "createClicked" target="view"}}>Create</button>
+            <button id="create-key-ok" data-theme="b" {{action "createClicked" target="view"}}>Create</button>
         </div>
-        
+
     </div>
-    
+
 </div>

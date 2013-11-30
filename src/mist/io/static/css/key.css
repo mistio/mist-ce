@@ -11,3 +11,7 @@
         margin-top: -20px;
     }
 }
+
+#single-key-page .ui-footer {
+    display: block;
+}

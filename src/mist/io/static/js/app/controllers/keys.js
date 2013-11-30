@@ -20,6 +20,7 @@ define(['app/models/key'],
             loading: false,
             creatingKey: false,
             renamingKey: false,
+            uploadingKey: false,
             associatingKey: false,
             gettingPublicKey: false,
             gettingPrivateKey: false,
@@ -276,6 +277,18 @@ define(['app/models/key'],
                     if (content[k].selected) return content[k].name;
                 }
             },
+
+
+            keyNameExists: function(name) {
+                var content = this.content;
+                var contentLength = this.content.length;
+                for (var k = 0; k < contentLength; ++k) {
+                    if (content[k].name == name) {
+                        return true;
+                    }
+                }
+            },
+
 
 
             /**

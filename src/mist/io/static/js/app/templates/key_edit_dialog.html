@@ -1,4 +1,4 @@
-<div id="rename-key-popup" class="small-popup" data-role="popup">
+<div id="rename-key-popup" class="small-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
 
     <div data-role="header">
         <h1>Rename key</h1>
@@ -10,11 +10,11 @@
         {{view Mist.TextField
                id="new-key-name"
                valueBinding="view.newName"}}
-              
+
         {{#if Mist.keysController.renamingKey}}
         <div class="ajax-loader"></div>
         {{/if}}
-        
+
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
             <button id="rename-key-ok" data-theme="b" {{action "saveClicked" target="view"}}>Save</button>

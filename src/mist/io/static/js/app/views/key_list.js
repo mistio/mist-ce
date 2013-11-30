@@ -24,22 +24,20 @@ define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_lis
 
             selectedKeysObserver: function() {
                 var that = this;
-                Ember.run.once(function() {
-                    switch (Mist.keysController.getSelectedKeysCount()) {
-                        case 0:
-                            $('#keys-footer').hide();
-                            break;
-                        case 1:
-                            $('#keys-footer').show();
-                            $('#keys-footer a').removeClass('ui-state-disabled');
-                            that.set('selectedKey', Mist.keysController.getSelectedKeyName());
-                            break;
-                        default:
-                            $('#keys-footer').show();
-                            $('#keys-footer a').addClass('ui-state-disabled');
-                            break;
-                    }
-                });
+                switch (Mist.keysController.getSelectedKeysCount()) {
+                    case 0:
+                        $('#key-list-page .ui-footer').hide();
+                        break;
+                    case 1:
+                        $('#key-list-page .ui-footer').show();
+                        $('#key-list-page .ui-footer a').removeClass('ui-state-disabled');
+                        that.set('selectedKey', Mist.keysController.getSelectedKeyName());
+                        break;
+                    default:
+                        $('#key-list-page .ui-footer').show();
+                        $('#key-list-page .ui-footer a').addClass('ui-state-disabled');
+                        break;
+                }
             }.observes('Mist.keysController.content.@each.selected').on('didInsertElement'),
 
 
@@ -54,6 +52,9 @@ define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_lis
 
                 createClicked: function() {
                     Mist.keyAddController.clear();
+                    Mist.keyAddController.set('newKeyCallback', function() {
+                        $('#create-key-popup').popup('close');
+                    });
                     $('#create-key-popup').popup('open');
                 },
 

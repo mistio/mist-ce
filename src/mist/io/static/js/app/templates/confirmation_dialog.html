@@ -1,4 +1,4 @@
-<div id="confirmation-popup" class="small-popup" data-role="popup">
+<div id="confirmation-popup" class="small-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
 
     <div data-role="header">
         <h1>{{Mist.confirmationController.title}}</h1>
@@ -6,7 +6,7 @@
 
     <div data-role="content">
         <p>{{Mist.confirmationController.text}}</p>
-        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal" align="center">
+        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <button data-theme="b" {{action "noClicked" target="view"}}>No</button>
             <button {{action "yesClicked" target="view"}}>Yes</button>
         </div>
