@@ -342,14 +342,21 @@ define(['app/models/key'],
 
             _deleteKey: function(name) {
                 var newKeys = [];
+                var wasDefalut = false;
                 var content = this.content;
                 var contentLength = this.content.length;
                 for (var k = 0; k < contentLength; ++k) {
                     if (content[k].name != name) {
                         newKeys.push(content[k]);
+                    } else if (content[k].default_key) {
+                        wasDefault = true;
                     }
                 }
                 this.set('content', newKeys);
+                
+                if (wasDefault) {
+                    Mist.keysController.setDefaultKey(content[0].name);
+                }
             },
 
 
