@@ -17,8 +17,6 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
             associatedMachines: null,
             template: Ember.Handlebars.compile(key_html),
 
-
-
             /**
              *
              *  Initialization
@@ -102,7 +100,7 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
                 displayClicked: function() {
                     Mist.keysController.getPrivateKey(this.key.name, function(privateKey) {
                         $('#private-key-popup').popup('open');
-                        $('#private-key').text(privateKey);
+                        $('#private-key').val(privateKey);
                     });
                 },
 

@@ -1,7 +1,4 @@
-define('app/controllers/confirmation', [
-    'ember',
-    'jquery',
-    ],
+define('app/controllers/confirmation', ['ember'],
     /**
      * Confirmation Dialog Controller
      *
@@ -10,8 +7,11 @@ define('app/controllers/confirmation', [
     function() {
         return Ember.Object.extend({
 
-            show: function(){
+            show: function() {
                 $('#confirmation-popup').popup('open');
+                Ember.run.later(function() {
+                    $('#confirmation-popup').popup('reposition', {positionTo: 'window'});
+                }, 10);
             },
 
             confirm: function() {

@@ -71,6 +71,18 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html','
                     }
                     
                     if (name != newName) {
+                        
+                        // Check if name exists already
+                        var found = false;
+                        Mist.keysController.content.some(function(key) {
+                            if (key.name == newName) {
+                                Mist.notificationController.notify('There is a key named "' + newName +'" already');
+                                return found = true;
+                            }
+                        });
+                        if (found) return;
+                        
+                        // Create key
                         var that = this;
                         Mist.keysController.renameKey(name, newName, function() {
                             
@@ -81,7 +93,7 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html','
                             that.close();
                         });
                     } else {
-                        this.close();
+                        this.close(); // Psudo-save
                     }
                 }
             }

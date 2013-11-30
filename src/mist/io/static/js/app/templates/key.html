@@ -1,6 +1,6 @@
 <div id="single-key-page">
 
-    <div data-role="header">
+    <div data-role="header" data-theme="b">
 
         <a href="#/keys" data-icon="arrow-l">Keys</a>
 
@@ -10,15 +10,23 @@
 
     </div>
 
-    <div data-role="content">
+    <div data-role="content" data-theme="c">
 
-         <div data-role="collapsible">
-            <h3>Public Key</h3>
+         <div data-role="collapsible" data-collapsed="false">
+            <h3>Public Key 
+                {{#if Mist.keysController.gettingPublicKey}}
+                <div class="ajax-loader"></div>
+                {{/if}}
+            </h3>
             <input id="public-key" type="text" readonly="readonly"/>
         </div>
 
         <div data-role="collapsible">
-            <h3>Private key</h3>
+            <h3>Private key
+                {{#if Mist.keysController.gettingPrivateKey}}
+                <div class="ajax-loader"></div>
+                {{/if}}            
+            </h3>
             <a data-role="button" {{action "displayClicked" target="view"}}>Display</a>
         </div>
 
@@ -32,6 +40,8 @@
             </ul>
         </div>
         {{/if}}
+
+        <div class="bottom-padding"></div>
 
     </div>
 
@@ -49,7 +59,7 @@
         </div>
     </div>
 
-    <div data-role="footer">
+    <div class="dual-action-footer" data-role="footer" data-theme="b">
         <div data-role="controlgroup" data-type="horizontal">
             <a data-role="button" data-icon="edit" {{action "renameClicked" target="view"}}>Rename</a>
             <a data-role="button" data-icon="delete" {{action "deleteClicked" target="view"}}>Delete</a>

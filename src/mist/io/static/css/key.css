@@ -1,6 +1,23 @@
-/**
- *     
- *  Single Key View CSS
- * 
- */
+
+/* Single Key Page CSS
+-----------------------------------------------------------------------------------------------------------*/
+
+#private-key {
+    height: 100px !important;
+}
+
+#single-key-page .ajax-loader {
+    display: inline;
+    float: right;
+}
+
+@-moz-document url-prefix() {
+    #single-key-page .ajax-loader {
+        margin-top: -20px;
+    }
+}
+
+#rename-key-popup .ajax-loader {
+    margin: 0 auto;
+}
 

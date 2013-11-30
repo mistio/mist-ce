@@ -66,6 +66,8 @@ def main(global_config, **settings):
     
     config.add_route('keys', '/keys')
     config.add_route('key_action', '/keys/{key}')
+    config.add_route('key_pub', '/keys/{key}/public')
+    config.add_route('key_priv', '/keys/{key}/private')
     config.add_route('key_association', '/backends/{backend}/machines/{machine}/keys/{key}')
     
     config.add_route('rules', '/rules')

@@ -1,1 +1,86 @@
+
+/* Import css files
+-----------------------------------------------------------------------------------------------------------*/
+
 @import url("css/key.css");
+
+/* Ajax loader
+-----------------------------------------------------------------------------------------------------------*/
+
+.ajax-loader {
+    background-image: url("images/spinner.gif");
+    background-position: center !important;
+    background-repeat: no-repeat;
+    height: 16px;
+    width: 16px;
+}
+
+/* Buttons
+-----------------------------------------------------------------------------------------------------------*/
+
+.ok-cancel {
+    width: 100%;
+}
+.ok-cancel > .ui-controlgroup-controls {
+    width: 100%;
+}
+.ok-cancel a,
+.ok-cancel button {
+    width: 34% !important;
+}
+@-moz-document url-prefix() {
+    .ok-cancel a,
+    .ok-cancel button {
+        width: 33% !important;
+    }
+}
+
+
+/* Bottom padding
+-----------------------------------------------------------------------------------------------------------*/
+
+.bottom-padding {
+    height: 100px;
+}
+
+/* Footer
+-----------------------------------------------------------------------------------------------------------*/
+
+.ui-footer {
+    position: fixed;
+    z-index: 2000;
+    width: 100%;
+    bottom: 0;
+}
+.ui-footer a {
+    padding-left: 0 !important;
+}
+.ui-footer .ui-controlgroup {
+    margin: 0 0.5%;
+}
+.ui-footer .ui-controlgroup-controls {
+    margin-bottom: -1px;
+    margin-left: 0.5%;
+    width: 100%;
+}
+.ui-footer.dual-action-footer a {
+    width: 48%;
+}
+@media only screen and  (max-width: 790px) {
+    .ui-footer.dual-action-footer a {
+        width: 47%;
+    }
+}
+@media only screen and  (max-width: 510px) {
+    .ui-footer.dual-action-footer a {
+        width: 46%;
+    }
+}
+@media only screen and  (max-width: 360px) {
+    .ui-footer.dual-action-footer a {
+        width: 45%;
+    }
+}
+
+
+

@@ -152,8 +152,8 @@ define(['app/models/key'],
                     }
                 });
             },
-          
-            
+
+
             associateKey: function(keyName, backendId, machineId, host, callback) {
                 this.set('associatingKey', true);
                 $.ajax({
@@ -219,7 +219,7 @@ define(['app/models/key'],
                 }).error(function() {
                     Mist.notificationController.notify('Failed to get private key');
                 }).complete(function() {
-                    Mist.keysController.set('gettingPrivateKey', true);
+                    Mist.keysController.set('gettingPrivateKey', false);
                 });
             },
             
@@ -231,7 +231,7 @@ define(['app/models/key'],
                 }).error(function() {
                     Mist.notificationController.notify('Failed to get public key');
                 }).complete(function() {
-                    Mist.keysController.set('gettingPublicKey', true);
+                    Mist.keysController.set('gettingPublicKey', false);
                 });
             },
 

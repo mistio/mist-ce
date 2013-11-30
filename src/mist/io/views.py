@@ -1330,11 +1330,11 @@ def edit_key(request):
 def set_default_key_request(request):
     return set_default_key(request)
 
-@view_config(route_name='key_action', request_method='GET', request_param='action=private', renderer='json')
+@view_config(route_name='key_priv', request_method='GET', renderer='json')
 def get_private_key_request(request):
     return get_private_key(request)
 
-@view_config(route_name='key_action', request_method='GET', request_param='action=public', renderer='json')
+@view_config(route_name='key_pub', request_method='GET', renderer='json')
 def get_public_key_request(request):
     return get_public_key(request)
 
