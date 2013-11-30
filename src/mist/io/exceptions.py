@@ -124,7 +124,7 @@ class MachineCreationError(InternalServerError):
 
 # SERVICE UNAVAILABLE (translated as 503 in views)
 class ServiceUnavailableError(MistError):
-    msg = "Sercvice unavailable"
+    msg = "Service unavailable"
 
 
 class BackendUnavailableError(ServiceUnavailableError):

@@ -515,7 +515,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     if conn.type in [Provider.RACKSPACE_FIRST_GEN,
                      Provider.RACKSPACE,
                      Provider.OPENSTACK]:
-        node = create_machine_openstack(conn, public_key, script, machine_name,
+        node = _create_machine_openstack(conn, public_key, script, machine_name,
                                         image, size, location)
     elif conn.type in config.EC2_PROVIDERS and private_key:
         locations = conn.list_locations()
@@ -523,22 +523,22 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             if loc.id == location_id:
                 location = loc
                 break
-        node = create_machine_ec2(conn, key_id, private_key, public_key,
+        node = _create_machine_ec2(conn, key_id, private_key, public_key,
                                   script, machine_name, image, size, location)
     elif conn.type is Provider.NEPHOSCALE:
-        node = create_machine_nephoscale(conn, key_id, private_key, public_key,
+        node = _create_machine_nephoscale(conn, key_id, private_key, public_key,
                                          script, machine_name, image, size,
                                          location)
     elif conn.type is Provider.SOFTLAYER:
-        node = create_machine_softlayer(conn, key_id, private_key, public_key,
+        node = _create_machine_softlayer(conn, key_id, private_key, public_key,
                                         script, machine_name, image, size,
                                         location)
     elif conn.type is Provider.DIGITAL_OCEAN:
-        node = create_machine_digital_ocean(conn, key_id, private_key,
+        node = _create_machine_digital_ocean(conn, key_id, private_key,
                                             public_key, script, machine_name,
                                             image, size, location)
     elif conn.type is Provider.LINODE and private_key:
-        node = create_machine_linode(conn, key_id, private_key, public_key,
+        node = _create_machine_linode(conn, key_id, private_key, public_key,
                                      script, machine_name, image, size,
                                      location)
     else:
@@ -554,7 +554,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             }
 
 
-def create_machine_openstack(conn, public_key, script, machine_name,
+def _create_machine_openstack(conn, public_key, script, machine_name,
                              image, size, location):
     """Create a machine in Openstack.
 
@@ -574,7 +574,7 @@ def create_machine_openstack(conn, public_key, script, machine_name,
     return node
 
 
-def create_machine_ec2(conn, key_name, private_key, public_key, script,
+def _create_machine_ec2(conn, key_name, private_key, public_key, script,
                        machine_name, image, size, location):
     """Create a machine in Amazon EC2.
 
@@ -631,7 +631,7 @@ def create_machine_ec2(conn, key_name, private_key, public_key, script,
     return node
 
 
-def create_machine_nephoscale(conn, key_name, private_key, public_key, script,
+def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
                               machine_name, image, size, location):
     """Create a machine in Nephoscale.
 
@@ -701,7 +701,7 @@ def create_machine_nephoscale(conn, key_name, private_key, public_key, script,
     return node
 
 
-def create_machine_softlayer(conn, key_name, private_key, public_key, script,
+def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
                              machine_name, image, size, location):
     """Create a machine in Softlayer.
 
@@ -735,7 +735,7 @@ def create_machine_softlayer(conn, key_name, private_key, public_key, script,
     return node
 
 
-def create_machine_digital_ocean(conn, key_name, private_key, public_key,
+def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                                  script, machine_name, image, size, location):
     """Create a machine in Digital Ocean.
 
@@ -774,7 +774,7 @@ def create_machine_digital_ocean(conn, key_name, private_key, public_key,
     return node
 
 
-def create_machine_linode(conn, key_name, private_key, public_key, script,
+def _create_machine_linode(conn, key_name, private_key, public_key, script,
                           machine_name, image, size, location):
     """Create a machine in Linode.
 
@@ -850,7 +850,6 @@ def start_machine(user, backend_id, machine_id):
               helpers.get_machine_actions.
 
     """
-
     _machine_action(user, backend_id, machine_id, 'start')
 
 
@@ -863,13 +862,11 @@ def stop_machine(user, backend_id, machine_id):
               helpers.get_machine_actions.
 
     """
-
     _machine_action(user, backend_id, machine_id, 'stop')
 
 
 def reboot_machine(user, backend_id, machine_id):
     """Reboots a machine on a certain backend."""
-
     _machine_action(user, backend_id, machine_id, 'reboot')
 
 
