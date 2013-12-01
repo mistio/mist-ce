@@ -283,7 +283,8 @@ class OODict(object):
         # sanitize/cast/set default
         val = field.cast2front(dict_value)
         if dict_value is None:
-            if isinstance(val, OODict) or isinstance(val, FieldsSequence):
+            if isinstance(val, OODict) or isinstance(val, FieldsSequence) \
+                    or isinstance(val, list) or isinstance(val, dict):
                 self.__setattr__(name, val)
         return val
 
