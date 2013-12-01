@@ -258,6 +258,7 @@ def toggle_backend(request):
         raise BackendNotFoundError()
     with user.lock_n_load():
         user.backends[backend_id].enabled = new_state
+        user.save()
 
     return OK
 
