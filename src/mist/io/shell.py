@@ -279,7 +279,7 @@ class Shell(object):
                             updated = True
                     # if association didn't exist, create it!
                     if not updated:
-                        user.keypairs[key_id].append(assoc)
+                        user.keypairs[key_id].machines.append(assoc)
                     user.save()
                 return key_id, ssh_user
 
