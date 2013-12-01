@@ -2,6 +2,7 @@
 /* Import css files
 -----------------------------------------------------------------------------------------------------------*/
 @import url("css/key.css");
+@import url("css/key_list.css");
 @import url("css/key_create.css");
 
 
@@ -59,7 +60,7 @@ textarea {
 }
 
 
-/* Bottom padding
+/* Page formating
 -----------------------------------------------------------------------------------------------------------*/
 .bottom-padding {
     height: 100px;

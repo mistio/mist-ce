@@ -12,10 +12,19 @@
 
     <div data-role="content" data-theme="c">
 
-        <a data-role="button" data-icon="arrow-d" {{action "selectClicked" target="view"}}>Select</a>
-        <a data-role="button" data-icon="plus" data-iconpos="right" {{action "createClicked" target="view"}}>Create</a>
+        <a id="select-keys-btn"
+           data-role="button"
+           data-icon="arrow-d"
+           {{action "selectClicked" target="view"}}>Select</a>
 
-        <ul data-role="listview" data-filter="true" data-filter-placeholder="Filter...">
+        <a id="create-key-btn"
+           data-role="button"
+           data-icon="plus"
+           data-iconpos="right"
+           data-theme="b"
+           {{action "createClicked" target="view"}}>Create</a>
+
+        <ul data-role="listview" data-filter="true" data-inset="true" data-filter-placeholder="Filter...">
             {{#each Mist.keysController.content}}
                 {{view Mist.KeyListItemView keyBinding="this"}}
             {{/each}}
@@ -31,7 +40,7 @@
 
     {{view Mist.ConfirmationDialog}}
 
-    <div id="select-keys-popup" data-role="popup">
+    <div id="select-keys-popup" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-keys-btn">
         <ul data-role='listview'>
             <li data-icon="false">
                 <a {{action "selectionModeClicked" true target="view"}}>All</a>

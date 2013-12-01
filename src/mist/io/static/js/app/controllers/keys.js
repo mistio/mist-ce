@@ -342,7 +342,7 @@ define(['app/models/key'],
 
             _deleteKey: function(name) {
                 var newKeys = [];
-                var wasDefalut = false;
+                var wasDefault = false;
                 var content = this.content;
                 var contentLength = this.content.length;
                 for (var k = 0; k < contentLength; ++k) {
@@ -355,7 +355,9 @@ define(['app/models/key'],
                 this.set('content', newKeys);
                 
                 if (wasDefault) {
-                    Mist.keysController.setDefaultKey(content[0].name);
+                    Ember.run.next(this, function() {
+                        this.setDefaultKey(this.content[0].name);
+                    });
                 }
             },
 

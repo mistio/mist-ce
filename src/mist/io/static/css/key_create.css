@@ -1,0 +1,10 @@
+
+/* Create Key Popup CSS
+-----------------------------------------------------------------------------------------------------------*/
+#create-key-upload {
+    display: none;
+}
+#create-key-popup .ajax-loader {
+    display: inline;
+    float: right;
+}

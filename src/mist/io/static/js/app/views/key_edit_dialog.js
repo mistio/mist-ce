@@ -26,7 +26,7 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html','
 
                 // Remove whitespaces from key name
                 if (this.newName) {
-                    this.set('newKeyName', this.newName.replace(/ /g, ''));
+                    this.set('newKeyName', this.newName.replace(/\W/g, ''));
                 }
 
                 if (this.newName) {

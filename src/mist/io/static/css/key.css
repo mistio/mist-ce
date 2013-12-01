@@ -1,17 +1,15 @@
 
 /* Single Key Page CSS
 -----------------------------------------------------------------------------------------------------------*/
+#single-key-page .ui-footer {
+    display: block;
+}
 #single-key-page .ajax-loader {
     display: inline;
     float: right;
 }
-
 @-moz-document url-prefix() {
     #single-key-page .ajax-loader {
         margin-top: -20px;
     }
-}
-
-#single-key-page .ui-footer {
-    display: block;
 }

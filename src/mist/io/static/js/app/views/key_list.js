@@ -22,6 +22,18 @@ define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_lis
              * 
              */
 
+            keysObserver: function() {
+                Ember.run.next(function() {
+                    if ($("input[type='checkbox']").checkboxradio) {
+                        $("input[type='checkbox']").checkboxradio();
+                    }
+                    if ($('#key-list-page .ui-listview').listview) {
+                        $('#key-list-page .ui-listview').listview('refresh');
+                    }
+                });
+            }.observes('Mist.keysController.content.@each'),
+
+
             selectedKeysObserver: function() {
                 var that = this;
                 switch (Mist.keysController.getSelectedKeysCount()) {

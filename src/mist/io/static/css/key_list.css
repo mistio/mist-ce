@@ -1,0 +1,12 @@
+
+/* Key List Page CSS
+-----------------------------------------------------------------------------------------------------------*/
+#key-list-page .ui-filterable {
+    clear: both;
+}
+#create-key-btn {
+    float: right;
+}
+#select-keys-btn {
+    float: left;
+}

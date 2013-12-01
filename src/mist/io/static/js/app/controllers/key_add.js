@@ -28,7 +28,7 @@ define('app/controllers/key_add', ['ember'],
 
                 // Remove whitespaces from name and key
                 if (this.newKeyName) {
-                    this.set('newKeyName', this.newKeyName.replace(/ /g, ''));
+                    this.set('newKeyName', this.newKeyName.replace(/\W/g, ''));
                 }
                 if (this.newKeyPrivate) {
                     this.set('newKeyPrivate', this.newKeyPrivate.trim());
