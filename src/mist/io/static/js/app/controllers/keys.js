@@ -334,7 +334,7 @@ define(['app/models/key'],
                 for (var k = 0; k < contentLength; ++k) {
                     if (content[k].name == name) {
                         content[k].set('name', newName);
-                        content[k].set('id', newName.replace(/ /g,''));
+                        content[k].set('id', newName);
                         return;
                     }
                 }
@@ -355,11 +355,9 @@ define(['app/models/key'],
                         }
                     }
                     this.set('content', newKeys);
-                    if (wasDefault) {
+                    if (wasDefault && this.content.length) {
                         Ember.run.next(this, function() {
-                            if (this.content.length) {
-                                this.setDefaultKey(this.content[0].name);
-                            }
+                            this.setDefaultKey(this.content[0].name);
                         });
                     }
                 });

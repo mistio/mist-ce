@@ -90,7 +90,7 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html','
 
                             // Redirect to new key location only if user is in single key view
                             if (window.location.hash == '#/keys/' + name) {
-                                window.location.hash = '#/keys/' + newName.replace(/ /g, '');
+                                window.location.hash = '#/keys/' + newName;
                             }
                             that.close();
                         });

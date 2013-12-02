@@ -1,34 +1,28 @@
 <div id="home-page">
-    
+
     <div data-role="header" data-theme="b">
-    
+
         <h1>mist.io</h1>
-    
+
         {{view Mist.UserMenuView}}
-    
+
     </div>
-    
+
     <div data-role="content" data-theme="c">
-    
-        {{view Mist.BackendAddView}}
-    
-        <div data-role="controlgroup" data-type="horizontal" id="backend-buttons">
-            {{#each Mist.backendsController}}
+
+        <div data-role="controlgroup" data-type="horizontal">
+            {{#each Mist.backendsController.content}}
                 {{view Mist.BackendButtonView backendBinding="this"
                    data-icon="check" classBinding="state" class="backend-button"}}
             {{/each}}
         </div>
-        
-        {{view Mist.EditBackendView backendBinding="Mist.backend"}}
-    
-        <ul data-role="listview"
-            class="ui-listview ui-listview-inset ui-corner-all ui-shadow"
-            id="home-menu">
+
+        <ul data-role="listview">
             <li>
                 {{#link-to "machines"}}Machines
                     {{#if Mist.backendsController.loadingMachines}}
                     <div class="ajax-loader"></div>
-                    {{/if}}    
+                    {{/if}}
                     <span class="ui-li-count">{{Mist.backendsController.machineCount}}</span>
                 {{/link-to}}
             </li>
@@ -49,6 +43,11 @@
                 {{/link-to}}
             </li>
         </ul>
-    
+
     </div>
+
+    {{view Mist.BackendAddView}}
+
+    {{view Mist.EditBackendView}}
+
 </div>
