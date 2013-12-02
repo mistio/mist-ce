@@ -6,9 +6,16 @@ define('app/views/key_list_item', ['text!app/templates/key_list_item.html', 'emb
      */
     function(key_list_item_html) {
         return Ember.View.extend({
- 
+
+            /**
+             * 
+             *  Properties
+             * 
+             */
+
             tagName:'li',
             template: Ember.Handlebars.compile(key_list_item_html)
+
         });
     }
 );

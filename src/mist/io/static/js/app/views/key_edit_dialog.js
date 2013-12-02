@@ -1,30 +1,30 @@
 define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html','ember'],
     /**
      *  Key Edit dialog
-     *
+     * 
      *  @returns Class
      */
     function(key_edit_dialog_html) {
         return Ember.View.extend({
 
             /**
-             *
+             * 
              *  Properties
-             *
+             * 
              */
 
             newName: null,
             template: Ember.Handlebars.compile(key_edit_dialog_html),
 
             /**
-             *
+             * 
              *  Observers
-             *
+             * 
              */
 
             newNameObserver: function() {
 
-                // Remove whitespaces from key name
+                // Remove non alphanumeric chars from key name
                 if (this.newName) {
                     this.set('newKeyName', this.newName.replace(/\W/g, ''));
                 }
@@ -87,7 +87,7 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html','
                         // Rename key
                         var that = this;
                         Mist.keysController.renameKey(name, newName, function() {
-                            
+
                             // Redirect to new key location only if user is in single key view
                             if (window.location.hash == '#/keys/' + name) {
                                 window.location.hash = '#/keys/' + newName.replace(/ /g, '');

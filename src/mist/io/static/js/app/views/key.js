@@ -1,16 +1,16 @@
 define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app/templates/key.html'],
     /**
      *  Single Key View
-     *
+     * 
      *  @returns Class
      */
     function(MistScreen, Machine, key_html) {
         return MistScreen.extend({
 
             /**
-             *
+             * 
              *  Properties
-             *
+             * 
              */
 
             key: null,
@@ -18,9 +18,9 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
             template: Ember.Handlebars.compile(key_html),
 
             /**
-             *
+             * 
              *  Initialization
-             *
+             * 
              */
 
             renderPage: function() {
@@ -74,9 +74,9 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
 
 
             /**
-             *
+             * 
              *  Observers
-             *
+             * 
              */
 
             requestedKeyObserver: function() {
@@ -90,9 +90,9 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
 
 
             /**
-             *
+             * 
              *  Actions
-             *
+             * 
              */
 
             actions: {

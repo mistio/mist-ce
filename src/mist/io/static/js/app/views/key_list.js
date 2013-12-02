@@ -1,7 +1,7 @@
 define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_list.html'],
     /**
      *  Key List View
-     *
+     * 
      *  @returns Class
      */
     function(MistScreen, key_list_html) {

@@ -134,8 +134,8 @@ define(['app/models/key'],
                     }
                 });
             },
-           
-            
+
+
             setDefaultKey: function(name, callback) {
                 var that = this;
                 this.set('settingDefaultKey', true);
@@ -224,8 +224,8 @@ define(['app/models/key'],
                     Mist.keysController.set('gettingPrivateKey', false);
                 });
             },
-            
-            
+
+
             getPublicKey: function(name, callback) {
                 this.set('gettingPublicKey', true);
                 $.getJSON('/keys/' + name + '/public', function(key) {
