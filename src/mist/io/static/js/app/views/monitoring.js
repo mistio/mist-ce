@@ -285,7 +285,6 @@ define('app/views/monitoring', [
 
                     // Distance of two values in graph (pixels), Important For Animation
                     this.valuesDistance = 0;
-                    this.isAnimated = true;
 
                     // Calculate The step  of the time axis
                     this.secondsStep =  Math.floor((timeToDisplayms / 1000) / NUM_OF_LABELS); 
@@ -462,13 +461,8 @@ define('app/views/monitoring', [
                         yScale.domain([0, fixedMaxValue]);
 
                         // Set the range
-                        if(this.isAnimated) {
-                            this.calcValueDistance();
-                            xScale.range([-this.valuesDistance, this.width - margin.left - margin.right]);
-                        }
-                        else{
-                            xScale.range([0, this.width - margin.left - margin.right]);
-                        }
+                        this.calcValueDistance();
+                        xScale.range([-this.valuesDistance, this.width - margin.left - margin.right]);
 
 
                         // Change grid lines and labels based on time displayed
@@ -542,7 +536,7 @@ define('app/views/monitoring', [
 
 
                         // Animate line, axis and grid
-                        if(this.isAnimated && !this.timeUpdated)
+                        if(!this.timeUpdated)
                         {
 
                             var animationDuration = STEP_SECONDS*1000;
