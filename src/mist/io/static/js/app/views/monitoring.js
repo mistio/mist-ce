@@ -292,6 +292,9 @@ define('app/views/monitoring', [
                     
                     var self = this;
 
+                    // Converts String into Date Object
+                    var timeFormater = d3.time.format("%d/%m/%Y-%X");
+
                     // Scale Functions will scale graph to defined width and height
                     var xScale = d3.time.scale().range([0, this.width - margin.left - margin.right]);
                     var yScale = d3.scale.linear().range([this.height - margin.top - margin.bottom, 0]);
@@ -302,7 +305,7 @@ define('app/views/monitoring', [
                                     .y(function(d) {return yScale(d.value); });
 
                     
-                    // SVG elements for graph manipulation.
+                    // ---------------  SVG elements for graph manipulation --------------------- //
                     // Elements will be added to the dom after first updateData().
                     var d3svg;            // Main SVG element where the graph will be rendered
                     var d3GridX;          // Horizontal grid lines g element
@@ -333,8 +336,7 @@ define('app/views/monitoring', [
                             if(measurements_received < NUM_OF_MIN_MEASUREMENTS)
                             {
                                 // Get First Measurement Time
-                                var format = d3.time.format("%d/%m/%Y-%X");
-                                var metricTime = format.parse(newData[0].time);
+                                var metricTime = timeFormater.parse(newData[0].time);
                                 metricTime = new Date(metricTime.getTime() - STEP_SECONDS*1000);
 
                                 // Fill Data With Zeros
@@ -370,9 +372,8 @@ define('app/views/monitoring', [
                             var fixedData = [];
                             dataBuffer.forEach(function(d) {
                                 
-                                var format    = d3.time.format("%d/%m/%Y-%X");
                                 var tempObj   = {};
-                                tempObj.time  = format.parse(d.time);
+                                tempObj.time  = timeFormater.parse(d.time);
                                 tempObj.value = +d.value;
                                 fixedData.push(tempObj);
                             });
@@ -402,9 +403,8 @@ define('app/views/monitoring', [
                             // Fix Values, TypeCaste To Date And Number
                             var fixedData = [];
                             newData.forEach(function(d) {
-                                var format = d3.time.format("%d/%m/%Y-%X");
                                 var tempObj = {};
-                                tempObj.time = format.parse(d.time);
+                                tempObj.time = timeFormater.parse(d.time);
                                 tempObj.value = +d.value;
                                 fixedData.push(tempObj);
                             });
@@ -471,60 +471,49 @@ define('app/views/monitoring', [
                         }
 
 
-                        // Change axis labels and grid position based on time that will display
-                        // TODO Reduce Code
-                        if (this.secondsStep <= 60) {
-                            d3xAxis.call(d3.svg.axis()
-                                               .scale(xScale)
-                                               .orient("bottom")
-                                               .ticks(d3.time.seconds, this.secondsStep)
-                                               .tickFormat(d3.time.format("%I:%M:%S%p")))
-                                               .selectAll("text") 
-                                               .style("text-anchor", "end")
-                                               .attr('x','-10');
+                        // Change grid lines and labels based on time displayed
+                        var modelXAxis = d3.svg.axis()
+                                                .scale(xScale)
+                                                .orient("bottom");
 
-                            d3GridX.call(d3.svg.axis()
+                        var modelGridX = d3.svg.axis()
                                                .scale(xScale)
                                                .orient("bottom")
-                                               .ticks(d3.time.seconds, this.secondsStep)
                                                .tickSize(-this.height, 0, 0)
-                                               .tickFormat(""));
+                                               .tickFormat("");
+                        
+                        if (this.secondsStep <= 60) {
+
+                            d3xAxis.call(modelXAxis
+                                         .ticks(d3.time.seconds, this.secondsStep)
+                                         .tickFormat(d3.time.format("%I:%M:%S%p")));
+
+                            d3GridX.call(modelGridX
+                                         .ticks(d3.time.seconds, this.secondsStep));
                         }
                         else if (this.secondsStep <= 18000) {
 
-                            d3xAxis.call(d3.svg.axis()
-                                               .scale(xScale)
-                                               .orient("bottom")
-                                               .ticks(d3.time.minutes, this.secondsStep/60)
-                                               .tickFormat(d3.time.format("%I:%M%p")))
-                                               .selectAll("text") 
-                                               .style("text-anchor", "end")
-                                               .attr('x','-10');
+                            d3xAxis.call(modelXAxis
+                                         .ticks(d3.time.minutes, this.secondsStep/60)
+                                         .tickFormat(d3.time.format("%I:%M%p")));
 
-                            d3GridX.call(d3.svg.axis()
-                                               .scale(xScale)
-                                               .orient("bottom")
-                                               .ticks(d3.time.minutes, this.secondsStep/60)
-                                               .tickSize(-this.height, 0, 0)
-                                               .tickFormat(""));
+                            d3GridX.call(modelGridX
+                                         .ticks(d3.time.minutes, this.secondsStep/60));
                         }
                         else {
-                            d3xAxis.call(d3.svg.axis()
-                                               .scale(xScale)
-                                               .orient("bottom")
-                                               .ticks(d3.time.hours, this.secondsStep/60/60)
-                                               .tickFormat(d3.time.format("%I:%M%p")))
-                                               .selectAll("text") 
-                                               .style("text-anchor", "end")
-                                               .attr('x','-10');
 
-                            d3GridX.call(d3.svg.axis()
-                                               .scale(xScale)
-                                               .orient("bottom")
-                                               .ticks(d3.time.hours, this.secondsStep/60/60)
-                                               .tickSize(-this.height, 0, 0)
-                                               .tickFormat(""));
+                            d3xAxis.call(modelXAxis
+                                         .ticks(d3.time.hours, this.secondsStep/60/60)
+                                         .tickFormat(d3.time.format("%I:%M%p")));
+
+                            d3GridX.call(modelGridX
+                                         .ticks(d3.time.hours, this.secondsStep/60/60));
                         }
+
+                        // Set time label at left side
+                        d3xAxis.selectAll("text") 
+                               .style("text-anchor", "end")
+                               .attr('x','-10');
 
 
                        // Horizontal grid lines will not change on time change
