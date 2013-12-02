@@ -16,10 +16,10 @@ define('app/views/machine_list_item', [
                 
                 fetchLoadavg: function(machine) {
                     if (machine.hasMonitoring) {
-                        var uri = URL_PREFIX + '/backends/' + machine.backend.id + '/machines/' + machine.id + '/loadavg.png';
+                        var uri = '/backends/' + machine.backend.id + '/machines/' + machine.id + '/loadavg.png';
                         var bgimage = new Image();
                         var timestamp = new Date().getTime();
-                        bgimage.src = uri + '?' + timestamp + '&auth_key=' + Mist.auth_key;
+                        bgimage.src = uri + '?' + timestamp;
                         // update load graph after the image is loaded
                         bgimage.onload = function () {
                            $('#' + machine.id + ' span.monitoring-icon').css('background-image', 'url(' + bgimage.src + ')');

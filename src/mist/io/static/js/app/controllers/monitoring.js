@@ -84,15 +84,14 @@ define('app/controllers/monitoring', [
                 // stop:  date/time we want to receeive data until
                 // step:  miliseconds we want to split data
                 $.ajax({
-                    url: URL_PREFIX + '/backends/' + this.machine.backend.id +
+                    url: '/backends/' + this.machine.backend.id +
                          '/machines/' + this.machine.id + '/stats',
                     type: 'GET',
                     async: true,
-                    dataType: 'jsonp',
+                    contentType: 'application/json',
                     data: {'start': Math.floor(start / 1000), 
                             'stop': Math.floor(stop / 1000),
-                            'step': step,
-                            'auth_key': Mist.auth_key},
+                            'step': step},
                     timeout: 4000,
                     success: function (data, status, xhr){
                         
