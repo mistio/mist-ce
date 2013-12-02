@@ -10,11 +10,12 @@ define('app/controllers/backends', [
      */
     function(Backend, Rule) {
         return Ember.ArrayController.extend({
+
             content: [],
             machineCount: 0,
             imageCount: 0,
             loadingImages: false,
-            loadingMachines: true,
+            loadingMachines: null,
             singleMachineRequest: null,
             singleMachineResponse: null,
 
@@ -211,7 +212,7 @@ define('app/controllers/backends', [
                 this._super();
 
                 var that = this;
-
+                this.set('loadingMachines', true);
                 that.addObserver('length', function() {
                     that.getMachineCount();
                     that.getSelectedMachineCount();
@@ -221,6 +222,9 @@ define('app/controllers/backends', [
                 $(document).bind('ready', function() {
                     Ember.run.next(function() {
                         $.getJSON('/backends', function(data) {
+                            if (!data.length) {
+                                that.set('loadingMachines', false);
+                            }
                             data.forEach(function(item){
                                 that.pushObject(Backend.create(item));
                             });
