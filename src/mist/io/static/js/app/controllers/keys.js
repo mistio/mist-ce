@@ -84,6 +84,7 @@ define(['app/models/key'],
                     },
                     error: function(jqXHR) {
                         Mist.notificationController.notify('Failed to create key');
+                        $('#create-key-ok').removeClass('ui-state-disabled');
                     },
                     complete: function() {
                         that.set('creatingKey', false);

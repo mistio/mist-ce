@@ -57,6 +57,7 @@ define('app/controllers/key_add', ['ember'],
                 // Check if key name exist already
                 if (Mist.keysController.keyNameExists(this.newKeyName)) {
                     Mist.notificationController.notify('Key name exists already');
+                    $('#create-key-ok').removeClass('ui-state-disabled');
                     return;
                 }
 
@@ -67,9 +68,11 @@ define('app/controllers/key_add', ['ember'],
 
                 if (privateKey.indexOf(beginning) != 0) {
                     Mist.notificationController.notify('Private key should begin with: ' + beginning);
+                    $('#create-key-ok').removeClass('ui-state-disabled');
                     return;
                 } else if (privateKey.indexOf(ending) != privateKey.length - ending.length) {
                     Mist.notificationController.notify('Private key should end with: ' + ending);
+                    $('#create-key-ok').removeClass('ui-state-disabled');
                     return;
                 }
 

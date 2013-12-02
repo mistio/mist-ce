@@ -13,10 +13,10 @@
 
         <label for="textarea-private-key">Private Key:
             {{#if Mist.keysController.generatingKey}}
-                <div class="ajax-loader"></div>
+                <div class="ajax-loader create-key-loader"></div>
             {{/if}}
             {{#if Mist.keysController.uploadingKey}}
-                <div class="ajax-loader"></div>
+                <div class="ajax-loader create-key-loader"></div>
             {{/if}}
         </label>
         {{view Ember.TextArea
@@ -29,6 +29,10 @@
         </div>
 
         <input id="create-key-upload" type="file" name="file" {{action "uploadInputChanged" on="change" target="view"}}/>
+
+        {{#if Mist.keysController.creatingKey}}
+        <div class="ajax-loader"></div>
+        {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
