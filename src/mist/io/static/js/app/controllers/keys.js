@@ -357,7 +357,9 @@ define(['app/models/key'],
                     this.set('content', newKeys);
                     if (wasDefault) {
                         Ember.run.next(this, function() {
-                            this.setDefaultKey(this.content[0].name);
+                            if (this.content.length) {
+                                this.setDefaultKey(this.content[0].name);
+                            }
                         });
                     }
                 });
