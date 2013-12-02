@@ -26,7 +26,7 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html','
 
                 // Remove non alphanumeric chars from key name
                 if (this.newName) {
-                    this.set('newKeyName', this.newName.replace(/\W/g, ''));
+                    this.set('newName', this.newName.replace(/\W/g, ''));
                 }
 
                 if (this.newName) {
