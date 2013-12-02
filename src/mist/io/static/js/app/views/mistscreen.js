@@ -9,17 +9,17 @@ define('app/views/mistscreen', ['ember'],
 
             tagName: false,
 
-            willInsertElement: function() {
-                try {
+            destroyElement: function() {
+                if ($('[data-role=page]').page) {
                     $('[data-role=page]').page('destroy');
-                    $('.ui-popup').remove();
-                } catch(e){}
+                }
+                $('.ui-popup').remove();
             },
 
             didInsertElement: function() {
-                try {
+                if ($('[data-role=page]').page) {
                     $('[data-role=page]').page();
-                } catch(e){}
+                }
             }
         });
     }

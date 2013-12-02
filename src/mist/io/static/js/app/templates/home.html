@@ -10,6 +10,13 @@
 
     <div data-role="content" data-theme="c">
 
+        <a id="add-backend-btn"
+           data-role="button"
+           data-iconpos="right"
+           data-icon="plus"
+           data-theme="b"
+           {{action "addBackend" target="view"}}>Add backend</a>
+        
         <div data-role="controlgroup" data-type="horizontal">
             {{#each Mist.backendsController.content}}
                 {{view Mist.BackendButtonView backendBinding="this"
@@ -17,7 +24,7 @@
             {{/each}}
         </div>
 
-        <ul data-role="listview">
+        <ul data-role="listview" data-inset="true">
             <li>
                 {{#link-to "machines"}}Machines
                     {{#if Mist.backendsController.loadingMachines}}

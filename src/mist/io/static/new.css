@@ -1,6 +1,7 @@
 
 /* Import css files
 -----------------------------------------------------------------------------------------------------------*/
+@import url("css/home.css");
 @import url("css/key.css");
 @import url("css/key_list.css");
 @import url("css/key_create.css");
@@ -62,7 +63,13 @@ textarea {
 
 /* Page formating
 -----------------------------------------------------------------------------------------------------------*/
-.bottom-padding {
+.small-padding {
+    height: 10px;
+}
+.mid-padding {
+    height: 50px;
+}
+.large-padding {
     height: 100px;
 }
 

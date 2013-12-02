@@ -1,14 +1,14 @@
-define('app/views/home', [
-    'app/views/mistscreen',
-    'text!app/templates/home.html','ember'],
+define('app/views/home', ['app/views/mistscreen','text!app/templates/home.html','ember'],
     /**
-     * Home page
+     *  Home Page
      *
-     * @returns Class
+     *  @returns Class
      */
     function(MistScreen, home_html) {
         return MistScreen.extend({
+
             template: Ember.Handlebars.compile(home_html)
+
         });
     }
 );
