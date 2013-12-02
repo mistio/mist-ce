@@ -1,13 +1,14 @@
-<div data-role="panel" id="add-backend" data-position="right" data-display="overlay" data-theme="a">
+<div id="add-backend-panel" class="side-panel" data-role="panel" data-position="right" data-display="overlay">
 
-    <div data-role="header" data-theme="b">
+    <div data-role="header">
         <h1>Add backend</h1>
     </div>
 
     <div data-role="content">
+        
         <label>1. Provider:</label>
-        <div id="new-backend-provider" data-role="collapsible" data-iconpos="right"
-            data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
+        <div id="new-backend-provider" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d" 
+                                                                                    data-expanded-icon="arrow-u">
             <h2>{{Mist.backendAddController.newBackendProvider.title}}</h2>
             <ul class="select-listmenu" data-role="listview">
                 {{#each Mist.backendsController.providerList}}
@@ -41,18 +42,13 @@
                    valueBinding="Mist.backendAddController.newBackendOpenStackTenant"}}
         </div>
 
-        {{#if Mist.backendAddController.pendingCreation}}
+        {{#if Mist.backendsController.addingBackend}}
         <div class="ajax-loader"></div>
         {{/if}}
 
-        <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button"
-               {{action "backClicked" target="view"}}>Back</a>
-
-            <a id="new-backend-ok"
-               data-role="button"
-               data-theme="b"
-               {{action "addClicked" target="view"}}>Add</a>
+        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
+            <button id="new-backend-ok" data-theme="b" {{action "addClicked" target="view"}}>Done</a>
         </div>
     </div>
 </div>

@@ -59,7 +59,7 @@ define('app/views/key_add_dialog', ['text!app/templates/key_add_dialog.html','em
                     Mist.keyAddController.clear();
                 },
 
-                createClicked: function() {
+                doneClicked: function() {
                     $('#create-key-ok').addClass('ui-state-disabled');
                     Mist.keyAddController.create();
                 }

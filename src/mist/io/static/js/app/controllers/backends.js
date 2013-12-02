@@ -1,12 +1,8 @@
-define('app/controllers/backends', [
-    'app/models/backend',
-    'app/models/rule',
-    'ember'
-    ],
+define('app/controllers/backends', ['app/models/backend','app/models/rule','ember'],
     /**
-     * Backends Controller
+     *  Backends Controller
      *
-     * @returns Class
+     *  @returns Class
      */
     function(Backend, Rule) {
         return Ember.ArrayController.extend({
@@ -25,14 +21,14 @@ define('app/controllers/backends', [
             init: function() {
                 this._super();
                 var that = this;
-                $(document).bind('ready', function() {
+                //$(document).bind('ready', function() {
                     Ember.run.next(function() {
                         that.loadBackends();
                         Ember.run.later(function() {
                             that.checkMonitoring();
                         }, 5000);
                     });
-                });
+                //});
             },
 
             loadBackends: function() {
@@ -44,11 +40,40 @@ define('app/controllers/backends', [
                     });
                     that.set('loadingBackends', false);
                 }).error(function() {
-                    Mist.notificationController.notify('Error loading backends. Will try again in 5 seconds');
+                    Mist.notificationController.notify('Failed to load backends');
                     that.set('loadingBackends', false);
                     Ember.run.later(function() {
                         that.loadBackends();
                     }, 5000);
+                });
+            },
+
+            addBackend: function(title, provider, apiKey, apiSecret, apiUrl, tenant, callback) {
+                this.set('addingBackend', true);
+                var that = this;
+                $.ajax({
+                    url: '/backends',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        'title'      : title,
+                        'provider'   : provider,
+                        'apikey'     : apiKey,
+                        'apisecret'  : apiSecret,
+                        'apiurl'     : apiUrl,
+                        'tenant_name': tenant
+                    }),
+                    success: function(backend) {
+                        $('#add-backend-panel').panel('close');
+                        Mist.backendAddController.clear();
+                        Mist.backendsController.pushObject(Backend.create(backend));
+                    },
+                    error: function() {
+                        Mist.notificationController.notify('Failed to add backend');
+                    },
+                    complete: function() {
+                        that.set('addingBackend', false);
+                    }
                 });
             },
 

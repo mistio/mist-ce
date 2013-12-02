@@ -1,64 +1,34 @@
-define('app/controllers/backend_add', [
-    'app/models/backend',
-    'ember'
-    ],
+define('app/controllers/backend_add', ['app/models/backend', 'ember'],
     /**
-     * Backend Add Controller
+     *  Backend Add Controller
      *
-     * @returns Class
+     *  @returns Class
      */
     function(Backend) {
         return Ember.Object.extend({
 
-            pendingCreation: null,
+            /**
+             * 
+             *  Properties
+             * 
+             */
+            
             newBackendReady: null,
             newBackendProvider: null,
             newBackendFirstField: null,
             newBackendSecondField: null,
             newBackendOpenStackURL: null,
             newBackendOpenStackTenant: null,
+            newBackendCallback: null,
 
-            clear: function() {
-                this.set('newBackendReady', null);
-                this.set('newBackendProvider', {title: 'Select provider'});
-                this.set('newBackendFirstField', null);
-                this.set('newBackendSecondField', null);
-                this.set('newBackendOpenStackURL', null);
-                this.set('newBackendOpenStackTenant', null);
-                
-                $('#new-backend-provider').collapsible('collapse');
-                $('#new-backend-provider').collapsible('option','collapsedIcon','arrow-d');
-            },
 
-            addBackend: function() {
-                this.set('pendingCreation', true);
-                var payload = {
-                    'title'      : this.newBackendProvider.title,
-                    'provider'   : this.newBackendProvider.provider,
-                    'apikey'     : this.newBackendFirstField,
-                    'apisecret'  : this.newBackendSecondField,
-                    'apiurl'     : this.newBackendOpenStackURL,
-                    'tenant_name': this.newBackendOpenStackTenant
-                };
-                var that = this;
-                $.ajax({
-                    url: '/backends',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    success: function(data) {
-                        that.set('pendingCreation', false);
-                        $('#add-backend').panel('close');
-                        that.clear();
-                        Mist.backendsController.pushObject(Backend.create(data));
-                    },
-                    error: function(jqXHR) {
-                        that.set('pendingCreation', false);
-                        Mist.notificationController.notify('Error adding backend: ' + jqXHR.responseText);
-                    }
-                });
-            },
 
+            /**
+             * 
+             *  Observers
+             * 
+             */
+           
             newBackendObserver: function() {
                 var ready = false;
                 if ('provider' in this.newBackendProvider) { // Filters out the "Select provider" dummy provider
@@ -72,11 +42,38 @@ define('app/controllers/backend_add', [
                     }
                 }
                 this.set('newBackendReady', ready);
-            }.observes('newBackendProvider',
-                       'newBackendFirstField',
-                       'newBackendSecondField',
-                       'newBackendOpenStackURL',
-                       'newBackendOpenStackTenant')
+            }.observes('newBackendProvider', 'newBackendFirstField', 'newBackendSecondField', 'newBackendOpenStackURL',
+                                                                                              'newBackendOpenStackTenant'),
+
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+                     
+            clear: function() {
+                this.set('newBackendReady', null);
+                this.set('newBackendProvider', {title: 'Select provider'});
+                this.set('newBackendFirstField', null);
+                this.set('newBackendSecondField', null);
+                this.set('newBackendOpenStackURL', null);
+                this.set('newBackendOpenStackTenant', null);
+                this.set('newBackendCallback', null);
+                
+                $('#new-backend-provider').collapsible('collapse');
+                $('#new-backend-provider').collapsible('option','collapsedIcon','arrow-d');
+            },
+
+            add: function() {
+                Mist.backendsController.addBackend(this.newBackendProvider.title,
+                                                   this.newBackendProvider.provider,
+                                                   this.newBackendFirstField,
+                                                   this.newBackendSecondField,
+                                                   this.newBackendOpenStackURL,
+                                                   this.newBackendOpenStackTenant,
+                                                   this.newBackendCallback);
+            }
         });
     }
 );

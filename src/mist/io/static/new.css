@@ -7,10 +7,16 @@
 @import url("css/key_create.css");
 
 
-/* Text fields
+/* Page formating
 -----------------------------------------------------------------------------------------------------------*/
-textarea {
-    height: 75px !important;
+.small-padding {
+    height: 10px;
+}
+.mid-padding {
+    height: 50px;
+}
+.large-padding {
+    height: 100px;
 }
 
 
@@ -23,6 +29,13 @@ textarea {
     margin: 0 auto;
     height: 16px;
     width: 16px;
+}
+
+
+/* Text fields
+-----------------------------------------------------------------------------------------------------------*/
+textarea {
+    height: 75px !important;
 }
 
 
@@ -61,16 +74,10 @@ textarea {
 }
 
 
-/* Page formating
+/* Side panel
 -----------------------------------------------------------------------------------------------------------*/
-.small-padding {
-    height: 10px;
-}
-.mid-padding {
-    height: 50px;
-}
-.large-padding {
-    height: 100px;
+.side-panel {
+    width: 290px;
 }
 
 

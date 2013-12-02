@@ -1,10 +1,8 @@
-define('app/views/backend_add', [
-    'text!app/templates/backend_add.html',
-    'ember'],
+define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember'],
     /**
-     * Add Backend Dialog
-     *
-     * @returns Class
+     *  Add Backend Dialog
+     * 
+     *  @returns Class
      */
     function(backend_add_html) {
 
@@ -12,7 +10,6 @@ define('app/views/backend_add', [
 
             firstFieldLabel: 'API Key',
             secondFieldLabel: 'API Secret',
-
             template: Ember.Handlebars.compile(backend_add_html),
 
             enableAddButtonObserver: function() {
@@ -27,7 +24,9 @@ define('app/views/backend_add', [
                        'Mist.backendAddController.pendingCreation'),
 
             actions: {
+
                 selectProvider: function(provider) {
+                    
                     $('#openstack-bundle').hide();
                     if (provider.provider.indexOf("rackspace") > -1 || provider.provider.indexOf("linode") > -1) {
                         this.set('firstFieldLabel', 'Username');
@@ -44,9 +43,8 @@ define('app/views/backend_add', [
                         this.set('secondFieldLabel', 'API Secret');
                     }
                     
-                    Mist.backendAddController.clear();
                     Mist.backendAddController.set('newBackendProvider', provider);
-                    $('#new-backend-provider').collapsible('option','collapsedIcon','check');
+                    $('#new-backend-provider').collapsible('option', 'collapsedIcon', 'check');
                     
                     // Autocomplete credentials
                     Mist.backendsController.content.some(function(backend) {
@@ -59,18 +57,13 @@ define('app/views/backend_add', [
                     });
                 },
 
-                addBackend: function() {
-                    Mist.backendAddController.clear();
-                    $('#add-backend').panel('open');
-                },
-
                 backClicked: function() {
-                    $("#add-backend").panel("close");
+                    $("#add-backend-panel").panel("close");
                     Mist.backendAddController.clear();
                 },
 
                 addClicked: function() {
-                    Mist.backendAddController.addBackend();
+                    Mist.backendAddController.add();
                 }
             }
         });
