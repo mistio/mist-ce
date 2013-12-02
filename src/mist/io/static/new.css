@@ -5,6 +5,7 @@
 @import url("css/key.css");
 @import url("css/key_list.css");
 @import url("css/key_create.css");
+@import url("css/backend_add.css");
 
 
 /* Page formating
@@ -43,6 +44,10 @@ textarea {
 -----------------------------------------------------------------------------------------------------------*/
 .ok-cancel {
     width: 100%;
+    margin-top: 10px;
+}
+.ok-cancel > .ui-controlgroup-controls {
+    width: 100%;
 }
 
 
@@ -50,9 +55,6 @@ textarea {
 -----------------------------------------------------------------------------------------------------------*/
 .small-popup {
     width: 240px !important;
-}
-.small-popup .ok-cancel > .ui-controlgroup-controls {
-    width: 100%;
 }
 .small-popup .ok-cancel a,
 .small-popup .ok-cancel button {
@@ -65,9 +67,6 @@ textarea {
 .large-popup {
     width: 290px !important;
 }
-.large-popup .ok-cancel > .ui-controlgroup-controls {
-    width: 100%;
-}
 .large-popup .ok-cancel a,
 .large-popup .ok-cancel button {
     width: 95px !important;
@@ -78,6 +77,10 @@ textarea {
 -----------------------------------------------------------------------------------------------------------*/
 .side-panel {
     width: 290px;
+}
+.side-panel .ok-cancel a,
+.side-panel .ok-cancel button {
+    width: 79px !important;
 }
 
 

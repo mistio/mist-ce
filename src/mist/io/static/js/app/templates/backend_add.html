@@ -13,7 +13,7 @@
             <ul class="select-listmenu" data-role="listview">
                 {{#each Mist.backendsController.providerList}}
                 <li data-icon="false">
-                    <a href="#" {{action "selectProvider" this target="view"}}>{{this.title}}</a>
+                    <a {{action "selectProvider" this target="view"}}>{{this.title}}</a>
                 </li>
                 {{/each}}
             </ul>

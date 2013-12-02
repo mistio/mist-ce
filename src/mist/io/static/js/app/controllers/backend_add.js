@@ -12,7 +12,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
              *  Properties
              * 
              */
-            
+
             newBackendReady: null,
             newBackendProvider: null,
             newBackendFirstField: null,
@@ -21,20 +21,18 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
             newBackendOpenStackTenant: null,
             newBackendCallback: null,
 
-
-
             /**
              * 
              *  Observers
              * 
              */
-           
+
             newBackendObserver: function() {
                 var ready = false;
                 if ('provider' in this.newBackendProvider) { // Filters out the "Select provider" dummy provider
                     if (this.newBackendFirstField && this.newBackendSecondField) {
                         ready = true;
-                        if (this.newBackendProvider.title == 'OpenStack') {
+                        if (this.newBackendProvider.provider == 'openstack') {
                             if (!(this.newBackendOpenStackURL && this.newBackendOpenStackTenant)) {
                                 ready = false;
                             }
@@ -51,7 +49,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
              *  Methods
              * 
              */
-                     
+
             clear: function() {
                 this.set('newBackendReady', null);
                 this.set('newBackendProvider', {title: 'Select provider'});
@@ -60,10 +58,11 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                 this.set('newBackendOpenStackURL', null);
                 this.set('newBackendOpenStackTenant', null);
                 this.set('newBackendCallback', null);
-                
+
                 $('#new-backend-provider').collapsible('collapse');
                 $('#new-backend-provider').collapsible('option','collapsedIcon','arrow-d');
             },
+
 
             add: function() {
                 Mist.backendsController.addBackend(this.newBackendProvider.title,

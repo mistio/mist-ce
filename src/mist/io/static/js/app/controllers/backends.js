@@ -64,9 +64,8 @@ define('app/controllers/backends', ['app/models/backend','app/models/rule','embe
                         'tenant_name': tenant
                     }),
                     success: function(backend) {
-                        $('#add-backend-panel').panel('close');
-                        Mist.backendAddController.clear();
                         Mist.backendsController.pushObject(Backend.create(backend));
+                        if (callback) callback();
                     },
                     error: function() {
                         Mist.notificationController.notify('Failed to add backend');
