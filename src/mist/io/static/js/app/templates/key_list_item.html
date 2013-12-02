@@ -1,10 +1,10 @@
-<label>{{view Mist.Checkbox checkedBinding="view.key.selected"}}</label>
+<label>{{view Mist.Checkbox checkedBinding="view.key.selected" id=view.key.name}}</label>
 
 {{#link-to "key" view.key}}
+
     <h3>{{view.key.name}}</h3>
-    <p>
-        {{#if view.key.default_key}}
-        <span>default</span>
-        {{/if}}
-    </p>
+    {{#if view.key.default_key}}
+    <p class="tag">default</p>
+    {{/if}}
+
 {{/link-to}}

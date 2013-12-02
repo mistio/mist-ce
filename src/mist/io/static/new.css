@@ -67,6 +67,42 @@ textarea {
 }
 
 
+/* Checkbox-link
+-----------------------------------------------------------------------------------------------------------*/
+.checkbox-link a {
+    height: 40px;
+}
+.checkbox-link .ui-checkbox {
+    margin: 0 !important;
+    float:left;
+}
+.checkbox-link .ui-checkbox input {
+    display: none;
+}
+.checkbox-link .ui-checkbox label {
+    border-radius: 0.1875em 0 0 0.1875em;
+    background-color: transparent;
+    margin: 0 !important;
+    border: none;
+    height: 41px;
+}
+.checkbox-link .tag {
+    border: 1px solid #bfbfbf;
+    margin: 3px 3px 9px 0;
+    color: #555 !important;
+    position: relative;
+    padding: 1px 7px;
+    float: right;
+    bottom: 26px;
+    right: 10px;
+}
+@-moz-document url-prefix() {
+    .checkbox-link .tag {
+        bottom: 28px;
+    }
+}
+
+
 /* Footer
 -----------------------------------------------------------------------------------------------------------*/
 .ui-footer {

@@ -341,24 +341,25 @@ define(['app/models/key'],
 
 
             _deleteKey: function(name) {
-                var newKeys = [];
-                var wasDefault = false;
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var k = 0; k < contentLength; ++k) {
-                    if (content[k].name != name) {
-                        newKeys.push(content[k]);
-                    } else if (content[k].default_key) {
-                        wasDefault = true;
+                Ember.run(this, function() {
+                    var newKeys = [];
+                    var wasDefault = false;
+                    var content = this.content;
+                    var contentLength = this.content.length;
+                    for (var k = 0; k < contentLength; ++k) {
+                        if (content[k].name != name) {
+                            newKeys.push(content[k]);
+                        } else if (content[k].default_key) {
+                            wasDefault = true;
+                        }
                     }
-                }
-                this.set('content', newKeys);
-                
-                if (wasDefault) {
-                    Ember.run.next(this, function() {
-                        this.setDefaultKey(this.content[0].name);
-                    });
-                }
+                    this.set('content', newKeys);
+                    if (wasDefault) {
+                        Ember.run.next(this, function() {
+                            this.setDefaultKey(this.content[0].name);
+                        });
+                    }
+                });
             },
 
 

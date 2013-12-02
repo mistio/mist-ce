@@ -26,7 +26,7 @@
 
         <ul data-role="listview" data-filter="true" data-inset="true" data-filter-placeholder="Filter...">
             {{#each Mist.keysController.content}}
-                {{view Mist.KeyListItemView keyBinding="this"}}
+                {{view Mist.KeyListItemView keyBinding="this" class="checkbox-link"}}
             {{/each}}
         </ul>
 
