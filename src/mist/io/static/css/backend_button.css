@@ -7,17 +7,35 @@
     position: relative;
     top: 1px;
 }
-
 #backend-buttons .ui-controlgroup-controls .ui-btn {
     padding: 10px 0 9px !important;
 }
-
 #backend-buttons .ui-controlgroup-controls {
     display: inline;
     float: left;
     margin-bottom: 18px;
 }
-
 #backend-buttons .ui-controlgroup-controls .ui-btn {
     border: 1px solid #C0C0C0;
+}
+@media only screen and  (max-width: 460px) {
+    #backend-buttons .ui-controlgroup-controls .ui-btn {
+        border-radius: 0px;
+    }
+}
+.ui-icon-waiting {
+    background-image: url(../states/load-white6.gif) !important;
+    background-position: 9px 9px !important;
+    background-repeat: no-repeat !important;
+    background-size: 22px 22px !important;
+}
+
+.ui-icon-offline {
+    background-image: url(../states/state-yellow-solid.png) !important;
+    background-position: 9px 9px !important;
+    background-repeat: no-repeat !important;
+}
+
+.ui-icon-offline:after, .ui-icon-waiting:after {
+    background-color: rgba(0,0,0,0);
 }
