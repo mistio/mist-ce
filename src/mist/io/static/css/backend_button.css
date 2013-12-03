@@ -24,7 +24,7 @@
     }
 }
 #backend-buttons .ui-icon-waiting {
-    background-image: url(../states/load-white6.gif) !important;
+    background-image: url("../states/load-white-solid.gif") !important;
     background-position: 9px 9px !important;
     background-repeat: no-repeat !important;
     background-size: 22px 22px !important;
