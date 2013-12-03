@@ -27,7 +27,7 @@ define('app/controllers/backend_edit', ['ember'],
                     success: function() {
                         $('#edit-backend-popup').popup('close');
                         $('#backend-delete-confirm').slideUp();
-                        $('#button-confirm-disable').removeClass('ui--state-disabled');
+                        $('#button-confirm-disable').removeClass('ui-state-disabled');
                         
                         Mist.backendsController.removeObject(that.backend);
                         Ember.run.next(function() {

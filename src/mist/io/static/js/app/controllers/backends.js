@@ -22,12 +22,12 @@ define('app/controllers/backends', ['app/models/backend','app/models/rule','embe
                 this._super();
                 var that = this;
                 //$(document).bind('ready', function() {
-                    Ember.run.next(function() {
+                    //Ember.run.next(function() {
                         that.loadBackends();
                         Ember.run.later(function() {
                             that.checkMonitoring();
                         }, 5000);
-                    });
+                    //});
                 //});
             },
 

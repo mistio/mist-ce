@@ -10,6 +10,28 @@
 @import url("css/backend_button.css");
 
 
+/* Splash
+-----------------------------------------------------------------------------------------------------------*/
+#splash {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: black;
+    z-index: 100000;
+}
+.mist-logo {
+    width: 280px;
+    height: 280px;
+    background: url('logo_splash.png') center no-repeat;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -140px;
+    margin-top: -140px;
+}
+
 /* Page formating
 -----------------------------------------------------------------------------------------------------------*/
 .small-padding {
@@ -209,3 +231,11 @@ textarea {
         width: 19%;
     }
 }
+
+
+/* SHIT
+-----------------------------------------------------------------------------------------------------------*/
+#hidden-shell-iframe {
+    display: none;
+}
+

@@ -49,7 +49,7 @@
 </head>
 
 <body style="background-color: #c2c3c4; overflow:hidden">
-    <div id="splash"><div class="mist-logo" /></div>
+    <div id="splash"><div class="mist-logo"></div></div>
     <iframe id="hidden-shell-iframe"></iframe>
     <script type="text/x-handlebars" data-template-name="application">
         {{outlet}}

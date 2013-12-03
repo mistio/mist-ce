@@ -123,11 +123,13 @@ define( 'app', [
             $.mobile.ajaxEnabled = false;
             $.mobile.hashListeningEnabled = false;
             $.mobile.linkBindingEnabled = false;
-            $('#splash').fadeOut(1000);
             $('body').css('overflow', '');
+            Ember.run.later(function() {
+                $('#splash').fadeOut(1000);
+            }, 1000);
         });
 
-        
+        //return;
         Ember.LOG_BINDINGS = false;
 
         App = Ember.Application.create({
