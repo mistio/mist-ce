@@ -280,6 +280,31 @@ define('app/views/monitoring', [
                 $('#timeWindowSelect').selectmenu();
             },
 
+            getLoadLineColor: function(currentLoad,cpuCores){
+                if(currentLoad >= 1 * cpuCores)
+                    return "#FF0000";
+                else if(currentLoad >= 0.7 * cpuCores)
+                    return "#00FF26";
+                else 
+                    return "#6CE0BA";
+            },
+
+            // ===== TODO , Find Values Between Path Points ===== //
+            setupLoadColorInterval: function(graphID){
+                 
+                 var self = this;
+                 window.monitoringLoadColorInterval = window.setInterval(function() {
+                    var loadValue = self.loadGraph.getLastValue();
+                    var color     = self.getLoadLineColor(loadValue,this.cpuCores);
+                    $("#" + graphID).find('.valueLine > path').css('stroke',color);
+             },1000);
+            },
+
+            stopLoadColorInterval: function(){
+                window.clearInterval(window.monitoringLoadColorInterval);
+            },
+            // ================================================== //
+
             // Graph Constructor
             setUpGraphs: function() {
                 
@@ -675,6 +700,12 @@ define('app/views/monitoring', [
                     };
 
 
+                    this.getLastValue = function(){
+                        if(this.data)
+                            return this.data[this.data.length - 1];
+                        else
+                            return null;
+                    }
                     /**
                     * Method: calcValueDistance
                     * Calculates the distance between the last two points
@@ -734,6 +765,7 @@ define('app/views/monitoring', [
                                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
                       d3vLine = d3svg.append('g')
+                                     .attr('class','valueLine')
                                      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
                                      .append('path'); 
 
