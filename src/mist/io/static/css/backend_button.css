@@ -1,0 +1,23 @@
+
+/* Backend Button CSS
+-----------------------------------------------------------------------------------------------------------*/
+#backend-buttons .ui-controlgroup-controls .ui-btn a {
+    padding: 10px 10px 10px 40px !important;
+    color: black;
+    position: relative;
+    top: 1px;
+}
+
+#backend-buttons .ui-controlgroup-controls .ui-btn {
+    padding: 10px 0 9px !important;
+}
+
+#backend-buttons .ui-controlgroup-controls {
+    display: inline;
+    float: left;
+    margin-bottom: 18px;
+}
+
+#backend-buttons .ui-controlgroup-controls .ui-btn {
+    border: 1px solid #C0C0C0;
+}
