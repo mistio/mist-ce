@@ -7,14 +7,28 @@ define('app/views/backend_button', ['ember'],
     function() {
         return Ember.View.extend({
 
+            /**
+             * 
+             *  Properties
+             * 
+             */
+
             tagName: 'a',
+            backend: null,
             template: Ember.Handlebars.compile('{{title}}'),
             attributeBindings: ['data-role', 'data-theme', 'data-inline', 'data-role', 'data-icon'],
 
+            /**
+             * 
+             *  Initialization
+             * 
+             */
+
             didInsertElement: function() {
-                if ('button' in $('#'+this.elementId)) {
+                var btnElement = $('#'+this.elementId);
+                if (btnElement.button) {
                     Ember.run.next(this, function() {
-                        $('#'+this.elementId).button();
+                        btnElement.button();
                         $('#backend-buttons').controlgroup('refresh');
                         this.stateObserver();
                     });
@@ -25,16 +39,32 @@ define('app/views/backend_button', ['ember'],
                 }
             },
 
+
+
+            /**
+             * 
+             *  Observers
+             * 
+             */
+
             stateObserver: function() {
                 $('#' + this.elementId).parent().removeClass('ui-icon-check ui-icon-offline ui-icon-waiting');
-                  if (this.backend.state == 'online') {
-                      $('#' + this.elementId).parent().addClass('ui-icon-check');
-                  } else if (this.backend.state == 'offline') {
-                      $('#' + this.elementId).parent().addClass('ui-icon-offline');
-                  } else if (this.backend.state == 'waiting') {
-                      $('#' + this.elementId).parent().addClass('ui-icon-waiting');
-                  }
+                if (this.backend.state == 'online') {
+                    $('#' + this.elementId).parent().addClass('ui-icon-check');
+                } else if (this.backend.state == 'offline') {
+                    $('#' + this.elementId).parent().addClass('ui-icon-offline');
+                } else if (this.backend.state == 'waiting') {
+                    $('#' + this.elementId).parent().addClass('ui-icon-waiting');
+                }
             }.observes('backend.state'),
+
+
+
+            /**
+             * 
+             *  Actions
+             * 
+             */
 
             click: function() {
                 var backend = this.backend;

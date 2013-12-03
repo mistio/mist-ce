@@ -1,4 +1,4 @@
-define('app/controllers/backend_add', ['app/models/backend', 'ember'],
+define('app/controllers/backend_add', ['app/models/backend','ember'],
     /**
      *  Backend Add Controller
      *

@@ -1,4 +1,4 @@
-define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember'],
+define('app/views/backend_add', ['text!app/templates/backend_add.html','ember'],
     /**
      *  Add Backend Panel
      * 
@@ -82,7 +82,7 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
                     Mist.backendAddController.clear();
                 },
 
-                addClicked: function() {
+                doneClicked: function() {
                     Mist.backendAddController.add();
                 }
             }

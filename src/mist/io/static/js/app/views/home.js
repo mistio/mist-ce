@@ -17,6 +17,20 @@ define('app/views/home', ['app/views/mistscreen','text!app/templates/home.html',
 
             /**
              * 
+             *  Observers
+             * 
+             */
+
+            backendsObserver: function() {
+                if ($('#backend-buttons').controlgroup) {
+                    $('#backend-buttons').controlgroup('refresh');
+                }
+            }.observes('Mist.backendsController.content.@each'),
+
+
+
+            /**
+             * 
              *  Actions
              * 
              */

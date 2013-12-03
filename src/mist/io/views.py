@@ -277,13 +277,13 @@ def delete_backend(request, renderer='json'):
 
 @view_config(route_name='backend_action', request_method='POST', renderer='json')
 def toggle_backend(request):
-    new_state = request.json_body.get('newState', '')
+    new_state = request.json_body.get('new_state', '')
     if not new_state:
         return Response('New backend state not provided', 400)
     
-    if new_state == "True":
+    if new_state == '1':
         new_state = True
-    elif new_state == "False":
+    elif new_state == '0':
         new_state = False
     else:
         return Response('Invalid backend state', 400)

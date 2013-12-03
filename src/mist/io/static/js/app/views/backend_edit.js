@@ -1,4 +1,4 @@
-define('app/views/backend_edit', ['text!app/templates/backend_edit_dialog.html', 'ember'],
+define('app/views/backend_edit', ['text!app/templates/backend_edit_dialog.html','ember'],
     /**
      *  Edit Backend Popup
      * 
@@ -17,11 +17,32 @@ define('app/views/backend_edit', ['text!app/templates/backend_edit_dialog.html',
 
             /**
              * 
+             *  Observers
+             * 
+             */
+
+            stateObserver: function() {
+                if ($('#backend-toggle').slider) {
+                    if (Mist.backendEditController.backend) {
+                        var currentValue = $('#backend-toggle').val();
+                        var newValue = Mist.backendEditController.backend.enabled ? '1' : '0';
+                        if (currentValue != newValue) {
+                            $('#backend-toggle').val(newValue).slider('refresh');
+                        }
+                    }
+                }
+            }.observes('Mist.backendsController.togglingBackend', 'Mist.backendEditController.backend.state'),
+
+
+
+            /**
+             * 
              *  Actions
              * 
              */
 
             actions: {
+
                 stateToggleSwitched: function() {
                     Mist.backendEditController.toggleBackend();
                 },
@@ -41,7 +62,14 @@ define('app/views/backend_edit', ['text!app/templates/backend_edit_dialog.html',
                 },
 
                 yesClicked: function() {
-                    Mist.backendEditController.deleteBackend();
+                    $('#button-confirm-disable').addClass('ui-state-disabled');
+                    Mist.backendEditController.deleteBackend(function(success) {
+                        if (success) {
+                            $('#edit-backend-popup').popup('close');
+                            $('#backend-delete-confirm').slideUp();
+                        }
+                        $('#button-confirm-disable').removeClass('ui-state-disabled');
+                    });
                 },
 
                 noClicked: function() {
