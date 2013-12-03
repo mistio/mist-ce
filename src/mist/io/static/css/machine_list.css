@@ -1,0 +1,10 @@
+
+/* Machine List Page CSS
+-----------------------------------------------------------------------------------------------------------*/
+.machine-state {
+    display: inline !important;
+    float: left;
+    margin-left: 140px !important;
+    margin-top: -28px !important;
+    position: relative;
+}
