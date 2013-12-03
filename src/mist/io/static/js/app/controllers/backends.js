@@ -7,46 +7,53 @@ define('app/controllers/backends', ['app/models/backend','app/models/rule','embe
     function(Backend, Rule) {
         return Ember.ArrayController.extend({
 
+            /**
+             * 
+             *  Properties
+             * 
+             */
+
             content: [],
             imageCount: 0,
             machineCount: 0,
-            loadingImages: true,
-            loadingMachines: true,
-            loadingBackends: true,
-            selectedMachine: null,
-            selectedMachineCount: 0,
-            singleMachineRequest: null,
-            singleMachineResponse: null,
-
-            init: function() {
-                this._super();
+            machineRequest: null,
+            machineResponse: null,
+            
+            loading: false,
+            loadingImages: false,
+            loadingMachines: false,
+            
+            /**
+             * 
+             *  Initialization
+             * 
+             */
+                        
+            load: function() {
                 var that = this;
-                //$(document).bind('ready', function() {
-                    //Ember.run.next(function() {
-                        that.loadBackends();
-                        Ember.run.later(function() {
-                            that.checkMonitoring();
-                        }, 5000);
-                    //});
-                //});
-            },
-
-            loadBackends: function() {
-                var that = this;
-                this.set('loadingBackends', true);
-                $.getJSON('/backends', function(data) {
-                    data.forEach(function(backend) {
-                        that.pushObject(Backend.create(backend));
-                    });
-                    that.set('loadingBackends', false);
+                this.set('loading', true);
+                $.getJSON('/backends', function(backends) {
+                    that._setContent(backends);
                 }).error(function() {
-                    Mist.notificationController.notify('Failed to load backends');
-                    that.set('loadingBackends', false);
-                    Ember.run.later(function() {
-                        that.loadBackends();
-                    }, 5000);
+                    that._reload();
+                }).complete(function() {
+                    that.set('loading', false);
                 });
-            },
+            }.on('init'),
+
+
+
+            /**
+             * 
+             *  Observers
+             * 
+             */
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
 
             addBackend: function(title, provider, apiKey, apiSecret, apiUrl, tenant, callback) {
                 this.set('addingBackend', true);
@@ -216,6 +223,7 @@ define('app/controllers/backends', ['app/models/backend','app/models/rule','embe
             },
 
             checkMonitoring: function() {
+                
                 if (!Mist.authenticated) {
                     return;
                 }
@@ -256,13 +264,34 @@ define('app/controllers/backends', ['app/models/backend','app/models/rule','embe
                     }
                     Mist.rulesController.redrawRules();
                 }).error( function() {
-                    Mist.notificationController.notify('Error checking monitoring');
+                    Mist.notificationController.notify('Failed to check monitoring');
                 });
             },
 
             providerList: function() {
                 return SUPPORTED_PROVIDERS;
-            }.property('providerList')
+            }.property('providerList'),
+
+            /**
+             * 
+             *  Psudo-Private Methods
+             * 
+             */
+
+            _setContent: function(backends) {
+                var newBackends = [];
+                var backendsLength = backends.length;
+                for (var b = 0; b < backendsLength; ++b) {
+                    newBackends.push(Backend.create(backends[b]));
+                }
+                this.set('content', newBackends);
+            },
+
+            _reload: function() {
+                Ember.run.later(this, function() {
+                    this.load();
+                }, 2000);
+            }
         });
     }
 );

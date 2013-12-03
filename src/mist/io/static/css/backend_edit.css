@@ -1,0 +1,14 @@
+
+/* Backend Edit Popup CSS
+-----------------------------------------------------------------------------------------------------------*/
+#edit-backend-popup .ui-slider {
+    width: 120px;
+}
+#edit-backend-popup .state {
+    position: relative;
+    bottom: 11px;
+    left: 24px;
+}
+#edit-backend-popup label {
+    text-align: center;
+}

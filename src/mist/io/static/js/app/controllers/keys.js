@@ -319,7 +319,7 @@ define(['app/models/key'],
             _reload: function() {
                 Ember.run.later(this, function() {
                     this.load();
-                }, 5000);
+                }, 2000);
             },
 
 

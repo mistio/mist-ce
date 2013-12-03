@@ -20,8 +20,6 @@ define('app/models/key', ['ember'],
             selected: null,
             default_key: null,
 
-
-
             /**
              * 
              *  Methods

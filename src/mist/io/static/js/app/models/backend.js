@@ -1,17 +1,12 @@
-define('app/models/backend', [
-    'app/controllers/machines',
-    'app/controllers/images',
-    'app/controllers/sizes',
-    'app/controllers/locations', 'ember'],
+define('app/models/backend', ['app/controllers/machines', 'app/controllers/images', 'app/controllers/sizes',
+                              'app/controllers/locations', 'ember'],
     /**
-     * Backend Model
+     *  Backend Model
      *
-     * @returns Class
+     *  @returns Class
      */
     function(MachinesController, ImagesController, SizesController, LocationsController) {
         return Ember.Object.extend({
-
-            BACKENDSTATES: ['offline', 'online', 'waiting'],
 
             id: null,
             host: null,
@@ -57,7 +52,7 @@ define('app/models/backend', [
                 }
             }.observes('loadingMachines', 'loadingImages', 'loadingSizes', 'loadingLocations', 'enabled'),
 
-            getSizeById: function(sizeId){
+            getSizeById: function(sizeId) {
                 for (var i = 0; i < this.sizes.content.length; i++) {
                     if (this.sizes.content[i].id == sizeId) {
                         return this.sizes.content[i];

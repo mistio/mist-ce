@@ -119,6 +119,7 @@ define( 'app', [
 
     function initialize() {
 
+    
         $(document).bind('mobileinit', function() {
             $.mobile.ajaxEnabled = false;
             $.mobile.hashListeningEnabled = false;
@@ -129,7 +130,6 @@ define( 'app', [
             }, 1000);
         });
 
-        //return;
         Ember.LOG_BINDINGS = false;
 
         App = Ember.Application.create({
