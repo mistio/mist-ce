@@ -14,6 +14,8 @@ define('app/controllers/monitoring', [
             lastMeasurmentTime: null,
             view: null,
 
+            step: 0,
+
             // This one is called from view
             initController: function(machine,view){
                 this.machine = machine;
@@ -25,7 +27,7 @@ define('app/controllers/monitoring', [
             * Receives first data and set time interval for
             * next reuqests
             */
-            setupDataRequest: function(timeToRequestms){
+            setupDataRequest: function(timeToRequestms,step){
 
                 var SECONDS_INTERVAL = 10000;
 
@@ -38,12 +40,12 @@ define('app/controllers/monitoring', [
 
                 var stop = (new Date()).getTime() - timeGap * 1000;
                 var start = stop - timeToRequestms;
-                var step = 10000;
+                self.step = step;
 
 
                 console.log("Stop: " + (new Date(stop)));
                 console.log("Start: " + (new Date(start)));
-                self.receiveData(start, stop, step);
+                self.receiveData(start, stop, self.step);
 
 
                 // Update Request Every SECONDS_INTERVAL miliseconds
@@ -51,7 +53,6 @@ define('app/controllers/monitoring', [
 
                     var start = (new Date()).getTime() - (timeGap+10) * 1000;
                     var stop =  (new Date()).getTime() - timeGap * 1000; 
-                    var step = 10000; // 10 Second Step
 
                     // Ask all the datat that we didn't receive
                     if(self.machineNotResponding){
@@ -63,14 +64,14 @@ define('app/controllers/monitoring', [
                         machineNotResponding = false;
                     }
 
-                    self.receiveData(start, stop, step);
+                    self.receiveData(start, stop, self.step);
 
                 },SECONDS_INTERVAL);
             },
 
-            updateDataRequest: function(timeToRequestms){
+            updateDataRequest: function(timeToRequestms,step){
                 window.clearInterval(window.monitoringInterval);
-                this.setupDataRequest(timeToRequestms);
+                this.setupDataRequest(timeToRequestms,step);
             },
 
             finishedGraphUpdate: function(){
@@ -128,6 +129,7 @@ define('app/controllers/monitoring', [
 
 
                             var receivedData = {
+                                cpuCores:   0,
                                 cpu:       [],
                                 load:      [],
                                 memory:    [],
@@ -137,6 +139,12 @@ define('app/controllers/monitoring', [
                                 netTX:     []
                             };
                             console.log("Received: " + data.load.length + " measurements");
+                            console.log("Step:" + step);
+
+
+                            // Set CPU Cores
+                            receivedData.cpuCores =  data['cpu']['cores'];
+
                             // Create a date with first measurement time
                             var metricTime = new Date(start);
 

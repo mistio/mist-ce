@@ -19,6 +19,8 @@ define('app/views/monitoring', [
             networkTXGraph: null,
             networkRXGraph: null,
 
+            cpuCores: 0,
+
             viewRendered: false,
             graphsCreated: false,
 
@@ -50,6 +52,8 @@ define('app/views/monitoring', [
 
             updateGraphs: function(data){
 
+                    this.cpuCores = data.cpuCores;
+                    console.log("CPU Cores:" + this.cpuCores);
                     this.cpuGraph.updateData(data.cpu);
                     this.loadGraph.updateData(data.load);
                     this.memGraph.updateData(data.memory);
@@ -143,17 +147,37 @@ define('app/views/monitoring', [
                 console.log("time Window");
                 console.log(this.cpuGraph.getTimeWindow());
                 var newTime = 0;
+                var newStep = 10000;
                 if(selectValue.toLowerCase().search("minutes") != -1)
                 {
                     selectValue = selectValue.replace(/\D+/g, '' );
                     console.log("Minutes To Display:" + selectValue);
                     newTime = selectValue * 60 * 1000;
+
+                    if(selectValue > 30)
+                        newStep = (selectValue*60 / 180)*1000;
+
+                    console.log("New Step: " + newStep);
                 }
                 else if(selectValue.toLowerCase().search("hours") != 1 || selectValue.toLowerCase().search("hour") != 1)
                 {
                     selectValue = selectValue.replace(/\D+/g, '' );
                     console.log("Hours To Display:" + selectValue);
+
                     newTime = selectValue * 60 * 60 * 1000;
+                    newStep = (selectValue*60*60 / 180)*1000;
+
+                    console.log("New Step: " + newStep);
+                }
+                else if(selectValue.toLowerCase().search("days") != 1 || selectValue.toLowerCase().search("day") != 1)
+                {
+                    selectValue = selectValue.replace(/\D+/g, '' );
+                    console.log("Days To Display:" + selectValue);
+
+                    newTime = selectValue * 24 * 60 * 60 * 1000;
+                    newStep = (selectValue * 24 * 60 * 60 / 180)*1000;
+
+                    console.log("New Step: " + newStep);
                 }
 
                 // Update Graph Time If selection is not the same
@@ -168,7 +192,7 @@ define('app/views/monitoring', [
                     this.networkTXGraph.changeTimeToDisplay(newTime);
                     this.networkRXGraph.changeTimeToDisplay(newTime);
 
-                    Mist.monitoringController.updateDataRequest(newTime);
+                    Mist.monitoringController.updateDataRequest(newTime,newStep);
                 }
             },
 
@@ -840,7 +864,7 @@ define('app/views/monitoring', [
 
                         self.graphsCreated = true;
 
-                        controller.setupDataRequest(timeToDisplay);
+                        controller.setupDataRequest(timeToDisplay,10000);
 
                         // Set Up Resolution Change Event
                         $(window).resize(function(){
