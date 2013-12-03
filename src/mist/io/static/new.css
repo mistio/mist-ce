@@ -6,6 +6,7 @@
 @import url("css/key_list.css");
 @import url("css/key_create.css");
 @import url("css/backend_add.css");
+@import url("css/backend_edit.css");
 @import url("css/backend_button.css");
 
 
@@ -52,7 +53,7 @@ textarea {
 }
 
 
-/* Small popup
+/* Popup
 -----------------------------------------------------------------------------------------------------------*/
 .small-popup {
     width: 240px !important;
@@ -61,10 +62,13 @@ textarea {
 .small-popup .ok-cancel button {
     width: 70px !important;
 }
-
-
-/* Large popup
------------------------------------------------------------------------------------------------------------*/
+.mid-popup {
+    width: 255px !important;
+}
+.mid-popup .ok-cancel a,
+.mid-popup .ok-cancel button {
+    width: 78px !important;
+}
 .large-popup {
     width: 290px !important;
 }

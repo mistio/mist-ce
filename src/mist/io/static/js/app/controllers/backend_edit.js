@@ -1,10 +1,8 @@
-define('app/controllers/backend_edit', [
-    'ember'
-    ],
+define('app/controllers/backend_edit', ['ember'],
     /**
-     * Backend Edit Controller
+     *  Backend Edit Controller
      *
-     * @returns Class
+     *  @returns Class
      */
     function() {
         return Ember.Object.extend({
@@ -12,8 +10,7 @@ define('app/controllers/backend_edit', [
             backend: null,
 
             deleteBackend: function() {
-                $('#edit-backend .ajax-loader').fadeIn(200);
-                $('#button-confirm-disable').addClass('ui-disabled');
+                $('#button-confirm-disable').addClass('ui-state-disabled');
                 
                 // TODO: This should be done by the server.
                 var monitoredMachines = this.backend.getMonitoredMachines();
@@ -28,10 +25,9 @@ define('app/controllers/backend_edit', [
                     url: '/backends/' + this.backend.id,
                     type: 'DELETE',
                     success: function() {
-                        $('#edit-backend').popup('close');
+                        $('#edit-backend-popup').popup('close');
                         $('#backend-delete-confirm').slideUp();
-                        $('#edit-backend .ajax-loader').fadeOut(200);
-                        $('#button-confirm-disable').removeClass('ui-disabled');
+                        $('#button-confirm-disable').removeClass('ui--state-disabled');
                         
                         Mist.backendsController.removeObject(that.backend);
                         Ember.run.next(function() {

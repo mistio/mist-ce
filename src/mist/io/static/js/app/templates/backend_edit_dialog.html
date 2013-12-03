@@ -1,13 +1,11 @@
-<div data-role="popup" id="edit-backend" class="mist-dialog" data-overlay-theme="a">
+<div id="edit-backend-popup" class="mid-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
 
-    <div data-role="header" data-theme="b">
+    <div data-role="header">
         <h1>Edit backend</h1>
     </div>
 
     <div data-role="content">
-        <div class="content-header">
-            <span class='name'>{{Mist.backendEditController.backend.title}}</span>
-        </div>
+        <label>{{Mist.backendEditController.backend.title}}</label>
 
         <div data-role="fieldcontain">
             <select id="backend-toggle" data-role="slider" {{action "stateToggleSwitched" target="view" on="change"}}>
@@ -28,7 +26,9 @@
             </div>
         </div>
 
+        {{#if Mist.backendsController.deletingBackend}}
         <div class="ajax-loader"></div>
+        {{/if}}
 
         <a href="#" data-role="button" {{action "backClicked" target="view"}}>Back</a>
     </div>

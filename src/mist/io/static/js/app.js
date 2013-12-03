@@ -119,7 +119,7 @@ define( 'app', [
 
     function initialize() {
 
-        $(document).bind("mobileinit", function() {
+        $(document).bind('mobileinit', function() {
             $.mobile.ajaxEnabled = false;
             $.mobile.hashListeningEnabled = false;
             $.mobile.linkBindingEnabled = false;
@@ -175,7 +175,6 @@ define( 'app', [
             exit: function() {
               Mist.backendsController.forEach(function(backend) {
                   backend.machines.forEach(function(machine) {
-                      log('deselecting machine: ' + machine.name);
                       machine.set('selected', false);
                   });
               });

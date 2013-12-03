@@ -1,16 +1,14 @@
 define('app/views/backend_button', ['ember'],
     /**
-     * Backend Button View
-     *
-     * @returns Class
+     *  Backend Button View
+     * 
+     *  @returns Class
      */
     function() {
         return Ember.View.extend({
 
-            template: Ember.Handlebars.compile("{{title}}"),
-
             tagName: 'a',
-
+            template: Ember.Handlebars.compile('{{title}}'),
             attributeBindings: ['data-role', 'data-theme', 'data-inline', 'data-role', 'data-icon'],
 
             didInsertElement: function() {
@@ -45,7 +43,7 @@ define('app/views/backend_button', ['ember'],
                 Mist.backendEditController.set('backend', backend);
                 $('#backend-toggle option[value=1]')[0].selected = backend.enabled;
                 $('#backend-toggle').slider('refresh');
-                $("#edit-backend").popup('option', 'positionTo', '#' + this.elementId).popup('open', {transition: 'pop'});
+                $('#edit-backend-popup').popup('open');
             }
         });
     }
