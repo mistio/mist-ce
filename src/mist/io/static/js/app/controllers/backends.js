@@ -236,6 +236,9 @@ define('app/controllers/backends', [
                     Ember.run.next(function() {
                         $.getJSON('/backends', function(data) {
                             data.forEach(function(item){
+                                if (item.provider == 'bare_metal') {
+                                    item.is_baremetal = true;
+                                }
                                 that.pushObject(Backend.create(item));
                             });
                             that.content.forEach(function(item) {
