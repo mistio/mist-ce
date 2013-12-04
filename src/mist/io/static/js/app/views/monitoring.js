@@ -42,7 +42,9 @@ define('app/views/monitoring', [
             willDestroyElement: function(){
 
                 this._super();
+                // Disable intervals of data request and Load Color change
                 window.clearInterval(window.monitoringInterval);
+                this.stopLoadColorInterval();
 
                 // Re-Initialize Enable Button Of Jquery Mobile
                 Em.run.next(function() {
@@ -53,7 +55,6 @@ define('app/views/monitoring', [
             updateGraphs: function(data){
 
                     this.cpuCores = data.cpuCores;
-                    console.log("CPU Cores:" + this.cpuCores);
                     this.cpuGraph.updateData(data.cpu);
                     this.loadGraph.updateData(data.load);
                     this.memGraph.updateData(data.memory);
@@ -290,21 +291,17 @@ define('app/views/monitoring', [
             },
 
             // ===== TODO , Find Values Between Path Points ===== //
-            setupLoadColorInterval: function(){//graphID){
+            setupLoadColorInterval: function(){
                  
                  var self = this;
                  window.monitoringLoadColorInterval = window.setInterval(function() {
                     var loadValue = self.loadGraph.getLastDisplayedValue();
 
-                    if(loadValue != null){
-                    console.log("=======================================");
-                    console.log("Last CPU: " + self.cpuGraph.getLastDisplayedValue());
-                    console.log("Last Load: " + self.loadGraph.getLastDisplayedValue());
-                    console.log("Last NetTX: " + self.networkTXGraph.getLastDisplayedValue());
-                    console.log("=======================================");
+                    if(loadValue != null) {
+
+                        var color = self.getLoadLineColor(loadValue,self.cpuCores);
+                        $("#loadGraph").find('.valueLine > path').css('stroke',color);
                     }
-                    //var color     = self.getLoadLineColor(loadValue,this.cpuCores);
-                    //$("#" + graphID).find('.valueLine > path').css('stroke',color);
              },1000);
             },
 
@@ -456,7 +453,7 @@ define('app/views/monitoring', [
                                 this.data = this.data.slice(num_of_overflow_Objs);
                             }
 
-                            // Fix Values, TypeCaste To Date And Number
+                            // Fix Values, TypeCast To Date And Number
                             var fixedData = [];
                             newData.forEach(function(d) {
                                 var tempObj = {};
@@ -752,6 +749,8 @@ define('app/views/monitoring', [
 
                             return null;
                     }
+
+
                     /**
                     * Method: calcValueDistance
                     * Calculates the distance between the last two points
@@ -867,6 +866,8 @@ define('app/views/monitoring', [
 
                     // Stop receiving Graph data
                     window.clearInterval(window.monitoringInterval);
+                    // Remove Load Color Change Interval
+                    this.stopLoadColorInterval();
                 }
                 else if(this.viewRendered && machine.hasMonitoring && !this.graphsCreated &&
                     !machine.probing && machine.probed && machine.id != ' '){
