@@ -68,7 +68,7 @@ define('app/views/backend_add', [
                     $('#addBackendInfo').hide();
                     $('#addBackendBareMetal').show();
                     $('#addBackendOpenstack').hide();
-                    Mist.backendAddController.set('newBareServerUser', 'root');       
+                    Mist.backendAddController.set('newBareMetalServerUser', 'root');       
                 } else {
                     $('#addBackendInfo').show();                 
                     $('#ApiKeylabel').text('2. API Key:');
@@ -118,7 +118,7 @@ define('app/views/backend_add', [
             selectKey: function(key){
                 $('.select-key-collapsible').collapsible('option','collapsedIcon','check');
                 $('.select-key-collapsible span.ui-btn-text').text(key.name);
-                Mist.backendAddController.set('newBareServerKey', key.name);       
+                Mist.backendAddController.set('newBareMetalServerKey', key.name);       
                 $('.select-key-collapsible').trigger('collapse');
             },
 
@@ -138,9 +138,9 @@ define('app/views/backend_add', [
                     "apisecret": Mist.backendAddController.newBackendSecret,
                     "apiurl": Mist.backendAddController.newBackendUrl,
                     "tenant_name": Mist.backendAddController.newBackendTenant,
-                    "machine_ip_address": Mist.backendAddController.newBareServeIp,                    
-                    "machine_key": Mist.backendAddController.newBareServerKey,                    
-                    "machine_user": Mist.backendAddController.newBareServerUser                                                           
+                    "machine_ip_address": Mist.backendAddController.newBareMetalServerIP,                    
+                    "machine_key": Mist.backendAddController.newBareMetalServerKey,                    
+                    "machine_user": Mist.backendAddController.newBareMetalServerUser                                                           
                 };
                 $.ajax({
                     url: '/backends',
