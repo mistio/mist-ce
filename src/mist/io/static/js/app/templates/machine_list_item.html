@@ -15,11 +15,12 @@
                 {{/if}}
             </span>
             
-            <p class="description">          
+            <p class="description">
+                        
                 {{#if view.machine.backend.is_baremetal}}
                 <span class="tag backend ui-btn-corner-all prov-{{unbound backend.provider}}">Bare Metal Server</span>
                 {{else}}
-                <span class="tag backend ui-btn-corner-all prov-{{unbound backend.provider}}">{{view.machine.backend.title}}</span>
+                <span class="tag backend ui-btn-corner-all">{{this.backend.title}}</span>
                 {{/if}}
                 
                 {{#each view.machine.tags}}
