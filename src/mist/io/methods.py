@@ -24,9 +24,9 @@ from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
 from mist.io.exceptions import *
 
-#~ # add curl ca-bundle default path to prevent libcloud certificate error
-#~ import libcloud.security
-#~ libcloud.security.CA_CERTS_PATH.append('/usr/share/curl/ca-bundle.crt')
+## # add curl ca-bundle default path to prevent libcloud certificate error
+## import libcloud.security
+## libcloud.security.CA_CERTS_PATH.append('/usr/share/curl/ca-bundle.crt')
 
 
 log = logging.getLogger(__name__)
@@ -81,7 +81,7 @@ def add_backend(user, title, provider, apikey,
     except:
         raise BackendUnavailableError()
 
-    #~ FIXME backend.poll_interval
+    # FIXME backend.poll_interval
     with user.lock_n_load():
         user.backends[backend_id] = backend
         user.save()

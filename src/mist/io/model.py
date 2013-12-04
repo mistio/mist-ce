@@ -36,9 +36,9 @@ from mist.io.dal import StrField, IntField, FloatField, BoolField
 from mist.io.dal import ListField, DictField
 from mist.io.dal import OODict, FieldsDict, FieldsList, make_field
 try:
-    from mist.core.dal import UserEngine
+    from mist.core.dal import User as DalUser
 except ImportError:
-    from mist.io.dal import UserEngine
+    from mist.io.dal import User as DalUser
 from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
 
 
@@ -56,7 +56,7 @@ class Backend(OODict):
     title = StrField()
     tenant_name = StrField()
     region = StrField()
-    poll_interval = IntField()
+    poll_interval = IntField(10000)
     provider = StrField()
     datacenter = StrField()
 
@@ -131,7 +131,7 @@ class Keypairs(FieldsDict):
     _key_error = KeypairNotFoundError
 
 
-class User(UserEngine):
+class User(DalUser):
     """The basic model class is User. It contains all the methods
     necessary to find and save users in memcache and in mongo.
     It transforms the user dict into an object with consistent

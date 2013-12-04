@@ -50,34 +50,35 @@ def main(global_config, **settings):
     settings['core_uri'] = config.get('core_uri', 'http://mist.io')
     settings['google_analytics_id'] = config.get('google_analytics_id', '')
 
-#~ FIXME
-#~ # try to authenticate with mist.io service if email,password are available
-#~ user = User()   # this automatically loads from db.yaml
-#~ if user.email and user.password:
-    #~ payload = {'email': user.email, 'password': user.password}
-    #~ ret = requests.post(settings['core_uri'] + '/auth',
-                        #~ params=payload, verify=False)
-#~
-#~ #OLD
-#~ #if settings['user'].get('email') and settings['user'].get('password'):
-#~ #    payload = {'email': settings['user'].get('email'),
-#~ #               'password': settings['user'].get('password')}
-#~ #    ret = requests.post(settings['core_uri'] + '/auth', params=payload, verify=False)
-    #~ if ret.status_code == 200:
-        #~ settings['auth'] = 1
-        #~ ret = json.loads(ret.content)
-        #~ settings['current_plan'] = ret.get('current_plan',{})
-        #~ settings['auth_key'] = ret.get('auth_key', '')
-        #~ user_details = ret.get('user_details', {})
-        #~ settings['user']['name'] = user_details.get('name', '')
-        #~ settings['user']['company_name'] = user_details.get('company_name', '')
-        #~ settings['user']['country'] = user_details.get('country', '')
-        #~ settings['user']['number_of_servers'] = user_details.get('number_of_servers', '')
-        #~ settings['user']['number_of_people'] = user_details.get('number_of_people', '')
-    #~ else:
-        #~ settings['auth'] = 0
+## FIXME
+## # try to authenticate with mist.io service if email,password are available
+## user = User()   # this automatically loads from db.yaml
+## if user.email and user.password:
+    ## payload = {'email': user.email, 'password': user.password}
+    ## ret = requests.post(settings['core_uri'] + '/auth',
+                        ## params=payload, verify=False)
+##
+## #OLD
+## #if settings['user'].get('email') and settings['user'].get('password'):
+## #    payload = {'email': settings['user'].get('email'),
+## #               'password': settings['user'].get('password')}
+## #    ret = requests.post(settings['core_uri'] + '/auth', params=payload, verify=False)
+    ## if ret.status_code == 200:
+        ## settings['auth'] = 1
+        ## ret = json.loads(ret.content)
+        ## settings['current_plan'] = ret.get('current_plan',{})
+        ## settings['auth_key'] = ret.get('auth_key', '')
+        ## user_details = ret.get('user_details', {})
+        ## settings['user']['name'] = user_details.get('name', '')
+        ## settings['user']['company_name'] = user_details.get('company_name', '')
+        ## settings['user']['country'] = user_details.get('country', '')
+        ## settings['user']['number_of_servers'] = user_details.get('number_of_servers', '')
+        ## settings['user']['number_of_people'] = user_details.get('number_of_people', '')
+    ## else:
+        ## settings['auth'] = 0
 
     config = Configurator(root_factory=Root, settings=settings)
+    config.add_static_view('resources', 'mist.io:static')
     config.include(add_routes)
     config.scan()
     app = config.make_wsgi_app()
@@ -94,7 +95,6 @@ def add_routes(config):
     Just use: config.include(add_routes)
 
     """
-    config.add_static_view('resources', 'mist.io:static')
 
     config.add_route('home', '/')
     config.add_route('providers', '/providers')
