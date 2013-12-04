@@ -187,11 +187,16 @@ def add_backend(request, renderer='json'):
             keypairs = user.get('keypairs', {})
             keypair = get_keypair_by_name(keypairs, machine_key)
             if not keypair:
-                return Response('Could not ssh to machine, please make sure settings are correct', 400)
+                return Response('Could not find ssh key, please make sure settings are correct', 400)
             
             machine_priv_key = keypair.get('private')
             machine_id = machine_hostname.replace('.', '').replace(' ', '')
-            
+
+            backend_id = generate_backend_id(provider, '', machine_hostname)
+            for b_id in backends:
+                if backend_id == b_id:
+                    return Response('Bare Metal Server already exists', 400)
+
             #check connection
             response = run_command(machine_id, machine_hostname, machine_user, machine_priv_key, 'uptime')
             if response.status_code != 200:
@@ -201,16 +206,7 @@ def add_backend(request, renderer='json'):
                             'hostname': machine_hostname,
                             'user': machine_user
                             }         
-
-            backend = False
-            for backend_id in backends:
-                if backends[backend_id].get('provider') == 'bare_metal':
-                    backend = backends[backend_id]
-                    break
-
-            if not backend:
-                backend_id = generate_backend_id(provider, '', '')
-            
+           
             machines = keypair.get('machines', [])   
             sudoer = False 
             key_machine = [backend_id, machine_id, int(time()), machine_user, sudoer]                        
@@ -220,16 +216,7 @@ def add_backend(request, renderer='json'):
             else:
                 keypairs[machine_key]['machines'] = [key_machine]                   
 
-            if backend:
-                backends[backend_id] = backend
-                if machine_dict in backend['list_of_machines']:
-                    return Response('Bare Metal Server already exists', 400)                
-                else:             
-                    backend['list_of_machines'].append(machine_dict)
-
-                return {'provider': 'bare_metal', 'exists': True,'id': backend_id}
-            else:   
-                backend = {'title': title,
+            backend = {'title': machine_hostname,
                    'list_of_machines': [machine_dict],
                    'provider': provider,
                    'apikey': apikey,
@@ -241,7 +228,7 @@ def add_backend(request, renderer='json'):
                    'starred': [],
                    'enabled': True,
                   }       
-                backends[backend_id] = backend                                                            
+            backends[backend_id] = backend  
         else:
             if apisecret == 'getsecretfromdb':
                 for backend_id in backends:
