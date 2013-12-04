@@ -223,7 +223,7 @@ def add_backend(request, renderer='json'):
             if backend:
                 backends[backend_id] = backend
                 if machine_dict in backend['list_of_machines']:
-                    return Response('Bare metal machine already exists', 400)                
+                    return Response('Bare Metal Server already exists', 400)                
                 else:             
                     backend['list_of_machines'].append(machine_dict)
 
