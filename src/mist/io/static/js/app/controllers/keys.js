@@ -72,11 +72,22 @@ define('app/controllers/keys', [
                         Mist.keyAddController.newKeyClear();
                         Mist.keysController.keys.addObject(Key.create(data));
                         if (autoSelect) {
-                            Ember.run.next(function(){
-                                $('.select-key-collapsible .select-listmenu').listview();
-                                $('.select-key-collapsible').parent().trigger('create');
-                                $('.select-key-collapsible li a').eq(0).click();
-                                $('.select-key-collapsible').removeClass('ui-disabled');
+                            Ember.run.next(function() {
+                                if ($('#add-backend').length) {
+                                    $('.select-keys-listmenu').listview('refresh');
+                                    Ember.run.next(function() {
+                                        for (var k = 0; k < Mist.keysController.keys.length; ++k) {
+                                            if($('.select-keys-listmenu').find('a').eq(k).text() == name) {
+                                                $('.select-keys-listmenu').find('a').eq(k).click();
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    $('.select-key-collapsible .select-listmenu').listview();
+                                    $('.select-key-collapsible').parent().trigger('create');
+                                    $('.select-key-collapsible li a').eq(0).click();
+                                    $('.select-key-collapsible').removeClass('ui-disabled');
+                                }
                             });
                         } else if (machine) {
                             Mist.keysController.associateKey(name, machine);

@@ -1396,7 +1396,7 @@ div.loading-monitoring {
     padding:10px !important;
 }
 
-.select-listmenu {
+.select-listmenu, .select-keys-listmenu {
     max-height: 150px;
     overflow-y: auto;
 }
