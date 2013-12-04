@@ -16,11 +16,13 @@
            data-icon="plus"
            data-theme="b"
            {{action "addBackend" target="view"}}>Add backend</a>
-        
+
         <div id="backend-buttons" data-role="controlgroup" data-type="horizontal">
             {{#each Mist.backendsController.content}}
-                {{view Mist.BackendButtonView backendBinding="this"
-                   data-icon="check" classBinding="state" class="backend-button"}}
+                {{view Mist.BackendButtonView 
+                       backendBinding="this"
+                       classBinding="state"
+                       data-icon="check"}}
             {{/each}}
         </div>
 

@@ -24,20 +24,29 @@ define('app/views/backend_button', ['ember'],
              * 
              */
 
-            didInsertElement: function() {
+            renderButton: function() {
                 var btnElement = $('#'+this.elementId);
                 if (btnElement.button) {
-                    Ember.run.next(this, function() {
-                        btnElement.button();
+                    btnElement.button();
+                    if ($('#backend-buttons').controlgroup) {
                         $('#backend-buttons').controlgroup('refresh');
-                        this.stateObserver();
-                    });
+                    }
+                    this.stateObserver();
                 } else {
                     Ember.run.later(this, function() {
-                        this.didInsertElement();
+                        this.renderButton();
                     }, 100);
                 }
-            },
+            }.on('didInsertElement'),
+
+
+            destroyButton: function() {
+                Ember.run.next(function() {
+                    if ($('#backend-buttons').controlgroup) {
+                        $('#backend-buttons').controlgroup('refresh');
+                    }
+                });
+            }.on('willDestroyElement'),
 
 
 

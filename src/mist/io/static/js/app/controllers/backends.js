@@ -62,7 +62,7 @@ define('app/controllers/backends', ['app/models/backend','app/models/rule','embe
                     this.set('machineResponse', this.getMachineByUrlId(this.machineRequest));
                     this.set('machineRequest', false);
                 }
-            }.observes('machineRequest', 'c.loadingMachines'),
+            }.observes('machineRequest', 'content.@each.loadingMachines'),
 
 
             loadingMachinesObserver: function() {

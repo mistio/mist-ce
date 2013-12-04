@@ -17,17 +17,15 @@ define('app/views/home', ['app/views/mistscreen','text!app/templates/home.html',
 
             /**
              * 
-             *  Observers
+             *  Initialization
              * 
              */
-
-            backendsObserver: function() {
-                if ($('#backend-buttons').controlgroup) {
-                    $('#backend-buttons').controlgroup('refresh');
-                }
-            }.observes('Mist.backendsController.content.@each'),
-
-
+            
+            whatCanIPossiblyDoChrome: function() {
+                Ember.run.later(function() {
+                    $('#backend-buttons').css('display', 'inline-block');
+                }, 100);
+            }.on('didInsertElement'),
 
             /**
              * 

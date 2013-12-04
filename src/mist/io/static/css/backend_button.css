@@ -11,7 +11,7 @@
     padding: 10px 0 9px !important;
 }
 #backend-buttons .ui-controlgroup-controls {
-    display: inline;
+    display: inline !important;
     float: left;
     margin-bottom: 18px;
 }
