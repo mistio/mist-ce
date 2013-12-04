@@ -290,13 +290,21 @@ define('app/views/monitoring', [
             },
 
             // ===== TODO , Find Values Between Path Points ===== //
-            setupLoadColorInterval: function(graphID){
+            setupLoadColorInterval: function(){//graphID){
                  
                  var self = this;
                  window.monitoringLoadColorInterval = window.setInterval(function() {
-                    var loadValue = self.loadGraph.getLastValue();
-                    var color     = self.getLoadLineColor(loadValue,this.cpuCores);
-                    $("#" + graphID).find('.valueLine > path').css('stroke',color);
+                    var loadValue = self.loadGraph.getLastDisplayedValue();
+
+                    if(loadValue != null){
+                    console.log("=======================================");
+                    console.log("Last CPU: " + self.cpuGraph.getLastDisplayedValue());
+                    console.log("Last Load: " + self.loadGraph.getLastDisplayedValue());
+                    console.log("Last NetTX: " + self.networkTXGraph.getLastDisplayedValue());
+                    console.log("=======================================");
+                    }
+                    //var color     = self.getLoadLineColor(loadValue,this.cpuCores);
+                    //$("#" + graphID).find('.valueLine > path').css('stroke',color);
              },1000);
             },
 
@@ -706,6 +714,44 @@ define('app/views/monitoring', [
                         else
                             return null;
                     }
+
+                    this.getLastDisplayedValue = function(){
+
+                        if(this.data){
+
+                            if(this.data.length > 2) {
+
+                                // Get Translate Value
+                                var translate =  $("#" + this.id).find('.valueLine > path').attr('transform');
+                                translate = + translate.slice(10,translate.indexOf(','));
+
+                                if(translate == 0)
+                                    return this.data[this.data.length-1].value;
+                                else if(translate == this.valuesDistance)
+                                    return this.data[this.data.length-2].value;
+                                else {
+                                    var distance = this.data[this.data.length-1].value  - this.data[this.data.length-2].value;
+
+                                    // ----- Debug ----- //
+                                   /* console.log('Last Data  : ' + this.data[this.data.length-1].value);
+                                    console.log('Last Data-1: ' + this.data[this.data.length-2].value);
+                                    console.log("Distance: " + distance);
+                                    console.log("Current Translate:" + translate);
+                                    console.log("Max     Translate: " + translate);
+                                    console.log("%       Translate: " + (translate/this.valuesDistance)*100);
+                                    console.log("Max Translate Distance : " + this.valuesDistance);*/
+                                    // ----- Debug ----- //
+
+                                    // Last value + the part that has been translated
+                                    return this.data[this.data.length-2].value + 
+                                            (distance * (this.valuesDistance-translate) / this.valuesDistance);
+                                }
+
+                            }
+                        }
+
+                            return null;
+                    }
                     /**
                     * Method: calcValueDistance
                     * Calculates the distance between the last two points
@@ -897,6 +943,7 @@ define('app/views/monitoring', [
                         self.graphsCreated = true;
 
                         controller.setupDataRequest(timeToDisplay,10000);
+                        self.setupLoadColorInterval();
 
                         // Set Up Resolution Change Event
                         $(window).resize(function(){
