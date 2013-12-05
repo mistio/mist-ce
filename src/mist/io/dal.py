@@ -501,7 +501,7 @@ class OODictYaml(OODict):
         settings like js_build etc remain in settings.yaml file"""
         if yaml_rel_path:
             self._yaml_rel_path = yaml_rel_path
-        yaml_db = os.getcwd() + self._yaml_rel_path
+        yaml_db = os.getcwd() + "/" + self._yaml_rel_path
         try:
             config_file = open(yaml_db, 'r')
         except IOError as exc:
@@ -544,14 +544,15 @@ class OODictYaml(OODict):
         yaml.add_representer(unicode, unicode_representer)
         yaml.add_representer(literal_unicode, literal_unicode_representer)
         yaml.add_representer(literal_string, literal_string_representer)
-        yaml_db = os.getcwd() + self._yaml_rel_path
+        yaml_db = os.getcwd() + '/' + self._yaml_rel_path
         with open(yaml_db, 'w') as config_file:
             yaml.dump(self._dict, config_file, default_flow_style=False)
 
 
 class User(OODictYaml):
 
-    _yaml_rel_path = "db.yaml"
+    def __init__(self):
+        super(User, self).__init__("db.yaml")
 
     @contextmanager
     def lock_n_load(self):
