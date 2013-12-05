@@ -62,7 +62,13 @@ define('app/views/key_add_dialog', [
                     Mist.notificationController.notify('Private key should end with: ' + ending);
                     return;
                 }
-                Mist.keyAddController.newKey(this.getAssociatedMachine());
+                if ($("#add-backend").length) {
+                    Mist.keysController.newKey(Mist.keyAddController.newKeyName, 
+                                               Mist.keyAddController.newKeyPrivate
+                                               , null, true);
+                } else {
+                    Mist.keyAddController.newKey(this.getAssociatedMachine());
+                }
                 try {
                     $('#manage-keys').panel('open');
                 } catch (e) {}

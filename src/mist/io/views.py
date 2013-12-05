@@ -178,39 +178,90 @@ def add_backend(request, renderer='json'):
         if not user:
             return Response('Unauthorized', 401)
         backends = user['backends']
-        
-        if apisecret == 'getsecretfromdb':
-            for backend_id in backends:
-                backend = backends[backend_id]
-                if backend.get('apikey', None) == apikey:
-                    apisecret = backend.get('apisecret', None)
-                    
-        region = ''
-        if not provider.__class__ is int and ':' in provider:
-            region = provider.split(':')[1]
-            provider = provider.split(':')[0]
 
-        if not provider or not apikey or not apisecret:
-            return Response('Invalid backend data', 400)
+        if provider == 'bare_metal':
+            machine_hostname = params.get('machine_ip_address', '')
+            machine_key = params.get('machine_key', '')
+            machine_user = params.get('machine_user', 'root')
+            
+            keypairs = user.get('keypairs', {})
+            keypair = get_keypair_by_name(keypairs, machine_key)
+            if not keypair:
+                return Response('Could not find ssh key, please make sure settings are correct', 400)
+            
+            machine_priv_key = keypair.get('private')
+            machine_id = machine_hostname.replace('.', '').replace(' ', '')
 
-        backend_id = generate_backend_id(provider, region, apikey)
-        
-        if backend_id in backends:
-            return Response('Backend exists', 409)
+            backend_id = generate_backend_id(provider, '', machine_hostname)
+            for b_id in backends:
+                if backend_id == b_id:
+                    return Response('Bare Metal Server already exists', 400)
 
-        backend = {'title': title,
+            #check connection
+            response = run_command(machine_id, machine_hostname, machine_user, machine_priv_key, 'uptime')
+            if response.status_code != 200:
+                return Response('Could not ssh to machine, please make sure settings are correct', 400)
+
+            machine_dict = {'id': machine_id, 
+                            'hostname': machine_hostname,
+                            'user': machine_user
+                            }         
+           
+            machines = keypair.get('machines', [])   
+            sudoer = False 
+            key_machine = [backend_id, machine_id, int(time()), machine_user, sudoer]                        
+
+            if machines:
+                keypairs[machine_key]['machines'].append(key_machine)    
+            else:
+                keypairs[machine_key]['machines'] = [key_machine]                   
+
+            backend = {'title': machine_hostname,
+                   'list_of_machines': [machine_dict],
                    'provider': provider,
                    'apikey': apikey,
                    'apisecret': apisecret,
                    'apiurl': apiurl,
                    'tenant_name': tenant_name,
-                   'region': region,
+                   'region': '',
                    'poll_interval': request.registry.settings['default_poll_interval'],
                    'starred': [],
                    'enabled': True,
-                  }
+                  }       
+            backends[backend_id] = backend  
+        else:
+            if apisecret == 'getsecretfromdb':
+                for backend_id in backends:
+                    backend = backends[backend_id]
+                    if backend.get('apikey', None) == apikey:
+                        apisecret = backend.get('apisecret', None)
+                        
+            region = ''
+            if not provider.__class__ is int and ':' in provider:
+                region = provider.split(':')[1]
+                provider = provider.split(':')[0]
 
-        backends[backend_id] = backend
+            if not provider or not apikey or not apisecret:
+                return Response('Invalid backend data', 400)
+
+            backend_id = generate_backend_id(provider, region, apikey)
+            
+            if backend_id in backends:
+                return Response('Backend exists', 409)
+
+            backend = {'title': title,
+                       'provider': provider,
+                       'apikey': apikey,
+                       'apisecret': apisecret,
+                       'apiurl': apiurl,
+                       'tenant_name': tenant_name,
+                       'region': region,
+                       'poll_interval': request.registry.settings['default_poll_interval'],
+                       'starred': [],
+                       'enabled': True,
+                      }
+
+            backends[backend_id] = backend
 
     #validate newly added backend, else remove
     try:

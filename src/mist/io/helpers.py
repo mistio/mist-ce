@@ -27,6 +27,7 @@ from fabric.api import env
 from fabric.api import run
 
 from mist.io.config import EC2_PROVIDERS, COMMAND_TIMEOUT
+from mist.io.bare_metal import BareMetalDriver
 
 # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
@@ -245,7 +246,8 @@ def connect(request, backend_id=False):
         backend_id = request.matchdict['backend']
     backend = backends.get(backend_id)
 
-    driver = get_driver(backend['provider'])
+    if backend['provider'] != 'bare_metal':
+        driver = get_driver(backend['provider'])
 
     if backend['provider'] == Provider.OPENSTACK:
         conn = driver(backend['apikey'],
@@ -265,6 +267,8 @@ def connect(request, backend_id=False):
         conn = driver(backend['apikey'], backend['apisecret'])
     elif backend['provider'] == Provider.SOFTLAYER:
         conn = driver(backend['apikey'], backend['apisecret'])
+    elif backend['provider'] == 'bare_metal':
+        conn = BareMetalDriver(backend['list_of_machines'])
     else:
         # ec2
         conn = driver(backend['apikey'], backend['apisecret'])
@@ -318,6 +322,13 @@ def get_machine_actions(machine, backend):
         can_stop = False
         can_reboot = False
         can_tag = False
+
+    if backend.type == 'bare_metal':
+        can_tag = False
+        can_start = False
+        can_destroy  = False
+        can_stop = False
+        can_reboot = False
 
     return {'can_stop': can_stop,
             'can_start': can_start,

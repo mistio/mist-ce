@@ -86,6 +86,20 @@ define('app/controllers/backends', [
                 return null;
             },
 
+            getCloudProviders: function() {
+                var providers = [];
+                this.content.forEach(function(backend) {
+                    if (backend.provider != 'bare_metal') {
+                        providers.push(backend);
+                    }
+                });
+                return providers;
+            },
+
+            getCloudProvidersProperty: function() {
+                return this.getCloudProviders();
+            }.property('@each'),
+
             getMachineByUrlId: function(urlId) {
                 var machineToFind = null;
                 this.content.some(function(backend) {
@@ -226,6 +240,9 @@ define('app/controllers/backends', [
                                 that.set('loadingMachines', false);
                             }
                             data.forEach(function(item){
+                                if (item.provider == 'bare_metal') {
+                                    item.is_baremetal = true;
+                                }
                                 that.pushObject(Backend.create(item));
                             });
                             that.content.forEach(function(item) {
