@@ -77,28 +77,29 @@ class Shell(object):
 
         log.info("Attempting to connect to %s@%s:%s.",
                  username, self.host, port)
+        if not key and not password:
+            raise RequiredParameterMissingError("neither key nor password "
+                                                "provided.")
+        if key:
+            with get_temp_file(key) as key_path:
+                rsa_key = paramiko.RSAKey.from_private_key_file(key_path)
+        else:
+            rsa_key = None
+
         try:
-            if key:
-                with get_temp_file(key) as key_path:
-                    rsa_key = paramiko.RSAKey.from_private_key_file(key_path)
-            if key and password:
-                self.ssh.connect(self.host, username=username, pkey=rsa_key,
-                                 password=password, port=port)
-            elif key:
-                self.ssh.connect(self.host, username=username,
-                                 pkey=rsa_key, port=port)
-            elif password:
-                self.ssh.connect(self.host, username=username,
-                                 password=password, port=port)
-            else:
-                raise RequiredParameterMissingError("neither key nor password "
-                                                    "provided.")
-            log.info("Succesfully connected to %s@%s:%s.",
-                     username, self.host, port)
-        except paramiko.SSHException as e:
-            log.error("ssh exception %r", e)
+            self.ssh.connect(
+                self.host,
+                port=port,
+                username=username,
+                password=password,
+                pkey=rsa_key,
+                allow_agent=False,
+                look_for_keys=False
+            )
+        except paramiko.SSHException as exc:
+            log.error("ssh exception %r", exc)
             raise MachineUnauthorizedError("Couldn't connect to %s@%s:%s. %s"
-                                           % (username, self.host, port, e))
+                                           % (username, self.host, port, exc))
 
     def disconnect(self):
         """Close the SSH connection."""
