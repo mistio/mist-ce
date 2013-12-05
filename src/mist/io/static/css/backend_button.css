@@ -1,6 +1,9 @@
 
 /* Backend Button CSS
 -----------------------------------------------------------------------------------------------------------*/
+#backend-buttons {
+    display: block;
+}
 #backend-buttons .ui-controlgroup-controls .ui-btn a {
     padding: 10px 10px 10px 40px !important;
     color: black;
@@ -11,7 +14,6 @@
     padding: 10px 0 9px !important;
 }
 #backend-buttons .ui-controlgroup-controls {
-    display: inline !important;
     float: left;
     margin-bottom: 18px;
 }

@@ -1,89 +1,73 @@
-<div data-role="header" data-theme="b">
+<div id="machine-list-page">
 
-    <a href="#"
-       data-icon="home"
-       data-direction="reverse"
-       class="ui-btn-left">Home</a>
+    <div data-role="header" data-theme="b">
 
-    <h1>Machines</h1>
+        <a href="#" data-icon="home" >Home</a>
 
-    {{view Mist.UserMenuView}}
+        <h1>Machines</h1>
 
-</div>
+        {{view Mist.UserMenuView}}
 
-<div data-role="content" id="machines" data-theme="c">
+    </div>
+
+    <div data-role="content" data-theme="c">
+
+        <a id="select-machines-btn"
+           data-role="button"
+           data-icon="arrow-d"
+           {{action "selectClicked" target="view"}}>Select</a>
+
+        <a id="create-machine-btn"
+           data-role="button"
+           data-icon="plus"
+           data-iconpos="right"
+           data-theme="b"
+           {{action "createClicked" target="view"}}>Create</a>
+
+        <ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter...">
+            {{#each Mist.backendsController.content}}
+                {{#each this.machines.content}}
+                    {{view Mist.MachineListItemView machineBinding="this" class="checkbox-link"}}
+                {{/each}}
+            {{/each}}
+        </ul>
+
+        <div class="large-padding"></div>
+
+    </div>
+
+    {{view Mist.ShellDialog}}
 
     {{view Mist.MachineAddView}}
 
-    <a href="#"
-       id="select-machines"
-       data-role="button"
-       data-icon="arrow-d"
-       {{action "selectClicked" target="view"}}>Select</a>
+    {{view Mist.MachineTagsDialog}}
 
-    <ul id="machines-list"
-        data-role="listview"
-        data-filter="true"
-        data-inset="true"
-        data-filter-placeholder="Filter...">
-        {{#each Mist.backendsController}}
-            {{#each this.machines}}
-                {{view Mist.MachineListItemView machineBinding="this"}}
+    {{view Mist.ConfirmationDialog}}
+
+    {{view Mist.MachineActionsDialog}}
+
+    <div id="select-machines-popup" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-machines-btn">
+        <ul data-role="listview">
+            <li data-icon="false">
+                <a {{action "selectModeClicked" "all" target="view"}}>All</a>
+            </li>
+            <li data-icon="false">
+                <a {{action "selectModeClicked" "none" target="view"}}>None</a>
+            </li>
+            {{#each Mist.backendsController.content}}
+            <li data-icon="false">
+                <a {{action "selectModeClicked" this target="view"}}>{{this.title}}</a>
+            </li>
             {{/each}}
-        {{/each}}
-    </ul>
-
-    <div class="bottom-padding"></div>
-</div>
-
-<div id="select-machines-popup" data-role="popup" data-transition="pop" data-position-to="#select-machines">
-    <ul id="select-machines-listmenu" data-role="listview">
-        <li data-icon="false">
-            <a href="#" {{action "selectOptionClicked" "all" target="view"}}>All</a>
-        </li>
-        <li data-icon="false">
-            <a href="#" {{action "selectOptionClicked" "none" target="view"}}>None</a>
-        </li>
-        {{#each Mist.backendsController.content}}
-        <li data-icon="false">
-            <a href="#" {{action "selectOptionClicked" this target="view"}}>{{this.title}}</a>
-        </li>
-        {{/each}}
-    </ul>
-</div>
-
-<div data-role="popup" id="dialog-confirm" data-transition="pop" class="mist-dialog" data-theme="a">
-    <div data-role="header" data-theme="b">
-        <h1 id="dialog-confirm-title">{{Mist.confirmationController.title}}</h1>
+        </ul>
     </div>
-    {{view Mist.ConfirmationDialog data-role="content"}}
-</div>
 
-<div id="machines-footer" data-role="footer" data-theme="b">
-    <div class="actions" data-role="controlgroup" data-type="horizontal">
-        <a href="#"
-            id="machines-button-tags"
-            {{bindAttr class=":action-links view.disabledTagClass"}}
-            data-role="button"
-            data-icon="grid"
-            {{action openTags target="view"}}>Tag</a>
-            {{view Mist.MachineTagsDialog machineBinding="Mist.backendsController.selectedMachine"}}
-
-        <a href="#"
-            id="machines-button-shell"
-            data-role="button"
-            data-icon="gear"
-            {{action openShell target="view"}}>Shell</a>
-            {{view Mist.ShellDialog machineBinding="Mist.backendsController.selectedMachine"}}
-
-        <a href="#"
-            id="machines-button-power"
-            {{bindAttr class=":action-links view.disabledPowerClass"}}
-            data-role="button"
-            data-icon="mist-power"
-            {{action openActions target="view"}}>Power</a>
-            {{view Mist.MachineActionsDialog machineBinding="Mist.backendsController.selectedMachine"}}
-
+    <div class="tri-action-footer" data-role="footer" data-theme="b">
+        <div data-role="controlgroup" data-type="horizontal">
+            <a id="machines-tags-btn" data-role="button" data-icon="grid" {{action "tagsClicked" target="view"}}>Tags</a>
+            <a id="machines-shell-btn" data-role="button" data-icon="gear" {{action "shellClicked" target="view"}}>Shell</a>
+            <a id="machines-power-btn" data-role="button" data-icon="power" {{action "powerClicked" target="view"}}>Power</a>
+        </div>
     </div>
 
 </div>
