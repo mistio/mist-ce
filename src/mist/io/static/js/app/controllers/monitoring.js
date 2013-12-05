@@ -102,15 +102,22 @@ define('app/controllers/monitoring', [
                             'stop': Math.floor(stop / 1000),
                             'step': step,
                             'auth_key': Mist.auth_key},
-                    timeout: 10000,
+                    timeout: 8000,
                     success: function (data, status, xhr){
                         
                         var controller = Mist.monitoringController;
 
                         try {
 
+                            var measurmentsExpected = Math.floor((stop-start) / step) ;
+
                             if(data.load.length == 0)
-                                throw "Received Wrong Server Response";
+                                throw "Error, Received none measurements";
+                            else if(data.load.length > measurmentsExpected)
+                                throw "Error, Received more measurements than expected";
+
+                            console.log("Measurement Expected: " + measurmentsExpected);
+                            console.log("Measurement Received: " + data.load.length);
 
                             var disks = [];
                             var netInterfaces = [];
