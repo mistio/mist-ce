@@ -15,6 +15,12 @@ define('app/controllers/backend_add', [
                 this.set('newBackendProvider', null);
                 this.set('newBackendKey', null);
                 this.set('newBackendSecret', null);
+                this.set('newBareMetalServerIP', null);
+                this.set('newBareMetalServerKey', null);
+                this.set('newBareMetalServerUser', null);    
+                $('#addBackendOpenstack').hide();
+                $('#addBackendBareMetal').hide();                    
+                $('#addBackendInfo').show();                                                                            
                 /* OpenStack support
                 this.set('newBackendURL', null);
                 this.set('newBackendTenant', null);
@@ -39,6 +45,11 @@ define('app/controllers/backend_add', [
                         */
                         this.set('newBackendReady', true);
                         $('#create-backend-ok').button('enable');
+                } else if (this.get('newBareMetalServerIP') &&
+                    this.get('newBareMetalServerKey') &&                
+                    this.get('newBareMetalServerUser')) {                                                                                        
+                        this.set('newBackendReady', true);
+                        $('#create-backend-ok').button('enable');                                                             
                 } else {
                     this.set('newBackendReady', false);
                     $('#create-backend-ok').button('disable');
@@ -50,6 +61,10 @@ define('app/controllers/backend_add', [
                 this.addObserver('newBackendProvider', this, this.updateNewBackendReady);
                 this.addObserver('newBackendKey', this, this.updateNewBackendReady);
                 this.addObserver('newBackendSecret', this, this.updateNewBackendReady);
+                this.addObserver('newBareMetalServerIP', this, this.updateNewBackendReady);                
+                this.addObserver('newBareMetalServerKey', this, this.updateNewBackendReady);                
+                this.addObserver('newBareMetalServerUser', this, this.updateNewBackendReady);                                
+                                                                
                 /* OpenStack support
                 this.addObserver('newBackendURL', this, this.updateNewBackendReady);
                 this.addObserver('newBackendTenant', this, this.updateNewBackendTenant);
