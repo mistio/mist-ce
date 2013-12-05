@@ -290,25 +290,27 @@ define('app/views/monitoring', [
                     return "#6CE0BA";
             },
 
-            // ===== TODO , Find Values Between Path Points ===== //
             setupLoadColorInterval: function(){
                  
                  var self = this;
-                 window.monitoringLoadColorInterval = window.setInterval(function() {
+                 jQuery.Color.hook( "stroke" );
+
+                 window.monitoringLoadColorInterval = window.setInterval(function () {
                     var loadValue = self.loadGraph.getLastDisplayedValue();
 
                     if(loadValue != null) {
 
                         var color = self.getLoadLineColor(loadValue,self.cpuCores);
-                        $("#loadGraph").find('.valueLine > path').css('stroke',color);
+                        $("#loadGraph").find('.valueLine > path').animate( {
+                            stroke: jQuery.Color(color)
+                        }, 700 );
                     }
-             },1000);
+                },1000);
             },
 
             stopLoadColorInterval: function(){
                 window.clearInterval(window.monitoringLoadColorInterval);
             },
-            // ================================================== //
 
             // Graph Constructor
             setUpGraphs: function() {
@@ -965,7 +967,6 @@ define('app/views/monitoring', [
                 } 
             }.observes('controller.model.hasMonitoring','controller.model.probing','viewRendered'),
 
-    
         });
     }
 );
