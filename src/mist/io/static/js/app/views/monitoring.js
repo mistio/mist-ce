@@ -158,7 +158,6 @@ define('app/views/monitoring', [
                     if(selectValue > 30)
                         newStep = (selectValue*60 / 180)*1000;
 
-                    console.log("New Step: " + newStep);
                 }
                 else if(selectValue.toLowerCase().search("hours") != 1 || selectValue.toLowerCase().search("hour") != 1)
                 {
@@ -168,7 +167,6 @@ define('app/views/monitoring', [
                     newTime = selectValue * 60 * 60 * 1000;
                     newStep = (selectValue*60*60 / 180)*1000;
 
-                    console.log("New Step: " + newStep);
                 }
                 else if(selectValue.toLowerCase().search("days") != 1 || selectValue.toLowerCase().search("day") != 1)
                 {
@@ -178,7 +176,6 @@ define('app/views/monitoring', [
                     newTime = selectValue * 24 * 60 * 60 * 1000;
                     newStep = (selectValue * 24 * 60 * 60 / 180)*1000;
 
-                    console.log("New Step: " + newStep);
                 }
 
                 // Update Graph Time If selection is not the same
@@ -193,7 +190,9 @@ define('app/views/monitoring', [
                     this.networkTXGraph.changeTimeToDisplay(newTime);
                     this.networkRXGraph.changeTimeToDisplay(newTime);
 
-                    Mist.monitoringController.updateDataRequest(newTime,newStep);
+                    // TODO
+                    // Step will be 10 seconds until machine is able to send less values //
+                    Mist.monitoringController.updateDataRequest(newTime,10000);
                 }
             },
 
