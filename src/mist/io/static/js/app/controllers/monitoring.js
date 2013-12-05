@@ -232,7 +232,7 @@ define('app/controllers/monitoring', [
                             // So we won't display error if it is disabled
                             if(self.machine.hasMonitoring){
                                 Mist.notificationController.timeNotify("Data request timed out. " +
-                                                                       "Internet is down or server doesn't respond",4000);
+                                                                       "Network connection is down or server doesn't respond",4000);
 
                                 self.machineNotResponding = true;
                             }
