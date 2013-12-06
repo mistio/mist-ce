@@ -442,8 +442,9 @@ def create_machine(request):
     return ret
 
 
-@view_config(route_name='machine', request_method='POST')
+@view_config(route_name='machine', request_method='POST', renderer="json")
 def machine_actions(request):
+    # TODO: We shouldn't return list_machines, just 200. Save the API!
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     user = user_from_request(request)
@@ -457,7 +458,8 @@ def machine_actions(request):
             methods.reboot_machine(user, backend_id, machine_id)
         elif action == 'destroy':
             methods.destroy_machine(user, backend_id, machine_id)
-        return OK
+        ## return OK
+        return methods.list_machines(user, backend_id)
     raise BadRequestError()
 
 
