@@ -31,11 +31,11 @@
         </div>
 
         {{#if machines}}
-        <div data-role="collapsible">
+        <div id="single-key-machines" data-role="collapsible">
             <h3>Machines</h3>
             <ul data-role="listview" data-inset="true">
-                {{#each view.associatedMachines}}
-                    {{view Mist.MachineListItemView machineBinding="this"}}
+                {{#each view.machines}}
+                    {{view Mist.MachineListItemView machineBinding="this" class="checkbox-link"}}
                 {{/each}}
             </ul>
         </div>

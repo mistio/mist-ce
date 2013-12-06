@@ -13,3 +13,6 @@
         margin-top: -20px;
     }
 }
+#single-key-page .checkbox-link .ui-checkbox {
+    display: none;
+}
