@@ -47,7 +47,7 @@ define('app/controllers/monitoring', [
                 window.monitoringInterval = window.setInterval(function() {
 
                     var start = (new Date()).getTime() - (timeGap+10) * 1000;
-                    var stop =  (new Date()).getTime() - timeGap * 1000; 
+                    var stop =  (new Date()).getTime() - timeGap * 1000;
                     var step = 10000; // 10 Second Step
 
                     // Ask all the datat that we didn't receive
@@ -67,7 +67,7 @@ define('app/controllers/monitoring', [
 
             finishedGraphUpdate: function(){
                 // Runs After All Graphs Are Updated
-                // Do Some Stuff Here                
+                // Do Some Stuff Here
             },
 
 
@@ -88,13 +88,12 @@ define('app/controllers/monitoring', [
                          '/machines/' + this.machine.id + '/stats',
                     type: 'GET',
                     async: true,
-                    contentType: 'application/json',
-                    data: {'start': Math.floor(start / 1000), 
+                    data: {'start': Math.floor(start / 1000),
                             'stop': Math.floor(stop / 1000),
                             'step': step},
                     timeout: 4000,
                     success: function (data, status, xhr){
-                        
+
                         var controller = Mist.monitoringController;
 
                         try {
@@ -197,7 +196,7 @@ define('app/controllers/monitoring', [
 
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        
+
                         if(errorThrown == 'timeout'){
 
                             // When monitoring is disabled ajax call may be still run one time.

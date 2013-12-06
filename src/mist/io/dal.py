@@ -147,6 +147,16 @@ class StrField(Field):
     front_types = [str, unicode]
     back_types = [str, unicode]
 
+    def _cast(self, val, atypes, btypes):
+        # try to handle unicode to str conversion errors
+        if isinstance(val, unicode) and issubclass(btypes[0], str):
+            try:
+                return super(StrField, self)._cast(val, atypes, btypes)
+            except UnicodeEncodeError:
+                log.error("Got a unicode to string conversion error.")
+                val = val.encode('ascii', 'replace')
+        return super(StrField, self)._cast(val, atypes, btypes)
+
 
 class IntField(Field):
     """Sets an integer field. Default value: 0"""
@@ -473,74 +483,44 @@ class FieldsDict(FieldsSequence, MutableMapping):
 # Completely untested, just POC. Shoud be easy though to make it work
 
 
-class UserEngine(OODict):
+class OODictYaml(OODict):
     """This takes care of all storage related operations."""
 
     _lock = None
 
-    def __init__(self):
+    def __init__(self, yaml_rel_path):
         """Loads user from db.yaml"""
-        super(UserEngine, self).__init__(self._load_from_settings())
+        self._yaml_rel_path = yaml_rel_path
+        super(OODictYaml, self).__init__(_dict=self._yaml_read())
 
-    def _load_from_settings(self):
+    def _yaml_read(self, yaml_rel_path=''):
         """Load user settings from db.yaml We have seperated
         user-specific settings from general settings
         and everything regarding the user dict is
         now in db.yaml (as if it were a database). General
         settings like js_build etc remain in settings.yaml file"""
-
-        yaml_db = os.getcwd() + "/db.yaml"
+        if yaml_rel_path:
+            self._yaml_rel_path = yaml_rel_path
+        yaml_db = os.getcwd() + "/" + self._yaml_rel_path
         try:
             config_file = open(yaml_db, 'r')
-        except IOError:
-            log.warn('db.yaml does not exist.')
+        except IOError as exc:
+            # maybe file doesn't exist, try to create it
+            log.error("%s doesn't exist.", yaml_db)
             config_file = open(yaml_db, 'w')
             config_file.close()
-            config_file = open(yaml_db, 'r')
+        with open(yaml_db, 'r') as config_file:
+            try:
+                user_dict = yaml.load(config_file) or {}
+            except:
+                log.error('Error parsing db.yaml.')
+                raise
+        return user_dict
 
-        try:
-            user_config = yaml.load(config_file) or {}
-            config_file.close()
-        except:
-            log.error('Error parsing db.yaml.')
-            config_file.close()
-            raise
-        return user_config
-
-    def refresh(self, flush=False):
-        """Dummy method, doesn't really do anything."""
-        self.__init__()
-
-    @contextmanager
-    def lock_n_load(self):
-        """Dummy lock, doesn't actually do anything.
-
-        It must be used with a 'with' statement as follows:
-            with user.lock_n_load():
-                # edit user
-                user.save()
-        Lock is automatically released after exiting the 'with' block.
-        Attempting to save without first acquiring the lock will raise an
-        exception.
-
-        """
-        self._lock = True
-        try:
-            yield
-        except:
-            raise
-        finally:
-            self.lock = False
-
-    def save(self):
-        """Save user data to storage.
-
-        Raises exception if not in a "with user.lock_n_load():" code block.
-
-        """
-        if not self._lock:
-            raise Exception("Attempting to save without prior lock. "
-                            "You should be ashamed of yourself.")
+    def save(self, yaml_rel_path=''):
+        """Save data to yaml file."""
+        if yaml_rel_path:
+            self._yaml_rel_path = yaml_rel_path
 
         class folded_unicode(unicode): pass
         class literal_unicode(unicode): pass
@@ -564,7 +544,43 @@ class UserEngine(OODict):
         yaml.add_representer(unicode, unicode_representer)
         yaml.add_representer(literal_unicode, literal_unicode_representer)
         yaml.add_representer(literal_string, literal_string_representer)
-        yaml_db = os.getcwd() + "/db.yaml"
-        config_file = open(yaml_db, 'w')
-        yaml.dump(self._dict, config_file, default_flow_style=False)
-        config_file.close()
+        yaml_db = os.getcwd() + '/' + self._yaml_rel_path
+        with open(yaml_db, 'w') as config_file:
+            yaml.dump(self._dict, config_file, default_flow_style=False)
+
+
+class User(OODictYaml):
+
+    def __init__(self):
+        super(User, self).__init__("db.yaml")
+
+    @contextmanager
+    def lock_n_load(self):
+        """Dummy lock, doesn't actually do anything.
+
+        It must be used with a 'with' statement as follows:
+            with user.lock_n_load():
+                # edit user
+                user.save()
+        Lock is automatically released after exiting the 'with' block.
+        Attempting to save without first acquiring the lock will raise an
+        exception.
+
+        """
+        self._lock = True
+        try:
+            yield
+        finally:
+            self.lock = False
+
+    def save(self):
+        """Save user data to storage.
+
+        Raises exception if not in a "with user.lock_n_load():" code block.
+
+        """
+        if not self._lock:
+            # this is to make the code lock compatible
+            raise Exception("Attempting to save without prior lock. "
+                            "You should be ashamed of yourself.")
+        super(User, self).save()

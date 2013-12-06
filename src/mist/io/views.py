@@ -68,7 +68,7 @@ def exception_handler_mist(exc, request):
         return Response(str(exc), 500)
 
 
-#~ @view_config(context=Exception)
+## @view_config(context=Exception)
 def exception_handler_general(exc, request):
     """This simply catches all exceptions that don't subclass MistError and
     returns an Internal Server Error status code.
@@ -249,7 +249,7 @@ def toggle_backend(request):
     elif new_state == "False":
         new_state = False
     else:
-        #~ raise BadRequestError('Invalid backend state')
+        ## raise BadRequestError('Invalid backend state')
         log.warning("something funcky going on with state toggling, "
                     "what's '%r' supposed to mean?", new_state)
         new_state = True
