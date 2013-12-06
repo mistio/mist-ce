@@ -12,7 +12,7 @@ define('app/controllers/notification', [
 
             timeout: false,
 
-            notify: function(message){
+            notify: function(message) {
                 $.mobile.loading( 'show', {
                             text: message,
                             textVisible: true,
@@ -24,7 +24,7 @@ define('app/controllers/notification', [
                 }, this.timeout ? this.timeout : 2000);
             },
             
-            warn: function(message){
+            warn: function(message) {
                 $.mobile.loading( 'show', {
                             text: message,
                             textVisible: true,

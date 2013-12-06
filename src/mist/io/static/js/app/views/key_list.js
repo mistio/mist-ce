@@ -75,8 +75,12 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
 
                 createClicked: function() {
                     Mist.keyAddController.clear();
-                    Mist.keyAddController.set('newKeyCallback', function() {
-                        $('#create-key-popup').popup('close');
+                    Mist.keyAddController.set('newKeyCallback', function(success) {
+                        if (success) {
+                            $('#create-key-popup').popup('close');
+                        } else {
+                            $('#create-key-ok').removeClass('ui-state-disabled');
+                        }
                     });
                     $('#create-key-popup').popup('open');
                 },

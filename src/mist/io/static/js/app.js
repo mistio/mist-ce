@@ -202,7 +202,7 @@ define( 'app', [
                             ret.error(jqXHR.responseText);
                         }
                         if (ret.complete) {
-                            ret.complete(jqXHR.status == 200);
+                            ret.complete(jqXHR.status == 200, jqXHR.responseJSON);
                         }
                     }
                 });
