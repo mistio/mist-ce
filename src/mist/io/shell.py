@@ -231,8 +231,9 @@ class Shell(object):
             users = []
             if saved_ssh_user:
                 users.append(saved_ssh_user)
-            if 'root' not in users:
-                users.append('root')
+            for name in ['root', 'ubuntu', 'ec2-user']:
+                if name not in users:
+                    users.append(name)
             for ssh_user in users:
                 try:
                     self.connect(username=ssh_user,
