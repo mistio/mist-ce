@@ -338,6 +338,10 @@ define('app/views/monitoring', [
                     this.timeUpdated = false;
                     this.yAxisValueFormat = yAxisValueFormat;
 
+                    // DEBUG TODO
+                    this.displayedData = [];
+                    this.xCordinates = [];
+
                     // Distance of two values in graph (pixels), Important For Animation
                     this.valuesDistance = 0;
 
@@ -488,36 +492,43 @@ define('app/views/monitoring', [
                     */
                     this.updateView = function() {
                         
-                        var displayedData = [];
+                        this.displayedData = [];
+                        this.xCordinates   = [];
                         var num_of_displayed_measurements = this.timeDisplayed / STEP_SECONDS;
 
                         // Get only data that will be displayed
                         if(this.data.length > num_of_displayed_measurements) {
 
-                            displayedData = this.data.slice(this.data.length - num_of_displayed_measurements);
+                            this.displayedData = this.data.slice(this.data.length - num_of_displayed_measurements);
                         }
                         else {
 
-                            displayedData = this.data;
+                            this.displayedData = this.data;
                         }
 
-
                         // DEBUG TODO REMOVE IT
-                        console.log("Number Of Measurements Graph Has: " + this.data.length);
-                        console.log("Number Of Measurements Displayed: " + displayedData.length);
+                        //console.log("Number Of Measurements Graph Has: " + this.data.length);
+                        //console.log("Number Of Measurements Displayed: " + this.displayedData.length);
                         // DEBUG TODO REMOVE IT
 
                         // If min & max == 0 y axis will not display values. max=1 fixes this.
-                        var maxValue = d3.max(displayedData, function(d) { return d.value; });
+                        var maxValue = d3.max(this.displayedData, function(d) { return d.value; });
                         var fixedMaxValue =  maxValue == 0 ? 1 : maxValue ;
 
                         // Set Possible min/max x & y values
-                        xScale.domain(d3.extent(displayedData , function(d) { return d.time;  }));
+                        xScale.domain(d3.extent(this.displayedData , function(d) { return d.time;  }));
                         yScale.domain([0, fixedMaxValue]);
 
                         // Set the range
                         this.calcValueDistance();
                         xScale.range([-this.valuesDistance, this.width - margin.left - margin.right]);
+
+
+                        // Create Array Of Cordinates
+                        this.displayedData.forEach(function(d){
+
+                            self.xCordinates.push(xScale(d.time));
+                        });
 
 
                         // Change grid lines and labels based on time displayed
@@ -598,7 +609,7 @@ define('app/views/monitoring', [
                             
                             // Update Animated Line
                             d3vLine.attr("transform", "translate(" + this.valuesDistance + ")")
-                                   .attr("d", valueline(displayedData)) 
+                                   .attr("d", valueline(this.displayedData)) 
                                    .transition() 
                                    .ease("linear")
                                    .duration(animationDuration)
@@ -620,7 +631,7 @@ define('app/views/monitoring', [
                         else {
 
                             // Update Non-Animated value line
-                            d3vLine.attr("d", valueline(displayedData))
+                            d3vLine.attr("d", valueline(this.displayedData))
 
                             // Fix For Animation after time displayed changed
                             if(this.timeUpdated)
@@ -843,6 +854,73 @@ define('app/views/monitoring', [
                                      .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
                     }
 
+                    function setupMouseOver(){
+
+                        // TODO make it display none until event triggered
+                        var mouseOverLine = d3svg.append('line')
+                                         .attr('class','axisLine')
+                                         .attr('x1',"" + margin.left)
+                                         .attr('y1',"0" )
+                                         .attr('x2',"" + margin.left)
+                                         .attr('y2',""+ (self.height - margin.bottom +3));
+
+                        // D3 Way
+                        /*d3svg.on('mouseover',function(){
+                            console.log("+++ Mouse Is Inside");
+                            });*/
+                        d3svg.on('mousemove',function(){
+                            //console.log("+++ Mouse Is Moving");
+                            var mouseX = d3.mouse(this)[0];
+
+                                if(mouseX > margin.left)
+                                {
+
+                                    // Set Mouse Line (TODO Possible Remove It)
+                                    mouseOverLine
+                                         .attr('x1',"" + mouseX)
+                                         .attr('x2',"" + mouseX);
+
+                                    // Mouse X inside value line area
+                                    var virtualMouseX = mouseX - margin.left;
+
+                                    // Calculate Translate 
+                                    var translate =  $("#" + self.id).find('.valueLine > path').attr('transform');
+                                    translate = + translate.slice(10,translate.indexOf(','));
+
+                                    // Measurement That is less than curson x
+                                    var minValueIndex = 0;
+                                    var currentValue = 0;
+
+                                    for(var i=0; i < self.xCordinates.length; i++)
+                                    {
+                                        if(self.xCordinates[i]+translate > virtualMouseX){
+                                            break;
+                                        }
+                                        else
+                                            minValueIndex = i;
+                                    } 
+                                    
+                                    
+                                    // Distanse between value before curson and after curson
+                                    var distance = self.displayedData[minValueIndex+1].value  - self.displayedData[minValueIndex].value;
+                                    // Mouse offset between this two values
+                                    var mouseOffset = (virtualMouseX -(self.xCordinates[minValueIndex]+translate))/self.valuesDistance ;
+                                    // Cursor's measurement value is the value before the curson + 
+                                    // the mouse percentage after the first point * the distance between the values
+                                    currentValue = self.displayedData[minValueIndex].value + distance * mouseOffset;
+                                    
+                                    // Value has a small loss of presition. We don't let it be less than 0
+                                    currentValue < 0 ? 0 : currentValue;
+
+                                    // Print Value
+                                    console.log("Value: " + currentValue);
+                                }
+                            });
+                        /*d3svg.on('mouseout',function(){
+                            console.log("+++ Mouse Is Out");
+                            });*/
+                    }
+
 
                     /*
                     * Method: onInitialized
@@ -851,7 +929,7 @@ define('app/views/monitoring', [
                     */
                     function onInitialized(){
                       // Run Stuff When Graph is appended and has first data
-
+                      setupMouseOver();
                     }
 
                 }
