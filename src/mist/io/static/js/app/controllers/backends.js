@@ -1,11 +1,11 @@
-define('app/controllers/backends', ['app/models/backend','app/models/rule','ember'],
+define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'ember'],
     /**
      *  Backends Controller
      *
      *  @returns Class
      */
     function(Backend, Rule) {
-        return Ember.ArrayController.extend({
+        return Ember.ArrayController.extend(Ember.Evented, {
 
             /**
              * 
@@ -16,6 +16,7 @@ define('app/controllers/backends', ['app/models/backend','app/models/rule','embe
             content: [],
             imageCount: 0,
             machineCount: 0,
+            selectedMachines: [],
             addingBackend: false,
             machineRequest: false,
             machineResponse: false,
@@ -99,7 +100,7 @@ define('app/controllers/backends', ['app/models/backend','app/models/rule','embe
              */
 
             addBackend: function(title, provider, apiKey, apiSecret, apiUrl, tenant, callback) {
-                var payload = JSON.stringify({
+                var data = JSON.stringify({
                     'title'      : title,
                     'provider'   : provider,
                     'apikey'     : apiKey,
@@ -112,17 +113,16 @@ define('app/controllers/backends', ['app/models/backend','app/models/rule','embe
                 $.ajax({
                     url: '/backends',
                     type: 'POST',
-                    data: payload,
-                    contentType: 'application/json',
+                    data: data,
                     success: function(backend) {
                         that._addBackend(backend);
                     },
                     error: function() {
                         Mist.notificationController.notify('Failed to add backend');
                     },
-                    complete: function(jqXHR, textStatus) {
+                    complete: function(jqXHR) {
                         that.set('addingBackend', false);
-                        if (callback) callback(textStatus == "success" ? true : false);
+                        if (callback) callback(jqXHR.status == 200);
                     }
                 });
             },
@@ -140,22 +140,24 @@ define('app/controllers/backends', ['app/models/backend','app/models/rule','embe
                     error: function() {
                         Mist.notificationController.notify('Failed to delete backend');
                     },
-                    complete: function(jqXHR, textStatus) {
+                    complete: function(jqXHR) {
                         that.set('deletingBackend', false);
-                        if (callback) callback(textStatus == "success" ? true : false);
+                        if (callback) callback(jqXHR.status == 200);
                     }
                 });
             },
 
 
             toggleBackend: function(backendId, newState, callback) {
+                var data = JSON.stringify({
+                    'new_state': newState ? '1' : '0'
+                });
                 var that = this;
                 this.set('togglingBackend', true);
                 $.ajax({
                     url: '/backends/' + backendId,
                     type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({'new_state': newState ? '1' : '0'}),
+                    data: data,
                     success: function() {
                         that._toggleBackend(backendId, newState);
                     },
@@ -163,9 +165,9 @@ define('app/controllers/backends', ['app/models/backend','app/models/rule','embe
                         Mist.notificationController.notify("Failed to change backend's state");
                         that._toggleBackend(backendId, !newState);
                     },
-                    complete: function(jqXHR, textStatus) {
+                    complete: function(jqXHR) {
                         that.set('togglingBackend', false);
-                        if (callback) callback(textStatus == "success" ? true : false); 
+                        if (callback) callback(jqXHR.status == 200); 
                     }
                 });
             },
@@ -264,12 +266,54 @@ define('app/controllers/backends', ['app/models/backend','app/models/rule','embe
             },
 
 
+            getSelectedMachinesCount: function() {
+                var counter = 0;
+                var machines = null;
+                var machinesLength = 0;
+                var content = this.content;
+                var contentLength = this.content.length;
+                for (var b = 0; b < contentLength; ++b) {
+                    machines = content[b].machines.content;
+                    machinesLength = machines.length;
+                    for (var m = 0; m < machinesLength; ++m) {
+                        if (machines[m].selected) {
+                            info('yo');
+                            ++counter;
+                        }
+                    }
+                }
+                return counter;
+            },
+
+
+            updateSelectedMachines: function() {
+                var selectedMachines = [];
+                var machines = null;
+                var machinesLength = 0;
+                var content = this.content;
+                var contentLength = this.content.length;
+                for (var b = 0; b < contentLength; ++b) {
+                    machines = content[b].machines.content;
+                    machinesLength = machines.length;
+                    for (var m = 0; m < machinesLength; ++m) {
+                        if (machines[m].selected) {
+                            selectedMachines.push(machines[m].id);
+                        }
+                    }
+                }
+                this.set('selectedMachines', selectedMachines);
+            },
+            
+            
             updateMachineCount: function() {
                 var count = 0;
-                this.content.forEach(function(backend) {
-                    count += backend.machines.content.length;
-                });
+                var content = this.content;
+                var contentLength = this.content.length;
+                for (var b = 0; b < contentLength; ++b) {
+                    count += content[b].machines.content.length;
+                }
                 this.set('machineCount', count);
+                this.trigger('updateMachines');
             }.observes('content.length'),
 
 

@@ -8,6 +8,7 @@
 @import url("css/backend_add.css");
 @import url("css/backend_edit.css");
 @import url("css/backend_button.css");
+@import url("css/machine_list.css");
 
 
 /* Splash
@@ -104,7 +105,10 @@ textarea {
 /* Side panel
 -----------------------------------------------------------------------------------------------------------*/
 .side-panel {
-    width: 290px;
+    width: 310px;
+}
+.side-panel .ui-panel-inner {
+    padding: 7px;
 }
 .side-panel .ok-cancel a,
 .side-panel .ok-cancel button {

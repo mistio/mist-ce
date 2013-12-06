@@ -33,7 +33,7 @@
         {{#if machines}}
         <div data-role="collapsible">
             <h3>Machines</h3>
-            <ul data-role="listview">
+            <ul data-role="listview" data-inset="true">
                 {{#each view.associatedMachines}}
                     {{view Mist.MachineListItemView machineBinding="this"}}
                 {{/each}}

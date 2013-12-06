@@ -12,19 +12,19 @@
 
     <div data-role="content" data-theme="c">
 
-        <a id="select-machines-btn"
-           data-role="button"
-           data-icon="arrow-d"
-           {{action "selectClicked" target="view"}}>Select</a>
-
         <a id="create-machine-btn"
            data-role="button"
            data-icon="plus"
            data-iconpos="right"
            data-theme="b"
            {{action "createClicked" target="view"}}>Create</a>
+          
+        <a id="select-machines-btn"
+           data-role="button"
+           data-icon="arrow-d"
+           {{action "selectClicked" target="view"}}>Select</a>
 
-        <ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter...">
+        <ul id="machines" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter...">
             {{#each Mist.backendsController.content}}
                 {{#each this.machines.content}}
                     {{view Mist.MachineListItemView machineBinding="this" class="checkbox-link"}}
@@ -49,14 +49,14 @@
     <div id="select-machines-popup" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-machines-btn">
         <ul data-role="listview">
             <li data-icon="false">
-                <a {{action "selectModeClicked" "all" target="view"}}>All</a>
+                <a {{action "selectionModeClicked" "all" target="view"}}>All</a>
             </li>
             <li data-icon="false">
-                <a {{action "selectModeClicked" "none" target="view"}}>None</a>
+                <a {{action "selectionModeClicked" "none" target="view"}}>None</a>
             </li>
             {{#each Mist.backendsController.content}}
             <li data-icon="false">
-                <a {{action "selectModeClicked" this target="view"}}>{{this.title}}</a>
+                <a {{action "selectionModeClicked" this.title target="view"}}>{{this.title}}</a>
             </li>
             {{/each}}
         </ul>

@@ -40,7 +40,7 @@ define('app/models/machine', [
             }.observes('probed', 'probing'),
 
             selectedObserver: function() {
-                Mist.backendsController.updateSelectedMachineCount();
+                Mist.backendsController.updateSelectedMachines();
             }.observes('selected'),
 
             image: function() {

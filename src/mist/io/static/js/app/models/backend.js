@@ -76,7 +76,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     this.sizes.init();
                     this.locations.init();
                 } else {
-                    this.set('state', "offline");
+                    this.set('state', 'offline');
                     this.machines.clear();
                     this.images.clear();
                     this.sizes.clear();

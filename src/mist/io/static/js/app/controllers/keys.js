@@ -5,7 +5,7 @@ define(['app/models/key'],
      * @returns Class
      */
     function(Key) {
-        return Ember.ArrayController.extend({
+        return Ember.ArrayController.extend(Ember.Evented, {
 
             /**
              * 
@@ -14,10 +14,8 @@ define(['app/models/key'],
              */
 
             content: [],
-            keyRequest: false,
-            keyResponse: false,
-
             loading: false,
+            keyRequest: false,
             creatingKey: false,
             renamingKey: false,
             uploadingKey: false,
@@ -26,8 +24,6 @@ define(['app/models/key'],
             gettingPrivateKey: false,
             disassociatingKey: false,
             settingDefaultKey: false,
-
-
 
             /**
              * 
@@ -40,27 +36,13 @@ define(['app/models/key'],
                 this.set('loading', true);
                 $.getJSON('/keys', function(keys) {
                     that._setContent(keys);
-                    that._sendKeyResponse();
                 }).error(function() {
                     that._reload();
                 }).complete(function() {
                     that.set('loading', false);
+                    that.trigger('load');
                 });
             }.on('init'),
-
-
-
-            /**
-             * 
-             *  Observers
-             * 
-             */
-
-            keyRequestObserver: function() {
-                if (!this.loading && this.keyRequest) {
-                    this._sendKeyResponse();
-                }
-            }.observes('keyRequest'),
 
 
 
@@ -88,6 +70,8 @@ define(['app/models/key'],
                     },
                     complete: function() {
                         that.set('creatingKey', false);
+                        that.trigger('createdKey');
+                        that.trigger('keysChanged');
                     }
                 });
                 privateKey = null; // Don't keep private key on client
@@ -279,7 +263,12 @@ define(['app/models/key'],
                 }
             },
 
-
+            getRequestedKey: function() {
+                if (this.keyRequest) {
+                    return this.getKeyByUrlName(this.keyRequest);
+                }
+            },
+            
             keyNameExists: function(name) {
                 var content = this.content;
                 var contentLength = this.content.length;
@@ -305,14 +294,6 @@ define(['app/models/key'],
                     newKeys.push(Key.create(keys[k]));
                 }
                 this.set('content', newKeys);
-            },
-
-
-            _sendKeyResponse: function() {
-                if (this.keyRequest) {
-                    this.set('keyResponse', this.getKeyByUrlName(this.keyRequest));
-                    this.set('keyRequest', false);
-                }
             },
 
 

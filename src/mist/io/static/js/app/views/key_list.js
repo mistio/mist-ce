@@ -1,4 +1,4 @@
-define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_list.html'],
+define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_list.html'],
     /**
      *  Key List View
      * 
@@ -18,6 +18,12 @@ define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_lis
 
             /**
              * 
+             *  Initialization 
+             * 
+             */
+
+            /**
+             * 
              *  Observers
              * 
              */
@@ -31,7 +37,7 @@ define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_lis
                         $('#key-list-page input.ember-checkbox').checkboxradio();
                     }
                 });
-            }.observes('Mist.keysController.content.@each', 'Mist.keysController.content'),
+            }.on('Mist.keysController.keysChanged'),
 
 
             selectedKeysObserver: function() {
@@ -50,7 +56,7 @@ define('app/views/key_list', ['app/views/mistscreen','text!app/templates/key_lis
                         $('#key-list-page .ui-footer a').addClass('ui-state-disabled');
                         break;
                 }
-            }.observes('Mist.keysController.content.@each.selected').on('didInsertElement'),
+            }.on('didInsertElement'),
 
 
 

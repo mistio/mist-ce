@@ -17,20 +17,6 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html','ember'],
             secondFieldLabel: 'API Secret',
             template: Ember.Handlebars.compile(backend_add_html),
 
-            /**
-             * 
-             *  Observers
-             * 
-             */
-
-            enableAddButtonObserver: function() {
-                if (Mist.backendAddController.newBackendReady && !Mist.backendsController.addingBackend) {
-                    $('#new-backend-ok').removeClass('ui-state-disabled');
-                } else {
-                    $('#new-backend-ok').addClass('ui-state-disabled');
-                }
-            }.observes('Mist.backendAddController.newBackendReady', 'Mist.backendsController.addingBackend'),
-
 
             /**
              * 

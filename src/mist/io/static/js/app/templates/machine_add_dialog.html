@@ -1,8 +1,11 @@
-<div class="mist-dialog dialog-add" data-role="panel" data-position="right" data-display="overlay" data-theme="a">
-    <div data-role="header" data-theme="b">
+<div id="create-machine-panel" class="side-panel" data-role="panel" data-position="right" data-display="overlay">
+   
+    <div data-role="header">
         <h1>Create Machine</h1>
     </div>
-    <div data-role="content">
+
+    <div data-role="content" data-theme="a">
+        
         <label for="create-machine-name">1. Name:</label>
         {{view Mist.TextField
             valueBinding="Mist.machineAddController.newMachineName"
@@ -22,7 +25,7 @@
                 {{/each}}
             </ul>
         </div>
-            
+
         <label for="createmachine-select-image">3. Image:</label>
         <div class="select-image-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
             data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
@@ -36,7 +39,7 @@
                 {{/each}}
             </ul>
         </div>
-        
+
         <label for="createmachine-select-size">4. Size:</label>
         <div class="select-size-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
             data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
@@ -98,5 +101,7 @@
             <button id="create-machine-cancel" data-theme="c" {{action backClicked target="view"}}>Back</button>
             <button id="create-machine-ok" data-theme="b" disabled="disabled"  {{action newMachineClicked target="view"}}>Launch!</button>
         </div>
+    
     </div>
+    
 </div>

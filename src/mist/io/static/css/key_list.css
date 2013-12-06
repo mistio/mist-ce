@@ -4,9 +4,9 @@
 #key-list-page .ui-filterable {
     clear: both;
 }
-#create-key-btn {
+#key-list-page #create-key-btn {
     float: right;
 }
-#select-keys-btn {
+#key-list-page #select-keys-btn {
     float: left;
 }
