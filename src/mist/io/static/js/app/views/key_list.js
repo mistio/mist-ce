@@ -22,6 +22,10 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
              * 
              */
 
+            initEvents: function() {
+                Mist.keysController.on('onKeyListChange', this.keysObserver);
+            }.on('init'),
+
             /**
              * 
              *  Observers
@@ -29,6 +33,7 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
              */
 
             keysObserver: function() {
+                info('sup?');
                 Ember.run.next(function() {
                     if ($('#key-list-page .ui-listview').listview) {
                         $('#key-list-page .ui-listview').listview('refresh');
@@ -37,7 +42,7 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
                         $('#key-list-page input.ember-checkbox').checkboxradio();
                     }
                 });
-            }.on('Mist.keysController.keysChanged'),
+            }.on('didInsertElement'),
 
 
             selectedKeysObserver: function() {

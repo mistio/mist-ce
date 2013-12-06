@@ -8,12 +8,9 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
         return MistScreen.extend({
 
             /**
-             * 
              *  Properties
-             * 
              */
 
-            key: null,
             machines: null,
             template: Ember.Handlebars.compile(key_html),
 
@@ -23,16 +20,11 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
              * 
              */
 
-            init: function() {
-                this._super();
+            initEvents: function() {
                 var that = this;
-                Mist.keysController.one('load', function() {
-                    that.renderPage();
-                });
-                Mist.backendsController.on('updateMachines', function() {
-                    that.renderMachines();
-                });
-            },
+                Mist.keysController.one('load', function() {that.renderPage();});
+                Mist.backendsController.on('updateMachines', function() {that.renderMachines();});
+            }.on('init'),
 
 
             renderPage: function() {
@@ -89,21 +81,20 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
                 });
 
                 Ember.run(this, function() {
-                this.set('machines', machineList);
-
-                Ember.run.next(function() {
-                    if ($('#single-key-machines').collapsible) {
-                        $('#single-key-machines').collapsible();
-                        $('#single-key-machines').trigger('create');
-                    }
-                    if ($('#single-key-machines .ui-listview').listview) {
-                        $('#single-key-machines .ui-listview').listview('refresh');
-                    }
-                    if ($('#single-key-machines input.ember-checkbox').checkboxradio) {
-                        $('#single-key-machines input.ember-checkbox').checkboxradio();
-                    }
-                    $('#single-key-machines').show();
-                });
+                    this.set('machines', machineList);
+                    Ember.run.next(function() {
+                        if ($('#single-key-machines').collapsible) {
+                            $('#single-key-machines').collapsible();
+                            $('#single-key-machines').trigger('create');
+                        }
+                        if ($('#single-key-machines .ui-listview').listview) {
+                            $('#single-key-machines .ui-listview').listview('refresh');
+                        }
+                        if ($('#single-key-machines input.ember-checkbox').checkboxradio) {
+                            $('#single-key-machines input.ember-checkbox').checkboxradio();
+                        }
+                        $('#single-key-machines').show();
+                    });
                 });
             },
 

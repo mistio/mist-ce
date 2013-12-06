@@ -8,9 +8,7 @@ define(['app/models/key'],
         return Ember.ArrayController.extend(Ember.Evented, {
 
             /**
-             * 
              *  Properties
-             * 
              */
 
             content: [],
@@ -34,11 +32,12 @@ define(['app/models/key'],
             load: function() {
                 var that = this;
                 this.set('loading', true);
-                $.getJSON('/keys', function(keys) {
+                Mist.getAJAX('/keys', {
+                }).success(function(keys) {
                     that._setContent(keys);
-                }).error(function() {
+                }).error(function(message) {
                     that._reload();
-                }).complete(function() {
+                }).complete(function(success) {
                     that.set('loading', false);
                     that.trigger('load');
                 });
@@ -55,26 +54,18 @@ define(['app/models/key'],
             createKey: function(name, privateKey, callback) {
                 var that = this;
                 this.set('creatingKey', true);
-                $.ajax({
-                    url: '/keys',
-                    type: 'PUT',
-                    contentType: 'application/json',
-                    data: JSON.stringify({'name': name, 'priv': privateKey}),
-                    success: function(key) {
-                        that._createKey(key);
-                        if (callback) callback();
-                    },
-                    error: function(jqXHR) {
-                        Mist.notificationController.notify('Failed to create key');
-                        $('#create-key-ok').removeClass('ui-state-disabled');
-                    },
-                    complete: function() {
-                        that.set('creatingKey', false);
-                        that.trigger('createdKey');
-                        that.trigger('keysChanged');
-                    }
+                Mist.ajaxPUT('/keys', {
+                    'name': name,
+                    'priv': privateKey
+                }).success(function(key) {
+                    that._createKey(key);
+                }).error(function(message) {
+                    Mist.notificationController.notify('Failed to create key');
+                }).complete(function(success) {
+                    that.set('creatingKey', false);
+                    if (callback) callback(success);
                 });
-                privateKey = null; // Don't keep private key on client
+                privateKey = null; // Don't keep private key on the client
             },
 
 
@@ -84,17 +75,16 @@ define(['app/models/key'],
                 $.ajax({
                     url: '/keys/' + name,
                     type: 'PUT',
-                    contentType: 'application/json',
                     data: JSON.stringify({'newName': newName}),
                     success: function() {
                         that._renameKey(name, newName);
-                        if (callback) callback();
                     },
                     error: function() {
                         Mist.notificationController.notify('Failed to rename key');
                     },
-                    complete: function() {
+                    complete: function(jqXHR) {
                         that.set('renamingKey', false);
+                        if (callback) callback(jqXHR.status == 200);
                     }
                 });
             },
@@ -108,13 +98,13 @@ define(['app/models/key'],
                     type: 'DELETE',
                     success: function() {
                         that._deleteKey(name);
-                        if (callback) callback();
                     },
                     error: function() {
                         Mist.notificationController.notify('Failed to delete key');
                     },
-                    complete: function() {
+                    complete: function(jqXHR) {
                         that.set('deletingKey', false);
+                        if (callback) callback(jqXHR.status == 200);
                     }
                 });
             },
@@ -133,8 +123,9 @@ define(['app/models/key'],
                     error: function() {
                         Mist.notificationController.notify('Failed to set default key');
                     },
-                    complete: function() {
+                    complete: function(jqXHR) {
                         that.set('settingDefaultKey', false);
+                        if (callback) callback(jqXHR.status == 200);
                     }
                 });
             },
@@ -148,13 +139,13 @@ define(['app/models/key'],
                     contentType: 'application/json',
                     data: JSON.stringify({'host': host}),
                     success: function() {
-                        if (callback) callback();
                     },
                     error: function() {
                         Mist.notificationController.notify('Failed to associate key');
                     },
-                    complete: function() {
+                    complete: function(jqXHR) {
                         Mist.keysController.set('associatingKey', false);
+                        if (callback) callback(jqXHR.status == 200);
                     }
                 });
             },
@@ -168,13 +159,13 @@ define(['app/models/key'],
                     contentType: 'application/json',
                     data: JSON.stringify({'host': host}),
                     success: function() {
-                        if (callback) callback();
                     },
                     error: function() {
                         Mist.notificationController.notify('Failed to disassociate key');
                     },
-                    complete: function() {
+                    complete: function(jqXHR) {
                         Mist.keysController.set('disassociatingKey', false);
+                        if (callback) callback(jqXHR.status == 200);
                     }
                 });
             },
@@ -222,25 +213,8 @@ define(['app/models/key'],
             },
 
 
-            getKeyByName: function(name) {
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var k = 0; k < contentLength; ++k) {
-                    if (content[k].name == name) {
-                        return content[k];
-                    }
-                }
-            },
-
-
-            getKeyByUrlName: function(name) {
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var k = 0; k < contentLength; ++k) {
-                    if (content[k].id == name) {
-                        return content[k];
-                    }
-                }
+            getKey: function(id) {
+                return this.content.findBy('id', id);
             },
 
 
@@ -279,23 +253,11 @@ define(['app/models/key'],
                 }
             },
 
-
-
             /**
              * 
              *  Psudo-Private Methods
              * 
              */
-
-            _setContent: function(keys) {
-                var newKeys = [];
-                var keysLength = keys.length;
-                for (var k = 0; k < keysLength; ++k) {
-                    newKeys.push(Key.create(keys[k]));
-                }
-                this.set('content', newKeys);
-            },
-
 
             _reload: function() {
                 Ember.run.later(this, function() {
@@ -304,57 +266,50 @@ define(['app/models/key'],
             },
 
 
-            _createKey: function(key) {
-                this.content.pushObject(Key.create(key));
-            },
-
-
-            _renameKey: function(name, newName) {
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var k = 0; k < contentLength; ++k) {
-                    if (content[k].name == name) {
-                        content[k].set('name', newName);
-                        content[k].set('id', newName);
-                        return;
-                    }
-                }
-            },
-
-
-            _deleteKey: function(name) {
-                Ember.run(this, function() {
-                    var newKeys = [];
-                    var wasDefault = false;
-                    var content = this.content;
-                    var contentLength = this.content.length;
-                    for (var k = 0; k < contentLength; ++k) {
-                        if (content[k].name != name) {
-                            newKeys.push(content[k]);
-                        } else if (content[k].default_key) {
-                            wasDefault = true;
-                        }
-                    }
-                    this.set('content', newKeys);
-                    if (wasDefault && this.content.length) {
-                        Ember.run.next(this, function() {
-                            this.setDefaultKey(this.content[0].name);
-                        });
-                    }
+            _setContent: function(keys) {
+                var that = this;
+                Ember.run(function() {
+                    keys.forEach(function(key) {
+                        that.content.pushObject(Key.create(key));
+                    });
+                    that.trigger('onKeyListChange');
                 });
             },
 
 
-            _setDefaultKey: function(name) {
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var k = 0; k < contentLength; ++k) {
-                    if (content[k].name == name) {
-                        content[k].set('default_key', true);
-                    } else {
-                        content[k].set('default_key', false);
-                    }
-                }
+            _createKey: function(key) {
+                Ember.run(this, function() {
+                    this.content.pushObject(Key.create(key));
+                    this.trigger('onKeyListChange');
+                    this.trigger('onKeyCreate');
+                });
+            },
+
+
+            _deleteKey: function(id) {
+                Ember.run(this, function() {
+                    this.content.removeObject(this.getKey(id));
+                    this.trigger('onKeyListChange');
+                    this.trigger('onKeyDelete');
+                });
+            },
+
+
+            _renameKey: function(id, newId) {
+                Ember.run(this, function() {
+                    this.getKey(id).set('id', newId);
+                    this.trigger('onKeyRename');
+                });
+            },
+
+
+            _setDefaultKey: function(id) {
+                Ember.run(this, function() {
+                    this.content.forEach(function(key) {
+                        key.set('default_key', key.id == id);
+                    });
+                    this.trigger('onKeyDefaultSet');
+                });
             }
         });
     }

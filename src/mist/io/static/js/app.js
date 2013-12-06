@@ -119,7 +119,6 @@ define( 'app', [
 
     function initialize() {
 
-    
         $(document).bind('mobileinit', function() {
             $.mobile.ajaxEnabled = false;
             $.mobile.hashListeningEnabled = false;
@@ -154,6 +153,63 @@ define( 'app', [
                 });
             }  
         });
+
+        window.Mist = App;
+
+        $.ajaxSetup ({
+            cache: false
+        });
+        App.ajaxGET = function(url, data) {
+            return App.ajax('GET', url, data);
+        };
+        App.ajaxPUT = function(url, data) {
+            return App.ajax('PUT', url, data);
+        };
+        App.ajaxPOST = function(url, data) {
+            return App.ajax('POST', url, data);
+        };
+        App.ajaxDELETE = function(url, data) {
+            return App.ajax('DELETE', url, data);
+        };
+        App.ajax = function(type, url, data) {
+            var ret = {};
+            var call = {};
+            call.success = function(callback) {
+                ret.success = callback;
+                return call;
+            };
+            call.error = function(callback) {
+                ret.error = callback;
+                return call;
+            };
+            call.complete = function(callback) {
+                ret.complete = callback;
+                return call;
+            };
+            call.ajax = function() {
+                $.ajax({
+                    url: url,
+                    type: type,
+                    auth: App.authKey,
+                    data: JSON.stringify(data),
+                    complete: function(jqXHR) {
+                        result = jqXHR;
+                        if (jqXHR.status == 200) {
+                            if (ret.success) {
+                                ret.success(jqXHR.responseJSON);
+                            }
+                        } else if (ret.error) {
+                            ret.error(jqXHR.responseText);
+                        }
+                        if (ret.complete) {
+                            ret.complete(jqXHR.status == 200);
+                        }
+                    }
+                });
+                return call;
+            };
+            return call.ajax();
+        };
 
         App.Router.map(function() {
             this.route('machines');
@@ -272,6 +328,23 @@ define( 'app', [
             return window.location.href.split('/')[5];
         };
 
+
+        App.HomeView = Home;
+        App.BackendButtonView = BackendButton;
+        App.BackendAddView = BackendAdd;
+        App.EditBackendView = EditBackend;
+        App.MachineListItemView = MachineListItem;
+        App.ImageListItemView = ImageListItem;
+        App.ConfirmationDialog = ConfirmationDialog;
+
+        App.DeleteTagView = DeleteTagView;
+        App.RuleView = RuleView;
+        App.MachineTagsDialog = MachineTagsDialog;
+        App.ShellDialog = Shell;
+        App.PowerDialog = SingleMachineActionsDialog;
+        App.MachineActionsDialog = MachineActionsDialog;
+        App.MachineListView = MachineListView;
+        
         App.SingleMachineView = SingleMachineView;
         App.MachineListView = MachineListView;
         App.UserMenuView = UserMenuView;
@@ -296,6 +369,8 @@ define( 'app', [
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
 
+        //App.set('authKey', AUTH_KEY);
+        App.set('authKey', '');
         App.set('authenticated', AUTH || URL_PREFIX == '' ? true : false);
         App.set('email', EMAIL);
         App.set('password', '');
@@ -390,32 +465,11 @@ define( 'app', [
         });
 
         App.Checkbox = Ember.Checkbox.extend({
-            attributeBindings: [
-                'name',
-                'id',
-                'data-inline'
-            ]
+            attributeBindings: ['id', 'data-inline']
         });
-
-        App.HomeView = Home;
-        App.BackendButtonView = BackendButton;
-        App.BackendAddView = BackendAdd;
-        App.EditBackendView = EditBackend;
-        App.MachineListItemView = MachineListItem;
-        App.ImageListItemView = ImageListItem;
-        App.ConfirmationDialog = ConfirmationDialog;
-
-        App.DeleteTagView = DeleteTagView;
-        App.RuleView = RuleView;
-        App.MachineTagsDialog = MachineTagsDialog;
-        App.ShellDialog = Shell;
-        App.PowerDialog = SingleMachineActionsDialog;
-        App.MachineActionsDialog = MachineActionsDialog;
-        App.MachineListView = MachineListView;
-
+        
         App.set('renderedImages', Ember.ArrayController.create());
         
-        window.Mist = App;
         return App;
     }
     
