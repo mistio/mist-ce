@@ -12,7 +12,7 @@ from pyramid.config import Configurator
 
 
 from mist.io.resources import Root
-from mist.io.model import User
+## from mist.io.model import User
 
 
 log = logging.getLogger(__name__)

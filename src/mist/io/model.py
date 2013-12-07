@@ -37,6 +37,7 @@ from mist.io.dal import ListField, DictField
 from mist.io.dal import OODict, FieldsDict, FieldsList, make_field
 try:
     from mist.core.dal import User as DalUser
+    from mist.core.dal import FieldsDict  # escapes dots in keys (for mongo)
 except ImportError:
     from mist.io.dal import User as DalUser
 from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
