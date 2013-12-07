@@ -1225,7 +1225,7 @@ def list_keys(request):
 @view_config(route_name='keys', request_method='PUT', renderer='json')
 def add_key(request):
     params = request.json_body
-    key_id = params.get('name', '')
+    key_id = params.get('id', '')
     private_key = params.get('priv', '')
     
     if not key_id:
@@ -1295,7 +1295,7 @@ def delete_key(request):
 def edit_key(request):
     
     old_id = request.matchdict.get('key', '')
-    key_id = request.json_body.get('newName', '')
+    key_id = request.json_body.get('new_id', '')
     
     if not old_id:
         return Response('Old keypair name not provided', 400)

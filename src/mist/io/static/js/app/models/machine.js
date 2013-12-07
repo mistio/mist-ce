@@ -220,7 +220,7 @@ define('app/models/machine', [
                     if (that.state == 'running') {
                         var host = that.getHost();
                         if (host) {
-                            var key = Mist.keysController.getKeyByName(keyName);
+                            var key = Mist.keysController.getKey(keyName);
                             if (keyName != undefined){
                                 that.set('probing', keyName);
                                 key.set('probing', that);

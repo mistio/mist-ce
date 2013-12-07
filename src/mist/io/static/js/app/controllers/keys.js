@@ -55,7 +55,7 @@ define(['app/models/key'],
                 var that = this;
                 this.set('creatingKey', true);
                 Mist.ajaxPUT('/keys', {
-                    'name': id,
+                    'id': id,
                     'priv': privateKey
                 }).success(function(key) {
                     that._createKey(key);
@@ -73,7 +73,7 @@ define(['app/models/key'],
                 var that = this;
                 this.set('renamingKey', true);
                 Mist.ajaxPUT('/keys/' + id, {
-                    'newName': newId
+                    'new_id': newId
                 }).success(function() {
                     that._renameKey(id, newId);
                 }).error(function() {
@@ -100,7 +100,7 @@ define(['app/models/key'],
             },
 
 
-            setDefaultKey: function(name, callback) {
+            setDefaultKey: function(id, callback) {
                 var that = this;
                 this.set('settingDefaultKey', true);
                 Mist.ajaxPOST('/keys/' + id, {
@@ -129,7 +129,7 @@ define(['app/models/key'],
             },
 
 
-            disassociateKey: function(keyName, backendId, machineId, host, callback) {
+            disassociateKey: function(keyId, backendId, machineId, host, callback) {
                 var that = this;
                 this.set('disassociatingKey', true);
                 Mist.ajaxDELETE('/backends/' + backendId + '/machines/' + machineId + '/keys/' + keyId, {
@@ -187,40 +187,18 @@ define(['app/models/key'],
             },
 
 
-            getSelectedKeysCount: function() {
-                var counter = 0;
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var k = 0; k < contentLength; ++k) {
-                    if (content[k].selected) ++counter;
-                }
-                return counter;
-            },
-
-
-            getSelectedKeyName: function() {
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var k = 0; k < contentLength; ++k) {
-                    if (content[k].selected) return content[k].name;
-                }
-            },
-
             getRequestedKey: function() {
                 if (this.keyRequest) {
-                    return this.getKeyByUrlName(this.keyRequest);
+                    return this.getKey(this.keyRequest);
                 }
             },
-            
-            keyNameExists: function(name) {
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var k = 0; k < contentLength; ++k) {
-                    if (content[k].name == name) {
-                        return true;
-                    }
-                }
+
+
+            keyExists: function(id) {
+                return !!this.getKey(id);
             },
+
+
 
             /**
              * 

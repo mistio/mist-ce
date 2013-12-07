@@ -35,7 +35,9 @@
             <h3>Machines</h3>
             <ul data-role="listview" data-inset="true">
                 {{#each view.machines}}
-                    {{view Mist.MachineListItemView machineBinding="this" class="checkbox-link"}}
+                    {{view Mist.MachineListItemView
+                           machineBinding="this"
+                           class="checkbox-link"}}
                 {{/each}}
             </ul>
         </div>
@@ -60,10 +62,11 @@
     </div>
 
     <div class="dual-action-footer" data-role="footer" data-theme="b">
-        <div data-role="controlgroup" data-type="horizontal">
+        <table><tbody><tr><td>
             <a data-role="button" data-icon="edit" {{action "renameClicked" target="view"}}>Rename</a>
+        </td><td>
             <a data-role="button" data-icon="delete" {{action "deleteClicked" target="view"}}>Delete</a>
-        </div>
+        </td></tr></tbody></table>
     </div>
 
 </div>
