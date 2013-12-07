@@ -11,7 +11,8 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
              *  Properties
              */
 
-            machines: null,
+            key: null,
+            machines: [],
             template: Ember.Handlebars.compile(key_html),
 
             /**
@@ -20,35 +21,22 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
              * 
              */
 
-            initEvents: function() {
-                var that = this;
-                Mist.keysController.one('load', function() {that.renderPage();});
-                Mist.backendsController.on('updateMachines', function() {that.renderMachines();});
-            }.on('init'),
+            init: function() {
+                this._super();
+                Mist.keysController.one('load', this, 'load');
+                Mist.backendsController.on('updateMachines', this, 'updateMachines');
+            },
 
 
-            renderPage: function() {
-
-                // Prevent bad collapsible rendering
-                $('#single-key-machines').hide();
-
-                // Get key model
-                var key = Mist.keysController.getRequestedKey();
-                if (key) {
-                    this.get('controller').set('model', key);
-                }
-                this.set('key', this.get('controller').get('model'));
-
-                // Render stuff
-                if (this.key.id) { // Dummy key doesn't have id
-                    Ember.run.next(this, function() {
-                        Mist.keysController.getPublicKey(this.key.name, function(publicKey) {
-                             $('#public-key').val(publicKey);
-                        });
-                    });
-                    this.renderMachines();
-                }
-            }.observes('controller.model').on('didInsertElement'),
+            load: function() {
+                Ember.run(this, function() {
+                    this.updateCurrentKey();
+                    if (this.key.id) {
+                        this.updateMachines();
+                        Ember.run.next(this, 'showPublicKey');
+                    }
+                });
+            }.on('didInsertElement'),
 
 
 
@@ -58,43 +46,54 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
              * 
              */
 
-            renderMachines: function() {
+            updateCurrentKey: function() {
+                var key = Mist.keysController.getRequestedKey();
+                if (key) this.get('controller').set('model', key);
+                this.set('key', this.get('controller').get('model'));
+            },
 
-                var machineList = [];
-                var backendsCtrl = Mist.backendsController;
-                this.key.machines.forEach(function(key_machine) {
 
-                    var machine = backendsCtrl.getMachineById(key_machine[0], key_machine[1]);
-
-                    // Construct ghost machine
-                    if (!machine) {
-                        var backend = backendsCtrl.getBackendById(key_machine[0]);
-                        machine = Machine.create({
-                            id: key_machine[1],
-                            name: key_machine[1],
+            updateMachines: function() {
+                var newMachines = [];
+                this.key.machines.forEach(function(machine) {
+                    var newMachine = Mist.backendsController.getMachineById(machine[0], machine[1]);
+                    if (!newMachine) {
+                        var backend = Mist.backendsController.getBackendById(machine[0]);
+                        newMachine = Machine.create({
+                            id: machine[1],
+                            name: machine[1],
                             state: backend ? 'terminated' : 'unknown',
-                            backend: backend ? backend : key_machine[0],
+                            backend: backend ? backend : machine[0],
                             isGhost: true,
                         });
                     }
-                    machineList.push(machine);
+                    newMachines.push(newMachine);
                 });
+                this.set('machines', newMachines);
+            },
 
-                Ember.run(this, function() {
-                    this.set('machines', machineList);
-                    Ember.run.next(function() {
-                        if ($('#single-key-machines').collapsible) {
-                            $('#single-key-machines').collapsible();
-                            $('#single-key-machines').trigger('create');
-                        }
-                        if ($('#single-key-machines .ui-listview').listview) {
-                            $('#single-key-machines .ui-listview').listview('refresh');
-                        }
-                        if ($('#single-key-machines input.ember-checkbox').checkboxradio) {
-                            $('#single-key-machines input.ember-checkbox').checkboxradio();
-                        }
-                        $('#single-key-machines').show();
-                    });
+
+            renderMachines: function() {
+                Ember.run.next(function() {
+                    if ($('#single-key-machines').collapsible) {
+                        $('#single-key-machines').collapsible();
+                        $('#single-key-machines').trigger('create');
+                    }
+                    if ($('#single-key-machines .ui-listview').listview) {
+                        $('#single-key-machines .ui-listview').listview('refresh');
+                    }
+                    if ($('#single-key-machines input.ember-checkbox').checkboxradio) {
+                        $('#single-key-machines input.ember-checkbox').checkboxradio();
+                    }
+                });
+            },
+
+
+            showPublicKey: function() {
+                Mist.keysController.getPublicKey(this.key.name, function(success, key) {
+                    if (success) {
+                        $('#public-key').val(key);
+                    }
                 });
             },
 
@@ -109,9 +108,11 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
             actions: {
 
                 displayClicked: function() {
-                    Mist.keysController.getPrivateKey(this.key.name, function(privateKey) {
-                        $('#private-key-popup').popup('open');
-                        $('#private-key').val(privateKey);
+                    Mist.keysController.getPrivateKey(this.key.name, function(success, key) {
+                        if (success) {
+                            $('#private-key-popup').popup('open');
+                            $('#private-key').val(key);
+                        }
                     });
                 },
 
@@ -135,7 +136,24 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
                     });
                     Mist.confirmationController.show();
                 }
-            }
+            },
+
+
+
+            /**
+             * 
+             *  Observers
+             * 
+             */
+
+            modelObserver: function() {
+                Ember.run.once(this, 'load');
+            }.observes('controller.model'),
+
+
+            machinesObserver: function() {
+                Ember.run.once(this, 'renderMachines');
+            }.observes('machines')
         });
     }
 );

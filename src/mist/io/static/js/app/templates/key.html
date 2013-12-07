@@ -4,7 +4,7 @@
 
         <a href="#/keys" data-icon="arrow-l">Keys</a>
 
-        <h1>{{name}}</h1>
+        <h1>{{id}}</h1>
 
         {{view Mist.UserMenuView}}
 
@@ -32,7 +32,11 @@
 
         {{#if machines}}
         <div id="single-key-machines" data-role="collapsible">
-            <h3>Machines</h3>
+            <h3>Machines
+                {{#if Mist.backendsController.loadingMachines}}
+                <div class="ajax-loader"></div>
+                {{/if}}
+            </h3>
             <ul data-role="listview" data-inset="true">
                 {{#each view.machines}}
                     {{view Mist.MachineListItemView
@@ -51,7 +55,7 @@
 
     {{view Mist.ConfirmationDialog}}
 
-    <div id="private-key-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
+    <div id="private-key-popup" class="small-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
         <div data-role="header">
             <h1>Private Key</h1>
         </div>

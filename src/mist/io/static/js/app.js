@@ -154,11 +154,17 @@ define( 'app', [
             }  
         });
 
+        //App.set('authKey', AUTH_KEY);
+        App.set('authKey', '');
+        App.set('authenticated', AUTH || URL_PREFIX == '' ? true : false);
+        App.set('email', EMAIL);
+        App.set('password', '');
         window.Mist = App;
 
         $.ajaxSetup ({
-            cache: false
+            cache: false // Appends random number on each ajax call
         });
+        
         App.ajaxGET = function(url, data) {
             return App.ajax('GET', url, data);
         };
@@ -187,10 +193,14 @@ define( 'app', [
                 return call;
             };
             call.ajax = function() {
+                if (data) {
+                    data.auth = App.authKey;
+                } else {
+                    data = {'auth': App.authKey};
+                }
                 $.ajax({
                     url: url,
                     type: type,
-                    auth: App.authKey,
                     data: JSON.stringify(data),
                     complete: function(jqXHR) {
                         result = jqXHR;
@@ -287,22 +297,19 @@ define( 'app', [
         });
 
         App.KeyRoute = Ember.Route.extend({
-            
             activate: function() {
                 Ember.run.next(function() {
-                    document.title = 'mist.io - ' + Mist.getKeyNameByUrl();
+                    document.title = 'mist.io - ' + Mist.getKeyIdByUrl();
                 });
             },
-
             redirect: function() {
-                Mist.keysController.set('keyRequest', Mist.getKeyNameByUrl());
+                Mist.keysController.set('keyRequest', Mist.getKeyIdByUrl());
             },
-
             model: function() {
                 if (Mist.keysController.loading) {
                     return {name: ' '};
                 }
-                return Mist.keysController.getKeyByUrlName(Mist.getKeyNameByUrl());
+                return Mist.keysController.getKey(Mist.getKeyIdByUrl());
             }
         });
 
@@ -320,7 +327,7 @@ define( 'app', [
             return (viewPortTop - distanceToViewportTop === 0);
         };  
 
-        App.getKeyNameByUrl = function() {
+        App.getKeyIdByUrl = function() {
             return window.location.href.split('/')[5];
         };
 
@@ -368,12 +375,6 @@ define( 'app', [
         App.set('keysController', KeysController.create());
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
-
-        //App.set('authKey', AUTH_KEY);
-        App.set('authKey', '');
-        App.set('authenticated', AUTH || URL_PREFIX == '' ? true : false);
-        App.set('email', EMAIL);
-        App.set('password', '');
 
         App.Select = Ember.Select.extend({
             attributeBindings: [

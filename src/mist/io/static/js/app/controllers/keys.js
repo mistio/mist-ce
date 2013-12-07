@@ -196,7 +196,7 @@ define(['app/models/key'],
             },
 
 
-            keyExists: function(key) {
+            keyExists: function(keyId) {
                 return !!this.getKey(keyId);
             },
 
