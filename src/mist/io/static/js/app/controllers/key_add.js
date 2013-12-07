@@ -55,7 +55,7 @@ define('app/controllers/key_add', ['ember'],
             create: function() {
 
                 // Check if key name exist already
-                if (Mist.keysController.keyNameExists(this.newKeyName)) {
+                if (Mist.keysController.keyExists(this.newKeyName)) {
                     Mist.notificationController.notify('Key name exists already');
                     $('#create-key-ok').removeClass('ui-state-disabled');
                     return;

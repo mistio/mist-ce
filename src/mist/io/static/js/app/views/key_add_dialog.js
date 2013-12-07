@@ -24,8 +24,10 @@ define('app/views/key_add_dialog', ['text!app/templates/key_add_dialog.html','em
             actions: {
 
                 generateClicked: function() {
-                    Mist.keysController.generateKey(function(privateKey) {
-                        $('#create-key-private').val(privateKey).trigger('change');
+                    Mist.keysController.generateKey(function(success, key) {
+                        if (success) {
+                            $('#create-key-private').val(key).trigger('change');
+                        }
                     });
                 },
 

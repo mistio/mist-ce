@@ -33,8 +33,6 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
              */
 
             keysObserver: function() {
-                
-                info('sup?');
                 Ember.run.next(function() {
                     if ($('#key-list-page .ui-listview').listview) {
                         $('#key-list-page .ui-listview').listview('refresh');
