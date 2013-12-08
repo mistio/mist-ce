@@ -4,12 +4,12 @@
 #single-key-page .ui-footer {
     display: block;
 }
-#single-key-page .ajax-loader {
+#single-key-page .ui-collapsible .ajax-loader {
     display: inline;
     float: right;
 }
 @-moz-document url-prefix() {
-    #single-key-page .ajax-loader {
+    #single-key-page .ui-collapsible .ajax-loader {
         margin-top: -20px;
     }
 }

@@ -307,7 +307,7 @@ define( 'app', [
             },
             model: function() {
                 if (Mist.keysController.loading) {
-                    return {name: ' ', machines: []};
+                    return {machines: []};
                 }
                 return Mist.keysController.getKey(Mist.getKeyIdByUrl());
             }

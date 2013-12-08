@@ -12,6 +12,10 @@
 
     <div data-role="content" data-theme="c">
 
+        {{#if Mist.keysController.loading}}
+        <div class="ajax-loader"></div>
+        {{/if}}
+
          <div data-role="collapsible" data-collapsed="false">
             <h3>Public Key
                 {{#if Mist.keysController.gettingPublicKey}}
