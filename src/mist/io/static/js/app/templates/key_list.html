@@ -52,11 +52,13 @@
     </div>
 
     <div class="tri-action-footer" data-role="footer" data-theme="b">
-        <div data-role="controlgroup" data-type="horizontal">
+        <table><tbody><tr><td>
             <a data-role="button" data-icon="edit" {{action "renameClicked" target="view"}}>Rename</a>
+        </td><td>
             <a data-role="button" data-icon="delete" {{action "deleteClicked" target="view"}}>Delete</a>
+        </td><td>
             <a data-role="button" data-icon="gear" {{action "setDefaultClicked" target="view"}}>Set default</a>
-        </div>
+        </td></tr></tbody></table>
     </div>
 
 </div>

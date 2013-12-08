@@ -8,12 +8,9 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
         return MistScreen.extend({
 
             /**
-             * 
              *  Properties
-             * 
              */
 
-            selectedKey: null,
             template: Ember.Handlebars.compile(key_list_html),
 
             /**
@@ -22,17 +19,29 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
              * 
              */
 
-            initEvents: function() {
-                Mist.keysController.on('onKeyListChange', this.keysObserver);
-            }.on('init'),
+            init: function() {
+                this._super();
+                Mist.keysController.on('onKeyListChange', this, 'renderKeyList');
+                Mist.keysController.on('onSelectedKeysChange', this, 'updateFooter');
+            },
+
+
+            load: function() {
+                Ember.run(this, function() {
+                    this.renderKeyList();
+                    this.updateFooter();
+                });
+            }.on('didInsertElement'),
+
+
 
             /**
              * 
-             *  Observers
+             *  Methods
              * 
              */
 
-            keysObserver: function() {
+            renderKeyList: function() {
                 Ember.run.next(function() {
                     if ($('#key-list-page .ui-listview').listview) {
                         $('#key-list-page .ui-listview').listview('refresh');
@@ -41,27 +50,24 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
                         $('#key-list-page input.ember-checkbox').checkboxradio();
                     }
                 });
-            }.on('didInsertElement'),
+            },
 
 
-            selectedKeysObserver: function() {
-                return;
-                var that = this;
-                switch (Mist.keysController.getSelectedKeysCount()) {
+            updateFooter: function() {
+                switch (Mist.keysController.selectedKeys.length) {
                     case 0:
-                        $('#key-list-page .ui-footer').hide();
+                        $('#key-list-page .ui-footer').slideUp();
                         break;
                     case 1:
-                        $('#key-list-page .ui-footer').show();
+                        $('#key-list-page .ui-footer').slideDown();
                         $('#key-list-page .ui-footer a').removeClass('ui-state-disabled');
-                        that.set('selectedKey', Mist.keysController.getSelectedKeyName());
                         break;
                     default:
-                        $('#key-list-page .ui-footer').show();
+                        $('#key-list-page .ui-footer').slideDown();
                         $('#key-list-page .ui-footer a').addClass('ui-state-disabled');
                         break;
                 }
-            }.on('didInsertElement'),
+            },
 
 
 

@@ -268,7 +268,7 @@ define(['app/models/key'],
                     this.content.forEach(function(key) {
                         if (key.selected) newSelectedKeys.push(key);
                     });
-                    this.set('selectedkeys', newSelectedKeys);
+                    this.set('selectedKeys', newSelectedKeys);
                     this.trigger('onSelectedKeysChange');
                 });
             },
