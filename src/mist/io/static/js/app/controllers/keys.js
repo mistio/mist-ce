@@ -204,7 +204,7 @@ define(['app/models/key'],
 
             /**
              * 
-             *  Psudo-Private Methods
+             *  Pseudo-Private Methods
              * 
              */
 

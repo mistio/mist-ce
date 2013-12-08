@@ -44,6 +44,7 @@ define( 'app', [
     'app/controllers/backend_edit',
     'app/controllers/machine_add',
     'app/controllers/key_add',
+    'app/controllers/key_edit',
     'app/controllers/select_images',
     'app/controllers/keys',
     'app/controllers/rules',
@@ -85,6 +86,7 @@ define( 'app', [
                 BackendEditController,
                 MachineAddController,
                 KeyAddController,
+                KeyEditController,
                 SelectImagesController,
                 KeysController,
                 RulesController,
@@ -154,16 +156,12 @@ define( 'app', [
             }  
         });
 
-        //App.set('authKey', AUTH_KEY);
-        App.set('authKey', '');
+        //App.set('CSRFToken', CSRF_TOKEN);
+        App.set('CSRFToken', '');
         App.set('authenticated', AUTH || URL_PREFIX == '' ? true : false);
         App.set('email', EMAIL);
         App.set('password', '');
         window.Mist = App;
-
-        $.ajaxSetup ({
-            cache: false // Appends random number on each ajax call
-        });
         
         App.ajaxGET = function(url, data) {
             return App.ajax('GET', url, data);
@@ -193,10 +191,12 @@ define( 'app', [
                 return call;
             };
             call.ajax = function() {
-                if (data) {
-                    data.auth = App.authKey;
-                } else {
-                    data = {'auth': App.authKey};
+                if (type != 'GET') {
+                    if (data) {
+                        data.csrf_token = App.CSRFToken;
+                    } else {
+                        data = {'csrf_token': App.CSRFToken};
+                    }
                 }
                 $.ajax({
                     url: url,
@@ -307,7 +307,7 @@ define( 'app', [
             },
             model: function() {
                 if (Mist.keysController.loading) {
-                    return {name: ' '};
+                    return {name: ' ', machines: []};
                 }
                 return Mist.keysController.getKey(Mist.getKeyIdByUrl());
             }
@@ -375,6 +375,7 @@ define( 'app', [
         App.set('keysController', KeysController.create());
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
+        App.set('keyEditController', KeyEditController.create());
 
         App.Select = Ember.Select.extend({
             attributeBindings: [

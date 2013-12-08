@@ -90,9 +90,9 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
 
 
             showPublicKey: function() {
-                Mist.keysController.getPublicKey(this.key.name, function(success, key) {
+                Mist.keysController.getPublicKey(this.key.id, function(success, keyPublic) {
                     if (success) {
-                        $('#public-key').val(key);
+                        $('#public-key').val(keyPublic);
                     }
                 });
             },
@@ -108,10 +108,10 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
             actions: {
 
                 displayClicked: function() {
-                    Mist.keysController.getPrivateKey(this.key.name, function(success, key) {
+                    Mist.keysController.getPrivateKey(this.key.id, function(success, keyPrivate) {
                         if (success) {
                             $('#private-key-popup').popup('open');
-                            $('#private-key').val(key);
+                            $('#private-key').val(keyPrivate);
                         }
                     });
                 },
@@ -122,17 +122,20 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
                 },
 
                 renameClicked: function() {
-                    $('#rename-key-popup').popup('open');
-                    $('#new-key-name').val(this.key.name).trigger('change');
+                    Mist.keyEditController.open(this.key, function(success, newKeyId) {
+                        if (success) {
+                            window.location.hash = '#/keys/' + newKeyId;
+                        }
+                    });
                 },
 
                 deleteClicked: function() {
-                    var keyName = this.key.name;
+                    var keyId = this.key.id;
                     Mist.confirmationController.set('title', 'Delete key');
-                    Mist.confirmationController.set('text', 'Are you sure you want to delete "' + keyName + '" ?');
+                    Mist.confirmationController.set('text', 'Are you sure you want to delete "' + keyId + '" ?');
                     Mist.confirmationController.set('callback', function() {
                         Mist.Router.router.transitionTo('keys');
-                        Mist.keysController.deleteKey(keyName);
+                        Mist.keysController.deleteKey(keyId);
                     });
                     Mist.confirmationController.show();
                 }
