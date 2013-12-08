@@ -1,11 +1,11 @@
 """Basic configuration and mappings
 
 Note:
-Provider.EC2_EU_WEST etc naming is deprecated by libcloud. 
+Provider.EC2_EU_WEST etc naming is deprecated by libcloud.
 
 Now we call driver = get_driver(Providers.EC2_EU_WEST) in helpers.connect which
 calls the default EC2 driver passing datacenter argument. Instead we should
-call the default driver of EC2 passing the datacenter, example 
+call the default driver of EC2 passing the datacenter, example
 
 driver = get_driver(Providers.EC2)
 conn = driver(key, secret, datacenter='eu-west-1')
@@ -74,6 +74,11 @@ LINODE_DATACENTERS = {
 
 
 SUPPORTED_PROVIDERS = [
+    # BareMetal
+    {
+        'title': 'Bare Metal Server',
+        'provider': 'bare_metal'
+    },
     # EC2
     {
         'title': 'EC2 AP NORTHEAST',
@@ -160,7 +165,7 @@ SUPPORTED_PROVIDERS = [
     {
         'title': 'SoftLayer',
         'provider' : Provider.SOFTLAYER
-    } 
+    }
 ]
 
 
@@ -302,9 +307,9 @@ EC2_IMAGES[Provider.EC2_US_EAST] = EC2_IMAGES['us-east-1']
 
 
 NOTE = '''
-Provider.EC2_EU_WEST etc naming is deprecated by libcloud. 
+Provider.EC2_EU_WEST etc naming is deprecated by libcloud.
 
-Now we call driver = get_driver(Providers.EC2_EU_WEST) in helpers.connect which calls the default EC2 driver passing datacenter argument. Instead we should call the default driver of EC2 passing the datacenter, example 
+Now we call driver = get_driver(Providers.EC2_EU_WEST) in helpers.connect which calls the default EC2 driver passing datacenter argument. Instead we should call the default driver of EC2 passing the datacenter, example
 
 driver = get_driver(Providers.EC2)
 conn = driver(key, secret, datacenter='eu-west-1')

@@ -708,6 +708,11 @@ div.ember-view div.ui-panel-content-wrap {
     background-image: url(images/p1_sm.png);
 }
 
+/* BareMetal */
+#single-view-provider-icon.provider-bare_metal  {
+    background-image: url(images/monitor.png);
+}
+
 /* NephoScale */
 #single-view-provider-icon.provider-nephoscale  {
     background-image: url(images/nephoscale_sm.png);
@@ -1378,6 +1383,10 @@ div.loading-monitoring {
     display: none;
 }
 
+#addBackendBareMetal {
+    display: none;
+}
+
 #add-backend label {
     display: block;
     margin: 14px 0 4px 0;
@@ -1408,7 +1417,7 @@ div.loading-monitoring {
     padding:10px !important;
 }
 
-.select-listmenu {
+.select-listmenu, .select-keys-listmenu {
     max-height: 150px;
     overflow-y: auto;
 }
