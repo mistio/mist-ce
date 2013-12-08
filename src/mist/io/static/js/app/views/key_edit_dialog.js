@@ -15,6 +15,22 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html', 
 
             /**
              *
+             *  Methods
+             *
+             */
+
+            updateSaveButton: function() {
+                if (Mist.keysController.renamingKey || !Mist.keyEditController.formReady) {
+                    $('#rename-key-ok').addClass('ui-state-disabled');
+                } else {
+                    $('#rename-key-ok').removeClass('ui-state-disabled');
+                }
+            },
+
+
+
+            /**
+             *
              *  Actions
              *
              */
@@ -28,7 +44,19 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html', 
                 saveClicked: function() {
                     Mist.keyEditController.save();
                 }
-            }
+            },
+
+
+
+            /**
+             *
+             *  Observers
+             *
+             */
+
+            enableSaveButtonObserver: function() {
+                Ember.run.once(this, 'updateSaveButton');
+            }.observes('Mist.keyEditController.formReady', 'Mist.keysController.renamingKey')
         });
     }
 );

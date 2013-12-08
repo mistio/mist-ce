@@ -8,43 +8,14 @@ define('app/controllers/key_add', ['ember'],
         return Ember.Object.extend({
 
             /**
-             * 
              *  Properties
-             * 
              */
 
-            newKeyName: null,
-            newKeyReady: null,
+            callback: null,
+            formReady: null,
+
+            newKeyId: null,
             newKeyPrivate: null,
-            newKeyCallback: null,
-
-            /**
-             * 
-             *  Observers
-             * 
-             */
-
-            newKeyObserver: function() {
-
-                // Remove whitespaces from name and key
-                if (this.newKeyName) {
-                    this.set('newKeyName', this.newKeyName.replace(/\W/g, ''));
-                }
-                if (this.newKeyPrivate) {
-                    this.set('newKeyPrivate', this.newKeyPrivate.trim());
-                }
-
-                // Check if key is ready
-                if (this.newKeyName && this.newKeyPrivate) {
-                    this.set('newKeyReady', true);
-                    $('#create-key-ok').removeClass('ui-state-disabled');
-                } else {
-                    this.set('newKeyReady', false);
-                    $('#create-key-ok').addClass('ui-state-disabled');
-                }
-            }.observes('newKeyName', 'newKeyPrivate'),
-
-
 
             /**
              * 
@@ -52,12 +23,22 @@ define('app/controllers/key_add', ['ember'],
              * 
              */
 
+            open: function(callback) {
+                $('#create-key-popup').popup('open');
+                this._clear();
+                this.set('callback', callback);
+            },
+
+            close: function() {
+                $('#create-key-popup').popup('close');
+                this._clear();
+            },
+
             create: function() {
 
-                // Check if key name exist already
-                if (Mist.keysController.keyExists(this.newKeyName)) {
+                if (Mist.keysController.keyExists(this.newKeyId)) {
                     Mist.notificationController.notify('Key name exists already');
-                    $('#create-key-ok').removeClass('ui-state-disabled');
+                    this._giveCallback(false);
                     return;
                 }
 
@@ -68,28 +49,70 @@ define('app/controllers/key_add', ['ember'],
 
                 if (privateKey.indexOf(beginning) != 0) {
                     Mist.notificationController.notify('Private key should begin with: ' + beginning);
-                    $('#create-key-ok').removeClass('ui-state-disabled');
+                    this._giveCallback(false);
                     return;
                 } else if (privateKey.indexOf(ending) != privateKey.length - ending.length) {
                     Mist.notificationController.notify('Private key should end with: ' + ending);
-                    $('#create-key-ok').removeClass('ui-state-disabled');
+                    this._giveCallback(false);
                     return;
                 }
 
-                // Create key
-                Mist.keysController.createKey(this.newKeyName,
-                                              this.newKeyPrivate,
-                                              this.newKeyCallback);
+                var that = this;
+                Mist.keysController.createKey(this.newKeyId, this.newKeyPrivate, function(success) {
+                    that._giveCallback(success);
+                    if (success) {
+                        that.close();
+                    }
+                });
             },
 
 
-            clear: function() {
-                this.set('newKeyName', null);
-                this.set('newKeyReady', null);
+
+            /**
+             * 
+             *  Pseudo-Private Methods
+             * 
+             */
+           
+            _clear: function() {
+                this.set('callback', null);
+                this.set('newKeyId', null);
                 this.set('newKeyPrivate', null);
-                this.set('newKeyCallback', null);
-                this.newKeyObserver();
-            }
+            },
+
+
+            _giveCallback: function(success) {
+                if (this.callback) this.callback(success, this.newId);
+            },
+
+
+            _updateFormReady: function() {
+                if (this.newKeyId) {
+                    // Remove non alphanumeric chars from key id
+                    this.set('newKeyId', this.newKeyId.replace(/\W/g, '')); 
+                }
+                if (this.newKeyPrivate) {
+                    this.set('newKeyPrivate', this.newKeyPrivate.trim());
+                }
+
+                if (this.newKeyId && this.newKeyPrivate) {
+                    this.set('formReady', true);
+                } else {
+                    this.set('formReady', false);
+                }
+            },
+
+
+
+            /**
+             * 
+             *  Observers
+             * 
+             */
+
+            formObserver: function() {
+                Ember.run.once(this, '_updateFormReady');
+            }.observes('newKeyId', 'newKeyPrivate', 'callback'),
         });
     }
 );

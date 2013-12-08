@@ -8,12 +8,26 @@ define('app/views/key_add_dialog', ['text!app/templates/key_add_dialog.html','em
         return Ember.View.extend({
 
             /**
-             * 
              *  Properties
-             * 
              */
 
             template: Ember.Handlebars.compile(key_add_dialog_html),
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+
+            updateDoneButton: function() {
+                if (Mist.keysController.creatingKey || !Mist.keyAddController.formReady) {
+                    $('#create-key-ok').addClass('ui-state-disabled');
+                } else {
+                    $('#create-key-ok').removeClass('ui-state-disabled');
+                }
+            },
+
+
 
             /**
              * 
@@ -57,15 +71,25 @@ define('app/views/key_add_dialog', ['text!app/templates/key_add_dialog.html','em
                 },
 
                 backClicked: function() {
-                    $('#create-key-popup').popup('close');
-                    Mist.keyAddController.clear();
+                    Mist.keyAddController.close();
                 },
 
                 doneClicked: function() {
-                    $('#create-key-ok').addClass('ui-state-disabled');
                     Mist.keyAddController.create();
                 }
-            }
+            },
+
+
+
+            /**
+             * 
+             *  Observers
+             * 
+             */
+
+            updateDoneButtonObserver: function() {
+                Ember.run.once(this, 'updateDoneButton');
+            }.observes('Mist.keysController.creatingKey', 'Mist.keyAddController.formReady')
         });
     }
 );

@@ -11,9 +11,11 @@ define('app/controllers/key_edit', ['ember'],
              *  Properties
              */
 
-            key: null,
-            newId: null,
             callback: null,
+            formReady: false,
+
+            keyId: null,
+            newKeyId: null,
 
             /**
              * 
@@ -21,12 +23,12 @@ define('app/controllers/key_edit', ['ember'],
              * 
              */
 
-            open: function(key, callback) {
+            open: function(keyId, callback) {
                 $('#rename-key-popup').popup('open');
                 this._clear();
                 this.set('callback', callback);
-                this.set('newId', key.id);
-                this.set('key', key);
+                this.set('newKeyId', keyId);
+                this.set('keyId', keyId);
             },
 
 
@@ -38,19 +40,19 @@ define('app/controllers/key_edit', ['ember'],
 
             save: function() {
 
-                if (this.key.id == this.newId) { // Pseudo save
+                if (this.keyId == this.newKeyId) { // Pseudo save
                     this._giveCallback(true);
                     this.close();
                     return;
                 }
-                if (Mist.keysController.keyExists(this.newId)) {
+                if (Mist.keysController.keyExists(this.newKeyId)) {
                     Mist.notificationController.notify('Key name exists already');
                     this._giveCallback(false);
                     return;
                 }
 
                 var that = this;
-                Mist.keysController.renameKey(this.key.id, this.newId, function(success) {
+                Mist.keysController.renameKey(this.keyId, this.newKeyId, function(success) {
                     that._giveCallback(success);
                     if (success) {
                         that.close();
@@ -68,26 +70,22 @@ define('app/controllers/key_edit', ['ember'],
 
             _clear: function() {
                 this.set('callback', null);
-                this.set('newId', null);
-                this.set('key', null);
+                this.set('newKeyId', null);
+                this.set('keyId', null);
+            },
+
+
+            _checkNewKeyId: function() {
+                if (this.newKeyId) {
+                    // Remove non alphanumeric chars from key id
+                    this.set('newKeyId', this.newKeyId.replace(/\W/g, ''));
+                }
+                this.set('formReady', !!this.newKeyId);
             },
 
 
             _giveCallback: function(success) {
-                if (this.callback) this.callback(success, this.newId);
-            },
-
-
-            _checkNewId: function() {
-                // Remove non alphanumeric chars from key id
-                if (this.newId) {
-                    this.set('newId', this.newId.replace(/\W/g, ''));
-                }
-                if (this.newId) {
-                    $('#rename-key-ok').removeClass('ui-state-disabled');
-                } else {
-                    $('#rename-key-ok').addClass('ui-state-disabled');
-                }
+                if (this.callback) this.callback(success, this.newKeyId);
             },
 
 
@@ -98,9 +96,9 @@ define('app/controllers/key_edit', ['ember'],
              * 
              */
 
-            newIdObserver: function() {
-                Ember.run.once(this, '_checkNewId');
-            }.observes('newId')
+            newKeyIdObserver: function() {
+                Ember.run.once(this, '_checkNewKeyId');
+            }.observes('newKeyId')
         });
     }
 );

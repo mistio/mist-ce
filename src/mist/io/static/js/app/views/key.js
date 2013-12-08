@@ -122,7 +122,7 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
                 },
 
                 renameClicked: function() {
-                    Mist.keyEditController.open(this.key, function(success, newKeyId) {
+                    Mist.keyEditController.open(this.key.id, function(success, newKeyId) {
                         if (success) {
                             window.location.hash = '#/keys/' + newKeyId;
                         }
