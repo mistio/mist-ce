@@ -23,7 +23,7 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
 
             init: function() {
                 this._super();
-                Mist.keysController.one('load', this, 'load');
+                Mist.keysController.one('onLoad', this, 'load');
                 Mist.backendsController.on('updateMachines', this, 'updateMachines');
             },
 
@@ -47,29 +47,33 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
              */
 
             updateCurrentKey: function() {
-                var key = Mist.keysController.getRequestedKey();
-                if (key) this.get('controller').set('model', key);
-                this.set('key', this.get('controller').get('model'));
+                Ember.run(this, function() {
+                    var key = Mist.keysController.getRequestedKey();
+                    if (key) this.get('controller').set('model', key);
+                    this.set('key', this.get('controller').get('model'));
+                });
             },
 
 
             updateMachines: function() {
-                var newMachines = [];
-                this.key.machines.forEach(function(machine) {
-                    var newMachine = Mist.backendsController.getMachineById(machine[0], machine[1]);
-                    if (!newMachine) {
-                        var backend = Mist.backendsController.getBackendById(machine[0]);
-                        newMachine = Machine.create({
-                            id: machine[1],
-                            name: machine[1],
-                            state: backend ? 'terminated' : 'unknown',
-                            backend: backend ? backend : machine[0],
-                            isGhost: true,
-                        });
-                    }
-                    newMachines.push(newMachine);
+                Ember.run(this, function() {
+                    var newMachines = [];
+                    this.key.machines.forEach(function(machine) {
+                        var newMachine = Mist.backendsController.getMachineById(machine[0], machine[1]);
+                        if (!newMachine) {
+                            var backend = Mist.backendsController.getBackendById(machine[0]);
+                            newMachine = Machine.create({
+                                id: machine[1],
+                                name: machine[1],
+                                state: backend ? 'terminated' : 'unknown',
+                                backend: backend ? backend : machine[0],
+                                isGhost: true,
+                            });
+                        }
+                        newMachines.push(newMachine);
+                    });
+                    this.set('machines', newMachines);
                 });
-                this.set('machines', newMachines);
             },
 
 

@@ -54,7 +54,7 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html', 
              *
              */
 
-            enableSaveButtonObserver: function() {
+            updateSaveButtonObserver: function() {
                 Ember.run.once(this, 'updateSaveButton');
             }.observes('Mist.keyEditController.formReady', 'Mist.keysController.renamingKey')
         });

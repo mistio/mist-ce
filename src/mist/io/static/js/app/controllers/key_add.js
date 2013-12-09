@@ -29,10 +29,12 @@ define('app/controllers/key_add', ['ember'],
                 this.set('callback', callback);
             },
 
+
             close: function() {
                 $('#create-key-popup').popup('close');
                 this._clear();
             },
+
 
             create: function() {
 
@@ -82,7 +84,7 @@ define('app/controllers/key_add', ['ember'],
 
 
             _giveCallback: function(success) {
-                if (this.callback) this.callback(success, this.newId);
+                if (this.callback) this.callback(success, this.newKeyId);
             },
 
 

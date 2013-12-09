@@ -1,4 +1,4 @@
-define('app/views/backend_add', ['text!app/templates/backend_add.html','ember'],
+define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember'],
     /**
      *  Add Backend Panel
      * 
@@ -8,14 +8,27 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html','ember'],
         return Ember.View.extend({
 
             /**
-             * 
              *  Properties
-             * 
              */
 
             firstFieldLabel: 'API Key',
             secondFieldLabel: 'API Secret',
             template: Ember.Handlebars.compile(backend_add_html),
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+
+            updateDoneButton: function() {
+                if (Mist.backendsController.addingBackend || !Mist.backendAddController.formReady) {
+                    $('#add-backend-ok').addClass('ui-state-disabled');
+                } else {
+                    $('#add-backend-ok').removeClass('ui-state-disabled');
+                }
+            },
+
 
 
             /**
@@ -64,14 +77,25 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html','ember'],
                 },
 
                 backClicked: function() {
-                    $('#add-backend-panel').panel('close');
-                    Mist.backendAddController.clear();
+                    Mist.backendAddController.close();
                 },
 
                 doneClicked: function() {
                     Mist.backendAddController.add();
                 }
-            }
+            },
+
+
+
+            /**
+             * 
+             *  Observers
+             * 
+             */
+
+            updateDoneButtonObserver: function() {
+                Ember.run.once(this, 'updateDoneButton');
+            }.observes('Mist.backendsController.addingBackend', 'Mist.backendAddController.formReady')
         });
     }
 );

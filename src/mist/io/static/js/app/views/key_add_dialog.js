@@ -60,7 +60,7 @@ define('app/views/key_add_dialog', ['text!app/templates/key_add_dialog.html','em
                         var reader = new FileReader();
                         reader.onloadend = function(evt) {
                             if (evt.target.readyState == FileReader.DONE) {
-                                $('#create-key-private').val(evt.target.result).trigger('change');
+                                Mist.keyAddController.set('newKeyPrivate', evt.target.result);
                             } else {
                                 Mist.notificationsController.notify('Failed to upload file');
                             }

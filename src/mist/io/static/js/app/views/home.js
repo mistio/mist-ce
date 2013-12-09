@@ -8,9 +8,7 @@ define('app/views/home', ['app/views/mistscreen','text!app/templates/home.html',
         return MistScreen.extend({
 
             /**
-             * 
              *  Properties
-             * 
              */
 
             template: Ember.Handlebars.compile(home_html),
@@ -34,6 +32,8 @@ define('app/views/home', ['app/views/mistscreen','text!app/templates/home.html',
                 }, 100);
             }.on('didInsertElement'),
 
+
+
             /**
              * 
              *  Actions
@@ -43,12 +43,7 @@ define('app/views/home', ['app/views/mistscreen','text!app/templates/home.html',
             actions: {
 
                 addBackend: function() {
-                    Mist.backendAddController.clear();
-                    Mist.backendAddController.set('newBackendCallback', function() {
-                        $('#add-backend-panel').panel('close');
-                        Mist.backendAddController.clear();
-                    });
-                    $('#add-backend-panel').panel('open');
+                    Mist.backendAddController.open();
                 }
             }
         });

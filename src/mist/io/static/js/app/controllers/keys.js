@@ -41,7 +41,7 @@ define(['app/models/key'],
                     that._reload();
                 }).complete(function(success) {
                     that.set('loading', false);
-                    that.trigger('load');
+                    that.trigger('onLoad');
                 });
             }.on('init'),
 
@@ -218,6 +218,7 @@ define(['app/models/key'],
             _setContent: function(keys) {
                 var that = this;
                 Ember.run(function() {
+                    that.set('content', null);
                     keys.forEach(function(key) {
                         that.content.pushObject(Key.create(key));
                     });
@@ -257,7 +258,7 @@ define(['app/models/key'],
                     this.content.forEach(function(key) {
                         key.set('default_key', key.id == keyId);
                     });
-                    this.trigger('onKeyDefaultSet');
+                    this.trigger('onDefaultKeySet');
                 });
             },
 

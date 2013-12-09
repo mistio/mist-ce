@@ -75,7 +75,7 @@ define('app/controllers/key_edit', ['ember'],
             },
 
 
-            _checkNewKeyId: function() {
+            _updateFormReady: function() {
                 if (this.newKeyId) {
                     // Remove non alphanumeric chars from key id
                     this.set('newKeyId', this.newKeyId.replace(/\W/g, ''));
@@ -96,8 +96,8 @@ define('app/controllers/key_edit', ['ember'],
              * 
              */
 
-            newKeyIdObserver: function() {
-                Ember.run.once(this, '_checkNewKeyId');
+            formObserver: function() {
+                Ember.run.once(this, '_updateFormReady');
             }.observes('newKeyId')
         });
     }
