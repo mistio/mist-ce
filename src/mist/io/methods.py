@@ -22,6 +22,7 @@ except ImportError:
 
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
+from mist.io.bare_metal import BareMetalDriver
 from mist.io.exceptions import *
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
@@ -33,58 +34,98 @@ log = logging.getLogger(__name__)
 
 
 @core_wrapper
-def add_backend(user, title, provider, apikey,
-                apisecret, apiurl, tenant_name):
+def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
+                machine_hostname, machine_key, machine_user):
     """Adds a new backend to the user and returns the new backend_id."""
-
-    log.info("Adding new backend in provider '%s'", provider)
-    # if api secret not given, search if we already know it
-    # FIXME: just pass along an empty apisecret
-    if apisecret == 'getsecretfromdb':
-        for backend_id in user.backends:
-            if apikey == user.backends[backend_id].apikey:
-                apisecret = user.backends[backend_id].apisecret
-                break
-
-    region = ''
-    if not provider.__class__ is int and ':' in provider:
-        provider, region = provider.split(':')[0], provider.split(':')[1]
 
     if not provider:
         raise RequiredParameterMissingError("provider")
-    if not apikey:
-        raise RequiredParameterMissingError("apikey")
-    if not apisecret:
-        raise RequiredParameterMissingError("apisecret")
+    log.info("Adding new backend in provider '%s'", provider)
 
-    backend = model.Backend()
-    backend.title = title
-    backend.provider = provider
-    backend.apikey = apikey
-    backend.apisecret = apisecret
-    backend.apiurl = apiurl
-    backend.tenant_name = tenant_name
-    backend.region = region
-    backend.enabled = True
+    baremetal = provider == 'bare_metal'
+    if provider == 'bare_metal':
+        if not machine_hostname:
+            raise RequiredParameterMissingError('machine_hostname')
+        if not machine_key:
+            raise RequiredParameterMissingError('machine_key')
+        if machine_key not in user.keypairs:
+            raise KeypairNotFoundError(machine_key)
+        if not machine_user:
+            machine_user = 'root'
 
-    backend_id = backend.get_id()
-    if backend_id in user.backends:
-        raise BackendExistsError(backend_id)
+        machine = model.Machine()
+        machine.dns_name = machine_hostname
+        machine.public_ips = [machine_hostname]
+        machine_id = machine_hostname.replace('.', '').replace(' ', '')
+        machine.name = machine_id
+        backend = model.Backend()
+        backend.title = machine_hostname
+        backend.provider = provider
+        backend.enabled = True
+        backend.machines[machine_id] = machine
+        backend_id = backend.get_id()
+        with user.lock_n_load():
+            if backend_id in user.backends:
+                raise BackendExistsError(backend_id)
+            user.backends[backend_id] = backend
+            # try to connect. this will either fail and we'll delete the
+            # backend, or it will work and it will create the association
+            try:
+                ssh_command(
+                    user, backend_id, machine_id, machine_hostname, 'uptime',
+                    key_id=machine_key, username=machine_user, password=None
+                )
+            except MachineUnauthorizedError as exc:
+                # remove backend
+                del user.backends[backend_id]
+                user.save()
+                raise BackendUnauthorizedError(exc)
+            user.save()  # this isn't needed cause ssh_command saved
+    else:
+        # if api secret not given, search if we already know it
+        # FIXME: just pass along an empty apisecret
+        if apisecret == 'getsecretfromdb':
+            for backend_id in user.backends:
+                if apikey == user.backends[backend_id].apikey:
+                    apisecret = user.backends[backend_id].apisecret
+                    break
 
-    # validate backend before adding
-    # TODO: is this good enough?
-    conn = connect_provider(backend)
-    try:
-        machines = conn.list_nodes()
-    except InvalidCredsError:
-        raise BackendUnauthorizedError()
-    except:
-        raise BackendUnavailableError()
+        region = ''
+        if not provider.__class__ is int and ':' in provider:
+            provider, region = provider.split(':')[0], provider.split(':')[1]
 
-    # FIXME backend.poll_interval
-    with user.lock_n_load():
-        user.backends[backend_id] = backend
-        user.save()
+        if not apikey:
+            raise RequiredParameterMissingError("apikey")
+        if not apisecret:
+            raise RequiredParameterMissingError("apisecret")
+
+        backend = model.Backend()
+        backend.title = title
+        backend.provider = provider
+        backend.apikey = apikey
+        backend.apisecret = apisecret
+        backend.apiurl = apiurl
+        backend.tenant_name = tenant_name
+        backend.region = region
+        backend.enabled = True
+
+        backend_id = backend.get_id()
+        if backend_id in user.backends:
+            raise BackendExistsError(backend_id)
+
+        # validate backend before adding
+        conn = connect_provider(backend)
+        try:
+            machines = conn.list_nodes()
+        except InvalidCredsError:
+            raise BackendUnauthorizedError()
+        except Exception as exc:
+            log.error("Error while trying list_nodes: %r". exc)
+            raise BackendUnavailableError()
+
+        with user.lock_n_load():
+            user.backends[backend_id] = backend
+            user.save()
     log.info("Backend with id '%s' added succesfully.", backend_id)
     return backend_id
 
@@ -331,8 +372,8 @@ def connect_provider(backend):
     Backend is expected to be a mist.io.model.Backend
 
     """
-
-    driver = get_driver(backend.provider)
+    if backend.provider != 'bare_metal':
+        driver = get_driver(backend.provider)
     if backend.provider == Provider.OPENSTACK:
         conn = driver(
             backend.apikey,
@@ -351,6 +392,8 @@ def connect_provider(backend):
                               Provider.DIGITAL_OCEAN,
                               Provider.SOFTLAYER]:
         conn = driver(backend.apikey, backend.apisecret)
+    elif backend.provider == 'bare_metal':
+        conn = BareMetalDriver(backend.machines)
     else:
         # ec2
         conn = driver(backend.apikey, backend.apisecret)
@@ -409,6 +452,13 @@ def get_machine_actions(machine_from_api, conn):
         can_reboot = False
         can_tag = False
 
+    if conn.type == 'bare_metal':
+        can_start = False
+        can_destroy = False
+        can_stop = False
+        can_reboot = False
+        can_tag = False
+
     return {'can_stop': can_stop,
             'can_start': can_start,
             'can_destroy': can_destroy,
@@ -427,7 +477,8 @@ def list_machines(user, backend_id):
         machines = conn.list_nodes()
     except InvalidCredsError:
         raise BackendUnauthorizedError()
-    except:
+    except Exception as exc:
+        log.error("Error while running list_nodes: %r", exc)
         raise BackendUnavailableError()
 
     ret = []
@@ -892,7 +943,7 @@ def destroy_machine(user, backend_id, machine_id):
 
 
 def ssh_command(user, backend_id, machine_id, host, command,
-                key_id=None, password=None):
+                key_id=None, username=None, password=None):
     """
     We initialize a Shell instant (for mist.io.shell).
 
@@ -903,7 +954,7 @@ def ssh_command(user, backend_id, machine_id, host, command,
 
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
-                                           key_id, password)
+                                           key_id, username, password)
     output = shell.command(command)
     shell.disconnect()
     return output

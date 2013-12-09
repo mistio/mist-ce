@@ -40,10 +40,40 @@ try:
     from mist.core.dal import FieldsDict  # escapes dots in keys (for mongo)
 except ImportError:
     from mist.io.dal import User as DalUser
-from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
+from mist.io import exceptions
 
 
 log = logging.getLogger(__name__)
+
+
+class Machine(OODict):
+    """A saved machine in the machines list of some backend.
+
+    For the time being, only bare metal machines are saved, for API backends
+    we get the machine list from the provider.
+
+    """
+
+    ## hasMonitoring = BoolField()
+    uuid = StrField()
+    ## monitor_server = make_field(MonitorServer)()
+    dns_name = StrField()
+    public_ips = ListField()
+    ## collectd_password = StrField()
+    name = StrField()
+    ssh_port = IntField(22)
+
+
+class Machines(FieldsDict):
+    """Collection of machines of a certain backend.
+
+    For the time being, only bare metal machines are saved, for API backends
+    we get the machine list from the provider.
+
+    """
+
+    _item_type = make_field(Machine)
+    _key_error = exceptions.MachineNotFoundError
 
 
 class Backend(OODict):
@@ -59,8 +89,9 @@ class Backend(OODict):
     region = StrField()
     poll_interval = IntField(10000)
     provider = StrField()
-    datacenter = StrField()
+    ## datacenter = StrField()
 
+    machines = make_field(Machines)()
     starred = ListField()
 
     def __repr__(self):
@@ -68,14 +99,17 @@ class Backend(OODict):
         return super(Backend, self).__repr__(print_fields)
 
     def get_id(self):
-        concat = '%s:%s:%s' % (self.provider, self.region, self.apikey)
+        if self.provider != 'bare_metal':
+            concat = '%s:%s:%s' % (self.provider, self.region, self.apikey)
+        else:
+            concat = '%s:%s:%s' % (self.provider, self.region, self.title)
         return sha256(concat).hexdigest()
 
 
 class Backends(FieldsDict):
 
     _item_type = make_field(Backend)
-    _key_error = BackendNotFoundError
+    _key_error = exceptions.BackendNotFoundError
 
 
 class Keypair(OODict):
@@ -129,7 +163,7 @@ class Keypair(OODict):
 class Keypairs(FieldsDict):
 
     _item_type = make_field(Keypair)
-    _key_error = KeypairNotFoundError
+    _key_error = exceptions.KeypairNotFoundError
 
 
 class User(DalUser):

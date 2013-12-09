@@ -183,7 +183,7 @@ def list_backends(request):
                     # for Provider.RACKSPACE_FIRST_GEN
                     'region': backend.region,
                     # for Provider.RACKSPACE (the new Nova provider)
-                    'datacenter': backend.datacenter,
+                    ## 'datacenter': backend.datacenter,
                     'enabled': backend.enabled})
     return ret
 
@@ -199,12 +199,17 @@ def add_backend(request):
     apisecret = params.get('apisecret', '')
     apiurl = params.get('apiurl', '')
     tenant_name = params.get('tenant_name', '')
-
+    # following params are for baremetal
+    machine_hostname = params.get('machine_ip_address', '')
+    machine_key = params.get('machine_key', '')
+    machine_user = params.get('machine_user', '')
     # TODO: check if all necessary information was provided in the request
 
     user = user_from_request(request)
-    backend_id = methods.add_backend(user, title, provider, apikey,
-                                     apisecret, apiurl, tenant_name)
+    backend_id = methods.add_backend(
+        user, title, provider, apikey, apisecret, apiurl, tenant_name,
+        machine_hostname, machine_key, machine_user
+    )
     backend = user.backends[backend_id]
     return {
         'index': len(user.backends) - 1,

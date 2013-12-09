@@ -168,7 +168,7 @@ class Shell(object):
             line = stdout.readline()
 
     def autoconfigure(self, user, backend_id, machine_id,
-                      key_id=None, password=None):
+                      key_id=None, username=None, password=None):
         """Autoconfigure SSH client.
 
         This will do its best effort to find a suitable keypair and username
@@ -234,6 +234,9 @@ class Shell(object):
             for name in ['root', 'ubuntu', 'ec2-user']:
                 if name not in users:
                     users.append(name)
+            # if username was specified, then try only that
+            if username:
+                users = [username]
             for ssh_user in users:
                 try:
                     self.connect(username=ssh_user,
