@@ -30,7 +30,8 @@ class BareMetalDriver(object):
         return ('<BareMetalDriver>')
 
     def list_nodes(self):
-        nodes = [self._to_node(machine) for machine in self.machines.values()]
+        nodes = [self._to_node(machine_id, machine)
+                 for machine_id, machine in self.machines.items()]
         return nodes
 
     def list_sizes(self):
@@ -50,10 +51,10 @@ class BareMetalDriver(object):
         result = httplib.OK
         return result in VALID_RESPONSE_CODES
 
-    def _to_node(self, machine):
+    def _to_node(self, machine_id, machine):
         state = self.check_host(machine.dns_name, machine.ssh_port)
 
-        node = Node(id=machine.name, name=machine.dns_name, state=state,
+        node = Node(id=machine_id, name=machine.name, state=state,
                     public_ips=machine.public_ips, private_ips=[],
                     driver=self, extra={})
         return node
