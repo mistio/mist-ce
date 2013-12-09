@@ -506,10 +506,6 @@ define('app/views/monitoring', [
                             this.displayedData = this.data;
                         }
 
-                        // DEBUG TODO REMOVE IT
-                        //console.log("Number Of Measurements Graph Has: " + this.data.length);
-                        //console.log("Number Of Measurements Displayed: " + this.displayedData.length);
-                        // DEBUG TODO REMOVE IT
 
                         // If min & max == 0 y axis will not display values. max=1 fixes this.
                         var maxValue = d3.max(this.displayedData, function(d) { return d.value; });
@@ -741,16 +737,6 @@ define('app/views/monitoring', [
                                 else {
                                     var distance = this.data[this.data.length-1].value  - this.data[this.data.length-2].value;
 
-                                    // ----- Debug ----- //
-                                   /* console.log('Last Data  : ' + this.data[this.data.length-1].value);
-                                    console.log('Last Data-1: ' + this.data[this.data.length-2].value);
-                                    console.log("Distance: " + distance);
-                                    console.log("Current Translate:" + translate);
-                                    console.log("Max     Translate: " + translate);
-                                    console.log("%       Translate: " + (translate/this.valuesDistance)*100);
-                                    console.log("Max Translate Distance : " + this.valuesDistance);*/
-                                    // ----- Debug ----- //
-
                                     // Last value + the part that has been translated
                                     return this.data[this.data.length-2].value + 
                                             (distance * (this.valuesDistance-translate) / this.valuesDistance);
@@ -856,29 +842,22 @@ define('app/views/monitoring', [
 
                     function setupMouseOver(){
 
-                        // TODO make it display none until event triggered
+                        // Append the Selector Line
                         var mouseOverLine = d3svg.append('line')
-                                         .attr('class','axisLine')
+                                         .attr('class','selectorLine')
                                          .attr('x1',"" + margin.left)
                                          .attr('y1',"0" )
                                          .attr('x2',"" + margin.left)
-                                         .attr('y2',""+ (self.height - margin.bottom +3));
+                                         .attr('y2',""+ (self.height - margin.bottom +3))
+                                         .style("display", "none");
 
-                        // D3 Way
-                        /*d3svg.on('mouseover',function(){
-                            console.log("+++ Mouse Is Inside");
-                            });*/
-                        d3svg.on('mousemove',function(){
-                            //console.log("+++ Mouse Is Moving");
-                            var mouseX = d3.mouse(this)[0];
+                        var mouseX = 0;
+                        var mouseY = 0;
+                        var updateInterval;
 
+                        var updatePopUpValue = function(){
                                 if(mouseX > margin.left)
                                 {
-
-                                    // Set Mouse Line (TODO Possible Remove It)
-                                    mouseOverLine
-                                         .attr('x1',"" + mouseX)
-                                         .attr('x2',"" + mouseX);
 
                                     // Mouse X inside value line area
                                     var virtualMouseX = mouseX - margin.left;
@@ -912,13 +891,63 @@ define('app/views/monitoring', [
                                     // Value has a small loss of presition. We don't let it be less than 0
                                     currentValue < 0 ? 0 : currentValue;
 
-                                    // Print Value
-                                    console.log("Value: " + currentValue);
+                                    // Fix For Big Numbers
+                                    var valueText = "";
+                                    if(currentValue>=1000*1000)
+                                        valueText = (currentValue/1000/1000).toFixed(2) +"M";
+                                    else if(currentValue>=1000)
+                                        valueText = (currentValue/1000).toFixed(2) + "K";
+                                    else if(self.yAxisValueFormat == "%")
+                                        valueText = currentValue.toFixed(2) + "%";
+                                    else 
+                                        valueText = currentValue.toFixed(2);
+
+                                    // Update Value Text
+                                    $('#GraphsArea').children('.valuePopUp').text(valueText);
                                 }
-                            });
-                        /*d3svg.on('mouseout',function(){
-                            console.log("+++ Mouse Is Out");
-                            });*/
+                        };
+
+
+                        var updatePopUpOffset = function(event){
+                            mouseX = event.pageX - $('#'+ self.id).children('svg').offset().left
+                            mouseY = event.pageY - $('#'+ self.id).children('svg').offset().top
+                            if(mouseX > margin.left)
+                                {
+
+                                    // Set Mouse Line Cordinates
+                                    mouseOverLine
+                                         .attr('x1',"" + mouseX)
+                                         .attr('x2',"" + mouseX);
+                                $('#GraphsArea').children('.valuePopUp').css('left',(event.clientX+15) +"px");
+                                $('#GraphsArea').children('.valuePopUp').css('top',(event.clientY-35)+"px");
+
+                                updatePopUpValue();
+                            }
+
+
+                        };
+
+
+                        // Mouse Events
+                        $('#' + self.id).children('svg').mouseenter(function() {
+
+                            $(this).find('.selectorLine').show(0);
+                            $("#GraphsArea").find('.valuePopUp').show(0);
+
+
+                            // Setup Interval
+                            updateInterval = window.setInterval(updatePopUpValue,500);
+                        });
+                        $('#' + self.id).children('svg').mouseleave(function() {
+
+                            $(this).find('.selectorLine').hide(0);
+                            $("#GraphsArea").find('.valuePopUp').hide(0);
+
+                            // Clear Interval
+                            window.clearInterval(updateInterval);
+                        });
+                        $('#' + self.id).children('svg').mousemove(updatePopUpOffset);
+
                     }
 
 
