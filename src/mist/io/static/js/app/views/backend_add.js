@@ -101,7 +101,8 @@ define('app/views/backend_add', [
                         Mist.backendAddController.set('newBackendKey', backend.apikey);
                         Mist.backendAddController.set('newBackendSecret', 'getsecretfromdb');
                         break;
-                    } else if (event.target.title.substr(0,9) == 'rackspace' && backend.provider.substr(0,9) == 'rackspace') {
+                    } else if (event.target.title.substr(0,9) == 'rackspace' && event.target.title.substr(10) != 'lon') {
+                        //autocomplete for all rackspace regions except LON, that needs an account on Rackspace Lon
                         Mist.backendAddController.set('newBackendKey', backend.apikey);
                         Mist.backendAddController.set('newBackendSecret', 'getsecretfromdb');
                         break;
