@@ -529,7 +529,7 @@ a#mist-select-machines-button span.ui-btn-text {
 .ui-collapsible-inset .ui-collapsible-content {
     padding-top: 0px;
     margin-top: -1px;
-    overflow: scroll;
+    overflow: auto;
 }
 
 .btn-right {
