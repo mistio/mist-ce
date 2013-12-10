@@ -57,7 +57,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         machine.dns_name = machine_hostname
         machine.public_ips = [machine_hostname]
         machine_id = machine_hostname.replace('.', '').replace(' ', '')
-        machine.name = machine_id
+        machine.name = machine_hostname
         backend = model.Backend()
         backend.title = machine_hostname
         backend.provider = provider
