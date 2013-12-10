@@ -107,12 +107,12 @@ def check_auth(request):
     params = request.json_body
     email = params.get('email', '').lower()
     password = params.get('password', '')
-    timestamp = params.get('timestamp', '')
-    hash_key = params.get('hash', '')
+    # timestamp = params.get('timestamp', '')
+    # hash_key = params.get('hash', '')
 
-    payload = {'email': email, 'password': password,
-               'timestamp': timestamp, 'hash_key': hash_key}
-    core_uri = request.registry.settings['core_uri']
+    payload = {'email': email, 'password': password}
+               # 'timestamp': timestamp, 'hash_key': hash_key}
+    core_uri = config.CORE_URI
     ret = requests.post(core_uri + '/auth', params=payload, verify=False)
 
     if ret.status_code == 200:
@@ -643,7 +643,7 @@ def check_monitoring(request):
     """Ask the mist.io service if monitoring is enabled for this machine.
 
     """
-    core_uri = request.registry.settings['core_uri']
+    core_uri = config.CORE_URI
     user = user_from_request(request)
     email = user.email
     password = user.password
@@ -667,16 +667,16 @@ def update_monitoring(request):
 
     """
     user = user_from_request(request)
-    core_uri = request.registry.settings['core_uri']
+    core_uri = config.CORE_URI
     try:
         email = request.json_body['email']
         password = request.json_body['pass']
         payload = {'email': email, 'password': password}
-        ret = requests.post(request.settings['core_uri'] + '/auth',
+        ret = requests.post(core_uri + '/auth',
                             params=payload,
                             verify=False)
         if ret.status_code == 200:
-            request.settings['auth'] = 1
+            request.registry.settings['auth'] = 1
             with user.lock_n_load():
                 user.email = email
                 user.password = password
