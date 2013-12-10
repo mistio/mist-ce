@@ -473,6 +473,10 @@ define('app/models/machine', [
                 $("#monitoring-dialog").popup('open');
             },
 
+            backendIsBareMetal: function() {
+                return this.backend.provider == 'bare_metal';
+            }.property('backend'),
+
             init: function() {
                 this._super();
                 this.tags = Ember.ArrayController.create();

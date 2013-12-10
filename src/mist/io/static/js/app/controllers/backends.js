@@ -239,9 +239,6 @@ define('app/controllers/backends', [
                                 that.set('loadingMachines', false);
                             }
                             data.forEach(function(item){
-                                if (item.provider == 'bare_metal') {
-                                    item.is_baremetal = true;
-                                }
                                 that.pushObject(Backend.create(item));
                             });
                             that.content.forEach(function(item) {
