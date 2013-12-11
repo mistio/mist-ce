@@ -35,7 +35,7 @@ log = logging.getLogger(__name__)
 
 @core_wrapper
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
-                machine_hostname, machine_key, machine_user):
+                machine_hostname="", machine_key="", machine_user=""):
     """Adds a new backend to the user and returns the new backend_id."""
 
     if not provider:
