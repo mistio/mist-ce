@@ -31,6 +31,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 }).success(function(machines) {
                     if (!that.backend.enabled) return;
                     that._setContent(machines);
+                    that._reload();
                 }).error(function() {
                     if (!that.backend.enabled) return;
                     Mist.notificationController.notify('Failed to load machines for ' + that.backend.title);
@@ -44,7 +45,6 @@ define('app/controllers/machines', ['app/models/machine'],
 
 
             newMachine: function(name, image, size, location, key, script) {
-                log('Creating machine', this.name, 'to backend', this.backend.title);
                 
                 this.backend.set('create_pending', true);
                 
@@ -158,6 +158,13 @@ define('app/controllers/machines', ['app/models/machine'],
              *  Pseudo-Private Methods
              * 
              */
+
+            _reload: function() {
+                Ember.run.later(this, function() {
+                    this.load();
+                }, this.backend.poll_interval);
+            },
+
 
             _setContent: function(machines) {
                 var that = this;
