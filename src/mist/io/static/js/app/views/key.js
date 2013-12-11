@@ -24,7 +24,7 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
             init: function() {
                 this._super();
                 Mist.keysController.one('onLoad', this, 'load');
-                Mist.backendsController.on('updateMachines', this, 'updateMachines');
+                Mist.backendsController.on('onMachineListChange', this, 'updateMachines');
             },
 
 

@@ -162,7 +162,7 @@ define( 'app', [
         App.set('email', EMAIL);
         App.set('password', '');
         window.Mist = App;
-        
+
         App.ajaxGET = function(url, data) {
             return App.ajax('GET', url, data);
         };
@@ -192,28 +192,22 @@ define( 'app', [
             };
             call.ajax = function() {
                 if (type != 'GET') {
-                    if (data) {
-                        data.csrf_token = App.CSRFToken;
-                    } else {
-                        data = {'csrf_token': App.CSRFToken};
-                    }
+                    if (data) { data.csrf_token = App.CSRFToken; }
+                    else { data = {'csrf_token': App.CSRFToken}; }
                 }
                 $.ajax({
                     url: url,
                     type: type,
                     data: JSON.stringify(data),
                     complete: function(jqXHR) {
-                        result = jqXHR;
                         if (jqXHR.status == 200) {
-                            if (ret.success) {
+                            if (ret.success)
                                 ret.success(jqXHR.responseJSON);
-                            }
                         } else if (ret.error) {
                             ret.error(jqXHR.responseText);
                         }
-                        if (ret.complete) {
+                        if (ret.complete)
                             ret.complete(jqXHR.status == 200, jqXHR.responseJSON);
-                        }
                     }
                 });
                 return call;
@@ -257,30 +251,14 @@ define( 'app', [
             },
 
             redirect: function() {
-                Mist.backendsController.set('singleMachineRequest', Mist.getMachineIdByUrl());
+                Mist.backendsController.set('machineRequest', Mist.getMachineIdByUrl());
             },
 
             model: function() {
-                if (Mist.backendsController.get('loadingMachines')) {
-                    return {
-                        id: ' ',
-                        imageId: ' ',
-                        name: ' ',
-                        backend: ' ',
-                        selected: false,
-                        probed: false,
-                        probing: false,
-                        hasMonitoring: false,
-                        pendingMonitoring: false,
-                        pendingShell: false,
-                        pendingAddTag: false,
-                        pendingDeleteTag: false,
-                        pendingStats: false,
-                        pendingCreation: false,
-                        keysCount: 0,
-                    };
+                if (Mist.backendsController.loading || Mist.backendsController.loadingMachines) {
+                    return {id: ' '};
                 }
-                return Mist.backendsController.getMachineByUrlId(Mist.getMachineIdByUrl());
+                return Mist.backendsController.getMachine(Mist.getMachineIdByUrl());
             }        
         });   
         

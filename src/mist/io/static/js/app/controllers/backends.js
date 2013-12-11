@@ -168,6 +168,14 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 }
             },
 
+            getMachine: function(machineId) {
+                var machine = null;
+                this.content.some(function(backend) {
+                    return machine = backend.getMachine(machineId);
+                });
+                return machine;
+            },
+
 
             getMachineById: function(backendId, machineId) {
                 var content = this.content;
@@ -265,6 +273,13 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             providerList: function() {
                 return SUPPORTED_PROVIDERS;
             }.property('providerList'),
+
+
+            getRequestedMachine: function() {
+                if (this.machineRequest) {
+                    return this.getMachine(this.machineRequest);
+                }
+            },
 
 
 
@@ -371,19 +386,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
              *  Observers
              * 
              */
-
-            machineRequestObserver: function() {
-                if (this.machineRequest) {
-                    if (this.loadingBackends || this.loadingMachines) {
-                        return;
-                    }
-                    this.set('machineResponse', this.getMachineByUrlId(this.machineRequest));
-                    this.set('machineRequest', false);
-                }
-            }.observes('machineRequest', 'content.@each.loadingMachines'),
-
-
-
 
             imageCountObserver: function() {
                 Ember.run.once(this, '_updateImageCount');

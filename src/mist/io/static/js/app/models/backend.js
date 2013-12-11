@@ -88,22 +88,22 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
              */
 
             getSize: function(sizeId) {
-                this.sizes.getSize(sizeId);
+                return this.sizes.getSize(sizeId);
             },
 
 
             getImage: function(imageId) {
-                this.images.getImage(imageId);
+                return this.images.getImage(imageId);
             },
 
 
             getMachine: function(machineId) {
-                this.machines.getMachine(machineId);
+                return this.machines.getMachine(machineId);
             },
 
 
             getLocation: function(locationId) {
-                this.locations.getLocation(locationId);
+                return this.locations.getLocation(locationId);
             },
 
 
