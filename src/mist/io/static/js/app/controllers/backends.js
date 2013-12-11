@@ -330,6 +330,19 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 });
             },
 
+
+            _updateMachineCount: function() {
+                Ember.run(this, function() {
+                    var counter = 0;
+                    this.content.forEach(function(backend) {
+                        if (backend.enabled) counter += backend.machineCount;
+                    });
+                    this.set('machineCount', counter);
+                    this.trigger('onMachineListChange');
+                });
+            },            
+
+
             _updateLoadingImages: function() {
                 Ember.run(this, function() {
                     var loadingImages = false;
@@ -339,6 +352,19 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     this.set('loadingImages', loadingImages);
                 });
             },
+
+
+            _updateLoadingMachines: function() {
+                Ember.run(this, function() {
+                    var loadingMachines = false;
+                    this.content.some(function(backend) {
+                        if (backend.loadingMachines) return loadingMachines = true;
+                    });
+                    this.set('loadingMachines', loadingMachines);
+                });
+            },
+
+
 
             /**
              * 
@@ -357,26 +383,26 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             }.observes('machineRequest', 'content.@each.loadingMachines'),
 
 
-            loadingMachinesObserver: function() {
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var b = 0; b < contentLength; ++b) {
-                    if (content[b].loadingMachines) {
-                        this.set('loadingMachines', true);
-                        return;
-                    }
-                }
-                this.set('loadingMachines', false);
-            }.observes('loading', 'content.@each.loadingMachines'),
 
 
             imageCountObserver: function() {
                 Ember.run.once(this, '_updateImageCount');
             }.observes('content.@each.imageCount'),
+ 
+ 
+            mahcineCountObserver: function() {
+                Ember.run.once(this, '_updateMachineCount');
+            }.observes('content.@each.machineCount'),
+ 
 
             loadingImagesObserver: function() {
                 Ember.run.once(this, '_updateLoadingImages');
             }.observes('content.@each.loadingImages'),
+
+
+            loadingMachinesObserver: function() {
+                Ember.run.once(this, '_updateLoadingMachines');
+            }.observes('content.@each.loadingMachines'),
         });
     }
 );

@@ -50,6 +50,15 @@ define('app/controllers/images', ['app/models/image'],
              * 
              */
 
+            clear: function() {
+                Ember.run(this, function() {
+                    this.set('content', []);
+                    this.set('loading', false);
+                    this.trigger('onImageListChange');
+                });
+            },
+
+
             getImage: function(imageId) {
                 return this.content.findBy('id', imageId);
             },

@@ -50,6 +50,15 @@ define('app/controllers/locations', ['app/models/location'],
              * 
              */
 
+            clear: function() {
+                Ember.run(this, function() {
+                    this.set('content', []);
+                    this.set('loading', false);
+                    this.trigger('onLocationListChange');
+                });
+            },
+
+
             getLocation: function(locationId) {
                 return this.content.findBy('id', locationId);
             },

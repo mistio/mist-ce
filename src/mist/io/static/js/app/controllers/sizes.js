@@ -50,6 +50,15 @@ define('app/controllers/sizes', ['app/models/size'],
              * 
              */
 
+            clear: function() {
+                Ember.run(this, function() {
+                    this.set('content', []);
+                    this.set('loading', false);
+                    this.trigger('onSizeListChange');
+                });
+            },
+
+
             getSize: function(sizeId) {
                 return this.content.findBy('id', sizeId);
             },

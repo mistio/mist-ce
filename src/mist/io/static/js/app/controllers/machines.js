@@ -1,145 +1,47 @@
-define('app/controllers/machines', [
-    'app/models/machine',
-    'ember',
-    'jquery'
-    ],
+define('app/controllers/machines', ['app/models/machine'],
     /**
-     * Machines Controller
-     *
-     * @returns Class
+     *  Machines Controller
+     * 
+     *  @returns Class
      */
     function(Machine) {
         return Ember.ArrayController.extend(Ember.Evented, {
 
+            /**
+             *  Properties
+             */
+
             content: [],
+            loading: null,
             backend: null,
 
-            init: function() {
-                this._super();
-                this.refresh();
-            },
-           
+            /**
+             * 
+             *  Initialization
+             * 
+             */
             
-            machineCountObserver: function() {
-                Mist.backendsController.updateMachineCount();
-            }.observes('content.length'),
+            load: function() {
 
-            refresh: function() {
-                
-                if(!this.backend.enabled) {
-                    return;
-                }
-                
+                if (!this.backend.enabled) return;
+
                 var that = this;
-                
-                this.backend.set('state', 'waiting');
-                this.backend.set('loadingMachines', true);
-                $.getJSON('/backends/' + this.backend.id + '/machines', function(data) {
-                    if (!that.backend.enabled) {
-                        return;
-                    }
-                    data.forEach(function(item){
-                        var found = false;
-                        that.content.forEach(function(machine) {
-                            if (typeof Mist.monitored_machines !== 'undefined') {
-                                Mist.monitored_machines.forEach(function(machine_tuple){
-                                    backend_id = machine_tuple[0];
-                                    machine_id = machine_tuple[1];
-                                    if (that.backend.id == backend_id && machine.id == machine_id && machine.hasMonitoring == false) {
-                                        machine.set('hasMonitoring', true);
-                                        return false;
-                                    }
-                                 });
-                            }
-                            if (machine.id == item.id || (machine.id == -1 && machine.name == item.name)) {
-                                found = true;
-                                // machine.set(item); //FIXME this does not change anything;
-                                if (machine.id == -1) {
-                                    machine.set('id', item.id);
-                                }
-                                machine.set('state', item.state);
-                                machine.set('can_stop', item.can_stop);
-                                machine.set('can_start', item.can_start);
-                                machine.set('can_destroy', item.can_destroy);
-                                machine.set('can_reboot', item.can_reboot);
-                                machine.set('can_tag', item.can_tag);
-                                //FIXME check for changes
-                                machine.tags.set('content', item.tags);
-                                machine.set('public_ips', item.public_ips);
-                                machine.set('extra', item.extra);
-                                return false;
-                            }
-                        });
-                        
-                        Mist.rulesController.content.forEach(function(rule) {
-                            if (!rule.machine) {
-                                if (rule.backend_id == that.backend.id) {
-                                    rule.set('machine', Mist.backendsController.getMachineById(rule.backend_id,
-                                                                                               rule.machine_id));
-                                    if (rule.machine) {
-                                        rule.backend_id = '';
-                                        rule.machine_id = '';
-                                    }
-                                }
-                            }
-                        });
-                        
-                        if (!found && !that.backend.create_pending) {
-                            item.backend = that.backend;
-                            var machine = Machine.create(item);
-                            machine.tags.set('content', item.tags);
-                            that.arrayContentWillChange();
-                            that.pushObject(machine);
-                            that.arrayContentDidChange();
-                        }
-                    });
-                    
-                    that.content.forEach(function(item) {
-                        var found = false;
-                        
-                        data.forEach(function(machine) {
-                            log("machine id: " + machine.id);
-                            
-                            if (machine.id == item.id) {
-                                found = true;
-                                return false;
-                            }
-                        });
-                        
-                        if (!found && item.id != -1) {
-                            log("not found, deleting");
-                            that.removeObject(item);
-                        }
-                    });
-                    
-                    Ember.run.later(that, function(){
-                        this.refresh();
-                    }, that.backend.poll_interval);
-                    
-                    if (that.backend.error) {
-                        that.backend.set('error', false);
-                    }
-                    Mist.rulesController.redrawRules();
-                    that.backend.set('loadingMachines', false);
-                }).error(function(jqXHR, textstate, errorThrown) {
-                    Mist.notificationController.notify("Error loading machines for backend: " +
-                                                        that.backend.title);
-                    error(textstate, errorThrown, 'while loading machines for:', that.backend.title);
-                    
-                    if (that.backend.error) {
-                        // This backend seems hopeless, disabling it
-                        that.backend.set('state', 'offline');
-                        that.backend.set('enabled', false);
-                    } else {
-                        // Mark error but try once again
-                        that.backend.set('error', "Error loading machines");
-                        Ember.run.later(that, function(){
-                            this.refresh();
-                        }, that.backend.poll_interval); 
-                    }
-                    that.backend.set('loadingMachines', false);
+                this.set('loading', true);
+                Mist.ajaxGET('/backends/' + this.backend.id + '/machines', {
+                }).success(function(machines) {
+                    if (!that.backend.enabled) return;
+                    that._setContent(machines);
+                }).error(function() {
+                    if (!that.backend.enabled) return;
+                    Mist.notificationController.notify('Failed to load machines for ' + that.backend.title);
+                    that.backend.set('enabled', false);
+                }).complete(function(success) {
+                    if (!that.backend.enabled) return;
+                    that.set('loading', false);
+                    that.trigger('onLoad');
                 });
             },
+
 
             newMachine: function(name, image, size, location, key, script) {
                 log('Creating machine', this.name, 'to backend', this.backend.title);
@@ -225,6 +127,46 @@ define('app/controllers/machines', [
                         that.backend.set('error', textstate);
                         that.backend.set('create_pending', false);
                     }
+                });
+            },
+
+
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+
+            clear: function() {
+                Ember.run(this, function() {
+                    this.set('content', []);
+                    this.set('loading', false);
+                    this.trigger('onMachineListChange');
+                });
+            },
+
+
+            getMachine: function(machineId) {
+                return this.content.findBy('id', machineId);
+            },
+
+
+
+            /**
+             * 
+             *  Pseudo-Private Methods
+             * 
+             */
+
+            _setContent: function(machines) {
+                var that = this;
+                Ember.run(function() {
+                    that.set('content', []);
+                    machines.forEach(function(machine) {
+                        that.content.pushObject(Machine.create(machine));
+                    });
+                    that.trigger('onMachineListChange');
                 });
             }
         });

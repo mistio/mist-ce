@@ -74,7 +74,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     // Load data
                     this.sizes.load();
                     this.images.load();
-                    //this.machines.load();
+                    this.machines.load();
                     this.locations.load();
                 });
             }.on('init'),
@@ -116,8 +116,8 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 if (this.enabled) {
                     this.sizes.load();
                     this.images.load();
+                    this.machines.load();
                     this.locations.load();
-                    this.machines.refresh();
                 } else {
                     this.sizes.clear();
                     this.images.clear();
