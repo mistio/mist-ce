@@ -6,41 +6,167 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
      *  @returns Class
      */
     function(MachinesController, ImagesController, SizesController, LocationsController) {
-        return Ember.Object.extend({
+        return Ember.Object.extend(Ember.Evented, {
+
+            /**
+             *  Properties
+             */
 
             id: null,
             host: null,
+            state: null,
             title: null,
             apikey: null,
             enabled: null,
             provider: null,
-            state: 'unknown',
             poll_interval: null,
-            create_pending: false,
+            create_pending: null,
 
-            sizes: [],
-            images: [],
-            machines: [],
-            locations: [],
-            loadingSizes: false,
-            loadingImages: false,
-            loadingMachines: false,
-            loadingLocations: false,
+            sizes: null,
+            images: null,
+            machines: null,
+            locations: null,
+            
+            sizeCount: 0,
+            imageCount: 0,
+            machineCount: 0,
+            locationCoount: 0,
+            
+            loadingSizes: null,
+            loadingImages: null,
+            loadingMachines: null,
+            loadingLocations: null,
 
-            init: function() {
-                this._super();
-                this.images = ImagesController.create({backend: this, content: []});
-                this.machines = MachinesController.create({backend: this, content: []});
-                this.sizes = SizesController.create({backend: this, content: []});
-                this.locations = LocationsController.create({backend: this, content: []});
-                Ember.run.next(this, function() {
-                    if (!this.enabled) {
-                        this.toggle();
-                    }
+            /**
+             * 
+             *  Initialization
+             * 
+             */
+
+            load: function() {
+                Ember.run(this, function() {
+                    // Add controllers
+                    this.sizes = SizesController.create({backend: this, content: []});
+                    this.images = ImagesController.create({backend: this, content: []});
+                    this.machines = MachinesController.create({backend: this, content: []});
+                    this.locations = LocationsController.create({backend: this, content: []});
+                    
+                    // Add events
+                    this.sizes.on('onSizeListChange', this, '_updateSizeCount');
+                    this.images.on('onImageListChange', this, '_updateImageCount');
+                    this.machines.on('onMachineListChange', this, '_updateMachineCount');
+                    this.locations.on('onLocationListChange', this, '_updateLocationCount');
+                    
+                    // Add observers
+                    this.sizes.addObserver('loading', this, function() {
+                        Ember.run.once(this, 'loadingSizesObserver');
+                    });
+                    this.images.addObserver('loading', this, function() {
+                        Ember.run.once(this, 'loadingImagesObserver');
+                    });
+                    this.machines.addObserver('loading', this, function() {
+                        Ember.run.once(this, 'loadingMachinesObserver');
+                    });
+                    this.locations.addObserver('loading', this, function() {
+                        Ember.run.once(this, 'loadingLocationsObserver');
+                    });
+    
+                    // Load data
+                    this.sizes.load();
+                    this.images.load();
+                    //this.machines.load();
+                    this.locations.load();
+                });
+            }.on('init'),
+
+
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+
+            getSize: function(sizeId) {
+                this.sizes.getSize(sizeId);
+            },
+
+
+            getImage: function(imageId) {
+                this.images.getImage(imageId);
+            },
+
+
+            getMachine: function(machineId) {
+                this.machines.getMachine(machineId);
+            },
+
+
+            getLocation: function(locationId) {
+                this.locations.getLocation(locationId);
+            },
+
+
+            getMonitoredMachines: function(){
+                return this.machines.getMonitoredMachines();
+            },
+
+
+            toggle: function() {
+                if (this.enabled) {
+                    this.sizes.load();
+                    this.images.load();
+                    this.locations.load();
+                    this.machines.refresh();
+                } else {
+                    this.sizes.clear();
+                    this.images.clear();
+                    this.machines.clear();
+                    this.locations.clear();
+                }
+            }.observes('enabled'),
+
+
+
+            /**
+             * 
+             *  Pseudo-Private Methods
+             * 
+             */
+
+            _updateSizeCount: function() {
+                Ember.run(this, function() {
+                    this.set('sizeCount', this.sizes.content.length);
+                    this.trigger('onSizeListChange');
                 });
             },
 
-            stateObserver: function() {
+
+            _updateImageCount: function() {
+                Ember.run(this, function() {
+                    this.set('imageCount', this.images.content.length);
+                    this.trigger('onImageListChange');
+                });
+            },
+
+
+            _updateMachineCount: function() {
+                Ember.run(this, function() {
+                    this.set('machineCount', this.machines.content.length);
+                    this.trigger('onMachineListChange');
+                });
+            },
+
+
+            _updateLocationCount: function() {
+                Ember.run(this, function() {
+                    this.set('locationCount', this.locations.content.length);
+                    this.trigger('onLocationListChange');
+                });
+            },
+
+
+            _updateState: function() {
                 if (this.enabled) {
                     if (this.loadingMachines || this.loadingImages || this.loadingSizes || this.loadingLocations) {
                         this.set('state', 'waiting');
@@ -50,51 +176,39 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 } else {
                     this.set('state', 'offline');
                 }
+            },
+
+
+
+            /**
+             * 
+             *  Dynamic Observers
+             * 
+             */
+
+            loadingSizesObserver: function() {
+                this.set('loadingSizes', this.sizes.loading);
+            },
+
+
+            loadingImagesObserver: function() {
+                this.set('loadingImages', this.images.loading);
+            },
+
+
+            loadingMachinesObserver: function() {
+                this.set('loadingMachines', this.machines.loading);
+            },
+
+
+            loadingLocationsObserver: function() {
+                this.set('loadingLocations', this.locations.loading);
+            },
+
+
+            stateObserver: function() {
+                Ember.run.once(this, '_updateState');
             }.observes('loadingMachines', 'loadingImages', 'loadingSizes', 'loadingLocations', 'enabled'),
-
-            getSizeById: function(sizeId) {
-                for (var i = 0; i < this.sizes.content.length; i++) {
-                    if (this.sizes.content[i].id == sizeId) {
-                        return this.sizes.content[i];
-                    }
-                }
-            },
-
-            getImageById: function(imageId) {
-                for (var i = 0; i < this.images.content.length; i++) {
-                    if (this.images.content[i].id == imageId) {
-                        return this.images.content[i];
-                    }
-                }
-            },
-
-            toggle: function() {
-                if (this.enabled) {
-                    this.set('state', 'waiting');
-                    this.machines.refresh();
-                    this.images.init();
-                    this.sizes.init();
-                    this.locations.init();
-                } else {
-                    this.set('state', 'offline');
-                    this.machines.clear();
-                    this.images.clear();
-                    this.sizes.clear();
-                    this.locations.clear();
-                    this.set('loadingImages', false);
-                    this.set('loadingMachines', false);
-                }
-            }.observes('enabled'),
-
-            getMonitoredMachines: function(){
-                var monitoredMachines = [];
-                this.machines.forEach(function(machine_iter) {
-                    if (machine_iter.hasMonitoring) {
-                        monitoredMachines.push(machine_iter);
-                    }
-                });
-                return monitoredMachines;
-            }
         });
     }
 );

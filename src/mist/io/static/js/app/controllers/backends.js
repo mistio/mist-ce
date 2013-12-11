@@ -253,7 +253,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 this.trigger('updateMachines');
             }.observes('content.length'),
 
-
             updateImageCount: function() {
                 var count = 0;
                 this.content.forEach(function(backend) {
@@ -285,7 +284,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             _setContent: function(backends) {
                 var that = this;
                 Ember.run(function() {
-                    that.set('content', null);
+                    that.set('content', []);
                     backends.forEach(function(backend) {
                         that.content.pushObject(Backend.create(backend));
                     });
@@ -320,6 +319,26 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             },
 
 
+            _updateImageCount: function() {
+                Ember.run(this, function() {
+                    var counter = 0;
+                    this.content.forEach(function(backend) {
+                        if (backend.enabled) counter += backend.imageCount;
+                    });
+                    this.set('imageCount', counter);
+                    this.trigger('onImageListChange');
+                });
+            },
+
+            _updateLoadingImages: function() {
+                Ember.run(this, function() {
+                    var loadingImages = false;
+                    this.content.some(function(backend) {
+                        if (backend.loadingImages) return loadingImages = true;
+                    });
+                    this.set('loadingImages', loadingImages);
+                });
+            },
 
             /**
              * 
@@ -351,17 +370,13 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             }.observes('loading', 'content.@each.loadingMachines'),
 
 
+            imageCountObserver: function() {
+                Ember.run.once(this, '_updateImageCount');
+            }.observes('content.@each.imageCount'),
+
             loadingImagesObserver: function() {
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var b = 0; b < contentLength; ++b) {
-                    if (content[b].loadingImages) {
-                        this.set('loadingImages', true);
-                        return;
-                    }
-                }
-                this.set('loadingImages', false);
-            }.observes('loading', 'content.@each.loadingImages'),
+                Ember.run.once(this, '_updateLoadingImages');
+            }.observes('content.@each.loadingImages'),
         });
     }
 );

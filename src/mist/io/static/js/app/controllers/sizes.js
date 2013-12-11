@@ -1,41 +1,75 @@
-define('app/controllers/sizes', [
-    'app/models/size',
-    'ember',
-    'jquery'
-    ],
+define('app/controllers/sizes', ['app/models/size'],
     /**
-     * Sizes Controller
-     *
-     * @returns Class
+     *  Sizes Controller
+     * 
+     *  @returns Class
      */
     function(Size) {
-        return Ember.ArrayController.extend({
+        return Ember.ArrayController.extend(Ember.Evented, {
+
+            /**
+             *  Properties
+             */
 
             content: [],
+            loading: null,
             backend: null,
 
-            init: function() {
-                this._super();
-                
-                if (!this.backend.enabled) {
-                    return;
-                }
-                
-                this.backend.set('loadingSizes', true);
+            /**
+             * 
+             *  Initialization
+             * 
+             */
+
+            load: function() {
+
+                if (!this.backend.enabled) return;
+
                 var that = this;
-                $.getJSON('/backends/' + this.backend.id + '/sizes', function(data) {
-                    that.backend.set('loadingSizes', false);
-                    if (that.backend.enabled) {
-                        var content = new Array();
-                        data.forEach(function(size) {
-                            content.push(Size.create(size));
-                        });
-                        that.set('content', content);
-                    }
+                this.set('loading', true);
+                Mist.ajaxGET('/backends/' + this.backend.id + '/sizes', {
+                }).success(function(sizes) {
+                    if (!that.backend.enabled) return;
+                    that._setContent(sizes);
                 }).error(function() {
-                    Mist.notificationController.notify('Error loading sizes for backend: ' + that.backend.title);
-                    that.backend.set('loadingSizes', false);
+                    if (!that.backend.enabled) return;
+                    Mist.notificationController.notify('Failed to load sizes for ' + that.backend.title);
                     that.backend.set('enabled', false);
+                }).complete(function(success) {
+                    if (!that.backend.enabled) return;
+                    that.set('loading', false);
+                    that.trigger('onLoad');
+                });
+            },
+
+
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+
+            getSize: function(sizeId) {
+                return this.content.findBy('id', sizeId);
+            },
+
+
+
+            /**
+             * 
+             *  Pseudo-Private Methods
+             * 
+             */
+
+            _setContent: function(sizes) {
+                var that = this;
+                Ember.run(function() {
+                    that.set('content', []);
+                    sizes.forEach(function(size) {
+                        that.content.pushObject(Size.create(size));
+                    });
+                    that.trigger('onSizeListChange');
                 });
             }
         });

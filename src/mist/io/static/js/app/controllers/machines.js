@@ -9,7 +9,7 @@ define('app/controllers/machines', [
      * @returns Class
      */
     function(Machine) {
-        return Ember.ArrayController.extend({
+        return Ember.ArrayController.extend(Ember.Evented, {
 
             content: [],
             backend: null,
@@ -18,6 +18,7 @@ define('app/controllers/machines', [
                 this._super();
                 this.refresh();
             },
+           
             
             machineCountObserver: function() {
                 Mist.backendsController.updateMachineCount();

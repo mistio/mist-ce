@@ -218,7 +218,7 @@ define(['app/models/key'],
             _setContent: function(keys) {
                 var that = this;
                 Ember.run(function() {
-                    that.set('content', null);
+                    that.set('content', []);
                     keys.forEach(function(key) {
                         that.content.pushObject(Key.create(key));
                     });
