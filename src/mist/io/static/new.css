@@ -1,14 +1,15 @@
 
 /* Import css files
 -----------------------------------------------------------------------------------------------------------*/
-@import url("css/home.css");
 @import url("css/key.css");
+@import url("css/home.css");
+@import url("css/machine.css");
 @import url("css/key_list.css");
 @import url("css/key_create.css");
 @import url("css/backend_add.css");
 @import url("css/backend_edit.css");
-@import url("css/backend_button.css");
 @import url("css/machine_list.css");
+@import url("css/backend_button.css");
 
 
 /* Splash
@@ -25,7 +26,7 @@
 .mist-logo {
     width: 280px;
     height: 280px;
-    background: url('logo_splash.png') center no-repeat;
+    background: url("logo_splash.png") center no-repeat;
     position: absolute;
     left: 50%;
     top: 50%;

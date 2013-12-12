@@ -1,0 +1,17 @@
+
+/* Single Machine Page CSS
+-----------------------------------------------------------------------------------------------------------*/
+#single-machine-page .info-table {
+    width: 100%;
+}
+#single-machine-page .info-table td {
+    font-size: 14px;
+    margin: 0;
+    padding: 10px 12px;
+    width: 50%;
+    border-bottom: 1px solid #CFCFCF;
+}
+
+#single-machine-page .info-table tr td:nth-child(2) {
+    font-weight: bold;
+}

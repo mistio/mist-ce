@@ -1,11 +1,8 @@
-define('app/views/machine_manage_keys', [
-    'app/models/machine',
-    'text!app/templates/machine_manage_keys.html',
-    'ember'],
+define('app/views/machine_manage_keys', ['app/models/machine', 'text!app/templates/machine_manage_keys.html'],
     /**
-     * Machine Manage Keys
-     *
-     * @returns Class
+     *  Machine Manage Keys View
+     * 
+     *  @returns Class
      */
     function(Machine, machine_manage_keys_html) {
         return Ember.View.extend({
@@ -26,7 +23,7 @@ define('app/views/machine_manage_keys', [
                 var newNonAssociatedKeys = new Array();
                 var machine = this.parentMachine;
                 var found = false;
-                Mist.keysController.keys.forEach(function(key) {
+                Mist.keysController.content.forEach(function(key) {
                     found = false;
                     key.machines.some(function(k_machine) {
                         if (machine.id == k_machine[1] && machine.backend.id == k_machine[0]) {
@@ -46,8 +43,8 @@ define('app/views/machine_manage_keys', [
                 Ember.run.next(function() {
                     $('#associated-keys').listview();
                 });
-            }.observes('Mist.keysController.keys', 'Mist.keysController.keys.@each.machines',
-                                                   'Mist.keysController.keys.@each.probeState'),
+            }.observes('Mist.keysController.content', 'Mist.keysController.content.@each.machines',
+                                                   'Mist.keysController.content.@each.probeState'),
 
             didInsertElement: function() {
                 this.renderMachineKeysManager();

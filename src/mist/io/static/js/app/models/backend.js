@@ -112,21 +112,6 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             },
 
 
-            toggle: function() {
-                if (this.enabled) {
-                    this.sizes.load();
-                    this.images.load();
-                    this.machines.load();
-                    this.locations.load();
-                } else {
-                    this.sizes.clear();
-                    this.images.clear();
-                    this.machines.clear();
-                    this.locations.clear();
-                }
-            }.observes('enabled'),
-
-
 
             /**
              * 
@@ -177,6 +162,28 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     this.set('state', 'offline');
                 }
             },
+
+
+
+            /**
+             * 
+             *  Observers
+             * 
+             */
+
+            enabledObserver: function() {
+                if (this.enabled) {
+                    this.sizes.load();
+                    this.images.load();
+                    this.machines.load();
+                    this.locations.load();
+                } else {
+                    this.sizes.clear();
+                    this.images.clear();
+                    this.machines.clear();
+                    this.locations.clear();
+                }
+            }.observes('enabled'),
 
 
 
