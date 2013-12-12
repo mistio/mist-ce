@@ -726,10 +726,10 @@ def get_stats(request):
     email = user.email
     password = user.password
     params = request.params
-    start = params.get('start')
-    stop = params.get('stop')
-    step = params.get('step')
-    expression = params.get('expression')
+    start = params.get('start', '')
+    stop = params.get('stop', '')
+    step = params.get('step', '')
+    expression = params.get('expression', '')
 
     timestamp = datetime.utcnow().strftime("%s")
     auth_key = get_auth_key(request)
@@ -747,6 +747,29 @@ def get_stats(request):
     else:
         log.error("Error getting stats %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
+
+
+@view_config(route_name='loadavg', request_method='GET')
+def get_loadavg(request, action=None):
+    """Get the loadavg png displayed in the machines list view."""
+    params = request.params
+    start = params.get('start', '')
+    stop = params.get('stop', '')
+    user = user_from_request(request)
+    auth_key = get_auth_key(request)
+    core_uri = config.CORE_URI
+    payload = {
+        'auth_key': auth_key,
+        'start': start,
+        'stop': stop,
+    }
+    headers = {'Content-type': 'image/png', 'Accept': '*/*'}
+    ret = requests.get(core_uri+request.path, params=payload,
+                       headers=headers, verify=False)
+    if ret.status_code != 200:
+        log.error("Error getting loadavg %d:%s", ret.status_code, ret.text)
+        raise ServiceUnavailableError()
+    return Response(ret.content, content_type='image/png', request=request)
 
 
 @view_config(route_name='rules', request_method='POST', renderer='json')
