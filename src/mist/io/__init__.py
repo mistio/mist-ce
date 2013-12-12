@@ -13,7 +13,6 @@ from pyramid.config import Configurator
 
 from mist.io.resources import Root
 import mist.io.config
-from mist.io.model import User
 
 
 log = logging.getLogger(__name__)
@@ -26,6 +25,7 @@ def main(global_config, **settings):
 
     settings = {}
     # try to authenticate with mist.io service if email,password are available
+    from mist.io.model import User
     user = User()   # this automatically loads from db.yaml
     if user.email and user.password:
         payload = {'email': user.email, 'password': user.password}
