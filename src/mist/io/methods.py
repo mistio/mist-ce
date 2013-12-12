@@ -291,6 +291,14 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
                 else:
                     return
 
+    # assume key is already deployed
+    try:
+        ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
+        log.info("Key already associated.")
+        return
+    except MachineUnauthorizedError:
+        pass
+
     # if host is specified, try to actually deploy
     if host:
         log.info("Deploying key to machine.")
