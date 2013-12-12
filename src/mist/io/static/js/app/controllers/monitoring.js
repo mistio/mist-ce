@@ -158,44 +158,37 @@ define('app/controllers/monitoring', [
                             // Create Custom Objects From Data
                             for(var i=0; i < data.load.length; i++ )
                             {
-                                // DD/MM/YY-HH:MM:SS
-                                var measurementTime = metricTime.getDate()      + "/" + 
-                                                      (metricTime.getMonth()+1) + "/" +
-                                                      metricTime.getFullYear()  + "-" +
-                                                      metricTime.getHours()     + ":" + 
-                                                      metricTime.getMinutes()   + ":" + 
-                                                      metricTime.getSeconds();
 
                                 var cpuObj = {
-                                    time : measurementTime,
+                                    time : metricTime,
                                     value: ( (data['cpu']['utilization'][i] * data['cpu']['cores']) * 100)
                                 };
                                 var loadObj = {
-                                    time : measurementTime,
+                                    time : metricTime,
                                     value: data['load'][i]
                                 };
                                 var memObj = {
-                                    time : measurementTime,
+                                    time : metricTime,
                                     value: data['memory'][i]
                                 };
 
                                 // TODO Add Multiple Disks
                                 var diskReadObj = {
-                                    time: measurementTime,
+                                    time: metricTime,
                                     value: data['disk']['read'][disks[0]]['disk_octets'][i]
                                 };
                                 var diskWriteObj = {
-                                    time: measurementTime,
+                                    time: metricTime,
                                     value: data['disk']['write'][disks[0]]['disk_octets'][i]
                                 };
 
                                 // TODO Add Multiple Interfaces
                                 var netRXObj = {
-                                    time: measurementTime,
+                                    time: metricTime,
                                     value: data['network'][netInterfaces[0]]['rx'][i]
                                 };
                                 var netTXObj = {
-                                    time: measurementTime,
+                                    time: metricTime,
                                     value: data['network'][netInterfaces[0]]['tx'][i]
                                 };
 

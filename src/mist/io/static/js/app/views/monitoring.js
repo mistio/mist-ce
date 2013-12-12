@@ -350,8 +350,6 @@ define('app/views/monitoring', [
                     
                     var self = this;
 
-                    // Converts String into Date Object
-                    var timeFormater = d3.time.format("%d/%m/%Y-%X");
 
                     // Scale Functions will scale graph to defined width and height
                     var xScale = d3.time.scale().range([0, this.width - margin.left - margin.right]);
@@ -394,20 +392,14 @@ define('app/views/monitoring', [
                             if(measurements_received < NUM_OF_MIN_MEASUREMENTS)
                             {
                                 // Get First Measurement Time
-                                var metricTime = timeFormater.parse(newData[0].time);
-                                metricTime = new Date(metricTime.getTime() - STEP_SECONDS*1000);
+                                metricTime = new Date(newData[0].time.getTime() - STEP_SECONDS*1000);
 
                                 // Fill Data With Zeros
                                 for(var i= 0; i < (NUM_OF_MIN_MEASUREMENTS - measurements_received); i++)
                                 {
-                                    var measurementTime = metricTime.getDate()      + "/" + 
-                                                          (metricTime.getMonth()+1) + "/" +
-                                                          metricTime.getFullYear()  + "-" +
-                                                          metricTime.getHours()     + ":" + 
-                                                          metricTime.getMinutes()   + ":" + 
-                                                          metricTime.getSeconds();
+
                                     var zeroObject = {
-                                        time: measurementTime,
+                                        time: metricTime,
                                         value: 0
                                     }
 
@@ -426,18 +418,8 @@ define('app/views/monitoring', [
                                 dataBuffer = newData;
                             }
 
-                            // Fix Values, TypeCaste To Date And Number
-                            var fixedData = [];
-                            dataBuffer.forEach(function(d) {
-                                
-                                var tempObj   = {};
-                                tempObj.time  = timeFormater.parse(d.time);
-                                tempObj.value = +d.value;
-                                fixedData.push(tempObj);
-                            });
-
                             // Set Our Final Data
-                            this.data = fixedData;
+                            this.data = dataBuffer;
 
                             // On first run append the Graph
                             if(!this.timeUpdated){
@@ -458,17 +440,8 @@ define('app/views/monitoring', [
                                 this.data = this.data.slice(num_of_overflow_Objs);
                             }
 
-                            // Fix Values, TypeCast To Date And Number
-                            var fixedData = [];
-                            newData.forEach(function(d) {
-                                var tempObj = {};
-                                tempObj.time = timeFormater.parse(d.time);
-                                tempObj.value = +d.value;
-                                fixedData.push(tempObj);
-                            });
-
                             // Set Our Final Data
-                            this.data = this.data.concat(fixedData);
+                            this.data = this.data.concat(newData);
                         }
 
                         this.updateView();
@@ -595,7 +568,6 @@ define('app/views/monitoring', [
                                             else 
                                                 return d;
                                           }));
-
 
                         // Animate line, axis and grid
                         if(!this.timeUpdated)
