@@ -92,11 +92,11 @@ def home(request):
         'email': user.email,
         'supported_providers': config.SUPPORTED_PROVIDERS,
         'core_uri': config.CORE_URI,
-        'auth': request.registry.settings.get('auth', 0),        #FIXME
+        'auth': request.registry.settings.get('auth') and 1 or 0,
         'js_build': config.JS_BUILD,
         'js_log_level': config.JS_LOG_LEVEL,
         'google_analytics_id': config.GOOGLE_ANALYTICS_ID,
-        'is_core': False
+        'is_core': 0
     }
 
 
@@ -107,12 +107,12 @@ def check_auth(request):
     params = request.json_body
     email = params.get('email', '').lower()
     password = params.get('password', '')
-    timestamp = params.get('timestamp', '')
-    hash_key = params.get('hash', '')
+    # timestamp = params.get('timestamp', '')
+    # hash_key = params.get('hash', '')
 
-    payload = {'email': email, 'password': password,
-               'timestamp': timestamp, 'hash_key': hash_key}
-    core_uri = request.registry.settings['core_uri']
+    payload = {'email': email, 'password': password}
+               # 'timestamp': timestamp, 'hash_key': hash_key}
+    core_uri = config.CORE_URI
     ret = requests.post(core_uri + '/auth', params=payload, verify=False)
 
     if ret.status_code == 200:
@@ -643,7 +643,7 @@ def check_monitoring(request):
     """Ask the mist.io service if monitoring is enabled for this machine.
 
     """
-    core_uri = request.registry.settings['core_uri']
+    core_uri = config.CORE_URI
     user = user_from_request(request)
     email = user.email
     password = user.password
@@ -656,6 +656,7 @@ def check_monitoring(request):
     if ret.status_code == 200:
         return ret.json()
     else:
+        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
 
 
@@ -667,16 +668,16 @@ def update_monitoring(request):
 
     """
     user = user_from_request(request)
-    core_uri = request.registry.settings['core_uri']
+    core_uri = config.CORE_URI
     try:
         email = request.json_body['email']
         password = request.json_body['pass']
         payload = {'email': email, 'password': password}
-        ret = requests.post(request.settings['core_uri'] + '/auth',
+        ret = requests.post(core_uri + '/auth',
                             params=payload,
                             verify=False)
         if ret.status_code == 200:
-            request.settings['auth'] = 1
+            request.registry.settings['auth'] = 1
             with user.lock_n_load():
                 user.email = email
                 user.password = password
@@ -713,9 +714,62 @@ def update_monitoring(request):
     if ret.status_code == 402:
         raise PaymentRequiredError(ret.text)
     elif ret.status_code != 200:
+        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
 
     return ret.json()
+
+@view_config(route_name='stats', request_method='GET', renderer='json')
+def get_stats(request):
+    core_uri = config.CORE_URI
+    user = user_from_request(request)
+    email = user.email
+    password = user.password
+    params = request.params
+    start = params.get('start', '')
+    stop = params.get('stop', '')
+    step = params.get('step', '')
+    expression = params.get('expression', '')
+
+    timestamp = datetime.utcnow().strftime("%s")
+    auth_key = get_auth_key(request)
+
+    payload = {
+        'auth_key': auth_key,
+        'start': start,
+        'stop': stop,
+        'step': step,
+        'expression': expression
+    }
+    ret = requests.get(core_uri+request.path, params=payload, verify=False)
+    if ret.status_code == 200:
+        return ret.json()
+    else:
+        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
+        raise ServiceUnavailableError()
+
+
+@view_config(route_name='loadavg', request_method='GET')
+def get_loadavg(request, action=None):
+    """Get the loadavg png displayed in the machines list view."""
+    params = request.params
+    start = params.get('start', '')
+    stop = params.get('stop', '')
+    user = user_from_request(request)
+    auth_key = get_auth_key(request)
+    core_uri = config.CORE_URI
+    payload = {
+        'auth_key': auth_key,
+        'start': start,
+        'stop': stop,
+    }
+    headers = {'Content-type': 'image/png', 'Accept': '*/*'}
+    ret = requests.get(core_uri+request.path, params=payload,
+                       headers=headers, verify=False)
+    if ret.status_code != 200:
+        log.error("Error getting loadavg %d:%s", ret.status_code, ret.text)
+        raise ServiceUnavailableError()
+    return Response(ret.content, content_type='image/png', request=request)
 
 
 @view_config(route_name='rules', request_method='POST', renderer='json')

@@ -35,7 +35,7 @@ log = logging.getLogger(__name__)
 
 @core_wrapper
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
-                machine_hostname, machine_key, machine_user):
+                machine_hostname="", machine_key="", machine_user=""):
     """Adds a new backend to the user and returns the new backend_id."""
 
     if not provider:
@@ -290,6 +290,14 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
                                 "will try to redeploy.")
                 else:
                     return
+
+    # assume key is already deployed
+    try:
+        ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
+        log.info("Key already associated.")
+        return
+    except:
+        pass
 
     # if host is specified, try to actually deploy
     if host:

@@ -24,7 +24,7 @@ from libcloud.compute.types import Provider
 from libcloud.compute.types import NodeState
 
 
-CORE_URI = "https://mist.io"
+CORE_URI = "https://dev.mist.io"
 JS_BUILD = False
 JS_LOG_LEVEL = 3
 GOOGLE_ANALYTICS_ID = ""
