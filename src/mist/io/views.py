@@ -92,11 +92,11 @@ def home(request):
         'email': user.email,
         'supported_providers': config.SUPPORTED_PROVIDERS,
         'core_uri': config.CORE_URI,
-        'auth': request.registry.settings.get('auth', 0),        #FIXME
+        'auth': request.registry.settings.get('auth') and 1 or 0,
         'js_build': config.JS_BUILD,
         'js_log_level': config.JS_LOG_LEVEL,
         'google_analytics_id': config.GOOGLE_ANALYTICS_ID,
-        'is_core': False
+        'is_core': 0
     }
 
 
