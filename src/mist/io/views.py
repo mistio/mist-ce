@@ -656,6 +656,7 @@ def check_monitoring(request):
     if ret.status_code == 200:
         return ret.json()
     else:
+        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
 
 
@@ -713,9 +714,39 @@ def update_monitoring(request):
     if ret.status_code == 402:
         raise PaymentRequiredError(ret.text)
     elif ret.status_code != 200:
+        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
 
     return ret.json()
+
+@view_config(route_name='stats', request_method='GET', renderer='json')
+def get_stats(request):
+    core_uri = config.CORE_URI
+    user = user_from_request(request)
+    email = user.email
+    password = user.password
+    params = request.params
+    start = params.get('start')
+    stop = params.get('stop')
+    step = params.get('step')
+    expression = params.get('expression')
+
+    timestamp = datetime.utcnow().strftime("%s")
+    auth_key = get_auth_key(request)
+
+    payload = {
+        'auth_key': auth_key,
+        'start': start,
+        'stop': stop,
+        'step': step,
+        'expression': expression
+    }
+    ret = requests.get(core_uri+request.path, params=payload, verify=False)
+    if ret.status_code == 200:
+        return ret.json()
+    else:
+        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
+        raise ServiceUnavailableError()
 
 
 @view_config(route_name='rules', request_method='POST', renderer='json')

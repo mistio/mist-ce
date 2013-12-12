@@ -111,6 +111,7 @@ def add_routes(config):
     config.add_route('monitoring', '/monitoring')
     config.add_route('update_monitoring',
                      '/backends/{backend}/machines/{machine}/monitoring')
+    config.add_route('stats', '/backends/{backend}/machines/{machine}/stats')
 
     config.add_route('images', '/backends/{backend}/images')
     config.add_route('image', '/backends/{backend}/images/{image}')
