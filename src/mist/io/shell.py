@@ -218,25 +218,29 @@ class Shell(object):
             keypair = user.keypairs[key_id]
 
             # find username
-            saved_ssh_user = ''
-            for machine in keypair.machines:
-                if machine[:2] == [backend_id, machine_id]:
-                    try:
-                        # this should be the user, since machine =
-                        # [backend_id, machine_id, timestamp, ssh_user, sudoer]
-                        saved_ssh_user = machine[3]
-                    except:
-                        pass
-            # if username not found, try several alternatives
             users = []
-            if saved_ssh_user:
-                users.append(saved_ssh_user)
-            for name in ['root', 'ubuntu', 'ec2-user']:
-                if name not in users:
-                    users.append(name)
             # if username was specified, then try only that
             if username:
                 users = [username]
+            else:
+                for machine in keypair.machines:
+                    if machine[:2] == [backend_id, machine_id]:
+                        if len(machine) >= 4 and machine[3]:
+                            users.append(machine[3])
+                            break
+                # if username not found, try several alternatives
+                # check to see if some other key is associated with machine
+                for other_keypair in user.keypairs.values():
+                    for machine in other_keypair.machines:
+                        if machine[:2] == [backend_id, machine_id]:
+                            if len(machine) >= 4 and machine[3]:
+                                ssh_user = machine[3]
+                                if ssh_user not in users:
+                                    users.append(ssh_user)
+                # check some common default names
+                for name in ['root', 'ubuntu', 'ec2-user']:
+                    if name not in users:
+                        users.append(name)
             for ssh_user in users:
                 try:
                     self.connect(username=ssh_user,
