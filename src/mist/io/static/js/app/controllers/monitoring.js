@@ -38,27 +38,34 @@ define('app/controllers/monitoring', [
                 // First Data Request
                 self.machine.set('pendingStats', true);
 
-                var stop = (new Date()).getTime() - timeGap * 1000;
-                var start = stop - timeToRequestms;
+                // Note: Converting ms To s for start and stop, step remains ms
+                var stop  = Math.floor( ( (new Date()).getTime() - timeGap * 1000) / 1000 );
+                var start = Math.floor(stop - timeToRequestms/1000);
                 self.step = step;
 
                 // Last measurement must be the first measurement
                 self.lastMeasurmentTime = new Date(start);
 
-                console.log("Stop : " + (new Date(stop)));
-                console.log("Start: " + (new Date(start)));
+                console.log("Stop : " + (new Date(stop*1000)));
+                console.log("Start: " + (new Date(start*1000)));
                 self.receiveData(start, stop, self.step);
 
 
                 // Update Request Every SECONDS_INTERVAL miliseconds
                 window.monitoringInterval = window.setInterval(function() {
 
-                    var start = self.lastMeasurmentTime.getTime();
-                    var stop =  (new Date()).getTime() - timeGap * 1000; 
+                    var start = Math.floor( self.lastMeasurmentTime.getTime() /1000 ) ;
+                    var stop =  Math.floor( ((new Date()).getTime() - timeGap * 1000 ) / 1000 );
+                    var stopRemainder = (stop - start) % (step/1000);
+                    stop = stop - stopRemainder;
+
+                    // DEBUG TODO Remove It
+                    if(stopRemainder>0)
+                        error("Loss Of Presition: " + stopRemainder);
 
                     console.log("Last Mes: " + self.lastMeasurmentTime);
-                    console.log("Start: " + new Date(start));
-                    console.log("Stop : " + new Date(stop ));
+                    console.log("Start: " + new Date(start*1000));
+                    console.log("Stop : " + new Date(stop *1000 ));
 
                     machineNotResponding = false;
 
@@ -87,8 +94,8 @@ define('app/controllers/monitoring', [
 
                 var self = this;
 
-                // start: date/time we want to receive data from
-                // stop:  date/time we want to receeive data until
+                // start: date/time we want to receive data from (seconds)
+                // stop:  date/time we want to receeive data until (seconds)
                 // step:  miliseconds we want to split data
                 $.ajax({
                     url: URL_PREFIX + '/backends/' + this.machine.backend.id +
@@ -96,8 +103,8 @@ define('app/controllers/monitoring', [
                     type: 'GET',
                     async: true,
                     dataType: 'jsonp',
-                    data: {'start': Math.floor(start / 1000), 
-                            'stop': Math.floor(stop / 1000),
+                    data: {'start': start, 
+                            'stop': stop,
                             'step': step,
                             'auth_key': Mist.auth_key},
                     timeout: 8000,
@@ -107,7 +114,7 @@ define('app/controllers/monitoring', [
 
                         try {
 
-                            var measurmentsExpected = Math.floor((stop-start) / step) ;
+                            var measurmentsExpected = Math.floor((stop-start) / (step/1000)) ;
 
                             if(data.load.length == 0)
                                 throw "Error, Received none measurements";
@@ -116,6 +123,7 @@ define('app/controllers/monitoring', [
 
                             console.log("Measurement Expected: " + measurmentsExpected);
                             console.log("Measurement Received: " + data.load.length);
+                            console.log("");
 
                             var disks = [];
                             var netInterfaces = [];
@@ -143,15 +151,13 @@ define('app/controllers/monitoring', [
                                 netRX:     [],
                                 netTX:     []
                             };
-                            console.log("Received: " + data.load.length + " measurements");
-                            console.log("Step:" + step);
 
 
                             // Set CPU Cores
                             receivedData.cpuCores =  data['cpu']['cores'];
 
                             // Create a date with first measurement time
-                            var metricTime = new Date(start + step);
+                            var metricTime = new Date(start*1000 + step);
 
                             // Create Custom Objects From Data
                             for(var i=0; i < data.load.length; i++ )
