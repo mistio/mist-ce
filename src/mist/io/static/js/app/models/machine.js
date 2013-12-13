@@ -51,92 +51,26 @@ define('app/models/machine', [
                 return !this.isGhost;
             }.property('isGhost'),
 
-            reboot: function() {
-                log('Rebooting machine', this.name);
-
-                var that = this;
-                $.ajax({
-                    url: '/backends/' + this.backend.id + '/machines/' + this.id,
-                    type: 'POST',
-                    headers: { "cache-control": "no-cache" },
-                    data: 'action=reboot',
-                    success: function(data) {
-                        that.set('state', 'rebooting');
-                        info('Succesfully sent reboot to machine', that.name);
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error when sending reboot to machine ' +
-                                that.name);
-                        error(textstate, errorThrown, 'when sending reboot to machine',
-                                that.name);
-                    }
-                });
-            },
-
-            destroy: function() {
-                log('Destroying machine', this.name);
-                var that = this;
-                $.ajax({
-                    url: '/backends/' + this.backend.id + '/machines/' + this.id,
-                    type: 'POST',
-                    headers: { "cache-control": "no-cache" },
-                    data: 'action=destroy',
-                    success: function(data) {
-                        that.set('state', 'pending');
-                        that.set('hasMonitoring', false);
-                        that.set('pendingCreation', false);
-                        info('Successfully sent destroy to machine', that.name);
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error when sending destroy to machine ' + that.name);
-                        error(textstate, errorThrown, 'when sending destroy to machine', that.name);
-                    }
-                });
-            },
-
-            start: function() {
-                log('Starting machine', this.name);
-
-                var that = this;
-                $.ajax({
-                    url: 'backends/' + this.backend.id + '/machines/' + this.id,
-                    type: 'POST',
-                    headers: { "cache-control": "no-cache" },
-                    data: 'action=start',
-                    success: function(data) {
-                        that.set('state', 'pending');
-                        info('Successfully sent start to machine', that.name);
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error when sending start to machine ' +
-                                that.name);
-                        error(textstate, errorThrown, 'when sending start to machine',
-                                that.name);
-                    }
-                });
-            },
 
             shutdown: function() {
-                log('Stopping machine', this.name);
-
-                var that = this;
-                $.ajax({
-                    url: 'backends/' + this.backend.id + '/machines/' + this.id,
-                    type: 'POST',
-                    headers: { "cache-control": "no-cache" },
-                    data: 'action=stop',
-                    success: function(data) {
-                        that.set('state', 'stopped');
-                        info('Successfully sent stop to machine', that.name);
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error when sending stop to machine ' +
-                                that.name);
-                        error(textstate, errorThrown, 'when sending stop to machine',
-                                that.name);
-                    }
-                });
+                Mist.backendsController.shutdownMachine(this.id);
             },
+
+
+            destroy: function() {
+                Mist.backendsController.destoryMachine(this.id);
+            },
+
+
+            reboot: function() {
+                Mist.backendsController.rebootMachine(this.id);
+            },
+
+
+            start: function() {
+                Mist.backendsController.startMachine(this.id);
+            },
+
 
             getHost: function() {
                 if (this.extra.dns_name) {
@@ -365,7 +299,7 @@ define('app/models/machine', [
                     dataType: 'json',
                     timeout : 600000,
                     success: function(data) {
-                        if (!that.hasMonitoring){
+                        if (!that.hasMonitoring) {
                             $('.pending-monitoring h1').text('Installing collectd');
                             var prefix = URL_PREFIX || document.location.href.split('#')[0];
                             if (prefix.slice(-1) == '/') {

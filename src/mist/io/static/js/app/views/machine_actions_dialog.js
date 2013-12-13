@@ -23,9 +23,9 @@ define('app/views/machine_actions_dialog', [
                 }
 
                 $("#dialog-power" ).on( "popupafterclose", function( event, ui ) {
-                    Mist.confirmationController.set("title", 'Reboot Machine' + (plural ? 's' : ''));
+                    Mist.confirmationController.set('title', 'Reboot Machine' + (plural ? 's' : ''));
                     var names = '';
-                    machines.forEach(function(machine){
+                    machines.forEach(function(machine) {
                         names = names + ' ' + machine.name;
                     });
                     Mist.confirmationController.set("text", 'Are you sure you want to reboot' +

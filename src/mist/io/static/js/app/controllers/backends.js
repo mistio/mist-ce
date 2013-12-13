@@ -168,15 +168,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 }
             },
 
-            getMachine: function(machineId) {
-                var machine = null;
-                this.content.some(function(backend) {
-                    return machine = backend.getMachine(machineId);
-                });
-                return machine;
-            },
-
-
             getMachineById: function(backendId, machineId) {
                 var content = this.content;
                 var contentLength = this.content.length;
@@ -281,6 +272,51 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 }
             },
 
+
+            getBackend: function(backendId) {
+                return this.content.findBy('id', backendId);
+            },
+
+
+            getMachine: function(machineId) {
+                var machine = null;
+                this.content.some(function(backend) {
+                    return machine = backend.getMachine(machineId);
+                });
+                return machine;
+            },
+
+            shutdownMachine: function(machineId) {
+                this.content.some(function(backend) {
+                    if (backend.getMachine(machineId)) {
+                        backend.shutdownMachine(machineId);
+                    }
+                });
+            },
+
+            destroyMachine: function(machineId) {
+               this.content.some(function(backend) {
+                    if (backend.getMachine(machineId)) {
+                        backend.destroyMachine(machineId);
+                    }
+                });
+            },
+
+            rebootMachine: function(machineId) {
+               this.content.some(function(backend) {
+                    if (backend.getMachine(machineId)) {
+                        backend.rebootMachine(machineId);
+                    }
+                });
+            },
+
+            startMachine: function(machineId) {
+               this.content.some(function(backend) {
+                    if (backend.getMachine(machineId)) {
+                        backend.startMachine(machineId);
+                    }
+                });
+            },
 
 
             /**

@@ -1,6 +1,9 @@
 
 /* Single Machine Page CSS
 -----------------------------------------------------------------------------------------------------------*/
+#single-machine-page .ui-footer {
+    display: block;
+}
 #single-machine-page .info-table {
     width: 100%;
 }
@@ -11,7 +14,6 @@
     width: 50%;
     border-bottom: 1px solid #CFCFCF;
 }
-
 #single-machine-page .info-table tr td:nth-child(2) {
     font-weight: bold;
 }

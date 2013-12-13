@@ -1,8 +1,6 @@
-define('app/controllers/machine_add', [
-    'ember'
-    ],
+define('app/controllers/machine_add', ['ember'],
     /**
-     * Machine add controller
+     * Machine Add Controller
      *
      * @returns Class
      */

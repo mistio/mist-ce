@@ -107,8 +107,28 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             },
 
 
-            getMonitoredMachines: function(){
+            getMonitoredMachines: function() {
                 return this.machines.getMonitoredMachines();
+            },
+
+
+            shutdownMachine: function(machineId) {
+                this.machines.shutdownMachine(machineId);
+            },
+
+
+            destroyMachine: function(machineId) {
+               this.machines.destroyMachine(machineId);
+            },
+
+
+            rebootMachine: function(machineId) {
+               this.machines.rebootMachine(machineId);
+            },
+
+
+            startMachine: function(machineId) {
+               this.machines.startMachine(machineId);
             },
 
 

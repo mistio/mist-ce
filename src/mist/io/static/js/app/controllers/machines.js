@@ -131,6 +131,70 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
+            shutdownMachine: function(machineId) {
+                var that = this;
+                this.set('shutingdownMachine', true);
+                Mist.ajaxPOST('/backends/' + this.backend.id + '/machines/' + machineId, {
+                    'action' : 'stop'
+                }).success(function() {
+                    that._shutdownMachine(machineId);
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to shutdown machine');
+                }).complete(function() {
+                    that.set('shutingdownMachine', false);
+                    that.trigger('onMachineShutdown');
+                });
+            },
+
+
+            destroyMachine: function(machineId) {
+                var that = this;
+                this.set('destroyingMachine', true);
+                Mist.ajaxPOST('/backends/' + this.backend.id + '/machines/' + machineId, {
+                    'action' : 'destroy'
+                }).success(function() {
+                    that._destroyMachine(machineId);
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to destory machine');
+                }).complete(function() {
+                    that.set('destroyingMachine', false);
+                    that.trigger('onMachineDestroy');
+                });
+            },
+
+
+            rebootMachine: function(machineId) {
+                var that = this;
+                this.set('rebootingMachine', true);
+                Mist.ajaxPOST('/backends/' + this.backend.id + '/machines/' + machineId, {
+                    'action' : 'destroy'
+                }).success(function() {
+                    that.rebootMachine(machineId);
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to reboot machine');
+                }).complete(function() {
+                    that.set('rebootingMachine', false);
+                    that.trigger('onMachineReboot');
+                });
+            },
+
+
+            startMachine: function(machineId) {
+                var that = this;
+                this.set('startingMachine', true);
+                Mist.ajaxPOST('/backends/' + this.backend.id + '/machines/' + machineId, {
+                    'action' : 'destroy'
+                }).success(function() {
+                    that.startMachine(machineId);
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to start machine');
+                }).complete(function() {
+                    that.set('startingMachine', false);
+                    that.trigger('onMachineStart');
+                });
+            },
+
+
 
             /**
              * 
@@ -171,6 +235,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 Ember.run(function() {
                     that.set('content', []);
                     machines.forEach(function(machine) {
+                        machine.backend = that.backend;
                         that.content.pushObject(Machine.create(machine));
                     });
                     that.trigger('onMachineListChange');

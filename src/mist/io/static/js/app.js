@@ -43,6 +43,7 @@ define( 'app', [
     'app/controllers/backend_add',
     'app/controllers/backend_edit',
     'app/controllers/machine_add',
+    'app/controllers/machine_power',
     'app/controllers/key_add',
     'app/controllers/key_edit',
     'app/controllers/select_images',
@@ -63,6 +64,7 @@ define( 'app', [
     'app/views/shell',
     'app/views/image_list',
     'app/views/delete_tag',
+    'app/views/machine_power',
     'app/views/machine_tags_dialog',
     'app/views/machine_manage_keys',
     'app/views/machine_manage_keys_list_item',
@@ -85,6 +87,7 @@ define( 'app', [
                 BackendAddController,
                 BackendEditController,
                 MachineAddController,
+                MachinePowerController,
                 KeyAddController,
                 KeyEditController,
                 SelectImagesController,
@@ -105,6 +108,7 @@ define( 'app', [
                 Shell,
                 ImageListView,
                 DeleteTagView,
+                MachinePowerPopup,
                 MachineTagsDialog,
                 MachineManageKeysView,
                 MachineManageKeysListItemView,
@@ -325,6 +329,7 @@ define( 'app', [
         App.DeleteTagView = DeleteTagView;
         App.RuleView = RuleView;
         App.MachineTagsDialog = MachineTagsDialog;
+        App.MachinePowerPopup = MachinePowerPopup;
         App.ShellDialog = Shell;
         App.PowerDialog = SingleMachineActionsDialog;
         App.MachineActionsDialog = MachineActionsDialog;
@@ -349,6 +354,7 @@ define( 'app', [
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
         App.set('machineAddController', MachineAddController.create());
+        App.set('machinePowerController', MachinePowerController.create());
         App.set('selectImagesController', SelectImagesController.create());
         App.set('keysController', KeysController.create());
         App.set('rulesController', RulesController.create());

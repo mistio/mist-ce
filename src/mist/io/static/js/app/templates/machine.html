@@ -77,7 +77,7 @@
                 <div class="ui-loader ui-corner-all ui-body-b ui-loader-verbose">
                     <span class="ui-icon ui-icon-loading"></span>
                     <h1>Disabling monitoring</h1>
-                </div>   
+                </div>
                 {{else}}
     
                 <h1>Monitoring is currently disabled</h1>
@@ -115,7 +115,7 @@
                 </td></tr>
                 {{/if}}
 
-                {{#each view.basicvars}}
+                {{#each view.basicvInfo}}
                 <tr><td>
                     {{key}}
                 </td><td>
@@ -145,11 +145,11 @@
 
     </div>
     
+    {{view Mist.MachinePowerPopup}}
     {{view Mist.MachineManageKeysView}}
     {{view Mist.MachineTagsDialog machineBinding="this"}}
     {{view Mist.ShellDialog machineBinding="this"}}
-    {{view Mist.PowerDialog machineBinding="this"}}
-
+    
     <div data-role="popup">
         <ul data-role="listview">
             {{#each Mist.rulesController.metricList}}
