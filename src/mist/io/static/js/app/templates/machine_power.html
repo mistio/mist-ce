@@ -1,0 +1,20 @@
+<div id="machine-power-popup" class="tiny-popup" data-role="popup" data-overlay-theme="b" data-transition="slideup">
+    <div data-role="header">
+        <h1>Power</h1>
+    </div>
+    <div data-role="content">
+        {{#if Mist.machinePowerController.canShutdown}}
+        <a data-role="button" data-theme="b" {{action "actionClicked" "shutdown" target="view"}}>Shutdown</a>
+        {{/if}}
+        {{#if Mist.machinePowerController.canDestroy}}
+        <a data-role="button" data-theme="b" {{action "actionClicked" "destroy" target="view"}}>Destroy</a>
+        {{/if}}
+        {{#if Mist.machinePowerController.canReboot}}
+        <a data-role="button" data-theme="b" {{action "actionClicked" "reboot" target="view"}}>Reboot</a>
+        {{/if}}
+        {{#if Mist.machinePowerController.canStart}}
+        <a data-role="button" data-theme="b" {{action "actionClicked" "start" target="view"}}>Start</a>
+        {{/if}}
+        <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
+    </div>
+</div>

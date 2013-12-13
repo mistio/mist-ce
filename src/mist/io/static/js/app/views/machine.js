@@ -59,13 +59,6 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 }
             },
 
-            singleMachineResponseObserver: function() {
-                if (Mist.backendsController.singleMachineResponse) {
-                    this.get('controller').set('model', Mist.backendsController.singleMachineResponse);
-                    this.setGraph();
-                }
-            }.observes('Mist.backendsController.singleMachineResponse'),
-
             enableMonitoringClick: function() {
                 if (Mist.authenticated) {
                     var machine = this.get('controller').get('model');
@@ -90,14 +83,9 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 $("#monitoring-dialog").popup('close');
             },
 
-            openTrialDialog: function() {
-                $("#monitoring-dialog").popup('close');
-                $("#trial-dialog").popup('open');
-            },
-
             clickedPurchaseDialog: function() {
                 $("#monitoring-dialog").popup('close');
-                window.location.href = URL_PREFIX + "/account";  
+                window.location.href = URL_PREFIX + "/account";
             },
             
             rules: function(){
@@ -110,33 +98,6 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 });
                 return ret;
             }.property('Mist.rulesController.@each', 'Mist.rulesController.@each.machine'),
-
-            disabledShellClass: function() {
-                var machine = this.get('controller').get('model');
-                if (machine && machine.probed && machine.state == 'running') {
-                    return '';
-                } else {
-                    return 'ui-disabled';
-                }
-            }.property('controller.model.probed'),
-
-            disabledTagClass: function() {
-                var machine = this.get('controller').get('model');
-                if (machine && machine.can_tag) {
-                    return '';
-                } else {
-                    return 'ui-disabled';
-                }
-            }.property('controller.model.can_tag'),
-
-            disabledPowerClass: function() {
-                var machine = this.get('controller').get('model');
-                if (machine && machine.state === 'terminated') {
-                    return 'ui-disabled';
-                } else {
-                    return '';
-                }
-            }.property('controller.model.state'),
 
             keySelect: function(key) {
                 //$('#associate-button').show();
@@ -154,14 +115,6 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 }
                 return machine.name || machine.id;
             }.property('controller.model'),
-
-            providerIconClass: function() {
-                var machine = this.get('controller').get('model');
-                if (!machine) {
-                    return '';
-                }
-                return 'provider-' + machine.backend.provider;
-            }.property('machine'),
 
             addRuleClicked: function() {
                 // initialize the rule to some sensible defaults
@@ -187,19 +140,25 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 Mist.Router.router.transitionTo('machines');
             },
 
-            handlePendingMonitoring: function() {
-                var machine = this.get('controller').get('model');
-                if (machine && machine.pendingMonitoring) {
-                    $('.pending-monitoring').show();
-                    $('.monitoring-button').addClass('ui-disabled'); //.hide();
-                } else {
-                    $('.monitoring-button').removeClass('ui-disabled'); //.show();
-                    $('.pending-monitoring').hide();
-                }
-            }.observes('controller.model.pendingMonitoring'),
+            /**
+             * 
+             *  Actions
+             * 
+             */
+            
+            actions: {
+                manageKeysClicked: function() {
+                    $('#manage-keys').panel('open');
+                }, 
+               
+                addKeyClicked: function() {
+                    $('#non-associated-keys').listview('refresh');
+                    $('#associate-key-dialog').popup('option', 'positionTo', '#mist-manage-keys').popup('open');
+                },
 
-            powerClicked: function() {
-                Mist.machinePowerController.open(this.machine);
+                powerClicked: function() {
+                    Mist.machinePowerController.open(this.machine);
+                },
             },
 
             associateClicked: function() {
@@ -207,15 +166,6 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 $('#associate-key').popup('option', 'positionTo', '#associate-key-button').popup('open');
             },
      
-            manageKeysClicked: function() {
-                $('#manage-keys').panel('open');
-            }, 
-           
-            addKeyClicked: function() {
-                $('#non-associated-keys').listview('refresh');
-                $('#associate-key-dialog').popup('option', 'positionTo', '#mist-manage-keys').popup('open');
-            },
-
 /*
             doLogin: function() {
                 Mist.ajaxPOST('/auth', {
@@ -238,7 +188,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
 
             /**
              * 
-             *  Properties
+             *  Computed Properties
              * 
              */
 
@@ -270,62 +220,52 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
             basicInfo: function() {
                 if (!this.machine) return;
 
-                var publicIps = null;
+                var basicInfo = {};
 
-                if ($.isArray(machine.public_ips)) {
-                    publicIps = machine.public_ips.join();
-                } else if (typeof machine.public_ips == 'string') {
-                    publicIps = machine.public_ips;
+                if (this.machine.public_ips instanceof Array) {
+                    basicInfo['Public IPs'] = this.machine.public_ips.join();
+                } else if (typeof this.machine.public_ips == 'string') {
+                    basicInfo['Public IPs']  = this.machine.public_ips;
                 }
-
-                var privateIps = null;
-
-                if ($.isArray(machine.private_ips)) {
-                    privateIps = machine.private_ips.join();
-                } else if (typeof machine.private_ips == 'string') {
-                    privateIps = machine.private_ips;
+                if (this.machine.private_ips instanceof Array) {
+                    basicInfo['Private IPs']  = this.machine.private_ips.join();
+                } else if (typeof this.machine.private_ips == 'string') {
+                    basicInfo['Private IPs']  = this.machine.private_ips;
                 }
-
-                try {
-                    var dnsName = machine.extra.dns_name;
-                    var launchDate = machine.extra.launchdatetime;
-                } catch(e ){}
-                
-                var basicInfo = {
-                        'Public IPs': publicIps,
-                        'Private IPs': privateIps,
-                        'DNS Name': dnsName,
-                        'Launch Date': launchDate
-                };
-
-                if (machine.image && machine.image.name) {
-                    basicInfo.image = machine.image.name;
+                if (this.machine.extra) {
+                    if (this.machine.extra.dns_name) {
+                        basicInfo['DNS Name'] = this.machine.extra.dns_name;
+                    }
+                    if (this.machine.extra.launchdatetime) {
+                        basicInfo['Launch Date'] = this.machine.extra.launchdatetime;
+                    }
+                }
+                if (this.machine.image && this.machine.image.name) {
+                    basicInfo.image = this.machine.image.name;
                 }
 
                 var ret = [];
-
-                basicInfo.forEach(function(key, value) {
-                    if (typeof value == 'string') {
-                        ret.push({key:key, value: value});
-                    }
-                });
-
+                for (item in basicInfo) {
+                    if (typeof basicInfo[item] == 'string') {
+                        ret.push({key:item, value: basicInfo[item]});
+                    }               
+                }
                 return ret;
-
             }.property('machine'),
 
 
             metadata: function() {
                 if (!this.machine || !this.machine.extra) return;
                 var ret = [];
-                /*
-                this.machine.extra.forEach(function(key, value) {
+                
+                for (item in this.machine.extra) {
+                    var value = this.machine.extra[item];
                     if (typeof value == 'string' || typeof value == 'number') {
-                        ret.push({key:key, value: value});
+                        ret.push({key:item, value: value});
                     }
-                });
+                }
                 return ret;
-                */
+                
             }.property('machine'),
 
 
