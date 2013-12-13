@@ -35,7 +35,8 @@ log = logging.getLogger(__name__)
 
 @core_wrapper
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
-                machine_hostname="", machine_key="", machine_user=""):
+                machine_hostname="", machine_key="", machine_user="",
+                remove_on_error=True):
     """Adds a new backend to the user and returns the new backend_id."""
 
     if not provider:
@@ -46,12 +47,13 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
     if provider == 'bare_metal':
         if not machine_hostname:
             raise RequiredParameterMissingError('machine_hostname')
-        if not machine_key:
-            raise RequiredParameterMissingError('machine_key')
-        if machine_key not in user.keypairs:
-            raise KeypairNotFoundError(machine_key)
-        if not machine_user:
-            machine_user = 'root'
+        if remove_on_error:
+            if not machine_key:
+                raise RequiredParameterMissingError('machine_key')
+            if machine_key not in user.keypairs:
+                raise KeypairNotFoundError(machine_key)
+            if not machine_user:
+                machine_user = 'root'
 
         machine = model.Machine()
         machine.dns_name = machine_hostname
@@ -70,17 +72,18 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
             user.backends[backend_id] = backend
             # try to connect. this will either fail and we'll delete the
             # backend, or it will work and it will create the association
-            try:
-                ssh_command(
-                    user, backend_id, machine_id, machine_hostname, 'uptime',
-                    key_id=machine_key, username=machine_user, password=None
-                )
-            except MachineUnauthorizedError as exc:
-                # remove backend
-                del user.backends[backend_id]
-                user.save()
-                raise BackendUnauthorizedError(exc)
-            user.save()  # this isn't needed cause ssh_command saved
+            if remove_on_error:
+                try:
+                    ssh_command(
+                        user, backend_id, machine_id, machine_hostname, 'uptime',
+                        key_id=machine_key, username=machine_user, password=None
+                    )
+                except MachineUnauthorizedError as exc:
+                    # remove backend
+                    del user.backends[backend_id]
+                    user.save()
+                    raise BackendUnauthorizedError(exc)
+            user.save()
     else:
         # if api secret not given, search if we already know it
         # FIXME: just pass along an empty apisecret
@@ -94,10 +97,11 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if not provider.__class__ is int and ':' in provider:
             provider, region = provider.split(':')[0], provider.split(':')[1]
 
-        if not apikey:
-            raise RequiredParameterMissingError("apikey")
-        if not apisecret:
-            raise RequiredParameterMissingError("apisecret")
+        if remove_on_error:
+            if not apikey:
+                raise RequiredParameterMissingError("apikey")
+            if not apisecret:
+                raise RequiredParameterMissingError("apisecret")
 
         backend = model.Backend()
         backend.title = title
@@ -114,14 +118,15 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
             raise BackendExistsError(backend_id)
 
         # validate backend before adding
-        conn = connect_provider(backend)
-        try:
-            machines = conn.list_nodes()
-        except InvalidCredsError:
-            raise BackendUnauthorizedError()
-        except Exception as exc:
-            log.error("Error while trying list_nodes: %r". exc)
-            raise BackendUnavailableError()
+        if remove_on_error:
+            conn = connect_provider(backend)
+            try:
+                machines = conn.list_nodes()
+            except InvalidCredsError:
+                raise BackendUnauthorizedError()
+            except Exception as exc:
+                log.error("Error while trying list_nodes: %r". exc)
+                raise BackendUnavailableError()
 
         with user.lock_n_load():
             user.backends[backend_id] = backend
