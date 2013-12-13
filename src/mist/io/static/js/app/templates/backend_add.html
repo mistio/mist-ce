@@ -25,19 +25,21 @@
             </ul>
         </div>
 
-        <label for="create-backend-key" id="ApiKeylabel">2. API Key:</label>
-        {{view Mist.TextField
-            valueBinding="Mist.backendAddController.newBackendKey"
-            name="create-backend-key"
-            id="create-backend-key"}}
+        <div id="addBackendInfo">
+            <label for="create-backend-key" id="ApiKeylabel">2. API Key:</label>
+            {{view Mist.TextField
+                valueBinding="Mist.backendAddController.newBackendKey"
+                name="create-backend-key"
+                id="create-backend-key"}}
 
-        <label for="create-backend-secret" id="ApiSecretlabel">3. API Secret:</label>
-        {{view Mist.TextField
-            type="password"
-            valueBinding="Mist.backendAddController.newBackendSecret"
-            name="create-backend-secret"
-            id="create-backend-secret"}}
-
+            <label for="create-backend-secret" id="ApiSecretlabel">3. API Secret:</label>
+            {{view Mist.TextField
+                type="password"
+                valueBinding="Mist.backendAddController.newBackendSecret"
+                name="create-backend-secret"
+                id="create-backend-secret"}}
+        </div>
+        
         <div id="addBackendOpenstack">
             <label for="create-backend-url" id="URLlabel">4. Auth URL:</label>
             {{view Mist.TextField
@@ -52,6 +54,37 @@
                 id="create-backend-tenant"}}
         </div>
         
+        <div id="addBackendBareMetal">
+            <label for="create-bareserver-ip" id="Iplabel">2. Hostname:</label>
+            {{view Mist.TextField
+                valueBinding="Mist.backendAddController.newBareMetalServerIP"
+                name="create-bareserver-ip"
+                id="create-bareserver-ip"}}
+
+            <label for="create-bareserver-key" id="Keylabel">3. SSH Key:</label>    
+            <div class="select-key-collapsible" data-role="collapsible" data-iconpos="right"
+                data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u" data-theme="d">
+                <h2>Select Key</h2>
+                <ul class="select-keys-listmenu" data-role="listview" data-theme="d">
+                    {{#each Mist.keysController.keys}}
+                    <li data-icon="false" data-corners="true">
+                        <a href="#" {{bindAttr title="name"}} 
+                                    {{action selectKey this target="view"}}>{{this.name}}</a>
+                    </li>
+                    {{/each}}
+                    <li data-icon="false" data-theme="b" data-corners="true">
+                        <a href="#" {{action "createBareMetalKeyClicked" target="view"}}>Create key</a>
+                    </li>
+                </ul>
+            </div>
+            
+            <label for="create-bareserver-user" id="Userlabel">4. User:</label>
+            {{view Mist.TextField
+                valueBinding="Mist.backendAddController.newBareMetalServerUser"
+                name="create-bareserver-user"
+                id="ROOTcreate-bareserver-user"}}
+        </div>
+
         {{#if view.pendingCreation}}
         <div class="ajax-loader"></div>
         {{/if}}
@@ -61,4 +94,11 @@
             <button id="create-backend-ok" data-theme="b" disabled {{action "addButtonClick" target="view"}}>Add</button>
         </div>
     </div>
+</div>
+
+<div data-role="popup" id="create-key-dialog" data-transition="pop" data-overlay-theme="a">
+    <div data-role="header">
+        <h1>Create key</h1>
+    </div>
+    {{view Mist.AddKeyView data-role="content"}}
 </div>

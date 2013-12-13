@@ -15,6 +15,7 @@ define('app/views/machine_add_dialog', [
             imagesBinding: 'Mist.machineAddController.newMachineBackend.images',
 
             openMachineAddDialog: function(){
+                this.clear();            
                 var that = this;
                 
                 $('.select-listmenu').listview();
@@ -257,10 +258,10 @@ define('app/views/machine_add_dialog', [
                         Ember.run.next(function(){
                             if (Mist.machineAddController.newMachineNameReady) {
                                 $('.select-provider-collapsible').removeClass('ui-disabled');
-                                if (Mist.backendsController.content.length == 1){
+                                if (Mist.backendsController.getCloudProviders().length == 1){
                                     $('.select-provider-collapsible').collapsible('option','collapsedIcon','check');                                    
-                                    $('.select-provider-collapsible span.ui-btn-text').text(Mist.backendsController.content[0].title);
-                                    Mist.machineAddController.set('newMachineBackend', Mist.backendsController.content[0]);
+                                    $('.select-provider-collapsible span.ui-btn-text').text(Mist.backendsController.getCloudProviders()[0].title);
+                                    Mist.machineAddController.set('newMachineBackend', Mist.backendsController.getCloudProviders()[0]);
                                 }
                                                                 
                                 $('.select-image-collapsible').addClass('ui-disabled');
