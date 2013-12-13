@@ -777,7 +777,7 @@ def update_rule(request):
     """Creates or updates a rule.
 
     """
-    core_uri = request.registry.settings['core_uri']
+    core_uri = config.CORE_URI
     payload = request.json_body.copy()
     payload['auth_key'] = get_auth_key(request)
 
@@ -785,6 +785,7 @@ def update_rule(request):
     ret = requests.post(core_uri+request.path, params=payload, verify=False)
 
     if ret.status_code != 200:
+        log.error("Error updating rule %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
 
     return ret.json()
@@ -796,7 +797,7 @@ def delete_rule(request):
 
     """
     # TODO: factor out common code in a shared function
-    core_uri = request.registry.settings['core_uri']
+    core_uri = config.CORE_URI
     payload = {}
     payload['auth_key'] = get_auth_key(request)
 
@@ -804,6 +805,7 @@ def delete_rule(request):
     ret = requests.delete(core_uri+request.path, params=payload, verify=False)
 
     if ret.status_code != 200:
+        log.error("Error deleting rule %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
 
     return OK
