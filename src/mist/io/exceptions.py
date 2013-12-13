@@ -129,3 +129,7 @@ class ServiceUnavailableError(MistError):
 
 class BackendUnavailableError(ServiceUnavailableError):
     msg = "Backend unavailable"
+
+
+class MachineUnavailableError(ServiceUnavailableError):
+    msg = "Machine currently unavailable"

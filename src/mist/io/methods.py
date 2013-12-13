@@ -432,7 +432,6 @@ def get_machine_actions(machine_from_api, conn):
     can_destroy = True
     can_reboot = True
     can_tag = True
-
     if conn.type in config.EC2_PROVIDERS:
         can_stop = True
 
@@ -451,8 +450,8 @@ def get_machine_actions(machine_from_api, conn):
         can_start = False
         can_stop = False
         can_reboot = False
-    elif machine_from_api.state is NodeState.UNKNOWN:
-        # We assume uknown state mean stopped
+    elif machine_from_api.state in (NodeState.UNKNOWN, NodeState.STOPPED):
+        # We assume unknown state mean stopped
         if conn.type in (Provider.NEPHOSCALE, Provider.SOFTLAYER,
                          Provider.DIGITAL_OCEAN) or conn.type in config.EC2_PROVIDERS:
             can_stop = False
@@ -509,7 +508,6 @@ def list_machines(user, backend_id):
         image_id = m.image or m.extra.get('imageId', None)
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
-
         machine = {'id': m.id,
                    'uuid': m.get_uuid(),
                    'name': m.name,
@@ -900,8 +898,10 @@ def _machine_action(user, backend_id, machine_id, action):
     except AttributeError:
         raise BadRequestError("Action %s not supported for this machine"
                               % action)
+
     except Exception as e:
-        raise InternalServerError("Error while attempting to %s machine"
+        log.error("%r", e)
+        raise MachineUnavailableError("Error while attempting to %s machine"
                                   % action)
 
 
