@@ -42,8 +42,10 @@ define('app/controllers/monitoring', [
                 var start = stop - timeToRequestms;
                 self.step = step;
 
+                // Last measurement must be the first measurement
+                self.lastMeasurmentTime = new Date(start);
 
-                console.log("Stop: " + (new Date(stop)));
+                console.log("Stop : " + (new Date(stop)));
                 console.log("Start: " + (new Date(start)));
                 self.receiveData(start, stop, self.step);
 
@@ -51,18 +53,14 @@ define('app/controllers/monitoring', [
                 // Update Request Every SECONDS_INTERVAL miliseconds
                 window.monitoringInterval = window.setInterval(function() {
 
-                    var start = (new Date()).getTime() - (timeGap+10) * 1000;
+                    var start = self.lastMeasurmentTime.getTime();
                     var stop =  (new Date()).getTime() - timeGap * 1000; 
 
-                    // Ask all the datat that we didn't receive
-                    if(self.machineNotResponding){
+                    console.log("Last Mes: " + self.lastMeasurmentTime);
+                    console.log("Start: " + new Date(start));
+                    console.log("Stop : " + new Date(stop ));
 
-                        // Get last time from a graph
-                        if(self.lastMeasurmentTime.getTime() < start)
-                            start = self.lastMeasurmentTime.getTime();
-
-                        machineNotResponding = false;
-                    }
+                    machineNotResponding = false;
 
                     self.receiveData(start, stop, self.step);
 
@@ -153,7 +151,7 @@ define('app/controllers/monitoring', [
                             receivedData.cpuCores =  data['cpu']['cores'];
 
                             // Create a date with first measurement time
-                            var metricTime = new Date(start);
+                            var metricTime = new Date(start + step);
 
                             // Create Custom Objects From Data
                             for(var i=0; i < data.load.length; i++ )
