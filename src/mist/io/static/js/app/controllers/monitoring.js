@@ -215,7 +215,6 @@ define('app/controllers/monitoring', [
                             self.finishedGraphUpdate();
                         }
                         catch(err) {
-                            Mist.notificationController.notify(err);
                             error(err);
                             self.machineNotResponding = true;
                         }
