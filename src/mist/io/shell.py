@@ -11,11 +11,13 @@ from time import time
 
 
 import paramiko
+import socket
 
 
 from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError
+from mist.io.exceptions import ServiceUnavailableError
 from mist.io.helpers import get_temp_file
 
 log = logging.getLogger(__name__)
@@ -86,20 +88,29 @@ class Shell(object):
         else:
             rsa_key = None
 
-        try:
-            self.ssh.connect(
-                self.host,
-                port=port,
-                username=username,
-                password=password,
-                pkey=rsa_key,
-                allow_agent=False,
-                look_for_keys=False
-            )
-        except paramiko.SSHException as exc:
-            log.error("ssh exception %r", exc)
-            raise MachineUnauthorizedError("Couldn't connect to %s@%s:%s. %s"
-                                           % (username, self.host, port, exc))
+        attempts = 3
+        while attempts:
+            attempts -= 1
+            try:
+                self.ssh.connect(
+                    self.host,
+                    port=port,
+                    username=username,
+                    password=password,
+                    pkey=rsa_key,
+                    allow_agent=False,
+                    look_for_keys=False,
+                    timeout=10
+                )
+            except paramiko.AuthenticationError as exc:
+                log.error("ssh exception %r", exc)
+                raise MachineUnauthorizedError("Couldn't connect to %s@%s:%s. %s"
+                                               % (username, self.host, port, exc))
+            except socket.error as exc:
+                log.error("Got ssh error: %r", exc)
+                if not attempts:
+                    raise ServiceUnavailableError("SSH timed-out repeatedly.")
+
 
     def disconnect(self):
         """Close the SSH connection."""
