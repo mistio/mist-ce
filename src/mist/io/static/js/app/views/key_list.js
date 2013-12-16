@@ -15,7 +15,7 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
 
             /**
              * 
-             *  Initialization 
+             *  Initialization
              * 
              */
 

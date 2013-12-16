@@ -8,9 +8,7 @@ define('app/views/key_list_item', ['text!app/templates/key_list_item.html', 'emb
         return Ember.View.extend({
 
             /**
-             * 
              *  Properties
-             * 
              */
 
             tagName:'li',

@@ -25,7 +25,7 @@ define('app/views/home', ['app/views/mistscreen','text!app/templates/home.html',
                     // ...
                     $('#backend-buttons').css('display', 'inline-block');
                     Ember.run.next(function() {
-                        // At this point, I want to mention that the 
+                        // At this point, I would like to mention that the 
                         // display attribute was set to block beforehand
                         $('#backend-buttons').css('display', 'block');
                     });
