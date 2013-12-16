@@ -13,7 +13,7 @@ This is a simle script to pull the branches you want
 -c      The core branch to pull
 
 EXAMPLE:
-/mistpull -d /home/johndoe/MIST/mist.io/ -i chaos.io -c chaos.core
+/mistpull -s -d /home/johndoe/MIST/mist.io/ -i chaos.io
 EOF
 }
 
