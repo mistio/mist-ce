@@ -102,7 +102,7 @@ class Shell(object):
                     look_for_keys=False,
                     timeout=10
                 )
-            except paramiko.AuthenticationError as exc:
+            except paramiko.AuthenticationException as exc:
                 log.error("ssh exception %r", exc)
                 raise MachineUnauthorizedError("Couldn't connect to %s@%s:%s. %s"
                                                % (username, self.host, port, exc))
