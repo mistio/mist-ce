@@ -132,6 +132,10 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             },
 
 
+            searchImages: function(filter, callback) {
+                this.images.searchImages(filter, callback);
+            },
+
 
             /**
              * 

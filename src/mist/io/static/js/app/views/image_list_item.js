@@ -8,6 +8,7 @@ define('app/views/image_list_item', [
      */
     function(image_list_item_html) {
         return Ember.View.extend({
+                
                 tagName:'li',
                 
                 starImage: function() {

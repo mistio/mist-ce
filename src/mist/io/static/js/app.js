@@ -6,13 +6,11 @@ require.config({
         mocha: 'lib/mocha-1.4.2',
         chai: 'lib/chai-1.2.0',
         jquery: 'lib/jquery-1.10.2',
-        jqueryUi: 'lib/jquery-ui-1.9.1.custom',
         text: 'lib/require/text',
         mobile: 'lib/jquery.mobile-1.4.0-rc.1',
         ember: 'lib/ember-1.1.2',
         handlebars: 'lib/handlebars-1.0.0',
         d3: 'lib/d3-2.10.1',
-        cubism: 'lib/cubism-1.2.2',
         md5: 'lib/md5',
         sha256: 'lib/sha256',
     },
@@ -20,14 +18,8 @@ require.config({
         'ember': {
             deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256']
         },
-        'jqueryUi': {
-            deps: ['jquery']
-        },
         'd3': {
             deps: ['jquery']
-        },
-        'cubism':{
-            deps: ['d3']
         }
     }
 });
@@ -35,7 +27,6 @@ require.config({
 // Load our app
 define( 'app', [
     'jquery',
-    'jqueryUi',
     'd3',
     'app/controllers/backends',
     'app/controllers/confirmation',
@@ -76,10 +67,8 @@ define( 'app', [
     'app/views/rule',
     'app/views/user_menu',
     'text!app/templates/machine.html',
-    'cubism',
     'ember'
     ], function($,
-                jQueryUI,
                 d3,
                 BackendsController,
                 ConfirmationController,
@@ -119,8 +108,7 @@ define( 'app', [
                 KeyEditDialog,
                 RuleView,
                 UserMenuView,
-                machine_html,
-                cubism
+                machine_html
                 ) {
 
     function initialize() {
@@ -143,21 +131,21 @@ define( 'app', [
             LOG_STATE_TRANSITIONS: false,
             email: null,
             password: null,
-            
+
             ready: function(){
-                Em.run.next(function(){
+                Ember.run.next(function(){
                     var id = false;
                     for(key in Ember.View.views) {
                         if("application" == Ember.View.views[key].renderedName) {
                             id = key;
                         }
                     }
-                    if(id){
+                    if(id) {
                         $("#" + id).attr('data-role', 'page');
                         require(['mobile'], function(){console.log('jqm loaded');});
                     }
                 });
-            }  
+            }
         });
 
         //App.set('CSRFToken', CSRF_TOKEN);
@@ -307,7 +295,7 @@ define( 'app', [
             }
         
             return (viewPortTop - distanceToViewportTop === 0);
-        };  
+        };
 
         App.getKeyIdByUrl = function() {
             return window.location.href.split('/')[5];

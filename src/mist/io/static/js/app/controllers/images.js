@@ -50,6 +50,26 @@ define('app/controllers/images', ['app/models/image'],
              * 
              */
 
+            searchImages: function(filter, callback) {
+                var that = this;
+                Mist.ajaxPOST('/backends/' + this.backend.id + '/images', {
+                    'search_term' : filter
+                }).success(function(images) {
+
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to search images');
+                }).complete(function(success, images) {
+                    var imagesToReturn = [];
+                    if (success) {
+                        images.forEach(function(image) {
+                            imagesToReturn.push(Image.create(image));
+                        });
+                    }
+                    if (callback) callback(success, imagesToReturn);
+                });
+            },
+
+
             clear: function() {
                 Ember.run(this, function() {
                     this.set('content', []);
@@ -64,7 +84,6 @@ define('app/controllers/images', ['app/models/image'],
             },
 
 
-
             /**
              * 
              *  Pseudo-Private Methods
@@ -76,6 +95,7 @@ define('app/controllers/images', ['app/models/image'],
                 Ember.run(function() {
                     that.set('content', []);
                     images.forEach(function(image) {
+                        image.backend = that.backend;
                         that.content.pushObject(Image.create(image));
                     });
                     that.trigger('onImageListChange');

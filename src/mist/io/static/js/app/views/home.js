@@ -20,6 +20,7 @@ define('app/views/home', ['app/views/mistscreen','text!app/templates/home.html',
              */
             
             whatCanIPossiblyDoChrome: function() {
+                return;
                 // Desperate
                 Ember.run.later(function() {
                     // ...

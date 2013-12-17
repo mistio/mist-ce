@@ -139,129 +139,69 @@ define('app/models/machine', [
                         return;
                     }
                 }, 1000);
-                
-                this.set('probeInterval', 10000);
             },
 
             probe: function(keyName) {
                 var that = this;
                 
-                function sendProbe() {
-                    if (!that.backend || that.backend.create_pending) {
-                        return false;
-                    }
+                if (!that.backend || that.backend.create_pending) {
+                    return false;
+                }
 
-                    if (that.state == 'running') {
-                        var host = that.getHost();
-                        if (host) {
-                            var key = Mist.keysController.getKey(keyName);
-                            if (keyName != undefined){
-                                that.set('probing', keyName);
-                                key.set('probing', that);
-                            } else {
-                                that.set('probing', true);
-                            }
-                            
-                            $.ajax({
-                                url: '/backends/' + that.backend.id + '/machines/' + that.id + '/probe',
-                                type: 'POST',
-                                headers: { "cache-control": "no-cache" },
-                                data: {'host': host,
-                                       'key': keyName},
-                                success: function(data, textStatus, jqXHR) {
-                                       // got it fine, also means it has a key
-                                    if (jqXHR.status === 200) {
-                                        var uptime = parseFloat(data['uptime'].split(' ')[0]) * 1000;
-                                        that.set('uptimeChecked', Date.now());
-                                        that.set('uptimeFromServer', uptime);
-                                        info('Successfully got uptime', uptime, 'from machine', that.name);
-                                        if(key) {
-                                            key.updateMachineUptimeChecked(that, that.uptimeChecked);
-                                            key.set('probing', false);
-                                        }
-                                        that.set('probed', true);
-                                       /* This piece of code displays fetched keys from 
-                                        * the machine. Curently commented out as it 
-                                        * causes some bugs
-                                        *
-                                        data.updated_keys.forEach(function(updatedKey) {
-                                            for (var i=0; i < Mist.keysController.keys.length; ++i) {
-                                                existingKey = Mist.keysController.keys[i];
-                                                if (existingKey.name == updatedKey.name) {
-                                                    warn('existing name');
-                                                    warn(existingKey.name);
-                                                    Mist.keysController.associateKey(existingKey.name, that);
-                                                    return;
-                                                }
-                                                else if (existingKey.pub.split(' ').slice(0, 2).join(' ') == updatedKey.pub.split(' ').slice(0, 2).join(' ')) {
-                                                    warn('existing public');
-                                                    Mist.keysController.associateKey(existingKey.name, that);
-                                                    return;
-                                                }
-                                            }
-                                            warn('create new');
-                                            Mist.keysController.newKey(updatedKey.name, updatedKey.publicKey, null, null, that);
-                                        });
-                                        if (data.updated_keys.length){
-                                            warn('Added ' + data.updated_keys.length + ' new keys from machine ' + that.name);
-                                        }
-                                        */
-                                    } else {
-                                        // in every other case there is a problem
-                                        info('Got response other than 200 while probing machine', that.name);
-                                        if(key) {
-                                            key.updateMachineUptimeChecked(that, -Date.now());
-                                            key.set('probing', false);
-                                        }
-                                        if (!that.backend.create_pending){
-                                             retry(that);
-                                        }
+                if (that.state == 'running') {
+                    var host = that.getHost();
+                    if (host) {
+                        var key = Mist.keysController.getKey(keyName);
+                        if (keyName != undefined){
+                            that.set('probing', keyName);
+                            key.set('probing', that);
+                        } else {
+                            that.set('probing', true);
+                        }
+                        
+                        $.ajax({
+                            url: '/backends/' + that.backend.id + '/machines/' + that.id + '/probe',
+                            type: 'POST',
+                            headers: { "cache-control": "no-cache" },
+                            data: {'host': host,
+                                   'key': keyName},
+                            success: function(data, textStatus, jqXHR) {
+                                   // got it fine, also means it has a key
+                                if (jqXHR.status === 200) {
+                                    var uptime = parseFloat(data['uptime'].split(' ')[0]) * 1000;
+                                    that.set('uptimeChecked', Date.now());
+                                    that.set('uptimeFromServer', uptime);
+                                    info('Successfully got uptime', uptime, 'from machine', that.name);
+                                    if(key) {
+                                        key.updateMachineUptimeChecked(that, that.uptimeChecked);
+                                        key.set('probing', false);
                                     }
-                                    that.set('probing', false);
-                                },
-                                error: function(jqXHR, textstate, errorThrown) {
+                                    that.set('probed', true);
+                                } else {
+                                    // in every other case there is a problem
+                                    info('Got response other than 200 while probing machine', that.name);
                                     if(key) {
                                         key.updateMachineUptimeChecked(that, -Date.now());
                                         key.set('probing', false);
                                     }
-                                    that.set('probing', false);
-                                    that.set('probeInterval', 2*that.get('probeInterval'));
-                                    
-                                    if (that.backend.enabled && !that.backend.create_pending) {
-                                         retryProbe(that.get('probeInterval'));
-                                    }
                                 }
-                            });
-                        }
+                                that.set('probing', false);
+                            },
+                            error: function(jqXHR, textstate, errorThrown) {
+                                if(key) {
+                                    key.updateMachineUptimeChecked(that, -Date.now());
+                                    key.set('probing', false);
+                                }
+                                that.set('probing', false);
+                            },
+                            complete: function() {
+
+                            }
+                        });
                     }
-                };
-                
-                function retryProbe(interval) {
-                    
-                    if (interval == undefined) {
-                        interval = 10000;
-                    }
-                    // retry only if the machine is still here and it's running
-                    if (Mist.backendsController.getMachineById(that.backend.id, that.id) && that.state == 'running'){
-                        if (!that.backend.create_pending){
-                             setTimeout(sendProbe, interval);
-                        }
-                    }
-                }
-                if (that.backend && !that.backend.create_pending) {
-                    setTimeout(sendProbe, 2000);
                 }
             },
 
-            reProbe: function() {
-                if (this.get('state') == 'running') {
-                    this.startUptimeTimer();
-                    this.probe();
-                } else {
-                    this.set('uptime', 0);
-                    this.uptimeTimer = false;
-                }
-            }.observes('state'),
             
             changeMonitoring: function() {
                 warn("Setting monitoring to:  " + !this.hasMonitoring);
@@ -407,7 +347,10 @@ define('app/models/machine', [
                 this._super();
                 this.tags = Ember.ArrayController.create();
                 this.startUptimeTimer();
-                this.probe();
+                if (!this.probeInterval) this.set('probeInterval', 5000);
+                Ember.run.later(this, function() {
+                    //this.probe();
+                }, this.probeInterval);
             }
         });
     }

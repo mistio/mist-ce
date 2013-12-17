@@ -233,11 +233,13 @@ define('app/controllers/machines', ['app/models/machine'],
             _setContent: function(machines) {
                 var that = this;
                 Ember.run(function() {
-                    that.set('content', []);
+                    var newMachines = [];
                     machines.forEach(function(machine) {
                         machine.backend = that.backend;
-                        that.content.pushObject(Machine.create(machine));
+                        //newMachines.push(Machine.create(machine));
+                        that.content.addObject(Machine.create(machine));
                     });
+                    //that.set('content', newMachines);
                     that.trigger('onMachineListChange');
                 });
             }

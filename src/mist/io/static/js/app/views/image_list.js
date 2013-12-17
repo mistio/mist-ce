@@ -1,148 +1,192 @@
-define('app/views/image_list', [
-    'app/models/image',
-    'app/views/mistscreen',
-    'text!app/templates/image_list.html','ember'],
+define('app/views/image_list', ['app/models/image', 'app/views/mistscreen', 'text!app/templates/image_list.html'],
     /**
-     *
-     * Images page
-     *
-     * @returns Class
+     *  Images page
+     * 
+     *  @returns Class
      */
     function(Image, MistScreen, image_list_html) {
         return MistScreen.extend({
+
+            /**
+             *  Properties
+             */
+
+            images: [],
+            baseImages: [],
+            renderedImages: [],
+            visibleImagesCount: 0,
+            advancedSearchMode: null,
             template: Ember.Handlebars.compile(image_list_html),
 
-            advancedSearch: false,
-            renderedImages: null,
+            /**
+             *
+             *  Initialization
+             *
+             */
 
-            init: function(){
+            init: function() {
                 this._super();
-                var that=this;
-                Ember.run.next(function() {
-                    $('#images-advanced-search').css('display', 'none');
-                    $('#images .ajax-loader').fadeIn();
-                });
-                Ember.run.later(function(){
-                    that.renderImages();
-                    that.scrollHandler();
-                    that.filterHandler();
-                    //add this $('ul#images-list li.node:visible').length
-                }, 2000);
+                Mist.backendsController.on('onImageListChange', this, 'updateImageList');
             },
 
-            scrollHandler: function() {
-                var that = this;
-                $(window).on('scroll', function() {
-                    if (Mist.isScrolledToBottom()) {
-                        var searchText = $('input.ui-input-text').eq(2).val();
-                        var counter = 0;
-                        Mist.backendsController.content.some(function(backend) {
-                            backend.images.content.some(function(image) {
-                                if ((!image.star) && that.renderedImages.indexOf(image) == -1) {
-                                    if (searchText && image.name.indexOf(searchText) == -1) {
-                                        return false;
-                                    }
-                                    that.renderedImages.pushObject(image);
-                                    if (++counter == 20)
-                                        return true;
-                                }
-                            });
-                            if (counter == 20)
-                                return true;
-                        });
+
+            load: function() {
+                this.set('images', []);
+                this.set('baseImages', []);
+                this.set('renderedImages', []);
+                Ember.run.later(this, function() {
+                    this.handleFilter();
+                    this.handleWindowScroll();
+                    if (!Mist.backendsController.loading &&
+                        !Mist.backendsController.loadingImages) {
+                            this.updateImageList();
                     }
-                });
-            },
+                }, 1000);
+            }.on('didInsertElement'),
 
-            filterHandler: function() {
-                var that = this;
-                $('input.ui-input-text').eq(2).on('keyup', function() {
-                    if ($('input.ui-input-text').eq(2).val()){
-                        $("#images-advanced-search").show();
-                    }else {
-                        $("#images-advanced-search").hide();
-                        that.renderImages();
-                    }
-                });
-            },
 
-            renderImages: function() {
-                if (Mist.backendsController.loadingImages) {
-                    this.reRenderImages(2500);
-                    return;
-                }
+
+            /**
+             *
+             *  Methods
+             *
+             */
+
+            updateImageList: function() {
                 var that = this;
-                var newRenderedImages = new Array();
                 Mist.backendsController.content.forEach(function(backend) {
-                    backend.images.content.forEach(function(image) {
-                        if ((image.star || newRenderedImages.length < 10) && newRenderedImages.indexOf(image) == -1) {
-                            if (image.star) {
-                                newRenderedImages.unshiftObject(image);
-                            }
-                            else {
-                                newRenderedImages.pushObject(image);
-                            }
-                        }
-                    });
+                    that.images.addObjects(backend.images.content);
                 });
-                $('#images .ajax-loader').fadeOut();
-                this.set('renderedImages', newRenderedImages);
             },
 
-            reRenderImages: function(interval) {
+
+            updateBaseImageList: function() {
+                if (this.advancedSearchMode) return;
+                this.set('baseImages', this.images);
+            },
+
+
+            updateRenderedImageList: function() {
+                var baseLength = this.baseImages.length;
+                var newLength = baseLength < 25 ? baseLength : 25;
+                this.set('renderedImages', this.baseImages.slice(0, newLength));
+            },
+
+
+            handleFilter: function() {
                 var that = this;
-                Ember.run.later(function() {
-                    that.renderImages();
-                }, interval);
+                var filterElement = $('#image-list-page .ui-input-search input');
+                filterElement.off('keyup');
+                filterElement.on('keyup', function() {
+                    if (!filterElement.val()) {
+                        that.set('advancedSearchMode', false);
+                        that.updateBaseImageList();
+                    } 
+                });
             },
 
-            willDestroyElement: function(){
-                $(window).off('scroll');
-            },
 
-            advancedSearchClicked: function() {
-                var searchText = $('input.ui-input-text').eq(2).val();
-                var payload = {
-                    'search_term': searchText
+            handleWindowScroll: function() {
+                var that = this;
+                window.onscroll = scrollHandler;
+                function scrollHandler() {
+                    if (Mist.isScrolledToBottom()) {
+                        that.getMoreImages();
+                    }
                 };
-                var that = this;
-                $(".ajax-loader").fadeIn();
-                $('#images-advanced-search span').text('Loading...');
-                that.set('renderedImages', new Array());
-                Mist.backendsController.content.forEach(function(backend, index) {
-                    $.ajax({
-                        url: '/backends/' + backend.id + '/images',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(payload),
-                        success: function(data) {
-                            var counter = 0;
-                            var exists = false;
-                            data.some(function(item) {
-                                image = Image.create(item);
-                                image.backend = backend;
-                                if (image.star){
-                                    that.renderedImages.unshiftObject(image);                                    
-                                }else {
+            },
+
+
+            getMoreImages: function() {
+                var filterValue = $('#image-list-page .ui-input-search input').val();
+                if (this.advancedSearchMode || !filterValue) {
+                    var newLength = this.renderedImages.length + 25;
+                    if (newLength > this.baseImages.length) {
+                        newLength = this.baseImages.length;
+                    }
+                    if (newLength == this.renderedImages.length) return;
+                    this.set('renderedImages', this.baseImages.slice(0, newLength));
+                    info('yo');
+                    info(this.baseImages.length);
+                } else {
+                    var that = this;
+                    var counter = 0;
+                    this.baseImages.some(function(image) {
+                        if (that.baseImages.indexOf(image) == -1) {
+                            if (image.id.indexOf(filterValue) > -1 ||
+                                image.name.indexOf(filterValue) > -1) {
                                     that.renderedImages.pushObject(image);
-                                }
-                            });
-                            if (index == Mist.backendsController.content.length - 1) {
-                                $('#images .ajax-loader').fadeOut();
-                                $('#images-advanced-search span').text('Continue search on server...');                          
-                            }
-                        },
-                        error: function(jqXHR, textstate, errorThrown) {
-                            Mist.notificationController.notify('Error while searching for term: ' + jqXHR.responseText);
-                            error(textstate, errorThrown, ' while searching term');
-                            if (index == Mist.backendsController.content.length - 1) {
-                                $('#images .ajax-loader').fadeOut();
-                                $('#images-advanced-search span').text('Continue search on server...');                          
+                                    if (++counter == 20) return true;
                             }
                         }
                     });
+                }
+            },
+
+
+            renderImageList: function() {
+                Ember.run.next(function() {
+                    if ($('#image-list-page .ui-listview').listview) {
+                        $('#image-list-page .ui-listview').listview('refresh');
+                    }
+                    if ($('#image-list-page input.ember-checkbox').checkboxradio) {
+                        $('#image-list-page input.ember-checkbox').checkboxradio();
+                    }
                 });
-            }
+            },
+
+
+
+            /**
+             *
+             *  Actions
+             *
+             */
+
+            actions: {
+
+                searchClicked: function() {
+                    this.set('searchingImages', true);
+                    var that = this;
+                    var newImages = [];
+                    var backendsCount = Mist.backendsController.content.length - 1;
+                    var filterValue = $('#image-list-page .ui-input-search input').val();
+                    Mist.backendsController.content.forEach(function(backend, index) {
+                        backend.searchImages(filterValue, function(success, images) {
+                            if (success) {
+                                newImages.pushObjects(images);
+                            }
+                            if (!backendsCount--) {
+                                info('index');
+                                that.set('searchingImages', false);
+                                that.set('baseImages', newImages);
+                            }
+                        });
+                    });
+                }
+            },
+
+
+
+            /**
+             *
+             *  Observers
+             *
+             */
+
+            imagesObserver: function() {
+                Ember.run.once(this, 'updateBaseImageList');
+            }.observes('images', 'images.length'),
+
+
+            baseImagesObserver: function() {
+                Ember.run.once(this, 'updateRenderedImageList');
+            }.observes('baseImages', 'baseImages.length'),
+
+
+            renderedImagesObserver: function() {
+                Ember.run.once(this, 'renderImageList');
+            }.observes('renderedImages', 'renderedImages.length'),
         });
     }
 );
