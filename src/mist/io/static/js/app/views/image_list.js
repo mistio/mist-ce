@@ -106,8 +106,6 @@ define('app/views/image_list', ['app/models/image', 'app/views/mistscreen', 'tex
                     }
                     if (newLength == this.renderedImages.length) return;
                     this.set('renderedImages', this.baseImages.slice(0, newLength));
-                    info('yo');
-                    info(this.baseImages.length);
                 } else {
                     var that = this;
                     var counter = 0;
@@ -157,7 +155,6 @@ define('app/views/image_list', ['app/models/image', 'app/views/mistscreen', 'tex
                                 newImages.pushObjects(images);
                             }
                             if (!backendsCount--) {
-                                info('index');
                                 that.set('searchingImages', false);
                                 that.set('baseImages', newImages);
                             }

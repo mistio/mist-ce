@@ -137,6 +137,11 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             },
 
 
+            toggleImageStar: function(imageId) {
+                this.images.toggleImageStar(imageId);
+            }
+
+
             /**
              * 
              *  Pseudo-Private Methods

@@ -1,13 +1,30 @@
 define('app/controllers/machine_add', ['ember'],
     /**
-     * Machine Add Controller
+     *  Machine Add Controller
      *
-     * @returns Class
+     *  @returns Class
      */
     function() {
         return Ember.Object.extend({
             
+            /**
+             *  Properties
+             */
+
+            callback;
             newMachineBackend: null,
+
+            /**
+             *
+             *  Methods
+             *
+             */
+
+            open: function(callback) {
+                $('#create-machine-panel').popup('open');
+                this._clear();
+                this.set('callback', callback);
+            },
 
             newMachine: function() {
                 log("new machine");

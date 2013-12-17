@@ -62,10 +62,25 @@ define('app/controllers/images', ['app/models/image'],
                     var imagesToReturn = [];
                     if (success) {
                         images.forEach(function(image) {
+                            image.backend = that.backend;
                             imagesToReturn.push(Image.create(image));
                         });
                     }
                     if (callback) callback(success, imagesToReturn);
+                });
+            },
+
+
+            toggleImageStar: function(imageId) {
+                var that = this;
+                Mist.ajaxPOST('/backends/' + this.backend.id + '/images/' + imageId, {
+                    'action' : 'star'
+                }).success(function() {
+
+                }).error(function() {
+
+                }).complete(function() {
+
                 });
             },
 
@@ -82,6 +97,12 @@ define('app/controllers/images', ['app/models/image'],
             getImage: function(imageId) {
                 return this.content.findBy('id', imageId);
             },
+
+
+            imageExists: function(imageId) {
+                return !!this.getImage(imageId);
+            }
+
 
 
             /**

@@ -1,4 +1,6 @@
-<label>{{view Mist.Checkbox checkedBinding="view.image.star"}}</label>
+<label {{action "toggleImageStar" target="view"}}>
+	{{view Mist.Checkbox checkedBinding="view.image.star"}}
+</label>
 
 <a {{action launchImage target="view"}}>
     <h3>{{view.image.name}}</h3>
