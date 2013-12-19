@@ -24,9 +24,29 @@ def main(global_config, **settings):
         settings = global_config
 
     settings = {}
-    # try to authenticate with mist.io service if email,password are available
     from mist.io.model import User
+
+    # migrate settings.yaml to db.yaml
+    try:
+        with open('settings.yaml', 'r') as config_file:
+            log.info("Found settings.yaml, migrating...")
+            data = config_file.read()
+            with open('db.yaml', 'w') as db_file:
+                db_file.write(data)
+        os.rename('settings.yaml', 'settings.yaml.backup')
+        user = User()
+        with user.lock_n_load():
+            for key in ['core_uri', 'js_build', 'js_log_level']:
+                if key in user._dict:
+                    del user._dict[key]
+            user.save()
+
+    except IOError as exc:
+        # settings.yaml doesn't exist, continue
+        pass
+
     user = User()   # this automatically loads from db.yaml
+    # try to authenticate with mist.io service if email,password are available
     if user.email and user.password:
         payload = {'email': user.email, 'password': user.password}
         ret = requests.post(mist.io.config.CORE_URI + '/auth',
