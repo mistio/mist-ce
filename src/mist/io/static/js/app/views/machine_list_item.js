@@ -29,8 +29,10 @@ define('app/views/machine_list_item', [
                 },
 
                 didInsertElement: function(){
-                    $('#machines-list').listview('refresh');
-                    $("#machines-list").trigger('create');
+                    try {
+                        $("#machines-list").trigger('create');
+                        $('#machines-list').listview('refresh');
+                    } catch(err) {}
                     var machine = this.machine;
                     setInterval(this.fetchLoadavg, 4*60*1000, machine);
                 },

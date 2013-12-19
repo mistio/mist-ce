@@ -30,10 +30,12 @@ define('app/models/machine', [
             
             probedObserver: function() {
                 Ember.run.next(function() {
-                    try {
-                        $('#mist-manage-keys').button();
-                    } catch (e) {
-                        $('#mist-manage-keys').button('refresh');
+                    if ($('#mist-manage-keys').button){
+                        try {
+                            $('#mist-manage-keys').button();
+                        } catch (e) {
+                            $('#mist-manage-keys').button('refresh');
+                        }
                     }
                 });
             }.observes('probed', 'probing'),
