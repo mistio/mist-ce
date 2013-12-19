@@ -11,8 +11,17 @@ define('app/controllers/machine_add', ['ember'],
              *  Properties
              */
 
-            callback;
-            newMachineBackend: null,
+            callback: null,
+            formReady: null,
+            newMachineCost: null,
+
+            newMachineKey: null,
+            newMachineName: null,
+            newMachineSize: null,
+            newMachineImage: null,
+            newMachineScript: null,
+            newMachineLocation: null,
+            newMachineProvider: null,
 
             /**
              *
@@ -21,10 +30,34 @@ define('app/controllers/machine_add', ['ember'],
              */
 
             open: function(callback) {
-                $('#create-machine-panel').popup('open');
                 this._clear();
+                $('#create-machine-panel').panel('open');
                 this.set('callback', callback);
             },
+
+
+            close: function() {
+                $('#create-machine-panel').panel('close');
+                this._clear();
+            },
+
+
+
+            /**
+             *
+             *  Pseudo-Private Methods
+             *
+             */
+
+             _clear: function() {
+                this.set('newMachineName', '');
+                this.set('newMachineScript', '');
+                this.set('newMachineKey', {'name' : 'Select Key'});
+                this.set('newMachineSize', {'name' : 'Select Size'});
+                this.set('newMachineImage', {'name' : 'Select Image'});
+                this.set('newMachineLocation', {'name' : 'Select Location'});
+                this.set('newMachineProvider', {'title' : 'Select Provider'});
+             },
 
             newMachine: function() {
                 log("new machine");
@@ -39,14 +72,7 @@ define('app/controllers/machine_add', ['ember'],
             },
 
             newMachineClear: function() {
-                this.set('newMachineName', null);
-                this.set('newMachineBackend', null);
-                this.set('newMachineImage', null);
-                this.set('newMachineSize', null);
-                this.set('newMachineLocation', null);
-                this.set('newMachineKey', null);
-                this.set('newMachineScript', null);
-                this.set('newMachineCost', 0);
+
             },
 
             updateNewMachineReady: function() {
@@ -70,17 +96,6 @@ define('app/controllers/machine_add', ['ember'],
                 this.set('newMachineLocationReady', !!this.get('newMachineLocation'));
                 this.set('newMachineKeyReady', !!this.get('newMachineKey'));
                 this.set('newMachineScriptReady', !!this.get('newMachineScript'));
-            },
-
-            init: function() {
-                this._super();
-                this.addObserver('newMachineName', this, this.updateNewMachineReady);
-                this.addObserver('newMachineBackend', this, this.updateNewMachineReady);
-                this.addObserver('newMachineImage', this, this.updateNewMachineReady);
-                this.addObserver('newMachineSize', this, this.updateNewMachineReady);
-                this.addObserver('newMachineLocation', this, this.updateNewMachineReady);
-                this.addObserver('newMachineKey', this, this.updateNewMachineReady);
-                this.addObserver('newMachineCost', this, this.updateNewMachineReady);
             }
         });
     }

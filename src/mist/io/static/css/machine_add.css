@@ -1,0 +1,10 @@
+
+/* Machine Add Panel CSS
+-----------------------------------------------------------------------------------------------------------*/
+#create-machine-panel label {
+    margin-top: 10px;
+}
+#create-machine-panel .select-listmenu {
+    height: 120px;
+    overflow-y: scroll;
+}

@@ -1,4 +1,4 @@
-<div id="create-machine-panel" class="side-panel" data-role="panel" data-position="right" data-display="overlay">
+<div id="create-machine-panel" class="side-panel" data-role="panel" data-position="right" data-position-fixed="true" data-display="overlay">
    
     <div data-role="header">
         <h1>Create Machine</h1>
@@ -11,7 +11,8 @@
                id="create-machine-name"
                valueBinding="Mist.machineAddController.newMachineName"}}
 
-        <label>2. Provider:</label>
+        <div data-role="collapsible-set">
+        <!--<label>2. Provider:</label>-->
         <div id="create-machine-provider" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
                                                                                        data-expanded-icon="arrow-u">
             <h2>{{Mist.machineAddController.newMachineProvider.title}}</h2>
@@ -24,7 +25,7 @@
             </ul>
         </div>
 
-        <label>3. Image:</label>
+        <!--<label>3. Image:</label>-->
         <div id="create-machine-image" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d" 
                                                                                     data-expanded-icon="arrow-u">
             <h2>{{Mist.machineAddController.newMachineImage.name}}</h2>
@@ -37,7 +38,7 @@
             </ul>
         </div>
 
-        <label>4. Size:</label>
+        <!--<label>4. Size:</label>-->
         <div id="create-machine-size" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
                                                                                    data-expanded-icon="arrow-u">
             <h2>{{Mist.machineAddController.newMachineSize.name}}</h2>
@@ -54,7 +55,7 @@
             </ul>
         </div>
 
-        <label>5. Location:</label>
+        <!--<label>5. Location:</label>-->
         <div id="create-machine-location" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
                                                                                        data-expanded-icon="arrow-u">
             <h2>{{Mist.machineAddController.newMachineLocation.name}}</h2>
@@ -67,12 +68,12 @@
             </ul>
         </div>
 
-        <label>6. Key:</label>
+        <!--<label>6. Key:</label>-->
         {{#if Mist.keysController.content.length}}
         <div id="create-machine-key" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
                                                                                   data-expanded-icon="arrow-u">
             <h2>{{Mist.machineAddController.newMachineKey.name}}</h2>
-            <ul data-role="listview">
+            <ul data-role="listview" data-theme="b">
                 {{#each Mist.keysController.content}}
                     <li data-icon="false">
                         <a {{action "selectKey" this target="view"}}>{{this.name}}</a>
@@ -89,6 +90,7 @@
             </h2>
         </div>
         {{/if}}
+    </div>
 
         <label for="create-machine-script">7.Script:</label>
         {{view Mist.TextField
@@ -101,7 +103,8 @@
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
-            <button id="create-machine-ok" data-theme="b" {{action newMachineClicked target="view"}}>Launch!</button>
+            <button id="create-machine-ok" data-theme="b" {{action "launchClicked" target="view"}}>Launch!</button>
         </div>
     </div>
+
 </div>

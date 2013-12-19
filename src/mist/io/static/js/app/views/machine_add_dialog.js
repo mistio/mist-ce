@@ -1,11 +1,8 @@
-define('app/views/machine_add_dialog', [
-    'text!app/templates/machine_add_dialog.html',
-    'ember'],
+define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.html', 'ember'],
     /**
+     *  Machine Add Dialog
      *
-     * Machine Add Dialog
-     *
-     * @returns Class
+     *  @returns Class
      */
     function(machine_add_dialog_html) {
         return Ember.View.extend({
@@ -27,14 +24,16 @@ define('app/views/machine_add_dialog', [
                 // resize dismiss div TODO: reset on window resize
                 $('.ui-panel-dismiss-position-right').css('left',(0-$('.ui-panel-position-right.ui-panel-open').width()));
             },
-            
+            nothing: function() {
+                
+            },
             selectProvider: function(backend){
                 $('.select-provider-collapsible').collapsible('option','collapsedIcon','check');
                 $('.select-provider-collapsible span.ui-btn-text').text(backend.title);
                 Mist.machineAddController.set('newMachineBackend', backend);
                   
                 Mist.machineAddController.set('newMachineImage', null);
-                $('.select-image-collapsible span.ui-btn-text').text('Select Image');   
+                $('.select-image-collapsible span.ui-btn-text').text('Select Image');
                 Mist.machineAddController.set('newMachineSize', null);
                 Mist.machineAddController.set('newMachineCost', 0);
                 $('.cost').css('display', 'none');
@@ -77,32 +76,33 @@ define('app/views/machine_add_dialog', [
                     } else {
                         return size.price.linux;
                     }
-                } else if (Mist.machineAddController.newMachineBackend.provider.indexOf('rackspace') != -1){
-                    if(image.name.indexOf('Red Hat') != -1){
+                } else if (Mist.machineAddController.newMachineBackend.provider.indexOf('rackspace') != -1) {
+                    if(image.name.indexOf('Red Hat') != -1) {
                         return size.price.rhel;
-                    } else if(image.name.indexOf('SQL Server Web') !=-1 ){
+                    } else if(image.name.indexOf('SQL Server Web') !=-1 ) {
                         return size.price.mswinSQLWeb;
-                    } else if(image.name.indexOf('SQL Server') !=-1 ){
+                    } else if(image.name.indexOf('SQL Server') !=-1 ) {
                         return size.price.mswinSQL;
-                    } else if(image.name.indexOf('Windows') !=-1 ){
+                    } else if(image.name.indexOf('Windows') !=-1 ) {
                         return size.price.mswin;
-                    } else if(image.name.indexOf('Vyatta') !=-1 ){
-                        return size.price.vyatta;                        
+                    } else if(image.name.indexOf('Vyatta') !=-1 ) {
+                        return size.price.vyatta;
                     } else {
                         return size.price.linux;
-                    }                    
-                } else {return size.price;
-                }              
+                    }
+                } else {
+                    return size.price;
+                }
             },
-                                   
+
             selectSize: function(size){
                 $('.select-size-collapsible').collapsible('option','collapsedIcon','check');
                 $('.select-size-collapsible span.ui-btn-text').text(size.name);
                 Mist.machineAddController.set('newMachineSize', size);  
                 Mist.machineAddController.set('newMachineCost', this.getPrice(size, Mist.machineAddController.newMachineImage));
-                $('.cost').css('display', 'block');                          
+                $('.cost').css('display', 'block');
                 Mist.machineAddController.set('newMachineLocation', null);
-                $('.select-location-collapsible span.ui-btn-text').text('Select Location');                     
+                $('.select-location-collapsible span.ui-btn-text').text('Select Location');
                 $('.select-size-collapsible').trigger('collapse');
 
                 if (Mist.machineAddController.newMachineBackend.locations.content.length == 1){
@@ -110,41 +110,40 @@ define('app/views/machine_add_dialog', [
                     $('.select-location-collapsible span.ui-btn-text').text(Mist.machineAddController.newMachineBackend.locations.content[0].name);
                     Mist.machineAddController.set('newMachineLocation', Mist.machineAddController.newMachineBackend.locations.content[0]);
                 }
-                return false;               
+                return false;
             },
 
             selectLocation: function(location){
                 $('.select-location-collapsible').collapsible('option','collapsedIcon','check');
                 $('.select-location-collapsible span.ui-btn-text').text(location.name);
-                Mist.machineAddController.set('newMachineLocation', location);      
+                Mist.machineAddController.set('newMachineLocation', location);
                 $('.select-location-collapsible').trigger('collapse');
 
                 if (Mist.keysController.content.length == 1){
                     $('.select-key-collapsible').collapsible('option','collapsedIcon','check');
                     $('.select-key-collapsible span.ui-btn-text').text(Mist.keysController.content[0].name);
-                    Mist.machineAddController.set('newMachineKey', Mist.keysController.content[0]);       
-                }                
-                return false;               
+                    Mist.machineAddController.set('newMachineKey', Mist.keysController.content[0]);
+                }
+                return false;
             },
-                        
+
             selectKey: function(key){
                 $('.select-key-collapsible').collapsible('option','collapsedIcon','check');
                 $('.select-key-collapsible span.ui-btn-text').text(key.name);
-                Mist.machineAddController.set('newMachineKey', key);       
+                Mist.machineAddController.set('newMachineKey', key);
                 $('.select-key-collapsible').trigger('collapse');
-                return false;               
+                return false;
             },
-                            
+
             clear: function(){
                 Mist.machineAddController.newMachineClear();
                 $('.select-provider-collapsible span.ui-btn-text').text('Select Provider');
                 $('.select-image-collapsible span.ui-btn-text').text('Select Image');
-                $('.select-size-collapsible span.ui-btn-text').text('Select Size');                
-                $('.select-location-collapsible span.ui-btn-text').text('Select Location');                
+                $('.select-size-collapsible span.ui-btn-text').text('Select Size');
+                $('.select-location-collapsible span.ui-btn-text').text('Select Location');
                 $('.select-key-collapsible span.ui-btn-text').text('Select Key');
-                
+
                 $('#create-machine-name').val('');
-                
             },
 
             didInsertElement: function() {

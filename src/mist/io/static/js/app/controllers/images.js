@@ -101,7 +101,7 @@ define('app/controllers/images', ['app/models/image'],
 
             imageExists: function(imageId) {
                 return !!this.getImage(imageId);
-            }
+            },
 
 
 
