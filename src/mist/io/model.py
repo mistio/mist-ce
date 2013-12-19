@@ -30,8 +30,9 @@ import logging
 
 
 from Crypto.PublicKey import RSA
-from hashlib import sha256
+from hashlib import sha1
 
+from mist.io.helpers import b58_encode
 from mist.io.dal import StrField, IntField, FloatField, BoolField
 from mist.io.dal import ListField, DictField
 from mist.io.dal import OODict, FieldsDict, FieldsList, make_field
@@ -100,10 +101,10 @@ class Backend(OODict):
 
     def get_id(self):
         if self.provider != 'bare_metal':
-            concat = '%s:%s:%s' % (self.provider, self.region, self.apikey)
+            concat = '%s%s%s' % (self.provider, self.region, self.apikey)
         else:
-            concat = '%s:%s:%s' % (self.provider, self.region, self.title)
-        return sha256(concat).hexdigest()
+            concat = '%s%s%s' % (self.provider, '', self.title)
+        return b58_encode(int(sha1(concat).hexdigest(), 16))
 
 
 class Backends(FieldsDict):

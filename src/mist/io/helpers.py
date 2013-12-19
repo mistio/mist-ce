@@ -47,3 +47,19 @@ def core_wrapper(func):
 
 def user_from_request(request):
     return User()
+
+
+def b58_encode(num):
+    """Returns num in a base58-encoded string."""
+    alphabet = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
+    base_count = len(alphabet)
+    encode = ''
+    if (num < 0):
+        return ''
+    while (num >= base_count):
+        mod = num % base_count
+        encode = alphabet[mod] + encode
+        num = num / base_count
+    if (num):
+        encode = alphabet[num] + encode
+    return encode
