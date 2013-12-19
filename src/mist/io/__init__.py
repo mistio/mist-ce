@@ -41,6 +41,27 @@ def main(global_config, **settings):
                     del user._dict[key]
             user.save()
 
+        from mist.io.model import Machine
+        with user.lock_n_load():
+            for backend in user.backends.values():
+                if 'list_of_machines' in backend._dict:
+                    list_of_machines = backend._dict['list_of_machines']
+                    for old_machine in list_of_machines:
+                        machine_id = old_machine.get('id')
+                        machine_hostname = old_machine.get('hostname')
+                        print ("Migrating %s(%s) for user %s" %
+                               (machine_id, machine_hostname, user.email))
+                        if not machine_id or not machine_hostname:
+                            print " *** ERROR MIGRATING, SKIPPING *** "
+                            continue
+                        if machine_id not in backend.machines:
+                            backend.machines[machine_id] = Machine()
+                        machine = backend.machines[machine_id]
+                        machine.dns_name = machine_hostname
+                        machine.public_ips.append(machine_hostname)
+                        machine.name = machine_hostname
+                    del backend._dict['list_of_machines']
+            user.save()
     except IOError as exc:
         # settings.yaml doesn't exist, continue
         pass
