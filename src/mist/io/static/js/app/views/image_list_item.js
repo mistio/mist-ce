@@ -16,14 +16,23 @@ define('app/views/image_list_item', [
                     };
                     var backend_id = this.image.backend.id
                     var image_id = this.image.id;
+                    var that = this;
                     $.ajax({
                         url: '/backends/' + backend_id + '/images/' + image_id,
                         type: "POST",
                         data: JSON.stringify(payload),
                         contentType: "application/json",
                         headers: { "cache-control": "no-cache" },
-                        dataType: "json"
-                    });    
+                        dataType: "json",
+                        success: function (){
+                            var backend = Mist.backendsController.getBackendById(backend_id);
+                            if (backend.images.content.indexOf(that.image) == -1) {
+                                if (image.star == false) {
+                                    backend.images.content.unshiftObject(that.image);
+                                }
+                            }
+                        }
+                    });
                 },
                 
                 didInsertElement: function(){

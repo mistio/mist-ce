@@ -30,10 +30,12 @@ define('app/models/machine', [
             
             probedObserver: function() {
                 Ember.run.next(function() {
-                    try {
-                        $('#mist-manage-keys').button();
-                    } catch (e) {
-                        $('#mist-manage-keys').button('refresh');
+                    if ($('#mist-manage-keys').button){
+                        try {
+                            $('#mist-manage-keys').button();
+                        } catch (e) {
+                            $('#mist-manage-keys').button('refresh');
+                        }
                     }
                 });
             }.observes('probed', 'probing'),
@@ -472,6 +474,10 @@ define('app/models/machine', [
                 }
                 $("#monitoring-dialog").popup('open');
             },
+
+            backendIsBareMetal: function() {
+                return this.backend.provider == 'bare_metal';
+            }.property('backend'),
 
             init: function() {
                 this._super();

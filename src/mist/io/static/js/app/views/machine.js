@@ -327,7 +327,7 @@ define('app/views/machine', [
                 $.ajax({
                     url: '/auth',
                     type: 'POST',
-                    headers: { "cache-control": "no-cache" },
+                    headers: { 'cache-control': 'no-cache' },
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     dataType: 'json',
@@ -335,7 +335,6 @@ define('app/views/machine', [
                     success: function(data) {
                         Mist.set('authenticated', true);
                         Mist.set('current_plan', data.current_plan);
-                        Mist.set('auth_key', data.auth_key);
                         Mist.set('user_details', data.user_details);
                         $("#login-dialog .ajax-loader").hide();
                         $("#login-dialog").popup('close');
@@ -345,7 +344,7 @@ define('app/views/machine', [
                         }
                         $("a.monitoring-button").click();
                     },
-                    error: function(jqXHR, textstate, errorThrown) {
+                    error: function() {
                         $("#login-dialog .ajax-loader").hide();
                         Mist.notificationController.warn('Authentication error');
                         $('div.pending-monitoring').hide();
@@ -364,6 +363,7 @@ define('app/views/machine', [
             },
  
             submitTrial: function(){
+                /*
                 var machine = this.get('controller').get('model');
                 user_first_name = $('#trial-user-first-name').val();
                 user_last_name = $('#trial-user-last-name').val();
@@ -424,6 +424,7 @@ define('app/views/machine', [
                         $('#trial-user-people').focus();
                     } 
                 }
+                */
             },
 
             emailReady: function(){

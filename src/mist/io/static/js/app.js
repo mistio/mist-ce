@@ -300,7 +300,7 @@ define( 'app', [
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
 
-        App.set('authenticated', AUTH || URL_PREFIX == '' ? true : false);
+        App.set('authenticated', AUTH || IS_CORE ? true : false);
         App.set('email', EMAIL);
         App.set('password', '');
 
