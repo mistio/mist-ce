@@ -114,8 +114,8 @@ class Shell(object):
 
     def disconnect(self):
         """Close the SSH connection."""
-        log.info("Closing ssh connection to %s", self.host)
         try:
+            log.info("Closing ssh connection to %s", self.host)
             self.ssh.close()
         except:
             pass
@@ -304,3 +304,6 @@ class Shell(object):
                 return key_id, ssh_user
 
         raise MachineUnauthorizedError("%s:%s" % (backend_id, machine_id))
+
+    def __del__(self):
+        self.disconnect()
