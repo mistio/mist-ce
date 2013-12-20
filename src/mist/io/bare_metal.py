@@ -30,7 +30,8 @@ class BareMetalDriver(object):
         return ('<BareMetalDriver>')
 
     def list_nodes(self):
-        nodes = [self._to_node(machine) for machine in self.machines]
+        nodes = [self._to_node(machine_id, machine)
+                 for machine_id, machine in self.machines.items()]
         return nodes
 
     def list_sizes(self):
@@ -50,26 +51,23 @@ class BareMetalDriver(object):
         result = httplib.OK
         return result in VALID_RESPONSE_CODES
 
-    def _to_node(self, machine):
-        state = self.check_host(machine.get('hostname'), machine.get('port', 22))
-        public_ips = [machine.get('hostname')]
-        private_ips = []
-        extra = {}
+    def _to_node(self, machine_id, machine):
+        state = self.check_host(machine.dns_name, machine.ssh_port)
 
-        node = Node(id=machine.get('id'), name=machine.get('hostname'), state=state,
-                    public_ips=public_ips, private_ips=private_ips,
-                    driver=self, extra=extra)
+        node = Node(id=machine_id, name=machine.name, state=state,
+                    public_ips=machine.public_ips, private_ips=[],
+                    driver=self, extra={})
         return node
 
     def check_host(self, hostname, port=22):
         "Perform a check if port is open"
         #FIXME: needs more thinking here!!!
-        socket.setdefaulttimeout(5)       
+        socket.setdefaulttimeout(5)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             s.connect((hostname, port))
             s.shutdown(2)
             state = NODE_STATE_MAP['on']
         except:
-            state = NODE_STATE_MAP['off']            
+            state = NODE_STATE_MAP['off']
         return state

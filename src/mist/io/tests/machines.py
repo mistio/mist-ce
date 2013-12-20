@@ -1,5 +1,6 @@
 from MyRequestsClass import MyRequests
 import json
+from time import sleep
 
 def list_machines(uri, backend_id, cookie=None):
     req = MyRequests(uri=uri+'/backends/'+backend_id+"/machines", cookie=cookie)
@@ -65,10 +66,14 @@ def stop_machine(uri, backend_id, machine_id, cookie=None):
     print "Stopped machine with id: %s" % machine_id
 
 def start_machine(uri, backend_id, machine_id, cookie=None):
+    sleep(30)
     payload = {
-        'action':'start'
+        'action': 'start'
     }
     req = MyRequests(uri=uri+"/backends/"+backend_id+"/machines/"+machine_id, data=payload, cookie=cookie)
     response = req.post()
+    if response.status_code == 503:
+        print "Machine state is not yet ready to be started"
+        return
     assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
     print "Started machine with id: %s" % machine_id

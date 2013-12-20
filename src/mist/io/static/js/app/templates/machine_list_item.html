@@ -17,7 +17,7 @@
             
             <p class="description">
                         
-                {{#if view.machine.backend.is_baremetal}}
+                {{#if view.machine.backendIsBareMetal}}
                 <span class="tag backend ui-btn-corner-all prov-{{unbound backend.provider}}">Bare Metal Server</span>
                 {{else}}
                 <span class="tag backend ui-btn-corner-all">{{this.backend.title}}</span>

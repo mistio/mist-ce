@@ -81,7 +81,7 @@ define('app/controllers/monitoring', [
 
             finishedGraphUpdate: function(){
                 // Runs After All Graphs Are Updated
-                // Do Some Stuff Here                
+                // Do Some Stuff Here
             },
 
 
@@ -98,18 +98,18 @@ define('app/controllers/monitoring', [
                 // stop:  date/time we want to receeive data until (seconds)
                 // step:  miliseconds we want to split data
                 $.ajax({
-                    url: URL_PREFIX + '/backends/' + this.machine.backend.id +
+                    url: '/backends/' + this.machine.backend.id +
                          '/machines/' + this.machine.id + '/stats',
                     type: 'GET',
                     async: true,
-                    dataType: 'jsonp',
-                    data: {'start': start, 
+                    dataType: 'json',
+                    data: { 'start': start, 
                             'stop': stop,
-                            'step': step,
-                            'auth_key': Mist.auth_key},
+                            'step': step
+                          },
                     timeout: 8000,
                     success: function (data, status, xhr){
-                        
+
                         var controller = Mist.monitoringController;
 
                         try {
@@ -221,7 +221,7 @@ define('app/controllers/monitoring', [
 
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        
+
                         if(errorThrown == 'timeout'){
 
                             // When monitoring is disabled ajax call may be still run one time.

@@ -142,6 +142,7 @@ define('app/views/monitoring', [
                 
             },
 
+            /* Commented Out Until It's Time To Test Zoom In/Out
             selectPressed: function(){
 
                 var selectValue = $("#timeWindowSelect").val();
@@ -195,7 +196,7 @@ define('app/views/monitoring', [
                     Mist.monitoringController.updateDataRequest(newTime,10000);
                 }
             },
-
+            */
             setGraphsCookie: function(){
 
                 var cookieExpire = new Date();
@@ -950,7 +951,7 @@ define('app/views/monitoring', [
                     this.stopLoadColorInterval();
                 }
                 else if(this.viewRendered && machine.hasMonitoring && !this.graphsCreated &&
-                    !machine.probing && machine.probed && machine.id != ' '){
+                        machine.id != ' '){
 
                     var self = this;
                     var controller = Mist.monitoringController;
@@ -1043,7 +1044,7 @@ define('app/views/monitoring', [
                     
                     Mist.rulesController.redrawRules();
                 } 
-            }.observes('controller.model.hasMonitoring','controller.model.probing','viewRendered'),
+            }.observes('controller.model.hasMonitoring','viewRendered'),
 
         });
     }

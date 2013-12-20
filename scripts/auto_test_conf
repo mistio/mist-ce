@@ -1,0 +1,54 @@
+#!/bin/bash
+
+function print_usage {
+cat<<EOF
+usage: $0 options
+
+This is a simle script to pull the branches you want
+
+-h      Show this message
+-d      The directory where the hardcoded files are
+-m	The mist.io root directory
+
+**Important**
+There needs to be a tests_config.yaml in the hardcoded dir
+EOF
+}
+
+function auto_config {
+    cp ${TESTSDIR}/tests_config.yaml.dist ${TESTSDIR}/tests_config.yaml
+    diff ${TESTSDIR}/tests_config.yaml ${HARDCODEDDIR}/tests_config.yaml | patch ${TESTSDIR}/tests_config.yaml
+    
+    TESTSYAML=${TESTSDIR}/tests_config.yaml
+    sed -i s/NinjaTests/NinjaTests$RANDOM/ $TESTSYAML
+    sed -i s/NinjaTestsKey/NinjaTestsKey$RANDOM/ $TESTSYAML
+    exit 0
+}
+
+while getopts ":hd:m:" opt; do
+    case $opt in
+    h) 
+        print_usage
+        exit 
+        ;; 
+    d) 
+        HARDCODEDDIR=$OPTARG
+        ;;
+    m)
+	MISTDIR=$OPTARG
+	TESTSDIR=${MISTDIR}/src/mist/io/tests
+	;;
+    \?)
+        echo "Invalid option: -$OPTARG" >&2
+        echo "mistpull -h for help"
+        exit 1
+        ;;
+    :)
+        echo "Option -$OPTARG requires an argument" >&2
+        exit 1
+        ;;
+
+    esac
+done
+
+auto_config

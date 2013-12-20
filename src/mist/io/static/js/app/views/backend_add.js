@@ -68,7 +68,10 @@ define('app/views/backend_add', [
                     $('#addBackendInfo').hide();
                     $('#addBackendBareMetal').show();
                     $('#addBackendOpenstack').hide();
-                    Mist.backendAddController.set('newBareMetalServerUser', 'root');       
+                    Mist.backendAddController.set('newBareMetalServerUser', 'root');
+                    Ember.run.next(function () {
+                        $('.select-key-collapsible .ui-listview').listview('refresh');
+                    });
                 } else {
                     $('#addBackendInfo').show();                 
                     $('#ApiKeylabel').text('2. API Key:');
@@ -98,7 +101,8 @@ define('app/views/backend_add', [
                         Mist.backendAddController.set('newBackendKey', backend.apikey);
                         Mist.backendAddController.set('newBackendSecret', 'getsecretfromdb');
                         break;
-                    } else if (event.target.title.substr(0,9) == 'rackspace' && backend.provider.substr(0,9) == 'rackspace') {
+                    } else if (event.target.title.substr(0,9) == 'rackspace' && event.target.title.substr(10) != 'lon') {
+                        //autocomplete for all rackspace regions except LON, that needs an account on Rackspace Lon
                         Mist.backendAddController.set('newBackendKey', backend.apikey);
                         Mist.backendAddController.set('newBackendSecret', 'getsecretfromdb');
                         break;
@@ -160,10 +164,11 @@ define('app/views/backend_add', [
                             if (!result.exists) {
                                 Mist.backendsController.pushObject(Backend.create(result));                                                    
                             }
-                            Ember.run.later(function() {
-                                Mist.backendsController.getBackendById(result.id).machines.refresh();
-                                $('#home-menu li').eq(0).find('a').click(); // Manually click machines button
-                            }, 500);
+//Removed redirection to machines view
+//                            Ember.run.later(function() {
+//                                Mist.backendsController.getBackendById(result.id).machines.refresh();
+//                                $('#home-menu li').eq(0).find('a').click(); // Manually click machines button
+//                            }, 500);
                         } else {
                             Mist.backendsController.pushObject(Backend.create(result));                        
                         }

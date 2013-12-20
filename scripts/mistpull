@@ -1,0 +1,90 @@
+#!/bin/bash
+
+function print_usage {
+cat<<EOF
+usage: $0 options
+
+This is a simle script to pull the branches you want
+
+-h      Show this message
+-s      If given it means it's a standalone io
+-d      The root directory of mist
+-i      The io branch to pull
+-c      The core branch to pull
+
+EXAMPLE:
+/mistpull -s -d /home/johndoe/MIST/mist.io/ -i chaos.io
+EOF
+}
+
+function libcloud_pull {
+cd $MISTDIR/src/libcloud
+git pull
+}
+
+function core_pull {
+cd $MISTDIR
+git stash
+git checkout master
+git pull
+git checkout $COREBRANCH
+git pull
+
+cd src/mist.io
+git stash
+git checkout master
+git pull
+git checkout $IOBRANCH
+git pull
+
+}
+
+function io_pull {
+cd $MISTDIR
+git stash
+git checkout master
+git pull
+git checkout $IOBRANCH
+git pull
+}
+
+while getopts ":hsd:i:c:" opt; do
+    case $opt in
+    h) 
+        print_usage
+        exit 
+        ;; 
+    s)
+        STANDALONE=1 
+        ;;
+    d) 
+        MISTDIR=$OPTARG
+        ;;
+    i) 
+        IOBRANCH=$OPTARG
+        ;;
+    c)  COREBRANCH=$OPTARG
+        ;;
+    \?)
+        echo "Invalid option: -$OPTARG" >&2
+        echo "mistpull -h for help"
+        exit 1
+        ;;
+    :)
+        echo "Option -$OPTARG requires an argument" >&2
+        exit 1
+        ;;
+
+    esac
+done
+
+
+#IF NOT STANDALONE (-s not given) then this is a
+#core mist
+if [ -z "${STANDALONE}" ]; then
+    libcloud_pull
+    core_pull
+else
+    libcloud_pull
+    io_pull
+fi
