@@ -21,17 +21,12 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
              *
              */
 
-             yo: function() {
-                Ember.run.later(function() {
-                    $('#create-machine-provider h3 a').on('click', function() {
-                        //return false;
-                        //info('yo');
-                    })
-                    $('#create-machine-provider h3 a').on('click', function() {
-                        //info('ya');
-                    })
-                }, 2000);
-             }.on('didInsertElement'),
+             fieldIsReady: function(field) {
+                $('#create-machine-' + field).collapsible('option', 'collapsedIcon', 'check')
+                                             .collapsible('collapse');
+             },
+
+
 
             /**
              *
@@ -42,56 +37,44 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
             actions: {
 
                 selectProvider: function(backend) {
-                    function select() {
-                        // Select backend
-                        Mist.machineAddController.set('newMachineProvider', backend);
-                        $('#create-machine-provider').collapsible('collapse');
-                        $('#create-machine-provider').collapsible('option', 'collapsedIcon', 'check');
 
-                        // Update other fields
-                        Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'});
-                        Mist.machineAddController.set('newMachineImage', {'name' : 'Select Image'});
-                        Mist.machineAddController.set('newMachineSize', {'name' : 'Select Size'});
-                        return false;
-                    };
-                    return select();
+                    this.fieldIsReady('provider');
+
+                    Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
+                                             .set('newMachineImage', {'name' : 'Select Image'})
+                                             .set('newMachineSize', {'name' : 'Select Size'})
+                                             .set('newMachineProvider', backend);
                 },
 
                 selectImage: function(image) {
 
-                    // Select image
-                    Mist.machineAddController.set('newMachineImage', image);
-                    $('#create-machine-image').collapsible('collapse');
-                    $('#create-machine-image').collapsible('option', 'collapsedIcon', 'check');
+                    this.fieldIsReady('image');
 
-                    // Update other fields
-                    Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'});
-                    Mist.machineAddController.set('newMachineSize', {'name' : 'Select Size'});
+                    Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
+                                             .set('newMachineSize', {'name' : 'Select Size'})
+                                             .set('newMachineImage', image);
                 },
 
                 selectSize: function(size) {
 
-                    // Select size
-                    Mist.machineAddController.set('newMachineSize', size);
-                    $('#create-machine-size').collapsible('collapse');
-                    $('#create-machine-size').collapsible('option','collapsedIcon','check');
+                    this.fieldIsReady('size');
 
-                    // Update other fields
-                    Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'});
+                    Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
+                                             .set('newMachineSize', size);
                 },
 
                 selectLocation: function(location) {
 
-                    // Select location
+                    this.fieldIsReady('location');
+
                     Mist.machineAddController.set('newMachineLocation', location);
-                    $('#create-machine-location').collapsible('collapse');
-                    $('#create-machine-location').collapsible('option','collapsedIcon','check');
                 },
 
                 selectKey: function(key) {
+
+                    this.fieldIsReady('key');
+
                     Mist.machineAddController.set('newMachineKey', key);
-                    $('#create-machine-key').collapsible('collapse');
-                    $('#create-machine-key').collapsible('option','collapsedIcon','check');
                 },
 
                 backClicked: function() {
