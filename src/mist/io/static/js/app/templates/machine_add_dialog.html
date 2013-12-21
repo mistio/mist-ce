@@ -1,4 +1,4 @@
-<div id="create-machine-panel" class="side-panel" data-role="panel" data-position="right" data-position-fixed="true" data-display="overlay">
+<div id="create-machine-panel" class="side-panel" data-role="panel" data-position="right" data-display="overlay">
    
     <div data-role="header">
         <h1>Create Machine</h1>
@@ -11,13 +11,12 @@
                id="create-machine-name"
                valueBinding="Mist.machineAddController.newMachineName"}}
 
-        <div data-role="collapsible-set">
-        <!--<label>2. Provider:</label>-->
+        <label>2. Provider:</label>
         <div id="create-machine-provider" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
                                                                                        data-expanded-icon="arrow-u">
-            <h2>{{Mist.machineAddController.newMachineProvider.title}}</h2>
-            <ul data-role="listview">
-                {{#each Mist.backendsController.providerList}}
+            <h3>{{Mist.machineAddController.newMachineProvider.title}}</h3>
+            <ul data-role="listview" data-inset="true">
+                {{#each Mist.backendsController.content}}
                 <li data-icon="false">
                     <a {{action "selectProvider" this target="view"}}>{{this.title}}</a>
                 </li>
@@ -25,7 +24,7 @@
             </ul>
         </div>
 
-        <!--<label>3. Image:</label>-->
+        <label>3. Image:</label>
         <div id="create-machine-image" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d" 
                                                                                     data-expanded-icon="arrow-u">
             <h2>{{Mist.machineAddController.newMachineImage.name}}</h2>
@@ -38,7 +37,7 @@
             </ul>
         </div>
 
-        <!--<label>4. Size:</label>-->
+        <label>4. Size:</label>
         <div id="create-machine-size" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
                                                                                    data-expanded-icon="arrow-u">
             <h2>{{Mist.machineAddController.newMachineSize.name}}</h2>
@@ -55,7 +54,7 @@
             </ul>
         </div>
 
-        <!--<label>5. Location:</label>-->
+        <label>5. Location:</label>
         <div id="create-machine-location" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
                                                                                        data-expanded-icon="arrow-u">
             <h2>{{Mist.machineAddController.newMachineLocation.name}}</h2>
@@ -68,12 +67,12 @@
             </ul>
         </div>
 
-        <!--<label>6. Key:</label>-->
+        <label>6. Key:</label>
         {{#if Mist.keysController.content.length}}
         <div id="create-machine-key" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
                                                                                   data-expanded-icon="arrow-u">
             <h2>{{Mist.machineAddController.newMachineKey.name}}</h2>
-            <ul data-role="listview" data-theme="b">
+            <ul data-role="listview">
                 {{#each Mist.keysController.content}}
                     <li data-icon="false">
                         <a {{action "selectKey" this target="view"}}>{{this.name}}</a>
@@ -82,15 +81,10 @@
             </ul>
         </div>
         {{else}}
-        <div id="create-machine-generate-key" data-role="collapsible" data-iconpos="right" data-collapsed-icon="gear">
-            <h2>Generate Key
-                {{#if Mist.keysController.generatingKey}}
-                    <div class="ajax-loader"></div>
-                {{/if}}
-            </h2>
-        </div>
+        <button data-iconpos="right" data-icon="gear" {{action "generateKeyClicked" target="view"}}>
+            Generate Key
+        </button>
         {{/if}}
-    </div>
 
         <label for="create-machine-script">7.Script:</label>
         {{view Mist.TextField
@@ -106,5 +100,4 @@
             <button id="create-machine-ok" data-theme="b" {{action "launchClicked" target="view"}}>Launch!</button>
         </div>
     </div>
-
 </div>

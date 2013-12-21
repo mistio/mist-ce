@@ -4,7 +4,7 @@
 #create-machine-panel label {
     margin-top: 10px;
 }
-#create-machine-panel .select-listmenu {
-    height: 120px;
+#create-machine-panel .ui-collapsible-content {
+    max-height: 120px;
     overflow-y: scroll;
 }

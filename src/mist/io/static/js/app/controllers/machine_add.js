@@ -42,6 +42,23 @@ define('app/controllers/machine_add', ['ember'],
             },
 
 
+            add: function() {
+                var that = this;
+                this.get('newMachineBackend').machines.newMachine(this.get('newMachineName'),
+                                                                  this.get('newMachineImage'),
+                                                                  this.get('newMachineSize'),
+                                                                  this.get('newMachineLocation'),
+                                                                  this.get('newMachineKey'),
+                                                                  this.get('newMachineScript'),
+                function(success, machine) {
+                    that._giveCallback(success, machine);
+                    if (success) {
+                        that.close();
+                    }
+                })
+            },
+
+
 
             /**
              *
@@ -50,6 +67,7 @@ define('app/controllers/machine_add', ['ember'],
              */
 
              _clear: function() {
+                this.set('callback', null);
                 this.set('newMachineName', '');
                 this.set('newMachineScript', '');
                 this.set('newMachineKey', {'name' : 'Select Key'});
@@ -59,44 +77,43 @@ define('app/controllers/machine_add', ['ember'],
                 this.set('newMachineProvider', {'title' : 'Select Provider'});
              },
 
-            newMachine: function() {
-                log("new machine");
-                this.get('newMachineBackend').machines.newMachine(
-                                            this.get('newMachineName'),
-                                            this.get('newMachineImage'),
-                                            this.get('newMachineSize'),
-                                            this.get('newMachineLocation'),
-                                            this.get('newMachineKey'),
-                                            this.get('newMachineScript'),
-                                            this.get('newMachineCost'));
+
+            _updateFormReady: function() {
+                if (this.newMachineName &&
+                    this.newMachineScript &&
+                    this.newMachineKey.id &&
+                    this.newMachineSize.id &&
+                    this.newMachineImage.id &&
+                    this.newmachineLocation.id &&
+                    this.newMachineProvider.id) {
+                        this.set('formReady', true);
+                        return;
+                } 
+                this.set('formReady', false);
             },
 
-            newMachineClear: function() {
 
+            _giveCallback: function(success, machine) {
+                if (this.callback) this.callback(success, machine);
             },
 
-            updateNewMachineReady: function() {
-                if (this.get('newMachineName') &&
-                    this.get('newMachineBackend') &&
-                    this.get('newMachineImage') &&
-                    this.get('newMachineSize') &&
-                    this.get('newMachineKey') &&
-                    this.get('newMachineLocation')) {
 
-                        this.set('newMachineReady', true);
 
-                } else {
-                    this.set('newMachineReady', false);
-                }
+            /**
+             *
+             *  Observers
+             *
+             */
 
-                this.set('newMachineNameReady', !!this.get('newMachineName') || !!this.get('newMachineBackend'));
-                this.set('newMachineBackendReady', !!this.get('newMachineBackend'));
-                this.set('newMachineImageReady', !!this.get('newMachineImage'));
-                this.set('newMachineSizeReady', !!this.get('newMachineSize'));
-                this.set('newMachineLocationReady', !!this.get('newMachineLocation'));
-                this.set('newMachineKeyReady', !!this.get('newMachineKey'));
-                this.set('newMachineScriptReady', !!this.get('newMachineScript'));
-            }
+            formObserver: function() {
+                Ember.run.once(this, '_updateFormReady');
+            }.observes('newMachineKey',
+                       'newMachineName',
+                       'newMachineSize',
+                       'newMachineImage',
+                       'newMachineScript',
+                       'newMachineLocation',
+                       'newMachineProvider')
         });
     }
 );
