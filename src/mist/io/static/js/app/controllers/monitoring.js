@@ -234,7 +234,8 @@ define('app/controllers/monitoring', [
                             }
                         }
                         else{
-                            Mist.notificationController.timeNotify("An error occurred while retrieving data",4000);
+                            //Mist.notificationController.timeNotify("An error occurred while retrieving data",4000);
+                            error(textStatus);
                         };
                     }
                 });
