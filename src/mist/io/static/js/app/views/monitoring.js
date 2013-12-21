@@ -1025,7 +1025,7 @@ define('app/views/monitoring', [
                         self.graphsCreated = true;
 
                         controller.setupDataRequest(timeToDisplay,10000);
-                        self.setupLoadColorInterval();
+                        //self.setupLoadColorInterval(); Commented Out Until It's Time To Deploy This Feature TODO
 
                         // Set Up Resolution Change Event
                         $(window).resize(function(){
