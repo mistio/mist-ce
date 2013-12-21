@@ -11,9 +11,29 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
              *  Properties
              */
 
-
             template: Ember.Handlebars.compile(machine_add_dialog_html),
-            imagesBinding: 'Mist.machineAddController.newMachineBackend.images',
+            price: function() {
+
+                var image = Mist.machineAddController.newMachineImage;
+                var size = Mist.machineAddController.newMachineSize;
+                var provider = Mist.machineAddController.newMachineProvider;
+
+                if (!image || !image.id || !size || !size.id || !provider || !provider.id) return 0;
+
+                if (provider.provider.indexOf('ec2') > -1) {
+                    if(image.name.indexOf('SUSE Linux Enterprise') > -1) return size.price.sles;
+                    if(image.name.indexOf('Red Hat') > -1)               return size.price.rhel;
+                                                                         return size.price.linux;
+                }
+                if (provider.provider.indexOf('rackspace') > -1) {
+                    if(image.name.indexOf('Red Hat') > -1) return size.price.rhel;
+                    if(image.name.indexOf('Vyatta') > -1)  return size.price.vyatta;
+                                                           return size.price.linux;
+                } 
+                return size.price;
+            }.property('Mist.machineAddController.newMachineProvider',
+                       'Mist.machineAddController.newMachineImage',
+                       'Mist.machineAddController.newMachineSize'),
 
             /**
              *
@@ -24,6 +44,23 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
              fieldIsReady: function(field) {
                 $('#create-machine-' + field).collapsible('option', 'collapsedIcon', 'check')
                                              .collapsible('collapse');
+             },
+
+
+             renderFields: function() {
+                Ember.run.next(function() {
+
+                    // Render collapsibles
+                    if ($('.ui-collapsible').collapsible) {
+                        $('.ui-collapsible').collapsible();
+                    }
+
+                    // Render listviews
+                    if ($('.ui-listview').listview) {
+                        $('.ui-listview').listview()
+                                         .listview('refresh');
+                    }
+                });
              },
 
 
@@ -82,59 +119,6 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
                 },
             },
 
-            getPrice: function(size, image){
-            //return price, for size/image combination for EC2/Rackspace, otherwise just size
-            //eg on provider Linode
-                if (Mist.machineAddController.newMachineProvider.provider.indexOf('ec2') != -1){
-                    if(image.name.indexOf('Red Hat') != -1){
-                        return size.price.rhel;
-                    } else if(image.name.indexOf('SUSE Linux Enterprise') !=-1 ){
-                        return size.price.sles;
-                    } else if(image.name.indexOf('SQL Server Web') !=-1 ){
-                        return size.price.mswinSQLWeb;
-                    } else if(image.name.indexOf('SQL Server') !=-1 ){
-                        return size.price.mswinSQL;
-                    } else if(image.name.indexOf('Windows') !=-1 ){
-                        return size.price.mswin;
-                    } else {
-                        return size.price.linux;
-                    }
-                } else if (Mist.machineAddController.newMachineProvider.provider.indexOf('rackspace') != -1) {
-                    if(image.name.indexOf('Red Hat') != -1) {
-                        return size.price.rhel;
-                    } else if(image.name.indexOf('SQL Server Web') !=-1 ) {
-                        return size.price.mswinSQLWeb;
-                    } else if(image.name.indexOf('SQL Server') !=-1 ) {
-                        return size.price.mswinSQL;
-                    } else if(image.name.indexOf('Windows') !=-1 ) {
-                        return size.price.mswin;
-                    } else if(image.name.indexOf('Vyatta') !=-1 ) {
-                        return size.price.vyatta;
-                    } else {
-                        return size.price.linux;
-                    }
-                } else {
-                    return size.price;
-                }
-            },
-
-            clear: function(){
-                Mist.machineAddController.newMachineClear();
-                $('.select-provider-collapsible span.ui-btn-text').text('Select Provider');
-                $('.select-image-collapsible span.ui-btn-text').text('Select Image');
-                $('.select-size-collapsible span.ui-btn-text').text('Select Size');
-                $('.select-location-collapsible span.ui-btn-text').text('Select Location');
-                $('.select-key-collapsible span.ui-btn-text').text('Select Key');
-
-                $('#create-machine-name').val('');
-            },
-
-            didInsertElement: function() {
-                var that = this;
-                this.$().bind('popupbeforeposition', function(e, data){
-                    that.clear();
-                });
-            },
 
             newMachineClicked: function() {
                 //FIXME there should be a way to bind the action directly to the controller
@@ -145,12 +129,16 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
                 if (providerName == 'NephoScale') {
                     var re = /^[0-9a-zA-Z-_]*$/;                 
                     if ((machineName.length > 64)||(!(re.test(machineName)))) {
-                        Mist.notificationController.timeNotify("Server name in NephoScale must start with a letter, can contain mixed alpha-numeric characters, hyphen ('-') and underscore ('_') characters, cannot exceed 64 characters, and can end with a letter or a number.", 7000);
+                        Mist.notificationController.timeNotify("Server name in NephoScale must start with a letter," + 
+                            " can contain mixed alpha-numeric characters, hyphen ('-') and underscore ('_') characters," + 
+                            " cannot exceed 64 characters, and can end with a letter or a number.", 7000);
                         return false;                        
                     } else if (machineSize.indexOf('CS025') != -1) {
-                          if (!((machineImage == 'Linux Ubuntu Server 10.04 LTS 64-bit') || (machineImage =='Linux CentOS 6.2 64-bit'))) {
-                              Mist.notificationController.timeNotify("On CS025 size you can only create one of the two images: Linux Ubuntu Server 10.04 LTS 64-bit or Linux CentOS 6.2 64-bit", 10000);
-                              return false;                                                      
+                          if (!((machineImage == 'Linux Ubuntu Server 10.04 LTS 64-bit') || 
+                              (machineImage =='Linux CentOS 6.2 64-bit'))) {
+                                Mist.notificationController.timeNotify("On CS025 size you can only create one of the two images:" + 
+                                        " Linux Ubuntu Server 10.04 LTS 64-bit or Linux CentOS 6.2 64-bit", 10000);
+                                return false;                                                      
                           }
                     }                                         
                 } 
@@ -164,14 +152,16 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
                 if (providerName == 'Linode') {                
                     var re = /^[0-9a-zA-Z-_]*$/; 
                     if (!re.test(machineName)) {
-                        Mist.notificationController.timeNotify("A Linode label may only contain ASCII letters or numbers, dashes, and underscores, must begin and end with letters or numbers, and be at least 3 characters in length.", 7000);
+                        Mist.notificationController.timeNotify("A Linode label may only contain ASCII letters or numbers," + 
+                        " dashes, and underscores, must begin and end with letters or numbers, and be at least 3 characters in length.", 7000);
                         return false; 
                     }                       
                 }
                 if (providerName == 'SoftLayer') {
                     var re = /^[0-9a-zA-Z.-]*$/;
                     if ((machineName.length > 253)||(!(re.test(machineName)))) {              
-                        Mist.notificationController.timeNotify("Server name must be an alphanumeric string, that may contain period ('.') and dash ('-') special characters.", 7000);
+                        Mist.notificationController.timeNotify("Server name must be an alphanumeric string," + 
+                        " that may contain period ('.') and dash ('-') special characters.", 7000);
                         return false;
                     }
                 }              
@@ -205,12 +195,21 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
                 return false;
             },
 
+
+
             /**
              *
              *  Observers
              *
              */
 
+             bindingsObserver: function() {
+                Ember.run.once(this, 'renderFields');
+             }.observes('Mist.keysController.content',
+                        'Mist.machineAddController.newMachineSize',
+                        'Mist.machineAddController.newMachineImage',
+                        'Mist.machineAddController.newMachineProvider',
+                        'Mist.machineAddController.newMachineLocation')
 
         });
     }

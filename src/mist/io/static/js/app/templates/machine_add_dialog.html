@@ -6,16 +6,20 @@
 
     <div data-role="content">
         
+        <!-- Select Name -->
+
         <label for="create-machine-name">1. Name:</label>
         {{view Mist.TextField
                id="create-machine-name"
                valueBinding="Mist.machineAddController.newMachineName"}}
 
+        <!-- Select Provider -->
+
         <label>2. Provider:</label>
         <div id="create-machine-provider" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
                                                                                        data-expanded-icon="arrow-u">
             <h3>{{Mist.machineAddController.newMachineProvider.title}}</h3>
-            <ul data-role="listview" data-inset="true">
+            <ul data-role="listview">
                 {{#each Mist.backendsController.content}}
                 <li data-icon="false">
                     <a {{action "selectProvider" this target="view"}}>{{this.title}}</a>
@@ -23,6 +27,8 @@
                 {{/each}}
             </ul>
         </div>
+
+        <!-- Select Image -->
 
         <label>3. Image:</label>
         <div id="create-machine-image" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d" 
@@ -36,6 +42,8 @@
                 {{/each}}
             </ul>
         </div>
+
+        <!-- Select Size -->
 
         <label>4. Size:</label>
         <div id="create-machine-size" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
@@ -54,6 +62,8 @@
             </ul>
         </div>
 
+        <!-- Select Location -->
+
         <label>5. Location:</label>
         <div id="create-machine-location" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
                                                                                        data-expanded-icon="arrow-u">
@@ -66,6 +76,8 @@
                 {{/each}}
             </ul>
         </div>
+
+        <!-- Select Key -->
 
         <label>6. Key:</label>
         {{#if Mist.keysController.content.length}}
@@ -86,13 +98,16 @@
         </button>
         {{/if}}
 
+        <!-- Select Script -->
+
         <label for="create-machine-script">7.Script:</label>
         {{view Mist.TextField
                id="create-machine-script"
                valueBinding="Mist.machineAddController.newMachineScript"}}
 
+
         <div id="create-machine-cost">Estimated price: 
-            <span>{{Mist.machineAddController.newMachineCost}}</span>
+            <span>{{view.price}}</span>
         </div>
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
