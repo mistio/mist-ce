@@ -14,6 +14,8 @@ define('app/controllers/monitoring', [
             lastMeasurmentTime: null,
             view: null,
 
+            step: 0,
+
             // This one is called from view
             initController: function(machine,view){
                 this.machine = machine;
@@ -25,7 +27,7 @@ define('app/controllers/monitoring', [
             * Receives first data and set time interval for
             * next reuqests
             */
-            setupDataRequest: function(){
+            setupDataRequest: function(timeToRequestms,step){
 
                 var SECONDS_INTERVAL = 10000;
 
@@ -36,33 +38,45 @@ define('app/controllers/monitoring', [
                 // First Data Request
                 self.machine.set('pendingStats', true);
 
-                var stop = (new Date()).getTime() - timeGap * 1000;
-                var start = stop - 1800*1000; // Substract Half Hour Of The Stop Date
-                var step = 10000;
+                // Note: Converting ms To s for start and stop, step remains ms
+                var stop  = Math.floor( ( (new Date()).getTime() - timeGap * 1000) / 1000 );
+                var start = Math.floor(stop - timeToRequestms/1000);
+                self.step = step;
 
-                self.receiveData(start, stop, step);
+                // Last measurement must be the first measurement
+                self.lastMeasurmentTime = new Date(start);
+
+                console.log("Stop : " + (new Date(stop*1000)));
+                console.log("Start: " + (new Date(start*1000)));
+                self.receiveData(start, stop, self.step);
 
 
                 // Update Request Every SECONDS_INTERVAL miliseconds
                 window.monitoringInterval = window.setInterval(function() {
 
-                    var start = (new Date()).getTime() - (timeGap+10) * 1000;
-                    var stop =  (new Date()).getTime() - timeGap * 1000;
-                    var step = 10000; // 10 Second Step
+                    var start = Math.floor( self.lastMeasurmentTime.getTime() /1000 ) ;
+                    var stop =  Math.floor( ((new Date()).getTime() - timeGap * 1000 ) / 1000 );
+                    var stopRemainder = (stop - start) % (step/1000);
+                    stop = stop - stopRemainder;
 
-                    // Ask all the datat that we didn't receive
-                    if(self.machineNotResponding){
+                    // DEBUG TODO Remove It
+                    if(stopRemainder>0)
+                        error("Loss Of Presition: " + stopRemainder);
 
-                        // Get last time from a graph
-                        if(self.lastMeasurmentTime.getTime() < start)
-                            start = self.lastMeasurmentTime.getTime();
+                    console.log("Last Mes: " + self.lastMeasurmentTime);
+                    console.log("Start: " + new Date(start*1000));
+                    console.log("Stop : " + new Date(stop *1000 ));
 
-                        machineNotResponding = false;
-                    }
+                    machineNotResponding = false;
 
-                    self.receiveData(start, stop, step);
+                    self.receiveData(start, stop, self.step);
 
                 },SECONDS_INTERVAL);
+            },
+
+            updateDataRequest: function(timeToRequestms,step){
+                window.clearInterval(window.monitoringInterval);
+                this.setupDataRequest(timeToRequestms,step);
             },
 
             finishedGraphUpdate: function(){
@@ -80,27 +94,36 @@ define('app/controllers/monitoring', [
 
                 var self = this;
 
-                // start: date/time we want to receive data from
-                // stop:  date/time we want to receeive data until
+                // start: date/time we want to receive data from (seconds)
+                // stop:  date/time we want to receeive data until (seconds)
                 // step:  miliseconds we want to split data
                 $.ajax({
                     url: '/backends/' + this.machine.backend.id +
                          '/machines/' + this.machine.id + '/stats',
                     type: 'GET',
                     async: true,
-                    data: {'start': Math.floor(start / 1000),
-                            'stop': Math.floor(stop / 1000),
-                            'step': step},
-                    timeout: 4000,
+                    dataType: 'json',
+                    data: { 'start': start, 
+                            'stop': stop,
+                            'step': step
+                          },
+                    timeout: 8000,
                     success: function (data, status, xhr){
 
                         var controller = Mist.monitoringController;
 
                         try {
 
-                            if(data.load.length == 0)
-                                throw "Received Wrong Server Response";
+                            var measurmentsExpected = Math.floor((stop-start) / (step/1000)) ;
 
+                            if(data.load.length == 0)
+                                throw "Error, Received none measurements";
+                            else if(data.load.length > measurmentsExpected)
+                                throw "Error, Received more measurements than expected";
+
+                            console.log("Measurement Expected: " + measurmentsExpected);
+                            console.log("Measurement Received: " + data.load.length);
+                            console.log("");
 
                             var disks = [];
                             var netInterfaces = [];
@@ -119,6 +142,7 @@ define('app/controllers/monitoring', [
 
 
                             var receivedData = {
+                                cpuCores:   0,
                                 cpu:       [],
                                 load:      [],
                                 memory:    [],
@@ -128,45 +152,47 @@ define('app/controllers/monitoring', [
                                 netTX:     []
                             };
 
+
+                            // Set CPU Cores
+                            receivedData.cpuCores =  data['cpu']['cores'];
+
                             // Create a date with first measurement time
-                            var metricTime = new Date(start);
+                            var metricTime = new Date(start*1000 + step);
 
                             // Create Custom Objects From Data
                             for(var i=0; i < data.load.length; i++ )
                             {
 
-                                var measurementTime = metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds();
-
                                 var cpuObj = {
-                                    time : measurementTime,
+                                    time : metricTime,
                                     value: ( (data['cpu']['utilization'][i] * data['cpu']['cores']) * 100)
                                 };
                                 var loadObj = {
-                                    time : measurementTime,
+                                    time : metricTime,
                                     value: data['load'][i]
                                 };
                                 var memObj = {
-                                    time : measurementTime,
+                                    time : metricTime,
                                     value: data['memory'][i]
                                 };
 
                                 // TODO Add Multiple Disks
                                 var diskReadObj = {
-                                    time: measurementTime,
+                                    time: metricTime,
                                     value: data['disk']['read'][disks[0]]['disk_octets'][i]
                                 };
                                 var diskWriteObj = {
-                                    time: measurementTime,
+                                    time: metricTime,
                                     value: data['disk']['write'][disks[0]]['disk_octets'][i]
                                 };
 
                                 // TODO Add Multiple Interfaces
                                 var netRXObj = {
-                                    time: measurementTime,
+                                    time: metricTime,
                                     value: data['network'][netInterfaces[0]]['rx'][i]
                                 };
                                 var netTXObj = {
-                                    time: measurementTime,
+                                    time: metricTime,
                                     value: data['network'][netInterfaces[0]]['tx'][i]
                                 };
 
@@ -189,7 +215,6 @@ define('app/controllers/monitoring', [
                             self.finishedGraphUpdate();
                         }
                         catch(err) {
-                            Mist.notificationController.notify(err);
                             error(err);
                             self.machineNotResponding = true;
                         }
@@ -203,13 +228,14 @@ define('app/controllers/monitoring', [
                             // So we won't display error if it is disabled
                             if(self.machine.hasMonitoring){
                                 Mist.notificationController.timeNotify("Data request timed out. " +
-                                                                       "Internet is down or server doesn't respond",4000);
+                                                                       "Network connection is down or server doesn't respond",4000);
 
                                 self.machineNotResponding = true;
                             }
                         }
                         else{
-                            Mist.notificationController.timeNotify("An error occurred while retrieving data",4000);
+                            //Mist.notificationController.timeNotify("An error occurred while retrieving data",4000);
+                            error(textStatus);
                         };
                     }
                 });
