@@ -64,6 +64,14 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
              },
 
 
+             updateLaunchButton: function() {
+                if (Mist.machineAddController.formReady) {
+                    $('#create-machine-ok').removeClass('ui-state-disabled');
+                } else {
+                    $('#create-machine-ok').addClass('ui-state-disabled');
+                }
+             },
+
 
             /**
              *
@@ -117,59 +125,12 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
                 backClicked: function() {
                     Mist.machineAddController.close();
                 },
+            
+                launchClicked: function() {
+                    Mist.machineAddController.add();
+                }
             },
 
-
-            newMachineClicked: function() {
-                //FIXME there should be a way to bind the action directly to the controller
-                var providerName = $('.select-provider-collapsible span.ui-btn-text').text();
-                var machineSize = $('.select-size-collapsible span.ui-btn-text').text();                
-                var machineImage = $('.select-image-collapsible span.ui-btn-text').text();                                
-                var machineName = $('#create-machine-name').val();                                
-                if (providerName == 'NephoScale') {
-                    var re = /^[0-9a-zA-Z-_]*$/;                 
-                    if ((machineName.length > 64)||(!(re.test(machineName)))) {
-                        Mist.notificationController.timeNotify("Server name in NephoScale must start with a letter," + 
-                            " can contain mixed alpha-numeric characters, hyphen ('-') and underscore ('_') characters," + 
-                            " cannot exceed 64 characters, and can end with a letter or a number.", 7000);
-                        return false;                        
-                    } else if (machineSize.indexOf('CS025') != -1) {
-                          if (!((machineImage == 'Linux Ubuntu Server 10.04 LTS 64-bit') || 
-                              (machineImage =='Linux CentOS 6.2 64-bit'))) {
-                                Mist.notificationController.timeNotify("On CS025 size you can only create one of the two images:" + 
-                                        " Linux Ubuntu Server 10.04 LTS 64-bit or Linux CentOS 6.2 64-bit", 10000);
-                                return false;                                                      
-                          }
-                    }                                         
-                } 
-                if (providerName == 'DigitalOcean') {                
-                    var re = /^[0-9a-zA-Z-.]*$/; 
-                    if (!re.test(machineName)) {
-                        Mist.notificationController.timeNotify("Characters allowed are a-z, A-Z, 0-9, . and -", 7000);
-                        return false; 
-                    }                       
-                }
-                if (providerName == 'Linode') {                
-                    var re = /^[0-9a-zA-Z-_]*$/; 
-                    if (!re.test(machineName)) {
-                        Mist.notificationController.timeNotify("A Linode label may only contain ASCII letters or numbers," + 
-                        " dashes, and underscores, must begin and end with letters or numbers, and be at least 3 characters in length.", 7000);
-                        return false; 
-                    }                       
-                }
-                if (providerName == 'SoftLayer') {
-                    var re = /^[0-9a-zA-Z.-]*$/;
-                    if ((machineName.length > 253)||(!(re.test(machineName)))) {              
-                        Mist.notificationController.timeNotify("Server name must be an alphanumeric string," + 
-                        " that may contain period ('.') and dash ('-') special characters.", 7000);
-                        return false;
-                    }
-                }              
-                Mist.machineAddController.newMachine();
-                $('.dialog-add').panel('close');
-                Mist.Router.router.transitionTo('machines');
-                this.clear();                
-            },
 
             generateClicked: function() {
                 info('yo');
@@ -209,8 +170,12 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
                         'Mist.machineAddController.newMachineSize',
                         'Mist.machineAddController.newMachineImage',
                         'Mist.machineAddController.newMachineProvider',
-                        'Mist.machineAddController.newMachineLocation')
+                        'Mist.machineAddController.newMachineLocation'),
 
+
+             formReadyObserver: function() {
+                Ember.run.once(this, 'updateLaunchButton');
+             }.observes('Mist.machineAddController.formReady')
         });
     }
 );

@@ -13,7 +13,6 @@ define('app/controllers/machine_add', ['ember'],
 
             callback: null,
             formReady: null,
-            newMachineCost: null,
 
             newMachineKey: null,
             newMachineName: null,
@@ -31,8 +30,8 @@ define('app/controllers/machine_add', ['ember'],
 
             open: function(callback) {
                 this._clear();
-                $('#create-machine-panel').panel('open');
                 this.set('callback', callback);
+                $('#create-machine-panel').panel('open');
             },
 
 
@@ -43,19 +42,74 @@ define('app/controllers/machine_add', ['ember'],
 
 
             add: function() {
-                var that = this;
-                this.get('newMachineBackend').machines.newMachine(this.get('newMachineName'),
-                                                                  this.get('newMachineImage'),
-                                                                  this.get('newMachineSize'),
-                                                                  this.get('newMachineLocation'),
-                                                                  this.get('newMachineKey'),
-                                                                  this.get('newMachineScript'),
-                function(success, machine) {
-                    that._giveCallback(success, machine);
-                    if (success) {
-                        that.close();
+
+                var providerName = this.newMachineProvider.title;
+                var machineSize = this.newMachineSize.name;
+                var machineImage = this.newMachineImage.name;
+                var machineName = this.newMachineName;
+
+                // Validate machine
+
+                if (providerName == 'NephoScale') {
+                    var re = /^[0-9a-zA-Z-_]*$/;
+                    if ( machineName.length > 64 || !re.test(machineName)) {
+
+                        Mist.notificationController.timeNotify(
+                            'Server name in NephoScale must start with a letter, can contain mixed alpha-numeric ' +
+                            'characters, hyphen (\'-\') and underscore (\'_\') characters, cannot exceed 64 ' +
+                            'characters, and can end with a letter or a number.', 7000);
+                        return;
                     }
-                })
+                    if (machineSize.indexOf('CS025') != -1) {
+                        if ((machineImage != 'Linux Ubuntu Server 10.04 LTS 64-bit') &&
+                            (machineImage !='Linux CentOS 6.2 64-bit')) {
+
+                                Mist.notificationController.timeNotify(
+                                    'On CS025 size you can only create one of the two images: ' + 
+                                    'Linux Ubuntu Server 10.04 LTS 64-bit or Linux CentOS 6.2 64-bit', 7000);
+                                return;
+                        }
+                    }
+                }
+                if (providerName == 'DigitalOcean') {
+                    var re = /^[0-9a-zA-Z-.]*$/; 
+                    if (!re.test(machineName)) {
+                        Mist.notificationController.timeNotify('Characters allowed are a-z, A-Z, 0-9, . and -', 7000);
+                        return;
+                    }
+                }
+                if (providerName == 'Linode') {
+                    var re = /^[0-9a-zA-Z-_]*$/;
+                    if (!re.test(machineName)) {
+                        Mist.notificationController.timeNotify(
+                            'A Linode label may only contain ASCII letters or numbers, dashes and underscores. Must ' +
+                            'begin and end with letters or numbers, and be at least 3 characters long', 7000);
+                        return;
+                    }
+                }
+                if (providerName == 'SoftLayer') {
+                    var re = /^[0-9a-zA-Z.-]*$/;
+                    if (machineName.length > 253 || !re.test(machineName)) {
+                        Mist.notificationController.timeNotify(
+                            'Server name in Softlayer must be an alphanumeric string,' + 
+                            ' that may contain period (\'.\') and dash (\'-\') special characters.', 7000);
+                        return;
+                    }
+                }
+                var that = this;
+                this.newMachineProvider.machines
+                    .newMachine(this.newMachineName,
+                                this.newMachineImage,
+                                this.newMachineSize,
+                                this.newMachineLocation,
+                                this.newMachineKey,
+                                this.newMachineScript,
+                                function(success, machine) {
+                                    that._giveCallback(success, machine);
+                                    if (success) {
+                                        that.close();
+                                    }
+                                });
             },
 
 
@@ -67,14 +121,14 @@ define('app/controllers/machine_add', ['ember'],
              */
 
              _clear: function() {
-                this.set('callback', null);
-                this.set('newMachineName', '');
-                this.set('newMachineScript', '');
-                this.set('newMachineKey', {'name' : 'Select Key'});
-                this.set('newMachineSize', {'name' : 'Select Size'});
-                this.set('newMachineImage', {'name' : 'Select Image'});
-                this.set('newMachineLocation', {'name' : 'Select Location'});
-                this.set('newMachineProvider', {'title' : 'Select Provider'});
+                this.set('callback', null)
+                    .set('newMachineName', '')
+                    .set('newMachineScript', '')
+                    .set('newMachineKey', {'name' : 'Select Key'})
+                    .set('newMachineSize', {'name' : 'Select Size'})
+                    .set('newMachineImage', {'name' : 'Select Image'})
+                    .set('newMachineLocation', {'name' : 'Select Location'})
+                    .set('newMachineProvider', {'title' : 'Select Provider'});
              },
 
 
