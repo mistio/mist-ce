@@ -66,6 +66,7 @@ define( 'app', [
     'app/views/key_edit_dialog',
     'app/views/rule',
     'app/views/user_menu',
+    'app/views/list_item',
     'text!app/templates/machine.html',
     'ember'
     ], function($,
@@ -108,6 +109,7 @@ define( 'app', [
                 KeyEditDialog,
                 RuleView,
                 UserMenuView,
+                ListItemView,
                 machine_html
                 ) {
 
@@ -307,6 +309,7 @@ define( 'app', [
 
 
         App.HomeView = Home;
+        App.ListItemView = ListItemView;
         App.BackendButtonView = BackendButton;
         App.BackendAddView = BackendAdd;
         App.EditBackendView = EditBackend;

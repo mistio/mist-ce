@@ -18,7 +18,6 @@ define(['app/models/key'],
             keyRequest: false,
             creatingKey: false,
             renamingKey: false,
-            uploadingKey: false,
             associatingKey: false,
             gettingPublicKey: false,
             gettingPrivateKey: false,
@@ -63,9 +62,9 @@ define(['app/models/key'],
                     that._createKey(key);
                 }).error(function() {
                     Mist.notificationController.notify('Failed to create key');
-                }).complete(function(success) {
+                }).complete(function(success, key) {
                     that.set('creatingKey', false);
-                    if (callback) callback(success);
+                    if (callback) callback(success, key);
                 });
                 keyPrivate = null;
             },
@@ -164,9 +163,9 @@ define(['app/models/key'],
                 Mist.ajaxGET('/keys/' + keyId + '/private', {
                 }).error(function() {
                     Mist.notificationController.notify('Failed to get private key');
-                }).complete(function(success, key) {
+                }).complete(function(success, keyPriv) {
                     that.set('gettingPrivateKey', false);
-                    if (callback) callback(success, key);
+                    if (callback) callback(success, keyPriv);
                 });
             },
 
@@ -177,9 +176,9 @@ define(['app/models/key'],
                 Mist.ajaxGET('/keys/' + keyId + '/public', {
                 }).error(function() {
                     Mist.notificationController.notify('Failed to get public key');
-                }).complete(function(success, key) {
+                }).complete(function(success, keyPub) {
                     that.set('gettingPublicKey', false);
-                    if (callback) callback(success, key);
+                    if (callback) callback(success, keyPub);
                 });
             },
 

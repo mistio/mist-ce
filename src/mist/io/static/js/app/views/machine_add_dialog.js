@@ -132,28 +132,17 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
             },
 
 
-            generateClicked: function() {
-                info('yo');
-                return;
-                $('.generate-key-collapsible').addClass('ui-disabled');
-                $('.generate-key-collapsible .ui-icon').hide();
-                $('.dialog-add .ajax-loader').show();
-                $.ajax({
-                    url: '/keys',
-                    type: 'POST',
-                    success: function(data) {
+            generateKeyClicked: function() {
+                Mist.keysController.generateKey(function(success, keyPriv) {
+                    if (success) {
                         var keyName = 'auto-generated-key-' + Math.round(+new Date/1000);
-                        Mist.keysController.newKey(keyName, data.priv, null, true);
-                        $('.dialog-add .ajax-loader').css('display','none');
-                        $('.generate-key-collapsible').removeClass('ui-disabled');
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while generating key');
-                        error(textstate, errorThrown, ' while getting public key. ', jqXHR.responseText);
-                        $('.generate-key-collapsible').removeClass('ui-disabled');
+                        Mist.keysController.createKey(keyName, keyPriv, function(success) {
+                            Ember.run.next(function() {
+                                $('[data-role=collapsible]').parent().trigger('create');
+                            });
+                        });
                     }
                 });
-                return false;
             },
 
 

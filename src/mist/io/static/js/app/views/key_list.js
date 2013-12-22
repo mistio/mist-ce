@@ -21,7 +21,6 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
 
             init: function() {
                 this._super();
-                Mist.keysController.on('onKeyListChange', this, 'renderKeyList');
                 Mist.keysController.on('onSelectedKeysChange', this, 'updateFooter');
             },
 
@@ -41,18 +40,6 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
              * 
              */
 
-            renderKeyList: function() {
-                Ember.run.next(function() {
-                    if ($('#key-list-page .ui-listview').listview) {
-                        $('#key-list-page .ui-listview').listview('refresh');
-                    }
-                    if ($('#key-list-page input.ember-checkbox').checkboxradio) {
-                        $('#key-list-page input.ember-checkbox').checkboxradio();
-                    }
-                });
-            },
-
-
             updateFooter: function() {
                 switch (Mist.keysController.selectedKeys.length) {
                     case 0:
@@ -60,11 +47,11 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
                         break;
                     case 1:
                         $('#key-list-page .ui-footer').slideDown();
-                        $('#key-list-page .ui-footer a').removeClass('ui-state-disabled');
+                        $('#key-list-page .ui-footer button').removeClass('ui-state-disabled');
                         break;
                     default:
                         $('#key-list-page .ui-footer').slideDown();
-                        $('#key-list-page .ui-footer a').addClass('ui-state-disabled');
+                        $('#key-list-page .ui-footer button').addClass('ui-state-disabled');
                         break;
                 }
             },
@@ -74,7 +61,7 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
             /**
              * 
              *  Actions
-             * 
+             *  
              */
 
             actions: {
@@ -92,9 +79,6 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
                         $('#select-keys-popup').popup('close');
                         Mist.keysController.content.forEach(function(key) {
                             key.set('selected', mode);
-                        });
-                        Ember.run.next(function() {
-                            $("input[type='checkbox']").checkboxradio('refresh');
                         });
                     });
                 },

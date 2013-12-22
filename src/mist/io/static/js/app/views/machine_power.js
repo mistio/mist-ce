@@ -49,7 +49,6 @@ define('app/views/machine_power', ['text!app/templates/machine_power.html', 'emb
             actions: {
 
                 actionClicked: function(action) {
-                    info(action);
                     Mist.machinePowerController.act(action);
                 },
 

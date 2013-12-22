@@ -60,7 +60,7 @@ define('app/controllers/machine_add', ['ember'],
                             'characters, and can end with a letter or a number.', 7000);
                         return;
                     }
-                    if (machineSize.indexOf('CS025') != -1) {
+                    if (machineSize.indexOf('CS025') > -1) {
                         if ((machineImage != 'Linux Ubuntu Server 10.04 LTS 64-bit') &&
                             (machineImage !='Linux CentOS 6.2 64-bit')) {
 
@@ -134,11 +134,10 @@ define('app/controllers/machine_add', ['ember'],
 
             _updateFormReady: function() {
                 if (this.newMachineName &&
-                    this.newMachineScript &&
                     this.newMachineKey.id &&
                     this.newMachineSize.id &&
                     this.newMachineImage.id &&
-                    this.newmachineLocation.id &&
+                    this.newMachineLocation.id &&
                     this.newMachineProvider.id) {
                         this.set('formReady', true);
                         return;

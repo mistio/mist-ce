@@ -35,6 +35,7 @@
                     <span class="ui-li-count">{{Mist.backendsController.machineCount}}</span>
                 {{/link-to}}
             </li>
+            
             <li>
                 {{#link-to "images"}}Images
                     {{#if Mist.backendsController.loadingImages}}
@@ -43,6 +44,7 @@
                     <span class="ui-li-count">{{Mist.backendsController.imageCount}}</span>
                 {{/link-to}}
             </li>
+
             <li>
                 {{#link-to "keys"}}Keys
                     {{#if Mist.keysController.loading}}

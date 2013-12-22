@@ -58,7 +58,7 @@ define('app/models/machine', [
 
 
             destroy: function() {
-                Mist.backendsController.destoryMachine(this.id);
+                Mist.backendsController.destroyMachine(this.id);
             },
 
 

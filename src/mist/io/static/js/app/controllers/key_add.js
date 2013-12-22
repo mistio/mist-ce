@@ -13,6 +13,7 @@ define('app/controllers/key_add', ['ember'],
 
             callback: null,
             formReady: null,
+            uploadingKey: null,
 
             newKeyId: null,
             newKeyPrivate: null,
