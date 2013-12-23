@@ -46,10 +46,15 @@ define('app/controllers/monitoring', [
                 // Last measurement must be the first measurement
                 self.lastMeasurmentTime = new Date(start);
 
-                console.log("Stop : " + (new Date(stop*1000)));
+                /* Request Debugging : TODO Remove It when requests are stable
+                console.log("Request Time:");
                 console.log("Start: " + (new Date(start*1000)));
-                self.receiveData(start, stop, self.step);
+                console.log("Stop : " + (new Date(stop*1000)));
+                console.log("");
+                */
 
+                self.receiveData(start, stop, self.step);
+                
 
                 // Update Request Every SECONDS_INTERVAL miliseconds
                 window.monitoringInterval = window.setInterval(function() {
@@ -59,14 +64,16 @@ define('app/controllers/monitoring', [
                     var stopRemainder = (stop - start) % (step/1000);
                     stop = stop - stopRemainder;
 
-                    // DEBUG TODO Remove It
+                    /* Request Debugging : TODO Remove It when requests are stable
                     if(stopRemainder>0)
                         error("Loss Of Presition: " + stopRemainder);
 
+                    console.log("Request Time:");
                     console.log("Last Mes: " + self.lastMeasurmentTime);
                     console.log("Start: " + new Date(start*1000));
                     console.log("Stop : " + new Date(stop *1000 ));
-
+                    console.log("");
+                    */
                     machineNotResponding = false;
 
                     self.receiveData(start, stop, self.step);
@@ -121,10 +128,6 @@ define('app/controllers/monitoring', [
                             else if(data.load.length > measurmentsExpected)
                                 throw "Error, Received more measurements than expected";
 
-                            console.log("Measurement Expected: " + measurmentsExpected);
-                            console.log("Measurement Received: " + data.load.length);
-                            console.log("");
-
                             var disks = [];
                             var netInterfaces = [];
 
@@ -155,6 +158,19 @@ define('app/controllers/monitoring', [
 
                             // Set CPU Cores
                             receivedData.cpuCores =  data['cpu']['cores'];
+
+                            /* Request Debugging : TODO Remove It when requests are stable
+                            console.log("Measurement Expected: " + measurmentsExpected + " For " + (stop-start) + " seconds");
+                            console.log("Measurement Received: ");
+                            console.log("LOAD   : " + data.load.length);
+                            console.log("CPU    : " + data['cpu']['utilization'].length);
+                            console.log("MEM    : " + data['memory'].length);
+                            console.log("DISK R : " + data['disk']['read'][disks[0]]['disk_octets'].length);
+                            console.log("DISK W : " + data['disk']['write'][disks[0]]['disk_octets'].length);
+                            console.log("NET TX : " + data['network'][netInterfaces[0]]['tx'].length);
+                            console.log("NET RX : " + data['network'][netInterfaces[0]]['rx'].length);
+                            console.log("");
+                            */
 
                             // Create a date with first measurement time
                             var metricTime = new Date(start*1000 + step);

@@ -829,6 +829,15 @@ define('app/views/monitoring', [
                         var updateInterval;
 
                         var updatePopUpValue = function(){
+
+                                // Check if mouse left from element without clearing interval
+                                if($($('#' + self.id).selector + ":hover").length <= 0)
+                                {
+                                   clearUpdatePopUp();
+                                   return;
+                                }
+
+                                // Update popup when it is over value line
                                 if(mouseX > margin.left)
                                 {
 
@@ -900,6 +909,15 @@ define('app/views/monitoring', [
 
                         };
 
+                        var clearUpdatePopUp = function() {
+
+                            $(this).find('.selectorLine').hide(0);
+                            $("#GraphsArea").find('.valuePopUp').hide(0);
+
+                            // Clear Interval
+                            window.clearInterval(updateInterval);
+                        };
+
 
                         // Mouse Events
                         $('#' + self.id).children('svg').mouseenter(function() {
@@ -911,16 +929,8 @@ define('app/views/monitoring', [
                             // Setup Interval
                             updateInterval = window.setInterval(updatePopUpValue,500);
                         });
-                        $('#' + self.id).children('svg').mouseleave(function() {
-
-                            $(this).find('.selectorLine').hide(0);
-                            $("#GraphsArea").find('.valuePopUp').hide(0);
-
-                            // Clear Interval
-                            window.clearInterval(updateInterval);
-                        });
+                        $('#' + self.id).children('svg').mouseleave(clearUpdatePopUp);
                         $('#' + self.id).children('svg').mousemove(updatePopUpOffset);
-
                     }
 
 
