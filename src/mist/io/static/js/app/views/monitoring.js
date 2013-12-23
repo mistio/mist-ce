@@ -11,13 +11,15 @@ define('app/views/monitoring', [
 
             template: Ember.Handlebars.compile(monitoring_html),
 
-            cpuGraph: null,
-            loadGraph: null,
-            memGraph: null,
-            diskReadGraph: null,
-            diskWriteGraph: null,
-            networkTXGraph: null,
-            networkRXGraph: null,
+            graphs : {
+                cpu: null,
+                load: null,
+                memory: null,
+                diskRead: null,
+                diskWrite: null,
+                networkTX: null,
+                networkRX: null
+            },
 
             cpuCores: 0,
 
@@ -74,15 +76,13 @@ define('app/views/monitoring', [
 
             updateGraphs: function(data){
 
-                    this.cpuCores = data.cpuCores;
-                    this.cpuGraph.updateData(data.cpu);
-                    this.loadGraph.updateData(data.load);
-                    this.memGraph.updateData(data.memory);
+                // Do Something For CPU Cores (Add Them Inside CPU ?) TODO
+                this.cpuCores = data.cpuCores;
 
-                    this.diskReadGraph.updateData(data.diskRead);
-                    this.diskWriteGraph.updateData(data.diskWrite);
-                    this.networkRXGraph.updateData(data.netRX);
-                    this.networkTXGraph.updateData(data.netTX);
+                for(metric in data){
+                    if(metric != 'cpuCores')
+                        this.graphs[metric].updateData(data[metric]);
+                }
             },
 
             hideGraphs: function(){
@@ -1042,14 +1042,14 @@ define('app/views/monitoring', [
                         var width = $("#GraphsArea").width() -2;  
 
                         // Create Graphs 
-                        var timeToDisplay = 10*60*1000; // 10 minutes
-                        self.cpuGraph  = new Graph('cpuGraph',width,timeToDisplay,"%");
-                        self.loadGraph = new Graph('loadGraph',width,timeToDisplay);
-                        self.memGraph  = new Graph('memGraph',width,timeToDisplay,"%");
-                        self.diskReadGraph  = new Graph('diskReadGraph' ,width,timeToDisplay);
-                        self.diskWriteGraph = new Graph('diskWriteGraph',width,timeToDisplay);
-                        self.networkRXGraph = new Graph('networkRXGraph',width,timeToDisplay);
-                        self.networkTXGraph = new Graph('networkTXGraph',width,timeToDisplay);
+                        var timeToDisplay        = 10*60*1000; // 10 minutes
+                        self.graphs['cpu']       = new Graph('cpuGraph',width,timeToDisplay,"%");
+                        self.graphs['load']      = new Graph('loadGraph',width,timeToDisplay);
+                        self.graphs['memory']    = new Graph('memGraph',width,timeToDisplay,"%");
+                        self.graphs['diskRead']  = new Graph('diskReadGraph' ,width,timeToDisplay);
+                        self.graphs['diskWrite'] = new Graph('diskWriteGraph',width,timeToDisplay);
+                        self.graphs['networkRX'] = new Graph('networkRXGraph',width,timeToDisplay);
+                        self.graphs['networkTX'] = new Graph('networkTXGraph',width,timeToDisplay);
 
 
                         self.graphsCreated = true;
@@ -1064,18 +1064,14 @@ define('app/views/monitoring', [
                         // Set Up Resolution Change Event
                         $(window).resize(function(){
 
-                                    var newWidth = $("#GraphsArea").width() -2;
-                                    self.cpuGraph.changeWidth(newWidth);
-                                    self.loadGraph.changeWidth(newWidth);
-                                    self.memGraph.changeWidth(newWidth);
-                                    self.diskReadGraph.changeWidth(newWidth);
-                                    self.diskWriteGraph.changeWidth(newWidth);
-                                    self.networkRXGraph.changeWidth(newWidth);
-                                    self.networkTXGraph.changeWidth(newWidth);
-
+                            var newWidth = $("#GraphsArea").width() -2;
+                            for(metric in self.graphs){
+                                 self.graphs[metric].changeWidth(newWidth);
+                            }
                         })
+
                     });
-                    
+
                     Mist.rulesController.redrawRules();
                 } 
             }.observes('controller.model.hasMonitoring','viewRendered'),

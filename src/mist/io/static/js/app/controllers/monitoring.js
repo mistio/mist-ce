@@ -188,8 +188,8 @@ define('app/controllers/monitoring', [
                                     memory:    [],
                                     diskRead:  [],
                                     diskWrite: [],
-                                    netRX:     [],
-                                    netTX:     []
+                                    networkRX: [],
+                                    networkTX: []
                                 };
 
 
@@ -240,11 +240,11 @@ define('app/controllers/monitoring', [
                                     };
 
                                     // TODO Add Multiple Interfaces
-                                    var netRXObj = {
+                                    var networkRXObj = {
                                         time: metricTime,
                                         value: data['network'][netInterfaces[0]]['rx'][i]
                                     };
-                                    var netTXObj = {
+                                    var networkTXObj = {
                                         time: metricTime,
                                         value: data['network'][netInterfaces[0]]['tx'][i]
                                     };
@@ -255,8 +255,8 @@ define('app/controllers/monitoring', [
                                     receivedData.memory.push(memObj);
                                     receivedData.diskRead.push(diskReadObj);
                                     receivedData.diskWrite.push(diskWriteObj);
-                                    receivedData.netRX.push(netRXObj);
-                                    receivedData.netTX.push(netTXObj);
+                                    receivedData.networkRX.push(networkRXObj);
+                                    receivedData.networkTX.push(networkTXObj);
 
                                     // Increase time by step for every new measurement
                                     metricTime = new Date(metricTime.getTime()+10000);
