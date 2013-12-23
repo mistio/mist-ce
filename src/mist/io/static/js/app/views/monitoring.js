@@ -30,6 +30,7 @@ define('app/views/monitoring', [
             init: function() {
                 this._super();
                 this.setUpGraphs();
+                this.setupEventListeners();
             },
 
             // Check If Ember View Rendered
@@ -49,6 +50,25 @@ define('app/views/monitoring', [
                 // Re-Initialize Enable Button Of Jquery Mobile
                 Em.run.next(function() {
                     $('.monitoring-button').button();
+                });
+            },
+
+            // TODO Create And Connect Functions For These Events
+            setupEventListeners: function(){
+
+                var controller = Mist.monitoringController;
+
+                controller.on("reloading",function(){
+                    console.log("Reloading Data");
+                });
+
+                controller.on("dataFetchStarted",function(){
+                    console.log("Controller Started Fetching Stats");
+                });
+
+                controller.on("dataFetchFinished",function(success){
+                    console.log("Controller Finished Fetching Stats");
+                    console.log("With Status: " + success);
                 });
             },
 
@@ -966,7 +986,7 @@ define('app/views/monitoring', [
                     var self = this;
                     var controller = Mist.monitoringController;
 
-                    controller.initController(machine,this);
+                    
 
                 
                     Em.run.next(function() {
@@ -1033,8 +1053,12 @@ define('app/views/monitoring', [
 
 
                         self.graphsCreated = true;
+                        //controller.initController(machine,self);
+                        //controller.setupDataRequest(timeToDisplay,10000);
+                        
+                        //var testTime = new Date( (new Date()).getTime() - 1000* 60* 60); DEBUG OLDER TIME
+                        controller.initialize(machine,self,timeToDisplay,10000,10000);
 
-                        controller.setupDataRequest(timeToDisplay,10000);
                         //self.setupLoadColorInterval(); Commented Out Until It's Time To Deploy This Feature TODO
 
                         // Set Up Resolution Change Event
