@@ -1024,7 +1024,7 @@ def list_images(user, backend_id, term=None):
         raise BackendUnavailableError(backend_id)
 
     ret = [{'id': image.id, 'extra': image.extra, 'name': image.name,
-        'star': image.id in starred} for image in images]
+            'star': image.id in starred} for image in images]
     return sorted(ret, key=lambda k: k.get('name'))
 
 
