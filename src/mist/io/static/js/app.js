@@ -7,6 +7,7 @@ require.config({
         chai: 'lib/chai-1.2.0',
         jquery: 'lib/jquery-1.9.1',
         jqueryUi: 'lib/jquery-ui-1.9.1.custom',
+        jqueryColor: 'lib/jquery.color-2.1.2.min',
         text: 'lib/require/text',
         ember: 'lib/ember-1.0.0-rc.3',
         handlebars: 'lib/handlebars-1.0.0-rc.3',
@@ -22,6 +23,9 @@ require.config({
         'jqueryUi': {
             deps: ['jquery']
         },
+        'jqueryColor': {
+            deps: ['jquery']
+        },
         'd3': {
             deps: ['jquery']
         }
@@ -32,6 +36,7 @@ require.config({
 define( 'app', [
     'jquery',
     'jqueryUi',
+    'jqueryColor',
     'd3',
     'app/controllers/backends',
     'app/controllers/confirmation',
@@ -76,6 +81,7 @@ define( 'app', [
     'ember'
     ], function($,
                 jQueryUI,
+                jQueryColor,
                 d3,
                 BackendsController,
                 ConfirmationController,
