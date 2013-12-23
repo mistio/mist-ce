@@ -286,6 +286,16 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 return machine;
             },
 
+
+            machineExists: function(machineId) {
+                return !!this.getMachine(machineId);
+            },
+
+
+            backendExists: function(backendId) {
+                return !!this.getBackend(backendId);
+            },
+
             shutdownMachine: function(machineId) {
                 this.content.some(function(backend) {
                     if (backend.getMachine(machineId)) {

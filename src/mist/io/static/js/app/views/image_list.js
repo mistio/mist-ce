@@ -91,6 +91,10 @@ define('app/views/image_list', ['app/models/image', 'app/views/mistscreen', 'tex
                 window.onscroll = scrollHandler;
                 function scrollHandler() {
                     if (Mist.isScrolledToBottom()) {
+                        if (!$('#image-list-page').length) {
+                            window.onscroll = null;
+                            return;
+                        }
                         that.getMoreImages();
                     }
                 };

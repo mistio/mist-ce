@@ -27,7 +27,6 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
 
             load: function() {
                 Ember.run(this, function() {
-                    this.renderKeyList();
                     this.updateFooter();
                 });
             }.on('didInsertElement'),

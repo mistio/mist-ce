@@ -56,6 +56,11 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
 
 
             updateMachines: function() {
+                if (!$('#single-key-page').length) {
+                    Mist.backendsController.off('onMachineListChange');
+                    return;
+                }
+
                 Ember.run(this, function() {
                     var newMachines = [];
                     this.key.machines.forEach(function(machine) {
@@ -82,12 +87,6 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
                     if ($('#single-key-machines').collapsible) {
                         $('#single-key-machines').collapsible();
                         $('#single-key-machines').trigger('create');
-                    }
-                    if ($('#single-key-machines .ui-listview').listview) {
-                        $('#single-key-machines .ui-listview').listview('refresh');
-                    }
-                    if ($('#single-key-machines input.ember-checkbox').checkboxradio) {
-                        $('#single-key-machines input.ember-checkbox').checkboxradio();
                     }
                 });
             },
@@ -155,6 +154,8 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
 
             modelObserver: function() {
                 Ember.run.once(this, 'load');
+                Mist.backendsController.off('onMachineListChange');
+                Mist.backendsController.on('onMachineListChange', this, 'updateMachines');
             }.observes('controller.model'),
 
 

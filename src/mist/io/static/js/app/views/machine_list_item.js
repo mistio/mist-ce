@@ -1,11 +1,11 @@
-define('app/views/machine_list_item', ['text!app/templates/machine_list_item.html','ember'],
+define('app/views/machine_list_item', ['app/views/list_item', 'text!app/templates/machine_list_item.html'],
     /**
      *  Machine List Item View
      * 
      *  @returns Class
      */
-    function(machine_list_item_html) {
-        return Ember.View.extend({
+    function(ListItemView, machine_list_item_html) {
+        return ListItemView.extend({
                 
                 tagName: 'li',
 

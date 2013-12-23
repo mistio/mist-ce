@@ -216,6 +216,10 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
+            machineExists: function(machineId) {
+                return !!this.getMachine(machineId);
+            },
+
 
             /**
              * 
@@ -235,11 +239,16 @@ define('app/controllers/machines', ['app/models/machine'],
                 Ember.run(function() {
                     var newMachines = [];
                     machines.forEach(function(machine) {
-                        machine.backend = that.backend;
-                        //newMachines.push(Machine.create(machine));
-                        that.content.addObject(Machine.create(machine));
+                        if (that.machineExists(machine.id)) {
+                            var old_machine = that.getMachine(machine.id);
+                            for (attr in machine) {
+                                old_machine.set(attr, machine[attr]);
+                            }
+                        } else {
+                            machine.backend = that.backend;
+                            that.content.pushObject(Machine.create(machine));
+                        }
                     });
-                    //that.set('content', newMachines);
                     that.trigger('onMachineListChange');
                 });
             }
