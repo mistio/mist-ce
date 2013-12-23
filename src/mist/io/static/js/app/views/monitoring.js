@@ -59,6 +59,7 @@ define('app/views/monitoring', [
             setupEventListeners: function(){
 
                 var controller = Mist.monitoringController;
+                var self = this;
 
                 controller.on("reloading",function(){
                     console.log("Reloading Data");
@@ -68,9 +69,10 @@ define('app/views/monitoring', [
                     console.log("Controller Started Fetching Stats");
                 });
 
-                controller.on("dataFetchFinished",function(success){
-                    console.log("Controller Finished Fetching Stats");
-                    console.log("With Status: " + success);
+                controller.on("dataFetchFinished",function(success,data){
+                    if(success){
+                        self.updateGraphs(data);
+                    }
                 });
             },
 
@@ -1057,7 +1059,7 @@ define('app/views/monitoring', [
                         //controller.setupDataRequest(timeToDisplay,10000);
                         
                         //var testTime = new Date( (new Date()).getTime() - 1000* 60* 60); DEBUG OLDER TIME
-                        controller.initialize(machine,self,timeToDisplay,10000,10000);
+                        controller.initialize(machine,timeToDisplay,10000,10000);
 
                         //self.setupLoadColorInterval(); Commented Out Until It's Time To Deploy This Feature TODO
 

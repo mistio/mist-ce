@@ -16,13 +16,11 @@ define('app/controllers/monitoring', [
             */
             
             machineNotResponding: false,
-            view: null,
 
             // TODO , Remove Machine And View Arguments
             // TODO , UpdateInterval And Step Must Be the Same
-            initialize: function(machine,view,timeWindow,step,updateInterval){
+            initialize: function(machine,timeWindow,step,updateInterval){
                 //this.machine = machine;
-                this.view = view;
                 this.request.initiliaze(timeWindow,step,updateInterval,machine);
             },
 
@@ -264,9 +262,6 @@ define('app/controllers/monitoring', [
 
                                 self.machine.set('pendingStats', false);
                                 self.lastMetrictime = new Date(metricTime.getTime()-10000);
-                                controller.view.updateGraphs(receivedData);
-                                controller.finishedGraphUpdate();
-
                                 // Send Data via Event
                                 controller.trigger("dataFetchFinished",true,receivedData);
                             }
@@ -314,12 +309,7 @@ define('app/controllers/monitoring', [
             updateDataRequest: function(timeToRequestms,step){
                 window.clearInterval(window.monitoringInterval);
                 this.setupDataRequest(timeToRequestms,step);
-            },
-
-            finishedGraphUpdate: function(){
-                // Runs After All Graphs Are Updated
-                // Do Some Stuff Here
-            },
+            }
 
 
         })
