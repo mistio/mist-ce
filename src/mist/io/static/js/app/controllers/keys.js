@@ -49,6 +49,9 @@ define('app/controllers/keys', [
                             if($('.select-key-collapsible').collapsible) {
                                 $('.select-key-collapsible').collapsible();
                             }
+                            if ($('.select-key-collapsible .ui-listview')) {
+                                $('.select-key-collapsible .ui-listview').listview('refresh');
+                            }
                         });
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
