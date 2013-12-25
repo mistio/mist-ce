@@ -44,6 +44,10 @@ define('app/controllers/keys', [
                         info('Successfully loaded keys');
                         Mist.keysController.set('loadingKeys', false);
                         Mist.keysController.updateKeysList(data);
+                        
+                        if($('.select-key-collapsible').collapsible) {
+                            $('.select-key-collapsible').collapsible();
+                        }
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         Mist.notificationController.notify('Error while loading keys: ' + jqXHR.responseText);
