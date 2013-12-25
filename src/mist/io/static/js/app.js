@@ -173,7 +173,23 @@ define( 'app', [
             });
         });
 
+        App.ImagesRoute = Ember.Route.extend({
+
+            activate: function() {
+                Ember.run.next(function() {
+                    document.title = 'mist.io - images';
+                });
+            }    
+        }); 
+
         App.MachinesRoute = Ember.Route.extend({
+
+            activate: function() {
+                Ember.run.next(function() {
+                    document.title = 'mist.io - machines';
+                });
+            },
+            
             //clear selected machines when exiting view
             exit: function(){
               Mist.backendsController.forEach(function(backend){
@@ -221,6 +237,13 @@ define( 'app', [
         });   
         
         App.KeysRoute = Ember.Route.extend({
+
+          activate: function() {
+              Ember.run.next(function() {
+                  document.title = 'mist.io - keys';
+              });
+          },
+            
           //clear selected keys when exiting view           
           exit: function(){
               Mist.keysController.keys.forEach(function(key){
