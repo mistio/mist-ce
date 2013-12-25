@@ -24,15 +24,6 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
                 Mist.keysController.on('onSelectedKeysChange', this, 'updateFooter');
             },
 
-
-            load: function() {
-                Ember.run(this, function() {
-                    this.updateFooter();
-                });
-            }.on('didInsertElement'),
-
-
-
             /**
              * 
              *  Methods
@@ -53,7 +44,7 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
                         $('#key-list-page .ui-footer button').addClass('ui-state-disabled');
                         break;
                 }
-            },
+            }.on('didInsertElement'),
 
 
 

@@ -106,10 +106,8 @@ define('app/controllers/machine_add', ['ember'],
                                 this.newMachineScript,
                                 function(success, machine) {
                                     that._giveCallback(success, machine);
-                                    if (success) {
-                                        that.close();
-                                    }
                                 });
+                this.close();
             },
 
 

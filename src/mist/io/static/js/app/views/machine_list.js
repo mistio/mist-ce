@@ -17,27 +17,23 @@ define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/ma
             template: Ember.Handlebars.compile(machine_list_html),
 
             /**
+             *
+             *  Initialization
+             *
+             */
+
+            init: function() {
+                this._super();
+                Mist.backendsController.on('onSelectedMachinesChange', this, 'updateFooter');
+            },
+
+            /**
              * 
              *  Observers
              * 
              */
 
-            machinesObserver: function() {
-                if (Mist.backendsController.machinesUpdated) {
-                    Ember.run.next(function() {
-                        if ($('#machine-list-page #machines').listview) {
-                            $('#machine-list-page #machines').listview('refresh');
-                        }
-                        if ($('#machine-list-page #machines input.ember-checkbox').checkboxradio) {
-                            $('#machine-list-page #machines input.ember-checkbox').checkboxradio();
-                        }
-                        Mist.backendsController.set('machinesUpdated', false);
-                    });
-                }
-            }.observes('Mist.backendsController.machinesUpdated').on('didInsertElement'),
-
-
-            selectedMachinesObserver: function() {
+            updateFooter: function() {
                 switch (Mist.backendsController.getSelectedMachinesCount()) {
                     case 0:
                         $('#machine-list-page .ui-footer').hide();
@@ -52,12 +48,27 @@ define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/ma
                         $('#machine-list-page .ui-footer a').addClass('ui-state-disabled');
                         break;
                 }
-            }.observes('Mist.backendsController.selectedMachinesUpdated').on('didInsertElement'),
+            }.on('didInsertElement'),
+
+            machinesObserver: function() {
+                if (Mist.backendsController.machinesUpdated) {
+                    Ember.run.next(function() {
+                        if ($('#machine-list-page #machines').listview) {
+                            $('#machine-list-page #machines').listview('refresh');
+                        }
+                        if ($('#machine-list-page #machines input.ember-checkbox').checkboxradio) {
+                            $('#machine-list-page #machines input.ember-checkbox').checkboxradio();
+                        }
+                        Mist.backendsController.set('machinesUpdated', false);
+                    });
+                }
+            }.observes('Mist.backendsController.machinesUpdated').on('didInsertElement'),
  
 
             openTags: function() {
                 $("#dialog-tags").popup('option', 'positionTo', '#machines-button-tags').popup('open', {transition: 'slideup'});
             },
+
     
             openShell: function() {
                 $("#dialog-shell").popup('option', 'positionTo', '#machines-button-shell')
@@ -117,8 +128,7 @@ define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/ma
             actions: {
 
                 createClicked: function() {
-                    $('#create-machine-panel').panel('open');
-                    $('#create-machine-panel .select-listmenu').listview();
+                    Mist.machineAddController.open();
                 },
 
                 selectClicked: function() {

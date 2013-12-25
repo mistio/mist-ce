@@ -251,7 +251,31 @@ define('app/controllers/machines', ['app/models/machine'],
                     });
                     that.trigger('onMachineListChange');
                 });
-            }
+            },
+
+
+            _updateSelectedMachines: function() {
+                Ember.run(this, function() {
+                    var newSelectedMachines = [];
+                    this.content.forEach(function(machine) {
+                        if (machine.selected) newSelectedMachines.push(machine);
+                    });
+                    this.set('selectedMachines', newSelectedMachines);
+                    this.trigger('onSelectedMachinesChange');
+                });
+            },
+
+
+
+            /**
+             * 
+             *  Observers
+             * 
+             */
+
+            selectedMachinesObserver: function() {
+                Ember.run.once(this, '_updateSelectedMachines');
+            }.observes('content.@each.selected')
         });
     }
 );
