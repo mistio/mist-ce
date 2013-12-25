@@ -1388,7 +1388,7 @@ div.loading-monitoring {
     padding: 8px 18px;
 }
 
-#edit-backend #backend-delete-confirm {
+#edit-backend #backend-delete-confirm, #edit-backend #backend-rename {
     display: none;
 }
 
