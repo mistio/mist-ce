@@ -1344,9 +1344,13 @@ div.loading-monitoring {
 
 #edit-backend .content-header {
     overflow: auto;
-    padding: 20px 6px;
     border-bottom: 1px solid #ddd;
-    margin-bottom: 8px;
+}
+
+#backend-rename {
+    color: #008000;
+    margin: 10px 0;
+    text-align: center;
 }
 
 #edit-backend .state {

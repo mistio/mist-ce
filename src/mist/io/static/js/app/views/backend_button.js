@@ -26,6 +26,7 @@ define('app/views/backend_button', ['ember'],
                 Mist.set('backend', backend);
                 $('select.ui-slider-switch option[value=1]')[0].selected = backend.enabled;
                 $('select.ui-slider-switch').slider('refresh');
+                $('#edit-backend .content-header input').val(backend.title);
                 $("#edit-backend").popup('option', 'positionTo', '#' + this.elementId).popup('open', {transition: 'pop'});
             },
 

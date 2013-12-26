@@ -26,9 +26,9 @@ define('app/views/backend_edit', [
             },
             
             renameOkClicked: function() {
-                
+
                 // Make sure user gave a name
-                var newName = $('#backend-rename input').val();
+                var newName = $('#edit-backend .content-header input').val();
                 
                 if (!newName) {
                     Mist.notificationController.notify('Please give a new name');

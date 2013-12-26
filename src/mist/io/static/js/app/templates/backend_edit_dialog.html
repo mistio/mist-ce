@@ -4,7 +4,11 @@
     </div>
     <div data-role="content">
         <div class="content-header">
-            <span class='name'>{{view.backend.title}}</span>
+            <label>Name:</label>
+            <input type="text" val="" {{action "renameOkClicked" on="focusOut" target="view"}}/>
+            <div id="backend-rename">
+                <label>Backend was renamed!</label>
+            </div>
         </div>
         
         <div data-role="fieldcontain">
@@ -13,18 +17,6 @@
                 <option value="1" {{bindAttr selected="view.backend.enabled"}}>Enabled</option>
             </select>
             <span class="state">{{view.backend.state}}</span>
-        </div>
-
-        <div>
-            <input type="button" value="Rename" {{action "renameButtonClick" target="view" on="click"}} />
-            <div id="backend-rename">
-                <div class="label">New name:</div>
-                <input type="text" val=""/>
-                <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-                    <button {{action "renameCancelClicked" target="view"}}>Cancel</button>
-                    <button data-theme="b" {{action "renameOkClicked" target="view"}}>Rename</button>
-                </div>
-            </div>
         </div>
 
         <div>
