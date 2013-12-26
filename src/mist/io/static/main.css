@@ -1354,12 +1354,6 @@ div.loading-monitoring {
     overflow: visible;
 }
 
-#backend-rename {
-    color: #008000;
-    margin: 10px 0;
-    text-align: center;
-}
-
 #edit-backend .state {
     float: right;
     font-size: 16px;
