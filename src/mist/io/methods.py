@@ -135,7 +135,6 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
     return backend_id
 
 
-@core_wrapper
 def rename_backend(user, backend_id, new_name):
     """Renames backend with given backend_id."""
 
