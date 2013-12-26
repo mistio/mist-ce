@@ -1343,10 +1343,8 @@ div.loading-monitoring {
 }
 
 #edit-backend .content-header {
-    overflow: auto;
+    overflow: visibles;
     border-bottom: 1px solid #ddd;
-    padding-bottom: 5px;
-    margin-top: -5px;
 }
 
 #edit-backend .content-header input {
