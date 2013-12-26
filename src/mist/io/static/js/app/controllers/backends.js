@@ -224,15 +224,12 @@ define('app/controllers/backends', [
             renameBackend: function(backendId, newName) {
                 $('#edit-backend .ajax-loader').show();
                 var that = this;
-        
                 $.ajax({
                     url: '/backends/' + backendId,
-                    type: 'Put',
+                    type: 'PUT',
                     data: JSON.stringify({'new_name': newName}),
                     success: function() {
-                        info('Successfully renamed backend');
                         that.getBackendById(backendId).set('title', newName);
-                        
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while renaming backend: ' + jqXHR.responseText);
