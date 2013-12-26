@@ -1345,6 +1345,17 @@ div.loading-monitoring {
 #edit-backend .content-header {
     overflow: auto;
     border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+    margin-top: -5px;
+}
+
+#edit-backend .content-header input {
+    font-weight: bold;
+}
+
+#edit-backend .content-header div.ui-input-text {
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 #backend-rename {
