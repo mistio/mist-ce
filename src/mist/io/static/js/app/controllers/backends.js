@@ -230,10 +230,6 @@ define('app/controllers/backends', [
                     data: JSON.stringify({'new_name': newName}),
                     success: function() {
                         that.getBackendById(backendId).set('title', newName);
-                        $('#backend-rename').slideDown();
-                        Ember.run.later(function() {
-                            $('#backend-rename').slideUp();
-                        }, 2000);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while renaming backend: ' + jqXHR.responseText);

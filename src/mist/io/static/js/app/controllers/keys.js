@@ -49,7 +49,7 @@ define('app/controllers/keys', [
                             if($('.select-key-collapsible').collapsible) {
                                 $('.select-key-collapsible').collapsible();
                             }
-                            if ($('.select-key-collapsible .ui-listview')) {
+                            if ($('.select-key-collapsible .ui-listview').listview) {
                                 $('.select-key-collapsible .ui-listview').listview('refresh');
                             }
                         });

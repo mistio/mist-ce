@@ -16,47 +16,36 @@ define('app/views/backend_edit', [
                 $("#edit-backend").popup("close");
             },
 
-            renameButtonClick: function() {
-                $('#backend-rename').slideDown();
-            },
-
-            renameCancelClicked: function() {
-                $('#backend-rename').slideUp();
-                $('#backend-rename input').val('');
-            },
-            
-            renameOkClicked: function() {
-
-                // Make sure user gave a name
-                var newName = $('#edit-backend .content-header input').val();
-                
-                if (!newName) {
-                    Mist.notificationController.notify('Please give a new name');
-                    return;
-                }
-                
-                // Check if newName is the same as current title
-                if (newName == this.backend.title) {
-                    this.renameCancelClicked();
-                    return;
-                }
-                
-                // Check if name exists in other backends
-                var exists = false;
-                Mist.backendsController.content.some(function(backend) {
-                    if (backend.title == newName) {
-                        return exists = true;
+            renameBackend: function() {
+                Ember.run.later(this, function() {
+                    // Make sure user gave a name
+                    var newName = $('#edit-backend .content-header input').val();
+                    
+                    if (!newName) {
+                        $('#edit-backend .content-header input').val(this.backend.title);
+                        return;
                     }
-                });
-                
-                if (exists) {
-                    Mist.notificationController.notify('There is a backend named "' + newName + '" already');
-                    return;
-                }
-                
-                Mist.backendsController.renameBackend(this.backend.id, newName);
-                
-                this.renameCancelClicked();
+                    
+                    // Check if newName is the same as current title
+                    if (newName == this.backend.title) {
+                        return;
+                    }
+                    
+                    // Check if name exists in other backends
+                    var exists = false;
+                    Mist.backendsController.content.some(function(backend) {
+                        if (backend.title == newName) {
+                            return exists = true;
+                        }
+                    });
+                    
+                    if (exists) {
+                        Mist.notificationController.notify('There is a backend named "' + newName + '" already');
+                        return;
+                    }
+                    
+                    Mist.backendsController.renameBackend(this.backend.id, newName);
+                }, 200);
             },
 
             deleteButtonClick: function() {
