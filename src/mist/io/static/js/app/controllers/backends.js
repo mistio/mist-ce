@@ -221,6 +221,30 @@ define('app/controllers/backends', [
 
             },
 
+            renameBackend: function(backendId, newName) {
+                $('#edit-backend .ajax-loader').show();
+                var that = this;
+                $.ajax({
+                    url: '/backends/' + backendId,
+                    type: 'PUT',
+                    data: JSON.stringify({'new_name': newName}),
+                    success: function() {
+                        that.getBackendById(backendId).set('title', newName);
+                        $('#backend-rename').slideDown();
+                        Ember.run.later(function() {
+                            $('#backend-rename').slideUp();
+                        }, 2000);
+                    },
+                    error: function(jqXHR, textstate, errorThrown) {
+                        Mist.notificationController.notify('Error while renaming backend: ' + jqXHR.responseText);
+                    },
+                    complete: function() {
+                        $('#edit-backend .ajax-loader').hide();
+                    }
+                });
+            },
+
+
             init: function() {
                 this._super();
 

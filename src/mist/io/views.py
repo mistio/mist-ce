@@ -241,6 +241,20 @@ def delete_backend(request):
     return OK
 
 
+@view_config(route_name='backend_action', request_method='PUT')
+def rename_backend(request):
+    """Renames a backend."""
+
+    backend_id = request.matchdict['backend']
+    new_name = request.json_body.get('new_name', '')
+    if not new_name:
+        raise RequiredParameterMissingError('new_name')
+    
+    user = user_from_request(request)
+    methods.rename_backend(user, backend_id, new_name)
+    return OK
+
+
 @view_config(route_name='backend_action', request_method='POST')
 def toggle_backend(request):
     backend_id = request.matchdict['backend']

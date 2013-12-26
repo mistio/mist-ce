@@ -1343,10 +1343,21 @@ div.loading-monitoring {
 }
 
 #edit-backend .content-header {
-    overflow: auto;
-    padding: 20px 6px;
     border-bottom: 1px solid #ddd;
-    margin-bottom: 8px;
+}
+
+#edit-backend .content-header input {
+    font-weight: bold;
+}
+
+#edit-backend .content-header div.ui-input-text {
+    overflow: visible;
+}
+
+#backend-rename {
+    color: #008000;
+    margin: 10px 0;
+    text-align: center;
 }
 
 #edit-backend .state {
@@ -1388,7 +1399,7 @@ div.loading-monitoring {
     padding: 8px 18px;
 }
 
-#edit-backend #backend-delete-confirm {
+#edit-backend #backend-delete-confirm, #edit-backend #backend-rename {
     display: none;
 }
 

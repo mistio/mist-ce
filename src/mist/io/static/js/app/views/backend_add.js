@@ -69,9 +69,6 @@ define('app/views/backend_add', [
                     $('#addBackendBareMetal').show();
                     $('#addBackendOpenstack').hide();
                     Mist.backendAddController.set('newBareMetalServerUser', 'root');
-                    Ember.run.next(function () {
-                        $('.select-key-collapsible .ui-listview').listview('refresh');
-                    });
                 } else {
                     $('#addBackendInfo').show();                 
                     $('#ApiKeylabel').text('2. API Key:');
