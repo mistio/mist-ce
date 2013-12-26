@@ -25,7 +25,7 @@
             baseUrl: 'resources/js/',
             paths: {
                 //the optimized mist.js source file.
-                "app": "../build/mist-1387821222"
+                "app": "../build/mist-1388069259"
             }
         });
         require(["app"]);
