@@ -204,7 +204,9 @@ define( 'app', [
         App.MachineRoute = Ember.Route.extend({
             activate: function() {
                 Ember.run.next(function() {
-                    document.title = 'mist.io - ' + Mist.getMachineIdByUrl();
+                    var id = Mist.getMachineIdByUrl();
+                    var machine = Mist.backendsController.getMachineByUrlId(id);
+                    document.title = 'mist.io - ' + (machine ? machine.name : id);
                 });
             },
 
