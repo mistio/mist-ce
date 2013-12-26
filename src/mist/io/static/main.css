@@ -1343,7 +1343,7 @@ div.loading-monitoring {
 }
 
 #edit-backend .content-header {
-    overflow: visibles;
+    overflow: visible;
     border-bottom: 1px solid #ddd;
 }
 
@@ -1352,8 +1352,7 @@ div.loading-monitoring {
 }
 
 #edit-backend .content-header div.ui-input-text {
-    margin-left: 10px;
-    margin-right: 10px;
+    overflow: visible;
 }
 
 #backend-rename {
