@@ -105,21 +105,32 @@ define('app/controllers/monitoring', [
                 changeStep: function(){},
                 changeTimeWindow: function(){},
 
-                enableUpdates: function(){},
-                disableUpdates: function(){},
+                enableUpdates: function(){
+                    this.updateData = true;
+                    this.reload('updatesEnabled');
+                },
+                disableUpdates: function(){
+                    this.updateData = false;
+                    this.reload('updatesDisabled');
+                },
 
-                reload: function(){
+                /**
+                *
+                *   reason : Values(manualReload,updatesDisabled,updatesEnabled)
+                */
+                reload: function(reason){
                     // Clear Intervals 
                     this.stopDataUpdates();
 
-                    // Trigger Reload Event
-                    // TODO
-                    Mist.monitoringController.trigger('reloading');
+                    reason = (typeof reason == 'undefined' ? 'manualReload' : reason);
+
+                    Mist.monitoringController.trigger('reloading',reason);
+
                     // Re-Initialize Request
                     this.initiliaze(this.timeWindow,this.step,this.updateInterval,this.machine);
                 },
 
-                printRequestInfo: function(){
+                printInfo: function(){
                     console.log("Time Window    : " + (this.timeWindow/1000) + " seconds");
                     console.log("Last Metric    : " + this.lastMetrictime);
                     console.log("Step           : " + (this.step/1000) + " seconds");

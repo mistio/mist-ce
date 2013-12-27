@@ -61,8 +61,30 @@ define('app/views/monitoring', [
                 var controller = Mist.monitoringController;
                 var self = this;
 
-                controller.on("reloading",function(){
-                    console.log("Reloading Data");
+                controller.on("reloading",function(reason){
+
+                    console.log("Reloading Data,Reason " + reason);
+
+                    if(reason == 'updatesDisabled') {
+
+                        for(metric in self.graphs)
+                        {
+                            self.graphs[metric].disableAnimation();
+                        }
+                    }
+                    else if(reason == 'updatesEnabled') {
+                        
+                        for(metric in self.graphs)
+                        {
+                            self.graphs[metric].enableAnimation();
+                        }
+                    }
+
+                    // Clear Data
+                    for(metric in self.graphs){
+
+                        self.graphs[metric].clearData();
+                    }
                 });
 
                 controller.on("dataFetchStarted",function(){
@@ -227,7 +249,7 @@ define('app/views/monitoring', [
                 var graphBtnIdList = [];
 
                 // Get Visible Graphs List
-                $('.graph').each(function(){
+                $('.graph').each(function() {
 
                     if( $(this).css('display') != 'none' )
                         graphIdList.push($(this).attr('id'));
@@ -350,20 +372,20 @@ define('app/views/monitoring', [
 
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = 160 / 1280 * width;
-                    var margin = {top: 10, right: 0, bottom: 24, left: 40};
+                    var margin      = {top: 10, right: 0, bottom: 24, left: 40};
 
-                    this.id = divID;
-                    this.width = width;
-                    this.height = (fixedHeight < 85 ? 85 : fixedHeight);
-                    this.data = [];
-                    this.timeDisplayed = timeToDisplayms/1000;
-                    this.realDataIndex = -1;
-                    this.timeUpdated = false;
+                    this.id               = divID;
+                    this.width            = width;
+                    this.height           = (fixedHeight < 85 ? 85 : fixedHeight);
+                    this.data             = [];
+                    this.timeDisplayed    = timeToDisplayms/1000;
+                    this.realDataIndex    = -1;
+                    this.timeUpdated      = false;
+                    this.animationEnabled = true;
                     this.yAxisValueFormat = yAxisValueFormat;
-
-                    // DEBUG TODO
-                    this.displayedData = [];
-                    this.xCordinates = [];
+                    this.isAppended       = false;
+                    this.displayedData    = [];
+                    this.xCordinates      = [];
 
                     // Distance of two values in graph (pixels), Important For Animation
                     this.valuesDistance = 0;
@@ -445,9 +467,13 @@ define('app/views/monitoring', [
                             this.data = dataBuffer;
 
                             // On first run append the Graph
-                            if(!this.timeUpdated){
+                            if(!this.isAppended){
+
                                 // Append SVG Elements And Call onInitialized When Finish
                                 appendGraph(this.id,this.width,this.height);
+
+                                this.isAppended = true;
+
                                 // Do staff after Graph is in the dom and we have data
                                 onInitialized();
                             }
@@ -593,7 +619,7 @@ define('app/views/monitoring', [
                                           }));
 
                         // Animate line, axis and grid
-                        if(!this.timeUpdated)
+                        if(!this.timeUpdated && this.animationEnabled)
                         {
 
                             var animationDuration = STEP_SECONDS*1000;
@@ -680,6 +706,32 @@ define('app/views/monitoring', [
                         this.updateView();
                     };
 
+
+                    this.enableAnimation = function() {
+
+                        this.animationEnabled = true;
+                    };
+
+                    this.stopCurrentAnimation = function() {
+
+                         d3vLine.transition()
+                                .duration( 0 )
+                                .attr("transform", "translate(" + 0 + ")");
+
+                        d3xAxis.transition()
+                               .duration( 0 )
+                               .attr("transform", "translate(" +  margin.left + "," + (this.height - margin.bottom +2) + ")");
+
+                        d3GridX.transition()
+                               .duration( 0 )
+                               .attr("transform", "translate(" + margin.left + "," + this.height + ")");
+                    };
+
+                    this.disableAnimation = function() {
+
+                        this.animationEnabled = false;
+                        this.stopCurrentAnimation();
+                    };
 
                     /**
                     * Method: getLastMeasurementTime
@@ -867,9 +919,11 @@ define('app/views/monitoring', [
                                     var virtualMouseX = mouseX - margin.left;
 
                                     // Calculate Translate 
-                                    var translate =  $("#" + self.id).find('.valueLine > path').attr('transform');
-                                    translate = + translate.slice(10,translate.indexOf(','));
-
+                                    var translate = 0;
+                                    if(self.animationEnabled){
+                                        translate =  $("#" + self.id).find('.valueLine > path').attr('transform');
+                                        translate = + translate.slice(10,translate.indexOf(','));
+                                    }
                                     // Measurement That is less than curson x
                                     var minValueIndex = 0;
                                     var currentValue = 0;
