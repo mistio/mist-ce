@@ -93,7 +93,7 @@ define( 'app', [
                 MachineListView,
                 ConfirmationDialog,
                 MachineActionsDialog,
-                Shell,
+                ShellView,
                 ImageListView,
                 DeleteTagView,
                 MachinePowerPopup,
@@ -334,7 +334,7 @@ define( 'app', [
         App.RuleView = RuleView;
         App.MachineTagsDialog = MachineTagsDialog;
         App.MachinePowerPopup = MachinePowerPopup;
-        App.ShellDialog = Shell;
+        App.ShellView = ShellView;
         App.MachineActionsDialog = MachineActionsDialog;
         App.MachineListView = MachineListView;
         

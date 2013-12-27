@@ -3,6 +3,7 @@
 -----------------------------------------------------------------------------------------------------------*/
 @import url("css/key.css");
 @import url("css/home.css");
+@import url("css/shell.css");
 @import url("css/machine.css");
 @import url("css/key_list.css");
 @import url("css/key_create.css");
@@ -106,6 +107,10 @@ textarea {
 .large-popup .ok-cancel button {
     width: 95px !important;
 }
+.huge-popup {
+    width: 100% !important;
+    height: 100% !important;
+}
 
 
 /* Side panel
@@ -120,7 +125,6 @@ textarea {
      * 
      *  The value "315px" is also unique to jqm.css
      *  so this change can easily be undone or modified
-     * 
      */
     width: 315px; /* Useless, but leave it there for reference reasons */
 }
