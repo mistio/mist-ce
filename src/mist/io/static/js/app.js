@@ -150,12 +150,30 @@ define( 'app', [
             }
         });
 
+
+
+        /**
+         * 
+         *  G L O B A L S
+         * 
+         */
+
+
+
         //App.set('CSRFToken', CSRF_TOKEN);
         App.set('CSRFToken', '');
         App.set('authenticated', AUTH || URL_PREFIX == '' ? true : false);
         App.set('email', EMAIL);
         App.set('password', '');
         window.Mist = App;
+
+
+        /**
+         * 
+         *  A J A X   W R A P P E R S
+         * 
+         */
+
 
         App.ajaxGET = function(url, data) {
             return App.ajax('GET', url, data);
@@ -208,6 +226,16 @@ define( 'app', [
             };
             return call.ajax();
         };
+
+
+
+        /**
+         * 
+         *  E M B E R   R O U T E S
+         * 
+         */
+
+
 
         App.Router.map(function() {
             this.route('machines');
@@ -285,29 +313,16 @@ define( 'app', [
             }
         });
 
-        App.isScrolledToBottom = function() {
-            var distanceToViewportTop = (
-                $(document).height() - $(window).height());
-            var viewPortTop = $(document).scrollTop();
+
+
+        /**
+         * 
+         *  E M B E R   V I E W S
+         * 
+         */
         
-            if (viewPortTop === 0) {
-                // if we are at the top of the page, don't do
-                // the infinite scroll thing
-                return false;
-            }
         
-            return (viewPortTop - distanceToViewportTop === 0);
-        };
-
-        App.getKeyIdByUrl = function() {
-            return window.location.href.split('/')[5];
-        };
-
-        App.getMachineIdByUrl = function() {
-            return window.location.href.split('/')[5];
-        };
-
-
+        
         App.HomeView = Home;
         App.ListItemView = ListItemView;
         App.BackendButtonView = BackendButton;
@@ -338,6 +353,16 @@ define( 'app', [
         App.MachineAddView = MachineAddDialog;
         App.MachineManageKeysView = MachineManageKeysView;
         App.MachineManageKeysListItemView = MachineManageKeysListItemView;
+
+
+
+        /**
+         * 
+         *  E M B E R   C O N T R O L L E R S
+         * 
+         */
+        
+        
         
         App.set('backendAddController', BackendAddController.create());
         App.set('backendEditController', BackendEditController.create());
@@ -351,6 +376,15 @@ define( 'app', [
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
         App.set('keyEditController', KeyEditController.create());
+
+
+        /**
+         * 
+         *  E M B E R   C U S T O M   W I D G E T S
+         * 
+         */
+        
+        
 
         App.Select = Ember.Select.extend({
             attributeBindings: [
@@ -445,7 +479,39 @@ define( 'app', [
             attributeBindings: ['id', 'data-inline']
         });
         
-        App.set('renderedImages', Ember.ArrayController.create());
+        
+        
+        /**
+         * 
+         *  M I S T   F U N C T I O N S
+         * 
+         */        
+        
+        
+        
+        App.isScrolledToBottom = function() {
+            var distanceToViewportTop = (
+                $(document).height() - $(window).height());
+            var viewPortTop = $(document).scrollTop();
+        
+            if (viewPortTop === 0) {
+                // if we are at the top of the page, don't do
+                // the infinite scroll thing
+                return false;
+            }
+        
+            return (viewPortTop - distanceToViewportTop === 0);
+        };
+
+        App.getKeyIdByUrl = function() {
+            return window.location.href.split('/')[5];
+        };
+
+        App.getMachineIdByUrl = function() {
+            return window.location.href.split('/')[5];
+        };
+        
+        
         
         return App;
     }
