@@ -51,7 +51,6 @@ define( 'app', [
     'app/views/machine_list',
     'app/views/confirmation_dialog',
     'app/views/machine_actions_dialog',
-    'app/views/single_machine_actions_dialog',
     'app/views/shell',
     'app/views/image_list',
     'app/views/delete_tag',
@@ -94,7 +93,6 @@ define( 'app', [
                 MachineListView,
                 ConfirmationDialog,
                 MachineActionsDialog,
-                SingleMachineActionsDialog,
                 Shell,
                 ImageListView,
                 DeleteTagView,
@@ -337,7 +335,6 @@ define( 'app', [
         App.MachineTagsDialog = MachineTagsDialog;
         App.MachinePowerPopup = MachinePowerPopup;
         App.ShellDialog = Shell;
-        App.PowerDialog = SingleMachineActionsDialog;
         App.MachineActionsDialog = MachineActionsDialog;
         App.MachineListView = MachineListView;
         
