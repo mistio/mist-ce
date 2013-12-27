@@ -8,14 +8,14 @@
     <title>${project} - cloud management in your pocket</title>
     <link type="text/css" href="resources/ui-smoothness/jquery-ui-1.9.1.custom.css" rel="stylesheet" />
     <link rel="stylesheet" href="resources/jquery.mobile-1.4.0-rc.1.css" />
-    <link rel="stylesheet" href="resources/new.css" />
+    <link rel="stylesheet" type='text/css' href="resources/main.css" />
     <link rel="icon" href="resources/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
-    <script tal:content="string: var URL_PREFIX='${core_uri}'" />
-    <script tal:content="string: var AUTH=${auth}" />    
+    <script tal:content="string: var URL_PREFIX='${core_uri}'"/>
+    <script tal:content="string: var AUTH=${auth}" />
     <script tal:content="string: var SUPPORTED_PROVIDERS=${supported_providers}" />
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
-    <script tal:content="string: var EMAIL='${email}'" />
+    <script tal:content="string: var EMAIL='${email}'"/>
 
     <script src="resources/js/lib/require/require.js"></script>
 

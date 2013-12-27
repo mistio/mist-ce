@@ -1,48 +1,32 @@
 <a id="me-btn"
-    class="ui-btn-right"
-    data-role="button"
-    data-icon="user"
-    data-iconpos="right"
-    {{bindAttr class="Mist.backendsController.state :state-providers"}}
-    {{action click target="view"}}>me</a>
+   class="ui-btn-right"
+   data-role="button"
+   data-icon="user"
+   data-iconpos="right"
+   {{action "meClicked" target="view"}}>me</a>
 
-<div id="user-dialog" class="mist-dialog" data-role="popup" data-transition="pop" data-position-to="#me-btn">
-    <div data-role="content" data-theme="b">
-        {{#if view.email}}
-        <img class="gravatar-image" {{bindAttr src="view.gravatarURL"}}/>
-        <div class="userEmail">{{view.email}}</div>
-        
-        <div id="user-dialog-buttons">
-            <div class="account-placeholder">
-                <a {{bindAttr href="view.account_url"}}
-                    class="account-button"
-                    data-role="button"
-                    data-mini="true"
-                    data-theme="a"
-                    data-ajax="false">My account</a>
-            </div>
-            {{/if}}
-    
-            <div class="support-placeholder">
-                <a href="https://mistio.zendesk.com/access/login"
-                    class="support-button"
-                    data-role="button"
-                    target="_blank"
-                    data-mini="true"
-                    data-theme="a"
-                    data-ajax="false">Support</a>
-            </div>
-    
-            {{#if view.logout}}
-            <div class="logout-placeholder">
-                <a href="logout"
-                    class="logout-button"
-                    data-role="button"
-                    data-mini="true"
-                    data-theme="a"
-                    data-ajax="false">Logout</a>
-            </div>
-            {{/if}}
-        </div>
+<div id="user-menu-popup" data-role="popup" data-transition="flip" data-position-to="#me-btn" data-theme="b">
+
+    <div data-role="content">
+
+        {{#if EMAIL}}
+        <img class="gravatar-image" {{bind-attr src="view.gravatarURL"}}/>
+        <div class="userEmail">{{EMAIL}}</div>
+
+        <a data-role="button" data-mini="true"
+           {{bind-attr href="view.account_url"}}
+           {{bind-attr target="view.notLogout"}}>My account</a>
+        {{/if}}
+
+        <a href="https://mistio.zendesk.com/access/login"
+           target="_blank"
+           data-role="button"
+           data-mini="true">Support</a>
+
+        {{#if view.logout}}
+        <a href="logout" data-role="button" data-mini="true">Logout</a>
+        {{/if}}
+
     </div>
+
 </div>
