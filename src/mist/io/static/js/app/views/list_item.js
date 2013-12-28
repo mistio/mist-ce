@@ -8,17 +8,21 @@ define('app/views/list_item', ['ember'],
         return Ember.View.extend({
 
             /**
-             *
              *  Initialization
-             *
              */
 
             renderListItem: function() {
+                
+                // Prevent bad rendering from showing up
+                
+                var element = $('#' + this.elementId).hide();
                 Ember.run.next(this, function() {
-                    var element = $('#' + this.elementId).parent()
-                    if (element.listview) {
+                    element = element.trigger('create')
+                                     .show()
+                                     .parent();
+                    try {
                         element.listview('refresh');
-                    }
+                    } catch (e) {}
                 });
             }.on('didInsertElement')
         });

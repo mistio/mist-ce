@@ -16,7 +16,7 @@ define('app/views/backend_button', ['ember'],
             tagName: 'a',
             backend: null,
             template: Ember.Handlebars.compile('{{title}}'),
-            attributeBindings: ['data-role', 'data-theme', 'data-inline', 'data-role', 'data-icon'],
+            attributeBindings: ['data-role', 'data-inline', 'data-role', 'data-icon'],
 
             /**
              * 

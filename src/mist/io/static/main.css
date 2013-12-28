@@ -45,12 +45,15 @@
 }
 .small-padding {
     height: 10px;
+    width: 100%;
 }
 .mid-padding {
     height: 50px;
+    width: 100%;
 }
 .large-padding {
     height: 100px;
+    width: 100%;
 }
 
 
@@ -130,6 +133,9 @@ textarea {
      *  so this change can easily be undone or modified
      */
     width: 315px; /* Useless, but leave it there for reference reasons */
+}
+.ui-panel-wrapper {
+    height: 100% !important;
 }
 .side-panel .ui-panel-inner {
     padding: 7px;
