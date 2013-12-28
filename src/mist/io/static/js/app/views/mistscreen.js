@@ -7,6 +7,10 @@ define('app/views/mistscreen', ['ember'],
     function() {
         return Ember.View.extend({
 
+            /**
+             *  Initialization
+             */
+
             destroyElement: function() {
                 $('.ui-popup').remove();
                 if ($('[data-role=page]').page) {
@@ -16,7 +20,7 @@ define('app/views/mistscreen', ['ember'],
 
             didInsertElement: function() {
                 if ($('[data-role=page]').page) {
-                    $('[data-role=page]').page();
+                    $('[data-role=page]').page().show();
                 }
             }
         });

@@ -66,7 +66,6 @@ define( 'app', [
     'app/views/rule',
     'app/views/user_menu',
     'app/views/list_item',
-    'text!app/templates/machine.html',
     'ember'
     ], function($,
                 d3,
@@ -107,71 +106,37 @@ define( 'app', [
                 KeyEditDialog,
                 RuleView,
                 UserMenuView,
-                ListItemView,
-                machine_html
+                ListItemView
                 ) {
 
     function initialize() {
 
+        // JQM init event
+
         $(document).bind('mobileinit', function() {
+            $('#splash').fadeOut(650);
             $.mobile.ajaxEnabled = false;
-            $.mobile.hashListeningEnabled = false;
             $.mobile.linkBindingEnabled = false;
-            $('body').css('overflow', '');
-            Ember.run.later(function() {
-                $('#splash').fadeOut(1000);
-            }, 1000);
+            $.mobile.hashListeningEnabled = false;
         });
 
-        Ember.LOG_BINDINGS = false;
+        // Create Ember Application
 
         App = Ember.Application.create({
-            rootElement: 'body',
-            LOG_TRANSITIONS: false,
-            LOG_STATE_TRANSITIONS: false,
-            email: null,
-            password: null,
-
-            ready: function(){
-                Ember.run.next(function(){
-                    var id = false;
-                    for(key in Ember.View.views) {
-                        if("application" == Ember.View.views[key].renderedName) {
-                            id = key;
-                        }
-                    }
-                    if(id) {
-                        $("#" + id).attr('data-role', 'page');
-                        require(['mobile'], function(){console.log('jqm loaded');});
-                    }
-                });
+            ready: function() {
+                require(['mobile']);
             }
         });
 
+        // Global constants
 
-
-        /**
-         * 
-         *  G L O B A L S
-         * 
-         */
-
-
-
-        //App.set('CSRFToken', CSRF_TOKEN);
         App.set('CSRFToken', '');
         App.set('authenticated', AUTH || URL_PREFIX == '' ? true : false);
         App.set('email', EMAIL);
         App.set('password', '');
         window.Mist = App;
 
-
-        /**
-         * 
-         *  A J A X   W R A P P E R S
-         * 
-         */
-
+        // Ajax wrappers
 
         App.ajaxGET = function(url, data) {
             return App.ajax('GET', url, data);
@@ -225,15 +190,7 @@ define( 'app', [
             return call.ajax();
         };
 
-
-
-        /**
-         * 
-         *  E M B E R   R O U T E S
-         * 
-         */
-
-
+        // Ember routes and routers
 
         App.Router.map(function() {
             this.route('machines');
@@ -253,40 +210,34 @@ define( 'app', [
                     document.title = 'mist.io - Machines';
                 });
             },
-
             exit: function() {
-              Mist.backendsController.forEach(function(backend) {
-                  backend.machines.forEach(function(machine) {
-                      machine.set('selected', false);
-                  });
-              });
-            }          
-        }); 
-        
+                Mist.backendsController.forEach(function(backend) {
+                    backend.machines.forEach(function(machine) {
+                        machine.set('selected', false);
+                    });
+                });
+            }
+        });
+
         App.MachineRoute = Ember.Route.extend({
             activate: function() {
-                Ember.run.next(function() {
-                    document.title = 'mist.io - ' + Mist.getMachineIdByUrl();
-                });
+                document.title = 'mist.io - ' + Mist.getMachineIdByUrl();
             },
-
             redirect: function() {
                 Mist.backendsController.set('machineRequest', Mist.getMachineIdByUrl());
             },
-
             model: function() {
                 if (Mist.backendsController.loading || Mist.backendsController.loadingMachines) {
                     return {id: ' '};
                 }
                 return Mist.backendsController.getMachine(Mist.getMachineIdByUrl());
-            }        
-        });   
-        
+            }
+        });
+
         App.KeysRoute = Ember.Route.extend({
             activate: function() {
                 document.title = 'mist.io - Keys';
             },
-
             exit: function() {
                 Mist.keysController.content.forEach(function(key){
                      key.set('selected', false);
@@ -296,9 +247,7 @@ define( 'app', [
 
         App.KeyRoute = Ember.Route.extend({
             activate: function() {
-                Ember.run.next(function() {
-                    document.title = 'mist.io - ' + Mist.getKeyIdByUrl();
-                });
+                document.title = 'mist.io - ' + Mist.getKeyIdByUrl();
             },
             redirect: function() {
                 Mist.keysController.set('keyRequest', Mist.getKeyIdByUrl());
@@ -311,77 +260,52 @@ define( 'app', [
             }
         });
 
+        // Ember views
 
-
-        /**
-         * 
-         *  E M B E R   V I E W S
-         * 
-         */
-        
-        
-        
         App.HomeView = Home;
-        App.ListItemView = ListItemView;
-        App.BackendButtonView = BackendButton;
-        App.BackendAddView = BackendAdd;
-        App.EditBackendView = EditBackend;
-        App.MachineListItemView = MachineListItem;
-        App.ImageListItemView = ImageListItem;
-        App.ConfirmationDialog = ConfirmationDialog;
-
-        App.DeleteTagView = DeleteTagView;
         App.RuleView = RuleView;
-        App.MachineTagsDialog = MachineTagsDialog;
-        App.MachinePowerPopup = MachinePowerPopup;
         App.ShellView = ShellView;
-        App.MachineActionsDialog = MachineActionsDialog;
-        App.MachineListView = MachineListView;
-        
-        App.SingleMachineView = SingleMachineView;
-        App.MachineListView = MachineListView;
-        App.UserMenuView = UserMenuView;
         App.KeyListView = KeyListView;
-        App.KeyListItemView = KeyListItemView;
+        App.AddKeyView = KeyAddDialog;
+        App.ListItemView = ListItemView;
+        App.BackendAddView = BackendAdd;
+        App.UserMenuView = UserMenuView;
+        App.EditBackendView = EditBackend;
+        App.EditKeyView = KeyEditDialog;
         App.ImageListView = ImageListView;
         App.SingleKeyView = SingleKeyView;
-        App.AddKeyView = KeyAddDialog;
-        App.EditKeyView = KeyEditDialog;
+        App.DeleteTagView = DeleteTagView;
+        App.KeyListItemView = KeyListItemView;
+        App.MachineListView = MachineListView;
+        App.MachineListView = MachineListView;
+        App.ImageListItemView = ImageListItem;
         App.MachineAddView = MachineAddDialog;
+        App.BackendButtonView = BackendButton;
+        App.MachineListItemView = MachineListItem;
+        App.SingleMachineView = SingleMachineView;
+        App.MachineTagsDialog = MachineTagsDialog;
+        App.MachinePowerPopup = MachinePowerPopup;
+        App.ConfirmationDialog = ConfirmationDialog;
+        App.MachineActionsDialog = MachineActionsDialog;
         App.MachineManageKeysView = MachineManageKeysView;
         App.MachineManageKeysListItemView = MachineManageKeysListItemView;
 
+        // Ember controllers
 
-
-        /**
-         * 
-         *  E M B E R   C O N T R O L L E R S
-         * 
-         */
-        
-        
-        
-        App.set('backendAddController', BackendAddController.create());
-        App.set('backendEditController', BackendEditController.create());
-        App.set('backendsController', BackendsController.create());
-        App.set('confirmationController', ConfirmationController.create());
-        App.set('notificationController', NotificationController.create());
-        App.set('machineAddController', MachineAddController.create());
-        App.set('machinePowerController', MachinePowerController.create());
-        App.set('selectImagesController', SelectImagesController.create());
         App.set('keysController', KeysController.create());
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
-        App.set('keyEditController', KeyEditController.create());
+        App.set('keyEditController', KeyEditController.create());        
+        App.set('backendsController', BackendsController.create());
+        App.set('machineAddController', MachineAddController.create());
+        App.set('backendAddController', BackendAddController.create());
+        App.set('backendEditController', BackendEditController.create());
+        App.set('confirmationController', ConfirmationController.create());
+        App.set('notificationController', NotificationController.create());
+        App.set('machinePowerController', MachinePowerController.create());
+        App.set('selectImagesController', SelectImagesController.create());
 
-
-        /**
-         * 
-         *  E M B E R   C U S T O M   W I D G E T S
-         * 
-         */
-        
-        
+        // Ember custom widgets
 
         App.Select = Ember.Select.extend({
             attributeBindings: [
@@ -390,7 +314,7 @@ define( 'app', [
                 'data-icon',
                 'data-native-menu',
                 'disabled'
-            ],
+            ]
         });
 
         App.TextField = Ember.TextField.extend({
@@ -411,18 +335,16 @@ define( 'app', [
             insertNewline: function() {
                 this._parentView.submit();
             },
-            
+
             keyDown: function(event, view) {
                 var parent = this._parentView;
                 var inputField = '.shell-input div.ui-input-text input';
-                
                 if (event.keyCode == 38 ) { // Up Key
                     if (parent.commandHistoryIndex > -1) {
                         if (parent.commandHistoryIndex > 0) {
                             parent.commandHistoryIndex--;
                         }
                         $(inputField).val(parent.commandHistory[parent.commandHistoryIndex]);
-                        
                     }
                 } else if (event.keyCode == 40) { // Down key
                     if (parent.commandHistoryIndex < parent.commandHistory.length) {
@@ -434,20 +356,19 @@ define( 'app', [
                 } else if (event.keyCode == 13) { // Enter key
                     this._parentView.submit();
                 } else if (event.keyCode == 1) {
-                    $('.shell-input input').focus();  
+                    $('.shell-input input').focus();
                 } else if (event.keyCode == 9) { // Tab key
                     // TODO: Autocomplete stuff...
                 } else { 
                     Ember.run.next(function(){
                         parent.commandHistory[parent.commandHistoryIndex] = parent.command;
-                    });      
+                    });
                 }
-                
                 if (event.keyCode == 38 || event.keyCode == 40 || event.keycode == 9) { // Up or Down or Tab
                     if(event.preventDefault) {
                         event.preventDefault();
                     }
-                }   
+                }
             }
         });
 
@@ -457,11 +378,9 @@ define( 'app', [
                 'data-theme',
                 'autocapitalize'
             ],
-
             insertNewline: function() {
                 this._parentView.submit();
             },
-        
             keyUp: function() {
                 if (this.value && this.value.length > 0) {
                     $('#tag-add').removeClass('ui-disabled');
@@ -469,34 +388,25 @@ define( 'app', [
                     $('#tag-add').addClass('ui-disabled');
                 }
             }
-
         });
 
         App.Checkbox = Ember.Checkbox.extend({
             attributeBindings: ['id', 'data-inline']
         });
-        
-        
-        
-        /**
-         * 
-         *  M I S T   F U N C T I O N S
-         * 
-         */        
-        
-        
-        
+
+        // Mist functions
+
         App.isScrolledToBottom = function() {
             var distanceToViewportTop = (
                 $(document).height() - $(window).height());
             var viewPortTop = $(document).scrollTop();
-        
+
             if (viewPortTop === 0) {
                 // if we are at the top of the page, don't do
                 // the infinite scroll thing
                 return false;
             }
-        
+
             return (viewPortTop - distanceToViewportTop === 0);
         };
 
@@ -507,12 +417,10 @@ define( 'app', [
         App.getMachineIdByUrl = function() {
             return window.location.href.split('/')[5];
         };
-        
-        
-        
+
         return App;
     }
-    
+
 
     var allImgs = [],
         imgUrls = [],

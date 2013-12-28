@@ -1,11 +1,8 @@
-define('app/views/rule', [
-    'text!app/templates/rule.html',
-    'ember'],
+define('app/views/rule', ['text!app/templates/rule.html', 'ember'],
     /**
+     *  Rule View
      *
-     * Rules view
-     *
-     * @returns Class
+     *  @returns Class
      */
     function(rule_html) {
         return Ember.View.extend({

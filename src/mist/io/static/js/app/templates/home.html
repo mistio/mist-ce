@@ -1,12 +1,13 @@
-    
-    <div class="home-page" data-role="header" data-theme="b">
+<div id="home-page" data-role="page">
+
+    <div data-role="header" data-theme="b">
 
         <h1>mist.io</h1>
         {{view Mist.UserMenuView}}
 
     </div>
 
-    <div class="home-page" data-role="content" data-theme="c">
+    <div data-role="content" data-theme="c">
 
         <a id="add-backend-btn"
            data-role="button"
@@ -56,5 +57,6 @@
     </div>
 
     {{view Mist.BackendAddView}}
-
     {{view Mist.EditBackendView}}
+
+</div>
