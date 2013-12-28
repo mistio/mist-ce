@@ -10,21 +10,27 @@ define('app/views/machine_tags', ['text!app/templates/machine_tags.html', 'ember
             /**
              *  Properties
              */
-            
-            machine: null,
+
             template: Ember.Handlebars.compile(machine_tags_html),
 
-            submit: function() {
+            /**
+             *  Actions
+             */
 
-            },
+            actions: {
 
-            disabledClass: function() {
-                if (this.tag && this.tag.length > 0) {
-                    return '';
-                } else {
-                    return 'ui-disabled';
+                addClicked: function() {
+                    Mist.machineTagsController.add();
+                },
+                
+                deleteTagClicked: function(tag) {
+                    Mist.machineTagsController.deleteTag(tag);
+                },
+                
+                backClicked: function() {
+                    Mist.machineTagsController.close();
                 }
-            }.property('tag')
+            }
         });
     }
 );
