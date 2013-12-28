@@ -17,14 +17,14 @@
         <ul data-role="list-view">
             {{#each Mist.machineTagsController.machine.tags}}
             <div>
-            {{this}}
-            <a data-role="button"
-               data-icon="delete"
-               data-inline="true"
-               data-iconpos="notext"
-               {{action "deleteTagClicked" this target="view"}}></a>
+                {{this}}
+                <a data-role="button"
+                   data-icon="delete"
+                   data-inline="true"
+                   data-iconpos="notext"
+                   {{action "deleteTagClicked" this target="view"}}>x</a>
+             </div>
             {{/each}}
-            </div>
         </ul>
 
         <a id="add-tag-back" data-role="button" {{action "backClicked" target="view"}}>Back</a>

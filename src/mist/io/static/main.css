@@ -18,7 +18,6 @@
 /* Splash
 -----------------------------------------------------------------------------------------------------------*/
 #splash {
-    yo: 10;
     width: 100%;
     height: 100%;
     position: absolute;
@@ -47,11 +46,11 @@ body {
 .ui-mobile, .ui-mobile body {
     height: 0 !important;
 }
-/*
-.ui-page, .ui-content {
+
+.ui-page {
    height: 100%;
 }
-*/
+
 .small-padding {
     height: 10px;
     width: 100%;
