@@ -1,0 +1,71 @@
+define('app/controllers/machine_tags', ['ember'],
+    /**
+     *  Machine Tags Controller
+     *
+     *  @returns Class
+     */
+    function() {
+        return Ember.Object.extend({
+
+            /**
+             *  Properties
+             */
+
+            newTag: null,
+            machine: null,
+            callback: null,
+            addingTag: null,
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+
+            open: function(machine, callback) {
+                $('#machine-tags-popup').popup('open');
+                this._clear();
+                this.set('machine', machine);
+                this.set('callback', callback);
+            },
+
+
+            close: function() {
+                $('#machine-tags-popup').popup('close');
+                this._clear();
+            },
+
+
+            add: function() {
+                var that = this;
+                var tag = this.newTag;
+                var machine = this.machine;
+                
+                this.set('addingTag', true);
+                Mist.ajaxPOST('backends/' + machine.backend.id + '/machines/' + machine.id + '/metadata', {
+                    'tag' : tag
+                }).success(function() {
+                    machine.tags.pushObject(tag);
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to add tag :' + tag);
+                }).complete(function(success) {
+                    that.set('addingTag', false);
+                    if (that.callback) that.callback(success, tag);
+                });
+            },
+
+
+
+            /**
+             * 
+             *  Pseudo-Private Methods
+             * 
+             */
+
+            _clear: function() {
+                this.set('machine', null);
+                this.set('callback', null);
+            }
+        });
+    }
+);

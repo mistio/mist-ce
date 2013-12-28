@@ -6792,8 +6792,8 @@ $.widget( "mobile.collapsible", {
         this.element.toggleClass( "ui-collapsible-collapsed", isCollapse );
         ui.content
             .toggleClass( "ui-collapsible-content-collapsed", isCollapse )
-            .attr( "aria-hidden", isCollapse );
-            //.trigger( "updatelayout" ); // Causes scroll to top when collapsible is inside panel
+            .attr( "aria-hidden", isCollapse )
+            .trigger( "updatelayout" ); // Causes scroll to top when collapsible is inside panel
         this.options.collapsed = isCollapse;
         this._trigger( isCollapse ? "collapse" : "expand" );
     },

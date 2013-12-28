@@ -39,7 +39,7 @@ define( 'app', [
     'app/controllers/key_edit',
     'app/controllers/select_images',
     'app/controllers/keys',
-    'app/controllers/tags',
+    'app/controllers/machine_tags',
     'app/controllers/rules',
     'app/views/home',
     'app/views/backend_button',
@@ -81,7 +81,7 @@ define( 'app', [
                 KeyEditController,
                 SelectImagesController,
                 KeysController,
-                TagsController,
+                MachineTagsController,
                 RulesController,
                 Home,
                 BackendButton,
@@ -310,7 +310,6 @@ define( 'app', [
 
         // Ember controllers
 
-        App.set('tagsController', TagsController.create());
         App.set('keysController', KeysController.create());
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
@@ -319,6 +318,7 @@ define( 'app', [
         App.set('machineAddController', MachineAddController.create());
         App.set('backendAddController', BackendAddController.create());
         App.set('backendEditController', BackendEditController.create());
+        App.set('machineTagsController', MachineTagsController.create());
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
         App.set('machinePowerController', MachinePowerController.create());

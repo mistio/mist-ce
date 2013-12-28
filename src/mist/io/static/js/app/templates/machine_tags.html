@@ -1,0 +1,32 @@
+<div id="machine-tags-popup" class="large-popup" data-role="popup" data-overlay-theme="b" data-transition="slideup">
+
+    <div data-role="header">
+        <h1>Manage Tags</h1>
+    </div>
+
+    <div data-role="content">
+
+        {{view Mist.TextField
+               valueBinding="Mist.machineTagsController.newTag"}}
+
+        <a id="add-tag-ok" data-role="button" data-theme="b" {{action "addClicked" target="view"}}>Add</a>
+
+        {{#if machineTagsController.addingTag}}
+        <div class="ajax-loader"></div>
+        {{/if}}
+
+        <ul id="tags-list">
+            {{#each view.machine.tags}}
+            <a data-role="button"
+               data-icon="delete"
+               data-inline="true"
+               data-iconpos="notext"
+               {{action "deleteTagClicked" this target="view"}}></a>
+            {{/each}}
+        </ul>
+
+        <a id="add-tag-back" data-role="button" {{action "backClicked" target="view"}}>Back</a>
+
+    </div>
+
+</div>
