@@ -40,9 +40,17 @@
 
 /* Page formating
 -----------------------------------------------------------------------------------------------------------*/
-.ui-page {
-    height: 100%;
+body {
+    background-color: #F9F9F9 !important;
 }
+.ui-mobile, .ui-mobile body {
+    height: 0 !important;
+}
+/*
+.ui-page, .ui-content {
+   height: 100%;
+}
+*/
 .small-padding {
     height: 10px;
     width: 100%;
@@ -54,6 +62,7 @@
 .large-padding {
     height: 100px;
     width: 100%;
+    margin: auto;
 }
 
 

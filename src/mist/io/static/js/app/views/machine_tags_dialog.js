@@ -1,17 +1,17 @@
-define('app/views/machine_tags_dialog',[
-    'text!app/templates/machine_tags_dialog.html',
-    'ember',
-    'jquery'
-    ],
+define('app/views/machine_tags_dialog', ['text!app/templates/machine_tags_dialog.html', 'ember'],
     /**
+     *  Machine Tags View
      *
-     * Machine Tags Dialog page
-     *
-     * @returns Class
+     *  @returns Class
      */
     function(machine_tags_dialog_html) {
         return Ember.View.extend({
 
+            /**
+             *  Properties
+             */
+            
+            machine: null,
             template: Ember.Handlebars.compile(machine_tags_dialog_html),
 
             submit: function() {
@@ -42,7 +42,7 @@ define('app/views/machine_tags_dialog',[
                         machine.set('pendingAddTag', false);
                         machine.tags.addObject(tag);
                         $('#tags-container .ajax-loader').hide();
-                        $('#tags-container input[type=text]').val('')
+                        $('#tags-container input[type=text]').val('');
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while adding tag to machine ' + machine.name);

@@ -13,7 +13,7 @@ define('app/views/list_item', ['ember'],
 
             renderListItem: function() {
                 
-                // Prevent bad rendering from showing up
+                // Prevent bad rendering
                 
                 var element = $('#' + this.elementId).hide();
                 Ember.run.next(this, function() {

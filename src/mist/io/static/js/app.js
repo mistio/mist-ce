@@ -8,7 +8,7 @@ require.config({
         jquery: 'lib/jquery-1.10.2',
         text: 'lib/require/text',
         mobile: 'lib/jquery.mobile-1.4.0-rc.1',
-        ember: 'lib/ember-1.1.2.min',
+        ember: 'lib/ember-1.1.2',
         handlebars: 'lib/handlebars-1.0.0',
         d3: 'lib/d3-2.10.1',
         md5: 'lib/md5',
