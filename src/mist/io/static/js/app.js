@@ -204,10 +204,18 @@ define( 'app', [
             });
         });
 
+        App.ImagesRoute = Ember.Route.extend({
+            activate: function() {
+                Ember.run.next(function() {
+                    document.title = 'mist.io - images';
+                });
+            }
+        });
+
         App.MachinesRoute = Ember.Route.extend({
             activate: function() {
                 Ember.run.next(function() {
-                    document.title = 'mist.io - Machines';
+                    document.title = 'mist.io - machines';
                 });
             },
             exit: function() {
@@ -221,7 +229,11 @@ define( 'app', [
 
         App.MachineRoute = Ember.Route.extend({
             activate: function() {
-                document.title = 'mist.io - ' + Mist.getMachineIdByUrl();
+                Ember.run.next(function() {
+                    var id = Mist.getMachineIdByUrl();
+                    var machine = Mist.backendsController.getMachine(id);
+                    document.title = 'mist.io - ' + (machine ? machine.name : id);
+                });
             },
             redirect: function() {
                 Mist.backendsController.set('machineRequest', Mist.getMachineIdByUrl());
@@ -236,7 +248,9 @@ define( 'app', [
 
         App.KeysRoute = Ember.Route.extend({
             activate: function() {
-                document.title = 'mist.io - Keys';
+                Ember.run.next(function() {
+                    document.title = 'mist.io - keys';
+                });
             },
             exit: function() {
                 Mist.keysController.content.forEach(function(key){
@@ -247,7 +261,9 @@ define( 'app', [
 
         App.KeyRoute = Ember.Route.extend({
             activate: function() {
-                document.title = 'mist.io - ' + Mist.getKeyIdByUrl();
+                Ember.run.next(function() {
+                    document.title = 'mist.io - ' + Mist.getKeyIdByUrl();
+                });
             },
             redirect: function() {
                 Mist.keysController.set('keyRequest', Mist.getKeyIdByUrl());
