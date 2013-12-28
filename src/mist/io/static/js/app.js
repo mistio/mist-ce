@@ -39,6 +39,7 @@ define( 'app', [
     'app/controllers/key_edit',
     'app/controllers/select_images',
     'app/controllers/keys',
+    'app/controllers/tags',
     'app/controllers/rules',
     'app/views/home',
     'app/views/backend_button',
@@ -55,7 +56,7 @@ define( 'app', [
     'app/views/image_list',
     'app/views/delete_tag',
     'app/views/machine_power',
-    'app/views/machine_tags_dialog',
+    'app/views/machine_tags',
     'app/views/machine_manage_keys',
     'app/views/machine_manage_keys_list_item',
     'app/views/key_list_item',
@@ -80,6 +81,7 @@ define( 'app', [
                 KeyEditController,
                 SelectImagesController,
                 KeysController,
+                TagsController,
                 RulesController,
                 Home,
                 BackendButton,
@@ -96,7 +98,7 @@ define( 'app', [
                 ImageListView,
                 DeleteTagView,
                 MachinePowerPopup,
-                MachineTagsDialog,
+                MachineTagsView,
                 MachineManageKeysView,
                 MachineManageKeysListItemView,
                 KeyListItemView,
@@ -291,6 +293,7 @@ define( 'app', [
         App.ImageListView = ImageListView;
         App.SingleKeyView = SingleKeyView;
         App.DeleteTagView = DeleteTagView;
+        App.MachineTagsView = MachineTagsView;
         App.KeyListItemView = KeyListItemView;
         App.MachineListView = MachineListView;
         App.MachineListView = MachineListView;
@@ -299,7 +302,6 @@ define( 'app', [
         App.BackendButtonView = BackendButton;
         App.MachineListItemView = MachineListItem;
         App.SingleMachineView = SingleMachineView;
-        App.MachineTagsDialog = MachineTagsDialog;
         App.MachinePowerPopup = MachinePowerPopup;
         App.ConfirmationDialog = ConfirmationDialog;
         App.MachineActionsDialog = MachineActionsDialog;
@@ -308,6 +310,7 @@ define( 'app', [
 
         // Ember controllers
 
+        App.set('tagsController', TagsController.create());
         App.set('keysController', KeysController.create());
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
