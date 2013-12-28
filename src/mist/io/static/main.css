@@ -204,7 +204,7 @@ textarea {
     margin-left: -1px;
     width: 100%;
 }
-.ui-footer button {
+.ui-footer a {
     padding-left: 0 !important;
     padding-right: 0 !important;
     width: 100%;
@@ -214,7 +214,7 @@ textarea {
     width: 50%;
 }
 .ui-footer.tri-action-footer td {
-    width: 33%;
+    width: 33.3%;
 }
 
 

@@ -426,6 +426,18 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             },
 
 
+            _updateSelectedMachines: function() {
+                Ember.run(this, function() {
+                    var newSelectedMachines = [];
+                    this.content.forEach(function(backend) {
+                        newSelectedMachines = newSelectedMachines.concat(backend.selectedMachines);
+                    });
+                    this.set('selectedMachines', newSelectedMachines);
+                    this.trigger('onSelectedMachinesChange');
+                });
+            },
+
+
 
             /**
              * 
@@ -451,6 +463,11 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             loadingMachinesObserver: function() {
                 Ember.run.once(this, '_updateLoadingMachines');
             }.observes('content.@each.loadingMachines'),
+
+
+            selectedMachinesObserver: function() {
+                Ember.run.once(this, '_updateSelectedMachines');
+            }.observes('content.@each.selectedMachines')
         });
     }
 );

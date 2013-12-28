@@ -29,7 +29,7 @@ define('app/views/key_list_item', ['app/views/list_item', 'text!app/templates/ke
                                .checkboxradio('refresh');
                     }
                 });
-            }.on('didInsertElement'),
+            },
 
 
 

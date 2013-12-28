@@ -34,35 +34,22 @@ define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/ma
              */
 
             updateFooter: function() {
-                switch (Mist.backendsController.getSelectedMachinesCount()) {
+                switch (Mist.backendsController.selectedMachines.length) {
                     case 0:
-                        $('#machine-list-page .ui-footer').hide();
+                        $('#machine-list-page .ui-footer').slideUp();
                         break;
                     case 1:
-                        $('#machine-list-page .ui-footer').show();
-                        $('#machine-list-page .ui-footer a').removeClass('ui-state-disabled');
-                        this.set('selectedMachine', Mist.backendsController.getSelectedMachinesId());
+                        $('#machine-list-page .ui-footer').slideDown();
+                        $('#machine-list-page #machines-tags-btn').removeClass('ui-state-disabled');
+                        $('#machine-list-page #machines-shell-btn').removeClass('ui-state-disabled');
                         break;
                     default:
-                        $('#machine-list-page .ui-footer').show();
-                        $('#machine-list-page .ui-footer a').addClass('ui-state-disabled');
+                        $('#machine-list-page .ui-footer').slideDown();
+                        $('#machine-list-page #machines-tags-btn').addClass('ui-state-disabled');
+                        $('#machine-list-page #machines-shell-btn').addClass('ui-state-disabled');
                         break;
                 }
             }.on('didInsertElement'),
-
-            machinesObserver: function() {
-                if (Mist.backendsController.machinesUpdated) {
-                    Ember.run.next(function() {
-                        if ($('#machine-list-page #machines').listview) {
-                            $('#machine-list-page #machines').listview('refresh');
-                        }
-                        if ($('#machine-list-page #machines input.ember-checkbox').checkboxradio) {
-                            $('#machine-list-page #machines input.ember-checkbox').checkboxradio();
-                        }
-                        Mist.backendsController.set('machinesUpdated', false);
-                    });
-                }
-            }.observes('Mist.backendsController.machinesUpdated').on('didInsertElement'),
  
 
             openTags: function() {
@@ -89,6 +76,7 @@ define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/ma
                     $(window).trigger('resize');
                 });
             },
+    
     
             openActions: function(){
                 $("#dialog-power").popup('option', 'positionTo', '#machines-button-power').popup('open', {transition: 'slideup'});
@@ -146,7 +134,11 @@ define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/ma
                     Ember.run.next(function() {
                         $("input[type='checkbox']").checkboxradio('refresh');
                     });
-                }
+                },
+
+                tagsClicked: function() {
+                    Mist.machineTagsController.open(Mist.backendsController.selectedMachines[0]);
+                },
             }
         });
     }

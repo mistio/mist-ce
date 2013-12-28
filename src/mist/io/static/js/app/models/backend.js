@@ -21,6 +21,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             provider: null,
             poll_interval: null,
             create_pending: null,
+            selectedMachines: [],
 
             sizes: null,
             images: null,
@@ -56,6 +57,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     this.images.on('onImageListChange', this, '_updateImageCount');
                     this.machines.on('onMachineListChange', this, '_updateMachineCount');
                     this.locations.on('onLocationListChange', this, '_updateLocationCount');
+                    this.machines.on('onSelectedMachinesChange', this, '_updateSelectedMachines');
                     
                     // Add observers
                     this.sizes.addObserver('loading', this, function() {
@@ -179,6 +181,13 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 });
             },
 
+
+            _updateSelectedMachines: function() {
+                Ember.run(this, function() {
+                    this.set('selectedMachines', this.machines.selectedMachines);
+                    this.trigger('onSelectedMachinesChange');
+                });
+            },
 
             _updateState: function() {
                 if (this.enabled) {

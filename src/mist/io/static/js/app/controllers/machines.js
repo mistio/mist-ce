@@ -221,6 +221,7 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
+
             /**
              * 
              *  Pseudo-Private Methods
