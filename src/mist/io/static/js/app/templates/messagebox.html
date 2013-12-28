@@ -1,0 +1,13 @@
+
+    <div id="message-box" data-role="popup" data-overlay-theme="a" >
+        <div data-role="header">
+            <h1>{{Mist.notificationController.msgHeader}}</h1>
+        </div>
+        <div data-role="content" data-theme="c">
+            <p>{{Mist.notificationController.msgPart1}}</p>
+            <p>{{Mist.notificationController.msgPart2}}</p>
+            <p>{{Mist.notificationController.msgPart3}}</p>
+            <p id="message-ps">{{Mist.notificationController.msgPart4}}</p>
+        </div>
+        <button {{action "closeMessage" target="view"}}>OK</button>
+    </div>

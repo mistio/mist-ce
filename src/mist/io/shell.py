@@ -1,124 +1,309 @@
-import os
-import sys
-import socket
+"""mist.io.shell
+
+This module contains everything that is need to communicate with machines via
+SSH.
+
+"""
+
+
 import logging
-import subprocess
-import tempfile
+from time import time
 
-#import gevent
-#import gevent.socket
 
-#from gevent import monkey
-#monkey.patch_socket()
+import paramiko
+import socket
 
-from StringIO import StringIO
 
-from pyramid.request import Request
-from pyramid.response import Response
-from mist.io.helpers import connect, run_command, get_keypair, get_ssh_user_from_keypair, get_user
-from mist.io.views import get_preferred_keypairs
+from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
+from mist.io.exceptions import MachineUnauthorizedError
+from mist.io.exceptions import RequiredParameterMissingError
+from mist.io.exceptions import ServiceUnavailableError
+from mist.io.helpers import get_temp_file
 
-log = logging.getLogger('mistshell')
+log = logging.getLogger(__name__)
 
-class ShellMiddleware(object):
-    """Shell middleware that intercepts requests for shell commands and streams 
-       the output"""
-    def __init__(self, app):
-        #mist.io app
-        self.app = app
-        self.routes_mapper = app.routes_mapper
-        self.registry = app.registry
 
-    def __call__(self, environ, start_response):
-        request = Request(environ)
-        if request.path.endswith('shell') and request.method == 'GET':
-            try:
-                backend = self.app.routes_mapper(request)['match']['backend']
-                machine = self.app.routes_mapper(request)['match']['machine']
-                host = request.params.get('host', None)
-                ssh_user = request.params.get('ssh_user', None)
-                command = request.params.get('command', None)
-                request.registry = self.app.registry
+class Shell(object):
+    """sHell
 
-                if not ssh_user or ssh_user == 'undefined':
-                    log.debug("Will select root as the ssh-user as we don't know who we are")
-                    ssh_user = 'root'
+    This class takes care of all SSH related issues. It initiates a connection
+    to a given host and can send commands whose output can be treated in
+    different ways. It can search a user's data and autoconfigure itself for
+    a given machine by finding the right private key and username. Under the
+    hood it uses paramiko.
 
-                with get_user(request, readonly=True) as user:
-                    keypairs = user['keypairs']
+    Use it like:
+        shell = Shell('localhost', username='root', password='123')
+        print shell.command('uptime')
+    Or:
+        shell = Shell('localhost')
+        shell.autoconfigure(user, backend_id, machine_id)
+        for line in shell.command_stream('ps -fe'):
+            print line
 
-                preferred_keypairs = get_preferred_keypairs(keypairs, backend, machine)
-                log.debug("preferred keypairs = %s" % preferred_keypairs)
-              
-                if preferred_keypairs:
-                    keypair = keypairs[preferred_keypairs[0]]
-                    private_key = keypair['private']
-                    s_user = get_ssh_user_from_keypair(keypair, backend, machine)
-                    log.debug("get user from keypair returned: %s" % s_user)
-                    if s_user:
-                        ssh_user = s_user
-                        log.debug("Will select %s as the ssh-user" % ssh_user)
-                else:
-                    private_key = None
-                    log.error("Missing private key")
-                    raise Exception("Missing private key")
+    """
 
-                conn = connect(request, backend)
-                if conn:
-                    return self.stream_command(conn, machine, host, ssh_user, 
-                                               private_key, command, 
-                                               start_response)
-                else:
-                    raise
-            except:
-                # leave error handling up to the app
-                return self.app(environ, start_response)
-        else:
-            return self.app(environ, start_response)
+    def __init__(self, host, username=None, key=None, password=None, port=22):
+        """Initialize a Shell instance
 
-        
-    def stream_command(self, conn, machine, host, ssh_user, private_key, command, start_response):
-        """ 
-            Generator function that streams the output of the remote command 
-            using the hidden iframe web pattern
+        Initializes a Shell instance for host. If username is provided, then
+        it tries to actually initiate the connection, by calling connect().
+        Check out the docstring of connect().
+
         """
-        #TODO: add timeout
-        outputPrefix = u'[%s] out:' % host
-        
-        # save private key in temp file
-        (tmp_key, key_path) = tempfile.mkstemp()
-        key_fd = os.fdopen(tmp_key, 'w+b')
-        key_fd.write(private_key)
-        key_fd.close()
-        
-        # start the http response
-        start_response('200 OK', [('Content-Type','text/html')])
-        # send some blank data to get webkit browsers to display what's sent
-        yield 1024*'\0'
-        
-        # start the html response
-        yield '<html><body>\n'
 
-        # run the command as a seperate process using fab
-        cmd = ['./bin/fab','-H', host , '-u', ssh_user, '-k', '-i', key_path, '--', command]
-        proc = subprocess.Popen(cmd, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        while True:
-            # get commands output, line by line
-            line = proc.stdout.readline()
-            if line == '' and proc.poll() != None:
-                break
-            if line != '':
-                sys.stdout.write(line)
-                sys.stdout.flush()
-                if outputPrefix.encode('utf-8','ignore') in line: # remove logging decorators
-                    line = line[len(outputPrefix):]
-                    # send the actual output
-                    yield "<script type='text/javascript'>parent.appendShell('%s');</script>\n" % line.replace('\'','\\\'').replace('\n','<br/>') #.replace('<','&lt;').replace('>', '&gt;')
-        # wait for child
-        stdout, stderr = proc.communicate()
-        
-        # remove temp key
-        os.remove(key_path)
-        
-        yield "<script type='text/javascript'>parent.completeShell(%s);</script>\n" % proc.returncode        
-        yield '</body></html>\n'   
+        if not host:
+            raise RequiredParameterMissingError('host not given')
+        self.host = host
+        self.sudo = False
+
+        self.ssh = paramiko.SSHClient()
+        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        # if username provided, try to connect
+        if username:
+            self.connect(username, key, password, port)
+
+    def connect(self, username, key=None, password=None, port=22):
+        """Initialize an SSH connection.
+
+        Tries to connect and configure self. If only password is provided, it
+        will be used for authentication. If key is provided, it is treated as
+        and OpenSSH private RSA key and used for authentication. If both key
+        and password are provided, password is used as a passphrase to unlock
+        the private key.
+
+        Raises MachineUnauthorizedError if it fails to connect.
+
+        """
+
+        log.info("Attempting to connect to %s@%s:%s.",
+                 username, self.host, port)
+        if not key and not password:
+            raise RequiredParameterMissingError("neither key nor password "
+                                                "provided.")
+        if key:
+            with get_temp_file(key) as key_path:
+                rsa_key = paramiko.RSAKey.from_private_key_file(key_path)
+        else:
+            rsa_key = None
+
+        attempts = 3
+        while attempts:
+            attempts -= 1
+            try:
+                self.ssh.connect(
+                    self.host,
+                    port=port,
+                    username=username,
+                    password=password,
+                    pkey=rsa_key,
+                    allow_agent=False,
+                    look_for_keys=False,
+                    timeout=10
+                )
+            except paramiko.AuthenticationException as exc:
+                log.error("ssh exception %r", exc)
+                raise MachineUnauthorizedError("Couldn't connect to %s@%s:%s. %s"
+                                               % (username, self.host, port, exc))
+            except socket.error as exc:
+                log.error("Got ssh error: %r", exc)
+                if not attempts:
+                    raise ServiceUnavailableError("SSH timed-out repeatedly.")
+
+
+    def disconnect(self):
+        """Close the SSH connection."""
+        try:
+            log.info("Closing ssh connection to %s", self.host)
+            self.ssh.close()
+        except:
+            pass
+
+    def check_sudo(self):
+        """Checks if sudo is installed.
+
+        In case it is self.sudo = True, else self.sudo = False
+
+        """
+        # FIXME
+        stdout, stderr = self.command("which sudo", pty=False)
+        if not stderr:
+            self.sudo = True
+            return True
+
+    def _command(self, cmd, pty=True):
+        """Helper method used by command and stream_command."""
+        channel = self.ssh.get_transport().open_session()
+        channel.settimeout(10800)
+        stdout = channel.makefile()
+        stderr = channel.makefile_stderr()
+        if pty:
+            # this combines the stdout and stderr streams as if in a pty
+            # if enabled both streams are combined in stdout and stderr file
+            # descriptor isn't used
+            channel.get_pty()
+        # command starts being executed in the background
+        channel.exec_command(cmd)
+        return stdout, stderr
+
+    def command(self, cmd, pty=True):
+        """Run command and return output.
+
+        If pty is True, then it returns a string object that contains the
+        combined streams of stdout and stderr, like they would appear in a pty.
+
+        If pty is False, then it returns a two string tupple, consisting of
+        stdout and stderr.
+
+        """
+        log.info("running command: '%s'", cmd)
+        stdout, stderr = self._command(cmd, pty)
+        if pty:
+            return stdout.read()
+        else:
+            return stdout.read(), stderr.read()
+
+    def command_stream(self, cmd):
+        """Run command and stream output line by line.
+
+        This function is a generator that returns the commands output line
+        by line. Use like: for line in command_stream(cmd): print line.
+
+        """
+        log.info("running command: '%s'", cmd)
+        stdout, stderr = self._command(cmd)
+        line = stdout.readline()
+        while line:
+            yield line
+            line = stdout.readline()
+
+    def autoconfigure(self, user, backend_id, machine_id,
+                      key_id=None, username=None, password=None):
+        """Autoconfigure SSH client.
+
+        This will do its best effort to find a suitable keypair and username
+        and will try to connect. If it fails it raises
+        MachineUnauthorizedError, otherwise it initializes self and returns a
+        (key_id, ssh_user) tupple. If connection succeeds, it updates the
+        association information in the key with the current timestamp and the
+        username used to connect.
+
+        """
+
+        log.info("autoconfiguring Shell for machine %s:%s",
+                 backend_id, machine_id)
+        if backend_id not in user.backends:
+            raise BackendNotFoundError(backend_id)
+        if key_id is not None and key_id not in user.keypairs:
+            raise KeypairNotFoundError(key_id)
+
+        # get candidate keypairs if key_id not provided
+        keypairs = user.keypairs
+        if key_id:
+            pref_keys = [key_id]
+        else:
+            default_keys = [key_id for key_id in keypairs
+                            if keypairs[key_id].default]
+            assoc_keys = []
+            recent_keys = []
+            root_keys = []
+            sudo_keys = []
+            for key_id in keypairs:
+                for machine in keypairs[key_id].machines:
+                    if [backend_id, machine_id] == machine[:2]:
+                        assoc_keys.append(key_id)
+                        if len(machine) > 2 and \
+                                int(time() - machine[2]) < 7*24*3600:
+                            recent_keys.append(key_id)
+                        if len(machine) > 3 and machine[3] == 'root':
+                            root_keys.append(key_id)
+                        if len(machine) > 4 and machine[4] is True:
+                            sudo_keys.append(key_id)
+            pref_keys = root_keys or sudo_keys or assoc_keys
+            if default_keys and default_keys[0] not in pref_keys:
+                pref_keys.append(default_keys[0])
+
+        # try to connect
+        for key_id in pref_keys:
+            keypair = user.keypairs[key_id]
+
+            # find username
+            users = []
+            # if username was specified, then try only that
+            if username:
+                users = [username]
+            else:
+                for machine in keypair.machines:
+                    if machine[:2] == [backend_id, machine_id]:
+                        if len(machine) >= 4 and machine[3]:
+                            users.append(machine[3])
+                            break
+                # if username not found, try several alternatives
+                # check to see if some other key is associated with machine
+                for other_keypair in user.keypairs.values():
+                    for machine in other_keypair.machines:
+                        if machine[:2] == [backend_id, machine_id]:
+                            if len(machine) >= 4 and machine[3]:
+                                ssh_user = machine[3]
+                                if ssh_user not in users:
+                                    users.append(ssh_user)
+                # check some common default names
+                for name in ['root', 'ubuntu', 'ec2-user']:
+                    if name not in users:
+                        users.append(name)
+            for ssh_user in users:
+                try:
+                    self.connect(username=ssh_user,
+                                 key=keypair.private,
+                                 password=password)
+                except MachineUnauthorizedError:
+                    continue
+                # this is a hack: if you try to login to ec2 with the wrong
+                # username, it won't fail the connection, so a
+                # MachineUnauthorizedException won't be raised. Instead, it
+                # will prompt you to login as some other user.
+                # This hack tries to identify when such a thing is happening
+                # and then tries to connect with the username suggested in
+                # the prompt.
+                resp = self.command('uptime')
+                new_ssh_user = None
+                if 'Please login as the user ' in resp:
+                    new_ssh_user = resp.split()[5].strip('"')
+                elif 'Please login as the' in resp:
+                    # for EC2 Amazon Linux machines, usually with ec2-user
+                    new_ssh_user = resp.split()[4].strip('"')
+                if new_ssh_user:
+                    log.info("retrying as %s", new_ssh_user)
+                    try:
+                        self.disconnect()
+                        self.connect(username=new_ssh_user,
+                                     key=keypair.private,
+                                     password=password)
+                        ssh_user = new_ssh_user
+                    except MachineUnauthorizedError:
+                        continue
+                # we managed to connect succesfully, return
+                # but first update key
+                assoc = [backend_id,
+                         machine_id,
+                         time(),
+                         ssh_user,
+                         self.check_sudo()]
+                with user.lock_n_load():
+                    updated = False
+                    for i in range(len(user.keypairs[key_id].machines)):
+                        machine = user.keypairs[key_id].machines[i]
+                        if [backend_id, machine_id] == machine[:2]:
+                            user.keypairs[key_id].machines[i] = assoc
+                            updated = True
+                    # if association didn't exist, create it!
+                    if not updated:
+                        user.keypairs[key_id].machines.append(assoc)
+                    user.save()
+                return key_id, ssh_user
+
+        raise MachineUnauthorizedError("%s:%s" % (backend_id, machine_id))
+
+    def __del__(self):
+        self.disconnect()
