@@ -19,9 +19,9 @@ define('app/controllers/monitoring', [
 
             // TODO , Remove Machine And View Arguments
             // TODO , UpdateInterval And Step Must Be the Same
-            initialize: function(machine,timeWindow,step,updateInterval){
+            initialize: function(machine,timeWindow,step,updateInterval,enableUpdates){
                 //this.machine = machine;
-                this.request.initiliaze(timeWindow,step,updateInterval,machine);
+                this.request.initiliaze(timeWindow,step,machine,updateInterval,enableUpdates);
             },
 
             /**
@@ -35,9 +35,10 @@ define('app/controllers/monitoring', [
                 *   Initialize function
                 *   timeWindow     : integer in microseconds
                 *   step           : integer in microseconds
-                *   updateinterval : integer in microseconds (Set 0 to disable updates)
+                *   updateinterval : integer in microseconds
+                *   enableUpdates  : boolean
                 */
-                initiliaze : function(timeWindow,step,updateInterval,machine){
+                initiliaze : function(timeWindow,step,machine,updateInterval,enableUpdates){
 
 
                     var self = this;
@@ -49,7 +50,7 @@ define('app/controllers/monitoring', [
                     this.updateInterval = updateInterval;
                     this.machine = machine;
                     // Enable/Disable Updates
-                    this.updateData = updateInterval == 0 ? false : true;
+                    this.updateData = enableUpdates;
 
                     // Show Fetching Message On Initial Request
                     self.machine.set('pendingStats', true);
@@ -127,7 +128,7 @@ define('app/controllers/monitoring', [
                     Mist.monitoringController.trigger('reloading',reason);
 
                     // Re-Initialize Request
-                    this.initiliaze(this.timeWindow,this.step,this.updateInterval,this.machine);
+                    this.initiliaze(this.timeWindow,this.step,this.machine,this.updateInterval,this.updateData);
                 },
 
                 printInfo: function(){
@@ -320,8 +321,19 @@ define('app/controllers/monitoring', [
             updateDataRequest: function(timeToRequestms,step){
                 window.clearInterval(window.monitoringInterval);
                 this.setupDataRequest(timeToRequestms,step);
-            }
+            },
 
+            /* Demo History Feature */
+            historyController : {
+                goBack: function(){
+
+                },
+                goForward: function(){
+
+                },
+
+                currentStopTime: null
+            }
 
         })
     }

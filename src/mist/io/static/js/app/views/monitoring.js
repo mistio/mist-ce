@@ -1113,7 +1113,7 @@ define('app/views/monitoring', [
                         //controller.setupDataRequest(timeToDisplay,10000);
                         
                         //var testTime = new Date( (new Date()).getTime() - 1000* 60* 60); DEBUG OLDER TIME
-                        controller.initialize(machine,timeToDisplay,10000,10000);
+                        controller.initialize(machine,timeToDisplay,10000,10000,true);
 
                         //self.setupLoadColorInterval(); Commented Out Until It's Time To Deploy This Feature TODO
 
