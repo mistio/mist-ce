@@ -47,11 +47,9 @@ body {
 .ui-mobile, .ui-mobile body {
     height: 0 !important;
 }
-
 .ui-page {
    height: 100%;
 }
-
 .small-padding {
     height: 10px;
     width: 100%;
@@ -144,9 +142,11 @@ textarea {
      */
     width: 315px; /* Useless, but leave it there for reference reasons */
 }
+/*
 .ui-panel-wrapper {
     height: 100% !important;
 }
+*/
 .side-panel .ui-panel-inner {
     padding: 7px;
 }

@@ -1,4 +1,4 @@
-<div id="single-machine-page" data-role="page">
+<div id="single-machine-page" data-role="page" class="ui-page-active">
     
     <div data-role="header" data-theme="b">
     
@@ -138,9 +138,13 @@
     </div>
     
     {{view Mist.ShellView}}
-    {{view Mist.MachinePowerPopup}}
+
     {{view Mist.MachineTagsView}}
+
+    {{view Mist.MachinePowerView}}
+
     {{view Mist.ConfirmationDialog}}
+
     {{view Mist.MachineManageKeysView}}
     
     <div data-role="popup">

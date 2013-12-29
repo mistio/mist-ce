@@ -97,7 +97,7 @@ define( 'app', [
                 ShellView,
                 ImageListView,
                 DeleteTagView,
-                MachinePowerPopup,
+                MachinePowerView,
                 MachineTagsView,
                 MachineManageKeysView,
                 MachineManageKeysListItemView,
@@ -300,9 +300,9 @@ define( 'app', [
         App.ImageListItemView = ImageListItem;
         App.MachineAddView = MachineAddDialog;
         App.BackendButtonView = BackendButton;
+        App.MachinePowerView = MachinePowerView;
         App.MachineListItemView = MachineListItem;
         App.SingleMachineView = SingleMachineView;
-        App.MachinePowerPopup = MachinePowerPopup;
         App.ConfirmationDialog = ConfirmationDialog;
         App.MachineActionsDialog = MachineActionsDialog;
         App.MachineManageKeysView = MachineManageKeysView;
