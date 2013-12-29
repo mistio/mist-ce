@@ -10,8 +10,14 @@ define('app/views/mistscreen', ['ember'],
             /**
              *  Initialization
              */
-
+            destroyElement: function() {
+                info('dist');
+            },
+            willInsertElement: function() {
+                info('will');  
+            },
             didInsertElement: function() {
+                info('yo');
                 if ($('[data-role=page]').page) {
                     $('[data-role=page]').page().show();
                 }

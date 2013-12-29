@@ -51,10 +51,8 @@ define( 'app', [
     'app/views/machine',
     'app/views/machine_list',
     'app/views/confirmation_dialog',
-    'app/views/machine_actions_dialog',
     'app/views/shell',
     'app/views/image_list',
-    'app/views/delete_tag',
     'app/views/machine_power',
     'app/views/machine_tags',
     'app/views/machine_manage_keys',
@@ -93,10 +91,8 @@ define( 'app', [
                 SingleMachineView,
                 MachineListView,
                 ConfirmationDialog,
-                MachineActionsDialog,
                 ShellView,
                 ImageListView,
-                DeleteTagView,
                 MachinePowerView,
                 MachineTagsView,
                 MachineManageKeysView,
@@ -133,7 +129,7 @@ define( 'app', [
 
         // Global constants
 
-        App.set('CSRFToken', '');
+        App.set('csrfToken', '');
         App.set('authenticated', AUTH || URL_PREFIX == '' ? true : false);
         App.set('email', EMAIL);
         App.set('password', '');
@@ -170,8 +166,8 @@ define( 'app', [
             };
             call.ajax = function() {
                 if (type != 'GET') {
-                    if (data) { data.csrf_token = App.CSRFToken; }
-                    else { data = {'csrf_token': App.CSRFToken}; }
+                    if (data) { data.csrf_token = App.csrfToken; }
+                    else { data = {'csrf_token': App.csrfToken}; }
                 }
                 $.ajax({
                     url: url,
@@ -281,33 +277,30 @@ define( 'app', [
 
         // Ember views
 
-        App.HomeView = Home;
-        App.RuleView = RuleView;
-        App.ShellView = ShellView;
-        App.KeyListView = KeyListView;
-        App.AddKeyView = KeyAddDialog;
-        App.ListItemView = ListItemView;
-        App.BackendAddView = BackendAdd;
-        App.UserMenuView = UserMenuView;
-        App.EditBackendView = EditBackend;
-        App.EditKeyView = KeyEditDialog;
-        App.ImageListView = ImageListView;
-        App.SingleKeyView = SingleKeyView;
-        App.DeleteTagView = DeleteTagView;
-        App.MachineTagsView = MachineTagsView;
-        App.KeyListItemView = KeyListItemView;
-        App.MachineListView = MachineListView;
-        App.MachineListView = MachineListView;
-        App.ImageListItemView = ImageListItem;
-        App.MachineAddView = MachineAddDialog;
-        App.BackendButtonView = BackendButton;
-        App.MachinePowerView = MachinePowerView;
-        App.MachineListItemView = MachineListItem;
-        App.SingleMachineView = SingleMachineView;
-        App.ConfirmationDialog = ConfirmationDialog;
-        App.MachineActionsDialog = MachineActionsDialog;
-        App.MachineManageKeysView = MachineManageKeysView;
-        App.MachineManageKeysListItemView = MachineManageKeysListItemView;
+        App.set('homeView', Home);
+        App.set('ruleView', RuleView);
+        App.set('shellView', ShellView);
+        App.keyListView = KeyListView;
+        App.addKeyView = KeyAddDialog;
+        App.set('listItemView', ListItemView);
+        App.set('backendAddView', BackendAdd);
+        App.set('userMenuView', UserMenuView);
+        App.set('editBackendView', EditBackend);
+        App.editKeyView = KeyEditDialog;
+        App.imageListView = ImageListView;
+        App.singleKeyView = SingleKeyView;
+        App.set('machineTagsView', MachineTagsView);
+        App.keyListItemView = KeyListItemView;
+        App.set('machineListView', MachineListView);
+        App.imageListItemView = ImageListItem;
+        App.set('machineAddView', MachineAddDialog);
+        App.set('backendButtonView', BackendButton);
+        App.set('machinePowerView', MachinePowerView);
+        App.set('machineListItemView', MachineListItem);
+        App.singleMachineView = SingleMachineView;
+        App.set('confirmationDialog', ConfirmationDialog);
+        App.machineManageKeysView = MachineManageKeysView;
+        App.machineManageKeysListItemView = MachineManageKeysListItemView;
 
         // Ember controllers
 

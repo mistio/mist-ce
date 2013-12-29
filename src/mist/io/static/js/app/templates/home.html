@@ -3,7 +3,7 @@
     <div data-role="header" data-theme="b">
 
         <h1>mist.io</h1>
-        {{view Mist.UserMenuView}}
+        {{view Mist.userMenuView}}
 
     </div>
 
@@ -18,7 +18,7 @@
 
         <div id="backend-buttons" data-role="controlgroup" data-type="horizontal">
             {{#each Mist.backendsController.content}}
-                {{view Mist.BackendButtonView
+                {{view Mist.backendButtonView
                        backendBinding="this"
                        classBinding="state"
                        data-icon="check"}}
@@ -56,8 +56,8 @@
 
     </div>
 
-    {{view Mist.BackendAddView}}
+    {{view Mist.backendAddView}}
 
-    {{view Mist.EditBackendView}}
+    {{view Mist.editBackendView}}
 
 </div>

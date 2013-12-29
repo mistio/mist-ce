@@ -57,22 +57,22 @@
         {{outlet}}
     </script>
     <script type="text/x-handlebars" data-template-name="index">
-        {{view Mist.HomeView}}
+        {{view Mist.homeView}}
     </script>
     <script type="text/x-handlebars" data-template-name="machines">
-        {{view Mist.MachineListView}}
+        {{view Mist.machineListView}}
     </script>
     <script type="text/x-handlebars" data-template-name="images">
-        {{view Mist.ImageListView}}
+        {{view Mist.imageListView}}
     </script>
     <script type="text/x-handlebars" data-template-name="machine">
-        {{view Mist.SingleMachineView}}
+        {{view Mist.singleMachineView}}
     </script>
     <script type="text/x-handlebars" data-template-name="keys">
-        {{view Mist.KeyListView}}
+        {{view Mist.keyListView}}
     </script>
     <script type="text/x-handlebars" data-template-name="key">
-        {{view Mist.SingleKeyView}}
+        {{view Mist.singleKeyView}}
     </script>
 </body>
 
