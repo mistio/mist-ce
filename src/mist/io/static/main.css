@@ -49,6 +49,7 @@ body {
 }
 .ui-page {
    height: 100%;
+   min-height: 100% !important;
 }
 .small-padding {
     height: 10px;
