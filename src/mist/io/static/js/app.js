@@ -118,6 +118,7 @@ define( 'app', [
         $(document).bind('mobileinit', function() {
             $('#splash').fadeOut(650);
             $.mobile.ajaxEnabled = false;
+            $.mobile.pushStateEnabled = false;
             $.mobile.linkBindingEnabled = false;
             $.mobile.hashListeningEnabled = false;
         });
