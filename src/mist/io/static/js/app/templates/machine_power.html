@@ -1,7 +1,10 @@
-<div id="machine-power-popup" class="tiny-popup" data-role="popup" data-overlay-theme="b" data-transition="slideup">
+<div id="machine-power-popup" class="tiny-popup" data-role="popup" data-overlay-theme="b" data-transition="slideup"
+                                                                            data-position-to="#machines-power-btn">
+
     <div data-role="header">
         <h1>Power</h1>
     </div>
+
     <div data-role="content">
         {{#if Mist.machinePowerController.canShutdown}}
         <a data-role="button" data-theme="b" {{action "actionClicked" "shutdown" target="view"}}>Shutdown</a>

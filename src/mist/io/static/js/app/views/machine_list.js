@@ -131,13 +131,14 @@ define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/ma
                             machine.set('selected', mode == 'all' || mode == backend.title);
                         });
                     });
-                    Ember.run.next(function() {
-                        $("input[type='checkbox']").checkboxradio('refresh');
-                    });
                 },
 
                 tagsClicked: function() {
                     Mist.machineTagsController.open(Mist.backendsController.selectedMachines[0]);
+                },
+
+                powerClicked: function() {
+                    Mist.machinePowerController.open(Mist.backendsController.selectedMachines[0]);
                 },
             }
         });
