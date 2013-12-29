@@ -216,6 +216,6 @@ define('app/controllers/monitoring', [
                     }
                 });
             }
-        })
+        });
     }
 );
