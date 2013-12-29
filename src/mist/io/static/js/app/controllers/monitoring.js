@@ -103,7 +103,10 @@ define('app/controllers/monitoring', [
                     }
                 },
 
-                changeStep: function(){},
+                changeStep: function(newStep){
+                    this.step = newStep;
+                    this.reload('stepChanged');
+                },
                 changeTimeWindow: function(){},
 
                 enableUpdates: function(){
@@ -130,13 +133,6 @@ define('app/controllers/monitoring', [
                     // Re-Initialize Request
                     this.initiliaze(this.timeWindow,this.step,this.machine,this.updateInterval,this.updateData);
                 },
-
-                printInfo: function(){
-                    console.log("Time Window    : " + (this.timeWindow/1000) + " seconds");
-                    console.log("Last Metric    : " + this.lastMetrictime);
-                    console.log("Step           : " + (this.step/1000) + " seconds");
-                    console.log("Update Interval: " + this.updateInterval)
-                }, 
 
 
                 // Private functions
@@ -173,7 +169,8 @@ define('app/controllers/monitoring', [
                                 if(data.load.length == 0)
                                     throw "Error, Received none measurements";
                                 else if(data.load.length > measurmentsExpected)
-                                    throw "Error, Received more measurements than expected";
+                                    throw ("Error, Received more measurements than expected, " + 
+                                            data.load.length + " instead of " + measurmentsExpected);
 
                                 var disks = [];
                                 var netInterfaces = [];
@@ -306,6 +303,13 @@ define('app/controllers/monitoring', [
                         }
                     });
                 },
+
+                printInfo: function(){
+                    console.log("Time Window    : " + (this.timeWindow/1000) + " seconds");
+                    console.log("Last Metric    : " + this.lastMetrictime);
+                    console.log("Step           : " + (this.step/1000) + " seconds");
+                    console.log("Update Interval: " + this.updateInterval)
+                }, 
 
                 // Private Variables
                 machine        : null,
