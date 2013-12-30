@@ -21,10 +21,8 @@ define('app/controllers/backend_add', [
                 $('#addBackendOpenstack').hide();
                 $('#addBackendBareMetal').hide();                    
                 $('#addBackendInfo').show();                                                                            
-                /* OpenStack support
                 this.set('newBackendURL', null);
                 this.set('newBackendTenant', null);
-                */
                 $('.select-backend-collapsible .ui-icon').removeClass('ui-icon-check').addClass('ui-icon-arrow-d');
                 $('.select-backend-collapsible span.ui-btn-text').text('Select provider');
             },
@@ -33,8 +31,8 @@ define('app/controllers/backend_add', [
                 if (this.get('newBackendProvider') &&
                     this.get('newBackendKey') &&
                     this.get('newBackendSecret')) {
-                        /* OpenStack support
-                        if (this.get('newBackendProvider').title == 'OpenStack') {
+                        /* HP Cloud support */
+                        if (this.get('newBackendProvider').title.indexOf('HP Cloud') != -1) {
                             if (!(this.get('newBackendURL') &&
                                   this.get('newBackendTenant'))) {
                                       this.set('newBackendReady', false);
@@ -42,7 +40,14 @@ define('app/controllers/backend_add', [
                                       return;
                                   }
                         }
-                        */
+                        /* OpenStack */                        
+                        if (this.get('newBackendProvider').title.indexOf('OpenStack') != -1) {
+                            if (!(this.get('newBackendURL'))) {
+                                      this.set('newBackendReady', false);
+                                      $('#create-backend-ok').button('disable');
+                                      return;
+                                  }
+                        }
                         this.set('newBackendReady', true);
                         $('#create-backend-ok').button('enable');
                 } else if (this.get('newBareMetalServerIP') &&
@@ -64,11 +69,8 @@ define('app/controllers/backend_add', [
                 this.addObserver('newBareMetalServerIP', this, this.updateNewBackendReady);                
                 this.addObserver('newBareMetalServerKey', this, this.updateNewBackendReady);                
                 this.addObserver('newBareMetalServerUser', this, this.updateNewBackendReady);                                
-                                                                
-                /* OpenStack support
                 this.addObserver('newBackendURL', this, this.updateNewBackendReady);
-                this.addObserver('newBackendTenant', this, this.updateNewBackendTenant);
-                */
+                this.addObserver('newBackendTenant', this, this.updateNewBackendReady);
             }
         });
     }

@@ -62,7 +62,11 @@ define('app/views/backend_add', [
                     $('#ApiKeylabel').text('2. Username:');
                     $('#ApiSecretlabel').text('3. Password:');
                     $('#addBackendOpenstack').show();
-                    $('#addBackendBareMetal').hide();                    
+                    $('#addBackendBareMetal').hide(); 
+                    //This is the apiurl for HPCloud. We autocomplete the api url instead of hiding this field, for consistency with openstack
+                    if (event.target.title.indexOf("region-") != -1) {
+                        Mist.backendAddController.set('newBackendURL', 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/');
+                    }
                 } else if (event.target.title.indexOf("bare_metal") != -1) {
                     // TODO: Render keys...
                     $('#addBackendInfo').hide();
@@ -139,7 +143,7 @@ define('app/views/backend_add', [
                     "provider": Mist.backendAddController.newBackendProvider.provider,
                     "apikey" : Mist.backendAddController.newBackendKey,
                     "apisecret": Mist.backendAddController.newBackendSecret,
-                    "apiurl": Mist.backendAddController.newBackendUrl,
+                    "apiurl": Mist.backendAddController.newBackendURL,
                     "tenant_name": Mist.backendAddController.newBackendTenant,
                     "machine_ip_address": Mist.backendAddController.newBareMetalServerIP,                    
                     "machine_key": Mist.backendAddController.newBareMetalServerKey,                    
