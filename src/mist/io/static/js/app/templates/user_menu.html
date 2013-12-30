@@ -9,7 +9,7 @@
 
     <div data-role="content">
 
-        {{#if EMAIL}}
+        {{#if view.gravatarURL}}
         <img class="gravatar-image" {{bind-attr src="view.gravatarURL"}}/>
         <div class="userEmail">{{EMAIL}}</div>
 
