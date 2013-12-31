@@ -46,6 +46,8 @@ define('app/controllers/machines', ['app/models/machine'],
 
             newMachine: function(name, image, size, location, key, script) {
                 
+                // TODO: CLEAN ME UP!!!
+                
                 this.backend.set('create_pending', true);
                 
                 if (this.backend.provider.search('rackspace_first_gen') > -1) {

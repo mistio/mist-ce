@@ -29,9 +29,9 @@ define('app/controllers/machine_add', ['ember'],
              */
 
             open: function(callback) {
+                $('#create-machine-panel').panel('open');
                 this._clear();
                 this.set('callback', callback);
-                $('#create-machine-panel').panel('open');
             },
 
 
@@ -96,17 +96,20 @@ define('app/controllers/machine_add', ['ember'],
                         return;
                     }
                 }
+
                 var that = this;
-                this.newMachineProvider.machines
-                    .newMachine(this.newMachineName,
-                                this.newMachineImage,
-                                this.newMachineSize,
-                                this.newMachineLocation,
-                                this.newMachineKey,
-                                this.newMachineScript,
-                                function(success, machine) {
-                                    that._giveCallback(success, machine);
-                                });
+                this.newMachineProvider.machines.newMachine(
+                        this.newMachineName,
+                        this.newMachineImage,
+                        this.newMachineSize,
+                        this.newMachineLocation,
+                        this.newMachineKey,
+                        this.newMachineScript,
+                        function(success, machine) {
+                            that._giveCallback(success, machine);
+                        }
+                );
+
                 this.close();
             },
 
