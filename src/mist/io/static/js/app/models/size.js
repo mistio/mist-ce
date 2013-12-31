@@ -1,8 +1,8 @@
 define('app/models/size', ['ember'],
     /**
-     * Size Model
+     *  Size Model
      *
-     * @returns Class
+     *  @returns Class
      */
     function () {
         return Ember.Object.extend({
