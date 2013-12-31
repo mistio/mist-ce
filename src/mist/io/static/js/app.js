@@ -119,7 +119,7 @@ define( 'app', [
             $.mobile.hashListeningEnabled = false;
         });
 
-        // Create Ember Application
+        // Ember Application
 
         App = Ember.Application.create({
             ready: function() {
@@ -280,27 +280,27 @@ define( 'app', [
         App.set('homeView', Home);
         App.set('ruleView', RuleView);
         App.set('shellView', ShellView);
-        App.keyListView = KeyListView;
-        App.addKeyView = KeyAddDialog;
+        App.set('keyListView', KeyListView);
+        App.set('addKeyView', KeyAddDialog);
         App.set('listItemView', ListItemView);
         App.set('backendAddView', BackendAdd);
         App.set('userMenuView', UserMenuView);
         App.set('editBackendView', EditBackend);
-        App.editKeyView = KeyEditDialog;
-        App.imageListView = ImageListView;
-        App.singleKeyView = SingleKeyView;
+        App.set('editKeyView', KeyEditDialog);
+        App.set('imageListView', ImageListView);
+        App.set('singleKeyView', SingleKeyView);
         App.set('machineTagsView', MachineTagsView);
-        App.keyListItemView = KeyListItemView;
+        App.set('keyListItemView', KeyListItemView);
         App.set('machineListView', MachineListView);
-        App.imageListItemView = ImageListItem;
+        App.set('imageListItemView', ImageListItem);
         App.set('machineAddView', MachineAddDialog);
         App.set('backendButtonView', BackendButton);
         App.set('machinePowerView', MachinePowerView);
         App.set('machineListItemView', MachineListItem);
-        App.singleMachineView = SingleMachineView;
+        App.set('singleMachineView', SingleMachineView);
         App.set('confirmationDialog', ConfirmationDialog);
-        App.machineManageKeysView = MachineManageKeysView;
-        App.machineManageKeysListItemView = MachineManageKeysListItemView;
+        App.set('machineManageKeysView', MachineManageKeysView);
+        App.set('machineManageKeysListItemView', MachineManageKeysListItemView);
 
         // Ember controllers
 

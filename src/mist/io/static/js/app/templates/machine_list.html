@@ -6,7 +6,7 @@
 
         <h1>Machines</h1>
 
-        {{view Mist.UserMenuView}}
+        {{view Mist.userMenuView}}
 
     </div>
 
@@ -27,7 +27,7 @@
         <ul id="machines" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter...">
             {{#each Mist.backendsController.content}}
                 {{#each this.machines.content}}
-                    {{view Mist.MachineListItemView machineBinding="this" class="checkbox-link"}}
+                    {{view Mist.machineListItemView machineBinding="this" class="checkbox-link"}}
                 {{/each}}
             {{/each}}
         </ul>
@@ -36,15 +36,15 @@
 
     </div>
 
-    {{view Mist.ShellView}}
+    {{view Mist.shellView}}
     
-    {{view Mist.MachineAddView}}
+    {{view Mist.machineAddView}}
     
-    {{view Mist.MachineTagsView}}
+    {{view Mist.machineTagsView}}
 
-    {{view Mist.MachinePowerView}}
+    {{view Mist.machinePowerView}}
 
-    {{view Mist.ConfirmationDialog}}
+    {{view Mist.confirmationDialog}}
 
     <div id="select-machines-popup" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-machines-btn">
         <ul data-role="listview">
