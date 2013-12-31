@@ -1,10 +1,10 @@
 define('app/controllers/sizes', ['app/models/size'],
     /**
      *  Sizes Controller
-     * 
+     *
      *  @returns Class
      */
-    function(Size) {
+    function (Size) {
         return Ember.ArrayController.extend(Ember.Evented, {
 
             /**
@@ -16,26 +16,26 @@ define('app/controllers/sizes', ['app/models/size'],
             backend: null,
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
-            load: function() {
+            load: function () {
 
                 if (!this.backend.enabled) return;
 
                 var that = this;
                 this.set('loading', true);
                 Mist.ajaxGET('/backends/' + this.backend.id + '/sizes', {
-                }).success(function(sizes) {
+                }).success(function (sizes) {
                     if (!that.backend.enabled) return;
                     that._setContent(sizes);
-                }).error(function() {
+                }).error(function () {
                     if (!that.backend.enabled) return;
                     Mist.notificationController.notify('Failed to load sizes for ' + that.backend.title);
                     that.backend.set('enabled', false);
-                }).complete(function(success) {
+                }).complete(function (success) {
                     if (!that.backend.enabled) return;
                     that.set('loading', false);
                     that.trigger('onLoad');
@@ -45,13 +45,13 @@ define('app/controllers/sizes', ['app/models/size'],
 
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
-            clear: function() {
-                Ember.run(this, function() {
+            clear: function () {
+                Ember.run(this, function () {
                     this.set('content', []);
                     this.set('loading', false);
                     this.trigger('onSizeListChange');
@@ -59,23 +59,23 @@ define('app/controllers/sizes', ['app/models/size'],
             },
 
 
-            getSize: function(sizeId) {
+            getSize: function (sizeId) {
                 return this.content.findBy('id', sizeId);
             },
 
 
 
             /**
-             * 
+             *
              *  Pseudo-Private Methods
-             * 
+             *
              */
 
-            _setContent: function(sizes) {
+            _setContent: function (sizes) {
                 var that = this;
-                Ember.run(function() {
+                Ember.run(function () {
                     that.set('content', []);
-                    sizes.forEach(function(size) {
+                    sizes.forEach(function (size) {
                         that.content.pushObject(Size.create(size));
                     });
                     that.trigger('onSizeListChange');
