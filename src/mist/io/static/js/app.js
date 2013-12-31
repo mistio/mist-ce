@@ -37,7 +37,6 @@ define( 'app', [
     'app/controllers/machine_power',
     'app/controllers/key_add',
     'app/controllers/key_edit',
-    'app/controllers/select_images',
     'app/controllers/keys',
     'app/controllers/machine_tags',
     'app/controllers/rules',
@@ -77,7 +76,6 @@ define( 'app', [
                 MachinePowerController,
                 KeyAddController,
                 KeyEditController,
-                SelectImagesController,
                 KeysController,
                 MachineTagsController,
                 RulesController,
@@ -316,7 +314,6 @@ define( 'app', [
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
         App.set('machinePowerController', MachinePowerController.create());
-        App.set('selectImagesController', SelectImagesController.create());
 
         // Ember custom widgets
 
