@@ -1,12 +1,8 @@
-define('app/controllers/rules', [
-    'app/models/rule',
-    'ember',
-    'jquery'
-    ],
+define('app/controllers/rules', ['app/models/rule', 'ember'],
     /**
-     * Rules controller
+     *  Rules Controller
      *
-     * @returns Class
+     *  @returns Class
      */
     function(Rule) {
         return Ember.ArrayController.extend({

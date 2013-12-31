@@ -1,54 +1,61 @@
-define('app/controllers/notification', [
-    'ember',
-    'jquery',
-    ],
+define('app/controllers/notification', ['ember'],
     /**
-     * Notification controller
+     *  Notification Controller
      *
-     * @returns Class
+     *  @returns Class
      */
-    function() {
+    function () {
         return Ember.Object.extend({
+
+            /**
+             *  Properties
+             */
 
             timeout: false,
 
-            notify: function(message) {
-                $.mobile.loading( 'show', {
-                            text: message,
-                            textVisible: true,
-                            textonly: true,
-                            theme: 'b'
+            /**
+             *
+             *  Methods
+             *
+             */
+
+            notify: function (message) {
+                $.mobile.loading('show', {
+                    text: message,
+                    textVisible: true,
+                    textonly: true,
+                    theme: 'b'
                 });
-                Ember.run.later(function() {
+                Ember.run.later(function () {
                     $.mobile.loading('hide');
                 }, this.timeout ? this.timeout : 2000);
             },
-            
-            warn: function(message) {
-                $.mobile.loading( 'show', {
-                            text: message,
-                            textVisible: true,
-                            textonly: true,
-                            theme: 'b'
+
+            warn: function (message) {
+                $.mobile.loading('show', {
+                    text: message,
+                    textVisible: true,
+                    textonly: true,
+                    theme: 'b'
                 });
-                Ember.run.later(function() {
+                Ember.run.later(function () {
                     $.mobile.loading('hide');
                 }, this.timeout ? this.timeout : 5000);
             },
 
-            timeNotify: function(message, miliseconds){
-                if(this.timeout){
+            timeNotify: function (message, miliseconds) {
+                if (this.timeout) {
                     clearTimeout(this.timeout);
                 }
-                log("warning: " + message);
-                $.mobile.loading( 'show', {
-                            text: message,
-                            textVisible: true,
-                            textonly: true,
-                            theme: $.mobile.pageLoadErrorMessageTheme
+                log('warning: ' + message);
+                $.mobile.loading('show', {
+                    text: message,
+                    textVisible: true,
+                    textonly: true,
+                    theme: $.mobile.pageLoadErrorMessageTheme
                 });
                 this.timeout = setTimeout("$.mobile.loading( 'hide' )", miliseconds);
-            },            
+            },
         });
     }
 );
