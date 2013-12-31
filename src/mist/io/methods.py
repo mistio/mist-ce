@@ -675,10 +675,10 @@ def _create_machine_openstack(conn, private_key, public_key, script, machine_nam
     sanitized by create_machine.
 
     """
-
-    key = str(public_key).replace('\n','')
+    key = SSHKeyDeployment(str(public_key))
     deploy_script = ScriptDeployment(script)
     msd = MultiStepDeployment([key, deploy_script])
+    key = str(public_key).replace('\n','')
     
     try:
         server_key = ''
