@@ -701,7 +701,7 @@ def _create_machine_openstack(conn, private_key, public_key, script, machine_nam
                                     location=location, 
                                     deploy=msd,
                                     ssh_key=tmp_key_path,    
-                                    max_tries=10,
+                                    ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                                     ex_keyname=server_key)
         except Exception as e:
             raise MachineCreationError("OpenStack, got exception %s" % e)
