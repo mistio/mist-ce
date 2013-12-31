@@ -4,15 +4,21 @@ define('app/models/size', ['ember'],
      *
      * @returns Class
      */
-    function() {
+    function () {
         return Ember.Object.extend({
+
+            /**
+             *  Properties
+             */
+
             id: null,
             ram: null,
             name: null,
             disk: null,
             price: null,
             driver: null,
-            bandwidth: null,
+            bandwidth: null
+
         });
     }
 );
