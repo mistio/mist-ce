@@ -302,7 +302,7 @@ def list_keys(request):
 @view_config(route_name='keys', request_method='PUT', renderer='json')
 def add_key(request):
     params = request.json_body
-    key_id = params.get('name', '')
+    key_id = params.get('id', '')
     private_key = params.get('priv', '')
 
     user = user_from_request(request)
@@ -311,9 +311,8 @@ def add_key(request):
     keypair = user.keypairs[key_id]
 
     return {'id': key_id,
-            'name': key_id,
-            'machines': keypair.machines,
-            'default': keypair.default}
+            'default': keypair.default,
+            'machines': keypair.machines}
 
 
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
@@ -360,8 +359,7 @@ def set_default_key(request):
     return OK
 
 
-@view_config(route_name='key_action', request_method='GET',
-             request_param='action=private', renderer='json')
+@view_config(route_name='key_private', request_method='GET', renderer='json')
 def get_private_key(request):
     """Gets private key from keypair name.
 
@@ -379,8 +377,7 @@ def get_private_key(request):
     return user.keypairs[key_id].private
 
 
-@view_config(route_name='key_action', request_method='GET',
-             request_param='action=public', renderer='json')
+@view_config(route_name='key_public', request_method='GET', renderer='json')
 def get_public_key(request):
     user = user_from_request(request)
     key_id = request.matchdict['key']

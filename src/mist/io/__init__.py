@@ -134,6 +134,8 @@ def add_routes(config):
 
     config.add_route('keys', '/keys')
     config.add_route('key_action', '/keys/{key}')
+    config.add_route('key_public', '/keys/{key}/public')
+    config.add_route('key_private', 'keys/{key}/private')
     config.add_route('key_association',
                      '/backends/{backend}/machines/{machine}/keys/{key}')
 
