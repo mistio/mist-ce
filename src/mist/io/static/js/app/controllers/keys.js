@@ -1,8 +1,8 @@
 define(['app/models/key'],
     /**
-     * Keys Controller
+     *  Keys Controller
      *
-     * @returns Class
+     *  @returns Class
      */
     function(Key) {
         return Ember.ArrayController.extend(Ember.Evented, {
@@ -40,7 +40,7 @@ define(['app/models/key'],
                     that._reload();
                 }).complete(function(success) {
                     that.set('loading', false);
-                    that.trigger('onLoad');
+                    that.trigger('onLoad', this);
                 });
             }.on('init'),
 
