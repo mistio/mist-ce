@@ -341,12 +341,12 @@ def delete_key(request):
 def edit_key(request):
 
     old_id = request.matchdict['key']
-    key_id = request.json_body.get('newName')
-    if not key_id:
-        raise RequiredParameterMissingError("new key name")
+    new_id = request.json_body.get('new_id')
+    if not new_id:
+        raise RequiredParameterMissingError("new_id")
 
     user = user_from_request(request)
-    methods.edit_key(user, key_id, old_id)
+    methods.edit_key(user, new_id, old_id)
     return OK
 
 
