@@ -45,6 +45,7 @@ define('app/controllers/monitoring', [
                     var controller = Mist.monitoringController;
                     var timeGap = 60;
 
+                    this.locked = true;
                     this.step = step;
                     this.timeWindow = timeWindow;
                     this.updateInterval = updateInterval;
@@ -74,13 +75,12 @@ define('app/controllers/monitoring', [
                     */
 
                     this.receiveData(start, stop, self.step);
-                
 
 
                     // Check if Data Updates Are Enabled
                     if(this.updateData){
                         window.monitoringInterval = window.setInterval(function() {
-
+                            self.locked = true;
                             var start = Math.floor( self.lastMetrictime.getTime() /1000 ) ;
                             var stop =  Math.floor( ((new Date()).getTime() - timeGap * 1000 ) / 1000 );
                             var stopRemainder = (stop - start) % (self.step/1000);
@@ -98,7 +98,6 @@ define('app/controllers/monitoring', [
                             controller.machineNotResponding = false;
 
                             self.receiveData(start, stop, self.step);
-
                         },updateInterval);
                     }
                 },
@@ -123,15 +122,31 @@ define('app/controllers/monitoring', [
                 *   reason : Values(manualReload,updatesDisabled,updatesEnabled)
                 */
                 reload: function(reason){
-                    // Clear Intervals 
-                    this.stopDataUpdates();
 
-                    reason = (typeof reason == 'undefined' ? 'manualReload' : reason);
+                    var self = this;
 
-                    Mist.monitoringController.trigger('reloading',reason);
+                    var reload = function(){
 
-                    // Re-Initialize Request
-                    this.initiliaze(this.timeWindow,this.step,this.machine,this.updateInterval,this.updateData);
+                        if(self.locked){
+                            console.log("Waiting For Action To Finish");
+                            window.setTimeout(reload,1000);
+                        }
+                        else{
+                            console.log("reloading");
+                           // Clear Intervals 
+                           self.stopDataUpdates();
+
+                           reason = (typeof reason == 'undefined' ? 'manualReload' : reason);
+
+                           Mist.monitoringController.trigger('reloading',reason);
+
+                           // Re-Initialize Request
+                           self.initiliaze(self.timeWindow,self.step,self.machine,self.updateInterval,self.updateData); 
+                        }
+
+                    };
+
+                    reload();
                 },
 
 
@@ -280,6 +295,7 @@ define('app/controllers/monitoring', [
                                 controller.trigger("dataFetchFinished",false);
                             }
 
+                            self.locked = false;
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
 
@@ -317,7 +333,8 @@ define('app/controllers/monitoring', [
                 timeWindow     : 0,
                 step           : 0,
                 updateData     : false,
-                updateInterval : 0
+                updateInterval : 0,
+                locked         : false
 
             },
 
