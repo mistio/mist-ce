@@ -55,7 +55,7 @@ define('app/controllers/monitoring', [
 
                     // Show Fetching Message On Initial Request
                     self.machine.set('pendingStats', true);
-                    controller.one('dataFetchFinished',function(){
+                    controller.one('dataFetchFinished',function() {
                         machine.set('pendingStats', false);
                     });
 
@@ -100,6 +100,42 @@ define('app/controllers/monitoring', [
                             self.receiveData(start, stop, self.step);
                         },updateInterval);
                     }
+                },
+
+                // Posible options, Stop,Step,Timewindow
+                custom : function(options){
+
+                    var timeGap          = 60;
+                    var timeWindow       = this.timeWindow;
+                    var step             = this.step;
+                    var stop             = Math.floor( ( (new Date()).getTime() - timeGap * 1000) / 1000 );
+                    var start            = Math.floor( stop - timeWindow/1000 );
+
+
+                    if(options){
+                        if ('stop' in options){
+                            stop  = Math.floor(options['stop'] - timeGap);
+                            start = Math.floor( stop - timeWindow/1000 );
+                        }
+                        
+                        if ('step' in options)
+                            step = options['step'];
+                        
+                        if ('timeWindow' in options)
+                            timeWindowSize = options['timeWindow'];
+                    }
+
+
+                    this.machine.set('pendingStats', true);
+                    Mist.monitoringController.one('dataFetchFinished',function() {
+                        Mist.monitoringController.request.machine.set('pendingStats', false);
+                    });
+
+
+                    this.receiveData(start, stop, step);
+
+
+
                 },
 
                 changeStep: function(newStep){
