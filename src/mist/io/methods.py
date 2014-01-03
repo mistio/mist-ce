@@ -128,7 +128,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
             except InvalidCredsError:
                 raise BackendUnauthorizedError()
             except Exception as exc:
-                log.error("Error while trying list_nodes: %r". exc)
+                log.error("Error while trying list_nodes: %r", exc)
                 raise BackendUnavailableError()
 
         with user.lock_n_load():
