@@ -15,7 +15,7 @@
             {{#if Mist.keysController.generatingKey}}
                 <div class="ajax-loader create-key-loader"></div>
             {{/if}}
-            {{#if Mist.keysController.uploadingKey}}
+            {{#if Mist.keyAddController.uploadingKey}}
                 <div class="ajax-loader create-key-loader"></div>
             {{/if}}
         </label>
@@ -38,7 +38,5 @@
             <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
             <button id="create-key-ok" data-theme="b" {{action "doneClicked" target="view"}}>Done</button>
         </div>
-
     </div>
-
 </div>

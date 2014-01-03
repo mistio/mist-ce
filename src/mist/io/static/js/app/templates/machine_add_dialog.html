@@ -83,11 +83,11 @@
         {{#if Mist.keysController.content.length}}
         <div id="create-machine-key" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
                                                                                   data-expanded-icon="arrow-u">
-            <h2>{{Mist.machineAddController.newMachineKey.name}}</h2>
+            <h2>{{Mist.machineAddController.newMachineKey.id}}</h2>
             <ul data-role="listview">
                 {{#each Mist.keysController.content}}
                     <li data-icon="false">
-                        <a {{action "selectKey" this target="view"}}>{{this.name}}</a>
+                        <a {{action "selectKey" this target="view"}}>{{this.id}}</a>
                     </li>
                 {{/each}}
             </ul>

@@ -4,24 +4,34 @@ define('app/views/list_item', ['ember'],
      *
      *  @returns Class
      */
-    function() {
+    function () {
         return Ember.View.extend({
 
             /**
-             *  Initialization
+             *  Properties
              */
 
-            renderListItem: function() {
-                
+            tagName: 'li',
+
+
+            /**
+             *
+             *  Initialization
+             *
+             */
+
+            renderListItem: function () {
+
                 // Prevent bad rendering
-                
+                // (or at least... try to...)
+
                 var element = $('#' + this.elementId).hide();
-                Ember.run.next(this, function() {
-                    element = element.trigger('create')
-                                     .show()
-                                     .parent();
+                Ember.run.next(this, function () {
                     try {
-                        element.listview('refresh');
+                        element.trigger('create')
+                            .show()
+                            .parent()
+                            .listview('refresh');
                     } catch (e) {}
                 });
             }.on('didInsertElement')

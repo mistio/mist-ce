@@ -4,7 +4,7 @@ define('app/views/key_list_item', ['app/views/list_item', 'text!app/templates/ke
      *
      *  @returns Class
      */
-    function(ListItemView, key_list_item_html) {
+    function (ListItemView, key_list_item_html) {
         return ListItemView.extend({
 
             /**
@@ -12,8 +12,8 @@ define('app/views/key_list_item', ['app/views/list_item', 'text!app/templates/ke
              */
 
             key: null,
-            tagName:'li',
             template: Ember.Handlebars.compile(key_list_item_html),
+
 
             /**
              *
@@ -21,9 +21,9 @@ define('app/views/key_list_item', ['app/views/list_item', 'text!app/templates/ke
              *
              */
 
-            updateCheckbox: function() {
-                Ember.run.next(this, function() {
-                    var element = $('#' + this.elementId + ' input.ember-checkbox');
+            updateCheckbox: function () {
+                var element = $('#' + this.elementId + ' input.ember-checkbox');
+                Ember.run.next(this, function () {
                     if (element.checkboxradio) {
                         element.checkboxradio()
                                .checkboxradio('refresh');
@@ -32,16 +32,15 @@ define('app/views/key_list_item', ['app/views/list_item', 'text!app/templates/ke
             },
 
 
-
             /**
              *
              *  Observers
              *
              */
 
-             keySelectedObserver: function() {
+            keySelectedObserver: function () {
                 Ember.run.once(this, 'updateCheckbox');
-             }.observes('key.selected')
+            }.observes('key.selected')
         });
     }
 );

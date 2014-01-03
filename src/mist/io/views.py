@@ -258,26 +258,18 @@ def rename_backend(request):
 @view_config(route_name='backend_action', request_method='POST')
 def toggle_backend(request):
     backend_id = request.matchdict['backend']
-    new_state = request.json_body.get('newState', '')
+    new_state = request.json_body.get('new_state', '')
     if not new_state:
         raise RequiredParameterMissingError('new_state')
 
-    # FIXME
-    if new_state == "True":
-        new_state = True
-    elif new_state == "False":
-        new_state = False
-    else:
-        ## raise BadRequestError('Invalid backend state')
-        log.warning("something funcky going on with state toggling, "
-                    "what's '%r' supposed to mean?", new_state)
-        new_state = True
+    if new_state != "1" and new_state != "0":
+        raise BadRequestError('Invalid backend state')
 
     user = user_from_request(request)
     if backend_id not in user.backends:
         raise BackendNotFoundError()
     with user.lock_n_load():
-        user.backends[backend_id].enabled = new_state
+        user.backends[backend_id].enabled = bool(int(new_state))
         user.save()
 
     return OK
@@ -293,9 +285,8 @@ def list_keys(request):
     """
     user = user_from_request(request)
     return [{'id': key.replace(' ', ''),
-             'name': key,
              'machines': user.keypairs[key].machines,
-             'default_key': user.keypairs[key].default}
+             'isDefault': user.keypairs[key].default}
             for key in user.keypairs]
 
 
@@ -311,8 +302,8 @@ def add_key(request):
     keypair = user.keypairs[key_id]
 
     return {'id': key_id,
-            'default': keypair.default,
-            'machines': keypair.machines}
+            'machines': keypair.machines,
+            'isDefault': keypair.default}
 
 
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
@@ -337,7 +328,7 @@ def delete_key(request):
     return list_keys(request)
 
 
-@view_config(route_name='key_action', request_method='PUT')
+@view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
 
     old_id = request.matchdict['key']
@@ -347,7 +338,7 @@ def edit_key(request):
 
     user = user_from_request(request)
     methods.edit_key(user, new_id, old_id)
-    return OK
+    return {'new_id': new_id}
 
 
 @view_config(route_name='key_action', request_method='POST')
@@ -643,7 +634,7 @@ def update_available_keys(user, backend_id, machine_id, authorized_keys):
     ret = [{'name': key,
             'machines': keypairs[key].machines,
             'pub': keypairs[key].public,
-            'default_key': keypairs[key].default
+            'isDefault': keypairs[key].default
             } for key in updated_keypairs]
 
     return ret

@@ -34,6 +34,7 @@ define( 'app', [
     'app/controllers/backend_add',
     'app/controllers/backend_edit',
     'app/controllers/machine_add',
+    'app/controllers/machine_keys',
     'app/controllers/machine_power',
     'app/controllers/key_add',
     'app/controllers/key_edit',
@@ -54,8 +55,8 @@ define( 'app', [
     'app/views/image_list',
     'app/views/machine_power',
     'app/views/machine_tags',
-    'app/views/machine_manage_keys',
-    'app/views/machine_manage_keys_list_item',
+    'app/views/machine_keys',
+    'app/views/machine_keys_list_item',
     'app/views/key_list_item',
     'app/views/key_list',
     'app/views/key',
@@ -73,6 +74,7 @@ define( 'app', [
                 BackendAddController,
                 BackendEditController,
                 MachineAddController,
+                MachineKeysController,
                 MachinePowerController,
                 KeyAddController,
                 KeyEditController,
@@ -93,8 +95,8 @@ define( 'app', [
                 ImageListView,
                 MachinePowerView,
                 MachineTagsView,
-                MachineManageKeysView,
-                MachineManageKeysListItemView,
+                MachineKeysView,
+                MachineKeysListItemView,
                 KeyListItemView,
                 KeyListView,
                 SingleKeyView,
@@ -297,8 +299,8 @@ define( 'app', [
         App.set('machineListItemView', MachineListItem);
         App.set('singleMachineView', SingleMachineView);
         App.set('confirmationDialog', ConfirmationDialog);
-        App.set('machineManageKeysView', MachineManageKeysView);
-        App.set('machineManageKeysListItemView', MachineManageKeysListItemView);
+        App.set('machineKeysView', MachineKeysView);
+        App.set('machineKeysListItemView', MachineKeysListItemView);
 
         // Ember controllers
 
@@ -311,6 +313,7 @@ define( 'app', [
         App.set('backendAddController', BackendAddController.create());
         App.set('backendEditController', BackendEditController.create());
         App.set('machineTagsController', MachineTagsController.create());
+        App.set('machineKeysController', MachineKeysController.create());
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
         App.set('machinePowerController', MachinePowerController.create());
@@ -382,24 +385,6 @@ define( 'app', [
             }
         });
 
-        App.TagTextField = Ember.TextField.extend({
-            attributeBindings: [
-                'name',
-                'data-theme',
-                'autocapitalize'
-            ],
-            insertNewline: function() {
-                this._parentView.submit();
-            },
-            keyUp: function() {
-                if (this.value && this.value.length > 0) {
-                    $('#tag-add').removeClass('ui-disabled');
-                } else {
-                    $('#tag-add').addClass('ui-disabled');
-                }
-            }
-        });
-
         App.Checkbox = Ember.Checkbox.extend({
             attributeBindings: ['id', 'data-inline']
         });
@@ -407,17 +392,9 @@ define( 'app', [
         // Mist functions
 
         App.isScrolledToBottom = function() {
-            var distanceToViewportTop = (
-                $(document).height() - $(window).height());
-            var viewPortTop = $(document).scrollTop();
-
-            if (viewPortTop === 0) {
-                // if we are at the top of the page, don't do
-                // the infinite scroll thing
-                return false;
-            }
-
-            return (viewPortTop - distanceToViewportTop === 0);
+            var page = $('.ui-page');
+            var content = $('.ui-content').eq(0);
+            return content.height() - page.height() - page.scrollTop() < 50;
         };
 
         App.getKeyIdByUrl = function() {

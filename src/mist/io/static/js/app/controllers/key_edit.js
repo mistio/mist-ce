@@ -4,47 +4,50 @@ define('app/controllers/key_edit', ['ember'],
      *
      *  @returns Class
      */
-    function() {
+    function () {
         return Ember.Object.extend({
 
             /**
              *  Properties
              */
 
+            keyId: null,
+            newKeyId: null,
             callback: null,
             formReady: false,
 
-            keyId: null,
-            newKeyId: null,
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
-            open: function(keyId, callback) {
+            open: function (keyId, callback) {
                 $('#rename-key-popup').popup('open');
                 this._clear();
-                this.set('callback', callback);
-                this.set('newKeyId', keyId);
-                this.set('keyId', keyId);
+                this.set('keyId', keyId)
+                    .set('newKeyId', keyId)
+                    .set('callback', callback);
             },
 
 
-            close: function() {
+            close: function () {
                 $('#rename-key-popup').popup('close');
                 this._clear();
             },
 
 
-            save: function() {
+            save: function () {
 
-                if (this.keyId == this.newKeyId) { // Pseudo save
-                    this._giveCallback(true);
+                // If new id is same as old id,
+                // act as if it is saved
+                if (this.keyId == this.newKeyId) {
+                    this._giveCallback(true, this.newKeyId);
                     this.close();
                     return;
                 }
+
                 if (Mist.keysController.keyExists(this.newKeyId)) {
                     Mist.notificationController.notify('Key name exists already');
                     this._giveCallback(false);
@@ -52,51 +55,49 @@ define('app/controllers/key_edit', ['ember'],
                 }
 
                 var that = this;
-                Mist.keysController.renameKey(this.keyId, this.newKeyId, function(success) {
-                    that._giveCallback(success);
-                    if (success) {
-                        that.close();
-                    }
-                });
+                Mist.keysController.renameKey(this.keyId, this.newKeyId,
+                    function (success, newKeyId) {
+                        that._giveCallback(success, newKeyId);
+                        if (success)
+                            that.close();
+                    });
             },
-
 
 
             /**
-             * 
+             *
              *  Pseudo-Private Methods
-             * 
+             *
              */
 
-            _clear: function() {
-                this.set('callback', null);
-                this.set('newKeyId', null);
-                this.set('keyId', null);
+            _clear: function () {
+                this.set('keyId', null)
+                    .set('newKeyId', null)
+                    .set('callback', null);
             },
 
 
-            _updateFormReady: function() {
+            _updateFormReady: function () {
                 if (this.newKeyId) {
                     // Remove non alphanumeric chars from key id
                     this.set('newKeyId', this.newKeyId.replace(/\W/g, ''));
                 }
-                this.set('formReady', !!this.newKeyId);
+                this.set('formReady', !! this.newKeyId);
             },
 
 
-            _giveCallback: function(success) {
-                if (this.callback) this.callback(success, this.newKeyId);
+            _giveCallback: function (success, newKeyId) {
+                if (this.callback) this.callback(success, newKeyId);
             },
-
 
 
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
-            formObserver: function() {
+            formObserver: function () {
                 Ember.run.once(this, '_updateFormReady');
             }.observes('newKeyId')
         });

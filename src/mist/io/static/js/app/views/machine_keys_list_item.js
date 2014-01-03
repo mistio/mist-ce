@@ -1,16 +1,13 @@
-define('app/views/machine_manage_keys_list_item', [
-    'text!app/templates/machine_manage_keys_list_item.html',
-    'ember'
-    ],
+define('app/views/machine_keys_list_item', ['app/views/list_item', 'text!app/templates/machine_keys_list_item.html'],
     /**
-     * Machine Manage Keys List Item View
+     *  Machine Keys List Item View
      *
-     * @returns Class
+     *  @returns Class
      */
-    function(machine_manage_keys_list_item_html) {
-        return Ember.View.extend({
+    function(ListItemView, machine_keys_list_item_html) {
+        return ListItemView.extend({
 
-            template: Ember.Handlebars.compile(machine_manage_keys_list_item_html),
+            template: Ember.Handlebars.compile(machine_keys_list_item_html),
 
             keyIcon: null,
 

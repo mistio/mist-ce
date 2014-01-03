@@ -6,7 +6,7 @@
     
         <h1>{{name}}</h1>
     
-        {{view Mist.UserMenuView}}
+        {{view Mist.userMenuView}}
     
     </div>
     
@@ -50,7 +50,7 @@
 
                 <div data-role="listview">
                     {{#each view.rules}}
-                        {{view Mist.RuleView ruleBinding="this"}}
+                        {{view Mist.ruleView ruleBinding="this"}}
                     {{/each}}
                     
                     {{#if Mist.rulesController.creationPending}}
@@ -137,16 +137,16 @@
 
     </div>
     
-    {{view Mist.ShellView}}
+    {{view Mist.shellView}}
 
-    {{view Mist.MachineTagsView}}
+    {{view Mist.machineKeysView}}
 
-    {{view Mist.MachinePowerView}}
+    {{view Mist.machineTagsView}}
 
-    {{view Mist.ConfirmationDialog}}
+    {{view Mist.machinePowerView}}
 
-    {{view Mist.MachineManageKeysView}}
-    
+    {{view Mist.confirmationDialog}}
+
     <div data-role="popup">
         <ul data-role="listview">
             {{#each Mist.rulesController.metricList}}

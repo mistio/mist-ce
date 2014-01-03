@@ -41,7 +41,11 @@ define('app/models/image', ['ember'],
                     }
                 }
                 return "generic";
-            }.property("id")
+            }.property("id"),
+
+            toggle: function(callback) {
+                this.backend.toggleImageStar(this, callback);
+            }
         });
     }
 );

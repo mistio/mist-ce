@@ -1,10 +1,10 @@
 define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html', 'ember'],
     /**
-     *  Key Edit dialog
-     * 
+     *  Key Edit View
+     *
      *  @returns Class
      */
-    function(key_edit_dialog_html) {
+    function (key_edit_dialog_html) {
         return Ember.View.extend({
 
             /**
@@ -13,20 +13,20 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html', 
 
             template: Ember.Handlebars.compile(key_edit_dialog_html),
 
+
             /**
              *
              *  Methods
              *
              */
 
-            updateSaveButton: function() {
+            updateSaveButton: function () {
                 if (Mist.keysController.renamingKey || !Mist.keyEditController.formReady) {
                     $('#rename-key-ok').addClass('ui-state-disabled');
                 } else {
                     $('#rename-key-ok').removeClass('ui-state-disabled');
                 }
             },
-
 
 
             /**
@@ -37,15 +37,16 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html', 
 
             actions: {
 
-                backClicked: function() {
+
+                backClicked: function () {
                     Mist.keyEditController.close();
                 },
 
-                saveClicked: function() {
+
+                saveClicked: function () {
                     Mist.keyEditController.save();
                 }
             },
-
 
 
             /**
@@ -54,7 +55,7 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html', 
              *
              */
 
-            updateSaveButtonObserver: function() {
+            updateSaveButtonObserver: function () {
                 Ember.run.once(this, 'updateSaveButton');
             }.observes('Mist.keyEditController.formReady', 'Mist.keysController.renamingKey')
         });

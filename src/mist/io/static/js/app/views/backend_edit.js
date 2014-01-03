@@ -17,11 +17,11 @@ define('app/views/backend_edit', ['text!app/templates/backend_edit_dialog.html',
 
             /**
              * 
-             *  Observers
+             *  Methods
              * 
              */
 
-            stateObserver: function() {
+            updateEnabledState: function() {
                 if ($('#backend-toggle').slider) {
                     if (Mist.backendEditController.backend) {
                         var currentValue = $('#backend-toggle').val();
@@ -31,6 +31,16 @@ define('app/views/backend_edit', ['text!app/templates/backend_edit_dialog.html',
                         }
                     }
                 }
+            },
+
+            /**
+             * 
+             *  Observers
+             * 
+             */
+
+            stateObserver: function() {
+                Ember.run.once(this, 'updateEnabledState');
             }.observes('Mist.backendsController.togglingBackend', 'Mist.backendEditController.backend.state'),
 
 

@@ -1,10 +1,10 @@
 define('app/views/image_list', ['app/models/image', 'app/views/mistscreen', 'text!app/templates/image_list.html'],
     /**
      *  Images page
-     * 
+     *
      *  @returns Class
      */
-    function(Image, MistScreen, image_list_html) {
+    function (Image, MistScreen, image_list_html) {
         return MistScreen.extend({
 
             /**
@@ -14,9 +14,9 @@ define('app/views/image_list', ['app/models/image', 'app/views/mistscreen', 'tex
             images: [],
             baseImages: [],
             renderedImages: [],
-            visibleImagesCount: 0,
             advancedSearchMode: null,
             template: Ember.Handlebars.compile(image_list_html),
+
 
             /**
              *
@@ -24,26 +24,38 @@ define('app/views/image_list', ['app/models/image', 'app/views/mistscreen', 'tex
              *
              */
 
-            init: function() {
-                this._super();
-                Mist.backendsController.on('onImageListChange', this, 'updateImageList');
-            },
+            load: function () {
 
-
-            load: function() {
+                // Clear image arrays
                 this.set('images', []);
                 this.set('baseImages', []);
                 this.set('renderedImages', []);
-                Ember.run.later(this, function() {
-                    this.handleFilter();
-                    this.handleWindowScroll();
-                    if (!Mist.backendsController.loading &&
-                        !Mist.backendsController.loadingImages) {
-                            this.updateImageList();
-                    }
-                }, 1000);
+
+                // Add event listeners
+                var that = this;
+                Ember.run.later(function () {
+                    $('.ui-page').on('scroll', function () {
+                        that.windowScrolled();
+                    });
+                    $('#image-list-page .ui-input-search input').on('keyup', function () {
+                        that.filterChanged();
+                    });
+                }, 500);
+                Mist.backendsController.on('onImageListChange', this, 'updateImageList');
+
+                this.updateImageList();
+
             }.on('didInsertElement'),
 
+
+            unload: function () {
+
+                // Remove event listeners
+                $('.ui-page-active').off('scroll');
+                $('#image-list-page .ui-input-search input').off('keyup');
+                Mist.backendsController.off('onImageListChange', this, 'updateImageList');
+
+            }.on('willDestroyElement'),
 
 
             /**
@@ -52,91 +64,108 @@ define('app/views/image_list', ['app/models/image', 'app/views/mistscreen', 'tex
              *
              */
 
-            updateImageList: function() {
-                var that = this;
-                Mist.backendsController.content.forEach(function(backend) {
-                    that.images.addObjects(backend.images.content);
+            updateImageList: function () {
+                var newImages = [];
+                Mist.backendsController.content.forEach(function (backend) {
+                    backend.images.content.forEach(function (image) {
+                        if (image.star) {
+                            newImages.unshift(image);
+                        } else {
+                            newImages.push(image);
+                        }
+                    });
                 });
+                this.set('images', newImages);
             },
 
 
-            updateBaseImageList: function() {
+            updateBaseImageList: function () {
+
+                // If user is in advanced search mode
+                // and for some reason this.images change
+                // we don't want to remove the search
+                // results to show the new images
                 if (this.advancedSearchMode) return;
-                this.set('baseImages', this.images);
+
+                var newBaseImages = [];
+                this.images.forEach(function (image) {
+                    if (image.star) {
+                        newBaseImages.unshift(image);
+                    } else {
+                        newBaseImages.push(image);
+                    }
+                });
+                this.set('baseImages', newBaseImages);
             },
 
 
-            updateRenderedImageList: function() {
+            updateRenderedImageList: function () {
                 var baseLength = this.baseImages.length;
                 var newLength = baseLength < 25 ? baseLength : 25;
-                this.set('renderedImages', this.baseImages.slice(0, newLength));
-            },
 
-
-            handleFilter: function() {
                 var that = this;
-                var filterElement = $('#image-list-page .ui-input-search input');
-                filterElement.off('keyup');
-                filterElement.on('keyup', function() {
-                    if (!filterElement.val()) {
-                        that.set('advancedSearchMode', false);
-                        that.updateBaseImageList();
-                    } 
+                this.baseImages.some(function (image, index) {
+                    if (index == newLength) return true;
+                    if (image.star) {
+                        if (that.renderedImages.indexOf(image) == -1) {
+                            that.renderedImages.unshiftObject(image);
+                        }
+                    } else {
+                        that.renderedImages.addObject(image);
+                    }
                 });
             },
 
 
-            handleWindowScroll: function() {
-                var that = this;
-                window.onscroll = scrollHandler;
-                function scrollHandler() {
-                    if (Mist.isScrolledToBottom()) {
-                        if (!$('#image-list-page').length) {
-                            window.onscroll = null;
-                            return;
-                        }
-                        that.getMoreImages();
-                    }
-                };
+            filterChanged: function () {
+                var filter = $('#image-list-page .ui-input-search input').val();
+                if (!filter) {
+                    this.set('advancedSearchMode', false);
+                    this.updateBaseImageList();
+                }
             },
 
 
-            getMoreImages: function() {
+            windowScrolled: function () {
+                if (Mist.isScrolledToBottom()) {
+                    this.getMoreImages();
+                }
+            },
+
+
+            getMoreImages: function () {
                 var filterValue = $('#image-list-page .ui-input-search input').val();
-                if (this.advancedSearchMode || !filterValue) {
+                if (!filterValue) {
+                    // Grab the next 25 images from the base
+                    // images array
                     var newLength = this.renderedImages.length + 25;
                     if (newLength > this.baseImages.length) {
                         newLength = this.baseImages.length;
                     }
                     if (newLength == this.renderedImages.length) return;
-                    this.set('renderedImages', this.baseImages.slice(0, newLength));
+
+                    var that = this;
+                    this.baseImages.some(function (image, index) {
+                        if (index == newLength) return true;
+                        that.renderedImages.addObject(image);
+                    });
                 } else {
+                    // Else, user has typed in the filter input
+                    // so grab 25 images from the base images 
+                    // array that meet the filter criteria
                     var that = this;
                     var counter = 0;
-                    this.baseImages.some(function(image) {
+                    this.baseImages.some(function (image) {
                         if (that.baseImages.indexOf(image) == -1) {
                             if (image.id.indexOf(filterValue) > -1 ||
                                 image.name.indexOf(filterValue) > -1) {
-                                    that.renderedImages.pushObject(image);
-                                    if (++counter == 20) return true;
+                                that.renderedImages.addObject(image);
+                                if (++counter == 25) return true;
                             }
                         }
                     });
                 }
             },
-
-
-            renderImageList: function() {
-                Ember.run.next(function() {
-                    if ($('#image-list-page .ui-listview').listview) {
-                        $('#image-list-page .ui-listview').listview('refresh');
-                    }
-                    if ($('#image-list-page input.ember-checkbox').checkboxradio) {
-                        $('#image-list-page input.ember-checkbox').checkboxradio();
-                    }
-                });
-            },
-
 
 
             /**
@@ -147,26 +176,32 @@ define('app/views/image_list', ['app/models/image', 'app/views/mistscreen', 'tex
 
             actions: {
 
-                searchClicked: function() {
-                    this.set('searchingImages', true);
+
+                searchClicked: function () {
+
                     var that = this;
-                    var newImages = [];
-                    var backendsCount = Mist.backendsController.content.length - 1;
+                    var resultImages = [];
+                    var backendsCount = Mist.backendsController.content.filterBy('enabled', true).length;
                     var filterValue = $('#image-list-page .ui-input-search input').val();
-                    Mist.backendsController.content.forEach(function(backend, index) {
-                        backend.searchImages(filterValue, function(success, images) {
-                            if (success) {
-                                newImages.pushObjects(images);
-                            }
-                            if (!backendsCount--) {
-                                that.set('searchingImages', false);
-                                that.set('baseImages', newImages);
-                            }
-                        });
+
+                    this.set('searchingImages', true);
+                    this.set('advancedSearchMode', true);
+
+                    Mist.backendsController.content.forEach(function (backend, index) {
+                        if (backend.enabled) {
+                            backend.searchImages(filterValue, function (success, images) {
+                                if (success) {
+                                    resultImages.addObjects(images);
+                                }
+                                if (!--backendsCount) {
+                                    that.set('searchingImages', false);
+                                    that.set('baseImages', resultImages);
+                                }
+                            });
+                        }
                     });
                 }
             },
-
 
 
             /**
@@ -175,19 +210,14 @@ define('app/views/image_list', ['app/models/image', 'app/views/mistscreen', 'tex
              *
              */
 
-            imagesObserver: function() {
+            imagesObserver: function () {
                 Ember.run.once(this, 'updateBaseImageList');
             }.observes('images', 'images.length'),
 
 
-            baseImagesObserver: function() {
+            baseImagesObserver: function () {
                 Ember.run.once(this, 'updateRenderedImageList');
-            }.observes('baseImages', 'baseImages.length'),
-
-
-            renderedImagesObserver: function() {
-                Ember.run.once(this, 'renderImageList');
-            }.observes('renderedImages', 'renderedImages.length'),
+            }.observes('baseImages', 'baseImages.length')
         });
     }
 );

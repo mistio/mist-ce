@@ -1,10 +1,10 @@
-define('app/views/key_add_dialog', ['text!app/templates/key_add_dialog.html','ember'],
+define('app/views/key_add_dialog', ['text!app/templates/key_add_dialog.html', 'ember'],
     /**
-     *  Key Add Dialog
+     *  Key Add View
      *
      *  @returns Class
      */
-    function(key_add_dialog_html) {
+    function (key_add_dialog_html) {
         return Ember.View.extend({
 
             /**
@@ -13,13 +13,14 @@ define('app/views/key_add_dialog', ['text!app/templates/key_add_dialog.html','em
 
             template: Ember.Handlebars.compile(key_add_dialog_html),
 
+
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
-            updateDoneButton: function() {
+            updateDoneButton: function () {
                 if (Mist.keysController.creatingKey || !Mist.keyAddController.formReady) {
                     $('#create-key-ok').addClass('ui-state-disabled');
                 } else {
@@ -28,66 +29,57 @@ define('app/views/key_add_dialog', ['text!app/templates/key_add_dialog.html','em
             },
 
 
-
             /**
-             * 
+             *
              *  Actions
-             * 
+             *
              */
 
             actions: {
 
-                generateClicked: function() {
-                    Mist.keysController.generateKey(function(success, key) {
-                        if (success) {
+
+                generateClicked: function () {
+                    Mist.keysController.generateKey(function (success, key) {
+                        if (success)
                             $('#create-key-private').val(key).trigger('change');
-                        }
                     });
                 },
 
-                uploadClicked: function() {
+
+                uploadClicked: function () {
                     if (window.File && window.FileReader && window.FileList) {
+                        // Dynamically click the hidden input
+                        // field to present the folder dialog
                         $('#create-key-upload').click();
                     } else {
                         Mist.notificationController.notify('Your browser does not support the HTML5 file API');
                     }
                 },
 
-                uploadInputChanged: function() {
-                    var file = $('#create-key-upload')[0].files[0];
-                    if (file) {
-                        Mist.keysController.set('uploadingKey', true);
-                        var reader = new FileReader();
-                        reader.onloadend = function(evt) {
-                            if (evt.target.readyState == FileReader.DONE) {
-                                Mist.keyAddController.set('newKeyPrivate', evt.target.result);
-                            } else {
-                                Mist.notificationsController.notify('Failed to upload file');
-                            }
-                            Mist.keysController.set('uploadingKey', false);
-                        };
-                        reader.readAsText(file, 'UTF-8');
-                    }
+
+                uploadInputChanged: function () {
+                    Mist.keyAddController.uploadKey($('#create-key-upload')[0].files[0]);
                 },
 
-                backClicked: function() {
+
+                backClicked: function () {
                     Mist.keyAddController.close();
                 },
 
-                doneClicked: function() {
+
+                doneClicked: function () {
                     Mist.keyAddController.create();
                 }
             },
 
 
-
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
-            updateDoneButtonObserver: function() {
+            updateDoneButtonObserver: function () {
                 Ember.run.once(this, 'updateDoneButton');
             }.observes('Mist.keysController.creatingKey', 'Mist.keyAddController.formReady')
         });

@@ -157,35 +157,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 });
             },
 
-
-            getBackendById: function(backendId) {
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var b = 0; b < contentLength; ++b) {
-                    if (content[b].id == backendId) {
-                        return content[b];
-                    }
-                }
-            },
-
-            getMachineById: function(backendId, machineId) {
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var b = 0; b < contentLength; ++b) {
-                    if (content[b].id == backendId) {
-                        var machines = content[b].machines.content;
-                        var machinesLength = machines.length;
-                        for (var m = 0; m < machinesLength; ++m) {
-                            if (machines[m].id == machineId) {
-                                return machines[m];
-                            }
-                        }
-                        return;
-                    }
-                }
-            },
-
-
             getMachineByUrlId: function(machineId) {
                 var machines = null;
                 var machinesLength = 0;
@@ -201,45 +172,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     }
                 }
             },
-
-
-            getSelectedMachinesCount: function() {
-                var counter = 0;
-                var machines = null;
-                var machinesLength = 0;
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var b = 0; b < contentLength; ++b) {
-                    machines = content[b].machines.content;
-                    machinesLength = machines.length;
-                    for (var m = 0; m < machinesLength; ++m) {
-                        if (machines[m].selected) {
-                            ++counter;
-                        }
-                    }
-                }
-                return counter;
-            },
-
-
-            updateSelectedMachines: function() {
-                var selectedMachines = [];
-                var machines = null;
-                var machinesLength = 0;
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var b = 0; b < contentLength; ++b) {
-                    machines = content[b].machines.content;
-                    machinesLength = machines.length;
-                    for (var m = 0; m < machinesLength; ++m) {
-                        if (machines[m].selected) {
-                            selectedMachines.push(machines[m].id);
-                        }
-                    }
-                }
-                this.set('selectedMachines', selectedMachines);
-            },
-            
             
             updateMachineCount: function() {
                 var count = 0;
@@ -278,7 +210,19 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             },
 
 
-            getMachine: function(machineId) {
+            getMachine: function(machineId, backendId) {
+
+                // If backendId is provided, get machine
+                // directly from that backend
+                if (backendId) {
+                    var backend = this.getBackend(backendId);
+                    if (backend) 
+                        return backend.getMachine(machineId);
+                    return null;
+                }
+
+                // When backendId is not provided, search
+                // through all backends to find machineId
                 var machine = null;
                 this.content.some(function(backend) {
                     return machine = backend.getMachine(machineId);
@@ -300,6 +244,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 this.content.some(function(backend) {
                     if (backend.getMachine(machineId)) {
                         backend.shutdownMachine(machineId);
+                        return true;
                     }
                 });
             },
@@ -308,6 +253,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                this.content.some(function(backend) {
                     if (backend.getMachine(machineId)) {
                         backend.destroyMachine(machineId);
+                        return true;
                     }
                 });
             },
@@ -316,6 +262,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                this.content.some(function(backend) {
                     if (backend.getMachine(machineId)) {
                         backend.rebootMachine(machineId);
+                        return true;
                     }
                 });
             },
@@ -324,6 +271,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                this.content.some(function(backend) {
                     if (backend.getMachine(machineId)) {
                         backend.startMachine(machineId);
+                        return true;
                     }
                 });
             },
@@ -365,7 +313,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
 
             _deleteBackend: function(id) {
                 Ember.run(this, function() {
-                    this.content.removeObject(this.getBackendById(id));
+                    this.content.removeObject(this.getBackend(id));
                     this.trigger('onBackendListChange');
                     this.trigger('onBackendDelete');
                 });
@@ -374,7 +322,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
 
             _toggleBackend: function(id, newState) {
                 Ember.run(this, function() {
-                    this.getBackendById(id).set('enabled', newState);
+                    this.getBackend(id).set('enabled', newState);
                     this.trigger('onBackendToggle');
                 });
             },

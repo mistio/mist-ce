@@ -4,16 +4,16 @@ define('app/views/mistscreen', ['ember'],
      *
      *  @returns Class
      */
-    function() {
+    function () {
         return Ember.View.extend({
 
             /**
              *  Initialization
              */
-            
-            didInsertElement: function() {
+
+            didInsertElement: function () {
                 if ($('[data-role=page]').page) {
-                    $('[data-role=page]').page().show();
+                    $('[data-role=page]').page();
                 }
             }
         });

@@ -1,13 +1,13 @@
-define('app/views/machine_manage_keys', ['app/models/machine', 'text!app/templates/machine_manage_keys.html'],
+define('app/views/machine_keys', ['text!app/templates/machine_keys.html', 'ember'],
     /**
-     *  Machine Manage Keys View
+     *  Machine Keys View
      * 
      *  @returns Class
      */
-    function(Machine, machine_manage_keys_html) {
+    function(machine_keys_html) {
         return Ember.View.extend({
 
-            template: Ember.Handlebars.compile(machine_manage_keys_html),
+            template: Ember.Handlebars.compile(machine_keys_html),
 
             selectedKey: null,
             parentMachine: null,
@@ -62,6 +62,7 @@ define('app/views/machine_manage_keys', ['app/models/machine', 'text!app/templat
                         this.renderMachineKeysManager();
                     }, 2000);
                 }
+                info(this.parentMachine.name);
             },
 
 
@@ -105,7 +106,13 @@ define('app/views/machine_manage_keys', ['app/models/machine', 'text!app/templat
                 $('#associate-key-dialog').popup('close');
                 $('#manage-keys').panel('open');
                 $('#manage-keys .ajax-loader').fadeIn(200);
-                Mist.keysController.associateKey(key.name, this.parentMachine);
+                Mist.keysController.associateKey(key.id, this.parentMachine.backend.id,
+                                                           this.parentMachine.id,
+                                                           this.parentMachine.backend.host,
+                                                           function(success, stuff) {
+                                                              warn(success);
+                                                              info(stuff);  
+                                                           });
             },
 
             createKeyClicked: function() {

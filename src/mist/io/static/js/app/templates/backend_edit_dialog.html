@@ -10,7 +10,7 @@
         <div data-role="fieldcontain">
             <select id="backend-toggle" data-role="slider" {{action "stateToggleSwitched" target="view" on="change"}}>
                 <option value="0">Disabled</option>
-                <option value="1" {{bindAttr selected="Mist.backendEditController.backend.enabled"}}>Enabled</option>
+                <option value="1">Enabled</option>
             </select>
             <span class="state">{{Mist.backendEditController.backend.state}}</span>
         </div>

@@ -17,3 +17,6 @@
 #single-machine-page .info-table tr td:nth-child(2) {
     font-weight: bold;
 }
+#single-machine-page .info-table tr:nth-child(2n) {
+    background-color: #F7F7F7;
+}

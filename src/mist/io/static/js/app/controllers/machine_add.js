@@ -29,6 +29,11 @@ define('app/controllers/machine_add', ['ember'],
              */
 
             open: function(callback) {
+                // In case page is scrolled, opening the
+                // panel introduces an unpleasant view.
+                // Scrolling to top fixes that
+                $('.ui-page-active').animate({scrollTop:0}, 'slow');
+                $('#create-machine-panel .ui-panel-inner').animate({scrollTop:0}, 'slow');
                 $('#create-machine-panel').panel('open');
                 this._clear();
                 this.set('callback', callback);
@@ -125,7 +130,7 @@ define('app/controllers/machine_add', ['ember'],
                 this.set('callback', null)
                     .set('newMachineName', '')
                     .set('newMachineScript', '')
-                    .set('newMachineKey', {'name' : 'Select Key'})
+                    .set('newMachineKey', {'id' : 'Select Key'})
                     .set('newMachineSize', {'name' : 'Select Size'})
                     .set('newMachineImage', {'name' : 'Select Image'})
                     .set('newMachineLocation', {'name' : 'Select Location'})
@@ -135,11 +140,11 @@ define('app/controllers/machine_add', ['ember'],
 
             _updateFormReady: function() {
                 if (this.newMachineName &&
-                    this.newMachineKey.id &&
                     this.newMachineSize.id &&
                     this.newMachineImage.id &&
                     this.newMachineLocation.id &&
-                    this.newMachineProvider.id) {
+                    this.newMachineProvider.id &&
+                    Mist.keysController.keyExists(this.newMachineKey.id)) {
                         this.set('formReady', true);
                         return;
                 } 

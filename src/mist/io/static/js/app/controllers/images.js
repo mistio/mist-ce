@@ -71,16 +71,18 @@ define('app/controllers/images', ['app/models/image'],
             },
 
 
-            toggleImageStar: function(imageId) {
+            toggleImageStar: function(image, callback) {
                 var that = this;
-                Mist.ajaxPOST('/backends/' + this.backend.id + '/images/' + imageId, {
-                    'action' : 'star'
-                }).success(function() {
-
+                Mist.ajaxPOST('/backends/' + this.backend.id + '/images/' + image.id, {
+                }).success(function(star) {
+                    if (!that.imageExists(image.id)) {
+                        that._addImage(image);
+                    }
+                    that._toggleImageStar(image.id, star);
                 }).error(function() {
-
-                }).complete(function() {
-
+                    Mist.notificationController.notify('Failed to (un)star image');
+                }).complete(function(success, star) {
+                    if (callback) callback(success, star);
                 });
             },
 
@@ -111,6 +113,13 @@ define('app/controllers/images', ['app/models/image'],
              * 
              */
 
+            _addImage: function(image) {
+                Ember.run(this, function() {
+                    this.content.pushObject(Image.create(image));
+                    this.trigger('onImageListChange');
+                });
+            },
+
             _setContent: function(images) {
                 var that = this;
                 Ember.run(function() {
@@ -121,7 +130,15 @@ define('app/controllers/images', ['app/models/image'],
                     });
                     that.trigger('onImageListChange');
                 });
-            }
+            },
+
+
+            _toggleImageStar: function(imageId, star) {
+                Ember.run(this, function() {
+                    this.getImage(imageId).set('star', star);
+                    this.trigger('onImageStarToggle');
+                });
+            },
         });
     }
 );

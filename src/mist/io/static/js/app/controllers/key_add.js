@@ -4,40 +4,40 @@ define('app/controllers/key_add', ['ember'],
      *
      *  @returns Class
      */
-    function() {
+    function () {
         return Ember.Object.extend({
 
             /**
              *  Properties
              */
 
+            newKeyId: null,
             callback: null,
             formReady: null,
             uploadingKey: null,
-
-            newKeyId: null,
             newKeyPrivate: null,
 
+
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
-            open: function(callback) {
+            open: function (callback) {
                 $('#create-key-popup').popup('open');
                 this._clear();
                 this.set('callback', callback);
             },
 
 
-            close: function() {
+            close: function () {
                 $('#create-key-popup').popup('close');
                 this._clear();
             },
 
 
-            create: function() {
+            create: function () {
 
                 if (Mist.keysController.keyExists(this.newKeyId)) {
                     Mist.notificationController.notify('Key name exists already');
@@ -61,59 +61,76 @@ define('app/controllers/key_add', ['ember'],
                 }
 
                 var that = this;
-                Mist.keysController.createKey(this.newKeyId, this.newKeyPrivate, function(success) {
-                    that._giveCallback(success);
-                    if (success) {
-                        that.close();
+                Mist.keysController.createKey(this.newKeyId, this.newKeyPrivate,
+                    function (success, newKeyId) {
+                        that._giveCallback(success, newKeyId);
+                        if (success)
+                            that.close();
                     }
-                });
+                );
             },
 
+
+            uploadKey: function (file) {
+
+                var that = this;
+                var reader = new FileReader();
+
+                reader.onloadend = function (e) {
+
+                    if (e.target.readyState == FileReader.DONE) {
+                        that.set('newKeyPrivate', e.target.result);
+                    } else {
+                        Mist.notificationsController.notify('Failed to upload file');
+                    }
+
+                    that.set('uploadingKey', false);
+                };
+
+                this.set('uploadingKey', true);
+                reader.readAsText(file, 'UTF-8');
+            },
 
 
             /**
-             * 
+             *
              *  Pseudo-Private Methods
-             * 
+             *
              */
-           
-            _clear: function() {
-                this.set('callback', null);
-                this.set('newKeyId', null);
-                this.set('newKeyPrivate', null);
+
+            _clear: function () {
+                this.set('callback', null)
+                    .set('newKeyId', null)
+                    .set('newKeyPrivate', null);
             },
 
 
-            _giveCallback: function(success) {
-                if (this.callback) this.callback(success, this.newKeyId);
+            _giveCallback: function (success, newKeyId) {
+                if (this.callback) this.callback(success, newKeyId);
             },
 
 
-            _updateFormReady: function() {
+            _updateFormReady: function () {
+
                 if (this.newKeyId) {
                     // Remove non alphanumeric chars from key id
-                    this.set('newKeyId', this.newKeyId.replace(/\W/g, '')); 
+                    this.set('newKeyId', this.newKeyId.replace(/\W/g, ''));
                 }
                 if (this.newKeyPrivate) {
                     this.set('newKeyPrivate', this.newKeyPrivate.trim());
                 }
 
-                if (this.newKeyId && this.newKeyPrivate) {
-                    this.set('formReady', true);
-                } else {
-                    this.set('formReady', false);
-                }
+                this.set('formReady', this.newKeyId && this.newKeyPrivate);
             },
 
 
-
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
-            formObserver: function() {
+            formObserver: function () {
                 Ember.run.once(this, '_updateFormReady');
             }.observes('newKeyId', 'newKeyPrivate', 'callback'),
         });

@@ -1,29 +1,47 @@
-define('app/views/image_list_item', ['text!app/templates/image_list_item.html','ember'],
+define('app/views/image_list_item', ['app/views/list_item', 'text!app/templates/image_list_item.html'],
     /**
      *  Image List Item View
      *
      *  @returns Class
      */
-    function(image_list_item_html) {
-        return Ember.View.extend({
-                
-                image: null,
-                tagName:'li',
-                template: Ember.Handlebars.compile(image_list_item_html),
-                
-                actions: {
+    function (ListItemView, image_list_item_html) {
+        return ListItemView.extend({
 
-                    toggleImageStar: function() {
-                        this.image.backend.toggleImageStar(this.image.id);
-                    },
+            /**
+             *  Properties
+             */
 
-                    launchImage: function(){
-                        var AddView = Mist.MachineAddView.create();
-                        AddView.selectProvider(this.image.backend);
-                        AddView.selectImage(this.image);
-                        $('#images .dialog-add').panel('open');
-                    }
-                }    
+            image: null,
+            template: Ember.Handlebars.compile(image_list_item_html),
+
+
+            /**
+             *
+             *  Actions
+             *
+             */
+
+            actions: {
+
+
+                toggleImageStar: function () {
+                    var that = this;
+                    this.image.toggle(function (success, star) {
+                        if (!success) {
+                            that.image.set('star', !that.image.star);
+                        }
+                    });
+                },
+
+
+                launchImage: function () {
+                    Mist.machineAddController.open(function (success) {
+                        //Mist.Router.router.transitionTo('machines');
+                    });
+                    Mist.machineAddController.set('newMachineProvider', this.image.backend);
+                    Mist.machineAddController.set('newMachineImage', this.image);
+                }
+            }
         });
     }
 );

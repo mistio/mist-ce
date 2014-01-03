@@ -15,7 +15,7 @@ define('app/models/key', ['ember'],
             probing: null,
             machines: null,
             selected: null,
-            default_key: null,
+            isDefault: null,
 
         });
     }

@@ -48,8 +48,8 @@ body {
     height: 0 !important;
 }
 .ui-page {
-   height: 100%;
-   min-height: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
 }
 .small-padding {
     height: 10px;
@@ -130,6 +130,12 @@ textarea {
 
 /* Side panel
 -----------------------------------------------------------------------------------------------------------*/
+.ui-panel .ui-panel-inner {
+    overflow: auto;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;  
+    -webkit-overflow-scrolling: touch;
+}
 .side-panel {
     /**
      *  .ui-panel's default width value is 17em
@@ -143,11 +149,6 @@ textarea {
      */
     width: 315px; /* Useless, but leave it there for reference reasons */
 }
-/*
-.ui-panel-wrapper {
-    height: 100% !important;
-}
-*/
 .side-panel .ui-panel-inner {
     padding: 7px;
 }
@@ -161,6 +162,9 @@ textarea {
 -----------------------------------------------------------------------------------------------------------*/
 .checkbox-link a {
     height: 40px;
+}
+.checkbox-link h3 {
+    max-width: 50%;
 }
 .checkbox-link .ui-checkbox {
     margin: 0 !important;

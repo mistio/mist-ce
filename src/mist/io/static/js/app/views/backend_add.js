@@ -15,6 +15,7 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
             secondFieldLabel: 'API Secret',
             template: Ember.Handlebars.compile(backend_add_html),
 
+
             /**
              * 
              *  Methods
@@ -30,7 +31,6 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
             },
 
 
-
             /**
              * 
              *  Actions
@@ -38,6 +38,7 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
              */
 
             actions: {
+
 
                 selectProvider: function(provider) {
 
@@ -76,15 +77,16 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
                     });
                 },
 
+
                 backClicked: function() {
                     Mist.backendAddController.close();
                 },
+
 
                 doneClicked: function() {
                     Mist.backendAddController.add();
                 }
             },
-
 
 
             /**

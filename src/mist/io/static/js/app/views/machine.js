@@ -68,25 +68,6 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                     $("#login-dialog").popup('open');
                 }
             },
-
-            closePlanDialog: function() {
-                $("#monitoring-dialog").popup('close');
-            },
-
-            buttonBackMonitoring: function() {
-                $("#monitoring-dialog").popup('close');
-            },
-
-            buttonChangeMonitoring: function() {
-                var machine = this.get('controller').get('model');
-                machine.changeMonitoring();
-                $("#monitoring-dialog").popup('close');
-            },
-
-            clickedPurchaseDialog: function() {
-                $("#monitoring-dialog").popup('close');
-                window.location.href = URL_PREFIX + "/account";
-            },
             
             rules: function(){
                 var ret = Ember.ArrayController.create(), 
@@ -107,14 +88,6 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 //$('#associate-key').popup('close');
                 return false;
             },
-
-            name: function() {
-                var machine = this.get('controller').get('model');
-                if (!machine) {
-                    return '';
-                }
-                return machine.name || machine.id;
-            }.property('controller.model'),
 
             addRuleClicked: function() {
                 // initialize the rule to some sensible defaults

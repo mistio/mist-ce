@@ -1,6 +1,6 @@
 define('app/views/home', ['app/views/mistscreen','text!app/templates/home.html','ember'],
     /**
-     *  Home Page
+     *  Home View
      *
      *  @returns Class
      */
@@ -12,6 +12,7 @@ define('app/views/home', ['app/views/mistscreen','text!app/templates/home.html',
              */
 
             template: Ember.Handlebars.compile(home_html),
+
 
             /**
              * 
@@ -26,7 +27,6 @@ define('app/views/home', ['app/views/mistscreen','text!app/templates/home.html',
             }.on('didInsertElement'),
 
 
-
             /**
              * 
              *  Actions
@@ -34,6 +34,7 @@ define('app/views/home', ['app/views/mistscreen','text!app/templates/home.html',
              */
 
             actions: {
+
 
                 addBackend: function() {
                     Mist.backendAddController.open();
