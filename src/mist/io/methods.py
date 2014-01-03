@@ -696,13 +696,14 @@ def _create_machine_openstack(conn, private_key, public_key, script, machine_nam
     with get_temp_file(private_key) as tmp_key_path:    
         try:
             node = conn.deploy_node(name=machine_name,
-                                    image=image,
-                                    size=size,
-                                    location=location, 
-                                    deploy=msd,
-                                    ssh_key=tmp_key_path,    
-                                    ssh_alternate_usernames=['ec2-user', 'ubuntu'],
-                                    ex_keyname=server_key)
+                image=image,
+                size=size,
+                location=location, 
+                deploy=msd,
+                ssh_key=tmp_key_path,    
+                ssh_alternate_usernames=['ec2-user', 'ubuntu'],
+                max_tries=1,
+                ex_keyname=server_key)
         except Exception as e:
             raise MachineCreationError("OpenStack, got exception %s" % e)
     return node
