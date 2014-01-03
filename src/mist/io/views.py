@@ -719,6 +719,8 @@ def update_monitoring(request):
         payload['backend_region'] = backend.region
         payload['backend_apikey'] = backend.apikey
         payload['backend_apisecret'] = backend.apisecret
+        payload['backend_apiurl'] = backend.apiurl
+        payload['backend_tenant_name'] = backend.tenant_name
 
     #TODO: make ssl verification configurable globally,
     # set to true by default
