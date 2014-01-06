@@ -19,9 +19,10 @@ define('app/controllers/monitoring', [
 
             // TODO , Remove Machine And View Arguments
             // TODO , UpdateInterval And Step Must Be the Same
-            initialize: function(machine,timeWindow,step,updateInterval,enableUpdates){
+            initialize: function(graphs,machine,timeWindow,step,updateInterval,enableUpdates){
                 //this.machine = machine;
                 this.request.initiliaze(timeWindow,step,machine,updateInterval,enableUpdates);
+                this.graphs.instances = graphs;
             },
 
             /**
@@ -105,8 +106,6 @@ define('app/controllers/monitoring', [
                 // Posible options, Stop,Step,Timewindow
                 custom : function(options){
 
-                    // TODO
-
                     // Clear Intervals
                     this.stopDataUpdates();
 
@@ -145,13 +144,19 @@ define('app/controllers/monitoring', [
                                 Mist.monitoringController.request.machine.set('pendingStats', false);
                             });
 
-
+                            Mist.monitoringController.graphs.disableAnimation();
                             self.receiveData(start, stop, step);
                         }
                     }
 
                     custom();
 
+                },
+
+                // Possible Temporary Function TODO check this
+                customReset : function(){
+                    Mist.monitoringController.graphs.enableAnimation();
+                    this.reload('customRequestReset');
                 },
 
                 changeStep: function(newStep){
@@ -367,6 +372,8 @@ define('app/controllers/monitoring', [
                                 error(textStatus);
                             };
 
+                            self.locked = false;
+
                             controller.trigger("dataFetchFinished",false);
                         }
                     });
@@ -396,7 +403,46 @@ define('app/controllers/monitoring', [
                 this.setupDataRequest(timeToRequestms,step);
             },
 
-            /* Demo History Feature */
+            
+            // Graphs Controller
+            graphs : {
+
+                enableAnimation  : function() {
+                    for(metric in this.instances)
+                    {
+                        this.instances[metric].enableAnimation();
+                    }
+
+                    this.animationEnabled = true;
+                },
+
+                disableAnimation : function() {
+
+                    for(metric in this.instances)
+                    {
+                        this.instances[metric].disableAnimation();
+                    }
+
+                    this.animationEnabled = false;
+                },
+
+                clearData        : function() {
+                    
+                    for(metric in this.instances)
+                    {
+                        this.instances[metric].clearData();
+                    }
+                },
+
+                instances        : null,    // Graph Objects created by the view
+                animationEnabled : true
+            },
+
+
+            /* History Feature 
+            *
+            *
+            */
             history : {
 
                 isEnabled       : false,
@@ -427,18 +473,53 @@ define('app/controllers/monitoring', [
                         // Custom Request
                         request.custom({'stop': (+this.currentStopTime / 1000)});
                     }
-                    // Check if history feature is enabled (is already on a history block)
-                    // Get Last Measurement.
-                    // Go To Previous Blog With Custom request
-                    // Also keep track of request index.
+                    else {
+                        this.currentStopTime = new Date(this.currentStopTime - this.timeWindow);
+
+                        // Debug
+                        console.log("Time Window: " + (this.timeWindow/1000/60) + " Minutes" );
+                        console.log("Last  Metric Time: " + this.lastMetrictime);
+                        console.log("New     Stop Time: " + this.currentStopTime);
+
+
+                        // Custom Request
+                        request.custom({'stop': (+this.currentStopTime / 1000)});
+                    }
                 },
+
+
                 goForward: function(){
 
-                    // When reaches the last history block enable again monitoring
+                    var request = Mist.monitoringController.request;
+
+                    if(this.isEnabled){
+
+                        this.currentStopTime = new Date(+this.currentStopTime + this.timeWindow);
+
+                        // If Next Block of time is ahead of last Metric Disable Monitoring
+                        if( (+this.currentStopTime) > (+this.lastMetrictime) ) {
+
+                            console.log("Disabling History");
+                            console.log("Last  Metric Time: " + this.lastMetrictime);
+                            console.log("New     Stop Time: " + this.currentStopTime);
+                            this.disable();
+
+                        }
+                        else{
+
+                            console.log("Time Window: " + (this.timeWindow/1000/60) + " Minutes" );
+                            console.log("Last  Metric Time: " + this.lastMetrictime);
+                            console.log("New     Stop Time: " + this.currentStopTime);
+                            request.custom({'stop': (+this.currentStopTime / 1000)});
+                        }
+                    }
 
                 },
 
-                currentStopTime: null
+                disable: function(){
+                    this.isEnabled = false;
+                    Mist.monitoringController.request.customReset();
+                }
             }
 
         })
