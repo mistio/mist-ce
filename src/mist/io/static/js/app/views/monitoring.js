@@ -539,7 +539,10 @@ define('app/views/monitoring', [
 
                         // Set the range
                         this.calcValueDistance();
-                        xScale.range([-this.valuesDistance, this.width - margin.left - margin.right]);
+                        if(this.animationEnabled)
+                            xScale.range([-this.valuesDistance, this.width - margin.left - margin.right]);
+                        else
+                            xScale.range([0, this.width - margin.left - margin.right]);
 
 
                         // Create Array Of Cordinates

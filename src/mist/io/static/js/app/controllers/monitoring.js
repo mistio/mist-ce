@@ -27,7 +27,7 @@ define('app/controllers/monitoring', [
             /**
             *   Request Object
             *   This object is responsible for data requests
-            *   
+            *
             */
             request: {
 
@@ -105,36 +105,52 @@ define('app/controllers/monitoring', [
                 // Posible options, Stop,Step,Timewindow
                 custom : function(options){
 
-                    var timeGap          = 60;
-                    var timeWindow       = this.timeWindow;
-                    var step             = this.step;
-                    var stop             = Math.floor( ( (new Date()).getTime() - timeGap * 1000) / 1000 );
-                    var start            = Math.floor( stop - timeWindow/1000 );
+                    // TODO
 
+                    // Clear Intervals
+                    this.stopDataUpdates();
 
-                    if(options){
-                        if ('stop' in options){
-                            stop  = Math.floor(options['stop'] - timeGap);
-                            start = Math.floor( stop - timeWindow/1000 );
+                    // Wait Until Requests are not locked
+                    var self   = this;
+                    var custom = function(){
+
+                        if(self.locked){
+                            console.log("Waiting For Action To Finish");
+                            window.setTimeout(custom,1000);
                         }
-                        
-                        if ('step' in options)
-                            step = options['step'];
-                        
-                        if ('timeWindow' in options)
-                            timeWindowSize = options['timeWindow'];
+                        else{
+                            //var timeGap          = 60;
+                            var timeWindow       = self.timeWindow;
+                            var step             = self.step;
+                            var stop             = Math.floor( ( new Date()).getTime() / 1000 ); //Math.floor( ( (new Date()).getTime() - timeGap * 1000) / 1000 );
+                            var start            = Math.floor( stop - timeWindow/1000 );
+
+
+                            if(options){
+                                if ('stop' in options){
+                                    stop  = Math.floor(options['stop']);//Math.floor(options['stop'] - timeGap);
+                                    start = Math.floor( stop - timeWindow/1000 );
+                                }
+                                
+                                if ('step' in options)
+                                    step = options['step'];
+                                
+                                if ('timeWindow' in options)
+                                    timeWindowSize = options['timeWindow']; // TODO Check this size ?
+                            }
+
+                            self.locked = true;
+                            self.machine.set('pendingStats', true);
+                            Mist.monitoringController.one('dataFetchFinished',function() {
+                                Mist.monitoringController.request.machine.set('pendingStats', false);
+                            });
+
+
+                            self.receiveData(start, stop, step);
+                        }
                     }
 
-
-                    this.machine.set('pendingStats', true);
-                    Mist.monitoringController.one('dataFetchFinished',function() {
-                        Mist.monitoringController.request.machine.set('pendingStats', false);
-                    });
-
-
-                    this.receiveData(start, stop, step);
-
-
+                    custom();
 
                 },
 
@@ -363,14 +379,14 @@ define('app/controllers/monitoring', [
                     console.log("Update Interval: " + this.updateInterval)
                 }, 
 
-                // Private Variables
+                
                 machine        : null,
-                lastMetrictime : null,
-                timeWindow     : 0,
-                step           : 0,
-                updateData     : false,
-                updateInterval : 0,
-                locked         : false
+                lastMetrictime : null,  // Date Object
+                timeWindow     : 0,     // integer in miliseconds
+                step           : 0,     // integer in miliseconds
+                updateData     : false, // boolean
+                updateInterval : 0,     // integer in miliseconds
+                locked         : false  // boolean
 
             },
 
@@ -381,11 +397,44 @@ define('app/controllers/monitoring', [
             },
 
             /* Demo History Feature */
-            historyController : {
-                goBack: function(){
+            history : {
 
+                isEnabled       : false,
+                lastMetrictime  : null,
+                timeWindow      : 0,
+                currentStopTime : null,
+
+
+                goBack: function() {
+
+                    var request = Mist.monitoringController.request;
+
+                    // When we enable history we must get last measurement and time window
+                    if(!this.isEnabled) {
+
+                        this.isEnabled       = true;
+                        this.timeWindow      = request.timeWindow;
+                        this.lastMetrictime  = request.lastMetrictime;
+                        this.currentStopTime =  new Date(this.lastMetrictime.getTime() - this.timeWindow);
+
+
+                        // Debug
+                        console.log("Time Window: " + (this.timeWindow/1000/60) + " Minutes" );
+                        console.log("Current Stop Time: " + this.lastMetrictime);
+                        console.log("New     Stop Time: " + this.currentStopTime);
+
+
+                        // Custom Request
+                        request.custom({'stop': (+this.currentStopTime / 1000)});
+                    }
+                    // Check if history feature is enabled (is already on a history block)
+                    // Get Last Measurement.
+                    // Go To Previous Blog With Custom request
+                    // Also keep track of request index.
                 },
                 goForward: function(){
+
+                    // When reaches the last history block enable again monitoring
 
                 },
 
