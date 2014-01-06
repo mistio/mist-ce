@@ -14,6 +14,20 @@
                   </select>
                   </div>
             -->
+
+                  <div style="margin-top: 10px;
+                              min-height: 50px;
+                              border:1px solid #ccc;
+                              background: #e0e0e1;
+                              width:400px;
+                              text-align:center;">
+                        <a id='graphsGoBack' href="#" data-role="button" data-inline="true" 
+                        {{action "goBack" target="Mist.monitoringController.history"}}><<</a><!--
+                  --><a id='graphsGoForward' href="#" data-role="button" data-inline="true" 
+                        {{action "goForward" target="Mist.monitoringController.history"}}>>></a><!--
+                  --><a id='graphsResetHistory' href="#" data-role="button" data-theme="a" data-inline="true" 
+                        {{action "disable" target="Mist.monitoringController.history"}}>Reset</a>
+                  </div>
                         
                   <!-- Graphs -->
                   <div id="cpuGraph" class="graph">

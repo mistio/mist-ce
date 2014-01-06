@@ -322,7 +322,14 @@ define('app/views/monitoring', [
                 $('#networkRXGraphBtn > button').button();
 
                 // DEBUG TODO Possible Remove It
-                $('#timeWindowSelect').selectmenu();
+                //$('#timeWindowSelect').selectmenu();
+
+                $('#graphsGoBack').button();
+                $('#graphsGoForward').button();
+                $('#graphsResetHistory').button();
+
+                $('#graphsGoForward').addClass('ui-disabled');
+                $('#graphsResetHistory').addClass('ui-disabled');
             },
 
             getLoadLineColor: function(currentLoad,cpuCores){

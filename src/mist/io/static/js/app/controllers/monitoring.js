@@ -470,8 +470,13 @@ define('app/controllers/monitoring', [
                         console.log("New     Stop Time: " + this.currentStopTime);
 
 
+
                         // Custom Request
                         request.custom({'stop': (+this.currentStopTime / 1000)});
+
+
+                        $('#graphsGoForward').removeClass('ui-disabled');
+                        $('#graphsResetHistory').removeClass('ui-disabled');
                     }
                     else {
                         this.currentStopTime = new Date(this.currentStopTime - this.timeWindow);
@@ -519,6 +524,9 @@ define('app/controllers/monitoring', [
                 disable: function(){
                     this.isEnabled = false;
                     Mist.monitoringController.request.customReset();
+
+                    $('#graphsGoForward').addClass('ui-disabled');
+                    $('#graphsResetHistory').addClass('ui-disabled');
                 }
             }
 
