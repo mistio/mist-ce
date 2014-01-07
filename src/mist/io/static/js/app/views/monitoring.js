@@ -1119,11 +1119,15 @@ define('app/views/monitoring', [
 
 
                         self.graphsCreated = true;
-                        //controller.initController(machine,self);
-                        //controller.setupDataRequest(timeToDisplay,10000);
-                        
-                        //var testTime = new Date( (new Date()).getTime() - 1000* 60* 60); DEBUG OLDER TIME
-                        controller.initialize(self.graphs,machine,timeToDisplay,10000,10000,true);
+
+                        controller.initialize({
+                            machineModel    : machine,      // Send Current Machine
+                            graphs          : self.graphs,  // Send Graphs Instances
+                            timeWindow      : 10*60*1000,   // Display 10 Minutes
+                            step            : 10000,        // Metrics Step in miliseconds
+                            updatesInterval : 10000,        // Get Updates Every x Miliseconds
+                            updatesEnabled  : true          // Get Updates
+                        });
 
                         //self.setupLoadColorInterval(); Commented Out Until It's Time To Deploy This Feature TODO
 

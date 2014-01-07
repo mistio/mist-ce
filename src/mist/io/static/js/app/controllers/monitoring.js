@@ -19,10 +19,15 @@ define('app/controllers/monitoring', [
 
             // TODO , Remove Machine And View Arguments
             // TODO , UpdateInterval And Step Must Be the Same
-            initialize: function(graphs,machine,timeWindow,step,updateInterval,enableUpdates){
-                //this.machine = machine;
-                this.request.initiliaze(timeWindow,step,machine,updateInterval,enableUpdates);
-                this.graphs.instances = graphs;
+            initialize: function(arguments){
+                
+                this.request.initiliaze(arguments['timeWindow'],
+                                        arguments['step'], 
+                                        arguments['machineModel'],
+                                        arguments['updatesInterval'],
+                                        arguments['updatesEnabled']);
+
+                this.graphs.instances = arguments['graphs'];
             },
 
             /**
