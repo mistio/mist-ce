@@ -11,13 +11,15 @@ define('app/views/monitoring', [
 
             template: Ember.Handlebars.compile(monitoring_html),
 
-            cpuGraph: null,
-            loadGraph: null,
-            memGraph: null,
-            diskReadGraph: null,
-            diskWriteGraph: null,
-            networkTXGraph: null,
-            networkRXGraph: null,
+            graphs : {
+                cpu: null,
+                load: null,
+                memory: null,
+                diskRead: null,
+                diskWrite: null,
+                networkTX: null,
+                networkRX: null
+            },
 
             cpuCores: 0,
 
@@ -50,19 +52,6 @@ define('app/views/monitoring', [
                 Em.run.next(function() {
                     $('.monitoring-button').button();
                 });
-            },
-
-            updateGraphs: function(data){
-
-                    this.cpuCores = data.cpuCores;
-                    this.cpuGraph.updateData(data.cpu);
-                    this.loadGraph.updateData(data.load);
-                    this.memGraph.updateData(data.memory);
-
-                    this.diskReadGraph.updateData(data.diskRead);
-                    this.diskWriteGraph.updateData(data.diskWrite);
-                    this.networkRXGraph.updateData(data.netRX);
-                    this.networkTXGraph.updateData(data.netTX);
             },
 
             hideGraphs: function(){
@@ -205,7 +194,7 @@ define('app/views/monitoring', [
                 var graphBtnIdList = [];
 
                 // Get Visible Graphs List
-                $('.graph').each(function(){
+                $('.graph').each(function() {
 
                     if( $(this).css('display') != 'none' )
                         graphIdList.push($(this).attr('id'));
@@ -278,7 +267,14 @@ define('app/views/monitoring', [
                 $('#networkRXGraphBtn > button').button();
 
                 // DEBUG TODO Possible Remove It
-                $('#timeWindowSelect').selectmenu();
+                //$('#timeWindowSelect').selectmenu();
+
+                $('#graphsGoBack').button();
+                $('#graphsGoForward').button();
+                $('#graphsResetHistory').button();
+
+                $('#graphsGoForward').addClass('ui-disabled');
+                $('#graphsResetHistory').addClass('ui-disabled');
             },
 
             getLoadLineColor: function(currentLoad,cpuCores){
@@ -328,20 +324,20 @@ define('app/views/monitoring', [
 
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = 160 / 1280 * width;
-                    var margin = {top: 10, right: 0, bottom: 24, left: 40};
+                    var margin      = {top: 10, right: 0, bottom: 24, left: 40};
 
-                    this.id = divID;
-                    this.width = width;
-                    this.height = (fixedHeight < 85 ? 85 : fixedHeight);
-                    this.data = [];
-                    this.timeDisplayed = timeToDisplayms/1000;
-                    this.realDataIndex = -1;
-                    this.timeUpdated = false;
+                    this.id               = divID;
+                    this.width            = width;
+                    this.height           = (fixedHeight < 85 ? 85 : fixedHeight);
+                    this.data             = [];
+                    this.timeDisplayed    = timeToDisplayms/1000;
+                    this.realDataIndex    = -1;
+                    this.timeUpdated      = false;
+                    this.animationEnabled = true;
                     this.yAxisValueFormat = yAxisValueFormat;
-
-                    // DEBUG TODO
-                    this.displayedData = [];
-                    this.xCordinates = [];
+                    this.isAppended       = false;
+                    this.displayedData    = [];
+                    this.xCordinates      = [];
 
                     // Distance of two values in graph (pixels), Important For Animation
                     this.valuesDistance = 0;
@@ -423,9 +419,13 @@ define('app/views/monitoring', [
                             this.data = dataBuffer;
 
                             // On first run append the Graph
-                            if(!this.timeUpdated){
+                            if(!this.isAppended){
+
                                 // Append SVG Elements And Call onInitialized When Finish
                                 appendGraph(this.id,this.width,this.height);
+
+                                this.isAppended = true;
+
                                 // Do staff after Graph is in the dom and we have data
                                 onInitialized();
                             }
@@ -491,7 +491,10 @@ define('app/views/monitoring', [
 
                         // Set the range
                         this.calcValueDistance();
-                        xScale.range([-this.valuesDistance, this.width - margin.left - margin.right]);
+                        if(this.animationEnabled)
+                            xScale.range([-this.valuesDistance, this.width - margin.left - margin.right]);
+                        else
+                            xScale.range([0, this.width - margin.left - margin.right]);
 
 
                         // Create Array Of Cordinates
@@ -571,7 +574,7 @@ define('app/views/monitoring', [
                                           }));
 
                         // Animate line, axis and grid
-                        if(!this.timeUpdated)
+                        if(!this.timeUpdated && this.animationEnabled)
                         {
 
                             var animationDuration = STEP_SECONDS*1000;
@@ -658,6 +661,36 @@ define('app/views/monitoring', [
                         this.updateView();
                     };
 
+
+                    this.enableAnimation = function() {
+
+                        this.animationEnabled = true;
+                    };
+
+                    this.stopCurrentAnimation = function() {
+
+                         d3vLine.transition()
+                                .duration( 0 )
+                                .attr("transform", "translate(" + 0 + ")");
+
+                        d3xAxis.transition()
+                               .duration( 0 )
+                               .attr("transform", "translate(" +  margin.left + "," + (this.height - margin.bottom +2) + ")");
+
+                        d3GridX.transition()
+                               .duration( 0 )
+                               .attr("transform", "translate(" + margin.left + "," + this.height + ")");
+                    };
+
+                    this.disableAnimation = function() {
+
+                        this.animationEnabled = false;
+                        this.stopCurrentAnimation();
+                    };
+
+                    this.disableNextAnimation = function(){
+                        this.animationEnabled = false;
+                    };
 
                     /**
                     * Method: getLastMeasurementTime
@@ -845,9 +878,11 @@ define('app/views/monitoring', [
                                     var virtualMouseX = mouseX - margin.left;
 
                                     // Calculate Translate 
-                                    var translate =  $("#" + self.id).find('.valueLine > path').attr('transform');
-                                    translate = + translate.slice(10,translate.indexOf(','));
-
+                                    var translate = 0;
+                                    if(self.animationEnabled){
+                                        translate =  $("#" + self.id).find('.valueLine > path').attr('transform');
+                                        translate = + translate.slice(10,translate.indexOf(','));
+                                    }
                                     // Measurement That is less than curson x
                                     var minValueIndex = 0;
                                     var currentValue = 0;
@@ -966,7 +1001,7 @@ define('app/views/monitoring', [
                     var self = this;
                     var controller = Mist.monitoringController;
 
-                    controller.initController(machine,this);
+                    
 
                 
                     Em.run.next(function() {
@@ -1022,36 +1057,40 @@ define('app/views/monitoring', [
                         var width = $("#GraphsArea").width() -2;  
 
                         // Create Graphs 
-                        var timeToDisplay = 10*60*1000; // 10 minutes
-                        self.cpuGraph  = new Graph('cpuGraph',width,timeToDisplay,"%");
-                        self.loadGraph = new Graph('loadGraph',width,timeToDisplay);
-                        self.memGraph  = new Graph('memGraph',width,timeToDisplay,"%");
-                        self.diskReadGraph  = new Graph('diskReadGraph' ,width,timeToDisplay);
-                        self.diskWriteGraph = new Graph('diskWriteGraph',width,timeToDisplay);
-                        self.networkRXGraph = new Graph('networkRXGraph',width,timeToDisplay);
-                        self.networkTXGraph = new Graph('networkTXGraph',width,timeToDisplay);
+                        var timeToDisplay        = 10*60*1000; // 10 minutes
+                        self.graphs['cpu']       = new Graph('cpuGraph',width,timeToDisplay,"%");
+                        self.graphs['load']      = new Graph('loadGraph',width,timeToDisplay);
+                        self.graphs['memory']    = new Graph('memGraph',width,timeToDisplay,"%");
+                        self.graphs['diskRead']  = new Graph('diskReadGraph' ,width,timeToDisplay);
+                        self.graphs['diskWrite'] = new Graph('diskWriteGraph',width,timeToDisplay);
+                        self.graphs['networkRX'] = new Graph('networkRXGraph',width,timeToDisplay);
+                        self.graphs['networkTX'] = new Graph('networkTXGraph',width,timeToDisplay);
 
 
                         self.graphsCreated = true;
 
-                        controller.setupDataRequest(timeToDisplay,10000);
+                        controller.initialize({
+                            machineModel    : machine,      // Send Current Machine
+                            graphs          : self.graphs,  // Send Graphs Instances
+                            timeWindow      : 10*60*1000,   // Display 10 Minutes
+                            step            : 10000,        // Metrics Step in miliseconds
+                            updatesInterval : 10000,        // Get Updates Every x Miliseconds
+                            updatesEnabled  : true          // Get Updates
+                        });
+
                         //self.setupLoadColorInterval(); Commented Out Until It's Time To Deploy This Feature TODO
 
                         // Set Up Resolution Change Event
                         $(window).resize(function(){
 
-                                    var newWidth = $("#GraphsArea").width() -2;
-                                    self.cpuGraph.changeWidth(newWidth);
-                                    self.loadGraph.changeWidth(newWidth);
-                                    self.memGraph.changeWidth(newWidth);
-                                    self.diskReadGraph.changeWidth(newWidth);
-                                    self.diskWriteGraph.changeWidth(newWidth);
-                                    self.networkRXGraph.changeWidth(newWidth);
-                                    self.networkTXGraph.changeWidth(newWidth);
-
+                            var newWidth = $("#GraphsArea").width() -2;
+                            for(metric in self.graphs){
+                                 self.graphs[metric].changeWidth(newWidth);
+                            }
                         })
+
                     });
-                    
+
                     Mist.rulesController.redrawRules();
                 } 
             }.observes('controller.model.hasMonitoring','viewRendered'),
