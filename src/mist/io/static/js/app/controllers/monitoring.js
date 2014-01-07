@@ -20,7 +20,10 @@ define('app/controllers/monitoring', [
             // TODO , Remove Machine And View Arguments
             // TODO , UpdateInterval And Step Must Be the Same
             initialize: function(arguments){
-                
+
+                // Reset All Controller Values
+                this.reset();
+
                 this.request.initiliaze(arguments['timeWindow'],
                                         arguments['step'], 
                                         arguments['machineModel'],
@@ -28,6 +31,14 @@ define('app/controllers/monitoring', [
                                         arguments['updatesEnabled']);
 
                 this.graphs.instances = arguments['graphs'];
+            },
+
+            // Todo add Description
+            reset: function(){
+
+                this.request.reset();
+                this.history.reset();
+                this.graphs.reset();
             },
 
             /**
@@ -391,6 +402,15 @@ define('app/controllers/monitoring', [
                     console.log("Update Interval: " + this.updateInterval)
                 }, 
 
+                reset: function(){
+                    this.machine        = null;
+                    this.lastMetrictime = null;  
+                    this.timeWindow     = 0;     
+                    this.step           = 0;     
+                    this.updateData     = false; 
+                    this.updateInterval = 0;     
+                    this.locked         = false; 
+                },
                 
                 machine        : null,
                 lastMetrictime : null,  // Date Object
@@ -439,6 +459,11 @@ define('app/controllers/monitoring', [
                     }
                 },
 
+                reset: function() {
+                    this.instances        = null;
+                    this.animationEnabled = true;
+                },
+
                 instances        : null,    // Graph Objects created by the view
                 animationEnabled : true
             },
@@ -449,12 +474,6 @@ define('app/controllers/monitoring', [
             *
             */
             history : {
-
-                isEnabled       : false,
-                lastMetrictime  : null,
-                timeWindow      : 0,
-                currentStopTime : null,
-
 
                 goBack: function() {
 
@@ -532,7 +551,19 @@ define('app/controllers/monitoring', [
 
                     $('#graphsGoForward').addClass('ui-disabled');
                     $('#graphsResetHistory').addClass('ui-disabled');
-                }
+                },
+
+                reset: function() {
+                    this.isEnabled       = false;
+                    this.lastMetrictime  = null;
+                    this.timeWindow      = 0;
+                    this.currentStopTime = null;
+                },
+
+                isEnabled       : false,
+                lastMetrictime  : null,
+                timeWindow      : 0,
+                currentStopTime : null
             }
 
         })
