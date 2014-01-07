@@ -25,7 +25,8 @@
         <span id="single-view-image-icon"></span>
     </span>
 
-    <h3 id="single-view-state" {{bindAttr class="state"}}>{{state}}</h3>
+    <h3 id="single-view-state" {{bindAttr class="state"}}>
+        <div class="machine-state">{{state}}</div></h3>
     {{#if pendingCreation}}
     <div class="ajax-loader"></div>
     {{/if}}

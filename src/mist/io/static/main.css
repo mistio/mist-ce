@@ -23,7 +23,7 @@ div#splash {
 div#splash div.mist-logo {
     width: 280px;
     height: 280px;
-    background: url('images/logo_christmas.png') center no-repeat;
+    background: url('logo_splash.png') center no-repeat;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -616,11 +616,13 @@ div.ember-view div.ui-panel-content-wrap {
 /* Machine single View */
 
 #single-view-state {
-   font-weight: normal;
-    left: 50%;
-    margin-bottom: 0;
+    font-weight: normal;
     margin-top: 20px;
+    margin-bottom: 0px;
     text-shadow: none;
+    left: 20%;
+    text-align: left;
+    position: relative;
 }
 
 #key-icon-wrapper {
@@ -891,6 +893,12 @@ div.loading-monitoring {
 .graph .grid-x path,.graph .grid-y path {
     stroke-width: 1;    
 }
+
+.graphControls {
+    width: 250px;
+    margin: 0 auto;
+    margin-bottom: -30px;   
+} 
 
 #GraphsArea{
     white-space: normal;
