@@ -69,9 +69,6 @@ define('app/views/backend_add', [
                     $('#addBackendBareMetal').show();
                     $('#addBackendOpenstack').hide();
                     Mist.backendAddController.set('newBareMetalServerUser', 'root');
-                    Ember.run.next(function () {
-                        $('.select-key-collapsible .ui-listview').listview('refresh');
-                    });
                 } else {
                     $('#addBackendInfo').show();                 
                     $('#ApiKeylabel').text('2. API Key:');
@@ -101,11 +98,13 @@ define('app/views/backend_add', [
                         Mist.backendAddController.set('newBackendKey', backend.apikey);
                         Mist.backendAddController.set('newBackendSecret', 'getsecretfromdb');
                         break;
-                    } else if (event.target.title.substr(0,9) == 'rackspace' && event.target.title.substr(10) != 'lon') {
+                    } else if (event.target.title.substr(0,9) == 'rackspace' && backend.provider.substr(0,9) == 'rackspace') {
                         //autocomplete for all rackspace regions except LON, that needs an account on Rackspace Lon
-                        Mist.backendAddController.set('newBackendKey', backend.apikey);
-                        Mist.backendAddController.set('newBackendSecret', 'getsecretfromdb');
-                        break;
+                        if (event.target.title.substr(10) != 'lon') {
+                            Mist.backendAddController.set('newBackendKey', backend.apikey);
+                            Mist.backendAddController.set('newBackendSecret', 'getsecretfromdb');
+                            break;
+                        }
                     }
                 }
             },
