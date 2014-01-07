@@ -354,8 +354,8 @@ def disassociate_key(user, key_id, backend_id, machine_id, host=None):
 
     if key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
-    if backend_id not in user.backends:
-        raise BackendNotFoundError(backend_id)
+    ## if backend_id not in user.backends:
+        ## raise BackendNotFoundError(backend_id)
 
     keypair = user.keypairs[key_id]
     machine_uid = [backend_id, machine_id]
