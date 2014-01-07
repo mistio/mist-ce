@@ -97,3 +97,13 @@ def list_locations(uri, backend_id, cookie=None):
         return params
     except Exception as e:
         assert False, u'Exception: %s' % e
+
+
+def rename_backend(uri, backend_id, new_name, cookie=None):
+    payload = {
+        'new_name': new_name
+    }
+
+    req = MyRequests(uri=uri+"/backends/"+backend_id, data=json.dumps(payload), cookie=cookie)
+    response = req.put()
+    assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
