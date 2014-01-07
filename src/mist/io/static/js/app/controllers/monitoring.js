@@ -211,7 +211,14 @@ define('app/controllers/monitoring', [
 
                            reason = (typeof reason == 'undefined' ? 'manualReload' : reason);
 
-                           Mist.monitoringController.trigger('reloading',reason);
+                           // Temporary Fix For Some Functions TODO change this
+                           if(reason == 'updatesDisabled')
+                                Mist.monitoringController.graphs.disableAnimation(false);
+                           if(reason == 'updatesEnabled')
+                                Mist.monitoringController.graphs.enableAnimation();
+
+                            Mist.monitoringController.graphs.clearData();
+                            // End Of Fix
 
                            // Re-Initialize Request
                            self.initiliaze(self.timeWindow,self.step,self.machine,self.updateInterval,self.updateData); 
@@ -231,8 +238,6 @@ define('app/controllers/monitoring', [
 
                     var controller = Mist.monitoringController;
                     var self = this;
-
-                    controller.trigger("dataFetchStarted");
 
                     // start: date/time we want to receive data from (seconds)
                     // stop:  date/time we want to receeive data until (seconds)
@@ -360,12 +365,12 @@ define('app/controllers/monitoring', [
                                 self.machine.set('pendingStats', false);
                                 self.lastMetrictime = new Date(metricTime.getTime()-10000);
                                 // Send Data via Event
-                                controller.trigger("dataFetchFinished",true,receivedData);
+                                //controller.trigger("dataFetchFinished",true,receivedData);
+                                controller.graphs.updateData(receivedData);
                             }
                             catch(err) {
                                 error(err);
                                 controller.machineNotResponding = true;
-                                controller.trigger("dataFetchFinished",false);
                             }
 
                             self.locked = false;
@@ -389,8 +394,6 @@ define('app/controllers/monitoring', [
                             };
 
                             self.locked = false;
-
-                            controller.trigger("dataFetchFinished",false);
                         }
                     });
                 },
@@ -441,17 +444,42 @@ define('app/controllers/monitoring', [
                     this.animationEnabled = true;
                 },
 
-                disableAnimation : function() {
+                
+                disableAnimation : function(stopCurrent) {
+                    
+                    // Default StopCurrent true
+                    stopCurrent = (typeof stopCurrent === 'undefined') ? true : stopCurrent ;
 
-                    for(metric in this.instances)
-                    {
-                        this.instances[metric].disableAnimation();
+                    if(stopCurrent) {
+
+                        for(metric in this.instances)
+                        {
+                            this.instances[metric].disableAnimation();
+                        }
+                    }
+                    else {
+
+                        for(metric in this.instances)
+                        {
+                            this.instances[metric].disableNextAnimation();
+                        }
                     }
 
                     this.animationEnabled = false;
                 },
 
-                clearData        : function() {
+                updateData : function(data){
+
+                    // TODO something with cpuCores property
+                    // Then we delete it
+                    delete data['cpuCores'];
+                    
+                    for(metric in data){
+                        this.instances[metric].updateData(data[metric]);
+                    }
+                },
+
+                clearData  : function() {
                     
                     for(metric in this.instances)
                     {

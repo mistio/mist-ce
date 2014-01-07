@@ -32,7 +32,6 @@ define('app/views/monitoring', [
             init: function() {
                 this._super();
                 this.setUpGraphs();
-                this.setupEventListeners();
             },
 
             // Check If Ember View Rendered
@@ -53,60 +52,6 @@ define('app/views/monitoring', [
                 Em.run.next(function() {
                     $('.monitoring-button').button();
                 });
-            },
-
-            // TODO Create And Connect Functions For These Events
-            setupEventListeners: function(){
-
-                var controller = Mist.monitoringController;
-                var self = this;
-
-                controller.on("reloading",function(reason){
-
-                    console.log("Reloading Data,Reason " + reason);
-
-                    if(reason == 'updatesDisabled') {
-
-                        for(metric in self.graphs)
-                        {
-                            self.graphs[metric].disableAnimation();
-                        }
-                    }
-                    else if(reason == 'updatesEnabled') {
-                        
-                        for(metric in self.graphs)
-                        {
-                            self.graphs[metric].enableAnimation();
-                        }
-                    }
-
-                    // Clear Data
-                    for(metric in self.graphs){
-
-                        self.graphs[metric].clearData();
-                    }
-                });
-
-                controller.on("dataFetchStarted",function(){
-                    console.log("Controller Started Fetching Stats");
-                });
-
-                controller.on("dataFetchFinished",function(success,data){
-                    if(success){
-                        self.updateGraphs(data);
-                    }
-                });
-            },
-
-            updateGraphs: function(data){
-
-                // Do Something For CPU Cores (Add Them Inside CPU ?) TODO
-                this.cpuCores = data.cpuCores;
-
-                for(metric in data){
-                    if(metric != 'cpuCores')
-                        this.graphs[metric].updateData(data[metric]);
-                }
             },
 
             hideGraphs: function(){
@@ -741,6 +686,10 @@ define('app/views/monitoring', [
 
                         this.animationEnabled = false;
                         this.stopCurrentAnimation();
+                    };
+
+                    this.disableNextAnimation = function(){
+                        this.animationEnabled = false;
                     };
 
                     /**
