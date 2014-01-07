@@ -419,10 +419,13 @@ def disassociate_key(request):
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
+    try:
+        host = request.json_body.get('host')
+    except:
+        host = None
     user = user_from_request(request)
-    methods.disassociate_key(user, key_id, backend_id, machine_id)
+    methods.disassociate_key(user, key_id, backend_id, machine_id, host)
     return user.keypairs[key_id].machines
-
 
 
 @view_config(route_name='machines', request_method='GET', renderer='json')

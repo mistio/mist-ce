@@ -372,11 +372,11 @@ def disassociate_key(user, key_id, backend_id, machine_id, host=None):
     # key not associated
     if not key_found:
         raise BadRequestError("Keypair '%s' is not associated with "
-                              "machine '%s'" % (key_id, machine_id), 304)
+                              "machine '%s'" % (key_id, machine_id))
 
     if host:
         log.info("Trying to actually remove key from authorized_keys.")
-        command = 'grep -v "' + keypair['public'] +\
+        command = 'grep -v "' + keypair.public +\
                   '" ~/.ssh/authorized_keys ' +\
                   '> ~/.ssh/authorized_keys.tmp && ' +\
                   'mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys ' +\
