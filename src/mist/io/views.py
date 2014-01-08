@@ -18,15 +18,15 @@ import requests
 import json
 
 from pyramid.response import Response
-from pyramid.view import view_config
-
 
 try:
     from mist.core import config
     from mist.core.helpers import user_from_request
+    from mist.core.helpers import view_config
 except ImportError:
     from mist.io import config
     from mist.io.helpers import user_from_request
+    from pyramid.view import view_config
 
 from mist.io import methods
 from mist.io.model import Keypair
@@ -238,6 +238,20 @@ def delete_backend(request):
     backend_id = request.matchdict['backend']
     user = user_from_request(request)
     methods.delete_backend(user, backend_id)
+    return OK
+
+
+@view_config(route_name='backend_action', request_method='PUT')
+def rename_backend(request):
+    """Renames a backend."""
+
+    backend_id = request.matchdict['backend']
+    new_name = request.json_body.get('new_name', '')
+    if not new_name:
+        raise RequiredParameterMissingError('new_name')
+
+    user = user_from_request(request)
+    methods.rename_backend(user, backend_id, new_name)
     return OK
 
 

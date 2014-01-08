@@ -16,6 +16,12 @@ define('app/views/home', [
                 
                 this._super();
                 
+                // TODO: This should be done through a router or something
+                // but there is no route for home
+                Ember.run.next(function() {
+                    document.title = 'mist.io - home';
+                });
+                
                 // Welcome message to the new users
                 
                 // Get data from registration

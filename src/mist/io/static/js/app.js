@@ -7,6 +7,7 @@ require.config({
         chai: 'lib/chai-1.2.0',
         jquery: 'lib/jquery-1.9.1',
         jqueryUi: 'lib/jquery-ui-1.9.1.custom',
+        jqueryColor: 'lib/jquery.color-2.1.2.min',
         text: 'lib/require/text',
         ember: 'lib/ember-1.0.0-rc.3',
         handlebars: 'lib/handlebars-1.0.0-rc.3',
@@ -22,6 +23,9 @@ require.config({
         'jqueryUi': {
             deps: ['jquery']
         },
+        'jqueryColor': {
+            deps: ['jquery']
+        },
         'd3': {
             deps: ['jquery']
         }
@@ -32,6 +36,7 @@ require.config({
 define( 'app', [
     'jquery',
     'jqueryUi',
+    'jqueryColor',
     'd3',
     'app/controllers/backends',
     'app/controllers/confirmation',
@@ -76,6 +81,7 @@ define( 'app', [
     'ember'
     ], function($,
                 jQueryUI,
+                jQueryColor,
                 d3,
                 BackendsController,
                 ConfirmationController,
@@ -167,7 +173,23 @@ define( 'app', [
             });
         });
 
+        App.ImagesRoute = Ember.Route.extend({
+
+            activate: function() {
+                Ember.run.next(function() {
+                    document.title = 'mist.io - images';
+                });
+            }    
+        }); 
+
         App.MachinesRoute = Ember.Route.extend({
+
+            activate: function() {
+                Ember.run.next(function() {
+                    document.title = 'mist.io - machines';
+                });
+            },
+            
             //clear selected machines when exiting view
             exit: function(){
               Mist.backendsController.forEach(function(backend){
@@ -182,7 +204,9 @@ define( 'app', [
         App.MachineRoute = Ember.Route.extend({
             activate: function() {
                 Ember.run.next(function() {
-                    document.title = 'mist.io - ' + Mist.getMachineIdByUrl();
+                    var id = Mist.getMachineIdByUrl();
+                    var machine = Mist.backendsController.getMachineByUrlId(id);
+                    document.title = 'mist.io - ' + (machine ? machine.name : id);
                 });
             },
 
@@ -215,6 +239,13 @@ define( 'app', [
         });   
         
         App.KeysRoute = Ember.Route.extend({
+
+          activate: function() {
+              Ember.run.next(function() {
+                  document.title = 'mist.io - keys';
+              });
+          },
+            
           //clear selected keys when exiting view           
           exit: function(){
               Mist.keysController.keys.forEach(function(key){

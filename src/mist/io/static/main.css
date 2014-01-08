@@ -16,7 +16,7 @@ div#splash {
     top: 0px;
     width: 100%;
     height: 100%;
-    background: #c2c3c4 url('images/bg_splash.gif') top left repeat;
+    background-color: #111;
     z-index: 1000;
 }
 
@@ -616,11 +616,13 @@ div.ember-view div.ui-panel-content-wrap {
 /* Machine single View */
 
 #single-view-state {
-   font-weight: normal;
-    left: 50%;
-    margin-bottom: 0;
+    font-weight: normal;
     margin-top: 20px;
+    margin-bottom: 0px;
     text-shadow: none;
+    left: 20%;
+    text-align: left;
+    position: relative;
 }
 
 #key-icon-wrapper {
@@ -853,6 +855,33 @@ div.loading-monitoring {
     border: 1px solid #ccc;
 }
 
+#GraphsArea .valuePopUp{
+    position:fixed; 
+    display: none;
+    left:0; 
+    top:0; 
+    width:90px; 
+    height:30px;
+    line-height:30px;
+    border:1px solid:#C2C4C2; 
+    border-radius:10px;
+    box-shadow: 2px 2px 4px 1px #888888;
+    text-align: center;
+
+    font-weight:bold;
+    color: #404040;
+
+    background: rgb(242,242,242); /* Old browsers */
+    background: -moz-linear-gradient(top,  rgba(242,242,242,1) 0%, rgba(229,229,229,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(242,242,242,1)), color-stop(100%,rgba(229,229,229,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba(242,242,242,1) 0%,rgba(229,229,229,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba(242,242,242,1) 0%,rgba(229,229,229,1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba(242,242,242,1) 0%,rgba(229,229,229,1) 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  rgba(242,242,242,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2f2f2', endColorstr='#e5e5e5',GradientType=0 ); /* IE6-9 */
+
+}
+
 .graph .grid-x .tick {
     stroke: #BABABA;
 }
@@ -864,6 +893,12 @@ div.loading-monitoring {
 .graph .grid-x path,.graph .grid-y path {
     stroke-width: 1;    
 }
+
+.graphControls {
+    width: 250px;
+    margin: 0 auto;
+    margin-bottom: -30px;   
+} 
 
 #GraphsArea{
     white-space: normal;
@@ -1013,7 +1048,7 @@ div.loading-monitoring {
     fill: #333333;
 }
 
-.graph .axisLine{
+.graph .axisLine,.graph .selectorLine{
     fill:none;
     stroke: #333333;
     stroke-width: 1;
@@ -1316,10 +1351,15 @@ div.loading-monitoring {
 }
 
 #edit-backend .content-header {
-    overflow: auto;
-    padding: 20px 6px;
     border-bottom: 1px solid #ddd;
-    margin-bottom: 8px;
+}
+
+#edit-backend .content-header input {
+    font-weight: bold;
+}
+
+#edit-backend .content-header div.ui-input-text {
+    overflow: visible;
 }
 
 #edit-backend .state {
@@ -1361,7 +1401,7 @@ div.loading-monitoring {
     padding: 8px 18px;
 }
 
-#edit-backend #backend-delete-confirm {
+#edit-backend #backend-delete-confirm, #edit-backend #backend-rename {
     display: none;
 }
 

@@ -44,6 +44,15 @@ define('app/controllers/keys', [
                         info('Successfully loaded keys');
                         Mist.keysController.set('loadingKeys', false);
                         Mist.keysController.updateKeysList(data);
+                        
+                        Ember.run.next(function() {
+                            if($('.select-key-collapsible').collapsible) {
+                                $('.select-key-collapsible').collapsible();
+                            }
+                            if ($('.select-key-collapsible .ui-listview').listview) {
+                                $('.select-key-collapsible .ui-listview').listview('refresh');
+                            }
+                        });
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         Mist.notificationController.notify('Error while loading keys: ' + jqXHR.responseText);

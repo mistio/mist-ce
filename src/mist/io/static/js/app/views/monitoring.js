@@ -11,13 +11,17 @@ define('app/views/monitoring', [
 
             template: Ember.Handlebars.compile(monitoring_html),
 
-            cpuGraph: null,
-            loadGraph: null,
-            memGraph: null,
-            diskReadGraph: null,
-            diskWriteGraph: null,
-            networkTXGraph: null,
-            networkRXGraph: null,
+            graphs : {
+                cpu: null,
+                load: null,
+                memory: null,
+                diskRead: null,
+                diskWrite: null,
+                networkTX: null,
+                networkRX: null
+            },
+
+            cpuCores: 0,
 
             viewRendered: false,
             graphsCreated: false,
@@ -40,24 +44,14 @@ define('app/views/monitoring', [
             willDestroyElement: function(){
 
                 this._super();
+                // Disable intervals of data request and Load Color change
                 window.clearInterval(window.monitoringInterval);
+                this.stopLoadColorInterval();
 
                 // Re-Initialize Enable Button Of Jquery Mobile
                 Em.run.next(function() {
                     $('.monitoring-button').button();
                 });
-            },
-
-            updateGraphs: function(data){
-
-                    this.cpuGraph.updateData(data.cpu);
-                    this.loadGraph.updateData(data.load);
-                    this.memGraph.updateData(data.memory);
-
-                    this.diskReadGraph.updateData(data.diskRead);
-                    this.diskWriteGraph.updateData(data.diskWrite);
-                    this.networkRXGraph.updateData(data.netRX);
-                    this.networkTXGraph.updateData(data.netTX);
             },
 
             hideGraphs: function(){
@@ -137,19 +131,61 @@ define('app/views/monitoring', [
                 
             },
 
-            selectPressed: function(graph){
+            /* Commented Out Until It's Time To Test Zoom In/Out
+            selectPressed: function(){
 
-                var selectValue = $("#" + graph.id + " select").val();
-                if(selectValue.toLowerCase().search("minutes") || selectValue.toLowerCase().search("minute"))
+                var selectValue = $("#timeWindowSelect").val();
+                console.log("time Window");
+                console.log(this.cpuGraph.getTimeWindow());
+                var newTime = 0;
+                var newStep = 10000;
+                if(selectValue.toLowerCase().search("minutes") != -1)
                 {
                     selectValue = selectValue.replace(/\D+/g, '' );
-                    var newTime = new Date();
-                    newTime.setHours(0,+selectValue,0);
-                    graph.changeTimeToDisplay(newTime);
-                }
-                // ELSE add Hours/Hour TODO
-            },
+                    console.log("Minutes To Display:" + selectValue);
+                    newTime = selectValue * 60 * 1000;
 
+                    if(selectValue > 30)
+                        newStep = (selectValue*60 / 180)*1000;
+
+                }
+                else if(selectValue.toLowerCase().search("hours") != 1 || selectValue.toLowerCase().search("hour") != 1)
+                {
+                    selectValue = selectValue.replace(/\D+/g, '' );
+                    console.log("Hours To Display:" + selectValue);
+
+                    newTime = selectValue * 60 * 60 * 1000;
+                    newStep = (selectValue*60*60 / 180)*1000;
+
+                }
+                else if(selectValue.toLowerCase().search("days") != 1 || selectValue.toLowerCase().search("day") != 1)
+                {
+                    selectValue = selectValue.replace(/\D+/g, '' );
+                    console.log("Days To Display:" + selectValue);
+
+                    newTime = selectValue * 24 * 60 * 60 * 1000;
+                    newStep = (selectValue * 24 * 60 * 60 / 180)*1000;
+
+                }
+
+                // Update Graph Time If selection is not the same
+                // TODO Make it cpugraph independent
+                if(newTime/1000 != this.cpuGraph.getTimeWindow())
+                {
+                    this.cpuGraph.changeTimeToDisplay(newTime);
+                    this.loadGraph.changeTimeToDisplay(newTime);
+                    this.memGraph.changeTimeToDisplay(newTime);
+                    this.diskReadGraph.changeTimeToDisplay(newTime);
+                    this.diskWriteGraph.changeTimeToDisplay(newTime);
+                    this.networkTXGraph.changeTimeToDisplay(newTime);
+                    this.networkRXGraph.changeTimeToDisplay(newTime);
+
+                    // TODO
+                    // Step will be 10 seconds until machine is able to send less values //
+                    Mist.monitoringController.updateDataRequest(newTime,10000);
+                }
+            },
+            */
             setGraphsCookie: function(){
 
                 var cookieExpire = new Date();
@@ -158,7 +194,7 @@ define('app/views/monitoring', [
                 var graphBtnIdList = [];
 
                 // Get Visible Graphs List
-                $('.graph').each(function(){
+                $('.graph').each(function() {
 
                     if( $(this).css('display') != 'none' )
                         graphIdList.push($(this).attr('id'));
@@ -229,6 +265,47 @@ define('app/views/monitoring', [
                 $('#diskWriteGraphBtn > button').button();
                 $('#networkTXGraphBtn > button').button();
                 $('#networkRXGraphBtn > button').button();
+
+                // DEBUG TODO Possible Remove It
+                //$('#timeWindowSelect').selectmenu();
+
+                $('#graphsGoBack').button();
+                $('#graphsGoForward').button();
+                $('#graphsResetHistory').button();
+
+                $('#graphsGoForward').addClass('ui-disabled');
+                $('#graphsResetHistory').addClass('ui-disabled');
+            },
+
+            getLoadLineColor: function(currentLoad,cpuCores){
+                if(currentLoad >= 1 * cpuCores)
+                    return "#FF0000";
+                else if(currentLoad >= 0.7 * cpuCores)
+                    return "#00FF26";
+                else 
+                    return "#6CE0BA";
+            },
+
+            setupLoadColorInterval: function(){
+                 
+                 var self = this;
+                 jQuery.Color.hook( "stroke" );
+
+                 window.monitoringLoadColorInterval = window.setInterval(function () {
+                    var loadValue = self.loadGraph.getLastDisplayedValue();
+
+                    if(loadValue != null) {
+
+                        var color = self.getLoadLineColor(loadValue,self.cpuCores);
+                        $("#loadGraph").find('.valueLine > path').animate( {
+                            stroke: jQuery.Color(color)
+                        }, 700 );
+                    }
+                },1000);
+            },
+
+            stopLoadColorInterval: function(){
+                window.clearInterval(window.monitoringLoadColorInterval);
             },
 
             // Graph Constructor
@@ -238,36 +315,38 @@ define('app/views/monitoring', [
                 *  
                 * 
                 */
-                function Graph(divID,width,timeToDisplay,yAxisValueFormat){
+                function Graph(divID,width,timeToDisplayms,yAxisValueFormat){
 
                     var NUM_OF_LABELS = 5;
                     var STEP_SECONDS = 10;
-                    var NUM_OF_MIN_MEASUREMENTS = 180;  // 30 Minutes
+                    var NUM_OF_MIN_MEASUREMENTS = 8640; // 24 Hours
                     var NUM_OF_MAX_MEASUREMENTS = 8640; // 24 Hours
 
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = 160 / 1280 * width;
-                    var margin = {top: 10, right: 0, bottom: 24, left: 40};
+                    var margin      = {top: 10, right: 0, bottom: 24, left: 40};
 
-                    this.id = divID;
-                    this.width = width;
-                    this.height = (fixedHeight < 85 ? 85 : fixedHeight);
-                    this.data = [];
-                    this.timeDisplayed = timeToDisplay;
-                    this.realDataIndex = -1;
-                    this.timeUpdated = false;
+                    this.id               = divID;
+                    this.width            = width;
+                    this.height           = (fixedHeight < 85 ? 85 : fixedHeight);
+                    this.data             = [];
+                    this.timeDisplayed    = timeToDisplayms/1000;
+                    this.realDataIndex    = -1;
+                    this.timeUpdated      = false;
+                    this.animationEnabled = true;
                     this.yAxisValueFormat = yAxisValueFormat;
+                    this.isAppended       = false;
+                    this.displayedData    = [];
+                    this.xCordinates      = [];
 
                     // Distance of two values in graph (pixels), Important For Animation
                     this.valuesDistance = 0;
-                    this.isAnimated = true;
 
                     // Calculate The step  of the time axis
-                    this.secondsStep =  Math.floor((timeToDisplay.getHours()*60*60 + 
-                                        timeToDisplay.getMinutes()*60 + 
-                                        timeToDisplay.getSeconds() ) / NUM_OF_LABELS); 
+                    this.secondsStep =  Math.floor((timeToDisplayms / 1000) / NUM_OF_LABELS); 
                     
                     var self = this;
+
 
                     // Scale Functions will scale graph to defined width and height
                     var xScale = d3.time.scale().range([0, this.width - margin.left - margin.right]);
@@ -279,7 +358,7 @@ define('app/views/monitoring', [
                                     .y(function(d) {return yScale(d.value); });
 
                     
-                    // SVG elements for graph manipulation.
+                    // ---------------  SVG elements for graph manipulation --------------------- //
                     // Elements will be added to the dom after first updateData().
                     var d3svg;            // Main SVG element where the graph will be rendered
                     var d3GridX;          // Horizontal grid lines g element
@@ -305,22 +384,19 @@ define('app/views/monitoring', [
 
                         if(this.data.length == 0)
                         {
-
                             var dataBuffer = [];
                             var measurements_received = newData.length;
                             if(measurements_received < NUM_OF_MIN_MEASUREMENTS)
                             {
-
                                 // Get First Measurement Time
-                                var format = d3.time.format("%X");
-                                var metricTime = format.parse(newData[0].time);
-                                metricTime = new Date(metricTime.getTime() - STEP_SECONDS*1000);
+                                metricTime = new Date(newData[0].time.getTime() - STEP_SECONDS*1000);
 
                                 // Fill Data With Zeros
                                 for(var i= 0; i < (NUM_OF_MIN_MEASUREMENTS - measurements_received); i++)
                                 {
+
                                     var zeroObject = {
-                                        time: (metricTime.getHours() + ":" + metricTime.getMinutes() + ":" + metricTime.getSeconds()),
+                                        time: metricTime,
                                         value: 0
                                     }
 
@@ -339,24 +415,20 @@ define('app/views/monitoring', [
                                 dataBuffer = newData;
                             }
 
-                            // Fix Values, TypeCaste To Date And Number
-                            var fixedData = [];
-                            dataBuffer.forEach(function(d) {
-                                
-                                var format    = d3.time.format("%X");
-                                var tempObj   = {};
-                                tempObj.time  = format.parse(d.time);
-                                tempObj.value = +d.value;
-                                fixedData.push(tempObj);
-                            });
-
                             // Set Our Final Data
-                            this.data = fixedData;
+                            this.data = dataBuffer;
 
-                            // Append SVG Elements And Call onInitialized When Finish
-                            appendGraph(this.id,this.width,this.height);
-                            // Do staff after Graph is in the dom and we have data
-                            onInitialized();
+                            // On first run append the Graph
+                            if(!this.isAppended){
+
+                                // Append SVG Elements And Call onInitialized When Finish
+                                appendGraph(this.id,this.width,this.height);
+
+                                this.isAppended = true;
+
+                                // Do staff after Graph is in the dom and we have data
+                                onInitialized();
+                            }
                         }
                         else{
 
@@ -369,21 +441,21 @@ define('app/views/monitoring', [
                                 this.data = this.data.slice(num_of_overflow_Objs);
                             }
 
-                            // Fix Values, TypeCaste To Date And Number
-                            var fixedData = [];
-                            newData.forEach(function(d) {
-                                var format = d3.time.format("%X");
-                                var tempObj = {};
-                                tempObj.time = format.parse(d.time);
-                                tempObj.value = +d.value;
-                                fixedData.push(tempObj);
-                            });
-
                             // Set Our Final Data
-                            this.data = this.data.concat(fixedData);
+                            this.data = this.data.concat(newData);
                         }
 
                         this.updateView();
+                    };
+
+
+                   /**
+                    * Method: clearData
+                    * Deletes current graph data
+                    * 
+                    */
+                    this.clearData = function() {
+                        this.data = [];
                     };
                     
 
@@ -394,94 +466,87 @@ define('app/views/monitoring', [
                     */
                     this.updateView = function() {
                         
-                        var displayedData = [];
-                        var num_of_displayed_measurements = (this.timeDisplayed.getHours()*60*60 +
-                                                            this.timeDisplayed.getMinutes()*60   +
-                                                            this.timeDisplayed.getSeconds()) / STEP_SECONDS;
+                        this.displayedData = [];
+                        this.xCordinates   = [];
+                        var num_of_displayed_measurements = this.timeDisplayed / STEP_SECONDS;
 
                         // Get only data that will be displayed
                         if(this.data.length > num_of_displayed_measurements) {
 
-                            displayedData = this.data.slice(this.data.length - num_of_displayed_measurements);
+                            this.displayedData = this.data.slice(this.data.length - num_of_displayed_measurements);
                         }
                         else {
 
-                            displayedData = this.data;
+                            this.displayedData = this.data;
                         }
 
 
                         // If min & max == 0 y axis will not display values. max=1 fixes this.
-                        var maxValue = d3.max(displayedData, function(d) { return d.value; });
+                        var maxValue = d3.max(this.displayedData, function(d) { return d.value; });
                         var fixedMaxValue =  maxValue == 0 ? 1 : maxValue ;
 
                         // Set Possible min/max x & y values
-                        xScale.domain(d3.extent(displayedData , function(d) { return d.time;  }));
+                        xScale.domain(d3.extent(this.displayedData , function(d) { return d.time;  }));
                         yScale.domain([0, fixedMaxValue]);
 
                         // Set the range
-                        if(this.isAnimated) {
-                            this.calcValueDistance();
+                        this.calcValueDistance();
+                        if(this.animationEnabled)
                             xScale.range([-this.valuesDistance, this.width - margin.left - margin.right]);
-                        }
-                        else{
+                        else
                             xScale.range([0, this.width - margin.left - margin.right]);
-                        }
 
 
-                        // Change axis labels and grid position based on time that will display
-                        // TODO Reduce Code
-                        if (this.secondsStep <= 60) {
-                            d3xAxis.call(d3.svg.axis()
+                        // Create Array Of Cordinates
+                        this.displayedData.forEach(function(d){
+
+                            self.xCordinates.push(xScale(d.time));
+                        });
+
+
+                        // Change grid lines and labels based on time displayed
+                        var modelXAxis = d3.svg.axis()
+                                                .scale(xScale)
+                                                .orient("bottom");
+
+                        var modelGridX = d3.svg.axis()
                                                .scale(xScale)
                                                .orient("bottom")
-                                               .ticks(d3.time.seconds, this.secondsStep)
-                                               .tickFormat(d3.time.format("%I:%M:%S%p")))
-                                               .selectAll("text") 
-                                               .style("text-anchor", "end")
-                                               .attr('x','-10');
-
-                            d3GridX.call(d3.svg.axis()
-                                               .scale(xScale)
-                                               .orient("bottom")
-                                               .ticks(d3.time.seconds, this.secondsStep)
                                                .tickSize(-this.height, 0, 0)
-                                               .tickFormat(""));
+                                               .tickFormat("");
+                        
+                        if (this.secondsStep <= 60) {
+
+                            d3xAxis.call(modelXAxis
+                                         .ticks(d3.time.seconds, this.secondsStep)
+                                         .tickFormat(d3.time.format("%I:%M:%S%p")));
+
+                            d3GridX.call(modelGridX
+                                         .ticks(d3.time.seconds, this.secondsStep));
                         }
                         else if (this.secondsStep <= 18000) {
 
-                            d3xAxis.call(d3.svg.axis()
-                                               .scale(xScale)
-                                               .orient("bottom")
-                                               .ticks(d3.time.minutes, this.secondsStep/60)
-                                               .tickFormat(d3.time.format("%I:%M%p")))
-                                               .selectAll("text") 
-                                               .style("text-anchor", "end")
-                                               .attr('x','-10');
+                            d3xAxis.call(modelXAxis
+                                         .ticks(d3.time.minutes, this.secondsStep/60)
+                                         .tickFormat(d3.time.format("%I:%M%p")));
 
-                            d3GridX.call(d3.svg.axis()
-                                               .scale(xScale)
-                                               .orient("bottom")
-                                               .ticks(d3.time.minutes, this.secondsStep/60)
-                                               .tickSize(-this.height, 0, 0)
-                                               .tickFormat(""));
+                            d3GridX.call(modelGridX
+                                         .ticks(d3.time.minutes, this.secondsStep/60));
                         }
                         else {
-                            d3xAxis.call(d3.svg.axis()
-                                               .scale(xScale)
-                                               .orient("bottom")
-                                               .ticks(d3.time.hours, this.secondsStep/60/60)
-                                               .tickFormat(d3.time.format("%I:%M%p")))
-                                               .selectAll("text") 
-                                               .style("text-anchor", "end")
-                                               .attr('x','-10');
 
-                            d3GridX.call(d3.svg.axis()
-                                               .scale(xScale)
-                                               .orient("bottom")
-                                               .ticks(d3.time.hours, this.secondsStep/60/60)
-                                               .tickSize(-this.height, 0, 0)
-                                               .tickFormat(""));
+                            d3xAxis.call(modelXAxis
+                                         .ticks(d3.time.hours, this.secondsStep/60/60)
+                                         .tickFormat(d3.time.format("%I:%M%p")));
+
+                            d3GridX.call(modelGridX
+                                         .ticks(d3.time.hours, this.secondsStep/60/60));
                         }
+
+                        // Set time label at left side
+                        d3xAxis.selectAll("text") 
+                               .style("text-anchor", "end")
+                               .attr('x','-10');
 
 
                        // Horizontal grid lines will not change on time change
@@ -508,16 +573,15 @@ define('app/views/monitoring', [
                                                 return d;
                                           }));
 
-
                         // Animate line, axis and grid
-                        if(this.isAnimated && !this.timeUpdated)
+                        if(!this.timeUpdated && this.animationEnabled)
                         {
 
                             var animationDuration = STEP_SECONDS*1000;
                             
                             // Update Animated Line
                             d3vLine.attr("transform", "translate(" + this.valuesDistance + ")")
-                                   .attr("d", valueline(displayedData)) 
+                                   .attr("d", valueline(this.displayedData)) 
                                    .transition() 
                                    .ease("linear")
                                    .duration(animationDuration)
@@ -539,13 +603,12 @@ define('app/views/monitoring', [
                         else {
 
                             // Update Non-Animated value line
-                            d3vLine.attr("d", valueline(displayedData))
+                            d3vLine.attr("d", valueline(this.displayedData))
 
                             // Fix For Animation after time displayed changed
                             if(this.timeUpdated)
                             {
                                 this.timeUpdated = false;
-
 
                                 d3vLine.transition()
                                        .duration( 0 )
@@ -553,11 +616,11 @@ define('app/views/monitoring', [
 
                                 d3xAxis.transition()
                                        .duration( 0 )
-                                       .attr("transform", "translate(0," + (this.height - margin.bottom +2) + ")");
+                                       .attr("transform", "translate(" +  margin.left + "," + (this.height - margin.bottom +2) + ")");
 
                                 d3GridX.transition()
                                        .duration( 0 )
-                                       .attr("transform", "translate(0," + this.height + ")");
+                                       .attr("transform", "translate(" + margin.left + "," + this.height + ")");
                             }
                         }
                     };
@@ -599,6 +662,36 @@ define('app/views/monitoring', [
                     };
 
 
+                    this.enableAnimation = function() {
+
+                        this.animationEnabled = true;
+                    };
+
+                    this.stopCurrentAnimation = function() {
+
+                         d3vLine.transition()
+                                .duration( 0 )
+                                .attr("transform", "translate(" + 0 + ")");
+
+                        d3xAxis.transition()
+                               .duration( 0 )
+                               .attr("transform", "translate(" +  margin.left + "," + (this.height - margin.bottom +2) + ")");
+
+                        d3GridX.transition()
+                               .duration( 0 )
+                               .attr("transform", "translate(" + margin.left + "," + this.height + ")");
+                    };
+
+                    this.disableAnimation = function() {
+
+                        this.animationEnabled = false;
+                        this.stopCurrentAnimation();
+                    };
+
+                    this.disableNextAnimation = function(){
+                        this.animationEnabled = false;
+                    };
+
                     /**
                     * Method: getLastMeasurementTime
                     * Returns null if there are no data
@@ -613,6 +706,53 @@ define('app/views/monitoring', [
                             return lastObject.time;
                         }   
                     };
+
+
+                    /**
+                    * Method: getLastMeasurementTime
+                    * Returns graph's time window in seconds
+                    * 
+                    */
+                    this.getTimeWindow = function(){
+
+                        return this.timeDisplayed;
+                    };
+
+
+                    this.getLastValue = function(){
+                        if(this.data)
+                            return this.data[this.data.length - 1];
+                        else
+                            return null;
+                    }
+
+                    this.getLastDisplayedValue = function(){
+
+                        if(this.data){
+
+                            if(this.data.length > 2) {
+
+                                // Get Translate Value
+                                var translate =  $("#" + this.id).find('.valueLine > path').attr('transform');
+                                translate = + translate.slice(10,translate.indexOf(','));
+
+                                if(translate == 0)
+                                    return this.data[this.data.length-1].value;
+                                else if(translate == this.valuesDistance)
+                                    return this.data[this.data.length-2].value;
+                                else {
+                                    var distance = this.data[this.data.length-1].value  - this.data[this.data.length-2].value;
+
+                                    // Last value + the part that has been translated
+                                    return this.data[this.data.length-2].value + 
+                                            (distance * (this.valuesDistance-translate) / this.valuesDistance);
+                                }
+
+                            }
+                        }
+
+                            return null;
+                    }
 
 
                     /**
@@ -637,15 +777,15 @@ define('app/views/monitoring', [
                     * Changes data that will be displayed and time of x-axis
                     *
                     */
-                    this.changeTimeToDisplay = function(newTime){
+                    this.changeTimeToDisplay = function(newTimems){
 
-                        this.timeDisplayed = newTime;
-                        this.secondsStep   = Math.floor((newTime.getHours()*60*60 + 
-                                                        newTime.getMinutes()*60 + 
-                                                        newTime.getSeconds() ) / NUM_OF_LABELS);
+                        this.timeDisplayed = newTimems/1000;
+                        this.secondsStep   = Math.floor((newTimems / 1000) / NUM_OF_LABELS);
 
                         this.timeUpdated = true;
-                        this.updateView();
+                        
+                        this.clearData();
+                        //this.updateView();
                     };
 
 
@@ -674,6 +814,7 @@ define('app/views/monitoring', [
                                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
                       d3vLine = d3svg.append('g')
+                                     .attr('class','valueLine')
                                      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
                                      .append('path'); 
 
@@ -705,6 +846,128 @@ define('app/views/monitoring', [
                                      .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
                     }
 
+                    function setupMouseOver(){
+
+                        // Append the Selector Line
+                        var mouseOverLine = d3svg.append('line')
+                                         .attr('class','selectorLine')
+                                         .attr('x1',"" + margin.left)
+                                         .attr('y1',"0" )
+                                         .attr('x2',"" + margin.left)
+                                         .attr('y2',""+ (self.height - margin.bottom +3))
+                                         .style("display", "none");
+
+                        var mouseX = 0;
+                        var mouseY = 0;
+                        var updateInterval;
+
+                        var updatePopUpValue = function(){
+
+                                // Check if mouse left from element without clearing interval
+                                if($($('#' + self.id).selector + ":hover").length <= 0)
+                                {
+                                   clearUpdatePopUp();
+                                   return;
+                                }
+
+                                // Update popup when it is over value line
+                                if(mouseX > margin.left)
+                                {
+
+                                    // Mouse X inside value line area
+                                    var virtualMouseX = mouseX - margin.left;
+
+                                    // Calculate Translate 
+                                    var translate = 0;
+                                    if(self.animationEnabled){
+                                        translate =  $("#" + self.id).find('.valueLine > path').attr('transform');
+                                        translate = + translate.slice(10,translate.indexOf(','));
+                                    }
+                                    // Measurement That is less than curson x
+                                    var minValueIndex = 0;
+                                    var currentValue = 0;
+
+                                    for(var i=0; i < self.xCordinates.length; i++)
+                                    {
+                                        if(self.xCordinates[i]+translate > virtualMouseX){
+                                            break;
+                                        }
+                                        else
+                                            minValueIndex = i;
+                                    } 
+                                    
+                                    
+                                    // Distanse between value before curson and after curson
+                                    var distance = self.displayedData[minValueIndex+1].value  - self.displayedData[minValueIndex].value;
+                                    // Mouse offset between this two values
+                                    var mouseOffset = (virtualMouseX -(self.xCordinates[minValueIndex]+translate))/self.valuesDistance ;
+                                    // Cursor's measurement value is the value before the curson + 
+                                    // the mouse percentage after the first point * the distance between the values
+                                    currentValue = self.displayedData[minValueIndex].value + distance * mouseOffset;
+                                    
+                                    // Value has a small loss of presition. We don't let it be less than 0
+                                    currentValue < 0 ? 0 : currentValue;
+
+                                    // Fix For Big Numbers
+                                    var valueText = "";
+                                    if(currentValue>=1000*1000)
+                                        valueText = (currentValue/1000/1000).toFixed(2) +"M";
+                                    else if(currentValue>=1000)
+                                        valueText = (currentValue/1000).toFixed(2) + "K";
+                                    else if(self.yAxisValueFormat == "%")
+                                        valueText = currentValue.toFixed(2) + "%";
+                                    else 
+                                        valueText = currentValue.toFixed(2);
+
+                                    // Update Value Text
+                                    $('#GraphsArea').children('.valuePopUp').text(valueText);
+                                }
+                        };
+
+
+                        var updatePopUpOffset = function(event){
+                            mouseX = event.pageX - $('#'+ self.id).children('svg').offset().left
+                            mouseY = event.pageY - $('#'+ self.id).children('svg').offset().top
+                            if(mouseX > margin.left)
+                                {
+
+                                    // Set Mouse Line Cordinates
+                                    mouseOverLine
+                                         .attr('x1',"" + mouseX)
+                                         .attr('x2',"" + mouseX);
+                                $('#GraphsArea').children('.valuePopUp').css('left',(event.clientX+15) +"px");
+                                $('#GraphsArea').children('.valuePopUp').css('top',(event.clientY-35)+"px");
+
+                                updatePopUpValue();
+                            }
+
+
+                        };
+
+                        var clearUpdatePopUp = function() {
+
+                            $(this).find('.selectorLine').hide(0);
+                            $("#GraphsArea").find('.valuePopUp').hide(0);
+
+                            // Clear Interval
+                            window.clearInterval(updateInterval);
+                        };
+
+
+                        // Mouse Events
+                        $('#' + self.id).children('svg').mouseenter(function() {
+
+                            $(this).find('.selectorLine').show(0);
+                            $("#GraphsArea").find('.valuePopUp').show(0);
+
+
+                            // Setup Interval
+                            updateInterval = window.setInterval(updatePopUpValue,500);
+                        });
+                        $('#' + self.id).children('svg').mouseleave(clearUpdatePopUp);
+                        $('#' + self.id).children('svg').mousemove(updatePopUpOffset);
+                    }
+
 
                     /*
                     * Method: onInitialized
@@ -713,7 +976,7 @@ define('app/views/monitoring', [
                     */
                     function onInitialized(){
                       // Run Stuff When Graph is appended and has first data
-
+                      setupMouseOver();
                     }
 
                 }
@@ -729,14 +992,16 @@ define('app/views/monitoring', [
 
                     // Stop receiving Graph data
                     window.clearInterval(window.monitoringInterval);
+                    // Remove Load Color Change Interval
+                    this.stopLoadColorInterval();
                 }
                 else if(this.viewRendered && machine.hasMonitoring && !this.graphsCreated &&
-                    !machine.probing && machine.probed && machine.id != ' '){
+                        machine.id != ' '){
 
                     var self = this;
                     var controller = Mist.monitoringController;
 
-                    controller.initController(machine,this);
+                    
 
                 
                     Em.run.next(function() {
@@ -792,40 +1057,44 @@ define('app/views/monitoring', [
                         var width = $("#GraphsArea").width() -2;  
 
                         // Create Graphs 
-                        var timeToDisplay = new Date();
-                        timeToDisplay.setHours(0,10,0);
-                        self.cpuGraph  = new Graph('cpuGraph',width,timeToDisplay,"%");
-                        self.loadGraph = new Graph('loadGraph',width,timeToDisplay);
-                        self.memGraph  = new Graph('memGraph',width,timeToDisplay,"%");
-                        self.diskReadGraph  = new Graph('diskReadGraph' ,width,timeToDisplay);
-                        self.diskWriteGraph = new Graph('diskWriteGraph',width,timeToDisplay);
-                        self.networkRXGraph = new Graph('networkRXGraph',width,timeToDisplay);
-                        self.networkTXGraph = new Graph('networkTXGraph',width,timeToDisplay);
+                        var timeToDisplay        = 10*60*1000; // 10 minutes
+                        self.graphs['cpu']       = new Graph('cpuGraph',width,timeToDisplay,"%");
+                        self.graphs['load']      = new Graph('loadGraph',width,timeToDisplay);
+                        self.graphs['memory']    = new Graph('memGraph',width,timeToDisplay,"%");
+                        self.graphs['diskRead']  = new Graph('diskReadGraph' ,width,timeToDisplay);
+                        self.graphs['diskWrite'] = new Graph('diskWriteGraph',width,timeToDisplay);
+                        self.graphs['networkRX'] = new Graph('networkRXGraph',width,timeToDisplay);
+                        self.graphs['networkTX'] = new Graph('networkTXGraph',width,timeToDisplay);
+
 
                         self.graphsCreated = true;
 
-                        controller.setupDataRequest();
+                        controller.initialize({
+                            machineModel    : machine,      // Send Current Machine
+                            graphs          : self.graphs,  // Send Graphs Instances
+                            timeWindow      : 10*60*1000,   // Display 10 Minutes
+                            step            : 10000,        // Metrics Step in miliseconds
+                            updatesInterval : 10000,        // Get Updates Every x Miliseconds
+                            updatesEnabled  : true          // Get Updates
+                        });
+
+                        //self.setupLoadColorInterval(); Commented Out Until It's Time To Deploy This Feature TODO
 
                         // Set Up Resolution Change Event
                         $(window).resize(function(){
 
-                                    var newWidth = $("#GraphsArea").width() -2;
-                                    self.cpuGraph.changeWidth(newWidth);
-                                    self.loadGraph.changeWidth(newWidth);
-                                    self.memGraph.changeWidth(newWidth);
-                                    self.diskReadGraph.changeWidth(newWidth);
-                                    self.diskWriteGraph.changeWidth(newWidth);
-                                    self.networkRXGraph.changeWidth(newWidth);
-                                    self.networkTXGraph.changeWidth(newWidth);
-
+                            var newWidth = $("#GraphsArea").width() -2;
+                            for(metric in self.graphs){
+                                 self.graphs[metric].changeWidth(newWidth);
+                            }
                         })
+
                     });
-                    
+
                     Mist.rulesController.redrawRules();
                 } 
-            }.observes('controller.model.hasMonitoring','controller.model.probing','viewRendered'),
+            }.observes('controller.model.hasMonitoring','viewRendered'),
 
-    
         });
     }
 );

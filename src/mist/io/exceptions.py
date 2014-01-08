@@ -109,6 +109,10 @@ class BackendExistsError(ConflictError):
     msg = "Backend exists"
 
 
+class BackendNameExistsError(ConflictError):
+    msg = "Backend name exists"
+
+
 class KeypairExistsError(ConflictError):
     msg = "Keypair exists"
 

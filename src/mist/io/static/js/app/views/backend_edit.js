@@ -16,7 +16,39 @@ define('app/views/backend_edit', [
                 $("#edit-backend").popup("close");
             },
 
-            deleteButtonClick: function( ){
+            renameBackend: function() {
+                Ember.run.later(this, function() {
+                    // Make sure user gave a name
+                    var newName = $('#edit-backend .content-header input').val();
+                    
+                    if (!newName) {
+                        $('#edit-backend .content-header input').val(this.backend.title);
+                        return;
+                    }
+                    
+                    // Check if newName is the same as current title
+                    if (newName == this.backend.title) {
+                        return;
+                    }
+                    
+                    // Check if name exists in other backends
+                    var exists = false;
+                    Mist.backendsController.content.some(function(backend) {
+                        if (backend.title == newName) {
+                            return exists = true;
+                        }
+                    });
+                    
+                    if (exists) {
+                        Mist.notificationController.notify('There is a backend named "' + newName + '" already');
+                        return;
+                    }
+                    
+                    Mist.backendsController.renameBackend(this.backend.id, newName);
+                }, 200);
+            },
+
+            deleteButtonClick: function() {
                 if (this.getMonitoredMachines.length) {
                     $('#backend-has-monitoring').show();
                 } else {

@@ -125,7 +125,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
             except InvalidCredsError:
                 raise BackendUnauthorizedError()
             except Exception as exc:
-                log.error("Error while trying list_nodes: %r". exc)
+                log.error("Error while trying list_nodes: %r", exc)
                 raise BackendUnavailableError()
 
         with user.lock_n_load():
@@ -133,6 +133,21 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
             user.save()
     log.info("Backend with id '%s' added succesfully.", backend_id)
     return backend_id
+
+
+def rename_backend(user, backend_id, new_name):
+    """Renames backend with given backend_id."""
+
+    log.info("Renaming backend: %s", backend_id)
+    if backend_id not in user.backends:
+        raise BackendNotFoundError(backend_id)
+    for backend in user.backends:
+        if backend.title == new_name:
+            raise BackendNameExistsError(new_name)
+    with user.lock_n_load():
+        user.backends[backend_id].title = new_name
+        user.save()
+    log.info("Succesfully renamed backend '%s'", backend_id)
 
 
 @core_wrapper
