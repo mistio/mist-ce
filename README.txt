@@ -54,9 +54,13 @@ environments and one for develompent.
 
 To get it up and running for production::
 
-    ./bin/paster serve production.ini
+    ./bin/uwsgi-start production.ini
 
 For development mode::
+
+    ./bin/uwsgi-start development.ini
+
+Or if you prefer to use paster::
 
     ./bin/paster serve development.ini --reload
 
