@@ -322,10 +322,18 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
     # if host is specified, try to actually deploy
     if host:
         log.info("Deploying key to machine.")
-        grep_output = '`grep \'%s\' ~/.ssh/authorized_keys`' % keypair.public
-        command = ('if [ -z "%s" ]; then echo "%s" >> '
-                   '~/.ssh/authorized_keys; fi'
-                   % (grep_output, keypair.public))
+        filename = '~/.ssh/authorized_keys'
+        grep_output = '`grep \'%s\' %s`' % (keypair.public, filename)
+        new_line_check_cmd = (
+            'if [ "$(tail -c1 %(file)s; echo x)" != "\\nx" ];'
+            ' then echo "" >> %(file)s; fi' % {'file': filename}
+        )
+        append_cmd = ('if [ -z "%s" ]; then echo "%s" >> '
+                   '%s; fi'
+                   % (grep_output, keypair.public, filename))
+        command = new_line_check_cmd + " ; " + append_cmd
+        log.debug("command = %s", command)
+
         try:
             ssh_command(user, backend_id, machine_id, host, command)
         except MachineUnauthorizedError:
@@ -354,37 +362,41 @@ def disassociate_key(user, key_id, backend_id, machine_id, host=None):
 
     if key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
-    if backend_id not in user.backends:
-        raise BackendNotFoundError(backend_id)
+    ## if backend_id not in user.backends:
+        ## raise BackendNotFoundError(backend_id)
 
     keypair = user.keypairs[key_id]
     machine_uid = [backend_id, machine_id]
     key_found = False
-    with user.lock_n_load():
-        keypair = user.keypairs[key_id]
-        for machine in keypair.machines:
-            if machine[:2] == machine_uid:
-                keypair.machines.remove(machine)
-                user.save()
-                key_found = True
-                break
-
+    for machine in keypair.machines:
+        if machine[:2] == machine_uid:
+            key_found = True
+            break
     # key not associated
     if not key_found:
         raise BadRequestError("Keypair '%s' is not associated with "
-                              "machine '%s'" % (key_id, machine_id), 304)
+                              "machine '%s'" % (key_id, machine_id))
 
     if host:
         log.info("Trying to actually remove key from authorized_keys.")
-        command = 'grep -v "' + keypair['public'] +\
+        command = 'grep -v "' + keypair.public +\
                   '" ~/.ssh/authorized_keys ' +\
-                  '> ~/.ssh/authorized_keys.tmp && ' +\
+                  '> ~/.ssh/authorized_keys.tmp ; ' +\
                   'mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys ' +\
                   '&& chmod go-w ~/.ssh/authorized_keys'
         try:
             ssh_command(user, backend_id, machine_id, host, command)
         except:
             pass
+
+    # removing key association
+    with user.lock_n_load():
+        keypair = user.keypairs[key_id]
+        for machine in keypair.machines:
+            if machine[:2] == machine_uid:
+                keypair.machines.remove(machine)
+                user.save()
+                break
 
 
 def connect_provider(backend):
