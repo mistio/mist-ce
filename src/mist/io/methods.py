@@ -322,10 +322,18 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
     # if host is specified, try to actually deploy
     if host:
         log.info("Deploying key to machine.")
-        grep_output = '`grep \'%s\' ~/.ssh/authorized_keys`' % keypair.public
-        command = ('if [ -z "%s" ]; then echo "%s" >> '
-                   '~/.ssh/authorized_keys; fi'
-                   % (grep_output, keypair.public))
+        filename = '~/.ssh/authorized_keys'
+        grep_output = '`grep \'%s\' %s`' % (keypair.public, filename)
+        new_line_check_cmd = (
+            'if [ "$(tail -c1 %(file)s; echo x)" != "\\nx" ];'
+            ' then echo "" >> %(file)s; fi' % {'file': filename}
+        )
+        append_cmd = ('if [ -z "%s" ]; then echo "%s" >> '
+                   '%s; fi'
+                   % (grep_output, keypair.public, filename))
+        command = new_line_check_cmd + " ; " + append_cmd
+        log.debug("command = %s", command)
+
         try:
             ssh_command(user, backend_id, machine_id, host, command)
         except MachineUnauthorizedError:
