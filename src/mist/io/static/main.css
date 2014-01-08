@@ -851,8 +851,8 @@ div.loading-monitoring {
 }
 
 .graph {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 6px;
+    margin-bottom: 20px;
     border: 1px solid #ccc;
 }
 
@@ -905,8 +905,7 @@ div.loading-monitoring {
 }
 
 #graphBar{
-    margin-top: 8px;
-    margin-bottom: 15px;
+    margin: 10px 0;
     min-height: 50px;
     border:1px solid #ccc;
     background: #e0e0e1;
