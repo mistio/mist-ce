@@ -197,7 +197,7 @@ def add_backend(request):
     provider = params.get('provider', '')
     apikey = params.get('apikey', '')
     apisecret = params.get('apisecret', '')
-    apiurl = params.get('apiurl', '')
+    apiurl = params.get('apiurl') or ''  # fixes weird issue with none value
     tenant_name = params.get('tenant_name', '')
     # following params are for baremetal
     machine_hostname = params.get('machine_ip_address', '')
