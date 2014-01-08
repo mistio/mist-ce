@@ -373,7 +373,7 @@ def disassociate_key(user, key_id, backend_id, machine_id, host=None):
         log.info("Trying to actually remove key from authorized_keys.")
         command = 'grep -v "' + keypair.public +\
                   '" ~/.ssh/authorized_keys ' +\
-                  '> ~/.ssh/authorized_keys.tmp && ' +\
+                  '> ~/.ssh/authorized_keys.tmp ; ' +\
                   'mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys ' +\
                   '&& chmod go-w ~/.ssh/authorized_keys'
         try:
