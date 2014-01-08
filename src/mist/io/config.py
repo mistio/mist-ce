@@ -164,6 +164,23 @@ SUPPORTED_PROVIDERS = [
     {
         'title': 'SoftLayer',
         'provider' : Provider.SOFTLAYER
+    },
+    #HP Cloud
+    {
+        'title': 'HP Cloud US West AZ 1',
+        'provider' : "%s:%s" % (Provider.OPENSTACK,'az-1.region-a.geo-1')
+    },
+    {
+        'title': 'HP Cloud US West AZ 2',
+        'provider' : "%s:%s" % (Provider.OPENSTACK,'az-2.region-a.geo-1')
+    },
+    {
+        'title': 'HP Cloud US West AZ 3',
+        'provider' : "%s:%s" % (Provider.OPENSTACK,'az-3.region-a.geo-1')
+    },
+    {
+        'title': 'HP Cloud US East',
+        'provider' : "%s:%s" % (Provider.OPENSTACK,'region-b.geo-1')
     }
 ]
 

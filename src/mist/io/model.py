@@ -86,6 +86,7 @@ class Backend(OODict):
     apisecret = StrField()
     title = StrField()
     tenant_name = StrField()
+    auth_version = StrField()
     region = StrField()
     poll_interval = IntField(10000)
     provider = StrField()
