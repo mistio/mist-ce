@@ -197,7 +197,7 @@ def add_backend(request):
     provider = params.get('provider', '')
     apikey = params.get('apikey', '')
     apisecret = params.get('apisecret', '')
-    apiurl = params.get('apiurl', '')
+    apiurl = params.get('apiurl') or ''  # fixes weird issue with none value
     tenant_name = params.get('tenant_name', '')
     # following params are for baremetal
     machine_hostname = params.get('machine_ip_address', '')
@@ -419,10 +419,13 @@ def disassociate_key(request):
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
+    try:
+        host = request.json_body.get('host')
+    except:
+        host = None
     user = user_from_request(request)
-    methods.disassociate_key(user, key_id, backend_id, machine_id)
+    methods.disassociate_key(user, key_id, backend_id, machine_id, host)
     return user.keypairs[key_id].machines
-
 
 
 @view_config(route_name='machines', request_method='GET', renderer='json')
@@ -719,6 +722,8 @@ def update_monitoring(request):
         payload['backend_region'] = backend.region
         payload['backend_apikey'] = backend.apikey
         payload['backend_apisecret'] = backend.apisecret
+        payload['backend_apiurl'] = backend.apiurl
+        payload['backend_tenant_name'] = backend.tenant_name
 
     #TODO: make ssl verification configurable globally,
     # set to true by default
