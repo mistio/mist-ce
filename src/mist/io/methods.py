@@ -360,15 +360,10 @@ def disassociate_key(user, key_id, backend_id, machine_id, host=None):
     keypair = user.keypairs[key_id]
     machine_uid = [backend_id, machine_id]
     key_found = False
-    with user.lock_n_load():
-        keypair = user.keypairs[key_id]
-        for machine in keypair.machines:
-            if machine[:2] == machine_uid:
-                keypair.machines.remove(machine)
-                user.save()
-                key_found = True
-                break
-
+    for machine in keypair.machines:
+        if machine[:2] == machine_uid:
+            key_found = True
+            break
     # key not associated
     if not key_found:
         raise BadRequestError("Keypair '%s' is not associated with "
@@ -385,6 +380,15 @@ def disassociate_key(user, key_id, backend_id, machine_id, host=None):
             ssh_command(user, backend_id, machine_id, host, command)
         except:
             pass
+
+    # removing key association
+    with user.lock_n_load():
+        keypair = user.keypairs[key_id]
+        for machine in keypair.machines:
+            if machine[:2] == machine_uid:
+                keypair.machines.remove(machine)
+                user.save()
+                break
 
 
 def connect_provider(backend):
