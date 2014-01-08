@@ -114,8 +114,8 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
 
         #for HP Cloud
         if 'hpcloudsvc' in apiurl:
-            backend.apiurl = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/'        
-            
+            backend.apiurl = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/'
+
         backend_id = backend.get_id()
         if backend_id in user.backends:
             raise BackendExistsError(backend_id)
@@ -243,6 +243,7 @@ def set_default_key(user, key_id):
         raise KeypairNotFoundError(key_id)
 
     with user.lock_n_load():
+        keypairs = user.keypairs
         for key in keypairs:
             if keypairs[key].default:
                 keypairs[key].default = False
@@ -690,7 +691,7 @@ def _create_machine_openstack(conn, private_key, public_key, script, machine_nam
     deploy_script = ScriptDeployment(script)
     msd = MultiStepDeployment([key, deploy_script])
     key = str(public_key).replace('\n','')
-    
+
     try:
         server_key = ''
         keys = conn.ex_list_keypairs()
@@ -704,14 +705,14 @@ def _create_machine_openstack(conn, private_key, public_key, script, machine_nam
     except:
         server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
         server_key = server_key.name
-    with get_temp_file(private_key) as tmp_key_path:    
+    with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.deploy_node(name=machine_name,
                 image=image,
                 size=size,
-                location=location, 
+                location=location,
                 deploy=msd,
-                ssh_key=tmp_key_path,    
+                ssh_key=tmp_key_path,
                 ssh_alternate_usernames=['ec2-user', 'ubuntu'],
                 max_tries=1,
                 ex_keyname=server_key)
