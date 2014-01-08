@@ -1,36 +1,35 @@
 """Basic configuration and mappings
 
-Note:
-Provider.EC2_EU_WEST etc naming is deprecated by libcloud.
+Here we define constants needed by mist.io
 
-Now we call driver = get_driver(Providers.EC2_EU_WEST) in helpers.connect which
-calls the default EC2 driver passing datacenter argument. Instead we should
-call the default driver of EC2 passing the datacenter, example
-
-driver = get_driver(Providers.EC2)
-conn = driver(key, secret, datacenter='eu-west-1')
-
-What we gain:
-1 Avoid using libcloud deprecated code
-2 No need to keep a separate mapping of ec2 providers
-
-EC2 datacenters are ['us-east-1', 'us-west-2', 'us-west-1', 'eu-west-1',
-            'ap-southeast-1', 'ap-northeast-1', 'ap-southeast-2','sa-east-1']
+Also, the configuration from settings.py is exposed through this module.
 
 """
+
+import logging
 
 
 from libcloud.compute.types import Provider
 from libcloud.compute.types import NodeState
 
 
-CORE_URI = "https://mist.io"
-JS_BUILD = False
-JS_LOG_LEVEL = 3
-GOOGLE_ANALYTICS_ID = ""
+# Parse user defined settings from settings.py in the top level project dir
+log = logging.getLogger(__name__)
+settings = {}
+try:
+    execfile("settings.py", settings)
+except IOError:
+    log.warning("No settings.py file found.")
+except Exception as exc:
+    log.error("Error parsing settings py: %r", exc)
+CORE_URI = settings.get("CORE_URI", "https://mist.io")
+JS_BUILD = settings.get("JS_BUILD", False)
+JS_LOG_LEVEL = settings.get("JS_LOG_LEVEL", 3)
+GOOGLE_ANALYTICS_ID = settings.get("GOOGLE_ANALYTICS_ID", "")
+COMMAND_TIMEOUT = settings.get("COMMAND_TIMEOUT", 20)
 
-COMMAND_TIMEOUT = 20
 
+# App constants
 
 STATES = {
     NodeState.RUNNING: 'running',
@@ -84,7 +83,7 @@ SUPPORTED_PROVIDERS = [
         'title': 'EC2 AP NORTHEAST',
         'provider': Provider.EC2_AP_NORTHEAST
     },
-   {
+    {
         'title': 'EC2 AP SOUTHEAST',
         'provider': Provider.EC2_AP_SOUTHEAST
     },
@@ -306,17 +305,18 @@ EC2_IMAGES[Provider.EC2_US_WEST_OREGON] = EC2_IMAGES['us-west-2']
 EC2_IMAGES[Provider.EC2_US_EAST] = EC2_IMAGES['us-east-1']
 
 
-NOTE = '''
-Provider.EC2_EU_WEST etc naming is deprecated by libcloud.
-
-Now we call driver = get_driver(Providers.EC2_EU_WEST) in helpers.connect which calls the default EC2 driver passing datacenter argument. Instead we should call the default driver of EC2 passing the datacenter, example
-
-driver = get_driver(Providers.EC2)
-conn = driver(key, secret, datacenter='eu-west-1')
-
-What we gain:
-1 Avoid using libcloud deprecated code
-2 No need to keep a separate mapping of ec2 providers
-
-EC2 datacenters are ['us-east-1', 'us-west-2', 'us-west-1', 'eu-west-1', 'ap-southeast-1', 'ap-northeast-1', 'ap-southeast-2','sa-east-1']
-'''
+# Provider.EC2_EU_WEST etc naming is deprecated by libcloud.
+#
+# Now we call driver = get_driver(Providers.EC2_EU_WEST) in helpers.connect
+# which calls the default EC2 driver passing datacenter argument. Instead we
+# should call the default driver of EC2 passing the datacenter, example
+#
+# driver = get_driver(Providers.EC2)
+# conn = driver(key, secret, datacenter='eu-west-1')
+#
+# What we gain:
+# 1 Avoid using libcloud deprecated code
+# 2 No need to keep a separate mapping of ec2 providers
+#
+# EC2 datacenters are ['us-east-1', 'us-west-2', 'us-west-1', 'eu-west-1',
+# 'ap-southeast-1', 'ap-northeast-1', 'ap-southeast-2','sa-east-1']
