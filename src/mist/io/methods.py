@@ -984,7 +984,7 @@ def _machine_action(user, backend_id, machine_id, action):
             if bare_metal:
                 try:
                     hostname = user.backends[backend_id].machines[machine_id].public_ips[0]
-                    command = '$(command -v sudo) reboot'
+                    command = '$(command -v sudo) shutdown -r now'
                     ssh_command(user, backend_id, machine_id, hostname, command)
                     return True
                 except:
