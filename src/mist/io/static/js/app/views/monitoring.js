@@ -257,7 +257,13 @@ define('app/views/monitoring', [
 
             },
 
-            redrawGraphButtons: function(){
+            redrawJQMComponents: function(){
+
+                $('.monitoring-button').button();
+                $('#add-rule-button').button();
+                $('#monitoring-dialog').popup();  
+
+                // Collapse/Extend Buttons
                 $('#cpuGraphBtn > button').button();
                 $('#loadGraphBtn > button').button();
                 $('#memGraphBtn > button').button();
@@ -268,11 +274,13 @@ define('app/views/monitoring', [
 
                 // DEBUG TODO Possible Remove It
                 //$('#timeWindowSelect').selectmenu();
-
+                
+                // History Buttons
                 $('#graphsGoBack').button();
                 $('#graphsGoForward').button();
                 $('#graphsResetHistory').button();
 
+                // Disable History
                 $('#graphsGoForward').addClass('ui-disabled');
                 $('#graphsResetHistory').addClass('ui-disabled');
             },
@@ -1006,11 +1014,8 @@ define('app/views/monitoring', [
                 
                     Em.run.next(function() {
 
-                        // Re-Initialize Jquery Mobile Buttons
-                        $('.monitoring-button').button();
-                        $('#add-rule-button').button();
-                        $('#monitoring-dialog').popup();   
-                        self.redrawGraphButtons();      
+                        // Re-Initialize Jquery Components
+                        self.redrawJQMComponents();      
                         
                         self.getGraphsCookie();
 
