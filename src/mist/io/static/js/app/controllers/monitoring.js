@@ -540,6 +540,74 @@ define('app/controllers/monitoring', [
                     }
                 },
 
+                collapse : function(metrics,duration) {
+
+                    // Mobile Hide Animation is slow, disabling animation
+                    var hideDuration = (typeof duration == 'undefined') ? 400 : duration;
+                    if (Mist.isClientMobile) {
+                        
+                        hideDuration = 0;
+                    }
+
+                    // Add graph to the end of the list
+                    metrics.forEach(function(metric){
+
+                        $("#" + metric + 'GraphBtn').insertAfter($('.graphBtn').last());
+
+                        // Hide the Graphs
+                        $("#" + metric + "Graph").hide(hideDuration,function(){
+
+                            // Show Graphs Buttons
+                            $("#" + metric + 'GraphBtn').show(0, function(){
+
+                                // Set Cookie
+                                var graphBtns = []; 
+                                $('.graphBtn').toArray().forEach(function(entry){
+                                    if($(entry).css('display') != 'none')
+                                        graphBtns.push($(entry).attr('id').replace('GraphBtn','').replace('#',''));
+                                });
+
+                                Mist.monitoringController.cookies.setCollapsedMetrics(graphBtns);
+                            });
+                        });
+                    });
+
+                },
+
+                expand : function(metrics,duration) {
+
+                    // Mobile Hide Animation is slow, disabling animation
+                    var hideDuration = (typeof duration == 'undefined') ? 400 : duration;
+                    if (Mist.isClientMobile) {
+                        
+                        hideDuration = 0;
+                    }
+
+                    // Add graph to the end of the list
+                    metrics.forEach(function(metric){
+
+                        $("#" + metric + 'Graph').insertAfter($('.graph').last());
+
+                        // Hide the buttons
+                        $("#" + metric + "GraphBtn").hide(0);
+
+                        // Show Graphs
+                        $("#" + metric + 'Graph').show(hideDuration, function(){
+
+                            // Set Cookie
+                            var graphBtns = []; 
+                            $('.graphBtn').toArray().forEach(function(entry){
+                                if($(entry).css('display') != 'none')
+                                    graphBtns.push($(entry).attr('id').replace('GraphBtn','').replace('#',''));
+                            });
+
+                            Mist.monitoringController.cookies.setCollapsedMetrics(graphBtns);
+
+                        });
+                    });
+
+                },
+
                 reset: function() {
                     this.instances        = null;
                     this.animationEnabled = true;
@@ -547,6 +615,48 @@ define('app/controllers/monitoring', [
 
                 instances        : null,    // Graph Objects created by the view
                 animationEnabled : true
+            },
+
+
+            cookies : {
+
+
+                getCollapsedMetrics : function(){
+
+                    if(document.cookie.indexOf("collapsedGraphs")  == -1) 
+                        return null
+
+                    var cookieValue     = "";
+                    var collapsedGraphs = [];
+
+                    // Get Graph List Cookie
+                    var parts = document.cookie.split("collapsedGraphs=");
+                    if (parts.length == 2) 
+                        cookieValue = parts.pop().split(";").shift();
+                    
+                    if(cookieValue.length > 0){
+                        
+                        // Create Array Of IDs
+                        collapsedGraphs = cookieValue.split('|');
+                    }
+                    
+
+                    return collapsedGraphs;
+                },
+
+
+                setCollapsedMetrics : function(metrics){
+                    
+                    var graphBtnIdList  = [];
+                    var collapsedGraphs = [];
+                    var cookieExpire    = new Date();
+                    cookieExpire.setFullYear(cookieExpire.getFullYear() + 2);
+
+
+                    document.cookie = "collapsedGraphs=" + metrics.join('|') + "; " +
+                                      "expires=" + cookieExpire.toUTCString() +"; " +
+                                      "path=/";
+                }
             },
 
 

@@ -87,48 +87,11 @@ define('app/views/monitoring', [
             },
 
             clickedCollapse: function(graph){
-
-                var self = this;
-                // Mobile Hide Animation is slow, disabling animation
-                var hideDuration = 400;
-                if (Mist.isClientMobile) {
-                    
-                    hideDuration = 0;
-                }
-
-                // Add button to the end of the row
-                $("#" + graph.id + "Btn").insertAfter($('.graphBtn').last());
-
-                // When graph is hidden show button and set new coockie 
-                $("#" + graph.id).hide(hideDuration, function(){
-                    
-                    $("#" + graph.id + "Btn").show(0);
-                    self.setGraphsCookie();
-                });
-                
+                Mist.monitoringController.graphs.collapse([graph.id.replace('Graph','')]);
             },
 
             clickedExpand: function(graph){
-                
-                var self = this;
-                // Mobile Hide Animation is slow, disabling animation
-                var hideDuration = 400;
-                if (Mist.isClientMobile) {
-                    
-                    hideDuration = 0;
-                }
-
-                // Add graph to the end of the list
-                $("#" + graph.id).insertAfter($('.graph').last());
-
-                // When graph is visible set new coockie 
-                $("#" + graph.id + "Btn").hide(0);
-                $("#" + graph.id).show(hideDuration, function(){
-
-                    self.setGraphsCookie();
-                });
-                
-                
+                Mist.monitoringController.graphs.expand([graph.id.replace('Graph','')]);
             },
 
             /* Commented Out Until It's Time To Test Zoom In/Out
@@ -174,7 +137,7 @@ define('app/views/monitoring', [
                 {
                     this.cpuGraph.changeTimeToDisplay(newTime);
                     this.loadGraph.changeTimeToDisplay(newTime);
-                    this.memGraph.changeTimeToDisplay(newTime);
+                    this.memoryGraph.changeTimeToDisplay(newTime);
                     this.diskReadGraph.changeTimeToDisplay(newTime);
                     this.diskWriteGraph.changeTimeToDisplay(newTime);
                     this.networkTXGraph.changeTimeToDisplay(newTime);
@@ -266,7 +229,7 @@ define('app/views/monitoring', [
                 // Collapse/Extend Buttons
                 $('#cpuGraphBtn > button').button();
                 $('#loadGraphBtn > button').button();
-                $('#memGraphBtn > button').button();
+                $('#memoryGraphBtn > button').button();
                 $('#diskReadGraphBtn > button').button();
                 $('#diskWriteGraphBtn > button').button();
                 $('#networkTXGraphBtn > button').button();
@@ -274,7 +237,7 @@ define('app/views/monitoring', [
 
                 // DEBUG TODO Possible Remove It
                 //$('#timeWindowSelect').selectmenu();
-                
+
                 // History Buttons
                 $('#graphsGoBack').button();
                 $('#graphsGoForward').button();
@@ -1017,46 +980,6 @@ define('app/views/monitoring', [
                         // Re-Initialize Jquery Components
                         self.redrawJQMComponents();      
                         
-                        self.getGraphsCookie();
-
-                        // Show Graphs And Buttons Based On Last Session or show only load Graph
-                        if(self.graphsListCookie.length > 0 || self.graphsBtnListCookie.length > 0) {
-
-                            // First Hide All Elements
-                            self.hideGraphs();
-
-                            // Re-Arrange And Show Graphs And Buttons
-                            for(var i=0; i < self.graphsListCookie.length; i++) 
-                            {
-                                
-                                var id = self.graphsListCookie[i];
-                                $(id).insertAfter($('.graph').last());
-                                $(id).show(0);
-
-                            }
-
-                            for(var i=0; i < self.graphsBtnListCookie.length; i++) 
-                            {
-                                
-                                var id = self.graphsBtnListCookie[i];
-                                $(id).insertAfter($('.graphBtn').last());
-                                $(id).show(0);
-
-                            }
-
-                        }
-                        else {
-
-                            // Show only load Graph at start
-                            $('#loadGraphBtn').hide(0);
-
-                            $('#cpuGraph').hide(0);
-                            $('#memGraph').hide(0);  
-                            $('#diskReadGraph').hide(0); 
-                            $('#diskWriteGraph').hide(0); 
-                            $('#networkRXGraph').hide(0); 
-                            $('#networkTXGraph').hide(0); 
-                        }
 
                         // Get Width, -2 left & right border
                         var width = $("#GraphsArea").width() -2;  
@@ -1065,7 +988,7 @@ define('app/views/monitoring', [
                         var timeToDisplay        = 10*60*1000; // 10 minutes
                         self.graphs['cpu']       = new Graph('cpuGraph',width,timeToDisplay,"%");
                         self.graphs['load']      = new Graph('loadGraph',width,timeToDisplay);
-                        self.graphs['memory']    = new Graph('memGraph',width,timeToDisplay,"%");
+                        self.graphs['memory']    = new Graph('memoryGraph',width,timeToDisplay,"%");
                         self.graphs['diskRead']  = new Graph('diskReadGraph' ,width,timeToDisplay);
                         self.graphs['diskWrite'] = new Graph('diskWriteGraph',width,timeToDisplay);
                         self.graphs['networkRX'] = new Graph('networkRXGraph',width,timeToDisplay);
@@ -1074,12 +997,37 @@ define('app/views/monitoring', [
 
                         self.graphsCreated = true;
 
+                        // hide all buttons
+                        $('.graphBtn').hide(0);
+
+
+                        // Get cookies and show graphs that are not collapsed
+                        var collapsedMetrics = controller.cookies.getCollapsedMetrics();
+
+                        if(collapsedMetrics != null){
+                            console.log("Metrics To Collapse: " + collapsedMetrics);
+                            controller.graphs.collapse(collapsedMetrics,0);
+                        }
+                        else{
+                            // Hide graphs
+                            var metrics = self.graphs;
+                            var metricsKeys = [];
+
+                            for(var key in metrics){
+                                // Let only load graph
+                                if(key == 'load') continue;
+
+                                metricsKeys.push(key);
+                            }
+
+                            controller.graphs.collapse(metricsKeys,0);
+
+                        }
+
                         controller.initialize({
                             machineModel    : machine,      // Send Current Machine
                             graphs          : self.graphs,  // Send Graphs Instances
                         });
-
-                        //self.setupLoadColorInterval(); Commented Out Until It's Time To Deploy This Feature TODO
 
                         // Set Up Resolution Change Event
                         $(window).resize(function(){
