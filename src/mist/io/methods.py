@@ -510,7 +510,7 @@ def get_machine_actions(machine_from_api, conn):
         can_start = False
         can_destroy = False
         can_stop = False
-        can_reboot = False
+        can_reboot = True
         can_tag = False
 
     return {'can_stop': can_stop,
@@ -962,6 +962,10 @@ def _machine_action(user, backend_id, machine_id, action):
 
     if backend_id not in user.backends:
         raise BackendNotFoundError()
+
+    bare_metal = False
+    if user.backends[backend_id].provider == 'bare_metal':
+        bare_metal = True
     conn = connect_provider(user.backends[backend_id])
     machine = Node(machine_id,
                    name=machine_id,
@@ -977,7 +981,16 @@ def _machine_action(user, backend_id, machine_id, action):
             # In libcloud it is not possible to call this with machine.stop()
             conn.ex_stop_node(machine)
         elif action is 'reboot':
-            machine.reboot()
+            if bare_metal:
+                try:
+                    hostname = user.backends[backend_id].machines[machine_id].public_ips[0]
+                    command = '$(command -v sudo) reboot'
+                    ssh_command(user, backend_id, machine_id, hostname, command)
+                    return True
+                except:
+                    return False            
+            else:
+                machine.reboot()
         elif action is 'destroy':
             machine.destroy()
     except AttributeError:
