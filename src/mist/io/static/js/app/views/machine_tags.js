@@ -4,7 +4,7 @@ define('app/views/machine_tags', ['text!app/templates/machine_tags.html', 'ember
      *
      *  @returns Class
      */
-    function(machine_tags_html) {
+    function (machine_tags_html) {
         return Ember.View.extend({
 
             /**
@@ -13,21 +13,22 @@ define('app/views/machine_tags', ['text!app/templates/machine_tags.html', 'ember
 
             template: Ember.Handlebars.compile(machine_tags_html),
 
+
             /**
+             * 
              *  Actions
+             *
              */
 
             actions: {
 
-                addClicked: function() {
+
+                addClicked: function () {
                     Mist.machineTagsController.add();
                 },
-                
-                deleteTagClicked: function(tag) {
-                    Mist.machineTagsController.deleteTag(tag);
-                },
-                
-                backClicked: function() {
+
+
+                backClicked: function () {
                     Mist.machineTagsController.close();
                 }
             }

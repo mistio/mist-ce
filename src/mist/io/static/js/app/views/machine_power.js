@@ -1,10 +1,10 @@
 define('app/views/machine_power', ['text!app/templates/machine_power.html', 'ember'],
     /**
-     *  Machine Power Popup
+     *  Machine Power View
      *
      *  @returns Class
      */
-    function(machine_power_html) {
+    function (machine_power_html) {
         return Ember.View.extend({
 
             /**
@@ -13,46 +13,57 @@ define('app/views/machine_power', ['text!app/templates/machine_power.html', 'emb
 
             template: Ember.Handlebars.compile(machine_power_html),
 
+
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
-            init: function() {
-                this._super();
-                Mist.machinePowerController.on('onActionsChange', this, 'renderActions');
-            },
+            load: function () {
 
+                // Add event listeners
+                Mist.machinePowerController.on('onActionsChange', this, 'renderActions');
+
+            }.on('didInsertElement'),
+
+
+            unload: function () {
+
+                // Remove event listeners
+                Mist.machinePowerController.off('onActionsChange', this, 'renderActions');
+
+            }.on('willDestroyElement'),
 
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
-            renderActions: function() {
-                Ember.run.next(function() {
+            renderActions: function () {
+                Ember.run.next(function () {
                     $('#machine-power-popup').trigger('create');
                 });
             },
 
 
-
             /**
-             * 
+             *
              *  Actions
-             * 
+             *
              */
 
             actions: {
 
-                actionClicked: function(action) {
+
+                actionClicked: function (action) {
                     Mist.machinePowerController.act(action);
                 },
 
-                backClicked: function() {
+
+                backClicked: function () {
                     Mist.machinePowerController.close();
                 }
             }

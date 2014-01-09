@@ -15,6 +15,8 @@ define('app/controllers/machine_tags', ['ember'],
             machine: null,
             callback: null,
             addingTag: null,
+            deletingTag: null,
+
 
             /**
              *
@@ -42,9 +44,10 @@ define('app/controllers/machine_tags', ['ember'],
                 var machine = this.machine;
 
                 this.set('addingTag', true);
-                Mist.ajaxPOST('backends/' + machine.backend.id + '/machines/' + machine.id + '/metadata', {
+                Mist.ajax.POST('backends/' + machine.backend.id + '/machines/' + machine.id + '/metadata', {
                     'tag': tag
                 }).success(function () {
+                    // TODO: move to seperate function and trigger event
                     machine.tags.pushObject(tag);
                 }).error(function () {
                     Mist.notificationController.notify('Failed to add tag :' + tag);
@@ -54,6 +57,24 @@ define('app/controllers/machine_tags', ['ember'],
                 });
             },
 
+
+            deleteTag: function (tag) {
+                var that = this;
+                var machine = this.machine;
+
+                this.set('deletingTag', true);
+                Mist.ajax.DELETE('backends/' + machine.backend.id + '/machines/' + machine.id + '/metadata', {
+                    'tag': tag
+                }).success(function () {
+                    // TODO: move to seperate function and trigger event
+                    machine.tags.removeObject(tag);
+                }).error(function () {
+                    Mist.notificationController.notify('Failed to delete tag :' + tag);
+                }).complete(function (success) {
+                    that.set('deletingTag', false);
+                    if (that.callback) that.callback(success, tag);
+                });
+            },
 
 
             /**

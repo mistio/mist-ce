@@ -57,6 +57,7 @@ define( 'app', [
     'app/views/machine_tags',
     'app/views/machine_keys',
     'app/views/machine_keys_list_item',
+    'app/views/machine_tags_list_item',
     'app/views/key_list_item',
     'app/views/key_list',
     'app/views/key',
@@ -97,6 +98,7 @@ define( 'app', [
                 MachineTagsView,
                 MachineKeysView,
                 MachineKeysListItemView,
+                MachineTagsListItemView,
                 KeyListItemView,
                 KeyListView,
                 SingleKeyView,
@@ -127,67 +129,15 @@ define( 'app', [
             }
         });
 
-        // Global constants
+        // Globals
 
-        App.set('csrfToken', '');
         App.set('authenticated', AUTH || URL_PREFIX == '' ? true : false);
+        App.set('ajax', new AJAX('')); // TODO: Get CSRF_TOKEN from server
         App.set('email', EMAIL);
         App.set('password', '');
         window.Mist = App;
 
-        // Ajax wrappers
-
-        App.ajaxGET = function(url, data) {
-            return App.ajax('GET', url, data);
-        };
-        App.ajaxPUT = function(url, data) {
-            return App.ajax('PUT', url, data);
-        };
-        App.ajaxPOST = function(url, data) {
-            return App.ajax('POST', url, data);
-        };
-        App.ajaxDELETE = function(url, data) {
-            return App.ajax('DELETE', url, data);
-        };
-        App.ajax = function(type, url, data) {
-            var ret = {};
-            var call = {};
-            call.success = function(callback) {
-                ret.success = callback;
-                return call;
-            };
-            call.error = function(callback) {
-                ret.error = callback;
-                return call;
-            };
-            call.complete = function(callback) {
-                ret.complete = callback;
-                return call;
-            };
-            call.ajax = function() {
-                if (type != 'GET') {
-                    if (data) { data.csrf_token = App.csrfToken; }
-                    else { data = {'csrf_token': App.csrfToken}; }
-                }
-                $.ajax({
-                    url: url,
-                    type: type,
-                    data: JSON.stringify(data),
-                    complete: function(jqXHR) {
-                        if (jqXHR.status == 200) {
-                            if (ret.success)
-                                ret.success(jqXHR.responseJSON);
-                        } else if (ret.error) {
-                            ret.error(jqXHR.responseText);
-                        }
-                        if (ret.complete)
-                            ret.complete(jqXHR.status == 200, jqXHR.responseJSON);
-                    }
-                });
-                return call;
-            };
-            return call.ajax();
-        };
+        //URL_PREFIX = AUTH = EMAIL = '';
 
         // Ember routes and routers
 
@@ -285,10 +235,11 @@ define( 'app', [
         App.set('listItemView', ListItemView);
         App.set('backendAddView', BackendAdd);
         App.set('userMenuView', UserMenuView);
-        App.set('editBackendView', EditBackend);
         App.set('editKeyView', KeyEditDialog);
+        App.set('editBackendView', EditBackend);
         App.set('imageListView', ImageListView);
         App.set('singleKeyView', SingleKeyView);
+        App.set('machineKeysView', MachineKeysView);
         App.set('machineTagsView', MachineTagsView);
         App.set('keyListItemView', KeyListItemView);
         App.set('machineListView', MachineListView);
@@ -299,8 +250,8 @@ define( 'app', [
         App.set('machineListItemView', MachineListItem);
         App.set('singleMachineView', SingleMachineView);
         App.set('confirmationDialog', ConfirmationDialog);
-        App.set('machineKeysView', MachineKeysView);
         App.set('machineKeysListItemView', MachineKeysListItemView);
+        App.set('machineTagsListItemView', MachineTagsListItemView);
 
         // Ember controllers
 
@@ -330,20 +281,9 @@ define( 'app', [
             ]
         });
 
-        App.TextField = Ember.TextField.extend({
-            attributeBindings: [
-                'name',
-                'data-theme'
-            ]
-        });
-
+        App.Checkbox = Ember.Checkbox;
+        App.TextField = Ember.TextField;
         App.ShellTextField = Ember.TextField.extend({
-
-            attributeBindings: [
-                'name',
-                'data-theme',
-                'autocapitalize'
-            ],
 
             insertNewline: function() {
                 this._parentView.submit();
@@ -385,10 +325,6 @@ define( 'app', [
             }
         });
 
-        App.Checkbox = Ember.Checkbox.extend({
-            attributeBindings: ['id', 'data-inline']
-        });
-
         // Mist functions
 
         App.isScrolledToBottom = function() {
@@ -406,6 +342,71 @@ define( 'app', [
         };
 
         return App;
+    }
+
+    /**
+     * 
+     *  Ajax wrapper constructor
+     * 
+     */
+
+    function AJAX (csrfToken) {
+
+        this.GET = function(url, data) {
+            return this.ajax('GET', url, data);
+        };
+        this.PUT = function(url, data) {
+            return this.ajax('PUT', url, data);
+        };
+        this.POST = function(url, data) {
+            return this.ajax('POST', url, data);
+        };
+        this.DELETE = function(url, data) {
+            return this.ajax('DELETE', url, data);
+        };
+        this.ajax = function(type, url, data) {
+
+            var ret = {};
+            var call = {};
+
+            call.success = function(callback) {
+                ret.success = callback;
+                return call;
+            };
+            call.error = function(callback) {
+                ret.error = callback;
+                return call;
+            };
+            call.complete = function(callback) {
+                ret.complete = callback;
+                return call;
+            };
+            call.ajax = function() {
+
+                if (type != 'GET') {
+                    if (data) { data.csrf_token = csrfToken; }
+                    else { data = {'csrf_token': csrfToken}; }
+                }
+
+                $.ajax({
+                    url: url,
+                    type: type,
+                    data: JSON.stringify(data),
+                    complete: function(jqXHR) {
+                        if (jqXHR.status == 200) {
+                            if (ret.success)
+                                ret.success(jqXHR.responseJSON);
+                        } else if (ret.error) {
+                            ret.error(jqXHR.responseText);
+                        }
+                        if (ret.complete)
+                            ret.complete(jqXHR.status == 200, jqXHR.responseJSON);
+                    }
+                });
+                return call;
+            };
+            return call.ajax();
+        };
     }
 
 

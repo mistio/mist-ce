@@ -1,6 +1,6 @@
 define('app/views/backend_edit', ['text!app/templates/backend_edit_dialog.html','ember'],
     /**
-     *  Edit Backend Popup
+     *  Edit Backend View
      * 
      *  @returns Class
      */
@@ -14,6 +14,7 @@ define('app/views/backend_edit', ['text!app/templates/backend_edit_dialog.html',
              */
 
             template: Ember.Handlebars.compile(edit_backend_dialog_html),
+
 
             /**
              * 
@@ -32,6 +33,7 @@ define('app/views/backend_edit', ['text!app/templates/backend_edit_dialog.html',
                     }
                 }
             },
+
 
             /**
              * 
@@ -53,9 +55,11 @@ define('app/views/backend_edit', ['text!app/templates/backend_edit_dialog.html',
 
             actions: {
 
+
                 stateToggleSwitched: function() {
                     Mist.backendEditController.toggleBackend();
                 },
+
 
                 deleteClicked: function(){
                     if (Mist.backendEditController.backend.getMonitoredMachines.length) {
@@ -66,10 +70,12 @@ define('app/views/backend_edit', ['text!app/templates/backend_edit_dialog.html',
                     $('#backend-delete-confirm').slideDown();
                 },
 
+
                 backClicked: function() {
                     $('#backend-delete-confirm').slideUp();
                     $('#edit-backend-popup').popup('close');
                 },
+
 
                 yesClicked: function() {
                     $('#button-confirm-disable').addClass('ui-state-disabled');
@@ -81,6 +87,7 @@ define('app/views/backend_edit', ['text!app/templates/backend_edit_dialog.html',
                         $('#button-confirm-disable').removeClass('ui-state-disabled');
                     });
                 },
+
 
                 noClicked: function() {
                     $('#backend-delete-confirm').slideUp();

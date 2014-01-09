@@ -1,9 +1,13 @@
 
 /* Machine Tags View CSS
 -----------------------------------------------------------------------------------------------------------*/
+#machine-tags-popup-popup {
+    top: auto !important;
+    bottom: 50px !important;
+}
 #machine-tags-popup .ui-input-text {
     float: left;
-    width: 180px;
+    width: 145px;
     display: inline-block;
 }
 #machine-tags-popup #add-tag-ok {
@@ -14,4 +18,8 @@
 #machine-tags-popup #add-tag-back {
     display: block;
     clear: both;
+}
+#machine-tags-popup .ui-listview {
+    clear: both;
+    margin: 20px auto;
 }

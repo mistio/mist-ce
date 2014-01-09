@@ -1,6 +1,5 @@
 define('app/models/backend', ['app/controllers/machines', 'app/controllers/images', 'app/controllers/sizes',
-        'app/controllers/locations', 'ember'
-    ],
+                              'app/controllers/locations', 'ember'],
     /**
      *  Backend Model
      *
@@ -39,6 +38,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             loadingMachines: null,
             loadingLocations: null,
 
+
             /**
              *
              *  Initialization
@@ -49,22 +49,10 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                 Ember.run(this, function () {
 
                     // Add controllers
-                    this.sizes = SizesController.create({
-                        backend: this,
-                        content: []
-                    });
-                    this.images = ImagesController.create({
-                        backend: this,
-                        content: []
-                    });
-                    this.machines = MachinesController.create({
-                        backend: this,
-                        content: []
-                    });
-                    this.locations = LocationsController.create({
-                        backend: this,
-                        content: []
-                    });
+                    this.sizes = SizesController.create({backend: this, content: []});
+                    this.images = ImagesController.create({backend: this, content: []});
+                    this.machines = MachinesController.create({backend: this, content: []});
+                    this.locations = LocationsController.create({backend: this, content: []});
 
                     // Add events
                     this.sizes.on('onSizeListChange', this, '_updateSizeCount');
@@ -94,7 +82,6 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     this.locations.load();
                 });
             }.on('init'),
-
 
 
             /**
@@ -230,7 +217,6 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             },
 
 
-
             /**
              *
              *  Observers
@@ -240,7 +226,6 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             enabledObserver: function () {
                 Ember.run.once(this, '_toggle');
             }.observes('enabled'),
-
 
 
             /**

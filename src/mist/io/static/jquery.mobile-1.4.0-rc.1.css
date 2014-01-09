@@ -4520,7 +4520,7 @@ for Android 4.1 */
 }
 /* Panel */
 .ui-panel {
-    width: 315px;
+    width: 325px;
     min-height: 100%;
     max-height: none;
     border-width: 0;
@@ -4609,15 +4609,15 @@ for Android 4.1 */
 /* Panel positioning (for overlay and push) */
 /* Panel left closed */
 .ui-panel-position-left {
-    left: -315px;
+    left: -325px;
 }
 /* Panel left closed animated */
 .ui-panel-animate.ui-panel-position-left.ui-panel-display-overlay,
 .ui-panel-animate.ui-panel-position-left.ui-panel-display-push {
     left: 0;
-    -webkit-transform: translate3d(-315px,0,0);
-    -moz-transform: translate3d(-315px,0,0);
-    transform: translate3d(-315px,0,0);
+    -webkit-transform: translate3d(-325px,0,0);
+    -moz-transform: translate3d(-325px,0,0);
+    transform: translate3d(-325px,0,0);
 }
 /* Panel left open */
 .ui-panel-position-left.ui-panel-display-reveal, /* Unset "panel left closed" for reveal */
@@ -4633,15 +4633,15 @@ for Android 4.1 */
 }
 /* Panel right closed */
 .ui-panel-position-right {
-    right: -315px;
+    right: -325px;
 }
 /* Panel right closed animated */
 .ui-panel-animate.ui-panel-position-right.ui-panel-display-overlay,
 .ui-panel-animate.ui-panel-position-right.ui-panel-display-push {
     right: 0;
-    -webkit-transform: translate3d(315px,0,0);
-    -moz-transform: translate3d(315px,0,0);
-    transform: translate3d(315px,0,0);
+    -webkit-transform: translate3d(325px,0,0);
+    -moz-transform: translate3d(325px,0,0);
+    transform: translate3d(325px,0,0);
 }
 /* Panel right open */
 .ui-panel-position-right.ui-panel-display-reveal, /* Unset "panel right closed" for reveal */
@@ -4658,36 +4658,36 @@ for Android 4.1 */
 /* Wrapper and fixed toolbars positioning (for reveal and push) */
 /* Panel left open */
 .ui-panel-page-content-position-left {
-    left: 315px;
-    right: -315px;
+    left: 325px;
+    right: -325px;
 }
 /* Panel left open animated */
 .ui-panel-animate.ui-panel-page-content-position-left {
     left: 0;
     right: 0;
-    -webkit-transform: translate3d(315px,0,0);
-    -moz-transform: translate3d(315px,0,0);
-    transform: translate3d(315px,0,0);
+    -webkit-transform: translate3d(325px,0,0);
+    -moz-transform: translate3d(325px,0,0);
+    transform: translate3d(325px,0,0);
 }
 /* Panel right open */
 .ui-panel-page-content-position-right {
-    left: -315px;
-    right: 315px;
+    left: -325px;
+    right: 325px;
 }
 /* Panel right open animated */
 .ui-panel-animate.ui-panel-page-content-position-right {
     left: 0;
     right: 0;
-    -webkit-transform: translate3d(-315px,0,0);
-    -moz-transform: translate3d(-315px,0,0);
-    transform: translate3d(-315px,0,0);
+    -webkit-transform: translate3d(-325px,0,0);
+    -moz-transform: translate3d(-325px,0,0);
+    transform: translate3d(-325px,0,0);
 }
 /* Dismiss model open */
 .ui-panel-dismiss-open.ui-panel-dismiss-position-left {
-    left: 315px;
+    left: 325px;
 }
 .ui-panel-dismiss-open.ui-panel-dismiss-position-right {
-    right: 315px;
+    right: 325px;
 }
 /* Shadows and borders */
 .ui-panel-display-reveal {
@@ -4729,10 +4729,10 @@ for Android 4.1 */
 /* Responsive: wrap on wide viewports once open */
 @media (min-width:55em) {
     .ui-responsive-panel .ui-panel-page-content-open.ui-panel-page-content-position-left {
-        margin-right: 315px;
+        margin-right: 325px;
     }
     .ui-responsive-panel .ui-panel-page-content-open.ui-panel-page-content-position-right {
-        margin-left: 315px;
+        margin-left: 325px;
     }
     .ui-responsive-panel .ui-panel-page-content-open {
         width: auto;    

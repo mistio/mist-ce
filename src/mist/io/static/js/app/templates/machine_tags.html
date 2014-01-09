@@ -1,4 +1,5 @@
-<div id="machine-tags-popup" class="large-popup" data-role="popup" data-overlay-theme="b" data-transition="slideup">
+<div id="machine-tags-popup" class="mid-popup" data-role="popup" data-overlay-theme="b" data-transition="slideup"
+                                                                            data-position-to="#machines-tags-btn">
 
     <div data-role="header">
         <h1>Manage Tags</h1>
@@ -10,22 +11,17 @@
 
         <a id="add-tag-ok" data-role="button" data-theme="b" {{action "addClicked" target="view"}}>Add</a>
 
-        {{#if machineTagsController.addingTag}}
-        <div class="ajax-loader"></div>
-        {{/if}}
-
-        <ul data-role="list-view">
+        <ul data-role="listview">
             {{#each Mist.machineTagsController.machine.tags}}
-            <div>
-                {{this}}
-                <a data-role="button"
-                   data-icon="delete"
-                   data-inline="true"
-                   data-iconpos="notext"
-                   {{action "deleteTagClicked" this target="view"}}>x</a>
-             </div>
+                {{view Mist.machineTagsListItemView tagBinding="this"}}
             {{/each}}
         </ul>
+
+        {{#if Mist.machineTagsController.addingTag}}
+            <div class="ajax-loader"></div>
+        {{else}} {{#if Mist.machineTagsController.deletingTag}}
+            <div class="ajax-loader"></div>
+        {{/if}} {{/if}}
 
         <a id="add-tag-back" data-role="button" {{action "backClicked" target="view"}}>Back</a>
 

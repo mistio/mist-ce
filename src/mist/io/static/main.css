@@ -47,8 +47,7 @@ body {
 .ui-mobile, .ui-mobile body {
     height: 0 !important;
 }
-.ui-page {
-    height: 100% !important;
+.ui-page-active {
     min-height: 100% !important;
 }
 .small-padding {
@@ -116,11 +115,11 @@ textarea {
     width: 78px !important;
 }
 .large-popup {
-    width: 290px !important;
+    width: 320px !important;
 }
 .large-popup .ok-cancel a,
 .large-popup .ok-cancel button {
-    width: 95px !important;
+    width: 110px !important;
 }
 .huge-popup {
     width: 100% !important;
@@ -130,12 +129,6 @@ textarea {
 
 /* Side panel
 -----------------------------------------------------------------------------------------------------------*/
-.ui-panel .ui-panel-inner {
-    overflow: auto;
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;  
-    -webkit-overflow-scrolling: touch;
-}
 .side-panel {
     /**
      *  .ui-panel's default width value is 17em
@@ -144,10 +137,10 @@ textarea {
      *  panel related selectors, a mass find/replace 
      *  process took place.
      * 
-     *  The value "315px" is also unique to jqm.css
+     *  The value "325px" is also unique to jqm.css
      *  so this change can easily be undone or modified
      */
-    width: 315px; /* Useless, but leave it there for reference reasons */
+    width: 325px; /* Useless, but leave it there for reference reasons */
 }
 .side-panel .ui-panel-inner {
     padding: 7px;
@@ -221,6 +214,26 @@ textarea {
 }
 .ui-footer.tri-action-footer td {
     width: 33.3%;
+}
+
+
+/* Small List Item
+-----------------------------------------------------------------------------------------------------------*/
+.small-list-item {
+    padding: 0 6px;
+    background: #ddd;
+    margin-bottom: 5px;
+    border-radius: 19px;
+    display: inline-block;
+    border: 1px solid #c4c4c4;
+}
+.small-list-item button {
+    display: inline;
+}
+.small-list-item p {
+    top: 5px;
+    position: relative;
+    display: inline;
 }
 
 

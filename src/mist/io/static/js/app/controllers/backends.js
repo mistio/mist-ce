@@ -37,7 +37,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             load: function() {
                 var that = this;
                 this.set('loading', true);
-                Mist.ajaxGET('/backends', {
+                Mist.ajax.GET('/backends', {
                 }).success(function(backends) {
                     that._setContent(backends);
                     that.checkMonitoring();
@@ -60,7 +60,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             addBackend: function(title, provider, apiKey, apiSecret, apiUrl, tenant, callback) {
                 var that = this;
                 this.set('addingBackend', true);
-                Mist.ajaxPOST('/backends', {
+                Mist.ajax.POST('/backends', {
                     'title'      : title,
                     'provider'   : provider,
                     'apikey'     : apiKey,
@@ -81,7 +81,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             deleteBackend: function(backendId, callback) {
                 var that = this;
                 this.set('deletingBackend', true);
-                Mist.ajaxDELETE('/backends/' + backendId, {
+                Mist.ajax.DELETE('/backends/' + backendId, {
                 }).success(function() {
                     that._deleteBackend(backendId);
                 }).error(function() {
@@ -96,7 +96,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             toggleBackend: function(backendId, newState, callback) {
                 var that = this;
                 this.set('togglingBackend', true);
-                Mist.ajaxPOST('/backends/' + backendId, {
+                Mist.ajax.POST('/backends/' + backendId, {
                     'new_state': newState ? '1' : '0'
                 }).success(function() {
                     that._toggleBackend(backendId, newState);
@@ -115,7 +115,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
 
                 var that = this;
                 this.set('checkingMonitoring', true);
-                Mist.ajaxGET('/monitoring', {
+                Mist.ajax.GET('/monitoring', {
                 }).success(function(data) {
                     Mist.set('monitored_machines', data.machines);
                     Mist.set('current_plan', data.current_plan);

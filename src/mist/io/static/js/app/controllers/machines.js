@@ -27,7 +27,7 @@ define('app/controllers/machines', ['app/models/machine'],
 
                 var that = this;
                 this.set('loading', true);
-                Mist.ajaxGET('/backends/' + this.backend.id + '/machines', {
+                Mist.ajax.GET('/backends/' + this.backend.id + '/machines', {
                 }).success(function(machines) {
                     if (!that.backend.enabled) return;
                     that._setContent(machines);
@@ -136,7 +136,7 @@ define('app/controllers/machines', ['app/models/machine'],
             shutdownMachine: function(machineId) {
                 var that = this;
                 this.set('shutingdownMachine', true);
-                Mist.ajaxPOST('/backends/' + this.backend.id + '/machines/' + machineId, {
+                Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
                     'action' : 'stop'
                 }).success(function() {
                     that._shutdownMachine(machineId);
@@ -152,7 +152,7 @@ define('app/controllers/machines', ['app/models/machine'],
             destroyMachine: function(machineId) {
                 var that = this;
                 this.set('destroyingMachine', true);
-                Mist.ajaxPOST('/backends/' + this.backend.id + '/machines/' + machineId, {
+                Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
                     'action' : 'destroy'
                 }).success(function() {
                     that._destroyMachine(machineId);
@@ -168,7 +168,7 @@ define('app/controllers/machines', ['app/models/machine'],
             rebootMachine: function(machineId) {
                 var that = this;
                 this.set('rebootingMachine', true);
-                Mist.ajaxPOST('/backends/' + this.backend.id + '/machines/' + machineId, {
+                Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
                     'action' : 'destroy'
                 }).success(function() {
                     that.rebootMachine(machineId);
@@ -184,7 +184,7 @@ define('app/controllers/machines', ['app/models/machine'],
             startMachine: function(machineId) {
                 var that = this;
                 this.set('startingMachine', true);
-                Mist.ajaxPOST('/backends/' + this.backend.id + '/machines/' + machineId, {
+                Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
                     'action' : 'destroy'
                 }).success(function() {
                     that.startMachine(machineId);
@@ -240,14 +240,27 @@ define('app/controllers/machines', ['app/models/machine'],
             _setContent: function(machines) {
                 var that = this;
                 Ember.run(function() {
+                    // Remove deleted machines
+                    that.content.forEach(function(machine) {
+                        if (!machines.findBy('id', machine.id)) {
+                            if (!machine.pendingCreation) {
+                                that.content.removeObject(machine);
+                            }
+                        }
+                    });
+                    // 
+                    // Get new machines
                     var newMachines = [];
                     machines.forEach(function(machine) {
                         if (that.machineExists(machine.id)) {
+                            // Refresh existing machines
                             var old_machine = that.getMachine(machine.id);
+                            var new_machine = Machine.create(machine);
                             for (attr in machine) {
-                                old_machine.set(attr, machine[attr]);
+                                old_machine.set(attr, new_machine[attr]);
                             }
                         } else {
+                            // Add new machine
                             machine.backend = that.backend;
                             that.content.pushObject(Machine.create(machine));
                         }

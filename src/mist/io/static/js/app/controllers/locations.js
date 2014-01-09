@@ -27,7 +27,7 @@ define('app/controllers/locations', ['app/models/location'],
 
                 var that = this;
                 this.set('loading', true);
-                Mist.ajaxGET('/backends/' + this.backend.id + '/locations', {
+                Mist.ajax.GET('/backends/' + this.backend.id + '/locations', {
                 }).success(function(locations) {
                     if (!that.backend.enabled) return;
                     that._setContent(locations);

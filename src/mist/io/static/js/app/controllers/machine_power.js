@@ -13,11 +13,11 @@ define('app/controllers/machine_power', ['ember'],
 
             machines: [],
             callback: null,
-
             canStart: null,
             canReboot: null,
             canDestroy: null,
             canShutdown: null,
+
 
             /**
              *
@@ -60,7 +60,6 @@ define('app/controllers/machine_power', ['ember'],
             },
 
 
-
             /**
              *
              *  Pseudo-Private Methods
@@ -68,7 +67,7 @@ define('app/controllers/machine_power', ['ember'],
              */
 
             _clear: function () {
-                Ember.run(this, function() {
+                Ember.run(this, function () {
                     this.set('machines', []);
                     this.set('callback', null);
                     this.set('canStart', null);
@@ -96,25 +95,18 @@ define('app/controllers/machine_power', ['ember'],
 
 
             _act: function (action) {
-                if (action == 'shutdown') {
-                    this.machines.forEach(function (machine) {
+                this.machines.forEach(function (machine) {
+                    if (action == 'shutdown') {
                         machine.shutdown();
-                    });
-                } else if (action == 'destroy') {
-                    this.machines.forEach(function (machine) {
+                    } else if (action == 'destroy') {
                         machine.destroy();
-                    });
-                } else if (action == 'reboot') {
-                    this.machines.forEach(function (machine) {
+                    } else if (action == 'reboot') {
                         machine.reboot();
-                    });
-                } else if (action == 'start') {
-                    this.machines.forEach(function (machine) {
+                    } else if (action == 'start') {
                         machine.start();
-                    });
-                }
+                    }
+                });
             },
-
 
 
             /**

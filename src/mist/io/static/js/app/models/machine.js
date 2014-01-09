@@ -29,27 +29,9 @@ define('app/models/machine', [
             stats:{'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
             
-            probedObserver: function() {
-                Ember.run.next(function() {
-                    try {
-                        $('#mist-manage-keys').button();
-                    } catch (e) {
-                        //$('#mist-manage-keys').button('refresh');
-                    }
-                });
-            }.observes('probed', 'probing'),
-
-            selectedObserver: function() {
-                Mist.backendsController.updateSelectedMachines();
-            }.observes('selected'),
-
             image: function() {
                 return this.backend.images.getImage(this.imageId);
             }.property('imageId'),
-            
-            isNotGhost: function() {                
-                return !this.isGhost;
-            }.property('isGhost'),
 
 
             shutdown: function() {
@@ -119,26 +101,6 @@ define('app/models/machine', [
                 
                 $('#hidden-shell-iframe').attr('src', url);
                 callback('');
-            },
-
-            hasAlert : function() {
-                //TODO when we have alerts
-                return false;
-            }.property('hasAlert'),
-
-            startUptimeTimer: function() {
-                var that = this;
-
-                setInterval(function() {
-                    if (that.get('state') == 'running' && that.get('uptimeFromServer') &&
-                        that.get('uptimeChecked')) {
-
-                        that.set('uptime', that.get('uptimeFromServer') + (Date.now()
-                                           - that.get('uptimeChecked')));
-                    } else {
-                        return;
-                    }
-                }, 1000);
             },
 
             probe: function(keyName) {
@@ -341,16 +303,6 @@ define('app/models/machine', [
                     }
                 }
                 $("#monitoring-dialog").popup('open');
-            },
-
-            init: function() {
-                this._super();
-                this.tags = Ember.ArrayController.create();
-                this.startUptimeTimer();
-                if (!this.probeInterval) this.set('probeInterval', 5000);
-                Ember.run.later(this, function() {
-                    //this.probe();
-                }, this.probeInterval);
             }
         });
     }

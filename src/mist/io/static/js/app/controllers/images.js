@@ -27,7 +27,7 @@ define('app/controllers/images', ['app/models/image'],
 
                 var that = this;
                 this.set('loading', true);
-                Mist.ajaxGET('/backends/' + this.backend.id + '/images', {
+                Mist.ajax.GET('/backends/' + this.backend.id + '/images', {
                 }).success(function(images) {
                     if (!that.backend.enabled) return;
                     that._setContent(images);
@@ -52,7 +52,7 @@ define('app/controllers/images', ['app/models/image'],
 
             searchImages: function(filter, callback) {
                 var that = this;
-                Mist.ajaxPOST('/backends/' + this.backend.id + '/images', {
+                Mist.ajax.POST('/backends/' + this.backend.id + '/images', {
                     'search_term' : filter
                 }).success(function(images) {
 
@@ -73,7 +73,7 @@ define('app/controllers/images', ['app/models/image'],
 
             toggleImageStar: function(image, callback) {
                 var that = this;
-                Mist.ajaxPOST('/backends/' + this.backend.id + '/images/' + image.id, {
+                Mist.ajax.POST('/backends/' + this.backend.id + '/images/' + image.id, {
                 }).success(function(star) {
                     if (!that.imageExists(image.id)) {
                         that._addImage(image);

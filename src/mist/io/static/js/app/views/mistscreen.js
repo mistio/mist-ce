@@ -12,8 +12,8 @@ define('app/views/mistscreen', ['ember'],
              */
 
             didInsertElement: function () {
-                if ($('[data-role=page]').page) {
-                    $('[data-role=page]').page();
+                if ($('.ui-page-active').page) {
+                    $('.ui-page-active').page();
                 }
             }
         });

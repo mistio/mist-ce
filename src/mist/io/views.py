@@ -455,7 +455,8 @@ def machine_actions(request):
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     user = user_from_request(request)
-    action = request.params.get('action')
+    params = request.json_body
+    action = params.get('action', '')
     if action in ('start', 'stop', 'reboot', 'destroy'):
         if action == 'start':
             methods.start_machine(user, backend_id, machine_id)

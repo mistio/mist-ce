@@ -13,8 +13,8 @@ define('app/views/backend_button', ['ember'],
 
             tagName: 'a',
             backend: null,
+            attributeBindings: ['data-role', 'data-icon'],
             template: Ember.Handlebars.compile('{{title}}'),
-            attributeBindings: ['data-role', 'data-inline', 'data-icon'],
 
 
             /**
@@ -55,13 +55,7 @@ define('app/views/backend_button', ['ember'],
              */
 
             click: function() {
-                var backend = this.backend;
-                $('#monitoring-message').hide();
-                $('#backend-delete-confirm').hide();
-                Mist.backendEditController.set('backend', backend);
-                $('#backend-toggle option[value=1]')[0].selected = backend.enabled;
-                $('#backend-toggle').slider('refresh');
-                $('#edit-backend-popup').popup('open');
+                Mist.backendEditController.open(this.backend);
             },
 
 

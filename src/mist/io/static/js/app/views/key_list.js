@@ -73,6 +73,16 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
                 },
 
 
+                renameClicked: function () {
+                    Mist.keyEditController.open(Mist.keysController.selectedKeys[0].id);
+                },
+
+
+                setDefaultClicked: function () {
+                    Mist.keysController.setDefaultKey(Mist.keysController.selectedKeys[0].id);
+                },
+
+
                 selectClicked: function () {
                     $('#select-keys-popup').popup('open');
                 },
@@ -87,16 +97,6 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
                             key.set('selected', mode);
                         });
                     });
-                },
-
-
-                renameClicked: function () {
-                    Mist.keyEditController.open(Mist.keysController.selectedKeys[0].id);
-                },
-
-
-                setDefaultClicked: function () {
-                    Mist.keysController.setDefaultKey(Mist.keysController.selectedKeys[0].id);
                 },
 
 

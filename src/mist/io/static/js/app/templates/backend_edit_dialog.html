@@ -5,7 +5,10 @@
     </div>
 
     <div data-role="content">
-        <label>{{Mist.backendEditController.backend.title}}</label>
+
+        {{!view Mist.TextField
+               id="new-backend-first-field"
+               valueBinding="Mist.backendEditController.backend.title"}}
 
         <div data-role="fieldcontain">
             <select id="backend-toggle" data-role="slider" {{action "stateToggleSwitched" target="view" on="change"}}>
