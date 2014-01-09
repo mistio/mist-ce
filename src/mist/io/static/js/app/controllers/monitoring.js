@@ -9,22 +9,35 @@ define('app/controllers/monitoring', [
     function() {
         return Ember.ObjectController.extend(Ember.Evented,{
             
-            machineNotResponding: false,
 
             // TODO , Remove Machine And View Arguments
             // TODO , UpdateInterval And Step Must Be the Same
             initialize: function(arguments){
 
-                // Reset All Controller Values
+                var self = this;
+
+                // Reset all controller values
                 this.reset();
 
-                this.request.initiliaze(arguments['timeWindow'],
-                                        arguments['step'], 
-                                        arguments['machineModel'],
-                                        arguments['updatesInterval'],
-                                        arguments['updatesEnabled']);
-
+                // Get graphs from view
                 this.graphs.instances = arguments['graphs'];
+
+                // Create and Start the request
+                this.request.create({
+                    machine         : arguments['machineModel'], // Send Current Machine
+                    timeWindow      : 10*60*1000,          // Display 10 Minutes
+                    step            : 10000,               // Metrics Step in miliseconds
+                    updateInterval  : 10000,               // Get Updates Every x Miliseconds
+                    updatesEnabled  : true,                // Get Updates
+                    timeGap         : 60,                  // Gap between current time and requested
+                    callback        : function(result){
+                        if(result['status'] == 'success'){
+                            self.graphs.updateData(result['data']);
+                        }
+                    }
+                });
+
+                this.request.start();
             },
 
             // Todo add Description
@@ -49,65 +62,131 @@ define('app/controllers/monitoring', [
                 *   updateinterval : integer in microseconds
                 *   enableUpdates  : boolean
                 */
-                initiliaze : function(timeWindow,step,machine,updateInterval,enableUpdates){
+                create : function(arguments){
+
+                    this.reset();
+
+                    var self             = this;
+                    var controller       = Mist.monitoringController;
+
+                    this.step            = arguments['step'];
+                    this.timeWindow      = arguments['timeWindow'];
+                    this.updateInterval  = arguments['updateInterval'];
+                    this.machine         = arguments['machine'];
+                    this.updateData      = arguments['updatesEnabled'];
+                    this.step            = arguments['step'];
+                    this.callback        = ('callback' in arguments) ? arguments['callback'] : null;
+                    this.timeGap         = arguments['timeGap']; // Temporary Fix , Give some time to server to collect data
+
+                    // Calculate Start And Stop
+                    this.timeStop        = Math.floor( ( (new Date()).getTime() - this.timeGap * 1000) / 1000 );
+                    this.timeStart       = Math.floor(this.timeStop - this.timeWindow/1000);
+                    this.lastMetrictime  = new Date(this.timeStart);
+                },
 
 
+                start : function(){
+
+                    console.log("started");
                     var self = this;
-                    var controller = Mist.monitoringController;
-                    var timeGap = 60;
 
                     this.locked = true;
-                    this.step = step;
-                    this.timeWindow = timeWindow;
-                    this.updateInterval = updateInterval;
-                    this.machine = machine;
-                    // Enable/Disable Updates
-                    this.updateData = enableUpdates;
+
+                    // If request stopped Re-calculate start and stop 
+                    if(this.initialized && !this.running){
+                        console.log("Re-calculating");
+                        this.timeStart = Math.floor( this.lastMetrictime.getTime() /1000 ) ;
+                        this.timeStop =  Math.floor( ((new Date()).getTime() - this.timeGap * 1000 ) / 1000 );
+
+                        // Fix time when lossing precision
+                        var stopRemainder = (this.timeStop - this.timeStart) % (this.step/1000);
+                        this.timeStop = this.timeStop - stopRemainder;
+                    } else {
+
+                        this.initialized = true;
+                    }
 
                     // Show Fetching Message On Initial Request
-                    self.machine.set('pendingStats', true);
+                    this.machine.set('pendingStats', true);
 
-                    // Note: Converting ms To s for start and stop, step remains ms
-                    var stop  = Math.floor( ( (new Date()).getTime() - timeGap * 1000) / 1000 );
-                    var start = Math.floor(stop - timeWindow/1000);
-                    self.step = step;
-
-                    // Last measurement must be the first measurement
-                    self.lastMetrictime = new Date(start);
-
-                    /* Request Debugging : TODO Remove It when requests are stable
-                    console.log("Request Time:");
-                    console.log("Start: " + (new Date(start*1000)));
-                    console.log("Stop : " + (new Date(stop*1000)));
-                    console.log("");
-                    */
-
-                    this.receiveData(start, stop, self.step,null);
+                    // Do the ajax call
+                    this.receiveData(this.timeStart, this.timeStop, this.step,this.callback);
 
 
                     // Check if Data Updates Are Enabled
-                    if(this.updateData){
+                    if(this.updateData && !this.running){
                         window.monitoringInterval = window.setInterval(function() {
+
+                            // Lock request so no other request can be done in the same time
                             self.locked = true;
-                            var start = Math.floor( self.lastMetrictime.getTime() /1000 ) ;
-                            var stop =  Math.floor( ((new Date()).getTime() - timeGap * 1000 ) / 1000 );
-                            var stopRemainder = (stop - start) % (self.step/1000);
-                            stop = stop - stopRemainder;
 
-                            /* Request Debugging : TODO Remove It when requests are stable
-                            if(stopRemainder>0)
-                                error("Loss Of Presition: " + stopRemainder);
+                            // Calculate Start and Stop
+                            self.timeStart = Math.floor( self.lastMetrictime.getTime() /1000 ) ;
+                            self.timeStop =  Math.floor( ((new Date()).getTime() - self.timeGap * 1000 ) / 1000 );
 
-                            console.log("Request Time:");
-                            console.log("Start: " + new Date(start*1000));
-                            console.log("Stop : " + new Date(stop *1000 ));
-                            console.log("");
-                            */
-                            controller.machineNotResponding = false;
+                            // Fix time when lossing precision
+                            var stopRemainder = (self.timeStop - self.timeStart) % (self.step/1000);
+                            self.timeStop = self.timeStop - stopRemainder;
 
-                            self.receiveData(start, stop, self.step,null);
-                        },updateInterval);
+                            // Do the ajax call
+                            self.receiveData(self.timeStart, self.timeStop, self.step,self.callback);
+
+                        },this.updateInterval);
                     }
+
+                    this.running = true;
+                },
+
+                stop : function(){
+
+                    this.running = false;
+                    window.clearInterval(window.monitoringInterval);
+                },
+
+                reload: function(reason){
+
+                    var self = this;
+
+                    var reload = function(){
+
+                        if(self.locked){
+                            console.log("Waiting For Action To Finish");
+                            window.setTimeout(reload,1000);
+                        }
+                        else{
+                            console.log("reloading");
+                           
+                           // Stop Current Request 
+                           self.stop();
+
+                           reason = (typeof reason == 'undefined' ? 'manualReload' : reason);
+
+                           // Temporary Fix For Some Functions TODO change this
+                           if(reason == 'updatesDisabled')
+                                Mist.monitoringController.graphs.disableAnimation(false);
+                           if(reason == 'updatesEnabled')
+                                Mist.monitoringController.graphs.enableAnimation();
+
+                            Mist.monitoringController.graphs.clearData();
+                            // End Of Fix
+
+                           // Re-Initialize and start request
+                           self.create({
+                                machine         : self.machine,
+                                timeWindow      : self.timeWindow,
+                                step            : self.step,
+                                updateInterval  : self.updateInterval,
+                                updatesEnabled  : self.updateData,
+                                timeGap         : self.timeGap,
+                                callback        : self.callback
+                           }); 
+
+                           self.start();
+                        }
+
+                    };
+
+                    reload();
                 },
 
                 // Posible options, Stop,Step,Timewindow
@@ -179,45 +258,6 @@ define('app/controllers/monitoring', [
                 disableUpdates: function(){
                     this.updateData = false;
                     this.reload('updatesDisabled');
-                },
-
-                /**
-                *
-                *   reason : Values(manualReload,updatesDisabled,updatesEnabled)
-                */
-                reload: function(reason){
-
-                    var self = this;
-
-                    var reload = function(){
-
-                        if(self.locked){
-                            console.log("Waiting For Action To Finish");
-                            window.setTimeout(reload,1000);
-                        }
-                        else{
-                            console.log("reloading");
-                           // Clear Intervals 
-                           self.stopDataUpdates();
-
-                           reason = (typeof reason == 'undefined' ? 'manualReload' : reason);
-
-                           // Temporary Fix For Some Functions TODO change this
-                           if(reason == 'updatesDisabled')
-                                Mist.monitoringController.graphs.disableAnimation(false);
-                           if(reason == 'updatesEnabled')
-                                Mist.monitoringController.graphs.enableAnimation();
-
-                            Mist.monitoringController.graphs.clearData();
-                            // End Of Fix
-
-                           // Re-Initialize Request
-                           self.initiliaze(self.timeWindow,self.step,self.machine,self.updateInterval,self.updateData); 
-                        }
-
-                    };
-
-                    reload();
                 },
 
 
@@ -359,15 +399,15 @@ define('app/controllers/monitoring', [
                                 }
 
                                 self.lastMetrictime = new Date(metricTime.getTime()-10000);
-                                controller.graphs.updateData(receivedData);
+                                //controller.graphs.updateData(receivedData);
 
                                 callback({
-                                    status: 'success'
+                                    status: 'success',
+                                    data  : receivedData
                                 });
                             }
                             catch(err) {
                                 error(err);
-                                controller.machineNotResponding = true;
 
                                 callback({
                                     status: 'error',
@@ -387,8 +427,6 @@ define('app/controllers/monitoring', [
                                 if(self.machine.hasMonitoring){
                                     Mist.notificationController.timeNotify("Data request timed out. " +
                                                                            "Network connection is down or server doesn't respond",4000);
-
-                                    controller.machineNotResponding = true;
                                 }
                             }
                             else{
@@ -417,27 +455,33 @@ define('app/controllers/monitoring', [
                 reset: function(){
                     this.machine        = null;
                     this.lastMetrictime = null;  
-                    this.timeWindow     = 0;     
-                    this.step           = 0;     
+                    this.callback       = null;
+                    this.timeWindow     = 0;  
+                    this.timeStart      = 0;     
+                    this.timeStop       = 0;  
+                    this.timeGap        = 0;  
+                    this.step           = 0;   
                     this.updateData     = false; 
                     this.updateInterval = 0;     
                     this.locked         = false; 
+                    this.running        = false;
+                    this.initialized    = false;
                 },
                 
-                machine        : null,
+                machine        : null,  // TODO Add more description in comments
                 lastMetrictime : null,  // Date Object
+                callback       : null,  // Function
                 timeWindow     : 0,     // integer in miliseconds
+                timeStart      : 0,     // integer in miliseconds
+                timeStop       : 0,     // integer in miliseconds
                 step           : 0,     // integer in miliseconds
-                updateData     : false, // boolean
+                timeGap        : 0,     // integer in miliseconds
                 updateInterval : 0,     // integer in miliseconds
+                updateData     : false, // boolean
                 locked         : false, // boolean 
+                running        : false, // boolean
+                initialized    : false, // boolean
 
-            },
-
-            // TODO Remove These Functions When They Are Not Needed
-            updateDataRequest: function(timeToRequestms,step){
-                window.clearInterval(window.monitoringInterval);
-                this.setupDataRequest(timeToRequestms,step);
             },
 
             
@@ -519,21 +563,7 @@ define('app/controllers/monitoring', [
 
                     // When we enable history we must get last measurement and time window
                     if(!this.isEnabled) {
-
-                        this.isEnabled       = true;
-                        this.timeWindow      = request.timeWindow;
-                        this.lastMetrictime  = request.lastMetrictime;
-                        this.currentStopTime =  new Date(this.lastMetrictime.getTime() - this.timeWindow);
-
-
-                        // Debug
-                        /*console.log("Time Window: " + (this.timeWindow/1000/60) + " Minutes" );
-                        console.log("Current Stop Time: " + this.lastMetrictime);
-                        console.log("New     Stop Time: " + this.currentStopTime);
-                        */
-
-                        $('#graphsGoForward').removeClass('ui-disabled');
-                        $('#graphsResetHistory').removeClass('ui-disabled');
+                        this.enable();
                     }
                     else {
                         this.currentStopTime = new Date(this.currentStopTime - this.timeWindow);
@@ -549,9 +579,11 @@ define('app/controllers/monitoring', [
                         stop     : (+this.currentStopTime / 1000),
                         callback : function(result){
                             // On error set currentStop where it was
-                            if(result['status'] != 'success'){
+                            if(result['status'] == 'success')
+                                Mist.monitoringController.graphs.updateData(result['data']);
+                            else
                                 self.currentStopTime = new Date(+self.currentStopTime + self.timeWindow);
-                            }
+                            
                         }
                     });
 
@@ -586,9 +618,10 @@ define('app/controllers/monitoring', [
                                 stop     : (+this.currentStopTime / 1000),
                                 callback : function(result){
                                     // On error set currentStop where it was
-                                    if(result['status'] != 'success'){
+                                    if(result['status'] == 'success')
+                                        Mist.monitoringController.graphs.updateData(result['data']);
+                                    else
                                         self.currentStopTime = new Date(+self.currentStopTime - self.timeWindow);
-                                    }
                                 }
                             });
                         }
@@ -596,7 +629,31 @@ define('app/controllers/monitoring', [
 
                 },
 
-                disable: function(){
+                enable : function() {
+
+                    var self    = this;
+                    var request = Mist.monitoringController.request;
+
+                    if(!this.isEnabled) {
+
+                        this.isEnabled       = true;
+                        this.timeWindow      = request.timeWindow;
+                        this.lastMetrictime  = request.lastMetrictime;
+                        this.currentStopTime =  new Date(this.lastMetrictime.getTime() - this.timeWindow);
+
+
+                        // Debug
+                        /*console.log("Time Window: " + (this.timeWindow/1000/60) + " Minutes" );
+                        console.log("Current Stop Time: " + this.lastMetrictime);
+                        console.log("New     Stop Time: " + this.currentStopTime);
+                        */
+
+                        $('#graphsGoForward').removeClass('ui-disabled');
+                        $('#graphsResetHistory').removeClass('ui-disabled');
+                    }
+                },
+
+                disable: function() {
                     this.isEnabled = false;
                     Mist.monitoringController.request.customReset();
 
