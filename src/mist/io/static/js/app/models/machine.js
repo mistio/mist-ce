@@ -373,24 +373,19 @@ define('app/models/machine', [
                             if (prefix.slice(-1) == '/') {
                                 prefix = prefix.substring(0, prefix.length - 1);
                             }
-                            var cmd = '$(command -v sudo) mkdir -p /opt/mistio-collectd/ && $(command -v sudo) chmod go+rwX /opt/mistio-collectd && wget --no-check-certificate ' + prefix + '/core/scripts/deploy_collectd.sh -O - > /opt/mistio-collectd/deploy_collectd.sh && $(command -v sudo) chmod +x /opt/mistio-collectd/deploy_collectd.sh && $(command -v sudo) /opt/mistio-collectd/deploy_collectd.sh ' + data['monitor_server'] + ' ' + data['uuid'] + ' ' + data['passwd'];
-                            //cmd = "sudo su -c '" + cmd + "' || " + cmd;
                             collectd_install_target = that;
-                            warn(cmd);
-                            that.shell(cmd, function(){}, timeout=300);
+                            that.set('hasMonitoring', true);
                         } else {
                             $('.pending-monitoring h1').text('Disabling collectd');
-                            var cmd = '$(command -v sudo) rm -f /etc/cron.d/mistio-collectd && $(command -v sudo) kill -9 `cat /opt/mistio-collectd/collectd.pid`';
-                            //cmd = "sudo su -c '" + cmd + "' || " + cmd;
                             collectd_uninstall_target = that;
-                            that.shell(cmd, function(){});
-                            //remove machine from monitored_machines array
                             var new_monitored_machines = jQuery.grep(Mist.monitored_machines, function(value) {
                                 var machine_arr = [that.backend.id, that.id];
                                 return (!($(value).not(machine_arr).length == 0 && $(machine_arr).not(value).length == 0));
                             });
                             Mist.set('monitored_machines', new_monitored_machines);
+                            that.set('hasMonitoring', false);
                         }
+                        that.set('pendingMonitoring', false);
                         Mist.set('authenticated', true);
                     },
                     error: function(jqXHR, textstate, errorThrown) {
