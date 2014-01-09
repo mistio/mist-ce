@@ -35,6 +35,11 @@ define('app/controllers/machine_add', ['ember'],
                 $('.ui-page-active').animate({scrollTop:0}, 'slow');
                 $('#create-machine-panel .ui-panel-inner').animate({scrollTop:0}, 'slow');
                 $('#create-machine-panel').panel('open');
+                Ember.run.next(function(){
+                    $('.ui-page-active').height($('.ui-panel-open').height());
+                    $('body').css('overflow','auto');
+                });
+                
                 this._clear();
                 this.set('callback', callback);
             },

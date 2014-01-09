@@ -24,7 +24,12 @@
            data-icon="arrow-d"
            {{action "selectClicked" target="view"}}>Select</a>
 
-        <ul id="machines" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter...">
+        <ul id="machines" 
+            data-role="listview" 
+            data-inset="true" 
+            data-filter="true" 
+            data-filter-placeholder="Filter..."
+            class="checkbox-list">
             {{#each Mist.backendsController.content}}
                 {{#each this.machines.content}}
                     {{view Mist.machineListItemView machineBinding="this" class="checkbox-link"}}

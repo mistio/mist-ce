@@ -30,6 +30,10 @@ define('app/controllers/backend_add', ['app/models/backend','ember'],
 
             open: function(callback) {
                 $('#add-backend-panel').panel('open');
+                Ember.run.next(function(){
+                    $('.ui-page-active').height($('.ui-panel-open').height());
+                    $('body').css('overflow','auto');
+                });
                 this._clear();
                 this.set('callback', callback);
             },

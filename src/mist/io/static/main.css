@@ -141,6 +141,7 @@ textarea {
      *  so this change can easily be undone or modified
      */
     width: 325px; /* Useless, but leave it there for reference reasons */
+    min-height: 300px; 
 }
 .side-panel .ui-panel-inner {
     padding: 7px;
@@ -151,6 +152,15 @@ textarea {
 }
 
 
+/* Checkbox lists */
+ul.checkbox-list li a, ul.checkbox-list li a:hover, ul.checkbox-list label, ul.checkbox-list label:hover {
+    background-color: transparent !important;
+}
+
+ul.checkbox-list li:hover {
+    background: #ededed /*{a-bhover-background-color}*/
+}
+ 
 /* Checkbox-link
 -----------------------------------------------------------------------------------------------------------*/
 .checkbox-link a {

@@ -24,7 +24,11 @@
            data-theme="b"
            {{action "createClicked" target="view"}}>Create</a>
 
-        <ul data-role="listview" data-filter="true" data-inset="true" data-filter-placeholder="Filter...">
+        <ul data-role="listview" 
+            data-filter="true" 
+            data-inset="true" 
+            data-filter-placeholder="Filter..."
+            class="checkbox-list">
             {{#each Mist.keysController.content}}
                 {{view Mist.keyListItemView keyBinding="this" class="checkbox-link"}}
             {{/each}}
