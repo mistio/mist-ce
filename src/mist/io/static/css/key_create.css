@@ -8,3 +8,8 @@
     display: inline;
     float: right;
 }
+#create-key-popup-screen {
+    height: 100%;
+    position: fixed;
+    top: 0;
+}

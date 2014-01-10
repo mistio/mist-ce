@@ -25,10 +25,12 @@ define('app/controllers/machine_tags', ['ember'],
              */
 
             open: function (machine, callback) {
-                $('#machine-tags-popup').popup('open');
                 this._clear();
                 this.set('machine', machine);
                 this.set('callback', callback);
+                Ember.run.next(function () {
+                    $('#machine-tags-popup').popup('open');
+                });
             },
 
 

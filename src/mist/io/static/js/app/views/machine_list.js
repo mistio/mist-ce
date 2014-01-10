@@ -80,7 +80,7 @@ define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/ma
 
 
                 powerClicked: function () {
-                    Mist.machinePowerController.open(Mist.backendsController.selectedMachines[0]);
+                    Mist.machinePowerController.open(Mist.backendsController.selectedMachines);
                 },
 
 

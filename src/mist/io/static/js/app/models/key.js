@@ -17,6 +17,23 @@ define('app/models/key', ['ember'],
             selected: null,
             isDefault: null,
 
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+
+            associate: function(machine, callback) {
+                Mist.keysController.associateKey(
+                    this.id,
+                    machine.backend.id,
+                    machine.id,
+                    machine.backend.host,
+                    callback
+                );
+            },
+
         });
     }
 );

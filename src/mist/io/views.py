@@ -284,7 +284,7 @@ def list_keys(request):
 
     """
     user = user_from_request(request)
-    return [{'id': key.replace(' ', ''),
+    return [{'id': key,
              'machines': user.keypairs[key].machines,
              'isDefault': user.keypairs[key].default}
             for key in user.keypairs]

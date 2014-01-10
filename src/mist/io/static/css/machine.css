@@ -8,10 +8,10 @@
     width: 100%;
 }
 #single-machine-page .info-table td {
-    font-size: 14px;
     margin: 0;
-    padding: 10px 12px;
     width: 50%;
+    font-size: 14px;
+    padding: 10px 12px;
     border-bottom: 1px solid #CFCFCF;
 }
 #single-machine-page .info-table tr td:nth-child(2) {
@@ -19,4 +19,14 @@
 }
 #single-machine-page .info-table tr:nth-child(2n) {
     background-color: #F7F7F7;
+}
+#single-machine-page #monitoring-disabled p {
+    text-align: center;
+}
+#single-machine-page #monitoring-disabled a {
+    width: 165px;
+    margin: 0 auto;
+}
+#single-machine-page #mist-manage-keys a {
+    
 }

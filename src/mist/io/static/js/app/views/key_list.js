@@ -50,7 +50,7 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
                     $('#key-list-page .ui-footer').slideUp();
                     break;
                 case 1:
-                    $('#key-list-page.ui-footer').slideDown().find('a').removeClass('ui-state-disabled');
+                    $('#key-list-page .ui-footer').slideDown().find('a').removeClass('ui-state-disabled');
                     break;
                 default:
                     $('#key-list-page .ui-footer').slideDown().find('a').addClass('ui-state-disabled');

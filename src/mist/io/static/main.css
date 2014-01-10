@@ -30,7 +30,7 @@
 .mist-logo {
     width: 280px;
     height: 280px;
-    background: url("logo_christmas.png") center no-repeat;
+    background: url("logo_splash_new.png") center no-repeat;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -157,7 +157,12 @@ textarea {
     height: 40px;
 }
 .checkbox-link h3 {
-    max-width: 50%;
+    width: 160px;
+    display: inline-block !important;
+}
+.checkbox-link .state h3 {
+    width: auto;
+    margin-left: 10px;
 }
 .checkbox-link .ui-checkbox {
     margin: 0 !important;
@@ -173,15 +178,18 @@ textarea {
     border: none;
     height: 41px;
 }
+.checkbox-link .tags {
+    bottom: 41px;
+    float: right;
+    position: relative;
+    display: inline-block;
+}
 .checkbox-link .tag {
     border: 1px solid #bfbfbf;
     margin: 3px 3px 9px 0;
     color: #555 !important;
-    position: relative;
     padding: 1px 7px;
     float: right;
-    bottom: 26px;
-    right: 10px;
 }
 @-moz-document url-prefix() {
     .checkbox-link .tag {

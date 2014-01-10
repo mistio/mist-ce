@@ -1,7 +1,7 @@
 
 /* Machine Tags View CSS
 -----------------------------------------------------------------------------------------------------------*/
-#machine-tags-popup-popup {
+#machine-tags-popup-popup.ui-popup-hidden {
     top: auto !important;
     bottom: 50px !important;
 }

@@ -12,9 +12,9 @@
     
     <div data-role="header" data-theme="a">
 
-        <h3>{{state}}</h3>
+        <h1 {{bind-attr class="view.machine.state"}}>{{state}}</h1>
         
-        <span id="mist-manage-keys">
+        <span class="ui-btn-right" id="mist-manage-keys">
             {{#if pendingCreation}}
                 <a class="ui-state-disabled" data-role="button" data-icon="plus" data-iconpos="right">Add key</a>
             {{else}} {{#if keysCount}}
@@ -30,21 +30,22 @@
     </div>
     
     <div data-role="content" data-theme="c">
-        
-        {{#if probing}}
-            <div>
-                <h1>Probing</h1>
-            </div>
-        {{/if}}
 
-        <div data-role="collapsible" data-collapsed="false">
+        <!--
+            
+             Monitoring collapsibles
+             
+        -->
+
+        <div data-role="collapsible" id="monitoring-collapsible" data-collapsed="false">
             
             <h3>Monitoring</h3>
      
             <div class="ui-loader ui-corner-all ui-body-b ui-loader-verbose">
                 <span class="ui-icon ui-icon-loading"></span>
                 <h1>Fecting data</h1>
-            </div>   
+            </div>
+
             <div>
                 {{#if hasMonitoring}}
 
@@ -73,19 +74,21 @@
                     <h1>Disabling monitoring</h1>
                 </div>
                 {{else}}
-    
-                <h1>Monitoring is currently disabled</h1>
-                <a data-role="button" data-icon="star" data-theme="b" {{action "enabledClicked" target="view"}}>Enable</a>
-                <div class="ui-loader ui-corner-all ui-body-b ui-loader-verbose">
-                    <span class="ui-icon ui-icon-loading"></span>
-                    <h1>Enabling monitoring</h1>
+                <div id="monitoring-disabled">
+                    <p>Monitoring is currently disabled</p>
+                    <a data-role="button" data-icon="star" data-theme="b" {{action "enabledClicked" target="view"}}>Enable</a>
                 </div>
-    
                 {{/if}}
     
             </div>
         </div>
-    
+
+        <!--
+            
+             Information collapsibles
+             
+        -->
+
         <div data-role="collapsible">
 
             <h3>Basic Info</h3>

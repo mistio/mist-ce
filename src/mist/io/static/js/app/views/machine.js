@@ -80,15 +80,6 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 return ret;
             }.property('Mist.rulesController.@each', 'Mist.rulesController.@each.machine'),
 
-            keySelect: function(key) {
-                //$('#associate-button').show();
-                //$('#associate-key-button').addClass('ui-disabled');
-                var machine = this.get('controller').get('model');
-                Mist.keysController.associateKey(key.name, machine);
-                //$('#associate-key').popup('close');
-                return false;
-            },
-
             addRuleClicked: function() {
                 // initialize the rule to some sensible defaults
                 var machine = this.get('controller').get('model');

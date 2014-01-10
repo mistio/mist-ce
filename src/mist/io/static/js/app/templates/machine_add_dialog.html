@@ -80,7 +80,6 @@
         <!-- Select Key -->
 
         <label>6. Key:</label>
-        {{#if Mist.keysController.content.length}}
         <div id="create-machine-key" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
                                                                                   data-expanded-icon="arrow-u">
             <h2>{{Mist.machineAddController.newMachineKey.id}}</h2>
@@ -90,13 +89,11 @@
                         <a {{action "selectKey" this target="view"}}>{{this.id}}</a>
                     </li>
                 {{/each}}
+                <li data-icon="false" data-theme="b">
+                    <a {{action "createKeyClicked" target="view"}}>Create Key</a>
+                </li>
             </ul>
         </div>
-        {{else}}
-        <button data-iconpos="right" data-icon="gear" {{action "generateKeyClicked" target="view"}}>
-            Generate Key
-        </button>
-        {{/if}}
 
         <!-- Select Script -->
 

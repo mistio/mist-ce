@@ -22,6 +22,7 @@ define('app/controllers/machine_add', ['ember'],
             newMachineLocation: null,
             newMachineProvider: null,
 
+
             /**
              *
              *  Methods
@@ -53,7 +54,8 @@ define('app/controllers/machine_add', ['ember'],
                 var machineImage = this.newMachineImage.name;
                 var machineName = this.newMachineName;
 
-                // Validate machine
+                // Validate machine name
+                // TODO: This thing is ugly. Move regex and strings into a dict
 
                 if (providerName == 'NephoScale') {
                     var re = /^[0-9a-zA-Z-_]*$/;
@@ -119,7 +121,6 @@ define('app/controllers/machine_add', ['ember'],
             },
 
 
-
             /**
              *
              *  Pseudo-Private Methods
@@ -139,23 +140,22 @@ define('app/controllers/machine_add', ['ember'],
 
 
             _updateFormReady: function() {
+                var formReady = false;
                 if (this.newMachineName &&
                     this.newMachineSize.id &&
                     this.newMachineImage.id &&
                     this.newMachineLocation.id &&
                     this.newMachineProvider.id &&
                     Mist.keysController.keyExists(this.newMachineKey.id)) {
-                        this.set('formReady', true);
-                        return;
+                        formReady = true;
                 } 
-                this.set('formReady', false);
+                this.set('formReady', formReady);
             },
 
 
             _giveCallback: function(success, machine) {
                 if (this.callback) this.callback(success, machine);
             },
-
 
 
             /**

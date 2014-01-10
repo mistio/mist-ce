@@ -10,10 +10,18 @@
 #machine-list-page #select-machines-btn {
     float: left;
 }
-.machine-state {
-    display: inline !important;
-    float: left;
-    margin-left: 140px !important;
-    margin-top: -28px !important;
-    position: relative;
+.running {
+    color: #13B754;
+}
+.pedning {
+    color: #E09400;
+}
+.rebooting {
+    color: #4E68BB;
+}
+.terminated {
+    color: #AAAAAA;
+}
+.stopped {
+    color: #777777;
 }

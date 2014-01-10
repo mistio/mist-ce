@@ -121,6 +121,8 @@ define(['app/models/key'],
                 this.set('associatingKey', true);
                 Mist.ajax.PUT('/backends/' + backendId + '/machines/' + machineId + '/keys/' + keyId, {
                     'host': host
+                }).success(function() {
+                    that._associateKey(keyId, backendId, machineId);
                 }).error(function() {
                      Mist.notificationController.notify('Failed to associate key');
                 }).complete(function(success) {
@@ -258,6 +260,13 @@ define(['app/models/key'],
                         key.set('isDefault', key.id == keyId);
                     });
                     this.trigger('onDefaultKeySet');
+                });
+            },
+
+
+            _associateKey: function(keyId, backendId, machineId) {
+                Ember.run(this, function() {
+                    this.getKey(keyId).machines.pushObject([backendId, machineId]);
                 });
             },
 

@@ -1,10 +1,10 @@
 define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.html', 'ember'],
     /**
-     *  Machine Add Panel
+     *  Machine Add View
      *
      *  @returns Class
      */
-    function(machine_add_dialog_html) {
+    function (machine_add_dialog_html) {
         return Ember.View.extend({
 
             /**
@@ -12,7 +12,7 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
              */
 
             template: Ember.Handlebars.compile(machine_add_dialog_html),
-            price: function() {
+            price: function () {
 
                 var image = Mist.machineAddController.newMachineImage;
                 var size = Mist.machineAddController.newMachineSize;
@@ -21,19 +21,46 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
                 if (!image || !image.id || !size || !size.id || !provider || !provider.id) return 0;
 
                 if (provider.provider.indexOf('ec2') > -1) {
-                    if(image.name.indexOf('SUSE Linux Enterprise') > -1) return size.price.sles;
-                    if(image.name.indexOf('Red Hat') > -1)               return size.price.rhel;
-                                                                         return size.price.linux;
+                    if (image.name.indexOf('SUSE Linux Enterprise') > -1)
+                        return size.price.sles;
+                    if (image.name.indexOf('Red Hat') > -1)
+                        return size.price.rhel;
+                    return size.price.linux;
                 }
                 if (provider.provider.indexOf('rackspace') > -1) {
-                    if(image.name.indexOf('Red Hat') > -1) return size.price.rhel;
-                    if(image.name.indexOf('Vyatta') > -1)  return size.price.vyatta;
-                                                           return size.price.linux;
+                    if (image.name.indexOf('Red Hat') > -1)
+                        return size.price.rhel;
+                    if (image.name.indexOf('Vyatta') > -1)
+                        return size.price.vyatta;
+                    return size.price.linux;
                 } 
                 return size.price;
             }.property('Mist.machineAddController.newMachineProvider',
                        'Mist.machineAddController.newMachineImage',
                        'Mist.machineAddController.newMachineSize'),
+
+
+            /**
+             * 
+             *  Initialization
+             * 
+             */
+
+             load: function () {
+
+                // Add event listeners
+                Mist.keysController.on('onKeyListChange', this, 'renderFields');
+
+             }.on('didInsertElement'),
+
+
+             unload: function () {
+
+                // Remove event listeners
+                Mist.keysController.off('onKeyListChange', this, 'renderFields');
+
+             }.on('willDestroyElement'),
+
 
             /**
              *
@@ -41,14 +68,14 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
              *
              */
 
-             fieldIsReady: function(field) {
+             fieldIsReady: function (field) {
                 $('#create-machine-' + field).collapsible('option', 'collapsedIcon', 'check')
                                              .collapsible('collapse');
              },
 
 
-             renderFields: function() {
-                Ember.run.next(function() {
+             renderFields: function () {
+                Ember.run.next(function () {
 
                     // Render collapsibles
                     if ($('.ui-collapsible').collapsible) {
@@ -64,7 +91,7 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
              },
 
 
-             updateLaunchButton: function() {
+             updateLaunchButton: function () {
                 if (Mist.machineAddController.formReady) {
                     $('#create-machine-ok').removeClass('ui-state-disabled');
                 } else {
@@ -81,7 +108,8 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
 
             actions: {
 
-                selectProvider: function(backend) {
+
+                selectProvider: function (backend) {
 
                     this.fieldIsReady('provider');
 
@@ -91,7 +119,8 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
                                              .set('newMachineProvider', backend);
                 },
 
-                selectImage: function(image) {
+
+                selectImage: function (image) {
 
                     this.fieldIsReady('image');
 
@@ -100,7 +129,8 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
                                              .set('newMachineImage', image);
                 },
 
-                selectSize: function(size) {
+
+                selectSize: function (size) {
 
                     this.fieldIsReady('size');
 
@@ -108,43 +138,41 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
                                              .set('newMachineSize', size);
                 },
 
-                selectLocation: function(location) {
+
+                selectLocation: function (location) {
 
                     this.fieldIsReady('location');
 
                     Mist.machineAddController.set('newMachineLocation', location);
                 },
 
-                selectKey: function(key) {
+
+                selectKey: function (key) {
 
                     this.fieldIsReady('key');
 
                     Mist.machineAddController.set('newMachineKey', key);
                 },
 
-                backClicked: function() {
+
+                createKeyClicked: function () {
+                    var that = this;
+                    Mist.keyAddController.open(function (success, key) {
+                        that.fieldIsReady('key');
+                        Mist.machineAddController.set('newMachineKey', key);
+                    });
+                },
+
+
+                backClicked: function () {
                     Mist.machineAddController.close();
                 },
-            
-                launchClicked: function() {
+
+
+                launchClicked: function () {
                     Mist.machineAddController.add();
                 }
             },
-
-
-            generateKeyClicked: function() {
-                Mist.keysController.generateKey(function(success, keyPriv) {
-                    if (success) {
-                        var keyName = 'auto-generated-key-' + Math.round(+new Date/1000);
-                        Mist.keysController.createKey(keyName, keyPriv, function(success) {
-                            Ember.run.next(function() {
-                                $('[data-role=collapsible]').parent().trigger('create');
-                            });
-                        });
-                    }
-                });
-            },
-
 
 
             /**
@@ -153,16 +181,15 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
              *
              */
 
-             bindingsObserver: function() {
+             bindingsObserver: function () {
                 Ember.run.once(this, 'renderFields');
-             }.observes('Mist.keysController.content',
-                        'Mist.machineAddController.newMachineSize',
+             }.observes('Mist.machineAddController.newMachineSize',
                         'Mist.machineAddController.newMachineImage',
                         'Mist.machineAddController.newMachineProvider',
                         'Mist.machineAddController.newMachineLocation'),
 
 
-             formReadyObserver: function() {
+             formReadyObserver: function () {
                 Ember.run.once(this, 'updateLaunchButton');
              }.observes('Mist.machineAddController.formReady')
         });
