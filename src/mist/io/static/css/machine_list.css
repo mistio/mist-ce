@@ -10,10 +10,18 @@
 #machine-list-page #select-machines-btn {
     float: left;
 }
+
+.machine-name {
+    width: 40% !important;
+}
+
 .machine-state {
-    display: inline !important;
-    float: left;
-    margin-left: 140px !important;
-    margin-top: -28px !important;
-    position: relative;
+    width: 20% !important;
+    text-align: center;
+    margin-left: -18px;
+}
+
+.machine-tags {
+    width:40% !important;
+    text-align: right;
 }

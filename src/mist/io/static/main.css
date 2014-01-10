@@ -187,6 +187,11 @@ ul.checkbox-list li {
     border: 1px #ccc solid;
 }
 
+ul.checkbox-list .ui-grid-b {
+    padding-top: 12px;
+}
+
+
 /* Checkbox-link
 -----------------------------------------------------------------------------------------------------------*/
 .checkbox-link a {
