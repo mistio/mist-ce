@@ -154,6 +154,7 @@ define('app/views/monitoring', [
                     var margin      = {top: 10, right: 0, bottom: 24, left: 40};
 
                     this.id               = divID;
+                    this.name             = divID.replace('Graph','');
                     this.width            = width;
                     this.height           = (fixedHeight < 85 ? 85 : fixedHeight);
                     this.data             = [];

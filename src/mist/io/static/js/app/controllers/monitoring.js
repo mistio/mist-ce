@@ -508,11 +508,11 @@ define('app/controllers/monitoring', [
 
             UI : {
                 collapsePressed : function(graph){
-                    Mist.monitoringController.graphs.collapse([graph.id.replace('Graph','')]);
+                    Mist.monitoringController.graphs.collapse([graph]);
                 },
 
                 expandPressed : function(graph){
-                    Mist.monitoringController.graphs.expand([graph.id.replace('Graph','')]);
+                    Mist.monitoringController.graphs.expand([graph]);
                 }
             },
 
