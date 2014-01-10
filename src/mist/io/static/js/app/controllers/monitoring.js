@@ -494,10 +494,10 @@ define('app/controllers/monitoring', [
                 lastMetrictime : null,  // Date Object
                 callback       : null,  // Function
                 timeWindow     : 0,     // integer in miliseconds
-                timeStart      : 0,     // integer in miliseconds
-                timeStop       : 0,     // integer in miliseconds
+                timeStart      : 0,     // integer in miliseconds - Note Currently In Seconds
+                timeStop       : 0,     // integer in miliseconds - Note Currently In Seconds
                 step           : 0,     // integer in miliseconds
-                timeGap        : 0,     // integer in miliseconds
+                timeGap        : 0,     // integer in miliseconds - Note Currently In Seconds
                 updateInterval : 0,     // integer in miliseconds
                 updateData     : false, // boolean
                 locked         : false, // boolean 

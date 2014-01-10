@@ -624,6 +624,10 @@ define('app/views/monitoring', [
                     */
                     function appendGraph(id,width,height){
                       
+                      /* Add Graph Element Dynamically
+                      d3.select('#GraphsArea').insert('div','#graphBar').attr('id','CustomMetric'+'Graph').attr('class','graph').insert('div').attr('class','header').insert('div').attr('class','title').text('CustomMetric');
+                      d3.select('#'+'CustomMetric'+'Graph').select('.header').insert('div').attr('class','closeBtn').attr('onClick',"Mist.monitoringController.UI.collapsePressed('CustomMetric')").text('-');
+                      */
                       d3svg =   d3.select("#"+id)
                                   .append('svg')
                                   .attr('width',width)
