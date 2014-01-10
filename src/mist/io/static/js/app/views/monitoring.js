@@ -21,13 +21,8 @@ define('app/views/monitoring', [
                 networkRX: null
             },
 
-            cpuCores: 0,
-
             viewRendered: false,
             graphsCreated: false,
-
-            graphsListCookie: null,
-            graphsBtnListCookie: null,
 
             init: function() {
                 this._super();
@@ -44,9 +39,7 @@ define('app/views/monitoring', [
             willDestroyElement: function(){
 
                 this._super();
-                // Disable intervals of data request and Load Color change
-                window.clearInterval(window.monitoringInterval);
-                this.stopLoadColorInterval();
+                Mist.monitoringController.request.stop();
 
                 // Re-Initialize Enable Button Of Jquery Mobile
                 Em.run.next(function() {
@@ -54,37 +47,50 @@ define('app/views/monitoring', [
                 });
             },
 
-            hideGraphs: function(){
+            setUpGraphs: function() {
 
-                $('.graph').each(function(){
+                var machine = this.get('controller').get('model');
 
-                    if( $(this).css('display') != 'none' )
-                        $(this).hide(0);
-                });
+                // Check if disable button pressed
+                // Then check if everything is ok to render the graphs
+                if(machine.id != ' ' && this.viewRendered && !machine.hasMonitoring){
 
-                // Get Visible Button List
-                $('.graphBtn').each(function(){
+                    Mist.monitoringController.request.stop();
+                }
+                else if(this.viewRendered && machine.hasMonitoring && !this.graphsCreated &&
+                        machine.id != ' '){
 
-                    if( $(this).css('display') != 'none' )
-                        $(this).hide(0);
-                });
-            },
+                    var self = this;
+                    var controller = Mist.monitoringController;
 
-            showGraphs: function(){
+                    Em.run.next(function() {
 
-                $('.graph').each(function(){
+                        // Re-Initialize jquery components and hide buttons
+                        self.redrawJQMComponents();     
+                        $('.graphBtn').hide(0); 
+                        
+                        self.createGraphs(10*60*1000);
+                        console.log("Graphs Created");
 
-                    if( $(this).css('display') == 'none' )
-                        $(this).show(0);
-                });
+                        controller.initialize({
+                            machineModel    : machine,      // Send Current Machine
+                            graphs          : self.graphs,  // Send Graphs Instances
+                        });
 
-                // Get Visible Button List
-                $('.graphBtn').each(function(){
+                        // Set Up Resolution Change Event
+                        $(window).resize(function(){
 
-                    if( $(this).css('display') == 'none' )
-                        $(this).show(0);
-                });
-            },
+                            var newWidth = $("#GraphsArea").width() -2;
+                            for(metric in self.graphs){
+                                 self.graphs[metric].changeWidth(newWidth);
+                            }
+                        })
+
+                    });
+
+                    Mist.rulesController.redrawRules();
+                } 
+            }.observes('controller.model.hasMonitoring','viewRendered'),
 
             clickedCollapse: function(graph){
                 Mist.monitoringController.graphs.collapse([graph.id.replace('Graph','')]);
@@ -92,132 +98,6 @@ define('app/views/monitoring', [
 
             clickedExpand: function(graph){
                 Mist.monitoringController.graphs.expand([graph.id.replace('Graph','')]);
-            },
-
-            /* Commented Out Until It's Time To Test Zoom In/Out
-            selectPressed: function(){
-
-                var selectValue = $("#timeWindowSelect").val();
-                console.log("time Window");
-                console.log(this.cpuGraph.getTimeWindow());
-                var newTime = 0;
-                var newStep = 10000;
-                if(selectValue.toLowerCase().search("minutes") != -1)
-                {
-                    selectValue = selectValue.replace(/\D+/g, '' );
-                    console.log("Minutes To Display:" + selectValue);
-                    newTime = selectValue * 60 * 1000;
-
-                    if(selectValue > 30)
-                        newStep = (selectValue*60 / 180)*1000;
-
-                }
-                else if(selectValue.toLowerCase().search("hours") != 1 || selectValue.toLowerCase().search("hour") != 1)
-                {
-                    selectValue = selectValue.replace(/\D+/g, '' );
-                    console.log("Hours To Display:" + selectValue);
-
-                    newTime = selectValue * 60 * 60 * 1000;
-                    newStep = (selectValue*60*60 / 180)*1000;
-
-                }
-                else if(selectValue.toLowerCase().search("days") != 1 || selectValue.toLowerCase().search("day") != 1)
-                {
-                    selectValue = selectValue.replace(/\D+/g, '' );
-                    console.log("Days To Display:" + selectValue);
-
-                    newTime = selectValue * 24 * 60 * 60 * 1000;
-                    newStep = (selectValue * 24 * 60 * 60 / 180)*1000;
-
-                }
-
-                // Update Graph Time If selection is not the same
-                // TODO Make it cpugraph independent
-                if(newTime/1000 != this.cpuGraph.getTimeWindow())
-                {
-                    this.cpuGraph.changeTimeToDisplay(newTime);
-                    this.loadGraph.changeTimeToDisplay(newTime);
-                    this.memoryGraph.changeTimeToDisplay(newTime);
-                    this.diskReadGraph.changeTimeToDisplay(newTime);
-                    this.diskWriteGraph.changeTimeToDisplay(newTime);
-                    this.networkTXGraph.changeTimeToDisplay(newTime);
-                    this.networkRXGraph.changeTimeToDisplay(newTime);
-
-                    // TODO
-                    // Step will be 10 seconds until machine is able to send less values //
-                    Mist.monitoringController.updateDataRequest(newTime,10000);
-                }
-            },
-            */
-            setGraphsCookie: function(){
-
-                var cookieExpire = new Date();
-                    cookieExpire.setFullYear(cookieExpire.getFullYear() + 2);
-                var graphIdList    = [];
-                var graphBtnIdList = [];
-
-                // Get Visible Graphs List
-                $('.graph').each(function() {
-
-                    if( $(this).css('display') != 'none' )
-                        graphIdList.push($(this).attr('id'));
-                });
-
-                // Get Visible Button List
-                $('.graphBtn').each(function(){
-
-                    if( $(this).css('display') != 'none' )
-                        graphBtnIdList.push($(this).attr('id'));
-                });
-
-                // Set graph list and graph button list cookies
-                document.cookie = "graphsList=" + graphIdList.join('|') + "; " +
-                                "expires=" + cookieExpire.toUTCString() +"; " +
-                                "path=/";
-                document.cookie = "graphsBtnList=" + graphBtnIdList.join('|') + "; " +
-                                "expires=" + cookieExpire.toUTCString() +"; " +
-                                "path=/";
-            },
-
-            getGraphsCookie: function(){
-                
-                var cookieValue   = "";
-                var graphsList    = [];
-                var graphsBtnList = [];
-
-                // Get Graph List Cookie
-                var parts = document.cookie.split("graphsList=");
-                if (parts.length == 2) 
-                    cookieValue = parts.pop().split(";").shift();
-                
-                if(cookieValue.length > 0){
-                    
-                    // Create Array Of IDs
-                    graphsList = cookieValue.split('|');
-                    graphsList.forEach(function(value,index){
-                        graphsList[index] = "#" + value;
-                    });
-                }
-                
-
-                // Get Graph Button List Cookie
-                var parts = document.cookie.split("graphsBtnList=");
-                if (parts.length == 2) 
-                    cookieValue = parts.pop().split(";").shift();
-                
-                if(cookieValue.length > 0){
-
-                    // Create Array Of IDs
-                    graphsBtnList = cookieValue.split('|');
-                    graphsBtnList.forEach(function(value,index){
-                        graphsBtnList[index] = "#" + value;
-                    });
-                }
-
-                this.graphsListCookie    = graphsList;
-                this.graphsBtnListCookie = graphsBtnList;
-
-
             },
 
             redrawJQMComponents: function(){
@@ -248,45 +128,29 @@ define('app/views/monitoring', [
                 $('#graphsResetHistory').addClass('ui-disabled');
             },
 
-            getLoadLineColor: function(currentLoad,cpuCores){
-                if(currentLoad >= 1 * cpuCores)
-                    return "#FF0000";
-                else if(currentLoad >= 0.7 * cpuCores)
-                    return "#00FF26";
-                else 
-                    return "#6CE0BA";
+            createGraphs: function(timeToDisplay){
+
+                // Get Width, -2 left & right border
+                var width = $("#GraphsArea").width() -2;  
+
+                this.graphs['cpu']       = new this.Graph('cpuGraph',width,timeToDisplay,"%");
+                this.graphs['load']      = new this.Graph('loadGraph',width,timeToDisplay);
+                this.graphs['memory']    = new this.Graph('memoryGraph',width,timeToDisplay,"%");
+                this.graphs['diskRead']  = new this.Graph('diskReadGraph' ,width,timeToDisplay);
+                this.graphs['diskWrite'] = new this.Graph('diskWriteGraph',width,timeToDisplay);
+                this.graphs['networkRX'] = new this.Graph('networkRXGraph',width,timeToDisplay);
+                this.graphs['networkTX'] = new this.Graph('networkTXGraph',width,timeToDisplay);
+
+
+                self.graphsCreated = true;
             },
+            
 
-            setupLoadColorInterval: function(){
-                 
-                 var self = this;
-                 jQuery.Color.hook( "stroke" );
-
-                 window.monitoringLoadColorInterval = window.setInterval(function () {
-                    var loadValue = self.loadGraph.getLastDisplayedValue();
-
-                    if(loadValue != null) {
-
-                        var color = self.getLoadLineColor(loadValue,self.cpuCores);
-                        $("#loadGraph").find('.valueLine > path').animate( {
-                            stroke: jQuery.Color(color)
-                        }, 700 );
-                    }
-                },1000);
-            },
-
-            stopLoadColorInterval: function(){
-                window.clearInterval(window.monitoringLoadColorInterval);
-            },
-
-            // Graph Constructor
-            setUpGraphs: function() {
-                
-                /* Class: Graph
-                *  
-                * 
-                */
-                function Graph(divID,width,timeToDisplayms,yAxisValueFormat){
+            /* Class: Graph
+            *  
+            * 
+            */
+            Graph: function(divID,width,timeToDisplayms,yAxisValueFormat){
 
                     var NUM_OF_LABELS = 5;
                     var STEP_SECONDS = 10;
@@ -952,97 +816,94 @@ define('app/views/monitoring', [
 
                 }
 
-                // -------------------------------------------------------------------------------------
+                // Features not yet used
 
-                // Execuation Starts Here
-                var machine = this.get('controller').get('model');
+                /* Commented Out Until It's Time To Test Zoom In/Out
+                selectPressed: function(){
 
-                // Check if disable button pressed
-                // Then check if everything is ok to render the graphs
-                if(machine.id != ' ' && this.viewRendered && !machine.hasMonitoring){
+                    var selectValue = $("#timeWindowSelect").val();
+                    console.log("time Window");
+                    console.log(this.cpuGraph.getTimeWindow());
+                    var newTime = 0;
+                    var newStep = 10000;
+                    if(selectValue.toLowerCase().search("minutes") != -1)
+                    {
+                        selectValue = selectValue.replace(/\D+/g, '' );
+                        console.log("Minutes To Display:" + selectValue);
+                        newTime = selectValue * 60 * 1000;
 
-                    // Stop receiving Graph data
-                    window.clearInterval(window.monitoringInterval);
-                    // Remove Load Color Change Interval
-                    this.stopLoadColorInterval();
-                }
-                else if(this.viewRendered && machine.hasMonitoring && !this.graphsCreated &&
-                        machine.id != ' '){
+                        if(selectValue > 30)
+                            newStep = (selectValue*60 / 180)*1000;
 
-                    var self = this;
-                    var controller = Mist.monitoringController;
+                    }
+                    else if(selectValue.toLowerCase().search("hours") != 1 || selectValue.toLowerCase().search("hour") != 1)
+                    {
+                        selectValue = selectValue.replace(/\D+/g, '' );
+                        console.log("Hours To Display:" + selectValue);
 
-                    
+                        newTime = selectValue * 60 * 60 * 1000;
+                        newStep = (selectValue*60*60 / 180)*1000;
 
-                
-                    Em.run.next(function() {
+                    }
+                    else if(selectValue.toLowerCase().search("days") != 1 || selectValue.toLowerCase().search("day") != 1)
+                    {
+                        selectValue = selectValue.replace(/\D+/g, '' );
+                        console.log("Days To Display:" + selectValue);
 
-                        // Re-Initialize Jquery Components
-                        self.redrawJQMComponents();      
-                        
+                        newTime = selectValue * 24 * 60 * 60 * 1000;
+                        newStep = (selectValue * 24 * 60 * 60 / 180)*1000;
 
-                        // Get Width, -2 left & right border
-                        var width = $("#GraphsArea").width() -2;  
+                    }
 
-                        // Create Graphs 
-                        var timeToDisplay        = 10*60*1000; // 10 minutes
-                        self.graphs['cpu']       = new Graph('cpuGraph',width,timeToDisplay,"%");
-                        self.graphs['load']      = new Graph('loadGraph',width,timeToDisplay);
-                        self.graphs['memory']    = new Graph('memoryGraph',width,timeToDisplay,"%");
-                        self.graphs['diskRead']  = new Graph('diskReadGraph' ,width,timeToDisplay);
-                        self.graphs['diskWrite'] = new Graph('diskWriteGraph',width,timeToDisplay);
-                        self.graphs['networkRX'] = new Graph('networkRXGraph',width,timeToDisplay);
-                        self.graphs['networkTX'] = new Graph('networkTXGraph',width,timeToDisplay);
+                    // Update Graph Time If selection is not the same
+                    // TODO Make it cpugraph independent
+                    if(newTime/1000 != this.cpuGraph.getTimeWindow())
+                    {
+                        this.cpuGraph.changeTimeToDisplay(newTime);
+                        this.loadGraph.changeTimeToDisplay(newTime);
+                        this.memoryGraph.changeTimeToDisplay(newTime);
+                        this.diskReadGraph.changeTimeToDisplay(newTime);
+                        this.diskWriteGraph.changeTimeToDisplay(newTime);
+                        this.networkTXGraph.changeTimeToDisplay(newTime);
+                        this.networkRXGraph.changeTimeToDisplay(newTime);
 
+                        // TODO
+                        // Step will be 10 seconds until machine is able to send less values //
+                        Mist.monitoringController.updateDataRequest(newTime,10000);
+                    }
+                },
+                */
 
-                        self.graphsCreated = true;
+                /*getLoadLineColor: function(currentLoad,cpuCores){
+                    if(currentLoad >= 1 * cpuCores)
+                        return "#FF0000";
+                    else if(currentLoad >= 0.7 * cpuCores)
+                        return "#00FF26";
+                    else 
+                        return "#6CE0BA";
+                },
 
-                        // hide all buttons
-                        $('.graphBtn').hide(0);
+                setupLoadColorInterval: function(){
+                     
+                     var self = this;
+                     jQuery.Color.hook( "stroke" );
 
+                     window.monitoringLoadColorInterval = window.setInterval(function () {
+                        var loadValue = self.loadGraph.getLastDisplayedValue();
 
-                        // Get cookies and show graphs that are not collapsed
-                        var collapsedMetrics = controller.cookies.getCollapsedMetrics();
+                        if(loadValue != null) {
 
-                        if(collapsedMetrics != null){
-                            console.log("Metrics To Collapse: " + collapsedMetrics);
-                            controller.graphs.collapse(collapsedMetrics,0);
+                            var color = self.getLoadLineColor(loadValue,self.cpuCores);
+                            $("#loadGraph").find('.valueLine > path').animate( {
+                                stroke: jQuery.Color(color)
+                            }, 700 );
                         }
-                        else{
-                            // Hide graphs
-                            var metrics = self.graphs;
-                            var metricsKeys = [];
+                    },1000);
+                },
 
-                            for(var key in metrics){
-                                // Let only load graph
-                                if(key == 'load') continue;
-
-                                metricsKeys.push(key);
-                            }
-
-                            controller.graphs.collapse(metricsKeys,0);
-
-                        }
-
-                        controller.initialize({
-                            machineModel    : machine,      // Send Current Machine
-                            graphs          : self.graphs,  // Send Graphs Instances
-                        });
-
-                        // Set Up Resolution Change Event
-                        $(window).resize(function(){
-
-                            var newWidth = $("#GraphsArea").width() -2;
-                            for(metric in self.graphs){
-                                 self.graphs[metric].changeWidth(newWidth);
-                            }
-                        })
-
-                    });
-
-                    Mist.rulesController.redrawRules();
-                } 
-            }.observes('controller.model.hasMonitoring','viewRendered'),
+                stopLoadColorInterval: function(){
+                    window.clearInterval(window.monitoringLoadColorInterval);
+                },*/
 
         });
     }

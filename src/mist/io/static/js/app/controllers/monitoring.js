@@ -22,6 +22,26 @@ define('app/controllers/monitoring', [
                 // Get graphs from view
                 this.graphs.instances = arguments['graphs'];
 
+                // Get cookies and show graphs that are not collapsed
+                var collapsedMetrics = this.cookies.getCollapsedMetrics();
+
+                if(collapsedMetrics != null) {
+                    this.graphs.collapse(collapsedMetrics,0);
+                } else{
+                    
+                    // Hide graphs
+                    var metrics = self.graphs;
+                    var metricsKeys = [];
+
+                    for(var key in metrics){
+
+                        if(key == 'load') continue;
+                        metricsKeys.push(key);
+                    }
+
+                    this.graphs.collapse(metricsKeys,0);
+                }
+
                 // Create and Start the request
                 this.request.create({
                     machine         : arguments['machineModel'], // Send Current Machine
@@ -38,6 +58,8 @@ define('app/controllers/monitoring', [
                 });
 
                 this.request.start();
+
+                console.log("Controller Initialized");
             },
 
             // Todo add Description
