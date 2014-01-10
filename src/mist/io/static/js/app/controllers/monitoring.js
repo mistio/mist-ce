@@ -28,7 +28,7 @@ define('app/controllers/monitoring', [
                 if(collapsedMetrics != null) {
                     this.graphs.collapse(collapsedMetrics,0);
                 } else{
-                    
+
                     // Hide graphs
                     var metrics = self.graphs;
                     var metricsKeys = [];
@@ -504,6 +504,16 @@ define('app/controllers/monitoring', [
                 running        : false, // boolean
                 initialized    : false, // boolean
 
+            },
+
+            UI : {
+                collapsePressed : function(graph){
+                    Mist.monitoringController.graphs.collapse([graph.id.replace('Graph','')]);
+                },
+
+                expandPressed : function(graph){
+                    Mist.monitoringController.graphs.expand([graph.id.replace('Graph','')]);
+                }
             },
 
             

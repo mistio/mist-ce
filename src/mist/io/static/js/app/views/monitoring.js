@@ -92,14 +92,6 @@ define('app/views/monitoring', [
                 } 
             }.observes('controller.model.hasMonitoring','viewRendered'),
 
-            clickedCollapse: function(graph){
-                Mist.monitoringController.graphs.collapse([graph.id.replace('Graph','')]);
-            },
-
-            clickedExpand: function(graph){
-                Mist.monitoringController.graphs.expand([graph.id.replace('Graph','')]);
-            },
-
             redrawJQMComponents: function(){
 
                 $('.monitoring-button').button();
