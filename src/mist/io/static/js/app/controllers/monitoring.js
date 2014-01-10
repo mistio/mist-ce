@@ -30,7 +30,7 @@ define('app/controllers/monitoring', [
                 } else{
 
                     // Hide graphs
-                    var metrics = self.graphs;
+                    var metrics = this.graphs.instances;
                     var metricsKeys = [];
 
                     for(var key in metrics){
@@ -690,6 +690,17 @@ define('app/controllers/monitoring', [
                                       "path=/";
                 }
             },
+
+
+            /* Zoom Feature 
+            *
+            *
+            
+            Zoom : {
+                in  : function(){},
+                out : function(){},
+                to  : function(){},
+            },*/
 
 
             /* History Feature 
