@@ -10,3 +10,13 @@
 #key-list-page #select-keys-btn {
     float: left;
 }
+#key-list-page .tag {
+    position: relative;
+    top: 5px;
+}
+@-moz-document url-prefix() {
+    #key-list-page .tag {
+        bottom: 36px;
+        top: auto;
+    }
+}

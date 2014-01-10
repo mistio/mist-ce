@@ -87,6 +87,13 @@ textarea {
 
 /* Buttons
 -----------------------------------------------------------------------------------------------------------*/
+.ui-btn-icon-left {
+    padding: .6em 1.1em .6em 2.5em !important;
+}
+
+.ui-btn-icon-right {
+    padding: .6em 2.5em .6em 1.1em !important;
+}
 .ok-cancel {
     width: 100%;
     margin-top: 10px;
@@ -152,7 +159,9 @@ textarea {
     width: 98px !important;
 }
 
-/* Filtered list headers */
+
+/* Filtered list headers
+-----------------------------------------------------------------------------------------------------------*/
 #machine-list-page .ui-filterable, #key-list-page .ui-filterable  {    
     margin: 10px 118px -44px 118px !important;
     position: relative;
@@ -163,17 +172,9 @@ textarea {
     min-height:2.50em;
 }
 
-/* Buttons */
-.ui-btn-icon-left {
-    padding: .6em 1.1em .6em 2.5em !important;
-}
 
-.ui-btn-icon-right {
-    padding: .6em 2.5em .6em 1.1em !important;
-
-}
-
-/* Checkbox lists */
+/* Checkbox list
+-----------------------------------------------------------------------------------------------------------*/
 ul.checkbox-list li a, ul.checkbox-list li a:hover, ul.checkbox-list label, ul.checkbox-list label:hover {
     background-color: transparent !important;
     border-width: 0px !important;
@@ -192,7 +193,7 @@ ul.checkbox-list .ui-grid-b {
 }
 
 
-/* Checkbox-link
+/* Checkbox link
 -----------------------------------------------------------------------------------------------------------*/
 .checkbox-link a {
     height: 40px;
@@ -225,23 +226,12 @@ ul.checkbox-list .ui-grid-b {
     color: #555 !important;
     padding: 1px 7px;
     float: right;
+    font-size: 15px;
 }
 @-moz-document url-prefix() {
     .checkbox-link .tag {
         bottom: 28px;
     }
-}
-
-/* User menu */
-#me-btn {
-    background: transparent;
-    margin-top: -4px;
-    height: 42px;
-    padding: 0px;
-}
-
-#me-btn img {
-    border-radius: 2em;
 }
 
 /* Footer
@@ -291,9 +281,23 @@ ul.checkbox-list .ui-grid-b {
 }
 
 
-/* SHIT
+/* Other
 -----------------------------------------------------------------------------------------------------------*/
 #hidden-shell-iframe {
     display: none;
+}
+
+
+/* User menu
+-----------------------------------------------------------------------------------------------------------*/
+#me-btn {
+    background: transparent;
+    margin-top: -4px;
+    height: 42px;
+    padding: 0px;
+}
+
+#me-btn img {
+    border-radius: 2em;
 }
 
