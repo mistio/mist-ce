@@ -6,13 +6,17 @@
         <div class="ui-grid-b">
             <div class="ui-block-a machine-name">{{view.machine.name}}</div>
     
-            <span class="ui-block-b machine-state">{{view.machine.state}}</span>
+            <span class="ui-block-b machine-state">
+                <span {{bind-attr class="view.machine.state"}}>
+                {{view.machine.state}}
+                </span>
+            </span>
             
             <div class="ui-block-c machine-tags">  
-                <span class="ui-li-count">{{view.machine.backend.title}}</span>
+                <span class="tag">{{view.machine.backend.title}}</span>
     
                 {{#each view.machine.tags}}
-                <span class="ui-li-count">{{this}}</span>
+                <span class="tag">{{this}}</span>
                 {{/each}}
                 <span>
                     {{#if view.machine.hasMonitoring}}
