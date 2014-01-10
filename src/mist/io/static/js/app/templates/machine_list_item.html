@@ -3,31 +3,38 @@
     <label>{{view Mist.Checkbox checkedBinding="view.machine.selected"}}</label>
     {{#link-to "machine" view.machine}}
     
-        <h3>{{view.machine.name}}</h3>
+        <div class="ui-grid-b">
+            <div class="ui-block-a machine-name">{{view.machine.name}}</div>
+    
+            <span class="ui-block-b machine-state">{{view.machine.state}}</span>
+            
+            <div class="ui-block-c machine-tags">  
+                <span class="ui-li-count">{{view.machine.backend.title}}</span>
+    
+                {{#each view.machine.tags}}
+                <span class="ui-li-count">{{this}}</span>
+                {{/each}}
+                <span>
+                    {{#if view.machine.hasMonitoring}}
+                        <span></span>
+                    {{/if}}
+                </span>            
 
-        <span class="state">
-            <h3 {{bind-attr class="view.machine.state"}}>{{view.machine.state}}</h3>
-        </span>
-
-        <p class="tags">  
-            <span class="tag">{{view.machine.backend.title}}</span>
-
-            {{#each view.machine.tags}}
-            <span class="tag">{{this}}</span>
-            {{/each}}
-        </p>
-
-        <span>
-            {{#if pendingCreation}}
-                <div class="ajax-loader"></div>
-            {{else}} {{#if probing}}
-                <span></span>                
-            {{else}} {{#if probed}}
-                <span></span>
-            {{else}}
-                <span></span>
-            {{/if}} {{/if}} {{/if}}
-        </span>
+                {{#if pendingCreation}}
+                    <div class='ajax-loader'></div>
+                {{else}} 
+                    {{#if probing}}
+                        <span></span>                
+                    {{else}} 
+                        {{#if probed}}
+                        <span></span>
+                        {{else}}
+                        <span></span>
+                        {{/if}} 
+                    {{/if}} 
+                {{/if}}                
+            </div>
+        </div>
     {{/link-to}}
     
 {{else}}

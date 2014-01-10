@@ -1,4 +1,4 @@
-<div id="image-list-page" data-role="page" class="ui-page-active">
+<div id="image-list-page" data-role="page" class="ui-page-active" data-theme="c">
 
     <div data-role="header" data-theme="b">
 
@@ -16,7 +16,12 @@
             <div class="ajax-loader"></div>
         {{/if}}
 
-        <ul id="image-list" data-role="listview" data-filter="true" data-inset="true" data-filter-placeholder="Filter images...">
+        <ul id="image-list" 
+            data-role="listview" 
+            data-filter="true" 
+            data-inset="true" 
+            data-filter-placeholder="Filter images..."
+            class="checkbox-list">
             {{#each view.renderedImages}}
                 {{view Mist.imageListItemView imageBinding="this" class="checkbox-link" }}
             {{/each}}

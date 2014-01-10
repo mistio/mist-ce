@@ -1,16 +1,20 @@
 <a id="me-btn"
    class="ui-btn-right"
    data-role="button"
-   data-icon="user"
-   data-iconpos="right"
-   {{action "meClicked" target="view"}}>me</a>
+   {{action "meClicked" target="view"}}>
+    {{#if view.gravatarURL}}
+        <img class="gravatar-image" {{bind-attr src="view.gravatarURL"}}/>
+    {{else}}
+        <img class="gravatar-image" src="resources/images/user.png" />
+
+    {{/if}}
+    &nbsp;</a>
 
 <div id="user-menu-popup" data-role="popup" data-position-to="#me-btn" data-theme="b" data-overlay-theme="b" data-transition="flip">
 
     <div data-role="content">
 
         {{#if view.gravatarURL}}
-        <img class="gravatar-image" {{bind-attr src="view.gravatarURL"}}/>
         <div class="userEmail">{{EMAIL}}</div>
 
         <a data-role="button" data-mini="true"

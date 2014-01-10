@@ -1,4 +1,4 @@
-<div id="key-list-page" data-role="page" class="ui-page-active">
+<div id="key-list-page" data-role="page" class="ui-page-active" data-theme="c">
 
     <div data-role="header" data-theme="b">
 
@@ -21,10 +21,14 @@
            data-role="button"
            data-icon="plus"
            data-iconpos="right"
-           data-theme="b"
+           data-theme="d"
            {{action "createClicked" target="view"}}>Create</a>
 
-        <ul data-role="listview" data-filter="true" data-inset="true" data-filter-placeholder="Filter...">
+        <ul data-role="listview" 
+            data-filter="true" 
+            data-inset="true" 
+            data-filter-placeholder="Filter..."
+            class="checkbox-list">
             {{#each Mist.keysController.content}}
                 {{view Mist.keyListItemView keyBinding="this" class="checkbox-link"}}
             {{/each}}

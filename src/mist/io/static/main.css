@@ -1,6 +1,7 @@
 
 /* Import css files
 -----------------------------------------------------------------------------------------------------------*/
+
 @import url("css/key.css");
 @import url("css/home.css");
 @import url("css/shell.css");
@@ -30,7 +31,7 @@
 .mist-logo {
     width: 280px;
     height: 280px;
-    background: url("logo_splash_new.png") center no-repeat;
+    background: url("logo_splash.png") center no-repeat;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -141,6 +142,7 @@ textarea {
      *  so this change can easily be undone or modified
      */
     width: 325px; /* Useless, but leave it there for reference reasons */
+    min-height: 300px; 
 }
 .side-panel .ui-panel-inner {
     padding: 7px;
@@ -148,6 +150,45 @@ textarea {
 .side-panel .ok-cancel a,
 .side-panel .ok-cancel button {
     width: 98px !important;
+}
+
+/* Filtered list headers */
+#machine-list-page .ui-filterable, #key-list-page .ui-filterable  {    
+    margin: 10px 118px -44px 118px !important;
+    position: relative;
+    top: -49px;
+}
+
+#machine-list-page .ui-filterable input, #key-list-page .ui-filterable input {
+    min-height:2.50em;
+}
+
+/* Buttons */
+.ui-btn-icon-left {
+    padding: .6em 1.1em .6em 2.5em !important;
+}
+
+.ui-btn-icon-right {
+    padding: .6em 2.5em .6em 1.1em !important;
+
+}
+
+/* Checkbox lists */
+ul.checkbox-list li a, ul.checkbox-list li a:hover, ul.checkbox-list label, ul.checkbox-list label:hover {
+    background-color: transparent !important;
+    border-width: 0px !important;
+}
+
+ul.checkbox-list li:hover {
+    background: #ededed /*{a-bhover-background-color}*/
+}
+
+ul.checkbox-list li {
+    border: 1px #ccc solid;
+}
+
+ul.checkbox-list .ui-grid-b {
+    padding-top: 12px;
 }
 
 
@@ -197,6 +238,17 @@ textarea {
     }
 }
 
+/* User menu */
+#me-btn {
+    background: transparent;
+    margin-top: -4px;
+    height: 42px;
+    padding: 0px;
+}
+
+#me-btn img {
+    border-radius: 2em;
+}
 
 /* Footer
 -----------------------------------------------------------------------------------------------------------*/

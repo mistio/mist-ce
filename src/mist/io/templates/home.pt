@@ -7,7 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0" />
     <title>${project} - cloud management in your pocket</title>
     <link type="text/css" href="resources/ui-smoothness/jquery-ui-1.9.1.custom.css" rel="stylesheet" />
-    <link rel="stylesheet" href="resources/jquery.mobile-1.4.0-rc.1.css" />
+    <link rel="stylesheet" href="resources/theme.css" />
+    <link rel="stylesheet" href="resources/jquery.mobile.icons.min.css" />
+    <link rel="stylesheet" href="resources/jquery.mobile.structure-1.4.0.min.css" />
     <link rel="stylesheet" type='text/css' href="resources/main.css" />
     <link rel="icon" href="resources/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>

@@ -25,3 +25,15 @@
 .stopped {
     color: #777777;
 }
+.machine-name {
+    width: 40% !important;
+}
+.machine-state {
+    width: 20% !important;
+    text-align: center;
+    margin-left: -18px;
+}
+.machine-tags {
+    width:40% !important;
+    text-align: right;
+}
