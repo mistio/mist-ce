@@ -103,7 +103,7 @@ define('app/controllers/monitoring', [
                     // Calculate Start And Stop
                     this.timeStop        = Math.floor( ( (new Date()).getTime() - this.timeGap * 1000) / 1000 );
                     this.timeStart       = Math.floor(this.timeStop - this.timeWindow/1000);
-                    this.lastMetrictime  = new Date(this.timeStart);
+                    this.lastMetrictime  = new Date(this.timeStart*1000);
                 },
 
 
@@ -177,7 +177,7 @@ define('app/controllers/monitoring', [
                         }
                         else{
                             console.log("reloading");
-                           
+
                            // Stop Current Request 
                            self.stop();
 
@@ -421,7 +421,6 @@ define('app/controllers/monitoring', [
                                 }
 
                                 self.lastMetrictime = new Date(metricTime.getTime()-10000);
-                                //controller.graphs.updateData(receivedData);
 
                                 callback({
                                     status: 'success',
@@ -695,7 +694,7 @@ define('app/controllers/monitoring', [
             /* Zoom Feature 
             *
             *
-            
+
             Zoom : {
                 in  : function(){},
                 out : function(){},
@@ -734,21 +733,24 @@ define('app/controllers/monitoring', [
                             // On error set currentStop where it was
                             if(result['status'] == 'success')
                                 Mist.monitoringController.graphs.updateData(result['data']);
-                            else
+                            else{
                                 self.currentStopTime = new Date(+self.currentStopTime + self.timeWindow);
-                            
+                                if(self.currentStopTime.getTime() == self.lastMetrictime.getTime()){
+                                    self.disable();
+                                }
+                            }
                         }
                     });
 
                 },
 
 
-                goForward: function(){
-
+                goForward: function() {
+ 
                     var self    = this;
                     var request = Mist.monitoringController.request;
 
-                    if(this.isEnabled){
+                    if(this.isEnabled) {
 
                         this.currentStopTime = new Date(+this.currentStopTime + this.timeWindow);
 
