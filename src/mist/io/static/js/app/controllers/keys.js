@@ -116,11 +116,11 @@ define(['app/models/key'],
             },
 
 
-            associateKey: function(keyId, backendId, machineId, host, callback) {
+            associateKey: function(keyId, machine, host, callback) {
                 var that = this;
                 this.set('associatingKey', true);
-                Mist.ajax.PUT('/backends/' + backendId + '/machines/' + machineId + '/keys/' + keyId, {
-                    'host': host
+                Mist.ajax.PUT('/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + keyId, {
+                    'host': machine.getHost()
                 }).success(function() {
                     that._associateKey(keyId, backendId, machineId);
                 }).error(function() {

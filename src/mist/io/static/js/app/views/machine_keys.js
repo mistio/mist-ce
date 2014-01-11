@@ -7,122 +7,112 @@ define('app/views/machine_keys', ['text!app/templates/machine_keys.html', 'ember
     function(machine_keys_html) {
         return Ember.View.extend({
 
-            template: Ember.Handlebars.compile(machine_keys_html),
+            /**
+             * 
+             *  Properties
+             * 
+             */
 
             selectedKey: null,
-            parentMachine: null,
-            associatedKeys: null,
-            nonAssociatedKeys: null,
+            template: Ember.Handlebars.compile(machine_keys_html),
 
-            keysObserver: function() {
-                if (this.parentMachine.id == ' ') {
-                    return;
+
+            /**
+             * 
+             *  Initialization
+             * 
+             */
+
+            load: function () {
+
+                // Send view to controller
+                var viewId = $('#machine-keys-panel').parent().attr('id');
+                Mist.machineKeysController.set('view', Ember.View.views[viewId]);
+
+            }.on('didInsertElement'),
+
+
+            unload: function () {
+
+                // Remove view from controller
+                Mist.machineKeysController.set('view', null);
+
+            }.on('willDestroyElement'),
+
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+
+            renderNonAssocatedKeys: function () {
+                Ember.run.next(function () {
+                    $('#non-associated-keys-popup .ui-listview').listview('refresh');
+                });
+            },
+
+
+            /**
+             * 
+             *  Actions
+             * 
+             */
+
+            actions: {
+
+
+                associateClicked: function () {
+                    $('#non-associated-keys-popup').popup('open');
+                },
+
+
+                nonAssociatedKeyClicked: function (key) {
+                    $('#non-associated-keys-popup').popup('close');
+                    Mist.machineKeysController.associate(key);
+
+                    // In case user associates key from "Add key" button
+                    $('#machine-keys-panel').panel('open');
+                },
+
+
+                associatedKeyClicked: function (key) {
+                    this.set('selectedKey', key);
+                    $('#key-actions-popup').popup('open');
+                },
+
+
+                removeClicked: function () {
+                    Mist.machineKeysController.disassociate(this.selectedKey);
+                },
+
+
+                probeClicked: function () {
+                    Mist.machineKeysController.probe(this.selectedKey);
+                },
+
+
+                cancelClicked: function () {
+                    this.set('selectedKey', null);
+                    $('#key-actions-popup').popup('close');
+                },
+
+
+                backClicked: function () {
+                    Mist.machineKeysController.close();
                 }
-                
-                var newAssociatedKeys = new Array();
-                var newNonAssociatedKeys = new Array();
-                var machine = this.parentMachine;
-                var found = false;
-                Mist.keysController.content.forEach(function(key) {
-                    found = false;
-                    key.machines.some(function(k_machine) {
-                        if (machine.id == k_machine[1] && machine.backend.id == k_machine[0]) {
-                            newAssociatedKeys.push(key);
-                            found = true;
-                            return true;
-                        } 
-                    });
-                    if (!found) {
-                        newNonAssociatedKeys.push(key);
-                    }
-                });
-                this.set('associatedKeys', newAssociatedKeys);
-                this.set('nonAssociatedKeys', newNonAssociatedKeys);
-                this.parentMachine.set('keysCount', newAssociatedKeys.length);
-                this.parentMachine.probedObserver();
-                Ember.run.next(function() {
-                    $('#associated-keys').listview();
-                });
-            }.observes('Mist.keysController.content', 'Mist.keysController.content.@each.machines',
-                                                   'Mist.keysController.content.@each.probeState'),
-
-            didInsertElement: function() {
-                this.renderMachineKeysManager();
-            },
-
-            renderMachineKeysManager: function() {
-                this.set('parentMachine', this.get('controller').get('model'));
-                if (this.parentMachine.id != ' ') { // This is the dummy machine. It exists when machine hasn't loaded yet
-                    var that = this;
-                    Ember.run.next(function() {
-                        that.keysObserver();
-                    });
-                } else {
-                    Ember.run.later(this, function() {
-                        this.renderMachineKeysManager();
-                    }, 2000);
-                }
-                info(this.parentMachine.name);
             },
 
 
-            associateButtonClicked: function() {
-                $('#non-associated-keys').listview('refresh');
-                $('#associate-key-dialog').popup('option', 'positionTo', '#associate-key-button').popup('open');
-            },
+            /**
+             * 
+             *  Observers
+             * 
+             */
 
-            backClicked: function() {
-                $('#manage-keys').panel("close");
-            },
-
-            actionRemoveClicked: function() {
-                $('#key-actions').popup('close');
-                if (this.associatedKeys.length == 1) {
-                    var that = this;
-                    Mist.confirmationController.set('title', 'Remove last key?');
-                    Mist.confirmationController.set('text', 'WARNING! You are about to remove the last key associated with this machine.\
-                                                             You will not be able to login through mist.io. Are you sure you want to do this?');
-                    Mist.confirmationController.set('callback', function() {
-                        $('#manage-keys .ajax-loader').fadeIn(200);
-                        Mist.keysController.disassociateKey(that.selectedKey.name, that.parentMachine);      
-                    });
-                    Mist.confirmationController.show();
-                } else {
-                    $('#manage-keys .ajax-loader').fadeIn(200);
-                    Mist.keysController.disassociateKey(this.selectedKey.name, this.parentMachine); 
-                }         
-            },
-
-            actionProbeClicked: function() {
-                $('#key-actions').popup('close');
-                this.parentMachine.probe(this.selectedKey.name);
-            },
-
-            actionBackClicked: function() {
-                $('#key-actions').popup('close');
-            },
-
-            associateKeyClicked: function(key) {
-                $('#associate-key-dialog').popup('close');
-                $('#manage-keys').panel('open');
-                $('#manage-keys .ajax-loader').fadeIn(200);
-                Mist.keysController.associateKey(key.id, this.parentMachine.backend.id,
-                                                           this.parentMachine.id,
-                                                           this.parentMachine.backend.host,
-                                                           function(success, stuff) {
-                                                              warn(success);
-                                                              info(stuff);  
-                                                           });
-            },
-
-            createKeyClicked: function() {
-                $('#associate-key-dialog').popup('close');
-                var that = this;
-                Ember.run.next(function() {
-                    $('#create-key-dialog').popup('open');
-                    Mist.keyAddController.set('associateMachine', that.parentMachine);
-                });
-            },
+             nonAssociatedKeysObserver: function () {
+                 Ember.run.once(this, 'renderNonAssocatedKeys');
+             }.observes('Mist.machineKeysController.nonAssociatedKeys')
         });
     }
 );

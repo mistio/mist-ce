@@ -331,7 +331,7 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
         except MachineUnauthorizedError:
             raise MachineUnauthorizedError("Couldn't connect to "
                                            "deploy new SSH keypair.")
-
+    print "YO"
     # attemp to connect with new key
     # if it fails to connect it'll raise exception
     # there is no need to manually set the association in keypair.machines

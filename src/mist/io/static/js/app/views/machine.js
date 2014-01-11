@@ -104,6 +104,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 Mist.Router.router.transitionTo('machines');
             },
 
+
             /**
              * 
              *  Actions
@@ -111,25 +112,23 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
              */
             
             actions: {
+
+
                 manageKeysClicked: function() {
-                    $('#manage-keys').panel('open');
+                    Mist.machineKeysController.open(this.machine);
                 }, 
                
+               
                 addKeyClicked: function() {
-                    $('#non-associated-keys').listview('refresh');
-                    $('#associate-key-dialog').popup('option', 'positionTo', '#mist-manage-keys').popup('open');
+                    Mist.machineKeysController.openKeyList(this.machine);
                 },
+
 
                 powerClicked: function() {
                     Mist.machinePowerController.open(this.machine);
                 },
             },
 
-            associateClicked: function() {
-                $('.key-list').listview('refresh');
-                $('#associate-key').popup('option', 'positionTo', '#associate-key-button').popup('open');
-            },
-     
 /*
             doLogin: function() {
                 Mist.ajaxPOST('/auth', {

@@ -1,4 +1,4 @@
-<div id="machine-keys-panel" class="side-panel" data-role="panel" data-position="right" data-display="reveal">
+<div id="machine-keys-panel" class="side-panel" data-role="panel" data-position="right" data-display="overlay">
 
     <div data-role="header">
         <h1>Manage Keys</h1>
@@ -34,20 +34,25 @@
 {{view Mist.addKeyView}}
 
 <div id="key-actions-popup" class="tiny-popup" data-role="popup" data-overlay-theme="b" data-transition="flip" 
-                                                                                        data-position-to="#associated-keys">
+                                                                                        data-position-to="#associated-keys"
+                                                                                        data-dismissible="false">
     <div data-role="header">
         <h1>Actions</h1>
     </div>
-    <button {{action "removeClicked" target="view"}}>Remove</button>
-    <button {{action "probeClicked" target="view"}}>Probe</button>
-    <button {{action "cancelClicked" target="view"}}>Cancel</button>
+    
+    <div data-role="content">
+        <button {{action "removeClicked" target="view"}}>Remove</button>
+        <button {{action "probeClicked" target="view"}}>Probe</button>
+        <button {{action "cancelClicked" target="view"}}>Cancel</button>
+    </div>
 </div>
 
-<div id="associate-key-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
-    <ul id="non-associated-keys" data-role="listview">
+<div id="non-associated-keys-popup" class="tiny-popup" data-role="popup" data-overlay-theme="b" data-transition="flip"
+                                                                                        data-position-to="#associate-btn">
+    <ul data-role="listview">
         {{#each Mist.machineKeysController.nonAssociatedKeys}}
         <li data-icon="false">
-            <a {{action "nonAssociatedKeyClicked" this target="view"}}>{{this.name}}</a>
+            <a {{action "nonAssociatedKeyClicked" this target="view"}}>{{this.id}}</a>
         </li>
         {{/each}}
         <li data-icon="false" data-theme="b"> 

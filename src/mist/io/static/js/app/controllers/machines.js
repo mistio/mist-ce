@@ -230,7 +230,6 @@ define('app/controllers/machines', ['app/models/machine'],
                             // Add new machine
                             machine.backend = that.backend;
                             that.content.pushObject(Machine.create(machine));
-                            info(that.getMachine(machine.id).backend.title);
                         }
                     });
 

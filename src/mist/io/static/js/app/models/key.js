@@ -25,13 +25,7 @@ define('app/models/key', ['ember'],
              */
 
             associate: function(machine, callback) {
-                Mist.keysController.associateKey(
-                    this.id,
-                    machine.backend.id,
-                    machine.id,
-                    machine.backend.host,
-                    callback
-                );
+                Mist.keysController.associateKey(this.id, machine, callback);
             },
 
         });
