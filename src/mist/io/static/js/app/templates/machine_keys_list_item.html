@@ -1,7 +1,5 @@
-<span class="small-list-item">
+<span class="small-list-item" {{action "associatedKeyClicked" this on="click" target="view"}}>
 
-    <div {{bindAttr class="view.keyIcon"}} {{action "associatedKeyClicked" this target="view"}}>
-          {{this.id}}
-    </div>
+    <p {{bindAttr class="view.keyIcon"}}>{{this.id}}</p>
 
 </span>

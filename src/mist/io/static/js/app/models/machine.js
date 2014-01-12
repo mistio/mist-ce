@@ -1,14 +1,16 @@
-define('app/models/machine', [
-    'ember'
-    ],
+define('app/models/machine', ['ember'],
     /**
-     * Machine Model
+     *  Machine Model
      *
-     * Also check state mapping in config.py
-     * @returns Class
+     *  Also check state mapping in config.py
+     *  @returns Class
      */
     function() {
         return Ember.Object.extend({
+
+            /**
+             *  Properties
+             */
 
             id: null,
             imageId: null,
@@ -18,6 +20,7 @@ define('app/models/machine', [
             probed: false,
             probing: false,
             hasMonitoring: false,
+            probeInterval: 10000,
             pendingMonitoring: false,
             pendingShell: false,
             pendingAddTag: false,
@@ -28,7 +31,18 @@ define('app/models/machine', [
             state: 'stopped',
             stats:{'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
-            
+
+
+            /**
+             * 
+             *  Initialization
+             * 
+             */
+
+            load: function() {
+                this.probe();
+            }.on('init'),
+
             image: function() {
                 return this.backend.images.getImage(this.imageId);
             }.property('imageId'),
@@ -103,65 +117,19 @@ define('app/models/machine', [
                 callback('');
             },
 
-            probe: function(keyName) {
+            probe: function(keyId) {
                 var that = this;
-                
-                if (!that.backend || that.backend.create_pending) {
-                    return false;
-                }
+                Mist.backendsController.probeMachine(this, keyId, function(success) {
+                    if (!success) that.reProbe();
+                });
+            },
 
-                if (that.state == 'running') {
-                    var host = that.getHost();
-                    if (host) {
-                        var key = Mist.keysController.getKey(keyName);
-                        if (keyName != undefined){
-                            that.set('probing', keyName);
-                            key.set('probing', that);
-                        } else {
-                            that.set('probing', true);
-                        }
-                        
-                        $.ajax({
-                            url: '/backends/' + that.backend.id + '/machines/' + that.id + '/probe',
-                            type: 'POST',
-                            headers: { "cache-control": "no-cache" },
-                            data: {'host': host,
-                                   'key': keyName},
-                            success: function(data, textStatus, jqXHR) {
-                                   // got it fine, also means it has a key
-                                if (jqXHR.status === 200) {
-                                    var uptime = parseFloat(data['uptime'].split(' ')[0]) * 1000;
-                                    that.set('uptimeChecked', Date.now());
-                                    that.set('uptimeFromServer', uptime);
-                                    info('Successfully got uptime', uptime, 'from machine', that.name);
-                                    if(key) {
-                                        key.updateMachineUptimeChecked(that, that.uptimeChecked);
-                                        key.set('probing', false);
-                                    }
-                                    that.set('probed', true);
-                                } else {
-                                    // in every other case there is a problem
-                                    info('Got response other than 200 while probing machine', that.name);
-                                    if(key) {
-                                        key.updateMachineUptimeChecked(that, -Date.now());
-                                        key.set('probing', false);
-                                    }
-                                }
-                                that.set('probing', false);
-                            },
-                            error: function(jqXHR, textstate, errorThrown) {
-                                if(key) {
-                                    key.updateMachineUptimeChecked(that, -Date.now());
-                                    key.set('probing', false);
-                                }
-                                that.set('probing', false);
-                            },
-                            complete: function() {
 
-                            }
-                        });
-                    }
-                }
+            reProbe: function() {
+                Ember.run.later(this, function() {
+                    this.probe();
+                    this.set('probeInterval', this.probeInterval * 2);
+                }, this.probeInterval);
             },
 
             

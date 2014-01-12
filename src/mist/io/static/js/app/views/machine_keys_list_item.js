@@ -18,7 +18,7 @@ define('app/views/machine_keys_list_item', ['app/views/list_item', 'text!app/tem
             keyObserver: function() {
                 var machineToFind = this.key.probing ?
                                     this.key.probing :
-                                    this.get('parentView').get('parentMachine');
+                                    Mist.machineKeysController.get('machine');
                 var that = this;
                 this.key.machines.some(function(machine) {
                     if (machine[1] == machineToFind.id &&
@@ -38,6 +38,13 @@ define('app/views/machine_keys_list_item', ['app/views/list_item', 'text!app/tem
             keyClicked: function() {
                 $('#key-actions').popup('open');
                 this.get('parentView').set('selectedKey', this.key);
+            },
+
+            actions: {
+                associatedKeyClicked: function (key) {
+                    this.get('parentView').set('selectedKey', key);
+                    $('#key-actions-popup').popup('open');
+                },
             }
         });
     }

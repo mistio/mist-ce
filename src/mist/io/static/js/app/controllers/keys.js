@@ -122,7 +122,7 @@ define(['app/models/key'],
                 Mist.ajax.PUT('/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + keyId, {
                     'host': machine.getHost()
                 }).success(function() {
-                    that._associateKey(keyId, backendId, machineId);
+                    that._associateKey(keyId, machine);
                 }).error(function() {
                      Mist.notificationController.notify('Failed to associate key');
                 }).complete(function(success) {
@@ -132,13 +132,15 @@ define(['app/models/key'],
             },
 
 
-            disassociateKey: function(keyId, backendId, machineId, host, callback) {
+            disassociateKey: function(keyId, machine, host, callback) {
                 var that = this;
                 this.set('disassociatingKey', true);
-                Mist.ajax.DELETE('/backends/' + backendId + '/machines/' + machineId + '/keys/' + keyId, {
-                    'host': host
+                Mist.ajax.DELETE('/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + keyId, {
+                    'host': machine.getHost()
+                }).success(function() {
+                    that._disassociateKey(keyId, machine);
                 }).error(function() {
-                     Mist.notificationController.notify('Failed to disassociate key');
+                    Mist.notificationController.notify('Failed to disassociate key');
                 }).complete(function(success) {
                     that.set('disassociatingKey', false);
                     if (callback) callback(success);
@@ -202,6 +204,18 @@ define(['app/models/key'],
             },
 
 
+            getMachineKeysCount: function(machine) {
+                var count = 0;
+                this.content.forEach(function(key) {
+                    key.machines.some(function(key_machine) {
+                        if (key_machine[1] == machine.id && key_machine[0] == machine.backend.id) {
+                            return ++count;
+                        }
+                    });
+                });
+                return count;
+            },
+
 
             /**
              * 
@@ -264,9 +278,22 @@ define(['app/models/key'],
             },
 
 
-            _associateKey: function(keyId, backendId, machineId) {
+            _associateKey: function(keyId, machine) {
                 Ember.run(this, function() {
-                    this.getKey(keyId).machines.pushObject([backendId, machineId]);
+                    this.getKey(keyId).machines.pushObject([machine.backend.id, machine.id]);
+                });
+            },
+
+
+            _disassociateKey: function(keyId, machine) {
+                Ember.run(this, function() {
+                    var key = this.getKey(keyId);
+                    key.machines.some(function(key_machine) {
+                        if (key_machine[1] == machine.id && key_machine[0] == machine.backend.id) {
+                            key.machines.removeObject(key_machine);
+                            return true;
+                        }
+                    });
                 });
             },
 

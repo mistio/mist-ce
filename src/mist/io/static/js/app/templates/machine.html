@@ -18,7 +18,7 @@
             {{#if pendingCreation}}
                 <a class="ui-state-disabled" data-role="button" data-icon="plus" data-iconpos="right">Add key</a>
             {{else}} {{#if keysCount}}
-                <a data-role="button" {{action "keysClicked" target="view"}}>{{keysCount}} keys</a>
+                <a data-role="button" {{action "manageKeysClicked" target="view"}}>{{keysCount}} keys</a>
             {{else}}
                 <a data-role="button"
                    data-theme="b" 

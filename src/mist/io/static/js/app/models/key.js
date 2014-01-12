@@ -28,6 +28,10 @@ define('app/models/key', ['ember'],
                 Mist.keysController.associateKey(this.id, machine, callback);
             },
 
+            disassociate: function(machine, callback) {
+                Mist.keysController.disassociateKey(this.id, machine, callback);
+            },
+
         });
     }
 );

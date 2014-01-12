@@ -157,6 +157,46 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 });
             },
 
+
+            probeMachine: function(machine, keyId, callback) {
+
+                // TODO: This should be moved inside machines controller
+
+                if (!machine.id) return;
+                if (!machine.state == 'running') return;
+
+                var host = machine.getHost();
+                if (!host) return;
+
+                var key = Mist.keysController.getKey(keyId);
+                if (key) {
+                    machine.set('probing', keyId);
+                    key.set('probing', machine);
+                } else {
+                    machine.set('probing', true);
+                }
+
+                Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/probe', {
+                    'host': host,
+                    'key': keyId
+                }).success(function(data) {
+                    var uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
+                    machine.set('uptimeChecked', Date.now());
+                    machine.set('uptimeFromServer', uptime);
+                    machine.set('probed', true);
+                }).error(function(message) {
+                    if (key) Mist.notificationController.notify(message);
+                }).complete(function(success) {
+                    if (key) {
+                        key.updateMachineUptimeChecked(machine, (success ? 1 : -1 ) * Date.now());
+                        key.set('probing', false);
+                    }
+                    machine.set('probing', false);
+                    if (callback) callback(success);
+                });
+            },
+
+
             getMachineByUrlId: function(machineId) {
                 var machines = null;
                 var machinesLength = 0;

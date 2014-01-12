@@ -15,19 +15,18 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
             machine: null,
             template: Ember.Handlebars.compile(machine_html),
 
+
             /**
              * 
              *  Initialization
              * 
              */
 
-            init: function() {
-                this._super();
-                Mist.backendsController.on('onMachineListChange', this, 'load');
-            },
-
-
             load: function() {
+
+                // Add Event listeners
+                Mist.backendsController.on('onMachineListChange', this, 'load');
+
                 Ember.run(this, function() {
                     this.updateCurrentMachine();
                     if (this.machine.id) {
@@ -36,6 +35,13 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 });
             }.on('didInsertElement'),
 
+
+            unload: function() {
+
+                // Remove event listeners
+                Mist.backendsController.off('onMachineListChange', this, 'load');
+
+            }.on('willDestroyElement'),
 
 
             /**
@@ -47,8 +53,13 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
             updateCurrentMachine: function() {
                 Ember.run(this, function() {
                     var machine = Mist.backendsController.getRequestedMachine();
-                    if (machine) this.get('controller').set('model', machine);
+                    if (machine) {
+                        this.get('controller').set('model', machine);
+                    }
                     this.set('machine', this.get('controller').get('model'));
+                    if (this.machine.id) {
+                        this.machine.set('keysCount', Mist.keysController.getMachineKeysCount(this.machine));
+                    }
                 });
             },
 
@@ -57,6 +68,12 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 if (machine.id != ' ') { // This is the dummy machine. It exists when machine hasn't loaded yet
                     this.setGraph();
                 }
+            },
+
+            renderKeysButton: function() {
+                Ember.run.next(function() {
+                    $('#mist-manage-keys').trigger('create');
+                });
             },
 
             enableMonitoringClick: function() {
@@ -241,7 +258,11 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
 
             modelObserver: function() {
                 Ember.run.once(this, 'load');
-            }.observes('controller.model'),     
+            }.observes('controller.model'),
+
+            keysCountObserver: function() {
+                Ember.run.once(this, 'renderKeysButton');
+            }.observes('machine.keysCount')
         });
     }
 );

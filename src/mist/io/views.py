@@ -570,8 +570,8 @@ def probe(request):
     """
     machine_id = request.matchdict['machine']
     backend_id = request.matchdict['backend']
-    host = request.params.get('host', None)
-    key = request.params.get('key', None)
+    host = request.json_body.get('host', None)
+    key = request.json_body.get('key', None)
     # FIXME: simply don't pass a key parameter
     if key == 'undefined':
         key = None

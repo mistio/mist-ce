@@ -76,19 +76,15 @@ define('app/views/machine_keys', ['text!app/templates/machine_keys.html', 'ember
                 },
 
 
-                associatedKeyClicked: function (key) {
-                    this.set('selectedKey', key);
-                    $('#key-actions-popup').popup('open');
-                },
-
-
                 removeClicked: function () {
                     Mist.machineKeysController.disassociate(this.selectedKey);
+                    $('#key-actions-popup').popup('close');
                 },
 
 
                 probeClicked: function () {
                     Mist.machineKeysController.probe(this.selectedKey);
+                    $('#key-actions-popup').popup('close');
                 },
 
 

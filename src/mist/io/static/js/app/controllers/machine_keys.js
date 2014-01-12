@@ -47,6 +47,14 @@ define('app/controllers/machine_keys', ['ember'],
             },
 
 
+            probe: function(key, callback) {
+                this.machine.probe(key.id, callback);
+            },
+
+            disassociate: function(key, callback) {
+                key.disassociate(this.machine, callback);
+            },
+
             /**
              *
              *  Pseudo-Private Methods
@@ -62,6 +70,8 @@ define('app/controllers/machine_keys', ['ember'],
 
 
             _updateKeys: function () {
+                if (!this.machine) return;
+                
                 var that = this;
                 Ember.run(function () {
                     var found = false;
