@@ -35,7 +35,7 @@ log = logging.getLogger(__name__)
 
 @core_wrapper
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
-                machine_hostname="", machine_key="", machine_user="",
+                machine_hostname="", region="", machine_key="", machine_user="",
                 remove_on_error=True):
     """Adds a new backend to the user and returns the new backend_id."""
 
@@ -93,7 +93,6 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                     apisecret = user.backends[backend_id].apisecret
                     break
 
-        region = ''
         if not provider.__class__ is int and ':' in provider:
             provider, region = provider.split(':')[0], provider.split(':')[1]
 
@@ -113,6 +112,10 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         backend.region = region
         backend.enabled = True
 
+        #for HP Cloud
+        if 'hpcloudsvc' in apiurl:
+            backend.apiurl = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/'
+
         backend_id = backend.get_id()
         if backend_id in user.backends:
             raise BackendExistsError(backend_id)
@@ -125,7 +128,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
             except InvalidCredsError:
                 raise BackendUnauthorizedError()
             except Exception as exc:
-                log.error("Error while trying list_nodes: %r". exc)
+                log.error("Error while trying list_nodes: %r", exc)
                 raise BackendUnavailableError()
 
         with user.lock_n_load():
@@ -240,6 +243,7 @@ def set_default_key(user, key_id):
         raise KeypairNotFoundError(key_id)
 
     with user.lock_n_load():
+        keypairs = user.keypairs
         for key in keypairs:
             if keypairs[key].default:
                 keypairs[key].default = False
@@ -322,10 +326,18 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
     # if host is specified, try to actually deploy
     if host:
         log.info("Deploying key to machine.")
-        grep_output = '`grep \'%s\' ~/.ssh/authorized_keys`' % keypair.public
-        command = ('if [ -z "%s" ]; then echo "%s" >> '
-                   '~/.ssh/authorized_keys; fi'
-                   % (grep_output, keypair.public))
+        filename = '~/.ssh/authorized_keys'
+        grep_output = '`grep \'%s\' %s`' % (keypair.public, filename)
+        new_line_check_cmd = (
+            'if [ "$(tail -c1 %(file)s; echo x)" != "\\nx" ];'
+            ' then echo "" >> %(file)s; fi' % {'file': filename}
+        )
+        append_cmd = ('if [ -z "%s" ]; then echo "%s" >> '
+                   '%s; fi'
+                   % (grep_output, keypair.public, filename))
+        command = new_line_check_cmd + " ; " + append_cmd
+        log.debug("command = %s", command)
+
         try:
             ssh_command(user, backend_id, machine_id, host, command)
         except MachineUnauthorizedError:
@@ -354,37 +366,41 @@ def disassociate_key(user, key_id, backend_id, machine_id, host=None):
 
     if key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
-    if backend_id not in user.backends:
-        raise BackendNotFoundError(backend_id)
+    ## if backend_id not in user.backends:
+        ## raise BackendNotFoundError(backend_id)
 
     keypair = user.keypairs[key_id]
     machine_uid = [backend_id, machine_id]
     key_found = False
-    with user.lock_n_load():
-        keypair = user.keypairs[key_id]
-        for machine in keypair.machines:
-            if machine[:2] == machine_uid:
-                keypair.machines.remove(machine)
-                user.save()
-                key_found = True
-                break
-
+    for machine in keypair.machines:
+        if machine[:2] == machine_uid:
+            key_found = True
+            break
     # key not associated
     if not key_found:
         raise BadRequestError("Keypair '%s' is not associated with "
-                              "machine '%s'" % (key_id, machine_id), 304)
+                              "machine '%s'" % (key_id, machine_id))
 
     if host:
         log.info("Trying to actually remove key from authorized_keys.")
-        command = 'grep -v "' + keypair['public'] +\
+        command = 'grep -v "' + keypair.public +\
                   '" ~/.ssh/authorized_keys ' +\
-                  '> ~/.ssh/authorized_keys.tmp && ' +\
+                  '> ~/.ssh/authorized_keys.tmp ; ' +\
                   'mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys ' +\
                   '&& chmod go-w ~/.ssh/authorized_keys'
         try:
             ssh_command(user, backend_id, machine_id, host, command)
         except:
             pass
+
+    # removing key association
+    with user.lock_n_load():
+        keypair = user.keypairs[key_id]
+        for machine in keypair.machines:
+            if machine[:2] == machine_uid:
+                keypair.machines.remove(machine)
+                user.save()
+                break
 
 
 def connect_provider(backend):
@@ -403,13 +419,24 @@ def connect_provider(backend):
     if backend.provider != 'bare_metal':
         driver = get_driver(backend.provider)
     if backend.provider == Provider.OPENSTACK:
-        conn = driver(
-            backend.apikey,
-            backend.apisecret,
-            ex_force_auth_version=backend.auth_version or '2.0_password',
-            ex_force_auth_url=backend.apiurl,
-            ex_tenant_name=backend.tenant_name
-        )
+        if 'hpcloudsvc' in backend.apiurl:
+            conn = driver(
+                backend.apikey,
+                backend.apisecret,
+                ex_force_auth_version=backend.auth_version or '2.0_password',
+                ex_force_auth_url=backend.apiurl,
+                ex_tenant_name=backend.tenant_name or backend.apikey,
+                ex_force_service_region = backend.region,
+                ex_force_service_name='Compute'
+            )
+        else:
+            conn = driver(
+                backend.apikey,
+                backend.apisecret,
+                ex_force_auth_version=backend.auth_version or '2.0_password',
+                ex_force_auth_url=backend.apiurl,
+                ex_tenant_name=backend.tenant_name
+            )
     elif backend.provider == Provider.LINODE:
         conn = driver(backend.apisecret)
     elif backend.provider in [Provider.RACKSPACE_FIRST_GEN,
@@ -483,7 +510,7 @@ def get_machine_actions(machine_from_api, conn):
         can_start = False
         can_destroy = False
         can_stop = False
-        can_reboot = False
+        can_reboot = True
         can_tag = False
 
     return {'can_stop': can_stop,
@@ -594,9 +621,11 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     location = NodeLocation(location_id, name='', country='', driver=conn)
 
     if conn.type in [Provider.RACKSPACE_FIRST_GEN,
-                     Provider.RACKSPACE,
-                     Provider.OPENSTACK]:
-        node = _create_machine_openstack(conn, public_key, script, machine_name,
+                     Provider.RACKSPACE]:
+        node = _create_machine_rackspace(conn, public_key, script, machine_name,
+                                        image, size, location)
+    elif conn.type in [Provider.OPENSTACK]:
+        node = _create_machine_openstack(conn, private_key, public_key, script, machine_name,
                                         image, size, location)
     elif conn.type in config.EC2_PROVIDERS and private_key:
         locations = conn.list_locations()
@@ -635,9 +664,9 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             }
 
 
-def _create_machine_openstack(conn, public_key, script, machine_name,
+def _create_machine_rackspace(conn, public_key, script, machine_name,
                              image, size, location):
-    """Create a machine in Openstack.
+    """Create a machine in Rackspace.
 
     Here there is no checking done, all parameters are expected to be
     sanitized by create_machine.
@@ -652,6 +681,47 @@ def _create_machine_openstack(conn, public_key, script, machine_name,
                                 location=location, deploy=msd)
     except Exception as e:
         raise MachineCreationError("Rackspace, got exception %s" % e)
+    return node
+
+def _create_machine_openstack(conn, private_key, public_key, script, machine_name,
+                             image, size, location):
+    """Create a machine in Openstack.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+    key = SSHKeyDeployment(str(public_key))
+    deploy_script = ScriptDeployment(script)
+    msd = MultiStepDeployment([key, deploy_script])
+    key = str(public_key).replace('\n','')
+
+    try:
+        server_key = ''
+        keys = conn.ex_list_keypairs()
+        for k in keys:
+            if key == k.public_key:
+                server_key = k.name
+                break
+        if not server_key:
+            server_key = conn.ex_import_keypair_from_string(name=machine_name, key_material=key)
+            server_key = server_key.name
+    except:
+        server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
+        server_key = server_key.name
+    with get_temp_file(private_key) as tmp_key_path:
+        try:
+            node = conn.deploy_node(name=machine_name,
+                image=image,
+                size=size,
+                location=location,
+                deploy=msd,
+                ssh_key=tmp_key_path,
+                ssh_alternate_usernames=['ec2-user', 'ubuntu'],
+                max_tries=1,
+                ex_keyname=server_key)
+        except Exception as e:
+            raise MachineCreationError("OpenStack, got exception %s" % e)
     return node
 
 
@@ -896,6 +966,10 @@ def _machine_action(user, backend_id, machine_id, action):
 
     if backend_id not in user.backends:
         raise BackendNotFoundError()
+
+    bare_metal = False
+    if user.backends[backend_id].provider == 'bare_metal':
+        bare_metal = True
     conn = connect_provider(user.backends[backend_id])
     machine = Node(machine_id,
                    name=machine_id,
@@ -911,7 +985,16 @@ def _machine_action(user, backend_id, machine_id, action):
             # In libcloud it is not possible to call this with machine.stop()
             conn.ex_stop_node(machine)
         elif action is 'reboot':
-            machine.reboot()
+            if bare_metal:
+                try:
+                    hostname = user.backends[backend_id].machines[machine_id].public_ips[0]
+                    command = '$(command -v sudo) shutdown -r now'
+                    ssh_command(user, backend_id, machine_id, hostname, command)
+                    return True
+                except:
+                    return False            
+            else:
+                machine.reboot()
         elif action is 'destroy':
             machine.destroy()
     except AttributeError:

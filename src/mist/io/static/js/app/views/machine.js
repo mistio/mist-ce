@@ -87,7 +87,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
             },
             
             rules: function(){
-                var ret = Ember.ArrayController.create(), 
+                var ret = Ember.ArrayController.create(),
                     machine = this.get('controller').get('model');
                 Mist.rulesController.forEach(function(rule){
                     if (rule.machine == machine) {
@@ -141,8 +141,18 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 },
 
 
-                powerClicked: function() {
+                tagsClicked: function () {
+                    Mist.machineTagsController.open(this.machine);
+                },
+
+
+                powerClicked: function () {
                     Mist.machinePowerController.open(this.machine);
+                },
+
+
+                shellClicked: function () {
+                    //Mist.machineShellController.open(this.machine);
                 },
             },
 

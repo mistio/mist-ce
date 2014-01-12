@@ -23,11 +23,11 @@ define('app/models/key', ['ember'],
              *  Methods
              * 
              */
-
+            // Depricated
             associate: function(machine, callback) {
                 Mist.keysController.associateKey(this.id, machine, callback);
             },
-
+            // Depricated
             disassociate: function(machine, callback) {
                 Mist.keysController.disassociateKey(this.id, machine, callback);
             },

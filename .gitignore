@@ -18,3 +18,5 @@ src/paramiko
 /.project
 *.yaml
 /.pydevproject
+settings.py
+local/
