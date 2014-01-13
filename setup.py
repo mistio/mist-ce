@@ -14,7 +14,8 @@ requires = [
     'pyyaml',
     'pycrypto',
     'requests',
-    'nose'
+    'nose',
+    'sphinxcontrib-httpdomain'
 ]
 
 setup(name='mist.io',
