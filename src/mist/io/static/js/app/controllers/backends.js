@@ -122,7 +122,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     Mist.set('user_details', data.user_details);
 
                     data.machines.forEach(function(machine_tuple) {
-                        var machine = that.getMachineById(machine_tuple[0], machine_tuple[1]);
+                        var machine = that.getMachine(machine_tuple[0], machine_tuple[1]);
                         if (machine) {
                             machine.set('hasMonitoring', true);
                         }
@@ -142,7 +142,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                         rule.maxValue = rules[ruleId].max_value;
                         rule.actionToTake = rules[ruleId].action;
                         rule.operator = Mist.rulesController.getOperatorByTitle(rules[ruleId].operator);
-                        rule.machine = that.getMachineById(rules[ruleId].backend, rules[ruleId].machine);
+                        rule.machine = that.getMachine(rules[ruleId].backend, rules[ruleId].machine);
                         if (!rule.machine) {
                             rule.backend_id = rules[ruleId].backend;
                             rule.machine_id = rules[ruleId].machine;
@@ -162,7 +162,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
 
                 // TODO: This should be moved inside machines controller
 
-                if (!machine.id) return;
+                if (!machine.id || machine.id == -1) return;
                 if (!machine.state == 'running') return;
 
                 var host = machine.getHost();
