@@ -1,6 +1,10 @@
 
 /* Machine Add Panel CSS
 -----------------------------------------------------------------------------------------------------------*/
+#create-machine-panel {
+    min-width: 320px;
+    width: 45%;
+}
 #create-machine-panel label {
     margin-top: 10px;
 }

@@ -163,6 +163,10 @@ textarea {
     right: 325px;
 }
 
+.ui-panel-inner {
+    padding: 10px !important;
+}
+
 
 /* Filtered list headers
 -----------------------------------------------------------------------------------------------------------*/
@@ -179,13 +183,16 @@ textarea {
 
 /* Checkbox list
 -----------------------------------------------------------------------------------------------------------*/
+ul.checkbox-list li {
+    background-color: #eeeeee /*{c-bup-background-color}*/
+}
 ul.checkbox-list li a, ul.checkbox-list li a:hover, ul.checkbox-list label, ul.checkbox-list label:hover {
     background-color: transparent !important;
     border-width: 0px !important;
 }
 
 ul.checkbox-list li:hover {
-    background: #ededed /*{a-bhover-background-color}*/
+    background-color: #dfdfdf /*{c-bhover-background-color}*/
 }
 
 ul.checkbox-list li {
@@ -231,6 +238,7 @@ ul.checkbox-list .ui-grid-b {
     padding: 1px 7px;
     float: right;
     font-size: 12px;
+    font-weight: normal;
 }
 @-moz-document url-prefix() {
     .checkbox-link .tag {
