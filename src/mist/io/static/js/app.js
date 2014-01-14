@@ -119,6 +119,8 @@ define( 'app', [
             $.mobile.pushStateEnabled = false;
             $.mobile.linkBindingEnabled = false;
             $.mobile.hashListeningEnabled = false;
+            $.mobile.panel.prototype._bindUpdateLayout = function(){};
+            $('body').css('overflow','auto');
         });
 
         // Ember Application

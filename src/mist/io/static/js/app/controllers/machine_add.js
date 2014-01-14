@@ -37,8 +37,11 @@ define('app/controllers/machine_add', ['ember'],
                 $('#create-machine-panel .ui-panel-inner').animate({scrollTop:0}, 'slow');
                 $('#create-machine-panel').panel('open');
                 Ember.run.next(function(){
-                    $('.ui-page-active').height($('.ui-panel-open').height());
-                    $('body').css('overflow','auto');
+                    var panelHeight = $('.ui-panel-open').height(), 
+                        pageHeight = $('.ui-page-active').height();
+                    if ( panelHeight > pageHeight) {
+                        $('.ui-page-active').height(panelHeight);
+                    }
                 });
                 
                 this._clear();

@@ -159,6 +159,10 @@ textarea {
     width: 98px !important;
 }
 
+.ui-panel-dismiss-open.ui-panel-dismiss-position-right {
+    right: 325px;
+}
+
 
 /* Filtered list headers
 -----------------------------------------------------------------------------------------------------------*/
@@ -226,7 +230,7 @@ ul.checkbox-list .ui-grid-b {
     color: #555 !important;
     padding: 1px 7px;
     float: right;
-    font-size: 15px;
+    font-size: 12px;
 }
 @-moz-document url-prefix() {
     .checkbox-link .tag {
