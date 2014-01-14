@@ -408,6 +408,8 @@ def associate_key(request):
         host = request.json_body.get('host')
     except:
         host = None
+    if not host:
+        raise RequiredParameterMissingError('host')
     user = user_from_request(request)
     methods.associate_key(user, key_id, backend_id, machine_id, host)
     return user.keypairs[key_id].machines
