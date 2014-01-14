@@ -3,8 +3,6 @@ REST API
 
 This is a detailed documentation of our API
 
-EXAMPLE:
-
 .. http:get:: /providers
 
    List of all supported providers.
@@ -23,7 +21,7 @@ EXAMPLE:
 
       HTTP/1.1 200 OK
       Vary: Accept
-      Content-Type: text/javascript
+      Content-Type: application/json; charset=UTF-8
 
         {
           "supported_providers": [
@@ -140,3 +138,49 @@ EXAMPLE:
                             header of request
    :statuscode 200: no error
    :statuscode 404: there's no user
+
+.. http:get:: /backends
+
+   List of all added backends
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      GET /backends
+      Host: mist.io
+      Accept: application/json; charset=UTF-8
+
+   **Example response**:
+
+   .. sourcecode:: http
+
+      HTTP/1.1 200 OK
+      Vary: Accept
+      Content-Type: application/json; charset=UTF-8
+
+
+
+    [
+       {
+           "state": "wait",
+           "apikey": "A09009NUMIQCIHA",
+           "title": "EC2 AP NORTHEAST",
+           "enabled": true,
+           "region": "",
+           "provider": "ec2_ap_northeast",
+           "poll_interval": 10000,
+           "id": "2tK74h4mXbjqXfKQxESgzqc4SHn3"
+       },
+       {
+           "state": "wait",
+           "apikey": "unwebme",
+           "title": "Rackspace DFW",
+           "enabled": true,
+           "region": "dfw",
+           "provider": "rackspace",
+           "poll_interval": 10000,
+           "id": "3YuLqA3p3QnjqiNgqqmDJAKSLWp6"
+       }
+    ]
+
