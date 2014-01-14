@@ -1,5 +1,5 @@
-REST API
-*****************
+REST API DOCUMENTATION
+**********************
 
 This is a detailed documentation of our API
 
@@ -18,10 +18,6 @@ This is a detailed documentation of our API
    **Example response**:
 
    .. sourcecode:: http
-
-      HTTP/1.1 200 OK
-      Vary: Accept
-      Content-Type: application/json; charset=UTF-8
 
         {
           "supported_providers": [
@@ -155,10 +151,6 @@ This is a detailed documentation of our API
 
    .. sourcecode:: http
 
-      HTTP/1.1 200 OK
-      Vary: Accept
-      Content-Type: application/json; charset=UTF-8
-
         [
            {
                "state": "wait",
@@ -188,13 +180,9 @@ This is a detailed documentation of our API
 
    **Example request**:
 
-    Add EC2 Backend
+   Add EC2 Backend
 
    .. sourcecode:: http
-
-      POST /backends
-      Host: mist.io
-      Accept: application/json; charset=UTF-8
 
         {
             "title":"EC2 AP Sydney",
@@ -207,10 +195,6 @@ This is a detailed documentation of our API
 
    .. sourcecode:: http
 
-      POST /backends
-      Host: mist.io
-      Accept: application/json; charset=UTF-8
-
         {
             "title":"OpenStack",
             "provider":"openstack",
@@ -219,26 +203,241 @@ This is a detailed documentation of our API
             "apiurl":"http://37.58.77.91:5000/v2.0",
             "tenant_name":"admin"
         }
-        
-   **Example response**:
 
-      HTTP/1.1 200 OK
-      Vary: Accept
-      Content-Type: application/json; charset=UTF-8
+   :jsonparam string title:  *required* Title of the backend
+   :jsonparam string provider: *required* Provider as found in supported providers list
+   :jsonparam string apikey: APIKEY or username (depending on the provider)
+   :jsonparam string apisecret: APISECRET or password (depending on the provider)
+   :jsonparam string apiurl: APIURL needed by Openstack and HP Cloud
+   :jsonparam string tenant_name: Tenant needed by Openstack and HP Cloud
+   :jsonparam string machine_ip: Ip address needed when adding Bare Metal Server
+   :jsonparam string machine_key: Id of ssh key needed when adding Bare Metal Server
+   :jsonparam string machine_user: User for Bare Metal Server
+
+   **Example response**:
 
    .. sourcecode:: http
 
-        {
-           "status": "off",
-           "tenant_name": "",
-           "id": "48emAUzL9teVYhkyJc9koRaPXEDp",
-           "index": 2,
-           "apikey": "OLNPOIJBIUMIQCIHA",
-           "title": "EC2 AP Sydney",
-           "region": "",
-           "poll_interval": 10000,
-           "apiurl": "",
-           "provider": "ec2_ap_southeast_2",
-           "enabled": true
-        }
+    {
+       "status": "off",
+       "tenant_name": "",
+       "id": "48emAUzL9teVYhkyJc9koRaPXEDp",
+       "index": 2,
+       "apikey": "OLNPOIJBIUMIQCIHA",
+       "title": "EC2 AP Sydney",
+       "region": "",
+       "poll_interval": 10000,
+       "apiurl": "",
+       "provider": "ec2_ap_southeast_2",
+       "enabled": true
+    }
 
+.. http:delete:: /backends/{backend_id}
+
+   Delete backend
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      DELETE /backends/{backend_id}
+      Host: mist.io
+      Accept: application/json; charset=UTF-8
+
+.. http:put:: /backends/{backend_id}
+
+   Rename backend
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      PUT /backends
+      Host: mist.io
+      Accept: application/json; charset=UTF-8
+
+      {
+        "new_name":"Renamed Backed"
+      }
+
+   :jsonparam string new_name:  *required* New name for backend
+
+.. http:post:: /backends/{backend_id}
+
+   Toggle state of backend between enabled and disabled
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      POST /backends
+      Host: mist.io
+      Accept: application/json; charset=UTF-8
+
+      {
+        "newState":"False"
+      }
+
+   :jsonparam string newState:  *required* True to enable, False to disable backend
+
+.. http:get:: /keys
+
+   List added keys.
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      GET /keys
+      Host: mist.io
+      Accept: application/json; charset=UTF-8
+
+   **Example response**:
+
+   .. sourcecode:: http
+
+    [
+       {
+           "default_key": true,
+           "id": "passwordless",
+           "machines":
+           [
+               [
+                   "2tK74h4mXbjqXfKQxESgzqc4SHn3",
+                   "i-c0ca59c5",
+                   1389715866.596957,
+                   "ec2-user",
+                   "true"
+               ]
+           ],
+           "name": "passwordless"
+       },
+       {
+           "default_key": false,
+           "id": "Key2",
+           "machines":
+           [
+           ],
+           "name": "Key 2"
+       }
+    ]
+
+   *For each Key a list of associated machines is returned with backend_id, machine_id, username_of_machine, if_sudo*
+
+.. http:put:: /keys
+
+   Add Key.
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      PUT /keys
+      Host: mist.io
+      Accept: application/json; charset=UTF-8
+
+      {
+        "name":"MyKey",
+        "priv":"-----BEGIN RSA PRIVATE KEY-----OoiknlOnNJNKCAQEAtbBji1OMHW2bS2Va..."
+      }
+
+   :jsonparam string name:  *required* Name of new key
+   :jsonparam string priv:  *required* Private ssh key
+
+.. http:post:: /keys
+
+   Ask mist to generate a new private key.
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      GET /keys
+      Host: mist.io
+      Accept: application/json; charset=UTF-8
+
+   **Example response**:
+
+   .. sourcecode:: http
+
+      {
+        "priv":"-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCA..."
+      }
+
+.. http:delete:: /keys/{key_id}
+
+   Delete key
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      DELETE /keys/{key_id}
+      Host: mist.io
+      Accept: application/json; charset=UTF-8
+
+.. http:put:: /keys/{key_id}
+
+   Rename key.
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      PUT /keys/{key_id}
+      Host: mist.io
+      Accept: application/json; charset=UTF-8
+
+      {
+        "newName":"New Key Name"
+      }
+
+   :jsonparam string newName:  *required* New name for key
+
+.. http:post:: /keys/{key_id}
+
+   Set default key
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      POST /keys/{key_id}
+      Host: mist.io
+      Accept: application/json; charset=UTF-8
+
+.. http:get:: /keys/{key_id}?action=private
+
+   Get private key.
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      GET /keys/{key_id}?action=private
+      Host: mist.io
+      Accept: application/json; charset=UTF-8
+
+   **Example response**:
+
+   .. sourcecode:: http
+
+    "-----BEGIN RSA PRIVATE KEY-----\nMIIE..."
+
+.. http:get:: /keys/{key_id}?action=public
+
+   Get public key.
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      GET /keys/{key_id}?action=public
+      Host: mist.io
+      Accept: application/json; charset=UTF-8
+
+   **Example response**:
+
+   .. sourcecode:: http
+
+    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQA..."
