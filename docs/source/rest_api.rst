@@ -1,5 +1,5 @@
-REST API DOCUMENTATION
-**********************
+RESTful API Documentation
+*************************
 
 This is a detailed documentation of our API
 
