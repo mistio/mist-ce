@@ -1,3 +1,4 @@
+import os
 import sys
 import socket
 
@@ -60,14 +61,39 @@ class BareMetalDriver(object):
         return node
 
     def check_host(self, hostname, port=22):
-        "Perform a check if port is open"
-        #FIXME: needs more thinking here!!!
+        """Check if host is running.
+    
+        Initially attempt a connection to ssh port specified for host. If connection
+        is successful, then consider host as running. If not, send an ICMP package
+        with ping. If this fails too, consider host state as stopped.
+        Still needs to be improved to perform more robust checks.
+        
+        """    
+
         socket.setdefaulttimeout(5)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             s.connect((hostname, port))
             s.shutdown(2)
             state = NODE_STATE_MAP['on']
-        except:
-            state = NODE_STATE_MAP['off']
+        except: 
+            ping_response = self.ping_host(hostname)
+            if ping_response == 0:
+                state = NODE_STATE_MAP['on']
+            else:
+                state = NODE_STATE_MAP['off']            
         return state
+
+    def ping_host(self, hostname):
+        """Pings given host 
+
+        Use ping utility, since a python implementation would require root privileges 
+        (ICMP packages need be sent by root), while ping gets around this by being set SUID. 
+        Will fail if ping is not found on system
+
+        """                
+        try:
+            response = os.system("ping -c 1 -w5 " + hostname + " > /dev/null 2>&1")
+        except:
+            response = 256
+        return response
