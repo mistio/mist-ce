@@ -10,8 +10,12 @@ define('app/controllers/monitoring', [
         return Ember.ObjectController.extend(Ember.Evented,{
             
 
-            // TODO , Remove Machine And View Arguments
-            // TODO , UpdateInterval And Step Must Be the Same
+            /*
+            * 
+            * Initalizes Request,Graphs,History objects
+            * Loads cookies and hides collapsed graphs
+            * @param {object} arguments - machine,timeWindow,step,updateInterval,updatesEnabled,timeGap,callback
+            */
             initialize: function(arguments){
 
                 var self = this;
@@ -30,7 +34,7 @@ define('app/controllers/monitoring', [
                 } else{
 
                     // Hide graphs
-                    var metrics = this.graphs.instances;
+                    var metrics     = this.graphs.instances;
                     var metricsKeys = [];
 
                     for(var key in metrics){
@@ -45,11 +49,11 @@ define('app/controllers/monitoring', [
                 // Create and Start the request
                 this.request.create({
                     machine         : arguments['machineModel'], // Send Current Machine
-                    timeWindow      : 10*60*1000,          // Display 10 Minutes
-                    step            : 10000,               // Metrics Step in miliseconds
-                    updateInterval  : 10000,               // Get Updates Every x Miliseconds
-                    updatesEnabled  : true,                // Get Updates
-                    timeGap         : 60,                  // Gap between current time and requested
+                    timeWindow      : 10*60*1000,                // Display 10 Minutes
+                    step            : 10000,                     // Metrics Step in miliseconds
+                    updateInterval  : 10000,                     // Get Updates Every x Miliseconds
+                    updatesEnabled  : true,                      // Get Updates
+                    timeGap         : 60,                        // Gap between current time and requested
                     callback        : function(result){
                         if(result['status'] == 'success'){
                             self.graphs.updateData(result['data']);
@@ -59,10 +63,13 @@ define('app/controllers/monitoring', [
 
                 this.request.start();
 
-                console.log("Controller Initialized");
             },
 
-            // Todo add Description
+            /**
+            *
+            *   Resets all controller instances to the default state
+            *
+            */
             reset: function(){
 
                 this.request.reset();
@@ -71,18 +78,18 @@ define('app/controllers/monitoring', [
             },
 
             /**
-            *   Request Object
+            *
             *   This object is responsible for data requests
             *
             */
             request: {
 
                 /**
-                *   Initialize function
-                *   timeWindow     : integer in microseconds
-                *   step           : integer in microseconds
-                *   updateinterval : integer in microseconds
-                *   enableUpdates  : boolean
+                *   Creates the request. use start() to start the request
+                *   @param {number}  timeWindow     - The time window in miliseconds
+                *   @param {number}  step           - Step of measurements
+                *   @param {number}  updateinterval - Update every updateInterval miliseconds
+                *   @param {boolean} enableUpdates  - Enable/Disable updates
                 */
                 create : function(arguments){
 
@@ -106,23 +113,26 @@ define('app/controllers/monitoring', [
                     this.lastMetrictime  = new Date(this.timeStart*1000);
                 },
 
-
+                /**
+                *
+                *   Starts the request. User create() first
+                *
+                */
                 start : function(){
 
-                    console.log("started");
                     var self = this;
 
                     this.locked = true;
 
                     // If request stopped Re-calculate start and stop 
                     if(this.initialized && !this.running){
-                        console.log("Re-calculating");
+
                         this.timeStart = Math.floor( this.lastMetrictime.getTime() /1000 ) ;
-                        this.timeStop =  Math.floor( ((new Date()).getTime() - this.timeGap * 1000 ) / 1000 );
+                        this.timeStop  =  Math.floor( ((new Date()).getTime() - this.timeGap * 1000 ) / 1000 );
 
                         // Fix time when lossing precision
                         var stopRemainder = (this.timeStop - this.timeStart) % (this.step/1000);
-                        this.timeStop = this.timeStop - stopRemainder;
+                        this.timeStop     = this.timeStop - stopRemainder;
                     } else {
 
                         this.initialized = true;
@@ -159,24 +169,33 @@ define('app/controllers/monitoring', [
                     this.running = true;
                 },
 
+                /**
+                *
+                *   Stops current request
+                *
+                */
                 stop : function(){
 
                     this.running = false;
                     window.clearInterval(window.monitoringInterval);
                 },
 
+                /**
+                *
+                *   Reloads current request. 
+                *   @param {string} reason - Reason for reloading (default: manualReload)
+                */
                 reload: function(reason){
 
                     var self = this;
 
                     var reload = function(){
 
+                        // wait until previous action (request) finishes
                         if(self.locked){
-                            console.log("Waiting For Action To Finish");
                             window.setTimeout(reload,1000);
                         }
                         else{
-                            console.log("reloading");
 
                            // Stop Current Request 
                            self.stop();
@@ -211,7 +230,11 @@ define('app/controllers/monitoring', [
                     reload();
                 },
 
-                // Posible options, Stop,Step,Timewindow
+                /**
+                *
+                *   Runs a custm request without destroying the previous
+                *   @param {object} options - Stop,Step,Timewindow
+                */
                 custom : function(options){
 
                     // Clear Intervals
@@ -221,17 +244,17 @@ define('app/controllers/monitoring', [
                     var self   = this;
                     var custom = function(){
 
+                        // wait until previous action (request) finishes
                         if(self.locked){
-                            console.log("Waiting For Action To Finish");
                             window.setTimeout(custom,1000);
                         }
                         else{
                             //var timeGap          = 60;
-                            var timeWindow       = self.timeWindow;
-                            var step             = self.step;
-                            var stop             = Math.floor( ( new Date()).getTime() / 1000 ); //Math.floor( ( (new Date()).getTime() - timeGap * 1000) / 1000 );
-                            var start            = Math.floor( stop - timeWindow/1000 );
-                            var callback         = null;
+                            var timeWindow  = self.timeWindow;
+                            var step        = self.step;
+                            var stop        = Math.floor( ( new Date()).getTime() / 1000 ); //Math.floor( ( (new Date()).getTime() - timeGap * 1000) / 1000 );
+                            var start       = Math.floor( stop - timeWindow/1000 );
+                            var callback    = null;
 
                             if(options){
                                 if ('stop' in options){
@@ -261,12 +284,21 @@ define('app/controllers/monitoring', [
 
                 },
 
-                // Possible Temporary Function TODO check this
+                /**
+                *
+                *   Resets the custom request and gets back to the original
+                *   
+                */
                 customReset : function(){
                     Mist.monitoringController.graphs.enableAnimation();
                     this.reload('customRequestReset');
                 },
 
+                /**
+                *
+                *   Changes current request step
+                *   @param {number} newStep - The new step
+                */
                 changeStep: function(newStep){
                     this.step = newStep;
                     this.reload('stepChanged');
@@ -283,10 +315,23 @@ define('app/controllers/monitoring', [
                 },
 
 
-                // Private functions
+                /**
+                *
+                *   Stops data updates by clearing the interval
+                *   
+                */
                 stopDataUpdates: function(){
                     window.clearInterval(window.monitoringInterval);
                 },
+
+                /**
+                *
+                *   Does an ajax request to the server
+                *   @param {number} start - The start time in seconds of requested measurements
+                *   @param {number} stop  - The stop  time in seconds of requested measurements
+                *   @param {number} step  - The step in miliseconds of requested measurements
+                *   @param {function} callback - The function that will be called when request has finished.
+                */
                 receiveData: function(start,stop,step,callback){
 
                     var controller = Mist.monitoringController;
@@ -297,9 +342,7 @@ define('app/controllers/monitoring', [
                       callback = function(){};
                     }
 
-                    // start: date/time we want to receive data from (seconds)
-                    // stop:  date/time we want to receeive data until (seconds)
-                    // step:  miliseconds we want to split data
+
                     $.ajax({
                         url: '/backends/' + self.machine.backend.id +
                              '/machines/' + self.machine.id + '/stats',
@@ -317,6 +360,7 @@ define('app/controllers/monitoring', [
 
                                 var measurmentsExpected = Math.floor((stop-start) / (step/1000)) ;
 
+                                // Throw error for none or more measurements
                                 if(data.load.length == 0)
                                     throw "Error, Received none measurements";
                                 else if(data.load.length > measurmentsExpected)
@@ -451,7 +495,7 @@ define('app/controllers/monitoring', [
                                 }
                             }
                             else{
-                                //Mist.notificationController.timeNotify("An error occurred while retrieving data",4000);
+                                
                                 error(textStatus);
                             };
 
@@ -466,6 +510,11 @@ define('app/controllers/monitoring', [
                     });
                 },
 
+                /**
+                *
+                *   Prints some debug information
+                *   
+                */
                 printInfo: function(){
                     console.log("Time Window    : " + (this.timeWindow/1000) + " seconds");
                     console.log("Last Metric    : " + this.lastMetrictime);
@@ -473,6 +522,11 @@ define('app/controllers/monitoring', [
                     console.log("Update Interval: " + this.updateInterval)
                 }, 
 
+                /**
+                *
+                *   Resets current object into the default state
+                *   
+                */
                 reset: function(){
                     this.machine        = null;
                     this.lastMetrictime = null;  
@@ -505,6 +559,12 @@ define('app/controllers/monitoring', [
 
             },
 
+            /**
+            *
+            *   Main object for user actions
+            *   Template calls these functions
+            *   
+            */
             UI : {
                 collapsePressed : function(graph){
                     Mist.monitoringController.graphs.collapse([graph]);
@@ -516,9 +576,18 @@ define('app/controllers/monitoring', [
             },
 
             
-            // Graphs Controller
+            /**
+            *
+            *   Controlls all graphs,
+            *   It has instances of graphs past by the view
+            */
             graphs : {
 
+                /**
+                *
+                *   Enable animation of all graphs
+                *   
+                */
                 enableAnimation  : function() {
                     for(metric in this.instances)
                     {
@@ -528,7 +597,11 @@ define('app/controllers/monitoring', [
                     this.animationEnabled = true;
                 },
 
-                
+                /**
+                *
+                *   Disable animation of all graphs
+                *   @param {boolean} stopCurrent - Stop current animation or Stop animation on next update
+                */
                 disableAnimation : function(stopCurrent) {
                     
                     // Default StopCurrent true
@@ -552,9 +625,15 @@ define('app/controllers/monitoring', [
                     this.animationEnabled = false;
                 },
 
+                /**
+                *
+                *  Updates graphs data
+                *   @param {object} data - Metrics objects in associative array
+                */
                 updateData : function(data){
 
                     // TODO something with cpuCores property
+
                     // Then we delete it
                     delete data['cpuCores'];
                     
@@ -563,6 +642,11 @@ define('app/controllers/monitoring', [
                     }
                 },
 
+                /**
+                *
+                *   Clears all data from graphs
+                *   
+                */
                 clearData  : function() {
                     
                     for(metric in this.instances)
@@ -571,6 +655,11 @@ define('app/controllers/monitoring', [
                     }
                 },
 
+                /**
+                *
+                *  Collapse selected metrics
+                *  Possible to set animation duration
+                */
                 collapse : function(metrics,duration) {
 
                     // Mobile Hide Animation is slow, disabling animation
@@ -605,6 +694,11 @@ define('app/controllers/monitoring', [
 
                 },
 
+                /**
+                *
+                *  Expands selected metrics
+                *  Possible to set animation duration
+                */
                 expand : function(metrics,duration) {
 
                     // Mobile Hide Animation is slow, disabling animation
@@ -639,6 +733,11 @@ define('app/controllers/monitoring', [
 
                 },
 
+                /**
+                *
+                *  Resets current object to the default state
+                *  
+                */
                 reset: function() {
                     this.instances        = null;
                     this.animationEnabled = true;
@@ -649,9 +748,19 @@ define('app/controllers/monitoring', [
             },
 
 
+            /**
+            *
+            *   Controls for cookies in monitoring
+            *   
+            */
             cookies : {
 
 
+                /**
+                *
+                *  Returns collapsed metrics retrieved for cookies
+                *  
+                */
                 getCollapsedMetrics : function(){
 
                     if(document.cookie.indexOf("collapsedGraphs")  == -1) 
@@ -675,7 +784,11 @@ define('app/controllers/monitoring', [
                     return collapsedGraphs;
                 },
 
-
+                /**
+                *
+                *  Write collapsed metrics to cookies
+                *  @param {array} metrics - Metric names
+                */
                 setCollapsedMetrics : function(metrics){
                     
                     var graphBtnIdList  = [];
@@ -702,12 +815,18 @@ define('app/controllers/monitoring', [
             },*/
 
 
-            /* History Feature 
+            /**
             *
-            *
+            *   History feature, get previous graph data and display them
+            *   
             */
             history : {
 
+                /**
+                *
+                *  Go a timewindow back,
+                *  Also enables history if not enabled
+                */
                 goBack: function() {
 
                     var self    = this;
@@ -720,10 +839,6 @@ define('app/controllers/monitoring', [
                     else {
                         this.currentStopTime = new Date(this.currentStopTime - this.timeWindow);
 
-                        // Debug
-                        /*console.log("Time Window: " + (this.timeWindow/1000/60) + " Minutes" );
-                        console.log("Last  Metric Time: " + this.lastMetrictime);
-                        console.log("New     Stop Time: " + this.currentStopTime);*/
                     }
 
 
@@ -744,7 +859,11 @@ define('app/controllers/monitoring', [
 
                 },
 
-
+                /**
+                *
+                *   Go a timewindow forward
+                *   Also disables history if it is in the last history block
+                */
                 goForward: function() {
  
                     var self    = this;
@@ -757,17 +876,9 @@ define('app/controllers/monitoring', [
                         // If Next Block of time is ahead of last Metric Disable Monitoring
                         if( (+this.currentStopTime) > (+this.lastMetrictime) ) {
 
-                            /*console.log("Disabling History");
-                            console.log("Last  Metric Time: " + this.lastMetrictime);
-                            console.log("New     Stop Time: " + this.currentStopTime);*/
                             this.disable();
-
                         }
                         else{
-
-                            /*console.log("Time Window: " + (this.timeWindow/1000/60) + " Minutes" );
-                            console.log("Last  Metric Time: " + this.lastMetrictime);
-                            console.log("New     Stop Time: " + this.currentStopTime);*/
                            
                             request.custom({
                                 stop     : (+this.currentStopTime / 1000),
@@ -784,6 +895,11 @@ define('app/controllers/monitoring', [
 
                 },
 
+                /**
+                *
+                *   Enable history feature
+                *   
+                */
                 enable : function() {
 
                     var self    = this;
@@ -796,18 +912,16 @@ define('app/controllers/monitoring', [
                         this.lastMetrictime  = request.lastMetrictime;
                         this.currentStopTime =  new Date(this.lastMetrictime.getTime() - this.timeWindow);
 
-
-                        // Debug
-                        /*console.log("Time Window: " + (this.timeWindow/1000/60) + " Minutes" );
-                        console.log("Current Stop Time: " + this.lastMetrictime);
-                        console.log("New     Stop Time: " + this.currentStopTime);
-                        */
-
                         $('#graphsGoForward').removeClass('ui-disabled');
                         $('#graphsResetHistory').removeClass('ui-disabled');
                     }
                 },
 
+                /**
+                *
+                *  Disable History Feature
+                *   
+                */
                 disable: function() {
                     this.isEnabled = false;
                     Mist.monitoringController.request.customReset();
@@ -816,6 +930,11 @@ define('app/controllers/monitoring', [
                     $('#graphsResetHistory').addClass('ui-disabled');
                 },
 
+                /**
+                *
+                *   Resets history object to the default state
+                *   
+                */
                 reset: function() {
                     this.isEnabled       = false;
                     this.lastMetrictime  = null;

@@ -24,18 +24,32 @@ define('app/views/monitoring', [
             viewRendered: false,
             graphsCreated: false,
 
+            /**
+            * 
+            * Initialize monitoring view. Automatically called by ember
+            *
+            */
             init: function() {
                 this._super();
                 this.setUpGraphs();
             },
 
-            // Check If Ember View Rendered
+            /**
+            * 
+            * Called by ember when view is rendered
+            *
+            */
             didInsertElement: function(){
                 this._super();
                 this.set('viewRendered',true);
             },
 
-            // Check If Ember View Is Destroyed Or Disable Pressed
+            /**
+            * 
+            * Called by ember when view will be destroyed
+            * Stops data request and re-initializes enable button
+            *
+            */
             willDestroyElement: function(){
 
                 this._super();
@@ -47,6 +61,13 @@ define('app/views/monitoring', [
                 });
             },
 
+            /**
+            * 
+            * If monitoring is enabled Re-draws jqm components,
+            * creates graph instances, initializes controller and
+            * setups resize event
+            *
+            */
             setUpGraphs: function() {
 
                 var machine = this.get('controller').get('model');
@@ -70,7 +91,7 @@ define('app/views/monitoring', [
                         $('.graphBtn').hide(0); 
                         
                         self.createGraphs(10*60*1000);
-                        console.log("Graphs Created");
+                        
 
                         controller.initialize({
                             machineModel    : machine,      // Send Current Machine
@@ -92,6 +113,11 @@ define('app/views/monitoring', [
                 } 
             }.observes('controller.model.hasMonitoring','viewRendered'),
 
+            /**
+            * 
+            * Re-draws JQM Components of monitoring
+            *
+            */
             redrawJQMComponents: function(){
 
                 $('.monitoring-button').button();
@@ -120,6 +146,12 @@ define('app/views/monitoring', [
                 $('#graphsResetHistory').addClass('ui-disabled');
             },
 
+            /**
+            * 
+            * Creates graph instances
+            * @param {number} timeToDisplay  - The graphs timeWindow in miliseconds
+            *
+            */
             createGraphs: function(timeToDisplay){
 
                 // Get Width, -2 left & right border
@@ -138,10 +170,14 @@ define('app/views/monitoring', [
             },
             
 
-            /* Class: Graph
-            *  
-            * 
-            */
+            /**
+             * Represents a Graph.
+             * @constructor
+             * @param {string} divID            - The id of div element, this is where graphs will append
+             * @param {number} width            - The width of graph
+             * @param {number} timeToDisplayms  - The TimeWindow in miliseconds
+             * @param {string} yAxisValueFormat - Format for Left axis values ex. 10%
+             */
             Graph: function(divID,width,timeToDisplayms,yAxisValueFormat){
 
                     var NUM_OF_LABELS = 5;
@@ -203,10 +239,11 @@ define('app/views/monitoring', [
 
 
                     /**
-                    * Method: updateData
-                    * Gets Data From Controller, checks for overflow or less data received
-                    * fixes them and then updates Graph. If it is the first data data received
-                    * It appends Graph into div and then calls onInitialized
+                    * 
+                    * Checks for overflow or less data received fixes them and then updates Graph.
+                    * Also appends graphs on initial request
+                    * @param {number} timeToDisplay  - The graphs timeWindow in miliseconds
+                    *
                     */
                     this.updateData = function(newData) {
 
@@ -278,7 +315,7 @@ define('app/views/monitoring', [
 
 
                    /**
-                    * Method: clearData
+                    *
                     * Deletes current graph data
                     * 
                     */
@@ -288,7 +325,7 @@ define('app/views/monitoring', [
                     
 
                     /**
-                    * Method: updateView
+                    * 
                     * Updates graph by selecting data from data instance
                     * redraws value line, x-axis, labels and grid
                     */
@@ -307,6 +344,8 @@ define('app/views/monitoring', [
 
                             this.displayedData = this.data;
                         }
+
+                        
 
 
                         // If min & max == 0 y axis will not display values. max=1 fixes this.
@@ -455,9 +494,10 @@ define('app/views/monitoring', [
 
 
                     /**
-                    * Method: changeWidth
+                    * 
                     * Changes the width of svg element, sets new scale values
                     * and updates height to keep aspect ratio
+                    * @param {number} width - Graph new width
                     */
                     this.changeWidth = function (width) {
 
@@ -490,12 +530,23 @@ define('app/views/monitoring', [
                         this.updateView();
                     };
 
-
+                    /**
+                    *
+                    * Enables animation of graph
+                    *
+                    */
                     this.enableAnimation = function() {
 
                         this.animationEnabled = true;
                     };
 
+
+                    /**
+                    *
+                    * Stops current animation
+                    * Next update will be animated
+                    *
+                    */
                     this.stopCurrentAnimation = function() {
 
                          d3vLine.transition()
@@ -511,6 +562,12 @@ define('app/views/monitoring', [
                                .attr("transform", "translate(" + margin.left + "," + this.height + ")");
                     };
 
+
+                    /**
+                    *
+                    * Disables animation of graph
+                    * Also stops current animation
+                    */
                     this.disableAnimation = function() {
 
                         this.animationEnabled = false;
@@ -521,10 +578,11 @@ define('app/views/monitoring', [
                         this.animationEnabled = false;
                     };
 
+
                     /**
-                    * Method: getLastMeasurementTime
-                    * Returns null if there are no data
-                    * else last measurements time as Date object
+                    * 
+                    * Finds last measurement of graph data
+                    * @return {date} Measurements time or null on failure
                     */
                     this.getLastMeasurementTime = function(){
 
@@ -538,9 +596,9 @@ define('app/views/monitoring', [
 
 
                     /**
-                    * Method: getLastMeasurementTime
-                    * Returns graph's time window in seconds
                     * 
+                    * Current time window
+                    * @return {number} time window in seconds
                     */
                     this.getTimeWindow = function(){
 
@@ -548,6 +606,11 @@ define('app/views/monitoring', [
                     };
 
 
+                    /**
+                    * 
+                    * Last received values
+                    * @return {object} metric object or null on failure
+                    */
                     this.getLastValue = function(){
                         if(this.data)
                             return this.data[this.data.length - 1];
@@ -555,6 +618,12 @@ define('app/views/monitoring', [
                             return null;
                     }
 
+
+                    /**
+                    * 
+                    * Last visible metric
+                    * @return {object} metric object or null on failure
+                    */
                     this.getLastDisplayedValue = function(){
 
                         if(this.data){
@@ -585,7 +654,7 @@ define('app/views/monitoring', [
 
 
                     /**
-                    * Method: calcValueDistance
+                    * 
                     * Calculates the distance between the last two points
                     * Important for animated graph
                     */
@@ -602,9 +671,9 @@ define('app/views/monitoring', [
 
 
                     /*
-                    * Method: changeTimeToDisplay
-                    * Changes data that will be displayed and time of x-axis
-                    *
+                    * 
+                    * Changes time window
+                    * @param {number} newTimems - New timewindow in miliseconds
                     */
                     this.changeTimeToDisplay = function(newTimems){
 
@@ -619,9 +688,12 @@ define('app/views/monitoring', [
 
 
                     /*
-                    * Method: appendGraph
-                    * Appends the graph into the div id specified 
-                    * by constructor
+                    * 
+                    * Appends the graph into the DOM.
+                    * Graph will be inside the id specified.
+                    * @param {string} id     - the div where graph will be 
+                    * @param {number} width  - the width of the graph
+                    * @param {height} height - the height of the graph
                     */
                     function appendGraph(id,width,height){
                       
@@ -679,6 +751,11 @@ define('app/views/monitoring', [
                                      .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
                     }
 
+                    /*
+                    * 
+                    * Setups event listeners for mouse,
+                    * also creates interval for popup value update
+                    */
                     function setupMouseOver() {
 
                         // Append the Selector Line
@@ -776,7 +853,7 @@ define('app/views/monitoring', [
                             mouseX = event.pageX - $('#'+ self.id).children('svg').offset().left;
                             mouseY = event.pageY - $('#'+ self.id).children('svg').offset().top;
                             
-                                // Set Mouse Line Cordinates
+                            // Set Mouse Line Cordinates
                             mouseOverLine.attr('x1',"" + mouseX)
                                          .attr('x2',"" + mouseX);
                             $('#GraphsArea').children('.valuePopUp').css('left',(event.clientX+15) +"px");
@@ -813,12 +890,12 @@ define('app/views/monitoring', [
 
 
                     /*
-                    * Method: onInitialized
+                    * 
                     * Is being called after first data received and 
                     * svg elements are in the dom
                     */
                     function onInitialized(){
-                      // Run Stuff When Graph is appended and has first data
+                      
                       setupMouseOver();
                     }
 
