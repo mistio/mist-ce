@@ -58,9 +58,7 @@ div#splash div.mist-logo {
 }
 
 #backend-buttons .ui-controlgroup-controls {
-    display: inline;
-    float: left;
-    margin-bottom: 18px;
+    display: block;
 }
 
 
@@ -851,7 +849,8 @@ div.loading-monitoring {
 }
 
 .graph {
-    margin-top: 30px;
+    margin-top: 6px;
+    margin-bottom: 20px;
     border: 1px solid #ccc;
 }
 
@@ -897,8 +896,7 @@ div.loading-monitoring {
 
 .graphControls {
     width: 250px;
-    margin: 0 auto;
-    margin-bottom: -30px;   
+    margin: 0 auto; 
 } 
 
 #GraphsArea{
@@ -906,8 +904,7 @@ div.loading-monitoring {
 }
 
 #graphBar{
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin: 10px 0;
     min-height: 50px;
     border:1px solid #ccc;
     background: #e0e0e1;

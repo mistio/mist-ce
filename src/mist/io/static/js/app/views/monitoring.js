@@ -434,7 +434,7 @@ define('app/views/monitoring', [
                             d3vLine.attr("d", valueline(this.displayedData))
 
                             // Fix For Animation after time displayed changed
-                            if(this.timeUpdated)
+                            if(this.timeUpdated || !this.animationEnabled)
                             {
                                 this.timeUpdated = false;
 
@@ -485,6 +485,7 @@ define('app/views/monitoring', [
                                    
                         d3yAxisLine.attr('y2',""+ (this.height - margin.bottom +3));
                         
+                        updateMouseOverSize();
 
                         this.updateView();
                     };
@@ -678,7 +679,7 @@ define('app/views/monitoring', [
                                      .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
                     }
 
-                    function setupMouseOver(){
+                    function setupMouseOver() {
 
                         // Append the Selector Line
                         var mouseOverLine = d3svg.append('line')
@@ -804,6 +805,10 @@ define('app/views/monitoring', [
                         });
                         $('#' + self.id).children('svg').mouseleave(clearUpdatePopUp);
                         $('#' + self.id).children('svg').mousemove(updatePopUpOffset);
+                    }
+
+                    function updateMouseOverSize() {
+                        d3svg.select('.selectorLine').attr('y2',""+ (self.height - margin.bottom +3));
                     }
 
 
