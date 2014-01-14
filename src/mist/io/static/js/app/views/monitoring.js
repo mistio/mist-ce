@@ -691,9 +691,10 @@ define('app/views/monitoring', [
 
                         var mouseX = 0;
                         var mouseY = 0;
+                        var isVisible = false;
                         var updateInterval;
 
-                        var updatePopUpValue = function(){
+                        var updatePopUpValue = function(graph){
 
                                 // Check if mouse left from element without clearing interval
                                 if($($('#' + self.id).selector + ":hover").length <= 0)
@@ -705,7 +706,12 @@ define('app/views/monitoring', [
                                 // Update popup when it is over value line
                                 if(mouseX > margin.left)
                                 {
-
+                                    if(!isVisible){
+                                        
+                                        $(graph).find('.selectorLine').show(0);
+                                        $("#GraphsArea").find('.valuePopUp').show(0);
+                                        isVisible = true;
+                                    }
                                     // Mouse X inside value line area
                                     var virtualMouseX = mouseX - margin.left;
 
@@ -753,31 +759,35 @@ define('app/views/monitoring', [
 
                                     // Update Value Text
                                     $('#GraphsArea').children('.valuePopUp').text(valueText);
+                                } else {
+
+                                    if(isVisible){
+
+                                        $(graph).find('.selectorLine').hide(0);
+                                        $("#GraphsArea").find('.valuePopUp').hide(0);
+                                        isVisible = false;
+                                    }
                                 }
                         };
 
 
                         var updatePopUpOffset = function(event){
-                            mouseX = event.pageX - $('#'+ self.id).children('svg').offset().left
-                            mouseY = event.pageY - $('#'+ self.id).children('svg').offset().top
-                            if(mouseX > margin.left)
-                                {
-
-                                    // Set Mouse Line Cordinates
-                                    mouseOverLine
-                                         .attr('x1',"" + mouseX)
+                            mouseX = event.pageX - $('#'+ self.id).children('svg').offset().left;
+                            mouseY = event.pageY - $('#'+ self.id).children('svg').offset().top;
+                            
+                                // Set Mouse Line Cordinates
+                            mouseOverLine.attr('x1',"" + mouseX)
                                          .attr('x2',"" + mouseX);
-                                $('#GraphsArea').children('.valuePopUp').css('left',(event.clientX+15) +"px");
-                                $('#GraphsArea').children('.valuePopUp').css('top',(event.clientY-35)+"px");
+                            $('#GraphsArea').children('.valuePopUp').css('left',(event.clientX+15) +"px");
+                            $('#GraphsArea').children('.valuePopUp').css('top',(event.clientY-35)+"px");
 
-                                updatePopUpValue();
-                            }
-
+                            updatePopUpValue(this);
 
                         };
 
                         var clearUpdatePopUp = function() {
 
+                            isVisible = false;
                             $(this).find('.selectorLine').hide(0);
                             $("#GraphsArea").find('.valuePopUp').hide(0);
 
@@ -788,11 +798,7 @@ define('app/views/monitoring', [
 
                         // Mouse Events
                         $('#' + self.id).children('svg').mouseenter(function() {
-
-                            $(this).find('.selectorLine').show(0);
-                            $("#GraphsArea").find('.valuePopUp').show(0);
-
-
+                            
                             // Setup Interval
                             updateInterval = window.setInterval(updatePopUpValue,500);
                         });
