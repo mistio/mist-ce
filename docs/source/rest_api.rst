@@ -159,30 +159,28 @@ This is a detailed documentation of our API
       Vary: Accept
       Content-Type: application/json; charset=UTF-8
 
-
-
-    [
-       {
-           "state": "wait",
-           "apikey": "A09009NUMIQCIHA",
-           "title": "EC2 AP NORTHEAST",
-           "enabled": true,
-           "region": "",
-           "provider": "ec2_ap_northeast",
-           "poll_interval": 10000,
-           "id": "2tK74h4mXbj8nNohljLIzqc4SHn3"
-       },
-       {
-           "state": "wait",
-           "apikey": "myapikey",
-           "title": "Rackspace DFW",
-           "enabled": true,
-           "region": "dfw",
-           "provider": "rackspace",
-           "poll_interval": 10000,
-           "id": "3po809NuIjqiNgqqmDJAKSLWp6"
-       }
-    ]
+        [
+           {
+               "state": "wait",
+               "apikey": "A09009NUMIQCIHA",
+               "title": "EC2 AP NORTHEAST",
+               "enabled": true,
+               "region": "",
+               "provider": "ec2_ap_northeast",
+               "poll_interval": 10000,
+               "id": "2tK74h4mXbj8nNohljLIzqc4SHn3"
+           },
+           {
+               "state": "wait",
+               "apikey": "myapikey",
+               "title": "Rackspace DFW",
+               "enabled": true,
+               "region": "dfw",
+               "provider": "rackspace",
+               "poll_interval": 10000,
+               "id": "3po809NuIjqiNgqqmDJAKSLWp6"
+           }
+        ]
 
 .. http:post:: /backends
 
@@ -221,7 +219,12 @@ This is a detailed documentation of our API
             "apiurl":"http://37.58.77.91:5000/v2.0",
             "tenant_name":"admin"
         }
+        
    **Example response**:
+
+      HTTP/1.1 200 OK
+      Vary: Accept
+      Content-Type: application/json; charset=UTF-8
 
    .. sourcecode:: http
 
