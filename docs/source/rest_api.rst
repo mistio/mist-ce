@@ -170,17 +170,72 @@ This is a detailed documentation of our API
            "region": "",
            "provider": "ec2_ap_northeast",
            "poll_interval": 10000,
-           "id": "2tK74h4mXbjqXfKQxESgzqc4SHn3"
+           "id": "2tK74h4mXbj8nNohljLIzqc4SHn3"
        },
        {
            "state": "wait",
-           "apikey": "unwebme",
+           "apikey": "myapikey",
            "title": "Rackspace DFW",
            "enabled": true,
            "region": "dfw",
            "provider": "rackspace",
            "poll_interval": 10000,
-           "id": "3YuLqA3p3QnjqiNgqqmDJAKSLWp6"
+           "id": "3po809NuIjqiNgqqmDJAKSLWp6"
        }
     ]
+
+.. http:post:: /backends
+
+   Add Backend
+
+   **Example request**:
+
+    Add EC2 Backend
+
+   .. sourcecode:: http
+
+      POST /backends
+      Host: mist.io
+      Accept: application/json; charset=UTF-8
+
+        {
+            "title":"EC2 AP Sydney",
+            "provider":"ec2_ap_southeast_2",
+            "apikey":"OLNPOIJBIUMIQCIHA",
+            "apisecret":"1R6vxKnub0087JKHgjhguy90ur"
+        }
+
+   Add Openstack Backend
+
+   .. sourcecode:: http
+
+      POST /backends
+      Host: mist.io
+      Accept: application/json; charset=UTF-8
+
+        {
+            "title":"OpenStack",
+            "provider":"openstack",
+            "apikey":"admin",
+            "apisecret":"mist",
+            "apiurl":"http://37.58.77.91:5000/v2.0",
+            "tenant_name":"admin"
+        }
+   **Example response**:
+
+   .. sourcecode:: http
+
+        {
+           "status": "off",
+           "tenant_name": "",
+           "id": "48emAUzL9teVYhkyJc9koRaPXEDp",
+           "index": 2,
+           "apikey": "OLNPOIJBIUMIQCIHA",
+           "title": "EC2 AP Sydney",
+           "region": "",
+           "poll_interval": 10000,
+           "apiurl": "",
+           "provider": "ec2_ap_southeast_2",
+           "enabled": true
+        }
 
