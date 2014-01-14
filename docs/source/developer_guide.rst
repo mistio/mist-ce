@@ -1,7 +1,6 @@
 Developer Guide
 ***************
 
-This will contain instructions for developers of the application.
 
 Installation
 ============
@@ -109,6 +108,10 @@ The tests_config.yaml will seem like this at first::
     COOKIE:
 
 You then add your credentials for every backend *(in case you don't have credentials for a backend it will not be added)*
+
+To actually run the tests::
+
+    ./bin/nosetests -w src/mist/io/tests
 
 Documentation
 =============
