@@ -22,45 +22,45 @@
     <div id="cpuGraph" class="graph">
         <div class='header'>
           <div class="title">CPU</div>
-          <div class='closeBtn' {{action "clickedCollapse" view.graphs.cpu target="view"}}>-</div>
+          <div class='closeBtn' {{action "collapsePressed" view.graphs.cpu.name target="Mist.monitoringController.UI"}}>-</div>
         </div>
     </div>
     <div id="loadGraph" class="graph">
         <div class='header'>
           <div class="title">Load</div>
-          <div class='closeBtn' {{action "clickedCollapse" view.graphs.load target="view"}}>-</div>
+          <div class='closeBtn' {{action "collapsePressed" view.graphs.load.name target="Mist.monitoringController.UI"}}>-</div>
         </div>
     </div>
-    <div id="memGraph" class="graph">
+    <div id="memoryGraph" class="graph">
         <div class='header'>
           <div class="title">Memory</div>
-          <div class='closeBtn' {{action "clickedCollapse" view.graphs.memory target="view"}}>-</div>
+          <div class='closeBtn' {{action "collapsePressed" view.graphs.memory.name target="Mist.monitoringController.UI"}}>-</div>
         </div>
     </div>
     <div id="diskReadGraph" class="graph">
         <div class='header'>
           <div class="title">Disk Read (B/s)</div>
-          <div class='closeBtn' {{action "clickedCollapse" view.graphs.diskRead target="view"}}>-</div>
+          <div class='closeBtn' {{action "collapsePressed" view.graphs.diskRead.name target="Mist.monitoringController.UI"}}>-</div>
         </div>
     </div>
     <div id="diskWriteGraph" class="graph">
         <div class='header'>
           <div class="title">Disk Write (B/s)</div>
-          <div class='closeBtn' {{action "clickedCollapse" view.graphs.diskWrite target="view"}}>-</div>
+          <div class='closeBtn' {{action "collapsePressed" view.graphs.diskWrite.name target="Mist.monitoringController.UI"}}>-</div>
         </div>
     </div>
 
     <div id="networkTXGraph" class="graph">
         <div class='header'>
           <div class="title">Network Tx (B/s)</div>
-          <div class='closeBtn' {{action "clickedCollapse" view.graphs.networkTX target="view"}}>-</div>
+          <div class='closeBtn' {{action "collapsePressed" view.graphs.networkTX.name target="Mist.monitoringController.UI"}}>-</div>
         </div>
     </div>
 
     <div id="networkRXGraph" class="graph">
         <div class='header'>
           <div class="title">Network Rx (B/s)</div>
-          <div class='closeBtn' {{action "clickedCollapse" view.graphs.networkRX target="view"}}>-</div>
+          <div class='closeBtn' {{action "collapsePressed" view.graphs.networkRX.name target="Mist.monitoringController.UI"}}>-</div>
         </div>
     </div>
 
@@ -69,37 +69,37 @@
     <div id="graphBar">
         <div id="cpuGraphBtn" class="graphBtn">
             <button data-icon="plus" data-theme="c" 
-                {{action "clickedExpand" view.graphs.cpu target="view"}}>CPU</button>
+                {{action "expandPressed" view.graphs.cpu.name target="Mist.monitoringController.UI"}}>CPU</button>
         </div>
 
         <div id="loadGraphBtn" class="graphBtn">
             <button data-icon="plus" data-theme="c"
-                {{action "clickedExpand" view.graphs.load target="view"}}>Load</button>
+                {{action "expandPressed" view.graphs.load.name target="Mist.monitoringController.UI"}}>Load</button>
         </div>
     
-        <div id="memGraphBtn" class="graphBtn">
+        <div id="memoryGraphBtn" class="graphBtn">
             <button data-icon="plus" data-theme="c"
-                {{action "clickedExpand" view.graphs.memory target="view"}}>Memory</button>
+                {{action "expandPressed" view.graphs.memory.name target="Mist.monitoringController.UI"}}>Memory</button>
         </div>
     
         <div id="diskReadGraphBtn" class="graphBtn">
             <button data-icon="plus" data-theme="c"
-                {{action "clickedExpand" view.graphs.diskRead target="view"}}>Disk Read</button>
+                {{action "expandPressed" view.graphs.diskRead.name target="Mist.monitoringController.UI"}}>Disk Read</button>
         </div>
     
         <div id="diskWriteGraphBtn" class="graphBtn">
             <button data-icon="plus" data-theme="c"
-                {{action "clickedExpand" view.graphs.diskWrite target="view"}}>Disk Write</button>
+                {{action "expandPressed" view.graphs.diskWrite.name target="Mist.monitoringController.UI"}}>Disk Write</button>
         </div>
     
         <div id="networkTXGraphBtn" class="graphBtn">
             <button data-icon="plus" data-theme="c"
-                {{action "clickedExpand" view.graphs.networkTX target="view"}}>Network Tx</button>
+                {{action "expandPressed" view.graphs.networkTX.name target="Mist.monitoringController.UI"}}>Network Tx</button>
         </div>
     
         <div  id="networkRXGraphBtn" class="graphBtn">
             <button data-icon="plus" data-theme="c"
-                {{action "clickedExpand" view.graphs.networkRX target="view"}}>Network Rx</button>
+                {{action "expandPressed" view.graphs.networkRX.name target="Mist.monitoringController.UI"}}>Network Rx</button>
         </div>
     </div>
 </div>

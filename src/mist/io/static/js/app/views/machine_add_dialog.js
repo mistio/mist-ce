@@ -180,7 +180,7 @@ define('app/views/machine_add_dialog', [
                         return false; 
                     }                       
                 }                
-                if (providerName.startsWith('HP Cloud')) { 
+                if (providerName.substring(0,8) == 'HP Cloud') { 
                     var re = /^[0-9a-zA-Z_-]*$/; 
                     if (!re.test(machineName)) {
                         Mist.notificationController.timeNotify("Server names may only contain letters, numbers, and the underscore and dash characters.  ", 7000);
