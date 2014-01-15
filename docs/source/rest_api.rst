@@ -18,3 +18,12 @@ Keys Actions
 
 .. include:: keys_api.rst
 
+Images Actions
+--------------
+
+.. include:: images_api.rst
+
+Machines Actions
+----------------
+
+.. include:: machines_api.rst
