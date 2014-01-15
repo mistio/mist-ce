@@ -34,9 +34,13 @@
     margin-left: -18px;
     font-weight: normal;
 }
+.machine-leds {
+    width: 45px !important;
+    float: right;
+    margin-right: 5px;
+}
 .machine-tags {
-    width:40% !important;
-    text-align: right;
-    position: relative;
-    bottom: 8px;
+    float: right;
+    margin-right: 27px;
+    width: auto !important;
 }

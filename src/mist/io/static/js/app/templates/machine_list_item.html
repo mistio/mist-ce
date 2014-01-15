@@ -11,13 +11,8 @@
                 {{view.machine.state}}
                 </span>
             </span>
-            
-            <div class="ui-block-c machine-tags">  
-                <span class="tag">{{view.machine.backend.title}}</span>
-    
-                {{#each view.machine.tags}}
-                <span class="tag">{{this}}</span>
-                {{/each}}
+
+            <div class="ui-block-c machine-leds">  
                 <span>
                     {{#if view.machine.hasMonitoring}}
                         <span></span>
@@ -28,16 +23,31 @@
                     <div class='ajax-loader'></div>
                 {{else}} 
                     {{#if probing}}
-                        <span></span>                
+                            <div class="led probing"></div>
+                            <div class="led probing"></div>
+                            <div class="led probing"></div>             
                     {{else}} 
                         {{#if probed}}
-                        <span></span>
+                            <div {{bind-attr class="loadavg1 :led" }}></div>
+                            <div {{bind-attr class="loadavg5 :led"}}></div>
+                            <div {{bind-attr class="loadavg15 :led"}}></div>
                         {{else}}
-                        <span></span>
+                            <div class="led"></div>
+                            <div class="led"></div>
+                            <div class="led"></div>
                         {{/if}} 
                     {{/if}} 
-                {{/if}}                
+                {{/if}}   
+                
             </div>
+            
+            <div class="ui-block-c machine-tags">              
+                <span class="tag">{{view.machine.backend.title}}</span>
+                {{#each view.machine.tags}}
+                <span class="tag">{{this}}</span>
+                {{/each}}             
+            </div>    
+                                
         </div>
     {{/link-to}}
     

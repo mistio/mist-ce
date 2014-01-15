@@ -31,8 +31,16 @@ define('app/models/machine', ['ember'],
             state: 'stopped',
             stats:{'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
+            
+            loadavg: null,            
+            loadavg1: null,            
+            loadavg5: null,            
+            loadavg15: null,
 
-
+            image: function() {
+                return this.backend.images.getImage(this.imageId);
+            }.property('imageId'),
+            
             /**
              * 
              *  Initialization
@@ -42,11 +50,6 @@ define('app/models/machine', ['ember'],
             load: function() {
                 this.probe();
             }.on('init'),
-
-            image: function() {
-                return this.backend.images.getImage(this.imageId);
-            }.property('imageId'),
-
 
             shutdown: function() {
                 Mist.backendsController.shutdownMachine(this.id);
