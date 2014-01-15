@@ -27,3 +27,8 @@ Machines Actions
 ----------------
 
 .. include:: machines_api.rst
+
+Shell
+-----
+
+.. include:: shell_api.rst
