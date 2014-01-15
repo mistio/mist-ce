@@ -1,7 +1,14 @@
 RESTful API Documentation
 *************************
 
-This is a detailed documentation of our API
+You can use this API either by setting up your own installation of mist
+as described in our *Developer Guide* or by using our
+service at https://mist.io
+
+Authenticate through https://mist.io
+------------------------------------
+
+.. include:: login_api.rst
 
 Supported Providers
 -------------------
