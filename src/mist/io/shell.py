@@ -33,13 +33,14 @@ class Shell(object):
     hood it uses paramiko.
 
     Use it like:
-        shell = Shell('localhost', username='root', password='123')
-        print shell.command('uptime')
+    shell = Shell('localhost', username='root', password='123')
+    print shell.command('uptime')
+    
     Or:
-        shell = Shell('localhost')
-        shell.autoconfigure(user, backend_id, machine_id)
-        for line in shell.command_stream('ps -fe'):
-            print line
+    shell = Shell('localhost')
+    shell.autoconfigure(user, backend_id, machine_id)
+    for line in shell.command_stream('ps -fe'):
+    print line
 
     """
 

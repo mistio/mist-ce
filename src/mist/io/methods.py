@@ -1013,9 +1013,9 @@ def start_machine(user, backend_id, machine_id):
     """Starts a machine on backends that support it.
 
     Currently only EC2 supports that.
-    .. note:: Normally try won't get an AttributeError exception because this
-              action is not allowed for machines that don't support it. Check
-              helpers.get_machine_actions.
+    Normally try won't get an AttributeError exception because this
+    action is not allowed for machines that don't support it. Check
+    helpers.get_machine_actions.
 
     """
     _machine_action(user, backend_id, machine_id, 'start')
@@ -1025,9 +1025,9 @@ def stop_machine(user, backend_id, machine_id):
     """Stops a machine on backends that support it.
 
     Currently only EC2 supports that.
-    .. note:: Normally try won't get an AttributeError exception because this
-              action is not allowed for machines that don't support it. Check
-              helpers.get_machine_actions.
+    Normally try won't get an AttributeError exception because this
+    action is not allowed for machines that don't support it. Check
+    helpers.get_machine_actions.
 
     """
     _machine_action(user, backend_id, machine_id, 'stop')
