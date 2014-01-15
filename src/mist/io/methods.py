@@ -281,7 +281,7 @@ def edit_key(user, new_key, old_key):
 
 
 @core_wrapper
-def associate_key(user, key_id, backend_id, machine_id, host=None):
+def associate_key(user, key_id, backend_id, machine_id, host=''):
     """Associates a key with a machine.
 
     If host is set it will also attempt to actually deploy it to the
@@ -290,7 +290,10 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
 
     """
 
-    log.info("Associating key, deploy = %s" % host)
+    log.info("Associating key %s to host %s", key_id, host)
+    if not host:
+        log.info("Host not given so will only create association without "
+                 "actually deploying the key to the server.")
     if key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
     if backend_id not in user.backends:
@@ -300,57 +303,59 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
     machine_uid = [backend_id, machine_id]
 
     # check if key already associated
+    associated = False
     for machine in keypair.machines:
         if machine[:2] == machine_uid:
             log.warning("Keypair '%s' already associated with machine '%s' "
                         "in backend '%s'", key_id, backend_id, machine_id)
-            # if host given, check if it is actually deployed
-            if host:
-                try:
-                    ssh_command(user, backend_id, machine_id, host,
-                                'uptime', key_id=key_id)
-                except MachineUnauthorizedError:
-                    log.warning("Keypair isn't actually deployed, "
-                                "will try to redeploy.")
-                else:
-                    return
-
-    # assume key is already deployed
-    try:
-        ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
-        log.info("Key already associated.")
+            associated = True
+    # if not already associated, create the association
+    # this is only needed if association doesn't exist and host is not provided
+    # associations will otherwise be created by shell.autoconfigure upon
+    # succesful connection
+    if not host:
+        if not associated:
+            with user.lock_n_load():
+                user.keypairs[key_id].machines.append(machine_uid)
+                user.save()
         return
-    except:
-        pass
 
     # if host is specified, try to actually deploy
-    if host:
-        log.info("Deploying key to machine.")
-        filename = '~/.ssh/authorized_keys'
-        grep_output = '`grep \'%s\' %s`' % (keypair.public, filename)
-        new_line_check_cmd = (
-            'if [ "$(tail -c1 %(file)s; echo x)" != "\\nx" ];'
-            ' then echo "" >> %(file)s; fi' % {'file': filename}
-        )
-        append_cmd = ('if [ -z "%s" ]; then echo "%s" >> '
-                   '%s; fi'
-                   % (grep_output, keypair.public, filename))
-        command = new_line_check_cmd + " ; " + append_cmd
-        log.debug("command = %s", command)
+    log.info("Deploying key to machine.")
+    filename = '~/.ssh/authorized_keys'
+    grep_output = '`grep \'%s\' %s`' % (keypair.public, filename)
+    new_line_check_cmd = (
+        'if [ "$(tail -c1 %(file)s; echo x)" != "\\nx" ];'
+        ' then echo "" >> %(file)s; fi' % {'file': filename}
+    )
+    append_cmd = ('if [ -z "%s" ]; then echo "%s" >> %s; fi'
+                  % (grep_output, keypair.public, filename))
+    command = new_line_check_cmd + " ; " + append_cmd
+    log.debug("command = %s", command)
 
+    try:
+        # deploy key
+        ssh_command(user, backend_id, machine_id, host, command)
+    except MachineUnauthorizedError:
+        # couldn't deploy key
         try:
-            ssh_command(user, backend_id, machine_id, host, command)
+            # maybe key was already deployed?
+            ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
+            log.info("Key was already deployed, local association created.")
         except MachineUnauthorizedError:
-            raise MachineUnauthorizedError("Couldn't connect to "
-                                           "deploy new SSH keypair.")
-
-    # attemp to connect with new key
-    # if it fails to connect it'll raise exception
-    # there is no need to manually set the association in keypair.machines
-    # that is automatically handled by Shell, if it is configured by
-    # shell.autoconfigure (which ssh_command does)
-    if host:
+            # oh screw this
+            raise MachineUnauthorizedError(
+                "Couldn't connect to deploy new SSH keypair."
+            )
+    else:
+        # deployment probably succeeded
+        # attemp to connect with new key
+        # if it fails to connect it'll raise exception
+        # there is no need to manually set the association in keypair.machines
+        # that is automatically handled by Shell, if it is configured by
+        # shell.autoconfigure (which ssh_command does)
         ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
+        log.info("Key associated and deployed succesfully.")
 
 
 @core_wrapper
@@ -679,6 +684,7 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
         raise MachineCreationError("Rackspace, got exception %s" % e)
     return node
 
+
 def _create_machine_openstack(conn, private_key, public_key, script, machine_name,
                              image, size, location):
     """Create a machine in Openstack.
@@ -988,7 +994,7 @@ def _machine_action(user, backend_id, machine_id, action):
                     ssh_command(user, backend_id, machine_id, hostname, command)
                     return True
                 except:
-                    return False            
+                    return False
             else:
                 machine.reboot()
         elif action is 'destroy':
