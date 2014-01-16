@@ -42,14 +42,11 @@ define('app/controllers/login', ['ember'],
                 this.set('loggingIn', true);
                 Mist.ajax.POST('/auth', {
                     'email': this.email,
-                    'password': this.password,
+                    'password': CryptoJS.SHA256(this.password).toString(),
                 }).success(function(data) {
-                    Mist.set('authenticated', true);
-                    Mist.set('current_plan', data.current_plan);
-                    Mist.set('user_details', data.user_details);
-                    if (!Mist.monitored_machines) {
-                        Mist.set('monitored_machines', []);
-                    }
+                    Ember.run.next(function() {
+                        window.location.reload();
+                    });
                 }).error(function() {
                     Mist.notificationController.warn('Authentication error');
                 }).complete(function(success, data) {
@@ -60,7 +57,7 @@ define('app/controllers/login', ['ember'],
 
 
             logout: function() {
-                Mist.ajax.GET('/logout');
+                window.location.hash = '/logout';
             },
 
 
