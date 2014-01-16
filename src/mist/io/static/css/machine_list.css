@@ -9,6 +9,7 @@
 }
 #machine-list-page #select-machines-btn {
     float: left;
+    font-weight: normal;
 }
 .running {
     color: #13B754;

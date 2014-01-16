@@ -25,7 +25,7 @@
     position: absolute;
     left: 0;
     top: 0;
-    background-color: black;
+    background: linear-gradient( #3c3c3c /*{a-bar-background-start}*/, #111 /*{a-bar-background-end}*/) /*{b-bar-background-color}*/;
     z-index: 100000;
 }
 .mist-logo {
@@ -304,9 +304,10 @@ ul.checkbox-list .ui-grid-b {
 -----------------------------------------------------------------------------------------------------------*/
 #me-btn {
     background: transparent;
-    margin-top: -4px;
+    margin-top: -3px;
     height: 42px;
     padding: 0px;
+    border-width: 0px;
 }
 
 #me-btn img {

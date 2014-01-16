@@ -1,16 +1,25 @@
-<div id="add-backend-panel" class="side-panel" data-role="panel" data-position="right" data-display="overlay">
+<div id="add-backend-panel" 
+     class="side-panel" 
+     data-role="panel" 
+     data-position="right" 
+     data-display="overlay"
+     data-theme="b">
 
     <div data-role="header">
         <h1>Add backend</h1>
     </div>
 
-    <div data-role="content">
+    <div data-role="content" data-theme="b">
 
         <label>1. Provider:</label>
-        <div id="new-backend-provider" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d" 
-                                                                                    data-expanded-icon="arrow-u">
+        <div id="new-backend-provider" 
+             data-role="collapsible" 
+             data-iconpos="right" 
+             data-collapsed-icon="arrow-d" 
+             data-expanded-icon="arrow-u"
+             data-theme="a">
             <h2>{{Mist.backendAddController.newBackendProvider.title}}</h2>
-            <ul class="select-listmenu" data-role="listview">
+            <ul class="select-listmenu" data-role="listview" data-theme="a">
                 {{#each Mist.backendsController.providerList}}
                 <li data-icon="false">
                     <a {{action "selectProvider" this target="view"}}>{{this.title}}</a>
@@ -18,19 +27,19 @@
                 {{/each}}
             </ul>
         </div>
-
-        <label for="new-backend-first-field">2. {{view.firstFieldLabel}}:</label>
-        {{view Mist.TextField
-               id="new-backend-first-field"
-               valueBinding="Mist.backendAddController.newBackendFirstField"}}
-
-        <label for="new-backend-second-field">3. {{view.secondFieldLabel}}:</label>
-        {{view Mist.TextField
-               type="password"
-               id="new-backend-second-field"
-               valueBinding="Mist.backendAddController.newBackendSecondField"}}
-
-        <div id="openstack-bundle">
+        <div data-theme="a">
+            <label for="new-backend-first-field">2. {{view.firstFieldLabel}}:</label>
+            {{view Mist.TextField
+                   id="new-backend-first-field"
+                   valueBinding="Mist.backendAddController.newBackendFirstField"}}
+    
+            <label for="new-backend-second-field">3. {{view.secondFieldLabel}}:</label>
+            {{view Mist.TextField
+                   type="password"
+                   id="new-backend-second-field"
+                   valueBinding="Mist.backendAddController.newBackendSecondField"}}
+        </div>
+        <div id="openstack-bundle" data-theme="a">
             <label for="new-backend-openstack-url">4. Auth URL:</label>
             {{view Mist.TextField
                    id="new-backend-openstack-url"
@@ -39,6 +48,7 @@
             <label for="new-backend-openstack-tenant">5. Tenant Name:</label>
             {{view Mist.TextField
                    id="new-backend-openstack-tenant"
+                   data-theme="a"
                    valueBinding="Mist.backendAddController.newBackendOpenStackTenant"}}
         </div>
 
@@ -47,8 +57,8 @@
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
-            <button id="add-backend-ok" data-theme="b" {{action "doneClicked" target="view"}}>Done</a>
+            <a data-role="button" {{action "backClicked" target="view"}} data-theme="a">Back</a>
+            <button id="add-backend-ok" data-theme="d" {{action "doneClicked" target="view"}}>Done</a>
         </div>
     </div>
 </div>
