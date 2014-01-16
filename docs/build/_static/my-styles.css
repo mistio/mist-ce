@@ -11,4 +11,9 @@ dt:active {
 }
 dt:hover {
     background: -moz-linear-gradient(center top , #DFDFDF 5%, #EDEDED 100%) repeat scroll 0 0 #DFDFDF;
+    cursor: pointer;
+}
+
+a.headerlink {
+    display: none;
 }
