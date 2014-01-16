@@ -40,7 +40,7 @@ Shell
 
 .. include:: shell_api.rst
 
-Status Codes
+Error Codes
 -----------
 
 .. include:: error_api.rst
