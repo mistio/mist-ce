@@ -68,6 +68,8 @@
                         {{action addRuleClicked target="view"}}>Add Rule</button>
                 </div>
                 
+                {{view Mist.MonitoringView}} 
+
                 <a data-role="button" {{action "disableClicked" target="view"}}>Disable</a>
                 <div class="ui-loader ui-corner-all ui-body-b ui-loader-verbose">
                     <span class="ui-icon ui-icon-loading"></span>
@@ -76,7 +78,7 @@
                 {{else}}
                 <div id="monitoring-disabled">
                     <p>Monitoring is currently disabled</p>
-                    <a data-role="button" data-icon="star" data-theme="b" {{action "enabledClicked" target="view"}}>Enable</a>
+                    <a data-role="button" data-icon="star" data-theme="b" {{action "enableMonitoringClicked" target="view"}}>Enable</a>
                 </div>
                 {{/if}}
     

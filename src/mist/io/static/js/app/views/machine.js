@@ -154,6 +154,45 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 shellClicked: function () {
                     //Mist.machineShellController.open(this.machine);
                 },
+
+                enableMonitoringClicked: function () {
+
+                    var self = this;
+
+                    // if machine id = '' setTimeout for next enabling because real machine is not yet loaded
+                    var enableMonitoring = function () {
+
+                        // Wait until machine is available
+                        var machine = self.get('controller').get('model');
+                        if(machine.id == '') {
+
+                            console.log("Waiting..");
+                            window.setTimeout(enableMonitoring,2000);
+
+                        } else {
+
+                            console.log("Going To Controller For Enabling Monitoring");
+                            machine.openMonitoringDialog();
+                        } 
+                    };
+
+                    if(Mist.authenticated)
+                        enableMonitoring();
+                    else {
+                        $("#login-dialog").show();
+                        $("#login-dialog").popup('open');
+                    }
+                },
+
+                buttonBackMonitoring: function() {
+                     $("#monitoring-dialog").popup('close');
+                },
+
+                buttonChangeMonitoring: function() {
+                    var machine = this.get('controller').get('model');
+                    machine.changeMonitoring();
+                    $("#monitoring-dialog").popup('close');
+                }
             },
 
 /*
