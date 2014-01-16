@@ -86,6 +86,7 @@ class Backend(OODict):
     apisecret = StrField()
     title = StrField()
     tenant_name = StrField()
+    auth_version = StrField()
     region = StrField()
     poll_interval = IntField(10000)
     provider = StrField()
@@ -176,7 +177,7 @@ class User(DalUser):
     """
 
     email = StrField()
-    password = StrField()
+    mist_api_token = StrField()
     backends = make_field(Backends)()
     keypairs = make_field(Keypairs)()
 

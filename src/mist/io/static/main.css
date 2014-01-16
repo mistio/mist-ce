@@ -23,7 +23,7 @@ div#splash {
 div#splash div.mist-logo {
     width: 280px;
     height: 280px;
-    background: url('images/logo_christmas.png') center no-repeat;
+    background: url('logo_splash.png') center no-repeat;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -58,9 +58,7 @@ div#splash div.mist-logo {
 }
 
 #backend-buttons .ui-controlgroup-controls {
-    display: inline;
-    float: left;
-    margin-bottom: 18px;
+    display: block;
 }
 
 
@@ -616,11 +614,13 @@ div.ember-view div.ui-panel-content-wrap {
 /* Machine single View */
 
 #single-view-state {
-   font-weight: normal;
-    left: 50%;
-    margin-bottom: 0;
+    font-weight: normal;
     margin-top: 20px;
+    margin-bottom: 0px;
     text-shadow: none;
+    left: 20%;
+    text-align: left;
+    position: relative;
 }
 
 #key-icon-wrapper {
@@ -849,12 +849,14 @@ div.loading-monitoring {
 }
 
 .graph {
-    margin-top: 30px;
+    margin-top: 6px;
+    margin-bottom: 20px;
     border: 1px solid #ccc;
 }
 
 #GraphsArea .valuePopUp{
     position:fixed; 
+    z-index: 1;
     display: none;
     left:0; 
     top:0; 
@@ -892,13 +894,17 @@ div.loading-monitoring {
     stroke-width: 1;    
 }
 
+.graphControls {
+    width: 250px;
+    margin: 0 auto; 
+} 
+
 #GraphsArea{
     white-space: normal;
 }
 
 #graphBar{
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin: 10px 0;
     min-height: 50px;
     border:1px solid #ccc;
     background: #e0e0e1;

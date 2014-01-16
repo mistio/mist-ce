@@ -315,13 +315,9 @@ define('app/views/machine', [
 
             doLogin: function() {
                 //sends email, passwords and check if auth is ok
-                var d = new Date();
-                var nowUTC = String(d.getTime() + d.getTimezoneOffset()*60*1000);
                 var payload = {
                     'email': Mist.email,
-                    'password': CryptoJS.SHA256(Mist.password).toString(),
-                    'timestamp': nowUTC,
-                    'hash': CryptoJS.SHA256(Mist.email + ':' + nowUTC + ':' + CryptoJS.SHA256(Mist.password).toString()).toString()
+                    'password': Mist.password,
                 };
                 $("#login-dialog .ajax-loader").show();
                 $.ajax({

@@ -77,8 +77,6 @@ class Shell(object):
 
         """
 
-        log.info("Attempting to connect to %s@%s:%s.",
-                 username, self.host, port)
         if not key and not password:
             raise RequiredParameterMissingError("neither key nor password "
                                                 "provided.")
@@ -102,6 +100,7 @@ class Shell(object):
                     look_for_keys=False,
                     timeout=10
                 )
+                break
             except paramiko.AuthenticationException as exc:
                 log.error("ssh exception %r", exc)
                 raise MachineUnauthorizedError("Couldn't connect to %s@%s:%s. %s"
@@ -110,7 +109,6 @@ class Shell(object):
                 log.error("Got ssh error: %r", exc)
                 if not attempts:
                     raise ServiceUnavailableError("SSH timed-out repeatedly.")
-
 
     def disconnect(self):
         """Close the SSH connection."""
@@ -254,6 +252,8 @@ class Shell(object):
                         users.append(name)
             for ssh_user in users:
                 try:
+                    log.info("ssh -i %s %s@%s",
+                             key_id, ssh_user, self.host)
                     self.connect(username=ssh_user,
                                  key=keypair.private,
                                  password=password)

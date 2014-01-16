@@ -348,12 +348,8 @@ define('app/models/machine', [
                         warn('no auth credentials!');
                         return false;
                     }
-                    var d = new Date();
-                    var nowUTC = String(d.getTime() + d.getTimezoneOffset()*60*1000);
                     payload['email'] = Mist.email;
-                    payload['timestamp'] = nowUTC;
-                    payload['pass'] = CryptoJS.SHA256(Mist.password).toString();
-                    payload['hash'] = CryptoJS.SHA256(Mist.email + ':' + nowUTC + ':' + CryptoJS.SHA256(Mist.password).toString()).toString();
+                    payload['password'] = Mist.password;
                 }
 
                 var that = this;

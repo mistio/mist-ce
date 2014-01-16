@@ -63,3 +63,10 @@ def b58_encode(num):
     if (num):
         encode = alphabet[num] + encode
     return encode
+
+
+def get_auth_header(user):
+    """The value created here is added as an "Authorization" header in HTTP
+    requests towards the hosted mist core service.
+    """
+    return "mist_1 %s:%s" % (user.email, user.mist_api_token)

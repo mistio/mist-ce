@@ -179,7 +179,14 @@ define('app/views/machine_add_dialog', [
                         Mist.notificationController.timeNotify("Characters allowed are a-z, A-Z, 0-9, . and -", 7000);
                         return false; 
                     }                       
-                }
+                }                
+                if (providerName.substring(0,8) == 'HP Cloud') { 
+                    var re = /^[0-9a-zA-Z_-]*$/; 
+                    if (!re.test(machineName)) {
+                        Mist.notificationController.timeNotify("Server names may only contain letters, numbers, and the underscore and dash characters.  ", 7000);
+                        return false;
+                    }
+                }                
                 if (providerName == 'Linode') {                
                     var re = /^[0-9a-zA-Z-_]*$/; 
                     if (!re.test(machineName)) {

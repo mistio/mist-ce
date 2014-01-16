@@ -18,21 +18,22 @@ import requests
 import json
 
 from pyramid.response import Response
-from pyramid.view import view_config
-
 
 try:
     from mist.core import config
     from mist.core.helpers import user_from_request
+    from mist.core.helpers import view_config
 except ImportError:
     from mist.io import config
     from mist.io.helpers import user_from_request
+    from pyramid.view import view_config
 
 from mist.io import methods
 from mist.io.model import Keypair
 from mist.io.shell import Shell
 import mist.io.exceptions as exceptions
 from mist.io.exceptions import *
+from mist.io.helpers import get_auth_header
 
 
 log = logging.getLogger(__name__)
@@ -107,25 +108,21 @@ def check_auth(request):
     params = request.json_body
     email = params.get('email', '').lower()
     password = params.get('password', '')
-    # timestamp = params.get('timestamp', '')
-    # hash_key = params.get('hash', '')
 
     payload = {'email': email, 'password': password}
-               # 'timestamp': timestamp, 'hash_key': hash_key}
-    core_uri = config.CORE_URI
-    ret = requests.post(core_uri + '/auth', params=payload, verify=False)
-
+    ret = requests.post(config.CORE_URI + '/auth', params=payload, verify=False)
     if ret.status_code == 200:
-        ret = json.loads(ret.content)
+        ret_dict = json.loads(ret.content)
         user = user_from_request(request)
         with user.lock_n_load():
             user.email = email
-            user.password = password
+            user.mist_api_token = ret_dict.pop('mist_api_token', '')
             user.save()
         request.registry.settings['auth'] = 1
         log.info("succesfully check_authed")
-        return ret
+        return ret_dict
     else:
+        log.error("Couldn't check_auth to mist.io: %r", ret)
         raise UnauthorizedError()
 
 
@@ -136,15 +133,15 @@ def update_user_settings(request):
     params = request.json_body
     action = params.get('action', '').lower()
     plan = params.get('plan', '')
-    auth_key = get_auth_key(request)
     name = params.get('name', '')
     company_name = params.get('company_name', '')
     country = params.get('country', '')
     number_of_servers = params.get('number_of_servers', '')
     number_of_people = params.get('number_of_people', '')
 
-    payload = {'auth_key': auth_key,
-               'action': action,
+    user = user_from_request(request)
+
+    payload = {'action': action,
                'plan': plan,
                'name': name,
                'company_name': company_name,
@@ -152,8 +149,10 @@ def update_user_settings(request):
                'number_of_servers': number_of_servers,
                'number_of_people': number_of_people}
 
-    core_uri = request.registry.settings['core_uri']
-    ret = requests.post(core_uri + '/account', params=payload, verify=False)
+    ret = requests.post(config.CORE_URI + '/account',
+                        params=payload,
+                        headers={'Authorization': get_auth_header(user)},
+                        verify=False)
 
     if ret.status_code == 200:
         ret = json.loads(ret.content)
@@ -197,7 +196,7 @@ def add_backend(request):
     provider = params.get('provider', '')
     apikey = params.get('apikey', '')
     apisecret = params.get('apisecret', '')
-    apiurl = params.get('apiurl', '')
+    apiurl = params.get('apiurl') or ''  # fixes weird issue with none value
     tenant_name = params.get('tenant_name', '')
     # following params are for baremetal
     machine_hostname = params.get('machine_ip_address', '')
@@ -207,8 +206,8 @@ def add_backend(request):
 
     user = user_from_request(request)
     backend_id = methods.add_backend(
-        user, title, provider, apikey, apisecret, apiurl, tenant_name,
-        machine_hostname, machine_key, machine_user
+        user, title, provider, apikey, apisecret, apiurl, tenant_name=tenant_name,
+        machine_hostname=machine_hostname, machine_key=machine_key, machine_user=machine_user
     )
     backend = user.backends[backend_id]
     return {
@@ -249,7 +248,7 @@ def rename_backend(request):
     new_name = request.json_body.get('new_name', '')
     if not new_name:
         raise RequiredParameterMissingError('new_name')
-    
+
     user = user_from_request(request)
     methods.rename_backend(user, backend_id, new_name)
     return OK
@@ -408,6 +407,8 @@ def associate_key(request):
         host = request.json_body.get('host')
     except:
         host = None
+    if not host:
+        raise RequiredParameterMissingError('host')
     user = user_from_request(request)
     methods.associate_key(user, key_id, backend_id, machine_id, host)
     return user.keypairs[key_id].machines
@@ -419,10 +420,13 @@ def disassociate_key(request):
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
+    try:
+        host = request.json_body.get('host')
+    except:
+        host = None
     user = user_from_request(request)
-    methods.disassociate_key(user, key_id, backend_id, machine_id)
+    methods.disassociate_key(user, key_id, backend_id, machine_id, host)
     return user.keypairs[key_id].machines
-
 
 
 @view_config(route_name='machines', request_method='GET', renderer='json')
@@ -657,16 +661,11 @@ def check_monitoring(request):
     """Ask the mist.io service if monitoring is enabled for this machine.
 
     """
-    core_uri = config.CORE_URI
     user = user_from_request(request)
-    email = user.email
-    password = user.password
 
-    timestamp = datetime.utcnow().strftime("%s")
-    auth_key = get_auth_key(request)
-
-    payload = {'auth_key': auth_key}
-    ret = requests.get(core_uri+request.path, params=payload, verify=False)
+    ret = requests.get(config.CORE_URI + request.path,
+                       headers={'Authorization': get_auth_header(user)},
+                       verify=False)
     if ret.status_code == 200:
         return ret.json()
     else:
@@ -682,35 +681,36 @@ def update_monitoring(request):
 
     """
     user = user_from_request(request)
-    core_uri = config.CORE_URI
-    try:
-        email = request.json_body['email']
-        password = request.json_body['pass']
+    if request.registry.settings.get('auth') != 1:
+        log.info("trying to authenticate to service first")
+        email = request.json_body.get('email')
+        password = request.json_body.get('password')
+        if not email or not password:
+            raise UnauthorizedError("You need to authenticate to mist.io.")
         payload = {'email': email, 'password': password}
-        ret = requests.post(core_uri + '/auth',
-                            params=payload,
-                            verify=False)
+        ret = requests.post(config.CORE_URI + '/auth', params=payload, verify=False)
         if ret.status_code == 200:
-            request.registry.settings['auth'] = 1
+            ret_dict = json.loads(ret.content)
             with user.lock_n_load():
                 user.email = email
-                user.password = password
+                user.mist_api_token = ret_dict.pop('mist_api_token', '')
                 user.save()
-    except:
-        pass
-    auth_key = get_auth_key(request)
+            request.registry.settings['auth'] = 1
+            log.info("succesfully check_authed")
+        else:
+            raise UnauthorizedError("You need to authenticate to mist.io.")
 
     name = request.json_body.get('name', '')
     public_ips = request.json_body.get('public_ips', [])
     dns_name = request.json_body.get('dns_name', '')
 
     action = request.json_body['action'] or 'enable'
-    payload = {'auth_key': auth_key,
-               'action': action,
-               'name': name,
-               'public_ips': public_ips,
-               'dns_name': dns_name,
-               }
+    payload = {
+        'action': action,
+        'name': name,
+        'public_ips': ",".join(public_ips),
+        'dns_name': dns_name,
+    }
 
     if action == 'enable':
         backend = user.backends[request.matchdict['backend']]
@@ -719,11 +719,14 @@ def update_monitoring(request):
         payload['backend_region'] = backend.region
         payload['backend_apikey'] = backend.apikey
         payload['backend_apisecret'] = backend.apisecret
+        payload['backend_apiurl'] = backend.apiurl
+        payload['backend_tenant_name'] = backend.tenant_name
 
     #TODO: make ssl verification configurable globally,
     # set to true by default
-    ret = requests.post(core_uri+request.path,
+    ret = requests.post(config.CORE_URI + request.path,
                         params=payload,
+                        headers={'Authorization': get_auth_header(user)},
                         verify=False)
     if ret.status_code == 402:
         raise PaymentRequiredError(ret.text)
@@ -737,25 +740,22 @@ def update_monitoring(request):
 def get_stats(request):
     core_uri = config.CORE_URI
     user = user_from_request(request)
-    email = user.email
-    password = user.password
     params = request.params
     start = params.get('start', '')
     stop = params.get('stop', '')
     step = params.get('step', '')
     expression = params.get('expression', '')
 
-    timestamp = datetime.utcnow().strftime("%s")
-    auth_key = get_auth_key(request)
-
     payload = {
-        'auth_key': auth_key,
         'start': start,
         'stop': stop,
         'step': step,
         'expression': expression
     }
-    ret = requests.get(core_uri+request.path, params=payload, verify=False)
+    ret = requests.get(config.CORE_URI + request.path,
+                       params=payload,
+                       headers={'Authorization': get_auth_header(user)},
+                       verify=False)
     if ret.status_code == 200:
         return ret.json()
     else:
@@ -770,15 +770,17 @@ def get_loadavg(request, action=None):
     start = params.get('start', '')
     stop = params.get('stop', '')
     user = user_from_request(request)
-    auth_key = get_auth_key(request)
     core_uri = config.CORE_URI
     payload = {
-        'auth_key': auth_key,
         'start': start,
         'stop': stop,
     }
-    headers = {'Content-type': 'image/png', 'Accept': '*/*'}
-    ret = requests.get(core_uri+request.path, params=payload,
+    headers = {
+        'Authorization': get_auth_header(user),
+        'Content-type': 'image/png',
+        'Accept': '*/*'
+    }
+    ret = requests.get(config.CORE_URI + request.path, params=payload,
                        headers=headers, verify=False)
     if ret.status_code != 200:
         log.error("Error getting loadavg %d:%s", ret.status_code, ret.text)
@@ -791,12 +793,14 @@ def update_rule(request):
     """Creates or updates a rule.
 
     """
-    core_uri = config.CORE_URI
-    payload = request.json_body.copy()
-    payload['auth_key'] = get_auth_key(request)
-
+    user = user_from_request(request)
     #TODO: make ssl verification configurable globally, set to true by default
-    ret = requests.post(core_uri+request.path, params=payload, verify=False)
+    ret = requests.post(
+        config.CORE_URI + request.path,
+        params=request.json_body,
+        headers={'Authorization': get_auth_header(user)},
+        verify=False
+    )
 
     if ret.status_code != 200:
         log.error("Error updating rule %d:%s", ret.status_code, ret.text)
@@ -810,13 +814,13 @@ def delete_rule(request):
     """Deletes a rule.
 
     """
-    # TODO: factor out common code in a shared function
-    core_uri = config.CORE_URI
-    payload = {}
-    payload['auth_key'] = get_auth_key(request)
-
+    user = user_from_request(request)
     #TODO: make ssl verification configurable globally, set to true by default
-    ret = requests.delete(core_uri+request.path, params=payload, verify=False)
+    ret = requests.delete(
+        config.CORE_URI + request.path,
+        headers={'Authorization': get_auth_header(user)},
+        verify=False
+    )
 
     if ret.status_code != 200:
         log.error("Error deleting rule %d:%s", ret.status_code, ret.text)
@@ -879,21 +883,10 @@ def shell_stream(request):
     return Response(status=200, app_iter=parse(stdout_lines))
 
 
-# FIXME
-def get_auth_key(request):
-    user = user_from_request(request)
-    from base64 import urlsafe_b64encode
-    auth_key = "%s:%s" % (user.email, user.password)
-    auth_key = urlsafe_b64encode(auth_key)
-    return auth_key
-
-
 @view_config(route_name='providers', request_method='GET', renderer='json')
 def list_supported_providers(request):
     """
     @param request: A simple GET request
     @return: Return all of our SUPPORTED PROVIDERS
     """
-    return {
-        'supported_providers': config.SUPPORTED_PROVIDERS
-    }
+    return {'supported_providers': config.SUPPORTED_PROVIDERS}
