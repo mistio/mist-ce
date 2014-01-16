@@ -175,7 +175,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     } else {
                         return 'cold';
                     } 
-                }                
+                }
 
                 if (!machine.id || machine.id == -1) return;
                 if (!machine.state == 'running') return;

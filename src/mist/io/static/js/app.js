@@ -28,6 +28,7 @@ require.config({
 define( 'app', [
     'jquery',
     'd3',
+    'app/controllers/login',
     'app/controllers/backends',
     'app/controllers/confirmation',
     'app/controllers/notification',
@@ -42,6 +43,7 @@ define( 'app', [
     'app/controllers/machine_tags',
     'app/controllers/rules',
     'app/views/home',
+    'app/views/login',
     'app/views/backend_button',
     'app/views/backend_add',
     'app/views/backend_edit',
@@ -69,6 +71,7 @@ define( 'app', [
     'ember'
     ], function($,
                 d3,
+                LoginController,
                 BackendsController,
                 ConfirmationController,
                 NotificationController,
@@ -83,6 +86,7 @@ define( 'app', [
                 MachineTagsController,
                 RulesController,
                 Home,
+                LoginView,
                 BackendButton,
                 BackendAdd,
                 EditBackend,
@@ -231,6 +235,7 @@ define( 'app', [
 
         App.set('homeView', Home);
         App.set('ruleView', RuleView);
+        App.set('loginView', LoginView);
         App.set('shellView', ShellView);
         App.set('keyListView', KeyListView);
         App.set('addKeyView', KeyAddDialog);
@@ -258,6 +263,7 @@ define( 'app', [
         // Ember controllers
 
         App.set('keysController', KeysController.create());
+        App.set('loginController', LoginController.create());
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
         App.set('keyEditController', KeyEditController.create());        

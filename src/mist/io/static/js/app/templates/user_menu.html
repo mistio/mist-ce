@@ -27,10 +27,14 @@
            data-role="button"
            data-mini="true">Support</a>
 
-        {{#if view.logout}}
-        <a href="logout" data-role="button" data-mini="true">Logout</a>
+        {{#if Mist.authenticated}}
+            <button data-mini="true" {{action "logoutClicked" target="view"}}>Logout</a>
+        {{else}}
+            <button data-mini="true" {{action "loginClicked" target="view"}}>Login</a>
         {{/if}}
 
     </div>
 
 </div>
+
+{{view Mist.loginView}}
