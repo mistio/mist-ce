@@ -161,6 +161,21 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             probeMachine: function(machine, keyId, callback) {
 
                 // TODO: This should be moved inside machines controller
+                
+                function loadToColor(load, cores) {
+                    var weightedLoad = load / cores;
+                    if (weightedLoad > 1.2) {
+                        return 'hot';
+                    } else if (weightedLoad > 0.8) {
+                        return 'warm';
+                    } else if (weightedLoad > 0.4) {
+                        return 'eco';
+                    } else if (weightedLoad > 0.1) {
+                        return 'cool';
+                    } else {
+                        return 'cold';
+                    } 
+                }                
 
                 if (!machine.id || machine.id == -1) return;
                 if (!machine.state == 'running') return;
@@ -183,6 +198,12 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     var uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
                     machine.set('uptimeChecked', Date.now());
                     machine.set('uptimeFromServer', uptime);
+                    machine.set('cores', data.cores);
+                    machine.set('users', data.users);
+                    machine.set('loadavg1', loadToColor(data.loadavg[0], data.cores));
+                    machine.set('loadavg5', loadToColor(data.loadavg[1], data.cores));
+                    machine.set('loadavg15', loadToColor(data.loadavg[2, data.cores]));                   
+                    machine.set('loadavg', data.loadavg);
                     machine.set('probed', true);
                 }).error(function(message) {
                     if (key) Mist.notificationController.notify(message);
@@ -315,7 +336,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     }
                 });
             },
-
 
             /**
              * 

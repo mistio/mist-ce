@@ -16,6 +16,7 @@ from datetime import datetime
 
 import requests
 import json
+import re
 
 from pyramid.response import Response
 
@@ -580,26 +581,44 @@ def probe(request):
         key = None
 
     ssh_user = request.params.get('ssh_user', None)
-    command = "sudo -n uptime 2>&1|grep load|wc -l && echo -------- && \
-cat /proc/uptime && echo -------- && cat ~/`grep '^AuthorizedKeysFile' \
-/etc/ssh/sshd_config /etc/sshd_config 2> /dev/null |awk '{print $2}'` \
-2> /dev/null || cat ~/.ssh/authorized_keys 2> /dev/null"
-
-    log.warn('probing with key %s' % key)
+    command = "sudo -n uptime 2>&1|grep load|wc -l && \
+echo -------- && \
+uptime && \
+echo -------- && \
+if [ -f /proc/uptime ]; then cat /proc/uptime; \
+else expr `date '+%s'` - `sysctl kern.boottime | sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`; fi; \
+echo -------- && \
+if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo; \
+else sysctl hw.ncpu | awk '{print $2}'; fi; \
+echo -------- \
+cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> \
+/dev/null |awk '{print $2}'` 2> /dev/null || \
+cat ~/.ssh/authorized_keys 2> /dev/null \
+"
 
     user = user_from_request(request)
     cmd_output = methods.ssh_command(user, backend_id, machine_id,
                                      host, command, key_id=key)
 
     if cmd_output:
-        cmd_output = cmd_output.split('--------')
-        if len(cmd_output) > 2:
+        cmd_output = cmd_output.replace('\r\n','').split('--------')
+        log.warn(cmd_output)
+        uptime_output = cmd_output[1]
+        loadavg = re.split('load averages?: ', uptime_output)[1].split(', ')
+        users = re.split(' users?', uptime_output)[0].split(', ')[-1].strip()
+        uptime = cmd_output[2]
+        cores = cmd_output[3]
+        ret = {'uptime': uptime,
+               'loadavg': loadavg,
+               'cores': cores,
+               'users': users,
+               }
+        if len(cmd_output) > 4:
             updated_keys = update_available_keys(user, backend_id,
-                                                 machine_id, cmd_output[2])
-            return {'uptime': cmd_output[1],
-                    'updated_keys': updated_keys}
-        else:
-            return {'uptime': cmd_output[1]}
+                                                 machine_id, cmd_output[4])
+            ret['updated_keys'] = updated_keys
+        return ret
+
 
 
 def update_available_keys(user, backend_id, machine_id, authorized_keys):

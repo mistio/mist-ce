@@ -233,7 +233,7 @@ ul.checkbox-list .ui-grid-b {
 }
 .checkbox-link .tag {
     border: 1px solid #bfbfbf;
-    margin: 3px 3px 9px 0;
+    margin: 0;
     color: #555 !important;
     padding: 1px 7px;
     float: right;
@@ -312,4 +312,46 @@ ul.checkbox-list .ui-grid-b {
 #me-btn img {
     border-radius: 2em;
 }
+
+/* Load colors
+ * */
+
+.led {
+    background-color: transparent;
+    border-radius: 0.1em;
+    float: right;
+    height: 16px;
+    margin: 0px 1px;
+    width: 12px;
+}
+
+.probing {
+    background-color: rgba(0, 0, 0, .4);    
+    animation: blink 1s steps(2, start) infinite;
+}
+@keyframes blink {
+    from {
+        background-color: rgba(0, 0, 0, 1);
+    }
+    to {
+        background-color: transparent;
+    }
+}
+
+.hot {
+    background-color: #DD1E2F !important;
+}
+.warm {
+    background-color: #EBB035 !important;
+}    
+.eco {
+    background-color: #218559 !important;
+}
+.cool {
+    background-color: #06A2CB !important;
+}
+.cold {
+    background-color: #336699 !important;
+}
+
 
