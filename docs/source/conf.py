@@ -49,7 +49,7 @@ copyright = u'2014, Mist.io Inc'
 # built documents.
 #
 # The short X.Y version.
-version = '1.0'
+# version = '1.0'
 # The full version, including alpha/beta/rc tags.
 release = '1.0b1'
 
@@ -101,11 +101,29 @@ html_theme = 'bootstrap'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
+
+#####################
+#MIST Theming options
+#####################
 html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+
+html_logo = 'logo_splash.png'
+html_favicon = 'favicon.ico'
+
+html_theme_options = {
+    'navbar_title': "mist.io",
+    #'globaltoc_includehidden': "true",
+    #'navbar_class': "navbar navbar-inverse",
+    'navbar_fixed_top': "false",
+    'bootswatch_theme': "cosmo",
+    #goto http://bootswatch.com for more themes
+}
+
+#html_sidebars = {}
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -116,7 +134,7 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-#html_logo = None
+# html_logo = 'logo_splash.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32

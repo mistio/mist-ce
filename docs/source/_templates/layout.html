@@ -4,8 +4,9 @@
 {# Custom CSS overrides #}
 {% set bootswatch_css_custom = ['_static/my-styles.css'] %}
 
+{% set script_files = script_files + ["_static/myscript.js"] %}
+
 {# Add some extra stuff before and use existing with 'super()' call. #}
 {% block footer %}
-  <h2>Custom Footer</h2>
-  {{ super() }}
+{{ super() }}
 {% endblock %}
