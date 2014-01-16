@@ -77,8 +77,6 @@ class Shell(object):
 
         """
 
-        log.info("Attempting to connect to %s@%s:%s.",
-                 username, self.host, port)
         if not key and not password:
             raise RequiredParameterMissingError("neither key nor password "
                                                 "provided.")
@@ -254,6 +252,8 @@ class Shell(object):
                         users.append(name)
             for ssh_user in users:
                 try:
+                    log.info("ssh -i %s %s@%s",
+                             key_id, ssh_user, self.host)
                     self.connect(username=ssh_user,
                                  key=keypair.private,
                                  password=password)
