@@ -7,7 +7,7 @@ Welcome to mist.io's documentation!
 =====================================
 
 :Version: 1.0.0
-:Author: unweb.me
+:Author: Mist.io Inc
 :Source: https://github.com/mistio/mist.io
 :License: GNU AGPL v3
 :Keywords: web cloud mobile libcloud pyramid amazon rackspace openstack linode
