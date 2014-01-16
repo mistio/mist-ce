@@ -111,7 +111,7 @@ html_theme = 'bootstrap'
 #####################
 html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
-html_logo = 'logo_splash.png'
+html_logo = 'logo.png'
 html_favicon = 'favicon.ico'
 
 html_theme_options = {
@@ -130,7 +130,7 @@ html_theme_options = {
 #html_title = None
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-#html_short_title = None
+html_short_title = ""
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.

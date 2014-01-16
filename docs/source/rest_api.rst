@@ -1,8 +1,8 @@
-RESTful API Documentation
-*************************
+RESTful API
+***********
 
-You can use this API either by setting up your own installation of mist
-as described in our *Developer Guide* or by using our
+You can use this API either by setting up your own mist.io installation
+as described in our *Developer Guide* or by using our hosted
 service at https://mist.io
 
 Authenticate through https://mist.io

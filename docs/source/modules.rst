@@ -1,5 +1,5 @@
-API Documentation
-*****************
+Modules
+********
 
 This is a detailed documentation of all basic modules
 

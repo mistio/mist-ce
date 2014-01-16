@@ -12,15 +12,17 @@ Welcome to mist.io's documentation!
 :License: GNU AGPL v3
 :Keywords: web cloud mobile libcloud pyramid amazon rackspace openstack linode
 
-Mist.io helps you manage and monitor your virtual machines, across different
-clouds, using any device that can access the web. Check out the freemium service
-at **https://mist.io**
+Mist.io helps you manage and monitor servers across clouds from anywhere, 
+using any device that can access the web. Check out the freemium service
+at `mist.io`__.
+
+__ https://mist.io
 
 .. toctree::
    :maxdepth: 2
 
    developer_guide
-   api_docs
+   modules
    rest_api
 
 Indices and tables

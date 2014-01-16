@@ -17,3 +17,15 @@ dt:hover {
 a.headerlink {
     display: none;
 }
+
+.navbar-form, .navbar-nav {
+    padding-top: 20px;
+}
+
+.navbar-brand {
+    font-size: 0px;
+}
+
+.navbar-default {
+    background-image: linear-gradient( #3c3c3c /*{a-bar-background-start}*/, #111 /*{a-bar-background-end}*/);
+}

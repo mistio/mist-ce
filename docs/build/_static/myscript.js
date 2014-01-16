@@ -7,7 +7,7 @@ $(document).ready(function() {
             elements.eq(i).html('<p> (no description) </p>')
         }
     }
-    
+
     $('.section dd').hide();
     $('.section dl > dt').click(function(e) {
         var dd = $(e.currentTarget).parent().find('dd');
