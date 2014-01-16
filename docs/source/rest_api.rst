@@ -39,3 +39,8 @@ Shell
 -----
 
 .. include:: shell_api.rst
+
+Status Codes
+-----------
+
+.. include:: error_api.rst
