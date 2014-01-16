@@ -708,7 +708,7 @@ def update_monitoring(request):
     payload = {
         'action': action,
         'name': name,
-        'public_ips': public_ips,
+        'public_ips': ",".join(public_ips),
         'dns_name': dns_name,
     }
 
