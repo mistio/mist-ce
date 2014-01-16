@@ -68,10 +68,11 @@ def main(global_config, **settings):
 
     user = User()   # this automatically loads from db.yaml
     # try to authenticate with mist.io service if email,password are available
-    if user.email and user.password:
-        payload = {'email': user.email, 'password': user.password}
+    if user.email and user.mist_api_token:
+        from mist.io.helpers import get_auth_header
         ret = requests.post(mist.io.config.CORE_URI + '/auth',
-                            params=payload, verify=False)
+                            headers={'Authorization': get_auth_header(user)},
+                            verify=False)
         if ret.status_code == 200:
             log.info("Succesfully authenticated to mist.io service.")
             settings['auth'] = True
