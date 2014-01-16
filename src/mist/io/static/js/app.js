@@ -137,13 +137,14 @@ define( 'app', [
 
         // Globals
 
-        App.set('authenticated', AUTH || URL_PREFIX == '' ? true : false);
+        App.set('isCore', IS_CORE);
+        App.set('authenticated', AUTH || IS_CORE);
         App.set('ajax', new AJAX('')); // TODO: Get CSRF_TOKEN from server
         App.set('email', EMAIL);
         App.set('password', '');
         window.Mist = App;
 
-        //URL_PREFIX = AUTH = EMAIL = '';
+        //URL_PREFIX = AUTH = EMAIL = IS_CORE = CSRF_TOKEN '';
 
         // Ember routes and routers
 
