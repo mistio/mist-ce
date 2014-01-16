@@ -13,7 +13,7 @@ define('app/views/user_menu', ['text!app/templates/user_menu.html', 'ember'],
 
             accountUrl: URL_PREFIX + '/account',
             template: Ember.Handlebars.compile(user_menu_html),
-            gravatarURL: EMAIL && ('https://www.gravatar.com/avatar/' + md5(EMAIL) + '?d=blank&s=40'),
+            gravatarURL: EMAIL && ('https://www.gravatar.com/avatar/' + md5(EMAIL) + '?d=blank&s=36'),
 
 
             /**
