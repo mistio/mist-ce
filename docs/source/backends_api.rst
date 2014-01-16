@@ -50,8 +50,8 @@
         {
             "title":"EC2 AP Sydney",
             "provider":"ec2_ap_southeast_2",
-            "apikey":"OLNPOIJBIUMIQCIHA",
-            "apisecret":"1R6vxKnub0087JKHgjhguy90ur"
+            "apikey":"POIHJOINPOIMIQCIHA",
+            "apisecret":"09jLlilkjIU087JKHgjhguy90ur"
         }
 
    Add Openstack Backend
@@ -61,10 +61,10 @@
         {
             "title":"OpenStack",
             "provider":"openstack",
-            "apikey":"admin",
-            "apisecret":"mist",
-            "apiurl":"http://37.58.77.91:5000/v2.0",
-            "tenant_name":"admin"
+            "apikey":"myuser",
+            "apisecret":"superstronpassword",
+            "apiurl":"http://31.53.71.90:5000/v2.0",
+            "tenant_name":"mist"
         }
 
    :jsonparam string title:  *required* Title of the backend
@@ -86,7 +86,7 @@
        "tenant_name": "",
        "id": "48emAUzL9teVYhkyJc9koRaPXEDp",
        "index": 2,
-       "apikey": "OLNPOIJBIUMIQCIHA",
+       "apikey": "POIHJOINPOIMIQCIHA",
        "title": "EC2 AP Sydney",
        "region": "",
        "poll_interval": 10000,
@@ -120,7 +120,7 @@
       Accept: application/json; charset=UTF-8
 
       {
-        "new_name":"Renamed Backed"
+        "new_name":"Renamed Backend"
       }
 
    :jsonparam string new_name:  *required* New name for backend

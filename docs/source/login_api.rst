@@ -1,6 +1,6 @@
 .. http:post:: mist.io/login
 
-   Authenticate to mist.io service.
+   Authenticate to mist.io service
 
    **Example request**:
 

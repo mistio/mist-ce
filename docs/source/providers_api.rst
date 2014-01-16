@@ -1,6 +1,6 @@
 .. http:get:: /providers
 
-   List of all supported providers.
+   List of all supported providers
 
    **Example request**:
 

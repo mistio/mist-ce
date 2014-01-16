@@ -1,6 +1,6 @@
 .. http:get:: /backends/{backend_id}/images
 
-   List available images for this backend.
+   List available images for this backend
 
    **Example request**:
 
@@ -14,8 +14,9 @@
         "search_term":"Gentoo"
       }
 
-   :jsonparam string search_term:  *not required* If given, mist will return only images that include the search term.
-   Else mist will return all available images for the given backend. If the given backend is an EC2 Backend, mist will
+   :jsonparam string search_term:  *not required*
+   If search_term is given, mist will return only images that include the search term, otherwise
+   mist will return all available images for the given backend. If the given backend is an EC2 Backend, mist will
    search through all EC2 images including community and custom images.
 
    **Example response**:

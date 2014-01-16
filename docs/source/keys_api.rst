@@ -1,6 +1,6 @@
 .. http:get:: /keys
 
-   List added keys.
+   List added keys
 
    **Example request**:
 
@@ -21,7 +21,7 @@
            "machines":
            [
                [
-                   "2tK74h4mXbjqXfKQxESgzqc4SHn3",
+                   "2tKqwqDWFFWFDWFESgzqc4SHn3",
                    "i-c0ca59c5",
                    1389715866.596957,
                    "ec2-user",
@@ -40,11 +40,11 @@
        }
     ]
 
-   *For each Key a list of associated machines is returned with backend_id, machine_id, username_of_machine, if_sudo*
+   For each Key a list of associated machines is returned with *backend_id, machine_id, username_of_machine, if_sudo* in this order
 
 .. http:put:: /keys
 
-   Add Key.
+   Add Key
 
    **Example request**:
 
@@ -64,7 +64,7 @@
 
 .. http:post:: /keys
 
-   Ask mist to generate a new private key.
+   Ask mist to generate a new private key
 
    **Example request**:
 
@@ -96,7 +96,7 @@
 
 .. http:put:: /keys/{key_id}
 
-   Rename key.
+   Rename key
 
    **Example request**:
 
@@ -126,7 +126,7 @@
 
 .. http:get:: /keys/{key_id}?action=private
 
-   Get private key.
+   Get private key
 
    **Example request**:
 
@@ -144,7 +144,7 @@
 
 .. http:get:: /keys/{key_id}?action=public
 
-   Get public key.
+   Get public key
 
    **Example request**:
 

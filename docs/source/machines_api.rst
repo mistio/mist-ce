@@ -99,7 +99,7 @@
    :jsonparam string size:  *required* Id of size to be used
    :jsonparam string name:  *required* Bash command to be run when machine is initiated, given as a string
    :jsonparam string image_extra:  *required* Needed only by Linode backend, otherwise empty string
-   :jsonparam string dusk:  *required* Needed only by Linode backend, otherwise empty string
+   :jsonparam string disk:  *required* Needed only by Linode backend, otherwise empty string
 
    **Example response**:
 
@@ -148,7 +148,7 @@
 
 .. http:post:: /backends/{backend_id}/machines/{machine_id}?action={action}
 
-   Machine actions like reboot, destroy, shutdown and start.
+   Machine actions like reboot, destroy, shutdown and start
 
    **Example request**:
 
@@ -162,7 +162,7 @@
 
 .. http:post:: /backends/{backend_id}/machines/{machine_id}/metadata
 
-   Add tags/metadata for machine.
+   Add tags/metadata for machine
 
    **Example request**:
 
