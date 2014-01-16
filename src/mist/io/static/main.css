@@ -184,25 +184,23 @@ textarea {
 /* Checkbox list
 -----------------------------------------------------------------------------------------------------------*/
 ul.checkbox-list li {
-    background-color: #eeeeee /*{c-bup-background-color}*/
+    background: #eeeeee /*{c-bup-background-color}*/ linear-gradient( #fff /*{c-bup-background-start}*/, #f1f1f1 /*{c-bup-background-end}*/) !important;
+    border: 1px #ccc solid;
+    border-bottom: 0px;
+}
+ul.checkbox-list li:hover {
+    background: #dfdfdf linear-gradient( #f6f6f6 /*{c-bhover-background-start}*/, #e0e0e0 /*{c-bhover-background-end}*/) !important;
 }
 ul.checkbox-list li a, ul.checkbox-list li a:hover, ul.checkbox-list label, ul.checkbox-list label:hover {
     background-color: transparent !important;
     border-width: 0px !important;
 }
-
-ul.checkbox-list li:hover {
-    background-color: #dfdfdf /*{c-bhover-background-color}*/
-}
-
-ul.checkbox-list li {
-    border: 1px #ccc solid;
-}
-
 ul.checkbox-list .ui-grid-b {
     padding-top: 12px;
 }
-
+ul.checkbox-list li a, ul.checkbox-list li label {
+    background: transparent !important;
+}
 
 /* Checkbox link
 -----------------------------------------------------------------------------------------------------------*/
@@ -304,10 +302,10 @@ ul.checkbox-list .ui-grid-b {
 -----------------------------------------------------------------------------------------------------------*/
 #me-btn {
     background: transparent;
-    margin-top: -3px;
-    height: 42px;
+    height: 36px;
     padding: 0px;
     border-width: 0px;
+    margin-right: 6px;
 }
 
 #me-btn img {
