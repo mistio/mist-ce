@@ -15,7 +15,8 @@ requires = [
     'pycrypto',
     'requests',
     'nose',
-    'sphinxcontrib-httpdomain'
+    'sphinxcontrib-httpdomain',
+    'sphinx-bootstrap-theme'
 ]
 
 setup(name='mist.io',
