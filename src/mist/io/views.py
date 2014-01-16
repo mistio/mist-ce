@@ -207,8 +207,8 @@ def add_backend(request):
 
     user = user_from_request(request)
     backend_id = methods.add_backend(
-        user, title, provider, apikey, apisecret, apiurl, tenant_name,
-        machine_hostname, machine_key, machine_user
+        user, title, provider, apikey, apisecret, apiurl, tenant_name=tenant_name,
+        machine_hostname=machine_hostname, machine_key=machine_key, machine_user=machine_user
     )
     backend = user.backends[backend_id]
     return {
