@@ -710,12 +710,13 @@ def update_monitoring(request):
     dns_name = request.json_body.get('dns_name', '')
 
     action = request.json_body['action'] or 'enable'
-    payload = {'auth_key': auth_key,
-               'action': action,
-               'name': name,
-               'public_ips': public_ips,
-               'dns_name': dns_name,
-               }
+    payload = {
+        'auth_key': auth_key,
+        'action': action,
+        'name': name,
+        'public_ips': ",".join(public_ips),
+        'dns_name': dns_name,
+    }
 
     if action == 'enable':
         backend = user.backends[request.matchdict['backend']]
