@@ -42,6 +42,7 @@ define( 'app', [
     'app/controllers/key_edit',
     'app/controllers/keys',
     'app/controllers/machine_tags',
+    'app/controllers/machine_shell',
     'app/controllers/rules',
     'app/views/home',
     'app/views/login',
@@ -55,7 +56,7 @@ define( 'app', [
     'app/views/machine',
     'app/views/machine_list',
     'app/views/confirmation_dialog',
-    'app/views/shell',
+    'app/views/machine_shell',
     'app/views/image_list',
     'app/views/machine_power',
     'app/views/machine_tags',
@@ -87,6 +88,7 @@ define( 'app', [
                 KeyEditController,
                 KeysController,
                 MachineTagsController,
+                MachineShellController,
                 RulesController,
                 Home,
                 LoginView,
@@ -100,7 +102,7 @@ define( 'app', [
                 SingleMachineView,
                 MachineListView,
                 ConfirmationDialog,
-                ShellView,
+                MachineShellView,
                 ImageListView,
                 MachinePowerView,
                 MachineTagsView,
@@ -247,7 +249,6 @@ define( 'app', [
         App.set('homeView', Home);
         App.set('ruleView', RuleView);
         App.set('loginView', LoginView);
-        App.set('shellView', ShellView);
         App.set('keyListView', KeyListView);
         App.set('addKeyView', KeyAddDialog);
         App.set('listItemView', ListItemView);
@@ -266,6 +267,7 @@ define( 'app', [
         App.set('machineAddView', MachineAddDialog);
         App.set('backendButtonView', BackendButton);
         App.set('machinePowerView', MachinePowerView);
+        App.set('machineShellView', MachineShellView);
         App.set('machineListItemView', MachineListItem);
         App.set('singleMachineView', SingleMachineView);
         App.set('confirmationDialog', ConfirmationDialog);
@@ -286,6 +288,7 @@ define( 'app', [
         App.set('backendEditController', BackendEditController.create());
         App.set('machineTagsController', MachineTagsController.create());
         App.set('machineKeysController', MachineKeysController.create());
+        App.set('machineShellController', MachineShellController.create());
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
         App.set('machinePowerController', MachinePowerController.create());

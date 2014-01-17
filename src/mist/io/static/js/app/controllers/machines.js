@@ -239,6 +239,7 @@ define('app/controllers/machines', ['app/models/machine'],
 
 
             _createMachine: function(machine, key) {
+                var machine = this.getMachine(machine.id);
                 Ember.run(this, function() {
                     machine.set('pendingCreation', false);
                     key.associate(machine, function(success) {

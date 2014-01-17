@@ -85,7 +85,7 @@ define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/ma
 
 
                 shellClicked: function () {
-                    //Mist.machineShellController.open(Mist.backendsController.selectedMachines[0]);
+                    Mist.machineShellController.open(Mist.backendsController.selectedMachines[0]);
                 },
 
 

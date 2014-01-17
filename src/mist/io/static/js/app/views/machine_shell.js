@@ -1,22 +1,28 @@
-define('app/views/shell', ['text!app/templates/shell.html', 'ember'],
+define('app/views/machine_shell', ['text!app/templates/machine_shell.html', 'ember'],
     /**
-     *  Shell View
+     * Machine Shell View
      *
-     *  @returns Class
+     * @returns Class
      */
-    function(shell_html) {
+    function(machine_shell_html) {
         return Ember.View.extend({
     
-            template: Ember.Handlebars.compile(shell_html),
+            template: Ember.Handlebars.compile(machine_shell_html),
     
             shellOutputItems: Ember.ArrayController.create(),
             
             availableCommands: [], //"dmesg", "uptime", "uname", "ls", "reboot", "whoami", "ifconfig" ],
             
-            commandHistory: [],
+            commandHistory: new Array(),
             commandHistoryIndex: -1,
             
             didInsertElement: function() {
+                
+                // Bad hack to stay away from refactoring shell view :(
+                var viewId = $('#machine-shell-popup').parent().attr('id');
+                Mist.machineShellController.set('view', Ember.View.views[viewId]);
+                //
+                
                 if ('localStorage' in window && window['localStorage'] !== null) {
                     var stored = localStorage['shellHistory'];
                     if (stored) {
@@ -31,10 +37,12 @@ define('app/views/shell', ['text!app/templates/shell.html', 'ember'],
                         });
                     }
                 }
+                //this.$("input[type=text]").autocomplete({
+                //    source : this.availableCommands
+                //});
             },
     
             submit: function() {
-
                 // This will work in single machine view
                 var machine = this.get('controller').get('model');
                 if (!machine) {
@@ -89,20 +97,22 @@ define('app/views/shell', ['text!app/templates/shell.html', 'ember'],
                     } else {
                         stored = new Array();
                     }
-                    if(stored.indexOf(command) == -1) {
+                    if(stored.indexOf(command) == -1){
                         stored.push(command);
                         localStorage['shellHistory'] = stored;
                     }
                 }
                 this.availableCommands.push(command);
-                this.$("input[type=text]").autocomplete("close");
-                this.$("input[type=text]").autocomplete({
-                    source : this.availableCommands
-                });
+                //this.$("input[type=text]").autocomplete("close");
+                //this.$("input[type=text]").autocomplete({
+                //    source : this.availableCommands
+                //});
             },
     
             clear: function() {
                 this.set('command', '');
             }
         });
-    });
+    }
+);
+

@@ -125,7 +125,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                         return 'cool';
                     } else {
                         return 'cold';
-                    } 
+                    }
                 }
 
                 if (!machine.id || machine.id == -1) return;
@@ -160,7 +160,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     if (key) Mist.notificationController.notify(message);
                 }).complete(function(success) {
                     if (key) {
-                        key.updateMachineUptimeChecked(machine, (success ? 1 : -1 ) * Date.now());
+                        //key.updateMachineUptimeChecked(machine, (success ? 1 : -1 ) * Date.now());
                         key.set('probing', false);
                     }
                     machine.set('probing', false);
@@ -169,22 +169,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             },
 
 
-            getMachineByUrlId: function(machineId) {
-                var machines = null;
-                var machinesLength = 0;
-                var content = this.content;
-                var contentLength = this.content.length;
-                for (var b = 0; b < contentLength; ++b) {
-                    machines = content[b].machines.content;
-                    machinesLength = machines.length;
-                    for (var m = 0; m < machinesLength; ++m) {
-                        if (machines[m].id == machineId) {
-                            return machines[m];
-                        }
-                    }
-                }
-            },
-            
             updateMachineCount: function() {
                 var count = 0;
                 var content = this.content;
