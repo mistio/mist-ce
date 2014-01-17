@@ -13,25 +13,24 @@
                             autocapitalize="off"
                             autocorrect="off"
                             autocomplete="off"
-                            valueBinding="view.command"}}
+                            valueBinding="Mist.machineShellController.command"}}
                     </td>
                     <td class="shell-send-wrapper">
                         <a data-icon="shell-return"
                             data-role="button"
                             data-iconpos="notext"
-                            {{action submit target="view"}}
+                            {{action "submitClicked" target="view"}}
                             class="shell-send"></a>
                     </td>
                 </tr>
             </table>
         </div>
-        <div class="shell-return">
-        {{#each view.shellOutputItems}}
-            <h3 class="command">{{command}}</h3>
-            <div class="output">{{{output}}}</div>
+        <div class="shell-return" data-role="listview">
+        {{#each Mist.machineShellController.machine.commandHistory}}
+            {{view Mist.machineShellListItemView commandBinding="this"}}
         {{/each}}
         </div>
-        <a data-role="button" data-theme="c" data-rel="back">Back</a>
+        <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
     </div>
-    
+
 </div>

@@ -57,6 +57,7 @@ define( 'app', [
     'app/views/machine_list',
     'app/views/confirmation_dialog',
     'app/views/machine_shell',
+    'app/views/machine_shell_list_item',
     'app/views/image_list',
     'app/views/machine_power',
     'app/views/machine_tags',
@@ -103,6 +104,7 @@ define( 'app', [
                 MachineListView,
                 ConfirmationDialog,
                 MachineShellView,
+                MachineShellListItemView,
                 ImageListView,
                 MachinePowerView,
                 MachineTagsView,
@@ -273,6 +275,7 @@ define( 'app', [
         App.set('confirmationDialog', ConfirmationDialog);
         App.set('machineKeysListItemView', MachineKeysListItemView);
         App.set('machineTagsListItemView', MachineTagsListItemView);
+        App.set('machineShellListItemView', MachineShellListItemView);
 
         // Ember controllers
 
@@ -310,35 +313,36 @@ define( 'app', [
         App.ShellTextField = Ember.TextField.extend({
 
             insertNewline: function() {
-                this._parentView.submit();
+                Mist.machineShellController.submit();
             },
 
             keyDown: function(event, view) {
-                var parent = this._parentView;
+                var commandHistoryIndex = Mist.machineShellController.commandHistoryIndex;
+                var commandHistory = Mist.machineShellController.machine.commandHistory;
                 var inputField = '.shell-input div.ui-input-text input';
                 if (event.keyCode == 38 ) { // Up Key
-                    if (parent.commandHistoryIndex > -1) {
-                        if (parent.commandHistoryIndex > 0) {
-                            parent.commandHistoryIndex--;
+                    if (commandHistoryIndex > -1) {
+                        if (commandHistoryIndex > 0) {
+                            commandHistoryIndex--;
                         }
-                        $(inputField).val(parent.commandHistory[parent.commandHistoryIndex]);
+                        $(inputField).val(commandHistory[commandHistoryIndex]);
                     }
                 } else if (event.keyCode == 40) { // Down key
-                    if (parent.commandHistoryIndex < parent.commandHistory.length) {
-                        if (parent.commandHistoryIndex < parent.commandHistory.length - 1) {
-                            parent.commandHistoryIndex++;
+                    if (commandHistoryIndex < commandHistory.length) {
+                        if (commandHistoryIndex < commandHistory.length - 1) {
+                            commandHistoryIndex++;
                         }
-                        $(inputField).val(parent.commandHistory[parent.commandHistoryIndex]);
+                        $(inputField).val(commandHistory[commandHistoryIndex]);
                     }
                 } else if (event.keyCode == 13) { // Enter key
-                    this._parentView.submit();
+                    Mist.machineShellController.submit();
                 } else if (event.keyCode == 1) {
                     $('.shell-input input').focus();
                 } else if (event.keyCode == 9) { // Tab key
                     // TODO: Autocomplete stuff...
                 } else { 
                     Ember.run.next(function(){
-                        parent.commandHistory[parent.commandHistoryIndex] = parent.command;
+                        commandHistory[commandHistoryIndex] = Mist.machineShellController.command.command;
                     });
                 }
                 if (event.keyCode == 38 || event.keyCode == 40 || event.keycode == 9) { // Up or Down or Tab
@@ -574,7 +578,7 @@ function error() {
 
 var collectd_install_target = false, collectd_uninstall_target = false, collectd_lastlog="";
 
-function appendShell(data){
+function appendShell(data, command_id){
     var line = data.trim();
 
     if (data.length){
@@ -593,39 +597,15 @@ function appendShell(data){
         // TODO: display collectd uninstall output
     } else {
         var target_page = $($.mobile.activePage);
-        var output = target_page.find('.shell-return .output').first();
+        var output = target_page.find('#' + command_id + ' .shell-li-body');
         if (data.length) {
             output.append(data);
             output.scrollTop(10000);
-        } else {
-            that.set('pendingShell', false);
-            target_page.find('.shell-return .pending').removeClass('pending');
         }
     }
 }
 
-function completeShell(ret){
-    $('iframe').remove();
-    // TODO disabling this for now, spinners won't work, globals are not there
-    //Mist.machine.set('pendingShell', false);
-    $('.shell-return .pending').removeClass('pending');
-    $('a.shell-send').removeClass('ui-disabled');
-    if (collectd_install_target) {
-        if (collectd_lastlog.search('root') == -1) {
-            // TODO: display instruction for manual installation
-            // alert('collectd install failed');
-        }
-        setTimeout(function(){
-            collectd_install_target.set('hasMonitoring', true);
-            collectd_install_target.set('pendingMonitoring', false);
-            $('.pending-monitoring h1').text('Enabling monitoring');
-            collectd_install_target = false;
-        }, 10000);
-    } else if (collectd_uninstall_target) {
-        collectd_uninstall_target.set('hasMonitoring', false);
-        collectd_uninstall_target.set('pendingMonitoring', false);
-        $('.pending-monitoring h1').text('Enabling monitoring');
-        collectd_uninstall_target = false;
-    }
-    $('body').append('<iframe id="hidden-shell-iframe"></iframe');
+function completeShell(ret, command_id) {
+    $('iframe#' + command_id).remove();
+    Mist.machineShellController.machine.commandHistory.findBy('id', command_id).set('pendingResponse', false);
 }

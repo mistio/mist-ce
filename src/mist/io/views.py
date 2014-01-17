@@ -857,23 +857,24 @@ def shell_stream(request):
         # start the html response
         yield "<html><body>\n"
         js = "<script type='text/javascript'>"
-        js += "parent.appendShell('%s');</script>\n"
+        js += "parent.appendShell('%s', '%s');</script>\n"
         for line in lines:
             # get commands output, line by line
             clear_line = line.replace('\'', '\\\'')
             clear_line = clear_line.replace('\n', '<br/>')
             clear_line = clear_line.replace('\r', '')
             #.replace('<','&lt;').replace('>', '&gt;')
-            yield js % clear_line
+            yield js % (clear_line, cmd_id)
         js = "<script type='text/javascript'>"
-        js += "parent.completeShell(%s);</script>\n"
-        yield js % 1  # FIXME
+        js += "parent.completeShell(%s, '%s');</script>\n"
+        yield js % (1, cmd_id)  # FIXME
         yield "</body></html>\n"
 
     log.info("got shell_stream request")
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     cmd = request.params.get('command')
+    cmd_id = request.params.get('command_id')
     host = request.params.get('host')
     if not cmd:
         raise RequiredParameterMissingError("command")

@@ -4,7 +4,6 @@
 
 @import url("css/key.css");
 @import url("css/home.css");
-@import url("css/shell.css");
 @import url("css/machine.css");
 @import url("css/key_list.css");
 @import url("css/key_create.css");
@@ -14,6 +13,7 @@
 @import url("css/machine_tags.css");
 @import url("css/machine_list.css");
 @import url("css/machine_power.css");
+@import url("css/machine_shell.css");
 @import url("css/backend_button.css");
 
 

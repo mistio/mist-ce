@@ -1,20 +1,21 @@
-define('app/controllers/machine_shell', ['ember'],
+define('app/controllers/machine_shell', ['app/models/command', 'ember'],
     /**
      * Machine Shell Controller
      *
      * @returns Class
      */
-    function () {
+    function (Command) {
         return Ember.Object.extend(Ember.Evented, {
 
             /**
              *  Properties
              */
 
-            view: null,
             machine: null,
             callback: null,
-
+            shellOutputItems: Ember.ArrayController.create(),
+            
+            commandHistoryIndex: -1,
 
             /**
              *
@@ -27,13 +28,61 @@ define('app/controllers/machine_shell', ['ember'],
                 this._clear();
                 this.set('machine', machine);
                 this.set('callback', callback);
-                this.view.set('machine', machine);
             },
 
 
             close: function () {
                 $('#machine-shell-popup').popup('close');
                 this._clear();
+            },
+
+
+            submit: function(timeout) {
+
+               
+                var machine = this.machine;
+                if (!machine || !machine.probed || !this.command) {
+                    return;
+                }
+
+                var commandHistory = machine.commandHistory;
+                var command = Command.create({
+                    'id'             : machine.backend.id + machine.id + commandHistory.length,
+                    'command'        : this.command,
+                    'response'       : '',
+                    'pendingResponse': true,
+                });
+                
+                // Modify machine's command history
+                commandHistory.pop();
+                commandHistory.pushObject(command);
+                commandHistory.push('');
+                this.commandHistoryIndex = commandHistory.length - 1;
+
+                // Construct request
+                var url = '/backends/' + machine.backend.id + '/machines/' + machine.id + '/shell';
+                var host = machine.getHost();
+                var that = machine;
+                var params =  {
+                    'host'      : host,
+                    'command'   : command.command,
+                    'command_id': command.id
+                };
+                if (timeout)
+                    params.timeout = timeout;
+
+                function EncodeQueryData(data)
+                {
+                   var ret = [];
+                   for (var d in data)
+                      ret.push(encodeURIComponent(d) + "=" + encodeURIComponent(data[d]));
+                   return ret.join("&");
+                }
+                url = url + '?' + EncodeQueryData(params);
+
+                $('#hidden-shell').append(
+                    '<iframe id="' + command.id +'" src="' + url + '"></iframe>'
+                );
             },
 
 

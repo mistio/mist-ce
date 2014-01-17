@@ -32,7 +32,9 @@ define('app/models/machine', ['ember'],
             stats:{'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
             
-            loadavg: null,            
+            commandHistory: [],
+            
+            loadavg: null,
             loadavg1: null,            
             loadavg5: null,            
             loadavg15: null,
@@ -93,32 +95,6 @@ define('app/models/machine', ['ember'],
                         return null;
                     }
                 }
-            },
-
-            shell: function(shell_command, callback, timeout) {
-                log('Sending', shell_command, 'to machine', this.name);
-
-                var url = '/backends/' + this.backend.id + '/machines/' + this.id + '/shell';
-                var host = this.getHost();
-                var that = this;
-                var params =  {'host': host,
-                               'command': shell_command};
-                if (timeout != undefined) {
-                    params['timeout'] = timeout;
-                }
-                
-                function EncodeQueryData(data)
-                {
-                   var ret = [];
-                   for (var d in data)
-                      ret.push(encodeURIComponent(d) + "=" + encodeURIComponent(data[d]));
-                   return ret.join("&");
-                }
-                url = url + '?' + EncodeQueryData(params);
-                this.set('pendingShell', true);
-                
-                $('#hidden-shell-iframe').attr('src', url);
-                callback('');
             },
 
             probe: function(keyId) {
