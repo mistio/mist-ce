@@ -130,6 +130,12 @@ define( 'app', [
             $.mobile.panel.prototype._bindUpdateLayout = function(){};
             $('body').css('overflow','auto');
         });
+        
+        // Hide error boxes on page unload
+        window.onbeforeunload = function() {
+            $('.ui-loader').hide();
+        };
+        
 
         // Ember Application
 
