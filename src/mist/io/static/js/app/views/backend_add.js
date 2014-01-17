@@ -83,7 +83,7 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
                 },
 
 
-                doneClicked: function() {
+                addClicked: function() {
                     Mist.backendAddController.add();
                 }
             },
