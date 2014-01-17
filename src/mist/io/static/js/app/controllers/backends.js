@@ -40,7 +40,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 Mist.ajax.GET('/backends', {
                 }).success(function(backends) {
                     that._setContent(backends);
-                    that.checkMonitoring();
                 }).error(function() {
                     that._reload();
                 }).complete(function() {
@@ -110,54 +109,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             },
  
  
-            checkMonitoring: function() {
-                if (!Mist.authenticated) return;
-
-                var that = this;
-                this.set('checkingMonitoring', true);
-                Mist.ajax.GET('/monitoring', {
-                }).success(function(data) {
-                    Mist.set('monitored_machines', data.machines);
-                    Mist.set('current_plan', data.current_plan);
-                    Mist.set('user_details', data.user_details);
-
-                    data.machines.forEach(function(machine_tuple) {
-                        var machine = that.getMachine(machine_tuple[0], machine_tuple[1]);
-                        if (machine) {
-                            machine.set('hasMonitoring', true);
-                        }
-                    });
-
-                   /* TODO: These rules should be returned properly from
-                    *       the server, so that we can use a forEach loop
-                    *       to make this world a better place.
-                    */
-                    var rules = data.rules;
-                    for (ruleId in rules) {
-                        var rule = {};
-                        rule.id = ruleId;
-                        rule.value = rules[ruleId].value;
-                        rule.metric = rules[ruleId].metric;
-                        rule.command = rules[ruleId].command;
-                        rule.maxValue = rules[ruleId].max_value;
-                        rule.actionToTake = rules[ruleId].action;
-                        rule.operator = Mist.rulesController.getOperatorByTitle(rules[ruleId].operator);
-                        rule.machine = that.getMachine(rules[ruleId].backend, rules[ruleId].machine);
-                        if (!rule.machine) {
-                            rule.backend_id = rules[ruleId].backend;
-                            rule.machine_id = rules[ruleId].machine;
-                        }
-                        Mist.rulesController.pushObject(Rule.create(rule));
-                    }
-                    Mist.rulesController.redrawRules();
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to get monitoring data');
-                }).complete(function() {
-                    that.set('checkingMonitoring', false);
-                });
-            },
-
-
             probeMachine: function(machine, keyId, callback) {
 
                 // TODO: This should be moved inside machines controller

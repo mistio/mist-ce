@@ -157,30 +157,10 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
 
                 enableMonitoringClicked: function () {
 
-                    var self = this;
-
-                    // if machine id = '' setTimeout for next enabling because real machine is not yet loaded
-                    var enableMonitoring = function () {
-
-                        // Wait until machine is available
-                        var machine = self.get('controller').get('model');
-                        if(machine.id == '') {
-
-                            console.log("Waiting..");
-                            window.setTimeout(enableMonitoring,2000);
-
-                        } else {
-
-                            console.log("Going To Controller For Enabling Monitoring");
-                            machine.openMonitoringDialog();
-                        } 
-                    };
-
-                    if(Mist.authenticated)
-                        enableMonitoring();
-                    else {
-                        $("#login-dialog").show();
-                        $("#login-dialog").popup('open');
+                    if (Mist.authenticated) {
+                        //this.machine.set('hasMonitoring', true);
+                    } else {
+                        Mist.loginController.open();
                     }
                 },
 
@@ -195,25 +175,6 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 }
             },
 
-/*
-            doLogin: function() {
-                Mist.ajaxPOST('/auth', {
-                    'email': Mist.email,
-                    'password': CryptoJS.SHA256(Mist.password).toString(),
-                }).success(function(data) {
-                    Mist.set('authenticated', true);
-                    Mist.set('current_plan', data.current_plan);
-                    Mist.set('auth_key', data.auth_key);
-                    Mist.set('user_details', data.user_details);
-                    Mist.set('monitored_machines', []);
-                }).error(function() {
-                    Mist.notificationController.warn('Failed to log in');
-                }).complete(function() {
-                    // TODO: return a callback here or something
-                });
-            },
-*/
- 
 
             /**
              * 

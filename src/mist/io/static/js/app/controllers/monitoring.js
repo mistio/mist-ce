@@ -7,7 +7,7 @@ define('app/controllers/monitoring', [
      * @returns Class
      */
     function() {
-        return Ember.ObjectController.extend({
+        return Ember.ObjectController.extend(Ember.Evented, {
 
             machine : null,
             machineNotResponding: false,
@@ -18,6 +18,46 @@ define('app/controllers/monitoring', [
             initController: function(machine,view){
                 this.machine = machine;
                 this.view = view;
+            },
+
+            /**
+            * Method: load
+            * Gets all monitoring related data from
+            * the server
+            */
+            load: function(callback) {
+
+                if (!Mist.authenticated) return;
+
+                var that = this;
+                this.checkingMonitoring = true;
+                Mist.ajax.GET('/monitoring', {
+                }).success(function(data) {
+                    that._updateMonitoringData(data);
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to get monitoring data');
+                }).complete(function(success, data) {
+                    that.checkingMonitoring = false;
+                    that.trigger('onMonitoringDataUpdate');
+                    if (callback) callback(success, data);
+                });
+            }.on('init'),
+
+            /**
+            * Method: _updateMonitoringData
+            * Updates everything in the app that has
+            * to do with monitoring
+            */
+            _updateMonitoringData: function(data) {
+
+                Mist.set('monitored_machines', data.machines);
+                Mist.set('current_plan', data.current_plan);
+                Mist.rulesController.setContent(data.rules);
+                data.machines.forEach(function(machine_tuple) {
+                    var machine = Mist.backendsController.getMachine(machine_tuple[1], machine_tuple[0]);
+                    if (machine)
+                        machine.set('hasMonitoring', true);
+                });
             },
 
             /**

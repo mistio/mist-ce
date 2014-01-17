@@ -33,6 +33,16 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 'command'
             ],
 
+            setContent: function(rules) {
+                if (!rules.lenght) return;
+                var that = this;
+                Ember.run(function() {
+                    rules.forEach(function(rule) {
+                        that.content.pushObject(Rule.create(rule));
+                    });
+                });
+            },
+
             getRuleById: function(ruleId) {
                 for (var i = 0; i < this.content.length; i++) {
                     if (this.content[i].id == ruleId) {

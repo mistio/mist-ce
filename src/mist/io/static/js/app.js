@@ -37,6 +37,7 @@ define( 'app', [
     'app/controllers/machine_add',
     'app/controllers/machine_keys',
     'app/controllers/machine_power',
+    'app/controllers/monitoring',
     'app/controllers/key_add',
     'app/controllers/key_edit',
     'app/controllers/keys',
@@ -47,6 +48,7 @@ define( 'app', [
     'app/views/backend_button',
     'app/views/backend_add',
     'app/views/backend_edit',
+    'app/views/monitoring',
     'app/views/machine_list_item',
     'app/views/image_list_item',
     'app/views/machine_add_dialog',
@@ -80,6 +82,7 @@ define( 'app', [
                 MachineAddController,
                 MachineKeysController,
                 MachinePowerController,
+                MonitoringController,
                 KeyAddController,
                 KeyEditController,
                 KeysController,
@@ -90,6 +93,7 @@ define( 'app', [
                 BackendButton,
                 BackendAdd,
                 EditBackend,
+                MonitoringView,
                 MachineListItem,
                 ImageListItem,
                 MachineAddDialog,
@@ -247,6 +251,7 @@ define( 'app', [
         App.set('editBackendView', EditBackend);
         App.set('imageListView', ImageListView);
         App.set('singleKeyView', SingleKeyView);
+        App.set('monitoringView', MonitoringView);
         App.set('machineKeysView', MachineKeysView);
         App.set('machineTagsView', MachineTagsView);
         App.set('keyListItemView', KeyListItemView);
@@ -269,6 +274,7 @@ define( 'app', [
         App.set('keyAddController', KeyAddController.create());
         App.set('keyEditController', KeyEditController.create());        
         App.set('backendsController', BackendsController.create());
+        App.set('monitoringController', MonitoringController.create());
         App.set('machineAddController', MachineAddController.create());
         App.set('backendAddController', BackendAddController.create());
         App.set('backendEditController', BackendEditController.create());

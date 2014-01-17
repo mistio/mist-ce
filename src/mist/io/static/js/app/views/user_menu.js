@@ -31,9 +31,7 @@ define('app/views/user_menu', ['text!app/templates/user_menu.html', 'ember'],
                 loginClicked: function() {
                     $('#user-menu-popup').popup('close');
                     Ember.run.later(function() {
-                        Mist.loginController.open(function(success) {
-                            if (success) Mist.loginController.close();
-                        });
+                        Mist.loginController.open();
                     }, 300);
                 },
 
