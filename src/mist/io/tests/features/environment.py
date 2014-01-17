@@ -6,18 +6,20 @@ from behaving import environment as benv
 from behaving.web.steps import *
 from behaving.personas.steps import *
 
-from test_config import CREDENTIALS, MISTCREDS, TESTNAMES
+try:
+    from test_config import CREDENTIALS, MISTCREDS, TESTNAMES
 
-PERSONAS = {
-    'NinjaTester': dict(
-        creds=CREDENTIALS,
-        mistcreds=MISTCREDS,
-        machine=TESTNAMES['machine_name']+str(random.randint(1, 10000)),
-        image_machine=TESTNAMES['image_machine']+str(random.randint(1, 10000)),
-        key_name=TESTNAMES['key']+str(random.randint(1, 10000))
-    )
-}
-
+    PERSONAS = {
+        'NinjaTester': dict(
+            creds=CREDENTIALS,
+            mistcreds=MISTCREDS,
+            machine=TESTNAMES['machine_name']+str(random.randint(1, 10000)),
+            image_machine=TESTNAMES['image_machine']+str(random.randint(1, 10000)),
+            key_name=TESTNAMES['key']+str(random.randint(1, 10000))
+        )
+    }
+except:
+    pass
 
 def before_all(context):
     benv.before_all(context)
