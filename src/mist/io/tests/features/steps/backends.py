@@ -17,6 +17,7 @@ from time import sleep, time
 @when(u'I use my "{provider}" credentials')
 def backends_use_credentials(context, provider):
     creds = context.personas['NinjaTester']['creds']
+    print creds
     if provider == "EC2":
         context.browser.find_by_css('input#new-backend-first-field').fill(creds['EC2']['api_key'])
         context.browser.find_by_css('input#new-backend-second-field').fill(creds['EC2']['api_secret'])
@@ -48,14 +49,28 @@ def backends_use_credentials(context, provider):
     assert False, u'"%s" credentials not supported'
 
 
-@then(u'I should see the "{backend}" Backend added within {timeout} seconds')
-def backends_see_backend_buttons(context, backend, timeout):
-    end_time = time() + int(timeout)
-    while time() < end_time:
-        backend_buttons_count = len(context.browser.find_by_css('#backend-buttons .ui-btn'))
-        for i in range(backend_buttons_count):
-            if context.browser.find_by_css('#backend-buttons .ui-btn')[i].text == backend.strip():
-                return
-        sleep(2)
+@then(u'I should see the "{backend}" Backend {state} within {timeout} seconds')
+def backends_see_backend_buttons(context, backend, timeout, state):
 
-    assert False, u'%s backend in not added' % backend
+    if state == "added":
+        end_time = time() + int(timeout)
+        while time() < end_time:
+            backend_buttons_count = len(context.browser.find_by_css('#backend-buttons .ui-btn'))
+            for i in range(backend_buttons_count):
+                if context.browser.find_by_css('#backend-buttons .ui-btn')[i].text == backend.strip():
+                    return
+            sleep(2)
+        assert False, u'%s backend in not added' % backend
+    elif state == "deleted":
+        end_time = time() + int(timeout)
+        while time() < end_time:
+            backend_buttons_count = len(context.browser.find_by_css('#backend-buttons .ui-btn'))
+            if not backend_buttons_count:
+                return
+            for i in range(backend_buttons_count):
+                if not context.browser.find_by_css('#backend-buttons .ui-btn')[i].text == backend.strip():
+                    return
+            sleep(2)
+        assert False, u'%s backend in not deleted' % backend
+    else:
+        assert False, u'Backend state should be <added> or <deleted> and not %s' % state

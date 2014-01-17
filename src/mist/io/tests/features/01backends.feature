@@ -10,6 +10,7 @@ Feature: showing off behave
 
     @web
     @ec2-backend
+    @test
     Scenario: Add EC2 Backend
         When I click the link with text "Add backend"
         And I click the link with text "Select provider"
@@ -17,6 +18,15 @@ Feature: showing off behave
         And I use my "EC2" credentials
         And I click the "Add" button
             Then I should see the "EC2 AP NORTHEAST" Backend added within 30 seconds
+
+    @web
+    @ec2-backend
+    Scenario: Delete Backend
+        When I click the "EC2 AP NORTHEAST" button
+        And I click the "Delete" button
+        And I click the "Yes" button
+            Then I should see the "EC2 AP NORTHEAST" Backend deleted within 30 seconds
+
 
     @web
     @rackspace
