@@ -12,10 +12,9 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
              */
 
             machine: null,
-            callback: null,
-            shellOutputItems: Ember.ArrayController.create(),
-            
             commandHistoryIndex: -1,
+            shellOutputItems: Ember.ArrayController.create(),
+
 
             /**
              *
@@ -23,11 +22,10 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
              *
              */
 
-            open: function (machine, callback) {
+            open: function (machine) {
                 $('#machine-shell-popup').popup('open');
                 this._clear();
                 this.set('machine', machine);
-                this.set('callback', callback);
             },
 
 
@@ -95,7 +93,6 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
             _clear: function () {
                 Ember.run(this, function () {
                     this.set('machine', null);
-                    this.set('callback', null);
                 });
             },
 

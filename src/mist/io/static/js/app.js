@@ -574,31 +574,19 @@ function error() {
 
 var collectd_install_target = false, collectd_uninstall_target = false, collectd_lastlog="";
 
-function appendShell(data, command_id){
-    var line = data.trim();
+function appendShell(output, command_id) {
 
-    if (data.length){
-        warn(Date() + ': ' + data);
-    }
+    var machine = Mist.machineShellController.machine;
+    var command = Mist.machineShellController.machine.commandHistory.findBy('id', command_id);
+    
+    if (!command) return;
 
-    if (collectd_install_target) {
-        if (line != '<br/>') {
-            collectd_lastlog = line;
-        }
-        // TODO: display collectd install output
-    } else if (collectd_uninstall_target){
-        if (line != '<br/>') {
-            collectd_lastlog = line;
-        }
-        // TODO: display collectd uninstall output
-    } else {
-        var target_page = $($.mobile.activePage);
-        var output = target_page.find('#' + command_id + ' .shell-li-body');
-        if (data.length) {
-            output.append(data);
-            output.scrollTop(10000);
-        }
-    }
+    var output = output.trim().replace('<br/>', String.fromCharCode(13));
+
+    if (output.length)
+        warn(Date() + ': ' + output);
+
+    command.set('response', command.response + output);
 }
 
 function completeShell(ret, command_id) {
