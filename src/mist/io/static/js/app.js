@@ -595,8 +595,6 @@ function error() {
     } catch(err) {console.log(err);}
 }
 
-var collectd_install_target = false, collectd_uninstall_target = false, collectd_lastlog="";
-
 function appendShell(data){
     var line = data.trim();
 
@@ -604,26 +602,14 @@ function appendShell(data){
         warn(Date() + ': ' + data);
     }
 
-    if (collectd_install_target) {
-        if (line != '<br/>') {
-            collectd_lastlog = line;
-        }
-        // TODO: display collectd install output
-    } else if (collectd_uninstall_target){
-        if (line != '<br/>') {
-            collectd_lastlog = line;
-        }
-        // TODO: display collectd uninstall output
+    var target_page = $($.mobile.activePage);
+    var output = target_page.find('.shell-return .output').first();
+    if (data.length) {
+        output.append(data);
+        output.scrollTop(10000);
     } else {
-        var target_page = $($.mobile.activePage);
-        var output = target_page.find('.shell-return .output').first();
-        if (data.length) {
-            output.append(data);
-            output.scrollTop(10000);
-        } else {
-            that.set('pendingShell', false);
-            target_page.find('.shell-return .pending').removeClass('pending');
-        }
+        that.set('pendingShell', false);
+        target_page.find('.shell-return .pending').removeClass('pending');
     }
 }
 
@@ -633,22 +619,5 @@ function completeShell(ret){
     //Mist.machine.set('pendingShell', false);
     $('.shell-return .pending').removeClass('pending');
     $('a.shell-send').removeClass('ui-disabled');
-    if (collectd_install_target) {
-        if (collectd_lastlog.search('root') == -1) {
-            // TODO: display instruction for manual installation
-            // alert('collectd install failed');
-        }
-        setTimeout(function(){
-            collectd_install_target.set('hasMonitoring', true);
-            collectd_install_target.set('pendingMonitoring', false);
-            $('.pending-monitoring h1').text('Enabling monitoring');
-            collectd_install_target = false;
-        }, 10000);
-    } else if (collectd_uninstall_target) {
-        collectd_uninstall_target.set('hasMonitoring', false);
-        collectd_uninstall_target.set('pendingMonitoring', false);
-        $('.pending-monitoring h1').text('Enabling monitoring');
-        collectd_uninstall_target = false;
-    }
     $('body').append('<iframe id="hidden-shell-iframe"></iframe');
 }
