@@ -369,11 +369,9 @@ define('app/models/machine', [
                             if (prefix.slice(-1) == '/') {
                                 prefix = prefix.substring(0, prefix.length - 1);
                             }
-                            collectd_install_target = that;
                             that.set('hasMonitoring', true);
                         } else {
                             $('.pending-monitoring h1').text('Disabling collectd');
-                            collectd_uninstall_target = that;
                             var new_monitored_machines = jQuery.grep(Mist.monitored_machines, function(value) {
                                 var machine_arr = [that.backend.id, that.id];
                                 return (!($(value).not(machine_arr).length == 0 && $(machine_arr).not(value).length == 0));
