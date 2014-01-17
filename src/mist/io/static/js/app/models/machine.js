@@ -126,7 +126,7 @@ define('app/models/machine', ['ember'],
                 if ($.active > 4) {
                     Ember.run.later(that, function() {
                         that.probe();
-                    }, 1000); warn('rescheduled traffic');
+                    }, 1000);
                     return;
                 }
                 Mist.backendsController.probeMachine(that, keyId, function(success) {

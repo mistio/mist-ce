@@ -316,7 +316,6 @@ ul.checkbox-list li a, ul.checkbox-list li label {
  * */
 
 .led {
-    background-color: transparent;
     border-radius: 0.1em;
     float: right;
     height: 16px;
@@ -325,10 +324,21 @@ ul.checkbox-list li a, ul.checkbox-list li label {
 }
 
 .probing {
-    background-color: rgba(0, 0, 0, .4);    
-    animation: blink 1s steps(2, start) infinite;
+    animation: probe 1s steps(2, start) infinite;
+    -webkit-animation: probe 1s steps(2, start) infinite;
+    height: 16px;
+    width: 12px;
+    background-color: rgba(0, 0, 0, .4);        
 }
-@keyframes blink {
+@keyframes probe {
+    from {
+        background-color: rgba(0, 0, 0, .4);    
+    }
+    to {
+        background-color: transparent;
+    }
+}
+@-webkit-keyframes probe {
     from {
         background-color: rgba(0, 0, 0, 1);
     }
