@@ -577,10 +577,11 @@ var collectd_install_target = false, collectd_uninstall_target = false, collectd
 function appendShell(output, command_id) {
 
     var machine = Mist.machineShellController.machine;
-    var command = Mist.machineShellController.machine.commandHistory.findBy('id', command_id);
+    var command = machine.commandHistory.findBy('id', command_id);
     
     if (!command) return;
 
+    // Replace break with new line
     var output = output.trim().replace('<br/>', String.fromCharCode(13));
 
     if (output.length)
