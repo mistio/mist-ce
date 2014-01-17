@@ -1,5 +1,7 @@
 import logging
 import random
+import json
+import requests
 from datetime import datetime
 from hashlib import sha256
 
@@ -22,6 +24,7 @@ except ImportError:
 
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
+from mist.io.helpers import get_auth_header
 from mist.io.bare_metal import BareMetalDriver
 from mist.io.exceptions import *
 
@@ -281,7 +284,7 @@ def edit_key(user, new_key, old_key):
 
 
 @core_wrapper
-def associate_key(user, key_id, backend_id, machine_id, host=None):
+def associate_key(user, key_id, backend_id, machine_id, host=''):
     """Associates a key with a machine.
 
     If host is set it will also attempt to actually deploy it to the
@@ -290,7 +293,10 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
 
     """
 
-    log.info("Associating key, deploy = %s" % host)
+    log.info("Associating key %s to host %s", key_id, host)
+    if not host:
+        log.info("Host not given so will only create association without "
+                 "actually deploying the key to the server.")
     if key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
     if backend_id not in user.backends:
@@ -300,47 +306,47 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
     machine_uid = [backend_id, machine_id]
 
     # check if key already associated
+    associated = False
     for machine in keypair.machines:
         if machine[:2] == machine_uid:
             log.warning("Keypair '%s' already associated with machine '%s' "
                         "in backend '%s'", key_id, backend_id, machine_id)
-            # if host given, check if it is actually deployed
-            if host:
-                try:
-                    ssh_command(user, backend_id, machine_id, host,
-                                'uptime', key_id=key_id)
-                except MachineUnauthorizedError:
-                    log.warning("Keypair isn't actually deployed, "
-                                "will try to redeploy.")
-                else:
-                    return
-
-    # assume key is already deployed
-    try:
-        ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
-        log.info("Key already associated.")
+            associated = True
+    # if not already associated, create the association
+    # this is only needed if association doesn't exist and host is not provided
+    # associations will otherwise be created by shell.autoconfigure upon
+    # succesful connection
+    if not host:
+        if not associated:
+            with user.lock_n_load():
+                user.keypairs[key_id].machines.append(machine_uid)
+                user.save()
         return
-    except:
-        pass
 
     # if host is specified, try to actually deploy
-    if host:
-        log.info("Deploying key to machine.")
-        filename = '~/.ssh/authorized_keys'
-        grep_output = '`grep \'%s\' %s`' % (keypair.public, filename)
-        new_line_check_cmd = (
-            'if [ "$(tail -c1 %(file)s; echo x)" != "\\nx" ];'
-            ' then echo "" >> %(file)s; fi' % {'file': filename}
-        )
-        append_cmd = ('if [ -z "%s" ]; then echo "%s" >> '
-                   '%s; fi'
-                   % (grep_output, keypair.public, filename))
-        command = new_line_check_cmd + " ; " + append_cmd
-        log.debug("command = %s", command)
+    log.info("Deploying key to machine.")
+    filename = '~/.ssh/authorized_keys'
+    grep_output = '`grep \'%s\' %s`' % (keypair.public, filename)
+    new_line_check_cmd = (
+        'if [ "$(tail -c1 %(file)s; echo x)" != "\\nx" ];'
+        ' then echo "" >> %(file)s; fi' % {'file': filename}
+    )
+    append_cmd = ('if [ -z "%s" ]; then echo "%s" >> %s; fi'
+                  % (grep_output, keypair.public, filename))
+    command = new_line_check_cmd + " ; " + append_cmd
+    log.debug("command = %s", command)
 
+    try:
+        # deploy key
+        ssh_command(user, backend_id, machine_id, host, command)
+    except MachineUnauthorizedError:
+        # couldn't deploy key
         try:
-            ssh_command(user, backend_id, machine_id, host, command)
+            # maybe key was already deployed?
+            ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
+            log.info("Key was already deployed, local association created.")
         except MachineUnauthorizedError:
+<<<<<<< HEAD
             raise MachineUnauthorizedError("Couldn't connect to "
                                            "deploy new SSH keypair.")
     print "YO"
@@ -350,7 +356,21 @@ def associate_key(user, key_id, backend_id, machine_id, host=None):
     # that is automatically handled by Shell, if it is configured by
     # shell.autoconfigure (which ssh_command does)
     if host:
+=======
+            # oh screw this
+            raise MachineUnauthorizedError(
+                "Couldn't connect to deploy new SSH keypair."
+            )
+    else:
+        # deployment probably succeeded
+        # attemp to connect with new key
+        # if it fails to connect it'll raise exception
+        # there is no need to manually set the association in keypair.machines
+        # that is automatically handled by Shell, if it is configured by
+        # shell.autoconfigure (which ssh_command does)
+>>>>>>> master
         ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
+        log.info("Key associated and deployed succesfully.")
 
 
 @core_wrapper
@@ -683,6 +703,7 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
         raise MachineCreationError("Rackspace, got exception %s" % e)
     return node
 
+
 def _create_machine_openstack(conn, private_key, public_key, script, machine_name,
                              image, size, location):
     """Create a machine in Openstack.
@@ -992,7 +1013,7 @@ def _machine_action(user, backend_id, machine_id, action):
                     ssh_command(user, backend_id, machine_id, hostname, command)
                     return True
                 except:
-                    return False            
+                    return False
             else:
                 machine.reboot()
         elif action is 'destroy':
@@ -1011,9 +1032,9 @@ def start_machine(user, backend_id, machine_id):
     """Starts a machine on backends that support it.
 
     Currently only EC2 supports that.
-    .. note:: Normally try won't get an AttributeError exception because this
-              action is not allowed for machines that don't support it. Check
-              helpers.get_machine_actions.
+    Normally try won't get an AttributeError exception because this
+    action is not allowed for machines that don't support it. Check
+    helpers.get_machine_actions.
 
     """
     _machine_action(user, backend_id, machine_id, 'start')
@@ -1023,9 +1044,9 @@ def stop_machine(user, backend_id, machine_id):
     """Stops a machine on backends that support it.
 
     Currently only EC2 supports that.
-    .. note:: Normally try won't get an AttributeError exception because this
-              action is not allowed for machines that don't support it. Check
-              helpers.get_machine_actions.
+    Normally try won't get an AttributeError exception because this
+    action is not allowed for machines that don't support it. Check
+    helpers.get_machine_actions.
 
     """
     _machine_action(user, backend_id, machine_id, 'stop')
@@ -1318,3 +1339,122 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
             conn.ex_set_metadata(machine, tags)
         except:
             BackendUnavailableError("Error while updating metadata")
+
+
+def enable_monitoring(user, backend_id, machine_id,
+                      name='', dns_name='', public_ips=None):
+    """Enable monitoring for a machine."""
+    backend = user.backends[backend_id]
+    payload = {
+        'action': 'enable',
+        'no_ssh': True,
+        'name': name,
+        'public_ips': ",".join(public_ips),
+        'dns_name': dns_name,
+        'backend_title': backend.title,
+        'backend_provider': backend.provider,
+        'backend_region': backend.region,
+        'backend_apikey': backend.apikey,
+        'backend_apisecret': backend.apisecret,
+        'backend_apiurl': backend.apiurl,
+        'backend_tenant_name': backend.tenant_name,
+    }
+    #TODO: make ssl verification configurable globally,
+    # set to true by default
+    url_scheme = "%s/backends/%s/machines/%/monitoring"
+    ret = requests.post(
+        url_scheme % (config.CORE_URI, backend_id, machine_id),
+        params=payload,
+        headers={'Authorization': get_auth_header(user)},
+        verify=False
+    )
+    if ret.status_code != 200:
+        if ret.status_code == 402:
+            raise PaymentRequiredError(ret.text)
+        else:
+            raise ServiceUnavailableError()
+
+    ret_dict = json.loads(ret.content)
+    machine_uuid = ret_dict.get('uuid')
+    collectd_password = ret_dict.get('passwd')
+    monitor_url = ret_dict.get('monitor_server')
+    host = ret_dict.get('host')
+
+    stdout = _deploy_collectd(user, backend_id, machine_id, host,
+                              monitor_url, machine_uuid, collectd_password)
+    return stdout
+
+
+def disable_monitoring(user, backend_id, machine_id):
+    """Disable monitoring for a machine."""
+    payload = {
+        'action': 'disable',
+        'no_ssh': True
+    }
+    #TODO: make ssl verification configurable globally,
+    # set to true by default
+    url_scheme = "%s/backends/%s/machines/%/monitoring"
+    ret = requests.post(
+        url_scheme % (config.CORE_URI, backend_id, machine_id),
+        params=payload,
+        headers={'Authorization': get_auth_header(user)},
+        verify=False
+    )
+    if ret.status_code != 200:
+        raise ServiceUnavailableError()
+
+    ret_dict = json.loads(ret.content)
+    host = ret_dict.get('host')
+
+    stdout = _undeploy_collectd(user, backend_id, machine_id, host)
+    return stdout
+
+
+def _deploy_collectd(user, backend_id, machine_id, host,
+                     monitor_url, machine_uuid, collectd_password):
+    """Install collectd to the machine and return command's output"""
+
+    #FIXME: do not hard-code stuff!
+    filename = 'deploy_collectd.sh'
+    uri = config.CORE_URI + '/core/scripts/%s' % filename
+    prefix = '/opt/mistio-collectd'
+    prepare_dirs = '$(command -v sudo) mkdir -p %s' % prefix
+    get_script = (
+        "$(command -v sudo) su root -c \"wget --no-check-certificate "
+        "%s -O - > %s/%s\"" % (uri, prefix, filename)
+    )
+    make_exec = "$(command -v sudo) chmod +x %s/%s" % (prefix, filename)
+    exec_script = (
+        "$(command -v sudo) %s/%s %s %s %s" %
+        (prefix, filename, monitor_url, machine_uuid, collectd_password)
+    )
+
+    shell = Shell(host)
+    shell.autoconfigure(user, backend_id, machine_id)
+    # FIXME:parse output and let the client know about the progress/status
+    stdout = shell.command(prepare_dirs)
+    stdout += shell.command(get_script)
+    stdout += shell.command(make_exec)
+    stdout += shell.command(exec_script)
+
+    return stdout
+
+
+def _undeploy_collectd(user, backend_id, machine_id, host):
+    """Uninstall collectd from the machine and return command's output"""
+
+    #FIXME: do not hard-code stuff!
+    check_collectd_dist = "if [ ! -d /opt/mistio-collectd/ ]; then $(command -v sudo) /etc/init.d/collectd stop ; $(command -v sudo) chmod -x /etc/init.d/collectd ; fi"
+    disable_collectd = (
+        "$(command -v sudo) rm -f /etc/cron.d/mistio-collectd "
+        "&& $(command -v sudo) kill -9 "
+        "`cat /opt/mistio-collectd/collectd.pid`"
+    )
+
+    shell = Shell(host)
+    shell.autoconfigure(user, backend_id, machine_id)
+    #FIXME: parse output and check for success/failure
+    stdout = shell.command(check_collectd_dist)
+    stdout += shell.command(disable_collectd)
+
+    return stdout

@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; mist.io 1.0b1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.0.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/my-styles.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0b1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/myscript.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="mist.io 1.0b1 documentation" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><img src="_static/logo.png">
+          mist.io</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a href="index.html"
+     class="dropdown-toggle"
+     data-toggle="dropdown">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+    ><ul>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"><ul class="simple">
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/machines_api.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <dl class="get">
+<dt id="get--backends-{backend_id}-machines">
+<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/machines</tt><a class="headerlink" href="#get--backends-{backend_id}-machines" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of all added machines for this backend</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
+Host: mist.io
+Accept: application/json; charset=UTF-8</pre>
+</div>
+<p><strong>Example response</strong>:</p>
+<div class="highlight-http"><pre>[
+   {
+       "can_start": false,
+       "can_reboot": true,
+       "uuid": "447c23edbe944911f23145538915865ebddec230",
+       "name": "i-5ebfdc59",
+       "tags":
+       [
+           "ap-northeast-1a"
+       ],
+       "can_stop": true,
+       "can_destroy": true,
+       "extra":
+       {
+           "status": "running",
+           "productcode":
+           [
+           ],
+           "groups":
+           [
+               null
+           ],
+           "tags":
+           {
+           },
+           "instanceId": "i-5ebfdc59",
+           "dns_name": "ec2-173-21-215-201.ap-northeast-1.compute.amazonaws.com",
+           "launchdatetime": "2014-01-13T13:58:03.000Z",
+           "iam_profile": null,
+           "imageId": "ami-2f61fe2e",
+           "kernelid": "aki-42992843",
+           "keyname": "Mykey",
+           "availability": "ap-northeast-1a",
+           "clienttoken": "",
+           "launchindex": "0",
+           "ramdiskid": null,
+           "private_dns": "ip-10-153-6-20.ap-northeast-1.compute.internal",
+           "instancetype": "t1.micro"
+       },
+       "public_ips":
+       [
+           "170.21.215.111"
+       ],
+       "private_ips":
+       [
+           "10.153.6.20"
+       ],
+       "imageId": "ami-2f61fe2e",
+       "state": "running",
+       "can_tag": true,
+       "id": "i-5ebfdc59",
+       "size": "t1.micro"
+   }
+]</pre>
+</div>
+</dd></dl>
+
+<dl class="post">
+<dt id="post--backends-{backend_id}-machines">
+<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines</tt><a class="headerlink" href="#post--backends-{backend_id}-machines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create machine</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
+Host: mist.io
+Accept: application/json; charset=UTF-8
+
+{
+    "name":"WebServer 3",
+    "key":"MyKey2",
+    "image":"ami-2f61fe2e",
+    "location":"0",
+    "size":"t1.micro",
+    "script":"echo `uptime` &gt; new_file.txt",
+    "image_extra":"",
+    "disk":""
+}</pre>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
+<li><strong>key</strong> (<em>string</em>) &#8211; <em>required</em> The id of the key to be associated with the machine</li>
+<li><strong>image</strong> (<em>string</em>) &#8211; <em>required</em> Id of image to be used</li>
+<li><strong>location</strong> (<em>string</em>) &#8211; <em>required</em> Id of the location to be used</li>
+<li><strong>size</strong> (<em>string</em>) &#8211; <em>required</em> Id of size to be used</li>
+<li><strong>name</strong> &#8211; <em>required</em> Bash command to be run when machine is initiated, given as a string</li>
+<li><strong>image_extra</strong> (<em>string</em>) &#8211; <em>required</em> Needed only by Linode backend, otherwise empty string</li>
+<li><strong>disk</strong> (<em>string</em>) &#8211; <em>required</em> Needed only by Linode backend, otherwise empty string</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example response</strong>:</p>
+<div class="highlight-http"><pre>{
+   "public_ips":
+   [
+       "50.253.51.216"
+   ],
+   "extra":
+   {
+       "status": "running",
+       "productcode":
+       [
+       ],
+       "groups":
+       [
+           null
+       ],
+       "tags":
+       {
+           "Name": "WebServer 3"
+       },
+       "instanceId": "i-50dd7257",
+       "dns_name": "ec2-50-253-51-216.ap-northeast-1.compute.amazonaws.com",
+       "launchdatetime": "2014-01-15T05:37:50.000Z",
+       "iam_profile": null,
+       "imageId": "ami-2f61fe2e",
+       "kernelid": "aki-42992843",
+       "keyname": "MyKey2",
+       "availability": "ap-northeast-1a",
+       "clienttoken": "",
+       "launchindex": "0",
+       "ramdiskid": null,
+       "private_dns": "ip-10-160-226-156.ap-northeast-1.compute.internal",
+       "instancetype": "t1.micro"
+   },
+   "id": "i-50dd7257",
+   "private_ips":
+   [
+       "10.160.226.156"
+   ],
+   "name": "WebServer 3"
+}</pre>
+</div>
+</dd></dl>
+
+<dl class="post">
+<dt id="post--backends-{backend_id}-machines-{machine_id}?action={action}">
+<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}?action={action}</tt><a class="headerlink" href="#post--backends-{backend_id}-machines-{machine_id}?action={action}" title="Permalink to this definition">¶</a></dt>
+<dd><p>Machine actions like reboot, destroy, shutdown and start</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257?action=reboot
+Host: mist.io
+Accept: application/json; charset=UTF-8</pre>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Query Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>action</strong> &#8211; <em>required</em> Can be reboot, shutdown, start or destroy depending on the available actions for each machine</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="post">
+<dt id="post--backends-{backend_id}-machines-{machine_id}-metadata">
+<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}/metadata</tt><a class="headerlink" href="#post--backends-{backend_id}-machines-{machine_id}-metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add tags/metadata for machine</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/metadata
+Host: mist.io
+Accept: application/json; charset=UTF-8
+
+{
+    "tag":"Backup Machine"
+}</pre>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>tag</strong> (<em>string</em>) &#8211; <em>required</em> Tags are used as metadata for each machine and can be handy to group machines with same tags</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, Mist.io Inc.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

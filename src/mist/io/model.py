@@ -177,7 +177,7 @@ class User(DalUser):
     """
 
     email = StrField()
-    password = StrField()
+    mist_api_token = StrField()
     backends = make_field(Backends)()
     keypairs = make_field(Keypairs)()
 

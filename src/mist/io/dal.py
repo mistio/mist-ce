@@ -559,9 +559,9 @@ class User(OODictYaml):
         """Dummy lock, doesn't actually do anything.
 
         It must be used with a 'with' statement as follows:
-            with user.lock_n_load():
-                # edit user
-                user.save()
+        with user.lock_n_load():
+        # edit user
+        user.save()
         Lock is automatically released after exiting the 'with' block.
         Attempting to save without first acquiring the lock will raise an
         exception.
