@@ -1,5 +1,7 @@
 import logging
 import random
+import json
+import requests
 from datetime import datetime
 from hashlib import sha256
 
@@ -22,6 +24,7 @@ except ImportError:
 
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
+from mist.io.helpers import get_auth_header
 from mist.io.bare_metal import BareMetalDriver
 from mist.io.exceptions import *
 
@@ -1322,7 +1325,76 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
             BackendUnavailableError("Error while updating metadata")
 
 
-def _deploy_collectd(user, backend_id, machine_id, host
+def enable_monitoring(user, backend_id, machine_id,
+                      name='', dns_name='', public_ips=None):
+    """Enable monitoring for a machine."""
+    backend = user.backends[backend_id]
+    payload = {
+        'action': 'enable',
+        'no_ssh': True,
+        'name': name,
+        'public_ips': ",".join(public_ips),
+        'dns_name': dns_name,
+        'backend_title': backend.title,
+        'backend_provider': backend.provider,
+        'backend_region': backend.region,
+        'backend_apikey': backend.apikey,
+        'backend_apisecret': backend.apisecret,
+        'backend_apiurl': backend.apiurl,
+        'backend_tenant_name': backend.tenant_name,
+    }
+    #TODO: make ssl verification configurable globally,
+    # set to true by default
+    url_scheme = "%s/backends/%s/machines/%/monitoring"
+    ret = requests.post(
+        url_scheme % (config.CORE_URI, backend_id, machine_id),
+        params=payload,
+        headers={'Authorization': get_auth_header(user)},
+        verify=False
+    )
+    if ret.status_code != 200:
+        if ret.status_code == 402:
+            raise PaymentRequiredError(ret.text)
+        else:
+            raise ServiceUnavailableError()
+
+    ret_dict = json.loads(ret.content)
+    machine_uuid = ret_dict.get('uuid')
+    collectd_password = ret_dict.get('passwd')
+    monitor_url = ret_dict.get('monitor_server')
+    host = ret_dict.get('host')
+
+    stdout = _deploy_collectd(user, backend_id, machine_id, host,
+                              monitor_url, machine_uuid, collectd_password)
+    return stdout
+
+
+def disable_monitoring(user, backend_id, machine_id):
+    """Disable monitoring for a machine."""
+    payload = {
+        'action': 'disable',
+        'no_ssh': True
+    }
+    #TODO: make ssl verification configurable globally,
+    # set to true by default
+    url_scheme = "%s/backends/%s/machines/%/monitoring"
+    ret = requests.post(
+        url_scheme % (config.CORE_URI, backend_id, machine_id),
+        params=payload,
+        headers={'Authorization': get_auth_header(user)},
+        verify=False
+    )
+    if ret.status_code != 200:
+        raise ServiceUnavailableError()
+
+    ret_dict = json.loads(ret.content)
+    host = ret_dict.get('host')
+
+    stdout = _undeploy_collectd(user, backend_id, machine_id, host)
+    return stdout
+
+
+def _deploy_collectd(user, backend_id, machine_id, host,
                      monitor_url, machine_uuid, collectd_password):
     """Install collectd to the machine and return command's output"""
 

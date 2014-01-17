@@ -681,6 +681,8 @@ def update_monitoring(request):
 
     """
     user = user_from_request(request)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
     if request.registry.settings.get('auth') != 1:
         log.info("trying to authenticate to service first")
         email = request.json_body.get('email')
@@ -700,41 +702,31 @@ def update_monitoring(request):
         else:
             raise UnauthorizedError("You need to authenticate to mist.io.")
 
+    action = request.json_body['action'] or 'enable'
     name = request.json_body.get('name', '')
     public_ips = request.json_body.get('public_ips', [])
     dns_name = request.json_body.get('dns_name', '')
 
-    action = request.json_body['action'] or 'enable'
     payload = {
         'action': action,
         'name': name,
         'public_ips': ",".join(public_ips),
         'dns_name': dns_name,
+        # tells core not to try to run ssh command to (un)deploy collectd
+        'no_ssh': True,
     }
 
     if action == 'enable':
-        backend = user.backends[request.matchdict['backend']]
-        payload['backend_title'] = backend.title
-        payload['backend_provider'] = backend.provider
-        payload['backend_region'] = backend.region
-        payload['backend_apikey'] = backend.apikey
-        payload['backend_apisecret'] = backend.apisecret
-        payload['backend_apiurl'] = backend.apiurl
-        payload['backend_tenant_name'] = backend.tenant_name
+        stdout = methods.enable_monitoring(
+            user, backend_id, machine_id, name, dns_name, public_ips
+        )
+    elif action == 'disable':
+        stdout = methods.disable_monitoring(user, backend_id, machine_id)
+    else:
+        raise BadRequestError()
 
-    #TODO: make ssl verification configurable globally,
-    # set to true by default
-    ret = requests.post(config.CORE_URI + request.path,
-                        params=payload,
-                        headers={'Authorization': get_auth_header(user)},
-                        verify=False)
-    if ret.status_code == 402:
-        raise PaymentRequiredError(ret.text)
-    elif ret.status_code != 200:
-        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
-        raise ServiceUnavailableError()
+    return {'cmd_output': stdout}
 
-    return ret.json()
 
 @view_config(route_name='stats', request_method='GET', renderer='json')
 def get_stats(request):
