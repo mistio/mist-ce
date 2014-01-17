@@ -1,0 +1,279 @@
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>HTTP Routing Table &mdash; mist.io 1.0b1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.0.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/my-styles.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0b1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/myscript.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="mist.io 1.0b1 documentation" href="index.html" />
+
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+
+    <script type="text/javascript">
+      DOCUMENTATION_OPTIONS.COLLAPSE_INDEX = true;
+    </script>
+
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><img src="_static/logo.png">
+          mist.io</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a href="index.html"
+     class="dropdown-toggle"
+     data-toggle="dropdown">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+    ><ul>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"></ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+
+   <h1>HTTP Routing Table</h1>
+
+   <div class="modindex-jumpbox">
+   <a href="#cap-/backends"><strong>/backends</strong></a> | 
+   <a href="#cap-/keys"><strong>/keys</strong></a> | 
+   <a href="#cap-/mist.io"><strong>/mist.io</strong></a> | 
+   <a href="#cap-/providers"><strong>/providers</strong></a>
+   </div>
+
+   <table class="indextable modindextable" cellspacing="0" cellpadding="2">
+     <tr class="pcap"><td></td><td>&nbsp;</td><td></td></tr>
+     <tr class="cap" id="cap-/backends"><td></td><td>
+       <strong>/backends</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#get--backends"><tt class="xref">GET /backends</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#post--backends"><tt class="xref">POST /backends</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#put--backends-{backend_id}"><tt class="xref">PUT /backends/{backend_id}</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#post--backends-{backend_id}"><tt class="xref">POST /backends/{backend_id}</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#delete--backends-{backend_id}"><tt class="xref">DELETE /backends/{backend_id}</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#get--backends-{backend_id}-images"><tt class="xref">GET /backends/{backend_id}/images</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#get--backends-{backend_id}-locations"><tt class="xref">GET /backends/{backend_id}/locations</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#get--backends-{backend_id}-machines"><tt class="xref">GET /backends/{backend_id}/machines</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#post--backends-{backend_id}-machines"><tt class="xref">POST /backends/{backend_id}/machines</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#post--backends-{backend_id}-machines-{machine_id}-metadata"><tt class="xref">POST /backends/{backend_id}/machines/{machine_id}/metadata</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#get--backends-{backend_id}-machines-{machine_id}-shell?host={host_ip}&command={shell_command}"><tt class="xref">GET /backends/{backend_id}/machines/{machine_id}/shell?host={host_ip}&amp;command={shell_command}</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#post--backends-{backend_id}-machines-{machine_id}?action={action}"><tt class="xref">POST /backends/{backend_id}/machines/{machine_id}?action={action}</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#get--backends-{backend_id}-sizes"><tt class="xref">GET /backends/{backend_id}/sizes</tt></a></td><td>
+       <em></em></td></tr>
+     <tr class="pcap"><td></td><td>&nbsp;</td><td></td></tr>
+     <tr class="cap" id="cap-/keys"><td></td><td>
+       <strong>/keys</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#get--keys"><tt class="xref">GET /keys</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#put--keys"><tt class="xref">PUT /keys</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#post--keys"><tt class="xref">POST /keys</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#put--keys-{key_id}"><tt class="xref">PUT /keys/{key_id}</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#post--keys-{key_id}"><tt class="xref">POST /keys/{key_id}</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#delete--keys-{key_id}"><tt class="xref">DELETE /keys/{key_id}</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#get--keys-{key_id}?action=private"><tt class="xref">GET /keys/{key_id}?action=private</tt></a></td><td>
+       <em></em></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#get--keys-{key_id}?action=public"><tt class="xref">GET /keys/{key_id}?action=public</tt></a></td><td>
+       <em></em></td></tr>
+     <tr class="pcap"><td></td><td>&nbsp;</td><td></td></tr>
+     <tr class="cap" id="cap-/mist.io"><td></td><td>
+       <strong>/mist.io</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#post-mist.io-auth"><tt class="xref">POST mist.io/auth</tt></a></td><td>
+       <em></em></td></tr>
+     <tr class="pcap"><td></td><td>&nbsp;</td><td></td></tr>
+     <tr class="cap" id="cap-/providers"><td></td><td>
+       <strong>/providers</strong></td><td></td></tr>
+     <tr>
+       <td></td>
+       <td>
+       <a href="rest_api.html#get--providers"><tt class="xref">GET /providers</tt></a></td><td>
+       <em></em></td></tr>
+   </table>
+
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, Mist.io Inc.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

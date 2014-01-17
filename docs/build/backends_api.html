@@ -1,0 +1,462 @@
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; mist.io 1.0b1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.0.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/my-styles.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0b1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/myscript.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="mist.io 1.0b1 documentation" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><img src="_static/logo.png">
+          mist.io</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a href="index.html"
+     class="dropdown-toggle"
+     data-toggle="dropdown">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+    ><ul>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"><ul class="simple">
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/backends_api.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <dl class="get">
+<dt id="get--backends">
+<tt class="descname">GET </tt><tt class="descname">/backends</tt><a class="headerlink" href="#get--backends" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of all added backends</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><pre>GET /backends
+Host: mist.io
+Accept: application/json; charset=UTF-8</pre>
+</div>
+<p><strong>Example response</strong>:</p>
+<div class="highlight-http"><pre>[
+   {
+       "state": "wait",
+       "apikey": "A09009NUMIQCIHA",
+       "title": "EC2 AP NORTHEAST",
+       "enabled": true,
+       "region": "",
+       "provider": "ec2_ap_northeast",
+       "poll_interval": 10000,
+       "id": "2tK74h4mXbj8nNohljLIzqc4SHn3"
+   },
+   {
+       "state": "wait",
+       "apikey": "myapikey",
+       "title": "Rackspace DFW",
+       "enabled": true,
+       "region": "dfw",
+       "provider": "rackspace",
+       "poll_interval": 10000,
+       "id": "3po809NuIjqiNgqqmDJAKSLWp6"
+   }
+]</pre>
+</div>
+</dd></dl>
+
+<dl class="post">
+<dt id="post--backends">
+<tt class="descname">POST </tt><tt class="descname">/backends</tt><a class="headerlink" href="#post--backends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add Backend</p>
+<p><strong>Example request</strong>:</p>
+<p>Add EC2 Backend</p>
+<div class="highlight-http"><pre>{
+    "title":"EC2 AP Sydney",
+    "provider":"ec2_ap_southeast_2",
+    "apikey":"POIHJOINPOIMIQCIHA",
+    "apisecret":"09jLlilkjIU087JKHgjhguy90ur"
+}</pre>
+</div>
+<p>Add Openstack Backend</p>
+<div class="highlight-http"><pre>{
+    "title":"OpenStack",
+    "provider":"openstack",
+    "apikey":"myuser",
+    "apisecret":"superstronpassword",
+    "apiurl":"http://31.53.71.90:5000/v2.0",
+    "tenant_name":"mist"
+}</pre>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>title</strong> (<em>string</em>) &#8211; <em>required</em> Title of the backend</li>
+<li><strong>provider</strong> (<em>string</em>) &#8211; <em>required</em> Provider as found in supported providers list</li>
+<li><strong>apikey</strong> (<em>string</em>) &#8211; APIKEY or username (depending on the provider)</li>
+<li><strong>apisecret</strong> (<em>string</em>) &#8211; APISECRET or password (depending on the provider)</li>
+<li><strong>apiurl</strong> (<em>string</em>) &#8211; APIURL needed by Openstack and HP Cloud</li>
+<li><strong>tenant_name</strong> (<em>string</em>) &#8211; Tenant needed by Openstack and HP Cloud</li>
+<li><strong>machine_ip</strong> (<em>string</em>) &#8211; Ip address needed when adding Bare Metal Server</li>
+<li><strong>machine_key</strong> (<em>string</em>) &#8211; Id of ssh key needed when adding Bare Metal Server</li>
+<li><strong>machine_user</strong> (<em>string</em>) &#8211; User for Bare Metal Server</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example response</strong>:</p>
+<div class="highlight-http"><pre>{
+   "status": "off",
+   "tenant_name": "",
+   "id": "48emAUzL9teVYhkyJc9koRaPXEDp",
+   "index": 2,
+   "apikey": "POIHJOINPOIMIQCIHA",
+   "title": "EC2 AP Sydney",
+   "region": "",
+   "poll_interval": 10000,
+   "apiurl": "",
+   "provider": "ec2_ap_southeast_2",
+   "enabled": true
+}</pre>
+</div>
+</dd></dl>
+
+<dl class="delete">
+<dt id="delete--backends-{backend_id}">
+<tt class="descname">DELETE </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#delete--backends-{backend_id}" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete backend</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><pre>DELETE /backends/2tK74h4mXbjjLlkjjO4SHn3
+Host: mist.io
+Accept: application/json; charset=UTF-8</pre>
+</div>
+</dd></dl>
+
+<dl class="put">
+<dt id="put--backends-{backend_id}">
+<tt class="descname">PUT </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#put--backends-{backend_id}" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename backend</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><pre>PUT /backends
+Host: mist.io
+Accept: application/json; charset=UTF-8
+
+{
+  "new_name":"Renamed Backend"
+}</pre>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>new_name</strong> (<em>string</em>) &#8211; <em>required</em> New name for backend</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="post">
+<dt id="post--backends-{backend_id}">
+<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#post--backends-{backend_id}" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggle state of backend between enabled and disabled</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3
+Host: mist.io
+Accept: application/json; charset=UTF-8
+
+{
+  "newState":"False"
+}</pre>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
+<li><strong>newState</strong> (<em>string</em>) &#8211; <em>required</em> True to enable, False to disable backend</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--backends-{backend_id}-sizes">
+<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/sizes</tt><a class="headerlink" href="#get--backends-{backend_id}-sizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of all sizes provided by backend</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/sizes
+Host: mist.io
+Accept: application/json; charset=UTF-8</pre>
+</div>
+<p><strong>Example response</strong>:</p>
+<div class="highlight-http"><pre>[
+   {
+       "name": "Micro Instance",
+       "price":
+       {
+           "mswin": "$0.035/hour",
+           "sles": "$0.037/hour",
+           "mswinSQLWeb": "$0.081/hour",
+           "rhel": "$0.087/hour",
+           "linux": "$0.027/hour"
+       },
+       "ram": 613,
+       "driver": "Amazon EC2 (ap-northeast-1)",
+       "bandwidth": null,
+       "disk": 15,
+       "id": "t1.micro"
+   },
+   {
+       "name": "Small Instance",
+       "price":
+       {
+           "mswinSQL": "$0.706/hour",
+           "mswinSQLWeb": "$0.161/hour",
+           "mswin": "$0.115/hour",
+           "rhel": "$0.155/hour",
+           "linux": "$0.088/hour",
+           "sles": "$0.122/hour"
+       },
+       "ram": 1740,
+       "driver": "Amazon EC2 (ap-northeast-1)",
+       "bandwidth": null,
+       "disk": 160,
+       "id": "m1.small"
+   },
+   {
+       "name": "Medium Instance",
+       "price":
+       {
+           "mswinSQL": "$0.821/hour",
+           "mswinSQLWeb": "$0.276/hour",
+           "mswin": "$0.23/hour",
+           "rhel": "$0.22/hour",
+           "linux": "$0.175/hour",
+           "sles": "$0.234/hour"
+       },
+       "ram": 3700,
+       "driver": "Amazon EC2 (ap-northeast-1)",
+       "bandwidth": null,
+       "disk": 410,
+       "id": "m1.medium"
+   },
+   {
+       "name": "Large Instance",
+       "price":
+       {
+           "mswinSQL": "$1.051/hour",
+           "mswinSQLWeb": "$0.506/hour",
+           "mswin": "$0.46/hour",
+           "rhel": "$0.419/hour",
+           "linux": "$0.35/hour",
+           "sles": "$0.465/hour"
+       },
+       "ram": 7680,
+       "driver": "Amazon EC2 (ap-northeast-1)",
+       "bandwidth": null,
+       "disk": 850,
+       "id": "m1.large"
+   },
+   {
+       "name": "Extra Large Instance",
+       "price":
+       {
+           "mswinSQL": "$1.511/hour",
+           "mswinSQLWeb": "$0.966/hour",
+           "mswin": "$0.92/hour",
+           "rhel": "$0.769/hour",
+           "linux": "$0.7/hour",
+           "sles": "$0.815/hour"
+       },
+       "ram": 15360,
+       "driver": "Amazon EC2 (ap-northeast-1)",
+       "bandwidth": null,
+       "disk": 1690,
+       "id": "m1.xlarge"
+   },
+   {
+       "name": "High-Memory Extra Large Instance",
+       "price":
+       {
+           "mswinSQL": "$1.161/hour",
+           "mswinSQLWeb": "$0.616/hour",
+           "mswin": "$0.57/hour",
+           "rhel": "$0.574/hour",
+           "linux": "$0.505/hour",
+           "sles": "$0.62/hour"
+       },
+       "ram": 17510,
+       "driver": "Amazon EC2 (ap-northeast-1)",
+       "bandwidth": null,
+       "disk": 420,
+       "id": "m2.xlarge"
+   },
+   {
+       "name": "High-Memory Double Extra Large Instance",
+       "price":
+       {
+           "mswinSQL": "$1.731/hour",
+           "mswinSQLWeb": "$1.186/hour",
+           "mswin": "$1.14/hour",
+           "rhel": "$1.079/hour",
+           "linux": "$1.01/hour",
+           "sles": "$1.125/hour"
+       },
+       "ram": 35021,
+       "driver": "Amazon EC2 (ap-northeast-1)",
+       "bandwidth": null,
+       "disk": 850,
+       "id": "m2.2xlarge"
+   }
+]</pre>
+</div>
+</dd></dl>
+
+<dl class="get">
+<dt id="get--backends-{backend_id}-locations">
+<tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/locations</tt><a class="headerlink" href="#get--backends-{backend_id}-locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>List locations provided by backend</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/locations
+Host: mist.io
+Accept: application/json; charset=UTF-8</pre>
+</div>
+<p><strong>Example response</strong>:</p>
+<div class="highlight-http"><pre>[
+   {
+       "country": "Japan",
+       "id": "0",
+       "name": "ap-northeast-1a"
+   },
+   {
+       "country": "Japan",
+       "id": "1",
+       "name": "ap-northeast-1b"
+   },
+   {
+       "country": "Japan",
+       "id": "2",
+       "name": "ap-northeast-1c"
+   }
+]</pre>
+</div>
+</dd></dl>
+
+
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, Mist.io Inc.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

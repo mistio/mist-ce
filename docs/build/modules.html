@@ -1,0 +1,1210 @@
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Modules &mdash; mist.io 1.0b1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.0.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/my-styles.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0b1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/myscript.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="mist.io 1.0b1 documentation" href="index.html" />
+    <link rel="next" title="RESTful API" href="rest_api.html" />
+    <link rel="prev" title="Developer Guide" href="developer_guide.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><img src="_static/logo.png">
+          mist.io</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a href="index.html"
+     class="dropdown-toggle"
+     data-toggle="dropdown">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+    ><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"><ul>
+<li><a class="reference internal" href="#">Modules</a><ul>
+<li><a class="reference internal" href="#module-mist.io"><tt class="docutils literal"><span class="pre">mist.io</span></tt></a></li>
+<li><a class="reference internal" href="#module-mist.io.views"><tt class="docutils literal"><span class="pre">mist.io.views</span></tt></a></li>
+<li><a class="reference internal" href="#module-mist.io.methods"><tt class="docutils literal"><span class="pre">mist.io.methods</span></tt></a></li>
+<li><a class="reference internal" href="#module-mist.io.dal"><tt class="docutils literal"><span class="pre">mist.io.dal</span></tt></a></li>
+<li><a class="reference internal" href="#module-mist.io.model"><tt class="docutils literal"><span class="pre">mist.io.model</span></tt></a></li>
+<li><a class="reference internal" href="#module-mist.io.shell"><tt class="docutils literal"><span class="pre">mist.io.shell</span></tt></a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="developer_guide.html" title="Previous Chapter: Developer Guide"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm">&laquo; Developer Guide</span>
+    </a>
+  </li>
+  <li>
+    <a href="rest_api.html" title="Next Chapter: RESTful API"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm">RESTful API &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/modules.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="modules">
+<h1>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h1>
+<p>This is a detailed documentation of all basic modules</p>
+<div class="section" id="module-mist.io">
+<span id="mist-io"></span><h2><a class="reference internal" href="#module-mist.io" title="mist.io"><tt class="xref py py-mod docutils literal"><span class="pre">mist.io</span></tt></a><a class="headerlink" href="#module-mist.io" title="Permalink to this headline">¶</a></h2>
+<p>Routes and wsgi app creation</p>
+<dl class="function">
+<dt id="mist.io.add_routes">
+<tt class="descclassname">mist.io.</tt><tt class="descname">add_routes</tt><big>(</big><em>config</em><big>)</big><a class="headerlink" href="#mist.io.add_routes" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function defines pyramid routes.</p>
+<p>Takes a Configurator instance as argument and changes it&#8217;s configuration.
+Any return value is ignored. This was put in a separate function so that it
+can easily be imported and extended upon.
+Just use: config.include(add_routes)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.main">
+<tt class="descclassname">mist.io.</tt><tt class="descname">main</tt><big>(</big><em>global_config</em>, <em>**settings</em><big>)</big><a class="headerlink" href="#mist.io.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns a Pyramid WSGI application.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-mist.io.views">
+<span id="mist-io-views"></span><h2><a class="reference internal" href="#module-mist.io.views" title="mist.io.views"><tt class="xref py py-mod docutils literal"><span class="pre">mist.io.views</span></tt></a><a class="headerlink" href="#module-mist.io.views" title="Permalink to this headline">¶</a></h2>
+<p>mist.io.views</p>
+<p>Here we define the HTTP API of the app. The view functions here are
+responsible for taking parameters from the web requests, passing them on to
+functions defined in methods and properly formatting the output. This is the
+only source file where we import things from pyramid. View functions should
+only check that all required params are provided. Any further checking should
+be performed inside the corresponding method functions.</p>
+<dl class="function">
+<dt id="mist.io.views.add_backend">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">add_backend</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.add_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new backend.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.add_key">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">add_key</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.add_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.associate_key">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">associate_key</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.associate_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.check_auth">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">check_auth</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.check_auth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check on the mist.core service if authenticated</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.check_monitoring">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">check_monitoring</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.check_monitoring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ask the mist.io service if monitoring is enabled for this machine.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.create_machine">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">create_machine</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.create_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new virtual machine on the specified backend.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.delete_backend">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">delete_backend</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.delete_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a backend.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It assumes the user may re-add it later so it does not remove
+any key associations.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.delete_key">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">delete_key</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.delete_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete key.</p>
+<p>When a keypair gets deleted, it takes its asociations with it so just need
+to remove from the server too.</p>
+<p>If the default key gets deleted, it sets the next one as default, provided
+that at least another key exists. It returns the list of all keys after
+the deletion, excluding the private keys (check also list_keys).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.delete_machine_metadata">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">delete_machine_metadata</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.delete_machine_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes metadata for a machine, given the machine id and the tag to be
+deleted.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.delete_rule">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">delete_rule</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.delete_rule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a rule.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.disassociate_key">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">disassociate_key</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.disassociate_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.edit_key">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">edit_key</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.edit_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.exception_handler_general">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">exception_handler_general</tt><big>(</big><em>exc</em>, <em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.exception_handler_general" title="Permalink to this definition">¶</a></dt>
+<dd><p>This simply catches all exceptions that don&#8217;t subclass MistError and
+returns an Internal Server Error status code.</p>
+<p>When debugging it may be useful to comment out this function or its
+&#64;view decorator.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.exception_handler_mist">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">exception_handler_mist</tt><big>(</big><em>exc</em>, <em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.exception_handler_mist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Here we catch exceptions and transform them to proper http responses</p>
+<p>This is a special pyramid view that gets triggered whenever an exception
+is raised from any other view. It catches all exceptions exc where
+isinstance(exc, context) is True.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.generate_keypair">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">generate_keypair</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.generate_keypair" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.get_loadavg">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">get_loadavg</tt><big>(</big><em>request</em>, <em>action=None</em><big>)</big><a class="headerlink" href="#mist.io.views.get_loadavg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the loadavg png displayed in the machines list view.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.get_private_key">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">get_private_key</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.get_private_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets private key from keypair name.</p>
+<p>It is used in single key view when the user clicks the display private key
+button.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.get_public_key">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">get_public_key</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.get_public_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.get_stats">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">get_stats</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.get_stats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.home">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">home</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.home" title="Permalink to this definition">¶</a></dt>
+<dd><p>Home page view</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.list_backends">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">list_backends</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.list_backends" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the available backends.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Currently, this is only used by the backend controller in js.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.list_images">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">list_images</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.list_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>List images from each backend.
+Furthermore if a search_term is provided, we loop through each
+backend and search for that term in the ids and the names of
+the community images</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.list_keys">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">list_keys</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.list_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>List keys.</p>
+<p>List all key pairs that are configured on this server. Only the public
+keys are returned.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.list_locations">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">list_locations</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.list_locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>List locations from each backend.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.list_machines">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">list_machines</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.list_machines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets machines and their metadata from a backend.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.list_sizes">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">list_sizes</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.list_sizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>List sizes (aka flavors) from each backend.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.list_specific_images">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">list_specific_images</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.list_specific_images" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.list_supported_providers">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">list_supported_providers</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.list_supported_providers" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;param request: A simple GET request
+&#64;return: Return all of our SUPPORTED PROVIDERS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.machine_actions">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">machine_actions</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.machine_actions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.probe">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">probe</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.probe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Probes a machine over ssh, using fabric.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Used for getting uptime and a list of deployed keys.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.rename_backend">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">rename_backend</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.rename_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renames a backend.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.set_default_key">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">set_default_key</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.set_default_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.set_machine_metadata">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">set_machine_metadata</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.set_machine_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets metadata for a machine, given the backend and machine id.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.shell_stream">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">shell_stream</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.shell_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute command via SSH and stream output</p>
+<p>Streams output using the hidden iframe technique.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.star_image">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">star_image</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.star_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Toggle image as starred.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.toggle_backend">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">toggle_backend</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.toggle_backend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.update_available_keys">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">update_available_keys</tt><big>(</big><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>authorized_keys</em><big>)</big><a class="headerlink" href="#mist.io.views.update_available_keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.update_monitoring">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">update_monitoring</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.update_monitoring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable/disable monitoring for this machine using the hosted mist.io
+service.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.update_rule">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">update_rule</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.update_rule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates or updates a rule.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.views.update_user_settings">
+<tt class="descclassname">mist.io.views.</tt><tt class="descname">update_user_settings</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.update_user_settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>try free plan, by communicating to the mist.core service</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-mist.io.methods">
+<span id="mist-io-methods"></span><h2><a class="reference internal" href="#module-mist.io.methods" title="mist.io.methods"><tt class="xref py py-mod docutils literal"><span class="pre">mist.io.methods</span></tt></a><a class="headerlink" href="#module-mist.io.methods" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="mist.io.methods.connect_provider">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">connect_provider</tt><big>(</big><em>backend</em><big>)</big><a class="headerlink" href="#mist.io.methods.connect_provider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Establishes backend connection using the credentials specified.</p>
+<p>It has been tested with:</p>
+<blockquote>
+<div><ul class="simple">
+<li>EC2, and the alternative providers like EC2_EU,</li>
+<li>Rackspace, old style and the new Nova powered one,</li>
+<li>Openstack Diablo through Trystack, should also try Essex,</li>
+<li>Linode</li>
+</ul>
+</div></blockquote>
+<p>Backend is expected to be a mist.io.model.Backend</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.delete_machine_metadata">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">delete_machine_metadata</tt><big>(</big><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>tag</em><big>)</big><a class="headerlink" href="#mist.io.methods.delete_machine_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes metadata for a machine, given the machine id and the tag to be
+deleted.</p>
+<p>Libcloud handles this differently for each provider. Linode and Rackspace,
+at least the old Rackspace providers, don&#8217;t support metadata updating. In
+EC2 you can delete just the tag you like. In Openstack you can only set a
+new list and not delete from the existing.</p>
+<p>Mist.io client knows only the value of the tag and not it&#8217;s key so it
+has to loop through the machine list in order to find it.</p>
+<p>Don&#8217;t forget to check string encoding before using them in ifs.
+u&#8217;f&#8217; is &#8216;f&#8217; returns false.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.edit_key">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">edit_key</tt><big>(</big><em>user</em>, <em>new_key</em>, <em>old_key</em><big>)</big><a class="headerlink" href="#mist.io.methods.edit_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Edits a given key&#8217;s name from old_key &#8212;&gt; new_key
+&#64;param user: The User
+&#64;param new_key: The new Key name (id)
+&#64;param old_key: The old key name (id)
+&#64;return: Nothing, only raises exceptions if needed</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.get_machine_actions">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">get_machine_actions</tt><big>(</big><em>machine_from_api</em>, <em>conn</em><big>)</big><a class="headerlink" href="#mist.io.methods.get_machine_actions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns available machine actions based on backend type.</p>
+<p>Rackspace, Linode and openstack support the same options, but EC2 also
+supports start/stop.</p>
+<p>The available actions are based on the machine state. The state
+codes supported by mist.io are those of libcloud, check config.py.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.list_images">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">list_images</tt><big>(</big><em>user</em>, <em>backend_id</em>, <em>term=None</em><big>)</big><a class="headerlink" href="#mist.io.methods.list_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>List images from each backend.</p>
+<p>Furthermore if a search_term is provided, we loop through each
+backend and search for that term in the ids and the names of
+the community images</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.list_locations">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">list_locations</tt><big>(</big><em>user</em>, <em>backend_id</em><big>)</big><a class="headerlink" href="#mist.io.methods.list_locations" title="Permalink to this definition">¶</a></dt>
+<dd><p>List locations from each backend.</p>
+<p>Locations mean different things in each backend. e.g. EC2 uses it as a
+datacenter in a given availability zone, whereas Linode lists availability
+zones. However all responses share id, name and country eventhough in some
+cases might be empty, e.g. Openstack.</p>
+<p>In EC2 all locations by a provider have the same name, so the availability
+zones are listed instead of name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.list_machines">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">list_machines</tt><big>(</big><em>user</em>, <em>backend_id</em><big>)</big><a class="headerlink" href="#mist.io.methods.list_machines" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all machines in this backend via API call to the provider.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.list_sizes">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">list_sizes</tt><big>(</big><em>user</em>, <em>backend_id</em><big>)</big><a class="headerlink" href="#mist.io.methods.list_sizes" title="Permalink to this definition">¶</a></dt>
+<dd><p>List sizes (aka flavors) from each backend.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.reboot_machine">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">reboot_machine</tt><big>(</big><em>user</em>, <em>backend_id</em>, <em>machine_id</em><big>)</big><a class="headerlink" href="#mist.io.methods.reboot_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reboots a machine on a certain backend.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.rename_backend">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">rename_backend</tt><big>(</big><em>user</em>, <em>backend_id</em>, <em>new_name</em><big>)</big><a class="headerlink" href="#mist.io.methods.rename_backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renames backend with given backend_id.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.set_default_key">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">set_default_key</tt><big>(</big><em>user</em>, <em>key_id</em><big>)</big><a class="headerlink" href="#mist.io.methods.set_default_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a new default key</p>
+<p>&#64;param user: The user
+&#64;param key_id: The id of the key we want to set as default
+&#64;return: Nothing. Raises only exceptions if needed.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.set_machine_metadata">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">set_machine_metadata</tt><big>(</big><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>tag</em><big>)</big><a class="headerlink" href="#mist.io.methods.set_machine_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets metadata for a machine, given the backend and machine id.</p>
+<p>Libcloud handles this differently for each provider. Linode and Rackspace,
+at least the old Rackspace providers, don&#8217;t support metadata adding.</p>
+<p>machine_id comes as u&#8217;...&#8217; but the rest are plain strings so use == when
+comparing in ifs. u&#8217;f&#8217; is &#8216;f&#8217; returns false and &#8216;in&#8217; is too broad.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.ssh_command">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">ssh_command</tt><big>(</big><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>host</em>, <em>command</em>, <em>key_id=None</em>, <em>username=None</em>, <em>password=None</em><big>)</big><a class="headerlink" href="#mist.io.methods.ssh_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>We initialize a Shell instant (for mist.io.shell).</p>
+<p>Autoconfigures shell and returns command&#8217;s output as string.
+Raises MachineUnauthorizedError if it doesn&#8217;t manage to connect.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.start_machine">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">start_machine</tt><big>(</big><em>user</em>, <em>backend_id</em>, <em>machine_id</em><big>)</big><a class="headerlink" href="#mist.io.methods.start_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts a machine on backends that support it.</p>
+<p>Currently only EC2 supports that.
+Normally try won&#8217;t get an AttributeError exception because this
+action is not allowed for machines that don&#8217;t support it. Check
+helpers.get_machine_actions.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.stop_machine">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">stop_machine</tt><big>(</big><em>user</em>, <em>backend_id</em>, <em>machine_id</em><big>)</big><a class="headerlink" href="#mist.io.methods.stop_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops a machine on backends that support it.</p>
+<p>Currently only EC2 supports that.
+Normally try won&#8217;t get an AttributeError exception because this
+action is not allowed for machines that don&#8217;t support it. Check
+helpers.get_machine_actions.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-mist.io.dal">
+<span id="mist-io-dal"></span><h2><a class="reference internal" href="#module-mist.io.dal" title="mist.io.dal"><tt class="xref py py-mod docutils literal"><span class="pre">mist.io.dal</span></tt></a><a class="headerlink" href="#module-mist.io.dal" title="Permalink to this headline">¶</a></h2>
+<p>Mist Io DAL</p>
+<p>DAL can stand for &#8216;Database Abstraction Layer&#8217;, &#8216;Data Access Layer&#8217; or
+any of several more similar combinations.</p>
+<p>The role of this DAL is to take control over all persistence related
+operations like reading from and writing to some storage. The rest of
+the application knows nothing about how the storage is implemented and
+is only presented with a simple, object oriented API.</p>
+<p>Mist io uses yaml files as its storage backend. We store data using a
+main dict consisting of nested dicts, lists, ints, strs etc. This
+module provides an object oriented interface on those dicts.</p>
+<p>A basic class here is OODict that defines a dict to object mapper.
+Classes that inherit OODict are initiated using a dict. Dict keys are
+on the fly transformed to object attributes, based on predefined fields.
+These fields (subclasses of Field) can be of a certain type and may have
+a default value.</p>
+<p>From here you should import:
+StrField, IntField, FloatField, BoolField, ListField, DictField,
+getOODictField, getFieldsListField, getFieldsDictField, OODict, UserEngine</p>
+<dl class="class">
+<dt id="mist.io.dal.BoolField">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">BoolField</tt><big>(</big><em>val=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.BoolField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a boolean field. Default value: False</p>
+<dl class="attribute">
+<dt id="mist.io.dal.BoolField.back_types">
+<tt class="descname">back_types</tt><em class="property"> = [&lt;type 'bool'&gt;]</em><a class="headerlink" href="#mist.io.dal.BoolField.back_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.dal.BoolField.front_types">
+<tt class="descname">front_types</tt><em class="property"> = [&lt;type 'bool'&gt;]</em><a class="headerlink" href="#mist.io.dal.BoolField.front_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.dal.DictField">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">DictField</tt><big>(</big><em>val=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.DictField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a dictionary field. Default value: {}</p>
+<dl class="attribute">
+<dt id="mist.io.dal.DictField.back_types">
+<tt class="descname">back_types</tt><em class="property"> = [&lt;type 'dict'&gt;]</em><a class="headerlink" href="#mist.io.dal.DictField.back_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.dal.DictField.front_types">
+<tt class="descname">front_types</tt><em class="property"> = [&lt;type 'dict'&gt;]</em><a class="headerlink" href="#mist.io.dal.DictField.front_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.dal.Field">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">Field</tt><big>(</big><em>val=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.Field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Field is an abstract base class meant to be subclassed.</p>
+<p>All field elements must inherit it so that they
+can be distinguished from other instance attributes.</p>
+<p>Front refers to the python side, back refers to the storage side.
+front_types and back_types must be lists of new style classes. They
+represent the valid types a field may have.
+Values will always be casted based on the first type. The rest just
+declare that they are also accepted inputs and should not raise
+errors.</p>
+<p>What is a field? A field object doesn&#8217;t actually hold the value
+corresponding to that field. It just contains the information of how
+this value should look like, what type it should have in the storage
+backend and what in the python frontend plus a default value, should
+there be no corresponding value set. It is used by OODict&#8217;s and
+FieldSequence&#8217;s to appropriately handle the values fetched from storage.</p>
+<dl class="attribute">
+<dt id="mist.io.dal.Field.back_types">
+<tt class="descname">back_types</tt><a class="headerlink" href="#mist.io.dal.Field.back_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Must be a list of new style classes. These classes represent the
+valid types a field may have in the storage side. Values will always be
+casted based on the first type. The rest just declare that they are
+also accepted inputs and should not raise errors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mist.io.dal.Field.cast2back">
+<tt class="descname">cast2back</tt><big>(</big><em>front_value=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.Field.cast2back" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a value from the frontend and cast to backend, replacing with
+default if None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mist.io.dal.Field.cast2front">
+<tt class="descname">cast2front</tt><big>(</big><em>back_value=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.Field.cast2front" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a value from the backend and cast to frontend, replacing with
+default if None.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.dal.Field.front_types">
+<tt class="descname">front_types</tt><a class="headerlink" href="#mist.io.dal.Field.front_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Must be a list of new style classes. These classes represent the
+valid types a field may have in the python side. Values will always be
+casted based on the first type. The rest just declare that they are
+also accepted inputs and should not raise errors.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.dal.FieldsDict">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">FieldsDict</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#mist.io.dal.FieldsDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines a dict like container object that parses the real dict
+in the backend by treating the items as fields. It inherits basic
+container methods getitem, setitem, delitem and len from FieldsSequence
+and adds the iter method. Based on these basic container methods, the
+MutableMapping ABC provides the rest of the dict api, so you can use
+this container just as you would do with a dict(clear, setdefault etc).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.dal.FieldsList">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">FieldsList</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#mist.io.dal.FieldsList" title="Permalink to this definition">¶</a></dt>
+<dd><p>This defines a list like container object that parses the real list
+in the backend by treating the items as fields. It inherits basic
+container methods getitem, setitem, delitem and len from FieldsSequence
+and adds the insert method. Based on these basic container methods, the
+MutableSequence ABC provides the rest of the list api, so you can use
+this container just as you would do with a list (append, pop etc).</p>
+<dl class="method">
+<dt id="mist.io.dal.FieldsList.insert">
+<tt class="descname">insert</tt><big>(</big><em>index</em>, <em>value</em><big>)</big><a class="headerlink" href="#mist.io.dal.FieldsList.insert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.dal.FieldsSequence">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">FieldsSequence</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#mist.io.dal.FieldsSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract Base Class providing part of the required methods for a
+custom container type to work.</p>
+<p>Sets up a basic Sequence field, whose items are being parsed by
+some Field subclass. That means you can have a list or dict with
+str values, or int, or bool, or etc. This is an abstract base class.
+It interfaces upon an existing sequence without copying it and treats its
+items based on a field type.</p>
+<p>Here we provide getitem, setitem, delitem and len methods for the
+containers. These methods are complemented by others in the subclasses.</p>
+<dl class="method">
+<dt id="mist.io.dal.FieldsSequence.get_raw">
+<tt class="descname">get_raw</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.dal.FieldsSequence.get_raw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.dal.FloatField">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">FloatField</tt><big>(</big><em>val=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.FloatField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a floating point number field. Default value: 0.0</p>
+<dl class="attribute">
+<dt id="mist.io.dal.FloatField.back_types">
+<tt class="descname">back_types</tt><em class="property"> = [&lt;type 'float'&gt;]</em><a class="headerlink" href="#mist.io.dal.FloatField.back_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.dal.FloatField.front_types">
+<tt class="descname">front_types</tt><em class="property"> = [&lt;type 'float'&gt;]</em><a class="headerlink" href="#mist.io.dal.FloatField.front_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.dal.IntField">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">IntField</tt><big>(</big><em>val=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.IntField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets an integer field. Default value: 0</p>
+<dl class="attribute">
+<dt id="mist.io.dal.IntField.back_types">
+<tt class="descname">back_types</tt><em class="property"> = [&lt;type 'int'&gt;, &lt;type 'float'&gt;]</em><a class="headerlink" href="#mist.io.dal.IntField.back_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.dal.IntField.front_types">
+<tt class="descname">front_types</tt><em class="property"> = [&lt;type 'int'&gt;, &lt;type 'float'&gt;]</em><a class="headerlink" href="#mist.io.dal.IntField.front_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.dal.ListField">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">ListField</tt><big>(</big><em>val=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.ListField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a list field. Default value: []</p>
+<dl class="attribute">
+<dt id="mist.io.dal.ListField.back_types">
+<tt class="descname">back_types</tt><em class="property"> = [&lt;type 'list'&gt;, &lt;type 'tuple'&gt;]</em><a class="headerlink" href="#mist.io.dal.ListField.back_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.dal.ListField.front_types">
+<tt class="descname">front_types</tt><em class="property"> = [&lt;type 'list'&gt;, &lt;type 'tuple'&gt;]</em><a class="headerlink" href="#mist.io.dal.ListField.front_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.dal.OODict">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">OODict</tt><big>(</big><em>_dict=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.OODict" title="Permalink to this definition">¶</a></dt>
+<dd><p>OODict is an abstract base class that defines a dict to object mapper.
+It is instantiated given a dict, as obtained by mongo for example.
+By defining (in OODict subclasses) properties that are instances of
+subclasses of Field, we define the dict schema, the names of the fields,
+the types of their values as well as default values.</p>
+<p>This class interfaces an existing dict. So when you give it a dict, as
+obtained by mongo or yaml or memcache or whatever, it sees which properties
+that are instances of subclasses of Field are defined. When you try to
+access that property, the call is intercepted and the values are read from
+and to the dict directly. If they are not of the correct type, they&#8217;ll be
+casted. If the values are missing on the dict, they will be set to the
+default. This aproach doesn&#8217;t copy data and store it seperately. It just
+interfaces.</p>
+<dl class="method">
+<dt id="mist.io.dal.OODict.as_dict">
+<tt class="descname">as_dict</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.dal.OODict.as_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mist.io.dal.OODict.get_raw">
+<tt class="descname">get_raw</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.dal.OODict.get_raw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mist.io.dal.OODict.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.dal.OODict.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.dal.OODictYaml">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">OODictYaml</tt><big>(</big><em>yaml_rel_path</em><big>)</big><a class="headerlink" href="#mist.io.dal.OODictYaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>This takes care of all storage related operations.</p>
+<dl class="method">
+<dt id="mist.io.dal.OODictYaml.save">
+<tt class="descname">save</tt><big>(</big><em>yaml_rel_path=''</em><big>)</big><a class="headerlink" href="#mist.io.dal.OODictYaml.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save data to yaml file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.dal.ObjectField">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">ObjectField</tt><big>(</big><em>val=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.ObjectField" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an abstract base class that inherits from Field. It
+assumes that front type is a subclass of BaseObject and changes
+the way values are casted to backend accordingly.</p>
+<dl class="method">
+<dt id="mist.io.dal.ObjectField.cast2back">
+<tt class="descname">cast2back</tt><big>(</big><em>front_value=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.ObjectField.cast2back" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.dal.StrField">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">StrField</tt><big>(</big><em>val=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.StrField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a string field. Default value: &#8216;&#8217;</p>
+<dl class="attribute">
+<dt id="mist.io.dal.StrField.back_types">
+<tt class="descname">back_types</tt><em class="property"> = [&lt;type 'str'&gt;, &lt;type 'unicode'&gt;]</em><a class="headerlink" href="#mist.io.dal.StrField.back_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.dal.StrField.front_types">
+<tt class="descname">front_types</tt><em class="property"> = [&lt;type 'str'&gt;, &lt;type 'unicode'&gt;]</em><a class="headerlink" href="#mist.io.dal.StrField.front_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.dal.User">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">User</tt><a class="headerlink" href="#mist.io.dal.User" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="mist.io.dal.User.lock_n_load">
+<tt class="descname">lock_n_load</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#mist.io.dal.User.lock_n_load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dummy lock, doesn&#8217;t actually do anything.</p>
+<p>It must be used with a &#8216;with&#8217; statement as follows:
+with user.lock_n_load():
+# edit user
+user.save()
+Lock is automatically released after exiting the &#8216;with&#8217; block.
+Attempting to save without first acquiring the lock will raise an
+exception.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mist.io.dal.User.save">
+<tt class="descname">save</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.dal.User.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save user data to storage.</p>
+<p>Raises exception if not in a &#8220;with user.lock_n_load():&#8221; code block.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.dal.make_field">
+<tt class="descclassname">mist.io.dal.</tt><tt class="descname">make_field</tt><big>(</big><em>obj_type</em><big>)</big><a class="headerlink" href="#mist.io.dal.make_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Field subclass out of some obj_type.</p>
+<p>This works for any obj_type that subclasses OODict or FieldsSequence.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-mist.io.model">
+<span id="mist-io-model"></span><h2><a class="reference internal" href="#module-mist.io.model" title="mist.io.model"><tt class="xref py py-mod docutils literal"><span class="pre">mist.io.model</span></tt></a><a class="headerlink" href="#module-mist.io.model" title="Permalink to this headline">¶</a></h2>
+<p>Mist Io Model</p>
+<p>Here we define the schema of our data structure in an object oriented
+way.</p>
+<p>Simple, low level, helper functions can also be added to the
+following classes. (eg user.get_num_mon_machines(), user.keys.unused()).
+It is recommended that only pure functions (no side-effects) are used
+as class methods.</p>
+<p>How this works:
+The basic class is the OODict. This defines a dict to object mapper.
+When we need a new data structure, we define a new subclass of OODict.
+Class properties that are instances of Field subclasses are considered to be
+OODict fields. These are the keys in the underlying dict that will be used.
+There is a large variety of standard type fields.
+One can create an OODict that has a field which is also parsed by some OODict.
+To do so, you define a field on the outer OODict that is created by make_field.
+Finally, list or dict like collections can be created by subclassing FieldsList
+and FieldsDict. The items of these collections will be parsed according to
+the field type defined in the class. This collection can be used as a field
+in some OODict by use of make_field. If it sounds too complicated, just look
+the code below, it should be pretty self-explanatory.</p>
+<dl class="class">
+<dt id="mist.io.model.Backend">
+<em class="property">class </em><tt class="descclassname">mist.io.model.</tt><tt class="descname">Backend</tt><big>(</big><em>_dict=None</em><big>)</big><a class="headerlink" href="#mist.io.model.Backend" title="Permalink to this definition">¶</a></dt>
+<dd><p>A cloud vm provider backend</p>
+<dl class="attribute">
+<dt id="mist.io.model.Backend.apikey">
+<tt class="descname">apikey</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.apikey" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Backend.apisecret">
+<tt class="descname">apisecret</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.apisecret" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Backend.apiurl">
+<tt class="descname">apiurl</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.apiurl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Backend.auth_version">
+<tt class="descname">auth_version</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.auth_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Backend.enabled">
+<tt class="descname">enabled</tt><em class="property"> = &lt;class 'mist.io.dal.BoolField'&gt;(False)</em><a class="headerlink" href="#mist.io.model.Backend.enabled" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mist.io.model.Backend.get_id">
+<tt class="descname">get_id</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.model.Backend.get_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Backend.machine_count">
+<tt class="descname">machine_count</tt><em class="property"> = &lt;class 'mist.io.dal.IntField'&gt;(0)</em><a class="headerlink" href="#mist.io.model.Backend.machine_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Backend.machines">
+<tt class="descname">machines</tt><em class="property"> = &lt;class 'mist.io.dal.FieldsDictField'&gt;(&lt;class 'mist.io.model.Machines'&gt;: {})</em><a class="headerlink" href="#mist.io.model.Backend.machines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Backend.poll_interval">
+<tt class="descname">poll_interval</tt><em class="property"> = &lt;class 'mist.io.dal.IntField'&gt;(10000)</em><a class="headerlink" href="#mist.io.model.Backend.poll_interval" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Backend.provider">
+<tt class="descname">provider</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.provider" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Backend.region">
+<tt class="descname">region</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.region" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Backend.starred">
+<tt class="descname">starred</tt><em class="property"> = &lt;class 'mist.io.dal.ListField'&gt;([])</em><a class="headerlink" href="#mist.io.model.Backend.starred" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Backend.tenant_name">
+<tt class="descname">tenant_name</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.tenant_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Backend.title">
+<tt class="descname">title</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.title" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.model.Backends">
+<em class="property">class </em><tt class="descclassname">mist.io.model.</tt><tt class="descname">Backends</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#mist.io.model.Backends" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="mist.io.model.Keypair">
+<em class="property">class </em><tt class="descclassname">mist.io.model.</tt><tt class="descname">Keypair</tt><big>(</big><em>_dict=None</em><big>)</big><a class="headerlink" href="#mist.io.model.Keypair" title="Permalink to this definition">¶</a></dt>
+<dd><p>An ssh keypair.</p>
+<dl class="method">
+<dt id="mist.io.model.Keypair.construct_public_from_private">
+<tt class="descname">construct_public_from_private</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.model.Keypair.construct_public_from_private" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs pub key from self.private and assignes to self.public.
+Only works for RSA.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Keypair.default">
+<tt class="descname">default</tt><em class="property"> = &lt;class 'mist.io.dal.BoolField'&gt;(False)</em><a class="headerlink" href="#mist.io.model.Keypair.default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mist.io.model.Keypair.generate">
+<tt class="descname">generate</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.model.Keypair.generate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a new RSA keypair and assignes to self.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mist.io.model.Keypair.isvalid">
+<tt class="descname">isvalid</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.model.Keypair.isvalid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if self is a valid RSA keypair.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Keypair.machines">
+<tt class="descname">machines</tt><em class="property"> = &lt;class 'mist.io.dal.ListField'&gt;([])</em><a class="headerlink" href="#mist.io.model.Keypair.machines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Keypair.private">
+<tt class="descname">private</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Keypair.private" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Keypair.public">
+<tt class="descname">public</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Keypair.public" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.model.Keypairs">
+<em class="property">class </em><tt class="descclassname">mist.io.model.</tt><tt class="descname">Keypairs</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#mist.io.model.Keypairs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="mist.io.model.Machine">
+<em class="property">class </em><tt class="descclassname">mist.io.model.</tt><tt class="descname">Machine</tt><big>(</big><em>_dict=None</em><big>)</big><a class="headerlink" href="#mist.io.model.Machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>A saved machine in the machines list of some backend.</p>
+<p>For the time being, only bare metal machines are saved, for API backends
+we get the machine list from the provider.</p>
+<dl class="attribute">
+<dt id="mist.io.model.Machine.dns_name">
+<tt class="descname">dns_name</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Machine.dns_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Machine.name">
+<tt class="descname">name</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Machine.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Machine.public_ips">
+<tt class="descname">public_ips</tt><em class="property"> = &lt;class 'mist.io.dal.ListField'&gt;([])</em><a class="headerlink" href="#mist.io.model.Machine.public_ips" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Machine.ssh_port">
+<tt class="descname">ssh_port</tt><em class="property"> = &lt;class 'mist.io.dal.IntField'&gt;(22)</em><a class="headerlink" href="#mist.io.model.Machine.ssh_port" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.Machine.uuid">
+<tt class="descname">uuid</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Machine.uuid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.model.Machines">
+<em class="property">class </em><tt class="descclassname">mist.io.model.</tt><tt class="descname">Machines</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#mist.io.model.Machines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collection of machines of a certain backend.</p>
+<p>For the time being, only bare metal machines are saved, for API backends
+we get the machine list from the provider.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.model.User">
+<em class="property">class </em><tt class="descclassname">mist.io.model.</tt><tt class="descname">User</tt><a class="headerlink" href="#mist.io.model.User" title="Permalink to this definition">¶</a></dt>
+<dd><p>The basic model class is User. It contains all the methods
+necessary to find and save users in memcache and in mongo.
+It transforms the user dict into an object with consistent
+attributes instead of inconsistent dict with missing keys.</p>
+<dl class="attribute">
+<dt id="mist.io.model.User.backends">
+<tt class="descname">backends</tt><em class="property"> = &lt;class 'mist.io.dal.FieldsDictField'&gt;(&lt;class 'mist.io.model.Backends'&gt;: {})</em><a class="headerlink" href="#mist.io.model.User.backends" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.User.email">
+<tt class="descname">email</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.User.email" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.User.keypairs">
+<tt class="descname">keypairs</tt><em class="property"> = &lt;class 'mist.io.dal.FieldsDictField'&gt;(&lt;class 'mist.io.model.Keypairs'&gt;: {})</em><a class="headerlink" href="#mist.io.model.User.keypairs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.model.User.mist_api_token">
+<tt class="descname">mist_api_token</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.User.mist_api_token" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-mist.io.shell">
+<span id="mist-io-shell"></span><h2><a class="reference internal" href="#module-mist.io.shell" title="mist.io.shell"><tt class="xref py py-mod docutils literal"><span class="pre">mist.io.shell</span></tt></a><a class="headerlink" href="#module-mist.io.shell" title="Permalink to this headline">¶</a></h2>
+<p>mist.io.shell</p>
+<p>This module contains everything that is need to communicate with machines via
+SSH.</p>
+<dl class="class">
+<dt id="mist.io.shell.Shell">
+<em class="property">class </em><tt class="descclassname">mist.io.shell.</tt><tt class="descname">Shell</tt><big>(</big><em>host</em>, <em>username=None</em>, <em>key=None</em>, <em>password=None</em>, <em>port=22</em><big>)</big><a class="headerlink" href="#mist.io.shell.Shell" title="Permalink to this definition">¶</a></dt>
+<dd><p>sHell</p>
+<p>This class takes care of all SSH related issues. It initiates a connection
+to a given host and can send commands whose output can be treated in
+different ways. It can search a user&#8217;s data and autoconfigure itself for
+a given machine by finding the right private key and username. Under the
+hood it uses paramiko.</p>
+<p>Use it like:
+shell = Shell(&#8216;localhost&#8217;, username=&#8217;root&#8217;, password=&#8216;123&#8217;)
+print shell.command(&#8216;uptime&#8217;)</p>
+<p>Or:
+shell = Shell(&#8216;localhost&#8217;)
+shell.autoconfigure(user, backend_id, machine_id)
+for line in shell.command_stream(&#8216;ps -fe&#8217;):
+print line</p>
+<dl class="method">
+<dt id="mist.io.shell.Shell.autoconfigure">
+<tt class="descname">autoconfigure</tt><big>(</big><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>key_id=None</em>, <em>username=None</em>, <em>password=None</em><big>)</big><a class="headerlink" href="#mist.io.shell.Shell.autoconfigure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Autoconfigure SSH client.</p>
+<p>This will do its best effort to find a suitable keypair and username
+and will try to connect. If it fails it raises
+MachineUnauthorizedError, otherwise it initializes self and returns a
+(key_id, ssh_user) tupple. If connection succeeds, it updates the
+association information in the key with the current timestamp and the
+username used to connect.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mist.io.shell.Shell.check_sudo">
+<tt class="descname">check_sudo</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.shell.Shell.check_sudo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if sudo is installed.</p>
+<p>In case it is self.sudo = True, else self.sudo = False</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mist.io.shell.Shell.command">
+<tt class="descname">command</tt><big>(</big><em>cmd</em>, <em>pty=True</em><big>)</big><a class="headerlink" href="#mist.io.shell.Shell.command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run command and return output.</p>
+<p>If pty is True, then it returns a string object that contains the
+combined streams of stdout and stderr, like they would appear in a pty.</p>
+<p>If pty is False, then it returns a two string tupple, consisting of
+stdout and stderr.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mist.io.shell.Shell.command_stream">
+<tt class="descname">command_stream</tt><big>(</big><em>cmd</em><big>)</big><a class="headerlink" href="#mist.io.shell.Shell.command_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run command and stream output line by line.</p>
+<p>This function is a generator that returns the commands output line
+by line. Use like: for line in command_stream(cmd): print line.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mist.io.shell.Shell.connect">
+<tt class="descname">connect</tt><big>(</big><em>username</em>, <em>key=None</em>, <em>password=None</em>, <em>port=22</em><big>)</big><a class="headerlink" href="#mist.io.shell.Shell.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize an SSH connection.</p>
+<p>Tries to connect and configure self. If only password is provided, it
+will be used for authentication. If key is provided, it is treated as
+and OpenSSH private RSA key and used for authentication. If both key
+and password are provided, password is used as a passphrase to unlock
+the private key.</p>
+<p>Raises MachineUnauthorizedError if it fails to connect.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mist.io.shell.Shell.disconnect">
+<tt class="descname">disconnect</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.shell.Shell.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the SSH connection.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, Mist.io Inc.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

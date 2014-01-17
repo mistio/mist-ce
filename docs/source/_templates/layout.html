@@ -1,0 +1,12 @@
+{# Import the theme's layout. #}
+{% extends "!layout.html" %}
+
+{# Custom CSS overrides #}
+{% set bootswatch_css_custom = ['_static/my-styles.css'] %}
+
+{% set script_files = script_files + ["_static/myscript.js"] %}
+
+{# Add some extra stuff before and use existing with 'super()' call. #}
+{% block footer %}
+{{ super() }}
+{% endblock %}

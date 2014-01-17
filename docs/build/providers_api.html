@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; mist.io 1.0b1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.0.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/my-styles.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0b1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/myscript.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="mist.io 1.0b1 documentation" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><img src="_static/logo.png">
+          mist.io</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a href="index.html"
+     class="dropdown-toggle"
+     data-toggle="dropdown">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+    ><ul>
+<li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"><ul class="simple">
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/providers_api.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <dl class="get">
+<dt id="get--providers">
+<tt class="descname">GET </tt><tt class="descname">/providers</tt><a class="headerlink" href="#get--providers" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of all supported providers</p>
+<p><strong>Example request</strong>:</p>
+<div class="highlight-http"><pre>GET /providers
+Host: mist.io
+Accept: application/json; charset=UTF-8</pre>
+</div>
+<p><strong>Example response</strong>:</p>
+<div class="highlight-http"><pre>{
+  "supported_providers": [
+    {
+      "provider": "bare_metal",
+      "title": "Bare Metal Server"
+    },
+    {
+      "provider": "ec2_ap_northeast",
+      "title": "EC2 AP NORTHEAST"
+    },
+    {
+      "provider": "ec2_ap_southeast",
+      "title": "EC2 AP SOUTHEAST"
+    },
+    {
+      "provider": "ec2_ap_southeast_2",
+      "title": "EC2 AP Sydney"
+    },
+    {
+      "provider": "ec2_eu_west",
+      "title": "EC2 EU Ireland"
+    },
+    {
+      "provider": "ec2_sa_east",
+      "title": "EC2 SA EAST"
+    },
+    {
+      "provider": "ec2_us_east",
+      "title": "EC2 US EAST"
+    },
+    {
+      "provider": "ec2_us_west",
+      "title": "EC2 US WEST"
+    },
+    {
+      "provider": "ec2_us_west_oregon",
+      "title": "EC2 US WEST OREGON"
+    },
+    {
+      "provider": "nephoscale",
+      "title": "NephoScale"
+    },
+    {
+      "provider": "digitalocean",
+      "title": "DigitalOcean"
+    },
+    {
+      "provider": "linode",
+      "title": "Linode"
+    },
+    {
+      "provider": "openstack",
+      "title": "OpenStack"
+    },
+    {
+      "provider": "rackspace:dfw",
+      "title": "Rackspace DFW"
+    },
+    {
+      "provider": "rackspace:ord",
+      "title": "Rackspace ORD"
+    },
+    {
+      "provider": "rackspace:iad",
+      "title": "Rackspace IAD"
+    },
+    {
+      "provider": "rackspace:lon",
+      "title": "Rackspace LON"
+    },
+    {
+      "provider": "rackspace:syd",
+      "title": "Rackspace AU"
+    },
+    {
+      "provider": "rackspace_first_gen:us",
+      "title": "Rackspace US (OLD)"
+    },
+    {
+      "provider": "rackspace_first_gen:uk",
+      "title": "Rackspace UK (OLD)"
+    },
+    {
+      "provider": "softlayer",
+      "title": "SoftLayer"
+    },
+    {
+      "provider": "openstack:az-1.region-a.geo-1",
+      "title": "HP Cloud US West AZ 1"
+    },
+    {
+      "provider": "openstack:az-2.region-a.geo-1",
+      "title": "HP Cloud US West AZ 2"
+    },
+    {
+      "provider": "openstack:az-3.region-a.geo-1",
+      "title": "HP Cloud US West AZ 3"
+    },
+    {
+      "provider": "openstack:region-b.geo-1",
+      "title": "HP Cloud US East"
+    }
+  ]
+}</pre>
+</div>
+</dd></dl>
+
+
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, Mist.io Inc.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

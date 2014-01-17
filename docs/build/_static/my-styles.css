@@ -1,0 +1,31 @@
+dt {
+    background-color: #EDEDED;
+    border: 1px solid #DCDCDC;
+    border-radius: 0 0 0 0;
+    box-shadow: 0 1px 0 0 #FFFFFF inset;
+    color: #777777;
+}
+dt:active {
+    position: relative;
+    top: 1px;
+}
+dt:hover {
+    background: -moz-linear-gradient(center top , #DFDFDF 5%, #EDEDED 100%) repeat scroll 0 0 #DFDFDF;
+    cursor: pointer;
+}
+
+a.headerlink {
+    display: none;
+}
+
+.navbar-form, .navbar-nav {
+    padding-top: 20px;
+}
+
+.navbar-brand {
+    font-size: 0px;
+}
+
+.navbar-default {
+    background-image: linear-gradient( #3c3c3c /*{a-bar-background-start}*/, #111 /*{a-bar-background-end}*/);
+}

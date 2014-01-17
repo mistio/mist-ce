@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Developer Guide &mdash; mist.io 1.0b1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.0.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/my-styles.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0b1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/myscript.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="top" title="mist.io 1.0b1 documentation" href="index.html" />
+    <link rel="next" title="Modules" href="modules.html" />
+    <link rel="prev" title="Welcome to mist.io’s documentation!" href="index.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><img src="_static/logo.png">
+          mist.io</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            <li class="divider-vertical"></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a href="index.html"
+     class="dropdown-toggle"
+     data-toggle="dropdown">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+    ><ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Developer Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a></li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"><ul>
+<li><a class="reference internal" href="#">Developer Guide</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#deployment">Deployment</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="index.html" title="Previous Chapter: Welcome to mist.io’s documentation!"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm">&laquo; Welcome to mist....</span>
+    </a>
+  </li>
+  <li>
+    <a href="modules.html" title="Next Chapter: Modules"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm">Modules &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/developer_guide.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      
+  <div class="section" id="developer-guide">
+<h1>Developer Guide<a class="headerlink" href="#developer-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Clone the project from <a class="reference external" href="https://github.com/mistio/mist.io">https://github.com/mistio/mist.io</a></li>
+</ul>
+<p>Mist.io is written in Python. Currently it is tested and developed using
+Python 2.7. The only system wide requirements are Python, Python header
+files and some basic build tools. Git is used for revision control. Every other
+dependency is build automatically via zc.buildout. Although we use zc.buildout
+it is recommended to install mist.io in a virtualenv to avoid conflicts with
+eggs in the system&#8217;s Python.</p>
+<p>To install the basic requirements in a Debian based distro do:</p>
+<div class="highlight-python"><pre>sudo aptitude install python-dev build-essential git</pre>
+</div>
+<p>If you wish to install it in a virtual environment you&#8217;ll also need:</p>
+<div class="highlight-python"><pre>sudo aptitude install python-virtualenv</pre>
+</div>
+<p>In MacOSX you have to install Xcode and its command line tools. For virtualenv
+you simply run:</p>
+<div class="highlight-python"><pre>sudo easy_install virtualenv</pre>
+</div>
+<p>In MacOSX there might be some problems with certificates. To solve the issue
+donwload a pem from <a class="reference external" href="http://curl.haxx.se/docs/caextract.html">http://curl.haxx.se/docs/caextract.html</a> rename it to
+curl-ca-bundle.crt and save it to /opt/local/share/curl/ or to /usr/share/curl/ca-bundle.crt.
+Check out this gist <a class="reference external" href="https://gist.github.com/1stvamp/2158128">https://gist.github.com/1stvamp/2158128</a></p>
+<p>Supposing you have all the above, the steps are simple. Clone the repository,
+create a virtualenv and run buildout:</p>
+<div class="highlight-python"><pre>git clone https://github.com/mistio/mist.io.git
+cd mist.io
+virtualenv --no-site-packages .
+mist.io$ ./bin/python bootstrap.py
+mist.io$ ./bin/buildout -v</pre>
+</div>
+<p>In case you are using an older version of setuptools, bootstrap will fail. To solve this you need to:</p>
+<div class="highlight-python"><pre>mist.io$ ./bin/pip install setuptools --upgrade</pre>
+</div>
+</div>
+<div class="section" id="deployment">
+<h2>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h2>
+<p>Mist.io comes with two sets of deployment options, one suited for production
+environments and one for develompent.</p>
+<p>To get it up and running for production:</p>
+<div class="highlight-python"><pre>mist.io$ ./bin/uwsgi-start production.ini</pre>
+</div>
+<p>For development mode:</p>
+<div class="highlight-python"><pre>mist.io$ ./bin/uwsgi-start development.ini</pre>
+</div>
+<p>Or if you prefer to use paster:</p>
+<div class="highlight-python"><pre>mist.io$ ./bin/paster serve development.ini --reload</pre>
+</div>
+<p>With the &#8211;reload flag, whenever there are changes in Python code and templates
+the server will automatically restart to load the new version. Changes in css
+and javascript don&#8217;t need a restart to show up. To stop it, simply press CTRL+C.</p>
+<p>Point your browser to <a class="reference external" href="http://127.0.0.1:6543">http://127.0.0.1:6543</a> and you are ready to roll!</p>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>We have only a basic set of API tests &#8211; <em>will soon add more</em> &#8211; based on nose package.</p>
+<p>In order to run the tests you have to have paster or uwsgi started.</p>
+<p>You also need to:</p>
+<div class="highlight-python"><pre>mist.io$ cp src/mist/tests/tests_config.yaml.dist src/mist/tests/tests_config.yaml</pre>
+</div>
+<p>The tests_config.yaml will seem like this at first:</p>
+<div class="highlight-python"><pre>BACKENDS: {}
+BACKEND_KEYS:
+  DigitalOcean:
+    api_key:
+    client_id:
+  EC2:
+    api_key:
+    api_secret:
+  Nephoscale:
+    password:
+    username:
+  Rackspace:
+    api_key:
+    username:
+  SoftLayer:
+    api_key:
+    username:
+KEYPAIRS: {}
+MIST_URI: http://127.0.0.1:6543
+SUPPORTED_PROVIDERS: []
+MACHINE_NAME: NinjaTests
+KEY_NAME: NinjaTestsKey
+COOKIE:</pre>
+</div>
+<p>You then add your credentials for every backend <em>(in case you don&#8217;t have credentials for a backend it will not be added)</em></p>
+<p>To actually run the tests:</p>
+<div class="highlight-python"><pre>mist.io$ ./bin/nosetests -w src/mist/io/tests</pre>
+</div>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>To generate these docs with sphinx:</p>
+<div class="highlight-python"><pre>mist.io$ ./bin/sphinx-build docs/source/ docs/build/</pre>
+</div>
+<p>Inside the docs/source folder there are two more, the _static and the _template folder. Inside the _static you can add
+css and js files and inside the _template you can tweak the layout.html file. Every time you change a static file and run
+sphinx-build again it may not add anything (adds only if there are changes in .py or .rst files). In order to consider the
+changes in static files you have to use the -a flag.:</p>
+<div class="highlight-python"><pre>mist.io$ ./bin/sphinx-build docs/source/ docs/build/</pre>
+</div>
+<p>Finally there is the -b flag which decides the builder. By default it is html, but you could easily choose between other
+latex <em>(and later use pdflatex to convert all of our Documentation to pdf)</em>. For example:</p>
+<div class="highlight-python"><pre>mist.io$ ./bin/sphinx-build -b latex docs/source/ docs/pdf</pre>
+</div>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014, Mist.io Inc.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>
