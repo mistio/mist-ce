@@ -13,6 +13,7 @@ define('app/views/mistscreen', ['ember'],
 
             didInsertElement: function () {
                 if ($('.ui-page-active').page) {
+                    info('yo');
                     $('.ui-page-active').page();
                 }
             }

@@ -72,7 +72,8 @@ define('app/models/machine', ['ember'],
 
 
             getHost: function() {
-                if (this.extra.dns_name) {
+               
+                if (this.extra && this.extra.dns_name) {
                     // it is an ec2 machine so it has dns_name
                     return this.extra.dns_name;
                 } else {
