@@ -56,6 +56,10 @@ define('app/controllers/notification', ['ember'],
                 });
                 this.timeout = setTimeout("$.mobile.loading( 'hide' )", miliseconds);
             },
+
+            messageBox: function() {
+                
+            }
         });
     }
 );

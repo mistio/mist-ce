@@ -1,5 +1,6 @@
 
-    <div id="message-box" data-role="popup" data-overlay-theme="a" >
+    <div id="message-box-popup" class="large-popup" data-role="popup" data-overlay-theme="a" data-transition="flip"
+                                                                                            data-dismissible="false">
         <div data-role="header">
             <h1>{{Mist.notificationController.msgHeader}}</h1>
         </div>
@@ -8,6 +9,7 @@
             <p>{{Mist.notificationController.msgPart2}}</p>
             <p>{{Mist.notificationController.msgPart3}}</p>
             <p id="message-ps">{{Mist.notificationController.msgPart4}}</p>
+            <a id="message-link">{{Mist.notificationController.msgLink}}</a>
         </div>
         <button {{action "closeMessage" target="view"}}>OK</button>
     </div>

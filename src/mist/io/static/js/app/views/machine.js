@@ -76,16 +76,6 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 });
             },
 
-            enableMonitoringClick: function() {
-                if (Mist.authenticated) {
-                    var machine = this.get('controller').get('model');
-                    machine.openMonitoringDialog();
-                } else {
-                    $("#login-dialog").show();
-                    $("#login-dialog").popup('open');
-                }
-            },
-            
             rules: function(){
                 var ret = Ember.ArrayController.create(),
                     machine = this.get('controller').get('model');
@@ -158,7 +148,31 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 enableMonitoringClicked: function () {
 
                     if (Mist.authenticated) {
-                        //this.machine.set('hasMonitoring', true);
+                        if (Mist.current_plan) {
+                            // TODO: return machine_limit from server (core)
+                            //if (Mist.current_plan.machine_limit >= Mist.monitored_machines.length) {
+                                if (this.machine.probed) {
+                                    // TODO: Send command to deploy collectd
+                                } else {
+                                    // TODO: Show message box about adding keys or deploying collectd manually
+                                }
+                            /*} else {
+                                Mist.notificationController.set('msgHeader', 'Machine limit reached');
+                                Mist.notificationController.set('msgPart1', 'The maximum number of monitored machines' +
+                                                                            ' has been reached');
+                                Mist.notificationController.set('msgPart1', 'In order to monitor more machines you should' +
+                                                                            ' upgrade to another plan');
+                                Mist.notificationController.set('msgPart3', 'You can do that in the Account page, which can' +
+                                                                            'be accessed from the menu button on the top right corner');
+                                    
+                            }*/
+                        } else {
+                            Mist.notificationController.set('msgHeader', 'No plan');
+                            Mist.notificationController.set('msgPart1', 'In order to use our monitoring service' +
+                                                                        ' you have to purchase a plan');
+                            Mist.notificationController.set('msgPart2', 'You can do that in the Account page, which can' +
+                                                                        'be accessed from the menu button on the top right corner');
+                        }
                     } else {
                         Mist.loginController.open();
                     }
