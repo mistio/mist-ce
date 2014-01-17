@@ -312,10 +312,6 @@ define( 'app', [
         App.TextField = Ember.TextField;
         App.ShellTextField = Ember.TextField.extend({
 
-            insertNewline: function() {
-                Mist.machineShellController.submit();
-            },
-
             keyDown: function(event, view) {
                 var commandHistoryIndex = Mist.machineShellController.commandHistoryIndex;
                 var commandHistory = Mist.machineShellController.machine.commandHistory;
