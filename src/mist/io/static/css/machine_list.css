@@ -28,6 +28,9 @@
 }
 .machine-name {
     width: 40% !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 16px;
 }
 .machine-state {
     width: 20% !important;
@@ -42,6 +45,12 @@
 }
 .machine-tags {
     float: right;
-    margin-right: 27px;
+    position: absolute;
+    right: 116px;
     width: auto !important;
+    top: 19px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 29%;
+    height: 21px;
 }

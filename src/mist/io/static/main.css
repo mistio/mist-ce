@@ -186,10 +186,23 @@ textarea {
 ul.checkbox-list li {
     background: #eeeeee /*{c-bup-background-color}*/ linear-gradient( #fff /*{c-bup-background-start}*/, #f1f1f1 /*{c-bup-background-end}*/) !important;
     border: 1px #ccc solid;
-    border-bottom: 0px;
+    margin-top: -1px;
 }
 ul.checkbox-list li:hover {
     background: #dfdfdf linear-gradient( #f6f6f6 /*{c-bhover-background-start}*/, #e0e0e0 /*{c-bhover-background-end}*/) !important;
+}
+ul.checkbox-list li a {
+    padding-left: 0px !important;
+}
+ul.checkbox-list li a.has-monitoring:after {
+    opacity: 1;
+}
+.ui-icon-carat-r:after {
+    background-color: #666;
+    opacity: .6;    
+}
+ul.checkbox-list li a:focus {
+    box-shadow: none !important;
 }
 ul.checkbox-list li a, ul.checkbox-list li a:hover, ul.checkbox-list label, ul.checkbox-list label:hover {
     background-color: transparent !important;
@@ -231,7 +244,7 @@ ul.checkbox-list li a, ul.checkbox-list li label {
 }
 .checkbox-link .tag {
     border: 1px solid #bfbfbf;
-    margin: 0;
+    margin: 1px;
     color: #555 !important;
     padding: 1px 7px;
     float: right;
@@ -332,18 +345,18 @@ ul.checkbox-list li a, ul.checkbox-list li label {
 }
 @keyframes probe {
     from {
-        background-color: rgba(0, 0, 0, .4);    
+        opacity: 1;    
     }
     to {
-        background-color: transparent;
+        opacity: .1;
     }
 }
 @-webkit-keyframes probe {
     from {
-        background-color: rgba(0, 0, 0, 1);
+        opacity: 1;    
     }
     to {
-        background-color: transparent;
+        opacity: .1;
     }
 }
 
@@ -360,7 +373,7 @@ ul.checkbox-list li a, ul.checkbox-list li label {
     background-color: #06A2CB !important;
 }
 .cold {
-    background-color: #336699 !important;
+    background-color: #396b9e !important;
 }
 
 
