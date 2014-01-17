@@ -139,11 +139,11 @@ service at <a class="reference external" href="https://mist.io">https://mist.io<
 <div class="section" id="authenticate-through-https-mist-io">
 <h2>Authenticate through <a class="reference external" href="https://mist.io">https://mist.io</a><a class="headerlink" href="#authenticate-through-https-mist-io" title="Permalink to this headline">¶</a></h2>
 <dl class="post">
-<dt id="post-mist.io-login">
-<tt class="descname">POST </tt><tt class="descname">mist.io/login</tt><a class="headerlink" href="#post-mist.io-login" title="Permalink to this definition">¶</a></dt>
+<dt id="post-mist.io-auth">
+<tt class="descname">POST </tt><tt class="descname">mist.io/auth</tt><a class="headerlink" href="#post-mist.io-auth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Authenticate to mist.io service</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /login
+<div class="highlight-http"><pre>POST /auth
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
@@ -153,33 +153,32 @@ Accept: application/json; charset=UTF-8
 }</pre>
 </div>
 <p><strong>Example response</strong>:</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Response Headers:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>Set-Cookie</strong> &#8211; beaker.session.id=5becc619aslkj098aoiljas099e4f; Path=/</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<p>This cookie id will have to be used from here on in your headers as:</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Request Headers:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>cookie</strong> &#8211; 5becc619aslkj098aoiljas099e4f</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
+<div class="highlight-http"><pre>{
+   "mist_api_token": "4a2c2j08099809709as098087832843e561abb495c4a30726a8590f73adad",
+   "current_plan":
+   {
+       "started": 1384966750.686227,
+       "has_expired": false,
+       "promo_code": "PROMO50",
+       "expiration": 1416502750.686229,
+       "title": "Basic"
+   },
+   "user_details":
+   {
+       "country": "Greece",
+       "number_of_servers": "1-5",
+       "number_of_people": "1-5",
+       "name": "John Doe",
+       "company_name": "mist"
+   }
+}</pre>
+</div>
+<p>Using this api token in your header you can now use all of mist.io&#8217;s API by passing in your headers:</p>
+<div class="highlight-python"><pre>Authorized: 4a2c2j08099809709as098087832843e561abb495c4a30726a8590f73adad</pre>
+</div>
 <p>In case you have your own installation of mist, you do not have to authenticate and get
-a beaker.session.id to use mist.io&#8217;s RESTful API.</p>
+a token to use mist.io&#8217;s RESTful API. However by doing so you can have your own setup and
+use the premioum services of mist such as monitoring, adding rules and alerts to your machine.</p>
 </dd></dl>
 
 </div>
