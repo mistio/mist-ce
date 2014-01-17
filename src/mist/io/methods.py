@@ -1320,3 +1320,53 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
             conn.ex_set_metadata(machine, tags)
         except:
             BackendUnavailableError("Error while updating metadata")
+
+
+def _deploy_collectd(user, backend_id, machine_id, host
+                     monitor_url, machine_uuid, collectd_password):
+    """Install collectd to the machine and return command's output"""
+
+    #FIXME: do not hard-code stuff!
+    filename = 'deploy_collectd.sh'
+    uri = config.CORE_URI + '/core/scripts/%s' % filename
+    prefix = '/opt/mistio-collectd'
+    prepare_dirs = '$(command -v sudo) mkdir -p %s' % prefix
+    get_script = (
+        "$(command -v sudo) su root -c \"wget --no-check-certificate "
+        "%s -O - > %s/%s\"" % (uri, prefix, filename)
+    )
+    make_exec = "$(command -v sudo) chmod +x %s/%s" % (prefix, filename)
+    exec_script = (
+        "$(command -v sudo) %s/%s %s %s %s" %
+        (prefix, filename, monitor_url, machine_uuid, collectd_password)
+    )
+
+    shell = Shell(host)
+    shell.autoconfigure(user, backend_id, machine_id)
+    # FIXME:parse output and let the client know about the progress/status
+    stdout = shell.command(prepare_dirs)
+    stdout += shell.command(get_script)
+    stdout += shell.command(make_exec)
+    stdout += shell.command(exec_script)
+
+    return stdout
+
+
+def _undeploy_collectd(user, backend_id, machine_id, host):
+    """Uninstall collectd from the machine and return command's output"""
+
+    #FIXME: do not hard-code stuff!
+    check_collectd_dist = "if [ ! -d /opt/mistio-collectd/ ]; then $(command -v sudo) /etc/init.d/collectd stop ; $(command -v sudo) chmod -x /etc/init.d/collectd ; fi"
+    disable_collectd = (
+        "$(command -v sudo) rm -f /etc/cron.d/mistio-collectd "
+        "&& $(command -v sudo) kill -9 "
+        "`cat /opt/mistio-collectd/collectd.pid`"
+    )
+
+    shell = Shell(host)
+    shell.autoconfigure(user, backend_id, machine_id)
+    #FIXME: parse output and check for success/failure
+    stdout = shell.command(check_collectd_dist)
+    stdout += shell.command(disable_collectd)
+
+    return stdout
