@@ -13,7 +13,7 @@ be performed inside the corresponding method functions.
 import logging
 from datetime import datetime
 
-
+import traceback
 import requests
 import json
 
@@ -40,7 +40,7 @@ log = logging.getLogger(__name__)
 OK = Response("OK", 200)
 
 
-@view_config(context=exceptions.MistError)
+@view_config(context=Exception)
 def exception_handler_mist(exc, request):
     """Here we catch exceptions and transform them to proper http responses
 
@@ -50,37 +50,17 @@ def exception_handler_mist(exc, request):
 
     """
 
-    mapping = {
-        exceptions.BadRequestError: 400,
-        exceptions.UnauthorizedError: 401,
-        exceptions.ForbiddenError: 403,
-        exceptions.NotFoundError: 404,
-        exceptions.MethodNotAllowedError: 405,
-        exceptions.ConflictError: 409,
-        exceptions.InternalServerError: 500,
-        exceptions.ServiceUnavailableError: 503,
-    }
+    # non-mist exceptions. that shouldn't happen! never!
+    if not isinstance(exc, exceptions.MistError):
+        trace = traceback.format_exc()
+        log.critical("Uncaught non-mist exception? WTF!\n%s", trace)
+        return Response("Internal Server Error", 500)
 
-    log.warning("MistError: %r", exc)
-    for exc_type in mapping:
-        if isinstance(exc, exc_type):
-            return Response(str(exc), mapping[exc_type])
-    else:
-        return Response(str(exc), 500)
+    # mist exceptions are ok.
+    log.info("MistError: %r", exc)
 
-
-## @view_config(context=Exception)
-def exception_handler_general(exc, request):
-    """This simply catches all exceptions that don't subclass MistError and
-    returns an Internal Server Error status code.
-
-    When debugging it may be useful to comment out this function or its
-    @view decorator.
-
-    """
-
-    log.error("Exception handler caught non-mist exception %s", exc)
-    return Response("Internal Server Error", 500)
+    # translate it to HTTP response based on http_code attribute
+    return Response(str(exc), exc.http_code)
 
 
 @view_config(route_name='home', request_method='GET',
