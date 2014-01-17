@@ -346,17 +346,6 @@ def associate_key(user, key_id, backend_id, machine_id, host=''):
             ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
             log.info("Key was already deployed, local association created.")
         except MachineUnauthorizedError:
-<<<<<<< HEAD
-            raise MachineUnauthorizedError("Couldn't connect to "
-                                           "deploy new SSH keypair.")
-    print "YO"
-    # attemp to connect with new key
-    # if it fails to connect it'll raise exception
-    # there is no need to manually set the association in keypair.machines
-    # that is automatically handled by Shell, if it is configured by
-    # shell.autoconfigure (which ssh_command does)
-    if host:
-=======
             # oh screw this
             raise MachineUnauthorizedError(
                 "Couldn't connect to deploy new SSH keypair."
@@ -368,7 +357,6 @@ def associate_key(user, key_id, backend_id, machine_id, host=''):
         # there is no need to manually set the association in keypair.machines
         # that is automatically handled by Shell, if it is configured by
         # shell.autoconfigure (which ssh_command does)
->>>>>>> master
         ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
         log.info("Key associated and deployed succesfully.")
 
