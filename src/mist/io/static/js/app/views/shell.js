@@ -36,9 +36,10 @@ function(shell_html) {
                     });
                 }
             }
+            /*
             this.$("input[type=text]").autocomplete({
                 source : this.availableCommands
-            });
+            });*/
         },
 
         submit: function() {
@@ -102,10 +103,11 @@ function(shell_html) {
                 }
             }
             this.availableCommands.push(command);
+            /*
             this.$("input[type=text]").autocomplete("close");
             this.$("input[type=text]").autocomplete({
                 source : this.availableCommands
-            });
+            });*/
         },
 
         clear: function() {
