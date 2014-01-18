@@ -321,24 +321,23 @@ define( 'app', [
                         if (commandHistoryIndex > 0) {
                             commandHistoryIndex--;
                         }
-                        $(inputField).val(commandHistory[commandHistoryIndex]);
+                        $(inputField).val(commandHistory[commandHistoryIndex].command);
                     }
                 } else if (event.keyCode == 40) { // Down key
                     if (commandHistoryIndex < commandHistory.length) {
                         if (commandHistoryIndex < commandHistory.length - 1) {
                             commandHistoryIndex++;
                         }
-                        $(inputField).val(commandHistory[commandHistoryIndex]);
+                        $(inputField).val(commandHistory[commandHistoryIndex].command);
                     }
                 } else if (event.keyCode == 13) { // Enter key
                     Mist.machineShellController.submit();
                 } else if (event.keyCode == 1) {
                     $('.shell-input input').focus();
-                } else if (event.keyCode == 9) { // Tab key
-                    // TODO: Autocomplete stuff...
                 } else { 
                     Ember.run.next(function(){
-                        commandHistory[commandHistoryIndex] = Mist.machineShellController.command.command;
+                        if (commandHistoryIndex > -1)
+                            commandHistory[commandHistoryIndex].set('command', Mist.machineShellController.command);
                     });
                 }
                 if (event.keyCode == 38 || event.keyCode == 40 || event.keycode == 9) { // Up or Down or Tab

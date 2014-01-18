@@ -13,7 +13,6 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
 
             machine: null,
             commandHistoryIndex: -1,
-            shellOutputItems: Ember.ArrayController.create(),
 
 
             /**
@@ -52,9 +51,8 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 });
                 
                 // Modify machine's command history
-                commandHistory.pop();
+                commandHistory.removeObject(commandHistory.length - 1);
                 commandHistory.pushObject(command);
-                commandHistory.push('');
                 this.commandHistoryIndex = commandHistory.length - 1;
 
                 // Construct request

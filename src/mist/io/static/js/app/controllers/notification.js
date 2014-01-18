@@ -57,9 +57,15 @@ define('app/controllers/notification', ['ember'],
                 this.timeout = setTimeout("$.mobile.loading( 'hide' )", miliseconds);
             },
 
-            messageBox: function() {
-                
-            }
+            showMessagebox: function() {
+                $('#message-box-popup').popup('open').popup('reposition', {positionTo: 'window'});
+                Ember.run.next(function() {
+                    $('#message-box-popup').popup('reposition', {positionTo: 'window'});
+                    Ember.run.later(function() {
+                        $('#message-box-popup').popup('reposition', {positionTo: 'window'});
+                    }, 300);
+                });
+            } 
         });
     }
 );
