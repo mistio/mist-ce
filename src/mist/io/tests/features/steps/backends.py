@@ -36,6 +36,10 @@ def backends_use_credentials(context, provider):
         context.browser.find_by_css('input#new-backend-first-field').fill(creds['Softlayer']['api_key'])
         context.browser.find_by_css('input#new-backend-second-field').fill(creds['Softlayer']['api_secret'])
         return
+    elif provider == "NEPHOSCALE":
+        context.browser.find_by_css('input#new-backend-first-field').fill(creds['Nephoscale']['username'])
+        context.browser.find_by_css('input#new-backend-second-field').fill(creds['Nephoscale']['password'])
+        return
     elif provider =="BAREMETAL":
         context.browser.find_by_css('input#create-bareserver-ip').fill(BARE_HOSTNAME)
         context.browser.find_by_css('input#ROOTcreate-bareserver-user').fill(BARE_USER)

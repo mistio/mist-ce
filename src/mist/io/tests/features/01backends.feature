@@ -24,6 +24,7 @@ Feature: Backends
         | Rackspace DFW     | RACKSPACE   |
         | OpenStack         | OPENSTACK   |
         | SoftLayer         | SOFTLAYER   |
+        | NephoScale        | NEPHOSCALE  |
 
 
 #COMMENTED OUT SCENARIOS
