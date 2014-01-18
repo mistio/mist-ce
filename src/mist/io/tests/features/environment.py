@@ -39,7 +39,6 @@ def before_all(context):
     try:
         copyfile("db.yaml", "db.yaml.test_backup")
         os.remove("db.yaml")
-        print "Removing file"
     except:
         pass
 
@@ -50,6 +49,7 @@ def after_all(context):
         os.remove("db.yaml.test_backup")
     except:
         pass
+    context.browser.quit()
 
 
 def before_feature(context, feature):

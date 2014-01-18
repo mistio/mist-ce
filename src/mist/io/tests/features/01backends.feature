@@ -15,6 +15,7 @@ Feature: Backends
         And i click the link with text "<provider>"
         And I use my "<credentials>" credentials
         And I click the "Add" button
+        And I wait for 1 seconds
             Then I should see the "<provider>" Backend added within 30 seconds
 
         Examples: Providers
