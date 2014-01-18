@@ -142,7 +142,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
 
 
                 shellClicked: function () {
-                    //Mist.machineShellController.open(this.machine);
+                    Mist.machineShellController.open(this.machine);
                 },
 
                 enableMonitoringClicked: function () {
