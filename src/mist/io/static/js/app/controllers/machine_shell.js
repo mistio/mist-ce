@@ -58,7 +58,6 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 // Construct request
                 var url = '/backends/' + machine.backend.id + '/machines/' + machine.id + '/shell';
                 var host = machine.getHost();
-                var that = machine;
                 var params =  {
                     'host'      : host,
                     'command'   : command.command,

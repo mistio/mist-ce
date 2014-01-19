@@ -313,38 +313,29 @@ define( 'app', [
         App.ShellTextField = Ember.TextField.extend({
 
             keyDown: function(event, view) {
+                var keyCode = event.keyCode;
                 var commandHistoryIndex = Mist.machineShellController.commandHistoryIndex;
                 var commandHistory = Mist.machineShellController.machine.commandHistory;
                 var inputField = '.shell-input div.ui-input-text input';
-                if (event.keyCode == 38 ) { // Up Key
-                    if (commandHistoryIndex > -1) {
-                        if (commandHistoryIndex > 0) {
+                switch (keyCode) {
+                    case 38: // Up
+                        if (commandHistoryIndex > 0)
                             commandHistoryIndex--;
-                        }
                         $(inputField).val(commandHistory[commandHistoryIndex].command);
-                    }
-                } else if (event.keyCode == 40) { // Down key
-                    if (commandHistoryIndex < commandHistory.length) {
-                        if (commandHistoryIndex < commandHistory.length - 1) {
-                            commandHistoryIndex++;
+                        break;
+                    case 40: // Down
+                        if (commandHistoryIndex < commandHistory.length) {
+                            if (commandHistoryIndex < commandHistory.length - 1)
+                                commandHistoryIndex++;
+                            $(inputField).val(commandHistory[commandHistoryIndex].command);
                         }
-                        $(inputField).val(commandHistory[commandHistoryIndex].command);
-                    }
-                } else if (event.keyCode == 13) { // Enter key
-                    Mist.machineShellController.submit();
-                } else if (event.keyCode == 1) {
-                    $('.shell-input input').focus();
-                } else { 
-                    Ember.run.next(function(){
-                        if (commandHistoryIndex > -1)
-                            commandHistory[commandHistoryIndex].set('command', Mist.machineShellController.command);
-                    });
+                        break;
+                    case 13: // Enter
+                        Mist.machineShellController.submit();
+                        break;
                 }
-                if (event.keyCode == 38 || event.keyCode == 40 || event.keycode == 9) { // Up or Down or Tab
-                    if(event.preventDefault) {
+                if (keyCode == 38 || keyCode == 40 && event.preventDefault) // Up or Down
                         event.preventDefault();
-                    }
-                }
             }
         });
 

@@ -35,8 +35,8 @@ define('app/models/machine', ['ember'],
             commandHistory: [],
             
             loadavg: null,
-            loadavg1: null,            
-            loadavg5: null,            
+            loadavg1: null,
+            loadavg5: null,
             loadavg15: null,
 
             image: function() {
@@ -50,6 +50,7 @@ define('app/models/machine', ['ember'],
              */
 
             load: function() {
+                this.set('commandHistory', []);
                 this.probe();
             }.on('init'),
 
