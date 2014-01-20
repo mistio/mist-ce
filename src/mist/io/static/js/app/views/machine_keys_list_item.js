@@ -9,11 +9,12 @@ define('app/views/machine_keys_list_item', ['app/views/list_item', 'text!app/tem
 
             template: Ember.Handlebars.compile(machine_keys_list_item_html),
 
+            tagName: 'span',
             keyIcon: null,
 
-            didInsertElement: function() {
+            load: function() {
                 this.keyObserver();
-            },
+            }.on('didInsertElement'),
 
             keyObserver: function() {
                 var machineToFind = this.key.probing ?

@@ -281,6 +281,7 @@ define(['app/models/key'],
             _associateKey: function(keyId, machine) {
                 Ember.run(this, function() {
                     this.getKey(keyId).machines.pushObject([machine.backend.id, machine.id]);
+                    this.trigger('onKeyAssociate');
                 });
             },
 
@@ -294,6 +295,7 @@ define(['app/models/key'],
                             return true;
                         }
                     });
+                    this.trigger('onKeyDisassociate');
                 });
             },
 

@@ -238,7 +238,7 @@ define('app/controllers/machines', ['app/models/machine'],
 
                     // Update monitoring
                     if (Mist.monitored_machines) {
-                        machines.forEach(function(machine) {
+                        that.content.forEach(function(machine) {
                             Mist.monitored_machines.some(function(machine_tuple){
                                 backend_id = machine_tuple[0];
                                 machine_id = machine_tuple[1];

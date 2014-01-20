@@ -75,6 +75,21 @@ define('app/views/machine_keys', ['text!app/templates/machine_keys.html', 'ember
                     $('#machine-keys-panel').panel('open');
                 },
 
+                
+                newKeyClicked: function() {
+                    $('#non-associated-keys-popup').popup('close');
+                    Ember.run.later(function() {
+                        Mist.keyAddController.open(function(success, key) {
+                            if (success) {
+                                Mist.machineKeysController.associate(Mist.keysController.getKey(key.id));
+            
+                                // In case user associates key from "Add key" button
+                                $('#machine-keys-panel').panel('open');
+                            }
+                        });
+                    }, 300);
+                },
+
 
                 removeClicked: function () {
                     Mist.machineKeysController.disassociate(this.selectedKey);

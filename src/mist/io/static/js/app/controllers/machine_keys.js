@@ -15,6 +15,23 @@ define('app/controllers/machine_keys', ['ember'],
             machine: null,
             callback: null,
 
+
+            /**
+             * 
+             *  Initialization
+             * 
+             */
+
+            load: function() {
+                
+                // Add event listeners
+                Mist.keysController.on('onKeyListChange', this, '_updateKeys');
+                Mist.keysController.on('onKeyAssociate', this, '_updateKeys');
+                Mist.keysController.on('onKeyDisassociate', this, '_updateKeys');
+                
+            }.on('init'),
+
+
             /**
              *
              *  Methods
@@ -51,9 +68,11 @@ define('app/controllers/machine_keys', ['ember'],
                 this.machine.probe(key.id, callback);
             },
 
+
             disassociate: function(key, callback) {
                 key.disassociate(this.machine, callback);
             },
+
 
             /**
              *
