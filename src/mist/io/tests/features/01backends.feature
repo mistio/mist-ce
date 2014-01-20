@@ -38,13 +38,14 @@ Feature: Backends
     Examples: Providers
     | provider          |
     | EC2 AP NORTHEAST  |
-    | Rackspace DFW     |
-    | OpenStack         |
-    | SoftLayer         |
-    | NephoScale        |
-    | Linode            |
-    | HP Cloud US East  |
-
+    #| Rackspace DFW     |
+    #| OpenStack         |
+    #| SoftLayer         |
+    #| NephoScale        |
+    #| Linode            |
+    #| HP Cloud US East  |
+    #Those are commented out cause we only need to test deleting one Backend
+    #The db.yaml is refreshed to be empty in the next feature
 
 
 
