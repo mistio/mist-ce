@@ -1,6 +1,7 @@
 """
 @given:
 -------
+an "{name}" backend     --> given_backend
 
 @when:
 ------
@@ -18,6 +19,22 @@ from behave import *
 from time import sleep, time
 
 from general import time_vslow, time_fast, time_mid, time_slow
+
+
+@given(u'an "{name}" backend')
+def given_backend(context, name):
+    if "EC2" in name:
+        context.execute_steps(u"""
+        When I click the "Add backend" button
+        And I click the "Select provider" button
+        And i click the "%s" button
+        And I use my "%s" credentials
+        And I click the "Add" button
+        And I wait for 1 seconds
+            Then I should see the "%s" Backend added within 30 seconds
+        """ % ("EC2 AP NORTHEAST", "EC2", "EC2 AP NORTHEAST"))
+
+    assert False, u"Could not execute Add Backend Scenario"
 
 @when(u'I use my "{provider}" credentials')
 def backends_use_credentials(context, provider):
