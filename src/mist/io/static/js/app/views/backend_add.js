@@ -22,7 +22,7 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
              * 
              */
 
-            updateDoneButton: function() {
+            updateAddButton: function() {
                 if (Mist.backendsController.addingBackend || !Mist.backendAddController.formReady) {
                     $('#new-backend-ok').addClass('ui-state-disabled');
                 } else {
@@ -45,8 +45,6 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
                     $('#new-backend-provider').collapsible('collapse');
                     $('#openstack-bundle').hide();
                     $('#baremetal-bundle').hide();
-
-                    info(provider);
 
                     if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('linode') > -1) {
                         this.set('firstFieldLabel', 'Username');
@@ -125,7 +123,7 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
              */
 
             updateDoneButtonObserver: function() {
-                Ember.run.once(this, 'updateDoneButton');
+                Ember.run.once(this, 'updateAddButton');
             }.observes('Mist.backendsController.addingBackend', 'Mist.backendAddController.formReady')
         });
     }

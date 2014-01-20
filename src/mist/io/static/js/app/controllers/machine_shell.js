@@ -22,9 +22,9 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
              */
 
             open: function (machine) {
-                $('#machine-shell-popup').popup('open');
                 this._clear();
                 this.set('machine', machine);
+                $('#machine-shell-popup').popup('open');
             },
 
 
@@ -36,7 +36,6 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
 
             submit: function(timeout) {
 
-               
                 var machine = this.machine;
                 if (!machine || !machine.probed || !this.command) {
                     return;
@@ -51,7 +50,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 });
                 
                 // Modify machine's command history
-                commandHistory.removeObject(commandHistory.length - 1);
+                commandHistory.removeObject(commandHistory[commandHistory.length - 1]);
                 commandHistory.pushObject(command);
                 this.commandHistoryIndex = commandHistory.length - 1;
 

@@ -69,6 +69,7 @@ define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/ma
 
             actions: {
 
+
                 createClicked: function () {
                     Mist.machineAddController.open();
                 },

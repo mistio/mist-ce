@@ -10,11 +10,7 @@
             <table class="shell-input">
                 <tr>
                     <td>
-                        {{view Mist.ShellTextField
-                            autocapitalize="off"
-                            autocorrect="off"
-                            autocomplete="off"
-                            valueBinding="Mist.machineShellController.command"}}
+                        {{view Mist.ShellTextField valueBinding="Mist.machineShellController.command"}}
                     </td>
                     <td class="shell-send-wrapper">
                         <a data-icon="shell-return"

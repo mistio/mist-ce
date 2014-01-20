@@ -200,7 +200,7 @@ def add_backend(request):
     apiurl = params.get('apiurl') or ''  # fixes weird issue with none value
     tenant_name = params.get('tenant_name', '')
     # following params are for baremetal
-    machine_hostname = params.get('machine_ip_address', '')
+    machine_hostname = params.get('machine_ip', '')
     machine_key = params.get('machine_key', '')
     machine_user = params.get('machine_user', '')
     # TODO: check if all necessary information was provided in the request

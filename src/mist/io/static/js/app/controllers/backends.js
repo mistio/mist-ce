@@ -8,9 +8,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
         return Ember.ArrayController.extend(Ember.Evented, {
 
             /**
-             * 
              *  Properties
-             * 
              */
 
             content: [],
@@ -18,7 +16,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             machineCount: 0,
             selectedMachines: [],
             machineRequest: false,
-            
+
             addingBackend: false,
             deletingBackend: false,
             togglingBackend: false,
@@ -27,6 +25,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             loading: false,
             loadingImages: false,
             loadingMachines: false,
+
 
             /**
              * 
@@ -49,7 +48,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             }.on('init'),
 
 
-
             /**
              * 
              *  Methods
@@ -60,22 +58,22 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 var that = this;
                 this.set('addingBackend', true);
                 Mist.ajax.POST('/backends', {
-                    'title'      : title,
-                    'provider'   : provider,
-                    'apikey'     : apiKey,
-                    'apisecret'  : apiSecret,
-                    'apiurl'     : apiUrl,
-                    'tenant_name': tenant,
-                    'machine_key': key,
-                    'machine_ip_address': apiKey, // This is ugly. For bare-metal, apiKey corresponds to machine_ip
-                    'machine_user': apiSecret // ---//-----//----//------, apiSecret corresponds to machine_user
+                    'title'       : title,
+                    'provider'    : provider,
+                    'apikey'      : apiKey,
+                    'apisecret'   : apiSecret,
+                    'apiurl'      : apiUrl,
+                    'tenant_name' : tenant,
+                    'machine_key' : key,
+                    'machine_ip'  : apiKey,    // For bare-metal
+                    'machine_user': apiSecret  // For bare-metal
                 }).success(function(backend) {
                     that._addBackend(backend);
                 }).error(function() {
                     Mist.notificationController.notify('Failed to add backend');
-                }).complete(function(success) {
+                }).complete(function(success, backend) {
                     that.set('addingBackend', false);
-                    if (callback) callback(success);
+                    if (callback) callback(success, backend);
                 });
             },
 
@@ -163,7 +161,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     if (key) Mist.notificationController.notify(message);
                 }).complete(function(success) {
                     if (key) {
-                        //key.updateMachineUptimeChecked(machine, (success ? 1 : -1 ) * Date.now());
                         key.set('probing', false);
                     }
                     machine.set('probing', false);
@@ -211,8 +208,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
 
             getMachine: function(machineId, backendId) {
 
-                // If backendId is provided, get machine
-                // directly from that backend
                 if (backendId) {
                     var backend = this.getBackend(backendId);
                     if (backend) 
@@ -220,8 +215,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     return null;
                 }
 
-                // When backendId is not provided, search
-                // through all backends to find machineId
                 var machine = null;
                 this.content.some(function(backend) {
                     return machine = backend.getMachine(machineId);
@@ -230,14 +223,15 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             },
 
 
-            machineExists: function(machineId) {
-                return !!this.getMachine(machineId);
+            machineExists: function(machineId, backendId) {
+                return !!this.getMachine(machineId, backendId);
             },
 
 
             backendExists: function(backendId) {
                 return !!this.getBackend(backendId);
             },
+
 
             shutdownMachine: function(machineId) {
                 this.content.some(function(backend) {
@@ -248,6 +242,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 });
             },
 
+
             destroyMachine: function(machineId) {
                this.content.some(function(backend) {
                     if (backend.getMachine(machineId)) {
@@ -256,6 +251,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     }
                 });
             },
+
 
             rebootMachine: function(machineId) {
                this.content.some(function(backend) {
@@ -266,6 +262,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 });
             },
 
+
             startMachine: function(machineId) {
                this.content.some(function(backend) {
                     if (backend.getMachine(machineId)) {
@@ -274,6 +271,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     }
                 });
             },
+
 
             /**
              * 
@@ -382,7 +380,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     this.trigger('onSelectedMachinesChange');
                 });
             },
-
 
 
             /**

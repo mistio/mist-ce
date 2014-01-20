@@ -6,8 +6,19 @@ define('app/views/machine_shell', ['text!app/templates/machine_shell.html', 'emb
      */
     function(machine_shell_html, Command) {
         return Ember.View.extend({
-    
+
+            /**
+             *  Properties
+             */
+            
             template: Ember.Handlebars.compile(machine_shell_html),
+    
+            
+            /**
+             * 
+             *  Actions
+             * 
+             */
     
             actions: {
                
