@@ -24,21 +24,6 @@ def before_all(context):
     if not "test_config.py" in files:
         copyfile(files_dir+"test_config.py.dist", files_dir+"test_config.py")
 
-
-    from test_config import CREDENTIALS, MISTCREDS, TESTNAMES
-
-    PERSONAS = {
-        'NinjaTester': dict(
-            creds=CREDENTIALS,
-            mistcreds=MISTCREDS,
-            machine=TESTNAMES['machine_name']+str(random.randint(1, 10000)),
-            image_machine=TESTNAMES['image_machine']+str(random.randint(1, 10000)),
-            key_name=TESTNAMES['key']+str(random.randint(1, 10000))
-        )
-    }
-
-    context.personas = PERSONAS
-    #context.browser = Browser('phantomjs')
     try:
         copyfile("db.yaml", "db.yaml.test_backup")
         os.remove("db.yaml")
@@ -56,6 +41,25 @@ def after_all(context):
 
 def before_feature(context, feature):
     benv.before_feature(context, feature)
+
+    from test_config import CREDENTIALS, MISTCREDS, TESTNAMES
+
+    PERSONAS = {
+        'NinjaTester': dict(
+            creds=CREDENTIALS,
+            mistcreds=MISTCREDS,
+            machine=TESTNAMES['machine_name']+str(random.randint(1, 10000)),
+            image_machine=TESTNAMES['image_machine']+str(random.randint(1, 10000)),
+            key_name=TESTNAMES['key']+str(random.randint(1, 10000))
+        )
+    }
+
+    context.personas = PERSONAS
+
+    try:
+        os.remove("db.yaml")
+    except:
+        pass
 
 
 def before_scenario(context, scenario):
