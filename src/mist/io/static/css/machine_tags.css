@@ -1,9 +1,9 @@
 
 /* Machine Tags View CSS
 -----------------------------------------------------------------------------------------------------------*/
-#machine-tags-popup-popup.ui-popup-hidden {
-    top: auto !important;
-    bottom: 50px !important;
+#machine-tags-popup-popup {
+    left: 10px !important;
+    margin-bottom: 55px !important;
 }
 #machine-tags-popup .ui-input-text {
     float: left;

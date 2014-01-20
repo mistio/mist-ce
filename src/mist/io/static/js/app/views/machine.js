@@ -123,7 +123,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
 
                 manageKeysClicked: function() {
                     Mist.machineKeysController.open(this.machine);
-                }, 
+                },
                
                
                 addKeyClicked: function() {
