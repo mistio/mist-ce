@@ -44,6 +44,9 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
 
                     $('#new-backend-provider').collapsible('collapse');
                     $('#openstack-bundle').hide();
+                    $('#bare-metal-bundle').hide();
+
+                    info(provider);
 
                     if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('linode') > -1) {
                         this.set('firstFieldLabel', 'Username');
@@ -54,16 +57,21 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
                     } else if (provider.provider.indexOf('digitalocean') > -1) {
                         this.set('firstFieldLabel', 'Client ID');
                         this.set('secondFieldLabel', 'API Key');
-                    } else if (provider.provider.indexOf('openstack') > -1 ) {
+                    } else if (provider.provider.indexOf('openstack') > -1) {
                         this.set('firstFieldLabel', 'Username');
                         this.set('secondFieldLabel', 'Password');
                         $('#openstack-bundle').show();
 
                         //This is for HP Cloud specific
                         if (provider.provider.indexOf('region-') > -1) {
-                            info("Yeah");
                             Mist.backendAddController.set('newBackendOpenStackURL', 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/');
                         }
+                    } else if (provider.provider.indexOf('bare_metal') > -1) {
+                        this.set('firstFieldLabel', 'Hostname');
+                        this.set('secondFieldLabel', 'User');
+                        $('#add-backend-key .ui-listview').listview('refresh');
+                        $('#bare-metal-bundle').show();
+
                     }
                     else {
                         this.set('firstFieldLabel', 'API Key');
@@ -82,6 +90,21 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
                                 return true;
                             }
                     });
+                },
+
+                selectKey: function(key) {
+                    $('#add-backend-key').collapsible('collapse');
+                    Mist.backendAddController.set('newBackendKey', key);
+                },
+
+                createKeyClicked: function() {
+                    Mist.keyAddController.open( function (success, key) {
+                        if (success) {
+                            Mist.backendAddController.set('newBackendKey', key);
+                            $('#add-backend-key').collapsible('collapse');
+                            $('#add-backend-key .ui-listview').listview('refresh');
+                        }
+                    })
                 },
 
 

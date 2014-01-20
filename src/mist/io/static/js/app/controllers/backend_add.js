@@ -16,6 +16,7 @@ define('app/controllers/backend_add', ['app/models/backend','ember'],
             callback: null,
             formReady: null,
 
+            newBackendKey: null,
             newBackendProvider: null,
             newBackendFirstField: null,
             newBackendSecondField: null,
@@ -53,6 +54,7 @@ define('app/controllers/backend_add', ['app/models/backend','ember'],
                                                    this.newBackendSecondField,
                                                    this.newBackendOpenStackURL,
                                                    this.newBackendOpenStackTenant,
+                                                   this.newBackendKey,
                 function(success, backend) {
                     that._giveCallback(success, backend);
                     if (success) {
@@ -76,6 +78,7 @@ define('app/controllers/backend_add', ['app/models/backend','ember'],
                 this.set('newBackendSecondField', null);
                 this.set('newBackendOpenStackURL', null);
                 this.set('newBackendOpenStackTenant', null);
+                this.set('newBackendKey', {id: "Select SSH Key"});
 
                 $('#new-backend-provider').collapsible('collapse');
                 $('#new-backend-provider').collapsible('option','collapsedIcon','arrow-d');
@@ -89,6 +92,10 @@ define('app/controllers/backend_add', ['app/models/backend','ember'],
                         ready = true;
                         if (this.newBackendProvider.provider == 'openstack') {
                             if (!(this.newBackendOpenStackURL && this.newBackendOpenStackTenant)) {
+                                ready = false;
+                            }
+                        } else if (this.newBackendProvider.provider == 'bare_metal') {
+                            if (this.newBackendKey.id == "Select SSH Key") {
                                 ready = false;
                             }
                         }
@@ -117,7 +124,8 @@ define('app/controllers/backend_add', ['app/models/backend','ember'],
                        'newBackendFirstField',
                        'newBackendSecondField',
                        'newBackendOpenStackURL',
-                       'newBackendOpenStackTenant'),
+                       'newBackendOpenStackTenant',
+                       'newBackendKey')
         });
     }
 );

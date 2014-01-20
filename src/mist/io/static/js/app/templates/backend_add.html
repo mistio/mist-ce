@@ -52,6 +52,24 @@
                    valueBinding="Mist.backendAddController.newBackendOpenStackTenant"}}
         </div>
 
+        <div id="bare-metal-bundle">
+            <label>4. SSH Key:</label>
+            <div id="add-backend-key" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
+                                                                                      data-expanded-icon="arrow-u">
+                <h2>{{Mist.backendAddController.newBackendKey.id}}</h2>
+                <ul data-role="listview">
+                    {{#each Mist.keysController.content}}
+                        <li data-icon="false">
+                            <a {{action "selectKey" this target="view"}}>{{this.id}}</a>
+                        </li>
+                    {{/each}}
+                    <li data-icon="false" data-theme="b">
+                        <a {{action "createKeyClicked" target="view"}}>Create Key</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
         {{#if Mist.backendsController.addingBackend}}
         <div class="ajax-loader"></div>
         {{/if}}
@@ -62,3 +80,5 @@
         </div>
     </div>
 </div>
+
+{{view Mist.addKeyView}}

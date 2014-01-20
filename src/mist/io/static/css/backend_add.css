@@ -4,6 +4,9 @@
 #add-backend-panel #openstack-bundle {
     display: none;
 }
+#add-backend-panel #bare-metal-bundle {
+    display: none;
+}
 #add-backend-panel label {
     margin-top: 10px;
 }

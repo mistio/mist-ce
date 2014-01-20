@@ -56,7 +56,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
              * 
              */
 
-            addBackend: function(title, provider, apiKey, apiSecret, apiUrl, tenant, callback) {
+            addBackend: function(title, provider, apiKey, apiSecret, apiUrl, tenant, key, callback) {
                 var that = this;
                 this.set('addingBackend', true);
                 Mist.ajax.POST('/backends', {
@@ -65,7 +65,10 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     'apikey'     : apiKey,
                     'apisecret'  : apiSecret,
                     'apiurl'     : apiUrl,
-                    'tenant_name': tenant
+                    'tenant_name': tenant,
+                    'machine_key': key.id,
+                    'machine_ip_address': apiKey, // This is ugly. For bare-metal, apiKey corresponds to machine_ip
+                    'machine_user': apiSecret // ---//-----//----//------, apiSecret corresponds to machine_user
                 }).success(function(backend) {
                     that._addBackend(backend);
                 }).error(function() {
