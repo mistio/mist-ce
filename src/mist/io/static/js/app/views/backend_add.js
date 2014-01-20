@@ -54,11 +54,18 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
                     } else if (provider.provider.indexOf('digitalocean') > -1) {
                         this.set('firstFieldLabel', 'Client ID');
                         this.set('secondFieldLabel', 'API Key');
-                    } else if (provider.provider.indexOf('openstack') > -1) {
+                    } else if (provider.provider.indexOf('openstack') > -1 ) {
                         this.set('firstFieldLabel', 'Username');
                         this.set('secondFieldLabel', 'Password');
                         $('#openstack-bundle').show();
-                    } else {
+
+                        //This is for HP Cloud specific
+                        if (provider.provider.indexOf('region-') > -1) {
+                            info("Yeah");
+                            Mist.backendAddController.set('newBackendOpenStackURL', 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/');
+                        }
+                    }
+                    else {
                         this.set('firstFieldLabel', 'API Key');
                         this.set('secondFieldLabel', 'API Secret');
                     }
