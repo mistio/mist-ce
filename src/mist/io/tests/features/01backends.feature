@@ -26,6 +26,7 @@ Feature: Backends
         | SoftLayer         | SOFTLAYER   |
         | NephoScale        | NEPHOSCALE  |
         | Linode            | LINODE      |
+        | HP Cloud US East  | HPCLOUD     |
 
     @web
     Scenario Outline: Delete Backends
@@ -42,6 +43,7 @@ Feature: Backends
     | SoftLayer         |
     | NephoScale        |
     | Linode            |
+    | HP Cloud US East  |
 
 
 

@@ -35,6 +35,11 @@ CREDENTIALS = {
     'Linode': {
         'username': "",
         'api_key': ""
+    },
+    'HPCloud': {
+        'username': "",
+        'password': "",
+        'tenant': ""
     }
 }
 

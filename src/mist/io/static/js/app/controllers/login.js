@@ -42,7 +42,7 @@ define('app/controllers/login', ['ember'],
                 this.set('loggingIn', true);
                 Mist.ajax.POST('/auth', {
                     'email': this.email,
-                    'password': CryptoJS.SHA256(this.password).toString(),
+                    'password': this.password,
                 }).success(function(data) {
                     Ember.run.next(function() {
                         window.location.reload();
