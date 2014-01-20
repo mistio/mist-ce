@@ -37,6 +37,7 @@ define('app/controllers/backend_add', ['app/models/backend','ember'],
                 });
                 this._clear();
                 this.set('callback', callback);
+                this._updateFormReady();
             },
 
 
@@ -73,13 +74,14 @@ define('app/controllers/backend_add', ['app/models/backend','ember'],
 
             _clear: function() {
                 this.set('callback', null);
+                
+                this.set('newBackendKey', {id: "Select SSH Key"});
                 this.set('newBackendProvider', {title: 'Select provider'});
                 this.set('newBackendFirstField', null);
                 this.set('newBackendSecondField', null);
                 this.set('newBackendOpenStackURL', null);
                 this.set('newBackendOpenStackTenant', null);
-                this.set('newBackendKey', {id: "Select SSH Key"});
-
+                
                 $('#new-backend-provider').collapsible('collapse');
                 $('#new-backend-provider').collapsible('option','collapsedIcon','arrow-d');
             },
@@ -95,7 +97,7 @@ define('app/controllers/backend_add', ['app/models/backend','ember'],
                                 ready = false;
                             }
                         } else if (this.newBackendProvider.provider == 'bare_metal') {
-                            if (this.newBackendKey.id == "Select SSH Key") {
+                            if (!Mist.keysController.keyExists(this.newBackendKey.id)) {
                                 ready = false;
                             }
                         }
@@ -119,13 +121,12 @@ define('app/controllers/backend_add', ['app/models/backend','ember'],
 
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('callback', 
+            }.observes('newBackendKey',
                        'newBackendProvider',
                        'newBackendFirstField',
                        'newBackendSecondField',
                        'newBackendOpenStackURL',
-                       'newBackendOpenStackTenant',
-                       'newBackendKey')
+                       'newBackendOpenStackTenant')
         });
     }
 );

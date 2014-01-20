@@ -66,7 +66,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     'apisecret'  : apiSecret,
                     'apiurl'     : apiUrl,
                     'tenant_name': tenant,
-                    'machine_key': key.id,
+                    'machine_key': key,
                     'machine_ip_address': apiKey, // This is ugly. For bare-metal, apiKey corresponds to machine_ip
                     'machine_user': apiSecret // ---//-----//----//------, apiSecret corresponds to machine_user
                 }).success(function(backend) {

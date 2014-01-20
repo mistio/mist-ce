@@ -24,9 +24,9 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
 
             updateDoneButton: function() {
                 if (Mist.backendsController.addingBackend || !Mist.backendAddController.formReady) {
-                    $('#add-backend-ok').addClass('ui-state-disabled');
+                    $('#new-backend-ok').addClass('ui-state-disabled');
                 } else {
-                    $('#add-backend-ok').removeClass('ui-state-disabled');
+                    $('#new-backend-ok').removeClass('ui-state-disabled');
                 }
             },
 
@@ -44,7 +44,7 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
 
                     $('#new-backend-provider').collapsible('collapse');
                     $('#openstack-bundle').hide();
-                    $('#bare-metal-bundle').hide();
+                    $('#baremetal-bundle').hide();
 
                     info(provider);
 
@@ -69,11 +69,10 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
                     } else if (provider.provider.indexOf('bare_metal') > -1) {
                         this.set('firstFieldLabel', 'Hostname');
                         this.set('secondFieldLabel', 'User');
-                        $('#add-backend-key .ui-listview').listview('refresh');
-                        $('#bare-metal-bundle').show();
+                        $('#new-backend-key .ui-listview').listview('refresh');
+                        $('#baremetal-bundle').show();
 
-                    }
-                    else {
+                    } else {
                         this.set('firstFieldLabel', 'API Key');
                         this.set('secondFieldLabel', 'API Secret');
                     }
@@ -93,7 +92,7 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
                 },
 
                 selectKey: function(key) {
-                    $('#add-backend-key').collapsible('collapse');
+                    $('#new-backend-key').collapsible('collapse');
                     Mist.backendAddController.set('newBackendKey', key);
                 },
 
@@ -101,10 +100,10 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
                     Mist.keyAddController.open( function (success, key) {
                         if (success) {
                             Mist.backendAddController.set('newBackendKey', key);
-                            $('#add-backend-key').collapsible('collapse');
-                            $('#add-backend-key .ui-listview').listview('refresh');
+                            $('#new-backend-key').collapsible('collapse');
+                            $('#new-backend-key .ui-listview').listview('refresh');
                         }
-                    })
+                    });
                 },
 
 

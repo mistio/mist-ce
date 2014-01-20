@@ -52,10 +52,10 @@
                    valueBinding="Mist.backendAddController.newBackendOpenStackTenant"}}
         </div>
 
-        <div id="bare-metal-bundle">
+        <div id="baremetal-bundle">
             <label>4. SSH Key:</label>
-            <div id="add-backend-key" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
-                                                                                      data-expanded-icon="arrow-u">
+            <div id="new-backend-key" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
+                                                                                    data-expanded-icon="arrow-u">
                 <h2>{{Mist.backendAddController.newBackendKey.id}}</h2>
                 <ul data-role="listview">
                     {{#each Mist.keysController.content}}
@@ -76,7 +76,7 @@
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <a data-role="button" {{action "backClicked" target="view"}} data-theme="a">Back</a>
-            <button id="add-backend-ok" data-theme="d" {{action "addClicked" target="view"}}>Add</a>
+            <button id="new-backend-ok" data-theme="d" {{action "addClicked" target="view"}}>Add</a>
         </div>
     </div>
 </div>
