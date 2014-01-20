@@ -862,9 +862,9 @@ def shell_stream(request):
         js which it streams in a hidden iframe.
 
         """
-        # send some blank data to get webkit browsers
-        # to display what's sent
-        yield 1024*'\0'  # really necessary?
+        # send some blank data to fill the initial buffer and get (webkit) 
+        # browsers to display right away what's sent 
+        #yield 1024*'\0'
         # start the html response
         yield "<html><body>\n"
         js = "<script type='text/javascript'>parent.appendShell('%s', '%s');</script>\n"
