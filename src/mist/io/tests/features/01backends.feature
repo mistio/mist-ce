@@ -10,9 +10,9 @@ Feature: Backends
 
     @web
     Scenario Outline: Add Backends
-        When I click the link with text "Add backend"
-        And I click the link with text "Select provider"
-        And i click the link with text "<provider>"
+        When I click the "Add backend" button
+        And I click the "Select provider" button
+        And i click the "<provider>" button
         And I use my "<credentials>" credentials
         And I click the "Add" button
         And I wait for 1 seconds
