@@ -836,36 +836,11 @@ def shell_stream(request):
     Streams output using the hidden iframe technique.
 
     """
-
-    def parse(lines):
-        """Generator function that converts stdout_lines to html with
-        js which it streams in a hidden iframe.
-
-        """
-        # send some blank data to get webkit browsers
-        # to display what's sent
-        yield 1024*'\0'  # really necessary?
-        # start the html response
-        yield "<html><body>\n"
-        js = "<script type='text/javascript'>"
-        js += "parent.appendShell('%s', '%s');</script>\n"
-        for line in lines:
-            # get commands output, line by line
-            clear_line = line.replace('\'', '\\\'')
-            clear_line = clear_line.replace('\n', '<br/>')
-            clear_line = clear_line.replace('\r', '')
-            #.replace('<','&lt;').replace('>', '&gt;')
-            yield js % (clear_line, cmd_id)
-        js = "<script type='text/javascript'>"
-        js += "parent.completeShell(%s, '%s');</script>\n"
-        yield js % (1, cmd_id)  # FIXME
-        yield "</body></html>\n"
-
     log.info("got shell_stream request")
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     cmd = request.params.get('command')
-    cmd_id = request.params.get('command_id')
+    cmd_id = request.params.get('command_id').encode('utf-8', 'ignore')    
     host = request.params.get('host')
     if not cmd:
         raise RequiredParameterMissingError("command")
@@ -881,6 +856,31 @@ def shell_stream(request):
     # will block if no line is in the buffer and will stop iterating once the
     # command is completed and the pipe is closed.
     stdout_lines = shell.command_stream(cmd)
+    
+    def parse(lines):
+        """Generator function that converts stdout_lines to html with
+        js which it streams in a hidden iframe.
+
+        """
+        # send some blank data to get webkit browsers
+        # to display what's sent
+        yield 1024*'\0'  # really necessary?
+        # start the html response
+        yield "<html><body>\n"
+        js = "<script type='text/javascript'>parent.appendShell('%s', '%s');</script>\n"
+        for line in lines:
+            # get commands output, line by line
+            clear_line = line.replace('\'', '\\\'')
+            clear_line = clear_line.replace('\n', '<br/>')
+            clear_line = clear_line.replace('\r', '')
+            #.replace('<','&lt;').replace('>', '&gt;')
+            ret = js % (clear_line, cmd_id)
+            yield ret 
+        js = "<script type='text/javascript'>"
+        js += "parent.completeShell(%s, '%s');</script>\n"
+        yield js % (1, cmd_id)  # FIXME
+        yield "</body></html>\n"    
+
     return Response(status=200, app_iter=parse(stdout_lines))
 
 
