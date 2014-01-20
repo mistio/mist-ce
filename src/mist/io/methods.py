@@ -1345,7 +1345,7 @@ def enable_monitoring(user, backend_id, machine_id,
     }
     #TODO: make ssl verification configurable globally,
     # set to true by default
-    url_scheme = "%s/backends/%s/machines/%/monitoring"
+    url_scheme = "%s/backends/%s/machines/%s/monitoring"
     ret = requests.post(
         url_scheme % (config.CORE_URI, backend_id, machine_id),
         params=payload,
@@ -1377,7 +1377,7 @@ def disable_monitoring(user, backend_id, machine_id):
     }
     #TODO: make ssl verification configurable globally,
     # set to true by default
-    url_scheme = "%s/backends/%s/machines/%/monitoring"
+    url_scheme = "%s/backends/%s/machines/%s/monitoring"
     ret = requests.post(
         url_scheme % (config.CORE_URI, backend_id, machine_id),
         params=payload,
