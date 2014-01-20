@@ -10,7 +10,6 @@ Feature: Keys
 
 
     @web
-    @test
     Scenario: Create Key
         When I click the "Keys" button
         And I wait for 2 seconds
@@ -51,7 +50,6 @@ Feature: Keys
 
 
     @web
-    @test
     Scenario: Delete all keys
         When i click the "Keys" button
         And I wait for 2 seconds
