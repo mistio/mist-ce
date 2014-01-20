@@ -5,14 +5,19 @@
 @when:
 ------
 And I use my "{provider}" credentials   --> backends_use_credentials
+I change the name of the backend to "{new_name}"    --> rename_backend
+I flip the backend switch       --> backends_flip_switch
 
 @then:
 ------
 I should see the "{backend}" Backend added within {timeout} seconds    --> backends_see_backend_buttons
+"{backend}" backend should be "{state}"     -->     backends_check_backend_state_by_index
 
 """
 from behave import *
 from time import sleep, time
+
+from general import time_vslow, time_fast, time_mid, time_slow
 
 @when(u'I use my "{provider}" credentials')
 def backends_use_credentials(context, provider):
@@ -78,3 +83,31 @@ def backends_see_backend_buttons(context, backend, timeout, state):
         assert False, u'%s backend in not deleted' % backend
     else:
         assert False, u'Backend state should be <added> or <deleted> and not %s' % state
+
+
+@when(u'I change the name of the backend to "{new_name}"')
+def rename_backend(context, new_name):
+    try:
+        context.browser.find_by_css('#edit-backend input.ui-input-text').fill(new_name)
+    except:
+        assert False, u'Could not fill in new name'
+
+
+@when(u'I flip the backend switch')
+def backends_flip_switch(context):
+    state = context.browser.find_by_css('#backend-toggle').value
+    context.browser.execute_script("$('#backend-toggle').val('%s' == '1' ? '0' : '1').slider('refresh').trigger('change')" % state)
+    sleep(time_fast)
+
+
+@then(u'"{backend}" backend should be "{state}"')
+def backends_check_backend_state_by_index(context, backend, state):
+
+    toggle_value = context.browser.find_by_css('#backend-toggle').value
+
+    if state == "Enabled" and toggle_value == 1:
+        return
+    elif state == "Disabled" and toggle_value == 0:
+        return
+    else:
+        assert False, u'Backend %s is not %s' % (backend, state)

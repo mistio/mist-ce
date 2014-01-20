@@ -2,14 +2,14 @@
 Feature: Backends
 
     Background:
-        Given PhantomJS as the default browser
+        #Given PhantomJS as the default browser
+        #Given a browser
         Given "NinjaTester" as the persona
         When i visit mist.io
             Then I should see "mist.io"
 
     @web
-    @test
-    Scenario Outline:
+    Scenario Outline: Add Backends
         When I click the link with text "Add backend"
         And I click the link with text "Select provider"
         And i click the link with text "<provider>"
@@ -26,16 +26,51 @@ Feature: Backends
         | SoftLayer         | SOFTLAYER   |
         | NephoScale        | NEPHOSCALE  |
 
+    @web
+    Scenario Outline: Delete Backends
+        When I click the "<provider>" button
+        And I click the "Delete" button
+        And I click the "Yes" button
+            Then I should see the "<provider>" Backend deleted within 5 seconds
 
-#COMMENTED OUT SCENARIOS
-#
-#
-#####Commented out cause phantomjs does not recognize Delete button
+    Examples: Providers
+    | provider          |
+    | EC2 AP NORTHEAST  |
+    | Rackspace DFW     |
+    | OpenStack         |
+    | SoftLayer         |
+    | NephoScale        |
+
+
+
+
+
+
 #    @web
-#    @ec2-backend
-#    Scenario: Delete Backend
-#        When I click the "EC2 AP NORTHEAST" button
-#            Then I should see an element with id "edit-backend-popup" within 3 seconds
-#        When I press "Delete"
-#        And I click the "Yes" button
-#            Then I should see the "EC2 AP NORTHEAST" Backend deleted within 30 seconds
+#    @text
+#    Scenario: Disable Backend
+#        When I click the "OpenStack" button
+#        And I wait for 2 seconds
+#        When I flip the backend switch
+#        And I click the "Back" button
+#        And I wait for 1 seconds
+#        And I click the "OpenStack" button
+#            Then "OpenStack" backend should be "Disabled"
+
+
+#    @web
+#    Scenario: Enable Backend
+#        When I click the "OpenStack" button
+#        And I wait for 2 seconds
+#        When I flip the backend switch
+#        And I click the "Back" button
+#            Then "OpenStack" backend should be "Enabled"
+
+#    @web
+#    Scenario: Rename Backend
+#        When I click the "OpenStack" button
+#        And I wait for 2 seconds
+#        And I change the name of the backend to "Renamed Backend"
+#        And I wait for 2 seconds
+#        And I click the "Back" button
+#            Then I should see the "Renamed Backend" Backend added within 30 seconds
