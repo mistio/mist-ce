@@ -158,6 +158,9 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
+ 
+
+
             clear: function() {
                 Ember.run(this, function() {
                     this.set('content', []);
@@ -232,6 +235,20 @@ define('app/controllers/machines', ['app/models/machine'],
                             that.content.pushObject(Machine.create(machine));
                         }
                     });
+
+                    // Update monitoring
+                    if (Mist.monitored_machines) {
+                        machines.forEach(function(machine) {
+                            Mist.monitored_machines.some(function(machine_tuple){
+                                backend_id = machine_tuple[0];
+                                machine_id = machine_tuple[1];
+                                if (machine.backend.id == backend_id && machine.id == machine_id && !machine.hasMonitoring) {
+                                    that.getMachine(machine_id, backend_id).set('hasMonitoring', true);
+                                    return true;
+                                }
+                            });
+                        });
+                    }
 
                     that.trigger('onMachineListChange');
                 });

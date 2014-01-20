@@ -43,6 +43,31 @@ define('app/controllers/monitoring', [
                 });
             }.on('init'),
 
+
+           changeMonitoring: function(machine, callback) {
+                var that = this;
+                //this.set('changingMonitoring', true);
+                Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring', {
+                   'action': machine.hasMonitoring ? 'disable' : 'enable',
+                   'dns_name': machine.extra.dns_name ? machine.extra.dns_name : 'n/a',
+                   'public_ips': machine.public_ips ? machine.public_ips[0] : [],
+                   'name': machine.name ? machine.name : machine.id
+                }).success(function(data) {
+                    if (!machine.hasMonitoring) {
+                        machine.set('hasMonitoring', true);
+                    } else {
+                        machine.set('hasMonitoring', false);
+                    }
+                    Mist.set('authenticated', true);
+                }).error(function() {
+                    Mist.notificationController.notify('Error when changing monitoring to ' + machine.name);
+                }).complete(function(success, data) {
+                    //that.set('changingMonitoring', false);
+                    if (callback) callback(success, data);
+                });
+            },
+
+
             /**
             * Method: _updateMonitoringData
             * Updates everything in the app that has

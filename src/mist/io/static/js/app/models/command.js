@@ -14,7 +14,7 @@ define('app/models/command', ['ember'],
             id: null,
             command: null,
             response: null,
-            pendingResponse: null,
+            pendingResponse: null
 
         });
     }

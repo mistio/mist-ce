@@ -105,7 +105,7 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
             renderMachines: function () {
                 Ember.run.next(function () {
                     if ($('#single-key-machines').collapsible)
-                        $('#single-key-machines').collapsible();
+                        $('#single-key-machines').collapsible().trigger('create');
                 });
             },
 

@@ -152,7 +152,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                             // TODO: return machine_limit from server (core)
                             //if (Mist.current_plan.machine_limit >= Mist.monitored_machines.length) {
                                 if (this.machine.probed) {
-                                    // TODO: Send command to deploy collectd
+                                    Mist.monitoringController.changeMonitoring(this.machine);
                                 } else {
                                     // TODO: Show message box about adding keys or deploying collectd manually
                                 }
