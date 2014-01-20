@@ -1,6 +1,7 @@
 """Helper functions used in views and WSGI initialization"""
 
 import os
+import re
 import tempfile
 import logging
 from hashlib import sha1
@@ -70,3 +71,47 @@ def get_auth_header(user):
     requests towards the hosted mist core service.
     """
     return "mist_1 %s:%s" % (user.email, user.mist_api_token)
+
+
+
+def parse_ping(stdout):
+    """Parse ping's stdout and return dict of extracted metrics."""
+    re_header = "^--- (.*) ping statistics ---$"
+    re_packets = "^([\d]+) packets transmitted, ([\d]+)" 
+    re_rtt = ".*min/avg/max/[a-z]* = ([\d]+\.[\d]+)/([\d]+\.[\d]+)/([\d]+\.[\d]+)"
+    lines = stdout.split("\n")
+    for i in range(len(lines) - 2):
+        line = lines[i]
+        # match statistics header line
+        match = re.match(re_header, line)
+        if match is None:
+            continue
+        host = match.groups()[0]
+        # match packets statistics line
+        line = lines[i + 1]
+        match = re.match(re_packets, line)
+        if match is None:
+            break
+        packets_tx = int(match.groups()[0])
+        packets_rx = int(match.groups()[1])
+        packets_loss = float(packets_tx - packets_rx) / packets_tx
+        # match rtt statistics line
+        line = lines[i + 2]
+        match = re.match(re_rtt, line)
+        if match is None:
+            break
+        rtt_min = float(match.groups()[0])
+        rtt_avg = float(match.groups()[1])
+        rtt_max = float(match.groups()[2])
+        return {
+            ## "host": host,
+            "packets_tx": packets_tx,
+            "packets_rx": packets_rx,
+            "packets_loss": packets_loss,
+            "rtt_min": rtt_min,
+            "rtt_avg": rtt_avg,
+            "rtt_max": rtt_max,
+        }
+    # parsing failed. good job..
+    log.error("Ping parsing failed for stdout '%s'", stdout)
+    return {}

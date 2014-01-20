@@ -2,6 +2,9 @@ import logging
 import random
 import json
 import requests
+import subprocess
+import re
+from time import sleep
 from datetime import datetime
 from hashlib import sha256
 
@@ -25,6 +28,7 @@ except ImportError:
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
+from mist.io.helpers import parse_ping
 from mist.io.bare_metal import BareMetalDriver
 from mist.io.exceptions import *
 
@@ -1446,3 +1450,114 @@ def _undeploy_collectd(user, backend_id, machine_id, host):
     stdout += shell.command(disable_collectd)
 
     return stdout
+
+
+def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
+    """Ping and SSH to machine and collect various metrics."""
+
+    # start pinging the machine in the background
+    log.info("Starting ping in the background for host %s", host)
+    ping = subprocess.Popen(["ping", "-c", "10", "-i", "0.4", "-W", "1", "-q", host], stdout=subprocess.PIPE)
+
+    # run SSH commands
+    command = (
+       "sudo -n uptime 2>&1|"
+       "grep load|"
+       "wc -l && "
+       "echo -------- && "
+       "uptime && "
+       "echo -------- && "
+       "if [ -f /proc/uptime ]; then cat /proc/uptime; "
+       "else expr `date '+%s'` - `sysctl kern.boottime | sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`;" 
+       "fi; "
+       "echo -------- && "
+       "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;"
+       "else sysctl hw.ncpu | awk '{print $2}';"
+       "fi;"
+       "echo --------"
+       #"cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null |"
+       #"awk '{print $2}'` 2> /dev/null || "
+       #"cat ~/.ssh/authorized_keys 2> /dev/null"
+    )
+
+    log.warn('probing with key %s' % key_id)
+
+    try:
+        cmd_output = ssh_command(user, backend_id, machine_id,
+                                 host, command, key_id=key_id)
+    except:
+        log.warning("SSH failed when probing, let's see what ping has to say.")
+        cmd_output = ""
+
+    # stop pinging
+    #ping.send_signal(2)  # SIGINT to print stats and exit
+    #sleep(0.1)
+    #ping.kill()  # better safe than sorry
+    ping_out = ping.stdout.read()
+    ping.wait()
+    log.info("ping output: %s" % ping_out)
+
+    ret = {}
+    if cmd_output:
+        cmd_output = cmd_output.replace('\r\n','').split('--------')
+        log.warn(cmd_output)
+        uptime_output = cmd_output[1]
+        loadavg = re.split('load averages?: ', uptime_output)[1].split(', ')
+        users = re.split(' users?', uptime_output)[0].split(', ')[-1].strip()
+        uptime = cmd_output[2]
+        cores = cmd_output[3]
+        ret = {'uptime': uptime,
+               'loadavg': loadavg,
+               'cores': cores,
+               'users': users,
+               }
+        # if len(cmd_output) > 4:
+        #     updated_keys = update_available_keys(user, backend_id,
+        #                                          machine_id, cmd_output[4])
+        #     ret['updated_keys'] = updated_keys
+              
+    ret.update(parse_ping(ping_out))
+    
+    return ret
+
+
+# def update_available_keys(user, backend_id, machine_id, authorized_keys):
+#     keypairs = user.keypairs
+# 
+#     # track which keypairs will be updated
+#     updated_keypairs = {}
+#     # get the actual public keys from the blob
+#     ak = [k for k in authorized_keys.split('\n') if k.startswith('ssh')]
+# 
+#     # for each public key
+#     for pk in ak:
+#         exists = False
+#         pub_key = pk.strip().split(' ')
+#         for k in keypairs:
+#             # check if the public key already exists in our keypairs
+#             if keypairs[k].public.strip().split(' ')[:2] == pub_key[:2]:
+#                 exists = True
+#                 associated = False
+#                 # check if it is already associated with this machine
+#                 for machine in keypairs[k].machines:
+#                     if machine[:2] == [backend_id, machine_id]:
+#                         associated = True
+#                         break
+#                 if not associated:
+#                     with user.lock_n_load():
+#                         keypairs[k].machines.append([backend_id, machine_id])
+#                         user.save()
+#                     updated_keypairs[k] = keypairs[k]
+#             if exists:
+#                 break
+# 
+#     if updated_keypairs:
+#         log.debug('update keypairs')
+# 
+#     ret = [{'name': key,
+#             'machines': keypairs[key].machines,
+#             'pub': keypairs[key].public,
+#             'default_key': keypairs[key].default
+#             } for key in updated_keypairs]
+# 
+#     return ret

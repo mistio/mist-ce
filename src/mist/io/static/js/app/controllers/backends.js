@@ -156,6 +156,8 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     machine.set('loadavg5', loadToColor(data.loadavg[1], data.cores));
                     machine.set('loadavg15', loadToColor(data.loadavg[2, data.cores]));                   
                     machine.set('loadavg', data.loadavg);
+                    machine.set('packetsLoss', data.packets_loss);
+                    machine.set('latency', data.rtt_avg);
                     machine.set('probed', true);
                 }).error(function(message) {
                     if (key) Mist.notificationController.notify(message);

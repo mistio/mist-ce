@@ -16,7 +16,6 @@ from datetime import datetime
 
 import requests
 import json
-import re
 
 from pyramid.response import Response
 
@@ -568,7 +567,7 @@ def list_locations(request):
 
 @view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
-    """Probes a machine over ssh, using fabric.
+    """Probes a machine using ping and ssh to collect metrics.
 
     .. note:: Used for getting uptime and a list of deployed keys.
 
@@ -576,96 +575,17 @@ def probe(request):
     machine_id = request.matchdict['machine']
     backend_id = request.matchdict['backend']
     host = request.json_body.get('host', None)
-    key = request.json_body.get('key', None)
+    key_id = request.json_body.get('key', None)
     # FIXME: simply don't pass a key parameter
-    if key == 'undefined':
-        key = None
+    if key_id == 'undefined':
+        key_id = None
 
-    ssh_user = request.params.get('ssh_user', None)
-    command = (
-       "sudo -n uptime 2>&1|"
-       "grep load|"
-       "wc -l && "
-       "echo -------- && "
-       "uptime && "
-       "echo -------- && "
-       "if [ -f /proc/uptime ]; then cat /proc/uptime; "
-       "else expr `date '+%s'` - `sysctl kern.boottime | sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`;" 
-       "fi; "
-       "echo -------- && "
-       "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;"
-       "else sysctl hw.ncpu | awk '{print $2}';"
-       "fi;"
-       "echo --------"
-       #"cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null |"
-       #"awk '{print $2}'` 2> /dev/null || "
-       #"cat ~/.ssh/authorized_keys 2> /dev/null"
-       )
-
+    ssh_user = request.params.get('ssh_user', '')
+    # FIXME: simply don't pass a key parameter
+    if key_id == 'undefined':
+        key_id = ''
     user = user_from_request(request)
-    cmd_output = methods.ssh_command(user, backend_id, machine_id,
-                                     host, command, key_id=key)
-
-    if cmd_output:
-        cmd_output = cmd_output.replace('\r\n','').split('--------')
-        log.warn(cmd_output)
-        uptime_output = cmd_output[1]
-        loadavg = re.split('load averages?: ', uptime_output)[1].split(', ')
-        users = re.split(' users?', uptime_output)[0].split(', ')[-1].strip()
-        uptime = cmd_output[2]
-        cores = cmd_output[3]
-        ret = {'uptime': uptime,
-               'loadavg': loadavg,
-               'cores': cores,
-               'users': users,
-               }
-        # if len(cmd_output) > 4:
-        #     updated_keys = update_available_keys(user, backend_id,
-        #                                          machine_id, cmd_output[4])
-        #     ret['updated_keys'] = updated_keys
-        return ret
-
-
-
-def update_available_keys(user, backend_id, machine_id, authorized_keys):
-    keypairs = user.keypairs
-
-    # track which keypairs will be updated
-    updated_keypairs = {}
-    # get the actual public keys from the blob
-    ak = [k for k in authorized_keys.split('\n') if k.startswith('ssh')]
-
-    # for each public key
-    for pk in ak:
-        exists = False
-        pub_key = pk.strip().split(' ')
-        for k in keypairs:
-            # check if the public key already exists in our keypairs
-            if keypairs[k].public.strip().split(' ')[:2] == pub_key[:2]:
-                exists = True
-                associated = False
-                # check if it is already associated with this machine
-                for machine in keypairs[k].machines:
-                    if machine[:2] == [backend_id, machine_id]:
-                        associated = True
-                        break
-                if not associated:
-                    with user.lock_n_load():
-                        keypairs[k].machines.append([backend_id, machine_id])
-                        user.save()
-                    updated_keypairs[k] = keypairs[k]
-            if exists:
-                break
-
-    if updated_keypairs:
-        log.debug('update keypairs')
-
-    ret = [{'name': key,
-            'machines': keypairs[key].machines,
-            'pub': keypairs[key].public,
-            'isDefault': keypairs[key].default
-            } for key in updated_keypairs]
-
+    ret = methods.probe(user, backend_id, machine_id, host, key_id, ssh_user)
     return ret
 
 
