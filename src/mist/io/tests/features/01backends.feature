@@ -25,6 +25,7 @@ Feature: Backends
         | OpenStack         | OPENSTACK   |
         | SoftLayer         | SOFTLAYER   |
         | NephoScale        | NEPHOSCALE  |
+        | Linode            | LINODE      |
 
     @web
     Scenario Outline: Delete Backends
@@ -40,6 +41,7 @@ Feature: Backends
     | OpenStack         |
     | SoftLayer         |
     | NephoScale        |
+    | Linode            |
 
 
 
