@@ -8,6 +8,7 @@ I visit mist.io     --> visit_home_page
 I click the "{text}" button     -->
 
 @then:
+
 ------
 """
 from behave import *
@@ -47,3 +48,4 @@ def general_click_button_by_text(context, text):
                 sleep(time_fast)
                 return
     assert False, u'Could not find %s' % text
+
