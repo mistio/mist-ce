@@ -1,6 +1,7 @@
 @backends
 Feature: Backends
 
+
     Background:
         #Given PhantomJS as the default browser
         #Given a browser
@@ -8,7 +9,9 @@ Feature: Backends
         When i visit mist.io
             Then I should see "mist.io"
 
+
     @web
+    @test
     Scenario Outline: Add Backends
         When I click the "Add backend" button
         And I click the "Select provider" button
@@ -31,19 +34,29 @@ Feature: Backends
 
     @web
     Scenario: Disable Backend
-        When I click the "OpenStack" button
+        When I click the "SoftLayer" button
         When I flip the backend switch
         And I click the "Back" button
-            Then "OpenStack" backend should be "offline"
+            Then "SoftLayer" backend should be "offline"
 
 
     @web
     Scenario: Enable Backend
-        When I click the "OpenStack" button
+        When I click the "SoftLayer" button
         When I flip the backend switch
         And I click the "Back" button
         And I wait for 2 seconds
-            Then "OpenStack" backend should be "online"
+            Then "SoftLayer" backend should be "online"
+
+
+    @web
+    @test
+    Scenario: Rename Backend
+        When I click the "SoftLayer" button
+        And I wait for 1 seconds
+        And I change the name of the backend to "New"
+        And I wait for 1 seconds
+            Then I should see the "New" Backend added within 10 seconds
 
     @web
     Scenario Outline: Delete Backends
@@ -55,20 +68,11 @@ Feature: Backends
     Examples: Providers
     | provider          |
     | EC2 AP NORTHEAST  |
-    | Rackspace DFW     |
-    | OpenStack         |
-    | SoftLayer         |
-    | NephoScale        |
-    | Linode            |
-    | HP Cloud US East  |
+    #| Rackspace DFW     |
+    #| OpenStack         |
+    #| New               |
+    #| NephoScale        |
+    #| Linode            |
+    #| HP Cloud US East  |
     #Those are commented out cause we only need to test deleting one Backend
     #The db.yaml is refreshed to be empty in the next feature
-
-#    @web
-#    Scenario: Rename Backend
-#        When I click the "OpenStack" button
-#        And I wait for 2 seconds
-#        And I change the name of the backend to "Renamed Backend"
-#        And I wait for 2 seconds
-#        And I click the "Back" button
-#            Then I should see the "Renamed Backend" Backend added within 30 seconds

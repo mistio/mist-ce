@@ -55,8 +55,8 @@ def backends_use_credentials(context, provider):
         context.browser.find_by_css('input#new-backend-openstack-tenant').fill(creds['Openstack']['tenant'])
         return
     elif provider == "SOFTLAYER":
-        context.browser.find_by_css('input#new-backend-first-field').fill(creds['Softlayer']['api_key'])
-        context.browser.find_by_css('input#new-backend-second-field').fill(creds['Softlayer']['api_secret'])
+        context.browser.find_by_css('input#new-backend-first-field').type(creds['Softlayer']['api_key'])
+        context.browser.find_by_css('input#new-backend-second-field').type(creds['Softlayer']['api_secret'])
         return
     elif provider == "NEPHOSCALE":
         context.browser.find_by_css('input#new-backend-first-field').fill(creds['Nephoscale']['username'])
@@ -113,10 +113,13 @@ def backends_see_backend_buttons(context, backend, timeout, state):
 
 @when(u'I change the name of the backend to "{new_name}"')
 def rename_backend(context, new_name):
+    name = list(new_name)
     try:
-        context.browser.find_by_css('#edit-backend input.ui-input-text').fill(new_name)
+        context.browser.find_by_css('#edit-backend-popup input').fill("")
+        for letter in name:
+            context.browser.find_by_css('#edit-backend-popup input').type(letter)
     except:
-        assert False, u'Could not fill in new name'
+        assert False, u'Could not change name or popup is not open'
 
 
 @when(u'I flip the backend switch')
