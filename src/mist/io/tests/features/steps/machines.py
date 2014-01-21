@@ -8,11 +8,11 @@ a key for the machine       --> given_key
 I type "{name}" as machine name     --> type_machine_name
 
 @then:
-
+"{machine_name}" state should be "{state}" within {timeout} seconds      --> check_machine_state
 ------
 
 """
-
+from time import sleep, time
 
 @given(u'a key for the machine')
 def given_key(context):
@@ -36,3 +36,19 @@ def type_machine_name(context, name):
         context.browser.find_by_css('input#create-machine-name').fill(machine_name)
     else:
         context.browser.find_by_css('input#create-machine-name').fill(name)
+
+
+@then(u'"{machine_name}" state should be "{state}" within {timeout} seconds')
+def check_machine_state(context, machine_name, state, timeout):
+    machines = context.browser.find_by_css('#machines li')
+    for machine in machines:
+        if machine_name in machine.text:
+            break
+
+    end_time = time() + int(timeout)
+    while time() < end_time:
+        if state in machine.text:
+            return
+        sleep(2)
+
+    assert False, u'Could not find %s state for machine %s' % (state, machine_name)
