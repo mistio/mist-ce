@@ -28,6 +28,23 @@ Feature: Backends
         | Linode            | LINODE      |
         | HP Cloud US East  | HPCLOUD     |
 
+
+    @web
+    Scenario: Disable Backend
+        When I click the "OpenStack" button
+        When I flip the backend switch
+        And I click the "Back" button
+            Then "OpenStack" backend should be "offline"
+
+
+    @web
+    Scenario: Enable Backend
+        When I click the "OpenStack" button
+        When I flip the backend switch
+        And I click the "Back" button
+        And I wait for 2 seconds
+            Then "OpenStack" backend should be "online"
+
     @web
     Scenario Outline: Delete Backends
         When I click the "<provider>" button
@@ -38,38 +55,14 @@ Feature: Backends
     Examples: Providers
     | provider          |
     | EC2 AP NORTHEAST  |
-    #| Rackspace DFW     |
-    #| OpenStack         |
-    #| SoftLayer         |
-    #| NephoScale        |
-    #| Linode            |
-    #| HP Cloud US East  |
+    | Rackspace DFW     |
+    | OpenStack         |
+    | SoftLayer         |
+    | NephoScale        |
+    | Linode            |
+    | HP Cloud US East  |
     #Those are commented out cause we only need to test deleting one Backend
     #The db.yaml is refreshed to be empty in the next feature
-
-
-
-
-
-#    @web
-#    @text
-#    Scenario: Disable Backend
-#        When I click the "OpenStack" button
-#        And I wait for 2 seconds
-#        When I flip the backend switch
-#        And I click the "Back" button
-#        And I wait for 1 seconds
-#        And I click the "OpenStack" button
-#            Then "OpenStack" backend should be "Disabled"
-
-
-#    @web
-#    Scenario: Enable Backend
-#        When I click the "OpenStack" button
-#        And I wait for 2 seconds
-#        When I flip the backend switch
-#        And I click the "Back" button
-#            Then "OpenStack" backend should be "Enabled"
 
 #    @web
 #    Scenario: Rename Backend
