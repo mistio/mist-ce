@@ -178,7 +178,7 @@ def list_backends(request):
                     'title': backend.title or backend.provider,
                     'provider': backend.provider,
                     'poll_interval': backend.poll_interval,
-                    'state': 'wait',
+                    'state': 'wait' if backend.enabled else 'offline',
                     # for Provider.RACKSPACE_FIRST_GEN
                     'region': backend.region,
                     # for Provider.RACKSPACE (the new Nova provider)
