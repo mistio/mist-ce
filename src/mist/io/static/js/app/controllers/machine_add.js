@@ -44,6 +44,11 @@ define('app/controllers/machine_add', ['ember'],
                         $('.ui-page-active').height(panelHeight);
                     }
                 });
+               $('#create-machine-location').addClass('ui-state-disabled');
+               $('#create-machine-image').addClass('ui-state-disabled');
+               $('#create-machine-size').addClass('ui-state-disabled');
+               $('#create-machine-key').addClass('ui-state-disabled');
+                
                 
                 this._clear();
                 this.set('callback', callback);

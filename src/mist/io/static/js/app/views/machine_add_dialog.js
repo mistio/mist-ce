@@ -117,6 +117,11 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
                                              .set('newMachineImage', {'name' : 'Select Image'})
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineProvider', backend);
+                   
+                   $('#create-machine-image').removeClass('ui-state-disabled');
+                   $('#create-machine-location').addClass('ui-state-disabled');
+                   $('#create-machine-size').addClass('ui-state-disabled');
+                   $('#create-machine-key').addClass('ui-state-disabled');
                 },
 
 
@@ -127,6 +132,10 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
                     Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineImage', image);
+
+                   $('#create-machine-location').addClass('ui-state-disabled');
+                   $('#create-machine-size').removeClass('ui-state-disabled');
+                   $('#create-machine-key').addClass('ui-state-disabled');
                 },
 
 
@@ -136,6 +145,9 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
 
                     Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
                                              .set('newMachineSize', size);
+                    
+                    $('#create-machine-location').removeClass('ui-state-disabled');
+                    $('#create-machine-key').addClass('ui-state-disabled');
                 },
 
 
@@ -144,6 +156,7 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
                     this.fieldIsReady('location');
 
                     Mist.machineAddController.set('newMachineLocation', location);
+                    $('#create-machine-key').removeClass('ui-state-disabled');
                 },
 
 
