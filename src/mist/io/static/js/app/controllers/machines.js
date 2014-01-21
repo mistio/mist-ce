@@ -84,6 +84,8 @@ define('app/controllers/machines', ['app/models/machine'],
                         'disk': size.disk,
                         'image_extra': image.extra
                 }).success(function (machine) {
+                    info('create machine success');
+                    info(key.id);
                     that._createMachine(machine, key);
                 }).error(function () {
                     that.removeObject(dummyMachine);
@@ -259,11 +261,9 @@ define('app/controllers/machines', ['app/models/machine'],
                 var machine = this.getMachine(machine.id);
                 Ember.run(this, function() {
                     machine.set('pendingCreation', false);
-                    key.associate(machine, function(success) {
-                        if (success)
-                            machine.probe(key.id);
-                    });
-                    that.trigger('onMachineListChange');
+                    Mist.keysController._associateKey(key.id, machine);
+                    machine.probe(key.id);
+                    this.trigger('onMachineListChange');
                 });
             },
 

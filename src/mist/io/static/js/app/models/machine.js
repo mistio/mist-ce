@@ -133,19 +133,19 @@ define('app/models/machine', ['ember'],
                 var that = this;
                 // If there are many pending requests, reschedule for a bit later
                 if ($.active > 4) {
-                    Ember.run.later(that, function() {
-                        that.probe();
+                    Ember.run.later(function() {
+                        that.probe(keyId);
                     }, 1000);
                     return;
                 }
                 Mist.backendsController.probeMachine(that, keyId, function(success) {
                     if (success) { // Reprobe in 100 seconds on success
-                        Ember.run.later(that, function() {
-                            that.probe();
+                        Ember.run.later(function() {
+                            that.probe(keyId);
                         }, 100000);
                     } else {  // Reprobe with double interval on failure
-                        Ember.run.later(that, function() {
-                            that.probe();
+                        Ember.run.later(function() {
+                            that.probe(keyId);
                             that.set('probeInterval', that.probeInterval * 2);
                         }, that.probeInterval);
                     }
