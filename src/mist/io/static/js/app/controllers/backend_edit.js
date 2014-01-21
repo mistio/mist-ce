@@ -13,6 +13,7 @@ define('app/controllers/backend_edit', ['ember'],
 
             backend: null,
             callback: null,
+            newBackendTitle: null,
 
 
             /**
@@ -24,6 +25,7 @@ define('app/controllers/backend_edit', ['ember'],
             open: function(backend, callback) {
                 this.set('backend', backend);
                 this.set('callback', callback);
+                this.set('newBackendTitle', backend.title);
                 $('#monitoring-message').hide();
                 $('#backend-delete-confirm').hide();
                 $('#backend-toggle option[value=1]')[0].selected = backend.enabled;
@@ -38,12 +40,15 @@ define('app/controllers/backend_edit', ['ember'],
 
 
             _clear: function() {
-                
+                this.set('backend', null);
+                this.set('callback', null);
+                this.set('newBackendTitle', null);
             },
 
 
-            renameBackend: function() {
-                
+            rename: function() {
+                if (! this.newBackendTitle) return;
+                Mist.backendsController.renameBackend(this.backend.id, this.newBackendTitle, this.callback);
             },
 
 
@@ -65,8 +70,8 @@ define('app/controllers/backend_edit', ['ember'],
              */
 
             backendTitleOBserver: function() {
-                Ember.run.once(this, 'renameBackend');
-            }.observes('backend.title'),
+                Ember.run.once(this, 'rename');
+            }.observes('newBackendTitle'),
         });
     }
 );

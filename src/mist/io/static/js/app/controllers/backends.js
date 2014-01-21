@@ -78,6 +78,22 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             },
 
 
+            renameBackend: function(backendId, newTitle, callback) {
+                var that = this;
+                this.set('renamingBackend', true);
+                Mist.ajax.PUT('/backends/' + backendId, {
+                    'new_name': newTitle
+                }).success(function() {
+                    that._renameBackend(backendId, newTitle);
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to rename backend');
+                }).complete(function(success) {
+                    that.set('renamingBackend', false);
+                    if (callback) callback(success);
+                });
+            },
+
+
             deleteBackend: function(backendId, callback) {
                 var that = this;
                 this.set('deletingBackend', true);
@@ -314,6 +330,14 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     this.content.removeObject(this.getBackend(id));
                     this.trigger('onBackendListChange');
                     this.trigger('onBackendDelete');
+                });
+            },
+
+
+            _renameBackend: function(id, newTitle) {
+                Ember.run(this, function() {
+                    this.getBackend(id).set('title', newTitle);
+                    this.trigger('onBackendRename');
                 });
             },
 
