@@ -13,7 +13,7 @@ Feature: Keys
     Scenario: Create Key
         When I click the "Keys" button
         And I wait for 2 seconds
-        And I click the "Create" button
+        And I click the "Add" button
         And I type "tester" as key name
         And I click the "Generate" button
         And I click the "Done" button
@@ -37,7 +37,7 @@ Feature: Keys
     Scenario: Add second key and make default
         When I click the "Keys" button
         And I wait for 2 seconds
-        And I click the "Create" button
+        And I click the "Add" button
         And I type "SecondKey" as key name
         And I click the "Generate" button
         And I click the "Done" button

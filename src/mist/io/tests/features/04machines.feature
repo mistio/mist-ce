@@ -38,3 +38,6 @@ Feature: Machines
             Then "$machine_name" state should be "pending" within 60 seconds
         When I wait for 1 seconds
             Then "$machine_name" state should be "running" within 400 seconds
+        When I wait for 1 seconds
+            Then "$machine_name" should be probed within 400 seconds
+        When I wait for 10 seconds
