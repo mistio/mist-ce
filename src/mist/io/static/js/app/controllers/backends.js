@@ -158,14 +158,18 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 } else {
                     machine.set('probing', true);
                 }
-
+                var uptime = null;
                 Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/probe', {
                     'host': host,
                     'key': keyId
                 }).success(function(data) {
-                    var uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
-                    machine.set('uptimeChecked', Date.now());
-                    machine.set('uptimeFromServer', uptime);
+                    if (data.uptime) {
+                        uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
+                        machine.set('uptimeChecked', Date.now());
+                        machine.set('uptimeFromServer', uptime);
+                    } else {
+                        machine.set('uptimeChecked', -Date.now());
+                    }
                     machine.set('cores', data.cores);
                     machine.set('users', data.users);
                     machine.set('loadavg1', loadToColor(data.loadavg[0], data.cores));
@@ -177,12 +181,12 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     machine.set('probed', true);
                 }).error(function(message) {
                     if (key) Mist.notificationController.notify(message);
-                }).complete(function(success) {
+                }).complete(function(success, data) {
                     if (key) {
                         key.set('probing', false);
                     }
                     machine.set('probing', false);
-                    if (callback) callback(success);
+                    if (callback) callback(!!uptime, data);
                 });
             },
 

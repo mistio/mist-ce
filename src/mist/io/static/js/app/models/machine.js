@@ -13,53 +13,52 @@ define('app/models/machine', ['ember'],
              */
 
             id: null,
-            imageId: null,
             name: null,
-            backend: null,
-            selected: false,
-            probed: false,
-            probing: false,
-            hasMonitoring: false,
-            probeInterval: 30000,
-            pendingMonitoring: false,
-            pendingShell: false,
-            pendingAddTag: false,
-            pendingDeleteTag: false,
-            pendingStats: false,
-            pendingCreation: false,
+            probed: null,
             keysCount: 0,
+            probing: null,
+            backend: null,
+            selected: null,
+            hasMonitoring: null,
+            probeInterval: 30000,
+            pendingCreation: null,
+            
             state: 'stopped',
             stats: {'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
             
             commandHistory: [],
             
+            loss: null,
+            latency: null,
             loadavg: null,
             loadavg1: null,
             loadavg5: null,
             loadavg15: null,
             
-            latency: null,
-            loss: null,
+            
+            /**
+             *  Computed Properties
+             */
             
             netled1: function() {
-                    if (this.latency < 1000) return 'on'; 
+                if (this.latency < 1000) return 'on'; 
             }.property('latency'),
             
             netled2: function() {
-                    if (this.latency < 500) return 'on'; 
+                if (this.latency < 500) return 'on'; 
             }.property('latency'),
             
             netled3: function() {
-                    if (this.latency < 250) return 'on'; 
+                if (this.latency < 250) return 'on'; 
             }.property('latency'),
 
             netled4: function() {
-                    if (this.latency < 100) return 'on'; 
+                if (this.latency < 100) return 'on'; 
             }.property('latency'),
                         
             netled4: function() {
-                    if (this.latency < 40) return 'on'; 
+                if (this.latency < 40) return 'on'; 
             }.property('latency'),  
 
             lossled: function() {
@@ -74,6 +73,7 @@ define('app/models/machine', ['ember'],
                 return this.backend.images.getImage(this.imageId);
             }.property('imageId'),
             
+            
             /**
              * 
              *  Initialization
@@ -81,9 +81,15 @@ define('app/models/machine', ['ember'],
              */
 
             load: function() {
-                this.set('commandHistory', []);
                 this.probe();
             }.on('init'),
+
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
 
             shutdown: function() {
                 Mist.backendsController.shutdownMachine(this.id);
