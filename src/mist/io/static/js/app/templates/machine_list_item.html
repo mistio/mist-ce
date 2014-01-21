@@ -22,15 +22,27 @@
                 {{#if pendingCreation}}
                     <div class='ajax-loader'></div>
                 {{else}} 
-                    <div {{bind-attr class="loadavg1 :led"}}>
-                        <div  {{bind-attr class="probing" }}></div>
+                    <div {{bind-attr class="probing"}}>
+                        <div class="loadleds">                                                                      
+                            <div {{bind-attr class="loadavg15 :led"}}>
+                            </div>                
+                            <div {{bind-attr class="loadavg5 :led"}}>
+                            </div> 
+                            <div {{bind-attr class="loadavg1 :led"}}>
+                            </div>
+                        </div>
+                        <div {{bind-attr class=":netleds"}}>
+                            <div {{bind-attr class="netled4 :netled1"}}>
+                            </div> 
+                            <div {{bind-attr class="netled3 :netled2"}}>
+                            </div> 
+                            <div {{bind-attr class="netled2 :netled3"}}>
+                            </div> 
+                            <div {{bind-attr class="netled1 :netled4"}}>
+                            </div>
+                        </div>
+                                                 
                     </div>
-                    <div {{bind-attr class="loadavg5 :led"}}>
-                        <div  {{bind-attr class="probing" }}></div>
-                    </div>                    
-                    <div {{bind-attr class="loadavg15 :led"}}>
-                        <div  {{bind-attr class="probing" }}></div>
-                    </div>                
                 {{/if}}   
                 
             </div>

@@ -328,19 +328,50 @@ ul.checkbox-list li a, ul.checkbox-list li label {
 /* Load colors
  * */
 
-.led {
-    border-radius: 0.1em;
+.netleds div {
+    border-radius: 0.2em;
     float: right;
     height: 16px;
     margin: 0px 1px;
-    width: 12px;
+    width: 3px;
+    background-color: rgba(0,0,0,.2)
+}
+
+.netleds .on {
+    background-color: rgba(0,0,0,0.6);
+}
+
+.netled4 {
+    height: 4px !important;
+    margin-top: 12px !important;
+}
+
+.netled3 {
+    height: 8px !important;
+    margin-top: 8px !important;
+}
+
+.netled2 {
+    height: 12px !important;
+    margin-top: 4px !important;
+}
+
+.loadleds {
+    position: relative;
+    left: 5px
+}
+
+.led {
+    border-radius: 0.15em;
+    float: right;
+    height: 16px;
+    margin: 0px 1px;
+    width: 6px;
 }
 
 .probing {
     animation: probe 1s steps(2, start) infinite;
     -webkit-animation: probe 1s steps(2, start) infinite;
-    height: 16px;
-    width: 12px;
     background-color: rgba(0, 0, 0, .4);        
 }
 @keyframes probe {
@@ -373,7 +404,7 @@ ul.checkbox-list li a, ul.checkbox-list li label {
     background-color: #06A2CB !important;
 }
 .cold {
-    background-color: #396b9e !important;
+    background: #396b9e /*{b-bup-background-color}*/linear-gradient( #5f9cc5 /*{d-bup-background-start}*/, #396b9e /*{d-bup-background-end}*/) /*{d-bup-background-color}*/ !important;
 }
 
 

@@ -29,7 +29,7 @@ define('app/models/machine', ['ember'],
             pendingCreation: false,
             keysCount: 0,
             state: 'stopped',
-            stats:{'cpu': [], 'load': [], 'disk': []},
+            stats: {'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
             
             commandHistory: [],
@@ -38,7 +38,38 @@ define('app/models/machine', ['ember'],
             loadavg1: null,
             loadavg5: null,
             loadavg15: null,
+            
+            latency: null,
+            loss: null,
+            
+            netled1: function() {
+                    if (this.latency < 1000) return 'on'; 
+            }.property('latency'),
+            
+            netled2: function() {
+                    if (this.latency < 500) return 'on'; 
+            }.property('latency'),
+            
+            netled3: function() {
+                    if (this.latency < 250) return 'on'; 
+            }.property('latency'),
 
+            netled4: function() {
+                    if (this.latency < 100) return 'on'; 
+            }.property('latency'),
+                        
+            netled4: function() {
+                    if (this.latency < 40) return 'on'; 
+            }.property('latency'),  
+
+            lossled: function() {
+                if (this.loss > 0.5) {
+                    return 'high-loss';
+                } else if (this.loss > 15 ){
+                    return 'low-loss';
+                }
+            },
+                              
             image: function() {
                 return this.backend.images.getImage(this.imageId);
             }.property('imageId'),
