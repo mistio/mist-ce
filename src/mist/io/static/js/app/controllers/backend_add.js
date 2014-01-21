@@ -56,7 +56,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     this.newBackendSecondField,
                     this.newBackendOpenStackURL,
                     this.newBackendOpenStackTenant,
-                    this.newBackendKey,
+                    this.newBackendKey.id,
                     function (success, backend) {
                         that._giveCallback(success, backend);
                         if (success) {
