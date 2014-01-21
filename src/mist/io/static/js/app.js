@@ -158,7 +158,7 @@ define( 'app', [
         App.set('password', '');
         window.Mist = App;
 
-        //URL_PREFIX = AUTH = EMAIL = IS_CORE = CSRF_TOKEN '';
+        // URL_PREFIX = AUTH = EMAIL = IS_CORE = CSRF_TOKEN '';
 
         // Ember routes and routers
 

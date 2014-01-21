@@ -170,7 +170,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     machine.set('users', data.users);
                     machine.set('loadavg1', loadToColor(data.loadavg[0], data.cores));
                     machine.set('loadavg5', loadToColor(data.loadavg[1], data.cores));
-                    machine.set('loadavg15', loadToColor(data.loadavg[2, data.cores]));                   
+                    machine.set('loadavg15', loadToColor(data.loadavg[2, data.cores]));                  
                     machine.set('loadavg', data.loadavg);
                     machine.set('loss', data.packets_loss);
                     machine.set('latency', data.rtt_avg);
