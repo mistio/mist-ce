@@ -120,18 +120,19 @@ define('app/views/monitoring', [
             */
             redrawJQMComponents: function(){
 
+
                 $('.monitoring-button').button();
                 $('#add-rule-button').button();
                 $('#monitoring-dialog').popup();  
 
                 // Collapse/Extend Buttons
-                $('#cpuGraphBtn > button').button();
-                $('#loadGraphBtn > button').button();
-                $('#memoryGraphBtn > button').button();
-                $('#diskReadGraphBtn > button').button();
-                $('#diskWriteGraphBtn > button').button();
-                $('#networkTXGraphBtn > button').button();
-                $('#networkRXGraphBtn > button').button();
+                $('#cpuGraphBtn > a').button();
+                $('#loadGraphBtn > a').button();
+                $('#memoryGraphBtn > a').button();
+                $('#diskReadGraphBtn > a').button();
+                $('#diskWriteGraphBtn > a').button();
+                $('#networkTXGraphBtn > a').button();
+                $('#networkRXGraphBtn > a').button();
 
                 // DEBUG TODO Possible Remove It
                 //$('#timeWindowSelect').selectmenu();
