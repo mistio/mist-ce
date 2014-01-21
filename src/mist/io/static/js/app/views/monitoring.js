@@ -11,40 +11,49 @@ define('app/views/monitoring', [
 
             template: Ember.Handlebars.compile(monitoring_html),
 
-            cpuGraph: null,
-            loadGraph: null,
-            memGraph: null,
-            diskReadGraph: null,
-            diskWriteGraph: null,
-            networkTXGraph: null,
-            networkRXGraph: null,
-
-            cpuCores: 0,
+            graphs : {
+                cpu: null,
+                load: null,
+                memory: null,
+                diskRead: null,
+                diskWrite: null,
+                networkTX: null,
+                networkRX: null
+            },
 
             viewRendered: false,
             graphsCreated: false,
 
-            graphsListCookie: null,
-            graphsBtnListCookie: null,
-
+            /**
+            * 
+            * Initialize monitoring view. Automatically called by ember
+            *
+            */
             init: function() {
                 this._super();
                 this.setUpGraphs();
             },
 
-            // Check If Ember View Rendered
+            /**
+            * 
+            * Called by ember when view is rendered
+            *
+            */
             didInsertElement: function(){
                 this._super();
                 this.set('viewRendered',true);
             },
 
-            // Check If Ember View Is Destroyed Or Disable Pressed
+            /**
+            * 
+            * Called by ember when view will be destroyed
+            * Stops data request and re-initializes enable button
+            *
+            */
             willDestroyElement: function(){
 
                 this._super();
-                // Disable intervals of data request and Load Color change
-                window.clearInterval(window.monitoringInterval);
-                this.stopLoadColorInterval();
+                Mist.monitoringController.request.stop();
 
                 // Re-Initialize Enable Button Of Jquery Mobile
                 Em.run.next(function() {
@@ -52,274 +61,124 @@ define('app/views/monitoring', [
                 });
             },
 
-            updateGraphs: function(data){
-
-                    this.cpuCores = data.cpuCores;
-                    this.cpuGraph.updateData(data.cpu);
-                    this.loadGraph.updateData(data.load);
-                    this.memGraph.updateData(data.memory);
-
-                    this.diskReadGraph.updateData(data.diskRead);
-                    this.diskWriteGraph.updateData(data.diskWrite);
-                    this.networkRXGraph.updateData(data.netRX);
-                    this.networkTXGraph.updateData(data.netTX);
-            },
-
-            hideGraphs: function(){
-
-                $('.graph').each(function(){
-
-                    if( $(this).css('display') != 'none' )
-                        $(this).hide(0);
-                });
-
-                // Get Visible Button List
-                $('.graphBtn').each(function(){
-
-                    if( $(this).css('display') != 'none' )
-                        $(this).hide(0);
-                });
-            },
-
-            showGraphs: function(){
-
-                $('.graph').each(function(){
-
-                    if( $(this).css('display') == 'none' )
-                        $(this).show(0);
-                });
-
-                // Get Visible Button List
-                $('.graphBtn').each(function(){
-
-                    if( $(this).css('display') == 'none' )
-                        $(this).show(0);
-                });
-            },
-
-            clickedCollapse: function(graph){
-
-                var self = this;
-                // Mobile Hide Animation is slow, disabling animation
-                var hideDuration = 400;
-                if (Mist.isClientMobile) {
-                    
-                    hideDuration = 0;
-                }
-
-                // Add button to the end of the row
-                $("#" + graph.id + "Btn").insertAfter($('.graphBtn').last());
-
-                // When graph is hidden show button and set new coockie 
-                $("#" + graph.id).hide(hideDuration, function(){
-                    
-                    $("#" + graph.id + "Btn").show(0);
-                    self.setGraphsCookie();
-                });
-                
-            },
-
-            clickedExpand: function(graph){
-                
-                var self = this;
-                // Mobile Hide Animation is slow, disabling animation
-                var hideDuration = 400;
-                if (Mist.isClientMobile) {
-                    
-                    hideDuration = 0;
-                }
-
-                // Add graph to the end of the list
-                $("#" + graph.id).insertAfter($('.graph').last());
-
-                // When graph is visible set new coockie 
-                $("#" + graph.id + "Btn").hide(0);
-                $("#" + graph.id).show(hideDuration, function(){
-
-                    self.setGraphsCookie();
-                });
-                
-                
-            },
-
-            /* Commented Out Until It's Time To Test Zoom In/Out
-            selectPressed: function(){
-
-                var selectValue = $("#timeWindowSelect").val();
-                console.log("time Window");
-                console.log(this.cpuGraph.getTimeWindow());
-                var newTime = 0;
-                var newStep = 10000;
-                if(selectValue.toLowerCase().search("minutes") != -1)
-                {
-                    selectValue = selectValue.replace(/\D+/g, '' );
-                    console.log("Minutes To Display:" + selectValue);
-                    newTime = selectValue * 60 * 1000;
-
-                    if(selectValue > 30)
-                        newStep = (selectValue*60 / 180)*1000;
-
-                }
-                else if(selectValue.toLowerCase().search("hours") != 1 || selectValue.toLowerCase().search("hour") != 1)
-                {
-                    selectValue = selectValue.replace(/\D+/g, '' );
-                    console.log("Hours To Display:" + selectValue);
-
-                    newTime = selectValue * 60 * 60 * 1000;
-                    newStep = (selectValue*60*60 / 180)*1000;
-
-                }
-                else if(selectValue.toLowerCase().search("days") != 1 || selectValue.toLowerCase().search("day") != 1)
-                {
-                    selectValue = selectValue.replace(/\D+/g, '' );
-                    console.log("Days To Display:" + selectValue);
-
-                    newTime = selectValue * 24 * 60 * 60 * 1000;
-                    newStep = (selectValue * 24 * 60 * 60 / 180)*1000;
-
-                }
-
-                // Update Graph Time If selection is not the same
-                // TODO Make it cpugraph independent
-                if(newTime/1000 != this.cpuGraph.getTimeWindow())
-                {
-                    this.cpuGraph.changeTimeToDisplay(newTime);
-                    this.loadGraph.changeTimeToDisplay(newTime);
-                    this.memGraph.changeTimeToDisplay(newTime);
-                    this.diskReadGraph.changeTimeToDisplay(newTime);
-                    this.diskWriteGraph.changeTimeToDisplay(newTime);
-                    this.networkTXGraph.changeTimeToDisplay(newTime);
-                    this.networkRXGraph.changeTimeToDisplay(newTime);
-
-                    // TODO
-                    // Step will be 10 seconds until machine is able to send less values //
-                    Mist.monitoringController.updateDataRequest(newTime,10000);
-                }
-            },
+            /**
+            * 
+            * If monitoring is enabled Re-draws jqm components,
+            * creates graph instances, initializes controller and
+            * setups resize event
+            *
             */
-            setGraphsCookie: function(){
+            setUpGraphs: function() {
 
-                var cookieExpire = new Date();
-                    cookieExpire.setFullYear(cookieExpire.getFullYear() + 2);
-                var graphIdList    = [];
-                var graphBtnIdList = [];
+                var machine = this.get('controller').get('model');
 
-                // Get Visible Graphs List
-                $('.graph').each(function(){
+                // Check if disable button pressed
+                // Then check if everything is ok to render the graphs
+                if(machine.id != ' ' && this.viewRendered && !machine.hasMonitoring){
 
-                    if( $(this).css('display') != 'none' )
-                        graphIdList.push($(this).attr('id'));
-                });
-
-                // Get Visible Button List
-                $('.graphBtn').each(function(){
-
-                    if( $(this).css('display') != 'none' )
-                        graphBtnIdList.push($(this).attr('id'));
-                });
-
-                // Set graph list and graph button list cookies
-                document.cookie = "graphsList=" + graphIdList.join('|') + "; " +
-                                "expires=" + cookieExpire.toUTCString() +"; " +
-                                "path=/";
-                document.cookie = "graphsBtnList=" + graphBtnIdList.join('|') + "; " +
-                                "expires=" + cookieExpire.toUTCString() +"; " +
-                                "path=/";
-            },
-
-            getGraphsCookie: function(){
-                
-                var cookieValue   = "";
-                var graphsList    = [];
-                var graphsBtnList = [];
-
-                // Get Graph List Cookie
-                var parts = document.cookie.split("graphsList=");
-                if (parts.length == 2) 
-                    cookieValue = parts.pop().split(";").shift();
-                
-                if(cookieValue.length > 0){
-                    
-                    // Create Array Of IDs
-                    graphsList = cookieValue.split('|');
-                    graphsList.forEach(function(value,index){
-                        graphsList[index] = "#" + value;
-                    });
+                    Mist.monitoringController.request.stop();
                 }
-                
+                else if(this.viewRendered && machine.hasMonitoring && !this.graphsCreated &&
+                        machine.id != ' '){
 
-                // Get Graph Button List Cookie
-                var parts = document.cookie.split("graphsBtnList=");
-                if (parts.length == 2) 
-                    cookieValue = parts.pop().split(";").shift();
-                
-                if(cookieValue.length > 0){
+                    var self = this;
+                    var controller = Mist.monitoringController;
 
-                    // Create Array Of IDs
-                    graphsBtnList = cookieValue.split('|');
-                    graphsBtnList.forEach(function(value,index){
-                        graphsBtnList[index] = "#" + value;
+                    Em.run.next(function() {
+
+                        // Re-Initialize jquery components and hide buttons
+                        self.redrawJQMComponents();     
+                        $('.graphBtn').hide(0); 
+                        
+                        self.createGraphs(10*60*1000);
+                        
+
+                        controller.initialize({
+                            machineModel    : machine,      // Send Current Machine
+                            graphs          : self.graphs,  // Send Graphs Instances
+                        });
+
+                        // Set Up Resolution Change Event
+                        $(window).resize(function(){
+
+                            var newWidth = $("#GraphsArea").width() -2;
+                            for(metric in self.graphs){
+                                 self.graphs[metric].changeWidth(newWidth);
+                            }
+                        })
+
                     });
-                }
 
-                this.graphsListCookie    = graphsList;
-                this.graphsBtnListCookie = graphsBtnList;
+                    Mist.rulesController.redrawRules();
+                } 
+            }.observes('controller.model.hasMonitoring','viewRendered'),
 
+            /**
+            * 
+            * Re-draws JQM Components of monitoring
+            *
+            */
+            redrawJQMComponents: function(){
 
-            },
+                $('.monitoring-button').button();
+                $('#add-rule-button').button();
+                $('#monitoring-dialog').popup();  
 
-            redrawGraphButtons: function(){
+                // Collapse/Extend Buttons
                 $('#cpuGraphBtn > button').button();
                 $('#loadGraphBtn > button').button();
-                $('#memGraphBtn > button').button();
+                $('#memoryGraphBtn > button').button();
                 $('#diskReadGraphBtn > button').button();
                 $('#diskWriteGraphBtn > button').button();
                 $('#networkTXGraphBtn > button').button();
                 $('#networkRXGraphBtn > button').button();
 
                 // DEBUG TODO Possible Remove It
-                $('#timeWindowSelect').selectmenu();
+                //$('#timeWindowSelect').selectmenu();
+
+                // History Buttons
+                $('#graphsGoBack').button();
+                $('#graphsGoForward').button();
+                $('#graphsResetHistory').button();
+
+                // Disable History
+                $('#graphsGoForward').addClass('ui-disabled');
+                $('#graphsResetHistory').addClass('ui-disabled');
             },
 
-            getLoadLineColor: function(currentLoad,cpuCores){
-                if(currentLoad >= 1 * cpuCores)
-                    return "#FF0000";
-                else if(currentLoad >= 0.7 * cpuCores)
-                    return "#00FF26";
-                else 
-                    return "#6CE0BA";
+            /**
+            * 
+            * Creates graph instances
+            * @param {number} timeToDisplay  - The graphs timeWindow in miliseconds
+            *
+            */
+            createGraphs: function(timeToDisplay){
+
+                // Get Width, -2 left & right border
+                var width = $("#GraphsArea").width() -2;  
+
+                this.graphs['cpu']       = new this.Graph('cpuGraph',width,timeToDisplay,"%");
+                this.graphs['load']      = new this.Graph('loadGraph',width,timeToDisplay);
+                this.graphs['memory']    = new this.Graph('memoryGraph',width,timeToDisplay,"%");
+                this.graphs['diskRead']  = new this.Graph('diskReadGraph' ,width,timeToDisplay);
+                this.graphs['diskWrite'] = new this.Graph('diskWriteGraph',width,timeToDisplay);
+                this.graphs['networkRX'] = new this.Graph('networkRXGraph',width,timeToDisplay);
+                this.graphs['networkTX'] = new this.Graph('networkTXGraph',width,timeToDisplay);
+
+
+                self.graphsCreated = true;
             },
+            
 
-            setupLoadColorInterval: function(){
-                 
-                 var self = this;
-                 jQuery.Color.hook( "stroke" );
-
-                 window.monitoringLoadColorInterval = window.setInterval(function () {
-                    var loadValue = self.loadGraph.getLastDisplayedValue();
-
-                    if(loadValue != null) {
-
-                        var color = self.getLoadLineColor(loadValue,self.cpuCores);
-                        $("#loadGraph").find('.valueLine > path').animate( {
-                            stroke: jQuery.Color(color)
-                        }, 700 );
-                    }
-                },1000);
-            },
-
-            stopLoadColorInterval: function(){
-                window.clearInterval(window.monitoringLoadColorInterval);
-            },
-
-            // Graph Constructor
-            setUpGraphs: function() {
-                
-                /* Class: Graph
-                *  
-                * 
-                */
-                function Graph(divID,width,timeToDisplayms,yAxisValueFormat){
+            /**
+             * Represents a Graph.
+             * @constructor
+             * @param {string} divID            - The id of div element, this is where graphs will append
+             * @param {number} width            - The width of graph
+             * @param {number} timeToDisplayms  - The TimeWindow in miliseconds
+             * @param {string} yAxisValueFormat - Format for Left axis values ex. 10%
+             */
+            Graph: function(divID,width,timeToDisplayms,yAxisValueFormat){
 
                     var NUM_OF_LABELS = 5;
                     var STEP_SECONDS = 10;
@@ -328,20 +187,21 @@ define('app/views/monitoring', [
 
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = 160 / 1280 * width;
-                    var margin = {top: 10, right: 0, bottom: 24, left: 40};
+                    var margin      = {top: 10, right: 0, bottom: 24, left: 40};
 
-                    this.id = divID;
-                    this.width = width;
-                    this.height = (fixedHeight < 85 ? 85 : fixedHeight);
-                    this.data = [];
-                    this.timeDisplayed = timeToDisplayms/1000;
-                    this.realDataIndex = -1;
-                    this.timeUpdated = false;
+                    this.id               = divID;
+                    this.name             = divID.replace('Graph','');
+                    this.width            = width;
+                    this.height           = (fixedHeight < 85 ? 85 : fixedHeight);
+                    this.data             = [];
+                    this.timeDisplayed    = timeToDisplayms/1000;
+                    this.realDataIndex    = -1;
+                    this.timeUpdated      = false;
+                    this.animationEnabled = true;
                     this.yAxisValueFormat = yAxisValueFormat;
-
-                    // DEBUG TODO
-                    this.displayedData = [];
-                    this.xCordinates = [];
+                    this.isAppended       = false;
+                    this.displayedData    = [];
+                    this.xCordinates      = [];
 
                     // Distance of two values in graph (pixels), Important For Animation
                     this.valuesDistance = 0;
@@ -379,10 +239,11 @@ define('app/views/monitoring', [
 
 
                     /**
-                    * Method: updateData
-                    * Gets Data From Controller, checks for overflow or less data received
-                    * fixes them and then updates Graph. If it is the first data data received
-                    * It appends Graph into div and then calls onInitialized
+                    * 
+                    * Checks for overflow or less data received fixes them and then updates Graph.
+                    * Also appends graphs on initial request
+                    * @param {number} timeToDisplay  - The graphs timeWindow in miliseconds
+                    *
                     */
                     this.updateData = function(newData) {
 
@@ -423,9 +284,13 @@ define('app/views/monitoring', [
                             this.data = dataBuffer;
 
                             // On first run append the Graph
-                            if(!this.timeUpdated){
+                            if(!this.isAppended){
+
                                 // Append SVG Elements And Call onInitialized When Finish
                                 appendGraph(this.id,this.width,this.height);
+
+                                this.isAppended = true;
+
                                 // Do staff after Graph is in the dom and we have data
                                 onInitialized();
                             }
@@ -450,7 +315,7 @@ define('app/views/monitoring', [
 
 
                    /**
-                    * Method: clearData
+                    *
                     * Deletes current graph data
                     * 
                     */
@@ -460,7 +325,7 @@ define('app/views/monitoring', [
                     
 
                     /**
-                    * Method: updateView
+                    * 
                     * Updates graph by selecting data from data instance
                     * redraws value line, x-axis, labels and grid
                     */
@@ -480,6 +345,8 @@ define('app/views/monitoring', [
                             this.displayedData = this.data;
                         }
 
+                        
+
 
                         // If min & max == 0 y axis will not display values. max=1 fixes this.
                         var maxValue = d3.max(this.displayedData, function(d) { return d.value; });
@@ -491,7 +358,10 @@ define('app/views/monitoring', [
 
                         // Set the range
                         this.calcValueDistance();
-                        xScale.range([-this.valuesDistance, this.width - margin.left - margin.right]);
+                        if(this.animationEnabled)
+                            xScale.range([-this.valuesDistance, this.width - margin.left - margin.right]);
+                        else
+                            xScale.range([0, this.width - margin.left - margin.right]);
 
 
                         // Create Array Of Cordinates
@@ -571,7 +441,7 @@ define('app/views/monitoring', [
                                           }));
 
                         // Animate line, axis and grid
-                        if(!this.timeUpdated)
+                        if(!this.timeUpdated && this.animationEnabled)
                         {
 
                             var animationDuration = STEP_SECONDS*1000;
@@ -603,7 +473,7 @@ define('app/views/monitoring', [
                             d3vLine.attr("d", valueline(this.displayedData))
 
                             // Fix For Animation after time displayed changed
-                            if(this.timeUpdated)
+                            if(this.timeUpdated || !this.animationEnabled)
                             {
                                 this.timeUpdated = false;
 
@@ -624,9 +494,10 @@ define('app/views/monitoring', [
 
 
                     /**
-                    * Method: changeWidth
+                    * 
                     * Changes the width of svg element, sets new scale values
                     * and updates height to keep aspect ratio
+                    * @param {number} width - Graph new width
                     */
                     this.changeWidth = function (width) {
 
@@ -654,15 +525,64 @@ define('app/views/monitoring', [
                                    
                         d3yAxisLine.attr('y2',""+ (this.height - margin.bottom +3));
                         
+                        updateMouseOverSize();
 
                         this.updateView();
                     };
 
+                    /**
+                    *
+                    * Enables animation of graph
+                    *
+                    */
+                    this.enableAnimation = function() {
+
+                        this.animationEnabled = true;
+                    };
+
 
                     /**
-                    * Method: getLastMeasurementTime
-                    * Returns null if there are no data
-                    * else last measurements time as Date object
+                    *
+                    * Stops current animation
+                    * Next update will be animated
+                    *
+                    */
+                    this.stopCurrentAnimation = function() {
+
+                         d3vLine.transition()
+                                .duration( 0 )
+                                .attr("transform", "translate(" + 0 + ")");
+
+                        d3xAxis.transition()
+                               .duration( 0 )
+                               .attr("transform", "translate(" +  margin.left + "," + (this.height - margin.bottom +2) + ")");
+
+                        d3GridX.transition()
+                               .duration( 0 )
+                               .attr("transform", "translate(" + margin.left + "," + this.height + ")");
+                    };
+
+
+                    /**
+                    *
+                    * Disables animation of graph
+                    * Also stops current animation
+                    */
+                    this.disableAnimation = function() {
+
+                        this.animationEnabled = false;
+                        this.stopCurrentAnimation();
+                    };
+
+                    this.disableNextAnimation = function(){
+                        this.animationEnabled = false;
+                    };
+
+
+                    /**
+                    * 
+                    * Finds last measurement of graph data
+                    * @return {date} Measurements time or null on failure
                     */
                     this.getLastMeasurementTime = function(){
 
@@ -676,9 +596,9 @@ define('app/views/monitoring', [
 
 
                     /**
-                    * Method: getLastMeasurementTime
-                    * Returns graph's time window in seconds
                     * 
+                    * Current time window
+                    * @return {number} time window in seconds
                     */
                     this.getTimeWindow = function(){
 
@@ -686,6 +606,11 @@ define('app/views/monitoring', [
                     };
 
 
+                    /**
+                    * 
+                    * Last received values
+                    * @return {object} metric object or null on failure
+                    */
                     this.getLastValue = function(){
                         if(this.data)
                             return this.data[this.data.length - 1];
@@ -693,6 +618,12 @@ define('app/views/monitoring', [
                             return null;
                     }
 
+
+                    /**
+                    * 
+                    * Last visible metric
+                    * @return {object} metric object or null on failure
+                    */
                     this.getLastDisplayedValue = function(){
 
                         if(this.data){
@@ -723,7 +654,7 @@ define('app/views/monitoring', [
 
 
                     /**
-                    * Method: calcValueDistance
+                    * 
                     * Calculates the distance between the last two points
                     * Important for animated graph
                     */
@@ -740,9 +671,9 @@ define('app/views/monitoring', [
 
 
                     /*
-                    * Method: changeTimeToDisplay
-                    * Changes data that will be displayed and time of x-axis
-                    *
+                    * 
+                    * Changes time window
+                    * @param {number} newTimems - New timewindow in miliseconds
                     */
                     this.changeTimeToDisplay = function(newTimems){
 
@@ -757,12 +688,19 @@ define('app/views/monitoring', [
 
 
                     /*
-                    * Method: appendGraph
-                    * Appends the graph into the div id specified 
-                    * by constructor
+                    * 
+                    * Appends the graph into the DOM.
+                    * Graph will be inside the id specified.
+                    * @param {string} id     - the div where graph will be 
+                    * @param {number} width  - the width of the graph
+                    * @param {height} height - the height of the graph
                     */
                     function appendGraph(id,width,height){
                       
+                      /* Add Graph Element Dynamically
+                      d3.select('#GraphsArea').insert('div','#graphBar').attr('id','CustomMetric'+'Graph').attr('class','graph').insert('div').attr('class','header').insert('div').attr('class','title').text('CustomMetric');
+                      d3.select('#'+'CustomMetric'+'Graph').select('.header').insert('div').attr('class','closeBtn').attr('onClick',"Mist.monitoringController.UI.collapsePressed('CustomMetric')").text('-');
+                      */
                       d3svg =   d3.select("#"+id)
                                   .append('svg')
                                   .attr('width',width)
@@ -813,7 +751,12 @@ define('app/views/monitoring', [
                                      .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
                     }
 
-                    function setupMouseOver(){
+                    /*
+                    * 
+                    * Setups event listeners for mouse,
+                    * also creates interval for popup value update
+                    */
+                    function setupMouseOver() {
 
                         // Append the Selector Line
                         var mouseOverLine = d3svg.append('line')
@@ -826,9 +769,10 @@ define('app/views/monitoring', [
 
                         var mouseX = 0;
                         var mouseY = 0;
+                        var isVisible = false;
                         var updateInterval;
 
-                        var updatePopUpValue = function(){
+                        var updatePopUpValue = function(graph){
 
                                 // Check if mouse left from element without clearing interval
                                 if($($('#' + self.id).selector + ":hover").length <= 0)
@@ -840,14 +784,21 @@ define('app/views/monitoring', [
                                 // Update popup when it is over value line
                                 if(mouseX > margin.left)
                                 {
-
+                                    if(!isVisible){
+                                        
+                                        $(graph).find('.selectorLine').show(0);
+                                        $("#GraphsArea").find('.valuePopUp').show(0);
+                                        isVisible = true;
+                                    }
                                     // Mouse X inside value line area
                                     var virtualMouseX = mouseX - margin.left;
 
                                     // Calculate Translate 
-                                    var translate =  $("#" + self.id).find('.valueLine > path').attr('transform');
-                                    translate = + translate.slice(10,translate.indexOf(','));
-
+                                    var translate = 0;
+                                    if(self.animationEnabled){
+                                        translate =  $("#" + self.id).find('.valueLine > path').attr('transform');
+                                        translate = + translate.slice(10,translate.indexOf(','));
+                                    }
                                     // Measurement That is less than curson x
                                     var minValueIndex = 0;
                                     var currentValue = 0;
@@ -886,31 +837,35 @@ define('app/views/monitoring', [
 
                                     // Update Value Text
                                     $('#GraphsArea').children('.valuePopUp').text(valueText);
+                                } else {
+
+                                    if(isVisible){
+
+                                        $(graph).find('.selectorLine').hide(0);
+                                        $("#GraphsArea").find('.valuePopUp').hide(0);
+                                        isVisible = false;
+                                    }
                                 }
                         };
 
 
                         var updatePopUpOffset = function(event){
-                            mouseX = event.pageX - $('#'+ self.id).children('svg').offset().left
-                            mouseY = event.pageY - $('#'+ self.id).children('svg').offset().top
-                            if(mouseX > margin.left)
-                                {
-
-                                    // Set Mouse Line Cordinates
-                                    mouseOverLine
-                                         .attr('x1',"" + mouseX)
+                            mouseX = event.pageX - $('#'+ self.id).children('svg').offset().left;
+                            mouseY = event.pageY - $('#'+ self.id).children('svg').offset().top;
+                            
+                            // Set Mouse Line Cordinates
+                            mouseOverLine.attr('x1',"" + mouseX)
                                          .attr('x2',"" + mouseX);
-                                $('#GraphsArea').children('.valuePopUp').css('left',(event.clientX+15) +"px");
-                                $('#GraphsArea').children('.valuePopUp').css('top',(event.clientY-35)+"px");
+                            $('#GraphsArea').children('.valuePopUp').css('left',(event.clientX+15) +"px");
+                            $('#GraphsArea').children('.valuePopUp').css('top',(event.clientY-35)+"px");
 
-                                updatePopUpValue();
-                            }
-
+                            updatePopUpValue(this);
 
                         };
 
                         var clearUpdatePopUp = function() {
 
+                            isVisible = false;
                             $(this).find('.selectorLine').hide(0);
                             $("#GraphsArea").find('.valuePopUp').hide(0);
 
@@ -921,11 +876,7 @@ define('app/views/monitoring', [
 
                         // Mouse Events
                         $('#' + self.id).children('svg').mouseenter(function() {
-
-                            $(this).find('.selectorLine').show(0);
-                            $("#GraphsArea").find('.valuePopUp').show(0);
-
-
+                            
                             // Setup Interval
                             updateInterval = window.setInterval(updatePopUpValue,500);
                         });
@@ -933,128 +884,111 @@ define('app/views/monitoring', [
                         $('#' + self.id).children('svg').mousemove(updatePopUpOffset);
                     }
 
+                    function updateMouseOverSize() {
+                        d3svg.select('.selectorLine').attr('y2',""+ (self.height - margin.bottom +3));
+                    }
+
 
                     /*
-                    * Method: onInitialized
+                    * 
                     * Is being called after first data received and 
                     * svg elements are in the dom
                     */
                     function onInitialized(){
-                      // Run Stuff When Graph is appended and has first data
+                      
                       setupMouseOver();
                     }
 
                 }
 
-                // -------------------------------------------------------------------------------------
+                // Features not yet used
 
-                // Execuation Starts Here
-                var machine = this.get('controller').get('model');
+                /* Commented Out Until It's Time To Test Zoom In/Out
+                selectPressed: function(){
 
-                // Check if disable button pressed
-                // Then check if everything is ok to render the graphs
-                if(machine.id != ' ' && this.viewRendered && !machine.hasMonitoring){
+                    var selectValue = $("#timeWindowSelect").val();
+                    console.log("time Window");
+                    console.log(this.cpuGraph.getTimeWindow());
+                    var newTime = 0;
+                    var newStep = 10000;
+                    if(selectValue.toLowerCase().search("minutes") != -1)
+                    {
+                        selectValue = selectValue.replace(/\D+/g, '' );
+                        console.log("Minutes To Display:" + selectValue);
+                        newTime = selectValue * 60 * 1000;
 
-                    // Stop receiving Graph data
-                    window.clearInterval(window.monitoringInterval);
-                    // Remove Load Color Change Interval
-                    this.stopLoadColorInterval();
-                }
-                else if(this.viewRendered && machine.hasMonitoring && !this.graphsCreated &&
-                        machine.id != ' '){
+                        if(selectValue > 30)
+                            newStep = (selectValue*60 / 180)*1000;
 
-                    var self = this;
-                    var controller = Mist.monitoringController;
+                    }
+                    else if(selectValue.toLowerCase().search("hours") != 1 || selectValue.toLowerCase().search("hour") != 1)
+                    {
+                        selectValue = selectValue.replace(/\D+/g, '' );
+                        console.log("Hours To Display:" + selectValue);
 
-                    controller.initController(machine,this);
+                        newTime = selectValue * 60 * 60 * 1000;
+                        newStep = (selectValue*60*60 / 180)*1000;
 
-                
-                    Em.run.next(function() {
+                    }
+                    else if(selectValue.toLowerCase().search("days") != 1 || selectValue.toLowerCase().search("day") != 1)
+                    {
+                        selectValue = selectValue.replace(/\D+/g, '' );
+                        console.log("Days To Display:" + selectValue);
 
-                        // Re-Initialize Jquery Mobile Buttons
-                        $('.monitoring-button').button();
-                        $('#add-rule-button').button();
-                        $('#monitoring-dialog').popup();   
-                        self.redrawGraphButtons();      
-                        
-                        self.getGraphsCookie();
+                        newTime = selectValue * 24 * 60 * 60 * 1000;
+                        newStep = (selectValue * 24 * 60 * 60 / 180)*1000;
 
-                        // Show Graphs And Buttons Based On Last Session or show only load Graph
-                        if(self.graphsListCookie.length > 0 || self.graphsBtnListCookie.length > 0) {
+                    }
 
-                            // First Hide All Elements
-                            self.hideGraphs();
+                    // Update Graph Time If selection is not the same
+                    // TODO Make it cpugraph independent
+                    if(newTime/1000 != this.cpuGraph.getTimeWindow())
+                    {
+                        this.cpuGraph.changeTimeToDisplay(newTime);
+                        this.loadGraph.changeTimeToDisplay(newTime);
+                        this.memoryGraph.changeTimeToDisplay(newTime);
+                        this.diskReadGraph.changeTimeToDisplay(newTime);
+                        this.diskWriteGraph.changeTimeToDisplay(newTime);
+                        this.networkTXGraph.changeTimeToDisplay(newTime);
+                        this.networkRXGraph.changeTimeToDisplay(newTime);
 
-                            // Re-Arrange And Show Graphs And Buttons
-                            for(var i=0; i < self.graphsListCookie.length; i++) 
-                            {
-                                
-                                var id = self.graphsListCookie[i];
-                                $(id).insertAfter($('.graph').last());
-                                $(id).show(0);
+                        // TODO
+                        // Step will be 10 seconds until machine is able to send less values //
+                        Mist.monitoringController.updateDataRequest(newTime,10000);
+                    }
+                },
+                */
 
-                            }
+                /*getLoadLineColor: function(currentLoad,cpuCores){
+                    if(currentLoad >= 1 * cpuCores)
+                        return "#FF0000";
+                    else if(currentLoad >= 0.7 * cpuCores)
+                        return "#00FF26";
+                    else 
+                        return "#6CE0BA";
+                },
 
-                            for(var i=0; i < self.graphsBtnListCookie.length; i++) 
-                            {
-                                
-                                var id = self.graphsBtnListCookie[i];
-                                $(id).insertAfter($('.graphBtn').last());
-                                $(id).show(0);
+                setupLoadColorInterval: function(){
+                     
+                     var self = this;
+                     jQuery.Color.hook( "stroke" );
 
-                            }
+                     window.monitoringLoadColorInterval = window.setInterval(function () {
+                        var loadValue = self.loadGraph.getLastDisplayedValue();
 
+                        if(loadValue != null) {
+
+                            var color = self.getLoadLineColor(loadValue,self.cpuCores);
+                            $("#loadGraph").find('.valueLine > path').animate( {
+                                stroke: jQuery.Color(color)
+                            }, 700 );
                         }
-                        else {
+                    },1000);
+                },
 
-                            // Show only load Graph at start
-                            $('#loadGraphBtn').hide(0);
-
-                            $('#cpuGraph').hide(0);
-                            $('#memGraph').hide(0);  
-                            $('#diskReadGraph').hide(0); 
-                            $('#diskWriteGraph').hide(0); 
-                            $('#networkRXGraph').hide(0); 
-                            $('#networkTXGraph').hide(0); 
-                        }
-
-                        // Get Width, -2 left & right border
-                        var width = $("#GraphsArea").width() -2;  
-
-                        // Create Graphs 
-                        var timeToDisplay = 10*60*1000; // 10 minutes
-                        self.cpuGraph  = new Graph('cpuGraph',width,timeToDisplay,"%");
-                        self.loadGraph = new Graph('loadGraph',width,timeToDisplay);
-                        self.memGraph  = new Graph('memGraph',width,timeToDisplay,"%");
-                        self.diskReadGraph  = new Graph('diskReadGraph' ,width,timeToDisplay);
-                        self.diskWriteGraph = new Graph('diskWriteGraph',width,timeToDisplay);
-                        self.networkRXGraph = new Graph('networkRXGraph',width,timeToDisplay);
-                        self.networkTXGraph = new Graph('networkTXGraph',width,timeToDisplay);
-
-
-                        self.graphsCreated = true;
-
-                        controller.setupDataRequest(timeToDisplay,10000);
-                        //self.setupLoadColorInterval(); Commented Out Until It's Time To Deploy This Feature TODO
-
-                        // Set Up Resolution Change Event
-                        $(window).resize(function(){
-
-                                    var newWidth = $("#GraphsArea").width() -2;
-                                    self.cpuGraph.changeWidth(newWidth);
-                                    self.loadGraph.changeWidth(newWidth);
-                                    self.memGraph.changeWidth(newWidth);
-                                    self.diskReadGraph.changeWidth(newWidth);
-                                    self.diskWriteGraph.changeWidth(newWidth);
-                                    self.networkRXGraph.changeWidth(newWidth);
-                                    self.networkTXGraph.changeWidth(newWidth);
-
-                        })
-                    });
-                    
-                    Mist.rulesController.redrawRules();
-                } 
-            }.observes('controller.model.hasMonitoring','viewRendered'),
+                stopLoadColorInterval: function(){
+                    window.clearInterval(window.monitoringLoadColorInterval);
+                },*/
 
         });
     }
