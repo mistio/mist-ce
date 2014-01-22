@@ -8,8 +8,10 @@ a key for the machine       --> given_key
 I type "{name}" as machine name     --> type_machine_name
 I click the "{name}" machine        --> click_machine
 I add my bare metal creds       --> aad_bare_metal
+I click the "{name}" from the associated keys       --> click_associated_key
 
 @then:
+------
 "{machine_name}" state should be "{state}" within {timeout} seconds      --> check_machine_state
 "{machine_name}" should be probed within {timeout} seconds      --> check_probed
 I should find the Public IP     --> find_ip
@@ -135,3 +137,15 @@ def keys_associated(context, number, timeout):
             return
 
     assert False, u'Could not find %s keys associated' % number
+
+
+@when(u'I click the "{name}" from the associated keys')
+def click_associated_key(context, name):
+    keys = context.browser.find_by_css('#machine-keys-panel ul .small-list-item')
+
+    for key in keys:
+        if name in key.text:
+            key.click()
+            return
+
+    assert False, u'Could not find/click the %s key' % name

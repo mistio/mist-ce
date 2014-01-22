@@ -41,7 +41,7 @@ Feature: Machines
             Then "$machine_name" state should be "running" within 400 seconds
         When I wait for 1 seconds
             Then "$machine_name" should be probed within 400 seconds
-        When I wait for 10 seconds
+        When I wait for 1 seconds
 
 
     @web
@@ -67,7 +67,6 @@ Feature: Machines
 
 
     @web
-    @test
     Scenario: Associate Second Key
         When I click the "Keys" button
         And I wait for 2 seconds
@@ -90,4 +89,22 @@ Feature: Machines
         And I click the "SecondKey" button
         And I wait for 5 seconds
             Then I should see 2 keys associated within 30 seconds
+
+
+    @web
+    Scenario: Disassociate Second Key
+        When I visit mist.io
+            Then I should see "mist.io"
+        When I wait for 2 seconds
+        When I click the "Machines" button
+        And I wait for 3 seconds
+        And I click the "tester" machine
+        And I wait for 5 seconds
+        And I click the "2 keys" button
+        And I wait for 1 seconds
+        And I click the "SecondKey" from the associated keys
+        And I click the "Remove" button
+        And I wait for 2 seconds
+            Then I should see 1 keys associated within 30 seconds
+
 
