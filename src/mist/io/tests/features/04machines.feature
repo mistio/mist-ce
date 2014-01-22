@@ -109,7 +109,6 @@ Feature: Machines
 
 
     @web
-    @test
     Scenario: Shutdown Machine
         When I visit mist.io
             Then I should see "mist.io"
@@ -125,7 +124,6 @@ Feature: Machines
 
 
     @web
-    @test
     Scenario: Start Machine
         When I visit mist.io
             Then I should see "mist.io"
@@ -138,9 +136,28 @@ Feature: Machines
         And I wait for 1 seconds
         And I click the "Yes" button
         And I wait for 2 seconds
-            Then "tester" state should be "pending" within 60 seconds
+            Then "tester" state should be "pending" within 70 seconds
         When I wait for 1 seconds
             Then "tester" state should be "running" within 400 seconds
         When I wait for 1 seconds
             Then "tester" should be probed within 400 seconds
         When I wait for 1 seconds
+
+
+    @web
+    @test
+    Scenario: Destroy Machine
+        When I visit mist.io
+            Then I should see "mist.io"
+        When I wait for 2 seconds
+        And I click the "Machines" button
+        And I wait for 3 seconds
+        And I tick the "tester" machine
+        And I click the "Power" button
+        And I click the "Destroy" button
+        And I wait for 1 seconds
+        And I click the "Yes" button
+        And I wait for 2 seconds
+            Then "tester" state should be "stopped" within 70 seconds
+        When I wait for 1 seconds
+            Then "tester" state should be "terminated" within 400 seconds
