@@ -128,8 +128,9 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
-            rebootMachine: function(machineId) {
+            rebootMachine: function(machineId, callback) {
                 var that = this;
+                this.getMachine(machineId).set('state', 'rebooting');
                 this.set('rebootingMachine', true);
                 Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
                     'action' : 'reboot'
@@ -137,9 +138,10 @@ define('app/controllers/machines', ['app/models/machine'],
                     //that.rebootMachine(machineId);
                 }).error(function() {
                     Mist.notificationController.notify('Failed to reboot machine');
-                }).complete(function() {
+                }).complete(function(success) {
                     that.set('rebootingMachine', false);
                     that.trigger('onMachineReboot');
+                    if (callback) callback(success);
                 });
             },
 

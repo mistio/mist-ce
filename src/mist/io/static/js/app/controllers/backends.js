@@ -280,10 +280,10 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             },
 
 
-            rebootMachine: function(machineId) {
+            rebootMachine: function(machineId, callback) {
                this.content.some(function(backend) {
                     if (backend.getMachine(machineId)) {
-                        backend.rebootMachine(machineId);
+                        backend.rebootMachine(machineId, callback);
                         return true;
                     }
                 });
