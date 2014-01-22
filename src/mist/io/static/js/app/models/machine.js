@@ -42,23 +42,23 @@ define('app/models/machine', ['ember'],
              */
             
             netled1: function() {
-                if (this.latency < 1000) return 'on'; 
+                if (this.latency > 0 &&  this.latency < 1000) return 'on'; 
             }.property('latency'),
             
             netled2: function() {
-                if (this.latency < 500) return 'on'; 
+                if (this.latency > 0 &&  this.latency < 500) return 'on'; 
             }.property('latency'),
             
             netled3: function() {
-                if (this.latency < 250) return 'on'; 
+                if (this.latency > 0 &&  this.latency < 250) return 'on'; 
             }.property('latency'),
 
             netled4: function() {
-                if (this.latency < 100) return 'on'; 
+                if (this.latency > 0 &&  this.latency < 100) return 'on'; 
             }.property('latency'),
                         
             netled4: function() {
-                if (this.latency < 40) return 'on'; 
+                if (this.latency > 0 &&  this.latency < 40) return 'on'; 
             }.property('latency'),  
 
             lossled: function() {

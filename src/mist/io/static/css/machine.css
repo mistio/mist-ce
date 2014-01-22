@@ -30,3 +30,17 @@
 #single-machine-page #mist-manage-keys a {
     
 }
+
+.single-machine-header {
+    height: 56px;
+}
+
+.single-machine-header .ui-title {
+    padding-top: 20px;
+    font-weight: normal;
+    padding-left: 48px;
+}
+
+.single-machine-header span {
+    margin-top: 4px !important;
+}
