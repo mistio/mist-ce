@@ -61,4 +61,9 @@ Feature: Machines
     And I wait for 1 seconds
     And I click the link with text that contains "$key_name"
     And I click the "Add" button
-    And I wait for 2 seconds
+    And I wait for 4 seconds
+        Then I should see the Bare Metal Backend added within 30 seconds
+
+
+    @web
+    Scenario: Reboot Machine

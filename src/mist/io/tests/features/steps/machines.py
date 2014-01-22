@@ -13,13 +13,14 @@ I add my bare metal creds       --> aad_bare_metal
 "{machine_name}" state should be "{state}" within {timeout} seconds      --> check_machine_state
 "{machine_name}" should be probed within {timeout} seconds      --> check_probed
 I should find the Public IP     --> find_ip
+I should see the Bare Metal Backend added within {timeout} seconds      --> see_bare_added
 
 ------
 
 """
 from time import sleep, time
 
-ip=""
+ip = ""
 
 @given(u'a key for the machine')
 def given_key(context):
@@ -111,3 +112,13 @@ def aad_bare_metal(context):
 
     context.browser.find_by_css('input#new-backend-first-field').fill(hostname)
     context.browser.find_by_css('input#new-backend-second-field').fill("ec2-user")
+
+
+@then(u'I should see the Bare Metal Backend added within {timeout} seconds')
+def see_bare_added(context, timeout):
+    global ip
+
+    hostname = ip
+    context.execute_steps(u"""
+    Then I should see the "%s" Backend added within %s seconds
+    """ % (hostname, timeout))
