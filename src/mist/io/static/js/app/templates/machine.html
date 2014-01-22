@@ -11,7 +11,9 @@
     </div>
     
     <div data-role="header" data-theme="a">
-
+        <span class="single-view-icon-wrapper">
+            <span id="single-view-provider-icon" {{bind-attr class="view.providerIconClass"}}></span>
+        </span>
         <h1 {{bind-attr class="view.machine.state"}}>{{state}}</h1>
         
         <span class="ui-btn-right" id="mist-manage-keys">
