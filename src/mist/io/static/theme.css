@@ -247,8 +247,8 @@ html .ui-bar-a .ui-body-inherit,
 html .ui-body-a .ui-body-inherit,
 html body .ui-group-theme-a .ui-body-inherit,
 html .ui-panel-page-container-a {
-	background: #ffffff /*{a-body-background-color}*/;
-	border-color: #bbbbbb /*{a-body-border}*/;
+	background: #f9f9f9 /*{a-body-background-color}*/ linear-gradient( #f9f9f9 /*{a-body-background-start}*/, #eee /*{a-body-background-end}*/);
+	border-color: #aaa /*{a-body-border}*/;
 	color: #333333 /*{a-body-color}*/;
 	text-shadow: 0 /*{a-body-shadow-x}*/ 1px /*{a-body-shadow-y}*/ 0 /*{a-body-shadow-radius}*/ #ffffff /*{a-body-shadow-color}*/;
 }

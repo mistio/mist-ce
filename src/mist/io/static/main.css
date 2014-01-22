@@ -98,7 +98,6 @@ textarea {
 }
 .ok-cancel {
     width: 100%;
-    margin-top: 10px;
 }
 .ok-cancel > .ui-controlgroup-controls {
     width: 100%;
@@ -119,13 +118,15 @@ textarea {
 }
 .mid-popup {
     width: 255px !important;
+    max-width: 99%;    
 }
 .mid-popup .ok-cancel a,
 .mid-popup .ok-cancel button {
-    width: 78px !important;
+    width: 77px !important;
 }
 .large-popup {
     width: 320px !important;
+    max-width: 99%;
 }
 .large-popup .ok-cancel a,
 .large-popup .ok-cancel button {
@@ -303,6 +304,22 @@ ul.checkbox-list li a, ul.checkbox-list li label {
     top: 5px;
     position: relative;
     display: inline;
+}
+
+/*
+ * Custom select
+ */
+
+.mist-select .ui-collapsible-content {
+    padding-right: 30px;
+    background: transparent !important;
+}
+.mist-select h2 {
+    z-index: 1000;
+    border-bottom-right-radius: inherit !important;    
+}
+.mist-select ul {
+    margin-top: 0px;
 }
 
 

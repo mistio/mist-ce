@@ -1,10 +1,15 @@
-<div id="edit-backend-popup" class="mid-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
+<div id="edit-backend-popup" 
+     class="mid-popup" 
+     data-role="popup" 
+     data-theme="a" 
+     data-overlay-theme="b"
+     data-transition="pop">
 
-    <div data-role="header">
+    <div data-role="header" data-theme="b">
         <h1>Edit backend</h1>
     </div>
 
-    <div data-role="content">
+    <div data-role="content" data-theme="a">
 
         {{view Mist.TextField valueBinding="Mist.backendEditController.newBackendTitle"}}
 
@@ -23,7 +28,7 @@
             <label id="monitoring-message">There are monitored machines.<br />Monitoring for these will be disabled</label>
             <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
                 <a data-role="button" id="button-confirm-disable" {{action "yesClicked" target="view"}}>Yes</a>
-                <a data-role="button" data-theme="b" {{action "noClicked" target="view"}}>No</a>
+                <a data-role="button" data-theme="d" {{action "noClicked" target="view"}}>No</a>
             </div>
         </div>
 
@@ -31,6 +36,6 @@
         <div class="ajax-loader"></div>
         {{/if}}
 
-        <a href="#" data-role="button" {{action "backClicked" target="view"}}>Back</a>
+        <a href="#" data-role="button" class="button-back" {{action "backClicked" target="view"}}>Back</a>
     </div>
 </div>

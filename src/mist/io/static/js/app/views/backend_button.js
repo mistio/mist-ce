@@ -55,6 +55,7 @@ define('app/views/backend_button', ['ember'],
              */
 
             click: function() {
+                $('#edit-backend-popup').popup('option', 'positionTo', '#' + this.elementId)
                 Mist.backendEditController.open(this.backend);
             },
 

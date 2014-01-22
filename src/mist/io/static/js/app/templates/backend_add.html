@@ -12,7 +12,8 @@
     <div data-role="content" data-theme="b">
 
         <label>1. Provider:</label>
-        <div id="new-backend-provider" 
+        <div id="new-backend-provider"
+             class="mist-select"
              data-role="collapsible" 
              data-iconpos="right" 
              data-collapsed-icon="arrow-d" 
@@ -31,12 +32,14 @@
             <label for="new-backend-first-field">2. {{view.firstFieldLabel}}:</label>
             {{view Mist.TextField
                    id="new-backend-first-field"
+                   data-theme="a"
                    valueBinding="Mist.backendAddController.newBackendFirstField"}}
     
             <label for="new-backend-second-field">3. {{view.secondFieldLabel}}:</label>
             {{view Mist.TextField
                    type="password"
                    id="new-backend-second-field"
+                   data-theme="a"                   
                    valueBinding="Mist.backendAddController.newBackendSecondField"}}
         </div>
         <div id="openstack-bundle" data-theme="a">
@@ -54,17 +57,22 @@
 
         <div id="baremetal-bundle">
             <label>4. SSH Key:</label>
-            <div id="new-backend-key" data-role="collapsible" data-iconpos="right" data-collapsed-icon="arrow-d"
-                                                                                    data-expanded-icon="arrow-u">
+            <div id="new-backend-key" 
+                 class="mist-select"
+                 data-role="collapsible" 
+                 data-iconpos="right" 
+                 data-collapsed-icon="arrow-d"
+                 data-expanded-icon="arrow-u"
+                 data-theme="a">
                 <h2>{{Mist.backendAddController.newBackendKey.id}}</h2>
                 <ul data-role="listview">
                     {{#each Mist.keysController.content}}
-                        <li data-icon="false">
+                        <li data-icon="false" data-theme="a">
                             <a {{action "selectKey" this target="view"}}>{{this.id}}</a>
                         </li>
                     {{/each}}
-                    <li data-icon="false" data-theme="b">
-                        <a {{action "createKeyClicked" target="view"}}>Create Key</a>
+                    <li data-icon="false" data-theme="d">
+                        <a {{action "createKeyClicked" target="view"}}>Add Key</a>
                     </li>
                 </ul>
             </div>

@@ -30,7 +30,7 @@ define('app/controllers/backend_edit', ['ember'],
                 $('#backend-delete-confirm').hide();
                 $('#backend-toggle option[value=1]')[0].selected = backend.enabled;
                 $('#backend-toggle').slider('refresh');
-                $('#edit-backend-popup').popup('open');
+                $('#edit-backend-popup').popup('open', {transition: 'pop'});
             },
 
 

@@ -14,3 +14,6 @@
     height: 120px;
     overflow-y: scroll;
 }
+#add-backend-panel .ok-cancel {
+    margin-top: 30px;
+}

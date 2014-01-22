@@ -309,7 +309,11 @@ define( 'app', [
         });
 
         App.Checkbox = Ember.Checkbox;
-        App.TextField = Ember.TextField;
+        App.TextField = Ember.TextField.extend({
+            attributeBindings: [
+                'data-theme'
+            ]
+        });
         App.ShellTextField = Ember.TextField.extend({
 
             keyDown: function(event, view) {
