@@ -6,14 +6,20 @@ a key for the machine       --> given_key
 @when:
 ------
 I type "{name}" as machine name     --> type_machine_name
+I click the "{name}" machine        --> click_machine
+I add my bare metal creds       --> aad_bare_metal
 
 @then:
 "{machine_name}" state should be "{state}" within {timeout} seconds      --> check_machine_state
 "{machine_name}" should be probed within {timeout} seconds      --> check_probed
+I should find the Public IP     --> find_ip
+
 ------
 
 """
 from time import sleep, time
+
+ip=""
 
 @given(u'a key for the machine')
 def given_key(context):
@@ -78,3 +84,30 @@ def check_probed(context, machine_name, timeout):
         sleep(2)
 
     assert False, u'%s machine is not probed within %s seconds' % (machine_name, timeout)
+
+
+@when(u'I click the "{name}" machine')
+def click_machine(context, name):
+    context.execute_steps(u"""
+    When I click the "%s" button
+    """ % context.personas['NinjaTester']['machine_name'])
+
+
+@then(u'I should find the Public IP')
+def find_ip(context):
+    global ip
+    infos = context.browser.find_by_css('.ui-collapsible tr td')
+
+    for i in range(len(infos)):
+        if "Public" in infos[i].text:
+            ip = infos[i+1].text
+
+
+@when(u'I add my bare metal creds')
+def aad_bare_metal(context):
+    global ip
+    hostname = ip
+    key = context.personas['NinjaTester']['key_name']
+
+    context.browser.find_by_css('input#new-backend-first-field').fill(hostname)
+    context.browser.find_by_css('input#new-backend-second-field').fill("ec2-user")

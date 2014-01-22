@@ -41,3 +41,24 @@ Feature: Machines
         When I wait for 1 seconds
             Then "$machine_name" should be probed within 400 seconds
         When I wait for 10 seconds
+
+
+    @web
+    Scenario: Add Bare Metal
+    When I click the "Machines" button
+    And I wait for 2 seconds
+    And I click the "tester" machine
+    And I click the "Basic Info" button
+        Then I should find the Public IP
+
+    When I visit mist.io
+        Then I should see "mist.io"
+    When I click the "Add backend" button
+    And I click the "Select provider" button
+    And I click the link with text that contains "Bare Metal"
+    And I add my bare metal creds
+    And I click the "Select SSH Key" button
+    And I wait for 1 seconds
+    And I click the link with text that contains "$key_name"
+    And I click the "Add" button
+    And I wait for 2 seconds
