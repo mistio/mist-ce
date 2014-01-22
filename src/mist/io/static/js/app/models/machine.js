@@ -101,8 +101,8 @@ define('app/models/machine', ['ember'],
             },
 
 
-            reboot: function() {
-                Mist.backendsController.rebootMachine(this.id);
+            reboot: function(callback) {
+                Mist.backendsController.rebootMachine(this.id, callback);
             },
 
 

@@ -103,7 +103,9 @@ define('app/controllers/machine_power', ['ember'],
                     } else if (action == 'destroy') {
                         machine.destroy();
                     } else if (action == 'reboot') {
-                        machine.reboot();
+                        machine.reboot( function (success) {
+                            machine.probe();
+                        });
                     } else if (action == 'start') {
                         machine.start();
                     }

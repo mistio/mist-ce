@@ -125,8 +125,8 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             },
 
 
-            rebootMachine: function (machineId) {
-                this.machines.rebootMachine(machineId);
+            rebootMachine: function (machineId, callback) {
+                this.machines.rebootMachine(machineId, callback);
             },
 
 

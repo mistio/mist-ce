@@ -9,6 +9,7 @@ I type "{name}" as machine name     --> type_machine_name
 I click the "{name}" machine        --> click_machine
 I add my bare metal creds       --> aad_bare_metal
 I click the "{name}" from the associated keys       --> click_associated_key
+I tick the "{name}" machine     --> tick_machine
 
 @then:
 ------
@@ -51,6 +52,9 @@ def type_machine_name(context, name):
 
 @then(u'"{machine_name}" state should be "{state}" within {timeout} seconds')
 def check_machine_state(context, machine_name, state, timeout):
+    if machine_name == "tester":
+        machine_name = context.personas['NinjaTester']['machine_name']
+
     machines = context.browser.find_by_css('#machines li')
     for machine in machines:
         if machine_name in machine.text:
@@ -149,3 +153,22 @@ def click_associated_key(context, name):
             return
 
     assert False, u'Could not find/click the %s key' % name
+
+
+@when(u'I tick the "{name}" machine')
+def tick_machine(context, name):
+    if name == "tester":
+        machine_name = context.personas['NinjaTester']['machine_name']
+    else:
+        machine_name = name
+
+    machines = context.browser.find_by_css('.ui-listview li')
+
+    for machine in machines:
+        if machine_name in machine.text.strip():
+            break
+
+    try:
+        machine.find_by_css('.ui-btn')[0].click()
+    except:
+        assert False, u'Could not tick/check %s machine' % machine_name
