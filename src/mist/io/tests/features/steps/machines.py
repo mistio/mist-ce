@@ -14,6 +14,7 @@ I add my bare metal creds       --> aad_bare_metal
 "{machine_name}" should be probed within {timeout} seconds      --> check_probed
 I should find the Public IP     --> find_ip
 I should see the Bare Metal Backend added within {timeout} seconds      --> see_bare_added
+I should see {number} keys associated within {timeout} seconds   --> keys_associated
 
 ------
 
@@ -122,3 +123,15 @@ def see_bare_added(context, timeout):
     context.execute_steps(u"""
     Then I should see the "%s" Backend added within %s seconds
     """ % (hostname, timeout))
+
+
+@then(u'I should see {number} keys associated within {timeout} seconds')
+def keys_associated(context, number, timeout):
+
+    end_time = time() + int(timeout)
+    while time() < end_time:
+        keys = context.browser.find_by_css('#machine-keys-panel ul .small-list-item')
+        if len(keys) == int(number):
+            return
+
+    assert False, u'Could not find %s keys associated' % number
