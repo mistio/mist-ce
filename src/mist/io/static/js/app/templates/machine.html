@@ -10,10 +10,14 @@
 
     </div>
     
-    <div data-role="header" data-theme="a">
+    <div data-role="header" data-theme="a" class="single-machine-header">
         <span class="single-view-icon-wrapper">
             <span id="single-view-provider-icon" {{bind-attr class="view.providerIconClass"}}></span>
         </span>
+        <span {{bind-attr class=":single-view-icon-wrapper image.type"}}>
+            <span id="single-view-image-icon"></span>
+        </span>
+        
         <h1 {{bind-attr class="view.machine.state"}}>{{state}}</h1>
         
         <span class="ui-btn-right" id="mist-manage-keys">
@@ -23,9 +27,10 @@
                 <a data-role="button" {{action "manageKeysClicked" target="view"}}>{{keysCount}} keys</a>
             {{else}}
                 <a data-role="button"
-                   data-theme="b" 
+                   data-theme="d" 
                    data-icon="plus" 
                    data-iconpos="right"
+                   data-mini="false"
                    {{action "addKeyClicked" target="view"}}>Add key</a>
             {{/if}}{{/if}}
         </span>

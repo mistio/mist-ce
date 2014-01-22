@@ -456,7 +456,7 @@ html .ui-bar-b .ui-btn:visited,
 html .ui-body-b .ui-btn:visited,
 html body .ui-group-theme-b .ui-btn:visited,
 html head + body .ui-btn.ui-btn-b:visited {
-	background: #333333 /*{b-bup-background-color}*/;
+	background: #333333 /*{b-bup-background-color}*/ linear-gradient( #444 /*{b-bup-background-start}*/, #2d2d2d /*{-bup-background-end}*/);
 	border-color: #111111 /*{b-bup-border}*/;
 	color: #ffffff /*{b-bup-color}*/;
 	text-shadow: 0 /*{b-bup-shadow-x}*/ 1px /*{b-bup-shadow-y}*/ 0 /*{b-bup-shadow-radius}*/ #111111 /*{b-bup-shadow-color}*/;
