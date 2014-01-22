@@ -28,7 +28,8 @@
     margin: 0 auto;
 }
 #single-machine-page #mist-manage-keys a {
-    
+    margin-top: 4px;
+    margin-right: 5px;
 }
 
 .single-machine-header {
@@ -43,4 +44,14 @@
 
 .single-machine-header span {
     margin-top: 4px !important;
+}
+
+#machine-basic-table, #machine-metadata {
+    border-collapse: collapse;
+    width: 100%;
+    background: #fff;
+}
+
+.info-table tr {
+    border: 1px solid #ccc;
 }

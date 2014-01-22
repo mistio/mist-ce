@@ -327,7 +327,20 @@ ul.checkbox-list li a, ul.checkbox-list li label {
     border-radius: 2em;
 }
 
-/* Load colors
+.monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {
+    padding: 15px;
+    background: #e0e0e1;
+    border-radius: inherit;
+}
+
+.ui-collapsible-inset .ui-collapsible-content {
+    padding-top: 0px;
+    margin-top: -1px;
+    overflow: auto;
+    border: none;
+}
+
+/* Leds
  * */
 
 .netleds div {
