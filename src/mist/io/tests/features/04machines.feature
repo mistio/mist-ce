@@ -108,3 +108,39 @@ Feature: Machines
             Then I should see 1 keys associated within 30 seconds
 
 
+    @web
+    @test
+    Scenario: Shutdown Machine
+        When I visit mist.io
+            Then I should see "mist.io"
+        When I wait for 2 seconds
+        And I click the "Machines" button
+        And I wait for 3 seconds
+        And I tick the "tester" machine
+        And I click the "Power" button
+        And I click the "Shutdown" button
+        And I wait for 1 seconds
+        And I click the "Yes" button
+            Then "tester" state should be "stopped" within 60 seconds
+
+
+    @web
+    @test
+    Scenario: Start Machine
+        When I visit mist.io
+            Then I should see "mist.io"
+        When I wait for 2 seconds
+        And I click the "Machines" button
+        And I wait for 3 seconds
+        And I tick the "tester" machine
+        And I click the "Power" button
+        And I click the "Start" button
+        And I wait for 1 seconds
+        And I click the "Yes" button
+        And I wait for 2 seconds
+            Then "tester" state should be "pending" within 60 seconds
+        When I wait for 1 seconds
+            Then "tester" state should be "running" within 400 seconds
+        When I wait for 1 seconds
+            Then "tester" should be probed within 400 seconds
+        When I wait for 1 seconds
