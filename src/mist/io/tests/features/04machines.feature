@@ -9,7 +9,6 @@ Feature: Machines
             Then I should see "mist.io"
 
     @web
-    @test
     Scenario: Create Machine
         When I click the "Add backend" button
         And I click the "Select provider" button
@@ -33,6 +32,7 @@ Feature: Machines
         And I click the "Select Location" button
         And I click the link with text that contains "ap-northeast"
         And I click the "Select Key" button
+        And I wait for 1 seconds
         And I click the link with text that contains "$key_name"
         And I click the "Launch!" button
         And I wait for 2 seconds
@@ -142,7 +142,6 @@ Feature: Machines
 
 
     @web
-    @test
     Scenario: Reboot Machine
         When I visit mist.io
             Then I should see "mist.io"
@@ -161,7 +160,6 @@ Feature: Machines
 
 
     @web
-    @test
     Scenario: Destroy Machine
         When I visit mist.io
             Then I should see "mist.io"

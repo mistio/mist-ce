@@ -27,7 +27,7 @@ define('app/models/machine', ['ember'],
             stats: {'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
             
-            commandHistory: [],
+            commandHistory: null,
             
             loss: null,
             latency: null,
@@ -81,6 +81,7 @@ define('app/models/machine', ['ember'],
              */
 
             load: function() {
+                this.set('commandHistory', []);
                 this.probe();
             }.on('init'),
 
@@ -156,7 +157,7 @@ define('app/models/machine', ['ember'],
                         }, that.probeInterval);
                     }
                 });
-            }            
+            }
         });
     }
 );

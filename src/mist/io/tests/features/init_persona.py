@@ -25,6 +25,13 @@ def main():
             machine_name=TESTNAMES['machine_name']+str(random.randint(1, 10000)),
             image_machine=TESTNAMES['image_machine']+str(random.randint(1, 10000)),
             key_name=TESTNAMES['key']+str(random.randint(1, 10000))
+        ),
+        'MonitorTester': dict(
+            creds=CREDENTIALS,
+            mistcreds=MISTCREDS,
+            machine_name=TESTNAMES['machine_name']+str(random.randint(1, 10000)),
+            image_machine=TESTNAMES['image_machine']+str(random.randint(1, 10000)),
+            key_name=TESTNAMES['key']+str(random.randint(1, 10000))
         )
     }
 
