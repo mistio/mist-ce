@@ -1,10 +1,10 @@
-@monitor
-Feature: Monitor
+@shell
+Feature: Shell
 
     Background:
         #Given PhantomJS as the default browser
         #Given a browser
-        Given "MonitorTester" as the persona
+        Given "ShellTester" as the persona
         When i visit mist.io
             Then I should see "mist.io"
 
@@ -26,7 +26,7 @@ Feature: Monitor
         When I visit mist.io
         And I click the "Machines" button
         And I click the "Create" button
-        And I type "monitor_tester" as machine name
+        And I type "shell_tester" as machine name
         And I wait for 1 seconds
         And I click the "Select Provider" button
         And I wait for 1 seconds
@@ -47,15 +47,15 @@ Feature: Monitor
         And I click the "Select Key" button
         And I wait for 1 seconds
         And I click the "Create Key" button
-        And I type "monitor_tester" as key name
+        And I type "shell_tester" as key name
         And I click the "Generate" button
         And I click the "Done" button
         And I wait for 2 seconds
         And I click the "Launch!" button
         And I wait for 2 seconds
-            Then "monitor_tester" state should be "pending" within 60 seconds
+            Then "shell_tester" state should be "pending" within 60 seconds
         When I wait for 1 seconds
-            Then "monitor_tester" state should be "running" within 400 seconds
+            Then "shell_tester" state should be "running" within 400 seconds
         When I wait for 1 seconds
-            Then "monitor_tester" should be probed within 400 seconds
+            Then "shell_tester" should be probed within 400 seconds
         When I wait for 1 seconds

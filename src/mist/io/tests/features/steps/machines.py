@@ -49,6 +49,9 @@ def type_machine_name(context, name):
     elif name == "monitor_tester":
         machine_name = context.personas['MonitorTester']['machine_name']
         context.browser.find_by_css('input#create-machine-name').fill(machine_name)
+    elif name == "shell_tester":
+        machine_name = context.personas['ShellTester']['machine_name']
+        context.browser.find_by_css('input#create-machine-name').fill(machine_name)
     else:
         context.browser.find_by_css('input#create-machine-name').fill(name)
 
@@ -59,6 +62,8 @@ def check_machine_state(context, machine_name, state, timeout):
         machine_name = context.personas['NinjaTester']['machine_name']
     elif machine_name == "monitor_tester":
         machine_name = context.personas['MonitorTester']['machine_name']
+    elif machine_name == "shell_tester":
+        machine_name = context.personas['ShellTester']['machine_name']
 
     machines = context.browser.find_by_css('#machines li')
     for machine in machines:
@@ -82,7 +87,9 @@ def check_probed(context, machine_name, timeout):
         machine_name = context.personas['NinjaTester']['machine_name']
     elif machine_name == "monitor_tester":
         machine_name = context.personas['MonitorTester']['machine_name']
-        
+    elif machine_name == "shell_tester":
+        machine_name = context.personas['ShellTester']['machine_name']
+
     for machine in machines:
         if machine_name in machine.text:
             break
