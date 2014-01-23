@@ -328,6 +328,11 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 Ember.run(this, function() {
                     var backendModel = Backend.create(backend);
                     this.content.pushObject(backendModel);
+                    backendModel.one('onMachineListChange', function() {
+                        info(backendModel.provider);
+                        if (backendModel.provider == 'bare_metal')
+                            Mist.keysController._associateKey(keyId, backendModel.machines.content[0]);
+                    });
                     this.trigger('onBackendListChange');
                     this.trigger('onBackendAdd');
                 });
