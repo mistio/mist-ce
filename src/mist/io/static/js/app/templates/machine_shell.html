@@ -6,28 +6,21 @@
     </div>
 
     <div data-role="content">
-        <div data-role="fieldcontain">
-            <table class="shell-input">
-                <tr>
-                    <td>
-                        {{view Mist.ShellTextField valueBinding="Mist.machineShellController.command"}}
-                    </td>
-                    <td class="shell-send-wrapper">
-                        <a data-icon="shell-return"
-                            data-role="button"
-                            data-iconpos="notext"
-                            {{action "submitClicked" target="view"}}
-                            class="shell-send"></a>
-                    </td>
-                </tr>
-            </table>
+        <div class="ui-grid-a" id="shell-grid">
+            <div class="ui-block-a" id="shell-input">
+                {{view Mist.ShellTextField valueBinding="Mist.machineShellController.command"}}
+            </div>
+            <div class="ui-block-b" id="shell-submit">
+                <button {{action "submitClicked" target="view"}}></button>
+            </div>
+            <div class="ui-block-a" id="shell-response" data-role="listview">
+            {{#each Mist.machineShellController.machine.commandHistory}}
+                {{view Mist.machineShellListItemView commandBinding="this"}}
+            {{/each}}
+            </div>
+            <div class="ui-grid-a" id="shell-back">
+                <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
+            </div>
         </div>
-        <div class="shell-return" data-role="listview">
-        {{#each Mist.machineShellController.machine.commandHistory}}
-            {{view Mist.machineShellListItemView commandBinding="this"}}
-        {{/each}}
-        </div>
-        <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
     </div>
-
 </div>

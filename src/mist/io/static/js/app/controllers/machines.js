@@ -11,6 +11,7 @@ define('app/controllers/machines', ['app/models/machine'],
              *  Properties
              */
 
+
             content: [],
             loading: null,
             backend: null,
