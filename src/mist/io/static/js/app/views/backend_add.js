@@ -42,6 +42,7 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
 
                 selectProvider: function(provider) {
 
+                    $('#new-backend-second-field').attr('type', 'password');
                     $('#new-backend-provider').collapsible('collapse');
                     $('#openstack-bundle').hide();
                     $('#baremetal-bundle').hide();
@@ -67,7 +68,9 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
                     } else if (provider.provider.indexOf('bare_metal') > -1) {
                         this.set('firstFieldLabel', 'Hostname');
                         this.set('secondFieldLabel', 'User');
+
                         $('#new-backend-key .ui-listview').listview('refresh');
+                        $('#new-backend-second-field').attr('type', '');
                         $('#baremetal-bundle').show();
 
                     } else {

@@ -46,7 +46,6 @@ define(['app/models/key'],
             }.on('init'),
 
 
-
             /**
              * 
              *  Methods
