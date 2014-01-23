@@ -162,9 +162,6 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
- 
-
-
             clear: function() {
                 Ember.run(this, function() {
                     this.set('content', []);

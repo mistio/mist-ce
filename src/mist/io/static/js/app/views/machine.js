@@ -22,6 +22,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 return 'provider-' + this.machine.backend.provider;
             }.property('controller.model'),
 
+
             /**
              * 
              *  Initialization
@@ -36,6 +37,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 Ember.run(this, function() {
                     this.updateCurrentMachine();
                     if (this.machine.id) {
+                        this.updateUptime();
                         this.updateFooter();
                         // TODO: Render stuff
                     }
@@ -84,8 +86,8 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                     $('#single-machine-page #single-machine-shell-btn').addClass('ui-state-disabled');
                 }
             },
-            
-            
+
+
             renderMachine: function() {
                 var machine = this.get('controller').get('model');
                 if (machine.id != ' ') { // This is the dummy machine. It exists when machine hasn't loaded yet
@@ -93,11 +95,13 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 }
             },
 
+
             renderKeysButton: function() {
                 Ember.run.next(function() {
                     $('#mist-manage-keys').trigger('create');
                 });
             },
+
 
             rules: function(){
                 var ret = Ember.ArrayController.create(),
@@ -110,6 +114,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 return ret;
             }.property('Mist.rulesController.@each', 'Mist.rulesController.@each.machine'),
 
+
             addRuleClicked: function() {
                 // initialize the rule to some sensible defaults
                 var machine = this.get('controller').get('model');
@@ -121,12 +126,32 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 Mist.rulesController.newRule(machine, metric, operator, value, actionToTake);
             },
 
+
             stopPolling: function() {
                 // if it polls for stats, stop it
                 if ('context' in Mist) {
                     Mist.context.stop();
                 }
             }.observes('controller.model.hasMonitoring'),
+
+
+            updateUptime: function() {
+                if ($('#single-machine-page').length) {
+
+                    // Rescedule updateUptime
+                    Ember.run.later(this, function() {
+                        this.updateUptime();
+                    }, 1000);
+    
+                    // Calculate uptime
+                    var machine = this.machine;
+                    if (!machine) return 0;
+                    if (!machine.uptimeChecked) return 0;
+                    if (!machine.uptimeFromServer) return 0;
+                    machine.set('uptime', machine.uptimeFromServer + (Date.now() - machine.uptimeChecked));
+                }
+            },
+
 
             backClicked: function() {
                 this.stopPolling();
@@ -247,7 +272,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                     }
                 }
                 return ret;
-            }.property('machine'),
+            }.property('machine.uptime'),
 
 
             basicInfo: function() {
@@ -297,10 +322,15 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                         ret.push({key:item, value: value});
                     }
                 }
+                
+                Ember.run.next(function() {
+                    if ($('#single-machine-metadata').collapsible) {
+                        $('#single-machine-metadata').collapsible();
+                    }
+                });
                 return ret;
                 
-            }.property('machine'),
-
+            }.property('machine', 'machine.extra'),
 
 
             /**
