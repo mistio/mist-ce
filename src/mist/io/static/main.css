@@ -357,6 +357,9 @@ ul.checkbox-list li a, ul.checkbox-list li label {
     border: none;
 }
 
+.single-machine-loader {
+    display: block !important;
+}
 /* Leds
  * */
 

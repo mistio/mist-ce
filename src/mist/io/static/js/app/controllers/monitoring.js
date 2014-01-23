@@ -38,9 +38,9 @@ define('app/controllers/monitoring', [
                  var that = this;
                  //this.set('changingMonitoring', true);
                  if (machine.hasMonitoring) {
-                     machine.set('enablingMonitoring', true);
-                 } else {
                      machine.set('disablingMonitoring', true);
+                 } else {
+                     machine.set('enablingMonitoring', true);
                  }
                  Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring', {
                     'action': machine.hasMonitoring ? 'disable' : 'enable',
