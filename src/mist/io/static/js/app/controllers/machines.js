@@ -87,8 +87,9 @@ define('app/controllers/machines', ['app/models/machine'],
                         'image_extra': image.extra
                 }).success(function (machine) {
                     that._createMachine(machine, key);
-                }).error(function () {
+                }).error(function (message) {
                     that.removeObject(dummyMachine);
+                    Mist.notificationController.notify('Failed to create machine: ' + message);
                 }).complete(function (success, machine) {
                     that.set('addingMachine', false);
                     that.set('onMachineAdd');
