@@ -27,7 +27,7 @@ getOODictField, getFieldsListField, getFieldsDictField, OODict, UserEngine
 import os
 import yaml
 import logging
-from time import sleep
+from time import time, sleep
 
 import abc
 from copy import copy, deepcopy
@@ -493,14 +493,12 @@ class OODictYaml(OODict):
         self._yaml_rel_path = yaml_rel_path
         super(OODictYaml, self).__init__(_dict=self._yaml_read())
 
-    def _yaml_read(self, yaml_rel_path=''):
+    def _yaml_read(self):
         """Load user settings from db.yaml We have seperated
         user-specific settings from general settings
         and everything regarding the user dict is
         now in db.yaml (as if it were a database). General
         settings like js_build etc remain in settings.yaml file"""
-        if yaml_rel_path:
-            self._yaml_rel_path = yaml_rel_path
         yaml_db = os.getcwd() + "/" + self._yaml_rel_path
         try:
             config_file = open(yaml_db, 'r')
@@ -517,11 +515,8 @@ class OODictYaml(OODict):
                 raise
         return user_dict
 
-    def save(self, yaml_rel_path=''):
+    def save(self):
         """Save data to yaml file."""
-        if yaml_rel_path:
-            self._yaml_rel_path = yaml_rel_path
-
         class folded_unicode(unicode): pass
         class literal_unicode(unicode): pass
         class literal_string(str): pass
@@ -548,15 +543,19 @@ class OODictYaml(OODict):
         with open(yaml_db, 'w') as config_file:
             yaml.dump(self._dict, config_file, default_flow_style=False)
 
+    def refresh(self):
+        super(OODictYaml, self).__init__(_dict=self._yaml_read())
 
-class User(OODictYaml):
 
-    def __init__(self):
-        super(User, self).__init__("db.yaml")
+class OODictYamlLock(OODictYaml):
+
+    def __init__(self, yaml_rel_path):
+        super(OODictYamlLock, self).__init__(yaml_rel_path)
+        self._rlock = FileLock(yaml_rel_path)
 
     @contextmanager
     def lock_n_load(self):
-        """Dummy lock, doesn't actually do anything.
+        """File lock context manager.
 
         It must be used with a 'with' statement as follows:
         with user.lock_n_load():
@@ -567,20 +566,142 @@ class User(OODictYaml):
         exception.
 
         """
-        self._lock = True
+
         try:
-            yield
+            # don't refresh if reentering lock
+            self._rlock.acquire() and self.refresh()
+            log.debug("Acquired lock")
+            yield   # here execution returns to the with statement
+        except Exception as exc:
+            # This block is executed if an exception is raised in the try
+            # block above or inside the with statement that called this.
+            # Returning False will reraise it.
+            log.error("lock_n_load got an exception: %r" % exc)
+            raise
         finally:
-            self.lock = False
+            # This block is always executed in the end no matter what
+            # to ensure we always release the lock.
+            log.debug("Releasing lock")
+            self._rlock.release()
 
     def save(self):
-        """Save user data to storage.
-
-        Raises exception if not in a "with user.lock_n_load():" code block.
-
+        """Save user data to storage. Raises exception if not in a
+        "with user.lock_n_load():" code block.
         """
-        if not self._lock:
-            # this is to make the code lock compatible
+
+        if not self._rlock.isset():
             raise Exception("Attempting to save without prior lock. "
                             "You should be ashamed of yourself.")
-        super(User, self).save()
+
+        # lock sanity check
+        if not self._rlock.check():
+            log.critical("Race condition! Aborting! Will not save!")
+            raise Exception('Race condition detected!')
+
+        # All went fine. Save to temp file and move to original's position.
+        original_path = self._yaml_rel_path
+        tmp_path = original_path + ".tmp"
+        self._yaml_rel_path = tmp_path
+        super(OODictYamlLock, self).save()
+        os.rename(tmp_path, original_path)
+        self._yaml_rel_path = original_path
+
+
+class FileLock(object):
+    """This class implements a basic locking mechanism in the filesystem.
+
+    It uses the atomic operation of softlinks creation in UNIX-like systems.
+
+    When the lock is acquired, a softlink (with a .lock suffix) is created
+    pointing to some arbitrary path. The link command will fail if such a link
+    already exists. Acquire will sleep and retry to create the link, up to
+    a specified timeout where it'll give up and break the lock.
+
+    The lock is initialized given a lock filepath.
+    When the lock has been acquired, any FileLock instance with the same
+    filepath won't be able to acquire the lock. Once however
+    a certain FileLock instance has acquired a lock, its acquire()
+    method can be called again. You have to release as many times as
+    you lock. This doesn't implement the reentrant property the way
+    usual Rlocks do. For example, it doesn't enforce that the releases
+    are in exact reverse order of acquires. That however is enforced by
+    the use of the with statement higher up in other classes using this
+    one.
+
+    """
+
+    sleep = 0.05  # seconds to sleep while waiting for lock
+    break_after = 10  # seconds to wait before breaking lock
+
+    def __init__(self, lock_file):
+        if not lock_file.endswith(".lock"):
+            lock_file += ".lock"
+        self.lock_file = lock_file
+        self.value = ''
+        self.re_counter = 0  # reentrant counter
+
+    def reset(self, lock_file):
+        if self.lock_file not in [lock_file, lock_file + ".lock"]:
+            self.__init__(lock_file)
+
+    def acquire(self):
+        value = "%f" % time()
+
+        # lock already acquired
+        if self.value:
+            if not self.check():
+                pass  # FIXME : someone broke the lock?
+            self.re_counter += 1
+            return False
+
+        # lock not already acquired by us
+        times = 0
+        while True:
+            try:
+                # try to acquire lock
+                os.symlink(value, self.lock_file)
+            except OSError:
+                # couldn't acquire it, it must be already locked
+                log.info("Lock is locked, sleeping")
+                if times * self.sleep >= self.break_after:
+                    log.critical("Hey, I've been waiting for lock '%s' "
+                                 "for %.1f secs! I'll brake the fucking lock",
+                                 self.lock_file, times * self.sleep)
+                    os.unlink(self.lock_file)
+                sleep(self.sleep)
+                times += 1
+            else:
+                if times:
+                    log.info("Slept for %.1f secs and then acquired "
+                            "lock '%s'.", times * self.sleep, self.lock_file)
+                else:
+                    log.debug("Acquired lock '%s'.", self.lock_file)
+                self.value = value
+                return True
+
+    def release(self):
+        if self.re_counter:
+            self.re_counter -= 1
+        else:
+            log.debug("Releasing lock '%s'." % self.lock_file)
+            if not self.check():
+                raise Exception("Cannot release lock since we don't own it.")
+            os.unlink(self.lock_file)
+            self.value = ''
+
+    def check(self):
+        return (self.value and
+                os.path.islink(self.lock_file) and
+                os.readlink(self.lock_file) == self.value)
+
+    def isset(self):
+        return bool(self.value)
+
+    def __repr__(self):
+        return "FileLock(path='%s')" % self.lock_file
+
+
+class User(OODictYamlLock):
+
+    def __init__(self):
+        super(User, self).__init__("db.yaml")
