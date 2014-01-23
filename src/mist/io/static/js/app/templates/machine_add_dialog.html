@@ -32,9 +32,13 @@
             <h2>{{Mist.machineAddController.newMachineProvider.title}}</h2>
             <ul data-role="listview" data-theme="a">
                 {{#each Mist.backendsController.content}}
-                <li data-icon="false">
-                    <a {{action "selectProvider" this target="view"}}>{{this.title}}</a>
-                </li>
+                    {{#if this.enabled}}
+                        {{#unless this.isBareMetal}}
+                            <li data-icon="false">
+                                <a {{action "selectProvider" this target="view"}}>{{this.title}}</a>
+                            </li>
+                        {{/unless}}
+                    {{/if}}
                 {{/each}}
             </ul>
         </div>
