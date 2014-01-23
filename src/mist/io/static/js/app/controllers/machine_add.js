@@ -51,6 +51,7 @@ define('app/controllers/machine_add', ['ember'],
                 
                 
                 this._clear();
+                this._updateFormReady();
                 this.set('callback', callback);
             },
 

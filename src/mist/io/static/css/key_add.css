@@ -1,14 +1,14 @@
 
-/* Create Key Popup CSS
+/* Key Add View
 -----------------------------------------------------------------------------------------------------------*/
-#create-key-upload {
+#add-key-upload {
     display: none;
 }
-#create-key-popup .create-key-loader {
+#add-key-popup .add-key-loader {
     display: inline;
     float: right;
 }
-#create-key-popup-screen {
+#add-key-popup-screen {
     height: 100%;
     position: fixed;
     top: 0;

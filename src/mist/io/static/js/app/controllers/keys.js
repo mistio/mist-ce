@@ -15,14 +15,15 @@ define(['app/models/key'],
             selectedKeys: [],
 
             loading: false,
+            addingKey: false,
             keyRequest: false,
-            creatingKey: false,
             renamingKey: false,
             associatingKey: false,
             gettingPublicKey: false,
             gettingPrivateKey: false,
             disassociatingKey: false,
             settingDefaultKey: false,
+
 
             /**
              * 
@@ -52,18 +53,18 @@ define(['app/models/key'],
              * 
              */
 
-            createKey: function(keyId, keyPrivate, callback) {
+            addKey: function(keyId, keyPrivate, callback) {
                 var that = this;
-                this.set('creatingKey', true);
+                this.set('addingKey', true);
                 Mist.ajax.PUT('/keys', {
                     'id': keyId,
                     'priv': keyPrivate
                 }).success(function(key) {
-                    that._createKey(key);
+                    that._addKey(key);
                 }).error(function() {
                     Mist.notificationController.notify('Failed to create key');
                 }).complete(function(success, key) {
-                    that.set('creatingKey', false);
+                    that.set('addingKey', false);
                     if (callback) callback(success, key);
                 });
                 keyPrivate = null;
@@ -242,11 +243,11 @@ define(['app/models/key'],
             },
 
 
-            _createKey: function(key) {
+            _addKey: function(key) {
                 Ember.run(this, function() {
                     this.content.pushObject(Key.create(key));
                     this.trigger('onKeyListChange');
-                    this.trigger('onKeyCreate');
+                    this.trigger('onKeyAdd');
                 });
             },
 

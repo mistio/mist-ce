@@ -25,19 +25,20 @@ define('app/controllers/key_add', ['ember'],
              */
 
             open: function (callback) {
-                $('#create-key-popup').popup('open');
-                this._clear();
-                this.set('callback', callback);
+                $('#add-key-popup').popup('open');
+                this._clear()
+                    ._updateFormReady()
+                    .set('callback', callback);
             },
 
 
             close: function () {
-                $('#create-key-popup').popup('close');
+                $('#add-key-popup').popup('close');
                 this._clear();
             },
 
 
-            create: function () {
+            add: function () {
 
                 if (Mist.keysController.keyExists(this.newKeyId)) {
                     Mist.notificationController.notify('Key name exists already');
@@ -61,7 +62,7 @@ define('app/controllers/key_add', ['ember'],
                 }
 
                 var that = this;
-                Mist.keysController.createKey(this.newKeyId, this.newKeyPrivate,
+                Mist.keysController.addKey(this.newKeyId, this.newKeyPrivate,
                     function (success, newKeyId) {
                         that._giveCallback(success, newKeyId);
                         if (success)
@@ -101,6 +102,7 @@ define('app/controllers/key_add', ['ember'],
             _clear: function () {
                 this.set('callback', null)
                     .set('newKeyId', null)
+                    .set('formReady', null)
                     .set('newKeyPrivate', null);
             },
 
@@ -111,7 +113,6 @@ define('app/controllers/key_add', ['ember'],
 
 
             _updateFormReady: function () {
-
                 if (this.newKeyId) {
                     // Remove non alphanumeric chars from key id
                     this.set('newKeyId', this.newKeyId.replace(/\W/g, ''));
@@ -120,7 +121,7 @@ define('app/controllers/key_add', ['ember'],
                     this.set('newKeyPrivate', this.newKeyPrivate.trim());
                 }
 
-                this.set('formReady', this.newKeyId && this.newKeyPrivate);
+                this.set('formReady', !!this.newKeyId && !!this.newKeyPrivate);
             },
 
 
@@ -132,7 +133,7 @@ define('app/controllers/key_add', ['ember'],
 
             formObserver: function () {
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('newKeyId', 'newKeyPrivate', 'callback'),
+            }.observes('newKeyId', 'newKeyPrivate'),
         });
     }
 );

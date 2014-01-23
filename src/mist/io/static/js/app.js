@@ -67,7 +67,7 @@ define( 'app', [
     'app/views/key_list_item',
     'app/views/key_list',
     'app/views/key',
-    'app/views/key_add_dialog',
+    'app/views/key_add',
     'app/views/key_edit_dialog',
     'app/views/rule',
     'app/views/user_menu',
@@ -114,7 +114,7 @@ define( 'app', [
                 KeyListItemView,
                 KeyListView,
                 SingleKeyView,
-                KeyAddDialog,
+                KeyAddView,
                 KeyEditDialog,
                 RuleView,
                 UserMenuView,
@@ -252,7 +252,7 @@ define( 'app', [
         App.set('ruleView', RuleView);
         App.set('loginView', LoginView);
         App.set('keyListView', KeyListView);
-        App.set('addKeyView', KeyAddDialog);
+        App.set('keyAddView', KeyAddView);
         App.set('listItemView', ListItemView);
         App.set('backendAddView', BackendAdd);
         App.set('userMenuView', UserMenuView);

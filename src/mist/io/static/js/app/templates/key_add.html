@@ -1,4 +1,4 @@
-<div id="create-key-popup" class="large-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
+<div id="add-key-popup" class="large-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
 
     <div data-role="header" data-theme="b">
         <h1>Add key</h1>
@@ -6,21 +6,21 @@
 
     <div data-role="content" data-theme="a">
 
-        <label for="create-key-name">Name:</label>
+        <label for="add-key-id">Name:</label>
         {{view Mist.TextField
-               id="create-key-id"
+               id="add-key-id"
                valueBinding="Mist.keyAddController.newKeyId"}}
 
         <label for="textarea-private-key">Private Key:
             {{#if Mist.keysController.generatingKey}}
-                <div class="ajax-loader create-key-loader"></div>
+                <div class="ajax-loader add-key-loader"></div>
             {{/if}}
             {{#if Mist.keyAddController.uploadingKey}}
-                <div class="ajax-loader create-key-loader"></div>
+                <div class="ajax-loader add-key-loader"></div>
             {{/if}}
         </label>
         {{view Ember.TextArea
-               id="create-key-private"
+               id="add-key-private"
                valueBinding="Mist.keyAddController.newKeyPrivate"}}
 
         <div class="generate-upload" data-role="controlgroup" data-type="horizontal" data-theme="a">
@@ -30,15 +30,15 @@
                     {{action "uploadClicked" target="view"}}>Upload</button>
         </div>
 
-        <input id="create-key-upload" type="file" name="file" {{action "uploadInputChanged" on="change" target="view"}}/>
+        <input id="add-key-upload" type="file" name="file" {{action "uploadInputChanged" on="change" target="view"}}/>
 
-        {{#if Mist.keysController.creatingKey}}
+        {{#if Mist.keysController.addingKey}}
         <div class="ajax-loader"></div>
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
             <a data-role="button" data-theme="a" {{action "backClicked" target="view"}}>Back</a>
-            <button id="create-key-ok" data-theme="d" {{action "doneClicked" target="view"}}>Done</button>
+            <button id="add-key-ok" data-theme="d" {{action "addClicked" target="view"}}>Add</button>
         </div>
     </div>
 </div>

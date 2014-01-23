@@ -30,8 +30,8 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
 
             open: function (callback) {
                 this._clear();
-                this.set('callback', callback);
                 this._updateFormReady();
+                this.set('callback', callback);
 
                 $('#add-backend-panel').panel('open');
                 Ember.run.next(function () {
