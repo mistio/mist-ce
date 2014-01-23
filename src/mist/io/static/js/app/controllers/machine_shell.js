@@ -11,6 +11,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
              *  Properties
              */
 
+            command: null,
             machine: null,
             commandHistoryIndex: -1,
 
@@ -50,9 +51,8 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 });
                 
                 // Modify machine's command history
-                commandHistory.pushObject(command);
-                this.commandHistoryIndex = commandHistory.length - 1;
-
+                commandHistory.unshiftObject(command);
+                
                 // Construct request
                 var url = '/backends/' + machine.backend.id + '/machines/' + machine.id + '/shell';
                 var host = machine.getHost();
@@ -76,6 +76,9 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 $('#hidden-shell').append(
                     '<iframe id="' + command.id +'" src="' + url + '"></iframe>'
                 );
+                
+                this.set('command', '');
+                this.set('commandHistoryIndex', -1);
             },
 
 

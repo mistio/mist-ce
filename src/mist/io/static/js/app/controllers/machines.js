@@ -86,8 +86,6 @@ define('app/controllers/machines', ['app/models/machine'],
                         'disk': size.disk,
                         'image_extra': image.extra
                 }).success(function (machine) {
-                    info('create machine success');
-                    info(key.id);
                     that._createMachine(machine, key);
                 }).error(function () {
                     that.removeObject(dummyMachine);

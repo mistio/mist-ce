@@ -320,26 +320,32 @@ define( 'app', [
                 var keyCode = event.keyCode;
                 var commandHistoryIndex = Mist.machineShellController.commandHistoryIndex;
                 var commandHistory = Mist.machineShellController.machine.commandHistory;
-                var inputField = '.shell-input div.ui-input-text input';
                 switch (keyCode) {
                     case 38: // Up
-                        if (commandHistoryIndex > 0)
-                            commandHistoryIndex--;
-                        $(inputField).val(commandHistory[commandHistoryIndex].command);
+                        if (commandHistoryIndex < commandHistory.length - 1) {
+                            commandHistoryIndex++;
+                        }
+                        Mist.machineShellController.set('command', commandHistory[commandHistoryIndex].command);
+                        Mist.machineShellController.set('commandHistoryIndex', commandHistoryIndex);
                         break;
                     case 40: // Down
-                        if (commandHistoryIndex < commandHistory.length) {
-                            if (commandHistoryIndex < commandHistory.length - 1)
-                                commandHistoryIndex++;
-                            $(inputField).val(commandHistory[commandHistoryIndex].command);
+                        if (commandHistoryIndex >= 0) {
+                            commandHistoryIndex--;
                         }
+                        if (commandHistoryIndex >= 0) {
+                            Mist.machineShellController.set('command', commandHistory[commandHistoryIndex].command);
+                        } else if (commandHistoryIndex == -1) {
+                            Mist.machineShellController.set('command', '');
+                        }
+                        Mist.machineShellController.set('commandHistoryIndex', commandHistoryIndex);
                         break;
                     case 13: // Enter
                         Mist.machineShellController.submit();
                         break;
                 }
                 if (keyCode == 38 || keyCode == 40 && event.preventDefault) // Up or Down
-                        event.preventDefault();
+                    event.preventDefault();
+                
             }
         });
 
@@ -571,8 +577,11 @@ var collectd_install_target = false, collectd_uninstall_target = false, collectd
 function appendShell(output, command_id) {
 
     var machine = Mist.machineShellController.machine;
-    var command = machine.commandHistory.findBy('id', command_id);
     
+    if (!machine) return;
+    
+    var command = machine.commandHistory.findBy('id', command_id);
+
     if (!command) return;
 
     // Replace break with new line
