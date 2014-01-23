@@ -26,9 +26,9 @@ define('app/controllers/key_add', ['ember'],
 
             open: function (callback) {
                 $('#add-key-popup').popup('open');
-                this._clear()
-                    ._updateFormReady()
-                    .set('callback', callback);
+                this._clear();
+                this._updateFormReady();
+                this.set('callback', callback);
             },
 
 
