@@ -67,9 +67,10 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     'machine_ip'  : apiKey,    // For bare-metal
                     'machine_user': apiSecret  // For bare-metal
                 }).success(function(backend) {
-                    that._addBackend(backend);
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to add backend');
+                    info(backend);
+                    that._addBackend(backend, key);
+                }).error(function(message) {
+                    Mist.notificationController.notify('Failed to add backend: ' + message);
                 }).complete(function(success, backend) {
                     that.set('addingBackend', false);
                     if (callback) callback(success, backend);
@@ -167,11 +168,9 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                         uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
                         machine.set('uptimeChecked', Date.now());
                         machine.set('uptimeFromServer', uptime);
+                        machine.set('probed', true);
                     } else {
                         machine.set('uptimeChecked', -Date.now());
-                    }
-                    for (attr in data){
-                        
                     }
                     machine.set('cores', data.cores);
                     machine.set('users', data.users);
@@ -183,7 +182,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     machine.set('loadavg', data.loadavg);
                     machine.set('loss', data.packets_loss);
                     machine.set('latency', data.rtt_avg);
-                    machine.set('probed', true);
+                    
                 }).error(function(message) {
                     if (key) Mist.notificationController.notify(message);
                 }).complete(function(success, data) {
@@ -326,9 +325,10 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             },
 
 
-            _addBackend: function(backend) {
+            _addBackend: function(backend, keyId) {
                 Ember.run(this, function() {
-                    this.content.pushObject(Backend.create(backend));
+                    var backend = Backend.create(backend);
+                    this.content.pushObject(backend);
                     this.trigger('onBackendListChange');
                     this.trigger('onBackendAdd');
                 });
