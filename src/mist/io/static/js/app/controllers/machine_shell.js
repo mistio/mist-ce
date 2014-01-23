@@ -56,7 +56,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 // Construct request
                 var url = '/backends/' + machine.backend.id + '/machines/' + machine.id + '/shell';
                 var host = machine.getHost();
-                var params =  {
+                var params = {
                     'host'      : host,
                     'command'   : command.command,
                     'command_id': command.id
@@ -69,7 +69,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                    var ret = [];
                    for (var d in data)
                       ret.push(encodeURIComponent(d) + "=" + encodeURIComponent(data[d]));
-                   return ret.join("&");
+                   return ret.join('&');
                 }
                 url = url + '?' + EncodeQueryData(params);
 
@@ -98,7 +98,6 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
             _giveCallback: function (success, action) {
                 if (this.callback) this.callback(success, action);
             },
-
 
 
             /**

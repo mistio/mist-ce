@@ -184,6 +184,12 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                     }
                 },
 
+
+                disableMonitoringClicked: function() {
+                    Mist.monitoringController.changeMonitoring(this.machine);
+                },
+
+
                 buttonBackMonitoring: function() {
                      $("#monitoring-dialog").popup('close');
                 },

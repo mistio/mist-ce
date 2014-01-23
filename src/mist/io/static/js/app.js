@@ -345,7 +345,6 @@ define( 'app', [
                 }
                 if (keyCode == 38 || keyCode == 40 && event.preventDefault) // Up or Down
                     event.preventDefault();
-                
             }
         });
 

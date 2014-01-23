@@ -37,6 +37,11 @@ define('app/controllers/monitoring', [
             changeMonitoring: function(machine, callback) {
                  var that = this;
                  //this.set('changingMonitoring', true);
+                 if (machine.hasMonitoring) {
+                     machine.set('enablingMonitoring', true);
+                 } else {
+                     machine.set('disablingMonitoring', true);
+                 }
                  Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring', {
                     'action': machine.hasMonitoring ? 'disable' : 'enable',
                     'dns_name': machine.extra.dns_name ? machine.extra.dns_name : 'n/a',
@@ -45,8 +50,10 @@ define('app/controllers/monitoring', [
                  }).success(function(data) {
                      if (!machine.hasMonitoring) {
                          machine.set('hasMonitoring', true);
+                         machine.set('enablingMonitoring', false);
                      } else {
                          machine.set('hasMonitoring', false);
+                         machine.set('disablingMonitoring', false);
                      }
                      Mist.set('authenticated', true);
                  }).error(function() {
@@ -344,7 +351,7 @@ define('app/controllers/monitoring', [
                             Mist.monitoringController.graphs.disableAnimation();
                             self.receiveData(start, stop, step,callback);
                         }
-                    }
+                    };
 
                     custom();
 
@@ -585,7 +592,7 @@ define('app/controllers/monitoring', [
                     console.log("Time Window    : " + (this.timeWindow/1000) + " seconds");
                     console.log("Last Metric    : " + this.lastMetrictime);
                     console.log("Step           : " + (this.step/1000) + " seconds");
-                    console.log("Update Interval: " + this.updateInterval)
+                    console.log("Update Interval: " + this.updateInterval);
                 }, 
 
                 /**
@@ -830,7 +837,7 @@ define('app/controllers/monitoring', [
                 getCollapsedMetrics : function(){
 
                     if(document.cookie.indexOf("collapsedGraphs")  == -1) 
-                        return null
+                        return null;
 
                     var cookieValue     = "";
                     var collapsedGraphs = [];
@@ -1014,6 +1021,6 @@ define('app/controllers/monitoring', [
                 currentStopTime : null
             }
 
-        })
+        });
     }
 );

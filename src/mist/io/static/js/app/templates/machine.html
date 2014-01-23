@@ -40,6 +40,33 @@
 
         <!--
             
+             Info popups
+              
+        -->
+        
+        {{#if probing}}
+        <div class="ui-loader ui-corner-all ui-bodyb ui-loader-verbose">
+            <span class="ui-icon ui-icon-loading"></span>
+            <h1>Probing</h1>
+        </div>
+        {{/if}}
+
+        {{#if enablingMonitoring}}
+        <div class="ui-loader ui-corner-all ui-bodyb ui-loader-verbose">
+            <span class="ui-icon ui-icon-loading"></span>
+            <h1>Deploying collectd</h1>
+        </div>
+        {{/if}}
+
+        {{#if disablingMonitoring}}
+        <div class="ui-loader ui-corner-all ui-bodyb ui-loader-verbose">
+            <span class="ui-icon ui-icon-loading"></span>
+            <h1>Uneploying collectd</h1>
+        </div>
+        {{/if}}
+
+        <!--
+            
              Monitoring collapsible
              
         -->
@@ -71,7 +98,7 @@
                         {{action addRuleClicked target="view"}}>Add Rule</button>
                 </div>
                 
-                <a data-role="button" {{action "disableClicked" target="view"}}>Disable</a>
+                <a data-role="button" {{action "disableMonitoringClicked" target="view"}}>Disable</a>
 
             {{else}}
 
