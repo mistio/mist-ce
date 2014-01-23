@@ -49,7 +49,7 @@ Feature: Shell
         And I click the "Create Key" button
         And I type "shell_tester" as key name
         And I click the "Generate" button
-        And I click the "Done" button
+        And I click the "Add" button
         And I wait for 2 seconds
         And I click the "Launch!" button
         And I wait for 2 seconds

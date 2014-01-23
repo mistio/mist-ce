@@ -16,7 +16,7 @@ Feature: Keys
         And I click the "Add" button
         And I type "tester" as key name
         And I click the "Generate" button
-        And I click the "Done" button
+        And I click the "Add" button
             Then I should see the "tester" Key added within 5 seconds
 
 
@@ -41,7 +41,7 @@ Feature: Keys
         And I type "SecondKey" as key name
         And I wait for 2 seconds
         And I click the "Generate" button
-        And I click the "Done" button
+        And I click the "Add" button
             Then I should see the "SecondKey" Key added within 5 seconds
 
         When I check the "SecondKey" key

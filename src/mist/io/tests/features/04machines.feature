@@ -9,10 +9,14 @@ Feature: Machines
             Then I should see "mist.io"
 
     @web
+    @test
     Scenario: Create Machine
         When I click the "Add backend" button
+        And I wait for 1 seconds
         And I click the "Select provider" button
+        And I wait for 1 seconds
         And i click the "EC2 AP NORTHEAST" button
+        And I wait for 1 seconds
         And I use my "EC2" credentials
         And I click the "Add" button
         And I wait for 1 seconds
@@ -23,24 +27,34 @@ Feature: Machines
         And I click the "Machines" button
         And I click the "Create" button
         And I type "tester" as machine name
+        And I wait for 1 seconds
         And I click the "Select Provider" button
+        And I wait for 1 seconds
         And I click the link with text that contains "EC2"
+        And I wait for 1 seconds
         And I click the "Select Image" button
+        And I wait for 1 seconds
         And I click the link with text that contains "Amazon Linux"
+        And I wait for 1 seconds
         And I click the "Select Size" button
+        And I wait for 1 seconds
         And I click the link with text that contains "Micro Instance"
+        And I wait for 1 seconds
         And I click the "Select Location" button
+        And I wait for 1 seconds
         And I click the link with text that contains "ap-northeast"
+        And I wait for 1 seconds
         And I click the "Select Key" button
         And I wait for 1 seconds
         And I click the link with text that contains "$key_name"
+        And I wait for 1 seconds
         And I click the "Launch!" button
         And I wait for 2 seconds
-            Then "$machine_name" state should be "pending" within 60 seconds
+            Then "tester" state should be "pending" within 60 seconds
         When I wait for 1 seconds
-            Then "$machine_name" state should be "running" within 400 seconds
+            Then "tester" state should be "running" within 400 seconds
         When I wait for 1 seconds
-            Then "$machine_name" should be probed within 400 seconds
+            Then "tester" should be probed within 400 seconds
         When I wait for 1 seconds
 
 
@@ -73,7 +87,7 @@ Feature: Machines
         And I click the "Add" button
         And I type "SecondKey" as key name
         And I click the "Generate" button
-        And I click the "Done" button
+        And I click the "Add" button
             Then I should see the "SecondKey" Key added within 5 seconds
 
         When I visit mist.io
@@ -109,21 +123,23 @@ Feature: Machines
 
 
     @web
+    @test
     Scenario: Shutdown Machine
         When I visit mist.io
             Then I should see "mist.io"
         When I wait for 2 seconds
         And I click the "Machines" button
-        And I wait for 3 seconds
+        And I wait for 30 seconds
         And I tick the "tester" machine
         And I click the "Power" button
         And I click the "Shutdown" button
         And I wait for 1 seconds
         And I click the "Yes" button
-            Then "tester" state should be "stopped" within 60 seconds
+            Then "tester" state should be "stopped" within 120 seconds
 
 
     @web
+    @test
     Scenario: Start Machine
         When I visit mist.io
             Then I should see "mist.io"
@@ -136,12 +152,13 @@ Feature: Machines
         And I wait for 1 seconds
         And I click the "Yes" button
         And I wait for 2 seconds
-            Then "tester" state should be "pending" within 70 seconds
+            Then "tester" state should be "pending" within 80 seconds
         When I wait for 1 seconds
             Then "tester" state should be "running" within 400 seconds
 
 
     @web
+    @test
     Scenario: Reboot Machine
         When I visit mist.io
             Then I should see "mist.io"
@@ -160,6 +177,7 @@ Feature: Machines
 
 
     @web
+    @test
     Scenario: Destroy Machine
         When I visit mist.io
             Then I should see "mist.io"
@@ -172,6 +190,6 @@ Feature: Machines
         And I wait for 1 seconds
         And I click the "Yes" button
         And I wait for 2 seconds
-            Then "tester" state should be "stopped" within 70 seconds
+            Then "tester" state should be "stopped" within 120 seconds
         When I wait for 1 seconds
             Then "tester" state should be "terminated" within 400 seconds

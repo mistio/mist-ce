@@ -29,23 +29,44 @@ def visit_home_page(context):
 @when(u'I click the "{text}" button')
 def general_click_button_by_text(context, text):
 
-    buttons = context.browser.find_by_css('button')
-    buttons += context.browser.find_by_css('.ui-btn')
-    buttons += context.browser.find_by_css('.ui-link')
+    try:
 
-    for button in buttons:
-        if text in button.text.strip():
-            try:
-                button.click()
-                sleep(time_fast)
-                return
-            except:
-                button.find_by_css('input').click()
-                sleep(time_fast)
-                return
-            else:
-                button.find_by_css('.ui-btn-text')[0].click()
-                sleep(time_fast)
-                return
+        buttons = context.browser.find_by_css('button')
+        buttons += context.browser.find_by_css('.ui-btn')
+        buttons += context.browser.find_by_css('.ui-link')
+
+        for button in buttons:
+            if text in button.text.strip():
+                try:
+                    button.click()
+                    sleep(time_fast)
+                    return
+                except:
+                    button.find_by_css('input').click()
+                    sleep(time_fast)
+                    return
+                else:
+                    button.find_by_css('.ui-btn-text')[0].click()
+                    sleep(time_fast)
+                    return
+    except:
+        buttons = context.browser.find_by_css('button')
+        buttons += context.browser.find_by_css('.ui-btn')
+        buttons += context.browser.find_by_css('.ui-link')
+
+        for button in buttons:
+            if text in button.text.strip():
+                try:
+                    button.click()
+                    sleep(time_fast)
+                    return
+                except:
+                    button.find_by_css('input').click()
+                    sleep(time_fast)
+                    return
+                else:
+                    button.find_by_css('.ui-btn-text')[0].click()
+                    sleep(time_fast)
+                    return
     assert False, u'Could not find %s' % text
 

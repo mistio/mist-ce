@@ -36,7 +36,7 @@ def given_key(context):
         And I click the "Add" button
         And I type "%s" as key name
         And I click the "Generate" button
-        And I click the "Done" button
+        And I click the "Add" button
             Then I should see the "%s" Key added within 5 seconds
     """ % (key, key))
 
@@ -65,23 +65,26 @@ def check_machine_state(context, machine_name, state, timeout):
     elif machine_name == "shell_tester":
         machine_name = context.personas['ShellTester']['machine_name']
 
-    machines = context.browser.find_by_css('#machines li')
-    for machine in machines:
-        if machine_name in machine.text:
-            break
+
 
     end_time = time() + int(timeout)
     while time() < end_time:
-        if state in machine.text:
-            return
-        sleep(2)
+        try:
+            machines = context.browser.find_by_css('#machines li')
+            for machine in machines:
+                if machine_name in machine.text:
+                    break
+            if state in machine.text:
+                return
+            sleep(2)
+        except:
+            pass
 
     assert False, u'Could not find %s state for machine %s' % (state, machine_name)
 
 
 @then(u'"{machine_name}" should be probed within {timeout} seconds')
 def check_probed(context, machine_name, timeout):
-    machines = context.browser.find_by_css('#machines li')
 
     if machine_name == "tester":
         machine_name = context.personas['NinjaTester']['machine_name']
@@ -90,14 +93,16 @@ def check_probed(context, machine_name, timeout):
     elif machine_name == "shell_tester":
         machine_name = context.personas['ShellTester']['machine_name']
 
-    for machine in machines:
-        if machine_name in machine.text:
-            break
 
-    leds = machine.find_by_css('a .machine-leds > div')
     end_time = time() + int(timeout)
     while time() < end_time:
         try:
+            machines = context.browser.find_by_css('#machines li')
+            for machine in machines:
+                if machine_name in machine.text:
+                    break
+
+            leds = machine.find_by_css('a .machine-leds > div')
             if leds.has_class('probed'):
                 return
         except:
@@ -195,6 +200,14 @@ def tick_machine(context, name):
             break
 
     try:
-        machine.find_by_css('.ui-btn')[0].click()
+        if machine_name in machine.text.strip():
+            machine.find_by_css('.ui-btn')[0].click()
+        else:
+            machines = context.browser.find_by_css('.ui-listview li')
+
+            for machine in machines:
+                if machine_name in machine.text.strip():
+                    break
+            machine.find_by_css('.ui-btn')[0].click()
     except:
         assert False, u'Could not tick/check %s machine' % machine_name
