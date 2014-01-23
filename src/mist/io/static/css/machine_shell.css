@@ -3,10 +3,10 @@
 -----------------------------------------------------------------------------------------------------------*/
 
 #machine-shell-popup-popup {
-    top: 5% !important;
+    top: 2% !important;
     width: 95% !important;
     bottom: 55px !important;
-    max-height: 90% !important;
+    max-height: 94% !important;
 }
 #machine-shell-popup #shell-grid {
     top: 50px;

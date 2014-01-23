@@ -1,4 +1,8 @@
-<div id="machine-shell-popup" class="huge-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
+<div id="machine-shell-popup" 
+     class="huge-popup" 
+     data-role="popup" 
+     data-overlay-theme="b" 
+     data-transition="slideup">
 
     <div data-role="header">
         <h1>{{Mist.machineShellController.machine.user}}@
@@ -11,7 +15,7 @@
                 {{view Mist.ShellTextField valueBinding="Mist.machineShellController.command"}}
             </div>
             <div class="ui-block-b" id="shell-submit">
-                <button {{action "submitClicked" target="view"}}></button>
+                <button data-theme="d" {{action "submitClicked" target="view"}}></button>
             </div>
             <div class="ui-block-a" id="shell-response" data-role="listview">
             {{#each Mist.machineShellController.machine.commandHistory}}
