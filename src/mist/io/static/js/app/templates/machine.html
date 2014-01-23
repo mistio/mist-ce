@@ -45,21 +45,23 @@
         -->
         
         {{#if probing}}
-        <div class="single-machine-loader ui-loader ui-corner-all ui-body-b ui-loader-verbose">
-            <span class="ui-icon ui-icon-loading"></span>
-            <h1>Probing</h1>
-        </div>
+            {{#unless probed}}
+                <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
+                    <span class="ui-icon ui-icon-loading"></span>
+                    <h1>Probing</h1>
+                </div>
+            {{/unless}}
         {{/if}}
 
         {{#if enablingMonitoring}}
-        <div class="single-machine-loader ui-loader ui-corner-all ui-body-b ui-loader-verbose">
+        <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
             <span class="ui-icon ui-icon-loading"></span>
             <h1>Deploying collectd</h1>
         </div>
         {{/if}}
 
         {{#if disablingMonitoring}}
-        <div class="single-machine-loader ui-loader ui-corner-all ui-body-b ui-loader-verbose">
+        <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
             <span class="ui-icon ui-icon-loading"></span>
             <h1>Uneploying collectd</h1>
         </div>
