@@ -31,8 +31,8 @@
             data-filter-placeholder="Filter..."
             data-theme="c"
             class="checkbox-list">
-            {{#each Mist.backendsController.content}}
-                {{#each this.machines.content}}
+            {{#each Mist.backendsController}}
+                {{#each this.machines}}
                     {{view Mist.machineListItemView machineBinding="this" class="checkbox-link"}}
                 {{/each}}
             {{/each}}

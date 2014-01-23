@@ -1,10 +1,10 @@
 <div id="create-key-popup" class="large-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
 
-    <div data-role="header">
+    <div data-role="header" data-theme="b">
         <h1>Add key</h1>
     </div>
 
-    <div data-role="content">
+    <div data-role="content" data-theme="a">
 
         <label for="create-key-name">Name:</label>
         {{view Mist.TextField
@@ -23,9 +23,11 @@
                id="create-key-private"
                valueBinding="Mist.keyAddController.newKeyPrivate"}}
 
-        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <button {{action "generateClicked" target="view"}}>Generate</button>
-            <button {{action "uploadClicked" target="view"}}>Upload</button>
+        <div class="generate-upload" data-role="controlgroup" data-type="horizontal" data-theme="a">
+            <button data-icon="gear" {{action "generateClicked" target="view"}}>Generate</button>
+            <button data-icon="arrow-u"
+                    data-iconpos="right"
+                    {{action "uploadClicked" target="view"}}>Upload</button>
         </div>
 
         <input id="create-key-upload" type="file" name="file" {{action "uploadInputChanged" on="change" target="view"}}/>
@@ -35,8 +37,8 @@
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
-            <button id="create-key-ok" data-theme="b" {{action "doneClicked" target="view"}}>Done</button>
+            <a data-role="button" data-theme="a" {{action "backClicked" target="view"}}>Back</a>
+            <button id="create-key-ok" data-theme="d" {{action "doneClicked" target="view"}}>Done</button>
         </div>
     </div>
 </div>

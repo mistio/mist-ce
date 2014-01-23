@@ -2,10 +2,15 @@
 
 {{#link-to "key" view.key}}
 
-    <h3>{{view.key.id}}</h3>
+    <div class="ui-grid-b">
+        <div class="ui-block-a key-name">{{view.key.id}}</div>
+        <div class="ui-block-b"></div>
+        <div class="ui-block-c key-tags">
+            {{#if view.key.isDefault}}
+             <span class="tag">default</span>
+            {{/if}}            
+        </div>
+    </div>
 
-    {{#if view.key.isDefault}}
-     <span class="tag">default</span>
-    {{/if}}
 
 {{/link-to}}

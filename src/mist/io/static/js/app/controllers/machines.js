@@ -19,7 +19,8 @@ define('app/controllers/machines', ['app/models/machine'],
             rebootingMachine: null,
             destroyingMachine: null,
             shutingdownMachine: null,
-
+            sortAscending: true,
+            sortProperties: ['selected'],
 
             /**
              * 

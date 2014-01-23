@@ -17,12 +17,12 @@
            data-icon="arrow-d"
            {{action "selectClicked" target="view"}}>Select</a>
 
-        <a id="create-key-btn"
+        <a id="add-key-btn"
            data-role="button"
            data-icon="plus"
            data-iconpos="right"
            data-theme="d"
-           {{action "createClicked" target="view"}}>Add</a>
+           {{action "addClicked" target="view"}}>Add</a>
 
         <ul data-role="listview" 
             data-filter="true" 
@@ -44,7 +44,7 @@
 
     {{view Mist.confirmationDialog}}
 
-    <div id="select-keys-popup" data-role="popup" data-overlay-theme="b" data-transition="flip" data-position-to="#select-keys-btn">
+    <div id="select-keys-popup" data-role="popup" data-transition="flip" data-position-to="#select-keys-btn">
         <ul data-role='listview'>
             <li data-icon="false">
                 <a {{action "selectionModeClicked" true target="view"}}>All</a>

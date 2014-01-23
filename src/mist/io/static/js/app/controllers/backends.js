@@ -26,7 +26,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             loadingImages: false,
             loadingMachines: false,
 
-
             /**
              * 
              *  Initialization

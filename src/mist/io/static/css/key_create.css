@@ -13,3 +13,6 @@
     position: fixed;
     top: 0;
 }
+.generate-upload button {
+    width: 84px !important;
+}

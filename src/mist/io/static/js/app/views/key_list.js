@@ -68,7 +68,8 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
             actions: {
 
 
-                createClicked: function () {
+                addClicked: function () {
+                    $('#create-key-popup').popup('option', 'positionTo', '#add-key-btn');
                     Mist.keyAddController.open();
                 },
 
