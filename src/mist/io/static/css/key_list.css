@@ -13,7 +13,7 @@
 }
 #key-list-page .tag {
     position: relative;
-    top: 5px;
+    top: 5px !important;
 }
 @-moz-document url-prefix() {
     #key-list-page .tag {
