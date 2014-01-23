@@ -38,13 +38,16 @@ def given_key(context):
         And I click the "Generate" button
         And I click the "Done" button
             Then I should see the "%s" Key added within 5 seconds
-    """ % (key, key) )
+    """ % (key, key))
 
 
 @when(u'I type "{name}" as machine name')
 def type_machine_name(context, name):
     if name == "tester":
         machine_name = context.personas['NinjaTester']['machine_name']
+        context.browser.find_by_css('input#create-machine-name').fill(machine_name)
+    elif name == "monitor_tester":
+        machine_name = context.personas['MonitorTester']['machine_name']
         context.browser.find_by_css('input#create-machine-name').fill(machine_name)
     else:
         context.browser.find_by_css('input#create-machine-name').fill(name)

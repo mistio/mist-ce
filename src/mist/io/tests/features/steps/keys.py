@@ -26,6 +26,12 @@ def type_key_name(context, name):
         global tester_key_name
         tester_key_name = key
         return
+    elif name == "monitor_tester":
+        key = context.personas['MonitorTester']['key_name']
+        context.browser.find_by_css('input#create-key-id').fill(key)
+        global tester_key_name
+        tester_key_name = key
+        return
     else:
         context.browser.find_by_css('input#create-key-id').fill(name)
         return
