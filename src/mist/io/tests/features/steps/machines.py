@@ -114,10 +114,18 @@ def check_probed(context, machine_name, timeout):
 
 @when(u'I click the "{name}" machine')
 def click_machine(context, name):
-    context.execute_steps(u"""
-    When I click the "%s" button
-    """ % context.personas['NinjaTester']['machine_name'])
-
+    if name == "tester":
+        context.execute_steps(u"""
+        When I click the "%s" button
+        """ % context.personas['NinjaTester']['machine_name'])
+    elif name == "monitor_tester":
+        context.execute_steps(u"""
+        When I click the "%s" button
+        """ % context.personas['MonitorTester']['machine_name'])
+    elif name == "shell_tester":
+        context.execute_steps(u"""
+        When I click the "%s" button
+        """ % context.personas['ShellTester']['machine_name'])
 
 @then(u'I should find the Public IP')
 def find_ip(context):

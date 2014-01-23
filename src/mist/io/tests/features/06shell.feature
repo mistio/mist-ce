@@ -59,3 +59,15 @@ Feature: Shell
         When I wait for 1 seconds
             Then "shell_tester" should be probed within 400 seconds
         When I wait for 1 seconds
+
+        When I click the "shell_tester" machine
+        And I wait for 2 seconds
+        And I click the "Shell" button
+        And I type the "who" shell command
+        And I wait for 1 seconds
+            Then I should see the "who" result in shell output
+        When I wait for 2 seconds
+        And I type the "w" shell command
+        And I wait for 1 seconds
+            Then I should see the "w" result in shell output
+            Then I should see the "who" result in shell output
