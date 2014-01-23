@@ -1,6 +1,10 @@
-<div id="rename-key-popup" class="small-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
+<div id="rename-key-popup" 
+     class="small-popup" 
+     data-role="popup" 
+     data-overlay-theme="b" 
+     data-transition="slideup">
 
-    <div data-role="header">
+    <div data-role="header" data-theme="b">
         <h1>Rename key</h1>
     </div>
 
@@ -16,8 +20,8 @@
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
-            <button id="rename-key-ok" data-theme="b" {{action "saveClicked" target="view"}}>Save</button>
+            <a data-role="button" data-theme="a" {{action "backClicked" target="view"}}>Back</a>
+            <button id="rename-key-ok" data-theme="d" {{action "saveClicked" target="view"}}>Save</button>
         </div>
 
     </div>

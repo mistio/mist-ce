@@ -314,7 +314,7 @@ define( 'app', [
                 'data-theme'
             ]
         });
-        App.ShellTextField = Ember.TextField.extend({
+        App.ShellTextField = App.TextField.extend({
 
             keyDown: function(event, view) {
                 var keyCode = event.keyCode;

@@ -105,7 +105,7 @@
             {{else}}
 
                 <div class="monitoring-dialog-container" id="monitoring-disabled">
-                    <p>Monitoring is currently disabled</p>
+                    <div>Monitoring is currently disabled</div>
                     <a data-role="button" data-icon="star" data-theme="d" {{action "enableMonitoringClicked" target="view"}}>Enable</a>
                 </div>
 
@@ -119,11 +119,18 @@
              
         -->
 
-        <div data-role="collapsible">
+        <div data-role="collapsible" data-collapsed="false">
 
             <h3>Basic Info</h3>
 
             <table class="info-table">
+                {{#if probed}}
+                <tr>
+                    <td>Up and running for</td>
+                    <td>{{view.upFor}}</td>
+                </tr>
+                {{/if}}
+                                
                 {{#if tags}}
                 <tr>
                     <td>Tags</td>
@@ -132,13 +139,6 @@
                         <span class="tag">{{this}}</span>
                         {{/each}}
                     </td>
-                </tr>
-                {{/if}}
-
-                {{#if uptime}}
-                <tr>
-                    <td>Up and running for</td>
-                    <td>{{view.upFor}}</td>
                 </tr>
                 {{/if}}
 
@@ -151,6 +151,7 @@
             </table>
         </div>
 
+        {{#if view.metadata}}
         <div data-role="collapsible">
 
             <h3>Full metadata list</h3>
@@ -165,6 +166,7 @@
             </table>
 
         </div>
+        {{/if}}
 
         <div class="mid-padding"></div>
 
