@@ -24,7 +24,7 @@ I should see {number} keys associated within {timeout} seconds   --> keys_associ
 """
 from time import sleep, time
 
-ip = ""
+
 
 @given(u'a key for the machine')
 def given_key(context):

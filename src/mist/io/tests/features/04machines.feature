@@ -9,7 +9,7 @@ Feature: Machines
             Then I should see "mist.io"
 
     @web
-    @test
+    @bare-metal
     Scenario: Create Machine
         When I click the "Add backend" button
         And I wait for 1 seconds
@@ -59,10 +59,12 @@ Feature: Machines
 
 
     @web
+    @bare-metal
     Scenario: Add Bare Metal
         When I click the "Machines" button
         And I wait for 2 seconds
         And I click the "tester" machine
+        And I wait for 10 seconds
         And I click the "Basic Info" button
             Then I should find the Public IP
 
@@ -71,6 +73,7 @@ Feature: Machines
         When I click the "Add backend" button
         And I click the "Select provider" button
         And I click the link with text that contains "Bare Metal"
+        And I wait for 1 seconds
         And I add my bare metal creds
         And I click the "Select SSH Key" button
         And I wait for 1 seconds
@@ -123,7 +126,6 @@ Feature: Machines
 
 
     @web
-    @test
     Scenario: Shutdown Machine
         When I visit mist.io
             Then I should see "mist.io"
@@ -139,7 +141,6 @@ Feature: Machines
 
 
     @web
-    @test
     Scenario: Start Machine
         When I visit mist.io
             Then I should see "mist.io"
@@ -158,7 +159,6 @@ Feature: Machines
 
 
     @web
-    @test
     Scenario: Reboot Machine
         When I visit mist.io
             Then I should see "mist.io"
@@ -177,7 +177,6 @@ Feature: Machines
 
 
     @web
-    @test
     Scenario: Destroy Machine
         When I visit mist.io
             Then I should see "mist.io"
