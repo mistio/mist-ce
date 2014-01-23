@@ -23,6 +23,7 @@ define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/ma
             load: function () {
 
                 // Add event listeners
+                Mist.backendsController.on('onMachineProbe', this, 'updateFooter');
                 Mist.backendsController.on('onSelectedMachinesChange', this, 'updateFooter');
 
             }.on('didInsertElement'),
@@ -31,6 +32,7 @@ define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/ma
             unload: function () {
 
                 // Remove event listeners
+                Mist.backendsController.off('onMachineProbe', this, 'updateFooter');
                 Mist.backendsController.off('onSelectedMachinesChange', this, 'updateFooter');
 
             }.on('willDestroyElement'),
@@ -49,8 +51,18 @@ define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/ma
                     break;
                 case 1:
                     $('#machine-list-page .ui-footer').slideDown();
-                    $('#machine-list-page #machines-tags-btn').removeClass('ui-state-disabled');
-                    $('#machine-list-page #machines-shell-btn').removeClass('ui-state-disabled');
+
+                    if (Mist.backendsController.selectedMachines[0].can_tag) {
+                        $('#machine-list-page #machines-tags-btn').removeClass('ui-state-disabled');
+                    } else {
+                        $('#machine-list-page #machines-tags-btn').addClass('ui-state-disabled');
+                    }
+
+                    if (Mist.backendsController.selectedMachines[0].probed) {
+                        $('#machine-list-page #machines-shell-btn').removeClass('ui-state-disabled');
+                    } else {
+                        $('#machine-list-page #machines-shell-btn').addClass('ui-state-disabled');
+                    }
                     break;
                 default:
                     $('#machine-list-page .ui-footer').slideDown();

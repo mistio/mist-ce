@@ -157,6 +157,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 } else {
                     machine.set('probing', true);
                 }
+                var that = this;
                 var uptime = null;
                 Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/probe', {
                     'host': host,
@@ -190,6 +191,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                         key.set('probing', false);
                     }
                     machine.set('probing', false);
+                    that.trigger('onMachineProbe');
                     if (callback) callback(!!uptime, data);
                 });
             },

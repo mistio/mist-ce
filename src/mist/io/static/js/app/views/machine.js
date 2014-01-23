@@ -36,6 +36,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 Ember.run(this, function() {
                     this.updateCurrentMachine();
                     if (this.machine.id) {
+                        this.updateFooter();
                         // TODO: Render stuff
                     }
                 });
@@ -69,6 +70,22 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 });
             },
 
+
+            updateFooter: function() {
+                if (this.machine.can_tag) {
+                    $('#single-machine-page #single-machine-tags-btn').removeClass('ui-state-disabled');
+                } else {
+                    $('#single-machine-page #single-machine-tags-btn').addClass('ui-state-disabled');
+                }
+
+                if (this.machine.probed) {
+                    $('#single-machine-page #single-machine-shell-btn').removeClass('ui-state-disabled');
+                } else {
+                    $('#single-machine-page #single-machine-shell-btn').addClass('ui-state-disabled');
+                }
+            },
+            
+            
             renderMachine: function() {
                 var machine = this.get('controller').get('model');
                 if (machine.id != ' ') { // This is the dummy machine. It exists when machine hasn't loaded yet
@@ -296,9 +313,15 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 Ember.run.once(this, 'load');
             }.observes('controller.model'),
 
+
+            footerObserver: function() {
+                Ember.run.once(this, 'updateFooter');
+            }.observes('machine.probed', 'machine.can_tag'),
+
+
             keysCountObserver: function() {
                 Ember.run.once(this, 'renderKeysButton');
-            }.observes('machine.keysCount')
+            }.observes('machine.keysCount'),
         });
     }
 );
