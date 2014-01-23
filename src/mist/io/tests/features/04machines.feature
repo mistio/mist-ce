@@ -65,7 +65,7 @@ Feature: Machines
         And I wait for 2 seconds
         And I click the "tester" machine
         And I wait for 10 seconds
-        And I click the "Basic Info" button
+        #And I click the "Basic Info" button
             Then I should find the Public IP
 
         When I visit mist.io
