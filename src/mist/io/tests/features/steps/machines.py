@@ -57,6 +57,8 @@ def type_machine_name(context, name):
 def check_machine_state(context, machine_name, state, timeout):
     if machine_name == "tester":
         machine_name = context.personas['NinjaTester']['machine_name']
+    elif machine_name == "monitor_tester":
+        machine_name = context.personas['MonitorTester']['machine_name']
 
     machines = context.browser.find_by_css('#machines li')
     for machine in machines:
@@ -75,6 +77,12 @@ def check_machine_state(context, machine_name, state, timeout):
 @then(u'"{machine_name}" should be probed within {timeout} seconds')
 def check_probed(context, machine_name, timeout):
     machines = context.browser.find_by_css('#machines li')
+
+    if machine_name == "tester":
+        machine_name = context.personas['NinjaTester']['machine_name']
+    elif machine_name == "monitor_tester":
+        machine_name = context.personas['MonitorTester']['machine_name']
+        
     for machine in machines:
         if machine_name in machine.text:
             break
