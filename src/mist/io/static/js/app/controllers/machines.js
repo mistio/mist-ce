@@ -21,7 +21,7 @@ define('app/controllers/machines', ['app/models/machine'],
             destroyingMachine: null,
             shutingdownMachine: null,
             sortAscending: true,
-            sortProperties: ['selected'],
+            sortProperties: ['hasMonitoring', 'probed'],
 
             /**
              * 
