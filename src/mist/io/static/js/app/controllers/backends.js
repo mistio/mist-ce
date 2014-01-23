@@ -67,7 +67,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     'machine_ip'  : apiKey,    // For bare-metal
                     'machine_user': apiSecret  // For bare-metal
                 }).success(function(backend) {
-                    info(backend);
                     that._addBackend(backend, key);
                 }).error(function(message) {
                     Mist.notificationController.notify('Failed to add backend: ' + message);
@@ -327,8 +326,8 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
 
             _addBackend: function(backend, keyId) {
                 Ember.run(this, function() {
-                    var backend = Backend.create(backend);
-                    this.content.pushObject(backend);
+                    var backendModel = Backend.create(backend);
+                    this.content.pushObject(backendModel);
                     this.trigger('onBackendListChange');
                     this.trigger('onBackendAdd');
                 });
