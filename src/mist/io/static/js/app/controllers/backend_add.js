@@ -90,15 +90,23 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
 
 
             _updateFormReady: function () {
+                info(this.newBackendProvider.provider);
                 var ready = false;
                 if ('provider' in this.newBackendProvider) { // Filters out the "Select provider" dummy provider
+                    
                     if (this.newBackendFirstField && this.newBackendSecondField) {
+                        
                         ready = true;
-                        if (this.newBackendProvider.provider == 'openstack') {
+                        
+                        if (this.newBackendProvider.provider == 'openstack') { // Pure Openstack
+                            if (!this.newBackendOpenStackURL) {
+                                ready = false;
+                            }
+                        } else if (this.newBackendProvider.provider.indexOf('openstack') > -1) { // HpCloud
                             if (!(this.newBackendOpenStackURL && this.newBackendOpenStackTenant)) {
                                 ready = false;
                             }
-                        } else if (this.newBackendProvider.provider == 'bare_metal') {
+                        } else if (this.newBackendProvider.provider == 'bare_metal') { // Baremetal
                             if (!Mist.keysController.keyExists(this.newBackendKey.id)) {
                                 ready = false;
                             }

@@ -163,6 +163,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     'host': host,
                     'key': keyId
                 }).success(function(data) {
+                    if (!machine.backend || !machine.backend.enabled) return;
                     if (data.uptime) {
                         uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
                         machine.set('uptimeChecked', Date.now());
@@ -183,8 +184,10 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     machine.set('latency', data.rtt_avg);
                     
                 }).error(function(message) {
+                    if (!machine.backend || !machine.backend.enabled) return;
                     if (key) Mist.notificationController.notify(message);
                 }).complete(function(success, data) {
+                    if (!machine.backend || !machine.backend.enabled) return;
                     if (key) {
                         key.set('probing', false);
                     }
