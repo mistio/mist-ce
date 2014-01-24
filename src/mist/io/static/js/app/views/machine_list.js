@@ -50,15 +50,17 @@ define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/ma
                     $('#machine-list-page .ui-footer').slideUp();
                     break;
                 case 1:
+                    var machine = Mist.backendsController.selectedMachines[0];
+                    
                     $('#machine-list-page .ui-footer').slideDown();
 
-                    if (Mist.backendsController.selectedMachines[0].can_tag) {
+                    if (machine.can_tag) {
                         $('#machine-list-page #machines-tags-btn').removeClass('ui-state-disabled');
                     } else {
                         $('#machine-list-page #machines-tags-btn').addClass('ui-state-disabled');
                     }
 
-                    if (Mist.backendsController.selectedMachines[0].probed) {
+                    if (machine.probed && machine.state == 'running') {
                         $('#machine-list-page #machines-shell-btn').removeClass('ui-state-disabled');
                     } else {
                         $('#machine-list-page #machines-shell-btn').addClass('ui-state-disabled');

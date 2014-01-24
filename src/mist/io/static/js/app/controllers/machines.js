@@ -97,7 +97,7 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
-            shutdownMachine: function(machineId) {
+            shutdownMachine: function(machineId, callback) {
                 var that = this;
                 this.set('shutingdownMachine', true);
                 Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
@@ -106,14 +106,15 @@ define('app/controllers/machines', ['app/models/machine'],
                     //that._shutdownMachine(machineId);
                 }).error(function() {
                     Mist.notificationController.notify('Failed to shutdown machine');
-                }).complete(function() {
+                }).complete(function(success) {
                     that.set('shutingdownMachine', false);
                     that.trigger('onMachineShutdown');
+                    if (callback) callback(success);
                 });
             },
 
 
-            destroyMachine: function(machineId) {
+            destroyMachine: function(machineId, callback) {
                 var that = this;
                 this.set('destroyingMachine', true);
                 Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
@@ -122,9 +123,10 @@ define('app/controllers/machines', ['app/models/machine'],
                     //that._destroyMachine(machineId);
                 }).error(function() {
                     Mist.notificationController.notify('Failed to destory machine');
-                }).complete(function() {
+                }).complete(function(success) {
                     that.set('destroyingMachine', false);
                     that.trigger('onMachineDestroy');
+                    if (callback) callback(success);
                 });
             },
 
@@ -147,7 +149,7 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
-            startMachine: function(machineId) {
+            startMachine: function(machineId, callback) {
                 var that = this;
                 this.set('startingMachine', true);
                 Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
@@ -156,9 +158,10 @@ define('app/controllers/machines', ['app/models/machine'],
                     //that.startMachine(machineId);
                 }).error(function() {
                     Mist.notificationController.notify('Failed to start machine');
-                }).complete(function() {
+                }).complete(function(success) {
                     that.set('startingMachine', false);
                     that.trigger('onMachineStart');
+                    if (callback) callback(success);
                 });
             },
 

@@ -80,7 +80,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                     $('#single-machine-page #single-machine-tags-btn').addClass('ui-state-disabled');
                 }
 
-                if (this.machine.probed) {
+                if (this.machine.probed && this.machine.state == 'running') {
                     $('#single-machine-page #single-machine-shell-btn').removeClass('ui-state-disabled');
                 } else {
                     $('#single-machine-page #single-machine-shell-btn').addClass('ui-state-disabled');

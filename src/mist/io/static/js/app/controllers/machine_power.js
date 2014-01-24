@@ -99,15 +99,26 @@ define('app/controllers/machine_power', ['ember'],
             _act: function (action) {
                 this.machines.forEach(function (machine) {
                     if (action == 'shutdown') {
+                        machine.set('state', 'pending');
                         machine.shutdown();
                     } else if (action == 'destroy') {
+                        machine.set('state', 'pending');
                         machine.destroy();
                     } else if (action == 'reboot') {
-                        machine.reboot( function (success) {
-                            machine.probe();
+                        machine.set('state', 'rebooting');
+                        machine.reboot(function (success) {
+                            if (success) {
+                                machine.probe();
+                            }
                         });
                     } else if (action == 'start') {
-                        machine.start();
+                        machine.set('state', 'pending');
+                        machine.start(function (success) {
+                            info('start');
+                            if (success) {
+                                machine.probe();
+                            }
+                        });
                     }
                 });
             },

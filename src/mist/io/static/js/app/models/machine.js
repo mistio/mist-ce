@@ -92,23 +92,23 @@ define('app/models/machine', ['ember'],
              * 
              */
 
-            shutdown: function() {
-                Mist.backendsController.shutdownMachine(this.id);
+            shutdown: function(callback) {
+                this.backend.shutdownMachine(this.id, callback);
             },
 
 
-            destroy: function() {
-                Mist.backendsController.destroyMachine(this.id);
+            destroy: function(callback) {
+                this.backend.destroyMachine(this.id, callback);
             },
 
 
             reboot: function(callback) {
-                Mist.backendsController.rebootMachine(this.id, callback);
+                this.backend.rebootMachine(this.id, callback);
             },
 
 
-            start: function() {
-                Mist.backendsController.startMachine(this.id);
+            start: function(callback) {
+                this.backend.startMachine(this.id, callback);
             },
 
 
@@ -138,6 +138,17 @@ define('app/models/machine', ['ember'],
 
             probe: function(keyId) {
                 var that = this;
+
+                if (!this.backend.enabled) return;
+                
+                if (!this.backend.enabled || (this.state != 'running')) {
+                    Ember.run.later(function() {
+                        that.probe(keyId);
+                    }, 5000);
+                    return;
+                };
+                
+                
                 // If there are many pending requests, reschedule for a bit later
                 if ($.active > 4) {
                     Ember.run.later(function() {
@@ -145,10 +156,7 @@ define('app/models/machine', ['ember'],
                     }, 1000);
                     return;
                 }
-                
-                // Do not send probe request if backend is disabled
-                if (!this.backend.enabled) return;
-                
+
                 Mist.backendsController.probeMachine(that, keyId, function(success) {
                     if (success) { // Reprobe in 100 seconds on success
                         Ember.run.later(function() {

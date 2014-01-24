@@ -115,13 +115,13 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             },
 
 
-            shutdownMachine: function (machineId) {
-                this.machines.shutdownMachine(machineId);
+            shutdownMachine: function (machineId, callback) {
+                this.machines.shutdownMachine(machineId, callback);
             },
 
 
-            destroyMachine: function (machineId) {
-                this.machines.destroyMachine(machineId);
+            destroyMachine: function (machineId, callback) {
+                this.machines.destroyMachine(machineId, callback);
             },
 
 
@@ -130,8 +130,8 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
             },
 
 
-            startMachine: function (machineId) {
-                this.machines.startMachine(machineId);
+            startMachine: function (machineId, callback) {
+                this.machines.startMachine(machineId, callback);
             },
 
 

@@ -68,7 +68,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 {
                    var ret = [];
                    for (var d in data)
-                      ret.push(encodeURIComponent(d) + "=" + encodeURIComponent(data[d]));
+                      ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
                    return ret.join('&');
                 }
                 url = url + '?' + EncodeQueryData(params);
