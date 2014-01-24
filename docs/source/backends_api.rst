@@ -76,6 +76,7 @@
    :jsonparam string machine_ip: Ip address needed when adding Bare Metal Server
    :jsonparam string machine_key: Id of ssh key needed when adding Bare Metal Server
    :jsonparam string machine_user: User for Bare Metal Server
+   :jsonparam string region: Necessary only if there is a custom Openstack region
 
    **Example response**:
 
