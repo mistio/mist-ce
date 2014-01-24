@@ -85,7 +85,7 @@ define('app/controllers/machine_power', ['ember'],
                     this.set('canStart', !this.machines.findBy('can_start', false));
                     this.set('canReboot', !this.machines.findBy('can_reboot', false));
                     this.set('canDestroy', !this.machines.findBy('can_destroy', false));
-                    this.set('canShutdown', !this.machines.findBy('can_shutdown', false));
+                    this.set('canShutdown', !this.machines.findBy('can_stop', false));
                     this.trigger('onActionsChange');
                 });
             },

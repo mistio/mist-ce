@@ -90,7 +90,6 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
 
 
             _updateFormReady: function () {
-                info(this.newBackendProvider.provider);
                 var ready = false;
                 if ('provider' in this.newBackendProvider) { // Filters out the "Select provider" dummy provider
                     
