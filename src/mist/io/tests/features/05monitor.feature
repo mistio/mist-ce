@@ -46,7 +46,7 @@ Feature: Monitor
         And I wait for 1 seconds
         And I click the "Select Key" button
         And I wait for 1 seconds
-        And I click the "Create Key" button
+        And I click the "Add Key" button
         And I type "monitor_tester" as key name
         And I click the "Generate" button
         And I click the "Add" button

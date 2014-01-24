@@ -24,8 +24,11 @@ Feature: Backends
     @web
     Scenario: Disable Backend
         When I click the "EC2 AP NORTHEAST" button
+        And I wait for 1 seconds
         When I flip the backend switch
+        And I wait for 1 seconds
         And I click the "Back" button
+        And I wait for 1 seconds
             Then "EC2 AP NORTHEAST" backend should be "offline"
 
 
@@ -34,7 +37,9 @@ Feature: Backends
         When I wait for 1 seconds
             Then "EC2 AP NORTHEAST" backend should be "offline"
         When I click the "EC2 AP NORTHEAST" button
+        And I wait for 1 seconds
         When I flip the backend switch
+        And I wait for 1 seconds
         And I click the "Back" button
         And I wait for 2 seconds
             Then "EC2 AP NORTHEAST" backend should be "online"
@@ -52,8 +57,11 @@ Feature: Backends
     @web
     Scenario: Delete Backend
         When I click the "New" button
+        And I wait for 1 seconds
         And I click the "Delete" button
+        And I wait for 1 seconds
         And I click the "Yes" button
+        And I wait for 1 seconds
             Then I should see the "New" Backend deleted within 5 seconds
 
 
