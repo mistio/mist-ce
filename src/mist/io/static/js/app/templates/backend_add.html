@@ -52,6 +52,14 @@
                 valueBinding="Mist.backendAddController.newBackendTenant"
                 name="create-backend-tenant"
                 id="create-backend-tenant"}}
+
+            <div id="notHpCloud">
+                <label for="create-backend-region" id="Regionlabel">6. Region Name:</label>
+                {{view Mist.TextField
+                    valueBinding="Mist.backendAddController.newBackendRegion"
+                    name="create-backend-region"
+                    id="create-backend-region"}}
+            </div>
         </div>
         
         <div id="addBackendBareMetal">
