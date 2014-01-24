@@ -202,7 +202,14 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                                 if (this.machine.probed) {
                                     Mist.monitoringController.changeMonitoring(this.machine);
                                 } else {
-                                    // TODO: Show message box about adding keys or deploying collectd manually
+                                    Mist.notificationController.set('msgHeader', 'No keys');
+                                    Mist.notificationController.set('msgPart1', "The collectd daemon can't be installed automatically " + 
+                                                                    'because Mist.io can not connect to this machine.');
+                                    Mist.notificationController.set('msgPart2', 'To connect a machine with Mist.io you can follow the ' + 
+                                                                                'instructions on the help page.');
+                                    Mist.notificationController.set('msgLink', 'Link to help page');
+                                    Mist.notificationController.set('msgHref', 'https://mistio.zendesk.com/hc/en-us/articles/200996166');
+                                    Mist.notificationController.showMessagebox();
                                 }
                             /*} else {
                                 Mist.notificationController.set('msgHeader', 'Machine limit reached');
@@ -212,7 +219,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                                                                             ' upgrade to another plan');
                                 Mist.notificationController.set('msgPart3', 'You can do that in the Account page, which can' +
                                                                             'be accessed from the menu button on the top right corner');
-                                    
+                                Mist.notificationController.showMessagebox();
                             }*/
                         } else {
                             Mist.notificationController.set('msgHeader', 'No plan');
@@ -220,6 +227,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                                                                         ' you have to purchase a plan');
                             Mist.notificationController.set('msgPart2', 'You can do that in the Account page, which can' +
                                                                         'be accessed from the menu button on the top right corner');
+                            Mist.notificationController.showMessagebox();
                         }
                     } else {
                         Mist.loginController.open();

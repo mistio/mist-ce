@@ -9,7 +9,9 @@
             <p>{{Mist.notificationController.msgPart2}}</p>
             <p>{{Mist.notificationController.msgPart3}}</p>
             <p id="message-ps">{{Mist.notificationController.msgPart4}}</p>
-            <a id="message-link">{{Mist.notificationController.msgLink}}</a>
+            <a id="message-link" target="_blank">
+                {{Mist.notificationController.msgLink}}
+            </a>
         </div>
         <button {{action "closeMessage" target="view"}}>OK</button>
     </div>

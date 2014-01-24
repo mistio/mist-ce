@@ -54,6 +54,7 @@ define( 'app', [
     'app/views/image_list_item',
     'app/views/machine_add_dialog',
     'app/views/machine',
+    'app/views/messagebox',
     'app/views/machine_list',
     'app/views/confirmation_dialog',
     'app/views/machine_shell',
@@ -101,6 +102,7 @@ define( 'app', [
                 ImageListItem,
                 MachineAddDialog,
                 SingleMachineView,
+                MessageBoxView,
                 MachineListView,
                 ConfirmationDialog,
                 MachineShellView,
@@ -260,6 +262,7 @@ define( 'app', [
         App.set('editBackendView', EditBackend);
         App.set('imageListView', ImageListView);
         App.set('singleKeyView', SingleKeyView);
+        App.set('messageBoxView', MessageBoxView);
         App.set('monitoringView', MonitoringView);
         App.set('machineKeysView', MachineKeysView);
         App.set('machineTagsView', MachineTagsView);
