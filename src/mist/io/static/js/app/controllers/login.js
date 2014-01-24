@@ -47,8 +47,8 @@ define('app/controllers/login', ['ember'],
                     Ember.run.next(function() {
                         window.location.reload();
                     });
-                }).error(function() {
-                    Mist.notificationController.warn('Authentication error');
+                }).error(function(message) {
+                    Mist.notificationController.warn('Authentication error: ' + message);
                 }).complete(function(success, data) {
                     that.set('loggingIn', false);
                     that._giveCallback(success, data);

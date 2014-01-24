@@ -13,6 +13,8 @@ define('app/views/messagebox', [
             template: Ember.Handlebars.compile(messagebox_html),
             
             actions: {
+                
+                
                 closeMessage: function() {
                     
                     $('#message-box-popup').popup('close');

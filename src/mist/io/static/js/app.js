@@ -315,7 +315,12 @@ define( 'app', [
         App.TextField = Ember.TextField.extend({
             attributeBindings: [
                 'data-theme'
-            ]
+            ],
+            keyUp: function(e) {
+                if(this.get('parentView').keyUp) {
+                    this.get('parentView').keyUp(e);
+                }
+            }
         });
         App.ShellTextField = App.TextField.extend({
 

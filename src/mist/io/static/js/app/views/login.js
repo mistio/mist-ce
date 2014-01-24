@@ -28,16 +28,24 @@ define('app/views/login', ['text!app/templates/login.html', 'ember'],
                 }
             },
 
-
+            
             /**
              * 
              *  Actions
              * 
              */
 
+            keyUp: function(e) {
+                if (e.keyCode == 13) {
+                    if (Mist.loginController.formReady) {
+                        Mist.loginController.login();
+                    }
+                } 
+            },
+
             actions: {
-                
-                
+    
+    
                 backClicked: function() {
                     Mist.loginController.close();
                 },
