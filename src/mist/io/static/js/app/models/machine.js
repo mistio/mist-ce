@@ -145,6 +145,10 @@ define('app/models/machine', ['ember'],
                     }, 1000);
                     return;
                 }
+                
+                // Do not send probe request if backend is disabled
+                if (!this.backend.enabled) return;
+                
                 Mist.backendsController.probeMachine(that, keyId, function(success) {
                     if (success) { // Reprobe in 100 seconds on success
                         Ember.run.later(function() {
