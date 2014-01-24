@@ -16,11 +16,11 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
             template: Ember.Handlebars.compile(machine_html),
 
             providerIconClass: function() {
-                if (!this.machine) {
+                if (!this.machine || !this.machine.backend) {
                     return '';
                 }
                 return 'provider-' + this.machine.backend.provider;
-            }.property('controller.model'),
+            }.property('machine'),
 
 
             /**
