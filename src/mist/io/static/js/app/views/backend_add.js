@@ -39,6 +39,7 @@ define('app/views/backend_add', [
             },
             
             selectBackend: function(event) {
+                $('#notHpCloud').hide();
                 if (event.target.title.indexOf("rackspace") != -1 || event.target.title.indexOf("linode") != -1 || event.target.title.indexOf("softlayer") !== -1) {
                     $('#addBackendInfo').show();                
                     $('#ApiKeylabel').text('2. Username:');
@@ -50,7 +51,7 @@ define('app/views/backend_add', [
                     $('#ApiKeylabel').text('2. Username:');
                     $('#ApiSecretlabel').text('3. Password:');
                     $('#addBackendOpenstack').hide();
-                    $('#addBackendBareMetal').hide();                    
+                    $('#addBackendBareMetal').hide(); 
                 } else if (event.target.title.indexOf("digitalocean") !== -1) {
                     $('#addBackendInfo').show();                 
                     $('#ApiKeylabel').text('2. Client ID:');
@@ -66,6 +67,8 @@ define('app/views/backend_add', [
                     //This is the apiurl for HPCloud. We autocomplete the api url instead of hiding this field, for consistency with openstack
                     if (event.target.title.indexOf("region-") != -1) {
                         Mist.backendAddController.set('newBackendURL', 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/');
+                    } else {
+                        $('#notHpCloud').show();
                     }
                 } else if (event.target.title.indexOf("bare_metal") != -1) {
                     // TODO: Render keys...
@@ -91,10 +94,10 @@ define('app/views/backend_add', [
                 
                 Mist.backendAddController.set('newBackendKey', '');
                 Mist.backendAddController.set('newBackendSecret', '');
-                /* OpenStack support
                 Mist.backendAddController.set('newBackendUrl', '');
                 Mist.backendAddController.set('newBackendTenant', '');
-                */
+                Mist.backendAddController.set('newBackendRegion', '');
+
                 for (var b = 0; b < Mist.backendsController.content.length; b++) {
                     var backend = Mist.backendsController.content[b];
                     if (event.target.title.split('_')[0] == 'ec2' && backend.provider.split('_')[0] == 'ec2') {
@@ -144,6 +147,7 @@ define('app/views/backend_add', [
                     "apikey" : Mist.backendAddController.newBackendKey,
                     "apisecret": Mist.backendAddController.newBackendSecret,
                     "apiurl": Mist.backendAddController.newBackendURL,
+                    "region": Mist.backendAddController.newBackendRegion,
                     "tenant_name": Mist.backendAddController.newBackendTenant,
                     "machine_ip_address": Mist.backendAddController.newBareMetalServerIP,                    
                     "machine_key": Mist.backendAddController.newBareMetalServerKey,                    

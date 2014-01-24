@@ -17,12 +17,13 @@ define('app/controllers/backend_add', [
                 this.set('newBackendSecret', null);
                 this.set('newBareMetalServerIP', null);
                 this.set('newBareMetalServerKey', null);
-                this.set('newBareMetalServerUser', null);    
+                this.set('newBareMetalServerUser', null);   
                 $('#addBackendOpenstack').hide();
                 $('#addBackendBareMetal').hide();                    
                 $('#addBackendInfo').show();                                                                            
                 this.set('newBackendURL', null);
                 this.set('newBackendTenant', null);
+                this.set('newBackendRegion', null);
                 $('.select-backend-collapsible .ui-icon').removeClass('ui-icon-check').addClass('ui-icon-arrow-d');
                 $('.select-backend-collapsible span.ui-btn-text').text('Select provider');
             },
@@ -42,7 +43,7 @@ define('app/controllers/backend_add', [
                         }
                         /* OpenStack */                        
                         if (this.get('newBackendProvider').title.indexOf('OpenStack') != -1) {
-                            if (!(this.get('newBackendURL'))) {
+                            if (!this.get('newBackendURL')) {
                                       this.set('newBackendReady', false);
                                       $('#create-backend-ok').button('disable');
                                       return;
@@ -71,6 +72,7 @@ define('app/controllers/backend_add', [
                 this.addObserver('newBareMetalServerUser', this, this.updateNewBackendReady);                                
                 this.addObserver('newBackendURL', this, this.updateNewBackendReady);
                 this.addObserver('newBackendTenant', this, this.updateNewBackendReady);
+                this.addObserver('newBackendRegion', this, this.updateNewBackendReady);
             }
         });
     }
