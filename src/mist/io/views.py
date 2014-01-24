@@ -202,12 +202,13 @@ def add_backend(request):
     machine_hostname = params.get('machine_ip', '')
     machine_key = params.get('machine_key', '')
     machine_user = params.get('machine_user', '')
+    region = params.get('region', '')
     # TODO: check if all necessary information was provided in the request
 
     user = user_from_request(request)
     backend_id = methods.add_backend(
         user, title, provider, apikey, apisecret, apiurl, tenant_name=tenant_name,
-        machine_hostname=machine_hostname, machine_key=machine_key, machine_user=machine_user
+        machine_hostname=machine_hostname, machine_key=machine_key, machine_user=machine_user, region=region
     )
     backend = user.backends[backend_id]
     return {

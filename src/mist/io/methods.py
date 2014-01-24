@@ -447,7 +447,8 @@ def connect_provider(backend):
                 backend.apisecret,
                 ex_force_auth_version=backend.auth_version or '2.0_password',
                 ex_force_auth_url=backend.apiurl,
-                ex_tenant_name=backend.tenant_name
+                ex_tenant_name=backend.tenant_name,
+                ex_force_service_region=backend.region
             )
     elif backend.provider == Provider.LINODE:
         conn = driver(backend.apisecret)
