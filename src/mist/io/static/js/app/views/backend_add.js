@@ -47,8 +47,8 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
                     $('#new-backend-second-field').attr('type', 'password');
                     $('#new-backend-provider').collapsible('collapse');
                     $('#openstack-bundle').hide();
-                    $('#non-hp-cloud').hide();
                     $('#baremetal-bundle').hide();
+                    $('#non-hp-cloud').hide();
 
                     if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('linode') > -1) {
                         this.set('firstFieldLabel', 'Username');
@@ -73,7 +73,7 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
                     } else if (provider.provider.indexOf('bare_metal') > -1) {
                         this.set('firstFieldLabel', 'Hostname');
                         this.set('secondFieldLabel', 'User');
-                        Mist.backendAddController.set('newBackendSecondField', 'root')
+                        Mist.backendAddController.set('newBackendSecondField', 'root');
 
                         $('#new-backend-key .ui-listview').listview('refresh');
                         $('#new-backend-second-field').attr('type', '');
