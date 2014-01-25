@@ -9,19 +9,20 @@
             <span class="ui-block-b machine-state">
                 <span {{bind-attr class="view.machine.state"}}>
                 {{view.machine.state}}
+
+                {{#if pendingCreation}}
+                <div class='ajax-loader'></div>
+                {{/if}}
                 </span>
             </span>
 
-            <div class="ui-block-c machine-leds">  
+            <div class="ui-block-c machine-leds">
                 <span>
                     {{#if view.machine.hasMonitoring}}
                         <span></span>
                     {{/if}}
-                </span>            
-
-                {{#if pendingCreation}}
-                    <div class='ajax-loader'></div>
-                {{else}} 
+                </span>
+                {{#unless pendingCreation}}
                     <div {{bind-attr class="probing probed"}}>
                         <div class="loadleds">                                                                      
                             <div {{bind-attr class="loadavg15 :led"}}>
@@ -43,7 +44,7 @@
                         </div>
                                                  
                     </div>
-                {{/if}}   
+                {{/unless}}
                 
             </div>
             

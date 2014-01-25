@@ -38,6 +38,13 @@
     margin-left: -18px;
     font-weight: normal;
 }
+
+.machine-state .ajax-loader {
+    display: inline-block;
+    position: relative;
+    left: 5px;
+    top: 4px;
+}
 .machine-leds {
     width: 120px !important;
     float: right;
