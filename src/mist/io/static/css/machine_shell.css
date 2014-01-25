@@ -46,5 +46,9 @@
     position: absolute;
     
 }
-
-
+#machine-shell-popup .shell-li .ajax-loader {
+    display: inline-block;
+    top: 4px;
+    position: relative;
+    left: 6px;
+}
