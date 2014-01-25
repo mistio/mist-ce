@@ -10,6 +10,7 @@ Feature: Machines
 
     @web
     @bare-metal
+    @machine-actions
     Scenario: Create Machine
         When I click the "Add backend" button
         And I wait for 1 seconds
@@ -126,6 +127,7 @@ Feature: Machines
 
 
     @web
+    @machine-actions
     Scenario: Shutdown Machine
         When I visit mist.io
             Then I should see "mist.io"
@@ -141,6 +143,7 @@ Feature: Machines
 
 
     @web
+    @machine-actions
     Scenario: Start Machine
         When I visit mist.io
             Then I should see "mist.io"
@@ -152,13 +155,14 @@ Feature: Machines
         And I click the "Start" button
         And I wait for 1 seconds
         And I click the "Yes" button
-        And I wait for 2 seconds
+        And I wait for 1 seconds
             Then "tester" state should be "pending" within 80 seconds
         When I wait for 1 seconds
             Then "tester" state should be "running" within 400 seconds
 
 
     @web
+    @machine-actions
     Scenario: Reboot Machine
         When I visit mist.io
             Then I should see "mist.io"
@@ -177,6 +181,8 @@ Feature: Machines
 
 
     @web
+    @machine-actions
+    
     Scenario: Destroy Machine
         When I visit mist.io
             Then I should see "mist.io"
@@ -189,6 +195,6 @@ Feature: Machines
         And I wait for 1 seconds
         And I click the "Yes" button
         And I wait for 2 seconds
-            Then "tester" state should be "stopped" within 120 seconds
+            Then "tester" state should be "pending" within 120 seconds
         When I wait for 1 seconds
             Then "tester" state should be "terminated" within 400 seconds
