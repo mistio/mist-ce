@@ -42,8 +42,7 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
 
                 selectProvider: function(provider) {
 
-                    Mist.backendAddController.set('newBackendFirstField', '');
-                    Mist.backendAddController.set('newBackendSecondField', '');
+                    Mist.backendAddController._clear();
                     
                     $('#new-backend-second-field').attr('type', 'password');
                     $('#new-backend-provider').collapsible('collapse');
