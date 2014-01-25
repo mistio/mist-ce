@@ -149,7 +149,7 @@ Feature: Machines
             Then I should see "mist.io"
         When I wait for 2 seconds
         And I click the "Machines" button
-        And I wait for 3 seconds
+        And I wait for 20 seconds
         And I tick the "tester" machine
         And I click the "Power" button
         And I click the "Start" button
@@ -168,7 +168,7 @@ Feature: Machines
             Then I should see "mist.io"
         When I wait for 2 seconds
         And I click the "Machines" button
-        And I wait for 3 seconds
+        And I wait for 20 seconds
         And I tick the "tester" machine
         And I click the "Power" button
         And I click the "Reboot" button
@@ -188,7 +188,7 @@ Feature: Machines
             Then I should see "mist.io"
         When I wait for 2 seconds
         And I click the "Machines" button
-        And I wait for 3 seconds
+        And I wait for 10 seconds
         And I tick the "tester" machine
         And I click the "Power" button
         And I click the "Destroy" button

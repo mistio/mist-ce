@@ -73,7 +73,7 @@ def home(request):
         'email': user.email,
         'supported_providers': config.SUPPORTED_PROVIDERS,
         'core_uri': config.CORE_URI,
-        'auth': request.registry.settings.get('auth') and 1 or 0,
+        'auth': bool(user.mist_api_token) and 1 or 0,
         'js_build': config.JS_BUILD,
         'js_log_level': config.JS_LOG_LEVEL,
         'google_analytics_id': config.GOOGLE_ANALYTICS_ID,
@@ -98,7 +98,6 @@ def check_auth(request):
             user.email = email
             user.mist_api_token = ret_dict.pop('mist_api_token', '')
             user.save()
-        request.registry.settings['auth'] = 1
         log.info("succesfully check_authed")
         return ret_dict
     else:
@@ -598,7 +597,7 @@ def update_monitoring(request):
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-    if request.registry.settings.get('auth') != 1:
+    if not user.mist_api_token:
         log.info("trying to authenticate to service first")
         email = request.json_body.get('email')
         password = request.json_body.get('password')
@@ -612,7 +611,6 @@ def update_monitoring(request):
                 user.email = email
                 user.mist_api_token = ret_dict.pop('mist_api_token', '')
                 user.save()
-            request.registry.settings['auth'] = 1
             log.info("succesfully check_authed")
         else:
             raise UnauthorizedError("You need to authenticate to mist.io.")
