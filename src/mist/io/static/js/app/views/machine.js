@@ -97,9 +97,23 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
 
 
             renderKeysButton: function() {
-                Ember.run.next(function() {
+                Ember.run.next(this, function() {
                     $('#mist-manage-keys').trigger('create');
+                    if (this.machine.state == 'running') {
+                        $('#mist-manage-keys').removeClass('ui-state-disabled');
+                    } else {
+                        $('#mist-manage-keys').addClass('ui-state-disabled');
+                    }
                 });
+            },
+
+
+            updateEnableButton: function() {
+                if (this.machine.state == 'running') {
+                    $('#enable-monitor-btn').removeClass('ui-state-disabled');
+                } else {
+                    $('#enable-monitor-btn').addClass('ui-state-disabled');
+                }
             },
 
 
@@ -366,6 +380,11 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
             keysCountObserver: function() {
                 Ember.run.once(this, 'renderKeysButton');
             }.observes('machine.keysCount'),
+
+            stateObserver: function () {
+                Ember.run.once(this, 'renderKeysButton');
+                Ember.run.once(this, 'updateEnableButton');
+            }.observes('machine.state')
         });
     }
 );
