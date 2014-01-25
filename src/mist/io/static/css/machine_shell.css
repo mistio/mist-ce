@@ -1,7 +1,9 @@
 
 /* Shell View CSS
 -----------------------------------------------------------------------------------------------------------*/
-
+#machine-shell-popup .ui-content {
+    background: transparent;
+}
 #machine-shell-popup-popup {
     top: 2% !important;
     width: 95% !important;
@@ -22,21 +24,48 @@
 #machine-shell-popup #shell-input {
     width: 90%;
 }
+#machine-shell-popup #shell-input input {
+    padding: 8px 0 8px 22px;
+    background-image: url("../images/prompt.png");
+    background-position: 4px 8px;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;    
+}
 #machine-shell-popup #shell-submit {
-    width: 10%;
+    width: 90px;
+    float: right;
+    height: 40px;
+    padding: 5px 27px !important;    
+}
+.ui-icon-shell-return:after {
+    background-image: url("../images/return.png");
+    padding: 1px;
+    right: 30px;
 }
 #machine-shell-popup #shell-submit .ui-btn {
     width: 100%;
     height: 37px;
-    background-image: url("../images/return.png");
 }
 #machine-shell-popup #shell-response {
+    border: 1px solid #AAA !important;
     top: 60px;
     width: 100%;
     bottom: 60px;
     margin: 0 auto;
     position: absolute;
-    overflow-x: scroll;
+    font-family: monospace;
+    font-size: 11px;
+    min-height: 150px;
+    max-height: 40% !important;
+    border-radius: 4px;
+    background: #dfe1e2;
+    overflow-x: auto;    
+    overflow-y: auto;
+}
+#machine-shell-popup #shell-response {
     border: 1px solid #000000;
 }
 #machine-shell-popup #shell-back {
@@ -52,3 +81,14 @@
     position: relative;
     left: 6px;
 }
+#machine-shell-popup .ui-collapsible-content {
+    background: #444;
+    color: #efeff1;
+    padding: 6px;
+    text-shadow: none;
+    max-height: 40% !important;
+    min-height: 140px;
+    height: auto !important;
+    overflow-y: scroll !important;
+}
+

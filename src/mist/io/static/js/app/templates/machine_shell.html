@@ -1,6 +1,7 @@
 <div id="machine-shell-popup" 
      class="huge-popup" 
-     data-role="popup" 
+     data-role="popup"
+     data-theme="b"
      data-overlay-theme="b" 
      data-transition="slideup">
 
@@ -12,18 +13,18 @@
     <div data-role="content">
         <div class="ui-grid-a" id="shell-grid">
             <div class="ui-block-a" id="shell-input">
-                {{view Mist.ShellTextField valueBinding="Mist.machineShellController.command"}}
+                {{view Mist.ShellTextField data-theme="a" valueBinding="Mist.machineShellController.command"}}
             </div>
             <div class="ui-block-b" id="shell-submit">
-                <button data-theme="d" {{action "submitClicked" target="view"}}></button>
+                <button data-theme="d" data-icon="shell-return" autofocus="true" {{action "submitClicked" target="view"}}></button>
             </div>
-            <div class="ui-block-a" id="shell-response" data-role="listview">
+            <div class="ui-block-a" id="shell-response" data-role="listview" data-theme="a">
             {{#each Mist.machineShellController.machine.commandHistory}}
                 {{view Mist.machineShellListItemView commandBinding="this"}}
             {{/each}}
             </div>
             <div class="ui-grid-a" id="shell-back">
-                <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
+                <a data-role="button" data-theme="a" {{action "backClicked" target="view"}}>Back</a>
             </div>
         </div>
     </div>

@@ -48,6 +48,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                     'command'        : this.command,
                     'response'       : '',
                     'pendingResponse': true,
+                    'data-collapsed' : false
                 });
                 
                 // Modify machine's command history
