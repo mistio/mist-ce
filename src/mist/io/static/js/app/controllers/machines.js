@@ -99,12 +99,16 @@ define('app/controllers/machines', ['app/models/machine'],
 
             shutdownMachine: function(machineId, callback) {
                 var that = this;
+                var machine = this.getMachine(machineId);
+                machine.waitFor('stopped');
+                machine.lockOn('pending');
                 this.set('shutingdownMachine', true);
                 Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
                     'action' : 'stop'
                 }).success(function() {
                     //that._shutdownMachine(machineId);
                 }).error(function() {
+                    machine.restoreState();
                     Mist.notificationController.notify('Failed to shutdown machine');
                 }).complete(function(success) {
                     that.set('shutingdownMachine', false);
@@ -116,12 +120,16 @@ define('app/controllers/machines', ['app/models/machine'],
 
             destroyMachine: function(machineId, callback) {
                 var that = this;
+                var machine = this.getMachine(machineId);
+                machine.waitFor('terminated');
+                machine.lockOn('pending');
                 this.set('destroyingMachine', true);
                 Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
                     'action' : 'destroy'
                 }).success(function() {
                     //that._destroyMachine(machineId);
                 }).error(function() {
+                    machine.restoreState();
                     Mist.notificationController.notify('Failed to destory machine');
                 }).complete(function(success) {
                     that.set('destroyingMachine', false);
@@ -133,13 +141,16 @@ define('app/controllers/machines', ['app/models/machine'],
 
             rebootMachine: function(machineId, callback) {
                 var that = this;
-                this.getMachine(machineId).set('state', 'rebooting');
+                var machine = this.getMachine(machineId);
+                machine.waitFor('running');
+                machine.lockOn('rebooting');
                 this.set('rebootingMachine', true);
                 Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
                     'action' : 'reboot'
                 }).success(function() {
                     //that.rebootMachine(machineId);
                 }).error(function() {
+                    machine.restoreState();
                     Mist.notificationController.notify('Failed to reboot machine');
                 }).complete(function(success) {
                     that.set('rebootingMachine', false);
@@ -151,12 +162,16 @@ define('app/controllers/machines', ['app/models/machine'],
 
             startMachine: function(machineId, callback) {
                 var that = this;
+                var machine = this.getMachine(machineId);
+                machine.waitFor('running');
+                machine.lockOn('pending');
                 this.set('startingMachine', true);
                 Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
                     'action' : 'start'
                 }).success(function() {
                     //that.startMachine(machineId);
                 }).error(function() {
+                    machine.restoreState();
                     Mist.notificationController.notify('Failed to start machine');
                 }).complete(function(success) {
                     that.set('startingMachine', false);

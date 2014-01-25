@@ -11,8 +11,10 @@
                 {{view.machine.state}}
 
                 {{#if pendingCreation}}
-                <div class='ajax-loader'></div>
-                {{/if}}
+                    <div class='ajax-loader'></div>
+                {{else}} {{#if waitState}}
+                    <div class='ajax-loader'></div>
+                {{/if}} {{/if}}
                 </span>
             </span>
 

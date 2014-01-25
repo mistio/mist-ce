@@ -24,6 +24,10 @@ define('app/models/machine', ['ember'],
             pendingCreation: null,
             
             state: 'stopped',
+            prevState: null,
+            waitState: null,
+            lockState: null,
+            
             stats: {'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
             
@@ -112,6 +116,24 @@ define('app/models/machine', ['ember'],
             },
 
 
+            waitFor: function(state) {
+                this.set('waitState', state);
+            },
+
+
+            lockOn: function(state) {
+                this.set('prevState', this.state);
+                this.set('lockState', state);
+                this.set('state', state);
+            },
+
+
+            restoreState: function() {
+                this.set('waitState', null);
+                this.set('state', this.prevState);
+            },
+
+
             getHost: function() {
                
                 if (this.extra && this.extra.dns_name) {
@@ -137,26 +159,19 @@ define('app/models/machine', ['ember'],
             },
 
             probe: function(keyId) {
-                var that = this;
 
                 if (!this.backend.enabled) return;
-                
-                if (!this.backend.enabled || (this.state != 'running')) {
-                    Ember.run.later(function() {
-                        that.probe(keyId);
-                    }, 5000);
-                    return;
-                };
-                
+                if (this.state != 'running') return;
                 
                 // If there are many pending requests, reschedule for a bit later
                 if ($.active > 4) {
-                    Ember.run.later(function() {
-                        that.probe(keyId);
+                    Ember.run.later(this, function() {
+                        this.probe(keyId);
                     }, 1000);
                     return;
                 }
 
+                var that = this;
                 Mist.backendsController.probeMachine(that, keyId, function(success) {
                     if (success) { // Reprobe in 100 seconds on success
                         Ember.run.later(function() {
@@ -169,7 +184,27 @@ define('app/models/machine', ['ember'],
                         }, that.probeInterval);
                     }
                 });
-            }
+            },
+
+
+            /**
+             * 
+             *  Observers
+             * 
+             */
+
+            stateObserver: function() {
+                if (this.waitState) {
+                    if (this.waitState != this.state) {
+                        this.set('state', this.lockState);
+                    } else { // Machine action completed
+                        this.set('waitState', null);
+                        if (this.state == 'running') {
+                            Mist.backendsController.probeMachine(this);
+                        }
+                    }
+                }
+            }.observes('state')
         });
     }
 );

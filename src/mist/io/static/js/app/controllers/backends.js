@@ -262,46 +262,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             },
 
 
-            shutdownMachine: function(machineId) {
-                this.content.some(function(backend) {
-                    if (backend.getMachine(machineId)) {
-                        backend.shutdownMachine(machineId);
-                        return true;
-                    }
-                });
-            },
-
-
-            destroyMachine: function(machineId) {
-               this.content.some(function(backend) {
-                    if (backend.getMachine(machineId)) {
-                        backend.destroyMachine(machineId);
-                        return true;
-                    }
-                });
-            },
-
-
-            rebootMachine: function(machineId, callback) {
-               this.content.some(function(backend) {
-                    if (backend.getMachine(machineId)) {
-                        backend.rebootMachine(machineId, callback);
-                        return true;
-                    }
-                });
-            },
-
-
-            startMachine: function(machineId) {
-               this.content.some(function(backend) {
-                    if (backend.getMachine(machineId)) {
-                        backend.startMachine(machineId);
-                        return true;
-                    }
-                });
-            },
-
-
             /**
              * 
              *  Psudo-Private Methods
