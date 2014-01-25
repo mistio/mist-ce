@@ -57,6 +57,11 @@ define('app/controllers/monitoring', [
                      }
                      Mist.set('authenticated', true);
                  }).error(function() {
+                     if (machine.hasMonitoring) {
+                         machine.set('disablingMonitoring', false);
+                     } else {
+                         machine.set('enablingMonitoring', false);
+                     }
                      Mist.notificationController.notify('Error when changing monitoring to ' + machine.name);
                  }).complete(function(success, data) {
                      //that.set('changingMonitoring', false);
