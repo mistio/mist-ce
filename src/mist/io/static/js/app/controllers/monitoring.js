@@ -45,7 +45,7 @@ define('app/controllers/monitoring', [
                  Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring', {
                     'action': machine.hasMonitoring ? 'disable' : 'enable',
                     'dns_name': machine.extra.dns_name ? machine.extra.dns_name : 'n/a',
-                    'public_ips': machine.public_ips ? machine.public_ips[0] : [],
+                    'public_ips': machine.public_ips ? machine.public_ips : [],
                     'name': machine.name ? machine.name : machine.id
                  }).success(function(data) {
                      if (!machine.hasMonitoring) {
