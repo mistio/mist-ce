@@ -225,7 +225,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                             Mist.notificationController.set('msgHeader', 'No plan');
                             Mist.notificationController.set('msgPart1', 'In order to use our monitoring service' +
                                                                         ' you have to purchase a plan');
-                            Mist.notificationController.set('msgPart2', 'You can do that in the Account page, which can' +
+                            Mist.notificationController.set('msgPart2', 'You can do that in the Account page, which can ' +
                                                                         'be accessed from the menu button on the top right corner');
                             Mist.notificationController.showMessagebox();
                         }
@@ -236,7 +236,13 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
 
 
                 disableMonitoringClicked: function() {
-                    Mist.monitoringController.changeMonitoring(this.machine);
+                    var machine = this.machine;
+                    Mist.confirmationController.set('title', 'Disable monitoring');
+                    Mist.confirmationController.set('text', 'Are you sure you want to disable monitoring for this machine?');
+                    Mist.confirmationController.set('callback', function () {
+                        Mist.monitoringController.changeMonitoring(machine);
+                    });
+                    Mist.confirmationController.show();
                 },
 
 
