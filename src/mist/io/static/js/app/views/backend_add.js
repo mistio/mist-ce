@@ -42,9 +42,13 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
 
                 selectProvider: function(provider) {
 
+                    Mist.backendAddController.set('newBackendFirstField', '');
+                    Mist.backendAddController.set('newBackendSecondField', '');
+                    
                     $('#new-backend-second-field').attr('type', 'password');
                     $('#new-backend-provider').collapsible('collapse');
                     $('#openstack-bundle').hide();
+                    $('#non-hp-cloud').hide();
                     $('#baremetal-bundle').hide();
 
                     if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('linode') > -1) {
@@ -64,6 +68,8 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
                         //This is for HP Cloud specific
                         if (provider.provider.indexOf('region-') > -1) {
                             Mist.backendAddController.set('newBackendOpenStackURL', 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/');
+                        } else {
+                            $('#non-hp-cloud').show();
                         }
                     } else if (provider.provider.indexOf('bare_metal') > -1) {
                         this.set('firstFieldLabel', 'Hostname');

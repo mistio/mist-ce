@@ -54,6 +54,14 @@
                    id="new-backend-openstack-tenant"
                    data-theme="a"
                    valueBinding="Mist.backendAddController.newBackendOpenStackTenant"}}
+            
+            <div id="non-hp-cloud">
+                <label for="new-backend-openstack-region">6. Region:</label>
+                {{view Mist.TextField
+                       id="new-backend-openstack-regino"
+                       data-theme="a"
+                       valueBinding="Mist.backendAddController.newBackendOpenStackRegion"}}
+            </div>
         </div>
 
         <div id="baremetal-bundle">

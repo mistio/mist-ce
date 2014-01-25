@@ -19,6 +19,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
             newBackendFirstField: null,
             newBackendSecondField: null,
             newBackendOpenStackURL: null,
+            newBackendOpenStackRegion: null,
             newBackendOpenStackTenant: null,
 
 
@@ -55,6 +56,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     this.newBackendFirstField,
                     this.newBackendSecondField,
                     this.newBackendOpenStackURL,
+                    this.newBackendOpenStackRegion,
                     this.newBackendOpenStackTenant,
                     this.newBackendKey.id,
                     function (success, backend) {
@@ -79,6 +81,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     .set('newBackendFirstField', null)
                     .set('newBackendSecondField', null)
                     .set('newBackendOpenStackURL', null)
+                    .set('newBackendOpenStackRegion', null)
                     .set('newBackendOpenStackTenant', null)
                     .set('newBackendKey', {id: 'Select SSH Key'})
                     .set('newBackendProvider', {title: 'Select provider'});
