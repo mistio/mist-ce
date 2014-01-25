@@ -13,7 +13,21 @@ define('app/views/machine_shell', ['text!app/templates/machine_shell.html', 'emb
             
             template: Ember.Handlebars.compile(machine_shell_html),
     
-            
+            /**
+             *
+             *  Methods
+             *
+             */
+
+            openCommand: function(target) {
+                var elements = $('#shell-response .ember-view');
+                for (var e = 0; e < elements.length; ++e) {
+                    if (elements.eq(e).attr('id') != target.attr('id')) {
+                        elements.eq(e).find('.ui-collapsible').collapsible('collapse');
+                    }
+                }
+            },
+
             /**
              * 
              *  Actions
