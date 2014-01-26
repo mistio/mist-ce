@@ -121,26 +121,26 @@ define('app/views/monitoring', [
             redrawJQMComponents: function(){
 
 
-                $('.monitoring-button').button();
-                $('#add-rule-button').button();
-                $('#monitoring-dialog').popup();  
+                $('.monitoring-button').trigger('create');
+                $('#add-rule-button').trigger('create');
+                $('#monitoring-dialog').trigger('create');  
 
                 // Collapse/Extend Buttons
-                $('#cpuGraphBtn > a').button();
-                $('#loadGraphBtn > a').button();
-                $('#memoryGraphBtn > a').button();
-                $('#diskReadGraphBtn > a').button();
-                $('#diskWriteGraphBtn > a').button();
-                $('#networkTXGraphBtn > a').button();
-                $('#networkRXGraphBtn > a').button();
+                $('#cpuGraphBtn > a').trigger('create');
+                $('#loadGraphBtn > a').trigger('create');
+                $('#memoryGraphBtn > a').trigger('create');
+                $('#diskReadGraphBtn > a').trigger('create');
+                $('#diskWriteGraphBtn > a').trigger('create');
+                $('#networkTXGraphBtn > a').trigger('create');
+                $('#networkRXGraphBtn > a').trigger('create');
 
                 // DEBUG TODO Possible Remove It
                 //$('#timeWindowSelect').selectmenu();
 
                 // History Buttons
-                $('#graphsGoBack').button();
-                $('#graphsGoForward').button();
-                $('#graphsResetHistory').button();
+                $('#graphsGoBack').trigger('create');
+                $('#graphsGoForward').trigger('create');
+                $('#graphsResetHistory').trigger('create');
 
                 // Disable History
                 $('#graphsGoForward').addClass('ui-disabled');
