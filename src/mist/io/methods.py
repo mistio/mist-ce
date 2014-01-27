@@ -624,9 +624,9 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     private_key = keypair.private
     public_key = keypair.public
 
-    print "Key id: " + key_id
-    print "Public: " + public_key
-    print "Private: " + private_key
+    #print "Key id: " + key_id
+    #print "Public: " + public_key
+    #print "Private: " + private_key
 
     size = NodeSize(size_id, name='', ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
