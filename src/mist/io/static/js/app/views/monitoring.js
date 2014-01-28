@@ -125,22 +125,18 @@ define('app/views/monitoring', [
                 $('#add-rule-button').trigger('create');
                 $('#monitoring-dialog').trigger('create');  
 
-                // Collapse/Extend Buttons
-                $('#cpuGraphBtn > a').trigger('create');
-                $('#loadGraphBtn > a').trigger('create');
-                $('#memoryGraphBtn > a').trigger('create');
-                $('#diskReadGraphBtn > a').trigger('create');
-                $('#diskWriteGraphBtn > a').trigger('create');
-                $('#networkTXGraphBtn > a').trigger('create');
-                $('#networkRXGraphBtn > a').trigger('create');
 
                 // DEBUG TODO Possible Remove It
                 //$('#timeWindowSelect').selectmenu();
 
                 // History Buttons
+                /*
                 $('#graphsGoBack').trigger('create');
                 $('#graphsGoForward').trigger('create');
-                $('#graphsResetHistory').trigger('create');
+                $('#graphsResetHistory').trigger('create');*/
+
+                $('.graphControls').trigger('create');
+                $('#graphBar').trigger('create');
 
                 // Disable History
                 $('#graphsGoForward').addClass('ui-disabled');
