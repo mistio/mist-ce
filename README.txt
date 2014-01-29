@@ -28,11 +28,6 @@ you simply run::
 
     sudo easy_install virtualenv
 
-In MacOSX there might be some problems with certificates. To solve the issue 
-donwload a pem from http://curl.haxx.se/docs/caextract.html rename it to 
-curl-ca-bundle.crt and save it to /opt/local/share/curl/ or to /usr/share/curl/ca-bundle.crt.
-Check out this gist https://gist.github.com/1stvamp/2158128
-
 Supposing you have all the above, the steps are simple. Clone the repository,
 create a virtualenv and run buildout::
 
