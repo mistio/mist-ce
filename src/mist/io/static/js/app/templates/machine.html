@@ -81,7 +81,7 @@
 
                 {{view Mist.monitoringView}}
 
-                <div data-role="listview">
+                <div class="rules-container" data-role="listview">
                     {{#each view.rules}}
                         {{view Mist.ruleView ruleBinding="this"}}
                     {{/each}}
@@ -192,31 +192,31 @@
        TODO: These should be in monitoring view 
     -->
 
-    <div data-role="popup">
+    <div class="rule-metric-popup"data-role="popup">
         <ul data-role="listview">
             {{#each Mist.rulesController.metricList}}
             <li data-icon="false">
-                <a>{{this}}</a>
+                <a {{bind-attr title="this"}}>{{this}}</a>
             </li>
             {{/each}}
         </ul>
     </div>
 
-    <div data-role="popup">
+    <div class="rule-operator-popup" data-role="popup">
         <ul data-role="listview">
             {{#each Mist.rulesController.operatorList}}
             <li data-icon="false">
-                <a>{{this.symbol}}</a>
+                <a {{bind-attr title="this.title"}}>{{this.symbol}}</a>
             </li>
             {{/each}}
         </ul>
     </div>
 
-    <div data-role="popup">
+    <div class="rule-action-popup" data-role="popup">
         <ul data-role="listview">
             {{#each Mist.rulesController.actionList}}
             <li data-icon="false">
-                <a>{{this}}</a>
+                <a {{bind-attr title="this"}}>{{this}}</a>
             </li>
             {{/each}}
             <li data-icon="false">

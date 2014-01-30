@@ -7,14 +7,14 @@
         data-icon="arrow-d"
         data-iconpos="right"
         data-inline="true"
-        {{action openMetricPopup target="view"}}>{{metric}}</a>
+        {{action "openMetricPopup" target="view"}}>{{metric}}</a>
 
     <a href="#"
         class="rule-button operator"
         data-role="button"
         data-icon="false"
         data-inline="true"
-        {{action openOperatorPopup target="view"}}>{{operator.symbol}}</a>
+        {{action "openOperatorPopup" target="view"}}>{{operator.symbol}}</a>
 
     <div class="rule-unit">{{unit}}</div>
     <input type="number"

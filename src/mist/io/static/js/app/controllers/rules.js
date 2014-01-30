@@ -20,10 +20,12 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 'network-tx'
             ],
 
+
             operatorList: [
                 {'title': 'gt', 'symbol': '>'},
                 {'title': 'lt', 'symbol': '<'}
             ],
+
 
             actionList: [
                 'alert',
@@ -32,6 +34,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 //'launch',
                 'command'
             ],
+
 
             setContent: function(rules) {
                 if (!rules.lenght) return;
@@ -43,6 +46,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 });
             },
 
+
             getRuleById: function(ruleId) {
                 for (var i = 0; i < this.content.length; i++) {
                     if (this.content[i].id == ruleId) {
@@ -51,6 +55,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 }
                 return null;
             },
+
 
             getOperatorByTitle: function(title) {
                 var ret = null;
@@ -62,14 +67,16 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 return ret;
             },
 
+
             creationPendingObserver: function() {
                 if (this.creatingPending) {
                     $('#add-rule-button').addClass('ui-state-disabled');
                 } else {
-                    $('#add-rule-button').addClass('ui-state-disabled');
+                    $('#add-rule-button').removeClass('ui-state-disabled');
                 }
                 
             }.observes('creationPending'),
+
 
             newRule: function(machine, metric, operator, value, actionToTake) {
                 var payload = {
@@ -110,10 +117,11 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 });
             },
 
+
             updateRule: function(id, metric, operator, value, actionToTake, command) {
                 
                 var rule = this.getRuleById(id);
-                
+
                 if (!rule) {
                     return false;
                 }
@@ -174,22 +182,24 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while updating rule');
-                        error(textstate, errorThrown, 'while updating rule');
                         rule.set('pendingAction', false);
                     }
                 });
             },
+
 
             saveCommand: function() {
                 $('.rule-command-popup').popup('close');
                 this.updateRule(this.commandRule.id, null, null, null, 'command', this.command);
             },
 
+
             changeRuleValue: function(event) {
                 var rule_id = $(event.currentTarget).attr('id');
                 var rule_value = $(event.currentTarget).find('.ui-slider-handle').attr('aria-valuenow');
                 this.updateRule(rule_id, null, null, rule_value);
             },
+
 
             setSliderEventHandlers: function() {
                 function showSlider(event) {
@@ -208,6 +218,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 $('.rules-container .rule-box').on('mouseleave', hideSlider);
             },
 
+
             removeSliderEventHandlers: function() {
                 $('.rules-container .ui-slider').off('tap');
                 $('.rules-container .ui-slider').off('click');
@@ -215,6 +226,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 $('#single-machine').off('tap');
                 $('.rules-container .rule-box').off('mouseleave');
             },
+
 
             redrawRules: function() {
                 var that = this;
