@@ -33,8 +33,8 @@ from mist.io.bare_metal import BareMetalDriver
 from mist.io.exceptions import *
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
-## import libcloud.security
-## libcloud.security.CA_CERTS_PATH.append('/usr/share/curl/ca-bundle.crt')
+import libcloud.security
+libcloud.security.CA_CERTS_PATH.append('cacert.pem')
 
 
 log = logging.getLogger(__name__)
