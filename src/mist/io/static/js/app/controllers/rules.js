@@ -63,11 +63,15 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             },
 
             creationPendingObserver: function() {
-                $('#add-rule-button').button(this.creationPending ? 'disable' : 'enable');
+                if (this.creatingPending) {
+                    $('#add-rule-button').addClass('ui-state-disabled');
+                } else {
+                    $('#add-rule-button').addClass('ui-state-disabled');
+                }
+                
             }.observes('creationPending'),
 
             newRule: function(machine, metric, operator, value, actionToTake) {
-                
                 var payload = {
                     'backendId': machine.backend.id,
                     'machineId': machine.id,
@@ -77,7 +81,6 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     'action': actionToTake
                 };
                 this.set('creationPending', true);
-                
                 var that = this;
                 $.ajax({
                     url: 'rules',

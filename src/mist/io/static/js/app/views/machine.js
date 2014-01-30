@@ -129,18 +129,6 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
             }.property('Mist.rulesController.@each', 'Mist.rulesController.@each.machine'),
 
 
-            addRuleClicked: function() {
-                // initialize the rule to some sensible defaults
-                var machine = this.get('controller').get('model');
-                var metric = 'load';
-                var operator = {'title': 'gt', 'symbol': '>'};
-                var value = 5;
-                var actionToTake = 'alert';
-
-                Mist.rulesController.newRule(machine, metric, operator, value, actionToTake);
-            },
-
-
             stopPolling: function() {
                 // if it polls for stats, stop it
                 if ('context' in Mist) {
@@ -260,9 +248,22 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 },
 
 
+                addRuleClicked: function() {
+                    // initialize the rule to some sensible defaults
+                    var machine = this.machine;
+                    var metric = 'load';
+                    var operator = {'title': 'gt', 'symbol': '>'};
+                    var value = 5;
+                    var actionToTake = 'alert';
+
+                    Mist.rulesController.newRule(machine, metric, operator, value, actionToTake);
+                },
+
+
                 buttonBackMonitoring: function() {
                      $("#monitoring-dialog").popup('close');
                 },
+
 
                 buttonChangeMonitoring: function() {
                     var machine = this.get('controller').get('model');

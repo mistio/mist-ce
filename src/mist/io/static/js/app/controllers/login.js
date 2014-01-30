@@ -48,7 +48,7 @@ define('app/controllers/login', ['ember'],
                         window.location.reload();
                     });
                 }).error(function(message) {
-                    Mist.notificationController.warn('Authentication error: ' + message);
+                    Mist.notificationController.info('Authentication error: ' + message);
                 }).complete(function(success, data) {
                     that.set('loggingIn', false);
                     that._giveCallback(success, data);
