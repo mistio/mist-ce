@@ -20,6 +20,12 @@
         
         <h1 {{bind-attr class="view.machine.state"}}>{{state}}</h1>
         
+        {{#unless view.machine.id}}
+            {{#if Mist.backendsController.loadingMachines}}
+                <div class="ajax-loader"></div>
+            {{/if}}
+        {{/unless}}
+        
         <span class="ui-btn-right" id="mist-manage-keys">
             {{#if pendingCreation}}
                 <a class="ui-state-disabled" data-role="button" data-icon="plus" data-iconpos="right">Add key</a>
