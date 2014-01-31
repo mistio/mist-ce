@@ -39,6 +39,8 @@ libcloud.security.CA_CERTS_PATH.append('cacert.pem')
 
 log = logging.getLogger(__name__)
 
+HPCLOUD_AUTH_URL = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/tokens'
+
 
 @core_wrapper
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
@@ -121,7 +123,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
 
         #for HP Cloud
         if 'hpcloudsvc' in apiurl:
-            backend.apiurl = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/'
+            backend.apiurl = HPCLOUD_AUTH_URL
 
         backend_id = backend.get_id()
         if backend_id in user.backends:
