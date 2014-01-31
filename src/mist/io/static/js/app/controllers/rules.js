@@ -37,12 +37,16 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
 
 
             setContent: function(rules) {
-                if (!rules.lenght) return;
+                if (!rules) return;
                 var that = this;
                 Ember.run(function() {
-                    rules.forEach(function(rule) {
+                    for (ruleId in rules) {
+                        var rule = rules[ruleId];
+                        rule.id = ruleId;
+                        rule.operator = that.getOperatorByTitle(rules[ruleId].operator);
+                        rule.machine = Mist.backendsController.getMachine(rule.machine, rule.backend) || rule.machine;
                         that.content.pushObject(Rule.create(rule));
-                    });
+                    }
                 });
             },
 

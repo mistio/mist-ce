@@ -362,6 +362,18 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
             }.property('machine', 'machine.extra'),
 
 
+            rules: function(){
+                var ret = Ember.ArrayController.create()
+                var machine = this.machine;
+                Mist.rulesController.forEach(function(rule){
+                    if (rule.machine == machine) {
+                        ret.pushObject(rule);
+                    }
+                });
+                return ret;
+            }.property('Mist.rulesController.@each', 'Mist.rulesController.@each.machine'),
+
+
             /**
              * 
              *  Observers

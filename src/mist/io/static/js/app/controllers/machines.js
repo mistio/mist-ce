@@ -267,6 +267,13 @@ define('app/controllers/machines', ['app/models/machine'],
                                     return true;
                                 }
                             });
+                            Mist.rulesController.content.forEach(function(rule) {
+                                if (!rule.machine.id) {
+                                    if (rule.machine == machine.id && rule.backend == machine.backend.id) {
+                                        rule.set('machine', machine);
+                                    }
+                                }
+                            });
                         });
                     }
 
