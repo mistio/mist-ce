@@ -85,6 +85,12 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 } else {
                     $('#single-machine-page #single-machine-shell-btn').addClass('ui-state-disabled');
                 }
+
+                if (this.machine.id) {
+                    $('#single-machine-page #single-machine-power-btn').removeClass('ui-state-disabled');
+                } else {
+                    $('#single-machine-page #single-machine-power-btn').addClass('ui-state-disabled');
+                }
             },
 
 

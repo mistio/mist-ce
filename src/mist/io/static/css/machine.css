@@ -42,6 +42,12 @@
     padding-left: 48px;
 }
 
+@-moz-document url-prefix() {
+    .single-machine-header .ui-title {
+        padding-left: 0px;
+    }
+}
+
 .single-machine-header .ajax-loader {
     position: relative;
     bottom: 30px;
