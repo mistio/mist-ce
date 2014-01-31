@@ -4,10 +4,12 @@
 
 @import url("css/key.css");
 @import url("css/home.css");
+@import url("css/rules.css");
 @import url("css/machine.css");
-@import url("css/monitoring.css");
 @import url("css/key_add.css");
 @import url("css/key_list.css");
+@import url("css/providers.css");
+@import url("css/monitoring.css");
 @import url("css/backend_add.css");
 @import url("css/machine_add.css");
 @import url("css/backend_edit.css");
@@ -16,7 +18,6 @@
 @import url("css/machine_power.css");
 @import url("css/machine_shell.css");
 @import url("css/backend_button.css");
-@import url("css/providers.css");
 
 
 /* Splash

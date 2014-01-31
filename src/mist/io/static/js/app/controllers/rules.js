@@ -43,6 +43,8 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     for (ruleId in rules) {
                         var rule = rules[ruleId];
                         rule.id = ruleId;
+                        rule.maxValue = rules[ruleId].max_value;
+                        rule.actionToTake = rules[ruleId].action;
                         rule.operator = that.getOperatorByTitle(rules[ruleId].operator);
                         rule.machine = Mist.backendsController.getMachine(rule.machine, rule.backend) || rule.machine;
                         that.content.pushObject(Rule.create(rule));
