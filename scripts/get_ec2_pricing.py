@@ -46,24 +46,34 @@ EC2_REGIONS = [
 ]
 
 EC2_INSTANCE_TYPES = [
-    "t1.micro",
-    "m1.small",
-    "m1.medium",
-    "m1.large",
-    "m1.xlarge",
-    "m2.xlarge",
-    "m2.2xlarge",
-    "m2.4xlarge",
-    "c1.medium",
-    "c1.xlarge",
-    "cc1.4xlarge",
-    "cc2.8xlarge",
-    "cg1.4xlarge",
-    "cr1.8xlarge",
-    "m3.xlarge",
-    "m3.2xlarge",
-    "hi1.4xlarge",
-    "hs1.8xlarge"
+'m3.large',
+ 'm1.small',
+ 'c1.medium',
+ 'cg1.4xlarge',
+ 'c3.8xlarge',
+ 'cr1.8xlarge',
+ 'c3.large',
+ 't1.micro',
+ 'c3.xlarge',
+ 'm1.large',
+ 'hs1.8xlarge',
+ 'c3.2xlarge',
+ 'c3.4xlarge',
+ 'i2.8xlarge',
+ 'm2.2xlarge',
+ 'm3.2xlarge',
+ 'c1.xlarge',
+ 'm2.xlarge',
+ 'cc1.4xlarge',
+ 'm1.medium',
+ 'i2.xlarge',
+ 'm3.medium',
+ 'cc2.8xlarge',
+ 'i2.2xlarge',
+ 'i2.4xlarge',
+ 'm1.xlarge',
+ 'm2.4xlarge',
+ 'm3.xlarge'
 ]
 
 EC2_OS_TYPES = [
@@ -100,7 +110,7 @@ EC2_REGIONS_API_TO_JSON_NAME = {
     "ap-southeast-1" : "apac-sin",
     "ap-southeast-2" : "apac-syd",
     "ap-northeast-1" : "apac-tokyo",
-    "sa-east-1" : "sa-east-1"   
+    "sa-east-1" : "sa-east-1"
 }
 
 INSTANCES_ON_DEMAND_LINUX_URL = "http://aws.amazon.com/ec2/pricing/json/linux-od.json"
@@ -170,13 +180,13 @@ INSTANCES_RESERVED_UTILIZATION_TYPE_BY_URL = {
     INSTANCES_RESERVED_MEDIUM_UTILIZATION_SLES_URL : "medium",
     INSTANCES_RESERVED_MEDIUM_UTILIZATION_WINDOWS_URL : "medium",
     INSTANCES_RESERVED_MEDIUM_UTILIZATION_WINSQL_URL : "medium",
-    INSTANCES_RESERVED_MEDIUM_UTILIZATION_WINSQLWEB_URL : "medium", 
+    INSTANCES_RESERVED_MEDIUM_UTILIZATION_WINSQLWEB_URL : "medium",
     INSTANCES_RESERVED_HEAVY_UTILIZATION_LINUX_URL : "heavy",
     INSTANCES_RESERVED_HEAVY_UTILIZATION_RHEL_URL : "heavy",
     INSTANCES_RESERVED_HEAVY_UTILIZATION_SLES_URL : "heavy",
     INSTANCES_RESERVED_HEAVY_UTILIZATION_WINDOWS_URL : "heavy",
     INSTANCES_RESERVED_HEAVY_UTILIZATION_WINSQL_URL : "heavy",
-    INSTANCES_RESERVED_HEAVY_UTILIZATION_WINSQLWEB_URL : "heavy",   
+    INSTANCES_RESERVED_HEAVY_UTILIZATION_WINSQLWEB_URL : "heavy",
 }
 
 DEFAULT_CURRENCY = "USD"
@@ -233,7 +243,7 @@ class ResultsCacheBase(object):
         pass
 
 
-class SimpleResultsCache(ResultsCacheBase): 
+class SimpleResultsCache(ResultsCacheBase):
     _cache = {}
 
     def get(self, key):
@@ -252,7 +262,7 @@ class TimeBasedResultsCache(ResultsCacheBase):
 
     # If you wish to chance this expiration use the following (a bit ugly) code:
     #
-    # TimeBasedResultsCache()._default_expiration_in_seconds = 86400 # 1 day    
+    # TimeBasedResultsCache()._default_expiration_in_seconds = 86400 # 1 day
     #
     # Since all cache classes inherit from ResultsCacheBase and are singletons that should set it correctly.
     #
@@ -281,9 +291,9 @@ def _load_data(url, use_cache=False, cache_class=SimpleResultsCache):
     if use_cache:
         cache_object = cache_class()
         result = cache_object.get(url)
-        if result is not None: 
+        if result is not None:
             return result
-    
+
     f = urllib2.urlopen(url)
     result = json.loads(f.read())
 
@@ -292,19 +302,143 @@ def _load_data(url, use_cache=False, cache_class=SimpleResultsCache):
 
     return result
 
-def get_ec2_ondemand_instances_prices(use_cache=False, cache_class=SimpleResultsCache):
-    """ Get EC2 on-demand instances prices. Results can be filtered by region """
+def get_ec2_reserved_instances_prices(filter_region=None, filter_instance_type=None, filter_os_type=None, use_cache=False, cache_class=SimpleResultsCache):
+    """ Get EC2 reserved instances prices. Results can be filtered by region """
 
+    get_specific_region = (filter_region is not None)
+    if get_specific_region:
+        filter_region = EC2_REGIONS_API_TO_JSON_NAME[filter_region]
+    get_specific_instance_type = (filter_instance_type is not None)
+    get_specific_os_type = (filter_os_type is not None)
 
     currency = DEFAULT_CURRENCY
-    
+
+    urls = [
+        INSTANCES_RESERVED_LIGHT_UTILIZATION_LINUX_URL,
+        INSTANCES_RESERVED_LIGHT_UTILIZATION_RHEL_URL,
+        INSTANCES_RESERVED_LIGHT_UTILIZATION_SLES_URL,
+        INSTANCES_RESERVED_LIGHT_UTILIZATION_WINDOWS_URL,
+        INSTANCES_RESERVED_LIGHT_UTILIZATION_WINSQL_URL,
+        INSTANCES_RESERVED_LIGHT_UTILIZATION_WINSQLWEB_URL,
+        INSTANCES_RESERVED_MEDIUM_UTILIZATION_LINUX_URL,
+        INSTANCES_RESERVED_MEDIUM_UTILIZATION_RHEL_URL,
+        INSTANCES_RESERVED_MEDIUM_UTILIZATION_SLES_URL,
+        INSTANCES_RESERVED_MEDIUM_UTILIZATION_WINDOWS_URL,
+        INSTANCES_RESERVED_MEDIUM_UTILIZATION_WINSQL_URL,
+        INSTANCES_RESERVED_MEDIUM_UTILIZATION_WINSQLWEB_URL,
+        INSTANCES_RESERVED_HEAVY_UTILIZATION_LINUX_URL,
+        INSTANCES_RESERVED_HEAVY_UTILIZATION_RHEL_URL,
+        INSTANCES_RESERVED_HEAVY_UTILIZATION_SLES_URL,
+        INSTANCES_RESERVED_HEAVY_UTILIZATION_WINDOWS_URL,
+        INSTANCES_RESERVED_HEAVY_UTILIZATION_WINSQL_URL,
+        INSTANCES_RESERVED_HEAVY_UTILIZATION_WINSQLWEB_URL,
+    ]
+
+    result_regions = []
+    result_regions_index = {}
+    result = {
+        "config" : {
+            "currency" : currency,
+        },
+        "regions" : result_regions
+    }
+
+    for u in urls:
+        os_type = INSTANCES_RESERVED_OS_TYPE_BY_URL[u]
+        if get_specific_os_type and os_type != filter_os_type:
+            continue
+        utilization_type = INSTANCES_RESERVED_UTILIZATION_TYPE_BY_URL[u]
+        data = _load_data(u, use_cache=use_cache, cache_class=cache_class)
+        if "config" in data and data["config"] and "regions" in data["config"] and data["config"]["regions"]:
+            for r in data["config"]["regions"]:
+                if "region" in r and r["region"]:
+                    if get_specific_region and filter_region != r["region"]:
+                        continue
+
+                    region_name = JSON_NAME_TO_EC2_REGIONS_API[r["region"]]
+                    if region_name in result_regions_index:
+                        instance_types = result_regions_index[region_name]["instanceTypes"]
+                    else:
+                        instance_types = []
+                        result_regions.append({
+                            "region" : region_name,
+                            "instanceTypes" : instance_types
+                        })
+                        result_regions_index[region_name] = result_regions[-1]
+
+                    if "instanceTypes" in r:
+                        for it in r["instanceTypes"]:
+                            instance_type = it["type"]
+                            if "sizes" in it:
+                                for s in it["sizes"]:
+                                    instance_size = s["size"]
+
+                                    prices = {
+                                        "1year" : {
+                                            "hourly" : None,
+                                            "upfront" : None
+                                        },
+                                        "3year" : {
+                                            "hourly" : None,
+                                            "upfront" : None
+                                        }
+                                    }
+
+                                    _type = instance_size
+                                    if _type == "cc1.8xlarge":
+                                        # Fix conflict where cc1 and cc2 share the same type
+                                        _type = "cc2.8xlarge"
+
+                                    if get_specific_instance_type and _type != filter_instance_type:
+                                        continue
+
+                                    if get_specific_os_type and os_type != filter_os_type:
+                                        continue
+
+                                    instance_types.append({
+                                        "type" : _type,
+                                        "os" : os_type,
+                                        "utilization" : utilization_type,
+                                        "prices" : prices
+                                    })
+
+                                    for price_data in s["valueColumns"]:
+                                        price = None
+                                        try:
+                                            price = float(price_data["prices"][currency])
+                                        except ValueError:
+                                            price = None
+
+                                        if price_data["name"] == "yrTerm1":
+                                            prices["1year"]["upfront"] = price
+                                        elif price_data["name"] == "yrTerm1Hourly":
+                                            prices["1year"]["hourly"] = price
+                                        elif price_data["name"] == "yrTerm3":
+                                            prices["3year"]["upfront"] = price
+                                        elif price_data["name"] == "yrTerm3Hourly":
+                                            prices["3year"]["hourly"] = price
+
+    return result
+
+def get_ec2_ondemand_instances_prices(filter_region=None, filter_instance_type=None, filter_os_type=None, use_cache=False, cache_class=SimpleResultsCache):
+    """ Get EC2 on-demand instances prices. Results can be filtered by region """
+
+    get_specific_region = (filter_region is not None)
+    if get_specific_region:
+        filter_region = EC2_REGIONS_API_TO_JSON_NAME[filter_region]
+
+    get_specific_instance_type = (filter_instance_type is not None)
+    get_specific_os_type = (filter_os_type is not None)
+
+    currency = DEFAULT_CURRENCY
+
     urls = [
         INSTANCES_ON_DEMAND_LINUX_URL,
         INSTANCES_ON_DEMAND_RHEL_URL,
         INSTANCES_ON_DEMAND_SLES_URL,
         INSTANCES_ON_DEMAND_WINDOWS_URL,
         INSTANCES_ON_DEMAND_WINSQL_URL,
-        INSTANCES_ON_DEMAND_WINSQLWEB_URL       
+        INSTANCES_ON_DEMAND_WINSQLWEB_URL
     ]
 
     result_regions = []
@@ -317,43 +451,54 @@ def get_ec2_ondemand_instances_prices(use_cache=False, cache_class=SimpleResults
     }
 
     for u in urls:
+        if get_specific_os_type and INSTANCES_ONDEMAND_OS_TYPE_BY_URL[u] != filter_os_type:
+            continue
 
         data = _load_data(u, use_cache=use_cache, cache_class=cache_class)
         if "config" in data and data["config"] and "regions" in data["config"] and data["config"]["regions"]:
             for r in data["config"]["regions"]:
+                if "region" in r and r["region"]:
+                    if get_specific_region and filter_region != r["region"]:
+                        continue
+
                     region_name = JSON_NAME_TO_EC2_REGIONS_API[r["region"]]
                     instance_types = []
                     if "instanceTypes" in r:
                         for it in r["instanceTypes"]:
-                            instance_type = INSTANCE_TYPE_MAPPING[it["type"]]
+                            instance_type = it["type"]
                             if "sizes" in it:
                                 for s in it["sizes"]:
-                                    instance_size = INSTANCE_SIZE_MAPPING[s["size"]]
-    
+                                    instance_size = s["size"]
+
                                     for price_data in s["valueColumns"]:
                                         price = None
                                         try:
                                             price = float(price_data["prices"][currency])
                                         except ValueError:
                                             price = None
-    
-                                        _type = "%s.%s" % (instance_type, instance_size)
+
+                                        _type = instance_size
                                         if _type == "cc1.8xlarge":
                                             # Fix conflict where cc1 and cc2 share the same type
                                             _type = "cc2.8xlarge"
-    
-    
+
+                                        if get_specific_instance_type and _type != filter_instance_type:
+                                            continue
+
+                                        if get_specific_os_type and price_data["name"] != filter_os_type:
+                                            continue
+
                                         instance_types.append({
                                             "type" : _type,
                                             "os" : price_data["name"],
                                             "price" : price
                                         })
-    
+
                         result_regions.append({
                             "region" : region_name,
                             "instanceTypes" : instance_types
                         })
-    
+
     return result
 
 
@@ -365,7 +510,7 @@ if __name__ == "__main__":
             return v
 
     try:
-        import argparse 
+        import argparse
     except ImportError:
         print "ERROR: You are running Python < 2.7. Please use pip to install argparse:   pip install argparse"
 
