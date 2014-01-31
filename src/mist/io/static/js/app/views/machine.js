@@ -108,6 +108,13 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
             },
 
 
+            renderMonitoringButtons: function() {
+                Ember.run.next(this, function() {
+                    $('#add-rule-button').parent().trigger('create');
+                    $('#disable-monitor-btn').parent().trigger('create');
+                });
+            },
+
             updateEnableButton: function() {
                 if (this.machine.state == 'running') {
                     $('#enable-monitor-btn').removeClass('ui-state-disabled');
@@ -397,7 +404,11 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
             stateObserver: function () {
                 Ember.run.once(this, 'renderKeysButton');
                 Ember.run.once(this, 'updateEnableButton');
-            }.observes('machine.state')
+            }.observes('machine.state'),
+
+            hasMonitoringObserver: function() {
+                Ember.run.once(this, 'renderMonitoringButtons')
+            }.observes('machine.hasMonitoring')
         });
     }
 );
