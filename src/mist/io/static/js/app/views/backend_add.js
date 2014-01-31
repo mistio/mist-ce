@@ -66,7 +66,7 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
 
                         //This is for HP Cloud specific
                         if (provider.provider.indexOf('region-') > -1) {
-                            Mist.backendAddController.set('newBackendOpenStackURL', 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/');
+                            Mist.backendAddController.set('newBackendOpenStackURL', 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/tokens');
                         } else {
                             $('#non-hp-cloud').show();
                         }
