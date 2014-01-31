@@ -28,7 +28,7 @@
     width: 0px;
 }
 
-.rule-if, .rule-then, .key-name {
+.rule-if, .rule-then {
     font-size: 20px;
     font-weight: bold;
     padding: 6px;
@@ -64,12 +64,12 @@
     float: left;
 }
 
-.delete-rule-container, .delete-key-container {
+.delete-rule-container {
     float: right;
     margin: 9px;
 }
 
-.delete-rule-container div.ui-btn span.ui-btn-inner, .delete-key-container div.ui-btn span.ui-btn-inner {
+.delete-rule-container div.ui-btn span.ui-btn-inner {
     padding-left: 9px;
 }
 
