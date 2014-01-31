@@ -282,6 +282,7 @@ define(['app/models/key'],
                 Ember.run(this, function() {
                     this.getKey(keyId).machines.pushObject([machine.backend.id, machine.id]);
                     machine.set('probed', true);
+                    machine.probe(keyId);
                     this.trigger('onKeyAssociate');
                 });
             },
