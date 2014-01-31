@@ -20,21 +20,26 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
 
                 if (!image || !image.id || !size || !size.id || !provider || !provider.id) return 0;
 
-                if (provider.provider.indexOf('ec2') > -1) {
-                    if (image.name.indexOf('SUSE Linux Enterprise') > -1)
-                        return size.price.sles;
-                    if (image.name.indexOf('Red Hat') > -1)
-                        return size.price.rhel;
-                    return size.price.linux;
+                try { //might fail with TypeError if no size for this image
+                    if (provider.provider.indexOf('ec2') > -1) {
+                        if (image.name.indexOf('SUSE Linux Enterprise') > -1)
+                            return size.price.sles;
+                        if (image.name.indexOf('Red Hat') > -1)
+                            return size.price.rhel;
+                        return size.price.linux;
+                    }
+                    if (provider.provider.indexOf('rackspace') > -1) {
+                        if (image.name.indexOf('Red Hat') > -1)
+                            return size.price.rhel;
+                        if (image.name.indexOf('Vyatta') > -1)
+                            return size.price.vyatta;
+                        return size.price.linux;
+                    } 
+                    return size.price;
+
+                } catch (error) {
+                    return 0;
                 }
-                if (provider.provider.indexOf('rackspace') > -1) {
-                    if (image.name.indexOf('Red Hat') > -1)
-                        return size.price.rhel;
-                    if (image.name.indexOf('Vyatta') > -1)
-                        return size.price.vyatta;
-                    return size.price.linux;
-                } 
-                return size.price;
             }.property('Mist.machineAddController.newMachineProvider',
                        'Mist.machineAddController.newMachineImage',
                        'Mist.machineAddController.newMachineSize'),
