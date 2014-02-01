@@ -56,6 +56,10 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
                 // Add event listeners
                 Mist.keysController.on('onKeyListChange', this, 'renderFields');
 
+                // Connect view with machineAddController
+                var viewId = $('#create-machine-panel').parent().attr('id');
+                Mist.machineAddController.set('view', Ember.View.views[viewId]);
+
              }.on('didInsertElement'),
 
 
@@ -116,7 +120,9 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
 
                 selectProvider: function (backend) {
 
-                    this.fieldIsReady('provider');
+                    if (this.fieldIsReady) {
+                        this.fieldIsReady('provider');
+                    }
 
                     Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
                                              .set('newMachineImage', {'name' : 'Select Image'})
@@ -132,7 +138,9 @@ define('app/views/machine_add_dialog', ['text!app/templates/machine_add_dialog.h
 
                 selectImage: function (image) {
 
-                    this.fieldIsReady('image');
+                    if (this.fieldIsReady) {
+                        this.fieldIsReady('image');
+                    }
 
                     Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
                                              .set('newMachineSize', {'name' : 'Select Size'})

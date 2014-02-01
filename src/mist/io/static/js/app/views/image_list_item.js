@@ -35,11 +35,12 @@ define('app/views/image_list_item', ['app/views/list_item', 'text!app/templates/
 
 
                 launchImage: function () {
-                    Mist.machineAddController.open(function (success) {
-                        //Mist.Router.router.transitionTo('machines');
+                    this.image.backend.images.content.addObject(this.image);
+                    Mist.machineAddController.open();
+                    Ember.run.next(this, function () {
+                        Mist.machineAddController.view._actions.selectProvider(this.image.backend);
+                        Mist.machineAddController.view._actions.selectImage(this.image);
                     });
-                    Mist.machineAddController.set('newMachineProvider', this.image.backend);
-                    Mist.machineAddController.set('newMachineImage', this.image);
                 }
             }
         });
