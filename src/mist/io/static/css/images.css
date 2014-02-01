@@ -1,0 +1,14 @@
+
+/* Image List Page CSS
+-----------------------------------------------------------------------------------------------------------*/
+
+@-moz-document url-prefix() {
+	#image-list-page .checkbox-link h3 {
+	    width: 50%;
+	}
+
+    #image-list-page .checkbox-link .tag {
+        position: relative;
+        bottom: 33px;
+    }
+}

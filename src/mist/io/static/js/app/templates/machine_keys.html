@@ -12,7 +12,7 @@
            {{action "associateClicked" target="view"}}>Associate</a>
 
         {{#if Mist.machineKeysController.associatedKeys}}
-        <ul data-role="listview">
+        <ul id="machine-keys" data-role="listview">
             {{#each Mist.machineKeysController.associatedKeys}}
                 {{view Mist.machineKeysListItemView keyBinding="this"}}
             {{/each}}
