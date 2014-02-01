@@ -235,7 +235,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                                     Mist.confirmationController.show();
                                 } else {
                                     Mist.notificationController.set('msgHeader', 'No keys');
-                                    Mist.notificationController.set('msgPart1', "The collectd daemon can't be installed automatically " + 
+                                    Mist.notificationController.set('msgPart1', "The collectd deamon can't be installed automatically " + 
                                                                     'because Mist.io can not connect to this machine.');
                                     Mist.notificationController.set('msgPart2', 'To connect a machine with Mist.io you can follow the ' + 
                                                                                 'instructions on the help page.');

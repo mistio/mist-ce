@@ -321,6 +321,20 @@ ul.checkbox-list li a, ul.checkbox-list li label {
     margin-top: 0px;
 }
 
+/* Confirmation popup
+-----------------------------------------------------------------------------------------------------------*/
+#confirmation-popup {
+    width: 355px !important;
+    max-width: 99%;
+}
+#confirmation-popup  .ok-cancel a,
+#confirmation-popup  .ok-cancel button {
+    width: 127px !important;
+}
+
+#confirmation-popup p {
+    text-align: center;
+}
 
 /* Other
 -----------------------------------------------------------------------------------------------------------*/
