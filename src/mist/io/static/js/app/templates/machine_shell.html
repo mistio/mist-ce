@@ -1,4 +1,4 @@
-<div id="machine-shell-popup" 
+<div id="machine-shell-popup"
      class="huge-popup" 
      data-role="popup"
      data-theme="b"
@@ -11,21 +11,30 @@
     </div>
 
     <div data-role="content">
-        <div class="ui-grid-a" id="shell-grid">
-            <div class="ui-block-a" id="shell-input">
-                {{view Mist.ShellTextField data-theme="a" valueBinding="Mist.machineShellController.command"}}
-            </div>
-            <div class="ui-block-b" id="shell-submit">
-                <button data-theme="d" data-icon="shell-return" autofocus="true" {{action "submitClicked" target="view"}}></button>
-            </div>
-            <div class="ui-block-a" id="shell-response" data-role="listview" data-theme="a">
-            {{#each Mist.machineShellController.machine.commandHistory}}
-                {{view Mist.machineShellListItemView commandBinding="this"}}
-            {{/each}}
-            </div>
-            <div class="ui-grid-a" id="shell-back">
-                <a data-role="button" data-theme="a" {{action "backClicked" target="view"}}>Back</a>
-            </div>
+        <table class="shell-input">
+            <tr>
+                <td>
+                    {{view Mist.ShellTextField 
+                           data-theme="a" 
+                           valueBinding="Mist.machineShellController.command"}}
+                </td>
+                <td id="shell-submit">
+                    <button data-theme="d" 
+                        data-icon="shell-return" 
+                        {{action "submitClicked" target="view"}}></button>
+                </td>
+            </tr>
+        </table>
+        <div id="shell-return">
+        {{#each Mist.machineShellController.machine.commandHistory}}
+            {{view Mist.machineShellListItemView commandBinding="this"}}
+        {{/each}}
         </div>
+        <div class="ui-grid-a shell-back">
+            <a data-role="button" 
+               data-theme="a" 
+               {{action "backClicked" target="view"}}>Back</a>
+        </div>
+        
     </div>
 </div>

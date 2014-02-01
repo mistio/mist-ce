@@ -25,12 +25,26 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
             open: function (machine) {
                 this._clear();
                 this.set('machine', machine);
-                $('#machine-shell-popup').popup('open');
+                $('#machine-shell-popup').on('popupafteropen',
+                    function(){
+                        $('.shell-input input').focus();
+                    }
+                ).popup('open');
+                
+                $(window).on('resize', function(){
+                        $('#shell-return').css({'height': ($(window).height() - 290) + 'px'});
+                        return true;
+                });
+                $(window).trigger('resize');
+                Ember.run.next(function(){
+                    $('.shell-input input').focus();
+                });                
             },
 
 
             close: function () {
                 $('#machine-shell-popup').popup('close');
+                $(window).off('resize');
                 this._clear();
             },
 
