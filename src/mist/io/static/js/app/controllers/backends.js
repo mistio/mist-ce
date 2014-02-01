@@ -182,7 +182,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     }                
                     machine.set('loadavg', data.loadavg);
                     machine.set('loss', data.packets_loss);
-                    machine.set('latency', data.rtt_avg);
+                    machine.set('latency', Math.floor(data.rtt_avg));
                     
                 }).error(function(message) {
                     if (!machine.backend || !machine.backend.enabled) return;

@@ -66,3 +66,7 @@
 .info-table tr {
     border: 1px solid #ccc;
 }
+
+.info-table .loadleds {
+    margin-right: 10px;
+}

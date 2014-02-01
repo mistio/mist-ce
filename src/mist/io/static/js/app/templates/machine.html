@@ -136,13 +136,57 @@
             <h3>Basic Info</h3>
 
             <table class="info-table">
+                <tr>
+                    <td>Last probed</td>
+                    <td>{{view.lastProbe}}</td>
+                </tr>
+                </tr>
                 {{#if probed}}
                 <tr>
                     <td>Up and running for</td>
                     <td>{{view.upFor}}</td>
                 </tr>
                 {{/if}}
- 
+                {{#if loadavg}}
+                <tr>
+                    <td>Load</td>
+                    <td>
+                        <div class="loadleds">
+                                                                                                  
+                            <div {{bind-attr class="loadavg15 :led"}}>
+                            </div>                
+                            <div {{bind-attr class="loadavg5 :led"}}>
+                            </div> 
+                            <div {{bind-attr class="loadavg1 :led"}}>
+                            </div>
+                        </div>
+                        {{loadavg}} - {{loadavg5}}
+                    </td>
+                </tr>                
+                {{/if}}
+                {{#if latency}}
+                <tr>
+                    <td>Latency</td>
+                    <td>
+                        <div {{bind-attr class=":netleds"}}>
+                            <div {{bind-attr class="netled4 :netled1"}}>
+                            </div> 
+                            <div {{bind-attr class="netled3 :netled2"}}>
+                            </div> 
+                            <div {{bind-attr class="netled2 :netled3"}}>
+                            </div> 
+                            <div {{bind-attr class="netled1 :netled4"}}>
+                            </div>
+                        </div>
+                        {{latency}}ms</td>
+                </tr>
+                {{/if}}
+                {{#if loss}}
+                <tr>
+                    <td>Packet loss</td>
+                    <td>{{loss}}</td>
+                </tr>
+                {{/if}}
                 {{#if tags}}
                 <tr>
                     <td>Tags</td>

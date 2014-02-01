@@ -316,7 +316,21 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 return ret;
             }.property('machine.uptime'),
 
-
+            lastProbe: function(){
+                var ret = 'never';
+                if (this.machine && this.machine.uptimeChecked > 0) {
+                    var x = (Date.now()-this.machine.uptimeChecked) / 1000;
+                    var minutes = Math.floor(x / 60);
+                    if (minutes > 1) 
+                        ret = minutes + ' minutes ago';
+                    else if (minutes == 1)
+                        ret = "1 minute ago";
+                    else 
+                        ret = "just now";                    
+                }
+                return ret;
+            }.property('machine.uptime'),
+            
             basicInfo: function() {
                 if (!this.machine) return;
 
