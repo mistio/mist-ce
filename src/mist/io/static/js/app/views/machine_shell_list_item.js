@@ -39,14 +39,19 @@ define('app/views/machine_shell_list_item', ['app/views/list_item', 'text!app/te
                     var element = $('#' + that.elementId);
                     element.find('h3').on('click', function () {
 
+                        var arrow = element.find('.shell-li-arrow');
+                        var output = element.find('.output');
+
                         // Notify parent only if user is about to expand (open) the collapsible
-                        if (element.find('.output').css('display') == 'none') {
+                        if (output.css('display') == 'none') {
                             that.get('parentView').openCommand(element);
                             Ember.run.later(function() {
-                                element.find('.output').slideDown(200);
+                                output.slideDown(200);
+                                arrow.removeClass('ui-icon-carat-d').addClass('ui-icon-carat-u');
                             }, 500);
                         } else {
-                            element.find('.output').slideUp(200);
+                            output.slideUp(200);
+                            arrow.removeClass('ui-icon-carat-u').addClass('ui-icon-carat-d');
                         }
                     });
 

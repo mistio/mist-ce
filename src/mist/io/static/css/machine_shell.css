@@ -85,11 +85,7 @@
     height: auto !important;
     overflow-y: scroll !important;
 }
-#shell-return .pending-response h3 {
-    background-image: url("../images/spinner.gif");
-    background-position: right !important;
-    background-repeat: no-repeat;
-}
+
 #machine-shell-popup #shell-response {
     border: 1px solid #000000;
 }
@@ -100,12 +96,20 @@
     position: absolute;
     
 }
-#machine-shell-popup .shell-li .ajax-loader {
+#machine-shell-popup .ajax-loader {
     display: inline-block;
-    top: 4px;
+    float: right;
     position: relative;
-    left: 6px;
+    right: 30px;
+    margin-left: -15px;
 }
+
+#machine-shell-popup .shell-li-arrow {
+    height: 16px;
+    float: right;
+    position: relative;
+}
+
 #machine-shell-popup .ui-collapsible-content {
     background: #444;
     color: #efeff1;
