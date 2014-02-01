@@ -99,16 +99,23 @@
                     {{/if}}
                 </div>
                 
-                <div class="add-rule-container">
-                    <button id="add-rule-button"
-                        data-icon="plus"
-                        data-theme="b"
-                        {{action "addRuleClicked" target="view"}}>Add Rule</button>
+                <div id="monitoring-bottom-btns">
+                <div data-rule="ui-grid-a">
+                    <div class="ui-block-a">
+                        <a id="add-rule-button"
+                            data-role="button"
+                            data-icon="plus"
+                            data-theme="d"
+                            {{action "addRuleClicked" target="view"}}>Add Rule</a>
+                    </div>
+                    <div class="ui-block-b">
+                        <a id="disable-monitor-btn"
+                            data-role="button"
+                            data-icon="delete"
+                            {{action "disableMonitoringClicked" target="view"}}>Disable</a>
+                    </div>
                 </div>
-                
-                <a id="disable-monitor-btn"
-                   data-role="button"
-                   {{action "disableMonitoringClicked" target="view"}}>Disable</a>
+                </div>
 
             {{else}}
 

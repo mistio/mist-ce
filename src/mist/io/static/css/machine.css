@@ -32,6 +32,19 @@
     margin-right: 5px;
 }
 
+#single-machine-page #monitoring-bottom-btns {
+    margin: 0 auto;
+    width: 340px;
+}
+
+#single-machine-page #add-rule-button {
+    width: 100px;
+}
+
+#single-machine-page #disable-monitor-btn {
+    width: 100px;
+}
+
 .single-machine-header {
     height: 56px;
 }
