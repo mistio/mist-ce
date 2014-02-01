@@ -129,6 +129,16 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 }
             },
 
+            updateChangeMonitoringButton: function() {
+                if (this.machine.disablingMonitoring) {
+                    $('#disable-monitor-btn').addClass('ui-state-disabled');
+                } else if (this.machine.enablingMonitoring) {
+                    $('#enable-monitor-btn').addClass('ui-state-disabled');
+                } else {
+                    $('#disable-monitor-btn').removeClass('ui-state-disabled');
+                    $('#enable-monitor-btn').removeClass('ui-state-disabled');
+                }
+            },
 
             rules: function(){
                 var ret = Ember.ArrayController.create(),
@@ -427,8 +437,12 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
             }.observes('machine.state'),
 
             hasMonitoringObserver: function() {
-                Ember.run.once(this, 'renderMonitoringButtons')
-            }.observes('machine.hasMonitoring')
+                Ember.run.once(this, 'renderMonitoringButtons');
+            }.observes('machine.hasMonitoring'),
+
+            changeMonitoringObserver: function() {
+                Ember.run.once(this,  'updateChangeMonitoringButton');
+            }.observes('machine.disablingMonitoring', 'machine.enablingMonitoring')
         });
     }
 );
