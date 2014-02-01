@@ -225,7 +225,13 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                             // TODO: return machine_limit from server (core)
                             //if (Mist.current_plan.machine_limit >= Mist.monitored_machines.length) {
                                 if (this.machine.probed) {
-                                    Mist.monitoringController.changeMonitoring(this.machine);
+                                    var machine = this.machine;
+                                    Mist.confirmationController.set('title', 'Enable monitoring');
+                                    Mist.confirmationController.set('text', 'Are you sure you want to enable monitoring for this machine?');
+                                    Mist.confirmationController.set('callback', function () {
+                                        Mist.monitoringController.changeMonitoring(machine);
+                                    });
+                                    Mist.confirmationController.show();
                                 } else {
                                     Mist.notificationController.set('msgHeader', 'No keys');
                                     Mist.notificationController.set('msgPart1', "The collectd daemon can't be installed automatically " + 
