@@ -1,10 +1,15 @@
-<div id="machine-keys-panel" class="side-panel" data-role="panel" data-position="right" data-display="overlay">
+<div id="machine-keys-panel"
+    class="side-panel"
+    data-role="panel"
+    data-position="right"
+    data-display="overlay"
+    data-theme="b">
 
     <div data-role="header">
         <h1>Manage Keys</h1>
     </div>
 
-    <div data-role="content">
+    <div data-role="content" data-theme="b">
 
         <a id="associate-btn"
            data-role="button"
@@ -25,7 +30,7 @@
             <div class="ajax-loader"></div>
         {{/if}} {{/if}}
         
-        <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
+        <a data-role="button" data-theme="a" {{action "backClicked" target="view"}}>Back</a>
 
     </div>
 
@@ -35,15 +40,16 @@
 
 <div id="key-actions-popup" class="tiny-popup" data-role="popup" data-overlay-theme="b" data-transition="flip" 
                                                                                         data-position-to="#associated-keys"
-                                                                                        data-dismissible="false">
+                                                                                        data-dismissible="false"
+                                                                                        data-theme="b">
     <div data-role="header">
         <h1>Actions</h1>
     </div>
     
     <div data-role="content">
-        <button {{action "removeClicked" target="view"}}>Remove</button>
-        <button {{action "probeClicked" target="view"}}>Probe</button>
-        <button {{action "cancelClicked" target="view"}}>Cancel</button>
+        <button data-theme="a" {{action "removeClicked" target="view"}}>Remove</button>
+        <button data-theme="a" {{action "probeClicked" target="view"}}>Probe</button>
+        <button data-theme="a" {{action "cancelClicked" target="view"}}>Cancel</button>
     </div>
 </div>
 
@@ -55,7 +61,7 @@
             <a {{action "nonAssociatedKeyClicked" this target="view"}}>{{this.id}}</a>
         </li>
         {{/each}}
-        <li data-icon="false" data-theme="b"> 
+        <li data-icon="false" data-theme="d"> 
             <a {{action "newKeyClicked" target="view"}}>New key</a>
         </li>
     </ul>
