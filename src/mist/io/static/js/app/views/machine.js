@@ -118,6 +118,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 Ember.run.next(this, function() {
                     $('#add-rule-button').parent().trigger('create');
                     $('#disable-monitor-btn').parent().trigger('create');
+                    $('#enable-monitor-btn').parent().trigger('create');
                 });
             },
 

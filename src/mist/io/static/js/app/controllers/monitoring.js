@@ -53,6 +53,12 @@ define('app/controllers/monitoring', [
                          machine.set('enablingMonitoring', false);
                      } else {
                          machine.set('hasMonitoring', false);
+                         // Remove machine from monitored_machines
+                         Mist.monitored_machines.some(function(machine_tupple) {
+                            if (machine_tupple[1] == machine.id && machine_tupple[0] == machine.backend.id) {
+                                Mist.monitored_machines.removeObject(machine_tupple);
+                            }
+                         });
                          machine.set('disablingMonitoring', false);
                      }
                      Mist.set('authenticated', true);
