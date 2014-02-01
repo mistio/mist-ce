@@ -42,9 +42,11 @@ define('app/views/machine_shell_list_item', ['app/views/list_item', 'text!app/te
                         // Notify parent only if user is about to expand (open) the collapsible
                         if (element.find('.output').css('display') == 'none') {
                             that.get('parentView').openCommand(element);
-                            element.find('.output').show();
+                            Ember.run.later(function() {
+                                element.find('.output').slideDown(200);
+                            }, 500);
                         } else {
-                            element.find('.output').hide();
+                            element.find('.output').slideUp(200);
                         }
                     });
 
