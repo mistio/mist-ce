@@ -20,10 +20,10 @@ define('app/views/machine_shell', ['text!app/templates/machine_shell.html', 'emb
              */
 
             openCommand: function(target) {
-                var elements = $('#shell-response .ember-view');
+                var elements = $('#shell-return .ember-view');
                 for (var e = 0; e < elements.length; ++e) {
                     if (elements.eq(e).attr('id') != target.attr('id')) {
-                        elements.eq(e).find('.ui-collapsible').collapsible('collapse');
+                        elements.eq(e).find('.output').hide();
                     }
                 }
             },
