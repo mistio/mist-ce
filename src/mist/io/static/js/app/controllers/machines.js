@@ -256,26 +256,7 @@ define('app/controllers/machines', ['app/models/machine'],
                         }
                     });
 
-                    // Update monitoring
-                    if (Mist.monitored_machines) {
-                        that.content.forEach(function(machine) {
-                            Mist.monitored_machines.some(function(machine_tuple){
-                                backend_id = machine_tuple[0];
-                                machine_id = machine_tuple[1];
-                                if (machine.backend.id == backend_id && machine.id == machine_id && !machine.hasMonitoring) {
-                                    that.getMachine(machine_id, backend_id).set('hasMonitoring', true);
-                                    return true;
-                                }
-                            });
-                            Mist.rulesController.content.forEach(function(rule) {
-                                if (!rule.machine.id) {
-                                    if (rule.machine == machine.id && rule.backend == machine.backend.id) {
-                                        rule.set('machine', machine);
-                                    }
-                                }
-                            });
-                        });
-                    }
+                    that._updateMonitoredMachines();
 
                     that.trigger('onMachineListChange');
                 });
@@ -302,6 +283,35 @@ define('app/controllers/machines', ['app/models/machine'],
                     this.set('selectedMachines', newSelectedMachines);
                     this.trigger('onSelectedMachinesChange');
                 });
+            },
+
+
+            _updateMonitoredMachines: function() {
+
+                var that = this;
+
+                if (Mist.monitored_machines) {
+
+                    that.content.forEach(function(machine) {
+                        
+                        Mist.monitored_machines.some(function(machine_tuple){
+                            backend_id = machine_tuple[0];
+                            machine_id = machine_tuple[1];
+                            if (machine.backend.id == backend_id && machine.id == machine_id && !machine.hasMonitoring) {
+                                that.getMachine(machine_id, backend_id).set('hasMonitoring', true);
+                                return true;
+                            }
+                        });
+
+                        Mist.rulesController.content.forEach(function(rule) {
+                            if (!rule.machine.id) {
+                                if (rule.machine == machine.id && rule.backend == machine.backend.id) {
+                                    rule.set('machine', machine);
+                                }
+                            }
+                        });
+                    });
+                }
             },
 
 

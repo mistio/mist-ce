@@ -91,6 +91,9 @@ define('app/controllers/monitoring', [
                      if (machine)
                          machine.set('hasMonitoring', true);
                  });
+                 Mist.backendsController.content.forEach(function(backend) {
+                    backend.machines._updateMonitoredMachines();
+                 });
              },
 
 
