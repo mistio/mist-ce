@@ -25,7 +25,7 @@
 
             <a data-role="button" data-mini="true"
                {{bind-attr href="view.accountUrl"}}
-               {{bind-attr target="Mist.isCore"}}>Account</a>
+               {{bind-attr target="view.isNotCore"}}>Account</a>
 
             {{#if Mist.isCore}}
                 <button data-mini="true" {{action "logoutClicked" target="view"}}>Logout</a>

@@ -153,7 +153,7 @@ define( 'app', [
 
         // Globals
 
-        App.set('isCore', IS_CORE);
+        App.set('isCore', !!IS_CORE);
         App.set('authenticated', AUTH || IS_CORE);
         App.set('ajax', new AJAX('')); // TODO: Get CSRF_TOKEN from server
         App.set('email', EMAIL);

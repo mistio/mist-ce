@@ -11,6 +11,7 @@ define('app/views/user_menu', ['text!app/templates/user_menu.html', 'ember'],
              *  Properties
              */
 
+            isNotCore: !IS_CORE,
             accountUrl: URL_PREFIX + '/account',
             template: Ember.Handlebars.compile(user_menu_html),
             //TODO: change the logo_splash.png to user.png
