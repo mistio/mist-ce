@@ -57,7 +57,7 @@ define('app/controllers/login', ['ember'],
 
 
             logout: function() {
-                window.location.hash = '/logout';
+                window.location = '/logout';
             },
 
 
