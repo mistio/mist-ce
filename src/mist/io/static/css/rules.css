@@ -64,6 +64,12 @@
     float: left;
 }
 
+.rule-box .ajax-loader  {
+    float: right;
+    margin-top: 22px;
+    margin-right: 18px;
+}
+
 .delete-rule-container {
     float: right;
     margin: 9px;
