@@ -420,7 +420,7 @@ define( 'app', [
                     else { data = {'csrf_token': csrfToken}; }
                 }
 
-                $.ajax({
+                var ajaxObject = {
                     url: url,
                     type: type,
                     data: JSON.stringify(data),
@@ -434,7 +434,14 @@ define( 'app', [
                         if (ret.complete)
                             ret.complete(jqXHR.status == 200, jqXHR.responseJSON);
                     }
-                });
+                }
+
+                if (Object.keys(data).length === 0) {
+                    delete ajaxObject.data;
+                }
+
+                $.ajax(ajaxObject);
+
                 return call;
             };
             return call.ajax();
