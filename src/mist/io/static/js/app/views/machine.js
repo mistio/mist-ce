@@ -141,7 +141,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 }
             },
 
-            rules: function(){
+            rulesObserver: function(){
                 var ret = Ember.ArrayController.create(),
                     machine = this.get('controller').get('model');
                 Mist.rulesController.forEach(function(rule){
@@ -149,8 +149,8 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                         ret.pushObject(rule);
                     }
                 });
-                return ret;
-            }.property('Mist.rulesController.@each', 'Mist.rulesController.@each.machine'),
+                this.set('rules', ret);
+            }.observes('Mist.rulesController.@each', 'Mist.rulesController.@each.machine', 'machine'),
 
 
             stopPolling: function() {
