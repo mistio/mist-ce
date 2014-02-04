@@ -16,3 +16,8 @@
 #single-key-machines .checkbox-link .ui-checkbox {
     display: none;
 }
+
+#single-key-page .machine-name {
+    left: 10px;
+    position: relative;
+}

@@ -36,12 +36,13 @@
 
         {{#if machines}}
         <div id="single-key-machines" data-role="collapsible">
+
             <h3>Machines
                 {{#if Mist.backendsController.loadingMachines}}
                 <div class="ajax-loader"></div>
                 {{/if}}
             </h3>
-            <ul data-role="listview" data-inset="true">
+            <ul data-role="listview" class="checkbox-list" data-inset="true">
                 {{#each view.machines}}
                     {{view Mist.machineListItemView
                            machineBinding="this"
