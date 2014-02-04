@@ -741,34 +741,14 @@ def shell_stream(request):
     Streams output using the hidden iframe technique.
 
     """
-    log.info("got shell_stream request")
-    backend_id = request.matchdict['backend']
-    machine_id = request.matchdict['machine']
-    cmd = request.params.get('command')
-    cmd_id = request.params.get('command_id').encode('utf-8', 'ignore')    
-    host = request.params.get('host')
-    if not cmd:
-        raise RequiredParameterMissingError("command")
-    if not host:
-        raise RequiredParameterMissingError("host")
 
-    user = user_from_request(request)
-    shell = Shell(host)
-    shell.autoconfigure(user, backend_id, machine_id)
-    # stdout_lines is a generator that spits out lines of combined
-    # stdout and stderr output. cmd is executed via the shell on the background
-    # and the stdout_lines generator is immediately available. stdout_lines
-    # will block if no line is in the buffer and will stop iterating once the
-    # command is completed and the pipe is closed.
-    stdout_lines = shell.command_stream(cmd)
-    
     def parse(lines):
         """Generator function that converts stdout_lines to html with
         js which it streams in a hidden iframe.
 
         """
-        # send some blank data to fill the initial buffer and get (webkit) 
-        # browsers to display right away what's sent 
+        # send some blank data to fill the initial buffer and get (webkit)
+        # browsers to display right away what's sent
         #yield 1024*'\0'
         # start the html response
         yield "<html><body>\n"
@@ -780,11 +760,36 @@ def shell_stream(request):
             clear_line = clear_line.replace('\r', '')
             #.replace('<','&lt;').replace('>', '&gt;')
             ret = js % (clear_line, cmd_id)
-            yield ret 
+            yield ret
         js = "<script type='text/javascript'>"
         js += "parent.completeShell(%s, '%s');</script>\n"
         yield js % (1, cmd_id)  # FIXME
-        yield "</body></html>\n"    
+        yield "</body></html>\n"
+
+    log.info("got shell_stream request")
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    cmd = request.params.get('command')
+    cmd_id = request.params.get('command_id').encode('utf-8', 'ignore')
+    host = request.params.get('host')
+    try:
+        if not cmd:
+            raise RequiredParameterMissingError("command")
+        if not host:
+            raise RequiredParameterMissingError("host")
+
+        user = user_from_request(request)
+        shell = Shell(host)
+        shell.autoconfigure(user, backend_id, machine_id)
+        # stdout_lines is a generator that spits out lines of combined
+        # stdout and stderr output. cmd is executed via the shell on the background
+        # and the stdout_lines generator is immediately available. stdout_lines
+        # will block if no line is in the buffer and will stop iterating once the
+        # command is completed and the pipe is closed.
+        stdout_lines = shell.command_stream(cmd)
+    except Exception as e:
+        message = ["Failed to execute command\n", "Error: %s \n" % e]
+        return Response(status=500, app_iter=parse(message))
 
     return Response(status=200, app_iter=parse(stdout_lines))
 
