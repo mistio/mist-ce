@@ -132,6 +132,18 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 });
             },
 
+
+            updateMonitoringCollapsible: function() {
+                Ember.run.next(this, function() {
+                    if (Mist.backendsController.checkedMonitoring) {
+                        $('#monitoring-collapsible').show();
+                    } else {
+                        $('#monitoring-collapsible').hide();
+                    }
+                });
+            },
+
+
             updateChangeMonitoringButton: function() {
                 if (this.machine.disablingMonitoring) {
                     $('#disable-monitor-btn').addClass('ui-state-disabled');
@@ -441,18 +453,26 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                 Ember.run.once(this, 'renderKeysButton');
             }.observes('machine.keysCount'),
 
+
             stateObserver: function () {
                 Ember.run.once(this, 'renderKeysButton');
                 Ember.run.once(this, 'updateEnableButton');
             }.observes('machine.state'),
 
+
             hasMonitoringObserver: function() {
                 Ember.run.once(this, 'renderMonitoringButtons');
             }.observes('machine.hasMonitoring'),
 
+
             changeMonitoringObserver: function() {
                 Ember.run.once(this,  'updateChangeMonitoringButton');
-            }.observes('machine.disablingMonitoring', 'machine.enablingMonitoring')
+            }.observes('machine.disablingMonitoring', 'machine.enablingMonitoring'),
+
+
+            checkedMonitoringObserver: function() {
+                Ember.run.once(this, 'updateMonitoringCollapsible');
+            }.observes('Mist.backendsController.checkedMonitoring', 'machine'),
         });
     }
 );

@@ -17,7 +17,10 @@ define('app/controllers/monitoring', [
              */
              load: function(callback) {
 
-                 if (!Mist.authenticated) return;
+                 if (!Mist.authenticated) {
+                    Mist.backendsController.set('checkedMonitoring', true);
+                    return;
+                 }
 
                  var that = this;
                  this.checkingMonitoring = true;
@@ -28,6 +31,7 @@ define('app/controllers/monitoring', [
                      Mist.notificationController.notify('Failed to get monitoring data');
                  }).complete(function(success, data) {
                      that.checkingMonitoring = false;
+                     Mist.backendsController.set('checkedMonitoring', true);
                      that.trigger('onMonitoringDataUpdate');
                      if (callback) callback(success, data);
                  });

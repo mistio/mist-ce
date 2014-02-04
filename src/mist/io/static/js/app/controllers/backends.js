@@ -20,6 +20,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             addingBackend: false,
             deletingBackend: false,
             togglingBackend: false,
+            checkedMonitoring: false,
             checkingMonitoring: false,
 
             loading: false,
