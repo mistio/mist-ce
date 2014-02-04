@@ -153,6 +153,10 @@ SUPPORTED_PROVIDERS = [
         'provider' : "%s:syd" % Provider.RACKSPACE
     },
     {
+        'title': 'Rackspace HKG',
+        'provider' : "%s:hkg" % Provider.RACKSPACE
+    },
+    {
         'title': 'Rackspace US (OLD)',
         'provider' : "%s:us" % Provider.RACKSPACE_FIRST_GEN
     },
