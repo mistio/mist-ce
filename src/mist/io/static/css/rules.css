@@ -4,6 +4,7 @@
 
 .rules-container {
     padding: 0;
+    margin: 0 !important;
     background: #e8e8e9;
     border-bottom: 1px solid #ccc;
 }
