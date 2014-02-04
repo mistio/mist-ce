@@ -123,11 +123,13 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
             },
 
             updateEnableButton: function() {
-                if (this.machine.state == 'running') {
-                    $('#enable-monitor-btn').removeClass('ui-state-disabled');
-                } else {
-                    $('#enable-monitor-btn').addClass('ui-state-disabled');
-                }
+                Ember.run.next(this, function() {
+                    if (this.machine.id && this.machine.state == 'running') {
+                        $('#enable-monitor-btn').removeClass('ui-state-disabled');
+                    } else {
+                        $('#enable-monitor-btn').addClass('ui-state-disabled');
+                    }
+                });
             },
 
             updateChangeMonitoringButton: function() {
@@ -426,6 +428,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
 
             modelObserver: function() {
                 Ember.run.once(this, 'load');
+                Ember.run.once(this, 'updateEnableButton');
             }.observes('controller.model'),
 
 
