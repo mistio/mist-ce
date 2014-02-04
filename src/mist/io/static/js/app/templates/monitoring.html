@@ -22,13 +22,13 @@
     <div id="cpuGraph" class="graph">
         <div class='header'>
           <div class="title">CPU</div>
-          <div class='closeBtn' {{action "collapsePressed" view.graphs.cpu.name target="Mist.monitoringController.UI"}}>-</div>
+          <div data-icon="carat-d" class='closeBtn' {{action "collapsePressed" view.graphs.cpu.name target="Mist.monitoringController.UI"}}>-</div>
         </div>
     </div>
     <div id="loadGraph" class="graph">
         <div class='header'>
           <div class="title">Load</div>
-          <div class='closeBtn' {{action "collapsePressed" view.graphs.load.name target="Mist.monitoringController.UI"}}>-</div>
+          <div data-icon="carat-d" {{action "collapsePressed" view.graphs.load.name target="Mist.monitoringController.UI"}}>-</div>
         </div>
     </div>
     <div id="memoryGraph" class="graph">
@@ -68,37 +68,37 @@
     <!-- Graph Buttons -->
     <div id="graphBar">
         <div id="cpuGraphBtn" class="graphBtn">
-            <a data-icon="plus" href="#" data-role="button" data-theme="c" 
+            <a data-icon="carat-u" href="#" data-role="button" data-theme="c" 
                 {{action "expandPressed" view.graphs.cpu.name target="Mist.monitoringController.UI"}}>CPU</a>
         </div>
 
         <div id="loadGraphBtn" class="graphBtn">
-            <a data-icon="plus" href="#" data-role="button" data-theme="c"
+            <a data-icon="carat-u" href="#" data-role="button" data-theme="c"
                 {{action "expandPressed" view.graphs.load.name target="Mist.monitoringController.UI"}}>Load</a>
         </div>
     
         <div id="memoryGraphBtn" class="graphBtn">
-            <a data-icon="plus" href="#" data-role="button" data-theme="c"
+            <a data-icon="carat-u" href="#" data-role="button" data-theme="c"
                 {{action "expandPressed" view.graphs.memory.name target="Mist.monitoringController.UI"}}>Memory</a>
         </div>
     
         <div id="diskReadGraphBtn" class="graphBtn">
-            <a data-icon="plus" href="#" data-role="button" data-theme="c"
+            <a data-icon="carat-u" href="#" data-role="button" data-theme="c"
                 {{action "expandPressed" view.graphs.diskRead.name target="Mist.monitoringController.UI"}}>Disk Read</a>
         </div>
     
         <div id="diskWriteGraphBtn" class="graphBtn">
-            <a data-icon="plus" href="#" data-role="button" data-theme="c"
+            <a data-icon="carat-u" href="#" data-role="button" data-theme="c"
                 {{action "expandPressed" view.graphs.diskWrite.name target="Mist.monitoringController.UI"}}>Disk Write</a>
         </div>
     
         <div id="networkTXGraphBtn" class="graphBtn">
-            <a data-icon="plus" href="#" data-role="button" data-theme="c"
+            <a data-icon="carat-u" href="#" data-role="button" data-theme="c"
                 {{action "expandPressed" view.graphs.networkTX.name target="Mist.monitoringController.UI"}}>Network Tx</a>
         </div>
     
         <div  id="networkRXGraphBtn" class="graphBtn">
-            <a data-icon="plus" href="#" data-role="button" data-theme="c"
+            <a data-icon="carat-u" href="#" data-role="button" data-theme="c"
                 {{action "expandPressed" view.graphs.networkRX.name target="Mist.monitoringController.UI"}}>Network Rx</a>
         </div>
     </div>

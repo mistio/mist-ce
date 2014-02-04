@@ -45,9 +45,13 @@
 }
 
 .graphControls {
-    width: 250px;
+    width: 210px;
     margin: 0 auto; 
-} 
+}
+
+#graphsGoForward {
+    margin-right: 0px;
+}
 
 #GraphsArea{
     white-space: normal;

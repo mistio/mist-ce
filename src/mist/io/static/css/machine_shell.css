@@ -74,6 +74,14 @@
     margin: 0px;
     font-weight: bold;
     color: #222;
+    border-bottom: rgb(211, 211, 211) 1px solid;
+}
+#shell-return .command .shell-li-arrow:after {
+    margin-left: -24px;
+    background-color: transparent;
+}
+#shell-return .command .ajax-loader {
+    margin-right: 10px;
 }
 #shell-return .output {
     background: #444;

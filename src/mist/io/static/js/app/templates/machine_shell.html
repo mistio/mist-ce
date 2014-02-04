@@ -25,7 +25,7 @@
                 </td>
             </tr>
         </table>
-        <div id="shell-return">
+        <div id="shell-return" data-theme="a">
         {{#each Mist.machineShellController.machine.commandHistory}}
             {{view Mist.machineShellListItemView commandBinding="this"}}
         {{/each}}

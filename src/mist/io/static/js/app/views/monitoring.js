@@ -498,6 +498,8 @@ define('app/views/monitoring', [
                     */
                     this.changeWidth = function (width) {
 
+                        if (!d3svg) 
+                            return;
                         // Create an aspect ratio
                         var newHeight = 160 / 1280 * width;
 

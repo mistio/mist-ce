@@ -606,6 +606,9 @@ function appendShell(output, command_id) {
         warn(Date() + ': ' + output);
 
     command.set('response', command.response + output);
+    Ember.run.next(function(){
+        $('.output').scrollTop(1000000);        
+    });
 }
 
 function completeShell(ret, command_id) {

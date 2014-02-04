@@ -33,42 +33,28 @@ define('app/views/machine_shell_list_item', ['app/views/list_item', 'text!app/te
                 // and notify the parent view (machine shell view) that a
                 // collapsible was clicked. The parent view will close every
                 // other collapsible except this one
-                var that = this;
-                Ember.run.later(function () {
-
-                    var element = $('#' + that.elementId);
-                    element.find('h3').on('click', function () {
-
-                        var arrow = element.find('.shell-li-arrow');
-                        var output = element.find('.output');
-
-                        // Notify parent only if user is about to expand (open) the collapsible
-                        if (output.css('display') == 'none') {
-                            that.get('parentView').openCommand(element);
-                            Ember.run.later(function() {
-                                output.slideDown(200);
-                                arrow.removeClass('ui-icon-carat-d').addClass('ui-icon-carat-u');
-                            }, 500);
-                        } else {
-                            output.slideUp(200);
-                            arrow.removeClass('ui-icon-carat-u').addClass('ui-icon-carat-d');
-                        }
-                    });
-
-                    // Automatically close all other collapsibles
-                    // when new command is created
-                    that.get('parentView').openCommand(element);
-
-                }, 300);
-
+                var element = $('#' + this.elementId);   
+                this.get('parentView').openCommand(element);          
             }.on('didInsertElement'),
 
-            unload: function () {
-
-                // Remove click event handler
-                $('#' + this.elementId).find('.ui-btn').off('click');
-
-            }.on('willDestroyElement')
+            actions: {             
+                toggleCommand: function() {
+                    var element = $('#' + this.elementId);                
+                    var arrow = element.find('.shell-li-arrow');
+                    var output = element.find('.output');
+    
+                    // Notify parent only if user is about to expand (open) the collapsible
+                    if (output.css('display') == 'none') {
+                        this.get('parentView').openCommand(element);
+                        output.slideDown(200);
+                        arrow.removeClass('ui-icon-carat-r').addClass('ui-icon-carat-d');
+                    } else {
+                        output.slideUp(200);
+                        arrow.removeClass('ui-icon-carat-d').addClass('ui-icon-carat-r');
+                    }  
+                    this.get('parentView').openCommand(element);          
+                }
+            }
         });
     }
 );
