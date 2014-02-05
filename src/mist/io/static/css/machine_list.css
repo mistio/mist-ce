@@ -53,8 +53,17 @@
         bottom: 6px;
         font-size: 0.9em;
     }
-
 }
+
+@media only screen and  (max-width: 341px) {
+
+    .machine-leds {
+        position: relative;
+        bottom: 19px;
+    }
+}
+
+
 .machine-state {
     width: 21.6% !important;
     text-align: center;
