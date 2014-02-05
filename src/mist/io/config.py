@@ -22,7 +22,7 @@ except IOError:
     log.warning("No settings.py file found.")
 except Exception as exc:
     log.error("Error parsing settings py: %r", exc)
-CORE_URI = settings.get("CORE_URI", "https://dev.mist.io")
+CORE_URI = settings.get("CORE_URI", "https://mist.io")
 JS_BUILD = settings.get("JS_BUILD", False)
 JS_LOG_LEVEL = settings.get("JS_LOG_LEVEL", 3)
 GOOGLE_ANALYTICS_ID = settings.get("GOOGLE_ANALYTICS_ID", "")
