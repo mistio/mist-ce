@@ -282,9 +282,10 @@ define( 'app', [
 
         // Ember controllers
 
+        App.set('backendsController', BackendsController.create());  
         App.set('monitoringController', MonitoringController.create());
         App.set('keysController', KeysController.create());
-        App.set('backendsController', BackendsController.create());        
+              
 
         App.set('loginController', LoginController.create());
         App.set('rulesController', RulesController.create());
