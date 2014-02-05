@@ -120,23 +120,14 @@ define('app/views/monitoring', [
             */
             redrawJQMComponents: function(){
 
-
                 $('.monitoring-button').trigger('create');
                 $('#add-rule-button').trigger('create');
                 $('#monitoring-dialog').trigger('create');  
 
-
-                // DEBUG TODO Possible Remove It
-                //$('#timeWindowSelect').selectmenu();
-
-                // History Buttons
-                /*
-                $('#graphsGoBack').trigger('create');
-                $('#graphsGoForward').trigger('create');
-                $('#graphsResetHistory').trigger('create');*/
-
-                $('.graphControls').trigger('create');
                 $('#graphBar').trigger('create');
+
+                // History And Zoom Buttons
+                $('.graphControls').trigger('create');
 
                 // Disable History
                 $('#graphsGoForward').addClass('ui-disabled');
@@ -178,9 +169,10 @@ define('app/views/monitoring', [
             Graph: function(divID,width,timeToDisplayms,yAxisValueFormat){
 
                     var NUM_OF_LABELS = 5;
-                    var STEP_SECONDS = 10;
                     var NUM_OF_MIN_MEASUREMENTS = 8640; // 24 Hours
                     var NUM_OF_MAX_MEASUREMENTS = 8640; // 24 Hours
+                    var NUM_OF_MEASUREMENT = 60; // Number of metrics monitor sends in every request
+                    
 
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = 160 / 1280 * width;
@@ -250,8 +242,9 @@ define('app/views/monitoring', [
                             var measurements_received = newData.length;
                             if(measurements_received < NUM_OF_MIN_MEASUREMENTS)
                             {
+                                var step = (this.timeDisplayed / NUM_OF_MEASUREMENT);
                                 // Get First Measurement Time
-                                metricTime = new Date(newData[0].time.getTime() - STEP_SECONDS*1000);
+                                metricTime = new Date(newData[0].time.getTime() - step*1000);
 
                                 // Fill Data With Zeros
                                 for(var i= 0; i < (NUM_OF_MIN_MEASUREMENTS - measurements_received); i++)
@@ -263,7 +256,7 @@ define('app/views/monitoring', [
                                     }
 
                                     dataBuffer.push(zeroObject);
-                                    metricTime = new Date(metricTime.getTime() - STEP_SECONDS*1000);
+                                    metricTime = new Date(metricTime.getTime() - step*1000);
                                 }
                                 // Set Real Data Start Index
                                 this.realDataIndex = dataBuffer.length;
@@ -327,10 +320,55 @@ define('app/views/monitoring', [
                     * redraws value line, x-axis, labels and grid
                     */
                     this.updateView = function() {
-                        
+
+                        var self           = this;
+
+                        var labelTicks = function(axisInstance,numOfLabels,format){
+
+                            // TODO check if ticks work with float number - Result : They Don't
+
+                            var labelsStep = (self.timeDisplayed / 60) / numOfLabels;
+                            
+                            if(self.id == 'cpuGraph')
+                                console.log("Labels Step: " + labelsStep);
+
+                            axisInstance.ticks(d3.time.minutesFixed,labelsStep);
+
+                            if( typeof format != 'undefined')
+                                axisInstance.tickFormat(d3.time.format(format));
+
+                            return axisInstance;
+                                               
+
+                        };
+
+                        var labelTicksFixed = function(axisInstance,format) {
+
+                            // Check Time Displayed
+                            var labelStep;
+                            if(self.timeDisplayed <= 10*60) // 10 Minutes
+                                axisInstance.ticks(d3.time.minutes,2);
+                            else if(self.timeDisplayed <= 1*60*60) // 1 Hour
+                                axisInstance.ticks(d3.time.minutes,12);
+                            else if(self.timeDisplayed <= 24*60*60) // 1 Day
+                                axisInstance.ticks(d3.time.hours,6);
+                            else if(self.timeDisplayed <= 7*24*60*60) // 1 Week
+                                axisInstance.ticks(d3.time.days,1);
+                            else if(self.timeDisplayed <= 30*7*24*60*60) // 1 Month
+                                axisInstance.ticks(d3.time.days,7);
+                            // TODO Add week and month
+
+                            if( typeof format != 'undefined')
+                                axisInstance.tickFormat(d3.time.format(format));
+
+                            return axisInstance;
+                        };
+
+
+
                         this.displayedData = [];
                         this.xCordinates   = [];
-                        var num_of_displayed_measurements = this.timeDisplayed / STEP_SECONDS;
+                        var num_of_displayed_measurements = 60; 
 
                         // Get only data that will be displayed
                         if(this.data.length > num_of_displayed_measurements) {
@@ -341,9 +379,6 @@ define('app/views/monitoring', [
 
                             this.displayedData = this.data;
                         }
-
-                        
-
 
                         // If min & max == 0 y axis will not display values. max=1 fixes this.
                         var maxValue = d3.max(this.displayedData, function(d) { return d.value; });
@@ -379,7 +414,10 @@ define('app/views/monitoring', [
                                                .tickSize(-this.height, 0, 0)
                                                .tickFormat("");
                         
-                        if (this.secondsStep <= 60) {
+                        // Add This To Function
+
+                        // We Don't really use this
+                        /*if (this.secondsStep <= 60) {
 
                             d3xAxis.call(modelXAxis
                                          .ticks(d3.time.seconds, this.secondsStep)
@@ -387,25 +425,17 @@ define('app/views/monitoring', [
 
                             d3GridX.call(modelGridX
                                          .ticks(d3.time.seconds, this.secondsStep));
-                        }
-                        else if (this.secondsStep <= 18000) {
+                        }*/
 
-                            d3xAxis.call(modelXAxis
-                                         .ticks(d3.time.minutes, this.secondsStep/60)
-                                         .tickFormat(d3.time.format("%I:%M%p")));
 
-                            d3GridX.call(modelGridX
-                                         .ticks(d3.time.minutes, this.secondsStep/60));
-                        }
-                        else {
+                        var tLabelFormat = "%I:%M%p";
 
-                            d3xAxis.call(modelXAxis
-                                         .ticks(d3.time.hours, this.secondsStep/60/60)
-                                         .tickFormat(d3.time.format("%I:%M%p")));
+                        if (this.timeDisplayed >= 24*60*60)
+                            tLabelFormat = "%d-%m | %I:%M%p";
+                            
 
-                            d3GridX.call(modelGridX
-                                         .ticks(d3.time.hours, this.secondsStep/60/60));
-                        }
+                        d3xAxis.call(labelTicksFixed(modelXAxis,tLabelFormat));
+                        d3GridX.call(labelTicksFixed(modelGridX));
 
                         // Set time label at left side
                         d3xAxis.selectAll("text") 
@@ -441,7 +471,8 @@ define('app/views/monitoring', [
                         if(!this.timeUpdated && this.animationEnabled)
                         {
 
-                            var animationDuration = STEP_SECONDS*1000;
+                            var step = (this.timeDisplayed / NUM_OF_MEASUREMENT);
+                            var animationDuration = step*1000;
                             
                             // Update Animated Line
                             d3vLine.attr("transform", "translate(" + this.valuesDistance + ")")
@@ -487,6 +518,7 @@ define('app/views/monitoring', [
                                        .attr("transform", "translate(" + margin.left + "," + this.height + ")");
                             }
                         }
+                        
                     };
 
 
@@ -674,10 +706,10 @@ define('app/views/monitoring', [
                     * Changes time window
                     * @param {number} newTimems - New timewindow in miliseconds
                     */
-                    this.changeTimeToDisplay = function(newTimems){
+                    this.changeTimeWindow = function(newTimeWindow){
 
-                        this.timeDisplayed = newTimems/1000;
-                        this.secondsStep   = Math.floor((newTimems / 1000) / NUM_OF_LABELS);
+                        this.timeDisplayed = newTimeWindow/1000;
+                        this.secondsStep   = Math.floor((newTimeWindow / 1000) / NUM_OF_LABELS);
 
                         this.timeUpdated = true;
                         
