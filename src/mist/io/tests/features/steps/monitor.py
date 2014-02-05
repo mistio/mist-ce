@@ -6,6 +6,7 @@ a key for the monitored machine       --> given_key
 @when:
 ------
 I click the monitor key     --> click_key
+I login to mist.io      --> login_to_mist
 
 @then:
 ------
@@ -37,3 +38,9 @@ def click_key(context):
     context.execute_steps(u"""
     When I click the link with text that contains "%s"
     """ % key)
+
+@when(u'I login to mist.io')
+def login_to_mist(context):
+    creds = context.personas['MonitorTester']['mistcreds']
+    context.browser.find_by_css('input#email').fill(creds['username'])
+    context.browser.find_by_css('input#password').fill(creds['password'])

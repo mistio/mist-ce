@@ -59,3 +59,15 @@ Feature: Monitor
         When I wait for 1 seconds
             Then "monitor_tester" should be probed within 400 seconds
         When I wait for 1 seconds
+
+        When I click the "monitor_tester" machine
+        And I wait for 2 seconds
+        And I click the "Enable" button
+        And I wait for 1 seconds
+        And I login to mist.io
+        And I click the "Log in" button
+        And I wait for 30 seconds
+        And I click the "Enable" button
+        And I wait for 1 seconds
+        And I click the "Yes" button
+        And I wait for 30 seconds
