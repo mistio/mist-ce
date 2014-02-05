@@ -70,14 +70,14 @@ def home(request):
     user = user_from_request(request)
     return {
         'project': 'mist.io',
-        'email': user.email,
-        'supported_providers': config.SUPPORTED_PROVIDERS,
-        'core_uri': config.CORE_URI,
-        'auth': request.registry.settings.get('auth') and 1 or 0,
+        'email': json.dumps(user.email),
+        'supported_providers': json.dumps(config.SUPPORTED_PROVIDERS),
+        'core_uri': json.dumps(config.CORE_URI),
+        'auth': json.dumps(request.registry.settings.get('auth')),
         'js_build': config.JS_BUILD,
-        'js_log_level': config.JS_LOG_LEVEL,
+        'js_log_level': json.dumps(config.JS_LOG_LEVEL),
         'google_analytics_id': config.GOOGLE_ANALYTICS_ID,
-        'is_core': 0
+        'is_core': json.dumps(False),
     }
 
 
