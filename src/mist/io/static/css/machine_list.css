@@ -68,15 +68,21 @@
 
 @media only screen and  (max-width: 430px) {
 
-    .netleds div {
-        display: none;
+    .machine-leds {
+        position: relative;
+        bottom: 26px !important;
     }
 
     .machine-tags {
         right: 38px !important;
+        top: 33px !important;
+    }
+
+    .machine-name {
+        width: 100% !important;
     }
 }
-
+/*
 @media only screen and  (max-width: 343px) {
 
     .machine-leds {
@@ -84,7 +90,7 @@
         bottom: 19px;
     }
 }
-
+*/
 
 .machine-state {
     width: 21.6% !important;
