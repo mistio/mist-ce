@@ -79,18 +79,10 @@
     }
 
     .machine-name {
-        width: 100% !important;
+        width: 80% !important;
     }
 }
-/*
-@media only screen and  (max-width: 343px) {
 
-    .machine-leds {
-        position: relative;
-        bottom: 19px;
-    }
-}
-*/
 
 .machine-state {
     width: 21.6% !important;
