@@ -9,6 +9,7 @@
     width: 95% !important;
     bottom: 55px !important;
     max-height: 94% !important;
+    position: fixed;
 }
 #machine-shell-popup #shell-grid {
     top: 50px;
@@ -25,9 +26,9 @@
     width: 95%;
 }
 #machine-shell-popup #shell-input input {
-    padding: 8px 0 8px 22px;
+    padding: 8px 0 8px 22px;    
     background-image: url("../images/prompt.png");
-    background-position: 4px 8px;
+    background-position: 8px 11px;
     background-repeat: no-repeat;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -44,7 +45,7 @@
     padding: 1px;
     left: 25px;
 }
-#machine-shell-popup .shell-input {
+#machine-shell-popup #shell-input {
     overflow: auto;
     width: 100%;
     clear: both;
@@ -76,12 +77,14 @@
     color: #222;
     border-bottom: rgb(211, 211, 211) 1px solid;
 }
+#shell-return .command.pending-response .shell-li-arrow:after {
+    background-image: url("../images/spinner.gif");
+    background-position: center !important;
+    background-repeat: no-repeat;
+}
 #shell-return .command .shell-li-arrow:after {
     margin-left: -24px;
     background-color: transparent;
-}
-#shell-return .command .ajax-loader {
-    margin-right: 10px;
 }
 #shell-return .output {
     background: #444;

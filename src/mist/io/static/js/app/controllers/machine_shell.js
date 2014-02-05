@@ -27,7 +27,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 this.set('machine', machine);
                 $('#machine-shell-popup').on('popupafteropen',
                     function(){
-                        $('.shell-input input').focus();
+                        $('#shell-input input').focus();
                     }
                 ).popup('open');
                 
@@ -37,7 +37,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 });
                 $(window).trigger('resize');
                 Ember.run.next(function(){
-                    $('.shell-input input').focus();
+                    $('#shell-input input').focus();
                 });                
             },
 
