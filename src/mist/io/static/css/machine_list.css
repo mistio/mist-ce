@@ -32,6 +32,29 @@
     text-overflow: ellipsis;
     padding-right: 16px;
 }
+
+/* Conditional for < 550px */
+@media only screen and  (max-width: 550px) {
+
+    .machine-state span {
+        float: left;
+    }
+
+    .machine-state {
+        position: absolute;
+        left: 0px;
+        top: 35px;
+        font-size: 0.9em;
+        margin-left: 0 !important;
+    }
+
+    .machine-name {
+        position: relative;
+        bottom: 6px;
+        font-size: 0.9em;
+    }
+
+}
 .machine-state {
     width: 21.6% !important;
     text-align: center;
