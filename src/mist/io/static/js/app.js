@@ -282,17 +282,16 @@ define( 'app', [
 
         // Ember controllers
 
-        App.set('backendsController', BackendsController.create());  
-        App.set('monitoringController', MonitoringController.create());
+        App.set('backendsController', BackendsController.create());
+        
         App.set('keysController', KeysController.create());
-              
-
         App.set('loginController', LoginController.create());
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
         App.set('keyEditController', KeyEditController.create());        
         App.set('machineAddController', MachineAddController.create());
         App.set('backendAddController', BackendAddController.create());
+        App.set('monitoringController', MonitoringController.create());
         App.set('backendEditController', BackendEditController.create());
         App.set('machineTagsController', MachineTagsController.create());
         App.set('machineKeysController', MachineKeysController.create());
@@ -300,6 +299,7 @@ define( 'app', [
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
         App.set('machinePowerController', MachinePowerController.create());
+
 
         // Ember custom widgets
 

@@ -33,8 +33,19 @@
 }
 
 #single-machine-page #monitoring-bottom-btns {
-    margin: 0 auto;
-    width: 340px;
+    background-color: #e0e0e1;
+    height: 56px;
+    width: 100%;
+    padding: 10px 0px;
+}
+
+#single-machine-page #monitoring-bottom-btns .ui-block-a,
+#single-machine-page #monitoring-bottom-btns .ui-block-b {
+    width: 50%;
+}
+
+#single-machine-page #monitoring-bottom-btns a {
+    margin: 7px auto;
 }
 
 #single-machine-page #add-rule-button {

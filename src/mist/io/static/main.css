@@ -341,6 +341,10 @@ ul.checkbox-list li a, ul.checkbox-list li label {
     display: none;
 }
 
+#notification-popup {
+    z-index: 1000;
+}
+
 
 /* User menu
 -----------------------------------------------------------------------------------------------------------*/
@@ -374,6 +378,7 @@ ul.checkbox-list li a, ul.checkbox-list li label {
 
 .single-machine-loader {
     display: block !important;
+    z-index: 1000;
 }
 /* Leds
  * */

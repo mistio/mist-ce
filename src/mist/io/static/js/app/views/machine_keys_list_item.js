@@ -39,16 +39,12 @@ define('app/views/machine_keys_list_item', ['app/views/list_item', 'text!app/tem
                 });
             }.observes('this.key.probing', 'this.key.machines'),
 
-            keyClicked: function() {
-                $('#key-actions').popup('open');
-                this.get('parentView').set('selectedKey', this.key);
-            },
-
             actions: {
+
                 associatedKeyClicked: function (key) {
                     this.get('parentView').set('selectedKey', key);
                     $('#key-actions-popup').popup('open');
-                },
+                }
             }
         });
     }
