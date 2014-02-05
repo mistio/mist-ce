@@ -62,12 +62,28 @@
     min-height: 50px;
     border:1px solid #ccc;
     background: #e0e0e1;
+    padding-right: 12px;
 }
 
-.graphBtn{
+.graphBtn {
     display: inline-block;
     margin: 0 5px;
     width: 150px;
+}
+
+/* Conditional for < 600px */
+@media only screen and  (max-width: 400px) {
+    
+
+    .graphBtn {
+        width: 45%;
+        display: inline-block;
+    }
+
+    .graphBtn .ui-btn {
+        font-size: 0.7em;
+        display: inline-block;
+    }
 }
 
 .graph > .header{

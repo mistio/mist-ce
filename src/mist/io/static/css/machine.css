@@ -56,6 +56,22 @@
     width: 100px;
 }
 
+/* Conditional for < 600px */
+@media only screen and  (max-width: 400px) {
+    
+
+    #single-machine-page #monitoring-bottom-btns .ui-block-a,
+    #single-machine-page #monitoring-bottom-btns .ui-block-b {
+        width: 100%;
+    }
+    
+    #single-machine-page #monitoring-bottom-btns {
+        height: 110px;
+    }
+    
+
+}
+
 .single-machine-header {
     height: 56px;
 }
