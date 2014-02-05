@@ -163,6 +163,7 @@ class HtmlSafeStrField(StrField):
 
     def cast2front(self, back_value=None):
         front_value = super(HtmlSafeStrField, self).cast2front(back_value)
+        front_value.replace("&", "&amp;")
         front_value.replace("<", "&lt;")
         front_value.replace(">", "&gt;")
         return front_value
