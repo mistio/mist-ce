@@ -53,9 +53,31 @@
         bottom: 6px;
         font-size: 0.9em;
     }
+
+    .machine-tags {
+        right: 96px !important;
+        top: 20px !important;
+        max-width: 49% !important;
+    }
+
+    .machine-tags .tag {
+        font-size: 10px !important;
+        margin-bottom: 3px !important;
+    }
 }
 
-@media only screen and  (max-width: 341px) {
+@media only screen and  (max-width: 430px) {
+
+    .netleds div {
+        display: none;
+    }
+
+    .machine-tags {
+        right: 38px !important;
+    }
+}
+
+@media only screen and  (max-width: 343px) {
 
     .machine-leds {
         position: relative;
