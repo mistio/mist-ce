@@ -282,13 +282,14 @@ define( 'app', [
 
         // Ember controllers
 
-        App.set('backendsController', BackendsController.create());
+        
         
         App.set('keysController', KeysController.create());
         App.set('loginController', LoginController.create());
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
-        App.set('keyEditController', KeyEditController.create());        
+        App.set('keyEditController', KeyEditController.create());   
+        App.set('backendsController', BackendsController.create());     
         App.set('machineAddController', MachineAddController.create());
         App.set('backendAddController', BackendAddController.create());
         App.set('monitoringController', MonitoringController.create());

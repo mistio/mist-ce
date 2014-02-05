@@ -26,6 +26,7 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
 
                 // Add event listeners
                 Mist.keysController.on('onKeyListChange', this, 'updateView');
+                Mist.keysController.on('onKeyDisassociate', this, 'updateMachines');
                 Mist.backendsController.on('onMachineListChange', this, 'updateMachines');
 
                 this.updateView();
@@ -37,6 +38,7 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
 
                 // Remove event listeners
                 Mist.keysController.off('onKeyListChange', this, 'updateView');
+                Mist.keysController.off('onKeyDisassociate', this, 'updateMachines');
                 Mist.backendsController.off('onMachineListChange', this, 'updateMachines');
 
             }.on('willDestroyElement'),
@@ -191,7 +193,7 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
 
             modelMachinesObserver: function () {
                 Ember.run.once(this, 'updateMachines');
-            }.observes('controller.model.machines'),
+            }.observes('key.machines'),
 
 
             viewMachinesObserver: function () {

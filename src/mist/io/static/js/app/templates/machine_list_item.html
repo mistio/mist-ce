@@ -62,20 +62,19 @@
     
 {{else}}
 
-    <a {{action disassociateGhostMachine target="view"}}>
+    <a class="ui-icon-delete" {{action disassociateGhostMachine target="view"}}>
         
-        <h3>{{view.machine.name}}</h3>
+        <div class="ui-grid-b">
+            <div class="ui-block-a machine-name">{{view.machine.name}}</div>
+    
+            <span class="ui-block-b machine-state">
+                <span {{bind-attr class="view.machine.state"}}>
+                    {{view.machine.state}}
+                </span>
+            </span> 
+                                
+        </div>
 
-        <h3>{{view.machine.state}}</h3>
-        
-        <p class="description">          
-            <span>{{view.machine.backend.title}}</span>
-
-            {{#each view.machine.tags}}
-            <span>{{this}}</span>
-            {{/each}}
-        </p>
-        
     </a>
     
 {{/unless}}

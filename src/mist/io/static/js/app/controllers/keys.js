@@ -133,9 +133,10 @@ define(['app/models/key'],
 
 
             disassociateKey: function(keyId, machine, host, callback) {
+                var backend_id = machine.backend.id ? machine.backend.id : machine.backend;
                 var that = this;
                 this.set('disassociatingKey', true);
-                Mist.ajax.DELETE('/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + keyId, {
+                Mist.ajax.DELETE('/backends/' + backend_id + '/machines/' + machine.id + '/keys/' + keyId, {
                     'host': machine.getHost()
                 }).success(function() {
                     that._disassociateKey(keyId, machine);
@@ -293,7 +294,8 @@ define(['app/models/key'],
                 Ember.run(this, function() {
                     var key = this.getKey(keyId);
                     key.machines.some(function(key_machine) {
-                        if (key_machine[1] == machine.id && key_machine[0] == machine.backend.id) {
+                        if (key_machine[1] == machine.id && (key_machine[0] == machine.backend.id ||
+                                                             key_machine[0] == machine.backend)) { // For ghost machines
                             key.machines.removeObject(key_machine);
                             return true;
                         }
