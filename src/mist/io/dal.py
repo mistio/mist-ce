@@ -158,6 +158,16 @@ class StrField(Field):
         return super(StrField, self)._cast(val, atypes, btypes)
 
 
+class HtmlSafeStrField(StrField):
+    """Escapes < and > when reading field."""
+
+    def cast2front(self, back_value=None):
+        front_value = super(HtmlSafeStrField, self).cast2front(back_value)
+        front_value.replace("<", "&lt;")
+        front_value.replace(">", "&gt;")
+        return front_value
+
+
 class IntField(Field):
     """Sets an integer field. Default value: 0"""
     front_types = back_types = [int, float]
