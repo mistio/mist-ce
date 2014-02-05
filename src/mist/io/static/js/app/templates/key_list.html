@@ -2,7 +2,7 @@
 
     <div data-role="header" data-theme="b">
 
-        <a href="#" data-icon="home">Home</a>
+        <a href="#" class="responsive-button" data-icon="home">Home</a>
 
         <h1>Keys</h1>
 
@@ -13,11 +13,13 @@
     <div data-role="content" data-theme="c">
 
         <a id="select-keys-btn"
+           class="responsive-button"
            data-role="button"
            data-icon="arrow-d"
            {{action "selectClicked" target="view"}}>Select</a>
 
         <a id="add-key-btn"
+           class="responsive-button"
            data-role="button"
            data-icon="plus"
            data-iconpos="right"

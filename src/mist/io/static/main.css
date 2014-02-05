@@ -349,6 +349,25 @@ ul.checkbox-list li a, ul.checkbox-list li label {
     z-index: 1000;
 }
 
+@media only screen and (max-width: 420px) {
+
+    .responsive-button {
+        padding: 0px !important;
+        width: 40px;
+        height: 40px;
+        text-indent: -5000px;
+    }
+
+    .ui-header .responsive-button {
+        width: 32px;
+        height: 30px;
+    }
+
+    #machine-list-page .ui-filterable, #key-list-page .ui-filterable  {    
+        margin-left: 50px !important;
+        margin-right: 50px !important;
+    }
+}
 
 /* User menu
 -----------------------------------------------------------------------------------------------------------*/

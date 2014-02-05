@@ -2,7 +2,7 @@
 
     <div data-role="header" data-theme="b">
 
-        <a href="#" data-icon="home">Home</a>
+        <a href="#" class="responsive-button" data-icon="home">Home</a>
 
         <h1>Machines</h1>
 
@@ -13,6 +13,7 @@
     <div data-role="content" data-theme="c">
 
         <a id="create-machine-btn"
+           class="responsive-button"
            data-role="button"
            data-icon="plus"
            data-iconpos="right"
@@ -20,6 +21,7 @@
            {{action "createClicked" target="view"}}>Create</a>
           
         <a id="select-machines-btn"
+           class="responsive-button"
            data-role="button"
            data-icon="arrow-d"
            {{action "selectClicked" target="view"}}>Select</a>
