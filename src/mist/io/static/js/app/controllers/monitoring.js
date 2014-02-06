@@ -501,6 +501,7 @@ define('app/controllers/monitoring', [
                                     throw ("Error, Received more measurements than expected, " + 
                                             data.load.length + " instead of " + measurmentsExpected);
 
+
                                 var disks = [];
                                 var netInterfaces = [];
 
@@ -1063,8 +1064,12 @@ define('app/controllers/monitoring', [
                 },
                 toIndex : function(zoomIndex){
 
-                    this.to(this.zoomValues[zoomIndex]['value']*60*1000);
+                    if(zoomIndex != this.zoomIndex) {
 
+                        this.prevZoomIndex = this.zoomIndex
+                        this.zoomIndex     = zoomIndex;
+                        this.to(this.zoomValues[zoomIndex]['value']*60*1000);
+                    }
                 },
                 // direction is optional, used for in and out
                 to  : function(timeWindow,direction){
@@ -1092,7 +1097,6 @@ define('app/controllers/monitoring', [
                             controller.graphs.addNextUpdateAction('before',changeTimeWindow);
                             
 
-                            // Currently Step Change Doesn't Work From Machine
                             var measurements = 60;
                             timeWindowInMinutes = timeWindow /60 /1000; // TODO change this , we don't really want more variables
                             newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 );
@@ -1113,7 +1117,8 @@ define('app/controllers/monitoring', [
                                     else if(direction =='out')
                                         self.zoomIndex--;
                                     else if(direction == 'to'){
-                                        // TODO
+                                        
+                                        self.zoomIndex = self.prevZoomIndex;
                                         console.log('TODO: Set Zoom Index to the previous value And select to the appropriate option');
                                     }
                                 
@@ -1148,6 +1153,10 @@ define('app/controllers/monitoring', [
 
                     // Info zoomSelect-button id is created by jquery.
                     // we set * to disable all children element
+
+                    // Set Current Zoom
+                    $('#zoomSelect').val(this.zoomIndex).change();
+
                     $('#zoomSelect-button *').removeClass('ui-disabled');
 
 
@@ -1165,7 +1174,8 @@ define('app/controllers/monitoring', [
 
                 reset: function(){
                     this.updateUI();
-                    this.zoomIndex = 0;
+                    this.zoomIndex     = 0;
+                    this.prevZoomIndex = 0;
                 },
 
                 zoomValues: [ // in minitues
@@ -1176,7 +1186,8 @@ define('app/controllers/monitoring', [
                         { label: '1 month   ', value: 30*24*60 }
                 ],
 
-                zoomIndex: 0,
+                zoomIndex    : 0,
+                prevZoomIndex: 0
             },
 
 
