@@ -1173,9 +1173,10 @@ define('app/controllers/monitoring', [
                 },
 
                 reset: function(){
-                    this.updateUI();
+                    
                     this.zoomIndex     = 0;
                     this.prevZoomIndex = 0;
+                    this.updateUI();
                 },
 
                 zoomValues: [ // in minitues
