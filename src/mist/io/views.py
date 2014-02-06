@@ -70,6 +70,8 @@ def home(request):
     user = user_from_request(request)
     return {
         'project': 'mist.io',
+        'email': json.dumps(user.email),
+        'supported_providers': json.dumps(config.SUPPORTED_PROVIDERS),
         'core_uri': json.dumps(config.CORE_URI),
         'auth': json.dumps(request.registry.settings.get('auth')),
         'js_build': config.JS_BUILD,
@@ -77,7 +79,7 @@ def home(request):
         'js_log_level': json.dumps(config.JS_LOG_LEVEL),
         'google_analytics_id': config.GOOGLE_ANALYTICS_ID,
         'is_core': json.dumps(False),
-        'csrf_token': "",
+        'csrf_token': json.dumps(""),
     }
 
 
