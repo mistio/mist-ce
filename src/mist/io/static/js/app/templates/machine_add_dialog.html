@@ -138,9 +138,11 @@
                data-theme="a"
                valueBinding="Mist.machineAddController.newMachineScript"}}
 
-
-        <div id="create-machine-cost">Estimated price: 
+        <div id="create-machine-cost">
+        {{#if view.price}}
+            Estimated price: 
             <span>{{view.price}}</span>
+        {{/if}}
         </div>
 
         <div class="ok-cancel" data-role="ui-grid-a" >
