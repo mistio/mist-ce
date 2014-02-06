@@ -1,19 +1,15 @@
-<div class="graphControls" style='width:500px;text-align:center'>
+<div class="graphControls">
     
-    <div class='zoomControls' style="border:1px solid grey;margin:10px auto;padding:10px; text-align:center">
-        <h2>Demo Zoom Feature</h2>
-        <div style='display:inline-block;font-weight:bold;'>Current Time Window: </div><div id='currentZoom' style='display:inline-block;'>10 minutes</div>
 
-        <div>
-        <a id='zoomInBtn'  href="#" dara-role="button" data-inline="true"
-        {{action "in" target="Mist.monitoringController.zoom"}}>In </a>
-        <a id='zoomOutBtn' href="#" dara-role="button" data-inline="true"
-        {{action "out" target="Mist.monitoringController.zoom"}}>Out</a>
-        </div>
+        <select id='zoomSelect' onChange="Mist.monitoringController.UI.zoomChange()">
+        <option value='0' selected='true'>Last 10 Minutes</option>
+        <option value='1' >Last 1 Hour</option>
+        <option value='2' >Last 1 Day</option>
+        <option value='3' >Last 1 Week</option>
+        <option value='4' >Last 1 Month</option>
+        </select>
     
-    </div>
-    
-    <div>
+
         <a id='graphsGoBack' href="#" data-role="button" data-inline="true" 
            {{action "goBack" target="Mist.monitoringController.history"}}>&lt;&lt;</a>
                           
@@ -21,7 +17,6 @@
             {{action "disable" target="Mist.monitoringController.history"}}>Reset</a>
         <a id='graphsGoForward' href="#" data-role="button" data-inline="true" 
             {{action "goForward" target="Mist.monitoringController.history"}}>&gt;&gt;</a>
-    </div>
 </div>
 
 <div id="GraphsArea">

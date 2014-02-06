@@ -720,6 +720,19 @@ define('app/controllers/monitoring', [
 
                 expandPressed : function(graph){
                     Mist.monitoringController.graphs.expand([graph]);
+                },
+
+                zoomChange : function(){
+                    
+
+                    var zoomIndex = $('#zoomSelect :selected').val();
+                    // Also try without pseudo
+
+                    // Temporary Code 
+                    var zoom = Mist.monitoringController.zoom;
+                    zoom.to(zoom.zoomValues[zoomIndex]*60*1000);
+                    // Also do something on error 
+                    console.log(zoomIndex);
                 }
             },
 
@@ -1016,6 +1029,18 @@ define('app/controllers/monitoring', [
                     document.cookie = "collapsedGraphs=" + metrics.join('|') + "; " +
                                       "expires=" + cookieExpire.toUTCString() +"; " +
                                       "path=/";
+                },
+
+
+                getCurrentTimeWindow: function(){
+                    if(document.cookie.indexOf("collapsedGraphs")  == -1) {
+                        console.log("No Time Window saved");
+                        return null
+                    }
+                },
+
+                setCurrentTimeWindow: function(zoomIndex){
+
                 }
             },
 
