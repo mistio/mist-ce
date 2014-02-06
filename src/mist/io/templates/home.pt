@@ -14,13 +14,17 @@
     <script tal:content="string: var SUPPORTED_PROVIDERS=${supported_providers}"/>
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
     <script tal:content="string: var EMAIL='${email}'"/>
+    <script tal:content="string: var CSRF_TOKEN='${csrf_token}'" />
+
+    <link rel="stylesheet" type='text/css' href="resources/main.css"
+          tal:condition="not:css_build"/>
 
     <link rel="stylesheet" type='text/css' href="resources/main.css" 
           tal:condition="not:css_build"/> 
     
     <link rel="stylesheet" href="resources/mist-1391696994.css"
           tal:condition="css_build" />
-          
+
     <script src="resources/js/lib/require/require.js"></script>
 
     <script tal:condition="js_build">
