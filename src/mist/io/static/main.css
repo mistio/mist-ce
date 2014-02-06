@@ -344,6 +344,11 @@ ul.checkbox-list li a, ul.checkbox-list li label {
     text-align: center;
 }
 
+@media only screen and  (max-width: 386px) {
+    #confirmation-popup .ok-cancel button {
+        width: 93px !important;
+    }
+}
 /* Other
 -----------------------------------------------------------------------------------------------------------*/
 #hidden-shell-iframe {
