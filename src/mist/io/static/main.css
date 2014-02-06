@@ -290,6 +290,13 @@ ul.checkbox-list li label {
     width: 100%;
     margin: 0;
 }
+
+@media only screen and  (max-width: 340px) {
+    .ui-footer .ui-btn {
+        font-size: 10px;
+        text-indent: 10px;
+    }
+}
 .ui-footer.dual-action-footer td {
     width: 50%;
 }
