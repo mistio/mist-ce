@@ -176,6 +176,11 @@ textarea {
     padding: 10px !important;
 }
 
+@media only screen and  (max-width: 718px) {
+    .side-panel .ok-cancel a, .side-panel .ok-cancel button {
+        width: 98px !important;
+    }
+}
 
 /* Filtered list headers
 -----------------------------------------------------------------------------------------------------------*/
