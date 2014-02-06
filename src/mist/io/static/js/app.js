@@ -155,7 +155,7 @@ define( 'app', [
 
         App.set('isCore', !!IS_CORE);
         App.set('authenticated', AUTH || IS_CORE);
-        App.set('ajax', new AJAX('')); // TODO: Get CSRF_TOKEN from server
+        App.set('ajax', new AJAX(CSRF_TOKEN)); // TODO: Get CSRF_TOKEN from server
         App.set('email', EMAIL);
         App.set('password', '');
         window.Mist = App;
