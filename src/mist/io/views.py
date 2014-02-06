@@ -73,7 +73,7 @@ def home(request):
         'email': json.dumps(user.email),
         'supported_providers': json.dumps(config.SUPPORTED_PROVIDERS),
         'core_uri': json.dumps(config.CORE_URI),
-        'auth': json.dumps(request.registry.settings.get('auth')),
+        'auth': json.dumps(bool(user.mist_api_token)),
         'js_build': config.JS_BUILD,
         'css_build': config.CSS_BUILD,
         'js_log_level': json.dumps(config.JS_LOG_LEVEL),
