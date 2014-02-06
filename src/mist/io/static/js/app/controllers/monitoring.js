@@ -726,13 +726,9 @@ define('app/controllers/monitoring', [
                     
 
                     var zoomIndex = $('#zoomSelect :selected').val();
-                    // Also try without pseudo
 
-                    // Temporary Code 
-                    var zoom = Mist.monitoringController.zoom;
-                    zoom.to(zoom.zoomValues[zoomIndex]*60*1000);
-                    // Also do something on error 
-                    console.log(zoomIndex);
+                    Mist.monitoringController.zoom.toIndex(zoomIndex);
+                    
                 }
             },
 
@@ -1065,6 +1061,11 @@ define('app/controllers/monitoring', [
                         this.to(this.zoomValues[this.zoomIndex]['value']*60*1000);
                     }
                 },
+                toIndex : function(zoomIndex){
+
+                    this.to(this.zoomValues[zoomIndex]['value']*60*1000);
+
+                },
                 // direction is optional, used for in and out
                 to  : function(timeWindow,direction){
 
@@ -1111,6 +1112,10 @@ define('app/controllers/monitoring', [
                                         self.zoomIndex++;
                                     else if(direction =='out')
                                         self.zoomIndex--;
+                                    else if(direction == 'to'){
+                                        // TODO
+                                        console.log('TODO: Set Zoom Index to the previous value And select to the appropriate option');
+                                    }
                                 
                                 } 
                                 else
@@ -1129,30 +1134,33 @@ define('app/controllers/monitoring', [
 
                 updateUI : function(){
 
-                    $('#currentZoom').text(this.zoomValues[this.zoomIndex]['label']);
+                    //$('#currentZoom').text(this.zoomValues[this.zoomIndex]['label']);
 
                     // Enable disable in/out buttons when we are at zoom borders
-                    if(this.zoomIndex == 0)
+                    /*if(this.zoomIndex == 0)
                         $('#zoomInBtn').addClass('ui-disabled');
                     else if(this.zoomIndex == this.zoomValues.length-1)
                         $('#zoomOutBtn').addClass('ui-disabled');
                     else {
                         $('#zoomInBtn').removeClass('ui-disabled');
                         $('#zoomOutBtn').removeClass('ui-disabled');
-                    }
+                    }*/
+
+                    // Info zoomSelect-button id is created by jquery.
+                    // we set * to disable all children element
+                    $('#zoomSelect-button *').removeClass('ui-disabled');
+
+
                 },
 
                 disable: function(){
 
-                    $('#zoomInBtn').addClass('ui-disabled');
-                    $('#zoomOutBtn').addClass('ui-disabled');
+                    $('#zoomSelect-button *').addClass('ui-disabled');
                 },
 
                 enable: function(){
 
-                    this.updateUI();
-                    $('#zoomInBtn').removeClass('ui-disabled');
-                    $('#zoomOutBtn').removeClass('ui-disabled');
+                    $('#zoomSelect-button *').removeClass('ui-disabled');
                 },
 
                 reset: function(){
@@ -1168,7 +1176,7 @@ define('app/controllers/monitoring', [
                         { label: '1 month   ', value: 30*24*60 }
                 ],
 
-                zoomIndex: 0
+                zoomIndex: 0,
             },
 
 

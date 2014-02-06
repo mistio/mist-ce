@@ -25,13 +25,14 @@ Feature: Machines
 
         Given a key for the machine
         When I visit mist.io
+        And I wait for 10 seconds
         And I click the "Machines" button
         And I click the "Create" button
         And I type "tester" as machine name
         And I wait for 1 seconds
         And I click the "Select Provider" button
         And I wait for 1 seconds
-        And I click the link with text that contains "EC2"
+        And I click the "EC2 AP NORTHEAST" button within "create-machine-panel" panel
         And I wait for 1 seconds
         And I click the "Select Image" button
         And I wait for 1 seconds
@@ -43,7 +44,7 @@ Feature: Machines
         And I wait for 1 seconds
         And I click the "Select Location" button
         And I wait for 1 seconds
-        And I click the link with text that contains "ap-northeast"
+        And I click the "ap-northeast-1a" button within "create-machine-panel" panel
         And I wait for 1 seconds
         And I click the "Select Key" button
         And I wait for 1 seconds
@@ -52,9 +53,9 @@ Feature: Machines
         And I click the "Launch!" button
         And I wait for 2 seconds
             Then "tester" state should be "pending" within 60 seconds
-        When I wait for 1 seconds
+        When I wait for 10 seconds
             Then "tester" state should be "running" within 400 seconds
-        When I wait for 1 seconds
+        When I wait for 10 seconds
             Then "tester" should be probed within 400 seconds
         When I wait for 1 seconds
 
@@ -91,6 +92,7 @@ Feature: Machines
         And I click the "Add" button
         And I type "SecondKey" as key name
         And I click the "Generate" button
+        And I wait for 5 seconds
         And I click the "Add" button
             Then I should see the "SecondKey" Key added within 5 seconds
 
@@ -175,26 +177,21 @@ Feature: Machines
         And I wait for 1 seconds
         And I click the "Yes" button
         And I wait for 2 seconds
-            Then "tester" state should be "rebooting" within 70 seconds
-        When I wait for 1 seconds
             Then "tester" state should be "running" within 400 seconds
 
 
     @web
     @machine-actions
-    
     Scenario: Destroy Machine
         When I visit mist.io
             Then I should see "mist.io"
         When I wait for 2 seconds
         And I click the "Machines" button
-        And I wait for 10 seconds
+        And I wait for 15 seconds
         And I tick the "tester" machine
         And I click the "Power" button
         And I click the "Destroy" button
         And I wait for 1 seconds
         And I click the "Yes" button
         And I wait for 2 seconds
-            Then "tester" state should be "pending" within 120 seconds
-        When I wait for 1 seconds
-            Then "tester" state should be "terminated" within 400 seconds
+            Then "tester" state should be "terminated" within 500 seconds

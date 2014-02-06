@@ -30,7 +30,7 @@ Feature: Shell
         And I wait for 1 seconds
         And I click the "Select Provider" button
         And I wait for 1 seconds
-        And I click the link with text that contains "EC2"
+        And I click the "EC2 AP NORTHEAST" button within "create-machine-panel" panel
         And I wait for 1 seconds
         And I click the "Select Image" button
         And I wait for 1 seconds
@@ -42,7 +42,7 @@ Feature: Shell
         And I wait for 1 seconds
         And I click the "Select Location" button
         And I wait for 1 seconds
-        And I click the link with text that contains "ap-northeast"
+        And I click the "ap-northeast-1a" button within "create-machine-panel" panel
         And I wait for 1 seconds
         And I click the "Select Key" button
         And I wait for 1 seconds

@@ -143,15 +143,17 @@
             <span>{{view.price}}</span>
         </div>
 
-        <div class="ok-cancel" 
-             data-role="controlgroup" 
-             data-type="horizontal">
-            <a data-role="button" 
-               data-theme="a"
-               {{action "backClicked" target="view"}}>Back</a>
-            <button id="create-machine-ok" 
-                    data-theme="d" 
-                    {{action "launchClicked" target="view"}}>Launch!</button>
+        <div class="ok-cancel" data-role="ui-grid-a" >
+            <div class="ui-block-a">
+                <a data-role="button" 
+                   data-theme="a"
+                   {{action "backClicked" target="view"}}>Back</a>
+            </div>
+            <div class="ui-block-b">
+                <button id="create-machine-ok" 
+                        data-theme="d"
+                        {{action "launchClicked" target="view"}}>Launch!</button>
+            </div>
         </div>
     </div>
 </div>
