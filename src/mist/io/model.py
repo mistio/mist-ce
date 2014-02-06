@@ -32,7 +32,8 @@ import logging
 from Crypto.PublicKey import RSA
 from hashlib import sha1
 
-from mist.io.dal import StrField, IntField, FloatField, BoolField
+from mist.io.dal import StrField, HtmlSafeStrField
+from mist.io.dal import IntField, FloatField, BoolField
 from mist.io.dal import ListField, DictField
 from mist.io.dal import OODict, FieldsDict, FieldsList, make_field
 try:
@@ -57,10 +58,10 @@ class Machine(OODict):
     ## hasMonitoring = BoolField()
     uuid = StrField()
     ## monitor_server = make_field(MonitorServer)()
-    dns_name = StrField()
+    dns_name = HtmlSafeStrField()
     public_ips = ListField()
     ## collectd_password = StrField()
-    name = StrField()
+    name = HtmlSafeStrField()
     ssh_port = IntField(22)
 
 
@@ -82,14 +83,14 @@ class Backend(OODict):
     enabled = BoolField()
     machine_count = IntField()
     apiurl = StrField()
-    apikey = StrField()
+    apikey = HtmlSafeStrField()
     apisecret = StrField()
-    title = StrField()
-    tenant_name = StrField()
-    auth_version = StrField()
-    region = StrField()
+    title = HtmlSafeStrField()
+    tenant_name = HtmlSafeStrField()
+    auth_version = HtmlSafeStrField()
+    region = HtmlSafeStrField()
     poll_interval = IntField(10000)
-    provider = StrField()
+    provider = HtmlSafeStrField()
     ## datacenter = StrField()
 
     machines = make_field(Machines)()
