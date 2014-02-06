@@ -35,7 +35,7 @@ from mist.io.exceptions import *
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
 libcloud.security.CA_CERTS_PATH.append('cacert.pem')
-
+libcloud.security.CA_CERTS_PATH.append('./src/mist.io/cacert.pem')
 
 log = logging.getLogger(__name__)
 
