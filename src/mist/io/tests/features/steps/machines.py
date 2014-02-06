@@ -36,6 +36,7 @@ def given_key(context):
         And I click the "Add" button
         And I type "%s" as key name
         And I click the "Generate" button
+        And I wait for 5 seconds
         And I click the "Add" button
             Then I should see the "%s" Key added within 5 seconds
     """ % (key, key))
