@@ -238,7 +238,7 @@ ul.checkbox-list li label {
     height: 40px;
 }
 .checkbox-link h3 {
-    width: 160px;
+    width: 65%;
     display: inline-block !important;
 }
 .checkbox-link .state h3 {
@@ -269,6 +269,9 @@ ul.checkbox-list li label {
     font-weight: normal;
 }
 
+#image-list .checkbox-link .tag {
+    margin: 11px 1px;
+}
 
 /* Footer
 -----------------------------------------------------------------------------------------------------------*/

@@ -1,16 +1,16 @@
 <div class="graphControls">
-    
-    <div class='zoom'>
+
+    <div class="graphZoomer">
         <select id='zoomSelect' data-inline='true' onChange="Mist.monitoringController.UI.zoomChange()">
-        <option value='0' selected='true'>Last 10 Minutes</option>
-        <option value='1' >Last 1 Hour</option>
-        <option value='2' >Last 1 Day</option>
-        <option value='3' >Last 1 Week</option>
-        <option value='4' >Last 1 Month</option>
-        </select>
+            <option value='0' selected='true'>Last 10 Minutes</option>
+            <option value='1' >Last 1 Hour</option>
+            <option value='2' >Last 1 Day</option>
+            <option value='3' >Last 1 Week</option>
+            <option value='4' >Last 1 Month</option>
+        </select> 
     </div>
-    
-    <div class='history'>
+
+    <div class="graphMover">
         <a id='graphsGoBack' href="#" data-role="button" data-inline="true" 
            {{action "goBack" target="Mist.monitoringController.history"}}>&lt;&lt;</a>
                           
@@ -19,6 +19,7 @@
         <a id='graphsGoForward' href="#" data-role="button" data-inline="true" 
             {{action "goForward" target="Mist.monitoringController.history"}}>&gt;&gt;</a>
     </div>
+   
 </div>
 
 <div id="GraphsArea">

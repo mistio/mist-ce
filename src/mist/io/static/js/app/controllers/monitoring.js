@@ -487,7 +487,7 @@ define('app/controllers/monitoring', [
                                 'stop': stop,
                                 'step': step
                               },
-                        timeout: 8000,
+                        timeout: 10000,
                         success: function (data, status, xhr){
 
                             try {
