@@ -453,6 +453,12 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
             }.observes('controller.model'),
 
 
+            probingObserver: function() {
+                Ember.run.next(function() {
+                    $('#machine-probe-btn').parent().trigger('create');
+                });
+            }.observes('machine.probing'),
+
             footerObserver: function() {
                 Ember.run.once(this, 'updateFooter');
             }.observes('machine.probed', 'machine.can_tag'),
