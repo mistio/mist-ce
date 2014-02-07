@@ -26,7 +26,7 @@ def shell_command(context, command):
 
 @then(u'I should see the "{command}" result in shell output')
 def shell_output(context, command):
-    shell_output = context.browser.find_by_css('#shell-response .ui-btn')
+    shell_output = context.browser.find_by_css('#shell-return h3')
 
     for output in shell_output:
         if command in output.text:
