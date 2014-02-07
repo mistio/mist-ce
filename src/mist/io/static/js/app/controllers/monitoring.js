@@ -492,16 +492,6 @@ define('app/controllers/monitoring', [
 
                             try {
 
-                                var measurmentsExpected = Math.floor((stop-start) / (step/1000)) ;
-
-                                // Throw error for none or more measurements
-                                if(data.load.length == 0)
-                                    throw "Error, Received none measurements";
-                                else if(data.load.length > measurmentsExpected)
-                                    throw ("Error, Received more measurements than expected, " +
-                                            data.load.length + " instead of " + measurmentsExpected);
-
-
                                 var disks = [];
                                 var netInterfaces = [];
 
@@ -546,9 +536,6 @@ define('app/controllers/monitoring', [
                                 console.log("");
                                 */
 
-                                // Create a date with first measurement time
-                                var metricTime = new Date(start*1000 + step);
-
                                 // Get min Data Length (Quick Fix)
                                 var lengths = [
                                     data['load'].length,
@@ -560,62 +547,65 @@ define('app/controllers/monitoring', [
                                     data['network'][netInterfaces[0]]['rx'].length
                                 ];
 
-
                                 var dataLength = Math.min.apply(null, lengths);
 
-                                // Create Custom Objects From Data
-                                for(var i=0; i < dataLength; i++ )
-                                {
-
+                                data.cpu.utilization.forEach(function(item) {
                                     var cpuObj = {
-                                        time : metricTime,
-                                        value: ( (data['cpu']['utilization'][i] * data['cpu']['cores']) * 100)
+                                        time: new Date(item[0]*1000),
+                                        value: item[1]
                                     };
-                                    var loadObj = {
-                                        time : metricTime,
-                                        value: data['load'][i]
-                                    };
-                                    var memObj = {
-                                        time : metricTime,
-                                        value: data['memory'][i]
-                                    };
-
-                                    // TODO Add Multiple Disks
-                                    var diskReadObj = {
-                                        time: metricTime,
-                                        value: data['disk']['read'][disks[0]]['disk_octets'][i]
-                                    };
-                                    var diskWriteObj = {
-                                        time: metricTime,
-                                        value: data['disk']['write'][disks[0]]['disk_octets'][i]
-                                        // Possible fix for Negative Disk Write And Disk read Values
-                                        // value: data['disk']['write'][disks[0]]['disk_octets'][i] < 0 ? 0 : data['disk']['write'][disks[0]]['disk_octets'][i]
-                                    };
-
-                                    // TODO Add Multiple Interfaces
-                                    var networkRXObj = {
-                                        time: metricTime,
-                                        value: data['network'][netInterfaces[0]]['rx'][i]
-                                    };
-                                    var networkTXObj = {
-                                        time: metricTime,
-                                        value: data['network'][netInterfaces[0]]['tx'][i]
-                                    };
-
-                                    // Push Objects Into Data Object
                                     receivedData.cpu.push(cpuObj);
+                                });
+
+                                data.load.forEach(function(item) {
+                                    var loadObj = {
+                                        time : new Date(item[0]*1000),
+                                        value : item[1]
+                                    };
                                     receivedData.load.push(loadObj);
-                                    receivedData.memory.push(memObj);
+                                });
+
+                                data.memory.forEach(function(item) {
+                                    var memoryObj = {
+                                        time : new Date(item[0]*1000),
+                                        value : item[1]
+                                    };
+                                    receivedData.memory.push(memoryObj);
+                                });
+
+                                data.disk.read[disks[0]].disk_octets.forEach(function(item) {
+                                    var diskReadObj = {
+                                        time : new Date(item[0]*1000),
+                                        value : item[1]
+                                    };
                                     receivedData.diskRead.push(diskReadObj);
+                                });
+
+                                data.disk.write[disks[0]].disk_octets.forEach(function(item) {
+                                    var diskWriteObj = {
+                                        time : new Date(item[0]*1000),
+                                        value : item[1]
+                                    };
                                     receivedData.diskWrite.push(diskWriteObj);
-                                    receivedData.networkRX.push(networkRXObj);
-                                    receivedData.networkTX.push(networkTXObj);
+                                });
 
-                                    // Increase time by step for every new measurement
-                                    metricTime = new Date(metricTime.getTime()+step);
-                                }
+                                data.network[netInterfaces[0]].rx.forEach(function(item) {
+                                    var networkRxObj = {
+                                        time : new Date(item[0]*1000),
+                                        value : item[1]
+                                    };
+                                    receivedData.networkRX.push(networkRxObj);
+                                });
 
-                                self.lastMetrictime = new Date(metricTime.getTime()-step);
+                               data.network[netInterfaces[0]].tx.forEach(function(item) {
+                                    var networkTxObj = {
+                                        time : new Date(item[0]*1000),
+                                        value : item[1]
+                                    };
+                                    receivedData.networkTX.push(networkTxObj);
+                                });
+
+                                self.lastMetrictime = new Date(stop*1000);
 
                                 callback({
                                     status: 'success',
