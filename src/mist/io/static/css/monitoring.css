@@ -45,8 +45,18 @@
 }
 
 .graphControls {
-    width: 215px !important;
+    width: 215px;
     margin: 0 auto; 
+    margin-top: 8px;
+}
+
+.graphControls .zoom{
+    display:block; 
+    text-align: center;
+}
+
+.graphControls .history{
+    display:block;
 }
 
 #graphsGoForward {
