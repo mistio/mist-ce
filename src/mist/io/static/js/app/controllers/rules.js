@@ -1,16 +1,13 @@
-define('app/controllers/rules', [
-    'app/models/rule',
-    'ember',
-    'jquery'
-    ],
+define('app/controllers/rules', ['app/models/rule', 'ember'],
     /**
-     * Rules controller
+     *  Rules Controller
      *
-     * @returns Class
+     *  @returns Class
      */
     function(Rule) {
         return Ember.ArrayController.extend({
 
+            content: [],
             command: null,
             commandRule: null,
             creationPending: false,
@@ -23,10 +20,12 @@ define('app/controllers/rules', [
                 'network-tx'
             ],
 
+
             operatorList: [
                 {'title': 'gt', 'symbol': '>'},
                 {'title': 'lt', 'symbol': '<'}
             ],
+
 
             actionList: [
                 'alert',
@@ -36,6 +35,24 @@ define('app/controllers/rules', [
                 'command'
             ],
 
+
+            setContent: function(rules) {
+                if (!rules) return;
+                var that = this;
+                Ember.run(function() {
+                    for (ruleId in rules) {
+                        var rule = rules[ruleId];
+                        rule.id = ruleId;
+                        rule.maxValue = rules[ruleId].max_value;
+                        rule.actionToTake = rules[ruleId].action;
+                        rule.operator = that.getOperatorByTitle(rules[ruleId].operator);
+                        rule.machine = Mist.backendsController.getMachine(rule.machine, rule.backend) || rule.machine;
+                        that.content.pushObject(Rule.create(rule));
+                    }
+                });
+            },
+
+
             getRuleById: function(ruleId) {
                 for (var i = 0; i < this.content.length; i++) {
                     if (this.content[i].id == ruleId) {
@@ -44,6 +61,7 @@ define('app/controllers/rules', [
                 }
                 return null;
             },
+
 
             getOperatorByTitle: function(title) {
                 var ret = null;
@@ -55,12 +73,18 @@ define('app/controllers/rules', [
                 return ret;
             },
 
+
             creationPendingObserver: function() {
-                $('#add-rule-button').button(this.creationPending ? 'disable' : 'enable');
+                if (this.creatingPending) {
+                    $('#add-rule-button').addClass('ui-state-disabled');
+                } else {
+                    $('#add-rule-button').removeClass('ui-state-disabled');
+                }
+                
             }.observes('creationPending'),
 
+
             newRule: function(machine, metric, operator, value, actionToTake) {
-                
                 var payload = {
                     'backendId': machine.backend.id,
                     'machineId': machine.id,
@@ -70,7 +94,6 @@ define('app/controllers/rules', [
                     'action': actionToTake
                 };
                 this.set('creationPending', true);
-                
                 var that = this;
                 $.ajax({
                     url: 'rules',
@@ -100,10 +123,11 @@ define('app/controllers/rules', [
                 });
             },
 
+
             updateRule: function(id, metric, operator, value, actionToTake, command) {
                 
                 var rule = this.getRuleById(id);
-                
+
                 if (!rule) {
                     return false;
                 }
@@ -164,22 +188,24 @@ define('app/controllers/rules', [
                     },
                     error: function(jqXHR, textstate, errorThrown) {
                         Mist.notificationController.notify('Error while updating rule');
-                        error(textstate, errorThrown, 'while updating rule');
                         rule.set('pendingAction', false);
                     }
                 });
             },
+
 
             saveCommand: function() {
                 $('.rule-command-popup').popup('close');
                 this.updateRule(this.commandRule.id, null, null, null, 'command', this.command);
             },
 
+
             changeRuleValue: function(event) {
                 var rule_id = $(event.currentTarget).attr('id');
                 var rule_value = $(event.currentTarget).find('.ui-slider-handle').attr('aria-valuenow');
                 this.updateRule(rule_id, null, null, rule_value);
             },
+
 
             setSliderEventHandlers: function() {
                 function showSlider(event) {
@@ -191,20 +217,22 @@ define('app/controllers/rules', [
                     $(event.currentTarget).find('.ui-slider').removeClass('open');
                     Mist.rulesController.changeRuleValue(event);
                 }
-                $('.ui-slider').on('tap', showSlider);
-                $('.ui-slider').on('click', showSlider);
-                $('.ui-slider').on('mouseover', showSlider);
+                $('.rules-container .ui-slider').on('tap', showSlider);
+                $('.rules-container .ui-slider').on('click', showSlider);
+                $('.rules-container .ui-slider').on('mouseover', showSlider);
                 $('#single-machine').on('tap', hideSlider);
-                $('.rule-box').on('mouseleave', hideSlider);
+                $('.rules-container .rule-box').on('mouseleave', hideSlider);
             },
 
+
             removeSliderEventHandlers: function() {
-                $('.ui-slider').off('tap');
-                $('.ui-slider').off('click');
-                $('.ui-slider').off('mouseover');
+                $('.rules-container .ui-slider').off('tap');
+                $('.rules-container .ui-slider').off('click');
+                $('.rules-container .ui-slider').off('mouseover');
                 $('#single-machine').off('tap');
-                $('.rule-box').off('mouseleave');
+                $('.rules-container .rule-box').off('mouseleave');
             },
+
 
             redrawRules: function() {
                 var that = this;

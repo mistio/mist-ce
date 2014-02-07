@@ -75,7 +75,6 @@ def main(global_config, **settings):
                             verify=False)
         if ret.status_code == 200:
             log.info("Succesfully authenticated to mist.io service.")
-            settings['auth'] = True
             ret = json.loads(ret.content)
             settings['current_plan'] = ret.get('current_plan', {})
             settings['auth_key'] = ret.get('auth_key', '')
@@ -136,6 +135,8 @@ def add_routes(config):
 
     config.add_route('keys', '/keys')
     config.add_route('key_action', '/keys/{key}')
+    config.add_route('key_public', '/keys/{key}/public')
+    config.add_route('key_private', 'keys/{key}/private')
     config.add_route('key_association',
                      '/backends/{backend}/machines/{machine}/keys/{key}')
 

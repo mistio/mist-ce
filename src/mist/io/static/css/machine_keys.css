@@ -1,0 +1,14 @@
+/* Machine Keys View CSS
+-----------------------------------------------------------------------------------------------------------*/
+
+#machine-keys-panel .small-list-item {
+	cursor: pointer;
+	padding: 6px 15px;
+}
+#machine-keys-panel .small-list-item p {
+	top: 0px;
+}
+
+#machine-keys-panel #machine-keys {
+	padding: 0;
+}

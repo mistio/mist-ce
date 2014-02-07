@@ -1,17 +1,25 @@
 <div class="graphControls">
-    <a id='graphsGoBack' href="#" data-role="button" data-inline="true" 
+
+    <div class="graphZoomer">
+        <select id='zoomSelect' data-inline='true' onChange="Mist.monitoringController.UI.zoomChange()">
+            <option value='0' selected='true'>Last 10 Minutes</option>
+            <option value='1' >Last 1 Hour</option>
+            <option value='2' >Last 1 Day</option>
+            <option value='3' >Last 1 Week</option>
+            <option value='4' >Last 1 Month</option>
+        </select> 
+    </div>
+
+    <div class="graphMover">
+        <a id='graphsGoBack' href="#" data-role="button" data-inline="true" 
            {{action "goBack" target="Mist.monitoringController.history"}}>&lt;&lt;</a>
-    <!--select id="timeWindowSelect" data-theme="c" {{action "selectPressed" target="view"}}>
-        <option value="5 Minutes" >Display Time:  5 Minutes</option>
-        <option value="10 Minutes" selected="true">Display Time: 10 Minutes</option>
-        <option value="15 Minutes">Display Time: 15 Minutes</option>
-        <option value="30 Minutes">Display Time: 30 Minutes</option>
-        <option value="1 Hour"    >Display Time:  1 Hour   </option>
-    </select-->                           
-     <a id='graphsResetHistory' href="#" data-role="button" data-theme="a" data-inline="true" 
-        {{action "disable" target="Mist.monitoringController.history"}}>Reset</a>
-     <a id='graphsGoForward' href="#" data-role="button" data-inline="true" 
-        {{action "goForward" target="Mist.monitoringController.history"}}>&gt;&gt;</a>
+                          
+        <a id='graphsResetHistory' href="#" data-role="button" data-theme="b" data-inline="true" 
+            {{action "disable" target="Mist.monitoringController.history"}}>Reset</a>
+        <a id='graphsGoForward' href="#" data-role="button" data-inline="true" 
+            {{action "goForward" target="Mist.monitoringController.history"}}>&gt;&gt;</a>
+    </div>
+   
 </div>
 
 <div id="GraphsArea">
@@ -68,37 +76,37 @@
     <!-- Graph Buttons -->
     <div id="graphBar">
         <div id="cpuGraphBtn" class="graphBtn">
-            <button data-icon="plus" data-theme="c" 
+            <button data-icon="carat-u" data-theme="c" 
                 {{action "expandPressed" view.graphs.cpu.name target="Mist.monitoringController.UI"}}>CPU</button>
         </div>
 
         <div id="loadGraphBtn" class="graphBtn">
-            <button data-icon="plus" data-theme="c"
+            <button data-icon="carat-u" data-theme="c"
                 {{action "expandPressed" view.graphs.load.name target="Mist.monitoringController.UI"}}>Load</button>
         </div>
     
         <div id="memoryGraphBtn" class="graphBtn">
-            <button data-icon="plus" data-theme="c"
+            <button data-icon="carat-u" data-theme="c"
                 {{action "expandPressed" view.graphs.memory.name target="Mist.monitoringController.UI"}}>Memory</button>
         </div>
     
         <div id="diskReadGraphBtn" class="graphBtn">
-            <button data-icon="plus" data-theme="c"
+            <button data-icon="carat-u" data-theme="c"
                 {{action "expandPressed" view.graphs.diskRead.name target="Mist.monitoringController.UI"}}>Disk Read</button>
         </div>
     
         <div id="diskWriteGraphBtn" class="graphBtn">
-            <button data-icon="plus" data-theme="c"
+            <button data-icon="carat-u" data-theme="c"
                 {{action "expandPressed" view.graphs.diskWrite.name target="Mist.monitoringController.UI"}}>Disk Write</button>
         </div>
     
         <div id="networkTXGraphBtn" class="graphBtn">
-            <button data-icon="plus" data-theme="c"
+            <button data-icon="carat-u" data-theme="c"
                 {{action "expandPressed" view.graphs.networkTX.name target="Mist.monitoringController.UI"}}>Network Tx</button>
         </div>
     
         <div  id="networkRXGraphBtn" class="graphBtn">
-            <button data-icon="plus" data-theme="c"
+            <button data-icon="carat-u" data-theme="c"
                 {{action "expandPressed" view.graphs.networkRX.name target="Mist.monitoringController.UI"}}>Network Rx</button>
         </div>
     </div>

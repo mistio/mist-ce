@@ -1,22 +1,20 @@
-define('app/controllers/confirmation', [
-    'ember',
-    'jquery',
-    ],
+define('app/controllers/confirmation', ['ember'],
     /**
-     * Confirmation Dialog controller
+     * Confirmation Dialog Controller
      *
      * @returns Class
      */
     function() {
         return Ember.Object.extend({
-            show: function(){
-                $('#dialog-confirm').popup('open', {transition: 'pop'});
+
+            show: function() {
+                $('#confirmation-popup').popup('open');
             },
 
             confirm: function() {
-                $('#dialog-confirm').popup('close');
+                $('#confirmation-popup').popup('close');
                 this.callback();
-                this.set("callback", function(){});
+                this.set('callback', function(){});
             }
         });
     }

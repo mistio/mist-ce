@@ -1,25 +1,20 @@
 define('app/views/mistscreen', ['ember'],
     /**
+     *  Mistscreen View
      *
-     * Mist Base screen page
-     *
-     * @returns Class
+     *  @returns Class
      */
-    function() {
+    function () {
         return Ember.View.extend({
 
-            tagName: false,
+            /**
+             *  Initialization
+             */
 
-            willInsertElement: function() {
-                try {
-                    $('.ui-popup').popup('destroy').remove();
-                } catch(e){}
-            },
-
-            didInsertElement: function() {
-                try {
-                    $("[data-role=page]").page('destroy').page();
-                } catch(e){}
+            didInsertElement: function () {
+                if ($('.ui-page-active').page) {
+                    $('.ui-page-active').page();
+                }
             }
         });
     }

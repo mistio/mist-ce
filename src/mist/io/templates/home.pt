@@ -6,18 +6,23 @@
     <meta content='True' name='HandheldFriendly' />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0" />
     <title>${project} - cloud management in your pocket</title>
-    <link type="text/css" href="resources/ui-smoothness/jquery-ui-1.9.1.custom.css" rel="stylesheet" />
-    <link rel="stylesheet" href="resources/jquery.mobile-1.3.0.css" />
-    <link rel="stylesheet" href="resources/main.css" />
     <link rel="icon" href="resources/favicon.ico" />
     <link rel="stylesheet" media="all" href=""/>
+
+    <link rel="stylesheet" type='text/css' href="resources/main.css" 
+          tal:condition="not:css_build"/> 
+    
+    <link rel="stylesheet" href="resources/mist-1391781541.css"
+          tal:condition="css_build" />
+
     <script tal:content="string: var IS_CORE=${is_core}" />
     <script tal:content="string: var URL_PREFIX=${core_uri}" />
     <script tal:content="string: var AUTH=${auth}" />
     <script tal:content="string: var SUPPORTED_PROVIDERS=${supported_providers}" />
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
     <script tal:content="string: var EMAIL=${email}" />
-
+    <script tal:content="string: var CSRF_TOKEN=${csrf_token}" />
+    
     <script src="resources/js/lib/require/require.js"></script>
 
     <script tal:condition="js_build">
@@ -25,7 +30,7 @@
             baseUrl: 'resources/js/',
             paths: {
                 //the optimized mist.js source file.
-                "app": "../build/mist-1391688113"
+                "app": "../build/mist-1391781541"
             }
         });
         require(["app"]);
@@ -50,29 +55,44 @@
 </head>
 
 <body style="background-color: #c2c3c4; overflow:hidden">
-    <div id="splash"><div class="mist-logo" /></div>
-    <iframe id="hidden-shell-iframe"></iframe>
+
+    <!-- Loading screen -->
+    <div id="splash">
+        <div class="mist-logo"></div>
+    </div>
+
+    <!-- Dumping area for shell streaming -->
+    <div id="hidden-shell"></div>
+
+    <!-- Notification widget -->
+    <div id="notification-popup" class="ui-loader ui-corner-all ui-body-b ui-loader-verbose ui-loader-textonly">
+        <span class="ui-icon-loading"></span>
+        <h1>Failed to get monitoring data</h1>
+    </div>
+
+    <!-- Ember Views -->
     <script type="text/x-handlebars" data-template-name="application">
         {{outlet}}
     </script>
     <script type="text/x-handlebars" data-template-name="index">
-        {{view Mist.HomeView}}
+        {{view Mist.homeView}}
     </script>
     <script type="text/x-handlebars" data-template-name="machines">
-        {{view Mist.MachineListView}}
+        {{view Mist.machineListView}}
     </script>
     <script type="text/x-handlebars" data-template-name="images">
-        {{view Mist.ImageListView}}
+        {{view Mist.imageListView}}
     </script>
     <script type="text/x-handlebars" data-template-name="machine">
-        {{view Mist.SingleMachineView}}
+        {{view Mist.singleMachineView}}
     </script>
     <script type="text/x-handlebars" data-template-name="keys">
-        {{view Mist.KeyListView}}
+        {{view Mist.keyListView}}
     </script>
     <script type="text/x-handlebars" data-template-name="key">
-        {{view Mist.SingleKeyView}}
+        {{view Mist.singleKeyView}}
     </script>
+
 </body>
 
 </html>

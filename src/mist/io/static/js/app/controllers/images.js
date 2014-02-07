@@ -1,85 +1,144 @@
-define('app/controllers/images', [
-    'app/models/image',
-    'ember',
-    'jquery'
-    ],
+define('app/controllers/images', ['app/models/image'],
     /**
-     * Images controller
+     *  Images Controller
      *
-     *
-     * @returns Class
+     *  @returns Class
      */
     function(Image) {
-        return Ember.ArrayController.extend({
+        return Ember.ArrayController.extend(Ember.Evented, {
+
+            /**
+             *  Properties
+             */
+
+            content: [],
+            loading: null,
             backend: null,
 
-            getImage: function(id, callback) {
-                // Linode will pass null, so don't bother
-                if (id == null){
-                    return false;
-                }
+            /**
+             * 
+             *  Initialization
+             * 
+             */
 
-                var foundImage = false;
-                if (this.content) {
-                    $.each(this.content, function(idx, image) {
-                        if (image.id == id) {
-                            foundImage = image;
-                            return false;
-                        }
-                    });
-                }
+            load: function() {
 
-                return foundImage;
+                if (!this.backend.enabled) return;
+
+                var that = this;
+                this.set('loading', true);
+                Mist.ajax.GET('/backends/' + this.backend.id + '/images', {
+                }).success(function(images) {
+                    if (!that.backend.enabled) return;
+                    that._setContent(images);
+                }).error(function() {
+                    if (!that.backend.enabled) return;
+                    Mist.notificationController.notify('Failed to load images for ' + that.backend.title);
+                    that.backend.set('enabled', false);
+                }).complete(function(success) {
+                    if (!that.backend.enabled) return;
+                    that.set('loading', false);
+                    that.trigger('onLoad');
+                });
             },
 
-            init: function() {
-                this._super();
-                
-                if (!this.backend.enabled) {
-                    return;
-                }
-                else if (this.backend.error && this.backend.state == 'offline') {
-                    return;
-                }
-                
-                this.backend.set('state', 'waiting');
-                this.backend.set('loadingImages', true);
+
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+
+            searchImages: function(filter, callback) {
                 var that = this;
-                $.getJSON('/backends/' + this.backend.id + '/images', function(data) {
-                    if (!that.backend.enabled) {
-                        that.backend.set('loadingImages', false);
-                        return;
+                Mist.ajax.POST('/backends/' + this.backend.id + '/images', {
+                    'search_term' : filter
+                }).success(function(images) {
+
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to search images');
+                }).complete(function(success, images) {
+                    var imagesToReturn = [];
+                    if (success) {
+                        images.forEach(function(image) {
+                            image.backend = that.backend;
+                            imagesToReturn.push(Image.create(image));
+                        });
                     }
-                    var content = new Array();
-                    data.forEach(function(item) {
-                        var image = Image.create(item);
-                        image.backend = that.backend;
-                        content.push(image);
-                    });
-                    that.set('content', content);
-                    Mist.backendsController.getImageCount();
-                    that.backend.set('state', 'online');
-                    if (that.backend.error){
-                        that.backend.set('error', false);
-                    }
-                    that.backend.set('loadingImages', false);
-                }).error(function(jqXHR, textstate, errorThrown) {
-                    Mist.notificationController.notify(jqXHR.responseText);
-                    error(jqXHR.responseText);
-                    if (that.backend.error){
-                        // This backend seems hopeless, disabling it                            
-                        that.backend.set('state', 'offline');
-                        that.backend.set('enabled', false);
-                    } else {
-                        // Mark error but try once again
-                        that.backend.set('error', "Error loading images");
-                        Ember.run.later(that, function(){
-                            this.init();
-                        }, that.backend.poll_interval); 
-                    }
-                    that.backend.set('loadingImages', false);
+                    if (callback) callback(success, imagesToReturn);
                 });
-            }
+            },
+
+
+            toggleImageStar: function(image, callback) {
+                var that = this;
+                Mist.ajax.POST('/backends/' + this.backend.id + '/images/' + image.id, {
+                }).success(function(star) {
+                    if (!that.imageExists(image.id)) {
+                        that._addImage(image);
+                    }
+                    that._toggleImageStar(image.id, star);
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to (un)star image');
+                }).complete(function(success, star) {
+                    if (callback) callback(success, star);
+                });
+            },
+
+
+            clear: function() {
+                Ember.run(this, function() {
+                    this.set('content', []);
+                    this.set('loading', false);
+                    this.trigger('onImageListChange');
+                });
+            },
+
+
+            getImage: function(imageId) {
+                return this.content.findBy('id', imageId);
+            },
+
+
+            imageExists: function(imageId) {
+                return !!this.getImage(imageId);
+            },
+
+
+
+            /**
+             * 
+             *  Pseudo-Private Methods
+             * 
+             */
+
+            _addImage: function(image) {
+                Ember.run(this, function() {
+                    this.content.pushObject(Image.create(image));
+                    this.trigger('onImageListChange');
+                });
+            },
+
+            _setContent: function(images) {
+                var that = this;
+                Ember.run(function() {
+                    that.set('content', []);
+                    images.forEach(function(image) {
+                        image.backend = that.backend;
+                        that.content.pushObject(Image.create(image));
+                    });
+                    that.trigger('onImageListChange');
+                });
+            },
+
+
+            _toggleImageStar: function(imageId, star) {
+                Ember.run(this, function() {
+                    this.getImage(imageId).set('star', star);
+                    this.trigger('onImageStarToggle');
+                });
+            },
         });
     }
 );

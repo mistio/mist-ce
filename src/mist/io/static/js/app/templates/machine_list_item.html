@@ -1,92 +1,80 @@
-{{#if view.machine.isNotGhost}}
-    <li class="node prov-{{unbound view.machine.backend.provider}}">
-        <fieldset class="list-item">
-            <label>
-                {{view Mist.Checkbox checkedBinding="view.machine.selected"}}
-            </label>
-        </fieldset>
-        {{#linkTo machine view.machine}}
-            <h3 class="name">{{view.machine.name}}</h3>
+{{#unless view.machine.isGhost}}
+
+    <label>{{view Mist.Checkbox checkedBinding="view.machine.selected"}}</label>
+    {{#link-to "machine" view.machine classBinding="view.machine.hasMonitoring"}}
     
-            <span class="caption-wrapper">
-                <h3 {{bindAttr class="view.machine.state :state"}}>{{view.machine.state}}</h3>
-                {{#if view.machine.hasAlert}}
-                <span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
-                {{/if}}
-            </span>
-            
-            <p class="description">
-                        
-                {{#if view.machine.backendIsBareMetal}}
-                <span class="tag backend ui-btn-corner-all prov-{{unbound backend.provider}}">Bare Metal Server</span>
-                {{else}}
-                <span class="tag backend ui-btn-corner-all">{{this.backend.title}}</span>
-                {{/if}}
-                
-                {{#each view.machine.tags}}
-                <span class="tag ui-btn-corner-all">{{this}}</span>
-                {{/each}}
-                <span class="monitoring-container" {{bindAttr id="view.machine.id" class=":action-links view.disabledMonitoringClass"}}>
-                    {{#if view.machine.hasMonitoring}}
-                        <span class="ui-li-count node-icon monitoring-icon ui-btn-corner-all">&nbsp;</span>
-                    {{/if}}
-                </span>            
-            </p>
-            
+        <div class="ui-grid-b">
+            <div class="ui-block-a machine-name">{{view.machine.name}}</div>
     
-            <span class="bubble-container">
+            <span class="ui-block-b machine-state">
+                <span {{bind-attr class="view.machine.state"}}>
+                {{view.machine.state}}
+
                 {{#if pendingCreation}}
-                        <div class='ajax-loader'></div>
-                {{else}}
-                    {{#if probing}}
-                        <span class="ui-li-count node-icon probing-icon ui-btn-corner-all"></span>                
-                    {{else}}
-                        {{#if probed}}
-                        <span class="ui-li-count node-icon key-icon ui-btn-corner-all"></span>
-                        {{else}}
-                        <span class="ui-li-count node-icon no-key-icon ui-btn-corner-all"></span>
-                        {{/if}}
-                    {{/if}}
-                {{/if}}
+                    <div class='ajax-loader'></div>
+                {{else}} {{#if waitState}}
+                    <div class='ajax-loader'></div>
+                {{/if}} {{/if}}
+                </span>
             </span>
-        {{/linkTo}}
-    </li>
-{{else}}
-    <li class="node ghost" data-icon="delete">
-        <a href="#" {{action disassociateGhostMachine target="view"}}>
-  
-            <h3 class="name">{{view.machine.name}}</h3>
-    
-            <span class="caption-wrapper">
-                <h3 {{bindAttr class="view.machine.state :state"}}>{{view.machine.state}}</h3>
-                {{#if view.machine.hasAlert}}
-                <span class="ui-li-count node-icon ui-icon ui-icon-alert alert-icon"></span>
-                {{/if}}
-            </span>
-            
-            <p class="description">          
-                <span class="tag backend ui-btn-corner-all prov-{{unbound backend.provider}}">{{view.machine.backend.title}}</span>
-    
-                {{#each view.machine.tags}}
-                <span class="tag ui-btn-corner-all">{{this}}</span>
-                {{/each}}
-                <span class="monitoring-container" {{bindAttr id="view.machine.id" class=":action-links view.disabledMonitoringClass"}}>
+
+            <div class="ui-block-c machine-leds">
+                <span>
                     {{#if view.machine.hasMonitoring}}
-                        <span class="ui-li-count node-icon monitoring-icon ui-btn-corner-all">&nbsp;</span>
+                        <span></span>
                     {{/if}}
-                </span>            
-            </p>
+                </span>
+                {{#unless pendingCreation}}
+                    <div {{bind-attr class="probing probed"}}>
+                        <div class="loadleds">                                                                      
+                            <div {{bind-attr class="loadavg15 :led"}}>
+                            </div>                
+                            <div {{bind-attr class="loadavg5 :led"}}>
+                            </div> 
+                            <div {{bind-attr class="loadavg1 :led"}}>
+                            </div>
+                        </div>
+                        <div {{bind-attr class=":netleds"}}>
+                            <div {{bind-attr class="netled4 :netled1"}}>
+                            </div> 
+                            <div {{bind-attr class="netled3 :netled2"}}>
+                            </div> 
+                            <div {{bind-attr class="netled2 :netled3"}}>
+                            </div> 
+                            <div {{bind-attr class="netled1 :netled4"}}>
+                            </div>
+                        </div>
+                                                 
+                    </div>
+                {{/unless}}
+                
+            </div>
             
+            <div class="ui-block-c machine-tags">              
+                <span class="tag">{{view.machine.backend.title}}</span>
+                {{#each view.machine.tags}}
+                <span class="tag">{{this}}</span>
+                {{/each}}             
+            </div>    
+                                
+        </div>
+    {{/link-to}}
     
-            <span class="bubble-container">
-                {{#if view.machine.probed}}
-                <span class="ui-li-count node-icon key-icon ui-btn-corner-all"></span>
-                {{else}}
-                    {{#if view.machine.isNotGhost}}
-                    <span class="ui-li-count node-icon no-key-icon ui-btn-corner-all"></span>
-                    {{/if}}
-                {{/if}}
-            </span>
-        </a>
-    </li>
-{{/if}}
+{{else}}
+
+    <a class="ui-icon-delete" {{action disassociateGhostMachine target="view"}}>
+        
+        <div class="ui-grid-b">
+            <div class="ui-block-a machine-name">{{view.machine.name}}</div>
+    
+            <span class="ui-block-b machine-state">
+                <span {{bind-attr class="view.machine.state"}}>
+                    {{view.machine.state}}
+                </span>
+            </span> 
+                                
+        </div>
+
+    </a>
+    
+{{/unless}}

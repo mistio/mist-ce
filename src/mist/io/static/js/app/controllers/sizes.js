@@ -1,57 +1,84 @@
-define('app/controllers/sizes', [
-    'app/models/size',
-    'ember',
-    'jquery'
-    ],
+define('app/controllers/sizes', ['app/models/size'],
     /**
-     * Sizes controller
+     *  Sizes Controller
      *
-     *
-     * @returns Class
+     *  @returns Class
      */
-    function(Size) {
-        return Ember.ArrayController.extend({
+    function (Size) {
+        return Ember.ArrayController.extend(Ember.Evented, {
+
+            /**
+             *  Properties
+             */
+
+            content: [],
+            loading: null,
             backend: null,
 
-            init: function() {
-                this._super();
-                
-                if (!this.backend.enabled) {
-                    return;
-                }
-                else if (this.backend.error && this.backend.state == 'offline') {
-                    return;
-                }
-                
-                this.backend.set('state', 'waiting');
+            /**
+             *
+             *  Initialization
+             *
+             */
+
+            load: function () {
+
+                if (!this.backend.enabled) return;
+
                 var that = this;
-                $.getJSON('/backends/' + this.backend.id + '/sizes', function(data) {
-                    if (!that.backend.enabled) {
-                        return;
-                    }
-                    var content = new Array();
-                    data.forEach(function(item){
-                        content.push(Size.create(item));
+                this.set('loading', true);
+                Mist.ajax.GET('/backends/' + this.backend.id + '/sizes', {
+                }).success(function (sizes) {
+                    if (!that.backend.enabled) return;
+                    that._setContent(sizes);
+                }).error(function () {
+                    if (!that.backend.enabled) return;
+                    Mist.notificationController.notify('Failed to load sizes for ' + that.backend.title);
+                    that.backend.set('enabled', false);
+                }).complete(function (success) {
+                    if (!that.backend.enabled) return;
+                    that.set('loading', false);
+                    that.trigger('onLoad');
+                });
+            },
+
+
+
+            /**
+             *
+             *  Methods
+             *
+             */
+
+            clear: function () {
+                Ember.run(this, function () {
+                    this.set('content', []);
+                    this.set('loading', false);
+                    this.trigger('onSizeListChange');
+                });
+            },
+
+
+            getSize: function (sizeId) {
+                return this.content.findBy('id', sizeId);
+            },
+
+
+
+            /**
+             *
+             *  Pseudo-Private Methods
+             *
+             */
+
+            _setContent: function (sizes) {
+                var that = this;
+                Ember.run(function () {
+                    that.set('content', []);
+                    sizes.forEach(function (size) {
+                        that.content.pushObject(Size.create(size));
                     });
-                    that.set('content', content);
-                    that.backend.set('state', 'online');
-                    if (that.backend.error){
-                        that.backend.set('error', false);
-                    }
-                }).error(function(jqXHR, textstate, errorThrown) {
-                    Mist.notificationController.notify(jqXHR.responseText);
-                    error(jqXHR.responseText);
-                    if (that.backend.error){
-                        // This backend seems hopeless, disabling it                            
-                        that.backend.set('state', 'offline');
-                        that.backend.set('enabled', false);
-                    } else {
-                        // Mark error but try once again
-                        that.backend.set('error', "Error loading sizes");
-                        Ember.run.later(that, function(){
-                            this.init();
-                        }, that.backend.poll_interval); 
-                    }   
+                    that.trigger('onSizeListChange');
                 });
             }
         });

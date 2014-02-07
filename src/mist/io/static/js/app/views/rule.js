@@ -1,16 +1,20 @@
-define('app/views/rule', [
-    'text!app/templates/rule.html',
-    'ember'],
+define('app/views/rule', ['text!app/templates/rule.html', 'ember'],
     /**
+     *  Rule View
      *
-     * Rules view
-     *
-     * @returns Class
+     *  @returns Class
      */
     function(rule_html) {
         return Ember.View.extend({
 
             template: Ember.Handlebars.compile(rule_html),
+
+            didInsertElement: function() {
+                Ember.run.next(this, function() {
+                    this.metricObserver();
+                    $('#'+this.elementId).find('.ui-slider-track').hide();
+                });
+            },
 
             valueObserver: function() {
                 $('#' + this.rule.id + ' .rule-value').val(this.rule.value);
@@ -34,14 +38,11 @@ define('app/views/rule', [
                 });
             }.observes('this.rule.pendingAction'),
 
-            openMetricPopup: function() {
-                $('.rule-metric-popup').popup('option', 'positionTo', '#' + this.rule.id + ' .rule-button.metric').popup('open');
-                $('.rule-metric-popup li a').on('click', this.rule, this.selectMetric);
-            },
-
             selectMetric: function(event) {
                 $('.rule-metric-popup').popup('close');
                 $('.rule-metric-popup li a').off('click');
+                info(event.data.id);
+                info(this.title);
                 Mist.rulesController.updateRule(event.data.id, this.title);
                 return false;
             },
@@ -56,6 +57,51 @@ define('app/views/rule', [
                 Mist.rulesController.updateRule(event.data.id, null, operator);
                 return false;
             },
+
+
+            actions: {
+
+
+                openMetricPopup: function() {
+                    $('.rule-metric-popup').popup('option', 'positionTo', '#' + this.rule.id + ' .rule-button.metric').popup('open');
+                    $('.rule-metric-popup li a').on('click', this.rule, this.selectMetric);
+                },
+
+
+                openOperatorPopup: function() {
+                    $('.rule-operator-popup').popup('option', 'positionTo', '#' + this.rule.id + ' .rule-button.operator').popup('open');
+                    $('.rule-operator-popup li a').on('click', this.rule, this.selectOperator);
+                },
+
+
+                openActionPopup: function() {
+                    $('.rule-action-popup').popup('option', 'positionTo', '#' + this.rule.id + ' .rule-button.action').popup('open');
+                    $('.rule-action-popup li a').on('click', this.rule, this.selectAction);
+                },
+
+
+                deleteRuleClicked: function(){
+                    this.rule.set('pendingAction', true);
+                    var that = this;
+                    $.ajax({
+                        url: 'rules/' + that.rule.id,
+                        type: 'DELETE',
+                        contentType: 'application/json',
+                        success: function(data) {
+                            info('Successfully deleted rule ', that.rule.id);
+                            Mist.rulesController.removeObject(that.rule);
+                            Mist.rulesController.redrawRules();
+                            that.rule.set('pendingAction', false);
+                        },
+                        error: function(jqXHR, textstate, errorThrown) {
+                            Mist.notificationController.notify('Error while deleting rule');
+                            error(textstate, errorThrown, 'while deleting rule');
+                            that.rule.set('pendingAction', false);
+                        }
+                    });
+                }
+            },
+
 
             selectAction: function(event) {
                 $('.rule-action-popup').popup('close');
@@ -73,37 +119,6 @@ define('app/views/rule', [
                 };
                 Mist.rulesController.updateRule(rule.id, null, null, null, action);
                 return false;
-            },
-
-            openOperatorPopup: function() {
-                $('.rule-operator-popup').popup('option', 'positionTo', '#' + this.rule.id + ' .rule-button.operator').popup('open');
-                $('.rule-operator-popup li a').on('click', this.rule, this.selectOperator);
-            },
-
-            openActionPopup: function() {
-                $('.rule-action-popup').popup('option', 'positionTo', '#' + this.rule.id + ' .rule-button.action').popup('open');
-                $('.rule-action-popup li a').on('click', this.rule, this.selectAction);
-            },
-
-            deleteRuleClicked: function(){
-                this.rule.set('pendingAction', true);
-                var that = this;
-                $.ajax({
-                    url: 'rules/' + that.rule.id,
-                    type: 'DELETE',
-                    contentType: 'application/json',
-                    success: function(data) {
-                        info('Successfully deleted rule ', that.rule.id);
-                        Mist.rulesController.removeObject(that.rule);
-                        Mist.rulesController.redrawRules();
-                        that.rule.set('pendingAction', false);
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while deleting rule');
-                        error(textstate, errorThrown, 'while deleting rule');
-                        that.rule.set('pendingAction', false);
-                    }
-                });
             }
         });
     }

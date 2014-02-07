@@ -1,0 +1,36 @@
+
+/* Image List Page CSS
+-----------------------------------------------------------------------------------------------------------*/
+
+@-moz-document url-prefix() {
+	#image-list-page .checkbox-link h3 {
+	    width: 50%;
+	    position: relative;
+	    top: 4px;
+	}
+
+    #image-list-page .checkbox-link .tag {
+        position: relative;
+        bottom: 33px;
+    }
+}
+
+#image-list-page .checkbox-link h3 {
+    position: relative;
+    top: 4px;
+}
+
+#image-list-page .ui-checkbox-off:after {
+    background-image: url(../images/staroff.png);
+    background-color: rgba(0,0,0,0) !important;
+    background-position: 0px -2px;
+    background-repeat: no-repeat !important;
+}
+
+#image-list-page .ui-checkbox-on:after {
+    background-image: url(../images/staron.png);
+    background-color: rgba(0,0,0,0) !important;
+    background-position: 0px -2px;
+    background-repeat: no-repeat !important;
+}
+

@@ -1,39 +1,63 @@
-define('app/views/key_edit_dialog', [
-    'text!app/templates/key_edit_dialog.html','ember'],
+define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html', 'ember'],
     /**
-     * Key Edit dialog
+     *  Key Edit View
      *
-     * @returns Class
+     *  @returns Class
      */
-    function(key_edit_dialog_html) {
+    function (key_edit_dialog_html) {
         return Ember.View.extend({
 
-            newName: null,
+            /**
+             *  Properties
+             */
 
             template: Ember.Handlebars.compile(key_edit_dialog_html),
 
-            attributeBindings: ['data-role'],
 
-            newNameObserver: function() {
-                if (this.newName) {
-                    $('#edit-key-ok').button('enable');
+            /**
+             *
+             *  Methods
+             *
+             */
+
+            updateSaveButton: function () {
+                if (Mist.keysController.renamingKey || !Mist.keyEditController.formReady) {
+                    $('#rename-key-ok').addClass('ui-state-disabled');
                 } else {
-                    $('#edit-key-ok').button('disable');
+                    $('#rename-key-ok').removeClass('ui-state-disabled');
                 }
-            }.observes('newName'),
-
-            backClicked: function() {
-                $('#edit-key-dialog').popup('close');
             },
 
-            saveClicked: function() {
-                var oldName = this.get('controller').get('model').name;
-                if (oldName != this.newName) {
-                    Mist.keysController.editKey(oldName, this.newName.trim());
-                } else {
-                    Mist.notificationController.notify('Please give a new name');
+
+            /**
+             *
+             *  Actions
+             *
+             */
+
+            actions: {
+
+
+                backClicked: function () {
+                    Mist.keyEditController.close();
+                },
+
+
+                saveClicked: function () {
+                    Mist.keyEditController.save();
                 }
-            }
+            },
+
+
+            /**
+             *
+             *  Observers
+             *
+             */
+
+            updateSaveButtonObserver: function () {
+                Ember.run.once(this, 'updateSaveButton');
+            }.observes('Mist.keyEditController.formReady', 'Mist.keysController.renamingKey')
         });
     }
 );

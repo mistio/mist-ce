@@ -1,0 +1,31 @@
+<div id="login-popup" class="mid-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
+
+    <div data-role="header">
+        <h1>Login</h1>
+    </div>
+
+    <div data-role="content">
+
+        <label for="email">Email:</label>
+        {{view Mist.TextField
+               id="email"
+               valueBinding="Mist.loginController.email"}}
+
+        <label for="password">Password:</label>
+        {{view Mist.TextField
+               id="password"
+               type="password"
+               valueBinding="Mist.loginController.password"}}
+
+        {{#if Mist.loginController.loggingIn}}
+        <div class="ajax-loader"></div>
+        {{/if}}
+
+        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <a data-role="button" {{action "backClicked" target="view"}}>Back</a>
+            <button id="login-ok" data-theme="b" {{action "loginClicked" target="view"}}>Log in</button>
+        </div>
+
+    </div>
+
+</div>

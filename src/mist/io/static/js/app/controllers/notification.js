@@ -1,68 +1,51 @@
-define('app/controllers/notification', [
-    'ember',
-    'jquery',
-    ],
+define('app/controllers/notification', ['ember'],
     /**
-     * Notification controller
+     *  Notification Controller
      *
-     * @returns Class
+     *  @returns Class
      */
-    function() {
+    function () {
         return Ember.Object.extend({
 
-            timeout: false,
+            /**
+             *  Properties
+             */
 
-            notify: function(message){
-                if(this.timeout){
-                    clearTimeout(this.timeout);
-                }
-                log("notification: " + message);
-                $.mobile.loading( 'show', {
-                            text: message,
-                            textVisible: true,
-                            textonly: true,
-                            theme: $.mobile.pageLoadErrorMessageTheme
-                });
-                this.timeout = setTimeout("$.mobile.loading( 'hide' )", 2000);
-            },
-            
-            warn: function(message){
-                if(this.timeout){
-                    clearTimeout(this.timeout);
-                }
-                log("warning: " + message);
-                $.mobile.loading( 'show', {
-                            text: message,
-                            textVisible: true,
-                            textonly: true,
-                            theme: $.mobile.pageLoadErrorMessageTheme
-                });
-                this.timeout = setTimeout("$.mobile.loading( 'hide' )", 5000);
+            timeout: null,
+
+
+            /**
+             *
+             *  Methods
+             *
+             */
+
+            notify: function (message) {
+                $('#notification-popup h1').text(message);
+                $('#notification-popup').show();
+                Ember.run.later(function () {
+                    $('#notification-popup').hide();
+                }, this.timeout ? this.timeout : 2000);
             },
 
-            timeNotify: function(message, miliseconds){
-                if(this.timeout){
-                    clearTimeout(this.timeout);
-                }
-                log("warning: " + message);
-                $.mobile.loading( 'show', {
-                            text: message,
-                            textVisible: true,
-                            textonly: true,
-                            theme: $.mobile.pageLoadErrorMessageTheme
-                });
-                this.timeout = setTimeout("$.mobile.loading( 'hide' )", miliseconds);
+
+            timeNotify: function (message, miliseconds) {
+                $('#notification-popup h1').text(message);
+                $('#notification-popup').show();
+                Ember.run.later(function () {
+                    $('#notification-popup').hide();
+                }, miliseconds);
             },
 
             showMessagebox: function() {
-                $('#message-box').popup('open').popup('reposition', {positionTo: 'window'});
+                $('#message-box-popup').popup('open').popup('reposition', {positionTo: 'window'});
                 Ember.run.next(function() {
-                    $('#message-box').popup('reposition', {positionTo: 'window'});
+                    $('#message-box-popup').popup('reposition', {positionTo: 'window'});
                     Ember.run.later(function() {
-                        $('#message-box').popup('reposition', {positionTo: 'window'});
+                        $('#message-box-popup').popup('reposition', {positionTo: 'window'});
                     }, 300);
                 });
-            }        
+            } 
         });
     }
 );
