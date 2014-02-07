@@ -1,313 +1,424 @@
-define('app/controllers/backends', [
-    'app/models/backend',
-    'app/models/rule',
-    'ember'
-    ],
+define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'ember'],
     /**
-     * Backends controller
+     *  Backends Controller
      *
-     * @returns Class
+     *  @returns Class
      */
     function(Backend, Rule) {
-        return Ember.ArrayController.extend({
+        return Ember.ArrayController.extend(Ember.Evented, {
+
+            /**
+             *  Properties
+             */
 
             content: [],
-            machineCount: 0,
             imageCount: 0,
+            machineCount: 0,
+            selectedMachines: [],
+            machineRequest: false,
+
+            addingBackend: false,
+            deletingBackend: false,
+            togglingBackend: false,
+            checkedMonitoring: false,
+            checkingMonitoring: false,
+
+            loading: false,
             loadingImages: false,
-            loadingMachines: null,
-            singleMachineRequest: null,
-            singleMachineResponse: null,
+            loadingMachines: false,
 
-            singleMachineRequestObserver: function() {
-                if (this.singleMachineRequest) {
-                    if (this.loadingMachines) {
-                        Ember.run.later(this, function() {
-                            this.singleMachineRequestObserver();
-                        }, 1000);
-                        return;
+            /**
+             * 
+             *  Initialization
+             * 
+             */
+
+            load: function() {
+                var that = this;
+                this.set('loading', true);
+                Mist.ajax.GET('/backends', {
+                }).success(function(backends) {
+                    that._setContent(backends);
+                }).error(function() {
+                    that._reload();
+                }).complete(function() {
+                    that.set('loading', false);
+                    that.trigger('onLoad');
+                });
+            }.on('init'),
+
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+
+            addBackend: function(title, provider, apiKey, apiSecret, apiUrl, region, tenant, key, callback) {
+                var that = this;
+                this.set('addingBackend', true);
+                Mist.ajax.POST('/backends', {
+                    'title'       : title,
+                    'provider'    : provider,
+                    'apikey'      : apiKey,
+                    'apisecret'   : apiSecret,
+                    'apiurl'      : apiUrl,
+                    'tenant_name' : tenant,
+                    'region'      : region,
+                    'machine_key' : key,
+                    'machine_ip'  : apiKey,    // For bare-metal
+                    'machine_user': apiSecret  // For bare-metal
+                }).success(function(backend) {
+                    that._addBackend(backend, key);
+                }).error(function(message) {
+                    Mist.notificationController.notify('Failed to add backend: ' + message);
+                }).complete(function(success, backend) {
+                    that.set('addingBackend', false);
+                    if (callback) callback(success, backend);
+                });
+            },
+
+
+            renameBackend: function(backendId, newTitle, callback) {
+                var that = this;
+                this.set('renamingBackend', true);
+                Mist.ajax.PUT('/backends/' + backendId, {
+                    'new_name': newTitle
+                }).success(function() {
+                    that._renameBackend(backendId, newTitle);
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to rename backend');
+                }).complete(function(success) {
+                    that.set('renamingBackend', false);
+                    if (callback) callback(success);
+                });
+            },
+
+
+            deleteBackend: function(backendId, callback) {
+                var that = this;
+                this.set('deletingBackend', true);
+                Mist.ajax.DELETE('/backends/' + backendId, {
+                }).success(function() {
+                    that._deleteBackend(backendId);
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to delete backend');
+                }).complete(function(success) {
+                    that.set('deletingBackend', false);
+                    if (callback) callback(success);
+                });
+            },
+
+
+            toggleBackend: function(backendId, newState, callback) {
+                var that = this;
+                this.set('togglingBackend', true);
+                Mist.ajax.POST('/backends/' + backendId, {
+                    'new_state': newState ? '1' : '0'
+                }).success(function() {
+                    that._toggleBackend(backendId, newState);
+                }).error(function() {
+                    Mist.notificationController.notify("Failed to change backend's state");
+                    that._toggleBackend(backendId, !newState);
+                }).complete(function(success) {
+                    that.set('togglingBackend', false);
+                    if (callback) callback(success);
+                });
+            },
+ 
+ 
+            probeMachine: function(machine, keyId, callback) {
+
+                // TODO: This should be moved inside machines controller
+                
+                function loadToColor(load, cores) {
+                    var weightedLoad = load / cores;
+                    if (weightedLoad > 1.2) {
+                        return 'hot';
+                    } else if (weightedLoad > 0.8) {
+                        return 'warm';
+                    } else if (weightedLoad > 0.4) {
+                        return 'eco';
+                    } else if (weightedLoad > 0.1) {
+                        return 'cool';
+                    } else {
+                        return 'cold';
                     }
-                    this.set('singleMachineResponse', this.getMachineByUrlId(this.singleMachineRequest));
-                    this.set('singleMachineRequest', false);
                 }
-            }.observes('singleMachineRequest'),
-            
-            // TODO make this property dynamic according to all backends states
-            state: "waiting",
-            ok: false,
-            
-            loadingMachinesObserver: function() {
-                for (var i = 0; i < this.content.length; i++) {
-                    if (this.content[i].loadingMachines) {
-                        this.set('loadingMachines', true);
-                        return;
-                    }
-                }
-                this.set('loadingMachines', false);
-            }.observes('@each.loadingMachines'),
-            
-            loadingImagesObserver: function() {
-                for (var i = 0; i < this.content.length; i++) {
-                    if (this.content[i].loadingImages) {
-                        this.set('loadingImages', true);
-                        return;
-                    }
-                }
-                this.set('loadingImages', false);
-            }.observes('content.@each.loadingImages'),
-            
-            isOK: function() {
-                if(this.state == 'state-ok') {
-                    this.set('ok', true);
+
+                if (!machine.id || machine.id == -1) return;
+                if (!machine.state == 'running') return;
+
+                var host = machine.getHost();
+                if (!host) return;
+
+                var key = Mist.keysController.getKey(keyId);
+                if (key) {
+                    machine.set('probing', keyId);
+                    key.set('probing', machine);
                 } else {
-                    this.set('ok', false);
+                    machine.set('probing', true);
                 }
-            }.observes('state'),
-            
-            getBackendById: function(backendId) {
-                for (var i = 0; i < this.content.length; i++) {
-                    if (this.content[i].id == backendId) {
-                        return this.content[i];
+                var that = this;
+                var uptime = null;
+                Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/probe', {
+                    'host': host,
+                    'key': keyId
+                }).success(function(data) {
+                    if (!machine.backend || !machine.backend.enabled) return;
+                    if (data.uptime) {
+                        uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
+                        machine.set('uptimeChecked', Date.now());
+                        machine.set('uptimeFromServer', uptime);
+                        machine.set('probed', true);
+                    } else {
+                        machine.set('uptimeChecked', -Date.now());
                     }
-                }
-                return null;
-            },
-            
-            getMachineById: function(backendId, machineId) {
-                for (var i = 0; i < this.content.length; i++) {
-                    if (this.content[i].id == backendId) {
-                        for (var j=0; j < this.content[i].machines.content.length; j++) {
-                            if (this.content[i].machines.content[j].id == machineId) {
-                                return this.content[i].machines.content[j];
-                            }
-                        }
+                    machine.set('cores', data.cores);
+                    machine.set('users', data.users);
+                    if (data.loadavg) {
+                        machine.set('loadavg1', loadToColor(data.loadavg[0], data.cores));
+                        machine.set('loadavg5', loadToColor(data.loadavg[1], data.cores));
+                        machine.set('loadavg15', loadToColor(data.loadavg[2], data.cores));                          
+                    }                
+                    machine.set('loadavg', data.loadavg);
+                    machine.set('loss', data.packets_loss);
+                    machine.set('latency', Math.floor(data.rtt_avg));
+                    
+                }).error(function(message) {
+                    if (!machine.backend || !machine.backend.enabled) return;
+                    if (key) Mist.notificationController.notify(message);
+                }).complete(function(success, data) {
+                    if (!machine.backend || !machine.backend.enabled) return;
+                    if (key) {
+                        key.set('probing', false);
                     }
-                }
-                return null;
-            },
-
-            getCloudProviders: function() {
-                var providers = [];
-                this.content.forEach(function(backend) {
-                    if (backend.provider != 'bare_metal') {
-                        providers.push(backend);
-                    }
+                    machine.set('probing', false);
+                    that.trigger('onMachineProbe');
+                    if (callback) callback(!!uptime, data);
                 });
-                return providers;
             },
 
-            getCloudProvidersProperty: function() {
-                return this.getCloudProviders();
-            }.property('@each'),
 
-            getMachineByUrlId: function(urlId) {
-                var machineToFind = null;
-                this.content.some(function(backend) {
-                    backend.machines.content.some(function(machine) {
-                        if (machine.id == urlId) {
-                            machineToFind = machine;
-                        }
-                        if (machineToFind) {
-                            return true;
-                        }
-                    });
-                    if (machineToFind) {
-                        return true;
-                    }
-                });
-                return machineToFind;
-            },
-
-            getMachineCount: function() {
+            updateMachineCount: function() {
                 var count = 0;
-                this.content.forEach(function(item) {
-                    count += item.machines.get('length', 0);
-                });
+                var content = this.content;
+                var contentLength = this.content.length;
+                for (var b = 0; b < contentLength; ++b) {
+                    count += content[b].machines.content.length;
+                }
                 this.set('machineCount', count);
-            },
+                this.trigger('updateMachines');
+            }.observes('content.length'),
 
-            getSelectedMachineCount: function() {
+            updateImageCount: function() {
                 var count = 0;
-                this.content.forEach(function(item) {
-                    count += item.machines.filterProperty('selected', true).get('length');
-                });
-                this.set('selectedMachineCount', count);
-            },
-
-            getImageCount: function() {
-                var count = 0;
-                this.content.forEach(function(item){
-                    count += item.images.get('length', 0);
+                this.content.forEach(function(backend) {
+                    count += backend.images.content.length;
                 });
                 this.set('imageCount', count);
-            },
-            
-            getSelectedMachine: function() {
-            	if(this.selectedMachineCount == 1) {
-                    var that = this;
-                    this.content.forEach(function(item) {
-                        var machines = item.machines.filterProperty('selected', true);
-                        if(machines.get('length') == 1) {
-                	       that.set('selectedMachine', machines[0]);
-                	       return;
-                        }
-                    });
-            	} else {
-            	    this.set('selectedMachine', null);
-            	}
-            },
+            }.observes('content.length'),
 
-            checkMonitoring: function() {
-                if (!Mist.authenticated) {
-                    return;
+
+            providerList: function() {
+                return SUPPORTED_PROVIDERS;
+            }.property('providerList'),
+
+
+            getRequestedMachine: function() {
+                if (this.machineRequest) {
+                    return this.getMachine(this.machineRequest);
                 }
-                
-                var that = this;
-                        
-                $.ajax({
-                    url: '/monitoring',
-                    type: 'GET',
-                    dataType: 'json',
-                    headers: { "cache-control": "no-cache" },
-                    success: function(data) {
-                        machines = data.machines;
-                        Mist.set('monitored_machines', data.machines);
-                        Mist.set('current_plan', data.current_plan);
-                        Mist.set('user_details', data.user_details);
-                        //now loop on backend_id, machine_id  list of lists and check if pair found
-                        machines.forEach(function(machine_tuple){
-                            var machine = Mist.backendsController.getMachineById(machine_tuple[0], machine_tuple[1]);
-                            if (machine) {
-                                machine.set('hasMonitoring', true);
-                            }
-                        });
-
-                        var rules = data.rules;
-
-                        for (ruleId in rules) {
-                            
-                            var rule = {};
-                            rule.id = ruleId;
-                            rule.value = rules[ruleId].value;
-                            rule.metric = rules[ruleId].metric;
-                            rule.command = rules[ruleId].command;
-                            rule.maxValue = rules[ruleId].max_value;
-                            rule.actionToTake = rules[ruleId].action;
-                            rule.operator = Mist.rulesController.getOperatorByTitle(rules[ruleId].operator);
-                            rule.machine = that.getMachineById(rules[ruleId].backend, rules[ruleId].machine);
-                            
-                            if (!rule.machine) {
-                                rule.backend_id = rules[ruleId].backend;
-                                rule.machine_id = rules[ruleId].machine;
-                            }
-                            
-                            var metric = rule.metric;
-                            if (metric == 'network-tx' || metric == 'disk-write') {
-                                rule.unit = 'KB/s';
-                            } else if (metric == 'cpu' || metric == 'ram') {
-                                rule.unit = '%';
-                            } else {
-                                rule.unit = '';
-                            }
-                            
-                            Mist.rulesController.pushObject(Rule.create(rule));
-                        }
-                        Mist.rulesController.redrawRules();
-                    },
-                    error: function(){
-                        Mist.notificationController.notify('Error checking monitoring');
-                    }
-                });
-
-            },
-
-            renameBackend: function(backendId, newName) {
-                $('#edit-backend .ajax-loader').show();
-                var that = this;
-                $.ajax({
-                    url: '/backends/' + backendId,
-                    type: 'PUT',
-                    data: JSON.stringify({'new_name': newName}),
-                    success: function() {
-                        that.getBackendById(backendId).set('title', newName);
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while renaming backend: ' + jqXHR.responseText);
-                    },
-                    complete: function() {
-                        $('#edit-backend .ajax-loader').hide();
-                    }
-                });
             },
 
 
-            init: function() {
-                this._super();
+            getBackend: function(backendId) {
+                return this.content.findBy('id', backendId);
+            },
 
-                var that = this;
-                this.set('loadingMachines', true);
-                that.addObserver('length', function() {
-                    that.getMachineCount();
-                    that.getSelectedMachineCount();
-                    that.getImageCount();
+
+            getMachine: function(machineId, backendId) {
+
+                if (backendId) {
+                    var backend = this.getBackend(backendId);
+                    if (backend) 
+                        return backend.getMachine(machineId);
+                    return null;
+                }
+
+                var machine = null;
+                this.content.some(function(backend) {
+                    return machine = backend.getMachine(machineId);
                 });
-                
-                $(document).bind('ready', function() {
-                    Ember.run.next(function() {
-                        $.getJSON('/backends', function(data) {
-                            if (!data.length) {
-                                that.set('loadingMachines', false);
-                            }
-                            data.forEach(function(item){
-                                that.pushObject(Backend.create(item));
-                            });
-                            that.content.forEach(function(item) {
-                                item.machines.addObserver('length', function() {
-                                    that.getMachineCount();
-                                });
-    
-                                item.machines.addObserver('@each.selected', function() {
-                                    that.getSelectedMachineCount();
-                                    that.getSelectedMachine();
-                                });
-    
-                                item.images.addObserver('length', function() {
-                                    that.getImageCount();
-                                });
-    
-                                item.addObserver('state', function() {
-                                    
-                                    var waiting = false;
-                                    var state = "ok";
-    
-                                    that.content.forEach(function(backend) {
-                                        if (backend.error) {
-                                            state = 'error';
-                                        } else if(backend.state == 'waiting') {
-                                            waiting = true;
-                                        } else if(backend.state == 'offline') {
-                                            state = 'down';
-                                        }
-                                    });
-    
-                                    if (waiting) {
-                                        state = 'state-wait-' + state;
-                                    } else {
-                                        state = 'state-' + state;
-                                    }
-                                    that.set('state', state);
-                                });
-                            });
-                        }).error(function() {
-                            Mist.notificationController.notify("Error loading backends");
-                        });
-    
-                        setTimeout(function() {
-                            Mist.backendsController.checkMonitoring();
-                        }, 5000);
+                return machine;
+            },
+
+
+            machineExists: function(machineId, backendId) {
+                return !!this.getMachine(machineId, backendId);
+            },
+
+
+            backendExists: function(backendId) {
+                return !!this.getBackend(backendId);
+            },
+
+
+            /**
+             * 
+             *  Psudo-Private Methods
+             * 
+             */
+
+            _reload: function() {
+                Ember.run.later(this, function() {
+                    this.load();
+                }, 2000);
+            },
+
+
+            _setContent: function(backends) {
+                var that = this;
+                Ember.run(function() {
+                    that.set('content', []);
+                    backends.forEach(function(backend) {
+                        if (backend.provider == 'bare_metal')
+                            backend.isBareMetal = true;
+                        that.content.pushObject(Backend.create(backend));
                     });
+                    that.trigger('onBackendListChange');
                 });
-            }
+            },
+
+
+            _addBackend: function(backend, keyId) {
+                Ember.run(this, function() {
+                    var backendModel = Backend.create(backend);
+                    this.content.pushObject(backendModel);
+                    backendModel.one('onMachineListChange', function() {
+                        if (backendModel.provider == 'bare_metal') {
+                            backendModel.set('isBareMetal', true);
+                            Mist.keysController._associateKey(keyId, backendModel.machines.content[0]);
+                        }
+                    });
+                    this.trigger('onBackendListChange');
+                    this.trigger('onBackendAdd');
+                });
+            },
+
+
+            _deleteBackend: function(id) {
+                Ember.run(this, function() {
+                    this.content.removeObject(this.getBackend(id));
+                    this.trigger('onBackendListChange');
+                    this.trigger('onBackendDelete');
+                });
+            },
+
+
+            _renameBackend: function(id, newTitle) {
+                Ember.run(this, function() {
+                    this.getBackend(id).set('title', newTitle);
+                    this.trigger('onBackendRename');
+                });
+            },
+
+
+            _toggleBackend: function(id, newState) {
+                Ember.run(this, function() {
+                    this.getBackend(id).set('enabled', newState);
+                    this.trigger('onBackendToggle');
+                });
+            },
+
+
+            _updateImageCount: function() {
+                Ember.run(this, function() {
+                    var counter = 0;
+                    this.content.forEach(function(backend) {
+                        if (backend.enabled) counter += backend.imageCount;
+                    });
+                    this.set('imageCount', counter);
+                    this.trigger('onImageListChange');
+                });
+            },
+
+
+            _updateMachineCount: function() {
+                Ember.run(this, function() {
+                    var counter = 0;
+                    this.content.forEach(function(backend) {
+                        if (backend.enabled) counter += backend.machineCount;
+                    });
+                    this.set('machineCount', counter);
+                    this.trigger('onMachineListChange');
+                });
+            },            
+
+
+            _updateLoadingImages: function() {
+                Ember.run(this, function() {
+                    var loadingImages = false;
+                    this.content.some(function(backend) {
+                        if (backend.loadingImages) return loadingImages = true;
+                    });
+                    this.set('loadingImages', loadingImages);
+                });
+            },
+
+
+            _updateLoadingMachines: function() {
+                Ember.run(this, function() {
+                    var loadingMachines = false;
+                    this.content.some(function(backend) {
+                        if (backend.loadingMachines) return loadingMachines = true;
+                    });
+                    this.set('loadingMachines', loadingMachines);
+                });
+            },
+
+
+            _updateSelectedMachines: function() {
+                Ember.run(this, function() {
+                    var newSelectedMachines = [];
+                    this.content.forEach(function(backend) {
+                        newSelectedMachines = newSelectedMachines.concat(backend.selectedMachines);
+                    });
+                    this.set('selectedMachines', newSelectedMachines);
+                    this.trigger('onSelectedMachinesChange');
+                });
+            },
+
+
+            /**
+             * 
+             *  Observers
+             * 
+             */
+
+            imageCountObserver: function() {
+                Ember.run.once(this, '_updateImageCount');
+            }.observes('content.@each.imageCount'),
+ 
+ 
+            mahcineCountObserver: function() {
+                Ember.run.once(this, '_updateMachineCount');
+            }.observes('content.@each.machineCount'),
+ 
+
+            loadingImagesObserver: function() {
+                Ember.run.once(this, '_updateLoadingImages');
+            }.observes('content.@each.loadingImages'),
+
+
+            loadingMachinesObserver: function() {
+                Ember.run.once(this, '_updateLoadingMachines');
+            }.observes('content.@each.loadingMachines'),
+
+
+            selectedMachinesObserver: function() {
+                Ember.run.once(this, '_updateSelectedMachines');
+            }.observes('content.@each.selectedMachines')
         });
     }
 );

@@ -1,18 +1,46 @@
-define('app/views/key_list_item', [
-    'text!app/templates/key_list_item.html',
-    'ember'
-    ],
+define('app/views/key_list_item', ['app/views/list_item', 'text!app/templates/key_list_item.html'],
     /**
-     * Key List Item View
+     *  Key List Item View
      *
-     * @returns Class
+     *  @returns Class
      */
-    function(key_list_item_html) {
-        return Ember.View.extend({
+    function (ListItemView, key_list_item_html) {
+        return ListItemView.extend({
 
+            /**
+             *  Properties
+             */
+
+            key: null,
             template: Ember.Handlebars.compile(key_list_item_html),
 
-            tagName:'li'
+
+            /**
+             *
+             *  Methods
+             *
+             */
+
+            updateCheckbox: function () {
+                var element = $('#' + this.elementId + ' input.ember-checkbox');
+                Ember.run.next(this, function () {
+                    if (element.checkboxradio) {
+                        element.checkboxradio()
+                               .checkboxradio('refresh');
+                    }
+                });
+            },
+
+
+            /**
+             *
+             *  Observers
+             *
+             */
+
+            keySelectedObserver: function () {
+                Ember.run.once(this, 'updateCheckbox');
+            }.observes('key.selected')
         });
     }
 );

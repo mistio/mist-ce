@@ -1,0 +1,19 @@
+
+/* Home Page CSS
+-----------------------------------------------------------------------------------------------------------*/
+#home-page #add-backend-btn {
+    float: right;
+}
+#home-page .ui-listview {
+    clear: both;
+}
+#home-page .ui-listview .ajax-loader {
+    display: inline;
+    float: right;
+    margin-top: 1px;
+}
+@-moz-document url-prefix() {
+    #home-page .ui-listview .ajax-loader {
+        margin-top: -19px;
+    }
+}

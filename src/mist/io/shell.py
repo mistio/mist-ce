@@ -35,7 +35,7 @@ class Shell(object):
     Use it like:
     shell = Shell('localhost', username='root', password='123')
     print shell.command('uptime')
-    
+
     Or:
     shell = Shell('localhost')
     shell.autoconfigure(user, backend_id, machine_id)
@@ -194,7 +194,7 @@ class Shell(object):
                  backend_id, machine_id)
         if backend_id not in user.backends:
             raise BackendNotFoundError(backend_id)
-        if key_id is not None and key_id not in user.keypairs:
+        if key_id and key_id not in user.keypairs:
             raise KeypairNotFoundError(key_id)
 
         # get candidate keypairs if key_id not provided

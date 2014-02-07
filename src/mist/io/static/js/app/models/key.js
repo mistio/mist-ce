@@ -1,30 +1,37 @@
-define('app/models/key', [
-    'ember'
-    ],
+define('app/models/key', ['ember'],
     /**
-     * Key model
+     *  Key Model
      *
-     * @returns Class
+     *  @returns Class
      */
     function() {
         return Ember.Object.extend({
 
+            /**
+             *  Properties
+             */
+
             id: null,
-            name: null,
             probing: null,
             machines: null,
             selected: null,
-            default_key: null,
+            isDefault: null,
 
-            updateMachineUptimeChecked: function(machine, timeStamp) {
-                this.machines.some(function(machineToUpdate) {
-                    if (machineToUpdate[1] == machine.id &&
-                        machineToUpdate[0] == machine.backend.id) {
-                            machineToUpdate[2] = timeStamp;
-                            return true;
-                    }
-                });
-            }
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+            // Depricated
+            associate: function(machine, callback) {
+                Mist.keysController.associateKey(this.id, machine, callback);
+            },
+            // Depricated
+            disassociate: function(machine, callback) {
+                Mist.keysController.disassociateKey(this.id, machine, callback);
+            },
+
         });
     }
 );

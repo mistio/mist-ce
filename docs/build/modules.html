@@ -363,7 +363,7 @@ keys are returned.</p>
 <dl class="function">
 <dt id="mist.io.views.probe">
 <tt class="descclassname">mist.io.views.</tt><tt class="descname">probe</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.probe" title="Permalink to this definition">¶</a></dt>
-<dd><p>Probes a machine over ssh, using fabric.</p>
+<dd><p>Probes a machine using ping and ssh to collect metrics.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Used for getting uptime and a list of deployed keys.</p>
@@ -403,11 +403,6 @@ keys are returned.</p>
 <dl class="function">
 <dt id="mist.io.views.toggle_backend">
 <tt class="descclassname">mist.io.views.</tt><tt class="descname">toggle_backend</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.toggle_backend" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="mist.io.views.update_available_keys">
-<tt class="descclassname">mist.io.views.</tt><tt class="descname">update_available_keys</tt><big>(</big><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>authorized_keys</em><big>)</big><a class="headerlink" href="#mist.io.views.update_available_keys" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -464,6 +459,12 @@ u&#8217;f&#8217; is &#8216;f&#8217; returns false.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="mist.io.methods.disable_monitoring">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">disable_monitoring</tt><big>(</big><em>user</em>, <em>backend_id</em>, <em>machine_id</em><big>)</big><a class="headerlink" href="#mist.io.methods.disable_monitoring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disable monitoring for a machine.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="mist.io.methods.edit_key">
 <tt class="descclassname">mist.io.methods.</tt><tt class="descname">edit_key</tt><big>(</big><em>user</em>, <em>new_key</em>, <em>old_key</em><big>)</big><a class="headerlink" href="#mist.io.methods.edit_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Edits a given key&#8217;s name from old_key &#8212;&gt; new_key
@@ -471,6 +472,12 @@ u&#8217;f&#8217; is &#8216;f&#8217; returns false.</p>
 &#64;param new_key: The new Key name (id)
 &#64;param old_key: The old key name (id)
 &#64;return: Nothing, only raises exceptions if needed</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.enable_monitoring">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">enable_monitoring</tt><big>(</big><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>name=''</em>, <em>dns_name=''</em>, <em>public_ips=None</em><big>)</big><a class="headerlink" href="#mist.io.methods.enable_monitoring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable monitoring for a machine.</p>
 </dd></dl>
 
 <dl class="function">
@@ -514,6 +521,12 @@ zones are listed instead of name.</p>
 <dt id="mist.io.methods.list_sizes">
 <tt class="descclassname">mist.io.methods.</tt><tt class="descname">list_sizes</tt><big>(</big><em>user</em>, <em>backend_id</em><big>)</big><a class="headerlink" href="#mist.io.methods.list_sizes" title="Permalink to this definition">¶</a></dt>
 <dd><p>List sizes (aka flavors) from each backend.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mist.io.methods.probe">
+<tt class="descclassname">mist.io.methods.</tt><tt class="descname">probe</tt><big>(</big><em>user</em>, <em>backend_id</em>, <em>machine_id</em>, <em>host</em>, <em>key_id=''</em>, <em>ssh_user=''</em><big>)</big><a class="headerlink" href="#mist.io.methods.probe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ping and SSH to machine and collect various metrics.</p>
 </dd></dl>
 
 <dl class="function">
@@ -727,6 +740,62 @@ containers. These methods are complemented by others in the subclasses.</p>
 </dd></dl>
 
 <dl class="class">
+<dt id="mist.io.dal.FileLock">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">FileLock</tt><big>(</big><em>lock_file</em><big>)</big><a class="headerlink" href="#mist.io.dal.FileLock" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class implements a basic locking mechanism in the filesystem.</p>
+<p>It uses the atomic operation of softlinks creation in UNIX-like systems.</p>
+<p>When the lock is acquired, a softlink (with a .lock suffix) is created
+pointing to some arbitrary path. The link command will fail if such a link
+already exists. Acquire will sleep and retry to create the link, up to
+a specified timeout where it&#8217;ll give up and break the lock.</p>
+<p>The lock is initialized given a lock filepath.
+When the lock has been acquired, any FileLock instance with the same
+filepath won&#8217;t be able to acquire the lock. Once however
+a certain FileLock instance has acquired a lock, its acquire()
+method can be called again. You have to release as many times as
+you lock. This doesn&#8217;t implement the reentrant property the way
+usual Rlocks do. For example, it doesn&#8217;t enforce that the releases
+are in exact reverse order of acquires. That however is enforced by
+the use of the with statement higher up in other classes using this
+one.</p>
+<dl class="method">
+<dt id="mist.io.dal.FileLock.acquire">
+<tt class="descname">acquire</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.dal.FileLock.acquire" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.dal.FileLock.break_after">
+<tt class="descname">break_after</tt><em class="property"> = 10</em><a class="headerlink" href="#mist.io.dal.FileLock.break_after" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mist.io.dal.FileLock.check">
+<tt class="descname">check</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.dal.FileLock.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mist.io.dal.FileLock.isset">
+<tt class="descname">isset</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.dal.FileLock.isset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mist.io.dal.FileLock.release">
+<tt class="descname">release</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.dal.FileLock.release" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mist.io.dal.FileLock.reset">
+<tt class="descname">reset</tt><big>(</big><em>lock_file</em><big>)</big><a class="headerlink" href="#mist.io.dal.FileLock.reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mist.io.dal.FileLock.sleep">
+<tt class="descname">sleep</tt><em class="property"> = 0.05</em><a class="headerlink" href="#mist.io.dal.FileLock.sleep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="mist.io.dal.FloatField">
 <em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">FloatField</tt><big>(</big><em>val=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.FloatField" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets a floating point number field. Default value: 0.0</p>
@@ -812,9 +881,39 @@ interfaces.</p>
 <em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">OODictYaml</tt><big>(</big><em>yaml_rel_path</em><big>)</big><a class="headerlink" href="#mist.io.dal.OODictYaml" title="Permalink to this definition">¶</a></dt>
 <dd><p>This takes care of all storage related operations.</p>
 <dl class="method">
+<dt id="mist.io.dal.OODictYaml.refresh">
+<tt class="descname">refresh</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.dal.OODictYaml.refresh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="mist.io.dal.OODictYaml.save">
-<tt class="descname">save</tt><big>(</big><em>yaml_rel_path=''</em><big>)</big><a class="headerlink" href="#mist.io.dal.OODictYaml.save" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">save</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.dal.OODictYaml.save" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save data to yaml file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mist.io.dal.OODictYamlLock">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">OODictYamlLock</tt><big>(</big><em>yaml_rel_path</em><big>)</big><a class="headerlink" href="#mist.io.dal.OODictYamlLock" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="mist.io.dal.OODictYamlLock.lock_n_load">
+<tt class="descname">lock_n_load</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#mist.io.dal.OODictYamlLock.lock_n_load" title="Permalink to this definition">¶</a></dt>
+<dd><p>File lock context manager.</p>
+<p>It must be used with a &#8216;with&#8217; statement as follows:
+with user.lock_n_load():
+# edit user
+user.save()
+Lock is automatically released after exiting the &#8216;with&#8217; block.
+Attempting to save without first acquiring the lock will raise an
+exception.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mist.io.dal.OODictYamlLock.save">
+<tt class="descname">save</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.dal.OODictYamlLock.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save user data to storage. Raises exception if not in a
+&#8220;with user.lock_n_load():&#8221; code block.</p>
 </dd></dl>
 
 </dd></dl>
@@ -851,27 +950,7 @@ the way values are casted to backend accordingly.</p>
 <dl class="class">
 <dt id="mist.io.dal.User">
 <em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">User</tt><a class="headerlink" href="#mist.io.dal.User" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="mist.io.dal.User.lock_n_load">
-<tt class="descname">lock_n_load</tt><big>(</big><em>*args</em>, <em>**kwds</em><big>)</big><a class="headerlink" href="#mist.io.dal.User.lock_n_load" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dummy lock, doesn&#8217;t actually do anything.</p>
-<p>It must be used with a &#8216;with&#8217; statement as follows:
-with user.lock_n_load():
-# edit user
-user.save()
-Lock is automatically released after exiting the &#8216;with&#8217; block.
-Attempting to save without first acquiring the lock will raise an
-exception.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="mist.io.dal.User.save">
-<tt class="descname">save</tt><big>(</big><big>)</big><a class="headerlink" href="#mist.io.dal.User.save" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save user data to storage.</p>
-<p>Raises exception if not in a &#8220;with user.lock_n_load():&#8221; code block.</p>
-</dd></dl>
-
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="mist.io.dal.make_field">

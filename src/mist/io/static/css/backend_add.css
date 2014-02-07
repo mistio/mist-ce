@@ -1,0 +1,19 @@
+
+/* Backend Add Panel CSS
+-----------------------------------------------------------------------------------------------------------*/
+#add-backend-panel #openstack-bundle {
+    display: none;
+}
+#add-backend-panel #baremetal-bundle {
+    display: none;
+}
+#add-backend-panel label {
+    margin-top: 10px;
+}
+#add-backend-panel .select-listmenu {
+    height: 120px;
+    overflow-y: scroll;
+}
+#add-backend-panel .ok-cancel {
+    margin-top: 30px;
+}

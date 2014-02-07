@@ -1,9 +1,29 @@
-<label for="new-key-name">New name:</label>
-{{view Mist.TextField
-    valueBinding="view.newName"
-    id="new-key-name"}}
+<div id="rename-key-popup" 
+     class="small-popup" 
+     data-role="popup" 
+     data-overlay-theme="b" 
+     data-transition="slideup">
 
-<div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-    <a href="#" data-role="button" {{action backClicked target="view"}}>Back</a>
-    <button id="edit-key-ok" data-theme="b" disabled {{action saveClicked target="view"}}>Save</button>
+    <div data-role="header" data-theme="b">
+        <h1>Rename key</h1>
+    </div>
+
+    <div data-role="content">
+
+        <label for="new-key-name">New name:</label>
+        {{view Mist.TextField
+               id="new-key-name"
+               valueBinding="Mist.keyEditController.newKeyId"}}
+
+        {{#if Mist.keysController.renamingKey}}
+        <div class="ajax-loader"></div>
+        {{/if}}
+
+        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <a data-role="button" data-theme="a" {{action "backClicked" target="view"}}>Back</a>
+            <button id="rename-key-ok" data-theme="d" {{action "saveClicked" target="view"}}>Save</button>
+        </div>
+
+    </div>
+
 </div>

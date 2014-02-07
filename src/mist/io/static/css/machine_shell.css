@@ -1,0 +1,134 @@
+
+/* Shell View CSS
+-----------------------------------------------------------------------------------------------------------*/
+#machine-shell-popup .ui-content {
+    background: transparent;
+}
+#machine-shell-popup-popup {
+    top: 2% !important;
+    width: 95% !important;
+    bottom: 55px !important;
+    max-height: 94% !important;
+    position: fixed;
+}
+#machine-shell-popup #shell-grid {
+    top: 50px;
+    left: 1em;
+    right: 1em;
+    bottom: 0.5em;
+    position: absolute;
+}
+#machine-shell-popup #shell-input, #machine-shell-popup #shell-submit {
+    height: 70px;
+    padding: 2px;
+}
+#machine-shell-popup #shell-input {
+    width: 95%;
+}
+#machine-shell-popup #shell-input input {
+    padding: 8px 0 8px 22px;    
+    background-image: url("../images/prompt.png");
+    background-position: 8px 11px;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;    
+}
+#machine-shell-popup #shell-submit {
+    width: 80px;
+    height: 40px;
+    padding: 5px 0px 5px 27px !important;   
+}
+.ui-icon-shell-return:after {
+    background-image: url("../images/return.png");
+    padding: 1px;
+    left: 25px;
+}
+#machine-shell-popup #shell-input {
+    overflow: auto;
+    width: 100%;
+    clear: both;
+    margin-top: 0px;
+}
+#machine-shell-popup #shell-submit .ui-btn {
+    width: 100%;
+    height: 40px;
+}
+#machine-shell-popup #shell-return {
+    width: 100%;
+    border: 1px solid #AAA;
+    font-family: monospace;
+    font-size: 11px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    background: #dfe1e2;
+    overflow-y: auto;
+}
+
+#shell-return .command {
+    background: #efeff1;
+    cursor: pointer;
+    padding: 6px 20px 6px 6px;
+    margin: 0px;
+    font-weight: bold;
+    color: #222;
+    border-bottom: rgb(211, 211, 211) 1px solid;
+}
+#shell-return .command.pending-response .shell-li-arrow:after {
+    background-image: url("../images/spinner.gif");
+    background-position: center !important;
+    background-repeat: no-repeat;
+}
+#shell-return .command .shell-li-arrow:after {
+    margin-left: -24px;
+    background-color: transparent;
+}
+#shell-return .output {
+    background: #444;
+    color: #efeff1;
+    padding: 6px;
+    text-shadow: none;
+    max-height: 40% !important;
+    min-height: 140px;
+    height: auto !important;
+    overflow-y: scroll !important;
+}
+
+#machine-shell-popup #shell-response {
+    border: 1px solid #000000;
+}
+#machine-shell-popup #shell-back {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    
+}
+#machine-shell-popup .ajax-loader {
+    display: inline-block;
+    float: right;
+    position: relative;
+    right: 30px;
+    margin-left: -15px;
+}
+
+#machine-shell-popup .shell-li-arrow {
+    height: 16px;
+    float: right;
+    position: relative;
+}
+
+#machine-shell-popup .ui-collapsible-content {
+    background: #444;
+    color: #efeff1;
+    padding: 6px;
+    text-shadow: none;
+    max-height: 40% !important;
+    min-height: 140px;
+    height: auto !important;
+    overflow-y: scroll !important;
+}
+

@@ -4,17 +4,16 @@
     <a href="#"
         class="rule-button metric"
         data-role="button"
-        data-icon="arrow-d"
         data-iconpos="right"
         data-inline="true"
-        {{action openMetricPopup target="view"}}>{{metric}}</a>
+        {{action "openMetricPopup" target="view"}}>{{metric}}</a>
 
     <a href="#"
         class="rule-button operator"
         data-role="button"
         data-icon="false"
         data-inline="true"
-        {{action openOperatorPopup target="view"}}>{{operator.symbol}}</a>
+        {{action "openOperatorPopup" target="view"}}>{{operator.symbol}}</a>
 
     <div class="rule-unit">{{unit}}</div>
     <input type="number"
@@ -32,7 +31,7 @@
         data-role="button"
         data-icon="false"
         data-inline="true"
-        {{action openActionPopup target="view"}}>{{actionToTake}}</a>
+        {{action "openActionPopup" target="view"}}>{{actionToTake}}</a>
 
     {{#if pendingAction}}
     <div class="ajax-loader"></div>
@@ -41,6 +40,7 @@
         <button class="delete-rule-button"
                 data-role="button"
                 data-icon="delete"
+                data-iconpos="notext"
                 data-mini="true"
                 {{action deleteRuleClicked target="view"}}>&nbsp;</button>
     </div>

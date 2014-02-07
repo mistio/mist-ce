@@ -1,245 +1,171 @@
-define('app/views/machine', [
-    'app/views/mistscreen',
-    'text!app/templates/machine.html', 'ember'],
+define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine.html'],
     /**
-     *
-     * Machine page
-     *
-     * @returns Class
+     *  Single Machine View
+     * 
+     *  @returns Class
      */
     function(MistScreen, machine_html) {
         return MistScreen.extend({
 
+            /**
+             *  Properties
+             */
+
+            rules: [],
+            machine: null,
             template: Ember.Handlebars.compile(machine_html),
-            
-            rules: null,
 
-            init: function() {
-                this._super();
+            providerIconClass: function() {
+                if (!this.machine || !this.machine.backend) {
+                    return '';
+                }
+                return 'provider-' + this.machine.backend.provider;
+            }.property('machine'),
+
+
+            /**
+             * 
+             *  Initialization
+             * 
+             */
+
+            load: function() {
+
+                // Add Event listeners
+                Mist.backendsController.on('onMachineListChange', this, 'load');
+
+                Ember.run(this, function() {
+                    this.updateCurrentMachine();
+                    if (this.machine.id) {
+                        this.updateUptime();
+                        this.updateFooter();
+                        // TODO: Render stuff
+                    }
+                });
+            }.on('didInsertElement'),
+
+
+            unload: function() {
+
+                // Remove event listeners
+                Mist.backendsController.off('onMachineListChange', this, 'load');
+
+            }.on('willDestroyElement'),
+
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+
+            updateCurrentMachine: function() {
+                Ember.run(this, function() {
+                    var machine = Mist.backendsController.getRequestedMachine();
+                    if (machine) {
+                        this.get('controller').set('model', machine);
+                    }
+                    this.set('machine', this.get('controller').get('model'));
+                    if (this.machine.id) {
+                        this.machine.set('keysCount', Mist.keysController.getMachineKeysCount(this.machine));
+                    }
+                });
             },
 
-            singleMachineResponseObserver: function() {
-                if (Mist.backendsController.singleMachineResponse) {
-                    this.get('controller').set('model', Mist.backendsController.singleMachineResponse);
-                }
-            }.observes('Mist.backendsController.singleMachineResponse'),
 
-            enableMonitoringClick: function() {
-                if (Mist.authenticated) {
-                    var machine = this.get('controller').get('model');
-                    machine.openMonitoringDialog();
+            updateFooter: function() {
+                if (this.machine.can_tag) {
+                    $('#single-machine-page #single-machine-tags-btn').removeClass('ui-state-disabled');
                 } else {
-                    $("#login-dialog").show();
-                    $("#login-dialog").popup('open');
+                    $('#single-machine-page #single-machine-tags-btn').addClass('ui-state-disabled');
+                }
+
+                if (this.machine.probed && this.machine.state == 'running') {
+                    $('#single-machine-page #single-machine-shell-btn').removeClass('ui-state-disabled');
+                } else {
+                    $('#single-machine-page #single-machine-shell-btn').addClass('ui-state-disabled');
+                }
+
+                if (this.machine.id) {
+                    $('#single-machine-page #single-machine-power-btn').removeClass('ui-state-disabled');
+                } else {
+                    $('#single-machine-page #single-machine-power-btn').addClass('ui-state-disabled');
                 }
             },
 
-            closePlanDialog: function() {
-                $("#monitoring-dialog").popup('close');
-            },
 
-            buttonBackMonitoring: function() {
-                $("#monitoring-dialog").popup('close');
-            },
-
-            buttonChangeMonitoring: function() {
+            renderMachine: function() {
                 var machine = this.get('controller').get('model');
-                machine.changeMonitoring();
-                $("#monitoring-dialog").popup('close');
+                if (machine.id != ' ') { // This is the dummy machine. It exists when machine hasn't loaded yet
+                    this.setGraph();
+                }
             },
 
-            openTrialDialog: function() {
-                $("#monitoring-dialog").popup('close');
-                $("#trial-dialog").popup('open');
+
+            renderKeysButton: function() {
+                Ember.run.next(this, function() {
+                    $('#mist-manage-keys').trigger('create');
+                    if (this.machine.state == 'running') {
+                        $('#mist-manage-keys').removeClass('ui-state-disabled');
+                    } else {
+                        $('#mist-manage-keys').addClass('ui-state-disabled');
+                    }
+                });
             },
 
-            clickedPurchaseDialog: function() {
-                $("#monitoring-dialog").popup('close');
-                window.location.href = URL_PREFIX + "/account";  
+
+            renderMonitoringButtons: function() {
+                Ember.run.next(this, function() {
+                    $('#add-rule-button').parent().trigger('create');
+                    $('#disable-monitor-btn').parent().trigger('create');
+                    $('#enable-monitor-btn').parent().trigger('create');
+                });
             },
-            
-            rules: function(){
-                var ret = Ember.ArrayController.create(), 
+
+            updateEnableButton: function() {
+                Ember.run.next(this, function() {
+                    if (this.machine.id && this.machine.state == 'running') {
+                        $('#enable-monitor-btn').removeClass('ui-state-disabled');
+                    } else {
+                        $('#enable-monitor-btn').addClass('ui-state-disabled');
+                    }
+                });
+            },
+
+
+            updateMonitoringCollapsible: function() {
+                Ember.run.next(this, function() {
+                    if (Mist.backendsController.checkedMonitoring) {
+                        $('#monitoring-collapsible').show();
+                    } else {
+                        $('#monitoring-collapsible').hide();
+                    }
+                });
+            },
+
+
+            updateChangeMonitoringButton: function() {
+                if (this.machine.disablingMonitoring) {
+                    $('#disable-monitor-btn').addClass('ui-state-disabled');
+                } else if (this.machine.enablingMonitoring) {
+                    $('#enable-monitor-btn').addClass('ui-state-disabled');
+                } else {
+                    $('#disable-monitor-btn').removeClass('ui-state-disabled');
+                    $('#enable-monitor-btn').removeClass('ui-state-disabled');
+                }
+            },
+
+            rulesObserver: function(){
+                var ret = Ember.ArrayController.create(),
                     machine = this.get('controller').get('model');
                 Mist.rulesController.forEach(function(rule){
                     if (rule.machine == machine) {
                         ret.pushObject(rule);
                     }
                 });
-                return ret;
-            }.property('Mist.rulesController.@each', 'Mist.rulesController.@each.machine'),
+                this.set('rules', ret);
+            }.observes('Mist.rulesController.@each', 'Mist.rulesController.@each.machine', 'machine'),
 
-            disabledShellClass: function() {
-                var machine = this.get('controller').get('model');
-                if (machine && machine.probed && machine.state == 'running') {
-                    return '';
-                } else {
-                    return 'ui-disabled';
-                }
-            }.property('controller.model.probed'),
-
-            disabledTagClass: function() {
-                var machine = this.get('controller').get('model');
-                if (machine && machine.can_tag) {
-                    return '';
-                } else {
-                    return 'ui-disabled';
-                }
-            }.property('controller.model.can_tag'),
-
-            disabledPowerClass: function() {
-                var machine = this.get('controller').get('model');
-                if (machine && machine.state === 'terminated') {
-                    return 'ui-disabled';
-                } else {
-                    return '';
-                }
-            }.property('controller.model.state'),
-
-            metadata: function() {
-                var machine = this.get('controller').get('model');
-                if (!machine || !machine.extra) {
-                    return [];
-                }
-                var ret = new Array();
-
-                $.each(machine.extra, function(key, value) {
-                    if (typeof(value) == 'string' || typeof(value) == 'number') {
-                        ret.push({key:key, value: value});
-                    }
-                });
-                return ret;
-            }.property('controller.model'),
-            
-            keySelect: function(key) {
-                //$('#associate-button').show();
-                //$('#associate-key-button').addClass('ui-disabled');
-                var machine = this.get('controller').get('model');
-                Mist.keysController.associateKey(key.name, machine);
-                //$('#associate-key').popup('close');
-                return false;
-            },
-
-            basicvars: function() {
-                var machine = this.get('controller').get('model');
-
-                if (!machine) {
-                    return [];
-                }
-
-                var publicIps = null;
-
-                if ($.isArray(machine.public_ips)) {
-                    publicIps = machine.public_ips.join();
-                } else if (typeof machine.public_ips === 'string') {
-                    publicIps = machine.public_ips;
-                }
-
-                var privateIps = null;
-
-                if ($.isArray(machine.private_ips)) {
-                    privateIps = machine.private_ips.join();
-                } else if (typeof machine.private_ips === 'string') {
-                    privateIps = machine.private_ips;
-                }
-
-                try {
-                    var dnsName = machine.extra.dns_name, launchDate = machine.extra.launchdatetime;
-                } catch(e){
-                    //var dnsName = null, launchDate = null;
-                }
-
-                
-                var basicvars = {
-                        'Public IPs': publicIps,
-                        'Private IPs': privateIps,
-                        'DNS Name': dnsName,
-                        'Launch Date': launchDate
-                };
-
-                if (machine.image && 'image' in machine &&
-                        'name' in machine.image) {
-                    basicvars['Image'] = machine.image.name;
-                }
-
-                var ret = new Array();
-
-                $.each(basicvars, function(key, value) {
-                    if (typeof(value) == 'string') {
-                        ret.push({key:key, value: value});
-                    }
-                });
-
-                return ret;
-
-            }.property('controller.model'),
-
-            name: function() {
-                var machine = this.get('controller').get('model');
-                if (!machine) {
-                    return '';
-                }
-                return machine.name || machine.id;
-            }.property('controller.model'),
-
-            upFor: function() {
-                var machine = this.get('controller').get('model');
-
-                if (machine && machine.uptime) {
-                    var ret = '';
-                    var x = Math.floor(machine.uptime / 1000);
-
-                    var seconds = x % 60;
-                    x = Math.floor(x / 60);
-                    var minutes = x % 60;
-                    x = Math.floor(x / 60);
-                    var hours = x % 24;
-                    x = Math.floor(x / 24);
-                    var days = x;
-
-                    if (days) {
-                        ret = ret + days + ' days, ';
-                    }
-
-                    if (hours) {
-                        ret = ret + hours + ' hours, ';
-                    }
-
-                    if (minutes) {
-                        ret = ret + minutes + ' minutes, ';
-                    }
-
-                    if (seconds) {
-                        ret = ret + seconds + ' seconds';
-                    } else {
-                        ret = ret + '0 seconds';
-                    }
-
-                    return ret;
-
-                } else {
-                    return '';
-                }
-            }.property('controller.model.uptime'),
-
-            providerIconClass: function() {
-                var machine = this.get('controller').get('model');
-                if (!machine) {
-                    return '';
-                }
-                return 'provider-' + machine.backend.provider;
-            }.property('controller.model'),
-
-            addRuleClicked: function() {
-                // initialize the rule to some sensible defaults
-                var machine = this.get('controller').get('model');
-                var metric = 'load';
-                var operator = {'title': 'gt', 'symbol': '>'};
-                var value = 5;
-                var actionToTake = 'alert';
-
-                Mist.rulesController.newRule(machine, metric, operator, value, actionToTake);
-            },
 
             stopPolling: function() {
                 // if it polls for stats, stop it
@@ -248,197 +174,320 @@ define('app/views/machine', [
                 }
             }.observes('controller.model.hasMonitoring'),
 
+
+            updateUptime: function() {
+                if ($('#single-machine-page').length) {
+
+                    // Rescedule updateUptime
+                    Ember.run.later(this, function() {
+                        this.updateUptime();
+                    }, 1000);
+    
+                    // Calculate uptime
+                    var machine = this.machine;
+                    if (!machine) return 0;
+                    if (!machine.uptimeChecked) return 0;
+                    if (!machine.uptimeFromServer) return 0;
+                    machine.set('uptime', machine.uptimeFromServer + (Date.now() - machine.uptimeChecked));
+                }
+            },
+
+
             backClicked: function() {
                 this.stopPolling();
                 // then get back to machines' list
                 Mist.Router.router.transitionTo('machines');
             },
 
-            handlePendingMonitoring: function() {
-                var machine = this.get('controller').get('model');
-                if (machine && machine.pendingMonitoring) {
-                    $('.pending-monitoring').show();
-                    $('.monitoring-button').addClass('ui-disabled'); //.hide();
-                } else {
-                    $('.monitoring-button').removeClass('ui-disabled'); //.show();
-                    $('.pending-monitoring').hide();
-                }
-            }.observes('controller.model.pendingMonitoring'),
 
-            showShell: function() {
-                $("#dialog-shell").popup('option', 'positionTo', '#machines-button-shell')
-                                  .popup('open', {transition: 'slideup', });
-                $("#dialog-shell").on('popupafteropen', 
-                    function(){
-                        $('.shell-input input').focus();
-                    }
-                );
-                
-                $("#dialog-shell").on('popupafterclose', 
-                    function(){
-                        $(window).off('resize');
-                    }
-                );
-                
-                Ember.run.next(function(){
-                    $(window).on('resize', function(){
-                        $('#dialog-shell-popup').css({'left':'5%','width':'90%'});
-                        $('.shell-return').css({'height': (0.6*$(window).height()) + 'px'});
-                        $('.shell-input input').focus();
-                        return false;
-                    });
-                    $(window).trigger('resize');
-                });                
-            },
+            /**
+             * 
+             *  Actions
+             * 
+             */
+            
+            actions: {
 
-            showActions: function() {
-                $("#dialog-single-power").popup('option', 'positionTo', '#machines-button-power').popup('open', {transition: 'slideup'});
-            },
 
-            openTags: function() {
-                $("#dialog-tags").popup('option', 'positionTo', '#machines-button-tags').popup('open', {transition: 'slideup'});
-            },
+                manageKeysClicked: function() {
+                    Mist.machineKeysController.open(this.machine);
+                },
+               
+               
+                addKeyClicked: function() {
+                    Mist.machineKeysController.openKeyList(this.machine);
+                },
 
-            associateClicked: function() {
-                $('.key-list').listview('refresh');
-                $('#associate-key').popup('option', 'positionTo', '#associate-key-button').popup('open');
-            },
-     
-            manageKeysClicked: function() {
-                $('#manage-keys').panel('open');
-            }, 
-           
-            addKeyClicked: function() {
-                $('#non-associated-keys').listview('refresh');
-                $('#associate-key-dialog').popup('option', 'positionTo', '#mist-manage-keys').popup('open');
-            },
 
-            doLogin: function() {
-                //sends email, passwords and check if auth is ok
-                var payload = {
-                    'email': Mist.email,
-                    'password': Mist.password,
-                };
-                $("#login-dialog .ajax-loader").show();
-                $.ajax({
-                    url: '/auth',
-                    type: 'POST',
-                    headers: { 'cache-control': 'no-cache' },
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    dataType: 'json',
-                    timeout : 60000,
-                    success: function(data) {
-                        Mist.set('authenticated', true);
-                        Mist.set('current_plan', data.current_plan);
-                        Mist.set('user_details', data.user_details);
-                        $("#login-dialog .ajax-loader").hide();
-                        $("#login-dialog").popup('close');
-                        //if Mist.monitored_machines is undefined, then set to []. /monitoring takes some time to run, to get the real monitored_machines
-                        if (typeof Mist.monitored_machines === 'undefined') {
-                            Mist.set('monitored_machines', []);
+                tagsClicked: function () {
+                    Mist.machineTagsController.open(this.machine);
+                },
+
+
+                powerClicked: function () {
+                    Mist.machinePowerController.open(this.machine);
+                },
+
+
+                shellClicked: function () {
+                    Mist.machineShellController.open(this.machine);
+                },
+
+                enableMonitoringClicked: function () {
+
+                    if (Mist.authenticated) {
+                        if (Mist.current_plan) {
+                            // TODO: return machine_limit from server (core)
+                            //if (Mist.current_plan.machine_limit >= Mist.monitored_machines.length) {
+                                if (this.machine.probed) {
+                                    var machine = this.machine;
+                                    Mist.confirmationController.set('title', 'Enable monitoring');
+                                    Mist.confirmationController.set('text', 'Are you sure you want to enable monitoring for this machine?');
+                                    Mist.confirmationController.set('callback', function () {
+                                        Mist.monitoringController.changeMonitoring(machine);
+                                    });
+                                    Mist.confirmationController.show();
+                                } else {
+                                    Mist.notificationController.set('msgHeader', 'No keys');
+                                    Mist.notificationController.set('msgPart1', "The collectd deamon can't be installed automatically " + 
+                                                                    'because Mist.io can not connect to this machine.');
+                                    Mist.notificationController.set('msgPart2', 'To connect a machine with Mist.io you can follow the ' + 
+                                                                                'instructions on the help page.');
+                                    Mist.notificationController.set('msgLink', 'Link to help page');
+                                    Mist.notificationController.set('msgHref', 'https://mistio.zendesk.com/hc/en-us/articles/200996166');
+                                    Mist.notificationController.showMessagebox();
+                                }
+                            /*} else {
+                                Mist.notificationController.set('msgHeader', 'Machine limit reached');
+                                Mist.notificationController.set('msgPart1', 'The maximum number of monitored machines' +
+                                                                            ' has been reached');
+                                Mist.notificationController.set('msgPart1', 'In order to monitor more machines you should' +
+                                                                            ' upgrade to another plan');
+                                Mist.notificationController.set('msgPart3', 'You can do that in the Account page, which can' +
+                                                                            'be accessed from the menu button on the top right corner');
+                                Mist.notificationController.showMessagebox();
+                            }*/
+                        } else {
+                            Mist.notificationController.set('msgHeader', 'No plan');
+                            Mist.notificationController.set('msgPart1', 'In order to use our monitoring service' +
+                                                                        ' you have to purchase a plan');
+                            Mist.notificationController.set('msgPart2', 'You can do that in the Account page, which can ' +
+                                                                        'be accessed from the menu button on the top right corner');
+                            Mist.notificationController.showMessagebox();
                         }
-                        $("a.monitoring-button").click();
-                    },
-                    error: function() {
-                        $("#login-dialog .ajax-loader").hide();
-                        Mist.notificationController.warn('Authentication error');
-                        $('div.pending-monitoring').hide();
+                    } else {
+                        Mist.loginController.open();
+                    }
+                },
+
+
+                disableMonitoringClicked: function() {
+                    var machine = this.machine;
+                    Mist.confirmationController.set('title', 'Disable monitoring');
+                    Mist.confirmationController.set('text', 'Are you sure you want to disable monitoring for this machine?');
+                    Mist.confirmationController.set('callback', function () {
+                        Mist.monitoringController.changeMonitoring(machine);
+                    });
+                    Mist.confirmationController.show();
+                },
+
+
+                addRuleClicked: function() {
+                    // initialize the rule to some sensible defaults
+                    var machine = this.machine;
+                    var metric = 'load';
+                    var operator = {'title': 'gt', 'symbol': '>'};
+                    var value = 5;
+                    var actionToTake = 'alert';
+
+                    Mist.rulesController.newRule(machine, metric, operator, value, actionToTake);
+                },
+
+
+                buttonBackMonitoring: function() {
+                     $("#monitoring-dialog").popup('close');
+                },
+
+
+                buttonChangeMonitoring: function() {
+                    var machine = this.get('controller').get('model');
+                    machine.changeMonitoring();
+                    $("#monitoring-dialog").popup('close');
+                },
+
+
+                probeClicked: function() {
+                    this.machine.probe(null, function(success) {
+                        if (!success) {
+                            Mist.notificationController.notify('Failed to probe machine');
+                        }
+                    })
+                }
+            },
+
+
+            /**
+             * 
+             *  Computed Properties
+             * 
+             */
+
+            upFor: function() {
+                var ret = '';
+                if (this.machine && this.machine.uptime) {
+                    var x = Math.floor(this.machine.uptime / 1000);
+                    var seconds = x % 60;
+                    x = Math.floor(x / 60);
+                    var minutes = x % 60;
+                    x = Math.floor(x / 60);
+                    var hours = x % 24;
+                    x = Math.floor(x / 24);
+                    var days = x;
+
+                    if (days) ret = ret + days + ' days, ';
+                    if (hours) ret = ret + hours + ' hours, ';
+                    if (minutes) ret = ret + minutes + ' minutes, ';
+                    if (seconds) {
+                        ret = ret + seconds + ' seconds';
+                    } else {
+                        ret = ret + '0 seconds';
+                    }
+                }
+                return ret;
+            }.property('machine.uptime'),
+
+            lastProbe: function(){
+                var ret = 'never';
+                if (this.machine && this.machine.uptimeChecked > 0) {
+                    var x = (Date.now()-this.machine.uptimeChecked) / 1000;
+                    var minutes = Math.floor(x / 60);
+                    if (minutes > 1) 
+                        ret = minutes + ' minutes ago';
+                    else if (minutes == 1)
+                        ret = "1 minute ago";
+                    else 
+                        ret = "just now";                    
+                }
+                return ret;
+            }.property('machine.uptime'),
+            
+            basicInfo: function() {
+                if (!this.machine) return;
+
+                var basicInfo = {};
+
+                if (this.machine.public_ips instanceof Array) {
+                    basicInfo['Public IPs'] = this.machine.public_ips.join();
+                } else if (typeof this.machine.public_ips == 'string') {
+                    basicInfo['Public IPs']  = this.machine.public_ips;
+                }
+                if (this.machine.private_ips instanceof Array) {
+                    basicInfo['Private IPs']  = this.machine.private_ips.join();
+                } else if (typeof this.machine.private_ips == 'string') {
+                    basicInfo['Private IPs']  = this.machine.private_ips;
+                }
+                if (this.machine.extra) {
+                    if (this.machine.extra.dns_name) {
+                        basicInfo['DNS Name'] = this.machine.extra.dns_name;
+                    }
+                    if (this.machine.extra.launchdatetime) {
+                        basicInfo['Launch Date'] = this.machine.extra.launchdatetime;
+                    }
+                }
+                if (this.machine.image && this.machine.image.name) {
+                    basicInfo.image = this.machine.image.name;
+                }
+
+                var ret = [];
+                for (item in basicInfo) {
+                    if (typeof basicInfo[item] == 'string') {
+                        ret.push({key:item, value: basicInfo[item]});
+                    }               
+                }
+                return ret;
+            }.property('machine'),
+
+
+            metadata: function() {
+                if (!this.machine || !this.machine.extra) return;
+                var ret = [];
+                
+                for (item in this.machine.extra) {
+                    var value = this.machine.extra[item];
+                    if (typeof value == 'string' || typeof value == 'number') {
+                        ret.push({key:item, value: value});
+                    }
+                }
+                
+                Ember.run.next(function() {
+                    if ($('#single-machine-metadata').collapsible) {
+                        $('#single-machine-metadata').collapsible();
                     }
                 });
-            },
+                return ret;
+                
+            }.property('machine', 'machine.extra'),
 
-            closeTrialDialog: function() {
-                $("#trial-dialog").popup('close');
-            },
 
-            backLoginClicked: function() {
-                $('#login-dialog').popup('close');
-                $('#login-dialog #email').val('');
-                $('#login-dialog #password').val('');
-            },
- 
-            submitTrial: function(){
-                /*
-                var machine = this.get('controller').get('model');
-                user_first_name = $('#trial-user-first-name').val();
-                user_last_name = $('#trial-user-last-name').val();
-                company_name = $('#trial-company-name').val();
-                user_country = $('#trial-user-country').val();
-                user_servers = $('#trial-user-servers').val();
-                user_people = $('#trial-user-people').val();
-
-                if (user_first_name && user_last_name && company_name && user_country && user_servers && user_people) {
-                    var payload = {
-                        "action": 'get_trial',
-                        "plan": 'Startup',
-                        "auth_key": Mist.auth_key,
-                        "first_name": user_first_name,
-                        "last_name": user_last_name,
-                        "company_name": company_name,
-                        "country": user_country,
-                        "number_of_servers": user_servers,
-                        "number_of_people": user_people                       
-                    };
-                    $('#trial-user-details .ajax-loader').show();  
-                    $('#submit-trial').addClass('ui-disabled');                      
-                    $.ajax({
-                        url: '/account',
-                        type: "POST",
-                        contentType: "application/json",
-                        dataType: "json",
-                        headers: { "cache-control": "no-cache" },
-                        data: JSON.stringify(payload),
-                        success: function(result) {
-                            $('#trial-user-details .ajax-loader').hide();     
-                            $('#submit-trial').removeClass('ui-disabled');
-                            $("#trial-dialog").popup('close');
-                            Mist.set('current_plan', result);
-                            machine.openMonitoringDialog();
-                        },
-                        error: function(jqXHR, textstate, errorThrown) {
-                            Mist.notificationController.notify(jqXHR.responseText);
-                            $('div.pending-monitoring').hide();                            
-                            $('#trial-user-details .ajax-loader').hide();   
-                            $('.trial-button').removeClass('ui-disabled');  
-                            $('#submit-trial').removeClass('ui-disabled');
-                        }
-                    });
-
-                } else {
-                    if (!(user_first_name)) {
-                        $('#trial-user-first-name').focus();
-                    } else if (!(user_last_name)) {
-                        $('#trial-user-last-name').focus();
-                    } else if (!(company_name)){
-                        $('#trial-company-name').focus();
-                    } else if (!(user_country)){
-                        $('#trial-user-country').focus();
-                    } else if (!(user_servers)){
-                        $('#trial-user-servers').focus();
-                    } else {
-                        $('#trial-user-people').focus();
-                    } 
-                }
-                */
-            },
-
-            emailReady: function(){
-                if (Mist.email && Mist.password){
-                    $('#auth-ok').button('enable');
-                } else {
-                    try{
-                        $('#auth-ok').button('disable');
-                    } catch(e){
-                        $('#auth-ok').button();
-                        $('#auth-ok').button('disable');
+            rules: function(){
+                var ret = Ember.ArrayController.create()
+                var machine = this.machine;
+                Mist.rulesController.forEach(function(rule){
+                    if (rule.machine == machine) {
+                        ret.pushObject(rule);
                     }
-                }
-            }.observes('Mist.email'),
-    
-            passReady: function(){
-                this.emailReady();
-            }.observes('Mist.password')       
+                });
+                return ret;
+            }.property('Mist.rulesController.@each', 'Mist.rulesController.@each.machine'),
+
+
+            /**
+             * 
+             *  Observers
+             * 
+             */
+
+            modelObserver: function() {
+                Ember.run.once(this, 'load');
+                Ember.run.once(this, 'updateEnableButton');
+            }.observes('controller.model'),
+
+
+            probingObserver: function() {
+                Ember.run.next(function() {
+                    $('#machine-probe-btn').parent().trigger('create');
+                });
+            }.observes('machine.probing'),
+
+            footerObserver: function() {
+                Ember.run.once(this, 'updateFooter');
+            }.observes('machine.probed', 'machine.can_tag'),
+
+
+            keysCountObserver: function() {
+                Ember.run.once(this, 'renderKeysButton');
+            }.observes('machine.keysCount'),
+
+
+            stateObserver: function () {
+                Ember.run.once(this, 'renderKeysButton');
+                Ember.run.once(this, 'updateEnableButton');
+            }.observes('machine.state'),
+
+
+            hasMonitoringObserver: function() {
+                Ember.run.once(this, 'renderMonitoringButtons');
+            }.observes('machine.hasMonitoring'),
+
+
+            changeMonitoringObserver: function() {
+                Ember.run.once(this,  'updateChangeMonitoringButton');
+            }.observes('machine.disablingMonitoring', 'machine.enablingMonitoring'),
+
+
+            checkedMonitoringObserver: function() {
+                Ember.run.once(this, 'updateMonitoringCollapsible');
+            }.observes('Mist.backendsController.checkedMonitoring', 'machine'),
         });
     }
 );

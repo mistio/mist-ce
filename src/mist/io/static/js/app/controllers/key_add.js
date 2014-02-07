@@ -1,59 +1,139 @@
-define('app/controllers/key_add', [
-    'ember'
-    ],
+define('app/controllers/key_add', ['ember'],
     /**
-     * Key Add Controller
+     *  Key Add Controller
      *
-     * @returns Class
+     *  @returns Class
      */
-    function() {
+    function () {
         return Ember.Object.extend({
 
-            newKeyName: null,
-            newKeyReady: null,
+            /**
+             *  Properties
+             */
+
+            newKeyId: null,
+            callback: null,
+            formReady: null,
+            uploadingKey: null,
             newKeyPrivate: null,
 
-            init: function() {
-                this._super();
+
+            /**
+             *
+             *  Methods
+             *
+             */
+
+            open: function (callback) {
+                $('#add-key-popup').popup('open');
+                this._clear();
+                this._updateFormReady();
+                this.set('callback', callback);
             },
 
-            newKeyObserver: function() {
-                if (this.newKeyName && this.newKeyPrivate) {
-                    this.set('newKeyReady', true);
-                    $('#create-key-ok').button('enable');
-                } else {
-                    this.set('newKeyReady', false);
-                    $('#create-key-ok').button('disable');
+
+            close: function () {
+                $('#add-key-popup').popup('close');
+                this._clear();
+            },
+
+
+            add: function () {
+
+                if (Mist.keysController.keyExists(this.newKeyId)) {
+                    Mist.notificationController.notify('Key name exists already');
+                    this._giveCallback(false);
+                    return;
                 }
-            }.observes('newKeyName', 'newKeyPrivate'),
 
-            newKey: function(machine) {
-                Mist.keysController.newKey(this.get('newKeyName').trim(),
-                                           this.get('newKeyPrivate').trim(), machine);
-            },
+                // Basic private key validation
+                var privateKey = this.newKeyPrivate;
+                var beginning = '-----BEGIN RSA PRIVATE KEY-----';
+                var ending = '-----END RSA PRIVATE KEY-----';
 
-            newKeyClear: function() {
-                this.set('newKeyName', null);
-                this.set('newKeyPrivate', null);
-            },
+                if (privateKey.indexOf(beginning) != 0) {
+                    Mist.notificationController.notify('Private key should begin with: ' + beginning);
+                    this._giveCallback(false);
+                    return;
+                } else if (privateKey.indexOf(ending) != privateKey.length - ending.length) {
+                    Mist.notificationController.notify('Private key should end with: ' + ending);
+                    this._giveCallback(false);
+                    return;
+                }
 
-            generateKey: function() {
-                $('#action-loader').fadeIn(200);
-                $.ajax({
-                    url: '/keys',
-                    type: 'POST',
-                    success: function(data) {
-                        info('Successfully generated key');
-                        $('#action-loader').fadeOut(200);
-                        Mist.keyAddController.set('newKeyPrivate', data.priv);
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while generating key: ' + jqXHR.responseText);
-                        error(textstate, errorThrown, ', while generating key. ', jqXHR.responseText);
-                        $('#action-loader').fadeOut(200);
+                var that = this;
+                Mist.keysController.addKey(this.newKeyId, this.newKeyPrivate,
+                    function (success, newKeyId) {
+                        that._giveCallback(success, newKeyId);
+                        if (success)
+                            that.close();
                     }
-                });
-            }
+                );
+            },
+
+
+            uploadKey: function (file) {
+
+                var that = this;
+                var reader = new FileReader();
+
+                reader.onloadend = function (e) {
+
+                    if (e.target.readyState == FileReader.DONE) {
+                        that.set('newKeyPrivate', e.target.result);
+                    } else {
+                        Mist.notificationsController.notify('Failed to upload file');
+                    }
+
+                    that.set('uploadingKey', false);
+                };
+
+                this.set('uploadingKey', true);
+                reader.readAsText(file, 'UTF-8');
+            },
+
+
+            /**
+             *
+             *  Pseudo-Private Methods
+             *
+             */
+
+            _clear: function () {
+                this.set('callback', null)
+                    .set('newKeyId', null)
+                    .set('formReady', null)
+                    .set('newKeyPrivate', null);
+            },
+
+
+            _giveCallback: function (success, newKeyId) {
+                if (this.callback) this.callback(success, newKeyId);
+            },
+
+
+            _updateFormReady: function () {
+                if (this.newKeyId) {
+                    // Remove non alphanumeric chars from key id
+                    this.set('newKeyId', this.newKeyId.replace(/\W/g, ''));
+                }
+                if (this.newKeyPrivate) {
+                    this.set('newKeyPrivate', this.newKeyPrivate.trim());
+                }
+
+                this.set('formReady', !!this.newKeyId && !!this.newKeyPrivate);
+            },
+
+
+            /**
+             *
+             *  Observers
+             *
+             */
+
+            formObserver: function () {
+                Ember.run.once(this, '_updateFormReady');
+            }.observes('newKeyId', 'newKeyPrivate'),
         });
     }
 );

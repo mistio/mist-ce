@@ -1,111 +1,163 @@
-<a href="#"
-    id="mist-create-machine"
-    class="add-button"
-    data-theme="b"
-    data-role="button"
-    data-icon="plus"
-    data-iconpos="right"
-    {{action openMachineAddDialog target="view"}}>Create</a>
-
-<div class="mist-dialog dialog-add" data-role="panel" data-position="right" data-display="overlay" data-theme="b">
+<div id="create-machine-panel" 
+     class="side-panel" 
+     data-role="panel" 
+     data-position="right" 
+     data-display="overlay"
+     data-theme="b">
+   
     <div data-role="header">
         <h1>Create Machine</h1>
     </div>
-    <div data-role="content">
+
+    <div data-role="content" data-theme="b">
+        
+        <!-- Select Name -->
+
         <label for="create-machine-name">1. Name:</label>
         {{view Mist.TextField
-            valueBinding="Mist.machineAddController.newMachineName"
-            name="create-machine-name"
-            id="create-machine-name"}}
+               id="create-machine-name"
+               data-theme="a"
+               valueBinding="Mist.machineAddController.newMachineName"}}
 
-        <label for="createmachine-select-provider">2. Provider:</label>
-        <div class="select-provider-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
-            data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
-            <h2>Select Provider</h2>
-            <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
-                {{#each Mist.backendsController.getCloudProvidersProperty}}
-                <li data-icon="false" data-corners="true">
-                    <a href="#" {{bindAttr title="title"}} 
-                                {{action selectProvider this target="view"}}>{{this.title}}</a>
-                </li>
-                {{/each}}
-            </ul>
-        </div>
-            
-        <label for="createmachine-select-image">3. Image:</label>
-        <div class="select-image-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
-            data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
-            <h2>Select Image</h2>
-            <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
-                {{#each Mist.machineAddController.newMachineBackend.images}}
-                <li data-icon="false" data-corners="true">
-                    <a href="#" {{bindAttr title="name"}} 
-                                {{action selectImage this target="view"}}>{{this.name}}</a>
-                </li>
-                {{/each}}
-            </ul>
-        </div>
-        
-        <label for="createmachine-select-size">4. Size:</label>
-        <div class="select-size-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
-            data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
-            <h2>Select Size</h2>
-            <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
-                {{#each Mist.machineAddController.newMachineBackend.sizes}}
-                <li data-icon="false" data-corners="true">
-                    <a href="#" {{bindAttr title="name"}} 
-                                {{action selectSize this target="view"}}>{{this.name}} <span style="color: rgb(170,170,170); font-size: 80%">- disk:{{this.disk}}, ram:{{this.ram}}</span></a>
-                </li>
+        <!-- Select Provider -->
+
+        <label>2. Provider:</label>
+        <div id="create-machine-provider" 
+             data-role="collapsible" 
+             data-iconpos="right" 
+             data-collapsed-icon="arrow-d"
+             data-expanded-icon="arrow-u"
+             data-theme="a"
+             class="mist-select">
+            <h2>{{Mist.machineAddController.newMachineProvider.title}}</h2>
+            <ul data-role="listview" data-theme="a">
+                {{#each Mist.backendsController.content}}
+                    {{#if this.enabled}}
+                        {{#unless this.isBareMetal}}
+                            <li data-icon="false">
+                                <a {{action "selectProvider" this target="view"}}>{{this.title}}</a>
+                            </li>
+                        {{/unless}}
+                    {{/if}}
                 {{/each}}
             </ul>
         </div>
 
-        <label for="createmachine-select-location">5. Location:</label>
-        <div class="select-location-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
-            data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
-            <h2>Select Location</h2>
-            <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
-                {{#each Mist.machineAddController.newMachineBackend.locations}}
-                <li data-icon="false" data-corners="true">
-                    <a href="#" {{bindAttr title="name"}} 
-                                {{action selectLocation this target="view"}}>{{this.name}}</a>
+        <!-- Select Image -->
+
+        <label>3. Image:</label>
+        <div id="create-machine-image" 
+             data-role="collapsible" 
+             data-iconpos="right" 
+             data-collapsed-icon="arrow-d"
+             data-expanded-icon="arrow-u"
+             data-theme="a"
+             class="mist-select">
+            <h2>{{Mist.machineAddController.newMachineImage.name}}</h2>
+            <ul data-role="listview" data-theme="a">
+                {{#each Mist.machineAddController.newMachineProvider.images}}
+                <li data-icon="false">
+                    <a {{action "selectImage" this target="view"}}>{{this.name}}</a>
                 </li>
                 {{/each}}
             </ul>
-        </div>        
+        </div>
 
-        <label for="createmachine-select-key">6. Key:</label>
-        {{#if Mist.keysController.keys}}
-        <div class="select-key-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
-            data-collapsed-icon="arrow-d" data-theme="d" data-expanded-icon="arrow-u">
-            <h2>Select Key</h2>
-            <ul class="select-listmenu" data-role="listview" data-divider-theme="d" data-corners="true">
-                {{#each Mist.keysController.keys}}
-                    <li data-icon="false" data-corners="true" data-theme="d">
-                        <a href="#" {{bindAttr title="name"}} 
-                                    {{action selectKey this target="view"}}>{{this.name}}</a>
+        <!-- Select Size -->
+
+        <label>4. Size:</label>
+        <div id="create-machine-size" 
+             data-role="collapsible" 
+             data-iconpos="right" 
+             data-collapsed-icon="arrow-d"
+             data-expanded-icon="arrow-u"
+             data-theme="a"
+             class="mist-select">
+            <h2>{{Mist.machineAddController.newMachineSize.name}}</h2>
+            <ul data-role="listview" data-theme="a">
+                {{#each Mist.machineAddController.newMachineProvider.sizes}}
+                <li data-icon="false">
+                    <a {{action "selectSize" this target="view"}}>{{this.name}} 
+                        <span class="size-decription">
+                         - disk:{{this.disk}}, ram:{{this.ram}}
+                        </span>
+                    </a>
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+
+        <!-- Select Location -->
+
+        <label>5. Location:</label>
+        <div id="create-machine-location" 
+             data-role="collapsible" 
+             data-iconpos="right" 
+             data-collapsed-icon="arrow-d"
+             data-expanded-icon="arrow-u"
+             data-theme="a"
+             class="mist-select">
+            <h2>{{Mist.machineAddController.newMachineLocation.name}}</h2>
+            <ul data-role="listview" data-theme="a">
+                {{#each Mist.machineAddController.newMachineProvider.locations}}
+                <li data-icon="false">
+                    <a {{action "selectLocation" this target="view"}}>{{this.name}}</a>
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+
+        <!-- Select Key -->
+
+        <label>6. Key:</label>
+        <div id="create-machine-key" 
+             data-role="collapsible" 
+             data-iconpos="right" 
+             data-collapsed-icon="arrow-d"
+             data-expanded-icon="arrow-u"
+             data-theme="a"
+             class="mist-select">
+            <h2>{{Mist.machineAddController.newMachineKey.id}}</h2>
+            <ul data-role="listview" data-theme="a">
+                {{#each Mist.keysController.content}}
+                    <li data-icon="false">
+                        <a {{action "selectKey" this target="view"}}>{{this.id}}</a>
                     </li>
                 {{/each}}
+                <li data-icon="false" data-theme="d">
+                    <a {{action "createKeyClicked" target="view"}}>Add Key</a>
+                </li>
             </ul>
         </div>
-        {{else}}
-        <div class="generate-key-collapsible ui-disabled" data-role="collapsible" data-iconpos="right" data-corners="true"
-            data-collapsed-icon="gear">
-            <h2><div class="ajax-loader"></div> Generate Key</h2>
-        </div>        
-        {{/if}}
+
+        <!-- Select Script -->
 
         <label for="create-machine-script">7.Script:</label>
         {{view Mist.TextField
-            valueBinding="Mist.machineAddController.newMachineScript"
-            name="create-machine-script"
-            id="create-machine-script"}}
+               id="create-machine-script"
+               data-theme="a"
+               valueBinding="Mist.machineAddController.newMachineScript"}}
 
-        <div class="cost">Estimated price: <span>{{Mist.machineAddController.newMachineCost}}</span></div>
+        <div id="create-machine-cost">
+        {{#if view.price}}
+            Estimated price: 
+            <span>{{view.price}}</span>
+        {{/if}}
+        </div>
 
-        <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <button id="create-machine-cancel" data-theme="c" {{action backClicked target="view"}}>Back</button>
-            <button id="create-machine-ok" data-theme="b" disabled="disabled"  {{action newMachineClicked target="view"}}>Launch!</button>
+        <div class="ok-cancel" data-role="ui-grid-a" >
+            <div class="ui-block-a">
+                <a data-role="button" 
+                   data-theme="a"
+                   {{action "backClicked" target="view"}}>Back</a>
+            </div>
+            <div class="ui-block-b">
+                <button id="create-machine-ok" 
+                        data-theme="d"
+                        {{action "launchClicked" target="view"}}>Launch!</button>
+            </div>
         </div>
     </div>
 </div>
+
+{{view Mist.keyAddView}}

@@ -1,79 +1,143 @@
-define('app/controllers/backend_add', [
-    'ember'
-    ],
+define('app/controllers/backend_add', ['app/models/backend', 'ember'],
     /**
-     * Backend Add Controller
+     *  Backend Add Controller
      *
-     * @returns Class
+     *  @returns Class
      */
-    function() {
+    function (Backend) {
         return Ember.Object.extend({
 
-            newBackendReady: false,
+            /**
+             *  Properties
+             */
 
-            newBackendClear: function() {
-                this.set('newBackendProvider', null);
-                this.set('newBackendKey', null);
-                this.set('newBackendSecret', null);
-                this.set('newBareMetalServerIP', null);
-                this.set('newBareMetalServerKey', null);
-                this.set('newBareMetalServerUser', null);   
-                $('#addBackendOpenstack').hide();
-                $('#addBackendBareMetal').hide();                    
-                $('#addBackendInfo').show();                                                                            
-                this.set('newBackendURL', null);
-                this.set('newBackendTenant', null);
-                this.set('newBackendRegion', null);
-                $('.select-backend-collapsible .ui-icon').removeClass('ui-icon-check').addClass('ui-icon-arrow-d');
-                $('.select-backend-collapsible span.ui-btn-text').text('Select provider');
+            callback: null,
+            formReady: null,
+
+            newBackendKey: null,
+            newBackendProvider: null,
+            newBackendFirstField: null,
+            newBackendSecondField: null,
+            newBackendOpenStackURL: null,
+            newBackendOpenStackRegion: null,
+            newBackendOpenStackTenant: null,
+
+
+            /**
+             *
+             *  Methods
+             *
+             */
+
+            open: function (callback) {
+                this._clear();
+                this._updateFormReady();
+                this.set('callback', callback);
+
+                $('#add-backend-panel').panel('open');
+                Ember.run.next(function () {
+                    $('.ui-page-active').height($('.ui-panel-open').height());
+                    $('body').css('overflow', 'auto');
+                });
             },
 
-            updateNewBackendReady: function() {
-                if (this.get('newBackendProvider') &&
-                    this.get('newBackendKey') &&
-                    this.get('newBackendSecret')) {
-                        /* HP Cloud support */
-                        if (this.get('newBackendProvider').title.indexOf('HP Cloud') != -1) {
-                            if (!(this.get('newBackendURL') &&
-                                  this.get('newBackendTenant'))) {
-                                      this.set('newBackendReady', false);
-                                      $('#create-backend-ok').button('disable');
-                                      return;
-                                  }
+
+            close: function () {
+                $('#add-backend-panel').panel('close');
+                this._clear();
+            },
+
+
+            add: function () {
+                var that = this;
+                Mist.backendsController.addBackend(
+                    this.newBackendProvider.title,
+                    this.newBackendProvider.provider,
+                    this.newBackendFirstField,
+                    this.newBackendSecondField,
+                    this.newBackendOpenStackURL,
+                    this.newBackendOpenStackRegion,
+                    this.newBackendOpenStackTenant,
+                    this.newBackendKey.id,
+                    function (success, backend) {
+                        that._giveCallback(success, backend);
+                        if (success) {
+                            that.close();
                         }
-                        /* OpenStack */                        
-                        if (this.get('newBackendProvider').title.indexOf('OpenStack') != -1) {
-                            if (!this.get('newBackendURL')) {
-                                      this.set('newBackendReady', false);
-                                      $('#create-backend-ok').button('disable');
-                                      return;
-                                  }
+                    }
+                );
+            },
+
+
+            /**
+             *
+             *  Pseudo-Private Methods
+             *
+             */
+
+            _clear: function () {
+
+                this.set('callback', null)
+                    .set('newBackendFirstField', null)
+                    .set('newBackendSecondField', null)
+                    .set('newBackendOpenStackURL', null)
+                    .set('newBackendOpenStackRegion', null)
+                    .set('newBackendOpenStackTenant', null)
+                    .set('newBackendKey', {id: 'Select SSH Key'})
+                    .set('newBackendProvider', {title: 'Select provider'});
+
+                // These should be in a view :(
+                $('#new-backend-key').collapsible('collapse').collapsible('option', 'collapsedIcon', 'arrow-d');
+                $('#new-backend-provider').collapsible('collapse').collapsible('option', 'collapsedIcon', 'arrow-d');
+            },
+
+
+            _updateFormReady: function () {
+                var ready = false;
+                if ('provider' in this.newBackendProvider) { // Filters out the "Select provider" dummy provider
+                    
+                    if (this.newBackendFirstField && this.newBackendSecondField) {
+                        
+                        ready = true;
+                        
+                        if (this.newBackendProvider.provider == 'openstack') { // Pure Openstack
+                            if (!this.newBackendOpenStackURL) {
+                                ready = false;
+                            }
+                        } else if (this.newBackendProvider.provider.indexOf('openstack') > -1) { // HpCloud
+                            if (!(this.newBackendOpenStackURL && this.newBackendOpenStackTenant)) {
+                                ready = false;
+                            }
+                        } else if (this.newBackendProvider.provider == 'bare_metal') { // Baremetal
+                            if (!Mist.keysController.keyExists(this.newBackendKey.id)) {
+                                ready = false;
+                            }
                         }
-                        this.set('newBackendReady', true);
-                        $('#create-backend-ok').button('enable');
-                } else if (this.get('newBareMetalServerIP') &&
-                    this.get('newBareMetalServerKey') &&                
-                    this.get('newBareMetalServerUser')) {                                                                                        
-                        this.set('newBackendReady', true);
-                        $('#create-backend-ok').button('enable');                                                             
-                } else {
-                    this.set('newBackendReady', false);
-                    $('#create-backend-ok').button('disable');
+                    }
                 }
+                this.set('formReady', ready);
             },
 
-            init: function() {
-                this._super();
-                this.addObserver('newBackendProvider', this, this.updateNewBackendReady);
-                this.addObserver('newBackendKey', this, this.updateNewBackendReady);
-                this.addObserver('newBackendSecret', this, this.updateNewBackendReady);
-                this.addObserver('newBareMetalServerIP', this, this.updateNewBackendReady);                
-                this.addObserver('newBareMetalServerKey', this, this.updateNewBackendReady);                
-                this.addObserver('newBareMetalServerUser', this, this.updateNewBackendReady);                                
-                this.addObserver('newBackendURL', this, this.updateNewBackendReady);
-                this.addObserver('newBackendTenant', this, this.updateNewBackendReady);
-                this.addObserver('newBackendRegion', this, this.updateNewBackendReady);
-            }
+
+            _giveCallback: function (success, backend) {
+                if (this.callback) this.callback(success, backend);
+            },
+
+
+            /**
+             *
+             *  Observers
+             *
+             */
+
+            formObserver: function () {
+                Ember.run.once(this, '_updateFormReady');
+            }.observes('newBackendKey',
+                       'newBackendProvider',
+                       'newBackendFirstField',
+                       'newBackendSecondField',
+                       'newBackendOpenStackURL',
+                       'newBackendOpenStackTenant')
         });
     }
 );

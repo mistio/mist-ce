@@ -1,0 +1,18 @@
+
+/* Key Add View
+-----------------------------------------------------------------------------------------------------------*/
+#add-key-upload {
+    display: none;
+}
+#add-key-popup .add-key-loader {
+    display: inline;
+    float: right;
+}
+#add-key-popup-screen {
+    height: 100%;
+    position: fixed;
+    top: 0;
+}
+.generate-upload button {
+    width: 69px !important;
+}

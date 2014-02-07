@@ -1,0 +1,40 @@
+<div id="machine-shell-popup"
+     class="huge-popup" 
+     data-role="popup"
+     data-theme="b"
+     data-overlay-theme="b" 
+     data-transition="slideup">
+
+    <div data-role="header">
+        <h1>{{Mist.machineShellController.machine.user}}@
+            {{Mist.machineShellController.machine.name}}</h1>
+    </div>
+
+    <div data-role="content">
+        <table id="shell-input">
+            <tr>
+                <td>
+                    {{view Mist.ShellTextField 
+                           data-theme="a" 
+                           valueBinding="Mist.machineShellController.command"}}
+                </td>
+                <td id="shell-submit">
+                    <button data-theme="d" 
+                        data-icon="shell-return" 
+                        {{action "submitClicked" target="view"}}></button>
+                </td>
+            </tr>
+        </table>
+        <div id="shell-return" data-theme="a">
+        {{#each Mist.machineShellController.machine.commandHistory}}
+            {{view Mist.machineShellListItemView commandBinding="this"}}
+        {{/each}}
+        </div>
+        <div class="ui-grid-a shell-back">
+            <a data-role="button" 
+               data-theme="a" 
+               {{action "backClicked" target="view"}}>Back</a>
+        </div>
+        
+    </div>
+</div>

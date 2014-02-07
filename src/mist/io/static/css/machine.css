@@ -1,0 +1,129 @@
+
+/* Single Machine Page CSS
+-----------------------------------------------------------------------------------------------------------*/
+#single-machine-page .ui-footer {
+    display: block;
+}
+#single-machine-page .info-table {
+    width: 100%;
+}
+#single-machine-page .info-table td {
+    margin: 0;
+    width: 50%;
+    font-size: 14px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #CFCFCF;
+}
+#single-machine-page .info-table tr td:nth-child(2) {
+    font-weight: bold;
+}
+#single-machine-page .info-table tr {
+    background-color: #F7F7F7;
+}
+#single-machine-page #monitoring-disabled p {
+    text-align: center;
+}
+#single-machine-page #monitoring-disabled a {
+    width: 165px;
+    margin: 0 auto;
+}
+#single-machine-page #mist-manage-keys a {
+    margin-top: 4px;
+    margin-right: 5px;
+}
+
+#single-machine-page #monitoring-bottom-btns {
+    background-color: #e0e0e1;
+    height: 56px;
+    width: 100%;
+    padding: 10px 0px;
+}
+
+#single-machine-page #monitoring-bottom-btns .ui-block-a,
+#single-machine-page #monitoring-bottom-btns .ui-block-b {
+    width: 50%;
+}
+
+#single-machine-page #monitoring-bottom-btns a {
+    margin: 7px auto;
+}
+
+#single-machine-page #add-rule-button {
+    width: 100px;
+}
+
+#single-machine-page #disable-monitor-btn {
+    width: 100px;
+}
+
+#single-machine-page #machine-probe-btn {
+    float: right;
+    width: auto;
+    font-size: 12px;
+    padding: 6px;
+    margin: ;;
+    margin-top: -6px;
+    margin-bottom: -5px;
+}
+
+#single-machine-page .info-table .ajax-loader {
+    display: inline-block;
+    position: relative;
+    top: 3px;
+    left: 6px;
+}
+
+/* Conditional for < 600px */
+@media only screen and  (max-width: 400px) {
+    
+
+    #single-machine-page #monitoring-bottom-btns .ui-block-a,
+    #single-machine-page #monitoring-bottom-btns .ui-block-b {
+        width: 100%;
+    }
+    
+    #single-machine-page #monitoring-bottom-btns {
+        height: 110px;
+    }
+    
+
+}
+
+.single-machine-header {
+    height: 56px;
+}
+
+.single-machine-header .ui-title {
+    padding-top: 20px;
+    font-weight: normal;
+    padding-left: 48px;
+}
+
+@-moz-document url-prefix() {
+    .single-machine-header .ui-title {
+        padding-left: 0px;
+    }
+}
+
+.single-machine-header .ajax-loader {
+    position: relative;
+    bottom: 30px;
+}
+
+.single-machine-header span {
+    margin-top: 4px !important;
+}
+
+.info-table {
+    border-collapse: collapse;
+    width: 100%;
+    background: #fff;
+}
+
+.info-table tr {
+    border: 1px solid #ccc;
+}
+
+.info-table .loadleds {
+    margin-right: 10px;
+}
