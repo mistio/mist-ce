@@ -132,12 +132,11 @@ textarea {
     width: 77px !important;
 }
 .large-popup {
-    width: 320px !important;
-    max-width: 99%;
+    width: 290px !important;
 }
 .large-popup .ok-cancel a,
 .large-popup .ok-cancel button {
-    width: 109px !important;
+    width: 95px !important;
 }
 .huge-popup {
     width: 100% !important;
