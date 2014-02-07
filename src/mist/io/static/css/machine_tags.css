@@ -1,0 +1,25 @@
+
+/* Machine Tags View CSS
+-----------------------------------------------------------------------------------------------------------*/
+#machine-tags-popup-popup {
+    left: 10px !important;
+    margin-bottom: 55px !important;
+}
+#machine-tags-popup .ui-input-text {
+    float: left;
+    width: 145px;
+    display: inline-block;
+}
+#machine-tags-popup #add-tag-ok {
+    float: right;
+    bottom: 5px;
+    display: inline-block;
+}
+#machine-tags-popup #add-tag-back {
+    display: block;
+    clear: both;
+}
+#machine-tags-popup .ui-listview {
+    clear: both;
+    margin: 20px auto;
+}

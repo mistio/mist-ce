@@ -1,112 +1,101 @@
-<a id="add-backend-button"
-    href="#"
-    class="add-button"
-    data-theme="b"
-    data-role="button"
-    data-icon="plus"
-    data-iconpos="right"
-    {{action addBackend target="view"}}>Add backend</a>
+<div id="add-backend-panel" 
+     class="side-panel" 
+     data-role="panel" 
+     data-position="right" 
+     data-display="overlay"
+     data-theme="b">
 
-<div data-role="panel" id="add-backend" data-position="right" data-display="overlay" data-theme="b">
     <div data-role="header">
         <h1>Add backend</h1>
     </div>
-    <div data-role="content">
+
+    <div data-role="content" data-theme="b">
+
         <label>1. Provider:</label>
-        <div class="select-backend-collapsible" data-role="collapsible" data-iconpos="right"
-            data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u">
-            <h2>Select provider</h2>
-            <ul class="select-listmenu" data-role="listview">
-                {{#each view.providerList}}
+        <div id="new-backend-provider"
+             class="mist-select"
+             data-role="collapsible" 
+             data-iconpos="right" 
+             data-collapsed-icon="arrow-d" 
+             data-expanded-icon="arrow-u"
+             data-theme="a">
+            <h2>{{Mist.backendAddController.newBackendProvider.title}}</h2>
+            <ul class="select-listmenu" data-role="listview" data-theme="a">
+                {{#each Mist.backendsController.providerList}}
                 <li data-icon="false">
-                    <a href="#" title="{{unbound this.provider}}">{{this.title}}</a>
+                    <a {{action "selectProvider" this target="view"}}>{{this.title}}</a>
                 </li>
                 {{/each}}
             </ul>
         </div>
-
-        <div id="addBackendInfo">
-            <label for="create-backend-key" id="ApiKeylabel">2. API Key:</label>
+        <div data-theme="a">
+            <label for="new-backend-first-field">2. {{view.firstFieldLabel}}:</label>
             {{view Mist.TextField
-                valueBinding="Mist.backendAddController.newBackendKey"
-                name="create-backend-key"
-                id="create-backend-key"}}
-
-            <label for="create-backend-secret" id="ApiSecretlabel">3. API Secret:</label>
+                   id="new-backend-first-field"
+                   data-theme="a"
+                   valueBinding="Mist.backendAddController.newBackendFirstField"}}
+    
+            <label for="new-backend-second-field">3. {{view.secondFieldLabel}}:</label>
             {{view Mist.TextField
-                type="password"
-                valueBinding="Mist.backendAddController.newBackendSecret"
-                name="create-backend-secret"
-                id="create-backend-secret"}}
+                   type="password"
+                   id="new-backend-second-field"
+                   data-theme="a"                   
+                   valueBinding="Mist.backendAddController.newBackendSecondField"}}
         </div>
-        
-        <div id="addBackendOpenstack">
-            <label for="create-backend-url" id="URLlabel">4. Auth URL:</label>
+        <div id="openstack-bundle" data-theme="a">
+            <label for="new-backend-openstack-url">4. Auth URL:</label>
             {{view Mist.TextField
-                valueBinding="Mist.backendAddController.newBackendURL"
-                name="create-backend-url"
-                id="create-backend-url"}}
+                   id="new-backend-openstack-url"
+                   data-theme="a"
+                   valueBinding="Mist.backendAddController.newBackendOpenStackURL"}}
 
-            <label for="create-backend-tenant" id="Tenantlabel">5. Tenant Name:</label>
+            <label for="new-backend-openstack-tenant">5. Tenant Name:</label>
             {{view Mist.TextField
-                valueBinding="Mist.backendAddController.newBackendTenant"
-                name="create-backend-tenant"
-                id="create-backend-tenant"}}
-
-            <div id="notHpCloud">
-                <label for="create-backend-region" id="Regionlabel">6. Region Name:</label>
+                   id="new-backend-openstack-tenant"
+                   data-theme="a"
+                   valueBinding="Mist.backendAddController.newBackendOpenStackTenant"}}
+            
+            <div id="non-hp-cloud">
+                <label for="new-backend-openstack-region">6. Region:</label>
                 {{view Mist.TextField
-                    valueBinding="Mist.backendAddController.newBackendRegion"
-                    name="create-backend-region"
-                    id="create-backend-region"}}
+                       id="new-backend-openstack-regino"
+                       data-theme="a"
+                       valueBinding="Mist.backendAddController.newBackendOpenStackRegion"}}
             </div>
         </div>
-        
-        <div id="addBackendBareMetal">
-            <label for="create-bareserver-ip" id="Iplabel">2. Hostname:</label>
-            {{view Mist.TextField
-                valueBinding="Mist.backendAddController.newBareMetalServerIP"
-                name="create-bareserver-ip"
-                id="create-bareserver-ip"}}
 
-            <label for="create-bareserver-key" id="Keylabel">3. SSH Key:</label>    
-            <div class="select-key-collapsible" data-role="collapsible" data-iconpos="right"
-                data-collapsed-icon="arrow-d" data-expanded-icon="arrow-u" data-theme="d">
-                <h2>Select Key</h2>
-                <ul class="select-keys-listmenu" data-role="listview" data-theme="d">
-                    {{#each Mist.keysController.keys}}
-                    <li data-icon="false" data-corners="true">
-                        <a href="#" {{bindAttr title="name"}} 
-                                    {{action selectKey this target="view"}}>{{this.name}}</a>
-                    </li>
+        <div id="baremetal-bundle">
+            <label>4. SSH Key:</label>
+            <div id="new-backend-key" 
+                 class="mist-select"
+                 data-role="collapsible" 
+                 data-iconpos="right" 
+                 data-collapsed-icon="arrow-d"
+                 data-expanded-icon="arrow-u"
+                 data-theme="a">
+                <h2>{{Mist.backendAddController.newBackendKey.id}}</h2>
+                <ul data-role="listview">
+                    {{#each Mist.keysController.content}}
+                        <li data-icon="false" data-theme="a">
+                            <a {{action "selectKey" this target="view"}}>{{this.id}}</a>
+                        </li>
                     {{/each}}
-                    <li data-icon="false" data-theme="b" data-corners="true">
-                        <a href="#" {{action "createBareMetalKeyClicked" target="view"}}>Create key</a>
+                    <li data-icon="false" data-theme="d">
+                        <a {{action "createKeyClicked" target="view"}}>Add Key</a>
                     </li>
                 </ul>
             </div>
-            
-            <label for="create-bareserver-user" id="Userlabel">4. User:</label>
-            {{view Mist.TextField
-                valueBinding="Mist.backendAddController.newBareMetalServerUser"
-                name="create-bareserver-user"
-                id="ROOTcreate-bareserver-user"}}
         </div>
 
-        {{#if view.pendingCreation}}
+        {{#if Mist.backendsController.addingBackend}}
         <div class="ajax-loader"></div>
         {{/if}}
 
-        <div class="btn-full ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <button id="create-backend-cancel" {{action "backClicked" target="view"}}>Back</button>
-            <button id="create-backend-ok" data-theme="b" disabled {{action "addButtonClick" target="view"}}>Add</button>
+        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <a data-role="button" {{action "backClicked" target="view"}} data-theme="a">Back</a>
+            <button id="new-backend-ok" data-theme="d" {{action "addClicked" target="view"}}>Add</a>
         </div>
     </div>
 </div>
 
-<div data-role="popup" id="create-key-dialog" data-transition="pop" data-overlay-theme="a">
-    <div data-role="header">
-        <h1>Create key</h1>
-    </div>
-    {{view Mist.AddKeyView data-role="content"}}
-</div>
+{{view Mist.keyAddView}}

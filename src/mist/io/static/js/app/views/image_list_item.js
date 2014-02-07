@@ -1,57 +1,48 @@
-define('app/views/image_list_item', [
-    'text!app/templates/image_list_item.html','ember'],
+define('app/views/image_list_item', ['app/views/list_item', 'text!app/templates/image_list_item.html'],
     /**
+     *  Image List Item View
      *
-     * Image List Item View
-     *
-     * @returns Class
+     *  @returns Class
      */
-    function(image_list_item_html) {
-        return Ember.View.extend({
-                tagName:'li',
-                
-                starImage: function() {
-                    var payload = {
-                        'action': 'star'
-                    };
-                    var backend_id = this.image.backend.id
-                    var image_id = this.image.id;
+    function (ListItemView, image_list_item_html) {
+        return ListItemView.extend({
+
+            /**
+             *  Properties
+             */
+
+            image: null,
+            template: Ember.Handlebars.compile(image_list_item_html),
+
+
+            /**
+             *
+             *  Actions
+             *
+             */
+
+            actions: {
+
+
+                toggleImageStar: function () {
                     var that = this;
-                    $.ajax({
-                        url: '/backends/' + backend_id + '/images/' + image_id,
-                        type: "POST",
-                        data: JSON.stringify(payload),
-                        contentType: "application/json",
-                        headers: { "cache-control": "no-cache" },
-                        dataType: "json",
-                        success: function (){
-                            var backend = Mist.backendsController.getBackendById(backend_id);
-                            if (backend.images.content.indexOf(that.image) == -1) {
-                                if (image.star == false) {
-                                    backend.images.content.unshiftObject(that.image);
-                                }
-                            }
+                    this.image.toggle(function (success, star) {
+                        if (!success) {
+                            that.image.set('star', !that.image.star);
                         }
                     });
                 },
-                
-                didInsertElement: function(){
-                    $('#images-list').listview('refresh');
-                    try{
-                        $('#images-list .ember-checkbox').checkboxradio();    
-                    } catch(e){}
-                    
-                },
 
-                launchImage: function(){
-                    var AddView = Mist.MachineAddView.create();
-                    AddView.selectProvider(this.image.backend);
-                    AddView.selectImage(this.image);
-                    $('#images .dialog-add').panel('open');
-                },
 
-                template: Ember.Handlebars.compile(image_list_item_html),
+                launchImage: function () {
+                    this.image.backend.images.content.addObject(this.image);
+                    Mist.machineAddController.open();
+                    Ember.run.next(this, function () {
+                        Mist.machineAddController.view._actions.selectProvider(this.image.backend);
+                        Mist.machineAddController.view._actions.selectImage(this.image);
+                    });
+                }
+            }
         });
-
     }
 );

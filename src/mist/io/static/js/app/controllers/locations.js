@@ -1,60 +1,85 @@
-define('app/controllers/locations', [
-    'app/models/location',
-    'ember',
-    'jquery'
-    ],
+define('app/controllers/locations', ['app/models/location'],
     /**
-     * Locations controller
-     *
-     *
-     * @returns Class
+     *  Locations controller
+     * 
+     *  @returns Class
      */
     function(Location) {
-        return Ember.ArrayController.extend({
+        return Ember.ArrayController.extend(Ember.Evented, {
+
+            /**
+             *  Properties
+             */
+
+            content: [],
+            loading: null,
             backend: null,
 
-            init: function() {
-                this._super();
+            /**
+             * 
+             *  Initialization
+             * 
+             */
 
-                if (!this.backend.enabled) {
-                    return;
-                }
-                else if (this.backend.error && this.backend.state == 'offline'){
-                    return;
-                }
-                
-                this.backend.set('state', 'waiting');
+            load: function() {
+
+                if (!this.backend.enabled) return;
+
                 var that = this;
-                $.getJSON('/backends/' + this.backend.id + '/locations', function(data) {
-                    if (!that.backend.enabled) {
-                        return;
-                    }
-                    var content = new Array();
-                    data.forEach(function(item) {
-                        if (item.name == '') {
-                            item.name = 'Default';
-                        }
-                        content.push(Location.create(item));
+                this.set('loading', true);
+                Mist.ajax.GET('/backends/' + this.backend.id + '/locations', {
+                }).success(function(locations) {
+                    if (!that.backend.enabled) return;
+                    that._setContent(locations);
+                }).error(function() {
+                    if (!that.backend.enabled) return;
+                    Mist.notificationController.notify('Failed to load locations for ' + that.backend.title);
+                    that.backend.set('enabled', false);
+                }).complete(function(success) {
+                    if (!that.backend.enabled) return;
+                    that.set('loading', false);
+                    that.trigger('onLoad');
+                });
+            },
+
+
+
+            /**
+             * 
+             *  Methods
+             * 
+             */
+
+            clear: function() {
+                Ember.run(this, function() {
+                    this.set('content', []);
+                    this.set('loading', false);
+                    this.trigger('onLocationListChange');
+                });
+            },
+
+
+            getLocation: function(locationId) {
+                return this.content.findBy('id', locationId);
+            },
+
+
+
+            /**
+             * 
+             *  Pseudo-Private Methods
+             * 
+             */
+
+            _setContent: function(locations) {
+                var that = this;
+                Ember.run(function() {
+                    that.set('content', []);
+                    locations.forEach(function(location) {
+                        if (location.name == '') location.name = 'Default';
+                        that.content.pushObject(Location.create(location));
                     });
-                    that.set('content', content);
-                    that.backend.set('state', 'online');
-                    if (that.backend.error){
-                        that.backend.set('error', false);
-                    }
-                }).error(function(jqXHR, textstate, errorThrown) {
-                    Mist.notificationController.notify("Error loading locations for backend: " +
-                                                        that.backend.title + ':' + jqXHR.responseText);
-                    if (that.backend.error){
-                        // This backend seems hopeless, disabling it                            
-                        that.backend.set('state', 'offline');
-                        that.backend.set('enabled', false);
-                    } else {
-                        // Mark error but try once again
-                        that.backend.set('error', "Error loading locations");
-                        Ember.run.later(that, function(){
-                            this.init();
-                        }, that.backend.poll_interval); 
-                    }   
+                    that.trigger('onLocationListChange');
                 });
             }
         });

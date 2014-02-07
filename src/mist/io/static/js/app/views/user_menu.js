@@ -1,24 +1,46 @@
-define('app/views/user_menu', [
-    'text!app/templates/user_menu.html',
-    'ember'
-    ],
+define('app/views/user_menu', ['text!app/templates/user_menu.html', 'ember'],
     /**
+     *  User Menu View
      *
-     * Logout Dialog
-     *
-     * @returns Class
+     *  @returns Class
      */
     function(user_menu_html) {
         return Ember.View.extend({
-            tagName: false,
-            gravatarURL: 'https://www.gravatar.com/avatar/'+md5(EMAIL)+'?d=blank&s=40',
-            email: EMAIL,
-            account_url: URL_PREFIX + '/account',
-            logout: IS_CORE,
+
+            /**
+             *  Properties
+             */
+
+            isNotCore: !IS_CORE,
+            accountUrl: URL_PREFIX + '/account',
             template: Ember.Handlebars.compile(user_menu_html),
-        
-            click: function(){
-        	   $("#user-dialog").popup("open");
+            //TODO: change the logo_splash.png to user.png
+            gravatarURL: EMAIL && ('https://www.gravatar.com/avatar/' + md5(EMAIL) + '?d=' +
+                  encodeURIComponent('https://mist.io/resources/logo_splash.png') +'&s=36'),
+
+
+            /**
+             * 
+             *  Actions
+             * 
+             */
+
+            actions: {
+
+                meClicked: function(){
+                    $('#user-menu-popup').popup('open');
+                },
+
+                loginClicked: function() {
+                    $('#user-menu-popup').popup('close');
+                    Ember.run.later(function() {
+                        Mist.loginController.open();
+                    }, 300);
+                },
+
+                logoutClicked: function() {
+                    Mist.loginController.logout();
+                }
             }
         });
     }

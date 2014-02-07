@@ -1,71 +1,117 @@
-define('app/views/key_list', [
-     'app/views/mistscreen',
-    'text!app/templates/key_list.html',
-    'ember'
-    ],
+define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_list.html'],
     /**
-     * Key List View
+     *  Key List View
      *
-     * @returns Class
+     *  @returns Class
      */
-    function(MistScreen, key_list_html) {
+    function (MistScreen, key_list_html) {
         return MistScreen.extend({
+
+            /**
+             *  Properties
+             */
 
             template: Ember.Handlebars.compile(key_list_html),
 
-            selectedKey: null,
 
-            selectedKeysObserver: function() {
-                var that = this;
-                var selectedKeysCount = 0;
-                Mist.keysController.keys.some(function(key) {
-                    if (key.selected) {
-                        if(++selectedKeysCount == 2) {
-                            $('#keys-footer a').addClass('ui-disabled');
-                            that.selectedKey = null;
-                            return true;
-                        }
-                        that.selectedKey = key;
-                    }
-                });
-                if (selectedKeysCount == 0) {
-                    $('#keys-footer').fadeOut(200);
-                } else if (selectedKeysCount == 1) {
-                    $('#keys-footer').fadeIn(200);
-                    $('#keys-footer a').removeClass('ui-disabled');
+            /**
+             *
+             *  Initialization
+             *
+             */
+
+            load: function () {
+
+                // Add event listeners
+                Mist.keysController.on('onSelectedKeysChange', this, 'updateFooter');
+
+                this.updateFooter();
+
+            }.on('didInsertElement'),
+
+
+            unload: function () {
+
+                // Remove event listeners
+                Mist.keysController.off('onSelectedKeysChange', this, 'updateFooter');
+
+            }.on('willDestroyElement'),
+
+
+            /**
+             *
+             *  Methods
+             *
+             */
+
+            updateFooter: function () {
+                switch (Mist.keysController.selectedKeys.length) {
+                case 0:
+                    $('#key-list-page .ui-footer').slideUp();
+                    break;
+                case 1:
+                    $('#key-list-page .ui-footer').slideDown().find('a').removeClass('ui-state-disabled');
+                    break;
+                default:
+                    $('#key-list-page .ui-footer').slideDown().find('a').addClass('ui-state-disabled');
+                    break;
                 }
-            }.observes('Mist.keysController.keys.@each.selected'),
-
-            createClicked: function() {
-                $("#create-key-dialog").popup("open");
             },
 
-            selectClicked: function() {
-                $('#select-keys-dialog').popup('open');
-            },
 
-            selectionModeClicked: function(mode) {
-                Mist.keysController.keys.forEach(function(key) {
-                    key.set('selected', mode);
-                });
-                Ember.run.next(function() {
-                    $("input[type='checkbox']").checkboxradio("refresh");
-                });
-                $('#select-keys-dialog').popup('close');
-            },
+            /**
+             *
+             *  Actions
+             *
+             */
 
-            deleteClicked: function() {
-                var keyName = this.selectedKey.name;
-                Mist.confirmationController.set('title', 'Delete key');
-                Mist.confirmationController.set('text', 'Are you sure you want to delete "' + keyName +'" ?');
-                Mist.confirmationController.set('callback', function() {
-                    Mist.keysController.deleteKey(keyName);
-                });
-                Mist.confirmationController.show();
-            },
+            actions: {
 
-            setDefaultClicked: function() {
-                Mist.keysController.setDefaultKey(this.selectedKey.name);
+
+                addClicked: function () {
+                    $('#create-key-popup').popup('option', 'positionTo', '#add-key-btn');
+                    Mist.keyAddController.open();
+                },
+
+
+                renameClicked: function () {
+                    Mist.keyEditController.open(Mist.keysController.selectedKeys[0].id);
+                },
+
+
+                setDefaultClicked: function () {
+                    Mist.keysController.setDefaultKey(Mist.keysController.selectedKeys[0].id);
+                },
+
+
+                selectClicked: function () {
+                    $('#select-keys-popup').popup('open');
+                },
+
+
+                selectionModeClicked: function (mode) {
+
+                    $('#select-keys-popup').popup('close');
+
+                    Ember.run(function () {
+                        Mist.keysController.content.forEach(function (key) {
+                            key.set('selected', mode);
+                        });
+                    });
+                },
+
+
+                deleteClicked: function () {
+
+                    var keyId = Mist.keysController.selectedKeys[0].id;
+
+                    Mist.confirmationController.set('title', 'Delete key');
+                    Mist.confirmationController.set('text', 'Are you sure you want to delete "' + keyId + '" ?');
+                    Mist.confirmationController.set('callback', function () {
+                        Mist.keysController.deleteKey(keyId);
+                    });
+                    Mist.confirmationController.show();
+                }
             }
         });
     }

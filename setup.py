@@ -15,6 +15,7 @@ requires = [
     'pycrypto',
     'requests',
     'nose',
+    'behaving',
     'sphinxcontrib-httpdomain',
     'sphinx-bootstrap-theme'
 ]

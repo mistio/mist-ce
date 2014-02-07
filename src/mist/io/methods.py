@@ -2,6 +2,9 @@ import logging
 import random
 import json
 import requests
+import subprocess
+import re
+from time import sleep
 from datetime import datetime
 from hashlib import sha256
 
@@ -25,15 +28,18 @@ except ImportError:
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
+from mist.io.helpers import parse_ping
 from mist.io.bare_metal import BareMetalDriver
 from mist.io.exceptions import *
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
-## import libcloud.security
-## libcloud.security.CA_CERTS_PATH.append('/usr/share/curl/ca-bundle.crt')
-
+import libcloud.security
+libcloud.security.CA_CERTS_PATH.append('cacert.pem')
+libcloud.security.CA_CERTS_PATH.append('./src/mist.io/cacert.pem')
 
 log = logging.getLogger(__name__)
+
+HPCLOUD_AUTH_URL = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/tokens'
 
 
 @core_wrapper
@@ -117,7 +123,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
 
         #for HP Cloud
         if 'hpcloudsvc' in apiurl:
-            backend.apiurl = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/'
+            backend.apiurl = HPCLOUD_AUTH_URL
 
         backend_id = backend.get_id()
         if backend_id in user.backends:
@@ -479,17 +485,10 @@ def get_machine_actions(machine_from_api, conn):
 
     # defaults for running state
     can_start = False
-    can_stop = False
+    can_stop = True
     can_destroy = True
     can_reboot = True
     can_tag = True
-    if conn.type in config.EC2_PROVIDERS:
-        can_stop = True
-
-    if conn.type in [Provider.NEPHOSCALE,
-                     Provider.DIGITAL_OCEAN,
-                     Provider.SOFTLAYER]:
-        can_stop = True
 
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
@@ -503,10 +502,8 @@ def get_machine_actions(machine_from_api, conn):
         can_reboot = False
     elif machine_from_api.state in (NodeState.UNKNOWN, NodeState.STOPPED):
         # We assume unknown state mean stopped
-        if conn.type in (Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                         Provider.DIGITAL_OCEAN) or conn.type in config.EC2_PROVIDERS:
-            can_stop = False
-            can_start = True
+        can_stop = False
+        can_start = True
         can_reboot = False
     elif machine_from_api.state in (NodeState.TERMINATED,):
         can_start = False
@@ -619,6 +616,10 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     keypair = user.keypairs[key_id]
     private_key = keypair.private
     public_key = keypair.public
+
+    #print "Key id: " + key_id
+    #print "Public: " + public_key
+    #print "Private: " + private_key
 
     size = NodeSize(size_id, name='', ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
@@ -1443,3 +1444,114 @@ def _undeploy_collectd(user, backend_id, machine_id, host):
     stdout += shell.command(disable_collectd)
 
     return stdout
+
+
+def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
+    """Ping and SSH to machine and collect various metrics."""
+
+    # start pinging the machine in the background
+    log.info("Starting ping in the background for host %s", host)
+    ping = subprocess.Popen(["ping", "-c", "10", "-i", "0.4", "-W", "1", "-q", host], stdout=subprocess.PIPE)
+
+    # run SSH commands
+    command = (
+       "sudo -n uptime 2>&1|"
+       "grep load|"
+       "wc -l && "
+       "echo -------- && "
+       "uptime && "
+       "echo -------- && "
+       "if [ -f /proc/uptime ]; then cat /proc/uptime; "
+       "else expr `date '+%s'` - `sysctl kern.boottime | sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`;" 
+       "fi; "
+       "echo -------- && "
+       "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;"
+       "else sysctl hw.ncpu | awk '{print $2}';"
+       "fi;"
+       "echo --------"
+       #"cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null |"
+       #"awk '{print $2}'` 2> /dev/null || "
+       #"cat ~/.ssh/authorized_keys 2> /dev/null"
+    )
+
+    log.warn('probing with key %s' % key_id)
+
+    try:
+        cmd_output = ssh_command(user, backend_id, machine_id,
+                                 host, command, key_id=key_id)
+    except:
+        log.warning("SSH failed when probing, let's see what ping has to say.")
+        cmd_output = ""
+
+    # stop pinging
+    #ping.send_signal(2)  # SIGINT to print stats and exit
+    #sleep(0.1)
+    #ping.kill()  # better safe than sorry
+    ping_out = ping.stdout.read()
+    ping.wait()
+    log.info("ping output: %s" % ping_out)
+
+    ret = {}
+    if cmd_output:
+        cmd_output = cmd_output.replace('\r\n','').split('--------')
+        log.warn(cmd_output)
+        uptime_output = cmd_output[1]
+        loadavg = re.split('load averages?: ', uptime_output)[1].split(', ')
+        users = re.split(' users?', uptime_output)[0].split(', ')[-1].strip()
+        uptime = cmd_output[2]
+        cores = cmd_output[3]
+        ret = {'uptime': uptime,
+               'loadavg': loadavg,
+               'cores': cores,
+               'users': users,
+               }
+        # if len(cmd_output) > 4:
+        #     updated_keys = update_available_keys(user, backend_id,
+        #                                          machine_id, cmd_output[4])
+        #     ret['updated_keys'] = updated_keys
+              
+    ret.update(parse_ping(ping_out))
+    
+    return ret
+
+
+# def update_available_keys(user, backend_id, machine_id, authorized_keys):
+#     keypairs = user.keypairs
+# 
+#     # track which keypairs will be updated
+#     updated_keypairs = {}
+#     # get the actual public keys from the blob
+#     ak = [k for k in authorized_keys.split('\n') if k.startswith('ssh')]
+# 
+#     # for each public key
+#     for pk in ak:
+#         exists = False
+#         pub_key = pk.strip().split(' ')
+#         for k in keypairs:
+#             # check if the public key already exists in our keypairs
+#             if keypairs[k].public.strip().split(' ')[:2] == pub_key[:2]:
+#                 exists = True
+#                 associated = False
+#                 # check if it is already associated with this machine
+#                 for machine in keypairs[k].machines:
+#                     if machine[:2] == [backend_id, machine_id]:
+#                         associated = True
+#                         break
+#                 if not associated:
+#                     with user.lock_n_load():
+#                         keypairs[k].machines.append([backend_id, machine_id])
+#                         user.save()
+#                     updated_keypairs[k] = keypairs[k]
+#             if exists:
+#                 break
+# 
+#     if updated_keypairs:
+#         log.debug('update keypairs')
+# 
+#     ret = [{'name': key,
+#             'machines': keypairs[key].machines,
+#             'pub': keypairs[key].public,
+#             'default_key': keypairs[key].default
+#             } for key in updated_keypairs]
+# 
+#     return ret

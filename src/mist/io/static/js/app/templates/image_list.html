@@ -1,45 +1,53 @@
-    <div data-role="header">
+<div id="image-list-page" data-role="page" class="ui-page-active" data-theme="c">
 
-        <a href="#"
-        data-icon="home"
-        data-direction="reverse"
-        class="ui-btn-left">Home</a>
+    <div data-role="header" data-theme="b">
+
+        <a href="#" class="responsive-button" data-icon="home">Home</a>
 
         <h1>Images</h1>
-        {{view Mist.UserMenuView}}
+
+        {{view Mist.userMenuView}}
+
     </div>
 
-    <div data-role="content" id="images">
+    <div data-role="content" data-theme="c">
 
-        {{view Mist.MachineAddView}}
+        {{#if Mist.backendsController.loadingImages}}
+            <div class="ajax-loader"></div>
+        {{/if}}
 
-
-        {{! view Mist.Select
-            data-native-menu="false"
-            name="select-images"
-            id="mist-select-images"
-            contentBinding="Mist.selectImagesController.content"
-            selectionBinding="Mist.selectImagesController.selection"
-            optionLabelPath="content.name"
-            optionValuePath="content.id"
-            prompt="Show Images"
-        }}
-
-        <ul id="images-list"
-        data-role="listview"
-        data-filter="true"
-        data-inset="true"
-        data-theme="c"
-        data-filter-placeholder="Filter images...">
+        <ul id="image-list" 
+            data-role="listview" 
+            data-filter="true" 
+            data-inset="true" 
+            data-filter-placeholder="Filter images..."
+            class="checkbox-list">
             {{#each view.renderedImages}}
-                {{view Mist.ImageListItemView imageBinding="this" class="node" }}
-            {{/each}}            
+                {{view Mist.imageListItemView imageBinding="this" class="checkbox-link" }}
+            {{/each}}
         </ul>
-        <div class="ajax-loader"></div>        
-        <a id="images-advanced-search" 
-           data-role="button" 
-           data-theme="b"
-           {{action advancedSearchClicked target="view"}}><span>Continue search on server...</span></a>
-        <div class="bottom-padding"></div>
+
+        {{#if view.gettingImages}}
+        <div class="ajax-loader"></div>
+        {{/if}}
+        {{#if view.searchingImages}}
+        <div class="ajax-loader"></div>
+        {{/if}}
+
+        <button id="images-advanced-search" data-theme="b" {{action "searchClicked" target="view"}}>
+            <span>
+                {{#if view.searchingImages}}
+                    Please wait...
+                {{else}}
+                    Continue search on server...
+                {{/if}}
+            </span>
+        </button>
+
+        <div class="small-padding"></div>
 
     </div>
+    
+    {{view Mist.machineAddView}}
+
+</div>

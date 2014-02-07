@@ -1,6 +1,6 @@
 define('app/models/image', ['ember'],
     /**
-     * Image model
+     * Image Model
      *
      * @returns Class
      */
@@ -28,19 +28,24 @@ define('app/models/image', ['ember'],
                     debian: "Debian",
                     amazon: "Amazon"
             },
+
             id: null,
+            star: null,
             name: null,
             extra: null,
-            star: null,
 
             type: function(){
-                    for(type in this.TYPES){
-                        if(this.name != null && this.name.toLowerCase().search(type) != -1){
-                            return type;
-                        }
+                for(type in this.TYPES){
+                    if(this.name != null && this.name.toLowerCase().search(type) != -1){
+                        return type;
                     }
-                    return "generic";
-            }.property("id")
+                }
+                return "generic";
+            }.property("id"),
+
+            toggle: function(callback) {
+                this.backend.toggleImageStar(this, callback);
+            }
         });
     }
 );

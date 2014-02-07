@@ -70,14 +70,16 @@ def home(request):
     user = user_from_request(request)
     return {
         'project': 'mist.io',
-        'email': user.email,
-        'supported_providers': config.SUPPORTED_PROVIDERS,
-        'core_uri': config.CORE_URI,
-        'auth': request.registry.settings.get('auth') and 1 or 0,
+        'email': json.dumps(user.email),
+        'supported_providers': json.dumps(config.SUPPORTED_PROVIDERS),
+        'core_uri': json.dumps(config.CORE_URI),
+        'auth': json.dumps(bool(user.mist_api_token)),
         'js_build': config.JS_BUILD,
-        'js_log_level': config.JS_LOG_LEVEL,
+        'css_build': config.CSS_BUILD,
+        'js_log_level': json.dumps(config.JS_LOG_LEVEL),
         'google_analytics_id': config.GOOGLE_ANALYTICS_ID,
-        'is_core': 0
+        'is_core': json.dumps(False),
+        'csrf_token': json.dumps(""),
     }
 
 
@@ -98,7 +100,6 @@ def check_auth(request):
             user.email = email
             user.mist_api_token = ret_dict.pop('mist_api_token', '')
             user.save()
-        request.registry.settings['auth'] = 1
         log.info("succesfully check_authed")
         return ret_dict
     else:
@@ -158,7 +159,7 @@ def list_backends(request):
                     'title': backend.title or backend.provider,
                     'provider': backend.provider,
                     'poll_interval': backend.poll_interval,
-                    'state': 'wait',
+                    'state': 'wait' if backend.enabled else 'offline',
                     # for Provider.RACKSPACE_FIRST_GEN
                     'region': backend.region,
                     # for Provider.RACKSPACE (the new Nova provider)
@@ -179,7 +180,7 @@ def add_backend(request):
     apiurl = params.get('apiurl') or ''  # fixes weird issue with none value
     tenant_name = params.get('tenant_name', '')
     # following params are for baremetal
-    machine_hostname = params.get('machine_ip_address', '')
+    machine_hostname = params.get('machine_ip', '')
     machine_key = params.get('machine_key', '')
     machine_user = params.get('machine_user', '')
     region = params.get('region', '')
@@ -239,26 +240,18 @@ def rename_backend(request):
 @view_config(route_name='backend_action', request_method='POST')
 def toggle_backend(request):
     backend_id = request.matchdict['backend']
-    new_state = request.json_body.get('newState', '')
+    new_state = request.json_body.get('new_state', '')
     if not new_state:
         raise RequiredParameterMissingError('new_state')
 
-    # FIXME
-    if new_state == "True":
-        new_state = True
-    elif new_state == "False":
-        new_state = False
-    else:
-        ## raise BadRequestError('Invalid backend state')
-        log.warning("something funcky going on with state toggling, "
-                    "what's '%r' supposed to mean?", new_state)
-        new_state = True
+    if new_state != "1" and new_state != "0":
+        raise BadRequestError('Invalid backend state')
 
     user = user_from_request(request)
     if backend_id not in user.backends:
         raise BackendNotFoundError()
     with user.lock_n_load():
-        user.backends[backend_id].enabled = new_state
+        user.backends[backend_id].enabled = bool(int(new_state))
         user.save()
 
     return OK
@@ -273,17 +266,16 @@ def list_keys(request):
 
     """
     user = user_from_request(request)
-    return [{'id': key.replace(' ', ''),
-             'name': key,
+    return [{'id': key,
              'machines': user.keypairs[key].machines,
-             'default_key': user.keypairs[key].default}
+             'isDefault': user.keypairs[key].default}
             for key in user.keypairs]
 
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
 def add_key(request):
     params = request.json_body
-    key_id = params.get('name', '')
+    key_id = params.get('id', '')
     private_key = params.get('priv', '')
 
     user = user_from_request(request)
@@ -292,9 +284,8 @@ def add_key(request):
     keypair = user.keypairs[key_id]
 
     return {'id': key_id,
-            'name': key_id,
             'machines': keypair.machines,
-            'default': keypair.default}
+            'isDefault': keypair.default}
 
 
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
@@ -319,17 +310,17 @@ def delete_key(request):
     return list_keys(request)
 
 
-@view_config(route_name='key_action', request_method='PUT')
+@view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
 
     old_id = request.matchdict['key']
-    key_id = request.json_body.get('newName')
-    if not key_id:
-        raise RequiredParameterMissingError("new key name")
+    new_id = request.json_body.get('new_id')
+    if not new_id:
+        raise RequiredParameterMissingError("new_id")
 
     user = user_from_request(request)
-    methods.edit_key(user, key_id, old_id)
-    return OK
+    methods.edit_key(user, new_id, old_id)
+    return {'new_id': new_id}
 
 
 @view_config(route_name='key_action', request_method='POST')
@@ -341,8 +332,7 @@ def set_default_key(request):
     return OK
 
 
-@view_config(route_name='key_action', request_method='GET',
-             request_param='action=private', renderer='json')
+@view_config(route_name='key_private', request_method='GET', renderer='json')
 def get_private_key(request):
     """Gets private key from keypair name.
 
@@ -360,8 +350,7 @@ def get_private_key(request):
     return user.keypairs[key_id].private
 
 
-@view_config(route_name='key_action', request_method='GET',
-             request_param='action=public', renderer='json')
+@view_config(route_name='key_public', request_method='GET', renderer='json')
 def get_public_key(request):
     user = user_from_request(request)
     key_id = request.matchdict['key']
@@ -453,7 +442,8 @@ def machine_actions(request):
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     user = user_from_request(request)
-    action = request.params.get('action')
+    params = request.json_body
+    action = params.get('action', '')
     if action in ('start', 'stop', 'reboot', 'destroy'):
         if action == 'start':
             methods.start_machine(user, backend_id, machine_id)
@@ -560,81 +550,25 @@ def list_locations(request):
 
 @view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
-    """Probes a machine over ssh, using fabric.
+    """Probes a machine using ping and ssh to collect metrics.
 
     .. note:: Used for getting uptime and a list of deployed keys.
 
     """
     machine_id = request.matchdict['machine']
     backend_id = request.matchdict['backend']
-    host = request.params.get('host', None)
-    key = request.params.get('key', None)
+    host = request.json_body.get('host', None)
+    key_id = request.json_body.get('key', None)
     # FIXME: simply don't pass a key parameter
-    if key == 'undefined':
-        key = None
+    if key_id == 'undefined':
+        key_id = None
 
-    ssh_user = request.params.get('ssh_user', None)
-    command = "sudo -n uptime 2>&1|grep load|wc -l && echo -------- && \
-cat /proc/uptime && echo -------- && cat ~/`grep '^AuthorizedKeysFile' \
-/etc/ssh/sshd_config /etc/sshd_config 2> /dev/null |awk '{print $2}'` \
-2> /dev/null || cat ~/.ssh/authorized_keys 2> /dev/null"
-
-    log.warn('probing with key %s' % key)
-
+    ssh_user = request.params.get('ssh_user', '')
+    # FIXME: simply don't pass a key parameter
+    if key_id == 'undefined':
+        key_id = ''
     user = user_from_request(request)
-    cmd_output = methods.ssh_command(user, backend_id, machine_id,
-                                     host, command, key_id=key)
-
-    if cmd_output:
-        cmd_output = cmd_output.split('--------')
-        if len(cmd_output) > 2:
-            updated_keys = update_available_keys(user, backend_id,
-                                                 machine_id, cmd_output[2])
-            return {'uptime': cmd_output[1],
-                    'updated_keys': updated_keys}
-        else:
-            return {'uptime': cmd_output[1]}
-
-
-def update_available_keys(user, backend_id, machine_id, authorized_keys):
-    keypairs = user.keypairs
-
-    # track which keypairs will be updated
-    updated_keypairs = {}
-    # get the actual public keys from the blob
-    ak = [k for k in authorized_keys.split('\n') if k.startswith('ssh')]
-
-    # for each public key
-    for pk in ak:
-        exists = False
-        pub_key = pk.strip().split(' ')
-        for k in keypairs:
-            # check if the public key already exists in our keypairs
-            if keypairs[k].public.strip().split(' ')[:2] == pub_key[:2]:
-                exists = True
-                associated = False
-                # check if it is already associated with this machine
-                for machine in keypairs[k].machines:
-                    if machine[:2] == [backend_id, machine_id]:
-                        associated = True
-                        break
-                if not associated:
-                    with user.lock_n_load():
-                        keypairs[k].machines.append([backend_id, machine_id])
-                        user.save()
-                    updated_keypairs[k] = keypairs[k]
-            if exists:
-                break
-
-    if updated_keypairs:
-        log.debug('update keypairs')
-
-    ret = [{'name': key,
-            'machines': keypairs[key].machines,
-            'pub': keypairs[key].public,
-            'default_key': keypairs[key].default
-            } for key in updated_keypairs]
-
+    ret = methods.probe(user, backend_id, machine_id, host, key_id, ssh_user)
     return ret
 
 
@@ -665,7 +599,7 @@ def update_monitoring(request):
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-    if request.registry.settings.get('auth') != 1:
+    if not user.mist_api_token:
         log.info("trying to authenticate to service first")
         email = request.json_body.get('email')
         password = request.json_body.get('password')
@@ -679,7 +613,6 @@ def update_monitoring(request):
                 user.email = email
                 user.mist_api_token = ret_dict.pop('mist_api_token', '')
                 user.save()
-            request.registry.settings['auth'] = 1
             log.info("succesfully check_authed")
         else:
             raise UnauthorizedError("You need to authenticate to mist.io.")
@@ -816,44 +749,50 @@ def shell_stream(request):
         js which it streams in a hidden iframe.
 
         """
-        # send some blank data to get webkit browsers
-        # to display what's sent
-        yield 1024*'\0'  # really necessary?
+        # send some blank data to fill the initial buffer and get (webkit)
+        # browsers to display right away what's sent
+        #yield 1024*'\0'
         # start the html response
         yield "<html><body>\n"
-        js = "<script type='text/javascript'>"
-        js += "parent.appendShell('%s');</script>\n"
+        js = "<script type='text/javascript'>parent.appendShell('%s', '%s');</script>\n"
         for line in lines:
             # get commands output, line by line
             clear_line = line.replace('\'', '\\\'')
             clear_line = clear_line.replace('\n', '<br/>')
             clear_line = clear_line.replace('\r', '')
             #.replace('<','&lt;').replace('>', '&gt;')
-            yield js % clear_line
+            ret = js % (clear_line, cmd_id)
+            yield ret
         js = "<script type='text/javascript'>"
-        js += "parent.completeShell(%s);</script>\n"
-        yield js % 1  # FIXME
+        js += "parent.completeShell(%s, '%s');</script>\n"
+        yield js % (1, cmd_id)  # FIXME
         yield "</body></html>\n"
 
     log.info("got shell_stream request")
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     cmd = request.params.get('command')
+    cmd_id = request.params.get('command_id').encode('utf-8', 'ignore')
     host = request.params.get('host')
-    if not cmd:
-        raise RequiredParameterMissingError("command")
-    if not host:
-        raise RequiredParameterMissingError("host")
+    try:
+        if not cmd:
+            raise RequiredParameterMissingError("command")
+        if not host:
+            raise RequiredParameterMissingError("host")
 
-    user = user_from_request(request)
-    shell = Shell(host)
-    shell.autoconfigure(user, backend_id, machine_id)
-    # stdout_lines is a generator that spits out lines of combined
-    # stdout and stderr output. cmd is executed via the shell on the background
-    # and the stdout_lines generator is immediately available. stdout_lines
-    # will block if no line is in the buffer and will stop iterating once the
-    # command is completed and the pipe is closed.
-    stdout_lines = shell.command_stream(cmd)
+        user = user_from_request(request)
+        shell = Shell(host)
+        shell.autoconfigure(user, backend_id, machine_id)
+        # stdout_lines is a generator that spits out lines of combined
+        # stdout and stderr output. cmd is executed via the shell on the background
+        # and the stdout_lines generator is immediately available. stdout_lines
+        # will block if no line is in the buffer and will stop iterating once the
+        # command is completed and the pipe is closed.
+        stdout_lines = shell.command_stream(cmd)
+    except Exception as e:
+        message = ["Failed to execute command\n", "Error: %s \n" % e]
+        return Response(status=500, app_iter=parse(message))
+
     return Response(status=200, app_iter=parse(stdout_lines))
 
 

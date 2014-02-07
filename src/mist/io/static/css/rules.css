@@ -1,0 +1,140 @@
+
+/* Rules CSS
+-----------------------------------------------------------------------------------------------------------*/
+
+.rules-container {
+    padding: 0;
+    margin: 0 !important;
+    background: #e8e8e9;
+    border-bottom: 1px solid #ccc;
+}
+
+.rule-box, .key-box {
+    overflow: hidden;
+    padding: 6px 10px;
+    border-top: 1px solid #ccc;
+}
+
+.rule-box {
+    height: 60px;
+}
+
+.rule-unit {
+    float: left;
+    position: relative;
+    top: 21px;
+    left: 73px;
+    font-size: 14px;
+    font-weight: bold;
+    width: 0px;
+}
+
+.rule-if, .rule-then {
+    font-size: 20px;
+    font-weight: bold;
+    padding: 6px;
+    float: left;
+    margin-top: 12px;
+    height:40px;
+}
+
+.rule-then {
+    margin-left: 30px;
+}
+
+.rule-if, .rule-then, .rule-value {
+    float: left;
+    height: 24px;
+}
+
+.rule-box .ui-slider {
+    float: left;
+    margin: 16px 16px 16px 8px;
+    width: auto;
+}
+
+.rule-box .ui-slider.open {
+    width: 40%;
+}
+
+.rule-box div.ui-slider-track {
+    width: 80%;
+    position: relative;
+    top: 4px;
+    left: 17px;
+}
+
+.rule-box .rule-button {
+    float: left;
+}
+
+.rule-box .ajax-loader  {
+    float: right;
+    margin-top: 22px;
+    margin-right: 18px;
+}
+
+.delete-rule-container {
+    float: right;
+    margin: 9px;
+}
+
+.delete-rule-container div.ui-btn span.ui-btn-inner {
+    padding-left: 9px;
+}
+
+
+@media only screen and (max-width: 535px) {
+
+
+    .rule-box div {
+        font-size: 15px;
+    }
+
+    .rule-box .ui-btn {
+        top: 7px;
+        font-size: 12px;
+    }
+
+    .rule-box div.ui-slider-track {
+        top: 4px;
+    }
+
+    .rule-unit {
+        top: 21px;
+    }
+}
+
+@media only screen and (max-width: 470px) {
+
+
+    .rule-box {
+        height: 92px;
+    }
+
+    .rule-box .rule-then {
+        clear: left;
+        margin-left: 0;
+        margin-top: -5px;
+    }
+
+    .rule-box .action {
+        margin-top: -16px;
+    }
+
+    .rule-box .delete-rule-button, .rule-box .ajax-loader {
+        margin-top: -15px;
+    }
+
+    .rule-box .ui-slider-track {
+        margin-left: -27px;
+        margin-top: 43px;
+        clear: left;
+    }
+
+    .rule-box .ajax-loader {
+        margin-right: 12px;
+        margin-top: 5px;
+    }
+}
+

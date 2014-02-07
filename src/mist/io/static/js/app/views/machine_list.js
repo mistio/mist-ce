@@ -1,155 +1,125 @@
-define('app/views/machine_list', [
-    'app/views/mistscreen',
-    'text!app/templates/machine_list.html',
-    'ember'
-    ],
-/**
- *
- * Machine page
- *
- * @returns Class
- */
-function(MistScreen, machine_list_html) {
-    return MistScreen.extend({
-        tagName:false,
+define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/machine_list.html'],
+    /**
+     * Machine List View
+     *
+     * @returns Class
+     */
+    function (MistScreen, machine_list_html) {
+        return MistScreen.extend({
 
-        template: Ember.Handlebars.compile(machine_list_html),
+            /**
+             *  Properties
+             */
 
-        disabledShellClass : function() {
-            var machines = new Array();
+            template: Ember.Handlebars.compile(machine_list_html),
 
-            if (Mist.backendsController.selectedMachineCount > 1) {
-                return 'ui-disabled';
-            }
 
-            Mist.backendsController.forEach(function(backend) {
-                backend.machines.forEach(function(machine) {
-                    if (machine.selected && machine.probed && machine.state == 'running') {
-                        machines.push(machine);
-                    }
-                });
-            });
+            /**
+             *
+             *  Initialization
+             *
+             */
 
-            if (machines.length == 1) {
-                return '';
-            } else {
-                return 'ui-disabled';
-            }
-        }.property('Mist.backendsController.selectedMachineCount'),
+            load: function () {
 
-        disabledTagClass : function() {
-            var machines = new Array();
+                // Add event listeners
+                Mist.backendsController.on('onMachineProbe', this, 'updateFooter');
+                Mist.backendsController.on('onSelectedMachinesChange', this, 'updateFooter');
 
-            if (Mist.backendsController.selectedMachineCount > 1) {
-                return 'ui-disabled';
-            }
+            }.on('didInsertElement'),
 
-            Mist.backendsController.forEach(function(backend) {
-                backend.machines.forEach(function(machine) {
-                    if (machine.selected && machine.can_tag) {
-                        machines.push(machine);
-                    }
-                });
-            });
 
-            if (machines.length == 1) {
-                return '';
-            } else {
-                return 'ui-disabled';
-            }
-        }.property('Mist.backendsController.selectedMachineCount'),
+            unload: function () {
 
-        disabledPowerClass : function() {
-            var machines = new Array();
+                // Remove event listeners
+                Mist.backendsController.off('onMachineProbe', this, 'updateFooter');
+                Mist.backendsController.off('onSelectedMachinesChange', this, 'updateFooter');
 
-            Mist.backendsController.forEach(function(backend) {
-                backend.machines.forEach(function(machine) {
-                    if (machine.selected && machine.state === 'terminated') {
-                        machines.push(machine);
-                    }
-                });
-            });
+            }.on('willDestroyElement'),
 
-            if (machines.length >= 1) {
-                // even if one machine is in the above states, no action is allowed
-                return 'ui-disabled';
-            } else {
-                return '';
-            }
-        }.property('Mist.backendsController.selectedMachineCount'),
 
-        openTags: function(){
-            $("#dialog-tags").popup('option', 'positionTo', '#machines-button-tags').popup('open', {transition: 'slideup'});
-        },
+            /**
+             *
+             *  Methods
+             *
+             */
 
-        openShell: function(){
-            $("#dialog-shell").popup('option', 'positionTo', '#machines-button-shell')
-                              .popup('open', {transition: 'slideup'});
-            $("#dialog-shell").on('popupafterclose', 
-                    function(){
-                        $(window).off('resize');
-                    }
-            );
-            
-            Ember.run.next(function(){
-                $(window).on('resize', function(){
-                    $('#dialog-shell-popup').css({'left':'5%','width':'90%'});
-                    $('.shell-return').css({'height': (0.6*$(window).height()) + 'px'});
-                    $('.shell-input input').focus();
-                    return false;
-                });
-                $(window).trigger('resize');     
-            });             
-        },
+            updateFooter: function () {
+                switch (Mist.backendsController.selectedMachines.length) {
+                case 0:
+                    $('#machine-list-page .ui-footer').slideUp();
+                    break;
+                case 1:
+                    var machine = Mist.backendsController.selectedMachines[0];
+                    
+                    $('#machine-list-page .ui-footer').slideDown();
 
-        openActions: function(){
-            $("#dialog-power").popup('option', 'positionTo', '#machines-button-power').popup('open', {transition: 'slideup'});
-        },
-
-        selectMachines: function(event) {
-            var selection = $(event.target).attr('title');
-
-            if(selection == 'none'){
-                Mist.backendsController.forEach(function(backend){
-                    backend.machines.forEach(function(machine){
-                        log('deselecting machine: ' + machine.name);
-                        machine.set('selected', false);
-                    });
-                });
-            } else if(selection == 'all'){
-                Mist.backendsController.forEach(function(backend){
-                    backend.machines.forEach(function(machine){
-                        log('selecting machine: ' + machine.name);
-                        machine.set('selected', true);
-                    });
-                });
-            } else {
-                Mist.backendsController.forEach(function(backend){
-                    if(backend.provider == selection){
-                        backend.machines.forEach(function(machine){
-                            log('selecting machine: ' + machine.name);
-                            machine.set('selected', true);
-                        });
+                    if (machine.can_tag) {
+                        $('#machine-list-page #machines-tags-btn').removeClass('ui-state-disabled');
                     } else {
-                        backend.machines.forEach(function(machine){
-                            log('deselecting machine: ' + machine.name);
-                            machine.set('selected', false);
-                        });
+                        $('#machine-list-page #machines-tags-btn').addClass('ui-state-disabled');
                     }
-                });
-            }
-            Ember.run.next(function(){
-                $("input[type='checkbox']").checkboxradio("refresh");
-            });
-            $("#select-machines-listmenu li a").off('click', this.selectMachines);
-            $('#select-machines-popup').popup('close');
-            return false;
-        },
 
-        openMachineSelectPopup: function() {
-            $('#select-machines-listmenu').listview('refresh');
-            $('#select-machines-popup').popup('option', 'positionTo', '.select-machines').popup('open', {transition: 'pop'});
-            $("#select-machines-listmenu li a").on('click', this.selectMachines);
-        }
-    });
-});
+                    if (machine.probed && machine.state == 'running') {
+                        $('#machine-list-page #machines-shell-btn').removeClass('ui-state-disabled');
+                    } else {
+                        $('#machine-list-page #machines-shell-btn').addClass('ui-state-disabled');
+                    }
+                    break;
+                default:
+                    $('#machine-list-page .ui-footer').slideDown();
+                    $('#machine-list-page #machines-tags-btn').addClass('ui-state-disabled');
+                    $('#machine-list-page #machines-shell-btn').addClass('ui-state-disabled');
+                    break;
+                }
+            },
+
+
+            /**
+             *
+             *  Actions
+             *
+             */
+
+            actions: {
+
+
+                createClicked: function () {
+                    Mist.machineAddController.open();
+                },
+
+
+                tagsClicked: function () {
+                    Mist.machineTagsController.open(Mist.backendsController.selectedMachines[0]);
+                },
+
+
+                powerClicked: function () {
+                    Mist.machinePowerController.open(Mist.backendsController.selectedMachines);
+                },
+
+
+                shellClicked: function () {
+                    Mist.machineShellController.open(Mist.backendsController.selectedMachines[0]);
+                },
+
+
+                selectClicked: function () {
+                    $('#select-machines-popup').popup('open').find('.ui-listview').listview('refresh');
+                },
+
+
+                selectionModeClicked: function (mode) {
+
+                    $('#select-machines-popup').popup('close');
+
+                    Mist.backendsController.content.forEach(function (backend) {
+                        backend.machines.content.forEach(function (machine) {
+                            machine.set('selected', mode == 'all' || mode == backend.title);
+                        });
+                    });
+                }
+            }
+        });
+    }
+);

@@ -1,49 +1,43 @@
-<button
-    id="me-btn"
-    class="ui-btn-right"
-    data-role="button"
-    data-icon="check"
-    data-iconpos="right"
-    {{bindAttr class="Mist.backendsController.state :state-providers"}}
-    {{action click target="view"}}>me</button>
+<a id="me-btn"
+   class="ui-btn-right"
+   data-role="button"
+   {{action "meClicked" target="view"}}>
+    {{#if view.gravatarURL}}
+        <img class="gravatar-image" {{bind-attr src="view.gravatarURL"}}/>
+    {{else}}
+        <img class="gravatar-image" src="resources/images/user.png" />
 
-<div id="user-dialog" class="mist-dialog" data-role="popup" data-transition="pop" data-position-to="#me-btn">
-    <div data-role="content" data-theme="b">
-        {{#if view.email}}
-        <img class="gravatar-image" {{bindAttr src="view.gravatarURL"}}/>
-        <div class="userEmail">{{view.email}}</div>
-        
-        <div id="user-dialog-buttons">
-            <div class="account-placeholder">
-                <a {{bindAttr href="view.account_url"}}
-                    class="account-button"
-                    data-role="button"
-                    data-mini="true"
-                    data-theme="a"
-                    data-ajax="false">My account</a>
-            </div>
+    {{/if}}
+    &nbsp;</a>
+
+<div id="user-menu-popup" data-role="popup" data-position-to="#me-btn" data-theme="b" data-overlay-theme="b" data-transition="flip">
+
+    <div data-role="content">
+
+        <div>{{EMAIL}}</div>
+
+        <a href="https://mistio.zendesk.com/access/login"
+           target="_blank"
+           data-role="button"
+           data-mini="true">Support</a>
+
+        {{#if Mist.authenticated}}
+
+            <a data-role="button" data-mini="true"
+               {{bind-attr href="view.accountUrl"}}
+               {{bind-attr target="view.isNotCore"}}>Account</a>
+
+            {{#if Mist.isCore}}
+                <button data-mini="true" {{action "logoutClicked" target="view"}}>Logout</a>
             {{/if}}
-    
-            <div class="support-placeholder">
-                <a href="https://mistio.zendesk.com/access/login"
-                    class="support-button"
-                    data-role="button"
-                    target="_blank"
-                    data-mini="true"
-                    data-theme="a"
-                    data-ajax="false">Support</a>
-            </div>
-    
-            {{#if view.logout}}
-            <div class="logout-placeholder">
-                <a href="logout"
-                    class="logout-button"
-                    data-role="button"
-                    data-mini="true"
-                    data-theme="a"
-                    data-ajax="false">Logout</a>
-            </div>
-            {{/if}}
-        </div>
+        {{else}}
+            {{#unless Mist.isCore}}
+                <button data-mini="true" {{action "loginClicked" target="view"}}>Login</a>
+            {{/unless}}
+        {{/if}}
+
     </div>
+
 </div>
+
+{{view Mist.loginView}}

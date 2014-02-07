@@ -1,0 +1,115 @@
+
+/* Machine List Page CSS
+-----------------------------------------------------------------------------------------------------------*/
+#machine-list-page .ui-filterable {
+    clear: both;
+}
+#machine-list-page #create-machine-btn {
+    float: right;
+}
+#machine-list-page #select-machines-btn {
+    float: left;
+    font-weight: normal;
+}
+.running {
+    color: #13B754;
+}
+.pending {
+    color: #E09400;
+}
+.rebooting {
+    color: #4E68BB;
+}
+.terminated {
+    color: #AAAAAA;
+}
+.stopped {
+    color: #777777;
+}
+.machine-name {
+    width: 40% !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 16px;
+}
+
+/* Conditional for < 550px */
+@media only screen and  (max-width: 550px) {
+
+    .machine-state span {
+        float: left;
+    }
+
+    .machine-state {
+        position: absolute;
+        left: 0px;
+        top: 35px;
+        font-size: 0.9em;
+        margin-left: 0 !important;
+    }
+
+    .machine-name {
+        position: relative;
+        bottom: 6px;
+        font-size: 0.9em;
+    }
+
+    .machine-tags {
+        right: 96px !important;
+        top: 20px !important;
+        max-width: 49% !important;
+    }
+
+    .machine-tags .tag {
+        font-size: 10px !important;
+        margin-bottom: 3px !important;
+    }
+}
+
+@media only screen and  (max-width: 430px) {
+
+    .machine-leds {
+        position: relative;
+        bottom: 26px !important;
+    }
+
+    .machine-tags {
+        right: 38px !important;
+        top: 33px !important;
+    }
+
+    .machine-name {
+        width: 80% !important;
+    }
+}
+
+
+.machine-state {
+    width: 21.6% !important;
+    text-align: center;
+    margin-left: -18px;
+    font-weight: normal;
+}
+
+.machine-state .ajax-loader {
+    display: inline-block;
+    position: relative;
+    left: 5px;
+    top: 4px;
+}
+.machine-leds {
+    width: 120px !important;
+    float: right;
+    margin-right: 5px;
+}
+.machine-tags {
+    float: right;
+    position: absolute;
+    right: 116px;
+    width: auto !important;
+    top: 19px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 29%;
+    height: 21px;
+}
