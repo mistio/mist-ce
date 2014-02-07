@@ -12,6 +12,7 @@ define('app/views/rule', ['text!app/templates/rule.html', 'ember'],
             didInsertElement: function() {
                 Ember.run.next(this, function() {
                     this.metricObserver();
+                    $('#'+this.elementId).find('.ui-slider-track').hide();
                 });
             },
 

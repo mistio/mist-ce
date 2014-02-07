@@ -16,14 +16,14 @@
 }
 
 .rule-box {
-    max-height: 60px;
+    height: 60px;
 }
 
 .rule-unit {
     float: left;
     position: relative;
     top: 21px;
-    left: 52px;
+    left: 73px;
     font-size: 14px;
     font-weight: bold;
     width: 0px;
@@ -39,7 +39,7 @@
 }
 
 .rule-then {
-    margin-left: 25px;
+    margin-left: 30px;
 }
 
 .rule-if, .rule-then, .rule-value {
@@ -59,6 +59,9 @@
 
 .rule-box div.ui-slider-track {
     width: 80%;
+    position: relative;
+    top: 4px;
+    left: 17px;
 }
 
 .rule-box .rule-button {
@@ -81,4 +84,57 @@
 }
 
 
+@media only screen and (max-width: 535px) {
+
+
+    .rule-box div {
+        font-size: 15px;
+    }
+
+    .rule-box .ui-btn {
+        top: 7px;
+        font-size: 12px;
+    }
+
+    .rule-box div.ui-slider-track {
+        top: 4px;
+    }
+
+    .rule-unit {
+        top: 21px;
+    }
+}
+
+@media only screen and (max-width: 470px) {
+
+
+    .rule-box {
+        height: 92px;
+    }
+
+    .rule-box .rule-then {
+        clear: left;
+        margin-left: 0;
+        margin-top: -5px;
+    }
+
+    .rule-box .action {
+        margin-top: -16px;
+    }
+
+    .rule-box .delete-rule-button, .rule-box .ajax-loader {
+        margin-top: -15px;
+    }
+
+    .rule-box .ui-slider-track {
+        margin-left: -27px;
+        margin-top: 43px;
+        clear: left;
+    }
+
+    .rule-box .ajax-loader {
+        margin-right: 12px;
+        margin-top: 5px;
+    }
+}
 

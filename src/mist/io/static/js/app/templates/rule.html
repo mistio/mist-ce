@@ -4,7 +4,6 @@
     <a href="#"
         class="rule-button metric"
         data-role="button"
-        data-icon="arrow-d"
         data-iconpos="right"
         data-inline="true"
         {{action "openMetricPopup" target="view"}}>{{metric}}</a>
@@ -32,7 +31,7 @@
         data-role="button"
         data-icon="false"
         data-inline="true"
-        {{action openActionPopup target="view"}}>{{actionToTake}}</a>
+        {{action "openActionPopup" target="view"}}>{{actionToTake}}</a>
 
     {{#if pendingAction}}
     <div class="ajax-loader"></div>
