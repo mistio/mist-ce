@@ -549,8 +549,22 @@ define('app/controllers/monitoring', [
                                 // Create a date with first measurement time
                                 var metricTime = new Date(start*1000 + step);
 
+                                // Get min Data Length (Quick Fix)
+                                var lengths = [
+                                    data['load'].length,
+                                    data['cpu']['utilization'].length,
+                                    data['memory'].length,
+                                    data['disk']['read'][disks[0]]['disk_octets'].length,
+                                    data['disk']['write'][disks[0]]['disk_octets'].length,
+                                    data['network'][netInterfaces[0]]['tx'].length,
+                                    data['network'][netInterfaces[0]]['rx'].length
+                                ];
+
+
+                                var dataLength = Math.min.apply(null, lengths);
+
                                 // Create Custom Objects From Data
-                                for(var i=0; i < data.load.length; i++ )
+                                for(var i=0; i < dataLength; i++ )
                                 {
 
                                     var cpuObj = {
