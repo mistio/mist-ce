@@ -158,7 +158,7 @@ define('app/models/machine', ['ember'],
                 }
             },
 
-            probe: function(keyId) {
+            probe: function(keyId, callback) {
 
                 if (!this.backend.enabled) return;
                 if (this.state != 'running') return;
@@ -166,23 +166,35 @@ define('app/models/machine', ['ember'],
                 // If there are many pending requests, reschedule for a bit later
                 if ($.active > 4) {
                     Ember.run.later(this, function() {
-                        this.probe(keyId);
+                        this.probe(keyId, callback);
                     }, 1000);
                     return;
                 }
 
                 var that = this;
                 Mist.backendsController.probeMachine(that, keyId, function(success) {
-                    if (success) { // Reprobe in 100 seconds on success
-                        Ember.run.later(function() {
-                            that.probe(keyId);
-                        }, 100000);
-                    } else {  // Reprobe with double interval on failure
-                        Ember.run.later(function() {
-                            that.probe(keyId);
-                            that.set('probeInterval', that.probeInterval * 2);
-                        }, that.probeInterval);
+                    
+
+                    // If the function was not called by the scheduled probing
+                    // procedure, then only call the callback function
+                    if (callback) {
+
+                        callback(success);
+
+                    } else {
+
+                        if (success) { // Reprobe in 100 seconds on success
+                            Ember.run.later(function() {
+                                that.probe(keyId);
+                            }, 100000);
+                        } else {  // Reprobe with double interval on failure
+                            Ember.run.later(function() {
+                                that.probe(keyId);
+                                that.set('probeInterval', that.probeInterval * 2);
+                            }, that.probeInterval);
+                        }
                     }
+
                 });
             },
 

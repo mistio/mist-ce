@@ -50,14 +50,16 @@
               
         -->
         
-        {{#if probing}}
-            {{#unless probed}}
+        <!--
+        {{!#if probing}}
+            {{!#unless probed}}
                 <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
                     <span class="ui-icon ui-icon-loading"></span>
                     <h1>Probing</h1>
                 </div>
-            {{/unless}}
-        {{/if}}
+            {{!/unless}}
+        {{!/if}}
+        -->
 
         {{#if enablingMonitoring}}
         <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
@@ -153,7 +155,17 @@
             <table class="info-table">
                 <tr>
                     <td>Last probed</td>
-                    <td>{{view.lastProbe}}</td>
+                    <td> {{#if probing}}
+                             probing... <div class="ajax-loader"></div>
+                         {{else}}
+                             {{view.lastProbe}}
+                         {{/if}}
+
+                         <button id="machine-probe-btn"
+                                data-theme="d"
+                                data-mini="true"
+                                {{action "probeClicked" target="view"}}>Probe</button>
+                    </td>
                 </tr>
                 </tr>
                 {{#if probed}}

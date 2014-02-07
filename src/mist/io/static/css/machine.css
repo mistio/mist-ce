@@ -56,6 +56,23 @@
     width: 100px;
 }
 
+#single-machine-page #machine-probe-btn {
+    float: right;
+    width: auto;
+    font-size: 12px;
+    padding: 6px;
+    margin: ;;
+    margin-top: -6px;
+    margin-bottom: -5px;
+}
+
+#single-machine-page .info-table .ajax-loader {
+    display: inline-block;
+    position: relative;
+    top: 3px;
+    left: 6px;
+}
+
 /* Conditional for < 600px */
 @media only screen and  (max-width: 400px) {
     

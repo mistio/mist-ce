@@ -313,6 +313,15 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
                     var machine = this.get('controller').get('model');
                     machine.changeMonitoring();
                     $("#monitoring-dialog").popup('close');
+                },
+
+
+                probeClicked: function() {
+                    this.machine.probe(null, function(success) {
+                        if (!success) {
+                            Mist.notificationController.notify('Failed to probe machine');
+                        }
+                    })
                 }
             },
 
