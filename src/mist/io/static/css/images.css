@@ -27,13 +27,6 @@
     background-repeat: no-repeat !important;
 }
 
-#image-list-page .ui-checkbox-off:hover:after {
-    background-image: url(../images/staroff_hov.png);
-    background-color: rgba(0,0,0,0) !important;
-    background-position: 0px -2px;
-    background-repeat: no-repeat !important;
-}
-
 #image-list-page .ui-checkbox-on:after {
     background-image: url(../images/staron.png);
     background-color: rgba(0,0,0,0) !important;
@@ -41,9 +34,3 @@
     background-repeat: no-repeat !important;
 }
 
-#image-list-page .ui-checkbox-on:hover:after {
-    background-image: url(../images/staron_hov.png);
-    background-color: rgba(0,0,0,0) !important;
-    background-position: 0px -2px;
-    background-repeat: no-repeat !important;
-}
