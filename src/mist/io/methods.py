@@ -485,17 +485,10 @@ def get_machine_actions(machine_from_api, conn):
 
     # defaults for running state
     can_start = False
-    can_stop = False
+    can_stop = True
     can_destroy = True
     can_reboot = True
     can_tag = True
-    if conn.type in config.EC2_PROVIDERS:
-        can_stop = True
-
-    if conn.type in [Provider.NEPHOSCALE,
-                     Provider.DIGITAL_OCEAN,
-                     Provider.SOFTLAYER]:
-        can_stop = True
 
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
@@ -509,10 +502,8 @@ def get_machine_actions(machine_from_api, conn):
         can_reboot = False
     elif machine_from_api.state in (NodeState.UNKNOWN, NodeState.STOPPED):
         # We assume unknown state mean stopped
-        if conn.type in (Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                         Provider.DIGITAL_OCEAN) or conn.type in config.EC2_PROVIDERS:
-            can_stop = False
-            can_start = True
+        can_stop = False
+        can_start = True
         can_reboot = False
     elif machine_from_api.state in (NodeState.TERMINATED,):
         can_start = False
