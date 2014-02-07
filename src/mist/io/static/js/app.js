@@ -317,7 +317,8 @@ define( 'app', [
         App.Checkbox = Ember.Checkbox;
         App.TextField = Ember.TextField.extend({
             attributeBindings: [
-                'data-theme'
+                'data-theme',
+                'autocapitalize'
             ],
             keyUp: function(e) {
                 if(this.get('parentView').keyUp) {
