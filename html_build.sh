@@ -44,7 +44,7 @@ done
 
 
 #
-# Add define header in templates.js
+# Add define header in build.js
 #
 
 echo "Adding define wrapper on: $HTML_BUILD"
