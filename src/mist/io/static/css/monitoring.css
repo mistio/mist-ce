@@ -173,7 +173,13 @@
     fill: white;
 }
 
-.graph path {
+.graph .valueArea {
+    fill: #6CE0BA;
+    stroke-width: 0;
+    opacity: 0.25;
+}
+
+.graph .valueLine {
     stroke: #6CE0BA;
     stroke-width: 3;
     fill: none;
