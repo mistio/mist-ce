@@ -1,26 +1,17 @@
 #
-# Constants
+# Create a temporary directory to store compiled templates
 #
 
-COMPILED_DIR="src/mist/io/static/js/app/templates/compiled"
-TEMPLATES_DIR="src/mist/io/static/js/app/templates"
-
-
-#
-# Create directory for compiled files
-#
-
+COMPILED_DIR="./compiled_tmp"
 rm -rf "$COMPILED_DIR"
 mkdir "$COMPILED_DIR"
 
 
 #
-# Compile html files
+# Compile templates
 #
 
-echo ""
-echo "Step 1/3 : Compilation"
-echo ""
+TEMPLATES_DIR="src/mist/io/static/js/app/templates"
 
 for f in $TEMPLATES_DIR"/"*.html
 do
@@ -33,55 +24,36 @@ done
 
 
 #
-# Add define headers in compiled files
+# Concatinate files
 #
 
-echo ""
-echo "Step 2/3 : Modification"
-echo ""
+echo""
+echo "Concatinating files..."
+HTML_BUILD="src/mist/io/static/js/app/templates/build.js"
+
+if [ -f $HTML_BUILD ]
+then 
+    rm $HTML_BUILD
+fi
+touch $HTML_BUILD
 
 for f in $COMPILED_DIR"/"*.js
 do
-    FILE_NAME=$(basename "$f")
-    FILE_NAME="${FILE_NAME%.*}"
-    HEADER="define('app/templates/compiled/$FILE_NAME', ['ember'], function() {
-    "
-    echo "Mofifying: $f"
-    echo "$HEADER" | cat - "$f" > temp && mv temp "$f"
-    echo "});" >> "$f"
-
-
+    cat "$f" >> $HTML_BUILD
 done
 
 
 #
-# Inject file definitions in app.js
+# Add define header in templates.js
 #
 
-echo ""
-echo "Step 3/3"
-echo ""
+echo "Adding define wrapper on: $HTML_BUILD"
+HEADER="define('app/templates/build', ['ember'], function() {
+"
+echo "$HEADER" | cat - "$HTML_BUILD" > temp && mv temp "$HTML_BUILD"
+echo "});" >> "$HTML_BUILD"
 
-PATHS=""
-DEFINITIONS=""
-
-# construct path/definition array
-
-for f in $COMPILED_DIR"/"*.js
-do
-    FILE_NAME=$(basename "$f")
-    FILE_NAME="${FILE_NAME%.*}"
-    PATHS="$PATHS""'app/templates/compiled/""$FILE_NAME""', "
-    DEFINITIONS="$DEFINITIONS""$FILE_NAME""PrecompiledTemplate, "
-   
-done
-
-# replace comments in app.js
-
-PATH_COMMENT="// @precompile-templates-path"
-sed -i ".pback" "s%${PATH_COMMENT}%${PATHS}%g" src/mist/io/static/js/app.js
-
-DEFINITION_COMMENT="// @precompile-templates-definition"
-sed -i ".dback" "s%${DEFINITION_COMMENT}%${DEFINITIONS}%g" src/mist/io/static/js/app.js
-
-
+#clean up
+echo "Cleaning up"
+rm -rf $COMPILED_DIR
+echo "Done"

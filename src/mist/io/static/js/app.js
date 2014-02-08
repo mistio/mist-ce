@@ -24,11 +24,12 @@ require.config({
     }
 });
 
+
 // Load our app
 define( 'app', [
     'jquery',
     'd3',
-    // @precompile-templates-path
+    'app/templates/build',
     'app/controllers/login',
     'app/controllers/backends',
     'app/controllers/confirmation',
@@ -77,7 +78,7 @@ define( 'app', [
     'ember'
     ], function($,
                 d3,
-                // @precompile-templates-definition
+                TemplatesBuild,
                 LoginController,
                 BackendsController,
                 ConfirmationController,
@@ -126,7 +127,7 @@ define( 'app', [
                 ) {
 
     function initialize() {
-
+        
         // JQM init event
 
         $(document).bind('mobileinit', function() {
@@ -623,11 +624,11 @@ function completeShell(ret, command_id) {
 
 function getTemplate(name) {
     if (HTML_BUILD) {
-        info('Getting precompiled template for: ' + name);
+        //info('Getting precompiled template for: ' + name);
         // Return precompiled template
         return Ember.TEMPLATES[name + '/html'];
     } else {
-        info('Compiling template for: ' + name);
+        //info('Compiling template for: ' + name);
         // Compile hrml
         return Ember.Handlebars.compile('text!app/templates/'+ name + '.html');
     }
