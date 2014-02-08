@@ -208,7 +208,8 @@ define('app/views/monitoring', [
                     // valueline is function that creates the main line based on data
                     var valueline = d3.svg.line()
                                     .x(function(d) {return xScale(d.time); })
-                                    .y(function(d) {return yScale(d.value); });
+                                    .y(function(d) {return yScale(d.value); })
+                                    .defined(function(d) {return d.value != null });
 
 
                     // ---------------  SVG elements for graph manipulation --------------------- //
