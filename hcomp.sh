@@ -24,8 +24,8 @@ function progress {
 	value=`bc <<< "$1 / 1"`
 	half_value=`bc <<< "$value / 2"`
 	bar="|"
-	for (( i=0; i <= $half_value; ++i)); do bar="$bar="; done
-	for (( i=$half_value; i < 50; ++i)); do bar="$bar "; done
+	for (( int=0; int <= $half_value; ++int)); do bar="$bar="; done
+	for (( int=$half_value; int < 50; ++int)); do bar="$bar "; done
     echo -ne "$bar| $value %\r"
 }
 
