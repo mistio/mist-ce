@@ -1,17 +1,17 @@
-define('app/views/machine_shell', ['text!app/templates/machine_shell.html', 'ember'],
+define('app/views/machine_shell', ['ember'],
     /**
      * Machine Shell View
      *
      * @returns Class
      */
-    function(machine_shell_html, Command) {
+    function() {
         return Ember.View.extend({
 
             /**
              *  Properties
              */
             
-            template: Ember.Handlebars.compile(machine_shell_html),
+            template: getTemplate('machine_shell'),
     
             /**
              *

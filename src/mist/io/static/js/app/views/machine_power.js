@@ -1,17 +1,17 @@
-define('app/views/machine_power', ['text!app/templates/machine_power.html', 'ember'],
+define('app/views/machine_power', ['ember'],
     /**
      *  Machine Power View
      *
      *  @returns Class
      */
-    function (machine_power_html) {
+    function () {
         return Ember.View.extend({
 
             /**
              *  Properties
              */
 
-            template: Ember.Handlebars.compile(machine_power_html),
+            template: getTemplate('machine_power'),
 
 
             /**

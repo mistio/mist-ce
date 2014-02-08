@@ -4,7 +4,7 @@ define('app/views/key_list', ['app/views/mistscreen'],
      *
      *  @returns Class
      */
-    function (MistScreen, key_list_html) {
+    function (MistScreen) {
         return MistScreen.extend({
 
             /**

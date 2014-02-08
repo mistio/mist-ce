@@ -4,7 +4,7 @@ define('app/views/confirmation_dialog', ['ember'],
      *
      * @returns Class
      */
-    function(confirmation_dialog_html) {
+    function() {
         return Ember.View.extend({
 
             template: getTemplate('confirmation_dialog'),

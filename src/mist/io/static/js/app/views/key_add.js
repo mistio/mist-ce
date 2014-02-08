@@ -4,7 +4,7 @@ define('app/views/key_add', ['ember'],
      *
      *  @returns Class
      */
-    function (key_add_html) {
+    function () {
         return Ember.View.extend({
 
             /**

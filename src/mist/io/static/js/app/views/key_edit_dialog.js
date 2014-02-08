@@ -4,7 +4,7 @@ define('app/views/key_edit_dialog', ['ember'],
      *
      *  @returns Class
      */
-    function (key_edit_dialog_html) {
+    function () {
         return Ember.View.extend({
 
             /**

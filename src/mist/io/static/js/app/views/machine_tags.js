@@ -1,17 +1,17 @@
-define('app/views/machine_tags', ['text!app/templates/machine_tags.html', 'ember'],
+define('app/views/machine_tags', ['ember'],
     /**
      *  Machine Tags View
      *
      *  @returns Class
      */
-    function (machine_tags_html) {
+    function () {
         return Ember.View.extend({
 
             /**
              *  Properties
              */
 
-            template: Ember.Handlebars.compile(machine_tags_html),
+            template: getTemplate('machine_tags'),
 
 
             /**
