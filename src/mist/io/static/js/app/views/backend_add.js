@@ -1,4 +1,4 @@
-define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember'],
+define('app/views/backend_add', ['ember'],
     /**
      *  Add Backend Panel
      * 
@@ -13,7 +13,7 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
 
             firstFieldLabel: 'API Key',
             secondFieldLabel: 'API Secret',
-            template: Ember.Handlebars.compile(backend_add_html),
+            template: getTemplate('backend_add'),
 
 
             /**

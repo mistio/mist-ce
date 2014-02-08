@@ -1,10 +1,10 @@
-define('app/views/backend_edit', ['text!app/templates/backend_edit_dialog.html','ember'],
+define('app/views/backend_edit', ['ember'],
     /**
      *  Edit Backend View
      * 
      *  @returns Class
      */
-    function(edit_backend_dialog_html) {
+    function() {
         return Ember.View.extend({
 
             /**
@@ -13,7 +13,7 @@ define('app/views/backend_edit', ['text!app/templates/backend_edit_dialog.html',
              * 
              */
 
-            template: Ember.Handlebars.compile(edit_backend_dialog_html),
+            template: getTemplate('backend_edit'),
 
 
             /**

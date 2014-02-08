@@ -1,10 +1,10 @@
-define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app/templates/key.html'],
+define('app/views/key', ['app/views/mistscreen', 'app/models/machine'],
     /**
      *  Single Key View
      *
      *  @returns Class
      */
-    function (MistScreen, Machine, key_html) {
+    function (MistScreen, Machine) {
         return MistScreen.extend({
 
             /**
@@ -13,7 +13,7 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine', 'text!app
 
             key: null,
             machines: [],
-            template: Ember.Handlebars.compile(key_html),
+            template: getTemplate('key'),
 
 
             /**

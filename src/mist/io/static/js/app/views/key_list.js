@@ -1,4 +1,4 @@
-define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_list.html'],
+define('app/views/key_list', ['app/views/mistscreen'],
     /**
      *  Key List View
      *
@@ -11,7 +11,7 @@ define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_li
              *  Properties
              */
 
-            template: Ember.Handlebars.compile(key_list_html),
+            template: getTemplate('key_list'),
 
 
             /**

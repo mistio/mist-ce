@@ -76,6 +76,7 @@ def home(request):
         'auth': json.dumps(bool(user.mist_api_token)),
         'js_build': config.JS_BUILD,
         'css_build': config.CSS_BUILD,
+        'html_build': json.dumps(bool(True)),
         'js_log_level': json.dumps(config.JS_LOG_LEVEL),
         'google_analytics_id': config.GOOGLE_ANALYTICS_ID,
         'is_core': json.dumps(False),

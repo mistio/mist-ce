@@ -1,17 +1,17 @@
-define('app/views/machine_list', ['app/views/mistscreen', 'text!app/templates/machine_list.html'],
+define('app/views/machine_list', ['app/views/mistscreen'],
     /**
      * Machine List View
      *
      * @returns Class
      */
-    function (MistScreen, machine_list_html) {
+    function (MistScreen) {
         return MistScreen.extend({
 
             /**
              *  Properties
              */
 
-            template: Ember.Handlebars.compile(machine_list_html),
+            template: getTemplate('machine_list'),
 
 
             /**

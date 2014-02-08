@@ -1,10 +1,10 @@
-define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine.html'],
+define('app/views/machine', ['app/views/mistscreen'],
     /**
      *  Single Machine View
      * 
      *  @returns Class
      */
-    function(MistScreen, machine_html) {
+    function(MistScreen) {
         return MistScreen.extend({
 
             /**
@@ -13,7 +13,7 @@ define('app/views/machine', ['app/views/mistscreen', 'text!app/templates/machine
 
             rules: [],
             machine: null,
-            template: Ember.Handlebars.compile(machine_html),
+            template: getTemplate('machine'),
 
             providerIconClass: function() {
                 if (!this.machine || !this.machine.backend) {

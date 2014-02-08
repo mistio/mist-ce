@@ -1,5 +1,4 @@
-define('app/views/confirmation_dialog', [
-    'text!app/templates/confirmation_dialog.html','ember'],
+define('app/views/confirmation_dialog', ['ember'],
     /**
      * Confirmation Dialog
      *
@@ -8,7 +7,7 @@ define('app/views/confirmation_dialog', [
     function(confirmation_dialog_html) {
         return Ember.View.extend({
 
-            template: Ember.Handlebars.compile(confirmation_dialog_html),
+            template: getTemplate('confirmation_dialog'),
 
             attributeBindings: ['data-role',],
 

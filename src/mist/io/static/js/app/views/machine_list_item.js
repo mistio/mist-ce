@@ -13,7 +13,9 @@ define('app/views/machine_list_item', ['app/views/list_item', 'text!app/template
 
             machine: null,
             template: Ember.Handlebars.compile(machine_list_item_html),
-
+            didInsertElement: function() {
+                info(machine_list_item_html);
+            },
 
             /**
              *

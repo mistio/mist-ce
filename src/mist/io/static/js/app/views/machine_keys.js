@@ -1,10 +1,10 @@
-define('app/views/machine_keys', ['text!app/templates/machine_keys.html', 'ember'],
+define('app/views/machine_keys', ['ember'],
     /**
      *  Machine Keys View
      * 
      *  @returns Class
      */
-    function(machine_keys_html) {
+    function() {
         return Ember.View.extend({
 
             /**
@@ -14,7 +14,7 @@ define('app/views/machine_keys', ['text!app/templates/machine_keys.html', 'ember
              */
 
             selectedKey: null,
-            template: Ember.Handlebars.compile(machine_keys_html),
+            template: getTemplate('machine_keys'),
 
 
             /**

@@ -1,10 +1,10 @@
-define('app/views/image_list_item', ['app/views/list_item', 'text!app/templates/image_list_item.html'],
+define('app/views/image_list_item', ['app/views/list_item'],
     /**
      *  Image List Item View
      *
      *  @returns Class
      */
-    function (ListItemView, image_list_item_html) {
+    function (ListItemView) {
         return ListItemView.extend({
 
             /**
@@ -12,7 +12,7 @@ define('app/views/image_list_item', ['app/views/list_item', 'text!app/templates/
              */
 
             image: null,
-            template: Ember.Handlebars.compile(image_list_item_html),
+            template: getTemplate('image_list_item'),
 
 
             /**

@@ -28,6 +28,7 @@ require.config({
 define( 'app', [
     'jquery',
     'd3',
+    'app/templates/compiled/backend_add', 'app/templates/compiled/backend_edit_dialog', 'app/templates/compiled/confirmation_dialog', 'app/templates/compiled/home', 'app/templates/compiled/image_list', 'app/templates/compiled/image_list_item', 'app/templates/compiled/key', 'app/templates/compiled/key_add', 'app/templates/compiled/key_edit_dialog', 'app/templates/compiled/key_list', 'app/templates/compiled/key_list_item', 'app/templates/compiled/login', 'app/templates/compiled/machine', 'app/templates/compiled/machine_actions_dialog', 'app/templates/compiled/machine_add_dialog', 'app/templates/compiled/machine_keys', 'app/templates/compiled/machine_keys_list_item', 'app/templates/compiled/machine_list', 'app/templates/compiled/machine_list_item', 'app/templates/compiled/machine_power', 'app/templates/compiled/machine_shell', 'app/templates/compiled/machine_shell_list_item', 'app/templates/compiled/machine_tags', 'app/templates/compiled/machine_tags_list_item', 'app/templates/compiled/messagebox', 'app/templates/compiled/monitoring', 'app/templates/compiled/rule', 'app/templates/compiled/user_menu', 
     'app/controllers/login',
     'app/controllers/backends',
     'app/controllers/confirmation',
@@ -76,6 +77,7 @@ define( 'app', [
     'ember'
     ], function($,
                 d3,
+                backend_addPrecompiledTemplate, backend_edit_dialogPrecompiledTemplate, confirmation_dialogPrecompiledTemplate, homePrecompiledTemplate, image_listPrecompiledTemplate, image_list_itemPrecompiledTemplate, keyPrecompiledTemplate, key_addPrecompiledTemplate, key_edit_dialogPrecompiledTemplate, key_listPrecompiledTemplate, key_list_itemPrecompiledTemplate, loginPrecompiledTemplate, machinePrecompiledTemplate, machine_actions_dialogPrecompiledTemplate, machine_add_dialogPrecompiledTemplate, machine_keysPrecompiledTemplate, machine_keys_list_itemPrecompiledTemplate, machine_listPrecompiledTemplate, machine_list_itemPrecompiledTemplate, machine_powerPrecompiledTemplate, machine_shellPrecompiledTemplate, machine_shell_list_itemPrecompiledTemplate, machine_tagsPrecompiledTemplate, machine_tags_list_itemPrecompiledTemplate, messageboxPrecompiledTemplate, monitoringPrecompiledTemplate, rulePrecompiledTemplate, user_menuPrecompiledTemplate, 
                 LoginController,
                 BackendsController,
                 ConfirmationController,
@@ -378,6 +380,7 @@ define( 'app', [
         return App;
     }
 
+
     /**
      * 
      *  Ajax wrapper constructor
@@ -617,3 +620,15 @@ function completeShell(ret, command_id) {
     $('iframe#' + command_id).remove();
     Mist.machineShellController.machine.commandHistory.findBy('id', command_id).set('pendingResponse', false);
 }
+
+function getTemplate(name) {
+    if (HTML_BUILD) {
+        info('Getting precompiled template for: ' + name);
+        // Return precompiled template
+        return Ember.TEMPLATES[name + '/html'];
+    } else {
+        info('Compiling template for: ' + name);
+        // Compile hrml
+        return Ember.Handlebars.compile('text!app/templates/'+ name + '.html');
+    }
+};

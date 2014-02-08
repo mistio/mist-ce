@@ -1,17 +1,17 @@
-define('app/views/home', ['app/views/mistscreen','text!app/templates/home.html','ember'],
+define('app/views/home', ['app/views/mistscreen', 'ember'],
     /**
      *  Home View
      *
      *  @returns Class
      */
-    function(MistScreen, home_html) {
+    function(MistScreen) {
         return MistScreen.extend({
 
             /**
              *  Properties
              */
 
-            template: Ember.Handlebars.compile(home_html),
+            template: getTemplate('home'),
 
 
             /**

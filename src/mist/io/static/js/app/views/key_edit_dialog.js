@@ -1,4 +1,4 @@
-define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html', 'ember'],
+define('app/views/key_edit_dialog', ['ember'],
     /**
      *  Key Edit View
      *
@@ -11,7 +11,7 @@ define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html', 
              *  Properties
              */
 
-            template: Ember.Handlebars.compile(key_edit_dialog_html),
+            template: getTemplate('key_edit_dialog'),
 
 
             /**
