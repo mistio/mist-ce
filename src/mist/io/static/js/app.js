@@ -623,13 +623,12 @@ function completeShell(ret, command_id) {
 }
 
 function getTemplate(name) {
-    if (JS_BUILD || true) {
-        info('Getting precompiled template for: ' + name);
+    if (JS_BUILD || false) { // The "|| true" part is just for debuging as for now
+        //info('Getting precompiled template for: ' + name);
         // Return precompiled template
         return Ember.TEMPLATES[name + '/html'];
     } else {
-        //info('Compiling template for: ' + name);
-        // Compile hrml
+        info('Compiling template for: ' + name);
         return Ember.Handlebars.compile('text!app/templates/'+ name + '.html');
     }
 };
