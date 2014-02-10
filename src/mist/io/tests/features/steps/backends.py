@@ -144,7 +144,7 @@ def backends_check_backend_state_by_index(context, name, state):
             return
     else:
         if button.has_class('ui-icon-online') or button.has_class('ui-icon-check')\
-                or button.has_clas('ui-icon-waiting'):
+                or button.has_class('ui-icon-waiting'):
             return
 
     assert False, u'%s is not %s' % (name, state)
