@@ -65,13 +65,9 @@ define('app/views/templated', ['ember'],
              */
 
             setTemplate: function(template) {
-                $('#' + this.elementId).hide();
                 this.set('template', template).rerender();
                 Ember.run.next(this, function() {
                     $('#' + this.elementId).trigger('create');
-                    Ember.run.next(this, function() {
-                        $('#' + this.elementId).show();
-                    });
                 });
             }
 		});
