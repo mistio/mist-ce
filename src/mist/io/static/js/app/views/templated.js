@@ -49,9 +49,9 @@ define('app/views/templated', ['ember'],
                         var that = this;
                         require(['text!app/templates/' + this.name + '.html'], function(template) {
 
-                            var template = Ember.Handlebars.compile(template);
-                            that.setTemplate(template);
-                            Mist.set(templateSaveName, template);
+                            var compiledTemplate = Ember.Handlebars.compile(template);
+                            that.setTemplate(compiledTemplate);
+                            Mist.set(templateSaveName, compiledTemplate);
                         });
                     }
                 }
