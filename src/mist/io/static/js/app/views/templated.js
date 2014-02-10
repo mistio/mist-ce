@@ -32,18 +32,47 @@ define('app/views/templated', ['ember'],
                 } else {
 
                 	// When JS_BUILD equals to false, the app compiles the
-                	// templates on the client.
-                	var that = this;
-                    require(['text!app/templates/'+this.name+'.html'], function(template) {
+                	// templates on the client. The the compiled template
+                    // is saved on the App to prevent recompilations
 
-                        info('Compiling template for: ' + that.name);
-                        that.set('template', Ember.Handlebars.compile(template)).rerender();
-                        
-                        Ember.run.next(function() {
-                            $('#'+that.elementId).trigger('create');
+                    var templateSaveName = this.name + '_template';
+
+
+                    if (Mist[templateSaveName]) {
+
+                        // Template has already been compiled
+                        this.setTemplate(Mist[templateSaveName]);
+
+                    } else {
+
+                        // Get html file, compile it, and save it
+                        var that = this;
+                        require(['text!app/templates/' + this.name + '.html'], function(template) {
+
+                            var template = Ember.Handlebars.compile(template);
+                            that.setTemplate(template);
+                            Mist.set(templateSaveName, template);
                         });
-                    });  
+                    }
                 }
+            },
+
+
+            /**
+             *
+             *  Methods
+             *
+             */
+
+            setTemplate: function(template) {
+                $('#' + this.elementId).hide();
+                this.set('template', template).rerender();
+                Ember.run.next(this, function() {
+                    $('#' + this.elementId).trigger('create');
+                    Ember.run.next(this, function() {
+                        $('#' + this.elementId).show();
+                    });
+                });
             }
 		});
 	}
