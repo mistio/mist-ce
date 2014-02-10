@@ -61,7 +61,7 @@ Feature: Backends
         And I click the "Delete" button
         And I wait for 1 seconds
         And I click the "Yes" button
-        And I wait for 1 seconds
+        And I wait for 3 seconds
             Then I should see the "New" Backend deleted within 5 seconds
 
 
