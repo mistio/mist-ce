@@ -1,13 +1,13 @@
-define('app/views/rule', ['ember'],
+define('app/views/rule', ['app/views/templated','ember'],
     /**
      *  Rule View
      *
      *  @returns Class
      */
-    function() {
-        return Ember.View.extend({
+    function(TemplatedView) {
+        return TemplatedView.extend({
 
-            template: getTemplate('rule'),
+            name: 'rule',
 
             didInsertElement: function() {
                 Ember.run.next(this, function() {

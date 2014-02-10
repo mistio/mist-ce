@@ -1,14 +1,14 @@
-define('app/views/shell', ['ember'],
+define('app/views/shell', ['app/views/templated','ember'],
 /**
  *
  * Shell dialog
  *
  * @returns Class
  */
-function() {
-    return Ember.View.extend({
+function(TemplatedView) {
+    return TemplatedView.extend({
 
-        template: getTemplate('shell'),
+        name: 'shell',
 
         shellOutputItems: Ember.ArrayController.create(),
         

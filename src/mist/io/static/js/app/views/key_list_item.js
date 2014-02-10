@@ -12,7 +12,7 @@ define('app/views/key_list_item', ['app/views/list_item'],
              */
 
             key: null,
-            template: getTemplate('key_list_item'),
+            name: 'key_list_item',
 
 
             /**

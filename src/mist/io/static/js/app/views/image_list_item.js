@@ -12,7 +12,7 @@ define('app/views/image_list_item', ['app/views/list_item'],
              */
 
             image: null,
-            template: getTemplate('image_list_item'),
+            name: 'image_list_item',
 
 
             /**

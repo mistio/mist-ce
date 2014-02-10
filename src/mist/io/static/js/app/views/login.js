@@ -1,17 +1,17 @@
-define('app/views/login', ['ember'],
+define('app/views/login', ['app/views/templated', 'ember'],
     /**
      *  Login View
      *
      *  @returns Class
      */
-    function () {
-        return Ember.View.extend({
+    function (TemplatedView) {
+        return TemplatedView.extend({
 
             /**
              *  Properties
              */
 
-            template: getTemplate('login'),
+            name: 'login',
 
 
             /**

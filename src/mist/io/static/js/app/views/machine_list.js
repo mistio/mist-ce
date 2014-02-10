@@ -11,7 +11,7 @@ define('app/views/machine_list', ['app/views/mistscreen'],
              *  Properties
              */
 
-            template: getTemplate('machine_list'),
+            name: 'machine_list',
 
 
             /**

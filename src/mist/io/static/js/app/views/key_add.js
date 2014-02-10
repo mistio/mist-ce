@@ -1,17 +1,17 @@
-define('app/views/key_add', ['ember'],
+define('app/views/key_add', ['app/views/templated', 'ember'],
     /**
      *  Key Add View
      *
      *  @returns Class
      */
-    function () {
-        return Ember.View.extend({
+    function (TemplatedView) {
+        return TemplatedView.extend({
 
             /**
              *  Properties
              */
 
-            template: getTemplate('key_add'),
+            name: 'key_add',
 
 
             /**

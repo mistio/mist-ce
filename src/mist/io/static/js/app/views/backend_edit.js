@@ -1,11 +1,11 @@
-define('app/views/backend_edit', ['ember'],
+define('app/views/backend_edit', ['app/views/templated', 'ember'],
     /**
      *  Edit Backend View
      * 
      *  @returns Class
      */
-    function() {
-        return Ember.View.extend({
+    function(TemplatedView) {
+        return TemplatedView.extend({
 
             /**
              * 
@@ -13,7 +13,7 @@ define('app/views/backend_edit', ['ember'],
              * 
              */
 
-            template: getTemplate('backend_edit'),
+             name: 'backend_edit',
 
 
             /**

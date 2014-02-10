@@ -13,7 +13,7 @@ define('app/views/machine', ['app/views/mistscreen'],
 
             rules: [],
             machine: null,
-            template: getTemplate('machine'),
+            name: 'machine',
 
             providerIconClass: function() {
                 if (!this.machine || !this.machine.backend) {

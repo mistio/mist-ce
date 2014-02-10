@@ -1,13 +1,13 @@
-define('app/views/confirmation_dialog', ['ember'],
+define('app/views/confirmation_dialog', ['app/views/templated', 'ember'],
     /**
      * Confirmation Dialog
      *
      * @returns Class
      */
-    function() {
-        return Ember.View.extend({
+    function(TemplatedView) {
+        return TemplatedView.extend({
 
-            template: getTemplate('confirmation_dialog'),
+            name: 'confirmation_dialog',
 
             attributeBindings: ['data-role',],
 

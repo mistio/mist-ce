@@ -11,8 +11,7 @@ define('app/views/home', ['app/views/mistscreen', 'ember'],
              *  Properties
              */
 
-            template: getTemplate('home'),
-
+            name: 'home',
 
             /**
              * 

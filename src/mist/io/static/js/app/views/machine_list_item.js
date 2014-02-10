@@ -12,7 +12,7 @@ define('app/views/machine_list_item', ['app/views/list_item'],
              */
 
             machine: null,
-            template: getTemplate('machine_list_item'),
+            name: 'machine_list_item',
 
             /**
              *

@@ -1,17 +1,17 @@
-define('app/views/machine_add_dialog', ['ember'],
+define('app/views/machine_add_dialog', ['app/views/templated', 'ember'],
     /**
      *  Machine Add View
      *
      *  @returns Class
      */
-    function () {
-        return Ember.View.extend({
+    function (TemplatedView) {
+        return TemplatedView.extend({
 
             /**
              *  Properties
              */
 
-            template: getTemplate('machine_add_dialog'),
+            name: 'machine_add_dialog',
             price: function () {
 
                 var image = Mist.machineAddController.newMachineImage;

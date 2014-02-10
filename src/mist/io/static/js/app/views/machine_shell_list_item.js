@@ -13,7 +13,7 @@ define('app/views/machine_shell_list_item', ['app/views/list_item'],
 
             command: {},
             tagName: 'span',
-            template: getTemplate('machine_shell_list_item'),
+            name: 'machine_shell_list_item',
 
 
             /**

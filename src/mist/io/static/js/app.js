@@ -46,6 +46,7 @@ define( 'app', [
     'app/controllers/machine_tags',
     'app/controllers/machine_shell',
     'app/controllers/rules',
+    'app/views/templated',
     'app/views/home',
     'app/views/login',
     'app/views/backend_button',
@@ -95,6 +96,7 @@ define( 'app', [
                 MachineTagsController,
                 MachineShellController,
                 RulesController,
+                TemplatedView,
                 Home,
                 LoginView,
                 BackendButton,
@@ -127,7 +129,8 @@ define( 'app', [
                 ) {
 
     function initialize() {
-        
+
+
         // JQM init event
 
         $(document).bind('mobileinit', function() {
@@ -139,12 +142,14 @@ define( 'app', [
             $.mobile.panel.prototype._bindUpdateLayout = function(){};
             $('body').css('overflow','auto');
         });
-        
+
+
         // Hide error boxes on page unload
+
         window.onbeforeunload = function() {
             $('.ui-loader').hide();
         };
-        
+
 
         // Ember Application
 
@@ -153,6 +158,7 @@ define( 'app', [
                 require(['mobile']);
             }
         });
+
 
         // Globals
 
@@ -253,13 +259,13 @@ define( 'app', [
 
         // Ember views
 
+        App.set('backendAddView', BackendAdd);
         App.set('homeView', Home);
         App.set('ruleView', RuleView);
         App.set('loginView', LoginView);
         App.set('keyListView', KeyListView);
         App.set('keyAddView', KeyAddView);
         App.set('listItemView', ListItemView);
-        App.set('backendAddView', BackendAdd);
         App.set('userMenuView', UserMenuView);
         App.set('editKeyView', KeyEditDialog);
         App.set('editBackendView', EditBackend);
@@ -623,7 +629,7 @@ function completeShell(ret, command_id) {
 }
 
 function getTemplate(name) {
-    if (JS_BUILD || false) { // The "|| true" part is just for debuging as for now
+    if (JS_BUILD || true) { // The "|| true" part is just for debuging as for now
         //info('Getting precompiled template for: ' + name);
         // Return precompiled template
         return Ember.TEMPLATES[name + '/html'];
@@ -632,3 +638,4 @@ function getTemplate(name) {
         return Ember.Handlebars.compile('text!app/templates/'+ name + '.html');
     }
 };
+

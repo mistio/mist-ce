@@ -143,6 +143,68 @@ function program5(depth0,data) {
   return buffer;
   
 });
+Ember.TEMPLATES["backend_edit/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+  var buffer = '', stack1, hashContexts, hashTypes, escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  
+  data.buffer.push("\n        <div class=\"ajax-loader\"></div>\n        ");
+  }
+
+  data.buffer.push("<div id=\"edit-backend-popup\" \n     class=\"mid-popup\" \n     data-role=\"popup\" \n     data-theme=\"a\" \n     data-overlay-theme=\"b\"\n     data-transition=\"pop\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n        <h1>Edit backend</h1>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        ");
+  hashContexts = {'valueBinding': depth0};
+  hashTypes = {'valueBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
+    'valueBinding': ("Mist.backendEditController.newBackendTitle")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n\n        <div data-role=\"fieldcontain\">\n            <select id=\"backend-toggle\" data-role=\"slider\" ");
+  hashContexts = {'target': depth0,'on': depth0};
+  hashTypes = {'target': "STRING",'on': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "stateToggleSwitched", {hash:{
+    'target': ("view"),
+    'on': ("change")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">\n                <option value=\"0\">Disabled</option>\n                <option value=\"1\">Enabled</option>\n            </select>\n            <span class=\"state\">");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.backendEditController.backend.state", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</span>\n        </div>\n\n        <input type=\"button\" value=\"Delete\" ");
+  hashContexts = {'target': depth0,'on': depth0};
+  hashTypes = {'target': "STRING",'on': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "deleteClicked", {hash:{
+    'target': ("view"),
+    'on': ("click")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(" />\n\n        <div id=\"backend-delete-confirm\">\n            <label>Confirm backend removal?</label>\n            <label id=\"monitoring-message\">There are monitored machines.<br />Monitoring for these will be disabled</label>\n            <div class=\"ok-cancel\" data-role=\"controlgroup\" data-type=\"horizontal\">\n                <a data-role=\"button\" id=\"button-confirm-disable\" ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "yesClicked", {hash:{
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">Yes</a>\n                <a data-role=\"button\" data-theme=\"d\" ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "noClicked", {hash:{
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">No</a>\n            </div>\n        </div>\n\n        ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['if'].call(depth0, "Mist.backendsController.deletingBackend", {hash:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n\n        <a href=\"#\" data-role=\"button\" class=\"button-back\" ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "backClicked", {hash:{
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">Back</a>\n    </div>\n</div>\n");
+  return buffer;
+  
+});
 Ember.TEMPLATES["backend_edit_dialog/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};

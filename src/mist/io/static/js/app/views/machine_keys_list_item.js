@@ -7,7 +7,7 @@ define('app/views/machine_keys_list_item', ['app/views/list_item'],
     function(ListItemView) {
         return ListItemView.extend({
 
-            template: getTemplate('machine_keys_list_item'),
+            name: 'machine_keys_list_item',
 
             tagName: 'span',
             keyIcon: null,

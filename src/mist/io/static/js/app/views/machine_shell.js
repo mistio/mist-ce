@@ -1,17 +1,17 @@
-define('app/views/machine_shell', ['ember'],
+define('app/views/machine_shell', ['app/views/templated', 'ember'],
     /**
      * Machine Shell View
      *
      * @returns Class
      */
-    function() {
-        return Ember.View.extend({
+    function(TemplatedView) {
+        return TemplatedView.extend({
 
             /**
              *  Properties
              */
             
-            template: getTemplate('machine_shell'),
+            name: 'machine_shell',
     
             /**
              *

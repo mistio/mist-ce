@@ -1,17 +1,17 @@
-define('app/views/machine_power', ['ember'],
+define('app/views/machine_power', ['app/views/templated','ember'],
     /**
      *  Machine Power View
      *
      *  @returns Class
      */
-    function () {
-        return Ember.View.extend({
+    function (TemplatedView) {
+        return TemplatedView.extend({
 
             /**
              *  Properties
              */
 
-            template: getTemplate('machine_power'),
+            name: 'machine_power',
 
 
             /**

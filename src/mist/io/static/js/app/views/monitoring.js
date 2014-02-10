@@ -1,14 +1,14 @@
-define('app/views/monitoring', ['ember'],
+define('app/views/monitoring', ['app/views/templated','ember'],
     /**
      *
      * Monitoring View
      *
      * @returns Class
      */
-    function() {
-        return Ember.View.extend({
+    function(TemplatedView) {
+        return TemplatedView.extend({
 
-            template: getTemplate('monitoring'),
+            name: 'monitoring',
 
             graphs : {
                 cpu: null,

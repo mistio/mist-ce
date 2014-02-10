@@ -11,7 +11,7 @@ define('app/views/key_list', ['app/views/mistscreen'],
              *  Properties
              */
 
-            template: getTemplate('key_list'),
+            name: 'key_list',
 
 
             /**

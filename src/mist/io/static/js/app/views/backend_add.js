@@ -1,20 +1,19 @@
-define('app/views/backend_add', ['ember'],
+define('app/views/backend_add', ['app/views/templated', 'ember'],
     /**
      *  Add Backend Panel
      * 
      *  @returns Class
      */
-    function() {
-        return Ember.View.extend({
+    function(TemplatedView) {
+        return TemplatedView.extend({
 
             /**
              *  Properties
              */
 
+            name: 'backend_add',
             firstFieldLabel: 'API Key',
             secondFieldLabel: 'API Secret',
-            template: getTemplate('backend_add'),
-
 
             /**
              * 

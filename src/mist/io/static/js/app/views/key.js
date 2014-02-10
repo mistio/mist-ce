@@ -13,7 +13,7 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine'],
 
             key: null,
             machines: [],
-            template: getTemplate('key'),
+            name: 'key',
 
 
             /**

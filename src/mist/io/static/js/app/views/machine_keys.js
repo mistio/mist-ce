@@ -1,11 +1,11 @@
-define('app/views/machine_keys', ['ember'],
+define('app/views/machine_keys', ['app/views/templated','ember'],
     /**
      *  Machine Keys View
      * 
      *  @returns Class
      */
-    function() {
-        return Ember.View.extend({
+    function(TemplatedView) {
+        return TemplatedView.extend({
 
             /**
              * 
@@ -14,7 +14,7 @@ define('app/views/machine_keys', ['ember'],
              */
 
             selectedKey: null,
-            template: getTemplate('machine_keys'),
+            name: 'machine_keys',
 
 
             /**
