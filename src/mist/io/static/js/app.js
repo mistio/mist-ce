@@ -24,7 +24,6 @@ require.config({
     }
 });
 
-
 // Load our app
 define( 'app', [
     'jquery',
@@ -258,7 +257,7 @@ define( 'app', [
         });
 
         // Ember views
-
+        info('hi');
         App.set('backendAddView', BackendAdd);
         App.set('homeView', Home);
         App.set('ruleView', RuleView);
