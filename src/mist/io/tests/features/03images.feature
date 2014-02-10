@@ -20,9 +20,11 @@ Feature: Images
             Then I should see the "EC2 AP Sydney" Backend added within 30 seconds
 
         When I click the "Images" button
+        And I wait for 3 seconds
         And I star a "SUSE" image
         And I visit mist.io
         And I click the "Images" button
+        And I wait for 5 seconds
             Then the first/second image should be "SUSE"
 
 
@@ -35,6 +37,7 @@ Feature: Images
         When I star a "django" image
         And I visit mist.io
         And I click the "Images" button
+        And I wait for 5 seconds
             Then the first/second image should be "django"
 
         
