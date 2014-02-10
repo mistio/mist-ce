@@ -16,6 +16,7 @@ Feature: Keys
         And I click the "Add" button
         And I type "tester" as key name
         And I click the "Generate" button
+        And I wait for 5 seconds
         And I click the "Add" button within "add-key-popup" panel
         And I wait for 5 seconds
             Then I should see the "tester" Key added within 5 seconds
@@ -42,6 +43,7 @@ Feature: Keys
         And I type "SecondKey" as key name
         And I wait for 2 seconds
         And I click the "Generate" button
+        And I wait for 5 seconds
         And I click the "Add" button within "add-key-popup" panel
         And I wait for 5 seconds
             Then I should see the "SecondKey" Key added within 5 seconds
