@@ -16,7 +16,7 @@ define('app/views/user_menu', ['text!app/templates/user_menu.html', 'ember'],
             template: Ember.Handlebars.compile(user_menu_html),
             //TODO: change the logo_splash.png to user.png
             gravatarURL: EMAIL && ('https://www.gravatar.com/avatar/' + md5(EMAIL) + '?d=' +
-                  encodeURIComponent('https://mist.io/resources/logo_splash.png') +'&s=36'),
+                  encodeURIComponent('https://mist.io/resources/images/user.png') +'&s=36'),
 
 
             /**
