@@ -94,8 +94,8 @@ Feature: Machines
         And I click the "Generate" button
         And I wait for 5 seconds
         And I click the "Add" button within "add-key-popup" panel
-        And I wait for 7 seconds
-            Then I should see the "SecondKey" Key added within 15 seconds
+        And I wait for 10 seconds
+            Then I should see the "SecondKey" Key added within 9 seconds
 
         When I visit mist.io
             Then I should see "mist.io"
