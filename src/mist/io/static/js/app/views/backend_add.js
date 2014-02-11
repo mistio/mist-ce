@@ -1,6 +1,6 @@
 define('app/views/backend_add', ['app/views/templated', 'ember'],
     /**
-     *  Add Backend Panel
+     *  Add Backend View
      * 
      *  @returns Class
      */
@@ -11,7 +11,6 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
              *  Properties
              */
 
-            name: 'backend_add',
             firstFieldLabel: 'API Key',
             secondFieldLabel: 'API Secret',
 

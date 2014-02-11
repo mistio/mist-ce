@@ -100,7 +100,7 @@ define( 'app', [
                 LoginView,
                 BackendButton,
                 BackendAdd,
-                EditBackend,
+                BackendEdit,
                 MonitoringView,
                 MachineListItem,
                 ImageListItem,
@@ -267,7 +267,7 @@ define( 'app', [
         App.set('userMenuView', UserMenuView);
         App.set('editKeyView', KeyEditDialog);
         App.set('backendAddView', BackendAdd);
-        App.set('editBackendView', EditBackend);
+        App.set('backendEditView', BackendEdit);
         App.set('imageListView', ImageListView);
         App.set('singleKeyView', SingleKeyView);
         App.set('messageBoxView', MessageBoxView);

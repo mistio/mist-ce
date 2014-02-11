@@ -1,6 +1,6 @@
 define('app/views/backend_edit', ['app/views/templated', 'ember'],
     /**
-     *  Edit Backend View
+     *  Backend Edit View
      * 
      *  @returns Class
      */
@@ -12,9 +12,6 @@ define('app/views/backend_edit', ['app/views/templated', 'ember'],
              *  Properties
              * 
              */
-
-             name: 'backend_edit',
-
 
             /**
              * 
