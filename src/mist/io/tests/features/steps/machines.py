@@ -137,11 +137,19 @@ def click_machine(context, name):
 @then(u'I should find the Public IP')
 def find_ip(context):
     global ip
-    infos = context.browser.find_by_css('.ui-collapsible tr td')
+    try:
+        infos = context.browser.find_by_css('.ui-collapsible tr td')
 
-    for i in range(len(infos)):
-        if "Public" in infos[i].text:
-            ip = infos[i+1].text
+        for i in range(len(infos)):
+            if "Public" in infos[i].text:
+                ip = infos[i+1].text
+    except:
+        sleep(2)
+        infos = context.browser.find_by_css('.ui-collapsible tr td')
+
+        for i in range(len(infos)):
+            if "Public" in infos[i].text:
+                ip = infos[i+1].text
 
 
 @when(u'I add my bare metal creds')
