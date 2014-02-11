@@ -48,9 +48,9 @@ Feature: Backends
     @web
     Scenario: Rename Backend
         When I click the "EC2 AP NORTHEAST" button
-        And I wait for 1 seconds
+        And I wait for 3 seconds
         And I change the name of the backend to "New"
-        And I wait for 1 seconds
+        And I wait for 5 seconds
             Then I should see the "New" Backend added within 10 seconds
 
 

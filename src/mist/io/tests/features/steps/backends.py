@@ -118,6 +118,7 @@ def rename_backend(context, new_name):
         context.browser.find_by_css('#edit-backend-popup input').fill("")
         for letter in name:
             context.browser.find_by_css('#edit-backend-popup input').type(letter)
+            sleep(2)
     except:
         assert False, u'Could not change name or popup is not open'
 
