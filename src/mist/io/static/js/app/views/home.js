@@ -8,12 +8,6 @@ define('app/views/home', ['app/views/mistscreen', 'ember'],
         return MistScreen.extend({
 
             /**
-             *  Properties
-             */
-
-            name: 'home',
-
-            /**
              * 
              *  Initialization
              * 

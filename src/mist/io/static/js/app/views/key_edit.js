@@ -1,4 +1,4 @@
-define('app/views/key_edit_dialog', ['app/views/templated', 'ember'],
+define('app/views/key_edit', ['app/views/templated', 'ember'],
     /**
      *  Key Edit View
      *
@@ -6,13 +6,6 @@ define('app/views/key_edit_dialog', ['app/views/templated', 'ember'],
      */
     function (TemplatedView) {
         return TemplatedView.extend({
-
-            /**
-             *  Properties
-             */
-
-            name: 'key_edit_dialog',
-
 
             /**
              *

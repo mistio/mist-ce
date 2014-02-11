@@ -8,8 +8,6 @@ define('app/views/shell', ['app/views/templated','ember'],
 function(TemplatedView) {
     return TemplatedView.extend({
 
-        name: 'shell',
-
         shellOutputItems: Ember.ArrayController.create(),
         
         availableCommands: [], //"dmesg", "uptime", "uname", "ls", "reboot", "whoami", "ifconfig" ],

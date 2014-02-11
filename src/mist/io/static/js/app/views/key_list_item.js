@@ -12,7 +12,6 @@ define('app/views/key_list_item', ['app/views/list_item'],
              */
 
             key: null,
-            name: 'key_list_item',
 
 
             /**

@@ -14,7 +14,6 @@ define('app/views/machine_keys', ['app/views/templated','ember'],
              */
 
             selectedKey: null,
-            name: 'machine_keys',
 
 
             /**

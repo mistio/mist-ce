@@ -1,4 +1,4 @@
-define('app/views/machine_add_dialog', ['app/views/templated', 'ember'],
+define('app/views/machine_add', ['app/views/templated', 'ember'],
     /**
      *  Machine Add View
      *
@@ -11,7 +11,6 @@ define('app/views/machine_add_dialog', ['app/views/templated', 'ember'],
              *  Properties
              */
 
-            name: 'machine_add_dialog',
             price: function () {
 
                 var image = Mist.machineAddController.newMachineImage;

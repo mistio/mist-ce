@@ -8,13 +8,6 @@ define('app/views/key_add', ['app/views/templated', 'ember'],
         return TemplatedView.extend({
 
             /**
-             *  Properties
-             */
-
-            name: 'key_add',
-
-
-            /**
              *
              *  Methods
              *

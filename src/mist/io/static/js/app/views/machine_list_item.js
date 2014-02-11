@@ -12,7 +12,6 @@ define('app/views/machine_list_item', ['app/views/list_item'],
              */
 
             machine: null,
-            name: 'machine_list_item',
 
             /**
              *

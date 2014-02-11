@@ -7,8 +7,6 @@ define('app/views/rule', ['app/views/templated','ember'],
     function(TemplatedView) {
         return TemplatedView.extend({
 
-            name: 'rule',
-
             didInsertElement: function() {
                 Ember.run.next(this, function() {
                     this.metricObserver();

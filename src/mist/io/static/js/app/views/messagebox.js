@@ -7,8 +7,6 @@ define('app/views/messagebox', ['app/views/templated', 'ember'],
     function(TemplatedView) {
         return TemplatedView.extend({
 
-            name: 'messagebox',
-            
             actions: {
                 
                 

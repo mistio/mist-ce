@@ -7,8 +7,6 @@ define('app/views/confirmation_dialog', ['app/views/templated', 'ember'],
     function(TemplatedView) {
         return TemplatedView.extend({
 
-            name: 'confirmation_dialog',
-
             attributeBindings: ['data-role',],
 
             actions: {

@@ -54,7 +54,7 @@ define( 'app', [
     'app/views/monitoring',
     'app/views/machine_list_item',
     'app/views/image_list_item',
-    'app/views/machine_add_dialog',
+    'app/views/machine_add',
     'app/views/machine',
     'app/views/messagebox',
     'app/views/machine_list',
@@ -71,7 +71,7 @@ define( 'app', [
     'app/views/key_list',
     'app/views/key',
     'app/views/key_add',
-    'app/views/key_edit_dialog',
+    'app/views/key_edit',
     'app/views/rule',
     'app/views/user_menu',
     'app/views/list_item',
@@ -257,21 +257,22 @@ define( 'app', [
         });
 
         // Ember views
-        
+
         App.set('homeView', Home);
         App.set('ruleView', RuleView);
         App.set('loginView', LoginView);
-        App.set('keyListView', KeyListView);
         App.set('keyAddView', KeyAddView);
+        App.set('keyView', SingleKeyView);
+        App.set('keyListView', KeyListView);
         App.set('listItemView', ListItemView);
         App.set('userMenuView', UserMenuView);
-        App.set('editKeyView', KeyEditDialog);
+        App.set('keyEditView', KeyEditDialog);
         App.set('backendAddView', BackendAdd);
         App.set('backendEditView', BackendEdit);
         App.set('imageListView', ImageListView);
-        App.set('singleKeyView', SingleKeyView);
-        App.set('messageBoxView', MessageBoxView);
+        App.set('messageboxView', MessageBoxView);
         App.set('monitoringView', MonitoringView);
+        App.set('machineView', SingleMachineView);
         App.set('machineKeysView', MachineKeysView);
         App.set('machineTagsView', MachineTagsView);
         App.set('keyListItemView', KeyListItemView);
@@ -282,14 +283,13 @@ define( 'app', [
         App.set('machinePowerView', MachinePowerView);
         App.set('machineShellView', MachineShellView);
         App.set('machineListItemView', MachineListItem);
-        App.set('singleMachineView', SingleMachineView);
         App.set('confirmationDialog', ConfirmationDialog);
         App.set('machineKeysListItemView', MachineKeysListItemView);
         App.set('machineTagsListItemView', MachineTagsListItemView);
         App.set('machineShellListItemView', MachineShellListItemView);
 
         // Ember controllers
-        
+
         App.set('keysController', KeysController.create());
         App.set('loginController', LoginController.create());
         App.set('rulesController', RulesController.create());

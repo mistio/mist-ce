@@ -8,13 +8,6 @@ define('app/views/login', ['app/views/templated', 'ember'],
         return TemplatedView.extend({
 
             /**
-             *  Properties
-             */
-
-            name: 'login',
-
-
-            /**
              *
              *  Methods
              *

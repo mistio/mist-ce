@@ -8,13 +8,6 @@ define('app/views/key_list', ['app/views/mistscreen'],
         return MistScreen.extend({
 
             /**
-             *  Properties
-             */
-
-            name: 'key_list',
-
-
-            /**
              *
              *  Initialization
              *

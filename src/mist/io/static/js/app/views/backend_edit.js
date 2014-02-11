@@ -9,12 +9,6 @@ define('app/views/backend_edit', ['app/views/templated', 'ember'],
 
             /**
              * 
-             *  Properties
-             * 
-             */
-
-            /**
-             * 
              *  Methods
              * 
              */

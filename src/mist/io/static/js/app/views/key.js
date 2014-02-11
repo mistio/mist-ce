@@ -13,7 +13,6 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine'],
 
             key: null,
             machines: [],
-            name: 'key',
 
 
             /**

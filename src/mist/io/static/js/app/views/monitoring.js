@@ -8,8 +8,6 @@ define('app/views/monitoring', ['app/views/templated','ember'],
     function(TemplatedView) {
         return TemplatedView.extend({
 
-            name: 'monitoring',
-
             graphs : {
                 cpu: null,
                 load: null,

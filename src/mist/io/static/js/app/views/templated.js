@@ -25,10 +25,10 @@ define('app/views/templated', ['ember'],
                     var name = this.constructor.toString().split('.')[1].split('View')[0];
 
                     // Then we replace all lower case letters that are followed by
-                    // an upper case letter to meed the template naming convensions.
+                    // an upper case letter to meet the template naming convensions.
                     // For example, aTotalyRandom would be converted to a_totaly_random
                     templateName = name.replace(/([a-z])([A-Z])/g, function(a,b) {
-                        return b + '_' + a.slice(1).toLowerCase()
+                        return b + '_' + a.slice(1).toLowerCase();
                     });
                 }
 

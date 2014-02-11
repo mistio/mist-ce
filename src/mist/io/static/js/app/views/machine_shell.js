@@ -8,12 +8,6 @@ define('app/views/machine_shell', ['app/views/templated', 'ember'],
         return TemplatedView.extend({
 
             /**
-             *  Properties
-             */
-            
-            name: 'machine_shell',
-    
-            /**
              *
              *  Methods
              *

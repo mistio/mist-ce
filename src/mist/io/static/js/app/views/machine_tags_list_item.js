@@ -13,7 +13,6 @@ define('app/views/machine_tags_list_item', ['app/views/list_item'],
 
             tag: null,
             tagName: 'span',
-            name: 'machine_tags_list_item',
 
 
             /**

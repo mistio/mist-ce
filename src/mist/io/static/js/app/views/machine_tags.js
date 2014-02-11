@@ -8,13 +8,6 @@ define('app/views/machine_tags', ['app/views/templated', 'ember'],
         return TemplatedView.extend({
 
             /**
-             *  Properties
-             */
-
-            name: 'machine_tags',
-
-
-            /**
              * 
              *  Actions
              *

@@ -10,12 +10,12 @@ if (!JS_BUILD) {
     'text!app/templates/image_list_item.html',
     'text!app/templates/key.html',
     'text!app/templates/key_add.html',
-    'text!app/templates/key_edit_dialog.html',
+    'text!app/templates/key_edit.html',
     'text!app/templates/key_list.html',
     'text!app/templates/key_list_item.html',
     'text!app/templates/login.html',
     'text!app/templates/machine.html',
-    'text!app/templates/machine_add_dialog.html',
+    'text!app/templates/machine_add.html',
     'text!app/templates/machine_keys.html',
     'text!app/templates/machine_keys_list_item.html',
     'text!app/templates/machine_list.html',
@@ -39,12 +39,12 @@ if (!JS_BUILD) {
     Ember.TEMPLATES['image_list_item/html'] = Ember.Handlebars.compile(arguments[5]);
     Ember.TEMPLATES['key/html'] = Ember.Handlebars.compile(arguments[6]);
     Ember.TEMPLATES['key_add/html'] = Ember.Handlebars.compile(arguments[7]);
-    Ember.TEMPLATES['key_edit_dialog/html'] = Ember.Handlebars.compile(arguments[8]);
+    Ember.TEMPLATES['key_edit/html'] = Ember.Handlebars.compile(arguments[8]);
     Ember.TEMPLATES['key_list/html'] = Ember.Handlebars.compile(arguments[9]);
     Ember.TEMPLATES['key_list_item/html'] = Ember.Handlebars.compile(arguments[10]);
     Ember.TEMPLATES['login/html'] = Ember.Handlebars.compile(arguments[11]);
     Ember.TEMPLATES['machine/html'] = Ember.Handlebars.compile(arguments[12]);
-    Ember.TEMPLATES['machine_add_dialog/html'] = Ember.Handlebars.compile(arguments[13]);
+    Ember.TEMPLATES['machine_add/html'] = Ember.Handlebars.compile(arguments[13]);
     Ember.TEMPLATES['machine_keys/html'] = Ember.Handlebars.compile(arguments[14]);
     Ember.TEMPLATES['machine_keys_list_item/html'] = Ember.Handlebars.compile(arguments[15]);
     Ember.TEMPLATES['machine_list/html'] = Ember.Handlebars.compile(arguments[16]);
@@ -411,7 +411,7 @@ function program8(depth0,data) {
   data.buffer.push("\n\n    ");
   hashTypes = {};
   hashContexts = {};
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.editBackendView", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.backendEditView", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
   data.buffer.push("\n\n</div>\n");
   return buffer;
   
@@ -626,7 +626,7 @@ function program6(depth0,data) {
   data.buffer.push("\n\n        <div class=\"large-padding\"></div>\n\n    </div>\n\n    ");
   hashTypes = {};
   hashContexts = {};
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.editKeyView", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.keyEditView", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
   data.buffer.push("\n\n    ");
   hashTypes = {};
   hashContexts = {};
@@ -734,7 +734,7 @@ function program3(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["key_edit_dialog/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["key_edit/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, hashContexts, hashTypes, escapeExpression=this.escapeExpression, self=this;
@@ -820,7 +820,7 @@ function program1(depth0,data) {
   data.buffer.push("\n\n    ");
   hashTypes = {};
   hashContexts = {};
-  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.editKeyView", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.keyEditView", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
   data.buffer.push("\n\n    ");
   hashTypes = {};
   hashContexts = {};
@@ -1501,7 +1501,7 @@ function program46(depth0,data) {
   return buffer;
   
 });
-Ember.TEMPLATES["machine_add_dialog/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+Ember.TEMPLATES["machine_add/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', stack1, hashContexts, hashTypes, escapeExpression=this.escapeExpression, self=this;

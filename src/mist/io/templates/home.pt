@@ -87,13 +87,13 @@
         {{view Mist.imageListView}}
     </script>
     <script type="text/x-handlebars" data-template-name="machine">
-        {{view Mist.singleMachineView}}
+        {{view Mist.machineView}}
     </script>
     <script type="text/x-handlebars" data-template-name="keys">
         {{view Mist.keyListView}}
     </script>
     <script type="text/x-handlebars" data-template-name="key">
-        {{view Mist.singleKeyView}}
+        {{view Mist.keyView}}
     </script>
 
 </body>

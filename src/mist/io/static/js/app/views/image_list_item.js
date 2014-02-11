@@ -12,7 +12,6 @@ define('app/views/image_list_item', ['app/views/list_item'],
              */
 
             image: null,
-            name: 'image_list_item',
 
 
             /**

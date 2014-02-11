@@ -15,8 +15,6 @@ define('app/views/image_list', ['app/models/image', 'app/views/mistscreen'],
             baseImages: [],
             renderedImages: [],
             advancedSearchMode: null,
-            name: 'image_list',
-
 
             /**
              *

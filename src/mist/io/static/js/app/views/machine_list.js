@@ -8,13 +8,6 @@ define('app/views/machine_list', ['app/views/mistscreen'],
         return MistScreen.extend({
 
             /**
-             *  Properties
-             */
-
-            name: 'machine_list',
-
-
-            /**
              *
              *  Initialization
              *

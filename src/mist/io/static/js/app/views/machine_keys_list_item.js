@@ -7,8 +7,6 @@ define('app/views/machine_keys_list_item', ['app/views/list_item'],
     function(ListItemView) {
         return ListItemView.extend({
 
-            name: 'machine_keys_list_item',
-
             tagName: 'span',
             keyIcon: null,
 
