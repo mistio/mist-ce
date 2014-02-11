@@ -92,7 +92,12 @@ def check_auth(request):
     password = params.get('password', '')
 
     payload = {'email': email, 'password': password}
-    ret = requests.post(config.CORE_URI + '/auth', params=payload, verify=config.SSL_VERIFY)
+    try:
+        ret = requests.post(config.CORE_URI + '/auth', params=payload,
+                            verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        log.error("%r", exc)
+        raise SSLError()
     if ret.status_code == 200:
         ret_dict = json.loads(ret.content)
         user = user_from_request(request)
@@ -130,11 +135,14 @@ def update_user_settings(request):
                'number_of_servers': number_of_servers,
                'number_of_people': number_of_people}
 
-    ret = requests.post(config.CORE_URI + '/account',
-                        params=payload,
-                        headers={'Authorization': get_auth_header(user)},
-                        verify=config.SSL_VERIFY)
-
+    try:
+        ret = requests.post(config.CORE_URI + '/account',
+                            params=payload,
+                            headers={'Authorization': get_auth_header(user)},
+                            verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        log.error("%r", exc)
+        raise SSLError()
     if ret.status_code == 200:
         ret = json.loads(ret.content)
         return ret
@@ -579,9 +587,13 @@ def check_monitoring(request):
     """
     user = user_from_request(request)
 
-    ret = requests.get(config.CORE_URI + request.path,
-                       headers={'Authorization': get_auth_header(user)},
-                       verify=config.SSL_VERIFY)
+    try:
+        ret = requests.get(config.CORE_URI + request.path,
+                           headers={'Authorization': get_auth_header(user)},
+                           verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        log.error("%r", exc)
+        raise SSLError()
     if ret.status_code == 200:
         return ret.json()
     else:
@@ -606,7 +618,12 @@ def update_monitoring(request):
         if not email or not password:
             raise UnauthorizedError("You need to authenticate to mist.io.")
         payload = {'email': email, 'password': password}
-        ret = requests.post(config.CORE_URI + '/auth', params=payload, verify=config.SSL_VERIFY)
+        try:
+            ret = requests.post(config.CORE_URI + '/auth', params=payload,
+                                verify=config.SSL_VERIFY)
+        except requests.exceptions.SSLError as exc:
+            log.error("%r", exc)
+            raise SSLError()
         if ret.status_code == 200:
             ret_dict = json.loads(ret.content)
             with user.lock_n_load():
@@ -659,10 +676,14 @@ def get_stats(request):
         'step': step,
         'expression': expression
     }
-    ret = requests.get(config.CORE_URI + request.path,
-                       params=payload,
-                       headers={'Authorization': get_auth_header(user)},
-                       verify=config.SSL_VERIFY)
+    try:
+        ret = requests.get(config.CORE_URI + request.path,
+                           params=payload,
+                           headers={'Authorization': get_auth_header(user)},
+                           verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        log.error("%r", exc)
+        raise SSLError()
     if ret.status_code == 200:
         return ret.json()
     else:
@@ -687,8 +708,12 @@ def get_loadavg(request, action=None):
         'Content-type': 'image/png',
         'Accept': '*/*'
     }
-    ret = requests.get(config.CORE_URI + request.path, params=payload,
-                       headers=headers, verify=config.SSL_VERIFY)
+    try:
+        ret = requests.get(config.CORE_URI + request.path, params=payload,
+                           headers=headers, verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        log.error("%r", exc)
+        raise SSLError()
     if ret.status_code != 200:
         log.error("Error getting loadavg %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
@@ -701,18 +726,19 @@ def update_rule(request):
 
     """
     user = user_from_request(request)
-    #TODO: make ssl verification configurable globally, set to true by default
-    ret = requests.post(
-        config.CORE_URI + request.path,
-        params=request.json_body,
-        headers={'Authorization': get_auth_header(user)},
-        verify=config.SSL_VERIFY
-    )
-
+    try:
+        ret = requests.post(
+            config.CORE_URI + request.path,
+            params=request.json_body,
+            headers={'Authorization': get_auth_header(user)},
+            verify=config.SSL_VERIFY
+        )
+    except requests.exceptions.SSLError as exc:
+        log.error("%r", exc)
+        raise SSLError()
     if ret.status_code != 200:
         log.error("Error updating rule %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
-
     return ret.json()
 
 
@@ -722,13 +748,15 @@ def delete_rule(request):
 
     """
     user = user_from_request(request)
-    #TODO: make ssl verification configurable globally, set to true by default
-    ret = requests.delete(
-        config.CORE_URI + request.path,
-        headers={'Authorization': get_auth_header(user)},
-        verify=config.SSL_VERIFY
-    )
-
+    try:
+        ret = requests.delete(
+            config.CORE_URI + request.path,
+            headers={'Authorization': get_auth_header(user)},
+            verify=config.SSL_VERIFY
+        )
+    except requests.exceptions.SSLError as exc:
+        log.error("%r", exc)
+        raise SSLError()
     if ret.status_code != 200:
         log.error("Error deleting rule %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()

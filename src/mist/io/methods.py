@@ -1345,15 +1345,17 @@ def enable_monitoring(user, backend_id, machine_id,
         'backend_apiurl': backend.apiurl,
         'backend_tenant_name': backend.tenant_name,
     }
-    #TODO: make ssl verification configurable globally,
-    # set to true by default
     url_scheme = "%s/backends/%s/machines/%s/monitoring"
-    ret = requests.post(
-        url_scheme % (config.CORE_URI, backend_id, machine_id),
-        params=payload,
-        headers={'Authorization': get_auth_header(user)},
-        verify=config.SSL_VERIFY
-    )
+    try:
+        ret = requests.post(
+            url_scheme % (config.CORE_URI, backend_id, machine_id),
+            params=payload,
+            headers={'Authorization': get_auth_header(user)},
+            verify=config.SSL_VERIFY
+        )
+    except requests.exceptions.SSLError as exc:
+        log.error("%r", exc)
+        raise SSLError()
     if ret.status_code != 200:
         if ret.status_code == 402:
             raise PaymentRequiredError(ret.text)
@@ -1377,15 +1379,17 @@ def disable_monitoring(user, backend_id, machine_id):
         'action': 'disable',
         'no_ssh': True
     }
-    #TODO: make ssl verification configurable globally,
-    # set to true by default
     url_scheme = "%s/backends/%s/machines/%s/monitoring"
-    ret = requests.post(
-        url_scheme % (config.CORE_URI, backend_id, machine_id),
-        params=payload,
-        headers={'Authorization': get_auth_header(user)},
-        verify=config.SSL_VERIFY
-    )
+    try:
+        ret = requests.post(
+            url_scheme % (config.CORE_URI, backend_id, machine_id),
+            params=payload,
+            headers={'Authorization': get_auth_header(user)},
+            verify=config.SSL_VERIFY
+        )
+    except requests.exceptions.SSLError as exc:
+        log.error("%r", exc)
+        raise SSLError()
     if ret.status_code != 200:
         raise ServiceUnavailableError()
 

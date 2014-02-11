@@ -66,28 +66,33 @@ def main(global_config, **settings):
         # settings.yaml doesn't exist, continue
         pass
 
-    user = User()   # this automatically loads from db.yaml
-    # try to authenticate with mist.io service if email,password are available
-    if user.email and user.mist_api_token:
-        from mist.io.helpers import get_auth_header
-        ret = requests.post(mist.io.config.CORE_URI + '/auth',
-                            headers={'Authorization': get_auth_header(user)},
-                            verify=mist.io.config.SSL_VERIFY)
-        if ret.status_code == 200:
-            log.info("Succesfully authenticated to mist.io service.")
-            ret = json.loads(ret.content)
-            settings['current_plan'] = ret.get('current_plan', {})
-            settings['auth_key'] = ret.get('auth_key', '')
-            ## # FIXME: do we really need the following params?
-            ## user_details = ret.get('user_details', {})
-            ## settings['user']['name'] = user_details.get('name', '')
-            ## settings['user']['company_name'] = user_details.get('company_name', '')
-            ## settings['user']['country'] = user_details.get('country', '')
-            ## settings['user']['number_of_servers'] = user_details.get('number_of_servers', '')
-            ## settings['user']['number_of_people'] = user_details.get('number_of_people', '')
-        else:
-            log.error("Error authenticating to mist.io service. %d: %s", ret.status_code, ret.text)
-            settings['auth'] = False
+    ## user = User()   # this automatically loads from db.yaml
+    ## # try to authenticate with mist.io service if email,password are available
+    ## if user.email and user.mist_api_token:
+        ## from mist.io.helpers import get_auth_header
+        ## try:
+            ## ret = requests.post(mist.io.config.CORE_URI + '/auth',
+                                ## headers={'Authorization': get_auth_header(user)},
+                                ## verify=mist.io.config.SSL_VERIFY)
+        ## except requests.exceptions.SSLError as exc:
+            ## log.error("SSL Error when communicating with %s: %s",
+                      ## mist.io.config.CORE_URI, exc)
+        ## else:
+            ## if ret.status_code == 200:
+                ## log.info("Succesfully authenticated to mist.io service.")
+                ## ret = json.loads(ret.content)
+                ## # all these are no longer used. Also settings is not a safe
+                # place to put info since it's worker dependant
+                ## settings['current_plan'] = ret.get('current_plan', {})
+                ## # FIXME: do we really need the following params?
+                ## user_details = ret.get('user_details', {})
+                ## settings['user']['name'] = user_details.get('name', '')
+                ## settings['user']['company_name'] = user_details.get('company_name', '')
+                ## settings['user']['country'] = user_details.get('country', '')
+                ## settings['user']['number_of_servers'] = user_details.get('number_of_servers', '')
+                ## settings['user']['number_of_people'] = user_details.get('number_of_people', '')
+            ## else:
+                ## log.error("Error authenticating to mist.io service. %d: %s", ret.status_code, ret.text)
 
     config = Configurator(root_factory=Root, settings=settings)
     config.add_static_view('resources', 'mist.io:static')
