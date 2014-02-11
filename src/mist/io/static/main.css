@@ -368,7 +368,7 @@ ul.checkbox-list li label {
     display: none;
 }
 
-#notification-popup {
+.single-machine-loader {
     z-index: 1000;
 }
 
