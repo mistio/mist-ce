@@ -48,7 +48,9 @@ Feature: Shell
         And I wait for 1 seconds
         And I click the "Add Key" button
         And I type "shell_tester" as key name
+        And I wait for 2 seconds
         And I click the "Generate" button
+        And I wait for 5 seconds
         And I click the "Add" button
         And I wait for 2 seconds
         And I click the "Launch!" button
