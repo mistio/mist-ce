@@ -38,7 +38,7 @@ def general_click_button_by_text(context, text):
         for button in buttons:
             if text in button.text.strip():
                 try:
-                    button.click()
+                    button.find_by_css('a').click()
                     sleep(time_fast)
                     return
                 except:
@@ -62,7 +62,7 @@ def general_click_button_by_text(context, text):
                     sleep(time_fast)
                     return
                 except:
-                    button.find_by_css('input').click()
+                    button.find_by_css('a').click()
                     sleep(time_fast)
                     return
                 else:
