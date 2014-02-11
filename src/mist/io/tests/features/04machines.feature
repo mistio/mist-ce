@@ -93,7 +93,8 @@ Feature: Machines
         And I type "SecondKey" as key name
         And I click the "Generate" button
         And I wait for 5 seconds
-        And I click the "Add" button
+        And I click the "Add" button within "add-key-popup" panel
+        And I wait for 5 seconds
             Then I should see the "SecondKey" Key added within 5 seconds
 
         When I visit mist.io
@@ -121,7 +122,7 @@ Feature: Machines
         And I click the "tester" machine
         And I wait for 5 seconds
         And I click the "2 keys" button
-        And I wait for 1 seconds
+        And I wait for 3 seconds
         And I click the "SecondKey" from the associated keys
         And I click the "Remove" button
         And I wait for 2 seconds
