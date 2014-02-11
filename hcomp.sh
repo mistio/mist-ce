@@ -1,24 +1,22 @@
-################################################################
+#########################################################################################
 #	
-#	Compiles multiple handlebars templates into
-#   a single file for optimized performacne
+#	Generates a script that loads and compiles all templates
+#   when the application starts up (only when JS_BUILD equals to
+#   false)
+#
+#   Then compiles the same templates so that they be used w/o
+#   client compilation (when JS_BUILD equals to true)
 #
 #   Needs ember-precompile:
 #   https://github.com/gabrielgrant/node-ember-precompile
 #  
-################################################################
-
-BUILD_PATH="src/mist/io/static/js/app/templates/build.js"
-TEMPLATES_DIR="src/mist/io/static/js/app/templates"
-FILE_COUNT=`eval ls -l $TEMPLATES_DIR | grep .html | wc -l | tr -d ' '`
+#########################################################################################
 
 
-# Wrap file into a define statement to access it in app.js
-echo "define('app/templates/build', ['ember'], function() {
-" > $BUILD_PATH
 
-
-# Prints a progress bar with value passed as first argument
+#########################################################################################
+# Progress bar
+##
 function progress {
 
 	value=`bc <<< "$1 / 1"`
@@ -30,11 +28,72 @@ function progress {
 }
 
 
-echo "Compiling..."
+
+#########################################################################################
+# Constants
+##
+
+BUILD_PATH="src/mist/io/static/js/app/templates/templates.js"
+TEMPLATES_DIR="src/mist/io/static/js/app/templates"
+FILE_COUNT=`eval ls -l $TEMPLATES_DIR | grep .html | wc -l | tr -d ' '`
+
+
+
+#########################################################################################
+# Generate javascript for client template compilation
+##
+
+echo "Generating script..."
 progress 0
 
+echo "define('app/templates/templates', ['ember'], function() {
 
-# Compile html files and append them to build.js
+if (!JS_BUILD) {
+  require([" > $BUILD_PATH
+
+i=0
+for f in $TEMPLATES_DIR"/"*.html
+do
+    echo "    'text!app/templates/""$(basename $f)""'," >> $BUILD_PATH
+    
+    # Show progressbar
+    i=$((i + 1))
+    progress `bc -l <<< "50 / $FILE_COUNT * $i"`
+done
+
+progress 50
+
+echo "    'ember'],
+  function() {" >> $BUILD_PATH
+
+i=0
+for f in $TEMPLATES_DIR"/"*.html
+do
+	filename=$(basename "$f")
+	filename="${filename%.*}"
+    echo "    Ember.TEMPLATES['""$filename""/html'] = Ember.Handlebars.compile(arguments[""$i""]);" >> $BUILD_PATH
+    
+    # Show progressbar
+    i=$((i + 1))
+    progress `bc -l <<< "(50 / $FILE_COUNT * $i) + 50 "`
+done
+
+echo "  });
+  return;
+}
+
+" >> $BUILD_PATH
+progress 100
+
+
+
+#########################################################################################
+# Compile templates
+##
+
+echo -ne "\nCompiling templates...\n"
+progress 0
+
 i=0
 for f in $TEMPLATES_DIR"/"*.html
 do
@@ -49,6 +108,6 @@ done
 # Close wrapper
 echo "});" >> $BUILD_PATH
 
-
 progress 100
 echo -ne "\nDone\n"
+

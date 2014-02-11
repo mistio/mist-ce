@@ -28,7 +28,7 @@ require.config({
 define( 'app', [
     'jquery',
     'd3',
-    'app/templates/build',
+    'app/templates/templates',
     'app/controllers/login',
     'app/controllers/backends',
     'app/controllers/confirmation',
@@ -257,8 +257,7 @@ define( 'app', [
         });
 
         // Ember views
-        info('hi');
-        App.set('backendAddView', BackendAdd);
+        
         App.set('homeView', Home);
         App.set('ruleView', RuleView);
         App.set('loginView', LoginView);
@@ -267,6 +266,7 @@ define( 'app', [
         App.set('listItemView', ListItemView);
         App.set('userMenuView', UserMenuView);
         App.set('editKeyView', KeyEditDialog);
+        App.set('backendAddView', BackendAdd);
         App.set('editBackendView', EditBackend);
         App.set('imageListView', ImageListView);
         App.set('singleKeyView', SingleKeyView);
@@ -289,8 +289,6 @@ define( 'app', [
         App.set('machineShellListItemView', MachineShellListItemView);
 
         // Ember controllers
-
-        
         
         App.set('keysController', KeysController.create());
         App.set('loginController', LoginController.create());
