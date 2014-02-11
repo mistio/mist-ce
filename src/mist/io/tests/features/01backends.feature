@@ -28,7 +28,7 @@ Feature: Backends
         When I flip the backend switch
         And I wait for 1 seconds
         And I click the "Back" button
-        And I wait for 1 seconds
+        And I wait for 5 seconds
             Then "EC2 AP NORTHEAST" backend should be "offline"
 
 
@@ -41,7 +41,7 @@ Feature: Backends
         When I flip the backend switch
         And I wait for 1 seconds
         And I click the "Back" button
-        And I wait for 2 seconds
+        And I wait for 5 seconds
             Then "EC2 AP NORTHEAST" backend should be "online"
 
 
