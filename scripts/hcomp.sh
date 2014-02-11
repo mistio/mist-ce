@@ -30,23 +30,22 @@ function progress {
 
 
 #########################################################################################
-# Construct paths
+# Constants
 ##
 
 TEMPLATES_DIR="src/mist/io/static/js/app/templates"
 BUILD_PATH="$TEMPLATES_DIR""/templates.js"
+FILE_COUNT=`eval ls -l $TEMPLATES_DIR | grep .html | wc -l | tr -d ' '`
+
 
 IS_CORE=`pwd | grep mist.core`
 if [ "$IS_CORE" ]
 then
     cd `pwd | sed 's%mist.core.*%mist.core%g'`
-
-    echo pwd
+    cd "src/mist.io"
+else
+    cd `pwd | sed 's%mist.io.*%mist.io%g'`
 fi
-exit
-
-
-FILE_COUNT=`eval ls -l $TEMPLATES_DIR | grep .html | wc -l | tr -d ' '`
 
 
 
