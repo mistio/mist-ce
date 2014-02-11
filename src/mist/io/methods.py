@@ -1352,7 +1352,7 @@ def enable_monitoring(user, backend_id, machine_id,
         url_scheme % (config.CORE_URI, backend_id, machine_id),
         params=payload,
         headers={'Authorization': get_auth_header(user)},
-        verify=False
+        verify=config.SSL_VERIFY
     )
     if ret.status_code != 200:
         if ret.status_code == 402:
@@ -1384,7 +1384,7 @@ def disable_monitoring(user, backend_id, machine_id):
         url_scheme % (config.CORE_URI, backend_id, machine_id),
         params=payload,
         headers={'Authorization': get_auth_header(user)},
-        verify=False
+        verify=config.SSL_VERIFY
     )
     if ret.status_code != 200:
         raise ServiceUnavailableError()
@@ -1405,9 +1405,11 @@ def _deploy_collectd(user, backend_id, machine_id, host,
     uri = config.CORE_URI + '/core/scripts/%s' % filename
     prefix = '/opt/mistio-collectd'
     prepare_dirs = '$(command -v sudo) mkdir -p %s' % prefix
-    get_script = (
-        "$(command -v sudo) su root -c \"wget --no-check-certificate "
-        "%s -O - > %s/%s\"" % (uri, prefix, filename)
+    get_script = "$(command -v sudo) wget %s %s -O - > %s/%s" % (
+        "--no-check-certificate" if not config.SSL_VERIFY else "",
+        uri,
+        prefix,
+        filename
     )
     make_exec = "$(command -v sudo) chmod +x %s/%s" % (prefix, filename)
     exec_script = (
@@ -1462,7 +1464,7 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "uptime && "
        "echo -------- && "
        "if [ -f /proc/uptime ]; then cat /proc/uptime; "
-       "else expr `date '+%s'` - `sysctl kern.boottime | sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`;" 
+       "else expr `date '+%s'` - `sysctl kern.boottime | sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`;"
        "fi; "
        "echo -------- && "
        "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;"
@@ -1509,20 +1511,20 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
         #     updated_keys = update_available_keys(user, backend_id,
         #                                          machine_id, cmd_output[4])
         #     ret['updated_keys'] = updated_keys
-              
+
     ret.update(parse_ping(ping_out))
-    
+
     return ret
 
 
 # def update_available_keys(user, backend_id, machine_id, authorized_keys):
 #     keypairs = user.keypairs
-# 
+#
 #     # track which keypairs will be updated
 #     updated_keypairs = {}
 #     # get the actual public keys from the blob
 #     ak = [k for k in authorized_keys.split('\n') if k.startswith('ssh')]
-# 
+#
 #     # for each public key
 #     for pk in ak:
 #         exists = False
@@ -1544,14 +1546,14 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
 #                     updated_keypairs[k] = keypairs[k]
 #             if exists:
 #                 break
-# 
+#
 #     if updated_keypairs:
 #         log.debug('update keypairs')
-# 
+#
 #     ret = [{'name': key,
 #             'machines': keypairs[key].machines,
 #             'pub': keypairs[key].public,
 #             'default_key': keypairs[key].default
 #             } for key in updated_keypairs]
-# 
+#
 #     return ret

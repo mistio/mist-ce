@@ -92,7 +92,7 @@ def check_auth(request):
     password = params.get('password', '')
 
     payload = {'email': email, 'password': password}
-    ret = requests.post(config.CORE_URI + '/auth', params=payload, verify=False)
+    ret = requests.post(config.CORE_URI + '/auth', params=payload, verify=config.SSL_VERIFY)
     if ret.status_code == 200:
         ret_dict = json.loads(ret.content)
         user = user_from_request(request)
@@ -133,7 +133,7 @@ def update_user_settings(request):
     ret = requests.post(config.CORE_URI + '/account',
                         params=payload,
                         headers={'Authorization': get_auth_header(user)},
-                        verify=False)
+                        verify=config.SSL_VERIFY)
 
     if ret.status_code == 200:
         ret = json.loads(ret.content)
@@ -581,7 +581,7 @@ def check_monitoring(request):
 
     ret = requests.get(config.CORE_URI + request.path,
                        headers={'Authorization': get_auth_header(user)},
-                       verify=False)
+                       verify=config.SSL_VERIFY)
     if ret.status_code == 200:
         return ret.json()
     else:
@@ -606,7 +606,7 @@ def update_monitoring(request):
         if not email or not password:
             raise UnauthorizedError("You need to authenticate to mist.io.")
         payload = {'email': email, 'password': password}
-        ret = requests.post(config.CORE_URI + '/auth', params=payload, verify=False)
+        ret = requests.post(config.CORE_URI + '/auth', params=payload, verify=config.SSL_VERIFY)
         if ret.status_code == 200:
             ret_dict = json.loads(ret.content)
             with user.lock_n_load():
@@ -662,7 +662,7 @@ def get_stats(request):
     ret = requests.get(config.CORE_URI + request.path,
                        params=payload,
                        headers={'Authorization': get_auth_header(user)},
-                       verify=False)
+                       verify=config.SSL_VERIFY)
     if ret.status_code == 200:
         return ret.json()
     else:
@@ -688,7 +688,7 @@ def get_loadavg(request, action=None):
         'Accept': '*/*'
     }
     ret = requests.get(config.CORE_URI + request.path, params=payload,
-                       headers=headers, verify=False)
+                       headers=headers, verify=config.SSL_VERIFY)
     if ret.status_code != 200:
         log.error("Error getting loadavg %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
@@ -706,7 +706,7 @@ def update_rule(request):
         config.CORE_URI + request.path,
         params=request.json_body,
         headers={'Authorization': get_auth_header(user)},
-        verify=False
+        verify=config.SSL_VERIFY
     )
 
     if ret.status_code != 200:
@@ -726,7 +726,7 @@ def delete_rule(request):
     ret = requests.delete(
         config.CORE_URI + request.path,
         headers={'Authorization': get_auth_header(user)},
-        verify=False
+        verify=config.SSL_VERIFY
     )
 
     if ret.status_code != 200:

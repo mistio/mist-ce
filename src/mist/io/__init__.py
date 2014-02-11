@@ -72,7 +72,7 @@ def main(global_config, **settings):
         from mist.io.helpers import get_auth_header
         ret = requests.post(mist.io.config.CORE_URI + '/auth',
                             headers={'Authorization': get_auth_header(user)},
-                            verify=False)
+                            verify=mist.io.config.SSL_VERIFY)
         if ret.status_code == 200:
             log.info("Succesfully authenticated to mist.io service.")
             ret = json.loads(ret.content)
