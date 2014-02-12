@@ -95,6 +95,7 @@ Feature: Machines
         And I wait for 2 seconds
         And I click the "Add" button
         And I type "SecondKey" as key name
+        And I wait for 5 seconds
         And I click the "Generate" button
         And I wait for 5 seconds
         And I click the "Add" button within "add-key-popup" panel
