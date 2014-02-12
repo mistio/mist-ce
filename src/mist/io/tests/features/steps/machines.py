@@ -30,18 +30,34 @@ ip = ""
 def given_key(context):
     key = context.personas['NinjaTester']['key_name']
 
-    context.execute_steps(u"""
-        When I click the "Keys" button
-        And I wait for 2 seconds
-        And I click the "Add" button
-        And I type "%s" as key name
-        And I click the "Generate" button
-        And I wait for 5 seconds
-        And I click the "Add" button within "add-key-popup" panel
-        And I wait for 5 seconds
-            Then I should see the "%s" Key added within 5 seconds
-    """ % (key, key))
+    try:
+        context.execute_steps(u"""
+            When I click the "Keys" button
+            And I wait for 2 seconds
+            And I click the "Add" button
+            And I type "%s" as key name
+            And I click the "Generate" button
+            And I wait for 5 seconds
+            And I click the "Add" button within "add-key-popup" panel
+            And I wait for 5 seconds
+                Then I should see the "%s" Key added within 5 seconds
+        """ % (key, key))
+        return
+    except Exception as e:
+        context.execute_steps(u"""
+            When I click the "Keys" button
+            And I wait for 2 seconds
+            And I click the "Add" button
+            And I type "%s" as key name
+            And I click the "Generate" button
+            And I wait for 5 seconds
+            And I click the "Add" button within "add-key-popup" panel
+            And I wait for 5 seconds
+                Then I should see the "%s" Key added within 5 seconds
+        """ % (key, key))
+        return
 
+    assert False, u'Could not create key for the machine, got %s exception' % e
 
 @when(u'I type "{name}" as machine name')
 def type_machine_name(context, name):
