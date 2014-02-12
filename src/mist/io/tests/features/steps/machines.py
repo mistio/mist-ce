@@ -80,7 +80,13 @@ def check_machine_state(context, machine_name, state, timeout):
                 return
             sleep(2)
         except:
-            pass
+            sleep(5)
+            machines = context.browser.find_by_css('#machines li')
+            for machine in machines:
+                if machine_name in machine.text:
+                    break
+            if state in machine.text:
+                return
 
     assert False, u'Could not find %s state for machine %s' % (state, machine_name)
 
@@ -108,6 +114,7 @@ def check_probed(context, machine_name, timeout):
             if leds.has_class('probed'):
                 return
         except:
+            sleep(5)
             machines = context.browser.find_by_css('#machines li')
             for machine in machines:
                 if machine_name in machine.text:

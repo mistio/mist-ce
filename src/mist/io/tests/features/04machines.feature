@@ -55,7 +55,7 @@ Feature: Machines
             Then "tester" state should be "pending" within 60 seconds
         When I wait for 10 seconds
             Then "tester" state should be "running" within 400 seconds
-        When I wait for 10 seconds
+        When I wait for 30 seconds
             Then "tester" should be probed within 400 seconds
         When I wait for 1 seconds
 
