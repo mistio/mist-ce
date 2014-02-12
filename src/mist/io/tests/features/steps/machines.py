@@ -32,8 +32,7 @@ def given_key(context):
 
     try:
         context.execute_steps(u"""
-            When I click the "Keys" button
-            And I wait for 2 seconds
+            When I wait for 2 seconds
             And I click the "Add" button
             And I type "%s" as key name
             And I click the "Generate" button
@@ -45,8 +44,7 @@ def given_key(context):
         return
     except Exception as e:
         context.execute_steps(u"""
-            When I click the "Keys" button
-            And I wait for 2 seconds
+            When I wait for 2 seconds
             And I click the "Add" button
             And I type "%s" as key name
             And I click the "Generate" button

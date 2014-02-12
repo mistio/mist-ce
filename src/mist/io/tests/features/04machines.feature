@@ -23,7 +23,11 @@ Feature: Machines
         And I wait for 1 seconds
             Then I should see the "EC2 AP NORTHEAST" Backend added within 30 seconds
 
+        When I wait for 3 seconds
+        And I click the "Keys" button
+
         Given a key for the machine
+
         When I visit mist.io
         And I wait for 10 seconds
         And I click the "Machines" button
