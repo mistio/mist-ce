@@ -34,6 +34,7 @@ def given_key(context):
         context.execute_steps(u"""
             When I wait for 2 seconds
             And I click the "Add" button
+            And I wait for 5 seconds
             And I type "%s" as key name
             And I click the "Generate" button
             And I wait for 5 seconds
@@ -46,6 +47,7 @@ def given_key(context):
         context.execute_steps(u"""
             When I wait for 2 seconds
             And I click the "Add" button
+            And I wait for 5 seconds
             And I type "%s" as key name
             And I click the "Generate" button
             And I wait for 5 seconds
