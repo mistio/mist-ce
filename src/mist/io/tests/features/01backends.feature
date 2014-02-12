@@ -18,7 +18,7 @@ Feature: Backends
         And I use my "EC2" credentials
         And I click the "Add" button
         And I wait for 1 seconds
-            Then I should see the "EC2 AP NORTHEAST" Backend added within 30 seconds
+            Then I should see the "EC2 AP NORTHEAST" Backend added within 60 seconds
 
 
     @web
@@ -74,7 +74,7 @@ Feature: Backends
         And I use my "<credentials>" credentials
         And I click the "Add" button
         And I wait for 1 seconds
-            Then I should see the "<provider>" Backend added within 30 seconds
+            Then I should see the "<provider>" Backend added within 60 seconds
 
         Examples: Providers
         | provider          | credentials |
