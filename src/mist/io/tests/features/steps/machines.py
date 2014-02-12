@@ -40,7 +40,7 @@ def given_key(context):
             And I wait for 5 seconds
             And I click the "Add" button within "add-key-popup" panel
             And I wait for 5 seconds
-                Then I should see the "%s" Key added within 5 seconds
+                Then I should see the "%s" Key added within 10 seconds
         """ % (key, key))
         return
     except Exception as e:
@@ -53,7 +53,7 @@ def given_key(context):
             And I wait for 5 seconds
             And I click the "Add" button within "add-key-popup" panel
             And I wait for 5 seconds
-                Then I should see the "%s" Key added within 5 seconds
+                Then I should see the "%s" Key added within 10 seconds
         """ % (key, key))
         return
 
