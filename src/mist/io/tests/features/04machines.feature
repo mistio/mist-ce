@@ -164,8 +164,6 @@ Feature: Machines
         And I wait for 1 seconds
         And I click the "Yes" button
         And I wait for 1 seconds
-            Then "tester" state should be "pending" within 80 seconds
-        When I wait for 1 seconds
             Then "tester" state should be "running" within 400 seconds
 
 
