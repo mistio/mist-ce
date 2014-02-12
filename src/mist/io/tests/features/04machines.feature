@@ -194,7 +194,7 @@ Feature: Machines
             Then I should see "mist.io"
         When I wait for 2 seconds
         And I click the "Machines" button
-        And I wait for 15 seconds
+        And I wait for 30 seconds
         And I tick the "tester" machine
         And I click the "Power" button
         And I click the "Destroy" button
