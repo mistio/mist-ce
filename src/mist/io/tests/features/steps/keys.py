@@ -73,7 +73,7 @@ def key_see_buttons(context, name):
             if name in key.text.strip():
                 return
 
-    assert False, u'%s in not found in added Keys' % context.personas['NinjaTester']['key_name']
+    assert False, u'%s in not found in added Keys' % name
 
 
 @when(u'I fill in "{name}" as Key name')
