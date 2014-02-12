@@ -57,7 +57,7 @@ def click_key(context, name):
 
     assert False, u'Could not Click the key, either not found or css/html/javascript broken'
 
-@then(u'I should see the "{name}" Key added within 5 seconds')
+@then(u'I should see the "{name}" Key added within 10 seconds')
 def key_see_buttons(context, name):
 
     global tester_key_name

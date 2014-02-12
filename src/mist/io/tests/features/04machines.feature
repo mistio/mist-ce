@@ -99,7 +99,7 @@ Feature: Machines
         And I wait for 5 seconds
         And I click the "Add" button within "add-key-popup" panel
         And I wait for 10 seconds
-            Then I should see the "SecondKey" Key added within 9 seconds
+            Then I should see the "SecondKey" Key added within 10 seconds
 
         When I visit mist.io
             Then I should see "mist.io"
@@ -187,6 +187,7 @@ Feature: Machines
 
     @web
     @machine-actions
+    @bare-metal
     Scenario: Destroy Machine
         When I visit mist.io
             Then I should see "mist.io"
