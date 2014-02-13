@@ -96,9 +96,8 @@ def main(global_config, **settings):
     # Add custom adapter to the JSON renderer to avoid serialization errors
     json_renderer = JSON()
     def string_adapter(obj, request):
-        print "using string adapter!"
         return str(obj)
-    json_renderer.add_adapter(EC2NetworkInterface, string_adapter)
+    json_renderer.add_adapter(object, string_adapter)
     config.add_renderer('json', json_renderer)    
     config.add_static_view('resources', 'mist.io:static')
     config.add_static_view('docs', path='../../../docs/build')
