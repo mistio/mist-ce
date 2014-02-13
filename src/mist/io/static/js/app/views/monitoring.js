@@ -84,31 +84,43 @@ define('app/views/monitoring', [
                     var self = this;
                     var controller = Mist.monitoringController;
 
-                    Em.run.next(function() {
+                    var setup = function() {
 
-                        // Re-Initialize jquery components and hide buttons
-                        self.redrawJQMComponents();     
-                        $('.graphBtn').hide(0); 
-                        
-                        self.createGraphs(10*60*1000);
-                        
+                        // Check if jqm is initialized
+                        if(!Mist.isJQMInitialized){
 
-                        controller.initialize({
-                            machineModel    : machine,      // Send Current Machine
-                            graphs          : self.graphs,  // Send Graphs Instances
-                        });
+                            window.setTimeout(setup,1000);
+                        }
+                        else{
 
-                        // Set Up Resolution Change Event
-                        $(window).resize(function(){
+                            Em.run.next(function() {
 
-                            var newWidth = $("#GraphsArea").width() -2;
-                            for(metric in self.graphs){
-                                 self.graphs[metric].changeWidth(newWidth);
-                            }
-                        })
+                                // Re-Initialize jquery components and hide buttons
+                                self.redrawJQMComponents();     
+                                $('.graphBtn').hide(0); 
+                                
+                                self.createGraphs(10*60*1000);
+                                
 
-                    });
+                                controller.initialize({
+                                    machineModel    : machine,      // Send Current Machine
+                                    graphs          : self.graphs,  // Send Graphs Instances
+                                });
 
+                                // Set Up Resolution Change Event
+                                $(window).resize(function(){
+
+                                    var newWidth = $("#GraphsArea").width() -2;
+                                    for(metric in self.graphs){
+                                         self.graphs[metric].changeWidth(newWidth);
+                                    }
+                                })
+
+                            });
+                        }
+                    }
+
+                    setup();
                     Mist.rulesController.redrawRules();
                 } 
             }.observes('controller.model.hasMonitoring','viewRendered'),

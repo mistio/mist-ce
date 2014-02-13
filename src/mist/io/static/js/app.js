@@ -135,6 +135,8 @@ define( 'app', [
             $.mobile.hashListeningEnabled = false;
             $.mobile.panel.prototype._bindUpdateLayout = function(){};
             $('body').css('overflow','auto');
+
+            App.set('isJQMInitialized',true);
         });
         
         // Hide error boxes on page unload
@@ -158,6 +160,8 @@ define( 'app', [
         App.set('ajax', new AJAX(CSRF_TOKEN)); // TODO: Get CSRF_TOKEN from server
         App.set('email', EMAIL);
         App.set('password', '');
+        App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/).test(navigator.userAgent) );
+        App.set('isJQMInitialized',false);
         window.Mist = App;
 
         // URL_PREFIX = AUTH = EMAIL = IS_CORE = CSRF_TOKEN '';
