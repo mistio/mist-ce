@@ -11,8 +11,6 @@ import requests
 from pyramid.config import Configurator
 from pyramid.renderers import JSON
 
-from libcloud.compute.drivers.ec2 import EC2NetworkInterface
-
 from mist.io.resources import Root
 import mist.io.config
 
