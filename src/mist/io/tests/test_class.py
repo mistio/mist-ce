@@ -386,22 +386,22 @@ class TestClass(unittest.TestCase):
             for image in images:
                 print image['name']
 
-    def test_041_search_image(self):
-        """
-        --->Search for an image
-        In our API we provide the choice to pass a search _term and
-        return a list of images with that name. This is the equivalent
-        with our 'Continue Search on server...' buttom...
-
-        Our API is lightyears ahead :-)
-        """
-        backend_id = self.test_config['BACKENDS'].keys()[0]
-        search_term = "Ubuntu"
-        print "\n>>>Searching for %s image " % search_term
-
-        images = backends.list_images(self.uri, backend_id, search_term=search_term, cookie=self.cookie)
-        for image in images:
-            print image['name']
+    # def test_041_search_image(self):
+    #     """
+    #     --->Search for an image
+    #     In our API we provide the choice to pass a search _term and
+    #     return a list of images with that name. This is the equivalent
+    #     with our 'Continue Search on server...' buttom...
+    #
+    #     Our API is lightyears ahead :-)
+    #     """
+    #     backend_id = self.test_config['BACKENDS'].keys()[0]
+    #     search_term = "Ubuntu"
+    #     print "\n>>>Searching for %s image " % search_term
+    #
+    #     images = backends.list_images(self.uri, backend_id, search_term=search_term, cookie=self.cookie)
+    #     for image in images:
+    #         print image['name']
 
     def test_041_list_sizes(self):
         """

@@ -36,12 +36,12 @@ def create_machine(uri, backend_id, key_id, name, location, image, size, script=
     except Exception as e:
         assert False, u'Exception: %s' % e
 
-#!Our API does not accept json in this post!
+
 def destroy_machine(uri, backend_id, machine_id, cookie=None):
     payload = {
         'action': 'destroy'
     }
-    req = MyRequests(uri=uri+"/backends/"+backend_id+"/machines/"+machine_id, data=payload, cookie=cookie)
+    req = MyRequests(uri=uri+"/backends/"+backend_id+"/machines/"+machine_id, data=json.dumps(payload), cookie=cookie)
     response = req.post()
     assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
     print "Destroyed machine with id: %s" % machine_id
@@ -51,26 +51,28 @@ def reboot_machine(uri, backend_id, machine_id, cookie=None):
     payload = {
         'action': 'reboot'
     }
-    req = MyRequests(uri=uri+"/backends/"+backend_id+"/machines/"+machine_id, cookie=cookie, data=payload)
+    req = MyRequests(uri=uri+"/backends/"+backend_id+"/machines/"+machine_id, cookie=cookie, data=json.dumps(payload))
     response = req.post()
     assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
     print "Rebooted machine with id: %s" % machine_id
+
 
 def stop_machine(uri, backend_id, machine_id, cookie=None):
     payload = {
         'action': 'stop'
     }
-    req = MyRequests(uri=uri+"/backends/"+backend_id+"/machines/"+machine_id, data=payload, cookie=cookie)
+    req = MyRequests(uri=uri+"/backends/"+backend_id+"/machines/"+machine_id, data=json.dumps(payload), cookie=cookie)
     response = req.post()
     assert response.ok, u'\nGot %d Response Status: %s \n%s' % (response.status_code, response.reason, response.text)
     print "Stopped machine with id: %s" % machine_id
+
 
 def start_machine(uri, backend_id, machine_id, cookie=None):
     sleep(30)
     payload = {
         'action': 'start'
     }
-    req = MyRequests(uri=uri+"/backends/"+backend_id+"/machines/"+machine_id, data=payload, cookie=cookie)
+    req = MyRequests(uri=uri+"/backends/"+backend_id+"/machines/"+machine_id, data=json.dumps(payload), cookie=cookie)
     response = req.post()
     if response.status_code == 503:
         print "Machine state is not yet ready to be started"
