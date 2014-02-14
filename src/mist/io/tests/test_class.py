@@ -289,8 +289,8 @@ class TestClass(unittest.TestCase):
             self.test_config['KEYPAIRS'] = {}
         else:
             for key in keys:
-                print key['name']
-                self.test_config['KEYPAIRS'][key['name']] = key
+                print key['id']
+                self.test_config['KEYPAIRS'][key['id']] = key
 
     def test_031_add_key(self):
         """
@@ -583,9 +583,9 @@ class TestClass(unittest.TestCase):
         """--->Delete All keys"""
         print "\n>>>Deleting all Keys"
         for key in keypairs.list_keys(self.uri):
-            if self.test_config['KEY_NAME'] in key['name']:
-                keypairs.delete_key(self.uri, key['name'])
-                del self.test_config['KEYPAIRS'][key['name']]
+            if self.test_config['KEY_NAME'] in key['id']:
+                keypairs.delete_key(self.uri, key['id'])
+                del self.test_config['KEYPAIRS'][key['id']]
 
     def test_94_delete_all_backends(self):
         """--->Delete All Backends"""
