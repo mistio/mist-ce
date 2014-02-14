@@ -120,65 +120,67 @@
 <tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/machines</tt><a class="headerlink" href="#get--backends-{backend_id}-machines" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all added machines for this backend</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
+<div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>[
+<div class="highlight-http"><div class="highlight"><pre>[
    {
-       "can_start": false,
-       "can_reboot": true,
-       "uuid": "447c23edbe944911f23145538915865ebddec230",
-       "name": "i-5ebfdc59",
-       "tags":
+       &quot;can_start&quot;: false,
+       &quot;can_reboot&quot;: true,
+       &quot;uuid&quot;: &quot;447c23edbe944911f23145538915865ebddec230&quot;,
+       &quot;name&quot;: &quot;i-5ebfdc59&quot;,
+       &quot;tags&quot;:
        [
-           "ap-northeast-1a"
+           &quot;ap-northeast-1a&quot;
        ],
-       "can_stop": true,
-       "can_destroy": true,
-       "extra":
+       &quot;can_stop&quot;: true,
+       &quot;can_destroy&quot;: true,
+       &quot;extra&quot;:
        {
-           "status": "running",
-           "productcode":
+           &quot;status&quot;: &quot;running&quot;,
+           &quot;productcode&quot;:
            [
            ],
-           "groups":
+           &quot;groups&quot;:
            [
                null
            ],
-           "tags":
+           &quot;tags&quot;:
            {
            },
-           "instanceId": "i-5ebfdc59",
-           "dns_name": "ec2-173-21-215-201.ap-northeast-1.compute.amazonaws.com",
-           "launchdatetime": "2014-01-13T13:58:03.000Z",
-           "iam_profile": null,
-           "imageId": "ami-2f61fe2e",
-           "kernelid": "aki-42992843",
-           "keyname": "Mykey",
-           "availability": "ap-northeast-1a",
-           "clienttoken": "",
-           "launchindex": "0",
-           "ramdiskid": null,
-           "private_dns": "ip-10-153-6-20.ap-northeast-1.compute.internal",
-           "instancetype": "t1.micro"
+           &quot;instanceId&quot;: &quot;i-5ebfdc59&quot;,
+           &quot;dns_name&quot;: &quot;ec2-173-21-215-201.ap-northeast-1.compute.amazonaws.com&quot;,
+           &quot;launchdatetime&quot;: &quot;2014-01-13T13:58:03.000Z&quot;,
+           &quot;iam_profile&quot;: null,
+           &quot;imageId&quot;: &quot;ami-2f61fe2e&quot;,
+           &quot;kernelid&quot;: &quot;aki-42992843&quot;,
+           &quot;keyname&quot;: &quot;Mykey&quot;,
+           &quot;availability&quot;: &quot;ap-northeast-1a&quot;,
+           &quot;clienttoken&quot;: &quot;&quot;,
+           &quot;launchindex&quot;: &quot;0&quot;,
+           &quot;ramdiskid&quot;: null,
+           &quot;private_dns&quot;: &quot;ip-10-153-6-20.ap-northeast-1.compute.internal&quot;,
+           &quot;instancetype&quot;: &quot;t1.micro&quot;
        },
-       "public_ips":
+       &quot;public_ips&quot;:
        [
-           "170.21.215.111"
+           &quot;170.21.215.111&quot;
        ],
-       "private_ips":
+       &quot;private_ips&quot;:
        [
-           "10.153.6.20"
+           &quot;10.153.6.20&quot;
        ],
-       "imageId": "ami-2f61fe2e",
-       "state": "running",
-       "can_tag": true,
-       "id": "i-5ebfdc59",
-       "size": "t1.micro"
+       &quot;imageId&quot;: &quot;ami-2f61fe2e&quot;,
+       &quot;state&quot;: &quot;running&quot;,
+       &quot;can_tag&quot;: true,
+       &quot;id&quot;: &quot;i-5ebfdc59&quot;,
+       &quot;size&quot;: &quot;t1.micro&quot;
    }
-]</pre>
+]
+</pre></div>
 </div>
 </dd></dl>
 
@@ -187,20 +189,21 @@ Accept: application/json; charset=UTF-8</pre>
 <tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines</tt><a class="headerlink" href="#post--backends-{backend_id}-machines" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create machine</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
+<div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
 {
-    "name":"WebServer 3",
-    "key":"MyKey2",
-    "image":"ami-2f61fe2e",
-    "location":"0",
-    "size":"t1.micro",
-    "script":"echo `uptime` &gt; new_file.txt",
-    "image_extra":"",
-    "disk":""
-}</pre>
+    &quot;name&quot;:&quot;WebServer 3&quot;,
+    &quot;key&quot;:&quot;MyKey2&quot;,
+    &quot;image&quot;:&quot;ami-2f61fe2e&quot;,
+    &quot;location&quot;:&quot;0&quot;,
+    &quot;size&quot;:&quot;t1.micro&quot;,
+    &quot;script&quot;:&quot;echo `uptime` &gt; new_file.txt&quot;,
+    &quot;image_extra&quot;:&quot;&quot;,
+    &quot;disk&quot;:&quot;&quot;
+}
+</pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -222,65 +225,71 @@ Accept: application/json; charset=UTF-8
 </tbody>
 </table>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>{
-   "public_ips":
+<div class="highlight-http"><div class="highlight"><pre>{
+   &quot;public_ips&quot;:
    [
-       "50.253.51.216"
+       &quot;50.253.51.216&quot;
    ],
-   "extra":
+   &quot;extra&quot;:
    {
-       "status": "running",
-       "productcode":
+       &quot;status&quot;: &quot;running&quot;,
+       &quot;productcode&quot;:
        [
        ],
-       "groups":
+       &quot;groups&quot;:
        [
            null
        ],
-       "tags":
+       &quot;tags&quot;:
        {
-           "Name": "WebServer 3"
+           &quot;Name&quot;: &quot;WebServer 3&quot;
        },
-       "instanceId": "i-50dd7257",
-       "dns_name": "ec2-50-253-51-216.ap-northeast-1.compute.amazonaws.com",
-       "launchdatetime": "2014-01-15T05:37:50.000Z",
-       "iam_profile": null,
-       "imageId": "ami-2f61fe2e",
-       "kernelid": "aki-42992843",
-       "keyname": "MyKey2",
-       "availability": "ap-northeast-1a",
-       "clienttoken": "",
-       "launchindex": "0",
-       "ramdiskid": null,
-       "private_dns": "ip-10-160-226-156.ap-northeast-1.compute.internal",
-       "instancetype": "t1.micro"
+       &quot;instanceId&quot;: &quot;i-50dd7257&quot;,
+       &quot;dns_name&quot;: &quot;ec2-50-253-51-216.ap-northeast-1.compute.amazonaws.com&quot;,
+       &quot;launchdatetime&quot;: &quot;2014-01-15T05:37:50.000Z&quot;,
+       &quot;iam_profile&quot;: null,
+       &quot;imageId&quot;: &quot;ami-2f61fe2e&quot;,
+       &quot;kernelid&quot;: &quot;aki-42992843&quot;,
+       &quot;keyname&quot;: &quot;MyKey2&quot;,
+       &quot;availability&quot;: &quot;ap-northeast-1a&quot;,
+       &quot;clienttoken&quot;: &quot;&quot;,
+       &quot;launchindex&quot;: &quot;0&quot;,
+       &quot;ramdiskid&quot;: null,
+       &quot;private_dns&quot;: &quot;ip-10-160-226-156.ap-northeast-1.compute.internal&quot;,
+       &quot;instancetype&quot;: &quot;t1.micro&quot;
    },
-   "id": "i-50dd7257",
-   "private_ips":
+   &quot;id&quot;: &quot;i-50dd7257&quot;,
+   &quot;private_ips&quot;:
    [
-       "10.160.226.156"
+       &quot;10.160.226.156&quot;
    ],
-   "name": "WebServer 3"
-}</pre>
+   &quot;name&quot;: &quot;WebServer 3&quot;
+}
+</pre></div>
 </div>
 </dd></dl>
 
 <dl class="post">
-<dt id="post--backends-{backend_id}-machines-{machine_id}?action={action}">
-<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}?action={action}</tt><a class="headerlink" href="#post--backends-{backend_id}-machines-{machine_id}?action={action}" title="Permalink to this definition">¶</a></dt>
+<dt id="post--backends-{backend_id}-machines-{machine_id}">
+<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}</tt><a class="headerlink" href="#post--backends-{backend_id}-machines-{machine_id}" title="Permalink to this definition">¶</a></dt>
 <dd><p>Machine actions like reboot, destroy, shutdown and start</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257?action=reboot
-Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+<div class="highlight-http"><div class="highlight"><pre>  POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257
+  Host: mist.io
+  Accept: application/json; charset=UTF-8
+
+{
+    &quot;action&quot;:&quot;reboot&quot;
+}
+</pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Query Parameters:</th></tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>action</strong> &#8211; <em>required</em> Can be reboot, shutdown, start or destroy depending on the available actions for each machine</li>
+<li><strong>action</strong> (<em>string</em>) &#8211; <em>required</em> Can be reboot, shutdown, start or destroy depending on the available actions for each machine</li>
 </ul>
 </td>
 </tr>
@@ -293,13 +302,14 @@ Accept: application/json; charset=UTF-8</pre>
 <tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}/metadata</tt><a class="headerlink" href="#post--backends-{backend_id}-machines-{machine_id}-metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add tags/metadata for machine</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/metadata
+<div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/metadata
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
 {
-    "tag":"Backup Machine"
-}</pre>
+    &quot;tag&quot;:&quot;Backup Machine&quot;
+}
+</pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -330,7 +340,7 @@ Accept: application/json; charset=UTF-8
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.1.<br/>
     </p>
   </div>
 </footer>

@@ -146,7 +146,7 @@
        "name": "WebServer 3"
     }
 
-.. http:post:: /backends/{backend_id}/machines/{machine_id}?action={action}
+.. http:post:: /backends/{backend_id}/machines/{machine_id}
 
    Machine actions like reboot, destroy, shutdown and start
 
@@ -154,11 +154,16 @@
 
    .. sourcecode:: http
 
-      POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257?action=reboot
+      POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257
       Host: mist.io
       Accept: application/json; charset=UTF-8
 
-   :query action: *required* Can be reboot, shutdown, start or destroy depending on the available actions for each machine
+    {
+        "action":"reboot"
+    }
+
+
+   :jsonparam string action: *required* Can be reboot, shutdown, start or destroy depending on the available actions for each machine
 
 .. http:post:: /backends/{backend_id}/machines/{machine_id}/metadata
 

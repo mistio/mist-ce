@@ -120,19 +120,21 @@
 <tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}/shell?host={host_ip}&amp;command={shell_command}</tt><a class="headerlink" href="#get--backends-{backend_id}-machines-{machine_id}-shell?host={host_ip}&command={shell_command}" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run shell command in machine. Mist will yield an html body with the command&#8217;s output.</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/shell?host=129.113.146.116&amp;command=uptime
+<div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/shell?host=129.113.146.116&amp;command=uptime
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>&lt;html&gt;
+<div class="highlight-http"><div class="highlight"><pre>&lt;html&gt;
 &lt;body&gt;
-&lt;script type='text/javascript'&gt;parent.appendShell \
-(' 06:29:06 up 1 day, 21:00,  1 user,  load average: 0.00, 0.01, 0.05&lt;br/&gt;'); \
+&lt;script type=&#39;text/javascript&#39;&gt;parent.appendShell \
+(&#39; 06:29:06 up 1 day, 21:00,  1 user,  load average: 0.00, 0.01, 0.05&lt;br/&gt;&#39;); \
 &lt;/script&gt;
-&lt;script type='text/javascript'&gt;parent.completeShell(1);&lt;/script&gt;
+&lt;script type=&#39;text/javascript&#39;&gt;parent.completeShell(1);&lt;/script&gt;
 &lt;/body&gt;
-&lt;/html&gt;</pre>
+&lt;/html&gt;
+</pre></div>
 </div>
 </dd></dl>
 
@@ -151,7 +153,7 @@ Accept: application/json; charset=UTF-8</pre>
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.1.<br/>
     </p>
   </div>
 </footer>
