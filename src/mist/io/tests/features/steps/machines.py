@@ -30,17 +30,34 @@ ip = ""
 def given_key(context):
     key = context.personas['NinjaTester']['key_name']
 
-    context.execute_steps(u"""
-        When I click the "Keys" button
-        And I wait for 2 seconds
-        And I click the "Add" button
-        And I type "%s" as key name
-        And I click the "Generate" button
-        And I wait for 5 seconds
-        And I click the "Add" button
-            Then I should see the "%s" Key added within 5 seconds
-    """ % (key, key))
+    try:
+        context.execute_steps(u"""
+            When I wait for 2 seconds
+            And I click the "Add" button
+            And I wait for 5 seconds
+            And I type "%s" as key name
+            And I click the "Generate" button
+            And I wait for 5 seconds
+            And I click the "Add" button within "add-key-popup" panel
+            And I wait for 5 seconds
+                Then I should see the "%s" Key added within 10 seconds
+        """ % (key, key))
+        return
+    except Exception as e:
+        context.execute_steps(u"""
+            When I wait for 2 seconds
+            And I click the "Add" button
+            And I wait for 5 seconds
+            And I type "%s" as key name
+            And I click the "Generate" button
+            And I wait for 5 seconds
+            And I click the "Add" button within "add-key-popup" panel
+            And I wait for 5 seconds
+                Then I should see the "%s" Key added within 10 seconds
+        """ % (key, key))
+        return
 
+    assert False, u'Could not create key for the machine, got %s exception' % e
 
 @when(u'I type "{name}" as machine name')
 def type_machine_name(context, name):
@@ -79,7 +96,13 @@ def check_machine_state(context, machine_name, state, timeout):
                 return
             sleep(2)
         except:
-            pass
+            sleep(5)
+            machines = context.browser.find_by_css('#machines li')
+            for machine in machines:
+                if machine_name in machine.text:
+                    break
+            if state in machine.text:
+                return
 
     assert False, u'Could not find %s state for machine %s' % (state, machine_name)
 
@@ -107,6 +130,7 @@ def check_probed(context, machine_name, timeout):
             if leds.has_class('probed'):
                 return
         except:
+            sleep(5)
             machines = context.browser.find_by_css('#machines li')
             for machine in machines:
                 if machine_name in machine.text:
@@ -136,11 +160,19 @@ def click_machine(context, name):
 @then(u'I should find the Public IP')
 def find_ip(context):
     global ip
-    infos = context.browser.find_by_css('.ui-collapsible tr td')
+    try:
+        infos = context.browser.find_by_css('.ui-collapsible tr td')
 
-    for i in range(len(infos)):
-        if "Public" in infos[i].text:
-            ip = infos[i+1].text
+        for i in range(len(infos)):
+            if "Public" in infos[i].text:
+                ip = infos[i+1].text
+    except:
+        sleep(2)
+        infos = context.browser.find_by_css('.ui-collapsible tr td')
+
+        for i in range(len(infos)):
+            if "Public" in infos[i].text:
+                ip = infos[i+1].text
 
 
 @when(u'I add my bare metal creds')
