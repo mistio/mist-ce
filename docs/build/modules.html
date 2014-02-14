@@ -246,15 +246,6 @@ deleted.</p>
 <dd></dd></dl>
 
 <dl class="function">
-<dt id="mist.io.views.exception_handler_general">
-<tt class="descclassname">mist.io.views.</tt><tt class="descname">exception_handler_general</tt><big>(</big><em>exc</em>, <em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.exception_handler_general" title="Permalink to this definition">¶</a></dt>
-<dd><p>This simply catches all exceptions that don&#8217;t subclass MistError and
-returns an Internal Server Error status code.</p>
-<p>When debugging it may be useful to comment out this function or its
-&#64;view decorator.</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="mist.io.views.exception_handler_mist">
 <tt class="descclassname">mist.io.views.</tt><tt class="descname">exception_handler_mist</tt><big>(</big><em>exc</em>, <em>request</em><big>)</big><a class="headerlink" href="#mist.io.views.exception_handler_mist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Here we catch exceptions and transform them to proper http responses</p>
@@ -812,6 +803,17 @@ one.</p>
 </dd></dl>
 
 <dl class="class">
+<dt id="mist.io.dal.HtmlSafeStrField">
+<em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">HtmlSafeStrField</tt><big>(</big><em>val=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.HtmlSafeStrField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Escapes &lt; and &gt; when reading field.</p>
+<dl class="method">
+<dt id="mist.io.dal.HtmlSafeStrField.cast2front">
+<tt class="descname">cast2front</tt><big>(</big><em>back_value=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.HtmlSafeStrField.cast2front" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="mist.io.dal.IntField">
 <em class="property">class </em><tt class="descclassname">mist.io.dal.</tt><tt class="descname">IntField</tt><big>(</big><em>val=None</em><big>)</big><a class="headerlink" href="#mist.io.dal.IntField" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets an integer field. Default value: 0</p>
@@ -988,7 +990,7 @@ the code below, it should be pretty self-explanatory.</p>
 <dd><p>A cloud vm provider backend</p>
 <dl class="attribute">
 <dt id="mist.io.model.Backend.apikey">
-<tt class="descname">apikey</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.apikey" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">apikey</tt><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.apikey" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1003,7 +1005,7 @@ the code below, it should be pretty self-explanatory.</p>
 
 <dl class="attribute">
 <dt id="mist.io.model.Backend.auth_version">
-<tt class="descname">auth_version</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.auth_version" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">auth_version</tt><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.auth_version" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1033,12 +1035,12 @@ the code below, it should be pretty self-explanatory.</p>
 
 <dl class="attribute">
 <dt id="mist.io.model.Backend.provider">
-<tt class="descname">provider</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.provider" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">provider</tt><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.provider" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="mist.io.model.Backend.region">
-<tt class="descname">region</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.region" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">region</tt><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.region" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1048,12 +1050,12 @@ the code below, it should be pretty self-explanatory.</p>
 
 <dl class="attribute">
 <dt id="mist.io.model.Backend.tenant_name">
-<tt class="descname">tenant_name</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.tenant_name" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">tenant_name</tt><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.tenant_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="mist.io.model.Backend.title">
-<tt class="descname">title</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.title" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">title</tt><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Backend.title" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1121,12 +1123,12 @@ Only works for RSA.</p>
 we get the machine list from the provider.</p>
 <dl class="attribute">
 <dt id="mist.io.model.Machine.dns_name">
-<tt class="descname">dns_name</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Machine.dns_name" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">dns_name</tt><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Machine.dns_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="mist.io.model.Machine.name">
-<tt class="descname">name</tt><em class="property"> = &lt;class 'mist.io.dal.StrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Machine.name" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">name</tt><em class="property"> = &lt;class 'mist.io.dal.HtmlSafeStrField'&gt;('')</em><a class="headerlink" href="#mist.io.model.Machine.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1280,7 +1282,7 @@ the private key.</p>
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.1.<br/>
     </p>
   </div>
 </footer>
