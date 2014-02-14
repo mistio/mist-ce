@@ -320,6 +320,7 @@ define( 'app', [
 
         App.Checkbox = Ember.Checkbox;
         App.TextField = Ember.TextField.extend({
+            autocapitalize: 'off',
             attributeBindings: [
                 'data-theme',
                 'autocapitalize'
