@@ -1121,23 +1121,20 @@ def list_images(user, backend_id, term=None):
         images = starred_images + ec2_images + rest_images
         images = [img for img in images
                   if img.id[:3] not in ['aki', 'ari']
-                  and img.id[:3] not in ['aki', 'ari']
                   and 'windows' not in img.name.lower()
                   and 'hvm' not in img.name.lower()]
 
         if term:
             images = [img for img in images
                       if term in img.id.lower()
-                      or term in img.name.lower()][:20]
+                      or term in img.name.lower()][:40]
     except Exception as e:
         log.error(repr(e))
         raise BackendUnavailableError(backend_id)
 
-    ret = []
-    for image in images:
-        ret.append({'id': image.id, 'extra': image.extra,
-                    'name': image.name, 'star': image.id in starred})
-    return ret
+    ret = [{'id': image.id, 'extra': image.extra, 'name': image.name,
+            'star': image.id in starred} for image in images]
+    return sorted(ret, key=lambda k: k.get('name'))
 
 
 def list_sizes(user, backend_id):
