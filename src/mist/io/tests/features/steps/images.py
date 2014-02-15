@@ -15,6 +15,7 @@ I should see "{name}" images within {timeout} seconds       --> parse_advance_se
 
 """
 from time import sleep, time
+from behave import *
 
 from general import time_vslow, time_fast, time_mid, time_slow
 

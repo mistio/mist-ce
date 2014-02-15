@@ -15,7 +15,7 @@ I login to mist.io      --> login_to_mist
 ------
 
 """
-
+from behave import *
 
 @given(u'a key for the monitored machine')
 def given_key(context):
