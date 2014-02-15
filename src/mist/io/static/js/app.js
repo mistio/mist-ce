@@ -8,7 +8,7 @@ require.config({
         jquery: 'lib/jquery-1.10.2',
         text: 'lib/require/text',
         mobile: 'lib/jquery.mobile-1.4.0-rc.1',
-        ember: 'lib/ember-1.1.2',
+        ember: 'lib/ember-1.1.2.min',
         handlebars: 'lib/handlebars-1.0.0',
         d3: 'lib/d3-2.10.1',
         md5: 'lib/md5',
@@ -140,6 +140,8 @@ define( 'app', [
             $.mobile.hashListeningEnabled = false;
             $.mobile.panel.prototype._bindUpdateLayout = function(){};
             $('body').css('overflow','auto');
+
+            App.set('isJQMInitialized',true);
         });
 
 
@@ -166,6 +168,8 @@ define( 'app', [
         App.set('ajax', new AJAX(CSRF_TOKEN)); // TODO: Get CSRF_TOKEN from server
         App.set('email', EMAIL);
         App.set('password', '');
+        App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/).test(navigator.userAgent) );
+        App.set('isJQMInitialized',false);
         window.Mist = App;
 
         // URL_PREFIX = AUTH = EMAIL = IS_CORE = CSRF_TOKEN '';
@@ -322,6 +326,7 @@ define( 'app', [
 
         App.Checkbox = Ember.Checkbox;
         App.TextField = Ember.TextField.extend({
+            autocapitalize: 'off',
             attributeBindings: [
                 'data-theme',
                 'autocapitalize'

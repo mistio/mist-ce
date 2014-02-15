@@ -81,31 +81,43 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     var self = this;
                     var controller = Mist.monitoringController;
 
-                    Em.run.next(function() {
+                    var setup = function() {
 
-                        // Re-Initialize jquery components and hide buttons
-                        self.redrawJQMComponents();     
-                        $('.graphBtn').hide(0); 
-                        
-                        self.createGraphs(10*60*1000);
-                        
+                        // Check if jqm is initialized
+                        if(!Mist.isJQMInitialized){
 
-                        controller.initialize({
-                            machineModel    : machine,      // Send Current Machine
-                            graphs          : self.graphs,  // Send Graphs Instances
-                        });
+                            window.setTimeout(setup,1000);
+                        }
+                        else{
 
-                        // Set Up Resolution Change Event
-                        $(window).resize(function(){
+                            Em.run.next(function() {
 
-                            var newWidth = $("#GraphsArea").width() -2;
-                            for(metric in self.graphs){
-                                 self.graphs[metric].changeWidth(newWidth);
-                            }
-                        })
+                                // Re-Initialize jquery components and hide buttons
+                                self.redrawJQMComponents();     
+                                $('.graphBtn').hide(0); 
+                                
+                                self.createGraphs(10*60*1000);
+                                
 
-                    });
+                                controller.initialize({
+                                    machineModel    : machine,      // Send Current Machine
+                                    graphs          : self.graphs,  // Send Graphs Instances
+                                });
 
+                                // Set Up Resolution Change Event
+                                $(window).resize(function(){
+
+                                    var newWidth = $("#GraphsArea").width() -2;
+                                    for(metric in self.graphs){
+                                         self.graphs[metric].changeWidth(newWidth);
+                                    }
+                                })
+
+                            });
+                        }
+                    }
+
+                    setup();
                     Mist.rulesController.redrawRules();
                 } 
             }.observes('controller.model.hasMonitoring','viewRendered'),
@@ -199,14 +211,21 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
 
                     // Scale Functions will scale graph to defined width and height
-                    var xScale = d3.time.scale().range([0, this.width - margin.left - margin.right]);
-                    var yScale = d3.scale.linear().range([this.height - margin.top - margin.bottom, 0]);
+                    width = this.width - margin.left - margin.right;
+                    height= this.height - margin.top - margin.bottom;
+                    var xScale = d3.time.scale().range([0, width]);
+                    var yScale = d3.scale.linear().range([height, 0]);
 
                     // valueline is function that creates the main line based on data
                     var valueline = d3.svg.line()
                                     .x(function(d) {return xScale(d.time); })
                                     .y(function(d) {return yScale(d.value); });
 
+                    // valuearea is function that fills the space under the main line
+                    var valuearea = d3.svg.area()
+                                    .x(function(d) {return xScale(d.time); })
+                                    .y1(function(d) {return yScale(d.value); })
+                                    .y0(height);
                     
                     // ---------------  SVG elements for graph manipulation --------------------- //
                     // Elements will be added to the dom after first updateData().
@@ -214,6 +233,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     var d3GridX;          // Horizontal grid lines g element
                     var d3GridY;          // Vertical   grid lines g element
                     var d3vLine;          // Main Line that will show the values
+                    var d3vArea;          // The are fill underneath d3vLine
                     var d3xAxis;          // Vertical/X Axis With Text(Time)
                     var d3HideAnimeLine;  // A Rectangle that hides the valueline when it's animated
                     var d3xAxisLine;      // The line of the x axis
@@ -471,10 +491,17 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                             var step = (this.timeDisplayed / NUM_OF_MEASUREMENT);
                             var animationDuration = step*1000;
                             
-                            // Update Animated Line
+                            // Update Animated Line and Area
                             d3vLine.attr("transform", "translate(" + this.valuesDistance + ")")
                                    .attr("d", valueline(this.displayedData)) 
                                    .transition() 
+                                   .ease("linear")
+                                   .duration(animationDuration)
+                                   .attr("transform", "translate(" + 0 + ")");
+
+                            d3vArea.attr("transform", "translate(" + this.valuesDistance + ")")
+                                   .attr("d", valuearea(this.displayedData))
+                                   .transition()
                                    .ease("linear")
                                    .duration(animationDuration)
                                    .attr("transform", "translate(" + 0 + ")");
@@ -494,8 +521,9 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         }
                         else {
 
-                            // Update Non-Animated value line
+                            // Update Non-Animated value line and area
                             d3vLine.attr("d", valueline(this.displayedData))
+                            d3vArea.attr("d", valuearea(this.displayedData))
 
                             // Fix For Animation after time displayed changed
                             if(this.timeUpdated || !this.animationEnabled)
@@ -503,6 +531,10 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                 this.timeUpdated = false;
 
                                 d3vLine.transition()
+                                       .duration( 0 )
+                                       .attr("transform", "translate(" + 0 + ")");
+
+                                d3vArea.transition()
                                        .duration( 0 )
                                        .attr("transform", "translate(" + 0 + ")");
 
@@ -577,9 +609,13 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     */
                     this.stopCurrentAnimation = function() {
 
-                         d3vLine.transition()
-                                .duration( 0 )
-                                .attr("transform", "translate(" + 0 + ")");
+                        d3vLine.transition()
+                               .duration( 0 )
+                               .attr("transform", "translate(" + 0 + ")");
+
+                        d3vArea.transition()
+                               .duration( 0 )
+                               .attr("transform", "translate(" + 0 + ")");
 
                         d3xAxis.transition()
                                .duration( 0 )
@@ -745,6 +781,11 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                   .append("g")         
                                   .attr("class", "grid-y")
                                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                      d3vArea = d3svg.append('g')
+                                     .attr('class','valueArea')
+                                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                                     .append('path');
 
                       d3vLine = d3svg.append('g')
                                      .attr('class','valueLine')

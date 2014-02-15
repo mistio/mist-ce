@@ -55,11 +55,11 @@
       Accept: application/json; charset=UTF-8
 
       {
-        "name":"MyKey",
+        "id":"MyKey",
         "priv":"-----BEGIN RSA PRIVATE KEY-----OoiknlOnNJNKCAQEAtbBji1OMHW2bS2Va..."
       }
 
-   :jsonparam string name:  *required* Name of new key
+   :jsonparam string id:  *required* Name of new key
    :jsonparam string priv:  *required* Private ssh key
 
 .. http:post:: /keys
@@ -107,10 +107,10 @@
       Accept: application/json; charset=UTF-8
 
       {
-        "newName":"New Key Name"
+        "new_id":"New Key Name"
       }
 
-   :jsonparam string newName:  *required* New name for key
+   :jsonparam string new_id:  *required* New name for key
 
 .. http:post:: /keys/{key_id}
 
@@ -124,7 +124,7 @@
       Host: mist.io
       Accept: application/json; charset=UTF-8
 
-.. http:get:: /keys/{key_id}?action=private
+.. http:get:: /keys/{key_id}/private
 
    Get private key
 
@@ -132,7 +132,7 @@
 
    .. sourcecode:: http
 
-      GET /keys/{key_id}?action=private
+      GET /keys/{key_id}/private
       Host: mist.io
       Accept: application/json; charset=UTF-8
 
@@ -142,7 +142,7 @@
 
     "-----BEGIN RSA PRIVATE KEY-----\nMIIE..."
 
-.. http:get:: /keys/{key_id}?action=public
+.. http:get:: /keys/{key_id}/public
 
    Get public key
 
@@ -150,7 +150,7 @@
 
    .. sourcecode:: http
 
-      GET /keys/{key_id}?action=public
+      GET /keys/{key_id}/public
       Host: mist.io
       Accept: application/json; charset=UTF-8
 

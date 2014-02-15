@@ -120,115 +120,117 @@
 <tt class="descname">GET </tt><tt class="descname">/providers</tt><a class="headerlink" href="#get--providers" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all supported providers</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /providers
+<div class="highlight-http"><div class="highlight"><pre>GET /providers
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>{
-  "supported_providers": [
+<div class="highlight-http"><div class="highlight"><pre>{
+  &quot;supported_providers&quot;: [
     {
-      "provider": "bare_metal",
-      "title": "Bare Metal Server"
+      &quot;provider&quot;: &quot;bare_metal&quot;,
+      &quot;title&quot;: &quot;Bare Metal Server&quot;
     },
     {
-      "provider": "ec2_ap_northeast",
-      "title": "EC2 AP NORTHEAST"
+      &quot;provider&quot;: &quot;ec2_ap_northeast&quot;,
+      &quot;title&quot;: &quot;EC2 AP NORTHEAST&quot;
     },
     {
-      "provider": "ec2_ap_southeast",
-      "title": "EC2 AP SOUTHEAST"
+      &quot;provider&quot;: &quot;ec2_ap_southeast&quot;,
+      &quot;title&quot;: &quot;EC2 AP SOUTHEAST&quot;
     },
     {
-      "provider": "ec2_ap_southeast_2",
-      "title": "EC2 AP Sydney"
+      &quot;provider&quot;: &quot;ec2_ap_southeast_2&quot;,
+      &quot;title&quot;: &quot;EC2 AP Sydney&quot;
     },
     {
-      "provider": "ec2_eu_west",
-      "title": "EC2 EU Ireland"
+      &quot;provider&quot;: &quot;ec2_eu_west&quot;,
+      &quot;title&quot;: &quot;EC2 EU Ireland&quot;
     },
     {
-      "provider": "ec2_sa_east",
-      "title": "EC2 SA EAST"
+      &quot;provider&quot;: &quot;ec2_sa_east&quot;,
+      &quot;title&quot;: &quot;EC2 SA EAST&quot;
     },
     {
-      "provider": "ec2_us_east",
-      "title": "EC2 US EAST"
+      &quot;provider&quot;: &quot;ec2_us_east&quot;,
+      &quot;title&quot;: &quot;EC2 US EAST&quot;
     },
     {
-      "provider": "ec2_us_west",
-      "title": "EC2 US WEST"
+      &quot;provider&quot;: &quot;ec2_us_west&quot;,
+      &quot;title&quot;: &quot;EC2 US WEST&quot;
     },
     {
-      "provider": "ec2_us_west_oregon",
-      "title": "EC2 US WEST OREGON"
+      &quot;provider&quot;: &quot;ec2_us_west_oregon&quot;,
+      &quot;title&quot;: &quot;EC2 US WEST OREGON&quot;
     },
     {
-      "provider": "nephoscale",
-      "title": "NephoScale"
+      &quot;provider&quot;: &quot;nephoscale&quot;,
+      &quot;title&quot;: &quot;NephoScale&quot;
     },
     {
-      "provider": "digitalocean",
-      "title": "DigitalOcean"
+      &quot;provider&quot;: &quot;digitalocean&quot;,
+      &quot;title&quot;: &quot;DigitalOcean&quot;
     },
     {
-      "provider": "linode",
-      "title": "Linode"
+      &quot;provider&quot;: &quot;linode&quot;,
+      &quot;title&quot;: &quot;Linode&quot;
     },
     {
-      "provider": "openstack",
-      "title": "OpenStack"
+      &quot;provider&quot;: &quot;openstack&quot;,
+      &quot;title&quot;: &quot;OpenStack&quot;
     },
     {
-      "provider": "rackspace:dfw",
-      "title": "Rackspace DFW"
+      &quot;provider&quot;: &quot;rackspace:dfw&quot;,
+      &quot;title&quot;: &quot;Rackspace DFW&quot;
     },
     {
-      "provider": "rackspace:ord",
-      "title": "Rackspace ORD"
+      &quot;provider&quot;: &quot;rackspace:ord&quot;,
+      &quot;title&quot;: &quot;Rackspace ORD&quot;
     },
     {
-      "provider": "rackspace:iad",
-      "title": "Rackspace IAD"
+      &quot;provider&quot;: &quot;rackspace:iad&quot;,
+      &quot;title&quot;: &quot;Rackspace IAD&quot;
     },
     {
-      "provider": "rackspace:lon",
-      "title": "Rackspace LON"
+      &quot;provider&quot;: &quot;rackspace:lon&quot;,
+      &quot;title&quot;: &quot;Rackspace LON&quot;
     },
     {
-      "provider": "rackspace:syd",
-      "title": "Rackspace AU"
+      &quot;provider&quot;: &quot;rackspace:syd&quot;,
+      &quot;title&quot;: &quot;Rackspace AU&quot;
     },
     {
-      "provider": "rackspace_first_gen:us",
-      "title": "Rackspace US (OLD)"
+      &quot;provider&quot;: &quot;rackspace_first_gen:us&quot;,
+      &quot;title&quot;: &quot;Rackspace US (OLD)&quot;
     },
     {
-      "provider": "rackspace_first_gen:uk",
-      "title": "Rackspace UK (OLD)"
+      &quot;provider&quot;: &quot;rackspace_first_gen:uk&quot;,
+      &quot;title&quot;: &quot;Rackspace UK (OLD)&quot;
     },
     {
-      "provider": "softlayer",
-      "title": "SoftLayer"
+      &quot;provider&quot;: &quot;softlayer&quot;,
+      &quot;title&quot;: &quot;SoftLayer&quot;
     },
     {
-      "provider": "openstack:az-1.region-a.geo-1",
-      "title": "HP Cloud US West AZ 1"
+      &quot;provider&quot;: &quot;openstack:az-1.region-a.geo-1&quot;,
+      &quot;title&quot;: &quot;HP Cloud US West AZ 1&quot;
     },
     {
-      "provider": "openstack:az-2.region-a.geo-1",
-      "title": "HP Cloud US West AZ 2"
+      &quot;provider&quot;: &quot;openstack:az-2.region-a.geo-1&quot;,
+      &quot;title&quot;: &quot;HP Cloud US West AZ 2&quot;
     },
     {
-      "provider": "openstack:az-3.region-a.geo-1",
-      "title": "HP Cloud US West AZ 3"
+      &quot;provider&quot;: &quot;openstack:az-3.region-a.geo-1&quot;,
+      &quot;title&quot;: &quot;HP Cloud US West AZ 3&quot;
     },
     {
-      "provider": "openstack:region-b.geo-1",
-      "title": "HP Cloud US East"
+      &quot;provider&quot;: &quot;openstack:region-b.geo-1&quot;,
+      &quot;title&quot;: &quot;HP Cloud US East&quot;
     }
   ]
-}</pre>
+}
+</pre></div>
 </div>
 </dd></dl>
 
@@ -247,7 +249,7 @@ Accept: application/json; charset=UTF-8</pre>
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.1.<br/>
     </p>
   </div>
 </footer>

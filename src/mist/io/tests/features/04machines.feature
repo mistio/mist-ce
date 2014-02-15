@@ -23,7 +23,11 @@ Feature: Machines
         And I wait for 1 seconds
             Then I should see the "EC2 AP NORTHEAST" Backend added within 30 seconds
 
+        When I wait for 3 seconds
+        And I click the "Keys" button
+
         Given a key for the machine
+
         When I visit mist.io
         And I wait for 10 seconds
         And I click the "Machines" button
@@ -55,7 +59,7 @@ Feature: Machines
             Then "tester" state should be "pending" within 60 seconds
         When I wait for 10 seconds
             Then "tester" state should be "running" within 400 seconds
-        When I wait for 10 seconds
+        When I wait for 30 seconds
             Then "tester" should be probed within 400 seconds
         When I wait for 1 seconds
 
@@ -91,11 +95,12 @@ Feature: Machines
         And I wait for 2 seconds
         And I click the "Add" button
         And I type "SecondKey" as key name
+        And I wait for 5 seconds
         And I click the "Generate" button
-        And I wait for 5 seconds
+        And I wait for 30 seconds
         And I click the "Add" button within "add-key-popup" panel
-        And I wait for 5 seconds
-            Then I should see the "SecondKey" Key added within 5 seconds
+        And I wait for 10 seconds
+            Then I should see the "SecondKey" Key added within 10 seconds
 
         When I visit mist.io
             Then I should see "mist.io"
@@ -125,7 +130,7 @@ Feature: Machines
         And I wait for 3 seconds
         And I click the "SecondKey" from the associated keys
         And I click the "Remove" button
-        And I wait for 2 seconds
+        And I wait for 5 seconds
             Then I should see 1 keys associated within 30 seconds
 
 
@@ -159,8 +164,6 @@ Feature: Machines
         And I wait for 1 seconds
         And I click the "Yes" button
         And I wait for 1 seconds
-            Then "tester" state should be "pending" within 80 seconds
-        When I wait for 1 seconds
             Then "tester" state should be "running" within 400 seconds
 
 
@@ -183,12 +186,13 @@ Feature: Machines
 
     @web
     @machine-actions
+    @bare-metal
     Scenario: Destroy Machine
         When I visit mist.io
             Then I should see "mist.io"
         When I wait for 2 seconds
         And I click the "Machines" button
-        And I wait for 15 seconds
+        And I wait for 30 seconds
         And I tick the "tester" machine
         And I click the "Power" button
         And I click the "Destroy" button

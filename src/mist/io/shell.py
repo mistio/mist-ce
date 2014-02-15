@@ -8,6 +8,7 @@ SSH.
 
 import logging
 from time import time
+from StringIO import StringIO
 
 
 import paramiko
@@ -18,7 +19,7 @@ from mist.io.exceptions import BackendNotFoundError, KeypairNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import ServiceUnavailableError
-from mist.io.helpers import get_temp_file
+
 
 log = logging.getLogger(__name__)
 
@@ -82,8 +83,7 @@ class Shell(object):
             raise RequiredParameterMissingError("neither key nor password "
                                                 "provided.")
         if key:
-            with get_temp_file(key) as key_path:
-                rsa_key = paramiko.RSAKey.from_private_key_file(key_path)
+            rsa_key = paramiko.RSAKey.from_private_key(StringIO(key))
         else:
             rsa_key = None
 
