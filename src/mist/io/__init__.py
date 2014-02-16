@@ -9,7 +9,7 @@ import requests
 
 
 from pyramid.config import Configurator
-
+from pyramid.renderers import JSON
 
 from mist.io.resources import Root
 import mist.io.config
@@ -90,6 +90,13 @@ def main(global_config, **settings):
             settings['auth'] = False
 
     config = Configurator(root_factory=Root, settings=settings)
+
+    # Add custom adapter to the JSON renderer to avoid serialization errors
+    json_renderer = JSON()
+    def string_adapter(obj, request):
+        return str(obj)
+    json_renderer.add_adapter(object, string_adapter)
+    config.add_renderer('json', json_renderer)    
     config.add_static_view('resources', 'mist.io:static')
     config.add_static_view('docs', path='../../../docs/build')
     config.include(add_routes)

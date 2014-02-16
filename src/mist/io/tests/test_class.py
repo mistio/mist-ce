@@ -289,8 +289,8 @@ class TestClass(unittest.TestCase):
             self.test_config['KEYPAIRS'] = {}
         else:
             for key in keys:
-                print key['name']
-                self.test_config['KEYPAIRS'][key['name']] = key
+                print key['id']
+                self.test_config['KEYPAIRS'][key['id']] = key
 
     def test_031_add_key(self):
         """
@@ -386,22 +386,22 @@ class TestClass(unittest.TestCase):
             for image in images:
                 print image['name']
 
-    def test_041_search_image(self):
-        """
-        --->Search for an image
-        In our API we provide the choice to pass a search _term and
-        return a list of images with that name. This is the equivalent
-        with our 'Continue Search on server...' buttom...
-
-        Our API is lightyears ahead :-)
-        """
-        backend_id = self.test_config['BACKENDS'].keys()[0]
-        search_term = "Ubuntu"
-        print "\n>>>Searching for %s image " % search_term
-
-        images = backends.list_images(self.uri, backend_id, search_term=search_term, cookie=self.cookie)
-        for image in images:
-            print image['name']
+    # def test_041_search_image(self):
+    #     """
+    #     --->Search for an image
+    #     In our API we provide the choice to pass a search _term and
+    #     return a list of images with that name. This is the equivalent
+    #     with our 'Continue Search on server...' buttom...
+    #
+    #     Our API is lightyears ahead :-)
+    #     """
+    #     backend_id = self.test_config['BACKENDS'].keys()[0]
+    #     search_term = "Ubuntu"
+    #     print "\n>>>Searching for %s image " % search_term
+    #
+    #     images = backends.list_images(self.uri, backend_id, search_term=search_term, cookie=self.cookie)
+    #     for image in images:
+    #         print image['name']
 
     def test_041_list_sizes(self):
         """
@@ -583,9 +583,9 @@ class TestClass(unittest.TestCase):
         """--->Delete All keys"""
         print "\n>>>Deleting all Keys"
         for key in keypairs.list_keys(self.uri):
-            if self.test_config['KEY_NAME'] in key['name']:
-                keypairs.delete_key(self.uri, key['name'])
-                del self.test_config['KEYPAIRS'][key['name']]
+            if self.test_config['KEY_NAME'] in key['id']:
+                keypairs.delete_key(self.uri, key['id'])
+                del self.test_config['KEYPAIRS'][key['id']]
 
     def test_94_delete_all_backends(self):
         """--->Delete All Backends"""

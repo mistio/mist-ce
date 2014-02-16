@@ -118,6 +118,7 @@ def rename_backend(context, new_name):
         context.browser.find_by_css('#edit-backend-popup input').fill("")
         for letter in name:
             context.browser.find_by_css('#edit-backend-popup input').type(letter)
+            sleep(2)
     except:
         assert False, u'Could not change name or popup is not open'
 
@@ -144,7 +145,7 @@ def backends_check_backend_state_by_index(context, name, state):
             return
     else:
         if button.has_class('ui-icon-online') or button.has_class('ui-icon-check')\
-                or button.has_clas('ui-icon-waiting'):
+                or button.has_class('ui-icon-waiting'):
             return
 
     assert False, u'%s is not %s' % (name, state)

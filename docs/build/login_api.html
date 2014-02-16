@@ -120,38 +120,41 @@
 <tt class="descname">POST </tt><tt class="descname">mist.io/auth</tt><a class="headerlink" href="#post-mist.io-auth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Authenticate to mist.io service</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>POST /auth
+<div class="highlight-http"><div class="highlight"><pre>POST /auth
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
 {
-  "email":"user376@mail.com",
-  "password":"mysuperpassword"
-}</pre>
+  &quot;email&quot;:&quot;user376@mail.com&quot;,
+  &quot;password&quot;:&quot;mysuperpassword&quot;
+}
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>{
-   "mist_api_token": "4a2c2j08099809709as098087832843e561abb495c4a30726a8590f73adad",
-   "current_plan":
+<div class="highlight-http"><div class="highlight"><pre>{
+   &quot;mist_api_token&quot;: &quot;4a2c2j08099809709as098087832843e561abb495c4a30726a8590f73adad&quot;,
+   &quot;current_plan&quot;:
    {
-       "started": 1384966750.686227,
-       "has_expired": false,
-       "promo_code": "PROMO50",
-       "expiration": 1416502750.686229,
-       "title": "Basic"
+       &quot;started&quot;: 1384966750.686227,
+       &quot;has_expired&quot;: false,
+       &quot;promo_code&quot;: &quot;PROMO50&quot;,
+       &quot;expiration&quot;: 1416502750.686229,
+       &quot;title&quot;: &quot;Basic&quot;
    },
-   "user_details":
+   &quot;user_details&quot;:
    {
-       "country": "Greece",
-       "number_of_servers": "1-5",
-       "number_of_people": "1-5",
-       "name": "John Doe",
-       "company_name": "mist"
+       &quot;country&quot;: &quot;Greece&quot;,
+       &quot;number_of_servers&quot;: &quot;1-5&quot;,
+       &quot;number_of_people&quot;: &quot;1-5&quot;,
+       &quot;name&quot;: &quot;John Doe&quot;,
+       &quot;company_name&quot;: &quot;mist&quot;
    }
-}</pre>
+}
+</pre></div>
 </div>
 <p>Using this api token in your header you can now use all of mist.io&#8217;s API by passing in your headers:</p>
-<div class="highlight-python"><pre>Authorized: 4a2c2j08099809709as098087832843e561abb495c4a30726a8590f73adad</pre>
+<div class="highlight-python"><div class="highlight"><pre>Authorized: 4a2c2j08099809709as098087832843e561abb495c4a30726a8590f73adad
+</pre></div>
 </div>
 <p>In case you have your own installation of mist, you do not have to authenticate and get
 a token to use mist.io&#8217;s RESTful API. However by doing so you can have your own setup and
@@ -173,7 +176,7 @@ use the premioum services of mist such as monitoring, adding rules and alerts to
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.1.<br/>
     </p>
   </div>
 </footer>

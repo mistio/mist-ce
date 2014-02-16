@@ -120,13 +120,14 @@
 <tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/images</tt><a class="headerlink" href="#get--backends-{backend_id}-images" title="Permalink to this definition">¶</a></dt>
 <dd><p>List available images for this backend</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/images
+<div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/images
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
 {
-  "search_term":"Gentoo"
-}</pre>
+  &quot;search_term&quot;:&quot;Gentoo&quot;
+}
+</pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -144,46 +145,47 @@ Accept: application/json; charset=UTF-8
 mist will return all available images for the given backend. If the given backend is an EC2 Backend, mist will
 search through all EC2 images including community and custom images.</p>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>[
+<div class="highlight-http"><div class="highlight"><pre>[
     {
-       "star": false,
-       "id": "73764eb8-3c1c-42a9-8fff-71f6beefc6a7",
-       "name": "Gentoo 13.3",
-       "extra":
+       &quot;star&quot;: false,
+       &quot;id&quot;: &quot;73764eb8-3c1c-42a9-8fff-71f6beefc6a7&quot;,
+       &quot;name&quot;: &quot;Gentoo 13.3&quot;,
+       &quot;extra&quot;:
        {
-           "status": "ACTIVE",
-           "updated": "2013-11-21T19:12:29Z",
-           "created": "2013-10-15T20:02:10Z",
-           "minDisk": 0,
-           "progress": 100,
-           "minRam": 512,
-           "serverId": null,
-           "metadata":
+           &quot;status&quot;: &quot;ACTIVE&quot;,
+           &quot;updated&quot;: &quot;2013-11-21T19:12:29Z&quot;,
+           &quot;created&quot;: &quot;2013-10-15T20:02:10Z&quot;,
+           &quot;minDisk&quot;: 0,
+           &quot;progress&quot;: 100,
+           &quot;minRam&quot;: 512,
+           &quot;serverId&quot;: null,
+           &quot;metadata&quot;:
            {
-               "os_distro": "gentoo",
-               "com.rackspace__1__visible_core": "1",
-               "com.rackspace__1__build_rackconnect": "0",
-               "com.rackspace__1__release_id": "600",
-               "image_type": "base",
-               "com.rackspace__1__release_build_date": "2013-10-15_11-22-13",
-               "com.rackspace__1__source": "kickstart",
-               "org.openstack__1__os_distro": "org.gentoo",
-               "cache_in_nova": "True",
-               "com.rackspace__1__visible_rackconnect": "1",
-               "com.rackspace__1__release_version": "6",
-               "com.rackspace__1__platform_target": "PublicCloud",
-               "org.openstack__1__os_version": "13.3",
-               "auto_disk_config": "True",
-               "com.rackspace__1__options": "0",
-               "os_type": "linux",
-               "com.rackspace__1__build_core": "1",
-               "com.rackspace__1__visible_managed": "0",
-               "org.openstack__1__architecture": "x64",
-               "com.rackspace__1__build_managed": "0"
+               &quot;os_distro&quot;: &quot;gentoo&quot;,
+               &quot;com.rackspace__1__visible_core&quot;: &quot;1&quot;,
+               &quot;com.rackspace__1__build_rackconnect&quot;: &quot;0&quot;,
+               &quot;com.rackspace__1__release_id&quot;: &quot;600&quot;,
+               &quot;image_type&quot;: &quot;base&quot;,
+               &quot;com.rackspace__1__release_build_date&quot;: &quot;2013-10-15_11-22-13&quot;,
+               &quot;com.rackspace__1__source&quot;: &quot;kickstart&quot;,
+               &quot;org.openstack__1__os_distro&quot;: &quot;org.gentoo&quot;,
+               &quot;cache_in_nova&quot;: &quot;True&quot;,
+               &quot;com.rackspace__1__visible_rackconnect&quot;: &quot;1&quot;,
+               &quot;com.rackspace__1__release_version&quot;: &quot;6&quot;,
+               &quot;com.rackspace__1__platform_target&quot;: &quot;PublicCloud&quot;,
+               &quot;org.openstack__1__os_version&quot;: &quot;13.3&quot;,
+               &quot;auto_disk_config&quot;: &quot;True&quot;,
+               &quot;com.rackspace__1__options&quot;: &quot;0&quot;,
+               &quot;os_type&quot;: &quot;linux&quot;,
+               &quot;com.rackspace__1__build_core&quot;: &quot;1&quot;,
+               &quot;com.rackspace__1__visible_managed&quot;: &quot;0&quot;,
+               &quot;org.openstack__1__architecture&quot;: &quot;x64&quot;,
+               &quot;com.rackspace__1__build_managed&quot;: &quot;0&quot;
            }
        }
     }
-]</pre>
+]
+</pre></div>
 </div>
 </dd></dl>
 
@@ -202,7 +204,7 @@ search through all EC2 images including community and custom images.</p>
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.1.<br/>
     </p>
   </div>
 </footer>

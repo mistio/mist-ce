@@ -143,38 +143,41 @@ service at <a class="reference external" href="https://mist.io">https://mist.io<
 <tt class="descname">POST </tt><tt class="descname">mist.io/auth</tt><a class="headerlink" href="#post-mist.io-auth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Authenticate to mist.io service</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>POST /auth
+<div class="highlight-http"><div class="highlight"><pre>POST /auth
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
 {
-  "email":"user376@mail.com",
-  "password":"mysuperpassword"
-}</pre>
+  &quot;email&quot;:&quot;user376@mail.com&quot;,
+  &quot;password&quot;:&quot;mysuperpassword&quot;
+}
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>{
-   "mist_api_token": "4a2c2j08099809709as098087832843e561abb495c4a30726a8590f73adad",
-   "current_plan":
+<div class="highlight-http"><div class="highlight"><pre>{
+   &quot;mist_api_token&quot;: &quot;4a2c2j08099809709as098087832843e561abb495c4a30726a8590f73adad&quot;,
+   &quot;current_plan&quot;:
    {
-       "started": 1384966750.686227,
-       "has_expired": false,
-       "promo_code": "PROMO50",
-       "expiration": 1416502750.686229,
-       "title": "Basic"
+       &quot;started&quot;: 1384966750.686227,
+       &quot;has_expired&quot;: false,
+       &quot;promo_code&quot;: &quot;PROMO50&quot;,
+       &quot;expiration&quot;: 1416502750.686229,
+       &quot;title&quot;: &quot;Basic&quot;
    },
-   "user_details":
+   &quot;user_details&quot;:
    {
-       "country": "Greece",
-       "number_of_servers": "1-5",
-       "number_of_people": "1-5",
-       "name": "John Doe",
-       "company_name": "mist"
+       &quot;country&quot;: &quot;Greece&quot;,
+       &quot;number_of_servers&quot;: &quot;1-5&quot;,
+       &quot;number_of_people&quot;: &quot;1-5&quot;,
+       &quot;name&quot;: &quot;John Doe&quot;,
+       &quot;company_name&quot;: &quot;mist&quot;
    }
-}</pre>
+}
+</pre></div>
 </div>
 <p>Using this api token in your header you can now use all of mist.io&#8217;s API by passing in your headers:</p>
-<div class="highlight-python"><pre>Authorized: 4a2c2j08099809709as098087832843e561abb495c4a30726a8590f73adad</pre>
+<div class="highlight-python"><div class="highlight"><pre>Authorized: 4a2c2j08099809709as098087832843e561abb495c4a30726a8590f73adad
+</pre></div>
 </div>
 <p>In case you have your own installation of mist, you do not have to authenticate and get
 a token to use mist.io&#8217;s RESTful API. However by doing so you can have your own setup and
@@ -189,115 +192,117 @@ use the premioum services of mist such as monitoring, adding rules and alerts to
 <tt class="descname">GET </tt><tt class="descname">/providers</tt><a class="headerlink" href="#get--providers" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all supported providers</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /providers
+<div class="highlight-http"><div class="highlight"><pre>GET /providers
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>{
-  "supported_providers": [
+<div class="highlight-http"><div class="highlight"><pre>{
+  &quot;supported_providers&quot;: [
     {
-      "provider": "bare_metal",
-      "title": "Bare Metal Server"
+      &quot;provider&quot;: &quot;bare_metal&quot;,
+      &quot;title&quot;: &quot;Bare Metal Server&quot;
     },
     {
-      "provider": "ec2_ap_northeast",
-      "title": "EC2 AP NORTHEAST"
+      &quot;provider&quot;: &quot;ec2_ap_northeast&quot;,
+      &quot;title&quot;: &quot;EC2 AP NORTHEAST&quot;
     },
     {
-      "provider": "ec2_ap_southeast",
-      "title": "EC2 AP SOUTHEAST"
+      &quot;provider&quot;: &quot;ec2_ap_southeast&quot;,
+      &quot;title&quot;: &quot;EC2 AP SOUTHEAST&quot;
     },
     {
-      "provider": "ec2_ap_southeast_2",
-      "title": "EC2 AP Sydney"
+      &quot;provider&quot;: &quot;ec2_ap_southeast_2&quot;,
+      &quot;title&quot;: &quot;EC2 AP Sydney&quot;
     },
     {
-      "provider": "ec2_eu_west",
-      "title": "EC2 EU Ireland"
+      &quot;provider&quot;: &quot;ec2_eu_west&quot;,
+      &quot;title&quot;: &quot;EC2 EU Ireland&quot;
     },
     {
-      "provider": "ec2_sa_east",
-      "title": "EC2 SA EAST"
+      &quot;provider&quot;: &quot;ec2_sa_east&quot;,
+      &quot;title&quot;: &quot;EC2 SA EAST&quot;
     },
     {
-      "provider": "ec2_us_east",
-      "title": "EC2 US EAST"
+      &quot;provider&quot;: &quot;ec2_us_east&quot;,
+      &quot;title&quot;: &quot;EC2 US EAST&quot;
     },
     {
-      "provider": "ec2_us_west",
-      "title": "EC2 US WEST"
+      &quot;provider&quot;: &quot;ec2_us_west&quot;,
+      &quot;title&quot;: &quot;EC2 US WEST&quot;
     },
     {
-      "provider": "ec2_us_west_oregon",
-      "title": "EC2 US WEST OREGON"
+      &quot;provider&quot;: &quot;ec2_us_west_oregon&quot;,
+      &quot;title&quot;: &quot;EC2 US WEST OREGON&quot;
     },
     {
-      "provider": "nephoscale",
-      "title": "NephoScale"
+      &quot;provider&quot;: &quot;nephoscale&quot;,
+      &quot;title&quot;: &quot;NephoScale&quot;
     },
     {
-      "provider": "digitalocean",
-      "title": "DigitalOcean"
+      &quot;provider&quot;: &quot;digitalocean&quot;,
+      &quot;title&quot;: &quot;DigitalOcean&quot;
     },
     {
-      "provider": "linode",
-      "title": "Linode"
+      &quot;provider&quot;: &quot;linode&quot;,
+      &quot;title&quot;: &quot;Linode&quot;
     },
     {
-      "provider": "openstack",
-      "title": "OpenStack"
+      &quot;provider&quot;: &quot;openstack&quot;,
+      &quot;title&quot;: &quot;OpenStack&quot;
     },
     {
-      "provider": "rackspace:dfw",
-      "title": "Rackspace DFW"
+      &quot;provider&quot;: &quot;rackspace:dfw&quot;,
+      &quot;title&quot;: &quot;Rackspace DFW&quot;
     },
     {
-      "provider": "rackspace:ord",
-      "title": "Rackspace ORD"
+      &quot;provider&quot;: &quot;rackspace:ord&quot;,
+      &quot;title&quot;: &quot;Rackspace ORD&quot;
     },
     {
-      "provider": "rackspace:iad",
-      "title": "Rackspace IAD"
+      &quot;provider&quot;: &quot;rackspace:iad&quot;,
+      &quot;title&quot;: &quot;Rackspace IAD&quot;
     },
     {
-      "provider": "rackspace:lon",
-      "title": "Rackspace LON"
+      &quot;provider&quot;: &quot;rackspace:lon&quot;,
+      &quot;title&quot;: &quot;Rackspace LON&quot;
     },
     {
-      "provider": "rackspace:syd",
-      "title": "Rackspace AU"
+      &quot;provider&quot;: &quot;rackspace:syd&quot;,
+      &quot;title&quot;: &quot;Rackspace AU&quot;
     },
     {
-      "provider": "rackspace_first_gen:us",
-      "title": "Rackspace US (OLD)"
+      &quot;provider&quot;: &quot;rackspace_first_gen:us&quot;,
+      &quot;title&quot;: &quot;Rackspace US (OLD)&quot;
     },
     {
-      "provider": "rackspace_first_gen:uk",
-      "title": "Rackspace UK (OLD)"
+      &quot;provider&quot;: &quot;rackspace_first_gen:uk&quot;,
+      &quot;title&quot;: &quot;Rackspace UK (OLD)&quot;
     },
     {
-      "provider": "softlayer",
-      "title": "SoftLayer"
+      &quot;provider&quot;: &quot;softlayer&quot;,
+      &quot;title&quot;: &quot;SoftLayer&quot;
     },
     {
-      "provider": "openstack:az-1.region-a.geo-1",
-      "title": "HP Cloud US West AZ 1"
+      &quot;provider&quot;: &quot;openstack:az-1.region-a.geo-1&quot;,
+      &quot;title&quot;: &quot;HP Cloud US West AZ 1&quot;
     },
     {
-      "provider": "openstack:az-2.region-a.geo-1",
-      "title": "HP Cloud US West AZ 2"
+      &quot;provider&quot;: &quot;openstack:az-2.region-a.geo-1&quot;,
+      &quot;title&quot;: &quot;HP Cloud US West AZ 2&quot;
     },
     {
-      "provider": "openstack:az-3.region-a.geo-1",
-      "title": "HP Cloud US West AZ 3"
+      &quot;provider&quot;: &quot;openstack:az-3.region-a.geo-1&quot;,
+      &quot;title&quot;: &quot;HP Cloud US West AZ 3&quot;
     },
     {
-      "provider": "openstack:region-b.geo-1",
-      "title": "HP Cloud US East"
+      &quot;provider&quot;: &quot;openstack:region-b.geo-1&quot;,
+      &quot;title&quot;: &quot;HP Cloud US East&quot;
     }
   ]
-}</pre>
+}
+</pre></div>
 </div>
 </dd></dl>
 
@@ -309,33 +314,35 @@ Accept: application/json; charset=UTF-8</pre>
 <tt class="descname">GET </tt><tt class="descname">/backends</tt><a class="headerlink" href="#get--backends" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all added backends</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /backends
+<div class="highlight-http"><div class="highlight"><pre>GET /backends
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>[
+<div class="highlight-http"><div class="highlight"><pre>[
    {
-       "state": "wait",
-       "apikey": "A09009NUMIQCIHA",
-       "title": "EC2 AP NORTHEAST",
-       "enabled": true,
-       "region": "",
-       "provider": "ec2_ap_northeast",
-       "poll_interval": 10000,
-       "id": "2tK74h4mXbj8nNohljLIzqc4SHn3"
+       &quot;state&quot;: &quot;wait&quot;,
+       &quot;apikey&quot;: &quot;A09009NUMIQCIHA&quot;,
+       &quot;title&quot;: &quot;EC2 AP NORTHEAST&quot;,
+       &quot;enabled&quot;: true,
+       &quot;region&quot;: &quot;&quot;,
+       &quot;provider&quot;: &quot;ec2_ap_northeast&quot;,
+       &quot;poll_interval&quot;: 10000,
+       &quot;id&quot;: &quot;2tK74h4mXbj8nNohljLIzqc4SHn3&quot;
    },
    {
-       "state": "wait",
-       "apikey": "myapikey",
-       "title": "Rackspace DFW",
-       "enabled": true,
-       "region": "dfw",
-       "provider": "rackspace",
-       "poll_interval": 10000,
-       "id": "3po809NuIjqiNgqqmDJAKSLWp6"
+       &quot;state&quot;: &quot;wait&quot;,
+       &quot;apikey&quot;: &quot;myapikey&quot;,
+       &quot;title&quot;: &quot;Rackspace DFW&quot;,
+       &quot;enabled&quot;: true,
+       &quot;region&quot;: &quot;dfw&quot;,
+       &quot;provider&quot;: &quot;rackspace&quot;,
+       &quot;poll_interval&quot;: 10000,
+       &quot;id&quot;: &quot;3po809NuIjqiNgqqmDJAKSLWp6&quot;
    }
-]</pre>
+]
+</pre></div>
 </div>
 </dd></dl>
 
@@ -345,22 +352,24 @@ Accept: application/json; charset=UTF-8</pre>
 <dd><p>Add Backend</p>
 <p><strong>Example request</strong>:</p>
 <p>Add EC2 Backend</p>
-<div class="highlight-http"><pre>{
-    "title":"EC2 AP Sydney",
-    "provider":"ec2_ap_southeast_2",
-    "apikey":"POIHJOINPOIMIQCIHA",
-    "apisecret":"09jLlilkjIU087JKHgjhguy90ur"
-}</pre>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;EC2 AP Sydney&quot;,
+    &quot;provider&quot;:&quot;ec2_ap_southeast_2&quot;,
+    &quot;apikey&quot;:&quot;POIHJOINPOIMIQCIHA&quot;,
+    &quot;apisecret&quot;:&quot;09jLlilkjIU087JKHgjhguy90ur&quot;
+}
+</pre></div>
 </div>
 <p>Add Openstack Backend</p>
-<div class="highlight-http"><pre>{
-    "title":"OpenStack",
-    "provider":"openstack",
-    "apikey":"myuser",
-    "apisecret":"superstronpassword",
-    "apiurl":"http://31.53.71.90:5000/v2.0",
-    "tenant_name":"mist"
-}</pre>
+<div class="highlight-http"><div class="highlight"><pre>{
+    &quot;title&quot;:&quot;OpenStack&quot;,
+    &quot;provider&quot;:&quot;openstack&quot;,
+    &quot;apikey&quot;:&quot;myuser&quot;,
+    &quot;apisecret&quot;:&quot;superstronpassword&quot;,
+    &quot;apiurl&quot;:&quot;http://31.53.71.90:5000/v2.0&quot;,
+    &quot;tenant_name&quot;:&quot;mist&quot;
+}
+</pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -384,19 +393,20 @@ Accept: application/json; charset=UTF-8</pre>
 </tbody>
 </table>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>{
-   "status": "off",
-   "tenant_name": "",
-   "id": "48emAUzL9teVYhkyJc9koRaPXEDp",
-   "index": 2,
-   "apikey": "POIHJOINPOIMIQCIHA",
-   "title": "EC2 AP Sydney",
-   "region": "",
-   "poll_interval": 10000,
-   "apiurl": "",
-   "provider": "ec2_ap_southeast_2",
-   "enabled": true
-}</pre>
+<div class="highlight-http"><div class="highlight"><pre>{
+   &quot;status&quot;: &quot;off&quot;,
+   &quot;tenant_name&quot;: &quot;&quot;,
+   &quot;id&quot;: &quot;48emAUzL9teVYhkyJc9koRaPXEDp&quot;,
+   &quot;index&quot;: 2,
+   &quot;apikey&quot;: &quot;POIHJOINPOIMIQCIHA&quot;,
+   &quot;title&quot;: &quot;EC2 AP Sydney&quot;,
+   &quot;region&quot;: &quot;&quot;,
+   &quot;poll_interval&quot;: 10000,
+   &quot;apiurl&quot;: &quot;&quot;,
+   &quot;provider&quot;: &quot;ec2_ap_southeast_2&quot;,
+   &quot;enabled&quot;: true
+}
+</pre></div>
 </div>
 </dd></dl>
 
@@ -405,9 +415,10 @@ Accept: application/json; charset=UTF-8</pre>
 <tt class="descname">DELETE </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#delete--backends-{backend_id}" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete backend</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>DELETE /backends/2tK74h4mXbjjLlkjjO4SHn3
+<div class="highlight-http"><div class="highlight"><pre>DELETE /backends/2tK74h4mXbjjLlkjjO4SHn3
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 </dd></dl>
 
@@ -416,13 +427,14 @@ Accept: application/json; charset=UTF-8</pre>
 <tt class="descname">PUT </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#put--backends-{backend_id}" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rename backend</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>PUT /backends
+<div class="highlight-http"><div class="highlight"><pre>PUT /backends
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
 {
-  "new_name":"Renamed Backend"
-}</pre>
+  &quot;new_name&quot;:&quot;Renamed Backend&quot;
+}
+</pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -443,13 +455,14 @@ Accept: application/json; charset=UTF-8
 <tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}</tt><a class="headerlink" href="#post--backends-{backend_id}" title="Permalink to this definition">¶</a></dt>
 <dd><p>Toggle state of backend between enabled and disabled</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3
+<div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
 {
-  "newState":"False"
-}</pre>
+  &quot;newState&quot;:&quot;False&quot;
+}
+</pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -470,131 +483,133 @@ Accept: application/json; charset=UTF-8
 <tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/sizes</tt><a class="headerlink" href="#get--backends-{backend_id}-sizes" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all sizes provided by backend</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/sizes
+<div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/sizes
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>[
+<div class="highlight-http"><div class="highlight"><pre>[
    {
-       "name": "Micro Instance",
-       "price":
+       &quot;name&quot;: &quot;Micro Instance&quot;,
+       &quot;price&quot;:
        {
-           "mswin": "$0.035/hour",
-           "sles": "$0.037/hour",
-           "mswinSQLWeb": "$0.081/hour",
-           "rhel": "$0.087/hour",
-           "linux": "$0.027/hour"
+           &quot;mswin&quot;: &quot;$0.035/hour&quot;,
+           &quot;sles&quot;: &quot;$0.037/hour&quot;,
+           &quot;mswinSQLWeb&quot;: &quot;$0.081/hour&quot;,
+           &quot;rhel&quot;: &quot;$0.087/hour&quot;,
+           &quot;linux&quot;: &quot;$0.027/hour&quot;
        },
-       "ram": 613,
-       "driver": "Amazon EC2 (ap-northeast-1)",
-       "bandwidth": null,
-       "disk": 15,
-       "id": "t1.micro"
+       &quot;ram&quot;: 613,
+       &quot;driver&quot;: &quot;Amazon EC2 (ap-northeast-1)&quot;,
+       &quot;bandwidth&quot;: null,
+       &quot;disk&quot;: 15,
+       &quot;id&quot;: &quot;t1.micro&quot;
    },
    {
-       "name": "Small Instance",
-       "price":
+       &quot;name&quot;: &quot;Small Instance&quot;,
+       &quot;price&quot;:
        {
-           "mswinSQL": "$0.706/hour",
-           "mswinSQLWeb": "$0.161/hour",
-           "mswin": "$0.115/hour",
-           "rhel": "$0.155/hour",
-           "linux": "$0.088/hour",
-           "sles": "$0.122/hour"
+           &quot;mswinSQL&quot;: &quot;$0.706/hour&quot;,
+           &quot;mswinSQLWeb&quot;: &quot;$0.161/hour&quot;,
+           &quot;mswin&quot;: &quot;$0.115/hour&quot;,
+           &quot;rhel&quot;: &quot;$0.155/hour&quot;,
+           &quot;linux&quot;: &quot;$0.088/hour&quot;,
+           &quot;sles&quot;: &quot;$0.122/hour&quot;
        },
-       "ram": 1740,
-       "driver": "Amazon EC2 (ap-northeast-1)",
-       "bandwidth": null,
-       "disk": 160,
-       "id": "m1.small"
+       &quot;ram&quot;: 1740,
+       &quot;driver&quot;: &quot;Amazon EC2 (ap-northeast-1)&quot;,
+       &quot;bandwidth&quot;: null,
+       &quot;disk&quot;: 160,
+       &quot;id&quot;: &quot;m1.small&quot;
    },
    {
-       "name": "Medium Instance",
-       "price":
+       &quot;name&quot;: &quot;Medium Instance&quot;,
+       &quot;price&quot;:
        {
-           "mswinSQL": "$0.821/hour",
-           "mswinSQLWeb": "$0.276/hour",
-           "mswin": "$0.23/hour",
-           "rhel": "$0.22/hour",
-           "linux": "$0.175/hour",
-           "sles": "$0.234/hour"
+           &quot;mswinSQL&quot;: &quot;$0.821/hour&quot;,
+           &quot;mswinSQLWeb&quot;: &quot;$0.276/hour&quot;,
+           &quot;mswin&quot;: &quot;$0.23/hour&quot;,
+           &quot;rhel&quot;: &quot;$0.22/hour&quot;,
+           &quot;linux&quot;: &quot;$0.175/hour&quot;,
+           &quot;sles&quot;: &quot;$0.234/hour&quot;
        },
-       "ram": 3700,
-       "driver": "Amazon EC2 (ap-northeast-1)",
-       "bandwidth": null,
-       "disk": 410,
-       "id": "m1.medium"
+       &quot;ram&quot;: 3700,
+       &quot;driver&quot;: &quot;Amazon EC2 (ap-northeast-1)&quot;,
+       &quot;bandwidth&quot;: null,
+       &quot;disk&quot;: 410,
+       &quot;id&quot;: &quot;m1.medium&quot;
    },
    {
-       "name": "Large Instance",
-       "price":
+       &quot;name&quot;: &quot;Large Instance&quot;,
+       &quot;price&quot;:
        {
-           "mswinSQL": "$1.051/hour",
-           "mswinSQLWeb": "$0.506/hour",
-           "mswin": "$0.46/hour",
-           "rhel": "$0.419/hour",
-           "linux": "$0.35/hour",
-           "sles": "$0.465/hour"
+           &quot;mswinSQL&quot;: &quot;$1.051/hour&quot;,
+           &quot;mswinSQLWeb&quot;: &quot;$0.506/hour&quot;,
+           &quot;mswin&quot;: &quot;$0.46/hour&quot;,
+           &quot;rhel&quot;: &quot;$0.419/hour&quot;,
+           &quot;linux&quot;: &quot;$0.35/hour&quot;,
+           &quot;sles&quot;: &quot;$0.465/hour&quot;
        },
-       "ram": 7680,
-       "driver": "Amazon EC2 (ap-northeast-1)",
-       "bandwidth": null,
-       "disk": 850,
-       "id": "m1.large"
+       &quot;ram&quot;: 7680,
+       &quot;driver&quot;: &quot;Amazon EC2 (ap-northeast-1)&quot;,
+       &quot;bandwidth&quot;: null,
+       &quot;disk&quot;: 850,
+       &quot;id&quot;: &quot;m1.large&quot;
    },
    {
-       "name": "Extra Large Instance",
-       "price":
+       &quot;name&quot;: &quot;Extra Large Instance&quot;,
+       &quot;price&quot;:
        {
-           "mswinSQL": "$1.511/hour",
-           "mswinSQLWeb": "$0.966/hour",
-           "mswin": "$0.92/hour",
-           "rhel": "$0.769/hour",
-           "linux": "$0.7/hour",
-           "sles": "$0.815/hour"
+           &quot;mswinSQL&quot;: &quot;$1.511/hour&quot;,
+           &quot;mswinSQLWeb&quot;: &quot;$0.966/hour&quot;,
+           &quot;mswin&quot;: &quot;$0.92/hour&quot;,
+           &quot;rhel&quot;: &quot;$0.769/hour&quot;,
+           &quot;linux&quot;: &quot;$0.7/hour&quot;,
+           &quot;sles&quot;: &quot;$0.815/hour&quot;
        },
-       "ram": 15360,
-       "driver": "Amazon EC2 (ap-northeast-1)",
-       "bandwidth": null,
-       "disk": 1690,
-       "id": "m1.xlarge"
+       &quot;ram&quot;: 15360,
+       &quot;driver&quot;: &quot;Amazon EC2 (ap-northeast-1)&quot;,
+       &quot;bandwidth&quot;: null,
+       &quot;disk&quot;: 1690,
+       &quot;id&quot;: &quot;m1.xlarge&quot;
    },
    {
-       "name": "High-Memory Extra Large Instance",
-       "price":
+       &quot;name&quot;: &quot;High-Memory Extra Large Instance&quot;,
+       &quot;price&quot;:
        {
-           "mswinSQL": "$1.161/hour",
-           "mswinSQLWeb": "$0.616/hour",
-           "mswin": "$0.57/hour",
-           "rhel": "$0.574/hour",
-           "linux": "$0.505/hour",
-           "sles": "$0.62/hour"
+           &quot;mswinSQL&quot;: &quot;$1.161/hour&quot;,
+           &quot;mswinSQLWeb&quot;: &quot;$0.616/hour&quot;,
+           &quot;mswin&quot;: &quot;$0.57/hour&quot;,
+           &quot;rhel&quot;: &quot;$0.574/hour&quot;,
+           &quot;linux&quot;: &quot;$0.505/hour&quot;,
+           &quot;sles&quot;: &quot;$0.62/hour&quot;
        },
-       "ram": 17510,
-       "driver": "Amazon EC2 (ap-northeast-1)",
-       "bandwidth": null,
-       "disk": 420,
-       "id": "m2.xlarge"
+       &quot;ram&quot;: 17510,
+       &quot;driver&quot;: &quot;Amazon EC2 (ap-northeast-1)&quot;,
+       &quot;bandwidth&quot;: null,
+       &quot;disk&quot;: 420,
+       &quot;id&quot;: &quot;m2.xlarge&quot;
    },
    {
-       "name": "High-Memory Double Extra Large Instance",
-       "price":
+       &quot;name&quot;: &quot;High-Memory Double Extra Large Instance&quot;,
+       &quot;price&quot;:
        {
-           "mswinSQL": "$1.731/hour",
-           "mswinSQLWeb": "$1.186/hour",
-           "mswin": "$1.14/hour",
-           "rhel": "$1.079/hour",
-           "linux": "$1.01/hour",
-           "sles": "$1.125/hour"
+           &quot;mswinSQL&quot;: &quot;$1.731/hour&quot;,
+           &quot;mswinSQLWeb&quot;: &quot;$1.186/hour&quot;,
+           &quot;mswin&quot;: &quot;$1.14/hour&quot;,
+           &quot;rhel&quot;: &quot;$1.079/hour&quot;,
+           &quot;linux&quot;: &quot;$1.01/hour&quot;,
+           &quot;sles&quot;: &quot;$1.125/hour&quot;
        },
-       "ram": 35021,
-       "driver": "Amazon EC2 (ap-northeast-1)",
-       "bandwidth": null,
-       "disk": 850,
-       "id": "m2.2xlarge"
+       &quot;ram&quot;: 35021,
+       &quot;driver&quot;: &quot;Amazon EC2 (ap-northeast-1)&quot;,
+       &quot;bandwidth&quot;: null,
+       &quot;disk&quot;: 850,
+       &quot;id&quot;: &quot;m2.2xlarge&quot;
    }
-]</pre>
+]
+</pre></div>
 </div>
 </dd></dl>
 
@@ -603,28 +618,30 @@ Accept: application/json; charset=UTF-8</pre>
 <tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/locations</tt><a class="headerlink" href="#get--backends-{backend_id}-locations" title="Permalink to this definition">¶</a></dt>
 <dd><p>List locations provided by backend</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/locations
+<div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/locations
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>[
+<div class="highlight-http"><div class="highlight"><pre>[
    {
-       "country": "Japan",
-       "id": "0",
-       "name": "ap-northeast-1a"
+       &quot;country&quot;: &quot;Japan&quot;,
+       &quot;id&quot;: &quot;0&quot;,
+       &quot;name&quot;: &quot;ap-northeast-1a&quot;
    },
    {
-       "country": "Japan",
-       "id": "1",
-       "name": "ap-northeast-1b"
+       &quot;country&quot;: &quot;Japan&quot;,
+       &quot;id&quot;: &quot;1&quot;,
+       &quot;name&quot;: &quot;ap-northeast-1b&quot;
    },
    {
-       "country": "Japan",
-       "id": "2",
-       "name": "ap-northeast-1c"
+       &quot;country&quot;: &quot;Japan&quot;,
+       &quot;id&quot;: &quot;2&quot;,
+       &quot;name&quot;: &quot;ap-northeast-1c&quot;
    }
-]</pre>
+]
+</pre></div>
 </div>
 </dd></dl>
 
@@ -636,36 +653,38 @@ Accept: application/json; charset=UTF-8</pre>
 <tt class="descname">GET </tt><tt class="descname">/keys</tt><a class="headerlink" href="#get--keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>List added keys</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /keys
+<div class="highlight-http"><div class="highlight"><pre>GET /keys
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>[
+<div class="highlight-http"><div class="highlight"><pre>[
    {
-       "default_key": true,
-       "id": "passwordless",
-       "machines":
+       &quot;default_key&quot;: true,
+       &quot;id&quot;: &quot;passwordless&quot;,
+       &quot;machines&quot;:
        [
            [
-               "2tKqwqDWFFWFDWFESgzqc4SHn3",
-               "i-c0ca59c5",
+               &quot;2tKqwqDWFFWFDWFESgzqc4SHn3&quot;,
+               &quot;i-c0ca59c5&quot;,
                1389715866.596957,
-               "ec2-user",
-               "true"
+               &quot;ec2-user&quot;,
+               &quot;true&quot;
            ]
        ],
-       "name": "passwordless"
+       &quot;name&quot;: &quot;passwordless&quot;
    },
    {
-       "default_key": false,
-       "id": "Key2",
-       "machines":
+       &quot;default_key&quot;: false,
+       &quot;id&quot;: &quot;Key2&quot;,
+       &quot;machines&quot;:
        [
        ],
-       "name": "Key 2"
+       &quot;name&quot;: &quot;Key 2&quot;
    }
-]</pre>
+]
+</pre></div>
 </div>
 <p>For each Key a list of associated machines is returned with <em>backend_id, machine_id, username_of_machine, if_sudo</em> in this order</p>
 </dd></dl>
@@ -675,14 +694,15 @@ Accept: application/json; charset=UTF-8</pre>
 <tt class="descname">PUT </tt><tt class="descname">/keys</tt><a class="headerlink" href="#put--keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add Key</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>PUT /keys
+<div class="highlight-http"><div class="highlight"><pre>PUT /keys
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
 {
-  "name":"MyKey",
-  "priv":"-----BEGIN RSA PRIVATE KEY-----OoiknlOnNJNKCAQEAtbBji1OMHW2bS2Va..."
-}</pre>
+  &quot;id&quot;:&quot;MyKey&quot;,
+  &quot;priv&quot;:&quot;-----BEGIN RSA PRIVATE KEY-----OoiknlOnNJNKCAQEAtbBji1OMHW2bS2Va...&quot;
+}
+</pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -690,7 +710,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of new key</li>
+<li><strong>id</strong> (<em>string</em>) &#8211; <em>required</em> Name of new key</li>
 <li><strong>priv</strong> (<em>string</em>) &#8211; <em>required</em> Private ssh key</li>
 </ul>
 </td>
@@ -704,14 +724,16 @@ Accept: application/json; charset=UTF-8
 <tt class="descname">POST </tt><tt class="descname">/keys</tt><a class="headerlink" href="#post--keys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ask mist to generate a new private key</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /keys
+<div class="highlight-http"><div class="highlight"><pre>GET /keys
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>{
-  "priv":"-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCA..."
-}</pre>
+<div class="highlight-http"><div class="highlight"><pre>{
+  &quot;priv&quot;:&quot;-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCA...&quot;
+}
+</pre></div>
 </div>
 </dd></dl>
 
@@ -720,9 +742,10 @@ Accept: application/json; charset=UTF-8</pre>
 <tt class="descname">DELETE </tt><tt class="descname">/keys/{key_id}</tt><a class="headerlink" href="#delete--keys-{key_id}" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete key</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>DELETE /keys/{key_id}
+<div class="highlight-http"><div class="highlight"><pre>DELETE /keys/{key_id}
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 </dd></dl>
 
@@ -731,13 +754,14 @@ Accept: application/json; charset=UTF-8</pre>
 <tt class="descname">PUT </tt><tt class="descname">/keys/{key_id}</tt><a class="headerlink" href="#put--keys-{key_id}" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rename key</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>PUT /keys/{key_id}
+<div class="highlight-http"><div class="highlight"><pre>PUT /keys/{key_id}
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
 {
-  "newName":"New Key Name"
-}</pre>
+  &quot;new_id&quot;:&quot;New Key Name&quot;
+}
+</pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -745,7 +769,7 @@ Accept: application/json; charset=UTF-8
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>newName</strong> (<em>string</em>) &#8211; <em>required</em> New name for key</li>
+<li><strong>new_id</strong> (<em>string</em>) &#8211; <em>required</em> New name for key</li>
 </ul>
 </td>
 </tr>
@@ -758,37 +782,42 @@ Accept: application/json; charset=UTF-8
 <tt class="descname">POST </tt><tt class="descname">/keys/{key_id}</tt><a class="headerlink" href="#post--keys-{key_id}" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set default key</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>POST /keys/{key_id}
+<div class="highlight-http"><div class="highlight"><pre>POST /keys/{key_id}
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 </dd></dl>
 
 <dl class="get">
-<dt id="get--keys-{key_id}?action=private">
-<tt class="descname">GET </tt><tt class="descname">/keys/{key_id}?action=private</tt><a class="headerlink" href="#get--keys-{key_id}?action=private" title="Permalink to this definition">¶</a></dt>
+<dt id="get--keys-{key_id}-private">
+<tt class="descname">GET </tt><tt class="descname">/keys/{key_id}/private</tt><a class="headerlink" href="#get--keys-{key_id}-private" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get private key</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /keys/{key_id}?action=private
+<div class="highlight-http"><div class="highlight"><pre>GET /keys/{key_id}/private
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>"-----BEGIN RSA PRIVATE KEY-----\nMIIE..."</pre>
+<div class="highlight-http"><div class="highlight"><pre>&quot;-----BEGIN RSA PRIVATE KEY-----\nMIIE...&quot;
+</pre></div>
 </div>
 </dd></dl>
 
 <dl class="get">
-<dt id="get--keys-{key_id}?action=public">
-<tt class="descname">GET </tt><tt class="descname">/keys/{key_id}?action=public</tt><a class="headerlink" href="#get--keys-{key_id}?action=public" title="Permalink to this definition">¶</a></dt>
+<dt id="get--keys-{key_id}-public">
+<tt class="descname">GET </tt><tt class="descname">/keys/{key_id}/public</tt><a class="headerlink" href="#get--keys-{key_id}-public" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get public key</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /keys/{key_id}?action=public
+<div class="highlight-http"><div class="highlight"><pre>GET /keys/{key_id}/public
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>"ssh-rsa AAAAB3NzaC1yc2EAAAADAQA..."</pre>
+<div class="highlight-http"><div class="highlight"><pre>&quot;ssh-rsa AAAAB3NzaC1yc2EAAAADAQA...&quot;
+</pre></div>
 </div>
 </dd></dl>
 
@@ -800,13 +829,14 @@ Accept: application/json; charset=UTF-8</pre>
 <tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/images</tt><a class="headerlink" href="#get--backends-{backend_id}-images" title="Permalink to this definition">¶</a></dt>
 <dd><p>List available images for this backend</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/images
+<div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/images
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
 {
-  "search_term":"Gentoo"
-}</pre>
+  &quot;search_term&quot;:&quot;Gentoo&quot;
+}
+</pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -824,46 +854,47 @@ Accept: application/json; charset=UTF-8
 mist will return all available images for the given backend. If the given backend is an EC2 Backend, mist will
 search through all EC2 images including community and custom images.</p>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>[
+<div class="highlight-http"><div class="highlight"><pre>[
     {
-       "star": false,
-       "id": "73764eb8-3c1c-42a9-8fff-71f6beefc6a7",
-       "name": "Gentoo 13.3",
-       "extra":
+       &quot;star&quot;: false,
+       &quot;id&quot;: &quot;73764eb8-3c1c-42a9-8fff-71f6beefc6a7&quot;,
+       &quot;name&quot;: &quot;Gentoo 13.3&quot;,
+       &quot;extra&quot;:
        {
-           "status": "ACTIVE",
-           "updated": "2013-11-21T19:12:29Z",
-           "created": "2013-10-15T20:02:10Z",
-           "minDisk": 0,
-           "progress": 100,
-           "minRam": 512,
-           "serverId": null,
-           "metadata":
+           &quot;status&quot;: &quot;ACTIVE&quot;,
+           &quot;updated&quot;: &quot;2013-11-21T19:12:29Z&quot;,
+           &quot;created&quot;: &quot;2013-10-15T20:02:10Z&quot;,
+           &quot;minDisk&quot;: 0,
+           &quot;progress&quot;: 100,
+           &quot;minRam&quot;: 512,
+           &quot;serverId&quot;: null,
+           &quot;metadata&quot;:
            {
-               "os_distro": "gentoo",
-               "com.rackspace__1__visible_core": "1",
-               "com.rackspace__1__build_rackconnect": "0",
-               "com.rackspace__1__release_id": "600",
-               "image_type": "base",
-               "com.rackspace__1__release_build_date": "2013-10-15_11-22-13",
-               "com.rackspace__1__source": "kickstart",
-               "org.openstack__1__os_distro": "org.gentoo",
-               "cache_in_nova": "True",
-               "com.rackspace__1__visible_rackconnect": "1",
-               "com.rackspace__1__release_version": "6",
-               "com.rackspace__1__platform_target": "PublicCloud",
-               "org.openstack__1__os_version": "13.3",
-               "auto_disk_config": "True",
-               "com.rackspace__1__options": "0",
-               "os_type": "linux",
-               "com.rackspace__1__build_core": "1",
-               "com.rackspace__1__visible_managed": "0",
-               "org.openstack__1__architecture": "x64",
-               "com.rackspace__1__build_managed": "0"
+               &quot;os_distro&quot;: &quot;gentoo&quot;,
+               &quot;com.rackspace__1__visible_core&quot;: &quot;1&quot;,
+               &quot;com.rackspace__1__build_rackconnect&quot;: &quot;0&quot;,
+               &quot;com.rackspace__1__release_id&quot;: &quot;600&quot;,
+               &quot;image_type&quot;: &quot;base&quot;,
+               &quot;com.rackspace__1__release_build_date&quot;: &quot;2013-10-15_11-22-13&quot;,
+               &quot;com.rackspace__1__source&quot;: &quot;kickstart&quot;,
+               &quot;org.openstack__1__os_distro&quot;: &quot;org.gentoo&quot;,
+               &quot;cache_in_nova&quot;: &quot;True&quot;,
+               &quot;com.rackspace__1__visible_rackconnect&quot;: &quot;1&quot;,
+               &quot;com.rackspace__1__release_version&quot;: &quot;6&quot;,
+               &quot;com.rackspace__1__platform_target&quot;: &quot;PublicCloud&quot;,
+               &quot;org.openstack__1__os_version&quot;: &quot;13.3&quot;,
+               &quot;auto_disk_config&quot;: &quot;True&quot;,
+               &quot;com.rackspace__1__options&quot;: &quot;0&quot;,
+               &quot;os_type&quot;: &quot;linux&quot;,
+               &quot;com.rackspace__1__build_core&quot;: &quot;1&quot;,
+               &quot;com.rackspace__1__visible_managed&quot;: &quot;0&quot;,
+               &quot;org.openstack__1__architecture&quot;: &quot;x64&quot;,
+               &quot;com.rackspace__1__build_managed&quot;: &quot;0&quot;
            }
        }
     }
-]</pre>
+]
+</pre></div>
 </div>
 </dd></dl>
 
@@ -875,65 +906,67 @@ search through all EC2 images including community and custom images.</p>
 <tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/machines</tt><a class="headerlink" href="#get--backends-{backend_id}-machines" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of all added machines for this backend</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
+<div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>[
+<div class="highlight-http"><div class="highlight"><pre>[
    {
-       "can_start": false,
-       "can_reboot": true,
-       "uuid": "447c23edbe944911f23145538915865ebddec230",
-       "name": "i-5ebfdc59",
-       "tags":
+       &quot;can_start&quot;: false,
+       &quot;can_reboot&quot;: true,
+       &quot;uuid&quot;: &quot;447c23edbe944911f23145538915865ebddec230&quot;,
+       &quot;name&quot;: &quot;i-5ebfdc59&quot;,
+       &quot;tags&quot;:
        [
-           "ap-northeast-1a"
+           &quot;ap-northeast-1a&quot;
        ],
-       "can_stop": true,
-       "can_destroy": true,
-       "extra":
+       &quot;can_stop&quot;: true,
+       &quot;can_destroy&quot;: true,
+       &quot;extra&quot;:
        {
-           "status": "running",
-           "productcode":
+           &quot;status&quot;: &quot;running&quot;,
+           &quot;productcode&quot;:
            [
            ],
-           "groups":
+           &quot;groups&quot;:
            [
                null
            ],
-           "tags":
+           &quot;tags&quot;:
            {
            },
-           "instanceId": "i-5ebfdc59",
-           "dns_name": "ec2-173-21-215-201.ap-northeast-1.compute.amazonaws.com",
-           "launchdatetime": "2014-01-13T13:58:03.000Z",
-           "iam_profile": null,
-           "imageId": "ami-2f61fe2e",
-           "kernelid": "aki-42992843",
-           "keyname": "Mykey",
-           "availability": "ap-northeast-1a",
-           "clienttoken": "",
-           "launchindex": "0",
-           "ramdiskid": null,
-           "private_dns": "ip-10-153-6-20.ap-northeast-1.compute.internal",
-           "instancetype": "t1.micro"
+           &quot;instanceId&quot;: &quot;i-5ebfdc59&quot;,
+           &quot;dns_name&quot;: &quot;ec2-173-21-215-201.ap-northeast-1.compute.amazonaws.com&quot;,
+           &quot;launchdatetime&quot;: &quot;2014-01-13T13:58:03.000Z&quot;,
+           &quot;iam_profile&quot;: null,
+           &quot;imageId&quot;: &quot;ami-2f61fe2e&quot;,
+           &quot;kernelid&quot;: &quot;aki-42992843&quot;,
+           &quot;keyname&quot;: &quot;Mykey&quot;,
+           &quot;availability&quot;: &quot;ap-northeast-1a&quot;,
+           &quot;clienttoken&quot;: &quot;&quot;,
+           &quot;launchindex&quot;: &quot;0&quot;,
+           &quot;ramdiskid&quot;: null,
+           &quot;private_dns&quot;: &quot;ip-10-153-6-20.ap-northeast-1.compute.internal&quot;,
+           &quot;instancetype&quot;: &quot;t1.micro&quot;
        },
-       "public_ips":
+       &quot;public_ips&quot;:
        [
-           "170.21.215.111"
+           &quot;170.21.215.111&quot;
        ],
-       "private_ips":
+       &quot;private_ips&quot;:
        [
-           "10.153.6.20"
+           &quot;10.153.6.20&quot;
        ],
-       "imageId": "ami-2f61fe2e",
-       "state": "running",
-       "can_tag": true,
-       "id": "i-5ebfdc59",
-       "size": "t1.micro"
+       &quot;imageId&quot;: &quot;ami-2f61fe2e&quot;,
+       &quot;state&quot;: &quot;running&quot;,
+       &quot;can_tag&quot;: true,
+       &quot;id&quot;: &quot;i-5ebfdc59&quot;,
+       &quot;size&quot;: &quot;t1.micro&quot;
    }
-]</pre>
+]
+</pre></div>
 </div>
 </dd></dl>
 
@@ -942,20 +975,21 @@ Accept: application/json; charset=UTF-8</pre>
 <tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines</tt><a class="headerlink" href="#post--backends-{backend_id}-machines" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create machine</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
+<div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
 {
-    "name":"WebServer 3",
-    "key":"MyKey2",
-    "image":"ami-2f61fe2e",
-    "location":"0",
-    "size":"t1.micro",
-    "script":"echo `uptime` &gt; new_file.txt",
-    "image_extra":"",
-    "disk":""
-}</pre>
+    &quot;name&quot;:&quot;WebServer 3&quot;,
+    &quot;key&quot;:&quot;MyKey2&quot;,
+    &quot;image&quot;:&quot;ami-2f61fe2e&quot;,
+    &quot;location&quot;:&quot;0&quot;,
+    &quot;size&quot;:&quot;t1.micro&quot;,
+    &quot;script&quot;:&quot;echo `uptime` &gt; new_file.txt&quot;,
+    &quot;image_extra&quot;:&quot;&quot;,
+    &quot;disk&quot;:&quot;&quot;
+}
+</pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -977,65 +1011,71 @@ Accept: application/json; charset=UTF-8
 </tbody>
 </table>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>{
-   "public_ips":
+<div class="highlight-http"><div class="highlight"><pre>{
+   &quot;public_ips&quot;:
    [
-       "50.253.51.216"
+       &quot;50.253.51.216&quot;
    ],
-   "extra":
+   &quot;extra&quot;:
    {
-       "status": "running",
-       "productcode":
+       &quot;status&quot;: &quot;running&quot;,
+       &quot;productcode&quot;:
        [
        ],
-       "groups":
+       &quot;groups&quot;:
        [
            null
        ],
-       "tags":
+       &quot;tags&quot;:
        {
-           "Name": "WebServer 3"
+           &quot;Name&quot;: &quot;WebServer 3&quot;
        },
-       "instanceId": "i-50dd7257",
-       "dns_name": "ec2-50-253-51-216.ap-northeast-1.compute.amazonaws.com",
-       "launchdatetime": "2014-01-15T05:37:50.000Z",
-       "iam_profile": null,
-       "imageId": "ami-2f61fe2e",
-       "kernelid": "aki-42992843",
-       "keyname": "MyKey2",
-       "availability": "ap-northeast-1a",
-       "clienttoken": "",
-       "launchindex": "0",
-       "ramdiskid": null,
-       "private_dns": "ip-10-160-226-156.ap-northeast-1.compute.internal",
-       "instancetype": "t1.micro"
+       &quot;instanceId&quot;: &quot;i-50dd7257&quot;,
+       &quot;dns_name&quot;: &quot;ec2-50-253-51-216.ap-northeast-1.compute.amazonaws.com&quot;,
+       &quot;launchdatetime&quot;: &quot;2014-01-15T05:37:50.000Z&quot;,
+       &quot;iam_profile&quot;: null,
+       &quot;imageId&quot;: &quot;ami-2f61fe2e&quot;,
+       &quot;kernelid&quot;: &quot;aki-42992843&quot;,
+       &quot;keyname&quot;: &quot;MyKey2&quot;,
+       &quot;availability&quot;: &quot;ap-northeast-1a&quot;,
+       &quot;clienttoken&quot;: &quot;&quot;,
+       &quot;launchindex&quot;: &quot;0&quot;,
+       &quot;ramdiskid&quot;: null,
+       &quot;private_dns&quot;: &quot;ip-10-160-226-156.ap-northeast-1.compute.internal&quot;,
+       &quot;instancetype&quot;: &quot;t1.micro&quot;
    },
-   "id": "i-50dd7257",
-   "private_ips":
+   &quot;id&quot;: &quot;i-50dd7257&quot;,
+   &quot;private_ips&quot;:
    [
-       "10.160.226.156"
+       &quot;10.160.226.156&quot;
    ],
-   "name": "WebServer 3"
-}</pre>
+   &quot;name&quot;: &quot;WebServer 3&quot;
+}
+</pre></div>
 </div>
 </dd></dl>
 
 <dl class="post">
-<dt id="post--backends-{backend_id}-machines-{machine_id}?action={action}">
-<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}?action={action}</tt><a class="headerlink" href="#post--backends-{backend_id}-machines-{machine_id}?action={action}" title="Permalink to this definition">¶</a></dt>
+<dt id="post--backends-{backend_id}-machines-{machine_id}">
+<tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}</tt><a class="headerlink" href="#post--backends-{backend_id}-machines-{machine_id}" title="Permalink to this definition">¶</a></dt>
 <dd><p>Machine actions like reboot, destroy, shutdown and start</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257?action=reboot
-Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+<div class="highlight-http"><div class="highlight"><pre>  POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257
+  Host: mist.io
+  Accept: application/json; charset=UTF-8
+
+{
+    &quot;action&quot;:&quot;reboot&quot;
+}
+</pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Query Parameters:</th></tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
-<li><strong>action</strong> &#8211; <em>required</em> Can be reboot, shutdown, start or destroy depending on the available actions for each machine</li>
+<li><strong>action</strong> (<em>string</em>) &#8211; <em>required</em> Can be reboot, shutdown, start or destroy depending on the available actions for each machine</li>
 </ul>
 </td>
 </tr>
@@ -1048,13 +1088,14 @@ Accept: application/json; charset=UTF-8</pre>
 <tt class="descname">POST </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}/metadata</tt><a class="headerlink" href="#post--backends-{backend_id}-machines-{machine_id}-metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add tags/metadata for machine</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/metadata
+<div class="highlight-http"><div class="highlight"><pre>POST /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/metadata
 Host: mist.io
 Accept: application/json; charset=UTF-8
 
 {
-    "tag":"Backup Machine"
-}</pre>
+    &quot;tag&quot;:&quot;Backup Machine&quot;
+}
+</pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1078,19 +1119,21 @@ Accept: application/json; charset=UTF-8
 <tt class="descname">GET </tt><tt class="descname">/backends/{backend_id}/machines/{machine_id}/shell?host={host_ip}&amp;command={shell_command}</tt><a class="headerlink" href="#get--backends-{backend_id}-machines-{machine_id}-shell?host={host_ip}&command={shell_command}" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run shell command in machine. Mist will yield an html body with the command&#8217;s output.</p>
 <p><strong>Example request</strong>:</p>
-<div class="highlight-http"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/shell?host=129.113.146.116&amp;command=uptime
+<div class="highlight-http"><div class="highlight"><pre>GET /backends/2tK74h4mXbjjLlkjjO4SHn3/machines/i-50aa7257/shell?host=129.113.146.116&amp;command=uptime
 Host: mist.io
-Accept: application/json; charset=UTF-8</pre>
+Accept: application/json; charset=UTF-8
+</pre></div>
 </div>
 <p><strong>Example response</strong>:</p>
-<div class="highlight-http"><pre>&lt;html&gt;
+<div class="highlight-http"><div class="highlight"><pre>&lt;html&gt;
 &lt;body&gt;
-&lt;script type='text/javascript'&gt;parent.appendShell \
-(' 06:29:06 up 1 day, 21:00,  1 user,  load average: 0.00, 0.01, 0.05&lt;br/&gt;'); \
+&lt;script type=&#39;text/javascript&#39;&gt;parent.appendShell \
+(&#39; 06:29:06 up 1 day, 21:00,  1 user,  load average: 0.00, 0.01, 0.05&lt;br/&gt;&#39;); \
 &lt;/script&gt;
-&lt;script type='text/javascript'&gt;parent.completeShell(1);&lt;/script&gt;
+&lt;script type=&#39;text/javascript&#39;&gt;parent.completeShell(1);&lt;/script&gt;
 &lt;/body&gt;
-&lt;/html&gt;</pre>
+&lt;/html&gt;
+</pre></div>
 </div>
 </dd></dl>
 
@@ -1138,7 +1181,7 @@ Accept: application/json; charset=UTF-8</pre>
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.1.<br/>
     </p>
   </div>
 </footer>
