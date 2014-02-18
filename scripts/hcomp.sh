@@ -17,15 +17,15 @@
 #########################################################################################
 # Progress bar
 ##
-function progress {
-
-	value=`bc <<< "$1 / 1"`
-	half_value=`bc <<< "$value / 2"`
-	bar="|"
-	for (( int=0; int <= $half_value; ++int)); do bar="$bar="; done
-	for (( int=$half_value; int < 50; ++int)); do bar="$bar "; done
-    echo -ne "$bar| $value %\r"
-}
+#function progress {
+    
+	#value=`bc <<< "$1 / 1"`
+	#half_value=`bc <<< "$value / 2"`
+	#bar="|"
+	#for (( int=0; int <= $half_value; ++int)); do bar="$bar="; done
+	#for (( int=$half_value; int < 50; ++int)); do bar="$bar "; done
+    #echo -ne "$bar| $value %\r"
+#}
 
 
 
@@ -54,7 +54,7 @@ fi
 ##
 
 echo "Generating script..."
-progress 0
+#progress 0
 
 echo "define('app/templates/templates', ['ember'], function() {
 
@@ -68,10 +68,10 @@ do
     
     # Show progressbar
     i=$((i + 1))
-    progress `bc -l <<< "50 / $FILE_COUNT * $i"`
+    #progress `bc -l <<< "50 / $FILE_COUNT * $i"`
 done
 
-progress 50
+#progress 50
 
 echo "    'ember'],
   function() {" >> $BUILD_PATH
@@ -85,7 +85,7 @@ do
     
     # Show progressbar
     i=$((i + 1))
-    progress `bc -l <<< "(50 / $FILE_COUNT * $i) + 50 "`
+    #progress `bc -l <<< "(50 / $FILE_COUNT * $i) + 50 "`
 done
 
 echo "  });
@@ -93,7 +93,7 @@ echo "  });
 }
 
 " >> $BUILD_PATH
-progress 100
+#progress 100
 
 
 
@@ -102,7 +102,7 @@ progress 100
 ##
 
 echo -ne "\nCompiling templates...\n"
-progress 0
+#progress 0
 
 i=0
 for f in $TEMPLATES_DIR"/"*.html
@@ -111,13 +111,13 @@ do
     
     # Show progressbar
     i=$((i + 1))
-    progress `bc -l <<< "100 / $FILE_COUNT * $i"`
+    #progress `bc -l <<< "100 / $FILE_COUNT * $i"`
 done
 
 
 # Close wrapper
 echo "});" >> $BUILD_PATH
 
-progress 100
+#progress 100
 echo -ne "\nDone\n"
 
