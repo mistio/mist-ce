@@ -3,8 +3,6 @@ require.config({
     baseUrl: 'resources/js/',
     waitSeconds: 200,
     paths: {
-        mocha: 'lib/mocha-1.4.2',
-        chai: 'lib/chai-1.2.0',
         jquery: 'lib/jquery-1.10.2',
         text: 'lib/require/text',
         mobile: 'lib/jquery.mobile-1.4.0-rc.1',
@@ -543,7 +541,7 @@ define( 'app', [
 
     function preloadImages(callback) {
         var imgs = [];
-        parseCSS(document.styleSheets);
+        parseCSS([document.styleSheets[0]]);
         var img;
         var remaining = imgUrls.length;
         for (var i = 0; i < imgUrls.length; i++) {
