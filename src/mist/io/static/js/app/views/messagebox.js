@@ -1,17 +1,12 @@
-define('app/views/messagebox', [
-    'text!app/templates/messagebox.html',
-    'ember'
-        ],
+define('app/views/messagebox', ['app/views/templated', 'ember'],
     /**
      * Message Box Dialog
      *
      * @returns Class
      */
-    function(messagebox_html) {
-        return Ember.View.extend({
+    function(TemplatedView) {
+        return TemplatedView.extend({
 
-            template: Ember.Handlebars.compile(messagebox_html),
-            
             actions: {
                 
                 

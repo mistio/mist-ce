@@ -1,10 +1,10 @@
-define('app/views/machine_tags_list_item', ['app/views/list_item', 'text!app/templates/machine_tags_list_item.html'],
+define('app/views/machine_tags_list_item', ['app/views/list_item'],
     /**
      *  Machine Tags List Item View
      *
      *  @returns Class
      */
-    function (ListItemView, machine_tags_list_item_html) {
+    function (ListItemView) {
         return ListItemView.extend({
 
             /**
@@ -13,7 +13,6 @@ define('app/views/machine_tags_list_item', ['app/views/list_item', 'text!app/tem
 
             tag: null,
             tagName: 'span',
-            template: Ember.Handlebars.compile(machine_tags_list_item_html),
 
 
             /**

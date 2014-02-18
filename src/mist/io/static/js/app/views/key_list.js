@@ -1,18 +1,11 @@
-define('app/views/key_list', ['app/views/mistscreen', 'text!app/templates/key_list.html'],
+define('app/views/key_list', ['app/views/mistscreen'],
     /**
      *  Key List View
      *
      *  @returns Class
      */
-    function (MistScreen, key_list_html) {
+    function (MistScreen) {
         return MistScreen.extend({
-
-            /**
-             *  Properties
-             */
-
-            template: Ember.Handlebars.compile(key_list_html),
-
 
             /**
              *

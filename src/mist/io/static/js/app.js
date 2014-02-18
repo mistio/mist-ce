@@ -28,6 +28,7 @@ require.config({
 define( 'app', [
     'jquery',
     'd3',
+    'app/templates/templates',
     'app/controllers/login',
     'app/controllers/backends',
     'app/controllers/confirmation',
@@ -44,6 +45,7 @@ define( 'app', [
     'app/controllers/machine_tags',
     'app/controllers/machine_shell',
     'app/controllers/rules',
+    'app/views/templated',
     'app/views/home',
     'app/views/login',
     'app/views/backend_button',
@@ -52,7 +54,7 @@ define( 'app', [
     'app/views/monitoring',
     'app/views/machine_list_item',
     'app/views/image_list_item',
-    'app/views/machine_add_dialog',
+    'app/views/machine_add',
     'app/views/machine',
     'app/views/messagebox',
     'app/views/machine_list',
@@ -69,13 +71,14 @@ define( 'app', [
     'app/views/key_list',
     'app/views/key',
     'app/views/key_add',
-    'app/views/key_edit_dialog',
+    'app/views/key_edit',
     'app/views/rule',
     'app/views/user_menu',
     'app/views/list_item',
     'ember'
     ], function($,
                 d3,
+                TemplatesBuild,
                 LoginController,
                 BackendsController,
                 ConfirmationController,
@@ -92,11 +95,12 @@ define( 'app', [
                 MachineTagsController,
                 MachineShellController,
                 RulesController,
+                TemplatedView,
                 Home,
                 LoginView,
                 BackendButton,
                 BackendAdd,
-                EditBackend,
+                BackendEdit,
                 MonitoringView,
                 MachineListItem,
                 ImageListItem,
@@ -125,6 +129,7 @@ define( 'app', [
 
     function initialize() {
 
+
         // JQM init event
 
         $(document).bind('mobileinit', function() {
@@ -138,12 +143,14 @@ define( 'app', [
 
             App.set('isJQMInitialized',true);
         });
-        
+
+
         // Hide error boxes on page unload
+
         window.onbeforeunload = function() {
             $('.ui-loader').hide();
         };
-        
+
 
         // Ember Application
 
@@ -152,6 +159,7 @@ define( 'app', [
                 require(['mobile']);
             }
         });
+
 
         // Globals
 
@@ -257,17 +265,18 @@ define( 'app', [
         App.set('homeView', Home);
         App.set('ruleView', RuleView);
         App.set('loginView', LoginView);
-        App.set('keyListView', KeyListView);
         App.set('keyAddView', KeyAddView);
+        App.set('keyView', SingleKeyView);
+        App.set('keyListView', KeyListView);
         App.set('listItemView', ListItemView);
-        App.set('backendAddView', BackendAdd);
         App.set('userMenuView', UserMenuView);
-        App.set('editKeyView', KeyEditDialog);
-        App.set('editBackendView', EditBackend);
+        App.set('keyEditView', KeyEditDialog);
+        App.set('backendAddView', BackendAdd);
+        App.set('backendEditView', BackendEdit);
         App.set('imageListView', ImageListView);
-        App.set('singleKeyView', SingleKeyView);
-        App.set('messageBoxView', MessageBoxView);
+        App.set('messageboxView', MessageBoxView);
         App.set('monitoringView', MonitoringView);
+        App.set('machineView', SingleMachineView);
         App.set('machineKeysView', MachineKeysView);
         App.set('machineTagsView', MachineTagsView);
         App.set('keyListItemView', KeyListItemView);
@@ -278,7 +287,6 @@ define( 'app', [
         App.set('machinePowerView', MachinePowerView);
         App.set('machineShellView', MachineShellView);
         App.set('machineListItemView', MachineListItem);
-        App.set('singleMachineView', SingleMachineView);
         App.set('confirmationDialog', ConfirmationDialog);
         App.set('machineKeysListItemView', MachineKeysListItemView);
         App.set('machineTagsListItemView', MachineTagsListItemView);
@@ -286,8 +294,6 @@ define( 'app', [
 
         // Ember controllers
 
-        
-        
         App.set('keysController', KeysController.create());
         App.set('loginController', LoginController.create());
         App.set('rulesController', RulesController.create());
@@ -384,6 +390,7 @@ define( 'app', [
         return App;
     }
 
+
     /**
      * 
      *  Ajax wrapper constructor
@@ -442,7 +449,7 @@ define( 'app', [
                         if (ret.complete)
                             ret.complete(jqXHR.status == 200, jqXHR.responseJSON);
                     }
-                }
+                };
 
                 if (Object.keys(data).length === 0) {
                     delete ajaxObject.data;
@@ -623,3 +630,15 @@ function completeShell(ret, command_id) {
     $('iframe#' + command_id).remove();
     Mist.machineShellController.machine.commandHistory.findBy('id', command_id).set('pendingResponse', false);
 }
+
+function getTemplate(name) {
+    if (JS_BUILD || true) { // The "|| true" part is just for debuging as for now
+        //info('Getting precompiled template for: ' + name);
+        // Return precompiled template
+        return Ember.TEMPLATES[name + '/html'];
+    } else {
+        info('Compiling template for: ' + name);
+        return Ember.Handlebars.compile('text!app/templates/'+ name + '.html');
+    }
+};
+

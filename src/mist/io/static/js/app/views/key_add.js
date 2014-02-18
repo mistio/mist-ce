@@ -1,18 +1,11 @@
-define('app/views/key_add', ['text!app/templates/key_add.html', 'ember'],
+define('app/views/key_add', ['app/views/templated', 'ember'],
     /**
      *  Key Add View
      *
      *  @returns Class
      */
-    function (key_add_html) {
-        return Ember.View.extend({
-
-            /**
-             *  Properties
-             */
-
-            template: Ember.Handlebars.compile(key_add_html),
-
+    function (TemplatedView) {
+        return TemplatedView.extend({
 
             /**
              *
