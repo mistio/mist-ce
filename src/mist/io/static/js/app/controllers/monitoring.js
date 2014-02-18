@@ -304,10 +304,10 @@ define('app/controllers/monitoring', [
 
                            reason = (typeof reason == 'undefined' ? 'manualReload' : reason);
 
-                           // Temporary Fix For Some Functions TODO change this
-                           if(reason == 'updatesDisabled')
+                           // Enable/Disable updates
+                           if(!self.updateData)
                                 Mist.monitoringController.graphs.disableAnimation(false);
-                           if(reason == 'updatesEnabled')
+                           else
                                 Mist.monitoringController.graphs.enableAnimation();
 
                             Mist.monitoringController.graphs.clearData();
@@ -432,9 +432,11 @@ define('app/controllers/monitoring', [
                 *   Enables Updates , Also Animation
                 *
                 */
-                enableUpdates: function(){
+                enableUpdates: function(reloadAfter){
+                    reload = (typeof reloadAfter == 'undefined' ? true : reloadAfter);
                     this.updateData = true;
-                    this.reload('updatesEnabled');
+                    if(reload)
+                        this.reload('updatesEnabled');
                 },
 
 
@@ -443,9 +445,11 @@ define('app/controllers/monitoring', [
                 *   Disables Updates , Also Animation
                 *
                 */
-                disableUpdates: function(){
+                disableUpdates: function(reloadAfter){
+                    reload = (typeof reloadAfter == 'undefined' ? true : reloadAfter);
                     this.updateData = false;
-                    this.reload('updatesDisabled');
+                    if(reload)
+                        this.reload('updatesDisabled');
                 },
 
 
@@ -1106,6 +1110,12 @@ define('app/controllers/monitoring', [
                             newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 );
                             controller.request.changeStep(newStep,false);
                             controller.request.changeTimeWindow(timeWindow,false);
+
+                            // When we have more than 10 minutes time window we don't really need updates
+                            if(timeWindowInMinutes > 10)
+                                controller.request.disableUpdates(false);
+                            else
+                                controller.request.enableUpdates(false);
 
                             var zoomID = controller.request.reload();
 
