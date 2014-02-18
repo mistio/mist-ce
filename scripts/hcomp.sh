@@ -18,13 +18,13 @@
 # Progress bar
 ##
 function progress {
-
-	value=`bc <<< "$1 / 1"`
-	half_value=`bc <<< "$value / 2"`
-	bar="|"
-	for (( int=0; int <= $half_value; ++int)); do bar="$bar="; done
-	for (( int=$half_value; int < 50; ++int)); do bar="$bar "; done
-    echo -ne "$bar| $value %\r"
+    
+	#value=`bc <<< "$1 / 1"`
+	#half_value=`bc <<< "$value / 2"`
+	#bar="|"
+	#for (( int=0; int <= $half_value; ++int)); do bar="$bar="; done
+	#for (( int=$half_value; int < 50; ++int)); do bar="$bar "; done
+    #echo -ne "$bar| $value %\r"
 }
 
 
@@ -68,7 +68,7 @@ do
     
     # Show progressbar
     i=$((i + 1))
-    progress `bc -l <<< "50 / $FILE_COUNT * $i"`
+    #progress `bc -l <<< "50 / $FILE_COUNT * $i"`
 done
 
 progress 50
@@ -85,7 +85,7 @@ do
     
     # Show progressbar
     i=$((i + 1))
-    progress `bc -l <<< "(50 / $FILE_COUNT * $i) + 50 "`
+    #progress `bc -l <<< "(50 / $FILE_COUNT * $i) + 50 "`
 done
 
 echo "  });
@@ -111,7 +111,7 @@ do
     
     # Show progressbar
     i=$((i + 1))
-    progress `bc -l <<< "100 / $FILE_COUNT * $i"`
+    #progress `bc -l <<< "100 / $FILE_COUNT * $i"`
 done
 
 
