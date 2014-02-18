@@ -55,6 +55,7 @@
       ga('send', 'pageview');
 
     </script>
+    <link rel="stylesheet" href="resources/jquery.mobile.icons.min.css" />
 </head>
 
 <body style="background-color: #c2c3c4; overflow:hidden">
