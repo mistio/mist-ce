@@ -34,18 +34,26 @@
 ##
 
 TEMPLATES_DIR="src/mist/io/static/js/app/templates"
+
+if [ "$1" ]
+then
+    TEMPLATES_DIR="$1""/$TEMPLATES_DIR"
+    echo $TEMPLATES_DIR
+else
+    IS_CORE=`pwd | grep mist.core`
+    if [ "$IS_CORE" ]
+    then
+        cd `pwd | sed 's%mist.core.*%mist.core%g'`
+        cd "src/mist.io"
+    else
+        cd `pwd | sed 's%mist.io.*%mist.io%g'`
+    fi
+fi
+
 BUILD_PATH="$TEMPLATES_DIR""/templates.js"
 FILE_COUNT=`eval ls -l $TEMPLATES_DIR | grep .html | wc -l | tr -d ' '`
 
 
-IS_CORE=`pwd | grep mist.core`
-if [ "$IS_CORE" ]
-then
-    cd `pwd | sed 's%mist.core.*%mist.core%g'`
-    cd "src/mist.io"
-else
-    cd `pwd | sed 's%mist.io.*%mist.io%g'`
-fi
 
 
 
