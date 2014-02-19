@@ -346,25 +346,6 @@ define('app/views/monitoring', [
 
                         var self           = this;
 
-                        var labelTicks = function(axisInstance,numOfLabels,format){
-
-                            // TODO check if ticks work with float number - Result : They Don't
-
-                            var labelsStep = (self.timeDisplayed / 60) / numOfLabels;
-
-                            if(self.id == 'cpuGraph')
-                                console.log("Labels Step: " + labelsStep);
-
-                            axisInstance.ticks(d3.time.minutesFixed,labelsStep);
-
-                            if( typeof format != 'undefined')
-                                axisInstance.tickFormat(d3.time.format(format));
-
-                            return axisInstance;
-
-
-                        };
-
                         var labelTicksFixed = function(axisInstance,format) {
 
                             // Check Time Displayed
@@ -436,19 +417,6 @@ define('app/views/monitoring', [
                                                .orient("bottom")
                                                .tickSize(-this.height, 0, 0)
                                                .tickFormat("");
-
-                        // Add This To Function
-
-                        // We Don't really use this
-                        /*if (this.secondsStep <= 60) {
-
-                            d3xAxis.call(modelXAxis
-                                         .ticks(d3.time.seconds, this.secondsStep)
-                                         .tickFormat(d3.time.format("%I:%M:%S%p")));
-
-                            d3GridX.call(modelGridX
-                                         .ticks(d3.time.seconds, this.secondsStep));
-                        }*/
 
 
                         var tLabelFormat = "%I:%M%p";
@@ -576,6 +544,9 @@ define('app/views/monitoring', [
                         // Set new values to SVG element
                         d3svg.attr('width',this.width)
                              .attr('height',this.height);
+
+                        // Set new height for value are
+                        valuearea.y0(this.height - margin.top - margin.bottom);
 
                         // Update scale to new values
                         yScale = d3.scale.linear().range([this.height - margin.top - margin.bottom, 0]);
