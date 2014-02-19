@@ -448,7 +448,9 @@ define('app/views/monitoring', [
                                           .ticks(5)
                                           .tickFormat(function(d){
                                             // Custom Y-Axis label formater
-                                            if(d>=1024*1024)
+                                            if(d>=1024*1024*1024)
+                                                return (d/1024/1024/1024).toFixed(1) +"G";
+                                            else if(d>=1024*1024)
                                                 return (d/1024/1024).toFixed(1) +"M";
                                             else if(d>=1024)
                                                 return (d/1024).toFixed(1) + "K";
@@ -872,10 +874,12 @@ define('app/views/monitoring', [
 
                                     // Fix For Big Numbers
                                     var valueText = "";
-                                    if(currentValue>=1000*1000)
-                                        valueText = (currentValue/1000/1000).toFixed(2) +"M";
-                                    else if(currentValue>=1000)
-                                        valueText = (currentValue/1000).toFixed(2) + "K";
+                                    if(currentValue>=1024*1024*1024)
+                                        valueText = (currentValue/1024/1024/1024).toFixed(2) +"G";
+                                    else if(currentValue>=1024*1024)
+                                        valueText = (currentValue/1024/1024).toFixed(2) +"M";
+                                    else if(currentValue>=1024)
+                                        valueText = (currentValue/1024).toFixed(2) + "K";
                                     else if(self.yAxisValueFormat == "%")
                                         valueText = currentValue.toFixed(2) + "%";
                                     else
