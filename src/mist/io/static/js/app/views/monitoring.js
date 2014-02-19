@@ -188,7 +188,7 @@ define('app/views/monitoring', [
 
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = 160 / 1280 * width;
-                    var margin      = {top: 10, right: 0, bottom: 24, left: 40};
+                    var margin      = {top: 10, right: 0, bottom: 24, left: 52};
 
                     this.id               = divID;
                     this.name             = divID.replace('Graph','');
