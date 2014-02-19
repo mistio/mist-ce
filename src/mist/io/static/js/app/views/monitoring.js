@@ -481,9 +481,9 @@ define('app/views/monitoring', [
                                           .tickFormat(function(d){
                                             // Custom Y-Axis label formater
                                             if(d>=1024*1024)
-                                                return (d/1024/1024) +"M";
+                                                return (d/1024/1024).toFixed(1) +"M";
                                             else if(d>=1024)
-                                                return (d/1024) + "K";
+                                                return (d/1024).toFixed(1) + "K";
                                             else if(yAxisValueFormat == "%")
                                                 return d + "%";
                                             else
