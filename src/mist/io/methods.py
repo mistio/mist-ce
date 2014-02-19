@@ -167,6 +167,22 @@ def delete_backend(user, backend_id):
     """Deletes backend with given backend_id."""
 
     log.info("Deleting backend: %s", backend_id)
+
+    # if a core/io installation, disable monitoring for machines
+    try:
+        from mist.core.methods import disable_monitoring_backend
+    except ImportError:
+        # this is a standalone io installation, don't bother
+        pass
+    else:
+        # this a core/io installation, disable directly using core's function
+        log.info("Disabling monitoring before deleting backend.")
+        try:
+            disable_monitoring_backend(user, backend_id)
+        except Exception as exc:
+            log.warning("Couldn't disable monitoring before deleting backend. "
+                        "Error: %r", exc)
+
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
     with user.lock_n_load():
@@ -1053,6 +1069,29 @@ def destroy_machine(user, backend_id, machine_id):
 
     """
 
+    # if machine has monitoring, disable it. the way we disable depends on
+    # whether this is a standalone io installation or not
+    disable_monitoring_function = None
+    try:
+        from mist.core.methods import disable_monitoring as dis_mon_core
+        disable_monitoring_function = dis_mon_core
+    except ImportError:
+        # this is a standalone io installation, using io's disable_monitoring
+        # if we have an authentication token for the core service
+        if user.mist_api_token:
+            disable_monitoring_function = disable_monitoring
+    if disable_monitoring_function is not None:
+        log.info("Will try to disable monitoring for machine before "
+                 "destroying it (we don't bother to check if it "
+                 "actually has monitoring enabled.")
+        try:
+            # we don't actually bother to undeploy collectd
+            disable_monitoring_function(user, backend_id, machine_id,
+                                        no_ssh=True)
+        except Exception as exc:
+            log.warning("Didn't manage to disable monitoring, maybe the "
+                        "machine never had monitoring enabled. Error: %r", exc)
+
     _machine_action(user, backend_id, machine_id, 'destroy')
 
     pair = [backend_id, machine_id]
@@ -1370,7 +1409,7 @@ def enable_monitoring(user, backend_id, machine_id,
     return stdout
 
 
-def disable_monitoring(user, backend_id, machine_id):
+def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
     """Disable monitoring for a machine."""
     payload = {
         'action': 'disable',
@@ -1393,7 +1432,10 @@ def disable_monitoring(user, backend_id, machine_id):
     ret_dict = json.loads(ret.content)
     host = ret_dict.get('host')
 
-    stdout = _undeploy_collectd(user, backend_id, machine_id, host)
+    if not no_ssh:
+        stdout = _undeploy_collectd(user, backend_id, machine_id, host)
+    else:
+        stdout = ""
     return stdout
 
 
