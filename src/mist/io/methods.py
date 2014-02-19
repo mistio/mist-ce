@@ -1448,7 +1448,9 @@ def _deploy_collectd(user, backend_id, machine_id, host,
     uri = config.CORE_URI + '/core/scripts/%s' % filename
     prefix = '/opt/mistio-collectd'
     prepare_dirs = '$(command -v sudo) mkdir -p %s' % prefix
-    get_script = "$(command -v sudo) wget %s %s -O - > %s/%s" % (
+    # in some machines, using simple sudo with output redirection doesn't work
+    # (permission denied) so we also use su to be on the safe side
+    get_script = "$(command -v sudo) su -c 'wget %s %s -O - > %s/%s'" % (
         "--no-check-certificate" if not config.SSL_VERIFY else "",
         uri,
         prefix,
