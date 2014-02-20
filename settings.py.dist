@@ -3,8 +3,10 @@
 ## URI of hosted mist service
 #CORE_URI = "https://mist.io"
 
+## Verify SSL certificates when communicating with core service
+#SSL_VERIFY = True
 
-## Use uglified js
+## Use minified (uglified) js
 #JS_BUILD = False
 
 
