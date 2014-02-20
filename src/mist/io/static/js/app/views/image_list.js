@@ -1,10 +1,10 @@
-define('app/views/image_list', ['app/models/image', 'app/views/mistscreen', 'text!app/templates/image_list.html'],
+define('app/views/image_list', ['app/models/image', 'app/views/mistscreen'],
     /**
      *  Images page
      *
      *  @returns Class
      */
-    function (Image, MistScreen, image_list_html) {
+    function (Image, MistScreen) {
         return MistScreen.extend({
 
             /**
@@ -15,8 +15,6 @@ define('app/views/image_list', ['app/models/image', 'app/views/mistscreen', 'tex
             baseImages: [],
             renderedImages: [],
             advancedSearchMode: null,
-            template: Ember.Handlebars.compile(image_list_html),
-
 
             /**
              *

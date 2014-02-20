@@ -140,6 +140,10 @@ class MachineCreationError(InternalServerError):
     msg = "Machine creation failed"
 
 
+class SSLError(MistError):
+    msg = "SSL certificate verification error"
+
+
 # SERVICE UNAVAILABLE (translated as 503 in views)
 class ServiceUnavailableError(MistError):
     msg = "Service unavailable"

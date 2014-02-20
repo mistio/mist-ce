@@ -1,16 +1,16 @@
-define('app/views/mistscreen', ['ember'],
+define('app/views/mistscreen', ['app/views/templated', 'ember'],
     /**
      *  Mistscreen View
      *
      *  @returns Class
      */
-    function () {
-        return Ember.View.extend({
+    function (TemplatedView) {
+        return TemplatedView.extend({
 
             /**
              *  Initialization
              */
-
+            
             didInsertElement: function () {
                 if ($('.ui-page-active').page) {
                     $('.ui-page-active').page();

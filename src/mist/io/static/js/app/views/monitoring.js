@@ -1,15 +1,12 @@
-define('app/views/monitoring', [
-    'text!app/templates/monitoring.html', 'ember'],
+define('app/views/monitoring', ['app/views/templated','ember'],
     /**
      *
      * Monitoring View
      *
      * @returns Class
      */
-    function(monitoring_html) {
-        return Ember.View.extend({
-
-            template: Ember.Handlebars.compile(monitoring_html),
+    function(TemplatedView) {
+        return TemplatedView.extend({
 
             graphs : {
                 cpu: null,
