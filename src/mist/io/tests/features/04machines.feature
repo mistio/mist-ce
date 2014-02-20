@@ -11,6 +11,7 @@ Feature: Machines
     @web
     @bare-metal
     @machine-actions
+    @machine-key-association
     Scenario: Create Machine
         When I click the "Add backend" button
         And I wait for 1 seconds
@@ -90,6 +91,7 @@ Feature: Machines
 
 
     @web
+    @machine-key-association
     Scenario: Associate Second Key
         When I click the "Keys" button
         And I wait for 2 seconds
@@ -118,6 +120,7 @@ Feature: Machines
 
 
     @web
+    @machine-key-association
     Scenario: Disassociate Second Key
         When I visit mist.io
             Then I should see "mist.io"
@@ -187,6 +190,7 @@ Feature: Machines
     @web
     @machine-actions
     @bare-metal
+    @machine-key-association
     Scenario: Destroy Machine
         When I visit mist.io
             Then I should see "mist.io"
