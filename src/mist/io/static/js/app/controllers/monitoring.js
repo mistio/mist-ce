@@ -65,13 +65,18 @@ define('app/controllers/monitoring', [
                          machine.set('disablingMonitoring', false);
                      }
                      Mist.set('authenticated', true);
-                 }).error(function(message) {
+                 }).error(function(message, statusCode) {
                      if (machine.hasMonitoring) {
                          machine.set('disablingMonitoring', false);
                      } else {
                          machine.set('enablingMonitoring', false);
                      }
-                     Mist.notificationController.timeNotify(message, 5000);
+
+                     if (statusCode == 402){
+                         Mist.notificationController.timeNotify(message, 5000);
+                     } else {
+                         Mist.notificationController.notify('Error when changing monitoring to ' + machine.name);
+                     }
                  }).complete(function(success, data) {
                      //that.set('changingMonitoring', false);
                      if (callback) callback(success, data);
