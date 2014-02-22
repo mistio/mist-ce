@@ -1,10 +1,10 @@
-define('app/views/key_list_item', ['app/views/list_item', 'text!app/templates/key_list_item.html'],
+define('app/views/key_list_item', ['app/views/list_item'],
     /**
      *  Key List Item View
      *
      *  @returns Class
      */
-    function (ListItemView, key_list_item_html) {
+    function (ListItemView) {
         return ListItemView.extend({
 
             /**
@@ -12,7 +12,6 @@ define('app/views/key_list_item', ['app/views/list_item', 'text!app/templates/ke
              */
 
             key: null,
-            template: Ember.Handlebars.compile(key_list_item_html),
 
 
             /**

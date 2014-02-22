@@ -167,6 +167,22 @@ def delete_backend(user, backend_id):
     """Deletes backend with given backend_id."""
 
     log.info("Deleting backend: %s", backend_id)
+
+    # if a core/io installation, disable monitoring for machines
+    try:
+        from mist.core.methods import disable_monitoring_backend
+    except ImportError:
+        # this is a standalone io installation, don't bother
+        pass
+    else:
+        # this a core/io installation, disable directly using core's function
+        log.info("Disabling monitoring before deleting backend.")
+        try:
+            disable_monitoring_backend(user, backend_id)
+        except Exception as exc:
+            log.warning("Couldn't disable monitoring before deleting backend. "
+                        "Error: %r", exc)
+
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
     with user.lock_n_load():
@@ -1053,6 +1069,29 @@ def destroy_machine(user, backend_id, machine_id):
 
     """
 
+    # if machine has monitoring, disable it. the way we disable depends on
+    # whether this is a standalone io installation or not
+    disable_monitoring_function = None
+    try:
+        from mist.core.methods import disable_monitoring as dis_mon_core
+        disable_monitoring_function = dis_mon_core
+    except ImportError:
+        # this is a standalone io installation, using io's disable_monitoring
+        # if we have an authentication token for the core service
+        if user.mist_api_token:
+            disable_monitoring_function = disable_monitoring
+    if disable_monitoring_function is not None:
+        log.info("Will try to disable monitoring for machine before "
+                 "destroying it (we don't bother to check if it "
+                 "actually has monitoring enabled.")
+        try:
+            # we don't actually bother to undeploy collectd
+            disable_monitoring_function(user, backend_id, machine_id,
+                                        no_ssh=True)
+        except Exception as exc:
+            log.warning("Didn't manage to disable monitoring, maybe the "
+                        "machine never had monitoring enabled. Error: %r", exc)
+
     _machine_action(user, backend_id, machine_id, 'destroy')
 
     pair = [backend_id, machine_id]
@@ -1342,15 +1381,17 @@ def enable_monitoring(user, backend_id, machine_id,
         'backend_apiurl': backend.apiurl,
         'backend_tenant_name': backend.tenant_name,
     }
-    #TODO: make ssl verification configurable globally,
-    # set to true by default
     url_scheme = "%s/backends/%s/machines/%s/monitoring"
-    ret = requests.post(
-        url_scheme % (config.CORE_URI, backend_id, machine_id),
-        params=payload,
-        headers={'Authorization': get_auth_header(user)},
-        verify=False
-    )
+    try:
+        ret = requests.post(
+            url_scheme % (config.CORE_URI, backend_id, machine_id),
+            params=payload,
+            headers={'Authorization': get_auth_header(user)},
+            verify=config.SSL_VERIFY
+        )
+    except requests.exceptions.SSLError as exc:
+        log.error("%r", exc)
+        raise SSLError()
     if ret.status_code != 200:
         if ret.status_code == 402:
             raise PaymentRequiredError(ret.text)
@@ -1368,28 +1409,33 @@ def enable_monitoring(user, backend_id, machine_id,
     return stdout
 
 
-def disable_monitoring(user, backend_id, machine_id):
+def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
     """Disable monitoring for a machine."""
     payload = {
         'action': 'disable',
         'no_ssh': True
     }
-    #TODO: make ssl verification configurable globally,
-    # set to true by default
     url_scheme = "%s/backends/%s/machines/%s/monitoring"
-    ret = requests.post(
-        url_scheme % (config.CORE_URI, backend_id, machine_id),
-        params=payload,
-        headers={'Authorization': get_auth_header(user)},
-        verify=False
-    )
+    try:
+        ret = requests.post(
+            url_scheme % (config.CORE_URI, backend_id, machine_id),
+            params=payload,
+            headers={'Authorization': get_auth_header(user)},
+            verify=config.SSL_VERIFY
+        )
+    except requests.exceptions.SSLError as exc:
+        log.error("%r", exc)
+        raise SSLError()
     if ret.status_code != 200:
         raise ServiceUnavailableError()
 
     ret_dict = json.loads(ret.content)
     host = ret_dict.get('host')
 
-    stdout = _undeploy_collectd(user, backend_id, machine_id, host)
+    if not no_ssh:
+        stdout = _undeploy_collectd(user, backend_id, machine_id, host)
+    else:
+        stdout = ""
     return stdout
 
 
@@ -1402,9 +1448,13 @@ def _deploy_collectd(user, backend_id, machine_id, host,
     uri = config.CORE_URI + '/core/scripts/%s' % filename
     prefix = '/opt/mistio-collectd'
     prepare_dirs = '$(command -v sudo) mkdir -p %s' % prefix
-    get_script = (
-        "$(command -v sudo) su root -c \"wget --no-check-certificate "
-        "%s -O - > %s/%s\"" % (uri, prefix, filename)
+    # in some machines, using simple sudo with output redirection doesn't work
+    # (permission denied) so we also use su to be on the safe side
+    get_script = "$(command -v sudo) su -c 'wget %s %s -O - > %s/%s'" % (
+        "--no-check-certificate" if not config.SSL_VERIFY else "",
+        uri,
+        prefix,
+        filename
     )
     make_exec = "$(command -v sudo) chmod +x %s/%s" % (prefix, filename)
     exec_script = (
@@ -1459,7 +1509,7 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "uptime && "
        "echo -------- && "
        "if [ -f /proc/uptime ]; then cat /proc/uptime; "
-       "else expr `date '+%s'` - `sysctl kern.boottime | sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`;" 
+       "else expr `date '+%s'` - `sysctl kern.boottime | sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`;"
        "fi; "
        "echo -------- && "
        "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;"
@@ -1506,20 +1556,20 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
         #     updated_keys = update_available_keys(user, backend_id,
         #                                          machine_id, cmd_output[4])
         #     ret['updated_keys'] = updated_keys
-              
+
     ret.update(parse_ping(ping_out))
-    
+
     return ret
 
 
 # def update_available_keys(user, backend_id, machine_id, authorized_keys):
 #     keypairs = user.keypairs
-# 
+#
 #     # track which keypairs will be updated
 #     updated_keypairs = {}
 #     # get the actual public keys from the blob
 #     ak = [k for k in authorized_keys.split('\n') if k.startswith('ssh')]
-# 
+#
 #     # for each public key
 #     for pk in ak:
 #         exists = False
@@ -1541,14 +1591,14 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
 #                     updated_keypairs[k] = keypairs[k]
 #             if exists:
 #                 break
-# 
+#
 #     if updated_keypairs:
 #         log.debug('update keypairs')
-# 
+#
 #     ret = [{'name': key,
 #             'machines': keypairs[key].machines,
 #             'pub': keypairs[key].public,
 #             'default_key': keypairs[key].default
 #             } for key in updated_keypairs]
-# 
+#
 #     return ret

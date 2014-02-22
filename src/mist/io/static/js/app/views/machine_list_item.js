@@ -1,10 +1,10 @@
-define('app/views/machine_list_item', ['app/views/list_item', 'text!app/templates/machine_list_item.html'],
+define('app/views/machine_list_item', ['app/views/list_item'],
     /**
      *  Machine List Item View
      *
      *  @returns Class
      */
-    function (ListItemView, machine_list_item_html) {
+    function (ListItemView) {
         return ListItemView.extend({
 
             /**
@@ -12,8 +12,6 @@ define('app/views/machine_list_item', ['app/views/list_item', 'text!app/template
              */
 
             machine: null,
-            template: Ember.Handlebars.compile(machine_list_item_html),
-
 
             /**
              *

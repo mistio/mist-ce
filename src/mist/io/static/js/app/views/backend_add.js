@@ -1,11 +1,11 @@
-define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember'],
+define('app/views/backend_add', ['app/views/templated', 'ember'],
     /**
-     *  Add Backend Panel
+     *  Add Backend View
      * 
      *  @returns Class
      */
-    function(backend_add_html) {
-        return Ember.View.extend({
+    function(TemplatedView) {
+        return TemplatedView.extend({
 
             /**
              *  Properties
@@ -13,8 +13,6 @@ define('app/views/backend_add', ['text!app/templates/backend_add.html', 'ember']
 
             firstFieldLabel: 'API Key',
             secondFieldLabel: 'API Secret',
-            template: Ember.Handlebars.compile(backend_add_html),
-
 
             /**
              * 

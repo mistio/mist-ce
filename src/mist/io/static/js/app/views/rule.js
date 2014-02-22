@@ -1,13 +1,11 @@
-define('app/views/rule', ['text!app/templates/rule.html', 'ember'],
+define('app/views/rule', ['app/views/templated','ember'],
     /**
      *  Rule View
      *
      *  @returns Class
      */
-    function(rule_html) {
-        return Ember.View.extend({
-
-            template: Ember.Handlebars.compile(rule_html),
+    function(TemplatedView) {
+        return TemplatedView.extend({
 
             didInsertElement: function() {
                 Ember.run.next(this, function() {

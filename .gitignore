@@ -9,7 +9,6 @@ include
 *.pyc
 *.pyo
 *.egg-info
-docs/build
 src/libcloud
 src/fabric
 src/paramiko

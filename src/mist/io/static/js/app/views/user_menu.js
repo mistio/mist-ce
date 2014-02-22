@@ -1,11 +1,11 @@
-define('app/views/user_menu', ['text!app/templates/user_menu.html', 'ember'],
+define('app/views/user_menu', ['app/views/templated','ember'],
     /**
      *  User Menu View
      *
      *  @returns Class
      */
-    function(user_menu_html) {
-        return Ember.View.extend({
+    function(TemplatedView) {
+        return TemplatedView.extend({
 
             /**
              *  Properties
@@ -13,7 +13,6 @@ define('app/views/user_menu', ['text!app/templates/user_menu.html', 'ember'],
 
             isNotCore: !IS_CORE,
             accountUrl: URL_PREFIX + '/account',
-            template: Ember.Handlebars.compile(user_menu_html),
             //TODO: change the logo_splash.png to user.png
             gravatarURL: EMAIL && ('https://www.gravatar.com/avatar/' + md5(EMAIL) + '?d=' +
                   encodeURIComponent('https://mist.io/resources/images/user.png') +'&s=36'),

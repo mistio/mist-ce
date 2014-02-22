@@ -1,18 +1,12 @@
-define('app/views/shell', [
-    'text!app/templates/shell.html',
-    'ember',
-    'jqueryUi'
-    ],
+define('app/views/shell', ['app/views/templated','ember'],
 /**
  *
  * Shell dialog
  *
  * @returns Class
  */
-function(shell_html) {
-    return Ember.View.extend({
-
-        template: Ember.Handlebars.compile(shell_html),
+function(TemplatedView) {
+    return TemplatedView.extend({
 
         shellOutputItems: Ember.ArrayController.create(),
         

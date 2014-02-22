@@ -12,12 +12,13 @@
     <link rel="stylesheet" type='text/css' href="resources/main.css" 
           tal:condition="not:css_build"/> 
     
-    <link rel="stylesheet" href="resources/mist-1392409184.css"
+    <link rel="stylesheet" href="resources/mist-1392825816.css"
           tal:condition="css_build" />
 
     <script tal:content="string: var IS_CORE=${is_core}" />
     <script tal:content="string: var URL_PREFIX=${core_uri}" />
     <script tal:content="string: var AUTH=${auth}" />
+    <script tal:content="string: var JS_BUILD=${js_build}" />
     <script tal:content="string: var SUPPORTED_PROVIDERS=${supported_providers}" />
     <script tal:content="string: var LOGLEVEL=${js_log_level}" />
     <script tal:content="string: var EMAIL=${email}" />
@@ -25,23 +26,25 @@
     
     <script src="resources/js/lib/require/require.js"></script>
 
-    <script tal:condition="js_build">
-        require.config({
-            baseUrl: 'resources/js/',
-            paths: {
-                //the optimized mist.js source file.
-                "app": "../build/mist-1392409184"
-            }
-        });
-        require(["app"]);
+    <script>
+        if (JS_BUILD) {
+            require.config({
+                baseUrl: 'resources/js/',
+                paths: {
+                    //the optimized mist.js source file.
+                    "app": "../build/mist-1392825816"
+                }
+            });
+            require(["app"]);
+        }else{
+            require.config({
+                // not optimized js, usefull for bedugging
+                baseUrl: 'resources/js/'
+            });
+            require(["app"]);
+        }
     </script>
-    <script tal:condition="not:js_build">
-        require.config({
-            // not optimized js, usefull for bedugging
-            baseUrl: 'resources/js/'
-        });
-        require(["app"]);
-    </script>
+
     <script tal:condition="google_analytics_id" tal:define="ANALYTICS_ID string:${google_analytics_id}">
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -52,6 +55,7 @@
       ga('send', 'pageview');
 
     </script>
+    <link rel="stylesheet" href="resources/jquery.mobile.icons.min.css" />
 </head>
 
 <body style="background-color: #c2c3c4; overflow:hidden">
@@ -84,13 +88,13 @@
         {{view Mist.imageListView}}
     </script>
     <script type="text/x-handlebars" data-template-name="machine">
-        {{view Mist.singleMachineView}}
+        {{view Mist.machineView}}
     </script>
     <script type="text/x-handlebars" data-template-name="keys">
         {{view Mist.keyListView}}
     </script>
     <script type="text/x-handlebars" data-template-name="key">
-        {{view Mist.singleKeyView}}
+        {{view Mist.keyView}}
     </script>
 
 </body>

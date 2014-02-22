@@ -1,18 +1,11 @@
-define('app/views/key_edit_dialog', ['text!app/templates/key_edit_dialog.html', 'ember'],
+define('app/views/key_edit', ['app/views/templated', 'ember'],
     /**
      *  Key Edit View
      *
      *  @returns Class
      */
-    function (key_edit_dialog_html) {
-        return Ember.View.extend({
-
-            /**
-             *  Properties
-             */
-
-            template: Ember.Handlebars.compile(key_edit_dialog_html),
-
+    function (TemplatedView) {
+        return TemplatedView.extend({
 
             /**
              *
