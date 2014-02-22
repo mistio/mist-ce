@@ -1394,7 +1394,7 @@ def enable_monitoring(user, backend_id, machine_id,
         raise SSLError()
     if ret.status_code != 200:
         if ret.status_code == 402:
-            raise PaymentRequiredError(ret.text)
+            raise PaymentRequiredError(ret.text.replace('Payment required: ', ''))
         else:
             raise ServiceUnavailableError()
 

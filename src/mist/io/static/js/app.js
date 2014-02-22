@@ -442,7 +442,7 @@ define( 'app', [
                             if (ret.success)
                                 ret.success(jqXHR.responseJSON);
                         } else if (ret.error) {
-                            ret.error(jqXHR.responseText);
+                            ret.error(jqXHR.responseText, jqXHR.status);
                         }
                         if (ret.complete)
                             ret.complete(jqXHR.status == 200, jqXHR.responseJSON);
