@@ -868,7 +868,13 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                             minValueIndex = i;
                                     }
 
+                                    // Fix for the area that has not defined data
+                                    if(!self.displayedData[minValueIndex].value || !self.displayedData[minValueIndex+1].value){
+                                        $('#GraphsArea').children('.valuePopUp').text("No Data");
+                                        return;
+                                    }
 
+                                    
                                     // Distanse between value before curson and after curson
                                     var distance = self.displayedData[minValueIndex+1].value  - self.displayedData[minValueIndex].value;
                                     // Mouse offset between this two values
