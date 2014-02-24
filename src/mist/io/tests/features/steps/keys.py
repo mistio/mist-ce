@@ -15,7 +15,7 @@ I should see the "{name}" Key added within 5 seconds    -->  key_see_buttons
 "{name}" should be the default key      --> check_default_key
 
 """
-
+from behave import *
 tester_key_name = ""
 
 @when(u'I type "{name}" as key name')

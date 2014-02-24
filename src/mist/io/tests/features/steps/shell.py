@@ -13,7 +13,7 @@ I should see the "{command}" result in shell output     --> shell_output
 ------
 
 """
-
+from behave import *
 
 @when(u'I type the "{command}" shell command')
 def shell_command(context, command):

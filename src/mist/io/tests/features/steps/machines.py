@@ -23,6 +23,7 @@ I should see {number} keys associated within {timeout} seconds   --> keys_associ
 
 """
 from time import sleep, time
+from behave import *
 
 ip = ""
 

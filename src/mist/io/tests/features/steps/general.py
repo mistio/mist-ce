@@ -26,6 +26,9 @@ time_vslow = 7
 def visit_home_page(context):
     context.browser.visit(MIST_URL)
 
+@when(u'i visit "{url}"')
+def visit_custom_url(context, url):
+    context.browser.visit(url)
 
 @when(u'I click the "{text}" button')
 def general_click_button_by_text(context, text):
