@@ -489,7 +489,7 @@ define('app/controllers/monitoring', [
                         dataType: 'json',
                         data: { 'start': start,
                                 'stop': stop,
-                                'step': step
+                                'step': step/1000
                               },
                         timeout: 10000,
                         success: function (data, status, xhr){
