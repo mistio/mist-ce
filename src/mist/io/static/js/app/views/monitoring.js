@@ -457,6 +457,17 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                                 return d;
                                           }));
 
+                        // Get path values for value line and area
+                        valueLinePath = valueline(this.displayedData);
+                        valueAreaPath = valuearea(this.displayedData);
+
+                        // Fix for "Error: Problem parsing d="" " in webkit
+                        if(!valueLinePath){
+                            valueLinePath = "M 0 0";
+                            valueAreaPath = "M 0 0";
+                        }
+
+
                         // Animate line, axis and grid
                         if(!this.timeUpdated && this.animationEnabled)
                         {
@@ -466,14 +477,14 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                             
                             // Update Animated Line and Area
                             d3vLine.attr("transform", "translate(" + this.valuesDistance + ")")
-                                   .attr("d", valueline(this.displayedData))
+                                   .attr("d", valueLinePath)
                                    .transition()
                                    .ease("linear")
                                    .duration(animationDuration)
                                    .attr("transform", "translate(" + 0 + ")");
 
                             d3vArea.attr("transform", "translate(" + this.valuesDistance + ")")
-                                   .attr("d", valuearea(this.displayedData))
+                                   .attr("d", valueAreaPath)
                                    .transition()
                                    .ease("linear")
                                    .duration(animationDuration)
@@ -495,8 +506,8 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         else {
 
                             // Update Non-Animated value line and area
-                            d3vLine.attr("d", valueline(this.displayedData))
-                            d3vArea.attr("d", valuearea(this.displayedData))
+                            d3vLine.attr("d", valueLinePath);
+                            d3vArea.attr("d", valueAreaPath);
 
                             // Fix For Animation after time displayed changed
                             if(this.timeUpdated || !this.animationEnabled)
