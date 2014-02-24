@@ -52,8 +52,14 @@ define('app/controllers/monitoring', [
                     'name': machine.name ? machine.name : machine.id
                  }).success(function(data) {
                      if (!machine.hasMonitoring) {
-                         machine.set('hasMonitoring', true);
-                         machine.set('enablingMonitoring', false);
+
+                        // Give some time to graphite to collect data (fix for new machines)
+                        window.setTimeout(function(){
+                            machine.set('hasMonitoring', true);
+                            machine.set('enablingMonitoring', false);
+
+                        },11000);
+
                      } else {
                          machine.set('hasMonitoring', false);
                          // Remove machine from monitored_machines
@@ -489,7 +495,7 @@ define('app/controllers/monitoring', [
                         dataType: 'json',
                         data: { 'start': start,
                                 'stop': stop,
-                                'step': step/1000
+                                'step': step // step/1000 removed temporary do not commit !!
                               },
                         timeout: 10000,
                         success: function (data, status, xhr){
