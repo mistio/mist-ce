@@ -121,6 +121,11 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         backend.region = region
         backend.enabled = True
 
+        #OpenStack does not like trailing slashes
+        #so https://192.168.1.101:5000 will work but https://192.168.1.101:5000/ won't! 
+        if backend.provider == 'openstack':
+            backend.apiurl = backend.apiurl.rstrip('/')
+
         #for HP Cloud
         if 'hpcloudsvc' in apiurl:
             backend.apiurl = HPCLOUD_AUTH_URL
