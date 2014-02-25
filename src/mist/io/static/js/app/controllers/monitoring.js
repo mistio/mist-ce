@@ -534,35 +534,9 @@ define('app/controllers/monitoring', [
 
 
                                 // Set CPU Cores
-                                receivedData.cpuCores = data.cpu.cores //data['cpu']['cores'];
+                                receivedData.cpuCores = data.cpu.cores 
 
-                                /* Request Debugging : TODO Remove It when requests are stable
-                                console.log("Measurement Expected: " + measurmentsExpected + " For " + (stop-start) + " seconds");
-                                console.log("Measurement Received: ");
-                                console.log("LOAD   : " + data.load.length);
-                                console.log("CPU    : " + data['cpu']['utilization'].length);
-                                console.log("MEM    : " + data['memory'].length);
-                                console.log("DISK R : " + data['disk']['read'][disks[0]]['disk_octets'].length);
-                                console.log("DISK W : " + data['disk']['write'][disks[0]]['disk_octets'].length);
-                                console.log("NET TX : " + data['network'][netInterfaces[0]]['tx'].length);
-                                console.log("NET RX : " + data['network'][netInterfaces[0]]['rx'].length);
-                                console.log("");
-                                */
-
-                                // Get min Data Length (Quick Fix)
-                                var lengths = [
-                                    data['load'].length,
-                                    data['cpu']['utilization'].length,
-                                    data['memory'].length,
-                                    data['disk']['read'][disks[0]]['disk_octets'].length,
-                                    data['disk']['write'][disks[0]]['disk_octets'].length,
-                                    data['network'][netInterfaces[0]]['tx'].length,
-                                    data['network'][netInterfaces[0]]['rx'].length
-                                ];
-
-                                var dataLength = Math.min.apply(null, lengths);
-                                //  We may not need the above length, TODO check
-
+                                // Create time-value objects to be used with d3
                                 data.cpu.utilization.forEach(function(item) {
                                     var cpuObj = {
                                         time: new Date(item[0]*1000),
