@@ -178,9 +178,8 @@ define('app/views/monitoring', ['app/views/templated','ember'],
             Graph: function(divID,width,timeToDisplayms,yAxisValueFormat){
 
                     var NUM_OF_LABELS = 5;
-                    var NUM_OF_MIN_MEASUREMENTS = 8640; // 24 Hours
-                    var NUM_OF_MAX_MEASUREMENTS = 8640; // 24 Hours
                     var NUM_OF_MEASUREMENT = 60; // Number of metrics monitor sends in every request
+                    var MAX_BUFFER_DATA    = 60;
 
 
                     // Calculate Aspect Ratio Of Height
@@ -193,7 +192,6 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     this.height           = (fixedHeight < 85 ? 85 : fixedHeight);
                     this.data             = [];
                     this.timeDisplayed    = timeToDisplayms/1000;
-                    this.realDataIndex    = -1;
                     this.timeUpdated      = false;
                     this.animationEnabled = true;
                     this.yAxisValueFormat = yAxisValueFormat;
@@ -256,69 +254,36 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     */
                     this.updateData = function(newData) {
 
-                        if(this.data.length == 0)
+                        // Optimize this code, we don't have to check this every time we update the data TODO Optimize
+
+                        // On first run append the Graph
+                        if(!this.isAppended){
+
+                            // Append SVG Elements And Call onInitialized When Finish
+                            appendGraph(this.id,this.width,this.height);
+
+                            this.isAppended = true;
+
+                            // Do staff after Graph is in the dom and we have data
+                            onInitialized();
+                        }
+
+
+                        // TODO Check performance and check if we can optimize this code of buffer
+
+                        // We don't let the buffer have more values than we need.
+                        // Check If We Have Overflow , Clip Older Measurement
+                        if(this.data.length + newData.length > MAX_BUFFER_DATA)
                         {
-                            var dataBuffer = [];
-                            var measurements_received = newData.length;
-                            if(measurements_received < NUM_OF_MIN_MEASUREMENTS)
-                            {
-                                var step = (this.timeDisplayed / NUM_OF_MEASUREMENT);
-                                // Get First Measurement Time
-                                metricTime = new Date(newData[0].time.getTime() - step*1000);
 
-                                // Fill Data With Zeros
-                                for(var i= 0; i < (NUM_OF_MIN_MEASUREMENTS - measurements_received); i++)
-                                {
-
-                                    var zeroObject = {
-                                        time: metricTime,
-                                        value: 0
-                                    }
-
-                                    dataBuffer.push(zeroObject);
-                                    metricTime = new Date(metricTime.getTime() - step*1000);
-                                }
-                                // Set Real Data Start Index
-                                this.realDataIndex = dataBuffer.length;
-                                dataBuffer.reverse();
-
-                                // Join New Data With Zero Value Array
-                                dataBuffer = dataBuffer.concat(newData);
-                            }
-                            else{
-
-                                dataBuffer = newData;
-                            }
-
-                            // Set Our Final Data
-                            this.data = dataBuffer;
-
-                            // On first run append the Graph
-                            if(!this.isAppended){
-
-                                // Append SVG Elements And Call onInitialized When Finish
-                                appendGraph(this.id,this.width,this.height);
-
-                                this.isAppended = true;
-
-                                // Do staff after Graph is in the dom and we have data
-                                onInitialized();
-                            }
+                            // Remove the first x data from bufffer ( the old ones )
+                            var num_of_overflow_Objs = this.data.length + newData.length - MAX_BUFFER_DATA;
+                            this.data = this.data.slice(num_of_overflow_Objs);
                         }
-                        else{
 
-                            // Check If We Have Overflow , Clip Older Measurement
-                            if(this.data.length + newData.length > NUM_OF_MAX_MEASUREMENTS)
-                            {
-
-                                // Clip Old Data
-                                var num_of_overflow_Objs = this.data.length + newData.length - NUM_OF_MAX_MEASUREMENTS;
-                                this.data = this.data.slice(num_of_overflow_Objs);
-                            }
-
-                            // Set Our Final Data
-                            this.data = this.data.concat(newData);
-                        }
+                        // Copy our new data to the data buffer.
+                        this.data = this.data.concat(newData);
+                        
 
                         this.updateView();
                     };
