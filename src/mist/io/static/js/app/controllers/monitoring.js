@@ -1066,14 +1066,14 @@ define('app/controllers/monitoring', [
                 in  : function(){
                     if(this.zoomIndex > 0){
                         this.zoomIndex--;
-                        this.to(this.zoomValues[this.zoomIndex]['value']*60*1000);
+                        this.to(this.zoomValues[this.zoomIndex]['value']*60000); // (60*1000)
                     }
                 },
                 out : function(){
 
                     if(this.zoomIndex < this.zoomValues.length-1){
                         this.zoomIndex++;
-                        this.to(this.zoomValues[this.zoomIndex]['value']*60*1000);
+                        this.to(this.zoomValues[this.zoomIndex]['value']*60000); // (60*1000)
                     }
                 },
                 toIndex : function(zoomIndex){
@@ -1082,7 +1082,7 @@ define('app/controllers/monitoring', [
 
                         this.prevZoomIndex = this.zoomIndex
                         this.zoomIndex     = zoomIndex;
-                        this.to(this.zoomValues[zoomIndex]['value']*60*1000);
+                        this.to(this.zoomValues[zoomIndex]['value']*60000); // (60*1000)
                     }
                 },
                 // direction is optional, used for in and out
@@ -1112,8 +1112,8 @@ define('app/controllers/monitoring', [
 
 
                             var measurements = 60;
-                            timeWindowInMinutes = timeWindow /60 /1000; // TODO change this , we don't really want more variables
-                            newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 );
+                            timeWindowInMinutes = timeWindow /60000; // TODO change this , we don't really want more variables
+                            newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 ); 
                             controller.request.changeStep(newStep,false);
                             controller.request.changeTimeWindow(timeWindow,false);
 
@@ -1200,11 +1200,11 @@ define('app/controllers/monitoring', [
                 },
 
                 zoomValues: [ // in minitues
-                        { label: '10 minutes', value: 10       },
-                        { label: '1 hour    ', value: 60       },
-                        { label: '1 day     ', value: 24*60    },
-                        { label: '1 week    ', value: 7*24*60  },
-                        { label: '1 month   ', value: 30*24*60 }
+                        { label: '10 minutes', value: 10    },
+                        { label: '1 hour    ', value: 60    },
+                        { label: '1 day     ', value: 1440  }, // (24*60)
+                        { label: '1 week    ', value: 10080 }, // (7*24*60)
+                        { label: '1 month   ', value: 43200 }  // (30*24*60)
                 ],
 
                 zoomIndex    : 0,
