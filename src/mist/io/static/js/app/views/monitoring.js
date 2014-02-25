@@ -827,8 +827,9 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                             minValueIndex = i;
                                     }
 
+
                                     // Fix for the area that has not defined data
-                                    if(self.displayedData[minValueIndex].value == null || self.displayedData[minValueIndex+1].value == null){
+                                    if(self.displayedData.length == 0 || self.displayedData[minValueIndex].value == null || self.displayedData[minValueIndex+1].value == null ){
                                         $('#GraphsArea').children('.valuePopUp').text("No Data");
                                         return;
                                     }
