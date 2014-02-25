@@ -502,6 +502,9 @@ define('app/controllers/monitoring', [
 
                             try {
 
+                                if(data.load.length == 0)
+                                    throw "No Data Received";
+
                                 var disks = [];
                                 var netInterfaces = [];
 
