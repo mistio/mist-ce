@@ -665,20 +665,20 @@ def get_stats(request):
     core_uri = config.CORE_URI
     user = user_from_request(request)
     params = request.params
-    start = params.get('start', '')
-    stop = params.get('stop', '')
-    step = params.get('step', '')
-    expression = params.get('expression', '')
+    start = params.get('start')
+    stop = params.get('stop')
+    step = params.get('step')
+    expression = params.get('expression')
 
-    payload = {
+    params = {
         'start': start,
         'stop': stop,
         'step': step,
-        'expression': expression
+        'expression': expression,
     }
     try:
         ret = requests.get(config.CORE_URI + request.path,
-                           params=payload,
+                           params=params,
                            headers={'Authorization': get_auth_header(user)},
                            verify=config.SSL_VERIFY)
     except requests.exceptions.SSLError as exc:
