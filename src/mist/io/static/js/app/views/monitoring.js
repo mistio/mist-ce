@@ -869,7 +869,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                     }
 
                                     // Fix for the area that has not defined data
-                                    if(!self.displayedData[minValueIndex].value || !self.displayedData[minValueIndex+1].value){
+                                    if(self.displayedData[minValueIndex].value == null || self.displayedData[minValueIndex+1].value == null){
                                         $('#GraphsArea').children('.valuePopUp').text("No Data");
                                         return;
                                     }
