@@ -96,7 +96,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                 self.redrawJQMComponents();     
                                 $('.graphBtn').hide(0); 
                                 
-                                self.createGraphs(10*60*1000);
+                                self.createGraphs(600000); // (10*60*1000)
                                 
 
                                 controller.initialize({
@@ -184,7 +184,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
 
                     // Calculate Aspect Ratio Of Height
-                    var fixedHeight = 160 / 1280 * width;
+                    var fixedHeight = width * 0.125; // (160 / 1280)
                     var margin      = {top: 10, right: 0, bottom: 24, left: 52};
 
                     this.id               = divID;
@@ -347,15 +347,15 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                             // Check Time Displayed
                             var labelStep;
-                            if(self.timeDisplayed <= 10*60) // 10 Minutes
+                            if(self.timeDisplayed <= 600)           // 10 Minutes (10*60)
                                 axisInstance.ticks(d3.time.minutes,2);
-                            else if(self.timeDisplayed <= 1*60*60) // 1 Hour
+                            else if(self.timeDisplayed <= 3600)     // 1 Hour (1*60*60)
                                 axisInstance.ticks(d3.time.minutes,12);
-                            else if(self.timeDisplayed <= 24*60*60) // 1 Day
+                            else if(self.timeDisplayed <= 86400)    // 1 Day (24*60*60)
                                 axisInstance.ticks(d3.time.hours,6);
-                            else if(self.timeDisplayed <= 7*24*60*60) // 1 Week
+                            else if(self.timeDisplayed <= 604800)   // 1 Week (7*24*60*60)
                                 axisInstance.ticks(d3.time.days,1);
-                            else if(self.timeDisplayed <= 30*7*24*60*60) // 1 Month
+                            else if(self.timeDisplayed <= 18144000) // 1 Month (30*7*24*60*60)
                                 axisInstance.ticks(d3.time.days,7);
                             // TODO Add week and month
 
@@ -418,7 +418,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                         var tLabelFormat = "%I:%M%p";
 
-                        if (this.timeDisplayed >= 24*60*60)
+                        if (this.timeDisplayed >= 86400) // (24*60*60)
                             tLabelFormat = "%d-%m | %I:%M%p";
 
 
@@ -445,10 +445,10 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                           .ticks(5)
                                           .tickFormat(function(d){
                                             // Custom Y-Axis label formater
-                                            if(d>=1024*1024*1024)
-                                                return (d/1024/1024/1024).toFixed(1) +"G";
-                                            else if(d>=1024*1024)
-                                                return (d/1024/1024).toFixed(1) +"M";
+                                            if(d>=1073741824)                          // (1024*1024*1024)
+                                                return (d/1073741824).toFixed(1) +"G"; // (1024*1024*1024)
+                                            else if(d>=1048576)                        // (1024*1024)
+                                                return (d/1048576).toFixed(1) +"M";    // (1024*1024)
                                             else if(d>=1024)
                                                 return (d/1024).toFixed(1) + "K";
                                             else if(yAxisValueFormat == "%")
@@ -546,7 +546,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         if (!d3svg)
                             return;
                         // Create an aspect ratio
-                        var newHeight = 160 / 1280 * width;
+                        var newHeight = width * 0.125; // (160 / 1280)
 
                         this.height = (newHeight < 85 ? 85 : newHeight);
                         this.width = width;
@@ -888,10 +888,10 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                                     // Fix For Big Numbers
                                     var valueText = "";
-                                    if(currentValue>=1024*1024*1024)
-                                        valueText = (currentValue/1024/1024/1024).toFixed(2) +"G";
-                                    else if(currentValue>=1024*1024)
-                                        valueText = (currentValue/1024/1024).toFixed(2) +"M";
+                                    if(currentValue>=1073741824)                               // (1024*1024*1024)
+                                        valueText = (currentValue/1073741824).toFixed(2) +"G"; // (1024*1024*1024)
+                                    else if(currentValue>=1048576)                             // (1024*1024)
+                                        valueText = (currentValue/1048576).toFixed(2) +"M";    // (1024*1024)
                                     else if(currentValue>=1024)
                                         valueText = (currentValue/1024).toFixed(2) + "K";
                                     else if(self.yAxisValueFormat == "%")
