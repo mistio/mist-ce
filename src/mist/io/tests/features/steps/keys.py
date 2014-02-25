@@ -15,27 +15,25 @@ I should see the "{name}" Key added within 5 seconds    -->  key_see_buttons
 "{name}" should be the default key      --> check_default_key
 
 """
-
+from behave import *
 tester_key_name = ""
 
 @when(u'I type "{name}" as key name')
 def type_key_name(context, name):
+    global tester_key_name
     if name == "tester":
         key = context.personas['NinjaTester']['key_name']
         context.browser.find_by_css('input#add-key-id').fill(key)
-        global tester_key_name
         tester_key_name = key
         return
     elif name == "monitor_tester":
         key = context.personas['MonitorTester']['key_name']
         context.browser.find_by_css('input#add-key-id').fill(key)
-        global tester_key_name
         tester_key_name = key
         return
     elif name == "shell_tester":
         key = context.personas['ShellTester']['key_name']
         context.browser.find_by_css('input#add-key-id').fill(key)
-        global tester_key_name
         tester_key_name = key
         return
     else:
