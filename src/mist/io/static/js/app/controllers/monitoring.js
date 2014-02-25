@@ -142,6 +142,7 @@ define('app/controllers/monitoring', [
                     this.graphs.collapse(metricsKeys,0);
                 }
 
+                // TODO Change Step to seconds
                 // Create and Start the request
                 this.request.create({
                     machine         : arguments.machineModel, // Send Current Machine
@@ -152,7 +153,6 @@ define('app/controllers/monitoring', [
                     timeGap         : 60,                        // Gap between current time and requested
                     callback        : function(result){
                         if(result.status == 'success'){
-                            //console.log("%cNumber Of Data Received: " + result['data']['cpu'].length, "color:orange;background-color:black; padding: 0 15px;");
                             self.graphs.updateData(result.data);
                         }
                     }
@@ -361,13 +361,13 @@ define('app/controllers/monitoring', [
                             //var timeGap          = 60;
                             var timeWindow  = self.timeWindow;
                             var step        = self.step;
-                            var stop        = Math.floor( ( new Date()).getTime() / 1000 ); //Math.floor( ( (new Date()).getTime() - timeGap * 1000) / 1000 );
+                            var stop        = Math.floor( ( new Date()).getTime() / 1000 );
                             var start       = Math.floor( stop - timeWindow/1000 );
                             var callback    = null;
 
                             if(options){
                                 if ('stop' in options){
-                                    stop  = Math.floor(options.stop);//Math.floor(options['stop'] - timeGap);
+                                    stop  = Math.floor(options.stop);
                                     start = Math.floor( stop - timeWindow/1000 );
                                 }
 
@@ -375,7 +375,7 @@ define('app/controllers/monitoring', [
                                     step = options.step;
 
                                 if ('timeWindow' in options)
-                                    timeWindowSize = options.timeWindow; // TODO Check this size ?
+                                    timeWindowSize = options.timeWindow;
 
                                 if('callback' in options)
                                     callback = options.callback;
@@ -558,6 +558,7 @@ define('app/controllers/monitoring', [
                                 ];
 
                                 var dataLength = Math.min.apply(null, lengths);
+                                //  We may not need the above length, TODO check
 
                                 data.cpu.utilization.forEach(function(item) {
                                     var cpuObj = {
@@ -615,6 +616,7 @@ define('app/controllers/monitoring', [
                                     receivedData.networkTX.push(networkTxObj);
                                 });
 
+                               // TODO this is wrong, we have to get last metric time by the last metric timestamp from data.
                                 self.lastMetrictime = new Date(stop*1000);
 
                                 callback({
@@ -704,14 +706,14 @@ define('app/controllers/monitoring', [
                     this.requestID      = 0;
                 },
 
-                machine        : null,  // TODO Add more description in comments
+                machine        : null,  // The current machine
                 lastMetrictime : null,  // Date Object
                 callback       : null,  // Function
                 timeWindow     : 0,     // integer in miliseconds
-                timeStart      : 0,     // integer in miliseconds - Note Currently In Seconds
-                timeStop       : 0,     // integer in miliseconds - Note Currently In Seconds
+                timeStart      : 0,     // integer in seconds 
+                timeStop       : 0,     // integer in seconds 
                 step           : 0,     // integer in miliseconds
-                timeGap        : 0,     // integer in miliseconds - Note Currently In Seconds
+                timeGap        : 0,     // integer in seconds 
                 updateInterval : 0,     // integer in miliseconds
                 updateData     : false, // boolean
                 locked         : false, // boolean
@@ -1112,7 +1114,7 @@ define('app/controllers/monitoring', [
 
 
                             var measurements = 60;
-                            timeWindowInMinutes = timeWindow /60000; // TODO change this , we don't really want more variables
+                            timeWindowInMinutes = timeWindow /60000;
                             newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 ); 
                             controller.request.changeStep(newStep,false);
                             controller.request.changeTimeWindow(timeWindow,false);
@@ -1139,7 +1141,7 @@ define('app/controllers/monitoring', [
                                     else if(direction == 'to'){
 
                                         self.zoomIndex = self.prevZoomIndex;
-                                        console.log('TODO: Set Zoom Index to the previous value And select to the appropriate option');
+                                        //TODO: Set Zoom Index to the previous value And select to the appropriate option
                                     }
 
                                 }

@@ -177,8 +177,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
              */
             Graph: function(divID,width,timeToDisplayms,yAxisValueFormat){
 
-                    var NUM_OF_LABELS = 5;
-                    var NUM_OF_MEASUREMENT = 60; // Number of metrics monitor sends in every request
+                    var NUM_OF_MEASUREMENT = 60;
                     var MAX_BUFFER_DATA    = 60;
 
 
@@ -201,9 +200,6 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                     // Distance of two values in graph (pixels), Important For Animation
                     this.valuesDistance = 0;
-
-                    // Calculate The step  of the time axis
-                    this.secondsStep =  Math.floor((timeToDisplayms / 1000) / NUM_OF_LABELS);
 
                     var self = this;
 
@@ -322,7 +318,6 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                 axisInstance.ticks(d3.time.days,1);
                             else if(self.timeDisplayed <= 18144000) // 1 Month (30*7*24*60*60)
                                 axisInstance.ticks(d3.time.days,7);
-                            // TODO Add week and month
 
                             if( typeof format != 'undefined')
                                 axisInstance.tickFormat(d3.time.format(format));
@@ -694,12 +689,11 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     this.changeTimeWindow = function(newTimeWindow){
 
                         this.timeDisplayed = newTimeWindow/1000;
-                        this.secondsStep   = Math.floor((newTimeWindow / 1000) / NUM_OF_LABELS);
 
                         this.timeUpdated = true;
 
                         this.clearData();
-                        //this.updateView();
+
                     };
 
 
@@ -929,95 +923,6 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     }
 
                 }
-
-                // Features not yet used
-
-                /* Commented Out Until It's Time To Test Zoom In/Out
-                selectPressed: function(){
-
-                    var selectValue = $("#timeWindowSelect").val();
-                    console.log("time Window");
-                    console.log(this.cpuGraph.getTimeWindow());
-                    var newTime = 0;
-                    var newStep = 10000;
-                    if(selectValue.toLowerCase().search("minutes") != -1)
-                    {
-                        selectValue = selectValue.replace(/\D+/g, '' );
-                        console.log("Minutes To Display:" + selectValue);
-                        newTime = selectValue * 60 * 1000;
-
-                        if(selectValue > 30)
-                            newStep = (selectValue*60 / 180)*1000;
-
-                    }
-                    else if(selectValue.toLowerCase().search("hours") != 1 || selectValue.toLowerCase().search("hour") != 1)
-                    {
-                        selectValue = selectValue.replace(/\D+/g, '' );
-                        console.log("Hours To Display:" + selectValue);
-
-                        newTime = selectValue * 60 * 60 * 1000;
-                        newStep = (selectValue*60*60 / 180)*1000;
-
-                    }
-                    else if(selectValue.toLowerCase().search("days") != 1 || selectValue.toLowerCase().search("day") != 1)
-                    {
-                        selectValue = selectValue.replace(/\D+/g, '' );
-                        console.log("Days To Display:" + selectValue);
-
-                        newTime = selectValue * 24 * 60 * 60 * 1000;
-                        newStep = (selectValue * 24 * 60 * 60 / 180)*1000;
-
-                    }
-
-                    // Update Graph Time If selection is not the same
-                    // TODO Make it cpugraph independent
-                    if(newTime/1000 != this.cpuGraph.getTimeWindow())
-                    {
-                        this.cpuGraph.changeTimeToDisplay(newTime);
-                        this.loadGraph.changeTimeToDisplay(newTime);
-                        this.memoryGraph.changeTimeToDisplay(newTime);
-                        this.diskReadGraph.changeTimeToDisplay(newTime);
-                        this.diskWriteGraph.changeTimeToDisplay(newTime);
-                        this.networkTXGraph.changeTimeToDisplay(newTime);
-                        this.networkRXGraph.changeTimeToDisplay(newTime);
-
-                        // TODO
-                        // Step will be 10 seconds until machine is able to send less values //
-                        Mist.monitoringController.updateDataRequest(newTime,10000);
-                    }
-                },
-                */
-
-                /*getLoadLineColor: function(currentLoad,cpuCores){
-                    if(currentLoad >= 1 * cpuCores)
-                        return "#FF0000";
-                    else if(currentLoad >= 0.7 * cpuCores)
-                        return "#00FF26";
-                    else
-                        return "#6CE0BA";
-                },
-
-                setupLoadColorInterval: function(){
-
-                     var self = this;
-                     jQuery.Color.hook( "stroke" );
-
-                     window.monitoringLoadColorInterval = window.setInterval(function () {
-                        var loadValue = self.loadGraph.getLastDisplayedValue();
-
-                        if(loadValue != null) {
-
-                            var color = self.getLoadLineColor(loadValue,self.cpuCores);
-                            $("#loadGraph").find('.valueLine > path').animate( {
-                                stroke: jQuery.Color(color)
-                            }, 700 );
-                        }
-                    },1000);
-                },
-
-                stopLoadColorInterval: function(){
-                    window.clearInterval(window.monitoringLoadColorInterval);
-                },*/
 
         });
     }
