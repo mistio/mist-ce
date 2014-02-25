@@ -120,7 +120,7 @@ define('app/controllers/monitoring', [
                 this.reset();
 
                 // Get graphs from view
-                this.graphs.instances = arguments['graphs'];
+                this.graphs.instances = arguments.graphs;
 
                 // Get cookies and show graphs that are not collapsed
                 var collapsedMetrics = this.cookies.getCollapsedMetrics();
@@ -144,16 +144,16 @@ define('app/controllers/monitoring', [
 
                 // Create and Start the request
                 this.request.create({
-                    machine         : arguments['machineModel'], // Send Current Machine
+                    machine         : arguments.machineModel, // Send Current Machine
                     timeWindow      : 10*60*1000,                // Display 10 Minutes
                     step            : 10000,                     // Metrics Step in miliseconds
                     updateInterval  : 10000,                     // Get Updates Every x Miliseconds
                     updatesEnabled  : true,                      // Get Updates
                     timeGap         : 60,                        // Gap between current time and requested
                     callback        : function(result){
-                        if(result['status'] == 'success'){
+                        if(result.status == 'success'){
                             //console.log("%cNumber Of Data Received: " + result['data']['cpu'].length, "color:orange;background-color:black; padding: 0 15px;");
-                            self.graphs.updateData(result['data']);
+                            self.graphs.updateData(result.data);
                         }
                     }
                 });
@@ -199,14 +199,14 @@ define('app/controllers/monitoring', [
                     var self             = this;
                     var controller       = Mist.monitoringController;
 
-                    this.step            = arguments['step'];
-                    this.timeWindow      = arguments['timeWindow'];
-                    this.updateInterval  = arguments['updateInterval'];
-                    this.machine         = arguments['machine'];
-                    this.updateData      = arguments['updatesEnabled'];
-                    this.step            = arguments['step'];
-                    this.callback        = ('callback' in arguments) ? arguments['callback'] : null;
-                    this.timeGap         = arguments['timeGap']; // Temporary Fix , Give some time to server to collect data
+                    this.step            = arguments.step;
+                    this.timeWindow      = arguments.timeWindow;
+                    this.updateInterval  = arguments.updateInterval;
+                    this.machine         = arguments.machine;
+                    this.updateData      = arguments.updatesEnabled;
+                    this.step            = arguments.step;
+                    this.callback        = ('callback' in arguments) ? arguments.callback : null;
+                    this.timeGap         = arguments.timeGap; // Temporary Fix , Give some time to server to collect data
 
                     // Calculate Start And Stop
                     this.timeStop        = Math.floor( ( (new Date()).getTime() - this.timeGap * 1000) / 1000 );
@@ -367,18 +367,18 @@ define('app/controllers/monitoring', [
 
                             if(options){
                                 if ('stop' in options){
-                                    stop  = Math.floor(options['stop']);//Math.floor(options['stop'] - timeGap);
+                                    stop  = Math.floor(options.stop);//Math.floor(options['stop'] - timeGap);
                                     start = Math.floor( stop - timeWindow/1000 );
                                 }
 
                                 if ('step' in options)
-                                    step = options['step'];
+                                    step = options.step;
 
                                 if ('timeWindow' in options)
-                                    timeWindowSize = options['timeWindow']; // TODO Check this size ?
+                                    timeWindowSize = options.timeWindow; // TODO Check this size ?
 
                                 if('callback' in options)
-                                    callback = options['callback'];
+                                    callback = options.callback;
                             }
 
                             self.locked = true;
@@ -506,13 +506,13 @@ define('app/controllers/monitoring', [
                                 var netInterfaces = [];
 
                                 // Get Disks Names
-                                for(disk in data['disk']['read'])
+                                for(disk in data.disk.read)
                                 {
                                     disks.push(disk);
                                 }
 
                                 // Get Network Interfaces Names
-                                for(netInterface in data['network'])
+                                for(netInterface in data.network)
                                 {
                                      netInterfaces.push(netInterface);
                                 }
@@ -531,7 +531,7 @@ define('app/controllers/monitoring', [
 
 
                                 // Set CPU Cores
-                                receivedData.cpuCores =  data['cpu']['cores'];
+                                receivedData.cpuCores = data.cpu.cores //data['cpu']['cores'];
 
                                 /* Request Debugging : TODO Remove It when requests are stable
                                 console.log("Measurement Expected: " + measurmentsExpected + " For " + (stop-start) + " seconds");
@@ -831,7 +831,7 @@ define('app/controllers/monitoring', [
                     }
 
                     // Deleting cpuCores as it is not a metric
-                    delete data['cpuCores'];
+                    delete data.cpuCores;
 
                     // Updating
                     for(metric in data){
@@ -1066,14 +1066,14 @@ define('app/controllers/monitoring', [
                 in  : function(){
                     if(this.zoomIndex > 0){
                         this.zoomIndex--;
-                        this.to(this.zoomValues[this.zoomIndex]['value']*60000); // (60*1000)
+                        this.to(this.zoomValues[this.zoomIndex].value * 60000); // (60*1000)
                     }
                 },
                 out : function(){
 
                     if(this.zoomIndex < this.zoomValues.length-1){
                         this.zoomIndex++;
-                        this.to(this.zoomValues[this.zoomIndex]['value']*60000); // (60*1000)
+                        this.to(this.zoomValues[this.zoomIndex].value * 60000); // (60*1000)
                     }
                 },
                 toIndex : function(zoomIndex){
@@ -1082,7 +1082,7 @@ define('app/controllers/monitoring', [
 
                         this.prevZoomIndex = this.zoomIndex
                         this.zoomIndex     = zoomIndex;
-                        this.to(this.zoomValues[zoomIndex]['value']*60000); // (60*1000)
+                        this.to(this.zoomValues[zoomIndex].value * 60000); // (60*1000)
                     }
                 },
                 // direction is optional, used for in and out
@@ -1244,8 +1244,8 @@ define('app/controllers/monitoring', [
                         stop     : (+this.currentStopTime / 1000),
                         callback : function(result){
                             // On error set currentStop where it was
-                            if(result['status'] == 'success')
-                                Mist.monitoringController.graphs.updateData(result['data']);
+                            if(result.status == 'success')
+                                Mist.monitoringController.graphs.updateData(result.data);
                             else{
                                 self.currentStopTime = new Date(+self.currentStopTime + self.timeWindow);
                                 if(self.currentStopTime.getTime() == self.lastMetrictime.getTime()){
@@ -1283,8 +1283,8 @@ define('app/controllers/monitoring', [
                                 stop     : (+this.currentStopTime / 1000),
                                 callback : function(result){
                                     // On error set currentStop where it was
-                                    if(result['status'] == 'success')
-                                        Mist.monitoringController.graphs.updateData(result['data']);
+                                    if(result.status == 'success')
+                                        Mist.monitoringController.graphs.updateData(result.data);
                                     else
                                         self.currentStopTime = new Date(+self.currentStopTime - self.timeWindow);
                                 }
