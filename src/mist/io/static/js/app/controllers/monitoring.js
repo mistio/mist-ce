@@ -84,7 +84,6 @@ define('app/controllers/monitoring', [
                          Mist.notificationController.notify('Error when changing monitoring to ' + machine.name);
                      }
                  }).complete(function(success, data) {
-                     //that.set('changingMonitoring', false);
                      if (callback) callback(success, data);
                  });
              },
@@ -218,15 +217,10 @@ define('app/controllers/monitoring', [
 
                     // Align time to be a multiply of 10
                     var secToRemove =(new Date(this.timeStop*1000)).getSeconds() % 10;
-                    console.log(secToRemove);
                     this.timeStop -= secToRemove;
 
                     this.timeStart       = Math.floor(this.timeStop - this.timeWindow/1000);
                     this.lastMetrictime  = new Date(this.timeStart*1000);
-
-                    console.log("Start : " + (new Date(this.timeStart*1000)));
-                    console.log("Stop  : " + (new Date(this.timeStop*1000)));
-                    //console.log("Last  : " + this.lastMetrictime);
                 },
 
 
@@ -608,13 +602,7 @@ define('app/controllers/monitoring', [
                                     receivedData.networkTX.push(networkTxObj);
                                 });
 
-                               // TODO this is wrong, we have to get last metric time by the last metric timestamp from data.
                                 self.lastMetrictime = receivedData.load[receivedData.load.length-1].time;
-                                /*console.log("Current Last M: " + self.lastMetrictime);
-                                console.log("Real    Last M: " + receivedData.load[receivedData.load.length-1].time);
-                                console.log("Data Received : " + receivedData.load.length);
-                                console.log(receivedData.load);
-                                console.log("");*/
 
                                 callback({
                                     status: 'success',
@@ -1140,7 +1128,7 @@ define('app/controllers/monitoring', [
                                         self.zoomIndex = self.prevZoomIndex;
                                         //TODO: Set Zoom Index to the previous value And select to the appropriate option
                                     }
-
+                                    self.updateUI();
                                 }
                                 else
                                     self.updateUI();
@@ -1157,18 +1145,6 @@ define('app/controllers/monitoring', [
                 },
 
                 updateUI : function(){
-
-                    //$('#currentZoom').text(this.zoomValues[this.zoomIndex]['label']);
-
-                    // Enable disable in/out buttons when we are at zoom borders
-                    /*if(this.zoomIndex == 0)
-                        $('#zoomInBtn').addClass('ui-disabled');
-                    else if(this.zoomIndex == this.zoomValues.length-1)
-                        $('#zoomOutBtn').addClass('ui-disabled');
-                    else {
-                        $('#zoomInBtn').removeClass('ui-disabled');
-                        $('#zoomOutBtn').removeClass('ui-disabled');
-                    }*/
 
                     // Info zoomSelect-button id is created by jquery.
                     // we set * to disable all children element
