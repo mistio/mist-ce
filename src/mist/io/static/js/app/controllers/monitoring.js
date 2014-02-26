@@ -215,8 +215,18 @@ define('app/controllers/monitoring', [
 
                     // Calculate Start And Stop
                     this.timeStop        = Math.floor( ( (new Date()).getTime() - this.timeGap * 1000) / 1000 );
+
+                    // Align time to be a multiply of 10
+                    var secToRemove =(new Date(this.timeStop*1000)).getSeconds() % 10;
+                    console.log(secToRemove);
+                    this.timeStop -= secToRemove;
+
                     this.timeStart       = Math.floor(this.timeStop - this.timeWindow/1000);
                     this.lastMetrictime  = new Date(this.timeStart*1000);
+
+                    console.log("Start : " + (new Date(this.timeStart*1000)));
+                    console.log("Stop  : " + (new Date(this.timeStop*1000)));
+                    //console.log("Last  : " + this.lastMetrictime);
                 },
 
 
@@ -599,7 +609,12 @@ define('app/controllers/monitoring', [
                                 });
 
                                // TODO this is wrong, we have to get last metric time by the last metric timestamp from data.
-                                self.lastMetrictime = new Date(stop*1000);
+                                self.lastMetrictime = receivedData.load[receivedData.load.length-1].time;
+                                /*console.log("Current Last M: " + self.lastMetrictime);
+                                console.log("Real    Last M: " + receivedData.load[receivedData.load.length-1].time);
+                                console.log("Data Received : " + receivedData.load.length);
+                                console.log(receivedData.load);
+                                console.log("");*/
 
                                 callback({
                                     status: 'success',
