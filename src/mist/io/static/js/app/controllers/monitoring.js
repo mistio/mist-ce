@@ -1069,7 +1069,7 @@ define('app/controllers/monitoring', [
 
                         this.prevZoomIndex = this.zoomIndex
                         this.zoomIndex     = zoomIndex;
-                        this.to(this.zoomValues[zoomIndex].value * 60000); // (60*1000)
+                        this.to(this.zoomValues[zoomIndex].value * 60000,'to'); // (60*1000)
                     }
                 },
                 // direction is optional, used for in and out
@@ -1123,17 +1123,13 @@ define('app/controllers/monitoring', [
                                         self.zoomIndex++;
                                     else if(direction =='out')
                                         self.zoomIndex--;
-                                    else if(direction == 'to'){
-
+                                    else if(direction == 'to')
                                         self.zoomIndex = self.prevZoomIndex;
-                                        //TODO: Set Zoom Index to the previous value And select to the appropriate option
-                                    }
-                                    self.updateUI();
+
+                                    self.setZoomUI(self.zoomIndex);
                                 }
-                                else
-                                    self.updateUI();
 
-
+                                self.enable();
                             })
                         }
                     };
@@ -1144,17 +1140,12 @@ define('app/controllers/monitoring', [
                     zoom();
                 },
 
-                updateUI : function(){
-
-                    // Info zoomSelect-button id is created by jquery.
-                    // we set * to disable all children element
-
-                    // Set Current Zoom
-                    $('#zoomSelect').val(this.zoomIndex).change();
-
-                    $('#zoomSelect-button *').removeClass('ui-disabled');
 
 
+                setZoomUI : function(index){
+
+                    document.getElementById('zoomSelect').options[this.zoomIndex].selected = 'selected';
+                    $('#zoomSelect-button').find("span").text($('#zoomSelect').find(":selected").text());
                 },
 
                 disable: function(){
@@ -1171,7 +1162,7 @@ define('app/controllers/monitoring', [
 
                     this.zoomIndex     = 0;
                     this.prevZoomIndex = 0;
-                    this.updateUI();
+                    this.setZoomUI(this.zoomIndex);
                 },
 
                 zoomValues: [ // in minitues
