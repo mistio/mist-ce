@@ -250,35 +250,36 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     */
                     this.updateData = function(newData) {
 
-                        // Optimize this code, we don't have to check this every time we update the data TODO Optimize
+
+                        // Fix for duplicate timestamps
+                        if(newData.length > 0 && this.data.length > 0){
+
+                            if(newData[0].time <= this.data[this.data.length-1].time){
+                                newData = newData.slice(1);
+                            }
+                        }
+
 
                         // On first run append the Graph
                         if(!this.isAppended){
 
-                            // Append SVG Elements And Call onInitialized When Finish
                             appendGraph(this.id,this.width,this.height);
-
                             this.isAppended = true;
 
                             // Do staff after Graph is in the dom and we have data
                             onInitialized();
                         }
 
-
-                        // TODO Check performance and check if we can optimize this code of buffer
+                        // Set Our New Data
+                        this.data = this.data.concat(newData);
 
                         // We don't let the buffer have more values than we need.
                         // Check If We Have Overflow , Clip Older Measurement
-                        if(this.data.length + newData.length > MAX_BUFFER_DATA)
-                        {
+                        if(this.data.length > MAX_BUFFER_DATA) {
 
-                            // Remove the first x data from bufffer ( the old ones )
-                            var num_of_overflow_Objs = this.data.length + newData.length - MAX_BUFFER_DATA;
+                            var num_of_overflow_Objs = this.data.length - MAX_BUFFER_DATA;
                             this.data = this.data.slice(num_of_overflow_Objs);
                         }
-
-                        // Copy our new data to the data buffer.
-                        this.data = this.data.concat(newData);
                         
 
                         this.updateView();
