@@ -3,13 +3,13 @@ require.config({
     baseUrl: 'resources/js/',
     waitSeconds: 200,
     paths: {
-        jquery: 'lib/jquery-1.10.2',
         text: 'lib/require/text',
-        mobile: 'lib/jquery.mobile-1.4.0-rc.1',
-        ember: 'lib/ember-1.1.2.min',
-        handlebars: 'lib/handlebars-1.0.0',
-        d3: 'lib/d3-2.10.1',
+        ember: 'lib/ember-1.4.1.min',
+        jquery: 'lib/jquery-2.1.0.min',
+        mobile: 'lib/jquery.mobile-1.4.1.min',
+        handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
+        d3: 'lib/d3-2.10.1',
         sha256: 'lib/sha256',
     },
     shim: {
