@@ -22,7 +22,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
             graphsCreated: false,
 
             /**
-            * 
+            *
             * Initialize monitoring view. Automatically called by ember
             *
             */
@@ -32,7 +32,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
             },
 
             /**
-            * 
+            *
             * Called by ember when view is rendered
             *
             */
@@ -42,7 +42,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
             },
 
             /**
-            * 
+            *
             * Called by ember when view will be destroyed
             * Stops data request and re-initializes enable button
             *
@@ -59,7 +59,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
             },
 
             /**
-            * 
+            *
             * If monitoring is enabled Re-draws jqm components,
             * creates graph instances, initializes controller and
             * setups resize event
@@ -96,7 +96,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                 self.redrawJQMComponents();     
                                 $('.graphBtn').hide(0); 
                                 
-                                self.createGraphs(10*60*1000);
+                                self.createGraphs(600000); // (10*60*1000)
                                 
 
                                 controller.initialize({
@@ -119,11 +119,11 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                     setup();
                     Mist.rulesController.redrawRules();
-                } 
+                }
             }.observes('controller.model.hasMonitoring','viewRendered'),
 
             /**
-            * 
+            *
             * Re-draws JQM Components of monitoring
             *
             */
@@ -131,7 +131,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                 $('.monitoring-button').trigger('create');
                 $('#add-rule-button').trigger('create');
-                $('#monitoring-dialog').trigger('create');  
+                $('#monitoring-dialog').trigger('create');
 
                 $('#graphBar').trigger('create');
 
@@ -144,7 +144,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
             },
 
             /**
-            * 
+            *
             * Creates graph instances
             * @param {number} timeToDisplay  - The graphs timeWindow in miliseconds
             *
@@ -152,7 +152,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
             createGraphs: function(timeToDisplay){
 
                 // Get Width, -2 left & right border
-                var width = $("#GraphsArea").width() -2;  
+                var width = $("#GraphsArea").width() -2;
 
                 this.graphs['cpu']       = new this.Graph('cpuGraph',width,timeToDisplay,"%");
                 this.graphs['load']      = new this.Graph('loadGraph',width,timeToDisplay);
@@ -165,7 +165,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                 self.graphsCreated = true;
             },
-            
+
 
             /**
              * Represents a Graph.
@@ -177,15 +177,13 @@ define('app/views/monitoring', ['app/views/templated','ember'],
              */
             Graph: function(divID,width,timeToDisplayms,yAxisValueFormat){
 
-                    var NUM_OF_LABELS = 5;
-                    var NUM_OF_MIN_MEASUREMENTS = 8640; // 24 Hours
-                    var NUM_OF_MAX_MEASUREMENTS = 8640; // 24 Hours
-                    var NUM_OF_MEASUREMENT = 60; // Number of metrics monitor sends in every request
-                    
+                    var NUM_OF_MEASUREMENT = 60;
+                    var MAX_BUFFER_DATA    = 60;
+
 
                     // Calculate Aspect Ratio Of Height
-                    var fixedHeight = 160 / 1280 * width;
-                    var margin      = {top: 10, right: 0, bottom: 24, left: 40};
+                    var fixedHeight = width * 0.125; // (160 / 1280)
+                    var margin      = {top: 10, right: 0, bottom: 24, left: 52};
 
                     this.id               = divID;
                     this.name             = divID.replace('Graph','');
@@ -193,7 +191,6 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     this.height           = (fixedHeight < 85 ? 85 : fixedHeight);
                     this.data             = [];
                     this.timeDisplayed    = timeToDisplayms/1000;
-                    this.realDataIndex    = -1;
                     this.timeUpdated      = false;
                     this.animationEnabled = true;
                     this.yAxisValueFormat = yAxisValueFormat;
@@ -204,9 +201,6 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     // Distance of two values in graph (pixels), Important For Animation
                     this.valuesDistance = 0;
 
-                    // Calculate The step  of the time axis
-                    this.secondsStep =  Math.floor((timeToDisplayms / 1000) / NUM_OF_LABELS); 
-                    
                     var self = this;
 
 
@@ -219,13 +213,16 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     // valueline is function that creates the main line based on data
                     var valueline = d3.svg.line()
                                     .x(function(d) {return xScale(d.time); })
-                                    .y(function(d) {return yScale(d.value); });
+                                    .y(function(d) {return yScale(d.value); })
+                                    .defined(function(d) {return d.value != null });
+
 
                     // valuearea is function that fills the space under the main line
                     var valuearea = d3.svg.area()
                                     .x(function(d) {return xScale(d.time); })
                                     .y1(function(d) {return yScale(d.value); })
-                                    .y0(height);
+                                    .y0(height)
+                                    .defined(function(d) {return d.value != null });
                     
                     // ---------------  SVG elements for graph manipulation --------------------- //
                     // Elements will be added to the dom after first updateData().
@@ -239,13 +236,13 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     var d3xAxisLine;      // The line of the x axis
                     var d3yAxisLine;      // The line of the y axis
                     var d3yAxis;          // Horizontal/Y Axis With Text(Values)
-    
+
 
                     //--------------------------------------------------------------------------------------------
 
 
                     /**
-                    * 
+                    *
                     * Checks for overflow or less data received fixes them and then updates Graph.
                     * Also appends graphs on initial request
                     * @param {number} timeToDisplay  - The graphs timeWindow in miliseconds
@@ -253,69 +250,37 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     */
                     this.updateData = function(newData) {
 
-                        if(this.data.length == 0)
-                        {
-                            var dataBuffer = [];
-                            var measurements_received = newData.length;
-                            if(measurements_received < NUM_OF_MIN_MEASUREMENTS)
-                            {
-                                var step = (this.timeDisplayed / NUM_OF_MEASUREMENT);
-                                // Get First Measurement Time
-                                metricTime = new Date(newData[0].time.getTime() - step*1000);
 
-                                // Fill Data With Zeros
-                                for(var i= 0; i < (NUM_OF_MIN_MEASUREMENTS - measurements_received); i++)
-                                {
+                        // Fix for duplicate timestamps
+                        if(newData.length > 0 && this.data.length > 0){
 
-                                    var zeroObject = {
-                                        time: metricTime,
-                                        value: 0
-                                    }
-
-                                    dataBuffer.push(zeroObject);
-                                    metricTime = new Date(metricTime.getTime() - step*1000);
-                                }
-                                // Set Real Data Start Index
-                                this.realDataIndex = dataBuffer.length;
-                                dataBuffer.reverse();
-
-                                // Join New Data With Zero Value Array
-                                dataBuffer = dataBuffer.concat(newData);
-                            }
-                            else{
-
-                                dataBuffer = newData;
-                            }
-
-                            // Set Our Final Data
-                            this.data = dataBuffer;
-
-                            // On first run append the Graph
-                            if(!this.isAppended){
-
-                                // Append SVG Elements And Call onInitialized When Finish
-                                appendGraph(this.id,this.width,this.height);
-
-                                this.isAppended = true;
-
-                                // Do staff after Graph is in the dom and we have data
-                                onInitialized();
+                            if(newData[0].time <= this.data[this.data.length-1].time){
+                                newData = newData.slice(1);
                             }
                         }
-                        else{
 
-                            // Check If We Have Overflow , Clip Older Measurement
-                            if(this.data.length + newData.length > NUM_OF_MAX_MEASUREMENTS)
-                            {
 
-                                // Clip Old Data
-                                var num_of_overflow_Objs = this.data.length + newData.length - NUM_OF_MAX_MEASUREMENTS;
-                                this.data = this.data.slice(num_of_overflow_Objs);
-                            }
+                        // On first run append the Graph
+                        if(!this.isAppended){
 
-                            // Set Our Final Data
-                            this.data = this.data.concat(newData);
+                            appendGraph(this.id,this.width,this.height);
+                            this.isAppended = true;
+
+                            // Do staff after Graph is in the dom and we have data
+                            onInitialized();
                         }
+
+                        // Set Our New Data
+                        this.data = this.data.concat(newData);
+
+                        // We don't let the buffer have more values than we need.
+                        // Check If We Have Overflow , Clip Older Measurement
+                        if(this.data.length > MAX_BUFFER_DATA) {
+
+                            var num_of_overflow_Objs = this.data.length - MAX_BUFFER_DATA;
+                            this.data = this.data.slice(num_of_overflow_Objs);
+                        }
+                        
 
                         this.updateView();
                     };
@@ -324,15 +289,15 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                    /**
                     *
                     * Deletes current graph data
-                    * 
+                    *
                     */
                     this.clearData = function() {
                         this.data = [];
                     };
-                    
+
 
                     /**
-                    * 
+                    *
                     * Updates graph by selecting data from data instance
                     * redraws value line, x-axis, labels and grid
                     */
@@ -340,40 +305,20 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                         var self           = this;
 
-                        var labelTicks = function(axisInstance,numOfLabels,format){
-
-                            // TODO check if ticks work with float number - Result : They Don't
-
-                            var labelsStep = (self.timeDisplayed / 60) / numOfLabels;
-                            
-                            if(self.id == 'cpuGraph')
-                                console.log("Labels Step: " + labelsStep);
-
-                            axisInstance.ticks(d3.time.minutesFixed,labelsStep);
-
-                            if( typeof format != 'undefined')
-                                axisInstance.tickFormat(d3.time.format(format));
-
-                            return axisInstance;
-                                               
-
-                        };
-
                         var labelTicksFixed = function(axisInstance,format) {
 
                             // Check Time Displayed
                             var labelStep;
-                            if(self.timeDisplayed <= 10*60) // 10 Minutes
+                            if(self.timeDisplayed <= 600)           // 10 Minutes (10*60)
                                 axisInstance.ticks(d3.time.minutes,2);
-                            else if(self.timeDisplayed <= 1*60*60) // 1 Hour
+                            else if(self.timeDisplayed <= 3600)     // 1 Hour (1*60*60)
                                 axisInstance.ticks(d3.time.minutes,12);
-                            else if(self.timeDisplayed <= 24*60*60) // 1 Day
+                            else if(self.timeDisplayed <= 86400)    // 1 Day (24*60*60)
                                 axisInstance.ticks(d3.time.hours,6);
-                            else if(self.timeDisplayed <= 7*24*60*60) // 1 Week
+                            else if(self.timeDisplayed <= 604800)   // 1 Week (7*24*60*60)
                                 axisInstance.ticks(d3.time.days,1);
-                            else if(self.timeDisplayed <= 30*7*24*60*60) // 1 Month
+                            else if(self.timeDisplayed <= 18144000) // 1 Month (30*7*24*60*60)
                                 axisInstance.ticks(d3.time.days,7);
-                            // TODO Add week and month
 
                             if( typeof format != 'undefined')
                                 axisInstance.tickFormat(d3.time.format(format));
@@ -385,7 +330,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                         this.displayedData = [];
                         this.xCordinates   = [];
-                        var num_of_displayed_measurements = 60; 
+                        var num_of_displayed_measurements = 60;
 
                         // Get only data that will be displayed
                         if(this.data.length > num_of_displayed_measurements) {
@@ -430,32 +375,19 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                                .orient("bottom")
                                                .tickSize(-this.height, 0, 0)
                                                .tickFormat("");
-                        
-                        // Add This To Function
-
-                        // We Don't really use this
-                        /*if (this.secondsStep <= 60) {
-
-                            d3xAxis.call(modelXAxis
-                                         .ticks(d3.time.seconds, this.secondsStep)
-                                         .tickFormat(d3.time.format("%I:%M:%S%p")));
-
-                            d3GridX.call(modelGridX
-                                         .ticks(d3.time.seconds, this.secondsStep));
-                        }*/
 
 
                         var tLabelFormat = "%I:%M%p";
 
-                        if (this.timeDisplayed >= 24*60*60)
+                        if (this.timeDisplayed >= 86400) // (24*60*60)
                             tLabelFormat = "%d-%m | %I:%M%p";
-                            
+
 
                         d3xAxis.call(labelTicksFixed(modelXAxis,tLabelFormat));
                         d3GridX.call(labelTicksFixed(modelGridX));
 
                         // Set time label at left side
-                        d3xAxis.selectAll("text") 
+                        d3xAxis.selectAll("text")
                                .style("text-anchor", "end")
                                .attr('x','-10');
 
@@ -474,15 +406,28 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                           .ticks(5)
                                           .tickFormat(function(d){
                                             // Custom Y-Axis label formater
-                                            if(d>=1000*1000)
-                                                return (d/1000/1000) +"M";
-                                            else if(d>=1000)
-                                                return (d/1000) + "K";
+                                            if(d>=1073741824)                          // (1024*1024*1024)
+                                                return (d/1073741824).toFixed(1) +"G"; // (1024*1024*1024)
+                                            else if(d>=1048576)                        // (1024*1024)
+                                                return (d/1048576).toFixed(1) +"M";    // (1024*1024)
+                                            else if(d>=1024)
+                                                return (d/1024).toFixed(1) + "K";
                                             else if(yAxisValueFormat == "%")
                                                 return d + "%";
-                                            else 
+                                            else
                                                 return d;
                                           }));
+
+                        // Get path values for value line and area
+                        valueLinePath = valueline(this.displayedData);
+                        valueAreaPath = valuearea(this.displayedData);
+
+                        // Fix for "Error: Problem parsing d="" " in webkit
+                        if(!valueLinePath){
+                            valueLinePath = "M 0 0";
+                            valueAreaPath = "M 0 0";
+                        }
+
 
                         // Animate line, axis and grid
                         if(!this.timeUpdated && this.animationEnabled)
@@ -493,14 +438,14 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                             
                             // Update Animated Line and Area
                             d3vLine.attr("transform", "translate(" + this.valuesDistance + ")")
-                                   .attr("d", valueline(this.displayedData)) 
-                                   .transition() 
+                                   .attr("d", valueLinePath)
+                                   .transition()
                                    .ease("linear")
                                    .duration(animationDuration)
                                    .attr("transform", "translate(" + 0 + ")");
 
                             d3vArea.attr("transform", "translate(" + this.valuesDistance + ")")
-                                   .attr("d", valuearea(this.displayedData))
+                                   .attr("d", valueAreaPath)
                                    .transition()
                                    .ease("linear")
                                    .duration(animationDuration)
@@ -508,13 +453,13 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                             // Animate Axis And Grid
                             d3xAxis.attr("transform", "translate(" + ( margin.left + this.valuesDistance) + ","+ (this.height - margin.bottom +2) +")")
-                                   .transition() 
+                                   .transition()
                                    .ease("linear")
                                    .duration(animationDuration)
                                    .attr("transform", "translate(" +  margin.left + "," + (this.height - margin.bottom +2) + ")");
 
                             d3GridX.attr("transform", "translate(" + (margin.left + this.valuesDistance) + ","+ this.height +")")
-                                   .transition() 
+                                   .transition()
                                    .ease("linear")
                                    .duration(animationDuration)
                                    .attr("transform", "translate(" + margin.left + "," + this.height + ")");
@@ -522,8 +467,8 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         else {
 
                             // Update Non-Animated value line and area
-                            d3vLine.attr("d", valueline(this.displayedData))
-                            d3vArea.attr("d", valuearea(this.displayedData))
+                            d3vLine.attr("d", valueLinePath);
+                            d3vArea.attr("d", valueAreaPath);
 
                             // Fix For Animation after time displayed changed
                             if(this.timeUpdated || !this.animationEnabled)
@@ -547,22 +492,22 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                        .attr("transform", "translate(" + margin.left + "," + this.height + ")");
                             }
                         }
-                        
+
                     };
 
 
                     /**
-                    * 
+                    *
                     * Changes the width of svg element, sets new scale values
                     * and updates height to keep aspect ratio
                     * @param {number} width - Graph new width
                     */
                     this.changeWidth = function (width) {
 
-                        if (!d3svg) 
+                        if (!d3svg)
                             return;
                         // Create an aspect ratio
-                        var newHeight = 160 / 1280 * width;
+                        var newHeight = width * 0.125; // (160 / 1280)
 
                         this.height = (newHeight < 85 ? 85 : newHeight);
                         this.width = width;
@@ -570,6 +515,9 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         // Set new values to SVG element
                         d3svg.attr('width',this.width)
                              .attr('height',this.height);
+
+                        // Set new height for value are
+                        valuearea.y0(this.height - margin.top - margin.bottom);
 
                         // Update scale to new values
                         yScale = d3.scale.linear().range([this.height - margin.top - margin.bottom, 0]);
@@ -582,9 +530,9 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         d3xAxisLine.attr('y1',""+(this.height - margin.bottom +2))
                                    .attr('y2',""+(this.height - margin.bottom +2))
                                    .attr('x2',""+(this.width + margin.left + margin.right));
-                                   
+
                         d3yAxisLine.attr('y2',""+ (this.height - margin.bottom +3));
-                        
+
                         updateMouseOverSize();
 
                         this.updateView();
@@ -644,7 +592,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
 
                     /**
-                    * 
+                    *
                     * Finds last measurement of graph data
                     * @return {date} Measurements time or null on failure
                     */
@@ -655,12 +603,12 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         else {
                             var lastObject = this.data[this.data.length-1];
                             return lastObject.time;
-                        }   
+                        }
                     };
 
 
                     /**
-                    * 
+                    *
                     * Current time window
                     * @return {number} time window in seconds
                     */
@@ -671,7 +619,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
 
                     /**
-                    * 
+                    *
                     * Last received values
                     * @return {object} metric object or null on failure
                     */
@@ -684,7 +632,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
 
                     /**
-                    * 
+                    *
                     * Last visible metric
                     * @return {object} metric object or null on failure
                     */
@@ -706,7 +654,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                     var distance = this.data[this.data.length-1].value  - this.data[this.data.length-2].value;
 
                                     // Last value + the part that has been translated
-                                    return this.data[this.data.length-2].value + 
+                                    return this.data[this.data.length-2].value +
                                             (distance * (this.valuesDistance-translate) / this.valuesDistance);
                                 }
 
@@ -718,12 +666,12 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
 
                     /**
-                    * 
+                    *
                     * Calculates the distance between the last two points
                     * Important for animated graph
                     */
                     this.calcValueDistance = function() {
-                        
+
                         // Get last 2 data
                         if(this.data.length >= 2) {
 
@@ -735,32 +683,31 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
 
                     /*
-                    * 
+                    *
                     * Changes time window
                     * @param {number} newTimems - New timewindow in miliseconds
                     */
                     this.changeTimeWindow = function(newTimeWindow){
 
                         this.timeDisplayed = newTimeWindow/1000;
-                        this.secondsStep   = Math.floor((newTimeWindow / 1000) / NUM_OF_LABELS);
 
                         this.timeUpdated = true;
-                        
+
                         this.clearData();
-                        //this.updateView();
+
                     };
 
 
                     /*
-                    * 
+                    *
                     * Appends the graph into the DOM.
                     * Graph will be inside the id specified.
-                    * @param {string} id     - the div where graph will be 
+                    * @param {string} id     - the div where graph will be
                     * @param {number} width  - the width of the graph
                     * @param {height} height - the height of the graph
                     */
                     function appendGraph(id,width,height){
-                      
+
                       /* Add Graph Element Dynamically
                       d3.select('#GraphsArea').insert('div','#graphBar').attr('id','CustomMetric'+'Graph').attr('class','graph').insert('div').attr('class','header').insert('div').attr('class','title').text('CustomMetric');
                       d3.select('#'+'CustomMetric'+'Graph').select('.header').insert('div').attr('class','closeBtn').attr('onClick',"Mist.monitoringController.UI.collapsePressed('CustomMetric')").text('-');
@@ -772,13 +719,13 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                       d3GridX = d3.select("#"+id)
                                   .select('svg')
-                                  .append("g")         
+                                  .append("g")
                                   .attr("class", "grid-x")
                                   .attr("transform", "translate(" + margin.left + "," + height + ")");
 
                       d3GridY = d3.select("#"+id)
                                   .select('svg')
-                                  .append("g")         
+                                  .append("g")
                                   .attr("class", "grid-y")
                                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -790,7 +737,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                       d3vLine = d3svg.append('g')
                                      .attr('class','valueLine')
                                      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                                     .append('path'); 
+                                     .append('path');
 
                       d3xAxis = d3svg.append('g')
                                      .attr('class','x-axis')
@@ -821,7 +768,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     }
 
                     /*
-                    * 
+                    *
                     * Setups event listeners for mouse,
                     * also creates interval for popup value update
                     */
@@ -854,7 +801,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                 if(mouseX > margin.left)
                                 {
                                     if(!isVisible){
-                                        
+
                                         $(graph).find('.selectorLine').show(0);
                                         $("#GraphsArea").find('.valuePopUp').show(0);
                                         isVisible = true;
@@ -862,7 +809,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                     // Mouse X inside value line area
                                     var virtualMouseX = mouseX - margin.left;
 
-                                    // Calculate Translate 
+                                    // Calculate Translate
                                     var translate = 0;
                                     if(self.animationEnabled){
                                         translate =  $("#" + self.id).find('.valueLine > path').attr('transform');
@@ -879,29 +826,38 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                         }
                                         else
                                             minValueIndex = i;
-                                    } 
-                                    
+                                    }
+
+
+                                    // Fix for the area that has not defined data
+                                    if(self.displayedData.length == 0 || self.displayedData[minValueIndex].value == null || self.displayedData[minValueIndex+1].value == null ){
+                                        $('#GraphsArea').children('.valuePopUp').text("No Data");
+                                        return;
+                                    }
+
                                     
                                     // Distanse between value before curson and after curson
                                     var distance = self.displayedData[minValueIndex+1].value  - self.displayedData[minValueIndex].value;
                                     // Mouse offset between this two values
                                     var mouseOffset = (virtualMouseX -(self.xCordinates[minValueIndex]+translate))/self.valuesDistance ;
-                                    // Cursor's measurement value is the value before the curson + 
+                                    // Cursor's measurement value is the value before the curson +
                                     // the mouse percentage after the first point * the distance between the values
                                     currentValue = self.displayedData[minValueIndex].value + distance * mouseOffset;
-                                    
+
                                     // Value has a small loss of presition. We don't let it be less than 0
                                     currentValue < 0 ? 0 : currentValue;
 
                                     // Fix For Big Numbers
                                     var valueText = "";
-                                    if(currentValue>=1000*1000)
-                                        valueText = (currentValue/1000/1000).toFixed(2) +"M";
-                                    else if(currentValue>=1000)
-                                        valueText = (currentValue/1000).toFixed(2) + "K";
+                                    if(currentValue>=1073741824)                               // (1024*1024*1024)
+                                        valueText = (currentValue/1073741824).toFixed(2) +"G"; // (1024*1024*1024)
+                                    else if(currentValue>=1048576)                             // (1024*1024)
+                                        valueText = (currentValue/1048576).toFixed(2) +"M";    // (1024*1024)
+                                    else if(currentValue>=1024)
+                                        valueText = (currentValue/1024).toFixed(2) + "K";
                                     else if(self.yAxisValueFormat == "%")
                                         valueText = currentValue.toFixed(2) + "%";
-                                    else 
+                                    else
                                         valueText = currentValue.toFixed(2);
 
                                     // Update Value Text
@@ -921,7 +877,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         var updatePopUpOffset = function(event){
                             mouseX = event.pageX - $('#'+ self.id).children('svg').offset().left;
                             mouseY = event.pageY - $('#'+ self.id).children('svg').offset().top;
-                            
+
                             // Set Mouse Line Cordinates
                             mouseOverLine.attr('x1',"" + mouseX)
                                          .attr('x2',"" + mouseX);
@@ -945,7 +901,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                         // Mouse Events
                         $('#' + self.id).children('svg').mouseenter(function() {
-                            
+
                             // Setup Interval
                             updateInterval = window.setInterval(updatePopUpValue,500);
                         });
@@ -959,105 +915,16 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
 
                     /*
-                    * 
-                    * Is being called after first data received and 
+                    *
+                    * Is being called after first data received and
                     * svg elements are in the dom
                     */
                     function onInitialized(){
-                      
+
                       setupMouseOver();
                     }
 
                 }
-
-                // Features not yet used
-
-                /* Commented Out Until It's Time To Test Zoom In/Out
-                selectPressed: function(){
-
-                    var selectValue = $("#timeWindowSelect").val();
-                    console.log("time Window");
-                    console.log(this.cpuGraph.getTimeWindow());
-                    var newTime = 0;
-                    var newStep = 10000;
-                    if(selectValue.toLowerCase().search("minutes") != -1)
-                    {
-                        selectValue = selectValue.replace(/\D+/g, '' );
-                        console.log("Minutes To Display:" + selectValue);
-                        newTime = selectValue * 60 * 1000;
-
-                        if(selectValue > 30)
-                            newStep = (selectValue*60 / 180)*1000;
-
-                    }
-                    else if(selectValue.toLowerCase().search("hours") != 1 || selectValue.toLowerCase().search("hour") != 1)
-                    {
-                        selectValue = selectValue.replace(/\D+/g, '' );
-                        console.log("Hours To Display:" + selectValue);
-
-                        newTime = selectValue * 60 * 60 * 1000;
-                        newStep = (selectValue*60*60 / 180)*1000;
-
-                    }
-                    else if(selectValue.toLowerCase().search("days") != 1 || selectValue.toLowerCase().search("day") != 1)
-                    {
-                        selectValue = selectValue.replace(/\D+/g, '' );
-                        console.log("Days To Display:" + selectValue);
-
-                        newTime = selectValue * 24 * 60 * 60 * 1000;
-                        newStep = (selectValue * 24 * 60 * 60 / 180)*1000;
-
-                    }
-
-                    // Update Graph Time If selection is not the same
-                    // TODO Make it cpugraph independent
-                    if(newTime/1000 != this.cpuGraph.getTimeWindow())
-                    {
-                        this.cpuGraph.changeTimeToDisplay(newTime);
-                        this.loadGraph.changeTimeToDisplay(newTime);
-                        this.memoryGraph.changeTimeToDisplay(newTime);
-                        this.diskReadGraph.changeTimeToDisplay(newTime);
-                        this.diskWriteGraph.changeTimeToDisplay(newTime);
-                        this.networkTXGraph.changeTimeToDisplay(newTime);
-                        this.networkRXGraph.changeTimeToDisplay(newTime);
-
-                        // TODO
-                        // Step will be 10 seconds until machine is able to send less values //
-                        Mist.monitoringController.updateDataRequest(newTime,10000);
-                    }
-                },
-                */
-
-                /*getLoadLineColor: function(currentLoad,cpuCores){
-                    if(currentLoad >= 1 * cpuCores)
-                        return "#FF0000";
-                    else if(currentLoad >= 0.7 * cpuCores)
-                        return "#00FF26";
-                    else 
-                        return "#6CE0BA";
-                },
-
-                setupLoadColorInterval: function(){
-                     
-                     var self = this;
-                     jQuery.Color.hook( "stroke" );
-
-                     window.monitoringLoadColorInterval = window.setInterval(function () {
-                        var loadValue = self.loadGraph.getLastDisplayedValue();
-
-                        if(loadValue != null) {
-
-                            var color = self.getLoadLineColor(loadValue,self.cpuCores);
-                            $("#loadGraph").find('.valueLine > path').animate( {
-                                stroke: jQuery.Color(color)
-                            }, 700 );
-                        }
-                    },1000);
-                },
-
-                stopLoadColorInterval: function(){
-                    window.clearInterval(window.monitoringLoadColorInterval);
-                },*/
 
         });
     }

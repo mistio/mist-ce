@@ -1466,7 +1466,7 @@ function program46(depth0,data) {
   hashContexts = {};
   stack2 = helpers.each.call(depth0, "Mist.rulesController.actionList", {hash:{},inverse:self.noop,fn:self.program(44, program44, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack2 || stack2 === 0) { data.buffer.push(stack2); }
-  data.buffer.push("\n            <li data-icon=\"false\">\n                <a>launch</a>\n            </li>\n        </ul>\n    </div>\n    \n    <div class=\"rule-command-popup large-popup\" data-role=\"popup\">\n        <div data-role=\"header\">\n            <h1>Command</h1>\n        </div>\n        <div data-role=\"content\">\n            ");
+  data.buffer.push("\n            <li class=\"ui-state-disabled\" data-icon=\"false\">\n                <a>launch</a>\n            </li>\n        </ul>\n    </div>\n    \n    <div class=\"rule-command-popup large-popup\" data-role=\"popup\">\n        <div data-role=\"header\">\n            <h1>Command</h1>\n        </div>\n        <div data-role=\"content\">\n            ");
   hashContexts = {'valueBinding': depth0,'name': depth0};
   hashTypes = {'valueBinding': "STRING",'name': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Ember.TextArea", {hash:{
