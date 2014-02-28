@@ -53,7 +53,7 @@ define('app/views/machine_manual_monitoring', ['app/views/templated', 'ember'],
 
 
                 manualInstallationClicked: function() {
-
+                    $('#manual-monitoring-popup').popup('open');
                 }
             }
         });

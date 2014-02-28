@@ -302,6 +302,11 @@ define('app/views/machine', ['app/views/mistscreen'],
                             Mist.notificationController.notify('Failed to probe machine');
                         }
                     })
+                },
+
+
+                closeManualMonitoringPopup: function() {
+                    $('#manual-monitoring-popup').popup('close');
                 }
             },
 
