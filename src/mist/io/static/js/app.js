@@ -65,6 +65,7 @@ define( 'app', [
     'app/views/machine_keys',
     'app/views/machine_keys_list_item',
     'app/views/machine_tags_list_item',
+    'app/views/machine_manual_monitoring',
     'app/views/key_list_item',
     'app/views/key_list',
     'app/views/key',
@@ -115,6 +116,7 @@ define( 'app', [
                 MachineKeysView,
                 MachineKeysListItemView,
                 MachineTagsListItemView,
+                MachineManualMonitoringView,
                 KeyListItemView,
                 KeyListView,
                 SingleKeyView,
@@ -289,6 +291,7 @@ define( 'app', [
         App.set('machineKeysListItemView', MachineKeysListItemView);
         App.set('machineTagsListItemView', MachineTagsListItemView);
         App.set('machineShellListItemView', MachineShellListItemView);
+        App.set('machineManualMonitoringView', MachineManualMonitoringView);
 
         // Ember controllers
 

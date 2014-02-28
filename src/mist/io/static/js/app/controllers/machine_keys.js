@@ -60,7 +60,7 @@ define('app/controllers/machine_keys', ['ember'],
 
 
             associate: function (key, callback) {
-                key.associate(this.machine, callback);
+                key.associate(this.machine, callback ? callback : this.callback);
             },
 
 

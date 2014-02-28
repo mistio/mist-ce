@@ -236,36 +236,17 @@ define('app/views/machine', ['app/views/mistscreen'],
 
                     if (Mist.authenticated) {
                         if (Mist.current_plan) {
-                            // TODO: return machine_limit from server (core)
-                            //if (Mist.current_plan.machine_limit >= Mist.monitored_machines.length) {
-                                if (this.machine.probed) {
-                                    var machine = this.machine;
-                                    Mist.confirmationController.set('title', 'Enable monitoring');
-                                    Mist.confirmationController.set('text', 'Are you sure you want to enable monitoring for this machine?');
-                                    Mist.confirmationController.set('callback', function () {
-                                        Mist.monitoringController.changeMonitoring(machine);
-                                    });
-                                    Mist.confirmationController.show();
-                                } else {
-                                    Mist.notificationController.set('msgHeader', 'No keys');
-                                    Mist.notificationController.set('msgPart1', "The collectd deamon can't be installed automatically " + 
-                                                                    'because Mist.io can not connect to this machine.');
-                                    Mist.notificationController.set('msgPart2', 'To connect a machine with Mist.io you can follow the ' + 
-                                                                                'instructions on the help page.');
-                                    Mist.notificationController.set('msgLink', 'Link to help page');
-                                    Mist.notificationController.set('msgHref', 'https://mistio.zendesk.com/hc/en-us/articles/200996166');
-                                    Mist.notificationController.showMessagebox();
-                                }
-                            /*} else {
-                                Mist.notificationController.set('msgHeader', 'Machine limit reached');
-                                Mist.notificationController.set('msgPart1', 'The maximum number of monitored machines' +
-                                                                            ' has been reached');
-                                Mist.notificationController.set('msgPart1', 'In order to monitor more machines you should' +
-                                                                            ' upgrade to another plan');
-                                Mist.notificationController.set('msgPart3', 'You can do that in the Account page, which can' +
-                                                                            'be accessed from the menu button on the top right corner');
-                                Mist.notificationController.showMessagebox();
-                            }*/
+                            if (this.machine.probed) {
+                                var machine = this.machine;
+                                Mist.confirmationController.set('title', 'Enable monitoring');
+                                Mist.confirmationController.set('text', 'Are you sure you want to enable monitoring for this machine?');
+                                Mist.confirmationController.set('callback', function () {
+                                    Mist.monitoringController.changeMonitoring(machine);
+                                });
+                                Mist.confirmationController.show();
+                            } else {
+                                $('#machine-manual-monitoring').slideDown();
+                            }
                         } else {
                             Mist.notificationController.set('msgHeader', 'No plan');
                             Mist.notificationController.set('msgPart1', 'In order to use our monitoring service' +

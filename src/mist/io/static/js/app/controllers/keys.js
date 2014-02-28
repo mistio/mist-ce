@@ -127,7 +127,7 @@ define(['app/models/key'],
                      Mist.notificationController.notify('Failed to associate key');
                 }).complete(function(success) {
                     that.set('associatingKey', false);
-                    if (callback) callback(success);
+                    if (callback) callback(success, machine, keyId);
                 });
             },
 

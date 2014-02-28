@@ -184,7 +184,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     machine.set('loadavg', data.loadavg);
                     machine.set('loss', data.packets_loss);
                     machine.set('latency', Math.floor(data.rtt_avg));
-                    
+                    that.trigger('onMachineProbe', machine, keyId);
                 }).error(function(message) {
                     if (!machine.backend || !machine.backend.enabled) return;
                     if (key) Mist.notificationController.notify(message);

@@ -1,0 +1,18 @@
+<div id="machine-manual-monitoring">
+
+	<p>Mist.io cannot install the collectd monitoring deamon on your server
+	   because you have not provided any SSH keys</p>
+	<p>You can either associate a key or install collectd manualy: </p>
+    
+    <div id="monitoring-bottom-btns">
+	    <div data-rule="ui-grid-a">
+	        <div class="ui-block-a">
+	            <button {{action "associateClicked" target="view"}}>Associate key</button>
+	        </div>
+	        <div class="ui-block-b">
+	            <button {{action "manualInstallationClicked" target="view"}}>Manual installation</button>
+	        </div>
+	    </div>
+    </div>
+	
+</div>
