@@ -300,6 +300,8 @@ define(['app/models/key'],
                             return true;
                         }
                     });
+                    machine.set('keysCount', this.getMachineKeysCount(machine));
+                    machine.set('probed', !!machine.keysCount);
                     this.trigger('onKeyDisassociate');
                 });
             },

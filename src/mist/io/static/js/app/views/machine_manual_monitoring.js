@@ -53,6 +53,13 @@ define('app/views/machine_manual_monitoring', ['app/views/templated', 'ember'],
 
 
                 manualInstallationClicked: function() {
+                    var machine = this._parentView._parentView.machine;
+                    Mist.monitoringController.getMonitoringCommand(machine, function(success, command) {
+                        if (success) {
+                            $('#machine-manual-monitoring').slideUp();
+                            $('#manual-monitoring-popup textarea').val(command);
+                        }
+                    });
                     $('#manual-monitoring-popup').popup('open');
                 }
             }

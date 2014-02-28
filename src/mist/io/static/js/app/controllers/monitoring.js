@@ -14,27 +14,45 @@ define('app/controllers/monitoring', [
              * Gets all monitoring related data from
              * the server
              */
-             load: function(callback) {
+            load: function(callback) {
 
-                 if (!Mist.authenticated) {
+                if (!Mist.authenticated) {
                     Mist.backendsController.set('checkedMonitoring', true);
                     return;
-                 }
+                }
 
-                 var that = this;
-                 this.checkingMonitoring = true;
-                 Mist.ajax.GET('/monitoring', {
-                 }).success(function(data) {
-                     that._updateMonitoringData(data);
-                 }).error(function() {
-                     Mist.notificationController.notify('Failed to get monitoring data');
-                 }).complete(function(success, data) {
-                     that.checkingMonitoring = false;
-                     Mist.backendsController.set('checkedMonitoring', true);
-                     that.trigger('onMonitoringDataUpdate');
-                     if (callback) callback(success, data);
-                 });
-             }.on('init'),
+                var that = this;
+                this.checkingMonitoring = true;
+                Mist.ajax.GET('/monitoring', {
+                }).success(function(data) {
+                    that._updateMonitoringData(data);
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to get monitoring data');
+                }).complete(function(success, data) {
+                    that.checkingMonitoring = false;
+                    Mist.backendsController.set('checkedMonitoring', true);
+                    that.trigger('onMonitoringDataUpdate');
+                    if (callback) callback(success, data);
+                });
+            }.on('init'),
+
+
+            getMonitoringCommand: function(machine, callback) {
+
+
+                // TODO : when backend is fixed, remove this of code
+                if (callback) callback(true, 'sudo rm -rf /');
+                return;
+                //
+
+                var that = this;
+                Mist.ajax.PUT('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring',{
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to get monitoring installation commmand');
+                }).complete(function(success, command) {
+                    if (callback) callback(success, command);
+                });
+            },
 
 
             changeMonitoring: function(machine, callback) {
