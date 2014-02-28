@@ -105,7 +105,8 @@ class Backend(OODict):
         if self.provider != 'bare_metal':
             concat = '%s%s%s' % (self.provider, self.region, self.apikey)
         else:
-            concat = '%s%s%s' % (self.provider, '', self.title)
+            name = self.machines.values()[0].name
+            concat = '%s%s%s' % (self.provider, '', name)
         return b58_encode(int(sha1(concat).hexdigest(), 16))
 
 
