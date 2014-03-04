@@ -1,7 +1,7 @@
 define('app/views/machine', ['app/views/mistscreen'],
     /**
      *  Single Machine View
-     * 
+     *
      *  @returns Class
      */
     function(MistScreen) {
@@ -23,9 +23,9 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
             load: function() {
@@ -53,9 +53,9 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
             updateCurrentMachine: function() {
@@ -181,7 +181,7 @@ define('app/views/machine', ['app/views/mistscreen'],
                     Ember.run.later(this, function() {
                         this.updateUptime();
                     }, 1000);
-    
+
                     // Calculate uptime
                     var machine = this.machine;
                     if (!machine) return 0;
@@ -200,19 +200,19 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             /**
-             * 
+             *
              *  Actions
-             * 
+             *
              */
-            
+
             actions: {
 
 
                 manageKeysClicked: function() {
                     Mist.machineKeysController.open(this.machine);
                 },
-               
-               
+
+
                 addKeyClicked: function() {
                     Mist.machineKeysController.openKeyList(this.machine);
                 },
@@ -245,6 +245,10 @@ define('app/views/machine', ['app/views/mistscreen'],
                                 });
                                 Mist.confirmationController.show();
                             } else {
+                                // Hide enable button
+                                $('#enable-monitoring-bundle').slideUp();
+
+                                // Show manual monitoring instructions
                                 $('#machine-manual-monitoring').slideDown();
                             }
                         } else {
@@ -312,9 +316,9 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             /**
-             * 
+             *
              *  Computed Properties
-             * 
+             *
              */
 
             upFor: function() {
@@ -346,16 +350,16 @@ define('app/views/machine', ['app/views/mistscreen'],
                 if (this.machine && this.machine.uptimeChecked > 0) {
                     var x = (Date.now()-this.machine.uptimeChecked) / 1000;
                     var minutes = Math.floor(x / 60);
-                    if (minutes > 1) 
+                    if (minutes > 1)
                         ret = minutes + ' minutes ago';
                     else if (minutes == 1)
                         ret = "1 minute ago";
-                    else 
-                        ret = "just now";                    
+                    else
+                        ret = "just now";
                 }
                 return ret;
             }.property('machine.uptime'),
-            
+
             basicInfo: function() {
                 if (!this.machine) return;
 
@@ -387,7 +391,7 @@ define('app/views/machine', ['app/views/mistscreen'],
                 for (item in basicInfo) {
                     if (typeof basicInfo[item] == 'string') {
                         ret.push({key:item, value: basicInfo[item]});
-                    }               
+                    }
                 }
                 return ret;
             }.property('machine'),
@@ -396,21 +400,21 @@ define('app/views/machine', ['app/views/mistscreen'],
             metadata: function() {
                 if (!this.machine || !this.machine.extra) return;
                 var ret = [];
-                
+
                 for (item in this.machine.extra) {
                     var value = this.machine.extra[item];
                     if (typeof value == 'string' || typeof value == 'number') {
                         ret.push({key:item, value: value});
                     }
                 }
-                
+
                 Ember.run.next(function() {
                     if ($('#single-machine-metadata').collapsible) {
                         $('#single-machine-metadata').collapsible();
                     }
                 });
                 return ret;
-                
+
             }.property('machine', 'machine.extra'),
 
 
@@ -427,9 +431,9 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
             modelObserver: function() {

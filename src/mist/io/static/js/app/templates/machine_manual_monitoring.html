@@ -6,25 +6,25 @@
         <p>You can either associate a key or install collectd manualy: </p>
     </div>
 
-    <div id="machine-manual-monitoring-btns">
-        <div data-rule="ui-grid-a">
-            <div class="ui-block-a">
-                <button {{action "associateClicked" target="view"}}>Associate key</button>
-            </div>
-            <div class="ui-block-b">
-                <button {{action "manualInstallationClicked" target="view"}}>Manual installation</button>
-            </div>
+    <div id="machine-manual-monitoring-btns" data-rule="ui-grid-b">
+        <div class="ui-block-a">
+            <button data-theme="d" {{action "associateClicked" target="view"}}>Associate key</button>
+        </div>
+        <div class="ui-block-b">
+            <button data-theme="d" {{action "manualInstallationClicked" target="view"}}>Manual installation</button>
+        </div>
+        <div class="ui-block-c">
+            <button {{action "backClicked" target="view"}}>Back</button>
         </div>
     </div>
 
-
     <div id="machine-manual-monitoring-commands">
         <ol>
-            <li> sudo mkdir -p /opt/mistio-collectd; </li>
-            <li> cd /opt/mistio-collectd; </li>
-            <li> sudo wget https://mist.io/core/scripts/deploy_collectd.sh; </li>
-            <li> sudo chmod +x deploy_collectd.sh; </li>
-            <li> sudo ./deploy_collectd.sh {{view.monitor_server}} {{view.uuid}} {{view.passwd}} </li>
+            <li><span class="manual-command"> sudo mkdir -p /opt/mistio-collectd; </span></li>
+            <li><span class="manual-command"> cd /opt/mistio-collectd; </span></li>
+            <li><span class="manual-command"> sudo wget https://mist.io/core/scripts/deploy_collectd.sh; </span></li>
+            <li><span class="manual-command"> sudo chmod +x deploy_collectd.sh; </span></li>
+            <li><span class="manual-command"> sudo ./deploy_collectd.sh {{view.monitor_server}} {{view.uuid}} {{view.passwd}} <span></li>
         </ol>
     </div>
 

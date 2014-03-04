@@ -36,8 +36,6 @@ define('app/views/machine_manual_monitoring', ['app/views/templated', 'ember'],
 
                 associateClicked: function() {
 
-
-
                     var that = this;
                     var machine = this._parentView._parentView.machine;
                     Mist.machineKeysController.openKeyList(this._parentView._parentView.machine, function(success) {
@@ -56,18 +54,36 @@ define('app/views/machine_manual_monitoring', ['app/views/templated', 'ember'],
 
 
                 manualInstallationClicked: function() {
+
                     var that = this;
                     var machine = this._parentView._parentView.machine;
                     Mist.monitoringController.getMonitoringCommand(machine, function(success, data) {
+
                         if (success) {
+
                             that.set('passwd', data.passwd);
                             that.set('monitor_server', data.monitor_server);
                             that.set('uuid', data.uuid);
 
-                            $('#monitoring-bottom-btns').slideUp();
-                            $('#monitoring-commands').slideDown();
+                            $('#machine-manual-monitoring-message').slideUp();
+                            $('#machine-manual-monitoring-btns').slideUp();
+                            $('#machine-manual-monitoring-commands').slideDown();
                         }
                     });
+                },
+
+                backClicked: function () {
+
+                    // Hide the whole view
+                    $('#machine-manual-monitoring').slideUp();
+
+                    // Bring everything back to the initial state
+                    $('#machine-manual-monitoring-message').slideDown();
+                    $('#machine-manual-monitoring-btns').slideDown();
+                    $('#machine-manual-monitoring-commands').slideUp();
+
+                    // Show enable button
+                    $('#enable-monitoring-bundle').slideDown();
                 }
             }
         });
