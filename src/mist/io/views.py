@@ -638,6 +638,7 @@ def update_monitoring(request):
     name = request.json_body.get('name', '')
     public_ips = request.json_body.get('public_ips', [])
     dns_name = request.json_body.get('dns_name', '')
+    no_ssh = bool(request.json_body.get('no_ssh', False))
 
     payload = {
         'action': action,
@@ -650,14 +651,14 @@ def update_monitoring(request):
 
     if action == 'enable':
         stdout = methods.enable_monitoring(
-            user, backend_id, machine_id, name, dns_name, public_ips
+            user, backend_id, machine_id, name, dns_name, public_ips, no_ssh=no_ssh
         )
     elif action == 'disable':
-        stdout = methods.disable_monitoring(user, backend_id, machine_id)
+        stdout = methods.disable_monitoring(user, backend_id, machine_id, no_ssh=no_ssh)
     else:
         raise BadRequestError()
 
-    return {'cmd_output': stdout}
+    return stdout
 
 
 @view_config(route_name='stats', request_method='GET', renderer='json')

@@ -1369,7 +1369,7 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
 
 
 def enable_monitoring(user, backend_id, machine_id,
-                      name='', dns_name='', public_ips=None):
+                      name='', dns_name='', public_ips=None, no_ssh=False):
     """Enable monitoring for a machine."""
     backend = user.backends[backend_id]
     payload = {
@@ -1409,9 +1409,18 @@ def enable_monitoring(user, backend_id, machine_id,
     monitor_url = ret_dict.get('monitor_server')
     host = ret_dict.get('host')
 
-    stdout = _deploy_collectd(user, backend_id, machine_id, host,
+    stdout = ''
+    if not no_ssh:
+        stdout = _deploy_collectd(user, backend_id, machine_id, host,
                               monitor_url, machine_uuid, collectd_password)
-    return stdout
+
+    return {
+            'uuid': machine_uuid,
+            'passwd': collectd_password,
+            'monitor_server': monitor_url,
+            'cmd_output': stdout,
+            'host': host
+        }
 
 
 def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
@@ -1437,10 +1446,12 @@ def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
     ret_dict = json.loads(ret.content)
     host = ret_dict.get('host')
 
-    if not no_ssh:
-        stdout = _undeploy_collectd(user, backend_id, machine_id, host)
-    else:
-        stdout = ""
+    stdout = ""
+    try:
+        if not no_ssh:
+            stdout = _undeploy_collectd(user, backend_id, machine_id, host)
+    except:
+        pass
     return stdout
 
 
