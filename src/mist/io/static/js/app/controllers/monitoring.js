@@ -39,18 +39,37 @@ define('app/controllers/monitoring', [
 
             getMonitoringCommand: function(machine, callback) {
 
-
-                // TODO : when backend is fixed, remove this of code
-                if (callback) callback(true, 'sudo rm -rf /');
-                return;
-                //
-
                 var that = this;
-                Mist.ajax.PUT('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring',{
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to get monitoring installation commmand');
-                }).complete(function(success, command) {
-                    if (callback) callback(success, command);
+                machine.set('enablingMonitoring', true);
+
+                Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring', {
+                    'action': 'enable',
+                    'dns_name': machine.extra.dns_name ? machine.extra.dns_name : 'n/a',
+                    'public_ips': machine.public_ips ? machine.public_ips : [],
+                    'name': machine.name ? machine.name : machine.id,
+                    'no_ssh': true
+                }).success(function(data) {
+
+                    // Give some time to graphite to collect data (fix for new machines)
+                    window.setTimeout(function() {
+                        machine.set('hasMonitoring', true);
+                        machine.set('enablingMonitoring', false);
+                    }, 11000); // TODO: this seems wrong
+
+                    Mist.set('authenticated', true);
+
+                }).error(function(message, statusCode) {
+
+                    machine.set('enablingMonitoring', false);
+
+                    if (statusCode == 402){
+                        Mist.notificationController.timeNotify(message, 5000);
+                    } else {
+                        Mist.notificationController.notify('Error when changing monitoring to ' + machine.name);
+                    }
+
+                }).complete(function(success, data) {
+                    if (callback) callback(success, data);
                 });
             },
 
@@ -561,7 +580,7 @@ define('app/controllers/monitoring', [
 
 
                                 // Set CPU Cores
-                                receivedData.cpuCores = data.cpu.cores 
+                                receivedData.cpuCores = data.cpu.cores
 
                                 // Create time-value objects to be used with d3
                                 data.cpu.utilization.forEach(function(item) {
@@ -713,10 +732,10 @@ define('app/controllers/monitoring', [
                 lastMetrictime : null,  // Date Object
                 callback       : null,  // Function
                 timeWindow     : 0,     // integer in miliseconds
-                timeStart      : 0,     // integer in seconds 
-                timeStop       : 0,     // integer in seconds 
+                timeStart      : 0,     // integer in seconds
+                timeStop       : 0,     // integer in seconds
                 step           : 0,     // integer in miliseconds
-                timeGap        : 0,     // integer in seconds 
+                timeGap        : 0,     // integer in seconds
                 updateInterval : 0,     // integer in miliseconds
                 updateData     : false, // boolean
                 locked         : false, // boolean
@@ -1118,7 +1137,7 @@ define('app/controllers/monitoring', [
 
                             var measurements = 60;
                             timeWindowInMinutes = timeWindow /60000;
-                            newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 ); 
+                            newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 );
                             controller.request.changeStep(newStep,false);
                             controller.request.changeTimeWindow(timeWindow,false);
 

@@ -53,14 +53,18 @@ define('app/views/machine_manual_monitoring', ['app/views/templated', 'ember'],
 
 
                 manualInstallationClicked: function() {
+                    var that = this;
                     var machine = this._parentView._parentView.machine;
-                    Mist.monitoringController.getMonitoringCommand(machine, function(success, command) {
+                    Mist.monitoringController.getMonitoringCommand(machine, function(success, data) {
                         if (success) {
+                            this.set('passwd', data.passwd);
+                            this.set('monitor_server', data.monitor_server);
+                            this.set('uuid', data.uuid);
+
                             $('#machine-manual-monitoring').slideUp();
-                            $('#manual-monitoring-popup textarea').val(command);
+                            $('#monitoring-commands').slideDown();
                         }
                     });
-                    $('#manual-monitoring-popup').popup('open');
                 }
             }
         });

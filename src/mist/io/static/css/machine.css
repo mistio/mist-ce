@@ -73,23 +73,23 @@
     left: 6px;
 }
 
-#single-machine-page #machine-manual-monitoring {
+#single-machine-page #machine-manual-monitoring, #single-machine-page  #monitoring-commands {
     display: none;
 }
 
 /* Conditional for < 600px */
 @media only screen and  (max-width: 400px) {
-    
+
 
     #single-machine-page #monitoring-bottom-btns .ui-block-a,
     #single-machine-page #monitoring-bottom-btns .ui-block-b {
         width: 100%;
     }
-    
+
     #single-machine-page #monitoring-bottom-btns {
         height: 110px;
     }
-    
+
 
 }
 
