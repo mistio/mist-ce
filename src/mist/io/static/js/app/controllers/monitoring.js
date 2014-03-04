@@ -51,10 +51,10 @@ define('app/controllers/monitoring', [
                 }).success(function(data) {
 
                     // Give some time to graphite to collect data (fix for new machines)
-                    window.setTimeout(function() {
-                        machine.set('hasMonitoring', true);
+                   // window.setTimeout(function() {
+                      //  machine.set('hasMonitoring', true);
                         machine.set('enablingMonitoring', false);
-                    }, 11000); // TODO: this seems wrong
+                    //}, 11000); // TODO: this seems wrong
 
                     Mist.set('authenticated', true);
 

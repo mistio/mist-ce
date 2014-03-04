@@ -57,11 +57,11 @@ define('app/views/machine_manual_monitoring', ['app/views/templated', 'ember'],
                     var machine = this._parentView._parentView.machine;
                     Mist.monitoringController.getMonitoringCommand(machine, function(success, data) {
                         if (success) {
-                            this.set('passwd', data.passwd);
-                            this.set('monitor_server', data.monitor_server);
-                            this.set('uuid', data.uuid);
+                            that.set('passwd', data.passwd);
+                            that.set('monitor_server', data.monitor_server);
+                            that.set('uuid', data.uuid);
 
-                            $('#machine-manual-monitoring').slideUp();
+                            $('#monitoring-bottom-btns').slideUp();
                             $('#monitoring-commands').slideDown();
                         }
                     });

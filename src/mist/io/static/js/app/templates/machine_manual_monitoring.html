@@ -18,12 +18,13 @@
 
     <div id="monitoring-commands">
 
-		$(command -v sudo) mkdir -p /opt/mistio-collectd;
-		cd /opt/mistio-collectd;
-		$(command -v sudo) wget https://mist.io/core/scripts/deploy_collectd.sh;
-		$(command -v sudo) chmod +x deploy_collectd.sh;
-		$(command -v sudo) ./deploy_collectd.sh {{view.monitor_server}} {{view.uuid}} {{view.passwd}}
-
-    </div>
+        <ol>
+	   <li>	sudo mkdir -p /opt/mistio-collectd; </li>
+	   <li> cd /opt/mistio-collectd; </li>
+           <li> sudo wget https://mist.io/core/scripts/deploy_collectd.sh; </li>
+	   <li> sudo chmod +x deploy_collectd.sh; </li>
+	   <li>	sudo ./deploy_collectd.sh {{view.monitor_server}} {{view.uuid}} {{view.passwd}} </li>
+       </ol>
+    </div> 
 
 </div>
