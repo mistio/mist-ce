@@ -35,6 +35,9 @@ define('app/views/machine_manual_monitoring', ['app/views/templated', 'ember'],
 
 
                 associateClicked: function() {
+
+
+
                     var that = this;
                     var machine = this._parentView._parentView.machine;
                     Mist.machineKeysController.openKeyList(this._parentView._parentView.machine, function(success) {

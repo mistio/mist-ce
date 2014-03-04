@@ -1,30 +1,31 @@
 <div id="machine-manual-monitoring">
 
-	<p>Mist.io cannot install the collectd monitoring deamon on your server
-	   because you have not provided any SSH keys</p>
-	<p>You can either associate a key or install collectd manualy: </p>
+    <div id="machine-manual-monitoring-message">
+        <p>Mist.io cannot install the collectd monitoring deamon on your server
+        because you have not provided any SSH keys</p>
+        <p>You can either associate a key or install collectd manualy: </p>
+    </div>
 
-    <div id="monitoring-bottom-btns">
-	    <div data-rule="ui-grid-a">
-	        <div class="ui-block-a">
-	            <button {{action "associateClicked" target="view"}}>Associate key</button>
-	        </div>
-	        <div class="ui-block-b">
-	            <button {{action "manualInstallationClicked" target="view"}}>Manual installation</button>
-	        </div>
-	    </div>
+    <div id="machine-manual-monitoring-btns">
+        <div data-rule="ui-grid-a">
+            <div class="ui-block-a">
+                <button {{action "associateClicked" target="view"}}>Associate key</button>
+            </div>
+            <div class="ui-block-b">
+                <button {{action "manualInstallationClicked" target="view"}}>Manual installation</button>
+            </div>
+        </div>
     </div>
 
 
-    <div id="monitoring-commands">
-
+    <div id="machine-manual-monitoring-commands">
         <ol>
-	   <li>	sudo mkdir -p /opt/mistio-collectd; </li>
-	   <li> cd /opt/mistio-collectd; </li>
-           <li> sudo wget https://mist.io/core/scripts/deploy_collectd.sh; </li>
-	   <li> sudo chmod +x deploy_collectd.sh; </li>
-	   <li>	sudo ./deploy_collectd.sh {{view.monitor_server}} {{view.uuid}} {{view.passwd}} </li>
-       </ol>
-    </div> 
+            <li> sudo mkdir -p /opt/mistio-collectd; </li>
+            <li> cd /opt/mistio-collectd; </li>
+            <li> sudo wget https://mist.io/core/scripts/deploy_collectd.sh; </li>
+            <li> sudo chmod +x deploy_collectd.sh; </li>
+            <li> sudo ./deploy_collectd.sh {{view.monitor_server}} {{view.uuid}} {{view.passwd}} </li>
+        </ol>
+    </div>
 
 </div>
