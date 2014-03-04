@@ -19,13 +19,29 @@
     </div>
 
     <div id="machine-manual-monitoring-commands">
+
+        <p>Run the following commands on your server: </p>
         <ol>
-            <li><span class="manual-command"> sudo mkdir -p /opt/mistio-collectd; </span></li>
-            <li><span class="manual-command"> cd /opt/mistio-collectd; </span></li>
-            <li><span class="manual-command"> sudo wget https://mist.io/core/scripts/deploy_collectd.sh; </span></li>
-            <li><span class="manual-command"> sudo chmod +x deploy_collectd.sh; </span></li>
+            <li><span class="manual-command"> sudo mkdir -p /opt/mistio-collectd </span></li>
+            <li><span class="manual-command"> cd /opt/mistio-collectd </span></li>
+            <li><span class="manual-command"> sudo wget https://mist.io/core/scripts/deploy_collectd.sh </span></li>
+            <li><span class="manual-command"> sudo chmod +x deploy_collectd.sh </span></li>
             <li><span class="manual-command"> sudo ./deploy_collectd.sh {{view.monitor_server}} {{view.uuid}} {{view.passwd}} <span></li>
         </ol>
+
+        <p>Or if you prefer, this one liner</p>
+        <ul>
+            <li>
+                <span class="manual-command">
+                    sudo mkdir -p /opt/mistio-collectd &&
+                    cd /opt/mistio-collectd &&
+                    sudo wget https://mist.io/core/scripts/deploy_collectd.sh &&
+                    sudo chmod +x deploy_collectd.sh  &&
+                    sudo ./deploy_collectd.sh {{view.monitor_server}} {{view.uuid}} {{view.passwd}}
+                </span>
+            </li>
+        </ul>
+        <p>After you've run the above commands, refresh the page and monitoring graphs will appear!</p>
     </div>
 
 </div>
