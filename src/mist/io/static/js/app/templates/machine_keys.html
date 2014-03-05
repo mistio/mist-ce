@@ -65,3 +65,39 @@
         </li>
     </ul>
 </div>
+
+<div id="userPort-popup" class="mid-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
+
+    <div data-role="header">
+        <h2 style='margin-left:10%;margin-right:10%;'>Machine Details</h2>
+    </div>
+
+    <div data-role="content">
+        <div style='font-size:13px;margin-bottom:5px;'>
+            We could not associate your key.
+            Please provide user and ssh port
+        </div>
+        <label for="user">User:</label>
+        {{view Mist.TextField
+               id="user"
+               placeholder="root"
+               valueBinding="Mist.machineKeysController.user"}}
+
+        <label for="port">Port:</label>
+        {{view Mist.TextField
+               id="port"
+               placeholder="22"
+               valueBinding="Mist.machineKeysController.port"}}
+
+        {{#if Mist.loginController.loggingIn}}
+        <div class="ajax-loader"></div>
+        {{/if}}
+
+        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <a data-role="button" onclick="$('#userPort-popup').popup('close')">Cancel</a>
+            <button id="tryAssociate" data-theme="b" {{action "customAssociateClicked" target="view"}}>Try Again</button>
+        </div>
+
+    </div>
+
+</div>

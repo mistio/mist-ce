@@ -11,9 +11,12 @@ define('app/controllers/machine_keys', ['ember'],
              *  Properties
              */
 
+            user: null,
+            port: null,
             view: null,
             machine: null,
             callback: null,
+            lastAssocKey: null,
 
 
             /**
@@ -59,8 +62,9 @@ define('app/controllers/machine_keys', ['ember'],
             },
 
 
-            associate: function (key, callback) {
-                key.associate(this.machine, callback);
+            associate: function (key, callback, user, port) {
+                this.set('lastAssocKey',key);
+                key.associate(this.machine, callback, user, port);
             },
 
 
@@ -84,6 +88,7 @@ define('app/controllers/machine_keys', ['ember'],
                 Ember.run(this, function () {
                     this.set('machine', null);
                     this.set('callback', null);
+                    this.set('lastAssocKey',null);
                 });
             },
 
@@ -116,6 +121,7 @@ define('app/controllers/machine_keys', ['ember'],
                 if (this.callback) this.callback(success, action);
             },
 
+            
 
             /**
              * 
@@ -125,7 +131,17 @@ define('app/controllers/machine_keys', ['ember'],
 
             machineObserver: function () {
                 Ember.run.once(this, '_updateKeys');
-            }.observes('machine')
+            }.observes('machine'),
+
+
+            portFieldObserver: function(){
+                
+                // Allow only numerical values
+                if(this.port)
+                    this.set('port',this.port.replace(/\D/g, ''));
+
+
+            }.observes('port')
         });
     }
 );
