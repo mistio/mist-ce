@@ -124,11 +124,6 @@ define(['app/models/key'],
                 if(typeof user == 'undefined') user = null;
                 if(typeof port == 'undefined') port = null;
 
-                // DEBUG TODO Remove it
-                info("Associating Key");
-                console.log("User: " + user);
-                console.log("Port: " + port);
-
                 this.set('associatingKey', true);
                 Mist.ajax.PUT('/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + keyId, {
                     'host': machine.getHost(),
@@ -139,11 +134,7 @@ define(['app/models/key'],
                 }).error(function(responseText, status) {
 
                     // Try another user/port
-                    if(status == 401)
-                        $("#userPort-popup").popup( "open" );
-                    else
-                        Mist.notificationController.notify('Failed to associate key');
-
+                    $("#userPort-popup").popup( "open" );
                 }).complete(function(success) {
                     that.set('associatingKey', false);
                     if (callback) callback(success);
