@@ -1,47 +1,25 @@
-<div id="machine-manual-monitoring">
+<div id="manual-monitoring-popup" class="large-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
 
-    <div id="machine-manual-monitoring-message">
-        <p>Mist.io cannot install the collectd monitoring deamon on your server
-        because you have not provided any SSH keys</p>
-        <p>You can either associate a key or install collectd manualy: </p>
+    <div data-role="header" data-theme="b">
+        <h3>Enable Monitoring</h3>
     </div>
 
-    <div id="machine-manual-monitoring-btns" data-rule="ui-grid-b">
-        <div class="ui-block-a">
-            <a class="ui-btn ui-corner-all ui-btn-d" {{action "associateClicked" target="view"}}>Associate key</a>
+    <div data-role="content">
+
+        <p>Run this command on your server: </p>
+
+        <div id="manual-monitoring-command">
+            sudo mkdir -p /opt/mistio-collectd &&
+            cd /opt/mistio-collectd &&
+            sudo wget https://mist.io/core/scripts/deploy_collectd.sh &&
+            sudo chmod +x deploy_collectd.sh  &&
+            sudo ./deploy_collectd.sh
+            {{Mist.machineManualMonitoringController.commandMonitorServer}} {{Mist.machineManualMonitoringController.commandUuid}} {{Mist.machineManualMonitoringController.commandPasswd}}
         </div>
-        <div class="ui-block-b">
-            <a class="ui-btn ui-corner-all ui-btn-d" {{action "manualInstallationClicked" target="view"}}>Manual installation</a>
-        </div>
-        <div class="ui-block-c">
-            <a class="ui-btn ui-corner-all" {{action "backClicked" target="view"}}>Back</a>
+
+        <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+            <a class="ui-btn ui-corner-all" {{action "cancelClicked" target="view"}}>Cancel</a>
+            <a class="ui-btn ui-btn-d ui-corner-all" {{action "doneClicked" target="view"}}>Done</a>
         </div>
     </div>
-
-    <div id="machine-manual-monitoring-commands">
-
-        <p>Run the following commands on your server: </p>
-        <ol>
-            <li><span class="manual-command"> sudo mkdir -p /opt/mistio-collectd </span></li>
-            <li><span class="manual-command"> cd /opt/mistio-collectd </span></li>
-            <li><span class="manual-command"> sudo wget https://mist.io/core/scripts/deploy_collectd.sh </span></li>
-            <li><span class="manual-command"> sudo chmod +x deploy_collectd.sh </span></li>
-            <li><span class="manual-command"> sudo ./deploy_collectd.sh {{view.monitor_server}} {{view.uuid}} {{view.passwd}} <span></li>
-        </ol>
-
-        <p>Or if you prefer, this one liner</p>
-        <ul>
-            <li>
-                <span class="manual-command">
-                    sudo mkdir -p /opt/mistio-collectd &&
-                    cd /opt/mistio-collectd &&
-                    sudo wget https://mist.io/core/scripts/deploy_collectd.sh &&
-                    sudo chmod +x deploy_collectd.sh  &&
-                    sudo ./deploy_collectd.sh {{view.monitor_server}} {{view.uuid}} {{view.passwd}}
-                </span>
-            </li>
-        </ul>
-        <p>After you've run the above commands, refresh the page and monitoring graphs will appear!</p>
-    </div>
-
 </div>

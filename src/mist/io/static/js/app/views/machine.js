@@ -245,11 +245,7 @@ define('app/views/machine', ['app/views/mistscreen'],
                                 });
                                 Mist.confirmationController.show();
                             } else {
-                                // Hide enable button
-                                $('#enable-monitoring-bundle').slideUp();
-
-                                // Show manual monitoring instructions
-                                $('#machine-manual-monitoring').slideDown();
+                                Mist.machineManualMonitoringController.open(this.machine);
                             }
                         } else {
                             Mist.notificationController.set('msgHeader', 'No plan');

@@ -73,33 +73,19 @@
     left: 6px;
 }
 
-#single-machine-page #machine-manual-monitoring,
-#single-machine-page  #machine-manual-monitoring-commands {
-    display: none;
-}
-#single-machine-page  #machine-manual-monitoring-btns div {
-    display: inline-block;
-    float: none;
-}
-
-#single-machine-page #monitoring-commands {
-    text-align: left;
-}
-
-.manual-command {
-    background-color: #C4C4ED;
-    border: 1px solid #9797C0;
-    display: block;
-    padding: 1px 1px 1px 8px;
-    width: 100%;
+#manual-monitoring-popup #manual-monitoring-command {
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border: 1px solid #AAA;
+    font-family: monospace;
+    border-radius: 4px;
+    text-shadow: none;
+    background: #444;
+    font-size: 11px;
+    color: #efeff1;
+    padding: 6px;
 }
 
-#machine-manual-monitoring-commands li {
-    margin-left: -20px;
-    margin-right: 20px;
-    margin-top: 5px;
-    text-align: left;
-}
 
 /* Conditional for < 600px */
 @media only screen and  (max-width: 400px) {

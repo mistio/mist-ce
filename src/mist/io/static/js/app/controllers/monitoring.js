@@ -37,46 +37,9 @@ define('app/controllers/monitoring', [
             }.on('init'),
 
 
-            getMonitoringCommand: function(machine, callback) {
-
-                var that = this;
-                machine.set('enablingMonitoring', true);
-
-                Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring', {
-                    'action': 'enable',
-                    'dns_name': machine.extra.dns_name ? machine.extra.dns_name : 'n/a',
-                    'public_ips': machine.public_ips ? machine.public_ips : [],
-                    'name': machine.name ? machine.name : machine.id,
-                    'no_ssh': true
-                }).success(function(data) {
-
-                    // Give some time to graphite to collect data (fix for new machines)
-                   // window.setTimeout(function() {
-                      //  machine.set('hasMonitoring', true);
-                        machine.set('enablingMonitoring', false);
-                    //}, 11000); // TODO: this seems wrong
-
-                    Mist.set('authenticated', true);
-
-                }).error(function(message, statusCode) {
-
-                    machine.set('enablingMonitoring', false);
-
-                    if (statusCode == 402){
-                        Mist.notificationController.timeNotify(message, 5000);
-                    } else {
-                        Mist.notificationController.notify('Error when changing monitoring to ' + machine.name);
-                    }
-
-                }).complete(function(success, data) {
-                    if (callback) callback(success, data);
-                });
-            },
-
-
             changeMonitoring: function(machine, callback) {
+
                  var that = this;
-                 //this.set('changingMonitoring', true);
                  if (machine.hasMonitoring) {
                      machine.set('disablingMonitoring', true);
                  } else {

@@ -11,6 +11,7 @@
     </div>
 
     <div data-role="header" data-theme="a" class="single-machine-header">
+
         <span class="single-view-icon-wrapper">
             <span id="single-view-provider-icon" {{bind-attr class="view.providerIconClass"}}></span>
         </span>
@@ -130,6 +131,7 @@
             {{else}}
 
                 <div class="monitoring-dialog-container" id="monitoring-disabled">
+
                     <div id="enable-monitoring-bundle">
                         <div>Monitoring is currently disabled</div>
                         <a id="enable-monitor-btn"
@@ -138,7 +140,7 @@
                            data-theme="d"
                            {{action "enableMonitoringClicked" target="view"}}>Enable</a>
                     </div>
-                    {{view Mist.machineManualMonitoringView}}
+
                 </div>
 
             {{/if}}
@@ -268,6 +270,8 @@
     {{view Mist.machinePowerView}}
 
     {{view Mist.confirmationDialog}}
+
+    {{view Mist.machineManualMonitoringView}}
 
     <div id="manual-monitoring-popup" class="mid-popup" data-role="popup" data-transition="popp"
          data-overlay-theme="b" data-disimissible="false">

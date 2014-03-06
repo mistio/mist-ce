@@ -42,6 +42,7 @@ define( 'app', [
     'app/controllers/keys',
     'app/controllers/machine_tags',
     'app/controllers/machine_shell',
+    'app/controllers/machine_manual_monitoring',
     'app/controllers/rules',
     'app/views/templated',
     'app/views/home',
@@ -93,6 +94,7 @@ define( 'app', [
                 KeysController,
                 MachineTagsController,
                 MachineShellController,
+                MachineManualMonitoringController,
                 RulesController,
                 TemplatedView,
                 Home,
@@ -299,8 +301,8 @@ define( 'app', [
         App.set('loginController', LoginController.create());
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
-        App.set('keyEditController', KeyEditController.create());   
-        App.set('backendsController', BackendsController.create());     
+        App.set('keyEditController', KeyEditController.create());
+        App.set('backendsController', BackendsController.create());
         App.set('machineAddController', MachineAddController.create());
         App.set('backendAddController', BackendAddController.create());
         App.set('monitoringController', MonitoringController.create());
@@ -311,6 +313,7 @@ define( 'app', [
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
         App.set('machinePowerController', MachinePowerController.create());
+        App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
 
 
         // Ember custom widgets
@@ -393,9 +396,9 @@ define( 'app', [
 
 
     /**
-     * 
+     *
      *  Ajax wrapper constructor
-     * 
+     *
      */
 
     function AJAX (csrfToken) {
@@ -608,9 +611,9 @@ var collectd_install_target = false, collectd_uninstall_target = false, collectd
 function appendShell(output, command_id) {
 
     var machine = Mist.machineShellController.machine;
-    
+
     if (!machine) return;
-    
+
     var command = machine.commandHistory.findBy('id', command_id);
 
     if (!command) return;
@@ -623,7 +626,7 @@ function appendShell(output, command_id) {
 
     command.set('response', command.response + output);
     Ember.run.next(function(){
-        $('.output').scrollTop(1000000);        
+        $('.output').scrollTop(1000000);
     });
 }
 
