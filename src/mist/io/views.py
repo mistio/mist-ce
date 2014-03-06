@@ -382,6 +382,11 @@ def associate_key(request):
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
+    ssh_user = request.json_body.get('user', 'root')
+    try:
+        ssh_port = int(request.json_body.get('port', 22))
+    except:
+        ssh_port = 22
     try:
         host = request.json_body.get('host')
     except:
@@ -389,7 +394,7 @@ def associate_key(request):
     if not host:
         raise RequiredParameterMissingError('host')
     user = user_from_request(request)
-    methods.associate_key(user, key_id, backend_id, machine_id, host)
+    methods.associate_key(user, key_id, backend_id, machine_id, host, username=ssh_user, port=ssh_port)
     return user.keypairs[key_id].machines
 
 
