@@ -67,7 +67,7 @@ define('app/views/machine_keys', ['app/views/templated','ember'],
 
                 customAssociateClicked: function(){
                     var machinesCtrl = Mist.machineKeysController;
-                    $("#userPort-popup").popup('close');
+                    $("#machine-userPort-popup").popup('close');
                     // Possible change this to selected key TODO check
                     machinesCtrl.associate(machinesCtrl.lastAssocKey,null,machinesCtrl.user,machinesCtrl.port);
                 },

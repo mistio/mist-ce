@@ -139,8 +139,9 @@ define(['app/models/key'],
                 }).error(function(responseText, status) {
 
                     // Try another user/port
-                    if(status == 401)
-                        $("#userPort-popup").popup( "open" );
+                    if(status == 401){
+                        Mist.machineKeysController.openSSH_Details();
+                    }
                     else
                         Mist.notificationController.notify('Failed to associate key');
 

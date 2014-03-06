@@ -55,6 +55,22 @@ define('app/controllers/machine_keys', ['ember'],
                 this.view._actions.associateClicked();
             },
 
+            openSSH_Details: function() {
+
+                var user = this.user ? this.user : "root";
+                var port = this.port ? this.port : "22";
+
+                $("#machine-userPort-popup .message").text("Cannot connect as " + user + " on port " + port );
+                $("#machine-userPort-popup").find("#user").val("");
+                $("#machine-userPort-popup").find("#port").val("");
+                $("#machine-userPort-popup").popup( "open" );
+            },
+
+            closeSSH_Details: function() {
+
+                this._cleanSSH_UserPortPopup();
+                $("#machine-userPort-popup").popup( "close" );
+            },
 
             close: function () {
                 $('#machine-keys-panel').panel('close');
@@ -86,9 +102,11 @@ define('app/controllers/machine_keys', ['ember'],
 
             _clear: function () {
                 Ember.run(this, function () {
+
                     this.set('machine', null);
                     this.set('callback', null);
-                    this.set('lastAssocKey',null);
+
+                    this._cleanSSH_UserPortPopup();
                 });
             },
 
@@ -119,6 +137,17 @@ define('app/controllers/machine_keys', ['ember'],
 
             _giveCallback: function (success, action) {
                 if (this.callback) this.callback(success, action);
+            },
+
+            _cleanSSH_UserPortPopup : function(){
+
+                this.set('lastAssocKey',null);
+                this.set('user',null);
+                this.set('port',null);
+
+                // TODO Change to children selector for optimize
+                $("#machine-userPort-popup").find("#user").val("")
+                $("#machine-userPort-popup").find("#port").val("")
             },
 
             

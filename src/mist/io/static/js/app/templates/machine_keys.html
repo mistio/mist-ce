@@ -65,17 +65,16 @@
         </li>
     </ul>
 </div>
+<!-- data-position-to="#machine-keys-panel" -->
+<div id="machine-userPort-popup" class="large-popup" data-role="popup" data-overlay-theme="b" data-position-to="#machine-keys-panel"  data-transition="pop">
 
-<div id="userPort-popup" class="mid-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
-
-    <div data-role="header">
-        <h2 style='margin-left:10%;margin-right:10%;'>Machine Details</h2>
+    <div data-role="header" data-theme="b">
+        <h2 class='title'>SSH user & port</h2>
     </div>
 
     <div data-role="content">
-        <div style='font-size:13px;margin-bottom:5px;'>
-            We could not associate your key.
-            Please provide user and ssh port
+        <div class="message">
+            Cannot connect as root on port 22
         </div>
         <label for="user">User:</label>
         {{view Mist.TextField
@@ -89,13 +88,9 @@
                placeholder="22"
                valueBinding="Mist.machineKeysController.port"}}
 
-        {{#if Mist.loginController.loggingIn}}
-        <div class="ajax-loader"></div>
-        {{/if}}
-
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a data-role="button" onclick="$('#userPort-popup').popup('close')">Cancel</a>
-            <button id="tryAssociate" data-theme="b" {{action "customAssociateClicked" target="view"}}>Try Again</button>
+            <a data-role="button" {{action "closeSSH_Details" target="Mist.machineKeysController"}}>Cancel</a>
+            <a id="tryAssociate" data-role="button" data-theme="d" {{action "customAssociateClicked" target="view"}}>Retry</a>
         </div>
 
     </div>
