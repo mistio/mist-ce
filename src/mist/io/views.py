@@ -382,7 +382,7 @@ def associate_key(request):
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-    ssh_user = request.json_body.get('user', 'root')
+    ssh_user = request.json_body.get('user', None)
     try:
         ssh_port = int(request.json_body.get('port', 22))
     except:
