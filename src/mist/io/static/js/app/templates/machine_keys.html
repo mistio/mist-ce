@@ -23,13 +23,13 @@
             {{/each}}
         </ul>
         {{/if}}
-        
+
         {{#if Mist.keysController.associatingKey}}
             <div class="ajax-loader"></div>
         {{else}} {{#if Mist.keysController.disassociatingKey}}
             <div class="ajax-loader"></div>
         {{/if}} {{/if}}
-        
+
         <a data-role="button" data-theme="a" {{action "backClicked" target="view"}}>Back</a>
 
     </div>
@@ -38,13 +38,13 @@
 
 {{view Mist.keyAddView}}
 
-<div id="key-actions-popup" class="tiny-popup" data-role="popup" data-overlay-theme="b" data-transition="flip" 
+<div id="key-actions-popup" class="tiny-popup" data-role="popup" data-overlay-theme="b" data-transition="flip"
                                                                                         data-position-to="#machine-keys"
                                                                                         data-theme="b">
     <div data-role="header">
         <h1>Actions</h1>
     </div>
-    
+
     <div data-role="content">
         <button data-theme="a" {{action "removeClicked" target="view"}}>Remove</button>
         <button data-theme="a" {{action "probeClicked" target="view"}}>Probe</button>
@@ -60,7 +60,7 @@
             <a {{action "nonAssociatedKeyClicked" this target="view"}}>{{this.id}}</a>
         </li>
         {{/each}}
-        <li data-icon="false" data-theme="d"> 
+        <li data-icon="false" data-theme="d">
             <a {{action "newKeyClicked" target="view"}}>New key</a>
         </li>
     </ul>

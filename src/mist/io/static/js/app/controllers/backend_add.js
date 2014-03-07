@@ -15,10 +15,10 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
             formReady: null,
 
             newBackendKey: null,
+            newBackendPort: null,
             newBackendProvider: null,
             newBackendFirstField: null,
             newBackendSecondField: null,
-            newBackendThirdField: null,            
             newBackendOpenStackURL: null,
             newBackendOpenStackRegion: null,
             newBackendOpenStackTenant: null,
@@ -56,10 +56,10 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     this.newBackendProvider.provider,
                     this.newBackendFirstField,
                     this.newBackendSecondField,
-                    this.newBackendThirdField,                    
                     this.newBackendOpenStackURL,
                     this.newBackendOpenStackRegion,
                     this.newBackendOpenStackTenant,
+                    this.newBackendPort,
                     this.newBackendKey.id,
                     function (success, backend) {
                         that._giveCallback(success, backend);
@@ -80,9 +80,9 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
             _clear: function () {
 
                 this.set('callback', null)
+                    .set('newBackendPort', null)
                     .set('newBackendFirstField', null)
                     .set('newBackendSecondField', null)
-                    .set('newBackendThirdField', null)                    
                     .set('newBackendOpenStackURL', null)
                     .set('newBackendOpenStackRegion', null)
                     .set('newBackendOpenStackTenant', null)
@@ -98,11 +98,11 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
             _updateFormReady: function () {
                 var ready = false;
                 if ('provider' in this.newBackendProvider) { // Filters out the "Select provider" dummy provider
-                    
+
                     if (this.newBackendFirstField && this.newBackendSecondField) {
-                        
+
                         ready = true;
-                        
+
                         if (this.newBackendProvider.provider == 'openstack') { // Pure Openstack
                             if (!this.newBackendOpenStackURL) {
                                 ready = false;

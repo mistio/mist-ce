@@ -1,7 +1,7 @@
 define('app/views/backend_add', ['app/views/templated', 'ember'],
     /**
      *  Add Backend View
-     * 
+     *
      *  @returns Class
      */
     function(TemplatedView) {
@@ -13,11 +13,11 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
 
             firstFieldLabel: 'API Key',
             secondFieldLabel: 'API Secret',
-            thirdFieldLabel: 'Port',
+
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
             updateAddButton: function() {
@@ -30,9 +30,9 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
 
 
             /**
-             * 
+             *
              *  Actions
-             * 
+             *
              */
 
             actions: {
@@ -41,7 +41,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                 selectProvider: function(provider) {
 
                     Mist.backendAddController._clear();
-                    
+
                     $('#new-backend-second-field').attr('type', 'password');
                     $('#new-backend-provider').collapsible('collapse');
                     $('#openstack-bundle').hide();
@@ -71,9 +71,8 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                     } else if (provider.provider.indexOf('bare_metal') > -1) {
                         this.set('firstFieldLabel', 'Hostname');
                         this.set('secondFieldLabel', 'User');
-                        this.set('thirdFieldLabel', 'Port');                        
                         Mist.backendAddController.set('newBackendSecondField', 'root');
-                        Mist.backendAddController.set('newBackendThirdField', 22);
+                        Mist.backendAddController.set('newBackendPort', 22);
                         $('#new-backend-key .ui-listview').listview('refresh');
                         $('#new-backend-second-field').attr('type', '');
                         $('#baremetal-bundle').show();
@@ -125,9 +124,9 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
 
 
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
             updateDoneButtonObserver: function() {
