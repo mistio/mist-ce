@@ -471,7 +471,8 @@ def connect_provider(backend):
                 ex_force_auth_version=backend.auth_version or '2.0_password',
                 ex_force_auth_url=backend.apiurl,
                 ex_tenant_name=backend.tenant_name,
-                ex_force_service_region=backend.region
+                ex_force_service_region=backend.region,
+                ex_force_base_url="https://compute0.cw-labs.net/v2/be118b8f2e4048888cc5e4aa937e78df",
             )
     elif backend.provider == Provider.LINODE:
         conn = driver(backend.apisecret)
