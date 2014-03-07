@@ -28,9 +28,9 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             loadingMachines: false,
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
             load: function() {
@@ -49,12 +49,12 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
 
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
-            addBackend: function(title, provider, apiKey, apiSecret, apiUrl, region, tenant, key, callback) {
+            addBackend: function(title, provider, apiKey, apiSecret, apiUrl, region, tenant, port, key, callback) {
                 var that = this;
                 this.set('addingBackend', true);
                 Mist.ajax.POST('/backends', {
@@ -66,6 +66,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     'tenant_name' : tenant,
                     'region'      : region,
                     'machine_key' : key,
+                    'machine_port': port,      // For bare-metal
                     'machine_ip'  : apiKey,    // For bare-metal
                     'machine_user': apiSecret  // For bare-metal
                 }).success(function(backend) {
@@ -125,12 +126,12 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     if (callback) callback(success);
                 });
             },
- 
- 
+
+
             probeMachine: function(machine, keyId, callback) {
 
                 // TODO: This should be moved inside machines controller
-                
+
                 function loadToColor(load, cores) {
                     var weightedLoad = load / cores;
                     if (weightedLoad > 1.2) {
@@ -179,12 +180,12 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     if (data.loadavg) {
                         machine.set('loadavg1', loadToColor(data.loadavg[0], data.cores));
                         machine.set('loadavg5', loadToColor(data.loadavg[1], data.cores));
-                        machine.set('loadavg15', loadToColor(data.loadavg[2], data.cores));                          
-                    }                
+                        machine.set('loadavg15', loadToColor(data.loadavg[2], data.cores));
+                    }
                     machine.set('loadavg', data.loadavg);
                     machine.set('loss', data.packets_loss);
                     machine.set('latency', Math.floor(data.rtt_avg));
-                    
+
                 }).error(function(message) {
                     if (!machine.backend || !machine.backend.enabled) return;
                     if (key) Mist.notificationController.notify(message);
@@ -241,7 +242,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
 
                 if (backendId) {
                     var backend = this.getBackend(backendId);
-                    if (backend) 
+                    if (backend)
                         return backend.getMachine(machineId);
                     return null;
                 }
@@ -265,9 +266,9 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
 
 
             /**
-             * 
+             *
              *  Psudo-Private Methods
-             * 
+             *
              */
 
             _reload: function() {
@@ -353,7 +354,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     this.set('machineCount', counter);
                     this.trigger('onMachineListChange');
                 });
-            },            
+            },
 
 
             _updateLoadingImages: function() {
@@ -391,20 +392,20 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
 
 
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
             imageCountObserver: function() {
                 Ember.run.once(this, '_updateImageCount');
             }.observes('content.@each.imageCount'),
- 
- 
+
+
             mahcineCountObserver: function() {
                 Ember.run.once(this, '_updateMachineCount');
             }.observes('content.@each.machineCount'),
- 
+
 
             loadingImagesObserver: function() {
                 Ember.run.once(this, '_updateLoadingImages');

@@ -45,7 +45,7 @@ HPCLOUD_AUTH_URL = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/to
 @core_wrapper
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 machine_hostname="", region="", machine_key="", machine_user="",
-                remove_on_error=True):
+                port=22, remove_on_error=True):
     """Adds a new backend to the user and returns the new backend_id."""
 
     if not provider:
@@ -66,6 +66,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
 
         machine = model.Machine()
         machine.dns_name = machine_hostname
+        machine.ssh_port = port
         machine.public_ips = [machine_hostname]
         machine_id = machine_hostname.replace('.', '').replace(' ', '')
         machine.name = machine_hostname
@@ -85,7 +86,8 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 try:
                     ssh_command(
                         user, backend_id, machine_id, machine_hostname, 'uptime',
-                        key_id=machine_key, username=machine_user, password=None
+                        key_id=machine_key, username=machine_user, password=None,
+                        port=port
                     )
                 except MachineUnauthorizedError as exc:
                     # remove backend
@@ -311,7 +313,7 @@ def edit_key(user, new_key, old_key):
 
 
 @core_wrapper
-def associate_key(user, key_id, backend_id, machine_id, host=''):
+def associate_key(user, key_id, backend_id, machine_id, host='', username=None, port=22):
     """Associates a key with a machine.
 
     If host is set it will also attempt to actually deploy it to the
@@ -365,12 +367,12 @@ def associate_key(user, key_id, backend_id, machine_id, host=''):
 
     try:
         # deploy key
-        ssh_command(user, backend_id, machine_id, host, command)
+        ssh_command(user, backend_id, machine_id, host, command, username=username, port=port)
     except MachineUnauthorizedError:
         # couldn't deploy key
         try:
             # maybe key was already deployed?
-            ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
+            ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id, username=username, port=port)
             log.info("Key was already deployed, local association created.")
         except MachineUnauthorizedError:
             # oh screw this
@@ -384,7 +386,7 @@ def associate_key(user, key_id, backend_id, machine_id, host=''):
         # there is no need to manually set the association in keypair.machines
         # that is automatically handled by Shell, if it is configured by
         # shell.autoconfigure (which ssh_command does)
-        ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id)
+        ssh_command(user, backend_id, machine_id, host, 'uptime', key_id=key_id, username=username, port=port)
         log.info("Key associated and deployed succesfully.")
 
 
@@ -1110,7 +1112,7 @@ def destroy_machine(user, backend_id, machine_id):
 
 
 def ssh_command(user, backend_id, machine_id, host, command,
-                key_id=None, username=None, password=None):
+                key_id=None, username=None, password=None, port=22):
     """
     We initialize a Shell instant (for mist.io.shell).
 
@@ -1121,7 +1123,7 @@ def ssh_command(user, backend_id, machine_id, host, command,
 
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
-                                           key_id, username, password)
+                                           key_id, username, password, port)
     output = shell.command(command)
     shell.disconnect()
     return output

@@ -11,24 +11,27 @@ define('app/controllers/machine_keys', ['ember'],
              *  Properties
              */
 
+            user: null,
+            port: null,
             view: null,
             machine: null,
             callback: null,
+            lastAssocKey: null,
 
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
             load: function() {
-                
+
                 // Add event listeners
                 Mist.keysController.on('onKeyListChange', this, '_updateKeys');
                 Mist.keysController.on('onKeyAssociate', this, '_updateKeys');
                 Mist.keysController.on('onKeyDisassociate', this, '_updateKeys');
-                
+
             }.on('init'),
 
 
@@ -52,6 +55,22 @@ define('app/controllers/machine_keys', ['ember'],
                 this.view._actions.associateClicked();
             },
 
+            openSSH_Details: function() {
+
+                var user = this.user ? this.user : "root";
+                var port = this.port ? this.port : "22";
+
+                $("#machine-userPort-popup .message").text("Cannot connect as " + user + " on port " + port );
+                $("#machine-userPort-popup").find("#user").val("");
+                $("#machine-userPort-popup").find("#port").val("");
+                $("#machine-userPort-popup").popup( "open" );
+            },
+
+            closeSSH_Details: function() {
+
+                this._cleanSSH_UserPortPopup();
+                $("#machine-userPort-popup").popup( "close" );
+            },
 
             close: function () {
                 $('#machine-keys-panel').panel('close');
@@ -59,8 +78,9 @@ define('app/controllers/machine_keys', ['ember'],
             },
 
 
-            associate: function (key, callback) {
-                key.associate(this.machine, callback);
+            associate: function (key, callback, user, port) {
+                this.set('lastAssocKey',key);
+                key.associate(this.machine, callback, user, port);
             },
 
 
@@ -70,7 +90,26 @@ define('app/controllers/machine_keys', ['ember'],
 
 
             disassociate: function(key, callback) {
-                key.disassociate(this.machine, callback);
+                // Check if this is the last key of the machine
+                if (Mist.keysController.getMachineKeysCount(this.machine) == 1) {
+                    var machine = this.machine;
+                    Mist.confirmationController.set('title', 'Disassociate key');
+                    Mist.confirmationController.set('text', 'You are about to remove the last key associated with "' +
+                        machine.name + '" machine and you won\'t be able to access it anymore. Are you sure ' +
+                        'you want to proceed?');
+                    Mist.confirmationController.set('callback', function () {
+                        key.disassociate(machine, callback);
+                    });
+
+                    // Open confirmation just a bit later
+                    // so that key actions popup has enough
+                    // time to close
+                    Ember.run.later(function() {
+                        Mist.confirmationController.show();
+                    }, 300);
+                } else {
+                    key.disassociate(this.machine, callback);
+                }
             },
 
 
@@ -82,15 +121,18 @@ define('app/controllers/machine_keys', ['ember'],
 
             _clear: function () {
                 Ember.run(this, function () {
+
                     this.set('machine', null);
                     this.set('callback', null);
+
+                    this._cleanSSH_UserPortPopup();
                 });
             },
 
 
             _updateKeys: function () {
                 if (!this.machine) return;
-                
+
                 var that = this;
                 Ember.run(function () {
                     var found = false;
@@ -116,16 +158,38 @@ define('app/controllers/machine_keys', ['ember'],
                 if (this.callback) this.callback(success, action);
             },
 
+            _cleanSSH_UserPortPopup : function(){
+
+                this.set('lastAssocKey',null);
+                this.set('user',null);
+                this.set('port',null);
+
+                // TODO Change to children selector for optimize
+                $("#machine-userPort-popup").find("#user").val("")
+                $("#machine-userPort-popup").find("#port").val("")
+            },
+
+            
 
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
             machineObserver: function () {
                 Ember.run.once(this, '_updateKeys');
-            }.observes('machine')
+            }.observes('machine'),
+
+
+            portFieldObserver: function(){
+                
+                // Allow only numerical values
+                if(this.port)
+                    this.set('port',this.port.replace(/\D/g, ''));
+
+
+            }.observes('port')
         });
     }
 );

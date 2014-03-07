@@ -1,7 +1,7 @@
-<div id="add-backend-panel" 
-     class="side-panel" 
-     data-role="panel" 
-     data-position="right" 
+<div id="add-backend-panel"
+     class="side-panel"
+     data-role="panel"
+     data-position="right"
      data-display="overlay"
      data-theme="b">
 
@@ -14,9 +14,9 @@
         <label>1. Provider:</label>
         <div id="new-backend-provider"
              class="mist-select"
-             data-role="collapsible" 
-             data-iconpos="right" 
-             data-collapsed-icon="arrow-d" 
+             data-role="collapsible"
+             data-iconpos="right"
+             data-collapsed-icon="arrow-d"
              data-expanded-icon="arrow-u"
              data-theme="a">
             <h2>{{Mist.backendAddController.newBackendProvider.title}}</h2>
@@ -34,12 +34,12 @@
                    id="new-backend-first-field"
                    data-theme="a"
                    valueBinding="Mist.backendAddController.newBackendFirstField"}}
-    
+
             <label for="new-backend-second-field">3. {{view.secondFieldLabel}}:</label>
             {{view Mist.TextField
                    type="password"
                    id="new-backend-second-field"
-                   data-theme="a"                   
+                   data-theme="a"
                    valueBinding="Mist.backendAddController.newBackendSecondField"}}
         </div>
         <div id="openstack-bundle" data-theme="a">
@@ -54,7 +54,7 @@
                    id="new-backend-openstack-tenant"
                    data-theme="a"
                    valueBinding="Mist.backendAddController.newBackendOpenStackTenant"}}
-            
+
             <div id="non-hp-cloud">
                 <label for="new-backend-openstack-region">6. Region:</label>
                 {{view Mist.TextField
@@ -65,11 +65,17 @@
         </div>
 
         <div id="baremetal-bundle">
-            <label>4. SSH Key:</label>
-            <div id="new-backend-key" 
+            <label for="new-backend-port">4. Port:</label>
+            {{view Mist.TextField
+                   id="new-backend-port"
+                   data-theme="a"
+                   valueBinding="Mist.backendAddController.newBackendPort"}}
+
+            <label>5. SSH Key:</label>
+            <div id="new-backend-key"
                  class="mist-select"
-                 data-role="collapsible" 
-                 data-iconpos="right" 
+                 data-role="collapsible"
+                 data-iconpos="right"
                  data-collapsed-icon="arrow-d"
                  data-expanded-icon="arrow-u"
                  data-theme="a">
