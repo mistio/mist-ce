@@ -66,6 +66,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
 
         machine = model.Machine()
         machine.dns_name = machine_hostname
+        machine.ssh_port = port
         machine.public_ips = [machine_hostname]
         machine_id = machine_hostname.replace('.', '').replace(' ', '')
         machine.name = machine_hostname
