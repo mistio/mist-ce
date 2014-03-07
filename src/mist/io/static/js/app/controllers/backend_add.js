@@ -43,6 +43,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
 
                     //This is the advanced section of OpenStack, by default
                     //hidden
+                    $('#openstack-advanced').val('0').slider('refresh');
                     $('#non-hp-cloud').hide();
                 });
             },

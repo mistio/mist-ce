@@ -120,7 +120,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                 },
 
 
-                advancedClicked: function () {
+                advancedToggled: function () {
                     var advanced = $('#non-hp-cloud');
                     if (advanced.css('display') == 'none') {
                         advanced.slideDown();
