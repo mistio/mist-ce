@@ -17,3 +17,16 @@
 #add-backend-panel .ok-cancel {
     margin-top: 30px;
 }
+
+#add-backend-panel .ui-slider {
+    width: 200px;
+}
+
+#add-backend-panel #non-hp-cloud {
+    margin-top: 20px;
+}
+
+#add-backend-panel #opentack-advanced-wrapper {
+    text-align: center;
+    margin-bottom: -20px;
+}

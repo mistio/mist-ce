@@ -22,6 +22,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
             newBackendOpenStackURL: null,
             newBackendOpenStackRegion: null,
             newBackendOpenStackTenant: null,
+            newBackendOpenStackComputeEndpoint: null,
 
 
             /**
@@ -39,6 +40,11 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                 Ember.run.next(function () {
                     $('.ui-page-active').height($('.ui-panel-open').height());
                     $('body').css('overflow', 'auto');
+
+                    //This is the advanced section of OpenStack, by default
+                    //hidden
+                    $('#openstack-advanced').val('0').slider('refresh');
+                    $('#non-hp-cloud').hide();
                 });
             },
 
@@ -59,6 +65,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     this.newBackendOpenStackURL,
                     this.newBackendOpenStackRegion,
                     this.newBackendOpenStackTenant,
+                    this.newBackendOpenStackComputeEndpoint,
                     this.newBackendPort,
                     this.newBackendKey.id,
                     function (success, backend) {
@@ -86,6 +93,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     .set('newBackendOpenStackURL', null)
                     .set('newBackendOpenStackRegion', null)
                     .set('newBackendOpenStackTenant', null)
+                    .set('newBackendOpenStackComputeEndpoint', null)
                     .set('newBackendKey', {id: 'Select SSH Key'})
                     .set('newBackendProvider', {title: 'Select provider'});
 

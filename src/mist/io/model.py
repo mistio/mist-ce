@@ -92,6 +92,7 @@ class Backend(OODict):
     poll_interval = IntField(10000)
     provider = HtmlSafeStrField()
     ## datacenter = StrField()
+    compute_endpoint = StrField()
 
     machines = make_field(Machines)()
     starred = ListField()

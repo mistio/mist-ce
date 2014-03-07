@@ -55,12 +55,26 @@
                    data-theme="a"
                    valueBinding="Mist.backendAddController.newBackendOpenStackTenant"}}
 
+            <div id="opentack-advanced-wrapper">
+            <select id="openstack-advanced" data-role="slider" data-theme="a"
+            {{action "advancedToggled" target="view" on="change"}}>
+               <option value="0">Basic settings</option>
+                <option value="1">Advanced settings</option>
+            </select>
+            </div>
+
             <div id="non-hp-cloud">
                 <label for="new-backend-openstack-region">6. Region:</label>
                 {{view Mist.TextField
-                       id="new-backend-openstack-regino"
+                       id="new-backend-openstack-region"
                        data-theme="a"
                        valueBinding="Mist.backendAddController.newBackendOpenStackRegion"}}
+
+                <label for="new-backend-openstack-endpoint">7. Compute Endpoint:</label>
+                {{view Mist.TextField
+                       id="new-backend-openstack-endpoint"
+                       data-theme="a"
+                       valueBinding="Mist.backendAddController.newBackendOpenStackComputeEndpoint"}}
             </div>
         </div>
 
