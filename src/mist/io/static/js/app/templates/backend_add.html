@@ -58,9 +58,15 @@
             <div id="non-hp-cloud">
                 <label for="new-backend-openstack-region">6. Region:</label>
                 {{view Mist.TextField
-                       id="new-backend-openstack-regino"
+                       id="new-backend-openstack-region"
                        data-theme="a"
                        valueBinding="Mist.backendAddController.newBackendOpenStackRegion"}}
+
+                <label for="new-backend-openstack-endpoint">7. Compute Endpoint:</label>
+                {{view Mist.TextField
+                       id="new-backend-openstack-endpoint"
+                       data-theme="a"
+                       valueBinding="Mist.backendAddController.newBackendOpenStackComputeEndpoint"}}
             </div>
         </div>
 
