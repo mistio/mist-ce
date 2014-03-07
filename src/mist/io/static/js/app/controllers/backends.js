@@ -67,7 +67,8 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     'region'      : region,
                     'machine_key' : key,
                     'machine_ip'  : apiKey,    // For bare-metal
-                    'machine_user': apiSecret  // For bare-metal
+                    'machine_user': apiSecret,  // For bare-metal
+                    'machine_port': apiSecret  // For bare-metal #FIXME!!!
                 }).success(function(backend) {
                     that._addBackend(backend, key);
                 }).error(function(message) {

@@ -45,7 +45,7 @@ HPCLOUD_AUTH_URL = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/to
 @core_wrapper
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 machine_hostname="", region="", machine_key="", machine_user="",
-                remove_on_error=True):
+                port=22, remove_on_error=True):
     """Adds a new backend to the user and returns the new backend_id."""
 
     if not provider:
@@ -85,7 +85,8 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 try:
                     ssh_command(
                         user, backend_id, machine_id, machine_hostname, 'uptime',
-                        key_id=machine_key, username=machine_user, password=None
+                        key_id=machine_key, username=machine_user, password=None,
+                        port=port
                     )
                 except MachineUnauthorizedError as exc:
                     # remove backend

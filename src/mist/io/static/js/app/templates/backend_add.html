@@ -65,7 +65,13 @@
         </div>
 
         <div id="baremetal-bundle">
-            <label>4. SSH Key:</label>
+            <label for="new-backend-first-field">4. {{view.thirdFieldLabel}}:</label>
+            {{view Mist.TextField
+                   id="new-backend-third-field"
+                   data-theme="a"
+                   valueBinding="Mist.backendAddController.newBackendThirdField"}}
+
+            <label>5. SSH Key:</label>
             <div id="new-backend-key" 
                  class="mist-select"
                  data-role="collapsible" 
