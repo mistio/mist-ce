@@ -13,7 +13,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
 
             firstFieldLabel: 'API Key',
             secondFieldLabel: 'API Secret',
-            thirdFieldLabel: 'Something else',
+            thirdFieldLabel: 'Port',
             /**
              * 
              *  Methods

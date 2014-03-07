@@ -54,7 +54,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
              * 
              */
 
-            addBackend: function(title, provider, apiKey, apiSecret, apiUrl, region, tenant, key, callback) {
+            addBackend: function(title, provider, apiKey, apiSecret, port, apiUrl, region, tenant, key, callback) {
                 var that = this;
                 this.set('addingBackend', true);
                 Mist.ajax.POST('/backends', {
@@ -62,13 +62,13 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     'provider'    : provider,
                     'apikey'      : apiKey,
                     'apisecret'   : apiSecret,
+                    'machine_port': port,  // For bare-metal                    
                     'apiurl'      : apiUrl,
                     'tenant_name' : tenant,
                     'region'      : region,
                     'machine_key' : key,
                     'machine_ip'  : apiKey,    // For bare-metal
                     'machine_user': apiSecret,  // For bare-metal
-                    'machine_port': apiSecret  // For bare-metal #FIXME!!!
                 }).success(function(backend) {
                     that._addBackend(backend, key);
                 }).error(function(message) {

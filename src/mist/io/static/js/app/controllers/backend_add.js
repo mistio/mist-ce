@@ -18,6 +18,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
             newBackendProvider: null,
             newBackendFirstField: null,
             newBackendSecondField: null,
+            newBackendThirdField: null,            
             newBackendOpenStackURL: null,
             newBackendOpenStackRegion: null,
             newBackendOpenStackTenant: null,
@@ -55,6 +56,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     this.newBackendProvider.provider,
                     this.newBackendFirstField,
                     this.newBackendSecondField,
+                    this.newBackendThirdField,                    
                     this.newBackendOpenStackURL,
                     this.newBackendOpenStackRegion,
                     this.newBackendOpenStackTenant,
@@ -80,6 +82,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                 this.set('callback', null)
                     .set('newBackendFirstField', null)
                     .set('newBackendSecondField', null)
+                    .set('newBackendThirdField', null)                    
                     .set('newBackendOpenStackURL', null)
                     .set('newBackendOpenStackRegion', null)
                     .set('newBackendOpenStackTenant', null)

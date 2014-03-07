@@ -194,7 +194,7 @@ def add_backend(request):
     try:
         ssh_port = int(params.get('machine_port', 22))
     except:
-        ssh_port = 22    
+        ssh_port = 22
     region = params.get('region', '')
     # TODO: check if all necessary information was provided in the request
 
