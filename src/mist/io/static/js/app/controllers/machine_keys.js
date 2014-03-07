@@ -17,18 +17,18 @@ define('app/controllers/machine_keys', ['ember'],
 
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
             load: function() {
-                
+
                 // Add event listeners
                 Mist.keysController.on('onKeyListChange', this, '_updateKeys');
                 Mist.keysController.on('onKeyAssociate', this, '_updateKeys');
                 Mist.keysController.on('onKeyDisassociate', this, '_updateKeys');
-                
+
             }.on('init'),
 
 
@@ -70,7 +70,26 @@ define('app/controllers/machine_keys', ['ember'],
 
 
             disassociate: function(key, callback) {
-                key.disassociate(this.machine, callback);
+                // Check if this is the last key of the machine
+                if (Mist.keysController.getMachineKeysCount(this.machine) == 1) {
+                    var machine = this.machine;
+                    Mist.confirmationController.set('title', 'Disassociate key');
+                    Mist.confirmationController.set('text', 'You are about to remove the last key associated with "' +
+                        machine.name + '" machine and you won\'t be able to access it anymore. Are you sure ' +
+                        'you want to proceed?');
+                    Mist.confirmationController.set('callback', function () {
+                        key.disassociate(machine, callback);
+                    });
+
+                    // Open confirmation just a bit later
+                    // so that key actions popup has enough
+                    // time to close
+                    Ember.run.later(function() {
+                        Mist.confirmationController.show();
+                    }, 300);
+                } else {
+                    key.disassociate(this.machine, callback);
+                }
             },
 
 
@@ -90,7 +109,7 @@ define('app/controllers/machine_keys', ['ember'],
 
             _updateKeys: function () {
                 if (!this.machine) return;
-                
+
                 var that = this;
                 Ember.run(function () {
                     var found = false;
@@ -118,9 +137,9 @@ define('app/controllers/machine_keys', ['ember'],
 
 
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
             machineObserver: function () {
