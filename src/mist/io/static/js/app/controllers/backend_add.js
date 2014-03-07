@@ -15,6 +15,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
             formReady: null,
 
             newBackendKey: null,
+            newBackendPort: null,
             newBackendProvider: null,
             newBackendFirstField: null,
             newBackendSecondField: null,
@@ -58,6 +59,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     this.newBackendOpenStackURL,
                     this.newBackendOpenStackRegion,
                     this.newBackendOpenStackTenant,
+                    this.newBackendPort,
                     this.newBackendKey.id,
                     function (success, backend) {
                         that._giveCallback(success, backend);
@@ -78,6 +80,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
             _clear: function () {
 
                 this.set('callback', null)
+                    .set('newBackendPort', null)
                     .set('newBackendFirstField', null)
                     .set('newBackendSecondField', null)
                     .set('newBackendOpenStackURL', null)
@@ -95,11 +98,11 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
             _updateFormReady: function () {
                 var ready = false;
                 if ('provider' in this.newBackendProvider) { // Filters out the "Select provider" dummy provider
-                    
+
                     if (this.newBackendFirstField && this.newBackendSecondField) {
-                        
+
                         ready = true;
-                        
+
                         if (this.newBackendProvider.provider == 'openstack') { // Pure Openstack
                             if (!this.newBackendOpenStackURL) {
                                 ready = false;

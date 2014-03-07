@@ -11,9 +11,12 @@ define('app/controllers/machine_keys', ['ember'],
              *  Properties
              */
 
+            user: null,
+            port: null,
             view: null,
             machine: null,
             callback: null,
+            lastAssocKey: null,
 
 
             /**
@@ -52,6 +55,22 @@ define('app/controllers/machine_keys', ['ember'],
                 this.view._actions.associateClicked();
             },
 
+            openSSH_Details: function() {
+
+                var user = this.user ? this.user : "root";
+                var port = this.port ? this.port : "22";
+
+                $("#machine-userPort-popup .message").text("Cannot connect as " + user + " on port " + port );
+                $("#machine-userPort-popup").find("#user").val("");
+                $("#machine-userPort-popup").find("#port").val("");
+                $("#machine-userPort-popup").popup( "open" );
+            },
+
+            closeSSH_Details: function() {
+
+                this._cleanSSH_UserPortPopup();
+                $("#machine-userPort-popup").popup( "close" );
+            },
 
             close: function () {
                 $('#machine-keys-panel').panel('close');
@@ -59,8 +78,9 @@ define('app/controllers/machine_keys', ['ember'],
             },
 
 
-            associate: function (key, callback) {
-                key.associate(this.machine, callback);
+            associate: function (key, callback, user, port) {
+                this.set('lastAssocKey',key);
+                key.associate(this.machine, callback, user, port);
             },
 
 
@@ -82,8 +102,11 @@ define('app/controllers/machine_keys', ['ember'],
 
             _clear: function () {
                 Ember.run(this, function () {
+
                     this.set('machine', null);
                     this.set('callback', null);
+
+                    this._cleanSSH_UserPortPopup();
                 });
             },
 
@@ -116,6 +139,18 @@ define('app/controllers/machine_keys', ['ember'],
                 if (this.callback) this.callback(success, action);
             },
 
+            _cleanSSH_UserPortPopup : function(){
+
+                this.set('lastAssocKey',null);
+                this.set('user',null);
+                this.set('port',null);
+
+                // TODO Change to children selector for optimize
+                $("#machine-userPort-popup").find("#user").val("")
+                $("#machine-userPort-popup").find("#port").val("")
+            },
+
+            
 
             /**
              * 
@@ -125,7 +160,17 @@ define('app/controllers/machine_keys', ['ember'],
 
             machineObserver: function () {
                 Ember.run.once(this, '_updateKeys');
-            }.observes('machine')
+            }.observes('machine'),
+
+
+            portFieldObserver: function(){
+                
+                // Allow only numerical values
+                if(this.port)
+                    this.set('port',this.port.replace(/\D/g, ''));
+
+
+            }.observes('port')
         });
     }
 );

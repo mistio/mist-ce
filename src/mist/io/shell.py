@@ -178,7 +178,7 @@ class Shell(object):
             line = stdout.readline()
 
     def autoconfigure(self, user, backend_id, machine_id,
-                      key_id=None, username=None, password=None):
+                      key_id=None, username=None, password=None, port=22):
         """Autoconfigure SSH client.
 
         This will do its best effort to find a suitable keypair and username
@@ -247,6 +247,8 @@ class Shell(object):
                                 ssh_user = machine[3]
                                 if ssh_user not in users:
                                     users.append(ssh_user)
+                            if len(machine) >= 6 and machine[5]:
+                                port = machine[5]
                 # check some common default names
                 for name in ['root', 'ubuntu', 'ec2-user']:
                     if name not in users:
@@ -257,7 +259,8 @@ class Shell(object):
                              key_id, ssh_user, self.host)
                     self.connect(username=ssh_user,
                                  key=keypair.private,
-                                 password=password)
+                                 password=password,
+                                 port=port)
                 except MachineUnauthorizedError:
                     continue
                 # this is a hack: if you try to login to ec2 with the wrong
@@ -280,7 +283,8 @@ class Shell(object):
                         self.disconnect()
                         self.connect(username=new_ssh_user,
                                      key=keypair.private,
-                                     password=password)
+                                     password=password,
+                                     port=port)
                         ssh_user = new_ssh_user
                     except MachineUnauthorizedError:
                         continue
@@ -290,7 +294,8 @@ class Shell(object):
                          machine_id,
                          time(),
                          ssh_user,
-                         self.check_sudo()]
+                         self.check_sudo(),
+                         port]
                 with user.lock_n_load():
                     updated = False
                     for i in range(len(user.keypairs[key_id].machines)):
