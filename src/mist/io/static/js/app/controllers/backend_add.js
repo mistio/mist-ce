@@ -40,6 +40,10 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                 Ember.run.next(function () {
                     $('.ui-page-active').height($('.ui-panel-open').height());
                     $('body').css('overflow', 'auto');
+
+                    //This is the advanced section of OpenStack, by default
+                    //hidden
+                    $('#non-hp-cloud').hide();
                 });
             },
 
