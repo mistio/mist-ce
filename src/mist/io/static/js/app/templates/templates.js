@@ -108,7 +108,7 @@ function program5(depth0,data) {
   data.buffer.push("\n        <div class=\"ajax-loader\"></div>\n        ");
   }
 
-  data.buffer.push("<div id=\"add-backend-panel\" \n     class=\"side-panel\" \n     data-role=\"panel\" \n     data-position=\"right\" \n     data-display=\"overlay\"\n     data-theme=\"b\">\n\n    <div data-role=\"header\">\n        <h1>Add backend</h1>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"b\">\n\n        <label>1. Provider:</label>\n        <div id=\"new-backend-provider\"\n             class=\"mist-select\"\n             data-role=\"collapsible\" \n             data-iconpos=\"right\" \n             data-collapsed-icon=\"arrow-d\" \n             data-expanded-icon=\"arrow-u\"\n             data-theme=\"a\">\n            <h2>");
+  data.buffer.push("<div id=\"add-backend-panel\"\n     class=\"side-panel\"\n     data-role=\"panel\"\n     data-position=\"right\"\n     data-display=\"overlay\"\n     data-theme=\"b\">\n\n    <div data-role=\"header\">\n        <h1>Add backend</h1>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"b\">\n\n        <label>1. Provider:</label>\n        <div id=\"new-backend-provider\"\n             class=\"mist-select\"\n             data-role=\"collapsible\"\n             data-iconpos=\"right\"\n             data-collapsed-icon=\"arrow-d\"\n             data-expanded-icon=\"arrow-u\"\n             data-theme=\"a\">\n            <h2>");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.backendAddController.newBackendProvider.title", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
@@ -129,7 +129,7 @@ function program5(depth0,data) {
     'data-theme': ("a"),
     'valueBinding': ("Mist.backendAddController.newBackendFirstField")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n    \n            <label for=\"new-backend-second-field\">3. ");
+  data.buffer.push("\n\n            <label for=\"new-backend-second-field\">3. ");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "view.secondFieldLabel", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
@@ -158,7 +158,7 @@ function program5(depth0,data) {
     'data-theme': ("a"),
     'valueBinding': ("Mist.backendAddController.newBackendOpenStackTenant")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n            \n            <div id=\"non-hp-cloud\">\n                <label for=\"new-backend-openstack-region\">6. Region:</label>\n                ");
+  data.buffer.push("\n\n            <div id=\"non-hp-cloud\">\n                <label for=\"new-backend-openstack-region\">6. Region:</label>\n                ");
   hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
   hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
@@ -166,7 +166,15 @@ function program5(depth0,data) {
     'data-theme': ("a"),
     'valueBinding': ("Mist.backendAddController.newBackendOpenStackRegion")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n            </div>\n        </div>\n\n        <div id=\"baremetal-bundle\">\n            <label>4. SSH Key:</label>\n            <div id=\"new-backend-key\" \n                 class=\"mist-select\"\n                 data-role=\"collapsible\" \n                 data-iconpos=\"right\" \n                 data-collapsed-icon=\"arrow-d\"\n                 data-expanded-icon=\"arrow-u\"\n                 data-theme=\"a\">\n                <h2>");
+  data.buffer.push("\n            </div>\n        </div>\n\n        <div id=\"baremetal-bundle\">\n            <label for=\"new-backend-port\">4. Port:</label>\n            ");
+  hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
+  hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
+    'id': ("new-backend-port"),
+    'data-theme': ("a"),
+    'valueBinding': ("Mist.backendAddController.newBackendPort")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n\n            <label>5. SSH Key:</label>\n            <div id=\"new-backend-key\"\n                 class=\"mist-select\"\n                 data-role=\"collapsible\"\n                 data-iconpos=\"right\"\n                 data-collapsed-icon=\"arrow-d\"\n                 data-expanded-icon=\"arrow-u\"\n                 data-theme=\"a\">\n                <h2>");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.backendAddController.newBackendKey.id", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
@@ -1353,7 +1361,7 @@ function program45(depth0,data) {
   hashContexts = {};
   stack2 = helpers['if'].call(depth0, "pendingCreation", {hash:{},inverse:self.program(6, program6, data),fn:self.program(4, program4, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack2 || stack2 === 0) { data.buffer.push(stack2); }
-  data.buffer.push("\n        </span>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"c\">\n\n        <!--\n\n             Info popups\n\n        -->\n\n        <!--\n        \n            \n                <div class=\"single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose\">\n                    <span class=\"ui-icon ui-icon-loading\"></span>\n                    <h1>Probing</h1>\n                </div>\n            \n        \n        -->\n\n        ");
+  data.buffer.push("\n        </span>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"c\">\n\n        <!--\n\n             Info popups\n\n        -->\n\n\n        ");
   hashTypes = {};
   hashContexts = {};
   stack2 = helpers['if'].call(depth0, "enablingMonitoring", {hash:{},inverse:self.noop,fn:self.program(11, program11, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
@@ -1483,7 +1491,7 @@ function program45(depth0,data) {
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "powerClicked", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Power</a>\n        </td></tr></tbody></table>\n    </div>\n\n</div>");
+  data.buffer.push(">Power</a>\n        </td></tr></tbody></table>\n    </div>\n\n</div>\n");
   return buffer;
   
 });
@@ -1785,12 +1793,12 @@ function program8(depth0,data) {
   hashContexts = {};
   stack1 = helpers['if'].call(depth0, "Mist.machineKeysController.associatedKeys", {hash:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n        \n        ");
+  data.buffer.push("\n\n        ");
   hashTypes = {};
   hashContexts = {};
   stack1 = helpers['if'].call(depth0, "Mist.keysController.associatingKey", {hash:{},inverse:self.program(6, program6, data),fn:self.program(4, program4, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n        \n        <a data-role=\"button\" data-theme=\"a\" ");
+  data.buffer.push("\n\n        <a data-role=\"button\" data-theme=\"a\" ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "backClicked", {hash:{
@@ -1800,7 +1808,7 @@ function program8(depth0,data) {
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.keyAddView", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n\n<div id=\"key-actions-popup\" class=\"tiny-popup\" data-role=\"popup\" data-overlay-theme=\"b\" data-transition=\"flip\" \n                                                                                        data-position-to=\"#machine-keys\"\n                                                                                        data-theme=\"b\">\n    <div data-role=\"header\">\n        <h1>Actions</h1>\n    </div>\n    \n    <div data-role=\"content\">\n        <button data-theme=\"a\" ");
+  data.buffer.push("\n\n<div id=\"key-actions-popup\" class=\"tiny-popup\" data-role=\"popup\" data-overlay-theme=\"b\" data-transition=\"flip\"\n                                                                                        data-position-to=\"#machine-keys\"\n                                                                                        data-theme=\"b\">\n    <div data-role=\"header\">\n        <h1>Actions</h1>\n    </div>\n\n    <div data-role=\"content\">\n        <button data-theme=\"a\" ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "removeClicked", {hash:{
@@ -1823,13 +1831,41 @@ function program8(depth0,data) {
   hashContexts = {};
   stack1 = helpers.each.call(depth0, "Mist.machineKeysController.nonAssociatedKeys", {hash:{},inverse:self.noop,fn:self.program(8, program8, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n        <li data-icon=\"false\" data-theme=\"d\"> \n            <a ");
+  data.buffer.push("\n        <li data-icon=\"false\" data-theme=\"d\">\n            <a ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "newKeyClicked", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">New key</a>\n        </li>\n    </ul>\n</div>\n");
+  data.buffer.push(">New key</a>\n        </li>\n    </ul>\n</div>\n<!-- data-position-to=\"#machine-keys-panel\" -->\n<div id=\"machine-userPort-popup\" class=\"large-popup\" data-role=\"popup\" data-overlay-theme=\"b\" data-position-to=\"#machine-keys-panel\"  data-transition=\"pop\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n        <h2 class='title'>SSH user & port</h2>\n    </div>\n\n    <div data-role=\"content\">\n        <div class=\"message\">\n            Cannot connect as root on port 22\n        </div>\n        <label for=\"user\">User:</label>\n        ");
+  hashContexts = {'id': depth0,'placeholder': depth0,'valueBinding': depth0};
+  hashTypes = {'id': "STRING",'placeholder': "STRING",'valueBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
+    'id': ("user"),
+    'placeholder': ("root"),
+    'valueBinding': ("Mist.machineKeysController.user")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n\n        <label for=\"port\">Port:</label>\n        ");
+  hashContexts = {'id': depth0,'placeholder': depth0,'valueBinding': depth0};
+  hashTypes = {'id': "STRING",'placeholder': "STRING",'valueBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
+    'id': ("port"),
+    'placeholder': ("22"),
+    'valueBinding': ("Mist.machineKeysController.port")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n\n        <div class=\"ok-cancel\" data-role=\"controlgroup\" data-type=\"horizontal\">\n            <a data-role=\"button\" ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "closeSSH_Details", {hash:{
+    'target': ("Mist.machineKeysController")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">Cancel</a>\n            <a id=\"tryAssociate\" data-role=\"button\" data-theme=\"d\" ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "customAssociateClicked", {hash:{
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">Retry</a>\n        </div>\n\n    </div>\n\n</div>\n");
   return buffer;
   
 });
