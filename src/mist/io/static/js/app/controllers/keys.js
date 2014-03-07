@@ -26,9 +26,9 @@ define(['app/models/key'],
 
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
             load: function() {
@@ -47,9 +47,9 @@ define(['app/models/key'],
 
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
             addKey: function(keyId, keyPrivate, callback) {
@@ -116,14 +116,11 @@ define(['app/models/key'],
             },
 
 
+            // BIG TODO: Callback argument should be at the end of the parameters
+            // We need to check every call to this function and change it (not urgent)
             associateKey: function(keyId, machine, callback, user , port) {
+
                 var that = this;
-
-                // Check if user and port are provided
-
-                if(typeof user == 'undefined') user = null;
-                if(typeof port == 'undefined') port = null;
-
                 this.set('associatingKey', true);
                 Mist.ajax.PUT('/backends/' + machine.backend.id + '/machines/' + machine.id + '/keys/' + keyId, {
                     'host': machine.getHost(),
@@ -131,10 +128,9 @@ define(['app/models/key'],
                     'port': port
                 }).success(function() {
                     that._associateKey(keyId, machine);
-                }).error(function(responseText, status) {
-
+                }).error(function() {
                     // Try another user/port
-                        Mist.machineKeysController.openSSH_Details();
+                    Mist.machineKeysController.openSSH_Details();
                 }).complete(function(success) {
                     that.set('associatingKey', false);
                     if (callback) callback(success);
@@ -229,9 +225,9 @@ define(['app/models/key'],
 
 
             /**
-             * 
+             *
              *  Pseudo-Private Methods
-             * 
+             *
              */
 
             _reload: function() {
@@ -329,9 +325,9 @@ define(['app/models/key'],
 
 
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
             selectedKeysObserver: function() {
