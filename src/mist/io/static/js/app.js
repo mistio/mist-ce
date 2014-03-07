@@ -171,7 +171,7 @@ define( 'app', [
         App.set('email', EMAIL);
         App.set('password', '');
         App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/).test(navigator.userAgent) );
-        App.set('isJQMInitialized',false);
+        App.set('isJQMInitialized', false);
         window.Mist = App;
 
         // URL_PREFIX = AUTH = EMAIL = IS_CORE = CSRF_TOKEN '';
