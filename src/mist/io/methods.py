@@ -126,6 +126,12 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         #OpenStack does not like trailing slashes
         #so https://192.168.1.101:5000 will work but https://192.168.1.101:5000/ won't! 
         if backend.provider == 'openstack':
+            #Strip the v2.0 or v2.0/ at the end of the url if they are there
+            if backend.apiurl.endswith('v2.0/'):
+                backend.apiurl = backend.apiurl.strip('v2.0/')
+            elif backend.apiurl.endswith('v2.0'):
+                backend.apiurl = backend.apiurl.strip('v2.0')
+
             backend.apiurl = backend.apiurl.rstrip('/')
 
         #for HP Cloud
@@ -473,8 +479,7 @@ def connect_provider(backend):
                 ex_force_auth_version=backend.auth_version or '2.0_password',
                 ex_force_auth_url=backend.apiurl,
                 ex_tenant_name=backend.tenant_name,
-                ex_force_service_region=backend.region,
-                ex_force_base_url="https://compute0.cw-labs.net/v2/be118b8f2e4048888cc5e4aa937e78df",
+                ex_force_service_region=backend.region
             )
     elif backend.provider == Provider.LINODE:
         conn = driver(backend.apisecret)
