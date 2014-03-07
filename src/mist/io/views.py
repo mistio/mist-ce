@@ -196,13 +196,14 @@ def add_backend(request):
     except:
         ssh_port = 22
     region = params.get('region', '')
+    compute_endpoint = params.get('compute_endpoint', '')
     # TODO: check if all necessary information was provided in the request
 
     user = user_from_request(request)
     backend_id = methods.add_backend(
         user, title, provider, apikey, apisecret, apiurl, tenant_name=tenant_name,
         machine_hostname=machine_hostname, machine_key=machine_key, machine_user=machine_user,
-        region=region, port=ssh_port
+        region=region, compute_endpoint=compute_endpoint, port=ssh_port
     )
     backend = user.backends[backend_id]
     return {

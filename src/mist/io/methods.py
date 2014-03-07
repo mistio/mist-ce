@@ -45,7 +45,7 @@ HPCLOUD_AUTH_URL = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/to
 @core_wrapper
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 machine_hostname="", region="", machine_key="", machine_user="",
-                port=22, remove_on_error=True):
+                compute_endpoint="", port=22, remove_on_error=True):
     """Adds a new backend to the user and returns the new backend_id."""
 
     if not provider:
@@ -121,6 +121,10 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         backend.apiurl = apiurl
         backend.tenant_name = tenant_name
         backend.region = region
+
+        #OpenStack specific: compute_endpoint is passed only when there is a
+        # custom endpoint for the compute/nova-compute service
+        backend.compute_endpoint = compute_endpoint
         backend.enabled = True
 
         #OpenStack does not like trailing slashes
@@ -479,7 +483,8 @@ def connect_provider(backend):
                 ex_force_auth_version=backend.auth_version or '2.0_password',
                 ex_force_auth_url=backend.apiurl,
                 ex_tenant_name=backend.tenant_name,
-                ex_force_service_region=backend.region
+                ex_force_service_region=backend.region,
+                ex_force_base_url=backend.compute_endpoint,
             )
     elif backend.provider == Provider.LINODE:
         conn = driver(backend.apisecret)
