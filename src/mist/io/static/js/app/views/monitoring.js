@@ -897,7 +897,13 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         var clearUpdatePopUp = function() {
 
                             isVisible = false;
-                            $(this).find('.selectorLine').hide(0);
+
+                            // We check for none display before we hide because jquery will 'show' the element instead
+                            // (possible jquery bug ?)
+                            var selectorLine = $(this).find('.selectorLine');
+                            if($(selectorLine).css('display') != 'none')
+                                $(selectorLine).hide(0);
+
                             $("#GraphsArea").find('.valuePopUp').hide(0);
 
                             // Clear Interval
