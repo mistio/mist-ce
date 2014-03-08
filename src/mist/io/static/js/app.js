@@ -163,14 +163,14 @@ define( 'app', [
 
         App.set('isCore', !!IS_CORE);
         App.set('authenticated', AUTH || IS_CORE);
-        App.set('ajax', new AJAX(CSRF_TOKEN)); // TODO: Get CSRF_TOKEN from server
+        App.set('ajax', new AJAX(CSRF_TOKEN));
         App.set('email', EMAIL);
         App.set('password', '');
         App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/).test(navigator.userAgent) );
         App.set('isJQMInitialized',false);
         window.Mist = App;
 
-        // URL_PREFIX = AUTH = EMAIL = IS_CORE = CSRF_TOKEN '';
+        CSRF_TOKEN = null;
 
         // Ember routes and routers
 
@@ -296,8 +296,8 @@ define( 'app', [
         App.set('loginController', LoginController.create());
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
-        App.set('keyEditController', KeyEditController.create());   
-        App.set('backendsController', BackendsController.create());     
+        App.set('keyEditController', KeyEditController.create());
+        App.set('backendsController', BackendsController.create());
         App.set('machineAddController', MachineAddController.create());
         App.set('backendAddController', BackendAddController.create());
         App.set('monitoringController', MonitoringController.create());
@@ -390,9 +390,9 @@ define( 'app', [
 
 
     /**
-     * 
+     *
      *  Ajax wrapper constructor
-     * 
+     *
      */
 
     function AJAX (csrfToken) {
@@ -605,9 +605,9 @@ var collectd_install_target = false, collectd_uninstall_target = false, collectd
 function appendShell(output, command_id) {
 
     var machine = Mist.machineShellController.machine;
-    
+
     if (!machine) return;
-    
+
     var command = machine.commandHistory.findBy('id', command_id);
 
     if (!command) return;
@@ -620,7 +620,7 @@ function appendShell(output, command_id) {
 
     command.set('response', command.response + output);
     Ember.run.next(function(){
-        $('.output').scrollTop(1000000);        
+        $('.output').scrollTop(1000000);
     });
 }
 
