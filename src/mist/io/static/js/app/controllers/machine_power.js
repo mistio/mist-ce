@@ -46,18 +46,18 @@ define('app/controllers/machine_power', ['ember'],
                 // Close current popup
                 $('#machine-power-popup').popup('close');
 
-                // Set confirmation popup
-                var that = this;
-                var mPart = this.machines.length > 1 ? ' these machines' : ' this machine';
-                Mist.confirmationController.set('title', 'Machine ' + action);
-                Mist.confirmationController.set('text', 'Are you sure you want to ' + action + mPart + '?');
-                Mist.confirmationController.set('callback', function () {
-                    that._act(action);
-                });
+
+                var machineNames = Mist.arrayToListString(this.machines, 'name');
 
                 // Show confirmation popup
+                var that = this;
                 Ember.run.later(function () {
-                    Mist.confirmationController.show();
+                    Mist.confirmationController.setUp('Machine ' + 'action',
+                        'Are you sure you want to ' + action + ' these machines: '
+                        + machineNames + ' ?', function () {
+                            that._act(action);
+                        }
+                    );
                 }, 500);
             },
 
