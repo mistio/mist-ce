@@ -357,6 +357,7 @@ define('app/controllers/monitoring', [
 
                     // Clear Intervals
                     this.stopDataUpdates();
+                    this.machine.set('pendingStats', true);
 
                     // Wait Until Requests are not locked
                     var self   = this;
@@ -1088,9 +1089,6 @@ define('app/controllers/monitoring', [
                         }
                         else{
 
-                            self.disable();
-
-
                             var changeTimeWindow = function(){
                                 controller.graphs.changeTimeWindow(timeWindow);
                             }
@@ -1136,6 +1134,12 @@ define('app/controllers/monitoring', [
 
 
                     controller.request.stop();
+
+                    // Show pending stats popup before data request because if previous request 
+                    // takes place because this feature may appear as broken
+                    Mist.monitoringController.request.machine.set('pendingStats', true);
+                    // Disable change time window button
+                    this.disable();
 
                     zoom();
                 },
