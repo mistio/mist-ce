@@ -163,14 +163,14 @@ define( 'app', [
 
         App.set('isCore', !!IS_CORE);
         App.set('authenticated', AUTH || IS_CORE);
-        App.set('ajax', new AJAX(CSRF_TOKEN)); // TODO: Get CSRF_TOKEN from server
+        App.set('ajax', new AJAX(CSRF_TOKEN));
         App.set('email', EMAIL);
         App.set('password', '');
         App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/).test(navigator.userAgent) );
         App.set('isJQMInitialized',false);
         window.Mist = App;
 
-        // URL_PREFIX = AUTH = EMAIL = IS_CORE = CSRF_TOKEN '';
+        CSRF_TOKEN = null;
 
         // Ember routes and routers
 
