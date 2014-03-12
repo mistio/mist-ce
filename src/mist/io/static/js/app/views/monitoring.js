@@ -527,14 +527,6 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                             tLabelFormat = "%d-%m | %I:%M%p";
 
 
-                        d3xAxis.call(labelTicksFixed(modelXAxis,tLabelFormat));
-                        d3GridX.call(labelTicksFixed(modelGridX));
-
-                        // Set time label at left side
-                        d3xAxis.selectAll("text")
-                               .style("text-anchor", "end")
-                               .attr('x','-10');
-
 
                        // Horizontal grid lines will not change on time change
                        d3GridY.call(d3.svg.axis()
@@ -610,12 +602,23 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                              .fps(fps)
                                              .duration(duration)
                                              .points(( margin.left + this.valuesDistance),(this.height - margin.bottom +2), margin.left,(this.height - margin.bottom +2))
+                                             .data({model:modelXAxis,labelFormat: tLabelFormat})
+                                             .before(function(data){
+                                                this.d3Selector.call(labelTicksFixed(data.model,data.labelFormat));
+                                                this.d3Selector.selectAll("text")
+                                                               .style("text-anchor", "end")
+                                                               .attr('x','-10');
+                                             })
                                              .push();
 
                             d3GridX.animation.select(d3GridX)
                                              .fps(fps)
                                              .duration(duration)
                                              .points((margin.left + this.valuesDistance),this.height, margin.left,this.height)
+                                             .data(modelGridX)
+                                             .before(function(data){
+                                                this.d3Selector.call(labelTicksFixed(data));
+                                             })
                                              .push();
                         }
                         else {
