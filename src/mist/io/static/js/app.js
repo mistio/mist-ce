@@ -453,7 +453,7 @@ define( 'app', [
                     url: url,
                     type: type,
                     headers: {
-                        'csrf_token': csrfToken;
+                        'Csrf-Token': csrfToken;
                     }
                     data: JSON.stringify(data),
                     complete: function(jqXHR) {
