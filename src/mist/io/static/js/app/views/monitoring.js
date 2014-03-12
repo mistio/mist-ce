@@ -520,23 +520,14 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                                .tickSize(-this.height, 0, 0)
                                                .tickFormat("");
 
-
-                        var tLabelFormat = "%I:%M%p";
-
-                        if (this.timeDisplayed >= 86400) // (24*60*60)
-                            tLabelFormat = "%d-%m | %I:%M%p";
-
-
-
-                       // Horizontal grid lines will not change on time change
-                       d3GridY.call(d3.svg.axis()
+                       var modelGridY = d3.svg.axis()
                                           .scale(yScale)
                                           .orient("left")
                                           .ticks(5)
                                           .tickSize(-this.width, 0, 0)
-                                          .tickFormat(""));
+                                          .tickFormat("");
 
-                       d3yAxis.call(d3.svg.axis()
+                       var modelYAxis = d3.svg.axis()
                                           .scale(yScale)
                                           .orient("left")
                                           .ticks(5)
@@ -552,7 +543,13 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                                 return d + "%";
                                             else
                                                 return d;
-                                          }));
+                                          });
+
+                        // X Axis label format
+                        var tLabelFormat = "%I:%M%p";
+                        if (this.timeDisplayed >= 86400) // (24*60*60)
+                            tLabelFormat = "%d-%m | %I:%M%p";
+
 
                         // Get path values for value line and area
                         valueLinePath = valueline(this.displayedData);
@@ -569,10 +566,6 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         // Animate line, axis and grid
                         if(!this.timeUpdated && this.animationEnabled)
                         {
-
-                            // Debug Todo Remove It
-                            if(this.name == 'cpu')
-                                console.log("Updating Graphs");
 
                             // Animation values
                             var fps  = 12;
@@ -602,12 +595,13 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                              .fps(fps)
                                              .duration(duration)
                                              .points(( margin.left + this.valuesDistance),(this.height - margin.bottom +2), margin.left,(this.height - margin.bottom +2))
-                                             .data({model:modelXAxis,labelFormat: tLabelFormat})
+                                             .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: tLabelFormat})
                                              .before(function(data){
-                                                this.d3Selector.call(labelTicksFixed(data.model,data.labelFormat));
+                                                this.d3Selector.call(labelTicksFixed(data.modelX,data.labelFormat));
                                                 this.d3Selector.selectAll("text")
                                                                .style("text-anchor", "end")
                                                                .attr('x','-10');
+                                                d3yAxis.call(data.modelY);
                                              })
                                              .push();
 
@@ -615,9 +609,11 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                              .fps(fps)
                                              .duration(duration)
                                              .points((margin.left + this.valuesDistance),this.height, margin.left,this.height)
-                                             .data(modelGridX)
+                                             .data({modelX: modelGridX,modelY: modelGridY})
                                              .before(function(data){
-                                                this.d3Selector.call(labelTicksFixed(data));
+                                                this.d3Selector.call(labelTicksFixed(data.modelX));
+                                                // Y grid should change when x changes
+                                                d3GridY.call(data.modelY);
                                              })
                                              .push();
                         }
