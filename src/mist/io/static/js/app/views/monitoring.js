@@ -881,7 +881,13 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                             // Set Mouse Line Cordinates
                             mouseOverLine.attr('x1',"" + mouseX)
                                          .attr('x2',"" + mouseX);
-                            $('#GraphsArea').children('.valuePopUp').css('left',(event.clientX+15) +"px");
+
+                            // Make popup appear at left side when it is at the right edge
+                            var popupWidth = $('#GraphsArea').children('.valuePopUp').width();
+                            var xAlign = (event.pageX + popupWidth >= window.innerWidth-25) ? -(popupWidth + 15) : 15;
+
+                            // Update popup cords
+                            $('#GraphsArea').children('.valuePopUp').css('left',(event.clientX+xAlign) +"px");
                             $('#GraphsArea').children('.valuePopUp').css('top',(event.clientY-35)+"px");
 
                             updatePopUpValue(this);
@@ -891,7 +897,13 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         var clearUpdatePopUp = function() {
 
                             isVisible = false;
-                            $(this).find('.selectorLine').hide(0);
+
+                            // We check for none display before we hide because jquery will 'show' the element instead
+                            // (possible jquery bug ?)
+                            var selectorLine = $(this).find('.selectorLine');
+                            if($(selectorLine).css('display') != 'none')
+                                $(selectorLine).hide(0);
+
                             $("#GraphsArea").find('.valuePopUp').hide(0);
 
                             // Clear Interval
