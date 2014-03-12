@@ -7,8 +7,8 @@ class MyRequests(object):
     This way we can have the same request methods both in io and core
     """
 
-    def __init__(self, uri, data=None, cookie=None, timeout=None):
-        self.headers = {'Cookie': cookie}
+    def __init__(self, uri, data=None, cookie=None, timeout=None, csrf=None):
+        self.headers = {'Cookie': cookie, 'Csrf-Token': csrf}
         self.timeout = timeout
         self.uri = uri
         self.data = data
