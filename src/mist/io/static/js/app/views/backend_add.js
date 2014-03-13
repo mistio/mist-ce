@@ -1,7 +1,7 @@
 define('app/views/backend_add', ['app/views/templated', 'ember'],
     /**
      *  Add Backend View
-     * 
+     *
      *  @returns Class
      */
     function(TemplatedView) {
@@ -15,9 +15,9 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
             secondFieldLabel: 'API Secret',
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
             updateAddButton: function() {
@@ -30,9 +30,9 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
 
 
             /**
-             * 
+             *
              *  Actions
-             * 
+             *
              */
 
             actions: {
@@ -41,7 +41,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                 selectProvider: function(provider) {
 
                     Mist.backendAddController._clear();
-                    
+
                     $('#new-backend-second-field').attr('type', 'password');
                     $('#new-backend-provider').collapsible('collapse');
                     $('#openstack-bundle').hide();
@@ -65,14 +65,12 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         //This is for HP Cloud specific
                         if (provider.provider.indexOf('region-') > -1) {
                             Mist.backendAddController.set('newBackendOpenStackURL', 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/tokens');
-                        } else {
-                            $('#non-hp-cloud').show();
                         }
                     } else if (provider.provider.indexOf('bare_metal') > -1) {
                         this.set('firstFieldLabel', 'Hostname');
                         this.set('secondFieldLabel', 'User');
                         Mist.backendAddController.set('newBackendSecondField', 'root');
-
+                        Mist.backendAddController.set('newBackendPort', 22);
                         $('#new-backend-key .ui-listview').listview('refresh');
                         $('#new-backend-second-field').attr('type', '');
                         $('#baremetal-bundle').show();
@@ -119,14 +117,24 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
 
                 addClicked: function() {
                     Mist.backendAddController.add();
+                },
+
+
+                advancedToggled: function () {
+                    var advanced = $('#non-hp-cloud');
+                    if (advanced.css('display') == 'none') {
+                        advanced.slideDown();
+                    } else {
+                        advanced.slideUp();
+                    }
                 }
             },
 
 
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
             updateDoneButtonObserver: function() {

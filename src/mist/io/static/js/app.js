@@ -167,14 +167,14 @@ define( 'app', [
 
         App.set('isCore', !!IS_CORE);
         App.set('authenticated', AUTH || IS_CORE);
-        App.set('ajax', new AJAX(CSRF_TOKEN)); // TODO: Get CSRF_TOKEN from server
+        App.set('ajax', new AJAX(CSRF_TOKEN));
         App.set('email', EMAIL);
         App.set('password', '');
         App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/).test(navigator.userAgent) );
         App.set('isJQMInitialized', false);
         window.Mist = App;
 
-        // URL_PREFIX = AUTH = EMAIL = IS_CORE = CSRF_TOKEN '';
+        CSRF_TOKEN = null;
 
         // Ember routes and routers
 
@@ -391,6 +391,22 @@ define( 'app', [
             return window.location.href.split('/')[5];
         };
 
+        App.arrayToListString = function(array, attribute) {
+
+            if (! array instanceof Array )
+                return '';
+
+            var listString = '';
+            array.forEach(function(item, index) {
+                listString += item[attribute];
+                if (index < array.length - 1)
+                    listString += ', ';
+            });
+
+            return listString;
+        }
+
+
         return App;
     }
 
@@ -434,14 +450,17 @@ define( 'app', [
             };
             call.ajax = function() {
 
-                if (type != 'GET') {
-                    if (data) { data.csrf_token = csrfToken; }
-                    else { data = {'csrf_token': csrfToken}; }
-                }
+//                if (type != 'GET') {
+//                    if (data) { data.csrf_token = csrfToken; }
+//                    else { data = {'csrf_token': csrfToken}; }
+//                }
 
                 var ajaxObject = {
                     url: url,
                     type: type,
+                    headers: {
+                        'Csrf-Token': csrfToken
+                    },
                     data: JSON.stringify(data),
                     complete: function(jqXHR) {
                         if (jqXHR.status == 200) {

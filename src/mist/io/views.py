@@ -191,14 +191,19 @@ def add_backend(request):
     machine_hostname = params.get('machine_ip', '')
     machine_key = params.get('machine_key', '')
     machine_user = params.get('machine_user', '')
+    try:
+        ssh_port = int(params.get('machine_port', 22))
+    except:
+        ssh_port = 22
     region = params.get('region', '')
+    compute_endpoint = params.get('compute_endpoint', '')
     # TODO: check if all necessary information was provided in the request
 
     user = user_from_request(request)
     backend_id = methods.add_backend(
         user, title, provider, apikey, apisecret, apiurl, tenant_name=tenant_name,
         machine_hostname=machine_hostname, machine_key=machine_key, machine_user=machine_user,
-        region=region
+        region=region, compute_endpoint=compute_endpoint, port=ssh_port
     )
     backend = user.backends[backend_id]
     return {
@@ -382,6 +387,11 @@ def associate_key(request):
     key_id = request.matchdict['key']
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
+    ssh_user = request.json_body.get('user', None)
+    try:
+        ssh_port = int(request.json_body.get('port', 22))
+    except:
+        ssh_port = 22
     try:
         host = request.json_body.get('host')
     except:
@@ -389,7 +399,7 @@ def associate_key(request):
     if not host:
         raise RequiredParameterMissingError('host')
     user = user_from_request(request)
-    methods.associate_key(user, key_id, backend_id, machine_id, host)
+    methods.associate_key(user, key_id, backend_id, machine_id, host, username=ssh_user, port=ssh_port)
     return user.keypairs[key_id].machines
 
 
