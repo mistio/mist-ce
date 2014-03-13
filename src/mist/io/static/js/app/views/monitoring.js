@@ -191,13 +191,12 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     this.height           = (fixedHeight < 85 ? 85 : fixedHeight);
                     this.data             = [];
                     this.timeDisplayed    = timeToDisplayms/1000;
-                    this.timeUpdated      = false;
                     this.animationEnabled = true;
                     this.yAxisValueFormat = yAxisValueFormat;
                     this.isAppended       = false;
                     this.displayedData    = [];
                     this.xCordinates      = [];
-
+                    this.clearAnimPending = false;
                     // Distance of two values in graph (pixels), Important For Animation
                     this.valuesDistance = 0;
 
@@ -646,27 +645,11 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                             d3vLine.attr("d", valueLinePath);
                             d3vArea.attr("d", valueAreaPath);
 
-                            // Fix For Animation after time displayed changed
-                            if(this.timeUpdated || !this.animationEnabled)
-                            {
-                                this.timeUpdated = false;
-
-                                /* Not used in new animations TODO implement stop
-                                d3vLine.transition()
-                                       .duration( 0 )
-                                       .attr("transform", "translate(" + 0 + ")");
-
-                                d3vArea.transition()
-                                       .duration( 0 )
-                                       .attr("transform", "translate(" + 0 + ")");
-
-                                d3xAxis.transition()
-                                       .duration( 0 )
-                                       .attr("transform", "translate(" +  margin.left + "," + (this.height - margin.bottom +2) + ")");
-
-                                d3GridX.transition()
-                                       .duration( 0 )
-                                       .attr("transform", "translate(" + margin.left + "," + this.height + ")");*/
+                            if(this.clearAnimPending) {
+                                d3vLine.attr("transform", "translate(" + 0 + ")");
+                                d3vArea.attr("transform", "translate(" + 0 + ")");
+                                d3xAxis.attr("transform", "translate(" + margin.left + "," + (this.height - margin.bottom +2) + ")");
+                                d3GridX.attr("transform", "translate(" + margin.left + "," + this.height + ")");
                             }
                         }
 
@@ -738,11 +721,15 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                     this.clearAnimation = function(stopCurrent) {
 
-                        console.log("Stop Current ? : " + stopCurrent);
                         d3vLine.animation.clearBuffer(stopCurrent)
                         d3vArea.animation.clearBuffer(stopCurrent)
                         d3xAxis.animation.clearBuffer(stopCurrent)
                         d3GridX.animation.clearBuffer(stopCurrent)
+
+                        // Reset Transform
+                        if(stopCurrent) {
+                            this.clearAnimPending = true;
+                        }
                     }
 
                     /**
@@ -843,7 +830,6 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     */
                     this.changeTimeWindow = function(newTimeWindow){
 
-                        this.timeUpdated = true;
                         this.timeDisplayed = newTimeWindow/1000;
 
                         this.clearData();
