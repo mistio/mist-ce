@@ -51,7 +51,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                 this._super();
                 Mist.monitoringController.request.stop();
-
+                Mist.monitoringController.graphs.disableAnimation();
                 // Re-Initialize Enable Button Of Jquery Mobile
                 Em.run.next(function() {
                     $('.monitoring-button').button();
