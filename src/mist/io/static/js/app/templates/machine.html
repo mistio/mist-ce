@@ -53,10 +53,12 @@
 
 
         {{#if enablingMonitoring}}
+        {{#unless pendingMonitoring}}
         <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
             <span class="ui-icon ui-icon-loading"></span>
             <h1>Enabling monitoring. Please wait</h1>
         </div>
+        {{/unless}}
         {{/if}}
 
         {{#if disablingMonitoring}}
@@ -85,6 +87,15 @@
 
             {{#if hasMonitoring}}
 
+            {{#unless pendingMonitoring}}
+
+                {{#if pendingFirstData}}
+                <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
+                    <span class="ui-icon ui-icon-loading"></span>
+                    <h1>Waiting for data</h1>
+                </div>
+                {{/if}}
+
                 {{view Mist.monitoringView}}
 
                 <div class="rules-container" data-role="listview">
@@ -103,20 +114,18 @@
                 <div data-rule="ui-grid-a">
                     <div class="ui-block-a">
                         <a id="add-rule-button"
-                            data-role="button"
-                            data-icon="plus"
-                            data-theme="d"
+                            class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-plus"
                             {{action "addRuleClicked" target="view"}}>Add Rule</a>
                     </div>
                     <div class="ui-block-b">
                         <a id="disable-monitor-btn"
-                            data-theme="b"
-                            data-role="button"
-                            data-icon="delete"
+                        class="ui-btn ui-corner-all ui-btn-b ui-btn-icon-left ui-icon-delete"
                             {{action "disableMonitoringClicked" target="view"}}>Disable</a>
                     </div>
                 </div>
                 </div>
+
+            {{/unless}}
 
             {{else}}
 
@@ -125,10 +134,11 @@
                     <div id="enable-monitoring-bundle">
                         <div>Monitoring is currently disabled</div>
                         <a id="enable-monitor-btn"
-                           data-role="button"
-                           data-icon="star"
-                           data-theme="d"
+                           class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-star"
                            {{action "enableMonitoringClicked" target="view"}}>Enable</a>
+                           {{#if enablingMonitoring}}
+                        <div class="ajax-loader"></div>
+                        {{/if}}
                     </div>
 
                 </div>

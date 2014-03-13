@@ -144,14 +144,21 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             updateChangeMonitoringButton: function() {
-                if (this.machine.disablingMonitoring) {
-                    $('#disable-monitor-btn').addClass('ui-state-disabled');
-                } else if (this.machine.enablingMonitoring) {
+                info('hello');
+                info(this.machine.disablingMonitoring);
+                info(this.machine.enablingMonitoring);
+                info(this.machine.pendingMonitoring);
+
+                Ember.run.next(this, function() {
                     $('#enable-monitor-btn').addClass('ui-state-disabled');
-                } else {
-                    $('#disable-monitor-btn').removeClass('ui-state-disabled');
-                    $('#enable-monitor-btn').removeClass('ui-state-disabled');
-                }
+
+                    if (this.machine.disablingMonitoring) {
+                        $('#disable-monitor-btn').addClass('ui-state-disabled');
+                    } else if (!this.machine.pendingMonitoring) {
+                        $('#disable-monitor-btn').removeClass('ui-state-disabled');
+                        $('#enable-monitor-btn').removeClass('ui-state-disabled');
+                    }
+                });
             },
 
             rulesObserver: function(){
@@ -467,7 +474,7 @@ define('app/views/machine', ['app/views/mistscreen'],
 
             changeMonitoringObserver: function() {
                 Ember.run.once(this,  'updateChangeMonitoringButton');
-            }.observes('machine.disablingMonitoring', 'machine.enablingMonitoring'),
+            }.observes('machine.disablingMonitoring', 'machine.enablingMonitoring', 'machine.pendingMonitoring'),
 
 
             checkedMonitoringObserver: function() {

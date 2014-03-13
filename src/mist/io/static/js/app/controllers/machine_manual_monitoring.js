@@ -59,6 +59,7 @@ define('app/controllers/machine_manual_monitoring', ['ember'],
             getMonitoringCommand: function(machine, callback) {
                 var that = this;
                 machine.set('enablingMonitoring', true);
+                machine.set('pendingMonitoring', true);
                 Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring', {
                     'action': 'enable',
                     'dns_name': machine.extra.dns_name ? machine.extra.dns_name : 'n/a',
@@ -70,7 +71,8 @@ define('app/controllers/machine_manual_monitoring', ['ember'],
                     machine.set('enablingMonitoring', false);
                     Mist.set('authenticated', true);
                 }).error(function(message, statusCode) {
-                    machine.set('enablingMonitoring', false);
+                    //machine.set('enablingMonitoring', false);
+                    machine.set('pendingMonitoring', false);
                     if (statusCode == 402) {
                         Mist.notificationController.timeNotify(message, 5000);
                     } else {

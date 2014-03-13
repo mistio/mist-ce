@@ -17,13 +17,21 @@ define('app/views/machine_manual_monitoring', ['app/views/templated', 'ember'],
             actions: {
 
                 cancelClicked: function () {
-                    Mist.monitoringController.changeMonitoring(
-                        Mist.machineManualMonitoringController.machine
-                    );
+
+                    var machine = Mist.machineManualMonitoringController.machine;
+
+                    Mist.monitoringController.disableMonitoring(machine, function(success) {
+                        if (success)
+                            machine.set('pendingMonitoring', false);
+                    });
+                    machine.set('hasMonitoring', false);
+                    machine.set('disablingMonitoring', false);
                     Mist.machineManualMonitoringController.close();
                 },
 
                 doneClicked: function () {
+                    Mist.machineManualMonitoringController.machine.set('pendingMonitoring', false);
+                    Mist.machineManualMonitoringController.machine.set('pendingFirstData', true);
                     Mist.machineManualMonitoringController.close();
                 },
             }

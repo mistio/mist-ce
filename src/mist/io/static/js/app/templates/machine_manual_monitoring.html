@@ -1,4 +1,9 @@
-<div id="manual-monitoring-popup" class="large-popup" data-role="popup" data-overlay-theme="b" data-transition="flip">
+<div id="manual-monitoring-popup"
+     class="large-popup"
+     data-role="popup"
+     data-overlay-theme="b"
+     data-transition="flip"
+     data-dismissible="false">
 
     <div data-role="header" data-theme="b">
         <h3>Enable Monitoring</h3>
@@ -6,7 +11,8 @@
 
     <div data-role="content">
 
-        <p>Run this command on your server: </p>
+        <p>Automatic installation of monitoring requires a valid key.</p>
+        <p> Run this command on your server for manual install: </p>
 
         <div id="manual-monitoring-command">
             sudo mkdir -p /opt/mistio-collectd &&
