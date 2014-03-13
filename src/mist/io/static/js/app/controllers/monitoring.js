@@ -320,9 +320,9 @@ define('app/controllers/monitoring', [
                            reason = (typeof reason == 'undefined' ? 'manualReload' : reason);
 
                            // Enable/Disable updates
-                           if(!self.updateData)
-                                Mist.monitoringController.graphs.disableAnimation(false);
-                           else
+                           if(!self.updateData && Mist.monitoringController.graphs.animationEnabled)
+                                Mist.monitoringController.graphs.disableAnimation();
+                           else if( self.updateData && !Mist.monitoringController.graphs.animationEnabled)
                                 Mist.monitoringController.graphs.enableAnimation();
 
                             Mist.monitoringController.graphs.clearData();
@@ -393,7 +393,8 @@ define('app/controllers/monitoring', [
                             self.locked = true;
                             self.machine.set('pendingStats', true);
 
-                            Mist.monitoringController.graphs.disableAnimation();
+                            if(Mist.monitoringController.graphs.animationEnabled)
+                                Mist.monitoringController.graphs.disableAnimation();
                             self.receiveData(start, stop, step,callback);
                         }
                     }
@@ -766,21 +767,11 @@ define('app/controllers/monitoring', [
                 disableAnimation : function(stopCurrent) {
 
                     // Default StopCurrent true
-                    stopCurrent = (typeof stopCurrent === 'undefined') ? true : stopCurrent ;
+                    stopCurrent = (typeof stopCurrent == 'undefined') ? true : stopCurrent ;
 
-                    if(stopCurrent) {
-
-                        for(metric in this.instances)
-                        {
-                            this.instances[metric].disableAnimation();
-                        }
-                    }
-                    else {
-
-                        for(metric in this.instances)
-                        {
-                            this.instances[metric].disableNextAnimation();
-                        }
+                    for(metric in this.instances)
+                    {
+                        this.instances[metric].disableAnimation(stopCurrent);
                     }
 
                     this.animationEnabled = false;

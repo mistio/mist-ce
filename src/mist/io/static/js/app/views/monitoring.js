@@ -318,6 +318,36 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                         }
 
+                        // Animation buffer constructor
+                        function Buffer(size) {
+
+                            var buffer = [];
+                            buffer.maxLength =  size ? size : 3; // The max buffer length
+
+                            buffer.pushAnimation = function(animation) {
+
+                                this.push(animation);
+
+                                // if buffer was empty start animation immediately, if it was full stop current running
+                                if(this.length == 1)
+                                    this[0].start();
+                                else if (this.length > this.maxLength)
+                                    this[0].stop();
+                            };
+
+                            buffer.nextAnimation = function() {
+
+                                // Clear Previous Animation
+                                this.splice(0,1);
+                                // Check if there is new animation to run
+                                if(this.length > 0) {
+                                    this[0].start();
+                                }
+                            };
+
+                            return buffer;
+                        }
+
                         this.select = function(d3Selector){
                             current_animation.d3Selector = d3Selector;
                             return this;
@@ -359,30 +389,16 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                             current_animation = new _Animation();
                         }
 
-                        var buffer = []; // The buffer that keeps the animation instances
-                        buffer.constSize =  bufferSize ? bufferSize : 3; // Thex max buffer length
-                        var current_animation = new _Animation();   // The animation instance where all the changes occur
+                        this.clearBuffer = function(stopCurrent) {
+                            if( (typeof stopCurrent == "undefined" || stopCurrent) && buffer.length > 0 ) {
+                                buffer[0].stop();
+                            }
 
-                        buffer.pushAnimation = function(animation) {
-
-                            this.push(animation);
-
-                            // if buffer was empty start animation immediately, if it was full stop current running
-                            if(this.length == 1)
-                                this[0].start();
-                            else if (this.length > this.constSize)
-                                this[0].stop();
+                            buffer = Buffer(bufferSize);
                         }
 
-                        buffer.nextAnimation = function() {
-
-                            // Clear Previous Animation
-                            this.splice(0,1);
-                            // Check if there is new animation to run
-                            if(this.length > 0) {
-                                this[0].start();
-                            }
-                        };
+                        var buffer = new Buffer(bufferSize); // The buffer that keeps the animation instances
+                        var current_animation = new _Animation();   // The animation instance where all the changes occur
                     }
 
                     /**
@@ -562,9 +578,16 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                             valueAreaPath = "M 0 0";
                         }
 
+                        // If we changed time window, clear animation buffer
+                        /*if(this.timeUpdated){
+                            console.log("time updated");
+                            this.clearAnimation();
+                        }*/
+
+
 
                         // Animate line, axis and grid
-                        if(!this.timeUpdated && this.animationEnabled)
+                        if(this.animationEnabled)
                         {
 
                             // Animation values
@@ -702,48 +725,25 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         this.animationEnabled = true;
                     };
 
-
-                    /**
-                    *
-                    * Stops current animation
-                    * Next update will be animated
-                    *
-                    */
-                    this.stopCurrentAnimation = function() {
-
-                        d3vLine.transition()
-                               .duration( 0 )
-                               .attr("transform", "translate(" + 0 + ")");
-
-                        d3vArea.transition()
-                               .duration( 0 )
-                               .attr("transform", "translate(" + 0 + ")");
-
-                        d3xAxis.transition()
-                               .duration( 0 )
-                               .attr("transform", "translate(" +  margin.left + "," + (this.height - margin.bottom +2) + ")");
-
-                        d3GridX.transition()
-                               .duration( 0 )
-                               .attr("transform", "translate(" + margin.left + "," + this.height + ")");
-                    };
-
-
                     /**
                     *
                     * Disables animation of graph
-                    * Also stops current animation
+                    * @param {boolean} immediately - if set to false will not stop current animation
                     */
-                    this.disableAnimation = function() {
+                    this.disableAnimation = function(immediately) {
 
                         this.animationEnabled = false;
-                        this.stopCurrentAnimation();
+                        this.clearAnimation(immediately)
                     };
 
-                    this.disableNextAnimation = function(){
-                        this.animationEnabled = false;
-                    };
+                    this.clearAnimation = function(stopCurrent) {
 
+                        console.log("Stop Current ? : " + stopCurrent);
+                        d3vLine.animation.clearBuffer(stopCurrent)
+                        d3vArea.animation.clearBuffer(stopCurrent)
+                        d3xAxis.animation.clearBuffer(stopCurrent)
+                        d3GridX.animation.clearBuffer(stopCurrent)
+                    }
 
                     /**
                     *
@@ -843,9 +843,8 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     */
                     this.changeTimeWindow = function(newTimeWindow){
 
-                        this.timeDisplayed = newTimeWindow/1000;
-
                         this.timeUpdated = true;
+                        this.timeDisplayed = newTimeWindow/1000;
 
                         this.clearData();
 
