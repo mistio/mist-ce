@@ -641,9 +641,16 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         }
                         else {
 
-                            // Update Non-Animated value line and area
+                            // Update Graph Elements
                             d3vLine.attr("d", valueLinePath);
                             d3vArea.attr("d", valueAreaPath);
+                            d3xAxis.call(labelTicksFixed(modelXAxis,tLabelFormat));
+                            d3xAxis.selectAll("text")
+                                   .style("text-anchor", "end")
+                                   .attr('x','-10');
+                            d3yAxis.call(modelYAxis);
+                            d3GridX.call(labelTicksFixed(modelGridX));
+                            d3GridY.call(modelGridY);
 
                             if(this.clearAnimPending) {
                                 d3vLine.attr("transform", "translate(" + 0 + ")");
