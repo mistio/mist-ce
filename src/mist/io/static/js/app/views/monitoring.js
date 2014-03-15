@@ -586,7 +586,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
 
                         // Animate line, axis and grid
-                        if(this.animationEnabled)
+                        if(this.animationEnabled && !this.clearAnimPending)
                         {
 
                             // Animation values
@@ -653,10 +653,14 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                             d3GridY.call(modelGridY);
 
                             if(this.clearAnimPending) {
-                                d3vLine.attr("transform", "translate(" + 0 + ")");
-                                d3vArea.attr("transform", "translate(" + 0 + ")");
-                                d3xAxis.attr("transform", "translate(" + margin.left + "," + (this.height - margin.bottom +2) + ")");
-                                d3GridX.attr("transform", "translate(" + margin.left + "," + this.height + ")");
+                                // Wait for 50ms for animation to finishes its changes
+                                window.setTimeout(function(){
+                                    d3vLine.attr("transform", "translate(" + 0 + ")");
+                                    d3vArea.attr("transform", "translate(" + 0 + ")");
+                                    d3xAxis.attr("transform", "translate(" + margin.left + "," + (self.height - margin.bottom +2) + ")");
+                                    d3GridX.attr("transform", "translate(" + margin.left + "," + self.height + ")");
+                                    self.clearAnimPending = false;
+                                },50);
                             }
                         }
 
@@ -678,7 +682,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                         this.height = (newHeight < 85 ? 85 : newHeight);
                         this.width = width;
-
+                        console.log("new height:" + this.height);
                         // Set new values to SVG element
                         d3svg.attr('width',this.width)
                              .attr('height',this.height);
@@ -701,7 +705,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         d3yAxisLine.attr('y2',""+ (this.height - margin.bottom +3));
 
                         updateMouseOverSize();
-
+                        this.clearAnimation(true);
                         this.updateView();
                     };
 
