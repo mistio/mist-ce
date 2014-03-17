@@ -93,11 +93,11 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                             Em.run.next(function() {
 
                                 // Re-Initialize jquery components and hide buttons
-                                self.redrawJQMComponents();     
-                                $('.graphBtn').hide(0); 
-                                
+                                self.redrawJQMComponents();
+                                $('.graphBtn').hide(0);
+
                                 self.createGraphs(600000); // (10*60*1000)
-                                
+
 
                                 controller.initialize({
                                     machineModel    : machine,      // Send Current Machine
@@ -223,7 +223,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                     .y1(function(d) {return yScale(d.value); })
                                     .y0(height)
                                     .defined(function(d) {return d.value != null });
-                    
+
                     // ---------------  SVG elements for graph manipulation --------------------- //
                     // Elements will be added to the dom after first updateData().
                     var d3svg;            // Main SVG element where the graph will be rendered
@@ -280,7 +280,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                             var num_of_overflow_Objs = this.data.length - MAX_BUFFER_DATA;
                             this.data = this.data.slice(num_of_overflow_Objs);
                         }
-                        
+
 
                         this.updateView();
                     };
@@ -379,8 +379,16 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                         var tLabelFormat = "%I:%M%p";
 
-                        if (this.timeDisplayed >= 86400) // (24*60*60)
-                            tLabelFormat = "%d-%m | %I:%M%p";
+                        // Timestamp fix for small screens
+                        // 1 Week || 1 Month
+                        if( (this.width <= 700 && this.timeDisplayed == 604800) ||  (this.width <= 521 && this.timeDisplayed == 2592000) )
+                            tLabelFormat = "%d-%b";
+                        else if(this.width <= 560 && this.timeDisplayed == 86400) // 1 Day
+                            tLabelFormat = "%I:%M%p";
+                        else  if (this.timeDisplayed >= 86400) // 1 Day (24*60*60) >=, should display date as well
+                                tLabelFormat = "%d-%m | %I:%M%p";
+
+
 
 
                         d3xAxis.call(labelTicksFixed(modelXAxis,tLabelFormat));
@@ -435,7 +443,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                             var step = (this.timeDisplayed / NUM_OF_MEASUREMENT);
                             var animationDuration = step*1000;
-                            
+
                             // Update Animated Line and Area
                             d3vLine.attr("transform", "translate(" + this.valuesDistance + ")")
                                    .attr("d", valueLinePath)
@@ -835,7 +843,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                         return;
                                     }
 
-                                    
+
                                     // Distanse between value before curson and after curson
                                     var distance = self.displayedData[minValueIndex+1].value  - self.displayedData[minValueIndex].value;
                                     // Mouse offset between this two values
