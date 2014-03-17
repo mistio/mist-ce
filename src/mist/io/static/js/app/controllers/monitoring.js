@@ -320,9 +320,9 @@ define('app/controllers/monitoring', [
                            reason = (typeof reason == 'undefined' ? 'manualReload' : reason);
 
                            // Enable/Disable updates
-                           if(!self.updateData)
-                                Mist.monitoringController.graphs.disableAnimation(false);
-                           else
+                           if(!self.updateData && Mist.monitoringController.graphs.animationEnabled)
+                                Mist.monitoringController.graphs.disableAnimation();
+                           else if( self.updateData && !Mist.monitoringController.graphs.animationEnabled)
                                 Mist.monitoringController.graphs.enableAnimation();
 
                             Mist.monitoringController.graphs.clearData();
@@ -393,7 +393,8 @@ define('app/controllers/monitoring', [
                             self.locked = true;
                             self.machine.set('pendingStats', true);
 
-                            Mist.monitoringController.graphs.disableAnimation();
+                            if(Mist.monitoringController.graphs.animationEnabled)
+                                Mist.monitoringController.graphs.disableAnimation();
                             self.receiveData(start, stop, step,callback);
                         }
                     }
@@ -543,7 +544,7 @@ define('app/controllers/monitoring', [
 
 
                                 // Set CPU Cores
-                                receivedData.cpuCores = data.cpu.cores 
+                                receivedData.cpuCores = data.cpu.cores
 
                                 // Create time-value objects to be used with d3
                                 data.cpu.utilization.forEach(function(item) {
@@ -695,10 +696,10 @@ define('app/controllers/monitoring', [
                 lastMetrictime : null,  // Date Object
                 callback       : null,  // Function
                 timeWindow     : 0,     // integer in miliseconds
-                timeStart      : 0,     // integer in seconds 
-                timeStop       : 0,     // integer in seconds 
+                timeStart      : 0,     // integer in seconds
+                timeStop       : 0,     // integer in seconds
                 step           : 0,     // integer in miliseconds
-                timeGap        : 0,     // integer in seconds 
+                timeGap        : 0,     // integer in seconds
                 updateInterval : 0,     // integer in miliseconds
                 updateData     : false, // boolean
                 locked         : false, // boolean
@@ -766,21 +767,11 @@ define('app/controllers/monitoring', [
                 disableAnimation : function(stopCurrent) {
 
                     // Default StopCurrent true
-                    stopCurrent = (typeof stopCurrent === 'undefined') ? true : stopCurrent ;
+                    stopCurrent = (typeof stopCurrent == 'undefined') ? true : stopCurrent ;
 
-                    if(stopCurrent) {
-
-                        for(metric in this.instances)
-                        {
-                            this.instances[metric].disableAnimation();
-                        }
-                    }
-                    else {
-
-                        for(metric in this.instances)
-                        {
-                            this.instances[metric].disableNextAnimation();
-                        }
+                    for(metric in this.instances)
+                    {
+                        this.instances[metric].disableAnimation(stopCurrent);
                     }
 
                     this.animationEnabled = false;
@@ -1100,7 +1091,7 @@ define('app/controllers/monitoring', [
 
                             var measurements = 60;
                             timeWindowInMinutes = timeWindow /60000;
-                            newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 ); 
+                            newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 );
                             controller.request.changeStep(newStep,false);
                             controller.request.changeTimeWindow(timeWindow,false);
 
