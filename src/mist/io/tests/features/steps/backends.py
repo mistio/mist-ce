@@ -125,7 +125,7 @@ def rename_backend(context, new_name):
 
 @when(u'I flip the backend switch')
 def backends_flip_switch(context):
-    context.browser.find_by_css('a.ui-slider-handle').click()
+    context.browser.find_by_css('#edit-backend-popup').find_by_css('a.ui-slider-handle').click()
     #context.browser.execute_script("$('#backend-toggle').val('%s' == '1' ? '0' : '1').slider('refresh').trigger('change')" % state)
     #sleep(time_fast)
 

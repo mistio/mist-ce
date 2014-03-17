@@ -15,6 +15,13 @@ define('app/controllers/confirmation', ['ember'],
                 $('#confirmation-popup').popup('close');
                 this.callback();
                 this.set('callback', function(){});
+            },
+
+            setUp: function(title, text, callback) {
+                this.set('title', title)
+                    .set('text', text)
+                    .set('callback', callback)
+                    .show();
             }
         });
     }
