@@ -27,9 +27,13 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 this.set('machine', machine);
                 $('#machine-shell-popup').on('popupafteropen',
                     function(){
-                        $('#shell-input input').focus();
+                        var ua = navigator.userAgent.toLowerCase();
+                        var isAndroid = ua.indexOf("android") > -1;
+                        if (!isAndroid){ // Chrome for Android doesn't like input focus 
+                            $('#shell-input input').focus();
+                        }                        
                     }
-                ).popup('open');
+                ).popup( "option", "dismissible", false ).popup('open');
                 
                 $(window).on('resize', function(){
                         $('#shell-return').css({'height': ($(window).height() - 290) + 'px'});
