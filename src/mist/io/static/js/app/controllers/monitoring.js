@@ -1128,6 +1128,7 @@ define('app/controllers/monitoring', [
                                 }
 
                                 self.enable();
+                                Mist.monitoringController.history.enableControls();
                             })
                         }
                     };
@@ -1140,7 +1141,8 @@ define('app/controllers/monitoring', [
                     Mist.monitoringController.request.machine.set('pendingStats', true);
                     // Disable change time window button
                     this.disable();
-
+                    // Temporary Disable History Controls
+                    Mist.monitoringController.history.disableControls();
                     zoom();
                 },
 
@@ -1305,6 +1307,19 @@ define('app/controllers/monitoring', [
                     Mist.monitoringController.zoom.enable();
                 },
 
+                disableControls: function() {
+                    $('#graphsGoBack').addClass('ui-disabled');
+                    $('#graphsGoForward').addClass('ui-disabled');
+                    $('#graphsResetHistory').addClass('ui-disabled');
+                },
+
+                enableControls: function() {
+                    $('#graphsGoBack').removeClass('ui-disabled');
+                    if(this.isEnabled){
+                        $('#graphsGoForward').removeClass('ui-disabled');
+                        $('#graphsResetHistory').removeClass('ui-disabled');
+                    }
+                },
 
                 /**
                 *
