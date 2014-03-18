@@ -144,10 +144,6 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             updateChangeMonitoringButton: function() {
-                info('hello');
-                info(this.machine.disablingMonitoring);
-                info(this.machine.enablingMonitoring);
-                info(this.machine.pendingMonitoring);
 
                 Ember.run.next(this, function() {
                     $('#enable-monitor-btn').addClass('ui-state-disabled');
