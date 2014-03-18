@@ -52,6 +52,8 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                 this._super();
                 Mist.monitoringController.request.stop();
                 Mist.monitoringController.graphs.disableAnimation();
+                Mist.monitoringController.reset();
+
                 // Re-Initialize Enable Button Of Jquery Mobile
                 Em.run.next(function() {
                     $('.monitoring-button').button();
@@ -180,6 +182,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     var NUM_OF_MEASUREMENT = 60;
                     var MAX_BUFFER_DATA    = 60;
 
+                    var d3 = require('d3');
 
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = width * 0.125; // (160 / 1280)
@@ -560,10 +563,15 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                                 return d;
                                           });
 
-                        // X Axis label format
+                        // Timestamp fix for small screens
+                        // 1 Week || 1 Month
                         var tLabelFormat = "%I:%M%p";
-                        if (this.timeDisplayed >= 86400) // (24*60*60)
-                            tLabelFormat = "%d-%m | %I:%M%p";
+                        if( (this.width <= 700 && this.timeDisplayed == 604800) ||  (this.width <= 521 && this.timeDisplayed == 2592000) )
+                            tLabelFormat = "%d-%b";
+                        else if(this.width <= 560 && this.timeDisplayed == 86400) // 1 Day
+                            tLabelFormat = "%I:%M%p";
+                        else  if (this.timeDisplayed >= 86400) // 1 Day (24*60*60) >=, should display date as well
+                                tLabelFormat = "%d-%m | %I:%M%p";
 
 
                         // Get path values for value line and area
@@ -682,7 +690,6 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                         this.height = (newHeight < 85 ? 85 : newHeight);
                         this.width = width;
-                        console.log("new height:" + this.height);
                         // Set new values to SVG element
                         d3svg.attr('width',this.width)
                              .attr('height',this.height);

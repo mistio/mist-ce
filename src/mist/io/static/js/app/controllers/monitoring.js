@@ -7,7 +7,7 @@ define('app/controllers/monitoring', [
      * @returns Class
      */
     function() {
-        return Ember.ObjectController.extend(Ember.Evented,{
+        return Ember.Object.extend(Ember.Evented,{
 
             /**
              *
@@ -88,7 +88,6 @@ define('app/controllers/monitoring', [
                  });
              },
 
-
              /**
              *
              * Updates everything in the app that has
@@ -160,6 +159,11 @@ define('app/controllers/monitoring', [
                             self.graphs.updateData(result.data);
                         }
                     }
+                });
+                // Disable updates if machine is being destroyed
+                arguments.machineModel.addObserver("beingDestroyed",function(){
+                    if(self.request.machine && self.request.machine.beingDestroyed)
+                        self.request.disableUpdates(false);
                 });
 
                 this.request.start();
@@ -261,6 +265,10 @@ define('app/controllers/monitoring', [
                     if(this.updateData && !this.running){
                         window.monitoringInterval = window.setInterval(function() {
 
+                            // Stop updates if updateData is set to false
+                            if(!self.updateData)
+                                window.clearInterval(window.monitoringInterval);
+
                             // Lock request so no other request can be done in the same time
                             self.locked = true;
 
@@ -357,6 +365,7 @@ define('app/controllers/monitoring', [
 
                     // Clear Intervals
                     this.stopDataUpdates();
+                    this.machine.set('pendingStats', true);
 
                     // Wait Until Requests are not locked
                     var self   = this;
@@ -466,7 +475,7 @@ define('app/controllers/monitoring', [
                     this.updateData = false;
                     if(reload)
                         this.reload('updatesDisabled');
-                },
+                }.observes("machine.isDestroying"),
 
 
                 /**
@@ -1079,9 +1088,6 @@ define('app/controllers/monitoring', [
                         }
                         else{
 
-                            self.disable();
-
-
                             var changeTimeWindow = function(){
                                 controller.graphs.changeTimeWindow(timeWindow);
                             }
@@ -1121,6 +1127,7 @@ define('app/controllers/monitoring', [
                                 }
 
                                 self.enable();
+                                Mist.monitoringController.history.enableControls();
                             })
                         }
                     };
@@ -1128,6 +1135,13 @@ define('app/controllers/monitoring', [
 
                     controller.request.stop();
 
+                    // Show pending stats popup before data request because if previous request
+                    // takes place because this feature may appear as broken
+                    Mist.monitoringController.request.machine.set('pendingStats', true);
+                    // Disable change time window button
+                    this.disable();
+                    // Temporary Disable History Controls
+                    Mist.monitoringController.history.disableControls();
                     zoom();
                 },
 
@@ -1292,6 +1306,19 @@ define('app/controllers/monitoring', [
                     Mist.monitoringController.zoom.enable();
                 },
 
+                disableControls: function() {
+                    $('#graphsGoBack').addClass('ui-disabled');
+                    $('#graphsGoForward').addClass('ui-disabled');
+                    $('#graphsResetHistory').addClass('ui-disabled');
+                },
+
+                enableControls: function() {
+                    $('#graphsGoBack').removeClass('ui-disabled');
+                    if(this.isEnabled){
+                        $('#graphsGoForward').removeClass('ui-disabled');
+                        $('#graphsResetHistory').removeClass('ui-disabled');
+                    }
+                },
 
                 /**
                 *
