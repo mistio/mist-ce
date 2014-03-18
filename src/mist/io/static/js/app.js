@@ -404,7 +404,7 @@ define( 'app', [
             });
 
             return listString;
-        }
+        };
 
 
         return App;

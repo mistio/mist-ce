@@ -7,6 +7,7 @@ define('app/views/machine_manual_monitoring', ['app/views/templated', 'ember'],
     function (TemplatedView) {
         return TemplatedView.extend({
 
+
             /**
              *
              *  Actions

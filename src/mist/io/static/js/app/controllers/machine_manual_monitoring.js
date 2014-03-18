@@ -13,9 +13,7 @@ define('app/controllers/machine_manual_monitoring', ['ember'],
 
             machine: null,
             callback: null,
-            commandUuid: null,
-            commandPasswd: null,
-            commandMonitorServer: null,
+            command: null,
 
 
             /**
@@ -50,9 +48,7 @@ define('app/controllers/machine_manual_monitoring', ['ember'],
             _clear: function() {
                 this.set('machine', null)
                     .set('callback', null)
-                    .set('commandUuid', null)
-                    .set('commandPasswd', null)
-                    .set('commandMonitorServer', null);
+                    .set('command', null);
             },
 
 
@@ -67,9 +63,12 @@ define('app/controllers/machine_manual_monitoring', ['ember'],
                     'name': machine.name ? machine.name : machine.id,
                     'no_ssh': true
                 }).success(function(data) {
+
+                    that.set('command', data.command);
                     machine.set('hasMonitoring', true);
                     machine.set('enablingMonitoring', false);
                     Mist.set('authenticated', true);
+
                 }).error(function(message, statusCode) {
                     //machine.set('enablingMonitoring', false);
                     machine.set('pendingMonitoring', false);

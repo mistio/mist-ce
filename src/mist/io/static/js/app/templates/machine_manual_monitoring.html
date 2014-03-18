@@ -15,12 +15,9 @@
         <p> Run this command on your server for manual install: </p>
 
         <div id="manual-monitoring-command">
-            sudo mkdir -p /opt/mistio-collectd &&
-            cd /opt/mistio-collectd &&
-            sudo wget https://mist.io/core/scripts/deploy_collectd.sh &&
-            sudo chmod +x deploy_collectd.sh  &&
-            sudo ./deploy_collectd.sh
-            {{Mist.machineManualMonitoringController.commandMonitorServer}} {{Mist.machineManualMonitoringController.commandUuid}} {{Mist.machineManualMonitoringController.commandPasswd}}
+
+            {{Mist.machineManualMonitoringController.command}}
+
         </div>
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
