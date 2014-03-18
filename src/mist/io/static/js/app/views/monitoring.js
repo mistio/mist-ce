@@ -689,7 +689,6 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                         this.height = (newHeight < 85 ? 85 : newHeight);
                         this.width = width;
-                        console.log("new height:" + this.height);
                         // Set new values to SVG element
                         d3svg.attr('width',this.width)
                              .attr('height',this.height);
