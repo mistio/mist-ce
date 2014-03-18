@@ -182,6 +182,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     var NUM_OF_MEASUREMENT = 60;
                     var MAX_BUFFER_DATA    = 60;
 
+                    var d3 = require('d3');
 
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = width * 0.125; // (160 / 1280)
