@@ -660,15 +660,16 @@ def update_monitoring(request):
     }
 
     if action == 'enable':
-        stdout = methods.enable_monitoring(
+        ret_dict = methods.enable_monitoring(
             user, backend_id, machine_id, name, dns_name, public_ips, no_ssh=no_ssh
         )
     elif action == 'disable':
         stdout = methods.disable_monitoring(user, backend_id, machine_id, no_ssh=no_ssh)
+        ret_dict = {'cmd_output': stdout}
     else:
         raise BadRequestError()
 
-    return stdout
+    return ret_dict
 
 
 @view_config(route_name='stats', request_method='GET', renderer='json')

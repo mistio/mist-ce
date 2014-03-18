@@ -128,7 +128,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         backend.enabled = True
 
         #OpenStack does not like trailing slashes
-        #so https://192.168.1.101:5000 will work but https://192.168.1.101:5000/ won't! 
+        #so https://192.168.1.101:5000 will work but https://192.168.1.101:5000/ won't!
         if backend.provider == 'openstack':
             #Strip the v2.0 or v2.0/ at the end of the url if they are there
             if backend.apiurl.endswith('v2.0/'):
@@ -1420,6 +1420,10 @@ def enable_monitoring(user, backend_id, machine_id,
     collectd_password = ret_dict.get('passwd')
     monitor_url = ret_dict.get('monitor_server')
     host = ret_dict.get('host')
+    deploy_kwargs = ret_dict.get('deploy_kwargs')
+    if not deploy_kwargs:
+        log.error("Didn't get the necessary args from core")
+        raise InternalServerError()
 
     stdout = ''
     if not no_ssh:
@@ -1427,12 +1431,10 @@ def enable_monitoring(user, backend_id, machine_id,
                               monitor_url, machine_uuid, collectd_password)
 
     return {
-            'uuid': machine_uuid,
-            'passwd': collectd_password,
-            'monitor_server': monitor_url,
-            'cmd_output': stdout,
-            'host': host
-        }
+        'cmd_output': stdout,
+        'host': host,
+        'deploy_kwargs': deploy_kwargs,
+    }
 
 
 def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
@@ -1467,36 +1469,22 @@ def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
     return stdout
 
 
-def _deploy_collectd(user, backend_id, machine_id, host,
-                     monitor_url, machine_uuid, collectd_password):
+def _deploy_collectd(user, backend_id, machine_id, host, deploy_kwargs):
     """Install collectd to the machine and return command's output"""
 
-    #FIXME: do not hard-code stuff!
-    filename = 'deploy_collectd.sh'
-    uri = config.CORE_URI + '/core/scripts/%s' % filename
-    prefix = '/opt/mistio-collectd'
-    prepare_dirs = '$(command -v sudo) mkdir -p %s' % prefix
-    # in some machines, using simple sudo with output redirection doesn't work
-    # (permission denied) so we also use su to be on the safe side
-    get_script = "$(command -v sudo) su -c 'wget %s %s -O - > %s/%s'" % (
+    parts = ["%s=%s" % (key, value) for key, value in deploy_kwargs.items()]
+    query = "&".join(parts)
+    url = "%s/deploy_script" % config.CORE_URI
+    if query:
+        url += "?" + query
+    command = "$(command -v sudo) bash -c \"$(wget -O - %s '%s')\"" % (
         "--no-check-certificate" if not config.SSL_VERIFY else "",
-        uri,
-        prefix,
-        filename
+        url,
     )
-    make_exec = "$(command -v sudo) chmod +x %s/%s" % (prefix, filename)
-    exec_script = (
-        "$(command -v sudo) %s/%s %s %s %s" %
-        (prefix, filename, monitor_url, machine_uuid, collectd_password)
-    )
-
     shell = Shell(host)
     shell.autoconfigure(user, backend_id, machine_id)
     # FIXME:parse output and let the client know about the progress/status
-    stdout = shell.command(prepare_dirs)
-    stdout += shell.command(get_script)
-    stdout += shell.command(make_exec)
-    stdout += shell.command(exec_script)
+    stdout = shell.command(command)
 
     return stdout
 
