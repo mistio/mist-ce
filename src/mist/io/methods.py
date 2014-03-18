@@ -1416,24 +1416,18 @@ def enable_monitoring(user, backend_id, machine_id,
             raise ServiceUnavailableError()
 
     ret_dict = json.loads(ret.content)
-    machine_uuid = ret_dict.get('uuid')
-    collectd_password = ret_dict.get('passwd')
-    monitor_url = ret_dict.get('monitor_server')
     host = ret_dict.get('host')
     deploy_kwargs = ret_dict.get('deploy_kwargs')
-    if not deploy_kwargs:
-        log.error("Didn't get the necessary args from core")
-        raise InternalServerError()
-
+    command = deploy_collectd_command(deploy_kwargs)
     stdout = ''
     if not no_ssh:
-        stdout = _deploy_collectd(user, backend_id, machine_id, host,
-                              monitor_url, machine_uuid, collectd_password)
+        stdout = ssh_command(user, backend_id, machine_id, host, command)
 
     return {
         'cmd_output': stdout,
         'host': host,
         'deploy_kwargs': deploy_kwargs,
+        'command': command,
     }
 
 
@@ -1469,9 +1463,8 @@ def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
     return stdout
 
 
-def _deploy_collectd(user, backend_id, machine_id, host, deploy_kwargs):
-    """Install collectd to the machine and return command's output"""
-
+def deploy_collectd_command(deploy_kwargs):
+    """Return command that must be run to deploy collectd on a machine."""
     parts = ["%s=%s" % (key, value) for key, value in deploy_kwargs.items()]
     query = "&".join(parts)
     url = "%s/deploy_script" % config.CORE_URI
@@ -1481,12 +1474,7 @@ def _deploy_collectd(user, backend_id, machine_id, host, deploy_kwargs):
         "--no-check-certificate" if not config.SSL_VERIFY else "",
         url,
     )
-    shell = Shell(host)
-    shell.autoconfigure(user, backend_id, machine_id)
-    # FIXME:parse output and let the client know about the progress/status
-    stdout = shell.command(command)
-
-    return stdout
+    return command
 
 
 def _undeploy_collectd(user, backend_id, machine_id, host):
