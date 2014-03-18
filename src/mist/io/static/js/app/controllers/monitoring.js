@@ -7,7 +7,7 @@ define('app/controllers/monitoring', [
      * @returns Class
      */
     function() {
-        return Ember.ObjectController.extend(Ember.Evented,{
+        return Ember.Object.extend(Ember.Evented,{
 
             /**
              *
@@ -88,7 +88,6 @@ define('app/controllers/monitoring', [
                  });
              },
 
-
              /**
              *
              * Updates everything in the app that has
@@ -160,6 +159,11 @@ define('app/controllers/monitoring', [
                             self.graphs.updateData(result.data);
                         }
                     }
+                });
+                // Disable updates if machine is being destroyed
+                arguments.machineModel.addObserver("beingDestroyed",function(){
+                    if(self.request.machine && self.request.machine.beingDestroyed)
+                        self.request.disableUpdates(false);
                 });
 
                 this.request.start();
@@ -260,6 +264,10 @@ define('app/controllers/monitoring', [
                     // Check if Data Updates Are Enabled
                     if(this.updateData && !this.running){
                         window.monitoringInterval = window.setInterval(function() {
+
+                            // Stop updates if updateData is set to false
+                            if(!self.updateData)
+                                window.clearInterval(window.monitoringInterval);
 
                             // Lock request so no other request can be done in the same time
                             self.locked = true;
@@ -466,7 +474,7 @@ define('app/controllers/monitoring', [
                     this.updateData = false;
                     if(reload)
                         this.reload('updatesDisabled');
-                },
+                }.observes("machine.isDestroying"),
 
 
                 /**
@@ -544,7 +552,7 @@ define('app/controllers/monitoring', [
 
 
                                 // Set CPU Cores
-                                receivedData.cpuCores = data.cpu.cores 
+                                receivedData.cpuCores = data.cpu.cores
 
                                 // Create time-value objects to be used with d3
                                 data.cpu.utilization.forEach(function(item) {
@@ -696,10 +704,10 @@ define('app/controllers/monitoring', [
                 lastMetrictime : null,  // Date Object
                 callback       : null,  // Function
                 timeWindow     : 0,     // integer in miliseconds
-                timeStart      : 0,     // integer in seconds 
-                timeStop       : 0,     // integer in seconds 
+                timeStart      : 0,     // integer in seconds
+                timeStop       : 0,     // integer in seconds
                 step           : 0,     // integer in miliseconds
-                timeGap        : 0,     // integer in seconds 
+                timeGap        : 0,     // integer in seconds
                 updateInterval : 0,     // integer in miliseconds
                 updateData     : false, // boolean
                 locked         : false, // boolean
@@ -1098,7 +1106,7 @@ define('app/controllers/monitoring', [
 
                             var measurements = 60;
                             timeWindowInMinutes = timeWindow /60000;
-                            newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 ); 
+                            newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 );
                             controller.request.changeStep(newStep,false);
                             controller.request.changeTimeWindow(timeWindow,false);
 
@@ -1136,7 +1144,7 @@ define('app/controllers/monitoring', [
 
                     controller.request.stop();
 
-                    // Show pending stats popup before data request because if previous request 
+                    // Show pending stats popup before data request because if previous request
                     // takes place because this feature may appear as broken
                     Mist.monitoringController.request.machine.set('pendingStats', true);
                     // Disable change time window button
