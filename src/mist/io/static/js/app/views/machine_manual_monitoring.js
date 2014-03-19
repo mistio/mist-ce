@@ -17,6 +17,10 @@ define('app/views/machine_manual_monitoring', ['app/views/templated', 'ember'],
 
             actions: {
 
+                selectCommandText: function () {
+                    Mist.selectElementContents('manual-monitoring-command');
+                },
+
                 cancelClicked: function () {
 
                     var machine = Mist.machineManualMonitoringController.machine;
@@ -34,7 +38,7 @@ define('app/views/machine_manual_monitoring', ['app/views/templated', 'ember'],
                     Mist.machineManualMonitoringController.machine.set('pendingMonitoring', false);
                     Mist.machineManualMonitoringController.machine.set('pendingFirstData', true);
                     Mist.machineManualMonitoringController.close();
-                },
+                }
             }
         });
     }

@@ -383,6 +383,15 @@ define( 'app', [
             return content.height() - page.height() - page.scrollTop() < 50;
         };
 
+        App.selectElementContents = function(elementId) {
+            var el = document.getElementById(elementId);
+            var range = document.createRange();
+            range.selectNodeContents(el);
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        };
+
         App.getKeyIdByUrl = function() {
             return window.location.href.split('/')[5];
         };

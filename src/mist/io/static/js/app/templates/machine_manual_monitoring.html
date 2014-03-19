@@ -14,7 +14,7 @@
         <p>Automatic installation of monitoring requires a valid key.</p>
         <p> Run this command on your server for manual install: </p>
 
-        <div id="manual-monitoring-command">
+        <div id="manual-monitoring-command" {{action "selectCommandText" on="click" target="view"}}>
 
             {{Mist.machineManualMonitoringController.command}}
 
