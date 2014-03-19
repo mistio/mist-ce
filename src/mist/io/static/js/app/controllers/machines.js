@@ -135,6 +135,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.waitFor('terminated');
                 machine.lockOn('pending');
                 this.set('destroyingMachine', true);
+                machine.set("beingDestroyed",true);
                 Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
                     'action' : 'destroy'
                 }).success(function() {
@@ -144,6 +145,7 @@ define('app/controllers/machines', ['app/models/machine'],
                     Mist.notificationController.notify('Failed to destory machine');
                 }).complete(function(success) {
                     that.set('destroyingMachine', false);
+                    machine.set("beingDestroyed",false);
                     that.trigger('onMachineDestroy');
                     if (callback) callback(success);
                 });
