@@ -138,12 +138,7 @@
                            class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-star"
                            {{action "enableMonitoringClicked" target="view"}}>Enable</a>
 
-                       {{#if enablingMonitoring}}
-                            {{#unless probed}} <!-- Which means user not doing manual collectd installation -->
-                            <div class="ajax-loader"></div>
-                            {{/unless}}
-                       {{/if}}
-                       {{#if disablingMonitoring}}
+                       {{#if Mist.machineManualMonitoringController.gettingCommand}}
                             <div class="ajax-loader"></div>
                        {{/if}}
                     </div>

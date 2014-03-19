@@ -52,6 +52,7 @@ define('app/controllers/machine_manual_monitoring', ['ember'],
 
             getMonitoringCommand: function(machine, callback) {
                 var that = this;
+                this.set('gettingCommand', true);
                 Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring', {
                     'action': 'enable',
                     'dns_name': machine.extra.dns_name ? machine.extra.dns_name : 'n/a',
@@ -64,6 +65,7 @@ define('app/controllers/machine_manual_monitoring', ['ember'],
                 }).error(function(message) {
                     Mist.notificationController.notify('Failed to enable monitoring: ' + message);
                 }).complete(function(success, data) {
+                    that.set('gettingCommand', false);
                     if (callback) callback(success, data);
                 });
             },
