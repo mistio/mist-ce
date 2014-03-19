@@ -72,8 +72,17 @@ define('app/controllers/machine_manual_monitoring', ['ember'],
             machineProbedObserver: function() {
                 if (this.machine && this.machine.probed
                     && !this.machine.enablingMonitoring) {
-                        Mist.monitoringController.enableMonitoring(this.machine);
+                        var machine = this.machine;
+                        Mist.confirmationController.set('title', 'Enable monitoring');
+                        Mist.confirmationController.set('text', 'Are you sure you want to enable monitoring for this machine?');
+                        Mist.confirmationController.set('callback', function () {
+                            Mist.monitoringController.enableMonitoring(machine);
+                        });
+
                         this.close();
+                        Ember.run.later(function() {
+                            Mist.confirmationController.show();
+                        }, 300);
                 }
             }.observes('machine.probed')
         });
