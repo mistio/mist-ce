@@ -51,6 +51,8 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                 this._super();
                 Mist.monitoringController.request.stop();
+                Mist.monitoringController.graphs.disableAnimation();
+                Mist.monitoringController.reset();
 
                 // Re-Initialize Enable Button Of Jquery Mobile
                 Em.run.next(function() {
@@ -93,11 +95,11 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                             Em.run.next(function() {
 
                                 // Re-Initialize jquery components and hide buttons
-                                self.redrawJQMComponents();     
-                                $('.graphBtn').hide(0); 
-                                
+                                self.redrawJQMComponents();
+                                $('.graphBtn').hide(0);
+
                                 self.createGraphs(600000); // (10*60*1000)
-                                
+
 
                                 controller.initialize({
                                     machineModel    : machine,      // Send Current Machine
@@ -180,6 +182,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     var NUM_OF_MEASUREMENT = 60;
                     var MAX_BUFFER_DATA    = 60;
 
+                    var d3 = require('d3');
 
                     // Calculate Aspect Ratio Of Height
                     var fixedHeight = width * 0.125; // (160 / 1280)
@@ -191,13 +194,12 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     this.height           = (fixedHeight < 85 ? 85 : fixedHeight);
                     this.data             = [];
                     this.timeDisplayed    = timeToDisplayms/1000;
-                    this.timeUpdated      = false;
                     this.animationEnabled = true;
                     this.yAxisValueFormat = yAxisValueFormat;
                     this.isAppended       = false;
                     this.displayedData    = [];
                     this.xCordinates      = [];
-
+                    this.clearAnimPending = false;
                     // Distance of two values in graph (pixels), Important For Animation
                     this.valuesDistance = 0;
 
@@ -223,7 +225,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                     .y1(function(d) {return yScale(d.value); })
                                     .y0(height)
                                     .defined(function(d) {return d.value != null });
-                    
+
                     // ---------------  SVG elements for graph manipulation --------------------- //
                     // Elements will be added to the dom after first updateData().
                     var d3svg;            // Main SVG element where the graph will be rendered
@@ -240,6 +242,166 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                     //--------------------------------------------------------------------------------------------
 
+                    /**
+                     * Represents an Animations series
+                     * @constructor
+                     * @param {number} bufferSize - The max length of the buffer (default : 3 animations)
+                     */
+                    function Animation(bufferSize){
+
+                        function _Animation(){
+                            this.d3Selector = null;
+                            this.fps        = null;
+                            this.duration   = null;
+                            this.data       = null;
+                            this.before     = null;
+                            this.after      = null;
+                            this.stopFlag   = false;
+                            this.startPoint = 0;
+                            this.stopPoint  = 0;
+
+                            this.start = function() {
+
+                                if(this.before)
+                                    this.before(this.data);
+
+                                var self = this;
+                                var intervalTime = 1000 / this.fps;
+                                var frame = 0;
+
+                                var start = d3.transform( "translate(" + this.startPoint.x  + "," + this.startPoint.y + ")");
+                                var stop   = d3.transform("translate(" + this.stopPoint.x   + "," + this.stopPoint.y  + ")");
+                                var interpolate = d3.interpolateTransform(start,stop);
+
+                                // Initial Start
+                                this.d3Selector.attr("transform", interpolate(0));
+
+                                // Create Interval For The Animation
+                                var animation_interval = window.setInterval(function(){
+
+                                    frame++;
+
+
+                                    // Get transform Value and aply it to the DOM
+                                    var transformValue = interpolate(frame/(self.fps * self.duration));
+                                    self.d3Selector.attr("transform", transformValue);
+
+                                    // Check if animation should stop
+                                    if(frame >= self.fps * self.duration || self.stopFlag){
+
+                                        // Make sure transform is in the final form
+                                        //var transformValue = interpolate(1);
+                                        //self.d3Selector.attr("transform", transformValue);
+                                        window.clearInterval(animation_interval);
+                                        finished();
+                                        return;
+                                    }
+
+
+                                },intervalTime);
+
+                                // This function is called when animation stops
+                                var finished = function(){
+
+                                    self.stopFlag = false;
+
+                                    if(self.after)
+                                        self.after(self.data)
+
+                                    // Inform buffer that animation finished
+                                    buffer.nextAnimation();
+                                }
+                            }
+
+                            this.stop = function(){
+                                this.stopFlag = true;
+                            }
+
+
+                        }
+
+                        // Animation buffer constructor
+                        function Buffer(size) {
+
+                            var buffer = [];
+                            buffer.maxLength =  size ? size : 3; // The max buffer length
+
+                            buffer.pushAnimation = function(animation) {
+
+                                this.push(animation);
+
+                                // if buffer was empty start animation immediately, if it was full stop current running
+                                if(this.length == 1)
+                                    this[0].start();
+                                else if (this.length > this.maxLength)
+                                    this[0].stop();
+                            };
+
+                            buffer.nextAnimation = function() {
+
+                                // Clear Previous Animation
+                                this.splice(0,1);
+                                // Check if there is new animation to run
+                                if(this.length > 0) {
+                                    this[0].start();
+                                }
+                            };
+
+                            return buffer;
+                        }
+
+                        this.select = function(d3Selector){
+                            current_animation.d3Selector = d3Selector;
+                            return this;
+                        }
+
+                        this.fps = function(fps){
+                            current_animation.fps = fps;
+                            return this;
+                        }
+
+                        this.duration = function(duration){
+                            current_animation.duration = duration;
+                            return this;
+                        }
+
+                        this.points = function(startPointX, startPointY, stopPointX, stopPointY){
+                            current_animation.startPoint = {x: startPointX, y: startPointY};
+                            current_animation.stopPoint  = {x: stopPointX,  y: stopPointY};
+                            return this;
+                        }
+
+                        this.data = function(data){
+                            current_animation.data = data;
+                            return this;
+                        }
+
+                        this.before = function(callback){
+                            current_animation.before = callback;
+                            return this;
+                        }
+
+                        this.after = function(callback){
+                            current_animation.after = callback;
+                            return this;
+                        }
+
+                        this.push = function(){
+                            buffer.pushAnimation(current_animation);
+                            current_animation = new _Animation();
+                        }
+
+                        this.clearBuffer = function(stopCurrent) {
+                            if( (typeof stopCurrent == "undefined" || stopCurrent) && buffer.length > 0 ) {
+                                buffer[0].stop();
+                            }
+
+                            buffer = Buffer(bufferSize);
+                        }
+
+                        var buffer = new Buffer(bufferSize); // The buffer that keeps the animation instances
+                        var current_animation = new _Animation();   // The animation instance where all the changes occur
+                    }
 
                     /**
                     *
@@ -280,7 +442,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                             var num_of_overflow_Objs = this.data.length - MAX_BUFFER_DATA;
                             this.data = this.data.slice(num_of_overflow_Objs);
                         }
-                        
+
 
                         this.updateView();
                     };
@@ -376,31 +538,14 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                                .tickSize(-this.height, 0, 0)
                                                .tickFormat("");
 
-
-                        var tLabelFormat = "%I:%M%p";
-
-                        if (this.timeDisplayed >= 86400) // (24*60*60)
-                            tLabelFormat = "%d-%m | %I:%M%p";
-
-
-                        d3xAxis.call(labelTicksFixed(modelXAxis,tLabelFormat));
-                        d3GridX.call(labelTicksFixed(modelGridX));
-
-                        // Set time label at left side
-                        d3xAxis.selectAll("text")
-                               .style("text-anchor", "end")
-                               .attr('x','-10');
-
-
-                       // Horizontal grid lines will not change on time change
-                       d3GridY.call(d3.svg.axis()
+                       var modelGridY = d3.svg.axis()
                                           .scale(yScale)
                                           .orient("left")
                                           .ticks(5)
                                           .tickSize(-this.width, 0, 0)
-                                          .tickFormat(""));
+                                          .tickFormat("");
 
-                       d3yAxis.call(d3.svg.axis()
+                       var modelYAxis = d3.svg.axis()
                                           .scale(yScale)
                                           .orient("left")
                                           .ticks(5)
@@ -416,11 +561,23 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                                 return d + "%";
                                             else
                                                 return d;
-                                          }));
+                                          });
+
+                        // Timestamp fix for small screens
+                        // 1 Week || 1 Month
+                        var tLabelFormat = "%I:%M%p";
+                        if( (this.width <= 700 && this.timeDisplayed == 604800) ||  (this.width <= 521 && this.timeDisplayed == 2592000) )
+                            tLabelFormat = "%d-%b";
+                        else if(this.width <= 560 && this.timeDisplayed == 86400) // 1 Day
+                            tLabelFormat = "%I:%M%p";
+                        else  if (this.timeDisplayed >= 86400) // 1 Day (24*60*60) >=, should display date as well
+                                tLabelFormat = "%d-%m | %I:%M%p";
+
 
                         // Get path values for value line and area
                         valueLinePath = valueline(this.displayedData);
                         valueAreaPath = valuearea(this.displayedData);
+
 
                         // Fix for "Error: Problem parsing d="" " in webkit
                         if(!valueLinePath){
@@ -428,68 +585,90 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                             valueAreaPath = "M 0 0";
                         }
 
+                        // If we changed time window, clear animation buffer
+                        /*if(this.timeUpdated){
+                            console.log("time updated");
+                            this.clearAnimation();
+                        }*/
+
+
 
                         // Animate line, axis and grid
-                        if(!this.timeUpdated && this.animationEnabled)
+                        if(this.animationEnabled && !this.clearAnimPending)
                         {
 
-                            var step = (this.timeDisplayed / NUM_OF_MEASUREMENT);
-                            var animationDuration = step*1000;
-                            
-                            // Update Animated Line and Area
-                            d3vLine.attr("transform", "translate(" + this.valuesDistance + ")")
-                                   .attr("d", valueLinePath)
-                                   .transition()
-                                   .ease("linear")
-                                   .duration(animationDuration)
-                                   .attr("transform", "translate(" + 0 + ")");
+                            // Animation values
+                            var fps  = 12;
+                            var duration = 10;
 
-                            d3vArea.attr("transform", "translate(" + this.valuesDistance + ")")
-                                   .attr("d", valueAreaPath)
-                                   .transition()
-                                   .ease("linear")
-                                   .duration(animationDuration)
-                                   .attr("transform", "translate(" + 0 + ")");
+                            d3vLine.animation.select(d3vLine)
+                                             .fps(fps)
+                                             .duration(duration)
+                                             .points(this.valuesDistance,0, 0,0)
+                                             .data(valueLinePath)
+                                             .before(function(data){
+                                                this.d3Selector.attr("d", data);
+                                             })
+                                             .push();
 
-                            // Animate Axis And Grid
-                            d3xAxis.attr("transform", "translate(" + ( margin.left + this.valuesDistance) + ","+ (this.height - margin.bottom +2) +")")
-                                   .transition()
-                                   .ease("linear")
-                                   .duration(animationDuration)
-                                   .attr("transform", "translate(" +  margin.left + "," + (this.height - margin.bottom +2) + ")");
+                            d3vArea.animation.select(d3vArea)
+                                             .fps(fps)
+                                             .duration(duration)
+                                             .points(this.valuesDistance,0, 0,0)
+                                             .data(valueAreaPath)
+                                             .before(function(data){
+                                                this.d3Selector.attr("d", data);
+                                             })
+                                             .push();
 
-                            d3GridX.attr("transform", "translate(" + (margin.left + this.valuesDistance) + ","+ this.height +")")
-                                   .transition()
-                                   .ease("linear")
-                                   .duration(animationDuration)
-                                   .attr("transform", "translate(" + margin.left + "," + this.height + ")");
+                            d3xAxis.animation.select(d3xAxis)
+                                             .fps(fps)
+                                             .duration(duration)
+                                             .points(( margin.left + this.valuesDistance),(this.height - margin.bottom +2), margin.left,(this.height - margin.bottom +2))
+                                             .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: tLabelFormat})
+                                             .before(function(data){
+                                                this.d3Selector.call(labelTicksFixed(data.modelX,data.labelFormat));
+                                                this.d3Selector.selectAll("text")
+                                                               .style("text-anchor", "end")
+                                                               .attr('x','-10');
+                                                d3yAxis.call(data.modelY);
+                                             })
+                                             .push();
+
+                            d3GridX.animation.select(d3GridX)
+                                             .fps(fps)
+                                             .duration(duration)
+                                             .points((margin.left + this.valuesDistance),this.height, margin.left,this.height)
+                                             .data({modelX: modelGridX,modelY: modelGridY})
+                                             .before(function(data){
+                                                this.d3Selector.call(labelTicksFixed(data.modelX));
+                                                // Y grid should change when x changes
+                                                d3GridY.call(data.modelY);
+                                             })
+                                             .push();
                         }
                         else {
 
-                            // Update Non-Animated value line and area
+                            // Update Graph Elements
                             d3vLine.attr("d", valueLinePath);
                             d3vArea.attr("d", valueAreaPath);
+                            d3xAxis.call(labelTicksFixed(modelXAxis,tLabelFormat));
+                            d3xAxis.selectAll("text")
+                                   .style("text-anchor", "end")
+                                   .attr('x','-10');
+                            d3yAxis.call(modelYAxis);
+                            d3GridX.call(labelTicksFixed(modelGridX));
+                            d3GridY.call(modelGridY);
 
-                            // Fix For Animation after time displayed changed
-                            if(this.timeUpdated || !this.animationEnabled)
-                            {
-                                this.timeUpdated = false;
-
-                                d3vLine.transition()
-                                       .duration( 0 )
-                                       .attr("transform", "translate(" + 0 + ")");
-
-                                d3vArea.transition()
-                                       .duration( 0 )
-                                       .attr("transform", "translate(" + 0 + ")");
-
-                                d3xAxis.transition()
-                                       .duration( 0 )
-                                       .attr("transform", "translate(" +  margin.left + "," + (this.height - margin.bottom +2) + ")");
-
-                                d3GridX.transition()
-                                       .duration( 0 )
-                                       .attr("transform", "translate(" + margin.left + "," + this.height + ")");
+                            if(this.clearAnimPending) {
+                                // Wait for 50ms for animation to finishes its changes
+                                window.setTimeout(function(){
+                                    d3vLine.attr("transform", "translate(" + 0 + ")");
+                                    d3vArea.attr("transform", "translate(" + 0 + ")");
+                                    d3xAxis.attr("transform", "translate(" + margin.left + "," + (self.height - margin.bottom +2) + ")");
+                                    d3GridX.attr("transform", "translate(" + margin.left + "," + self.height + ")");
+                                    self.clearAnimPending = false;
+                                },50);
                             }
                         }
 
@@ -511,7 +690,6 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                         this.height = (newHeight < 85 ? 85 : newHeight);
                         this.width = width;
-
                         // Set new values to SVG element
                         d3svg.attr('width',this.width)
                              .attr('height',this.height);
@@ -534,7 +712,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         d3yAxisLine.attr('y2',""+ (this.height - margin.bottom +3));
 
                         updateMouseOverSize();
-
+                        this.clearAnimation(true);
                         this.updateView();
                     };
 
@@ -548,48 +726,29 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                         this.animationEnabled = true;
                     };
 
-
-                    /**
-                    *
-                    * Stops current animation
-                    * Next update will be animated
-                    *
-                    */
-                    this.stopCurrentAnimation = function() {
-
-                        d3vLine.transition()
-                               .duration( 0 )
-                               .attr("transform", "translate(" + 0 + ")");
-
-                        d3vArea.transition()
-                               .duration( 0 )
-                               .attr("transform", "translate(" + 0 + ")");
-
-                        d3xAxis.transition()
-                               .duration( 0 )
-                               .attr("transform", "translate(" +  margin.left + "," + (this.height - margin.bottom +2) + ")");
-
-                        d3GridX.transition()
-                               .duration( 0 )
-                               .attr("transform", "translate(" + margin.left + "," + this.height + ")");
-                    };
-
-
                     /**
                     *
                     * Disables animation of graph
-                    * Also stops current animation
+                    * @param {boolean} immediately - if set to false will not stop current animation
                     */
-                    this.disableAnimation = function() {
+                    this.disableAnimation = function(immediately) {
 
                         this.animationEnabled = false;
-                        this.stopCurrentAnimation();
+                        this.clearAnimation(immediately)
                     };
 
-                    this.disableNextAnimation = function(){
-                        this.animationEnabled = false;
-                    };
+                    this.clearAnimation = function(stopCurrent) {
 
+                        d3vLine.animation.clearBuffer(stopCurrent)
+                        d3vArea.animation.clearBuffer(stopCurrent)
+                        d3xAxis.animation.clearBuffer(stopCurrent)
+                        d3GridX.animation.clearBuffer(stopCurrent)
+
+                        // Reset Transform
+                        if(stopCurrent) {
+                            this.clearAnimPending = true;
+                        }
+                    }
 
                     /**
                     *
@@ -691,8 +850,6 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                         this.timeDisplayed = newTimeWindow/1000;
 
-                        this.timeUpdated = true;
-
                         this.clearData();
 
                     };
@@ -769,6 +926,20 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                     /*
                     *
+                    *   Creates animation instances
+                    *
+                    */
+                    function setupAnimation() {
+
+                        d3vLine.animation = new Animation();
+                        d3vArea.animation = new Animation();
+                        d3xAxis.animation = new Animation();
+                        d3GridX.animation = new Animation();
+                    }
+
+
+                    /*
+                    *
                     * Setups event listeners for mouse,
                     * also creates interval for popup value update
                     */
@@ -835,7 +1006,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                                         return;
                                     }
 
-                                    
+
                                     // Distanse between value before curson and after curson
                                     var distance = self.displayedData[minValueIndex+1].value  - self.displayedData[minValueIndex].value;
                                     // Mouse offset between this two values
@@ -933,6 +1104,7 @@ define('app/views/monitoring', ['app/views/templated','ember'],
                     */
                     function onInitialized(){
 
+                      setupAnimation();
                       setupMouseOver();
                     }
 

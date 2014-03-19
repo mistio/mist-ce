@@ -9,7 +9,7 @@ require.config({
         mobile: 'lib/jquery.mobile-1.4.1.min',
         handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
-        d3: 'lib/d3-2.10.1',
+        d3: 'lib/d3.min',
         sha256: 'lib/sha256',
     },
     shim: {
@@ -42,6 +42,7 @@ define( 'app', [
     'app/controllers/keys',
     'app/controllers/machine_tags',
     'app/controllers/machine_shell',
+    'app/controllers/machine_manual_monitoring',
     'app/controllers/rules',
     'app/views/templated',
     'app/views/home',
@@ -65,6 +66,7 @@ define( 'app', [
     'app/views/machine_keys',
     'app/views/machine_keys_list_item',
     'app/views/machine_tags_list_item',
+    'app/views/machine_manual_monitoring',
     'app/views/key_list_item',
     'app/views/key_list',
     'app/views/key',
@@ -92,6 +94,7 @@ define( 'app', [
                 KeysController,
                 MachineTagsController,
                 MachineShellController,
+                MachineManualMonitoringController,
                 RulesController,
                 TemplatedView,
                 Home,
@@ -115,6 +118,7 @@ define( 'app', [
                 MachineKeysView,
                 MachineKeysListItemView,
                 MachineTagsListItemView,
+                MachineManualMonitoringView,
                 KeyListItemView,
                 KeyListView,
                 SingleKeyView,
@@ -167,7 +171,7 @@ define( 'app', [
         App.set('email', EMAIL);
         App.set('password', '');
         App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/).test(navigator.userAgent) );
-        App.set('isJQMInitialized',false);
+        App.set('isJQMInitialized', false);
         window.Mist = App;
 
         CSRF_TOKEN = null;
@@ -289,6 +293,7 @@ define( 'app', [
         App.set('machineKeysListItemView', MachineKeysListItemView);
         App.set('machineTagsListItemView', MachineTagsListItemView);
         App.set('machineShellListItemView', MachineShellListItemView);
+        App.set('machineManualMonitoringView', MachineManualMonitoringView);
 
         // Ember controllers
 
@@ -308,6 +313,7 @@ define( 'app', [
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
         App.set('machinePowerController', MachinePowerController.create());
+        App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
 
 
         // Ember custom widgets
@@ -377,6 +383,15 @@ define( 'app', [
             return content.height() - page.height() - page.scrollTop() < 50;
         };
 
+        App.selectElementContents = function(elementId) {
+            var el = document.getElementById(elementId);
+            var range = document.createRange();
+            range.selectNodeContents(el);
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        };
+
         App.getKeyIdByUrl = function() {
             return window.location.href.split('/')[5];
         };
@@ -398,7 +413,7 @@ define( 'app', [
             });
 
             return listString;
-        }
+        };
 
 
         return App;

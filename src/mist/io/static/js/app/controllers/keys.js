@@ -133,7 +133,7 @@ define(['app/models/key'],
                     Mist.machineKeysController.openSSH_Details();
                 }).complete(function(success) {
                     that.set('associatingKey', false);
-                    if (callback) callback(success);
+                    if (callback) callback(success, machine, keyId);
                 });
             },
 
@@ -306,6 +306,8 @@ define(['app/models/key'],
                             return true;
                         }
                     });
+                    machine.set('keysCount', this.getMachineKeysCount(machine));
+                    machine.set('probed', !!machine.keysCount);
                     this.trigger('onKeyDisassociate');
                 });
             },

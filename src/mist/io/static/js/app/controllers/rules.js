@@ -80,65 +80,56 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 } else {
                     $('#add-rule-button').removeClass('ui-state-disabled');
                 }
-                
+
             }.observes('creationPending'),
 
 
             newRule: function(machine, metric, operator, value, actionToTake) {
-                var payload = {
+                this.set('creationPending', true);
+                var that = this;
+                Mist.ajax.POST('/rules', {
                     'backendId': machine.backend.id,
                     'machineId': machine.id,
                     'metric': metric,
                     'operator': operator.title,
                     'value': value,
                     'action': actionToTake
-                };
-                this.set('creationPending', true);
-                var that = this;
-                $.ajax({
-                    url: 'rules',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    success: function(data) {
-                        info('Successfully created rule ', data.id);
-                        that.set('creationPending', false);
-                        var rule = Rule.create({
-                            'id': data.id,
-                            'value': value,
-                            'metric': metric,
-                            'machine': machine,
-                            'operator': operator,
-                            'maxValue': data.max_value,
-                            'actionToTake': actionToTake,
-                        });
-                        that.pushObject(rule);
-                        that.redrawRules();
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while creating rule');
-                        error(textstate, errorThrown, 'while creating rule');
-                        that.set('creationPending', false);
-                    }
+                }).success(function(data) {
+                    info('Successfully created rule ', data.id);
+                    that.set('creationPending', false);
+                    var rule = Rule.create({
+                        'id': data.id,
+                        'value': value,
+                        'metric': metric,
+                        'machine': machine,
+                        'operator': operator,
+                        'maxValue': data.max_value,
+                        'actionToTake': actionToTake,
+                    });
+                    that.pushObject(rule);
+                    that.redrawRules();
+                }).error(function(message) {
+                    Mist.notificationController.notify('Error while creating rule: ' + message);
+                    that.set('creationPending', false);
                 });
             },
 
 
             updateRule: function(id, metric, operator, value, actionToTake, command) {
-                
+
                 var rule = this.getRuleById(id);
 
                 if (!rule) {
                     return false;
                 }
-                
+
                 // Make sure parameters are not null
                 if (!value) { value = rule.value; }
                 if (!metric) { metric = rule.metric; }
                 if (!command) { command = rule.command; }
                 if (!operator) { operator = rule.operator; }
                 if (!actionToTake) { actionToTake = rule.actionToTake; }
-                
+
                 // Check if anything changed
                 if (value == rule.value &&
                     metric == rule.metric &&
@@ -147,49 +138,41 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     operator.title == rule.operator.title ) {
                         return false;
                 }
-                
+
                 // Fix value on metric change
                 if ((metric != 'network-tx') && (metric != 'disk-write')) {
                     if (value > 100) {
                         value = 100;
                     }
                 }
-                
-                var payload = {
+
+
+                rule.set('pendingAction', true);
+                Mist.ajax.POST('/rules', {
                     'id': id,
                     'value': value,
                     'metric': metric,
                     'command': command,
                     'operator': operator.title,
                     'action': actionToTake,
-                };
-                
-                rule.set('pendingAction', true);
-                $.ajax({
-                    url: 'rules',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    success: function(data) {
-                        info('Successfully updated rule ', id);
-                        rule.set('pendingAction', false);
-                        rule.set('value', value);
-                        rule.set('metric', metric);
-                        rule.set('command', command);
-                        rule.set('operator', operator);
-                        rule.set('actionToTake', actionToTake);
-                        rule.set('maxValue', data.max_value);
-                        
-                        var maxvalue = parseInt(rule.maxValue);
-                        var curvalue = parseInt(rule.value);
-                        if (curvalue > maxvalue) {
-                            rule.set('value', maxvalue);
-                        }
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while updating rule');
-                        rule.set('pendingAction', false);
+                }).success(function(data) {
+                    info('Successfully updated rule ', id);
+                    rule.set('pendingAction', false);
+                    rule.set('value', value);
+                    rule.set('metric', metric);
+                    rule.set('command', command);
+                    rule.set('operator', operator);
+                    rule.set('actionToTake', actionToTake);
+                    rule.set('maxValue', data.max_value);
+
+                    var maxvalue = parseInt(rule.maxValue);
+                    var curvalue = parseInt(rule.value);
+                    if (curvalue > maxvalue) {
+                        rule.set('value', maxvalue);
                     }
+                }).error(function(message) {
+                    Mist.notificationController.notify('Error while updating rule: ' + message);
+                    rule.set('pendingAction', false);
                 });
             },
 

@@ -22,6 +22,7 @@ define('app/models/machine', ['ember'],
             hasMonitoring: null,
             probeInterval: 30000,
             pendingCreation: null,
+            isDestroying : false,
             
             state: 'stopped',
             prevState: null,
