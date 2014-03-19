@@ -66,7 +66,16 @@ define('app/controllers/machine_manual_monitoring', ['ember'],
                 }).complete(function(success, data) {
                     if (callback) callback(success, data);
                 });
-            }
+            },
+
+
+            machineProbedObserver: function() {
+                if (this.machine && this.machine.probed
+                    && !this.machine.enablingMonitoring) {
+                        Mist.monitoringController.enableMonitoring(this.machine);
+                        this.close();
+                }
+            }.observes('machine.probed')
         });
     }
 );
