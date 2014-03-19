@@ -146,7 +146,6 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     }
                 }
 
-                var payload = ;
 
                 rule.set('pendingAction', true);
                 Mist.ajax.POST('/rules', {
