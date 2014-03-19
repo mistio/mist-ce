@@ -146,41 +146,34 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     }
                 }
 
-                var payload = {
+                var payload = ;
+
+                rule.set('pendingAction', true);
+                Mist.ajax.POST('/rules', {
                     'id': id,
                     'value': value,
                     'metric': metric,
                     'command': command,
                     'operator': operator.title,
                     'action': actionToTake,
-                };
+                }).success(function(data) {
+                    info('Successfully updated rule ', id);
+                    rule.set('pendingAction', false);
+                    rule.set('value', value);
+                    rule.set('metric', metric);
+                    rule.set('command', command);
+                    rule.set('operator', operator);
+                    rule.set('actionToTake', actionToTake);
+                    rule.set('maxValue', data.max_value);
 
-                rule.set('pendingAction', true);
-                $.ajax({
-                    url: 'rules',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    success: function(data) {
-                        info('Successfully updated rule ', id);
-                        rule.set('pendingAction', false);
-                        rule.set('value', value);
-                        rule.set('metric', metric);
-                        rule.set('command', command);
-                        rule.set('operator', operator);
-                        rule.set('actionToTake', actionToTake);
-                        rule.set('maxValue', data.max_value);
-
-                        var maxvalue = parseInt(rule.maxValue);
-                        var curvalue = parseInt(rule.value);
-                        if (curvalue > maxvalue) {
-                            rule.set('value', maxvalue);
-                        }
-                    },
-                    error: function(jqXHR, textstate, errorThrown) {
-                        Mist.notificationController.notify('Error while updating rule');
-                        rule.set('pendingAction', false);
+                    var maxvalue = parseInt(rule.maxValue);
+                    var curvalue = parseInt(rule.value);
+                    if (curvalue > maxvalue) {
+                        rule.set('value', maxvalue);
                     }
+                }).error(function(message) {
+                    Mist.notificationController.notify('Error while updating rule: ' + message);
+                    rule.set('pendingAction', false);
                 });
             },
 
