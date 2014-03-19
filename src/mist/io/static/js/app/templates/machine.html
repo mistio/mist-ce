@@ -137,8 +137,10 @@
                            class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-star"
                            {{action "enableMonitoringClicked" target="view"}}>Enable</a>
                            {{#if enablingMonitoring}}
-                        <div class="ajax-loader"></div>
-                        {{/if}}
+                               {{#unless probed}} <!-- Which means user not doing manual collectd installation -->
+                               <div class="ajax-loader"></div>
+                               {{/unless}}
+                           {{/if}}
                     </div>
 
                 </div>
