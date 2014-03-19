@@ -81,21 +81,15 @@ define('app/views/rule', ['app/views/templated','ember'],
                 deleteRuleClicked: function(){
                     this.rule.set('pendingAction', true);
                     var that = this;
-                    $.ajax({
-                        url: 'rules/' + that.rule.id,
-                        type: 'DELETE',
-                        contentType: 'application/json',
-                        success: function(data) {
-                            info('Successfully deleted rule ', that.rule.id);
-                            Mist.rulesController.removeObject(that.rule);
-                            Mist.rulesController.redrawRules();
-                            that.rule.set('pendingAction', false);
-                        },
-                        error: function(jqXHR, textstate, errorThrown) {
-                            Mist.notificationController.notify('Error while deleting rule');
-                            error(textstate, errorThrown, 'while deleting rule');
-                            that.rule.set('pendingAction', false);
-                        }
+                    Mist.ajax.DELETE('/rules/' + that.rule.id, {
+                    }).success(function(){
+                        info('Successfully deleted rule ', that.rule.id);
+                        Mist.rulesController.removeObject(that.rule);
+                        Mist.rulesController.redrawRules();
+                        that.rule.set('pendingAction', false);
+                    }).error(function(message) {
+                        Mist.notificationController.notify('Error while deleting rule: ' + message);
+                        that.rule.set('pendingAction', false);
                     });
                 }
             },
