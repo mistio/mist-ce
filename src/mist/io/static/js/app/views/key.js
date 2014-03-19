@@ -128,7 +128,6 @@ define('app/views/key', ['app/views/mistscreen', 'app/models/machine'],
 
             actions: {
 
-
                 displayClicked: function () {
                     Mist.keysController.getPrivateKey(this.key.id, function (success, keyPrivate) {
                         if (success) {

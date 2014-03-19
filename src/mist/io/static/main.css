@@ -140,6 +140,9 @@ textarea {
 .huge-popup {
     width: 100% !important;
 }
+.ui-popup .ui-title {
+    margin: 0 auto !important;
+}
 
 
 /* Side panel

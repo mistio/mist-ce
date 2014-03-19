@@ -169,7 +169,7 @@ define('app/controllers/machine_keys', ['ember'],
                 $("#machine-userPort-popup").find("#port").val("")
             },
 
-            
+
 
             /**
              *
@@ -183,7 +183,7 @@ define('app/controllers/machine_keys', ['ember'],
 
 
             portFieldObserver: function(){
-                
+
                 // Allow only numerical values
                 if(this.port)
                     this.set('port',this.port.replace(/\D/g, ''));
