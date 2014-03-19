@@ -1381,12 +1381,14 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
 
 
 def enable_monitoring(user, backend_id, machine_id,
-                      name='', dns_name='', public_ips=None, no_ssh=False):
+                      name='', dns_name='', public_ips=None,
+                      no_ssh=False, dry=False):
     """Enable monitoring for a machine."""
     backend = user.backends[backend_id]
     payload = {
         'action': 'enable',
         'no_ssh': True,
+        'dry': dry,
         'name': name,
         'public_ips': ",".join(public_ips),
         'dns_name': dns_name,
@@ -1400,35 +1402,37 @@ def enable_monitoring(user, backend_id, machine_id,
     }
     url_scheme = "%s/backends/%s/machines/%s/monitoring"
     try:
-        ret = requests.post(
+        resp = requests.post(
             url_scheme % (config.CORE_URI, backend_id, machine_id),
-            params=payload,
+            data=json.dumps(payload),
             headers={'Authorization': get_auth_header(user)},
             verify=config.SSL_VERIFY
         )
     except requests.exceptions.SSLError as exc:
         log.error("%r", exc)
         raise SSLError()
-    if ret.status_code != 200:
-        if ret.status_code == 402:
-            raise PaymentRequiredError(ret.text.replace('Payment required: ', ''))
+    if not resp.status_code.ok:
+        if resp.status_code == 402:
+            raise PaymentRequiredError(resp.text.replace('Payment required: ', ''))
         else:
             raise ServiceUnavailableError()
 
-    ret_dict = json.loads(ret.content)
-    host = ret_dict.get('host')
-    deploy_kwargs = ret_dict.get('deploy_kwargs')
+    resp_dict = resp.json()
+    host = resp_dict.get('host')
+    deploy_kwargs = resp_dict.get('deploy_kwargs')
     command = deploy_collectd_command(deploy_kwargs)
-    stdout = ''
-    if not no_ssh:
-        stdout = ssh_command(user, backend_id, machine_id, host, command)
-
-    return {
-        'cmd_output': stdout,
+    ret_dict = {
         'host': host,
         'deploy_kwargs': deploy_kwargs,
         'command': command,
     }
+    if dry:
+        return ret_dict
+    stdout = ''
+    if not no_ssh:
+        stdout = ssh_command(user, backend_id, machine_id, host, command)
+    ret_dict['cmd_output'] = stdout
+    return ret_dict
 
 
 def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
