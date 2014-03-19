@@ -29,8 +29,10 @@ define('app/controllers/machine_manual_monitoring', ['ember'],
 
                 var that = this;
                 this.getMonitoringCommand(this.machine, function(success, data) {
-                    if (success)
+                    if (success) {
                         that.set('command', data.command);
+                        $('#manual-monitoring-popup').popup('open');
+                    }
                 });
             },
 
