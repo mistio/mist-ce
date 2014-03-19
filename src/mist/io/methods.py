@@ -1411,7 +1411,7 @@ def enable_monitoring(user, backend_id, machine_id,
     except requests.exceptions.SSLError as exc:
         log.error("%r", exc)
         raise SSLError()
-    if not resp.status_code.ok:
+    if not resp.ok:
         if resp.status_code == 402:
             raise PaymentRequiredError(resp.text.replace('Payment required: ', ''))
         else:
