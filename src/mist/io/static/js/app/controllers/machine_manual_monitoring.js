@@ -29,12 +29,8 @@ define('app/controllers/machine_manual_monitoring', ['ember'],
 
                 var that = this;
                 this.getMonitoringCommand(this.machine, function(success, data) {
-                    if (success) {
-                        $('#manual-monitoring-popup').popup('open');
-                        that.set('commandUuid', data.uuid);
-                        that.set('commandPasswd', data.passwd);
-                        that.set('commandMonitorServer', data.monitor_server);
-                    }
+                    if (success)
+                        that.set('command', data.command);
                 });
             },
 
@@ -54,39 +50,21 @@ define('app/controllers/machine_manual_monitoring', ['ember'],
 
             getMonitoringCommand: function(machine, callback) {
                 var that = this;
-                machine.set('enablingMonitoring', true);
-                machine.set('pendingMonitoring', true);
                 Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring', {
                     'action': 'enable',
                     'dns_name': machine.extra.dns_name ? machine.extra.dns_name : 'n/a',
                     'public_ips': machine.public_ips ? machine.public_ips : [],
                     'name': machine.name ? machine.name : machine.id,
-                    'no_ssh': true
+                    'no_ssh': true,
+                    'dry': true,
                 }).success(function(data) {
-
                     that.set('command', data.command);
-                    machine.set('hasMonitoring', true);
-                    machine.set('enablingMonitoring', false);
-                    Mist.set('authenticated', true);
-
-                }).error(function(message, statusCode) {
-                    //machine.set('enablingMonitoring', false);
-                    machine.set('pendingMonitoring', false);
-                    if (statusCode == 402) {
-                        Mist.notificationController.timeNotify(message, 5000);
-                    } else {
-                        Mist.notificationController.notify('Failed to change monitoring to ' + machine.name);
-                    }
+                }).error(function(message) {
+                    Mist.notificationController.notify('Failed to enable monitoring: ' + message);
                 }).complete(function(success, data) {
                     if (callback) callback(success, data);
                 });
-            },
-
-            /**
-             *
-             *  Observers
-             *
-             */
+            }
         });
     }
 );

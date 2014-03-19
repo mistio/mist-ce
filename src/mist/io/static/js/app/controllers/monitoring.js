@@ -37,7 +37,7 @@ define('app/controllers/monitoring', [
             }.on('init'),
 
 
-            enableMonitoring: function(machine, callback) {
+            enableMonitoring: function(machine, callback, no_ssh) {
 
                 var that = this;
                 machine.set('enablingMonitoring', true);
@@ -45,7 +45,8 @@ define('app/controllers/monitoring', [
                     'action': 'enable',
                     'dns_name': machine.extra.dns_name ? machine.extra.dns_name : 'n/a',
                     'public_ips': machine.public_ips ? machine.public_ips : [],
-                    'name': machine.name ? machine.name : machine.id
+                    'name': machine.name ? machine.name : machine.id,
+                    'no_ssh': no_ssh || false,
                 }).success(function(data) {
 
                     Mist.set('authenticated', true);
