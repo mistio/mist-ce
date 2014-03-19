@@ -134,7 +134,7 @@ define('app/views/machine', ['app/views/mistscreen'],
 
             updateMonitoringCollapsible: function() {
                 Ember.run.next(this, function() {
-                    if (Mist.backendsController.checkedMonitoring) {
+                    if (Mist.backendsController.checkedMonitoring && this.machine.id) {
                         $('#monitoring-collapsible').show();
                     } else {
                         $('#monitoring-collapsible').hide();
