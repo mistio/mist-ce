@@ -51,7 +51,9 @@ define('app/views/monitoring', ['app/views/templated','ember'],
 
                 this._super();
                 Mist.monitoringController.request.stop();
-                Mist.monitoringController.graphs.disableAnimation();
+                // Disable animation if graphs are in the dom (we check at least one of them)
+                if(this.graphs.cpu.isAppended)
+                    Mist.monitoringController.graphs.disableAnimation();
                 Mist.monitoringController.reset();
 
                 // Re-Initialize Enable Button Of Jquery Mobile
