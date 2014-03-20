@@ -488,6 +488,8 @@ def connect_provider(backend):
             )
     elif backend.provider == Provider.LINODE:
         conn = driver(backend.apisecret)
+    elif backend.provider == Provider.GCE:
+        conn = driver(backend.apikey, backend.apisecret, project=backend.tenant_name)        
     elif backend.provider in [Provider.RACKSPACE_FIRST_GEN,
                               Provider.RACKSPACE]:
         conn = driver(backend.apikey, backend.apisecret,
@@ -553,6 +555,10 @@ def get_machine_actions(machine_from_api, conn):
         can_reboot = True
         can_tag = False
 
+    if conn.type is Provider.GCE:
+        can_start = False
+        can_stop = False
+
     return {'can_stop': can_stop,
             'can_start': can_start,
             'can_destroy': can_destroy,
@@ -578,8 +584,9 @@ def list_machines(user, backend_id):
     ret = []
     for m in machines:
         tags = m.extra.get('tags') or m.extra.get('metadata') or {}
-        tags = [value for key, value in tags.iteritems() if key != 'Name']
-
+        if type(tags) == dict:
+            tags = [value for key, value in tags.iteritems() if key != 'Name']
+        #in GCE tags is list
         if m.extra.get('availability', None):
             # for EC2
             tags.append(m.extra['availability'])
@@ -608,7 +615,7 @@ def list_machines(user, backend_id):
 
 @core_wrapper
 def create_machine(user, backend_id, key_id, machine_name, location_id,
-                   image_id, size_id, script, image_extra, disk):
+                   image_id, size_id, script, image_extra, disk, image_name, size_name, location_name):
 
     """Creates a new virtual machine on the specified backend.
 
@@ -655,10 +662,10 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     #print "Public: " + public_key
     #print "Private: " + private_key
 
-    size = NodeSize(size_id, name='', ram='', disk=disk,
+    size = NodeSize(size_id, name=size_name, ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
-    image = NodeImage(image_id, name='', extra=image_extra, driver=conn)
-    location = NodeLocation(location_id, name='', country='', driver=conn)
+    image = NodeImage(image_id, name=image_name, extra=image_extra, driver=conn)
+    location = NodeLocation(location_id, name=location_name, country='', driver=conn)
 
     if conn.type in [Provider.RACKSPACE_FIRST_GEN,
                      Provider.RACKSPACE]:
@@ -677,6 +684,15 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
                                   script, machine_name, image, size, location)
     elif conn.type is Provider.NEPHOSCALE:
         node = _create_machine_nephoscale(conn, key_id, private_key, public_key,
+                                         script, machine_name, image, size,
+                                         location)
+    elif conn.type is Provider.GCE:
+        sizes = conn.list_sizes(location=location_name)
+        for size in sizes:
+            if size.id == size_id:
+                size = size
+                break
+        node = _create_machine_gce(conn, key_id, private_key, public_key,
                                          script, machine_name, image, size,
                                          location)
     elif conn.type is Provider.SOFTLAYER:
@@ -965,6 +981,32 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
     return node
 
 
+def _create_machine_gce(conn, key_name, private_key, public_key,
+                                 script, machine_name, image, size, location):
+    """Create a machine in GCE.
+
+    Here there is no checking done, all parameters are expected to be
+    sanitized by create_machine.
+
+    """
+    key = public_key.replace('\n', '')
+
+    metadata = {'items': [{'key': 'startup-script', 'value': script},
+                          {'key': 'sshKeys', 'value': 'user:%s' % key}]}
+    with get_temp_file(private_key) as tmp_key_path:
+        try:
+            node = conn.create_node(
+                name=machine_name,
+                image=image,
+                size=size,
+                location=location,
+                ex_metadata=metadata
+            )
+        except Exception as e:
+            raise MachineCreationError("Google Compute Engine, got exception %s" % e)
+    return node
+
+
 def _create_machine_linode(conn, key_name, private_key, public_key, script,
                           machine_name, image, size, location):
     """Create a machine in Linode.
@@ -1011,7 +1053,14 @@ def _machine_action(user, backend_id, machine_id, action):
     if user.backends[backend_id].provider == 'bare_metal':
         bare_metal = True
     conn = connect_provider(user.backends[backend_id])
-    machine = Node(machine_id,
+    #GCE needs machine.extra as well, so we need the real machine object
+    try:
+        for node in conn.list_nodes():
+            if node.id == machine_id:
+                machine = node
+                break
+    except:       
+        machine = Node(machine_id,
                    name=machine_id,
                    state=0,
                    public_ips=[],
@@ -1164,6 +1213,17 @@ def list_images(user, backend_id, term=None):
             ec2_images = conn.list_images(None, imgs)
             for image in ec2_images:
                 image.name = config.EC2_IMAGES[conn.type].get(image.id, image.name)
+        elif conn.type == Provider.GCE:
+            # Currently not other way to receive all images :(
+            rest_images = conn.list_images()
+            for OS in ['debian-cloud', 'centos-cloud', 'suse-cloud']:
+                try:
+                    gce_images = conn.list_images(ex_project=OS)
+                    rest_images += gce_images
+                except:
+                    #eg ResourceNotFoundError
+                    pass
+            rest_images = [image for image in rest_images if not image.extra['deprecated']]
         else:
             rest_images = conn.list_images()
             starred_images = [image for image in rest_images
@@ -1202,7 +1262,15 @@ def list_sizes(user, backend_id):
     conn = connect_provider(backend)
 
     try:
-        sizes = conn.list_sizes()
+        if conn.type == Provider.GCE:
+            #have to get sizes for one location only, since list_sizes returns
+            #sizes for all zones (currently 88 sizes)
+            sizes = conn.list_sizes(location='us-central1-a')
+            sizes = [s for s in sizes if s.name and not s.name.endswith('-d')]
+            #deprecated sizes for GCE
+            
+        else:
+            sizes = conn.list_sizes()
     except:
         raise BackendUnavailableError(backend_id)
 
