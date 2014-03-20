@@ -1,7 +1,7 @@
 define('app/views/machine', ['app/views/mistscreen'],
     /**
      *  Single Machine View
-     * 
+     *
      *  @returns Class
      */
     function(MistScreen) {
@@ -23,9 +23,9 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
             load: function() {
@@ -53,9 +53,9 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
             updateCurrentMachine: function() {
@@ -134,7 +134,7 @@ define('app/views/machine', ['app/views/mistscreen'],
 
             updateMonitoringCollapsible: function() {
                 Ember.run.next(this, function() {
-                    if (Mist.backendsController.checkedMonitoring) {
+                    if (Mist.backendsController.checkedMonitoring && this.machine.id) {
                         $('#monitoring-collapsible').show();
                     } else {
                         $('#monitoring-collapsible').hide();
@@ -144,14 +144,17 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             updateChangeMonitoringButton: function() {
-                if (this.machine.disablingMonitoring) {
-                    $('#disable-monitor-btn').addClass('ui-state-disabled');
-                } else if (this.machine.enablingMonitoring) {
+
+                Ember.run.next(this, function() {
                     $('#enable-monitor-btn').addClass('ui-state-disabled');
-                } else {
-                    $('#disable-monitor-btn').removeClass('ui-state-disabled');
-                    $('#enable-monitor-btn').removeClass('ui-state-disabled');
-                }
+
+                    if (this.machine.disablingMonitoring) {
+                        $('#disable-monitor-btn').addClass('ui-state-disabled');
+                    } else if (!this.machine.pendingMonitoring) {
+                        $('#disable-monitor-btn').removeClass('ui-state-disabled');
+                        $('#enable-monitor-btn').removeClass('ui-state-disabled');
+                    }
+                });
             },
 
             rulesObserver: function(){
@@ -181,7 +184,7 @@ define('app/views/machine', ['app/views/mistscreen'],
                     Ember.run.later(this, function() {
                         this.updateUptime();
                     }, 1000);
-    
+
                     // Calculate uptime
                     var machine = this.machine;
                     if (!machine) return 0;
@@ -200,19 +203,19 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             /**
-             * 
+             *
              *  Actions
-             * 
+             *
              */
-            
+
             actions: {
 
 
                 manageKeysClicked: function() {
                     Mist.machineKeysController.open(this.machine);
                 },
-               
-               
+
+
                 addKeyClicked: function() {
                     Mist.machineKeysController.openKeyList(this.machine);
                 },
@@ -236,36 +239,17 @@ define('app/views/machine', ['app/views/mistscreen'],
 
                     if (Mist.authenticated) {
                         if (Mist.current_plan) {
-                            // TODO: return machine_limit from server (core)
-                            //if (Mist.current_plan.machine_limit >= Mist.monitored_machines.length) {
-                                if (this.machine.probed) {
-                                    var machine = this.machine;
-                                    Mist.confirmationController.set('title', 'Enable monitoring');
-                                    Mist.confirmationController.set('text', 'Are you sure you want to enable monitoring for this machine?');
-                                    Mist.confirmationController.set('callback', function () {
-                                        Mist.monitoringController.changeMonitoring(machine);
-                                    });
-                                    Mist.confirmationController.show();
-                                } else {
-                                    Mist.notificationController.set('msgHeader', 'No keys');
-                                    Mist.notificationController.set('msgPart1', "The collectd deamon can't be installed automatically " + 
-                                                                    'because Mist.io can not connect to this machine.');
-                                    Mist.notificationController.set('msgPart2', 'To connect a machine with Mist.io you can follow the ' + 
-                                                                                'instructions on the help page.');
-                                    Mist.notificationController.set('msgLink', 'Link to help page');
-                                    Mist.notificationController.set('msgHref', 'https://mistio.zendesk.com/hc/en-us/articles/200996166');
-                                    Mist.notificationController.showMessagebox();
-                                }
-                            /*} else {
-                                Mist.notificationController.set('msgHeader', 'Machine limit reached');
-                                Mist.notificationController.set('msgPart1', 'The maximum number of monitored machines' +
-                                                                            ' has been reached');
-                                Mist.notificationController.set('msgPart1', 'In order to monitor more machines you should' +
-                                                                            ' upgrade to another plan');
-                                Mist.notificationController.set('msgPart3', 'You can do that in the Account page, which can' +
-                                                                            'be accessed from the menu button on the top right corner');
-                                Mist.notificationController.showMessagebox();
-                            }*/
+                            if (this.machine.probed) {
+                                var machine = this.machine;
+                                Mist.confirmationController.set('title', 'Enable monitoring');
+                                Mist.confirmationController.set('text', 'Are you sure you want to enable monitoring for this machine?');
+                                Mist.confirmationController.set('callback', function () {
+                                    Mist.monitoringController.changeMonitoring(machine);
+                                });
+                                Mist.confirmationController.show();
+                            } else {
+                                Mist.machineManualMonitoringController.open(this.machine);
+                            }
                         } else {
                             Mist.notificationController.set('msgHeader', 'No plan');
                             Mist.notificationController.set('msgPart1', 'In order to use our monitoring service' +
@@ -321,14 +305,19 @@ define('app/views/machine', ['app/views/mistscreen'],
                             Mist.notificationController.notify('Failed to probe machine');
                         }
                     })
+                },
+
+
+                closeManualMonitoringPopup: function() {
+                    $('#manual-monitoring-popup').popup('close');
                 }
             },
 
 
             /**
-             * 
+             *
              *  Computed Properties
-             * 
+             *
              */
 
             upFor: function() {
@@ -360,16 +349,16 @@ define('app/views/machine', ['app/views/mistscreen'],
                 if (this.machine && this.machine.uptimeChecked > 0) {
                     var x = (Date.now()-this.machine.uptimeChecked) / 1000;
                     var minutes = Math.floor(x / 60);
-                    if (minutes > 1) 
+                    if (minutes > 1)
                         ret = minutes + ' minutes ago';
                     else if (minutes == 1)
                         ret = "1 minute ago";
-                    else 
-                        ret = "just now";                    
+                    else
+                        ret = "just now";
                 }
                 return ret;
             }.property('machine.uptime'),
-            
+
             basicInfo: function() {
                 if (!this.machine) return;
 
@@ -401,7 +390,7 @@ define('app/views/machine', ['app/views/mistscreen'],
                 for (item in basicInfo) {
                     if (typeof basicInfo[item] == 'string') {
                         ret.push({key:item, value: basicInfo[item]});
-                    }               
+                    }
                 }
                 return ret;
             }.property('machine'),
@@ -410,21 +399,21 @@ define('app/views/machine', ['app/views/mistscreen'],
             metadata: function() {
                 if (!this.machine || !this.machine.extra) return;
                 var ret = [];
-                
+
                 for (item in this.machine.extra) {
                     var value = this.machine.extra[item];
                     if (typeof value == 'string' || typeof value == 'number') {
                         ret.push({key:item, value: value});
                     }
                 }
-                
+
                 Ember.run.next(function() {
                     if ($('#single-machine-metadata').collapsible) {
                         $('#single-machine-metadata').collapsible();
                     }
                 });
                 return ret;
-                
+
             }.property('machine', 'machine.extra'),
 
 
@@ -441,9 +430,9 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
             modelObserver: function() {
@@ -481,7 +470,7 @@ define('app/views/machine', ['app/views/mistscreen'],
 
             changeMonitoringObserver: function() {
                 Ember.run.once(this,  'updateChangeMonitoringButton');
-            }.observes('machine.disablingMonitoring', 'machine.enablingMonitoring'),
+            }.observes('machine.disablingMonitoring', 'machine.enablingMonitoring', 'machine.pendingMonitoring'),
 
 
             checkedMonitoringObserver: function() {

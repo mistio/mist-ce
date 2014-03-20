@@ -7,87 +7,111 @@ define('app/controllers/monitoring', [
      * @returns Class
      */
     function() {
-        return Ember.ObjectController.extend(Ember.Evented,{
+        return Ember.Object.extend(Ember.Evented,{
 
             /**
              *
              * Gets all monitoring related data from
              * the server
              */
-             load: function(callback) {
+            load: function(callback) {
 
-                 if (!Mist.authenticated) {
+                if (!Mist.authenticated) {
                     Mist.backendsController.set('checkedMonitoring', true);
                     return;
-                 }
+                }
 
-                 var that = this;
-                 this.checkingMonitoring = true;
-                 Mist.ajax.GET('/monitoring', {
-                 }).success(function(data) {
-                     that._updateMonitoringData(data);
-                 }).error(function() {
-                     Mist.notificationController.notify('Failed to get monitoring data');
-                 }).complete(function(success, data) {
-                     that.checkingMonitoring = false;
-                     Mist.backendsController.set('checkedMonitoring', true);
-                     that.trigger('onMonitoringDataUpdate');
-                     if (callback) callback(success, data);
-                 });
-             }.on('init'),
+                var that = this;
+                this.checkingMonitoring = true;
+                Mist.ajax.GET('/monitoring', {
+                }).success(function(data) {
+                    that._updateMonitoringData(data);
+                }).error(function() {
+                    Mist.notificationController.notify('Failed to get monitoring data');
+                }).complete(function(success, data) {
+                    that.checkingMonitoring = false;
+                    Mist.backendsController.set('checkedMonitoring', true);
+                    that.trigger('onMonitoringDataUpdate');
+                    if (callback) callback(success, data);
+                });
+            }.on('init'),
 
 
-            changeMonitoring: function(machine, callback) {
-                 var that = this;
-                 //this.set('changingMonitoring', true);
-                 if (machine.hasMonitoring) {
-                     machine.set('disablingMonitoring', true);
-                 } else {
-                     machine.set('enablingMonitoring', true);
-                 }
-                 Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring', {
-                    'action': machine.hasMonitoring ? 'disable' : 'enable',
+            enableMonitoring: function(machine, callback, no_ssh) {
+
+                var that = this;
+                machine.set('enablingMonitoring', true);
+                Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring', {
+                    'action': 'enable',
+                    'dns_name': machine.extra.dns_name ? machine.extra.dns_name : 'n/a',
+                    'public_ips': machine.public_ips ? machine.public_ips : [],
+                    'name': machine.name ? machine.name : machine.id,
+                    'no_ssh': no_ssh || false,
+                }).success(function(data) {
+
+                    Mist.set('authenticated', true);
+                    machine.set('hasMonitoring', true);
+                    machine.set('pendingFirstData', true);
+                    machine.set('enablingMonitoring', false);
+
+                }).error(function(message, statusCode) {
+
+                    machine.set('enablingMonitoring', false);
+                    if (statusCode == 402) {
+                        Mist.notificationController.timeNotify(message, 5000);
+                    } else {
+                        Mist.notificationController.notify('Error when changing monitoring to ' + machine.name);
+                    }
+                }).complete(function(success, data) {
+                    if (callback) callback(success, data);
+                });
+            },
+
+
+            disableMonitoring: function(machine, callback) {
+
+                var that = this;
+                machine.set('disablingMonitoring', true);
+                Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring', {
+                    'action': 'disable',
                     'dns_name': machine.extra.dns_name ? machine.extra.dns_name : 'n/a',
                     'public_ips': machine.public_ips ? machine.public_ips : [],
                     'name': machine.name ? machine.name : machine.id
-                 }).success(function(data) {
-                     if (!machine.hasMonitoring) {
+                }).success(function(data) {
 
-                        // Give some time to graphite to collect data (fix for new machines)
-                        window.setTimeout(function(){
-                            machine.set('hasMonitoring', true);
-                            machine.set('enablingMonitoring', false);
-
-                        },11000);
-
-                     } else {
-                         machine.set('hasMonitoring', false);
-                         // Remove machine from monitored_machines
-                         Mist.monitored_machines.some(function(machine_tupple) {
-                            if (machine_tupple[1] == machine.id && machine_tupple[0] == machine.backend.id) {
+                    machine.set('hasMonitoring', false);
+                    // Remove machine from monitored_machines
+                    Mist.monitored_machines.some(function(machine_tupple) {
+                        if (machine_tupple[1] == machine.id &&
+                            machine_tupple[0] == machine.backend.id) {
                                 Mist.monitored_machines.removeObject(machine_tupple);
-                            }
-                         });
-                         machine.set('disablingMonitoring', false);
-                     }
-                     Mist.set('authenticated', true);
-                 }).error(function(message, statusCode) {
-                     if (machine.hasMonitoring) {
-                         machine.set('disablingMonitoring', false);
-                     } else {
-                         machine.set('enablingMonitoring', false);
-                     }
+                        }
+                    });
+                    machine.set('disablingMonitoring', false);
+                    Mist.set('authenticated', true);
 
-                     if (statusCode == 402){
-                         Mist.notificationController.timeNotify(message, 5000);
-                     } else {
-                         Mist.notificationController.notify('Error when changing monitoring to ' + machine.name);
-                     }
-                 }).complete(function(success, data) {
-                     if (callback) callback(success, data);
-                 });
-             },
+                }).error(function(message, statusCode) {
 
+                    machine.set('disablingMonitoring', false);
+                    if (statusCode == 402) {
+                        Mist.notificationController.timeNotify(message, 5000);
+                    } else {
+                        Mist.notificationController.notify('Error when changing monitoring to ' + machine.name);
+                    }
+                }).complete(function(success, data) {
+                    if (callback) callback(success, data);
+                });
+            },
+
+
+            changeMonitoring: function(machine, callback) {
+
+                if (machine.hasMonitoring) {
+                    this.disableMonitoring(machine, callback);
+                } else {
+                    this.enableMonitoring(machine, callback);
+                }
+            },
 
              /**
              *
@@ -160,6 +184,11 @@ define('app/controllers/monitoring', [
                             self.graphs.updateData(result.data);
                         }
                     }
+                });
+                // Disable updates if machine is being destroyed
+                arguments.machineModel.addObserver("beingDestroyed",function(){
+                    if(self.request.machine && self.request.machine.beingDestroyed)
+                        self.request.disableUpdates(false);
                 });
 
                 this.request.start();
@@ -261,6 +290,10 @@ define('app/controllers/monitoring', [
                     if(this.updateData && !this.running){
                         window.monitoringInterval = window.setInterval(function() {
 
+                            // Stop updates if updateData is set to false
+                            if(!self.updateData)
+                                window.clearInterval(window.monitoringInterval);
+
                             // Lock request so no other request can be done in the same time
                             self.locked = true;
 
@@ -320,9 +353,9 @@ define('app/controllers/monitoring', [
                            reason = (typeof reason == 'undefined' ? 'manualReload' : reason);
 
                            // Enable/Disable updates
-                           if(!self.updateData)
-                                Mist.monitoringController.graphs.disableAnimation(false);
-                           else
+                           if(!self.updateData && Mist.monitoringController.graphs.animationEnabled)
+                                Mist.monitoringController.graphs.disableAnimation();
+                           else if( self.updateData && !Mist.monitoringController.graphs.animationEnabled)
                                 Mist.monitoringController.graphs.enableAnimation();
 
                             Mist.monitoringController.graphs.clearData();
@@ -357,6 +390,7 @@ define('app/controllers/monitoring', [
 
                     // Clear Intervals
                     this.stopDataUpdates();
+                    this.machine.set('pendingStats', true);
 
                     // Wait Until Requests are not locked
                     var self   = this;
@@ -393,7 +427,8 @@ define('app/controllers/monitoring', [
                             self.locked = true;
                             self.machine.set('pendingStats', true);
 
-                            Mist.monitoringController.graphs.disableAnimation();
+                            if(Mist.monitoringController.graphs.animationEnabled)
+                                Mist.monitoringController.graphs.disableAnimation();
                             self.receiveData(start, stop, step,callback);
                         }
                     }
@@ -465,7 +500,7 @@ define('app/controllers/monitoring', [
                     this.updateData = false;
                     if(reload)
                         this.reload('updatesDisabled');
-                },
+                }.observes("machine.isDestroying"),
 
 
                 /**
@@ -514,6 +549,15 @@ define('app/controllers/monitoring', [
                                 if(data.load.length == 0)
                                     throw "No Data Received";
 
+                                // TODO: Maybe there is a better to tell if
+                                // we have data
+                                data.load.some(function(tuple) {
+                                    if (tuple[1] != null) {
+                                        self.machine.set('pendingFirstData', false);
+                                        return true;
+                                    }
+                                });
+
                                 var disks = [];
                                 var netInterfaces = [];
 
@@ -543,7 +587,7 @@ define('app/controllers/monitoring', [
 
 
                                 // Set CPU Cores
-                                receivedData.cpuCores = data.cpu.cores 
+                                receivedData.cpuCores = data.cpu.cores
 
                                 // Create time-value objects to be used with d3
                                 data.cpu.utilization.forEach(function(item) {
@@ -695,10 +739,10 @@ define('app/controllers/monitoring', [
                 lastMetrictime : null,  // Date Object
                 callback       : null,  // Function
                 timeWindow     : 0,     // integer in miliseconds
-                timeStart      : 0,     // integer in seconds 
-                timeStop       : 0,     // integer in seconds 
+                timeStart      : 0,     // integer in seconds
+                timeStop       : 0,     // integer in seconds
                 step           : 0,     // integer in miliseconds
-                timeGap        : 0,     // integer in seconds 
+                timeGap        : 0,     // integer in seconds
                 updateInterval : 0,     // integer in miliseconds
                 updateData     : false, // boolean
                 locked         : false, // boolean
@@ -766,21 +810,11 @@ define('app/controllers/monitoring', [
                 disableAnimation : function(stopCurrent) {
 
                     // Default StopCurrent true
-                    stopCurrent = (typeof stopCurrent === 'undefined') ? true : stopCurrent ;
+                    stopCurrent = (typeof stopCurrent == 'undefined') ? true : stopCurrent ;
 
-                    if(stopCurrent) {
-
-                        for(metric in this.instances)
-                        {
-                            this.instances[metric].disableAnimation();
-                        }
-                    }
-                    else {
-
-                        for(metric in this.instances)
-                        {
-                            this.instances[metric].disableNextAnimation();
-                        }
+                    for(metric in this.instances)
+                    {
+                        this.instances[metric].disableAnimation(stopCurrent);
                     }
 
                     this.animationEnabled = false;
@@ -1088,9 +1122,6 @@ define('app/controllers/monitoring', [
                         }
                         else{
 
-                            self.disable();
-
-
                             var changeTimeWindow = function(){
                                 controller.graphs.changeTimeWindow(timeWindow);
                             }
@@ -1100,7 +1131,7 @@ define('app/controllers/monitoring', [
 
                             var measurements = 60;
                             timeWindowInMinutes = timeWindow /60000;
-                            newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 ); 
+                            newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 );
                             controller.request.changeStep(newStep,false);
                             controller.request.changeTimeWindow(timeWindow,false);
 
@@ -1130,6 +1161,7 @@ define('app/controllers/monitoring', [
                                 }
 
                                 self.enable();
+                                Mist.monitoringController.history.enableControls();
                             })
                         }
                     };
@@ -1137,6 +1169,13 @@ define('app/controllers/monitoring', [
 
                     controller.request.stop();
 
+                    // Show pending stats popup before data request because if previous request
+                    // takes place because this feature may appear as broken
+                    Mist.monitoringController.request.machine.set('pendingStats', true);
+                    // Disable change time window button
+                    this.disable();
+                    // Temporary Disable History Controls
+                    Mist.monitoringController.history.disableControls();
                     zoom();
                 },
 
@@ -1301,6 +1340,19 @@ define('app/controllers/monitoring', [
                     Mist.monitoringController.zoom.enable();
                 },
 
+                disableControls: function() {
+                    $('#graphsGoBack').addClass('ui-disabled');
+                    $('#graphsGoForward').addClass('ui-disabled');
+                    $('#graphsResetHistory').addClass('ui-disabled');
+                },
+
+                enableControls: function() {
+                    $('#graphsGoBack').removeClass('ui-disabled');
+                    if(this.isEnabled){
+                        $('#graphsGoForward').removeClass('ui-disabled');
+                        $('#graphsResetHistory').removeClass('ui-disabled');
+                    }
+                },
 
                 /**
                 *

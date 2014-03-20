@@ -128,7 +128,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         backend.enabled = True
 
         #OpenStack does not like trailing slashes
-        #so https://192.168.1.101:5000 will work but https://192.168.1.101:5000/ won't! 
+        #so https://192.168.1.101:5000 will work but https://192.168.1.101:5000/ won't!
         if backend.provider == 'openstack':
             #Strip the v2.0 or v2.0/ at the end of the url if they are there
             if backend.apiurl.endswith('v2.0/'):
@@ -1449,12 +1449,14 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
 
 
 def enable_monitoring(user, backend_id, machine_id,
-                      name='', dns_name='', public_ips=None):
+                      name='', dns_name='', public_ips=None,
+                      no_ssh=False, dry=False):
     """Enable monitoring for a machine."""
     backend = user.backends[backend_id]
     payload = {
         'action': 'enable',
         'no_ssh': True,
+        'dry': dry,
         'name': name,
         'public_ips': ",".join(public_ips),
         'dns_name': dns_name,
@@ -1468,30 +1470,37 @@ def enable_monitoring(user, backend_id, machine_id,
     }
     url_scheme = "%s/backends/%s/machines/%s/monitoring"
     try:
-        ret = requests.post(
+        resp = requests.post(
             url_scheme % (config.CORE_URI, backend_id, machine_id),
-            params=payload,
+            data=json.dumps(payload),
             headers={'Authorization': get_auth_header(user)},
             verify=config.SSL_VERIFY
         )
     except requests.exceptions.SSLError as exc:
         log.error("%r", exc)
         raise SSLError()
-    if ret.status_code != 200:
-        if ret.status_code == 402:
-            raise PaymentRequiredError(ret.text.replace('Payment required: ', ''))
+    if not resp.ok:
+        if resp.status_code == 402:
+            raise PaymentRequiredError(resp.text.replace('Payment required: ', ''))
         else:
             raise ServiceUnavailableError()
 
-    ret_dict = json.loads(ret.content)
-    machine_uuid = ret_dict.get('uuid')
-    collectd_password = ret_dict.get('passwd')
-    monitor_url = ret_dict.get('monitor_server')
-    host = ret_dict.get('host')
-
-    stdout = _deploy_collectd(user, backend_id, machine_id, host,
-                              monitor_url, machine_uuid, collectd_password)
-    return stdout
+    resp_dict = resp.json()
+    host = resp_dict.get('host')
+    deploy_kwargs = resp_dict.get('deploy_kwargs')
+    command = deploy_collectd_command(deploy_kwargs)
+    ret_dict = {
+        'host': host,
+        'deploy_kwargs': deploy_kwargs,
+        'command': command,
+    }
+    if dry:
+        return ret_dict
+    stdout = ''
+    if not no_ssh:
+        stdout = ssh_command(user, backend_id, machine_id, host, command)
+    ret_dict['cmd_output'] = stdout
+    return ret_dict
 
 
 def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
@@ -1517,45 +1526,27 @@ def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
     ret_dict = json.loads(ret.content)
     host = ret_dict.get('host')
 
-    if not no_ssh:
-        stdout = _undeploy_collectd(user, backend_id, machine_id, host)
-    else:
-        stdout = ""
+    stdout = ""
+    try:
+        if not no_ssh:
+            stdout = _undeploy_collectd(user, backend_id, machine_id, host)
+    except:
+        pass
     return stdout
 
 
-def _deploy_collectd(user, backend_id, machine_id, host,
-                     monitor_url, machine_uuid, collectd_password):
-    """Install collectd to the machine and return command's output"""
-
-    #FIXME: do not hard-code stuff!
-    filename = 'deploy_collectd.sh'
-    uri = config.CORE_URI + '/core/scripts/%s' % filename
-    prefix = '/opt/mistio-collectd'
-    prepare_dirs = '$(command -v sudo) mkdir -p %s' % prefix
-    # in some machines, using simple sudo with output redirection doesn't work
-    # (permission denied) so we also use su to be on the safe side
-    get_script = "$(command -v sudo) su -c 'wget %s %s -O - > %s/%s'" % (
+def deploy_collectd_command(deploy_kwargs):
+    """Return command that must be run to deploy collectd on a machine."""
+    parts = ["%s=%s" % (key, value) for key, value in deploy_kwargs.items()]
+    query = "&".join(parts)
+    url = "%s/deploy_script" % config.CORE_URI
+    if query:
+        url += "?" + query
+    command = "$(command -v sudo) bash -c \"$(wget -O - %s '%s')\"" % (
         "--no-check-certificate" if not config.SSL_VERIFY else "",
-        uri,
-        prefix,
-        filename
+        url,
     )
-    make_exec = "$(command -v sudo) chmod +x %s/%s" % (prefix, filename)
-    exec_script = (
-        "$(command -v sudo) %s/%s %s %s %s" %
-        (prefix, filename, monitor_url, machine_uuid, collectd_password)
-    )
-
-    shell = Shell(host)
-    shell.autoconfigure(user, backend_id, machine_id)
-    # FIXME:parse output and let the client know about the progress/status
-    stdout = shell.command(prepare_dirs)
-    stdout += shell.command(get_script)
-    stdout += shell.command(make_exec)
-    stdout += shell.command(exec_script)
-
-    return stdout
+    return command
 
 
 def _undeploy_collectd(user, backend_id, machine_id, host):

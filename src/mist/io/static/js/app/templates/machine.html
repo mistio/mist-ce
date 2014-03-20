@@ -11,6 +11,7 @@
     </div>
 
     <div data-role="header" data-theme="a" class="single-machine-header">
+
         <span class="single-view-icon-wrapper">
             <span id="single-view-provider-icon" {{bind-attr class="view.providerIconClass"}}></span>
         </span>
@@ -52,10 +53,12 @@
 
 
         {{#if enablingMonitoring}}
+        {{#unless pendingMonitoring}}
         <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
             <span class="ui-icon ui-icon-loading"></span>
             <h1>Enabling monitoring. Please wait</h1>
         </div>
+        {{/unless}}
         {{/if}}
 
         {{#if disablingMonitoring}}
@@ -84,6 +87,15 @@
 
             {{#if hasMonitoring}}
 
+            {{#unless pendingMonitoring}}
+
+                {{#if pendingFirstData}}
+                <div class="single-machine-loader ui-loader ui-corner-all ui-body-a ui-loader-verbose">
+                    <span class="ui-icon ui-icon-loading"></span>
+                    <h1>Waiting for data</h1>
+                </div>
+                {{/if}}
+
                 {{view Mist.monitoringView}}
 
                 <div class="rules-container" data-role="listview">
@@ -102,30 +114,35 @@
                 <div data-rule="ui-grid-a">
                     <div class="ui-block-a">
                         <a id="add-rule-button"
-                            data-role="button"
-                            data-icon="plus"
-                            data-theme="d"
+                            class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-plus"
                             {{action "addRuleClicked" target="view"}}>Add Rule</a>
                     </div>
                     <div class="ui-block-b">
                         <a id="disable-monitor-btn"
-                            data-theme="b"
-                            data-role="button"
-                            data-icon="delete"
+                        class="ui-btn ui-corner-all ui-btn-b ui-btn-icon-left ui-icon-delete"
                             {{action "disableMonitoringClicked" target="view"}}>Disable</a>
                     </div>
                 </div>
                 </div>
 
+            {{/unless}}
+
             {{else}}
 
                 <div class="monitoring-dialog-container" id="monitoring-disabled">
-                    <div>Monitoring is currently disabled</div>
-                    <a id="enable-monitor-btn"
-                       data-role="button"
-                       data-icon="star"
-                       data-theme="d"
-                       {{action "enableMonitoringClicked" target="view"}}>Enable</a>
+
+                    <div id="enable-monitoring-bundle">
+                        <div>Monitoring is currently disabled</div>
+
+                        <a id="enable-monitor-btn"
+                           class="ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-star"
+                           {{action "enableMonitoringClicked" target="view"}}>Enable</a>
+
+                       {{#if Mist.machineManualMonitoringController.gettingCommand}}
+                            <div class="ajax-loader"></div>
+                       {{/if}}
+                    </div>
+
                 </div>
 
             {{/if}}
@@ -255,6 +272,23 @@
     {{view Mist.machinePowerView}}
 
     {{view Mist.confirmationDialog}}
+
+    {{view Mist.machineManualMonitoringView}}
+
+    <div id="manual-monitoring-popup" class="mid-popup" data-role="popup" data-transition="popp"
+         data-overlay-theme="b" data-disimissible="false">
+
+        <div data-role="header" data-theme="b">
+            <h1>Manual collectd installation</h1>
+        </div>
+
+        <div data-role="content" data-theme="c">
+
+            <p>Run these commands on your server:</p>
+            <textarea>Command here...</textarea>
+            <a data-role="button" {{action "closeManualMonitoringPopup" target="view"}}>Back</a>
+        </div>
+    </div>
 
     <!--
        TODO: These should be in monitoring view
