@@ -583,10 +583,14 @@ def list_machines(user, backend_id):
 
     ret = []
     for m in machines:
-        tags = m.extra.get('tags') or m.extra.get('metadata') or {}
-        if type(tags) == dict:
+        if m.driver.type == 'gce':
+            #tags and metadata exist in GCE
+            tags = m.extra.get('tags')
+        else:
+            tags = m.extra.get('tags') or m.extra.get('metadata') or {}
+        if type(tags) == dict:            
             tags = [value for key, value in tags.iteritems() if key != 'Name']
-        #in GCE tags is list
+
         if m.extra.get('availability', None):
             # for EC2
             tags.append(m.extra['availability'])
