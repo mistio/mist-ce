@@ -57,6 +57,11 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                     } else if (provider.provider.indexOf('digitalocean') > -1) {
                         this.set('firstFieldLabel', 'Client ID');
                         this.set('secondFieldLabel', 'API Key');
+                    } else if (provider.provider.indexOf('gce') > -1) {
+                        this.set('firstFieldLabel', 'CLIENT ID'); //sent as apikey
+                        this.set('secondFieldLabel', 'Key'); //sent as apisecret
+                        //FIXME1: Key is a private key file. Should either paste the key, or add an upload button
+                        //FIXME2: add project name here as third field //sent as tenant_name
                     } else if (provider.provider.indexOf('openstack') > -1) {
                         this.set('firstFieldLabel', 'Username');
                         this.set('secondFieldLabel', 'Password');
