@@ -29,6 +29,22 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
             },
 
 
+            inputClicked: function (e) {
+
+                info(e.target.id);
+                if (e.target.id != 'new-backend-second-field')
+                    return;
+
+                if (Mist.backendAddController.newBackendProvider.provider == 'gce') {
+                    Mist.fileUploadController.open('Upload file', 'Key',
+                        function (uploadedFile) {
+                            Mist.backendAddController.set('newBackendSecondField', uploadedFile);
+                        }
+                    );
+                }
+            },
+
+
             /**
              *
              *  Actions
@@ -47,6 +63,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                     $('#openstack-bundle').hide();
                     $('#baremetal-bundle').hide();
                     $('#non-hp-cloud').hide();
+                    $('#gce-bundle').hide();
 
                     if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('linode') > -1) {
                         this.set('firstFieldLabel', 'Username');
@@ -58,10 +75,9 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         this.set('firstFieldLabel', 'Client ID');
                         this.set('secondFieldLabel', 'API Key');
                     } else if (provider.provider.indexOf('gce') > -1) {
-                        this.set('firstFieldLabel', 'CLIENT ID'); //sent as apikey
-                        this.set('secondFieldLabel', 'Key'); //sent as apisecret
-                        //FIXME1: Key is a private key file. Should either paste the key, or add an upload button
-                        //FIXME2: add project name here as third field //sent as tenant_name
+                        this.set('firstFieldLabel', 'Client ID');
+                        this.set('secondFieldLabel', 'Key');
+                        $('#gce-bundle').show();
                     } else if (provider.provider.indexOf('openstack') > -1) {
                         this.set('firstFieldLabel', 'Username');
                         this.set('secondFieldLabel', 'Password');
@@ -99,10 +115,12 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                     });
                 },
 
+
                 selectKey: function(key) {
                     $('#new-backend-key').collapsible('collapse');
                     Mist.backendAddController.set('newBackendKey', key);
                 },
+
 
                 createKeyClicked: function() {
                     Mist.keyAddController.open( function (success, key) {

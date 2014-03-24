@@ -345,7 +345,12 @@ define( 'app', [
                 if(this.get('parentView').keyUp) {
                     this.get('parentView').keyUp(e);
                 }
-            }
+            },
+            click: function(e) {
+                if(this.get('parentView').inputClicked) {
+                    this.get('parentView').inputClicked(e);
+                }
+            },
         });
         App.ShellTextField = App.TextField.extend({
 

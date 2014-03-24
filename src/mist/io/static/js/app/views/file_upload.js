@@ -11,7 +11,6 @@ define('app/views/file_upload', ['app/views/templated', 'ember'],
         return TemplatedView.extend({
 
 
-
             //
             //
             //  Actions
@@ -23,8 +22,6 @@ define('app/views/file_upload', ['app/views/templated', 'ember'],
 
                 uploadClicked: function () {
                     if (window.File && window.FileReader && window.FileList) {
-                        // Dynamically click the hidden input
-                        // field to present the folder dialog
                         $('#file-upload-input').click();
                     } else {
                         Mist.notificationController.notify('Your browser does not support the HTML5 file API');

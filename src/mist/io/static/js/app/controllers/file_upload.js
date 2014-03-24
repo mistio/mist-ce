@@ -54,6 +54,12 @@ define('app/controllers/file_upload', ['ember'],
             },
 
 
+            confirmUpload: function () {
+                if (this.callback) this.callback(this.file);
+                this.close();
+            },
+
+
             uploadFile: function (file) {
 
                 var that = this;

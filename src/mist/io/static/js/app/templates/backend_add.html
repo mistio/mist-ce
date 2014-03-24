@@ -79,6 +79,14 @@
             </div>
         </div>
 
+        <div id="gce-bundle">
+            <label for="new-backend-port">3. Project name:</label>
+            {{view Mist.TextField
+                   id="new-backend-project-name"
+                   data-theme="a"
+                   valueBinding="Mist.backendAddController.newBackendProjectName"}}
+        </div>
+
         <div id="baremetal-bundle">
             <label for="new-backend-port">4. Port:</label>
             {{view Mist.TextField
