@@ -16,9 +16,9 @@ define('app/controllers/images', ['app/models/image'],
             backend: null,
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
             load: function() {
@@ -30,7 +30,7 @@ define('app/controllers/images', ['app/models/image'],
                 Mist.ajax.GET('/backends/' + this.backend.id + '/images', {
                 }).success(function(images) {
                     if (!that.backend.enabled) return;
-                    that._setContent(images);
+                    that._setContent(images || []);
                 }).error(function() {
                     if (!that.backend.enabled) return;
                     Mist.notificationController.notify('Failed to load images for ' + that.backend.title);
@@ -45,9 +45,9 @@ define('app/controllers/images', ['app/models/image'],
 
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
             searchImages: function(filter, callback) {
@@ -108,9 +108,9 @@ define('app/controllers/images', ['app/models/image'],
 
 
             /**
-             * 
+             *
              *  Pseudo-Private Methods
-             * 
+             *
              */
 
             _addImage: function(image) {
