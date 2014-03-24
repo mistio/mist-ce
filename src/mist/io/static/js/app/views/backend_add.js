@@ -31,7 +31,6 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
 
             inputClicked: function (e) {
 
-                info(e.target.id);
                 if (e.target.id != 'new-backend-second-field')
                     return;
 
