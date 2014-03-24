@@ -16,9 +16,9 @@ define('app/controllers/images', ['app/models/image'],
             backend: null,
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
             load: function() {
@@ -45,9 +45,9 @@ define('app/controllers/images', ['app/models/image'],
 
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
             searchImages: function(filter, callback) {
@@ -57,7 +57,7 @@ define('app/controllers/images', ['app/models/image'],
                 }).success(function(images) {
 
                 }).error(function() {
-                    Mist.notificationController.notify('Failed to search images');
+                    Mist.notificationController.notify('Failed to search images on ' + this.backend.title);
                 }).complete(function(success, images) {
                     var imagesToReturn = [];
                     if (success) {
@@ -108,9 +108,9 @@ define('app/controllers/images', ['app/models/image'],
 
 
             /**
-             * 
+             *
              *  Pseudo-Private Methods
-             * 
+             *
              */
 
             _addImage: function(image) {

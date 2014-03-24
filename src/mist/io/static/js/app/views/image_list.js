@@ -119,6 +119,21 @@ define('app/views/image_list', ['app/views/mistscreen'],
 
             //
             //
+            //  Actions
+            //
+            //
+
+
+            actions: {
+
+                searchClicked: function () {
+                    Mist.imageSearchController.search(true);
+                }
+            },
+
+
+            //
+            //
             //  Observers
             //
             //

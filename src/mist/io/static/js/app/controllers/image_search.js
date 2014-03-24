@@ -32,11 +32,11 @@ define('app/controllers/image_search', ['ember'],
             //
 
 
-            scheduleNewSearch: function () {
+            scheduleNewSearch: function (onServer) {
 
                 var that = this;
                 this.cancelSearch(function () {
-                    that.search();
+                    that.search(onServer);
                 });
             },
 
@@ -58,7 +58,7 @@ define('app/controllers/image_search', ['ember'],
             },
 
 
-            search: function () {
+            search: function (onServer) {
 
                 if (!this.searchTerm) {
                     this.set('searchResults', []);
@@ -73,9 +73,12 @@ define('app/controllers/image_search', ['ember'],
                 this.set('searchResults', []);
                 this.trigger('onSearchStart', this.searchTerm);
 
-                var chunkSize = Math.ceil(this.images.length / 10);
-
-                this.recursiveChunkSearch(this.searchTerm.toLowerCase(), 0, chunkSize);
+                if (onServer) {
+                    this.searchOnServer();
+                } else {
+                    var chunkSize = Math.ceil(this.images.length / 10);
+                    this.recursiveChunkSearch(this.searchTerm.toLowerCase(), 0, chunkSize);
+                }
             },
 
 
@@ -116,6 +119,31 @@ define('app/controllers/image_search', ['ember'],
 
                     this.recursiveChunkSearch(term, startIndex + chunkSize, chunkSize);
                 }, 60);
+            },
+
+
+            searchOnServer: function () {
+
+                var that = this;
+                var searchingBackends = [];
+                Mist.backendsController.content.forEach(function(backend, index) {
+
+                    if (!backend.enabled)
+                        return;
+                    if (backend.isBareMetal)
+                        return;
+
+                    searchingBackends.push(index);
+                    backend.searchImages(that.searchTerm, function(success, images) {
+
+                        if (success)
+                            that.searchResults.addObjects(images);
+
+                        searchingBackends.removeObject(index);
+                        if (!searchingBackends.length)
+                            that.endSearch();
+                    });
+                });
             },
 
 

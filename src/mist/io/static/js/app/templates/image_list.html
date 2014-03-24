@@ -17,6 +17,10 @@
                placeholder="Search images ..."
                valueBinding="Mist.imageSearchController.searchTerm"}}
 
+        {{#if Mist.imageSearchController.isSearching}}
+            <div class="ajax-loader"></div>
+        {{/if}}
+
         <ul id="image-list"
             data-role="listview"
             data-inset="true"
@@ -25,11 +29,6 @@
                 {{view Mist.imageListItemView imageBinding="this" class="checkbox-link" }}
             {{/each}}
         </ul>
-
-        {{#if view.gettingImages}}
-            <div class="ajax-loader"></div>
-            Downloading images...
-        {{/if}}
 
         <button id="images-advanced-search" data-theme="b" {{action "searchClicked" target="view"}}>
             <span>
