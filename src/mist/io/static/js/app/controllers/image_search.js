@@ -1,0 +1,134 @@
+define('app/controllers/image_search', ['ember'],
+    //
+    //  Image Search Controller
+    //
+    //  @returns Class
+    //
+    function () {
+
+        'use strict';
+
+        return Ember.ArrayController.extend(Ember.Evented, {
+
+
+            //
+            //
+            //  Properties
+            //
+            //
+
+
+            images: null,
+            searchTerm: null,
+            isSearching: null,
+            searchResults: null,
+            pendingSearchCancelation: null,
+
+
+            //
+            //
+            //  Methods
+            //
+            //
+
+
+            scheduleNewSearch: function () {
+
+                var that = this;
+                this.cancelSearch(function () {
+                    that.search();
+                });
+            },
+
+
+            cancelSearch: function (callback) {
+
+                this.trigger('beforeSearchCancel');
+
+                if (this.isSearching) {
+                    var that = this;
+                    this.set('pendingSearchCancelation', function () {
+                        that.set('pendingSearchCancelation', null);
+                        that.trigger('onSearchCancel');
+                        if (callback) callback();
+                    });
+                } else {
+                    if (callback) callback();
+                }
+            },
+
+
+            search: function () {
+
+                if (!this.searchTerm) {
+                    this.set('searchResults', []);
+                    this.trigger('onSearchEnd');
+                    return;
+                }
+
+                this.trigger('beforeSearchStart', this.searchTerm);
+
+                // Set up properties
+                this.set('isSearching', true);
+                this.set('searchResults', []);
+                this.trigger('onSearchStart', this.searchTerm);
+
+                var chunkSize = Math.ceil(this.images.length / 10);
+
+                this.recursiveChunkSearch(this.searchTerm.toLowerCase(), 0, chunkSize);
+            },
+
+
+            endSearch: function () {
+
+                this.set('isSearching', false);
+
+                if (this.pendingSearchCancelation) {
+                    this.pendingSearchCancelation();
+                } else {
+                    this.trigger('onSearchEnd');
+                }
+            },
+
+
+            recursiveChunkSearch: function (term, startIndex, chunkSize) {
+
+                Ember.run.later(this, function () {
+
+                    var images = this.images
+                    var imagesLength = images.length;
+
+                    if (this.pendingSearchCancelation || startIndex >= imagesLength) {
+                        this.endSearch();
+                        return;
+                    }
+
+                    for (var i = startIndex, count = 0; i < imagesLength && count < chunkSize; i++,
+                        count++) {
+                        if (images[i].id.toLowerCase().indexOf(term) > -1 ||
+                            images[i].name.toLowerCase().indexOf(term) > -1) {
+                                if (images[i].star)
+                                    this.searchResults.unshiftObject(images[i]);
+                                else
+                                    this.searchResults.pushObject(images[i]);
+                        }
+                    }
+
+                    this.recursiveChunkSearch(term, startIndex + chunkSize, chunkSize);
+                }, 60);
+            },
+
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
+            searchTermObserver: function () {
+                Ember.run.once(this, 'scheduleNewSearch');
+            }.observes('searchTerm')
+        });
+    }
+);

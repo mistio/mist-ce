@@ -43,6 +43,7 @@ define( 'app', [
     'app/controllers/machine_tags',
     'app/controllers/machine_shell',
     'app/controllers/machine_manual_monitoring',
+    'app/controllers/image_search',
     'app/controllers/rules',
     'app/views/templated',
     'app/views/home',
@@ -95,6 +96,7 @@ define( 'app', [
                 MachineTagsController,
                 MachineShellController,
                 MachineManualMonitoringController,
+                ImageSearchController,
                 RulesController,
                 TemplatedView,
                 Home,
@@ -309,6 +311,7 @@ define( 'app', [
         App.set('backendEditController', BackendEditController.create());
         App.set('machineTagsController', MachineTagsController.create());
         App.set('machineKeysController', MachineKeysController.create());
+        App.set('imageSearchController', ImageSearchController.create());
         App.set('machineShellController', MachineShellController.create());
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
@@ -377,12 +380,11 @@ define( 'app', [
 
         // Mist functions
 
-        App.isScrolledToBottom = function() {
-            var page = $('.ui-page');
-            var content = $('.ui-content').eq(0);
-            return content.height() - page.height() - page.scrollTop() < 50;
+        App.isScrolledToBottom = function(){
+            var distanceToTop = $(document).height() - $(window).height()
+            var top = $(document).scrollTop();
+            return distanceToTop - top < 20;
         };
-
         App.selectElementContents = function(elementId) {
             var el = document.getElementById(elementId);
             var range = document.createRange();
