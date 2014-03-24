@@ -57,6 +57,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
 
             add: function () {
                 var that = this;
+                var projectName = this.newBackendOpenStackTenant || this.newBackendProjectName;
                 Mist.backendsController.addBackend(
                     this.newBackendProvider.title,
                     this.newBackendProvider.provider,
@@ -64,7 +65,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     this.newBackendSecondField,
                     this.newBackendOpenStackURL,
                     this.newBackendOpenStackRegion,
-                    this.newBackendOpenStackTenant,
+                    projectName,
                     this.newBackendOpenStackComputeEndpoint,
                     this.newBackendPort,
                     this.newBackendKey.id,
