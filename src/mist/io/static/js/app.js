@@ -351,6 +351,11 @@ define( 'app', [
                     this.get('parentView').inputClicked(e);
                 }
             },
+            focusIn: function(e) {
+                if(this.get('parentView').inputClicked) {
+                    this.get('parentView').inputClicked(e);
+                }
+            }
         });
         App.ShellTextField = App.TextField.extend({
 
