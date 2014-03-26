@@ -1164,15 +1164,15 @@ def list_images(user, backend_id, term=None):
             ec2_images = conn.list_images(None, imgs)
             for image in ec2_images:
                 image.name = config.EC2_IMAGES[conn.type].get(image.id, image.name)
+            ec2_images += conn.list_images(ex_owner="amazon")
+            ec2_images += conn.list_images(ex_owner="self")
         else:
             rest_images = conn.list_images()
             starred_images = [image for image in rest_images
                               if image.id in starred]
 
         if term and conn.type in config.EC2_PROVIDERS:
-            ec2_images += conn.list_images(ex_owner="self")
             ec2_images += conn.list_images(ex_owner="aws-marketplace")
-            ec2_images += conn.list_images(ex_owner="amazon")
 
         images = starred_images + ec2_images + rest_images
         images = [img for img in images
