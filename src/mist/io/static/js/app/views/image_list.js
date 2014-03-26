@@ -21,6 +21,7 @@ define('app/views/image_list', ['app/views/mistscreen'],
             baseImages: [],
             defaultImages: [],
             renderedImages: [],
+            renderingMoreImages: null,
 
 
             //
@@ -102,11 +103,20 @@ define('app/views/image_list', ['app/views/mistscreen'],
 
 
             renderMoreImages: function () {
+
+                if (this.renderedImages.length == this.baseImages.length)
+                    return;
+
+                this.set('renderingMoreImages', true);
                 this.renderedImages.addObjects(
                     this.baseImages.slice(this.renderedImages.length,
                                          this.renderedImages.length + 25
                     )
                 );
+
+                Ember.run.next(this, function () {
+                    this.set('renderingMoreImages', false);
+                });
             },
 
 
