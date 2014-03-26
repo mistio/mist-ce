@@ -57,7 +57,7 @@ define('app/controllers/images', ['app/models/image'],
                 }).success(function(images) {
 
                 }).error(function() {
-                    Mist.notificationController.notify('Failed to search images on ' + this.backend.title);
+                    Mist.notificationController.notify('Failed to search images on ' + that.backend.title);
                 }).complete(function(success, images) {
                     var imagesToReturn = [];
                     if (success) {
