@@ -14,6 +14,9 @@ define('app/controllers/images', ['app/models/image'],
             content: [],
             loading: null,
             backend: null,
+            hasStarred: function () {
+                return !!this.content.findBy('star', true);
+            }.property('content.@each.star'),
 
             /**
              *

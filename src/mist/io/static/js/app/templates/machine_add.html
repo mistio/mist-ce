@@ -1,17 +1,17 @@
 <div id="create-machine-panel"
      data-swipe-close="false"
-     class="side-panel" 
-     data-role="panel" 
-     data-position="right" 
+     class="side-panel"
+     data-role="panel"
+     data-position="right"
      data-display="overlay"
      data-theme="b">
-   
+
     <div data-role="header">
         <h1>Create Machine</h1>
     </div>
 
     <div data-role="content" data-theme="b">
-        
+
         <!-- Select Name -->
 
         <label for="create-machine-name">1. Name:</label>
@@ -23,9 +23,9 @@
         <!-- Select Provider -->
 
         <label>2. Provider:</label>
-        <div id="create-machine-provider" 
-             data-role="collapsible" 
-             data-iconpos="right" 
+        <div id="create-machine-provider"
+             data-role="collapsible"
+             data-iconpos="right"
              data-collapsed-icon="arrow-d"
              data-expanded-icon="arrow-u"
              data-theme="a"
@@ -47,9 +47,9 @@
         <!-- Select Image -->
 
         <label>3. Image:</label>
-        <div id="create-machine-image" 
-             data-role="collapsible" 
-             data-iconpos="right" 
+        <div id="create-machine-image"
+             data-role="collapsible"
+             data-iconpos="right"
              data-collapsed-icon="arrow-d"
              data-expanded-icon="arrow-u"
              data-theme="a"
@@ -57,9 +57,15 @@
             <h2>{{Mist.machineAddController.newMachineImage.name}}</h2>
             <ul data-role="listview" data-theme="a">
                 {{#each Mist.machineAddController.newMachineProvider.images}}
-                <li data-icon="false">
-                    <a {{action "selectImage" this target="view"}}>{{this.name}}</a>
-                </li>
+                    {{#unless Mist.machineAddController.newMachineProvider.images.hasStarred}}
+                        <li data-icon="false">
+                            <a {{action "selectImage" this target="view"}}>{{this.name}}</a>
+                        </li>
+                    {{else}} {{#if this.star}}
+                        <li data-icon="false">
+                            <a {{action "selectImage" this target="view"}}>{{this.name}}</a>
+                        </li>
+                    {{/if}} {{/unless}}
                 {{/each}}
             </ul>
         </div>
@@ -67,9 +73,9 @@
         <!-- Select Size -->
 
         <label>4. Size:</label>
-        <div id="create-machine-size" 
-             data-role="collapsible" 
-             data-iconpos="right" 
+        <div id="create-machine-size"
+             data-role="collapsible"
+             data-iconpos="right"
              data-collapsed-icon="arrow-d"
              data-expanded-icon="arrow-u"
              data-theme="a"
@@ -78,7 +84,7 @@
             <ul data-role="listview" data-theme="a">
                 {{#each Mist.machineAddController.newMachineProvider.sizes}}
                 <li data-icon="false">
-                    <a {{action "selectSize" this target="view"}}>{{this.name}} 
+                    <a {{action "selectSize" this target="view"}}>{{this.name}}
                         <span class="size-decription">
                          - disk:{{this.disk}}, ram:{{this.ram}}
                         </span>
@@ -91,9 +97,9 @@
         <!-- Select Location -->
 
         <label>5. Location:</label>
-        <div id="create-machine-location" 
-             data-role="collapsible" 
-             data-iconpos="right" 
+        <div id="create-machine-location"
+             data-role="collapsible"
+             data-iconpos="right"
              data-collapsed-icon="arrow-d"
              data-expanded-icon="arrow-u"
              data-theme="a"
@@ -111,9 +117,9 @@
         <!-- Select Key -->
 
         <label>6. Key:</label>
-        <div id="create-machine-key" 
-             data-role="collapsible" 
-             data-iconpos="right" 
+        <div id="create-machine-key"
+             data-role="collapsible"
+             data-iconpos="right"
              data-collapsed-icon="arrow-d"
              data-expanded-icon="arrow-u"
              data-theme="a"
@@ -141,19 +147,19 @@
 
         <div id="create-machine-cost">
         {{#if view.price}}
-            Estimated price: 
+            Estimated price:
             <span>{{view.price}}</span>
         {{/if}}
         </div>
 
         <div class="ok-cancel" data-role="ui-grid-a" >
             <div class="ui-block-a">
-                <a data-role="button" 
+                <a data-role="button"
                    data-theme="a"
                    {{action "backClicked" target="view"}}>Back</a>
             </div>
             <div class="ui-block-b">
-                <button id="create-machine-ok" 
+                <button id="create-machine-ok"
                         data-theme="d"
                         {{action "launchClicked" target="view"}}>Launch!</button>
             </div>
