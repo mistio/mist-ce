@@ -1220,7 +1220,7 @@ def list_images(user, backend_id, term=None):
         elif conn.type == Provider.GCE:
             # Currently not other way to receive all images :(
             rest_images = conn.list_images()
-            for OS in ['debian-cloud', 'centos-cloud', 'suse-cloud']:
+            for OS in ['debian-cloud', 'centos-cloud', 'suse-cloud', 'rhel-cloud']:
                 try:
                     gce_images = conn.list_images(ex_project=OS)
                     rest_images += gce_images
@@ -1374,11 +1374,18 @@ def set_machine_metadata(user, backend_id, machine_id, tag):
             raise BackendUnavailableError(backend_id)
         if not machine:
             raise MachineNotFoundError(machine_id)
-        try:
-            machine.extra['metadata'].update(pair)
-            conn.ex_set_metadata(machine, machine.extra['metadata'])
-        except:
-            raise InternalServerError("error creating tag")
+        if conn.type == 'gce':
+            try:
+                machine.extra['tags'].append(tag)
+                conn.ex_set_node_tags(machine, machine.extra['tags'])            
+            except:
+                raise InternalServerError("error creating tag")            
+        else:
+            try:
+                machine.extra['metadata'].update(pair)
+                conn.ex_set_metadata(machine, machine.extra['metadata'])
+            except:
+                raise InternalServerError("error creating tag")
 
 
 def delete_machine_metadata(user, backend_id, machine_id, tag):
@@ -1436,20 +1443,27 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
             raise BackendUnavailableError("Error deleting metadata in EC2")
 
     else:
-        tags = machine.extra.get('metadata', None)
-        key = None
-        for mkey, mdata in tags.iteritems():
-            if tag == mdata:
-                key = mkey
-        if key:
-            tags.pop(key)
-        else:
-            raise NotFoundError("tag not found")
+        if conn.type == 'gce':
+            try:
+                machine.extra['tags'].remove(tag)
+                conn.ex_set_node_tags(machine, machine.extra['tags'])            
+            except:
+                raise InternalServerError("Error while updating metadata")            
+        else:    
+            tags = machine.extra.get('metadata', None)
+            key = None
+            for mkey, mdata in tags.iteritems():
+                if tag == mdata:
+                    key = mkey
+            if key:
+                tags.pop(key)
+            else:
+                raise NotFoundError("tag not found")
 
-        try:
-            conn.ex_set_metadata(machine, tags)
-        except:
-            BackendUnavailableError("Error while updating metadata")
+            try:
+                conn.ex_set_metadata(machine, tags)
+            except:
+                BackendUnavailableError("Error while updating metadata")
 
 
 def enable_monitoring(user, backend_id, machine_id,
