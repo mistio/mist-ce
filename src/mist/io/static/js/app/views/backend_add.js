@@ -75,7 +75,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         this.set('secondFieldLabel', 'API Key');
                     } else if (provider.provider.indexOf('gce') > -1) {
                         this.set('firstFieldLabel', 'Client ID');
-                        this.set('secondFieldLabel', 'Key');
+                        this.set('secondFieldLabel', 'Private Key');
                         $('#gce-bundle').show();
                     } else if (provider.provider.indexOf('openstack') > -1) {
                         this.set('firstFieldLabel', 'Username');
