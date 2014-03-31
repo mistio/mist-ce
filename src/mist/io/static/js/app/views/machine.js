@@ -117,7 +117,6 @@ define('app/views/machine', ['app/views/mistscreen'],
                 Ember.run.next(this, function() {
                     $('#add-rule-button').parent().trigger('create');
                     $('#disable-monitor-btn').parent().trigger('create');
-                    $('#enable-monitor-btn').parent().trigger('create');
                 });
             },
 
@@ -147,12 +146,12 @@ define('app/views/machine', ['app/views/mistscreen'],
 
                 Ember.run.next(this, function() {
                     $('#enable-monitor-btn').addClass('ui-state-disabled');
-
                     if (this.machine.disablingMonitoring) {
                         $('#disable-monitor-btn').addClass('ui-state-disabled');
                     } else if (!this.machine.pendingMonitoring) {
                         $('#disable-monitor-btn').removeClass('ui-state-disabled');
-                        $('#enable-monitor-btn').removeClass('ui-state-disabled');
+                        if (!this.machine.enablingMonitoring)
+                            $('#enable-monitor-btn').removeClass('ui-state-disabled');
                     }
                 });
             },
