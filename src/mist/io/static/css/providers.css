@@ -37,6 +37,7 @@
 /* GCE */
 #single-view-provider-icon.provider-gce  {
     background-image: url(../images/gce.png);
+    background-size: 45px;
 }
 
 /* DigitalOcean */
