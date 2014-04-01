@@ -38,21 +38,6 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
             },
 
 
-            inputClicked: function (e) {
-
-                if (e.target.id != 'new-backend-second-field')
-                    return;
-
-                if (Mist.backendAddController.newBackendProvider.provider == 'gce') {
-                    Mist.fileUploadController.open('Upload file', 'Key',
-                        function (uploadedFile) {
-                            Mist.backendAddController.set('newBackendSecondField', uploadedFile);
-                        }
-                    );
-                }
-            },
-
-
             clear: function () {
 
                 $('#gce-bundle').hide();
