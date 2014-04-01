@@ -16,9 +16,9 @@
         <div id="new-backend-provider"
              class="mist-select"
              data-role="collapsible"
+             data-collapsed-icon="carat-d"
+             data-expanded-icon="carat-u"
              data-iconpos="right"
-             data-collapsed-icon="arrow-d"
-             data-expanded-icon="arrow-u"
              data-theme="a">
             <h2>{{Mist.backendAddController.newBackendProvider.title}}</h2>
             <ul class="select-listmenu" data-role="listview" data-theme="a">
@@ -36,12 +36,15 @@
                    data-theme="a"
                    valueBinding="Mist.backendAddController.newBackendFirstField"}}
 
-            <label for="new-backend-second-field">3. {{view.secondFieldLabel}}:</label>
-            {{view Mist.TextField
-                   type="password"
-                   id="new-backend-second-field"
-                   data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendSecondField"}}
+            {{#if view.secondFieldLabel}}
+                <label for="new-backend-second-field">3. {{view.secondFieldLabel}}:</label>
+                {{view Mist.TextField
+                       type="password"
+                       id="new-backend-second-field"
+                       data-theme="a"
+                       valueBinding="Mist.backendAddController.newBackendSecondField"}}
+            {{/if}}
+
         </div>
         <div id="openstack-bundle" data-theme="a">
             <label for="new-backend-openstack-url">4. Auth URL:</label>
@@ -80,7 +83,15 @@
         </div>
 
         <div id="gce-bundle">
-            <label for="new-backend-port">3. Project name:</label>
+
+            <label for ="new-backend-key">3. Private key:</label>
+
+            <a class="ui-btn ui-btn-a ui-corner-all ui-btn-icon-right ui-icon-carat-u"
+              {{action "privateKeyClicked" target="view"}}>
+                Select key
+            </a>
+
+            <label for="new-backend-port">4. Project name:</label>
             {{view Mist.TextField
                    id="new-backend-project-name"
                    data-theme="a"
@@ -99,8 +110,8 @@
                  class="mist-select"
                  data-role="collapsible"
                  data-iconpos="right"
-                 data-collapsed-icon="arrow-d"
-                 data-expanded-icon="arrow-u"
+                 data-collapsed-icon="carat-d"
+                 data-expanded-icon="carat-u"
                  data-theme="a">
                 <h2>{{Mist.backendAddController.newBackendKey.id}}</h2>
                 <ul data-role="listview">

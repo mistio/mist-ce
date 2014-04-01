@@ -1,24 +1,33 @@
 define('app/views/backend_add', ['app/views/templated', 'ember'],
-    /**
-     *  Add Backend View
-     *
-     *  @returns Class
-     */
+    //
+    //  Add Backend View
+    //
+    //  @returns Class
+    //
     function(TemplatedView) {
+
+        'use strict';
+
         return TemplatedView.extend({
 
-            /**
-             *  Properties
-             */
+
+            //
+            //
+            //  Properties
+            //
+            //
+
 
             firstFieldLabel: 'API Key',
             secondFieldLabel: 'API Secret',
 
-            /**
-             *
-             *  Methods
-             *
-             */
+
+            //
+            //
+            //  Methods
+            //
+            //
+
 
             updateAddButton: function() {
                 if (Mist.backendsController.addingBackend || !Mist.backendAddController.formReady) {
@@ -44,25 +53,32 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
             },
 
 
-            /**
-             *
-             *  Actions
-             *
-             */
+            clear: function () {
+
+                $('#gce-bundle').hide();
+                $('#non-hp-cloud').hide();
+                $('#baremetal-bundle').hide();
+                $('#openstack-bundle').hide();
+                $('#new-backend-provider').collapsible('collapse');
+                $('#new-backend-second-field').attr('type', 'password');
+                $('#gce-bundle a').removeClass('ui-icon-check')
+                    .addClass('ui-icon-carat-u');
+            },
+
+
+            //
+            //
+            //  Actions
+            //
+            //
+
 
             actions: {
-
 
                 selectProvider: function(provider) {
 
                     Mist.backendAddController._clear();
-
-                    $('#new-backend-second-field').attr('type', 'password');
-                    $('#new-backend-provider').collapsible('collapse');
-                    $('#openstack-bundle').hide();
-                    $('#baremetal-bundle').hide();
-                    $('#non-hp-cloud').hide();
-                    $('#gce-bundle').hide();
+                    this.clear();
 
                     if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('linode') > -1) {
                         this.set('firstFieldLabel', 'Username');
@@ -75,7 +91,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         this.set('secondFieldLabel', 'API Key');
                     } else if (provider.provider.indexOf('gce') > -1) {
                         this.set('firstFieldLabel', 'Client ID');
-                        this.set('secondFieldLabel', 'Private Key');
+                        this.set('secondFieldLabel', '');
                         $('#gce-bundle').show();
                     } else if (provider.provider.indexOf('openstack') > -1) {
                         this.set('firstFieldLabel', 'Username');
@@ -121,6 +137,24 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                 },
 
 
+                privateKeyClicked: function () {
+                    Mist.fileUploadController.open('Upload file', 'Key',
+                        function (uploadedFile) {
+
+                            Mist.backendAddController.set('newBackendSecondField', uploadedFile);
+
+                            if (uploadedFile) {
+                                $('#gce-bundle a').addClass('ui-icon-check')
+                                    .removeClass('ui-icon-carat-u');
+                            } else {
+                                $('#gce-bundle a').removeClass('ui-icon-check')
+                                    .addClass('ui-icon-carat-u');
+                            }
+                        }
+                    );
+                },
+
+
                 createKeyClicked: function() {
                     Mist.keyAddController.open( function (success, key) {
                         if (success) {
@@ -153,11 +187,12 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
             },
 
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            //
+            //  Observers
+            //
+            //
+
 
             updateDoneButtonObserver: function() {
                 Ember.run.once(this, 'updateAddButton');
