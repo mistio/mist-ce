@@ -47,7 +47,7 @@ def first_image(context, name):
 
 @when(u'I type "{name}" in images search box')
 def advance_search(context, name):
-    context.browser.find_by_css('.ui-input-search input').fill(name)
+    context.browser.find_by_css('#search-term-input').fill(name)
     # images = context.browser.find_by_css('.ui-listview li')
     # results = []
     #
@@ -70,3 +70,25 @@ def parse_advance_search(context, name, timeout):
             sleep(2)
 
         assert False, u'Could not find any results in %s seconds' % timeout
+
+
+@when(u'the images are loaded within {timeout} seconds')
+def loaded_images(context, timeout):
+        end_time = time() + int(timeout)
+        while time() < end_time:
+            images_count = int(context.browser.find_by_css('.ui-listview li .ui-li-count')[1].text)
+            if images_count > 0:
+                return
+            sleep(2)
+
+        assert False, u'Could not load images in %s seconds' % timeout
+
+
+@then(u'I should see "{name}" image starred')
+def find_starred_image(context, name):
+    images = context.browser.find_by_css('.ui-listview li')
+    for image in images:
+        if name in image.text:
+            return
+
+    assert False, u'Could not find %s image in starred images' % name
