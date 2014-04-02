@@ -40,7 +40,7 @@ libcloud.security.CA_CERTS_PATH.append('./src/mist.io/cacert.pem')
 log = logging.getLogger(__name__)
 
 HPCLOUD_AUTH_URL = 'https://region-a.geo-1.identity.hpcloudsvc.com:35357/v2.0/tokens'
-
+GCE_IMAGES = ['debian-cloud', 'centos-cloud', 'suse-cloud', 'rhel-cloud']
 
 @core_wrapper
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
@@ -148,7 +148,10 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
 
         # validate backend before adding
         if remove_on_error:
-            conn = connect_provider(backend)
+            try:
+                conn = connect_provider(backend)
+            except:
+                raise BackendUnauthorizedError() 
             try:
                 machines = conn.list_nodes()
             except InvalidCredsError:
@@ -1220,7 +1223,7 @@ def list_images(user, backend_id, term=None):
         elif conn.type == Provider.GCE:
             # Currently not other way to receive all images :(
             rest_images = conn.list_images()
-            for OS in ['debian-cloud', 'centos-cloud', 'suse-cloud', 'rhel-cloud']:
+            for OS in GCE_IMAGES:
                 try:
                     gce_images = conn.list_images(ex_project=OS)
                     rest_images += gce_images
