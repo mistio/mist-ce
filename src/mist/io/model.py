@@ -96,6 +96,7 @@ class Backend(OODict):
 
     machines = make_field(Machines)()
     starred = ListField()
+    unstarred = ListField()
 
     def __repr__(self):
         print_fields = ['title', 'provider', 'region']

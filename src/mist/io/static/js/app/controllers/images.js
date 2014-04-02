@@ -14,11 +14,14 @@ define('app/controllers/images', ['app/models/image'],
             content: [],
             loading: null,
             backend: null,
+            hasStarred: function () {
+                return !!this.content.findBy('star', true);
+            }.property('content.@each.star'),
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
             load: function() {
@@ -45,9 +48,9 @@ define('app/controllers/images', ['app/models/image'],
 
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
             searchImages: function(filter, callback) {
@@ -57,7 +60,7 @@ define('app/controllers/images', ['app/models/image'],
                 }).success(function(images) {
 
                 }).error(function() {
-                    Mist.notificationController.notify('Failed to search images');
+                    Mist.notificationController.notify('Failed to search images on ' + that.backend.title);
                 }).complete(function(success, images) {
                     var imagesToReturn = [];
                     if (success) {
@@ -108,9 +111,9 @@ define('app/controllers/images', ['app/models/image'],
 
 
             /**
-             * 
+             *
              *  Pseudo-Private Methods
-             * 
+             *
              */
 
             _addImage: function(image) {
