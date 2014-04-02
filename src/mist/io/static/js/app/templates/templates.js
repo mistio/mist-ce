@@ -144,7 +144,7 @@ function program5(depth0,data) {
     'data-theme': ("a"),
     'valueBinding': ("Mist.backendAddController.newBackendSecondField")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n        </div>\n        <div id=\"openstack-bundle\" data-theme=\"a\">\n            <label for=\"new-backend-openstack-url\">4. Auth URL:</label>\n            ");
+  data.buffer.push("\n        </div>\n\n        <div id=\"openstack-bundle\" data-theme=\"a\">\n            <label for=\"new-backend-openstack-url\">4. Auth URL:</label>\n            ");
   hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
   hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
@@ -160,14 +160,14 @@ function program5(depth0,data) {
     'data-theme': ("a"),
     'valueBinding': ("Mist.backendAddController.newBackendOpenStackTenant")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n\n            <div id=\"opentack-advanced-wrapper\">\n            <select id=\"openstack-advanced\" data-role=\"slider\" data-theme=\"a\"\n            ");
+  data.buffer.push("\n\n            <div id=\"opentack-advanced-wrapper\">\n                <select id=\"openstack-advanced\" data-role=\"slider\" data-theme=\"a\"\n                ");
   hashContexts = {'target': depth0,'on': depth0};
   hashTypes = {'target': "STRING",'on': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "advancedToggled", {hash:{
     'target': ("view"),
     'on': ("change")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">\n               <option value=\"0\">Basic settings</option>\n                <option value=\"1\">Advanced settings</option>\n            </select>\n            </div>\n\n            <div id=\"non-hp-cloud\">\n                <label for=\"new-backend-openstack-region\">6. Region:</label>\n                ");
+  data.buffer.push(">\n                   <option value=\"0\">Basic settings</option>\n                    <option value=\"1\">Advanced settings</option>\n                </select>\n            </div>\n\n            <div id=\"non-hp-cloud\">\n\n                <label for=\"new-backend-openstack-region\">6. Region:</label>\n                ");
   hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
   hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
