@@ -123,7 +123,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
 
 
                 privateKeyClicked: function () {
-                    Mist.fileUploadController.open('Upload file', 'Key',
+                    Mist.fileUploadController.open('Upload private key', 'Key',
                         function (uploadedFile) {
 
                             Mist.backendAddController.set('newBackendSecondField', uploadedFile);
