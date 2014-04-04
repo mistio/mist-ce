@@ -380,11 +380,48 @@ define( 'app', [
 
         // Mist functions
 
+        App.getKeyIdByUrl = function() {
+            return window.location.href.split('/')[5];
+        };
+
+        App.getMachineIdByUrl = function() {
+            return window.location.href.split('/')[5];
+        };
+
+        App.getViewName = function (view) {
+            return view.constructor.toString().split('.')[1].split('View')[0];
+        };
+
+        App.capitalize = function (string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        };
+
+        App.decapitalize = function (string) {
+            return string.charAt(0).toLowerCase() + string.slice(1);
+        };
+
+        App.capitalizeArray = function (array) {
+            var newArray = [];
+            array.forEach(function(string) {
+                newArray.push(App.capitalize(string));
+            });
+            return newArray;
+        };
+
+        App.decapitalizeArray = function (array) {
+            var newArray = [];
+            array.forEach(function(string) {
+                newArray.push(App.decapitalize(string));
+            });
+            return newArray;
+        };
+
         App.isScrolledToBottom = function(){
             var distanceToTop = $(document).height() - $(window).height()
             var top = $(document).scrollTop();
             return distanceToTop - top < 20;
         };
+
         App.selectElementContents = function(elementId) {
             var el = document.getElementById(elementId);
             var range = document.createRange();
@@ -394,29 +431,40 @@ define( 'app', [
             sel.addRange(range);
         };
 
-        App.getKeyIdByUrl = function() {
-            return window.location.href.split('/')[5];
-        };
-
-        App.getMachineIdByUrl = function() {
-            return window.location.href.split('/')[5];
+        App.switchElementVisibility = function(elementSelector) {
+            var element = $('#' + elementSelector);
+            if (element.css('display') == 'none')
+                element.slideDown();
+            else
+                element.slideUp();
         };
 
         App.arrayToListString = function(array, attribute) {
-
-            if (! array instanceof Array )
-                return '';
-
             var listString = '';
             array.forEach(function(item, index) {
                 listString += item[attribute];
                 if (index < array.length - 1)
                     listString += ', ';
             });
-
             return listString;
         };
 
+        App.splitWords = function (string) {
+            if (string.indexOf('-') > -1)
+                return string.split('-');
+            else if (string.indexOf('_') > -1)
+                return string.split('_');
+            else if (string.indexOf(' ') > -1)
+                return string.split(' ');
+            else if (string.match(/([a-z])([A-Z])/g)) {
+                var wordJoints = string.match(/([a-z])([A-Z])/g);
+                wordJoints.forEach(function(joint) {
+                    string = string.replace(joint, joint[0] + '_' + joint[1]);
+                });
+                return App.splitWords(string);
+            }
+            return [string];
+        };
 
         return App;
     }
