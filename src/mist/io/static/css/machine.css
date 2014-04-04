@@ -106,6 +106,24 @@
     }
 }
 
+#machine-metric-add .ui-collapsible-content {
+    max-height: 120px;
+    overflow-y: scroll;
+}
+
+#machine-metric-add  .ajax-loader {
+    display: inline;
+    float: right;
+    margin-top: 1px;
+}
+
+@-moz-document url-prefix() {
+    #machine-metric-add  .ajax-loader {
+        margin-top: -19px;
+    }
+}
+
+
 .single-machine-header {
     height: 56px;
 }

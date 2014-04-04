@@ -14,15 +14,43 @@
 
         <div role="main" class="ui-content" data-theme="a">
 
-            {{#if Mist.machineMetricAddController.loadingMetrics}}
-                <div class="ajax-loader"></div>
-            {{/if}}
+            <label for="metric-add-title">Title:</label>
+            {{view Mist.TextField
+                   id="metric-add-title"
+                   valueBinding="Mist.machineMetricAddController.newMetricTitle"}}
+
+            <label>Metric:</label>
+            <div id="metric-add"
+                 data-role="collapsible"
+                 data-iconpos="right"
+                 data-collapsed-icon="arrow-d"
+                 data-expanded-icon="arrow-u"
+                 data-theme="a"
+                 class="mist-select">
+                <h2>
+                    {{#if Mist.machineMetricAddController.newMetric}}
+                        {{Mist.machineMetricAddController.newMetric}}
+                    {{else}}
+                        Select Metric
+                    {{/if}}
+                    {{#if Mist.machineMetricAddController.loadingMetrics}}
+                        <div class="ajax-loader"></div>
+                    {{/if}}
+                </h2>
+                <ul data-role="listview" data-theme="a">
+                    {{#each Mist.machineMetricAddController.metrics}}
+                        <li data-icon="false">
+                            <a {{action "selectMetric" this target="view"}}>{{this}}</a>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
 
             <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
                 <a class="ui-btn ui-btn-a ui-corner-all" {{action "backClicked" target="view"}}>Back</a>
-                <a class="ui-btn ui-btn-d ui-corner-all" {{action "addClicked" target="view"}}>Add</a>
+                <a class="ui-btn ui-btn-d ui-corner-all ui-state-disabled"
+                    id="metric-add-ok" {{action "addClicked" target="view"}}>Add</a>
             </div>
-
         </div>
     </div>
 </div>

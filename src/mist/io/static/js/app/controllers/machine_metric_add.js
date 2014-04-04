@@ -19,8 +19,12 @@ define('app/controllers/machine_metric_add', ['ember'],
 
 
             view: null,
+            metrics: [],
             machine: null,
             callback: null,
+            formReady: null,
+            newMetric: null,
+            newMetricTitle: null,
 
 
             //
@@ -31,6 +35,7 @@ define('app/controllers/machine_metric_add', ['ember'],
 
 
             open: function (machine, callback) {
+                this.clear();
                 this.set('machine', machine)
                     .set('callback', callback);
 
@@ -78,8 +83,12 @@ define('app/controllers/machine_metric_add', ['ember'],
 
 
             clear: function () {
-                this.set('machine', null)
-                    .set('callback', null);
+                this.view.clear();
+                this.set('metrics', [])
+                    .set('machine', null)
+                    .set('callback', null)
+                    .set('newMetric', null)
+                    .set('newMetricTitle', null);
             },
 
 
@@ -101,6 +110,23 @@ define('app/controllers/machine_metric_add', ['ember'],
                     this.set('metrics', newMetrics);
                 });
             },
+
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
+            newMetricObserver: function () {
+                if (this.newMetric &&
+                    this.newMetricTitle) {
+                        this.set('formReady', true);
+                } else {
+                    this.set('formReady', false);
+                }
+            }.observes('newMetric', 'newMetricTitle'),
 
 
             // DEBUGGING ONLY!
