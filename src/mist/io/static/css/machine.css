@@ -40,18 +40,17 @@
 }
 
 #single-machine-page #monitoring-bottom-btns .ui-block-a,
-#single-machine-page #monitoring-bottom-btns .ui-block-b {
-    width: 50%;
+#single-machine-page #monitoring-bottom-btns .ui-block-b,
+#single-machine-page #monitoring-bottom-btns .ui-block-c {
+    width: 33.33%;
 }
 
 #single-machine-page #monitoring-bottom-btns a {
     margin: 7px auto;
 }
 
-#single-machine-page #add-rule-button {
-    width: 100px;
-}
-
+#single-machine-page #add-metric-btn,
+#single-machine-page #add-rule-button,
 #single-machine-page #disable-monitor-btn {
     width: 100px;
 }
@@ -93,20 +92,18 @@
 }
 
 
-/* Conditional for < 600px */
-@media only screen and  (max-width: 400px) {
+@media only screen and  (max-width: 570px) {
 
 
     #single-machine-page #monitoring-bottom-btns .ui-block-a,
-    #single-machine-page #monitoring-bottom-btns .ui-block-b {
+    #single-machine-page #monitoring-bottom-btns .ui-block-b,
+    #single-machine-page #monitoring-bottom-btns .ui-block-c {
         width: 100%;
     }
 
     #single-machine-page #monitoring-bottom-btns {
-        height: 110px;
+        height: 165px;
     }
-
-
 }
 
 .single-machine-header {
