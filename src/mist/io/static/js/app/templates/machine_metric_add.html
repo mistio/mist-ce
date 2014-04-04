@@ -6,8 +6,7 @@
          class="ui-popup ui-corner-all"
          data-role="popup"
          data-enhanced="true"
-         data-transition="slideup"
-         data-position-to="#add-metric-btn">
+         data-transition="flip">
 
         <div data-role="header" data-theme="b">
             <h1>Add metric</h1>
@@ -15,6 +14,12 @@
 
         <div role="main" class="ui-content" data-theme="a">
 
+            {{Mist.machineMetricAddController.machine.name}}
+
+            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <a class="ui-btn ui-btn-a ui-corner-all" {{action "backClicked" target="view"}}>Back</a>
+                <a class="ui-btn ui-btn-d ui-corner-all" {{action "addClicked" target="view"}}>Add</a>
+            </div>
 
         </div>
     </div>

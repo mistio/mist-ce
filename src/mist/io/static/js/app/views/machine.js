@@ -235,6 +235,12 @@ define('app/views/machine', ['app/views/mistscreen'],
                     Mist.machineShellController.open(this.machine);
                 },
 
+
+                addMetricClicked: function () {
+                    Mist.machineMetricAddController.open(this.machine);
+                },
+
+
                 enableMonitoringClicked: function () {
 
                     if (Mist.authenticated) {
@@ -284,11 +290,6 @@ define('app/views/machine', ['app/views/mistscreen'],
                     var actionToTake = 'alert';
 
                     Mist.rulesController.newRule(machine, metric, operator, value, actionToTake);
-                },
-
-
-                addMetricClicked: function () {
-                    Mist.notificationController.timeNotify('Yeay', 1000);
                 },
 
 
