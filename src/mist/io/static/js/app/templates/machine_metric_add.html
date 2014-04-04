@@ -14,7 +14,9 @@
 
         <div role="main" class="ui-content" data-theme="a">
 
-            {{Mist.machineMetricAddController.machine.name}}
+            {{#if Mist.machineMetricAddController.loadingMetrics}}
+                <div class="ajax-loader"></div>
+            {{/if}}
 
             <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
                 <a class="ui-btn ui-btn-a ui-corner-all" {{action "backClicked" target="view"}}>Back</a>
