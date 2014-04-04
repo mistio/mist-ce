@@ -21,6 +21,7 @@ if (!JS_BUILD) {
     'text!app/templates/machine_list.html',
     'text!app/templates/machine_list_item.html',
     'text!app/templates/machine_manual_monitoring.html',
+    'text!app/templates/machine_metric_add.html',
     'text!app/templates/machine_power.html',
     'text!app/templates/machine_shell.html',
     'text!app/templates/machine_shell_list_item.html',
@@ -51,15 +52,16 @@ if (!JS_BUILD) {
     Ember.TEMPLATES['machine_list/html'] = Ember.Handlebars.compile(arguments[16]);
     Ember.TEMPLATES['machine_list_item/html'] = Ember.Handlebars.compile(arguments[17]);
     Ember.TEMPLATES['machine_manual_monitoring/html'] = Ember.Handlebars.compile(arguments[18]);
-    Ember.TEMPLATES['machine_power/html'] = Ember.Handlebars.compile(arguments[19]);
-    Ember.TEMPLATES['machine_shell/html'] = Ember.Handlebars.compile(arguments[20]);
-    Ember.TEMPLATES['machine_shell_list_item/html'] = Ember.Handlebars.compile(arguments[21]);
-    Ember.TEMPLATES['machine_tags/html'] = Ember.Handlebars.compile(arguments[22]);
-    Ember.TEMPLATES['machine_tags_list_item/html'] = Ember.Handlebars.compile(arguments[23]);
-    Ember.TEMPLATES['messagebox/html'] = Ember.Handlebars.compile(arguments[24]);
-    Ember.TEMPLATES['monitoring/html'] = Ember.Handlebars.compile(arguments[25]);
-    Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[26]);
-    Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[27]);
+    Ember.TEMPLATES['machine_metric_add/html'] = Ember.Handlebars.compile(arguments[19]);
+    Ember.TEMPLATES['machine_power/html'] = Ember.Handlebars.compile(arguments[20]);
+    Ember.TEMPLATES['machine_shell/html'] = Ember.Handlebars.compile(arguments[21]);
+    Ember.TEMPLATES['machine_shell_list_item/html'] = Ember.Handlebars.compile(arguments[22]);
+    Ember.TEMPLATES['machine_tags/html'] = Ember.Handlebars.compile(arguments[23]);
+    Ember.TEMPLATES['machine_tags_list_item/html'] = Ember.Handlebars.compile(arguments[24]);
+    Ember.TEMPLATES['messagebox/html'] = Ember.Handlebars.compile(arguments[25]);
+    Ember.TEMPLATES['monitoring/html'] = Ember.Handlebars.compile(arguments[26]);
+    Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[27]);
+    Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[28]);
   });
   return;
 }
@@ -1111,19 +1113,25 @@ function program19(depth0,data) {
   hashContexts = {};
   stack1 = helpers['if'].call(depth0, "Mist.rulesController.creationPending", {hash:{},inverse:self.noop,fn:self.program(24, program24, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n                </div>\n\n                <div id=\"monitoring-bottom-btns\">\n                <div data-rule=\"ui-grid-a\">\n                    <div class=\"ui-block-a\">\n                        <a id=\"add-rule-button\"\n                            class=\"ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-plus\"\n                            ");
+  data.buffer.push("\n                </div>\n\n                <div id=\"monitoring-bottom-btns\">\n                    <div data-rule=\"ui-grid-b\">\n                        <div class=\"ui-block-a\">\n                            <a id=\"add-rule-button\"\n                                class=\"ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-plus\"\n                                ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "addRuleClicked", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Add Rule</a>\n                    </div>\n                    <div class=\"ui-block-b\">\n                        <a id=\"disable-monitor-btn\"\n                        class=\"ui-btn ui-corner-all ui-btn-b ui-btn-icon-left ui-icon-delete\"\n                            ");
+  data.buffer.push(">Add Rule</a>\n                        </div>\n                        <div class=\"ui-block-b\">\n                            <a id=\"add-metric-btn\"\n                                class=\"ui-btn ui-corner-all ui-btn-d ui-btn-icon-left ui-icon-plus\"\n                                ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "addMetricClicked", {hash:{
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">Add Metric</a>\n                        </div>\n                        <div class=\"ui-block-c\">\n                            <a id=\"disable-monitor-btn\"\n                            class=\"ui-btn ui-corner-all ui-btn-b ui-btn-icon-left ui-icon-delete\"\n                                ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "disableMonitoringClicked", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Disable</a>\n                    </div>\n                </div>\n                </div>\n\n            ");
+  data.buffer.push(">Disable</a>\n                        </div>\n                    </div>\n                </div>\n\n            ");
   return buffer;
   }
 function program20(depth0,data) {
@@ -2367,6 +2375,15 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
   data.buffer.push(">Done</a>\n        </div>\n    </div>\n</div>\n");
   return buffer;
+  
+});
+Ember.TEMPLATES["machine_metric_add/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+  
+
+
+  data.buffer.push("<div id=\"machine-metric-add-screen\" class=\"ui-popup-screen ui-screen-hidden ui-overlay-b\"></div>\n<div id=\"machine-metric-add-popup\"\n     class=\"ui-popup-container ui-popup-hidden ui-body-inherit ui-overlay-shadow ui-corner-all\">\n\n    <div id=\"machine-metric-add\"\n         class=\"ui-popup mid-popup\"\n         data-role=\"popup\"\n         data-enhanced=\"true\"\n         data-transition=\"slideup\"\n         data-position-to=\"#add-metric-btn\">\n\n        <div data-role=\"header\" data-theme=\"b\">\n            <h1>Add metric</h1>\n        </div>\n\n        <div role=\"main\" class=\"ui-content\" data-theme=\"a\">\n\n\n        </div>\n    </div>\n</div>\n");
   
 });
 Ember.TEMPLATES["machine_power/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
