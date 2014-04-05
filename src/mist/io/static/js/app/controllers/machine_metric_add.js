@@ -60,17 +60,18 @@ define('app/controllers/machine_metric_add', ['ember'],
             loadMetrics: function () {
 
                 // Ajax call simulation
+                /*
                 this.set('loadingMetrics', true);
                 Ember.run.later(this, function () {
                     this._setMetrics(this.TEMP_METRIC_LIST);
                     this.set('loadingMetrics', false);
                 }, 2000);
+                */
 
-                /*
                 var that = this;
                 this.set('loadingMetrics', true);
                 Mist.ajax.GET('/backends/' + this.machine.backend.id + '/machines/' +
-                    this.machine.id + '/monitoring/metrics', {
+                    this.machine.id + '/metrics', {
                 }).success(function(metrics) {
                     that._setMetrics(metrics);
                 }).error(function(message) {
@@ -78,7 +79,6 @@ define('app/controllers/machine_metric_add', ['ember'],
                 }).complete(function() {
                     that.set('loadingMetrics', false);
                 });
-                */
             },
 
 
