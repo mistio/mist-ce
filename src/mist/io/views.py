@@ -698,6 +698,27 @@ def get_stats(request):
         raise ServiceUnavailableError()
 
 
+@view_config(route_name='find_metrics', request_method='GET', renderer='json')
+def find_metrics(request):
+    user = user_from_request(request)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    url = "%s/backends/%s/machines/%s/metrics" % (config.CORE_URI,
+                                                  backend_id, machine_id)
+    headers={'Authorization': get_auth_header(user)}
+    try:
+        resp = requests.get(url, headers=headers, verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        raise SSLError()
+    except Exception as exc:
+        log.error("Exception requesting find_metrics: %r", exc)
+        raise ServiceUnavailableError()
+    if not resp.ok:
+        log.error("Error getting stats %d:%s", resp.status_code, resp.text)
+        raise ServiceUnavailableError()
+    return resp.json()
+
+
 @view_config(route_name='loadavg', request_method='GET')
 def get_loadavg(request, action=None):
     """Get the loadavg png displayed in the machines list view."""
