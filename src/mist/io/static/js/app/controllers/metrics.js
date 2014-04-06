@@ -48,11 +48,14 @@ define('app/controllers/metrics', ['ember'],
             },
 
 
-            //
-            //
-            //  Actions
-            //
-            //
+            setContent: function(metrics) {
+                if (!metrics) return;
+                var that = this;
+                Ember.run(function() {
+                    for (metricId in metrics)
+                        that.content.pushObject(metrics[metricId]);
+                });
+            },
 
 
             _addMetric: function (metric) {

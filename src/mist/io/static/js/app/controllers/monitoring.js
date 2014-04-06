@@ -123,6 +123,7 @@ define('app/controllers/monitoring', [
                  Mist.set('monitored_machines', data.machines);
                  Mist.set('current_plan', data.current_plan);
                  Mist.rulesController.setContent(data.rules);
+                 Mist.metricsController.setContent(data.metrics);
                  data.machines.forEach(function(machine_tuple) {
                      var machine = Mist.backendsController.getMachine(machine_tuple[1], machine_tuple[0]);
                      if (machine)

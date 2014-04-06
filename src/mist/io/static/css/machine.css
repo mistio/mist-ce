@@ -117,6 +117,10 @@
     margin-top: 1px;
 }
 
+#metrics-container {
+    margin: 0;
+}
+
 @-moz-document url-prefix() {
     #machine-metric-add  .ajax-loader {
         margin-top: -19px;

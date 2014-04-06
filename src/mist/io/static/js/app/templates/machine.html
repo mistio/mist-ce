@@ -98,6 +98,12 @@
 
                 {{view Mist.monitoringView}}
 
+                <div id="metrics-container" data-role="listview">
+                    {{#each view.metrics}}
+                        {{this.name}}: {{this.target}}
+                    {{/each}}
+                </div>
+
                 <div class="rules-container" data-role="listview">
                     {{#each view.rules}}
                         {{view Mist.ruleView ruleBinding="this"}}

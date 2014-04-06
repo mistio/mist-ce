@@ -157,7 +157,7 @@ define('app/views/machine', ['app/views/mistscreen'],
             },
 
             rulesObserver: function(){
-                var ret = Ember.ArrayController.create(),
+                var ret = [],
                     machine = this.get('controller').get('model');
                 Mist.rulesController.forEach(function(rule){
                     if (rule.machine == machine) {
@@ -166,6 +166,23 @@ define('app/views/machine', ['app/views/mistscreen'],
                 });
                 this.set('rules', ret);
             }.observes('Mist.rulesController.@each', 'Mist.rulesController.@each.machine', 'machine'),
+
+
+            metricsObserver: function () {
+                var metrics = [];
+                var machine = this.machine;
+                Mist.metricsController.forEach(function(metric) {
+                    if (metric.machine.id == machine.id &&
+                        metric.machine.backend.id == machine.backend.id)
+                            metrics.push(metric);
+                });
+                this.set('metrics', metrics);
+                Ember.run.next(function () {
+                    if ($('#metrics-container').listview)
+                        $('#metrics-container').listview()
+                            .listview('refresh');
+                })
+            }.observes('Mist.metricsController.@each', 'Mist.metricsController.@each.machine', 'machine'),
 
 
             stopPolling: function() {
