@@ -46,6 +46,7 @@ define( 'app', [
     'app/controllers/machine_manual_monitoring',
     'app/controllers/image_search',
     'app/controllers/rules',
+    'app/controllers/metrics',
     'app/views/templated',
     'app/views/home',
     'app/views/login',
@@ -101,6 +102,7 @@ define( 'app', [
                 MachineManualMonitoringController,
                 ImageSearchController,
                 RulesController,
+                MetricsController,
                 TemplatedView,
                 Home,
                 LoginView,
@@ -308,6 +310,7 @@ define( 'app', [
         App.set('loginController', LoginController.create());
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
+        App.set('metricsController', MetricsController.create());
         App.set('keyEditController', KeyEditController.create());
         App.set('backendsController', BackendsController.create());
         App.set('machineAddController', MachineAddController.create());

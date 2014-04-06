@@ -1,4 +1,4 @@
-define('app/views/machine_metric_add', ['app/views/popup', 'ember'],
+define('app/views/machine_metric_add', ['app/views/popup'],
     //
     //  Machine Metric Add View
     //
