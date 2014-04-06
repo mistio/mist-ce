@@ -44,7 +44,7 @@ define('app/views/machine_metric_add', ['app/views/popup', 'ember'],
 
 
                 selectMetric: function (metric) {
-                    Mist.machineMetricAddController.set('newMetric', metric);
+                    Mist.machineMetricAddController.set('newMetricTarget', metric);
                     $('#metric-add').collapsible('option', 'collapsedIcon', 'check')
                                                  .collapsible('collapse');
                 }

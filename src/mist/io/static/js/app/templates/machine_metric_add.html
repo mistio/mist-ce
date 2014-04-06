@@ -17,7 +17,7 @@
             <label for="metric-add-title">Title:</label>
             {{view Mist.TextField
                    id="metric-add-title"
-                   valueBinding="Mist.machineMetricAddController.newMetricTitle"}}
+                   valueBinding="Mist.machineMetricAddController.newMetricName"}}
 
             <label>Metric:</label>
             <div id="metric-add"
@@ -28,8 +28,8 @@
                  data-theme="a"
                  class="mist-select">
                 <h2>
-                    {{#if Mist.machineMetricAddController.newMetric}}
-                        {{Mist.machineMetricAddController.newMetric}}
+                    {{#if Mist.machineMetricAddController.newMetricTarget}}
+                        {{Mist.machineMetricAddController.newMetricTarget}}
                     {{else}}
                         Select Metric
                     {{/if}}
@@ -45,6 +45,10 @@
                     {{/each}}
                 </ul>
             </div>
+
+            {{#if Mist.machineMetricAddController.addingMetric}}
+                <div class="ajax-loader"></div>
+            {{/if}}
 
             <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
                 <a class="ui-btn ui-btn-a ui-corner-all" {{action "backClicked" target="view"}}>Back</a>
