@@ -51,20 +51,13 @@ define('app/controllers/machine_metric_add', ['ember'],
 
 
             add: function () {
-                var url = '/backends/' + this.machine.backend.id + '/machines/' +
-                        this.machine.id + '/metrics';
-
                 var that = this;
-                this.set('addingMetric', true);
-                Mist.ajax.POST(url, {
+                Mist.metricsController.addMetric(this.machine, {
                     'name': this.newMetricName,
-                    'target': this.newMetricTarget,
-                }).success(function(metric) {
-                    that.close();
-                }).error(function(message) {
-                    Mist.notificationController.notify('Failed to add metric: ' + message);
-                }).complete(function (sucees) {
-                    that.set('addingMetric', false);
+                    'target': this.newMetricTarget
+                }, function (success) {
+                    if (success)
+                        that.close();
                 });
             },
 
