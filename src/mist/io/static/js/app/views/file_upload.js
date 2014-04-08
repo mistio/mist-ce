@@ -42,7 +42,23 @@ define('app/views/file_upload', ['app/views/templated', 'ember'],
                 doneClicked: function () {
                     Mist.fileUploadController.confirmUpload();
                 }
-            }
+            },
+
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
+            fileObserver: function () {
+                if (Mist.fileUploadController.file) {
+                    $('#file-upload-ok').removeClass('ui-state-disabled');
+                } else {
+                    $('#file-upload-ok').addClass('ui-state-disabled');
+                }
+            }.observes('Mist.fileUploadController.file'),
         });
     }
 );
