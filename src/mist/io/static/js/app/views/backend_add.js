@@ -48,6 +48,10 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                 $('#new-backend-second-field').attr('type', 'password');
                 $('#gce-bundle a').removeClass('ui-icon-check')
                     .addClass('ui-icon-carat-u');
+
+                Ember.run.next(function () {
+                    $('#add-backend-panel').trigger('create');
+                });
             },
 
 
