@@ -67,6 +67,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                 selectProvider: function(provider) {
 
                     Mist.backendAddController._clear();
+                    this.clear();
 
                     $('#new-backend-second-field').attr('type', 'password');
                     $('#new-backend-provider').collapsible('collapse');
