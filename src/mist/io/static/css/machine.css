@@ -106,17 +106,6 @@
     }
 }
 
-#machine-metric-add .ui-collapsible-content {
-    max-height: 120px;
-    overflow-y: scroll;
-}
-
-#machine-metric-add  .ajax-loader {
-    display: inline;
-    float: right;
-    margin-top: 1px;
-}
-
 #metrics-container {
     margin: 0;
 }

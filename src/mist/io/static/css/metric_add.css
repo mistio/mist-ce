@@ -1,0 +1,19 @@
+/* Metric Add view CSS
+-----------------------------------------------------------------------------------------------------------*/
+
+#metric-add .ui-collapsible-content {
+    max-height: 120px;
+    overflow-y: scroll;
+}
+
+#metric-add  .ajax-loader {
+    display: inline;
+    float: right;
+    margin-top: 1px;
+}
+
+@-moz-document url-prefix() {
+    #metric-add  .ajax-loader {
+        margin-top: -19px;
+    }
+}

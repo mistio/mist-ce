@@ -40,7 +40,7 @@
                 <ul data-role="listview" data-theme="a">
                     {{#each Mist.metricAddController.metrics}}
                         <li data-icon="false">
-                            <a {{action "selectMetric" this target="view"}}>{{this}}</a>
+                            <a {{action "selectMetric" this target="view"}}>{{this.name}}</a>
                         </li>
                     {{/each}}
                 </ul>
