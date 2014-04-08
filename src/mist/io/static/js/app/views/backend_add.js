@@ -106,9 +106,11 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         this.set('secondFieldLabel', 'User');
                         Mist.backendAddController.set('newBackendSecondField', 'root');
                         Mist.backendAddController.set('newBackendPort', 22);
-                        $('#new-backend-key .ui-listview').listview('refresh');
-                        $('#new-backend-second-field').attr('type', '');
-                        $('#baremetal-bundle').show();
+                        Ember.run.next(function () {
+                            $('#new-backend-key .ui-listview').listview('refresh');
+                            $('#new-backend-second-field').attr('type', '');
+                            $('#baremetal-bundle').show();
+                        });
 
                     } else {
                         this.set('firstFieldLabel', 'API Key');
