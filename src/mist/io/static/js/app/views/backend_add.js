@@ -81,7 +81,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         this.set('firstFieldLabel', 'Client ID');
                         this.set('secondFieldLabel', 'API Key');
                     } else if (provider.provider.indexOf('gce') > -1) {
-                        this.set('firstFieldLabel', 'Client ID');
+                        this.set('firstFieldLabel', 'Email address');
                         this.set('secondFieldLabel', '');
                         $('#gce-bundle').show();
                     } else if (provider.provider.indexOf('openstack') > -1) {
