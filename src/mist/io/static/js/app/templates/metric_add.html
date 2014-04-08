@@ -1,8 +1,8 @@
-<div id="machine-metric-add-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-b"></div>
-<div id="machine-metric-add-popup"
+<div id="metric-add-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-b"></div>
+<div id="metric-add-popup"
      class="ui-popup-container ui-popup-hidden ui-body-inherit ui-overlay-shadow ui-corner-all mid-popup">
 
-    <div id="machine-metric-add"
+    <div id="metric-add"
          class="ui-popup ui-corner-all"
          data-role="popup"
          data-enhanced="true"
@@ -14,13 +14,13 @@
 
         <div role="main" class="ui-content" data-theme="a">
 
-            <label for="metric-add-title">Title:</label>
+            <label for="metric-add-name">Name:</label>
             {{view Mist.TextField
-                   id="metric-add-title"
-                   valueBinding="Mist.machineMetricAddController.newMetricName"}}
+                   id="metric-add-name"
+                   valueBinding="Mist.metricAddController.newMetricName"}}
 
             <label>Metric:</label>
-            <div id="metric-add"
+            <div id="metric-add-metric"
                  data-role="collapsible"
                  data-iconpos="right"
                  data-collapsed-icon="arrow-d"
@@ -28,17 +28,17 @@
                  data-theme="a"
                  class="mist-select">
                 <h2>
-                    {{#if Mist.machineMetricAddController.newMetricTarget}}
-                        {{Mist.machineMetricAddController.newMetricTarget}}
+                    {{#if Mist.metricAddController.newMetricTarget}}
+                        {{Mist.metricAddController.newMetricTarget}}
                     {{else}}
                         Select Metric
                     {{/if}}
-                    {{#if Mist.machineMetricAddController.loadingMetrics}}
+                    {{#if Mist.metricAddController.loadingMetrics}}
                         <div class="ajax-loader"></div>
                     {{/if}}
                 </h2>
                 <ul data-role="listview" data-theme="a">
-                    {{#each Mist.machineMetricAddController.metrics}}
+                    {{#each Mist.metricAddController.metrics}}
                         <li data-icon="false">
                             <a {{action "selectMetric" this target="view"}}>{{this}}</a>
                         </li>
@@ -46,7 +46,7 @@
                 </ul>
             </div>
 
-            {{#if Mist.machineMetricAddController.addingMetric}}
+            {{#if Mist.metricsController.addingMetric}}
                 <div class="ajax-loader"></div>
             {{/if}}
 

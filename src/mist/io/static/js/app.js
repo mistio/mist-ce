@@ -42,7 +42,7 @@ define( 'app', [
     'app/controllers/keys',
     'app/controllers/machine_tags',
     'app/controllers/machine_shell',
-    'app/controllers/machine_metric_add',
+    'app/controllers/metric_add',
     'app/controllers/machine_manual_monitoring',
     'app/controllers/image_search',
     'app/controllers/rules',
@@ -69,7 +69,7 @@ define( 'app', [
     'app/views/machine_keys',
     'app/views/machine_keys_list_item',
     'app/views/machine_tags_list_item',
-    'app/views/machine_metric_add',
+    'app/views/metric_add',
     'app/views/machine_manual_monitoring',
     'app/views/key_list_item',
     'app/views/key_list',
@@ -98,7 +98,7 @@ define( 'app', [
                 KeysController,
                 MachineTagsController,
                 MachineShellController,
-                MachineMetricAddController,
+                MetricAddController,
                 MachineManualMonitoringController,
                 ImageSearchController,
                 RulesController,
@@ -125,7 +125,7 @@ define( 'app', [
                 MachineKeysView,
                 MachineKeysListItemView,
                 MachineTagsListItemView,
-                MachineMetricAddView,
+                MetricAddView,
                 MachineManualMonitoringView,
                 KeyListItemView,
                 KeyListView,
@@ -282,6 +282,7 @@ define( 'app', [
         App.set('userMenuView', UserMenuView);
         App.set('keyEditView', KeyEditDialog);
         App.set('backendAddView', BackendAdd);
+        App.set('metricAddView', MetricAddView);
         App.set('backendEditView', BackendEdit);
         App.set('imageListView', ImageListView);
         App.set('messageboxView', MessageBoxView);
@@ -298,7 +299,6 @@ define( 'app', [
         App.set('machineShellView', MachineShellView);
         App.set('machineListItemView', MachineListItem);
         App.set('confirmationDialog', ConfirmationDialog);
-        App.set('machineMetricAddView', MachineMetricAddView);
         App.set('machineKeysListItemView', MachineKeysListItemView);
         App.set('machineTagsListItemView', MachineTagsListItemView);
         App.set('machineShellListItemView', MachineShellListItemView);
@@ -313,6 +313,7 @@ define( 'app', [
         App.set('metricsController', MetricsController.create());
         App.set('keyEditController', KeyEditController.create());
         App.set('backendsController', BackendsController.create());
+        App.set('metricAddController', MetricAddController.create());
         App.set('machineAddController', MachineAddController.create());
         App.set('backendAddController', BackendAddController.create());
         App.set('monitoringController', MonitoringController.create());
@@ -324,7 +325,6 @@ define( 'app', [
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
         App.set('machinePowerController', MachinePowerController.create());
-        App.set('machineMetricAddController', MachineMetricAddController.create());
         App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
 
 

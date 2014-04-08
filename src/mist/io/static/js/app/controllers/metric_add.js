@@ -1,6 +1,6 @@
-define('app/controllers/machine_metric_add', ['ember'],
+define('app/controllers/metric_add', ['ember'],
     //
-    //  Machine Metric Add Controller
+    //  Metric Add Controller
     //
     //  @returns Class
     //

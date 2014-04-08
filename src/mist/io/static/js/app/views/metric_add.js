@@ -1,6 +1,6 @@
-define('app/views/machine_metric_add', ['app/views/popup'],
+define('app/views/metric_add', ['app/views/popup'],
     //
-    //  Machine Metric Add View
+    //  Metric Add View
     //
     //  @returns Class
     //
@@ -19,7 +19,7 @@ define('app/views/machine_metric_add', ['app/views/popup'],
 
 
             clear: function () {
-                $('#metric-add').collapsible('option', 'collapsedIcon', 'arrow-d')
+                $('#metric-add-metric').collapsible('option', 'collapsedIcon', 'arrow-d')
                              .collapsible('collapse');
             },
 
@@ -34,18 +34,18 @@ define('app/views/machine_metric_add', ['app/views/popup'],
             actions: {
 
                 backClicked: function () {
-                    Mist.machineMetricAddController.close();
+                    Mist.metricAddController.close();
                 },
 
 
                 addClicked: function () {
-                    Mist.machineMetricAddController.add();
+                    Mist.metricAddController.add();
                 },
 
 
                 selectMetric: function (metric) {
-                    Mist.machineMetricAddController.set('newMetricTarget', metric);
-                    $('#metric-add').collapsible('option', 'collapsedIcon', 'check')
+                    Mist.metricAddController.set('newMetricTarget', metric);
+                    $('#metric-add-metric').collapsible('option', 'collapsedIcon', 'check')
                                                  .collapsible('collapse');
                 }
             },
@@ -60,18 +60,18 @@ define('app/views/machine_metric_add', ['app/views/popup'],
 
             metricsObserver: function () {
                 Ember.run.next(function () {
-                    $('#metric-add .ui-listview').listview('refresh');
+                    $('#metric-add-metric .ui-listview').listview('refresh');
                 });
-            }.observes('Mist.machineMetricAddController.metrics'),
+            }.observes('Mist.metricAddController.metrics'),
 
 
             formReadyObserver: function () {
-                if (Mist.machineMetricAddController.formReady) {
+                if (Mist.metricAddController.formReady ) {
                     $('#metric-add-ok').removeClass('ui-state-disabled');
                 } else {
                     $('#metric-add-ok').addClass('ui-state-disabled');
                 }
-            }.observes('Mist.machineMetricAddController.formReady')
+            }.observes('Mist.metricAddController.formReady')
         });
     }
 );

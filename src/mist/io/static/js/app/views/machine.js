@@ -254,7 +254,7 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
                 addMetricClicked: function () {
-                    Mist.machineMetricAddController.open(this.machine);
+                    Mist.metricAddController.open(this.machine);
                 },
 
 
