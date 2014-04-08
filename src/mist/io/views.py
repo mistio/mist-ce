@@ -541,16 +541,7 @@ def star_image(request):
     backend_id = request.matchdict['backend']
     image_id = request.matchdict['image']
     user = user_from_request(request)
-    with user.lock_n_load():
-        if backend_id not in user.backends:
-            raise BackendNotFoundError(backend_id)
-        backend = user.backends[backend_id]
-        if image_id not in backend.starred:
-            backend.starred.append(image_id)
-        else:
-            backend.starred.remove(image_id)
-        user.save()
-    return image_id in backend.starred
+    return methods.star_image(user, backend_id, image_id)
 
 
 @view_config(route_name='sizes', request_method='GET', renderer='json')

@@ -1220,6 +1220,8 @@ def list_images(user, backend_id, term=None):
             ec2_images = conn.list_images(None, imgs)
             for image in ec2_images:
                 image.name = config.EC2_IMAGES[conn.type].get(image.id, image.name)
+            ec2_images += conn.list_images(ex_owner="amazon")
+            ec2_images += conn.list_images(ex_owner="self")
         elif conn.type == Provider.GCE:
             # Currently not other way to receive all images :(
             rest_images = conn.list_images()
@@ -1237,9 +1239,7 @@ def list_images(user, backend_id, term=None):
                               if image.id in starred]
 
         if term and conn.type in config.EC2_PROVIDERS:
-            ec2_images += conn.list_images(ex_owner="self")
             ec2_images += conn.list_images(ex_owner="aws-marketplace")
-            ec2_images += conn.list_images(ex_owner="amazon")
 
         images = starred_images + ec2_images + rest_images
         images = [img for img in images
@@ -1255,9 +1255,48 @@ def list_images(user, backend_id, term=None):
         log.error(repr(e))
         raise BackendUnavailableError(backend_id)
 
-    ret = [{'id': image.id, 'extra': image.extra, 'name': image.name,
-            'star': image.id in starred} for image in images]
+    ret = [{'id': image.id,
+            'extra': image.extra,
+            'name': image.name,
+            'star': _image_starred(user, backend_id, image.id)}
+           for image in images]
     return ret
+
+
+def _image_starred(user, backend_id, image_id):
+    """Check if an image should appear as starred or not to the user"""
+    backend = user.backends[backend_id]
+    if backend.provider.startswith('ec2'):
+        default = False
+        if backend.provider in config.EC2_IMAGES:
+            if image_id in config.EC2_IMAGES[backend.provider]:
+                default = True
+    else:
+        # consider all images default for backends with few images
+        default = True
+    starred = image_id in backend.starred
+    unstarred = image_id in backend.unstarred
+    return starred or (default and not unstarred)
+
+
+def star_image(user, backend_id, image_id):
+    """Toggle image star (star/unstar)"""
+
+    with user.lock_n_load():
+        backend = user.backends[backend_id]
+        star = _image_starred(user, backend_id, image_id)
+        if star:
+            if image_id in backend.starred:
+                backend.starred.remove(image_id)
+            if image_id not in backend.unstarred:
+                backend.unstarred.append(image_id)
+        else:
+            if image_id not in backend.starred:
+                backend.starred.append(image_id)
+            if image_id in backend.unstarred:
+                backend.unstarred.remove(image_id)
+        user.save()
+    return not star
 
 
 def list_sizes(user, backend_id):

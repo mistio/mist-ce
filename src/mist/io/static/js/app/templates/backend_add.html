@@ -48,6 +48,7 @@
             {{/if}}
 
         </div>
+
         <div id="openstack-bundle" data-theme="a">
             <label for="new-backend-openstack-url">4. Auth URL:</label>
             {{view Mist.TextField
@@ -62,14 +63,15 @@
                    valueBinding="Mist.backendAddController.newBackendOpenStackTenant"}}
 
             <div id="opentack-advanced-wrapper">
-            <select id="openstack-advanced" data-role="slider" data-theme="a"
-            {{action "advancedToggled" target="view" on="change"}}>
-               <option value="0">Basic settings</option>
-                <option value="1">Advanced settings</option>
-            </select>
+                <select id="openstack-advanced" data-role="slider" data-theme="a"
+                {{action "advancedToggled" target="view" on="change"}}>
+                   <option value="0">Basic settings</option>
+                    <option value="1">Advanced settings</option>
+                </select>
             </div>
 
             <div id="non-hp-cloud">
+
                 <label for="new-backend-openstack-region">6. Region:</label>
                 {{view Mist.TextField
                        id="new-backend-openstack-region"
