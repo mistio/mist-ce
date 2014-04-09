@@ -137,8 +137,10 @@ def add_routes(config):
     config.add_route('update_monitoring',
                      '/backends/{backend}/machines/{machine}/monitoring')
     config.add_route('stats', '/backends/{backend}/machines/{machine}/stats')
-    config.add_route('find_metrics',
+    config.add_route('machine_metrics',
                      '/backends/{backend}/machines/{machine}/metrics')
+    config.add_route('metrics', '/metrics')
+    config.add_route('metric', '/metrics/{metric}')
     config.add_route('loadavg',
                      '/backends/{backend}/machines/{machine}/loadavg.png')
 

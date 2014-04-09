@@ -698,7 +698,8 @@ def get_stats(request):
         raise ServiceUnavailableError()
 
 
-@view_config(route_name='find_metrics', request_method='GET', renderer='json')
+@view_config(route_name='machine_metrics', request_method='GET',
+             renderer='json')
 def find_metrics(request):
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
@@ -714,8 +715,68 @@ def find_metrics(request):
         log.error("Exception requesting find_metrics: %r", exc)
         raise ServiceUnavailableError()
     if not resp.ok:
-        log.error("Error getting stats %d:%s", resp.status_code, resp.text)
+        log.error("Error in find_metrics %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError()
+    return resp.json()
+
+
+@view_config(route_name='metrics', request_method='POST', renderer='json')
+def add_metric(request):
+    user = user_from_request(request)
+    params = params_from_request(request)
+    url = "%s/metrics" % config.CORE_URI
+    headers={'Authorization': get_auth_header(user)}
+    try:
+        resp = requests.get(url, headers=headers, params=parmas,
+                            verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        raise SSLError()
+    except Exception as exc:
+        log.error("Exception add metric: %r", exc)
+        raise ServiceUnavailableError()
+    if not resp.ok:
+        log.error("Error adding metric %d:%s", resp.status_code, resp.text)
+        raise BadRequestError(resp.text)
+    return resp.json()
+
+
+@view_config(route_name='metric', request_method='PUT', renderer='json')
+def update_metric(request):
+    user = user_from_request(request)
+    metric_id = request.matchdict['metric_id']
+    params = params_from_request(request)
+    url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
+    headers={'Authorization': get_auth_header(user)}
+    try:
+        resp = requests.get(url, headers=headers, params=parmas,
+                            verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        raise SSLError()
+    except Exception as exc:
+        log.error("Exception updating metric: %r", exc)
+        raise ServiceUnavailableError()
+    if not resp.ok:
+        log.error("Error updating metric %d:%s", resp.status_code, resp.text)
+        raise BadRequestError(resp.text)
+    return resp.json()
+
+
+@view_config(route_name='metric', request_method='DELETE', renderer='json')
+def remove_metric(request):
+    user = user_from_request(request)
+    metric_id = request.matchdict['metric_id']
+    url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
+    headers={'Authorization': get_auth_header(user)}
+    try:
+        resp = requests.get(url, headers=headers, verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        raise SSLError()
+    except Exception as exc:
+        log.error("Exception removing metric: %r", exc)
+        raise ServiceUnavailableError()
+    if not resp.ok:
+        log.error("Error removing metric %d:%s", resp.status_code, resp.text)
+        raise BadRequestError(resp.text)
     return resp.json()
 
 
