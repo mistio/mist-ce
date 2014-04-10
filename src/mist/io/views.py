@@ -743,7 +743,7 @@ def add_metric(request):
 @view_config(route_name='metric', request_method='PUT', renderer='json')
 def update_metric(request):
     user = user_from_request(request)
-    metric_id = request.matchdict['metric_id']
+    metric_id = request.matchdict['metric']
     params = params_from_request(request)
     url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
     headers={'Authorization': get_auth_header(user)}
