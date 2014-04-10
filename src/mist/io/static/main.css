@@ -14,6 +14,7 @@
 @import url("css/key_list.css");
 @import url("css/providers.css");
 @import url("css/monitoring.css");
+@import url("css/file_upload.css");
 @import url("css/backend_add.css");
 @import url("css/machine_add.css");
 @import url("css/machine_keys.css");
@@ -124,7 +125,7 @@ textarea {
 }
 .mid-popup {
     width: 255px !important;
-    max-width: 99%;    
+    max-width: 99%;
 }
 .mid-popup .ok-cancel a,
 .mid-popup .ok-cancel button {
@@ -152,14 +153,14 @@ textarea {
      *  .ui-panel's default width value is 17em
      *  but it's on many many selectors in jqm.css.
      *  Bacause the value "17em" existed only in
-     *  panel related selectors, a mass find/replace 
+     *  panel related selectors, a mass find/replace
      *  process took place.
-     * 
+     *
      *  The value "325px" is also unique to jqm.css
      *  so this change can easily be undone or modified
      */
     width: 325px; /* Useless, but leave it there for reference reasons */
-    min-height: 300px; 
+    min-height: 300px;
 }
 .side-panel .ui-panel-inner {
     padding: 7px;
@@ -185,7 +186,7 @@ textarea {
 
 /* Filtered list headers
 -----------------------------------------------------------------------------------------------------------*/
-#machine-list-page .ui-filterable, #key-list-page .ui-filterable  {    
+#machine-list-page .ui-filterable, #key-list-page .ui-filterable  {
     margin: 10px 118px -44px 118px !important;
     position: relative;
     top: -49px;
@@ -214,7 +215,7 @@ ul.checkbox-list li a.has-monitoring:after {
 }
 .ui-icon-carat-r:after {
     background-color: #666;
-    opacity: .6;    
+    opacity: .6;
 }
 ul.checkbox-list li a:focus {
     box-shadow: none !important;
@@ -226,9 +227,9 @@ ul.checkbox-list li a, ul.checkbox-list li a:hover, ul.checkbox-list label, ul.c
 ul.checkbox-list .ui-grid-b {
     padding-top: 12px;
 }
-ul.checkbox-list li a, 
-ul.checkbox-list li a:active, 
-ul.checkbox-list li a:focus, 
+ul.checkbox-list li a,
+ul.checkbox-list li a:active,
+ul.checkbox-list li a:focus,
 ul.checkbox-list li a:hover,
 ul.checkbox-list li label {
     background: transparent !important;
@@ -338,7 +339,7 @@ ul.checkbox-list li label {
 }
 .mist-select h2 {
     z-index: 1000;
-    border-bottom-right-radius: inherit !important;    
+    border-bottom-right-radius: inherit !important;
 }
 .mist-select ul {
     margin-top: 0px;
@@ -388,7 +389,7 @@ ul.checkbox-list li label {
         height: 30px;
     }
 
-    #machine-list-page .ui-filterable, #key-list-page .ui-filterable  {    
+    #machine-list-page .ui-filterable, #key-list-page .ui-filterable  {
         margin-left: 50px !important;
         margin-right: 50px !important;
     }
@@ -475,11 +476,11 @@ ul.checkbox-list li label {
 .probing {
     animation: probe 1s steps(2, start) infinite;
     -webkit-animation: probe 1s steps(2, start) infinite;
-    background-color: rgba(0, 0, 0, .4);        
+    background-color: rgba(0, 0, 0, .4);
 }
 @keyframes probe {
     from {
-        opacity: 1;    
+        opacity: 1;
     }
     to {
         opacity: .1;
@@ -487,7 +488,7 @@ ul.checkbox-list li label {
 }
 @-webkit-keyframes probe {
     from {
-        opacity: 1;    
+        opacity: 1;
     }
     to {
         opacity: .1;
@@ -499,7 +500,7 @@ ul.checkbox-list li label {
 }
 .warm {
     background-color: #EBB035 !important;
-}    
+}
 .eco {
     background-color: #218559 !important;
 }

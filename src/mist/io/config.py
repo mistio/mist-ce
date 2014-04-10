@@ -113,6 +113,12 @@ SUPPORTED_PROVIDERS = [
         'title': 'EC2 US WEST OREGON',
         'provider': Provider.EC2_US_WEST_OREGON
     },
+    # GCE
+    {
+        'title': 'Google Compute Engine',
+        'provider' : Provider.GCE
+    },
+
     # NephoScale
     {
         'title': 'NephoScale',

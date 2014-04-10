@@ -19,6 +19,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
             newBackendProvider: null,
             newBackendFirstField: null,
             newBackendSecondField: null,
+            newBackendProjectName: null,
             newBackendOpenStackURL: null,
             newBackendOpenStackRegion: null,
             newBackendOpenStackTenant: null,
@@ -57,6 +58,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
 
             add: function () {
                 var that = this;
+                var projectName = this.newBackendOpenStackTenant || this.newBackendProjectName;
                 Mist.backendsController.addBackend(
                     this.newBackendProvider.title,
                     this.newBackendProvider.provider,
@@ -64,7 +66,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     this.newBackendSecondField,
                     this.newBackendOpenStackURL,
                     this.newBackendOpenStackRegion,
-                    this.newBackendOpenStackTenant,
+                    projectName,
                     this.newBackendOpenStackComputeEndpoint,
                     this.newBackendPort,
                     this.newBackendKey.id,
@@ -98,8 +100,8 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     .set('newBackendProvider', {title: 'Select provider'});
 
                 // These should be in a view :(
-                $('#new-backend-key').collapsible('collapse').collapsible('option', 'collapsedIcon', 'arrow-d');
-                $('#new-backend-provider').collapsible('collapse').collapsible('option', 'collapsedIcon', 'arrow-d');
+                $('#new-backend-key').collapsible('collapse').collapsible('option', 'collapsedIcon', 'carat-d');
+                $('#new-backend-provider').collapsible('collapse').collapsible('option', 'collapsedIcon', 'carat-d');
             },
 
 
@@ -121,6 +123,10 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                             }
                         } else if (this.newBackendProvider.provider == 'bare_metal') { // Baremetal
                             if (!Mist.keysController.keyExists(this.newBackendKey.id)) {
+                                ready = false;
+                            }
+                        } else if (this.newBackendProvider.provider == 'gce') { // Google Compute Engine
+                            if (!this.newBackendProjectName) {
                                 ready = false;
                             }
                         }
@@ -147,6 +153,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                        'newBackendProvider',
                        'newBackendFirstField',
                        'newBackendSecondField',
+                       'newBackendProjectName',
                        'newBackendOpenStackURL',
                        'newBackendOpenStackTenant')
         });

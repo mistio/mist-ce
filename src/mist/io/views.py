@@ -441,16 +441,19 @@ def create_machine(request):
         size_id = request.json_body['size']
         #deploy_script received as unicode, but ScriptDeployment wants str
         script = str(request.json_body.get('script', ''))
-        # these are required only for Linode, passing them anyway
-        image_extra = request.json_body['image_extra']
-        disk = request.json_body['disk']
+        # these are required only for Linode/GCE, passing them anyway
+        image_extra = request.json_body.get('image_extra', None)
+        disk = request.json_body.get('disk', None)
+        image_name = request.json_body.get('image_name', None)
+        size_name = request.json_body.get('size_name', None)
+        location_name = request.json_body.get('location_name', None)
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
     user = user_from_request(request)
     ret = methods.create_machine(user, backend_id, key_id, machine_name,
                                  location_id, image_id, size_id, script,
-                                 image_extra, disk)
+                                 image_extra, disk, image_name, size_name, location_name)
     return ret
 
 
