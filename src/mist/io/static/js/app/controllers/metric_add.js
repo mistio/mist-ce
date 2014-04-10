@@ -55,8 +55,10 @@ define('app/controllers/metric_add', ['ember'],
                     'name': this.newMetric.newName,
                     'target': this.newMetric.target
                 }, function (success) {
-                    if (success)
+                    if (success) {
+                        if (that.callback) that.callback(that.newMetric);
                         that.close();
+                    }
                 });
             },
 
@@ -115,7 +117,8 @@ define('app/controllers/metric_add', ['ember'],
 
 
             newMetricObserver: function () {
-                if (this.newMetric.target &&
+                if (this.newMetric &&
+                    this.newMetric.target &&
                     this.newMetric.newName) {
                         this.set('formReady', true);
                 } else {
