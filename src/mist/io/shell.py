@@ -250,7 +250,7 @@ class Shell(object):
                             if len(machine) >= 6 and machine[5]:
                                 port = machine[5]
                 # check some common default names
-                for name in ['root', 'ubuntu', 'ec2-user']:
+                for name in ['root', 'ubuntu', 'ec2-user', 'user']:
                     if name not in users:
                         users.append(name)
             for ssh_user in users:

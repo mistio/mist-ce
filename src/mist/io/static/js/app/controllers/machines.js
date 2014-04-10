@@ -95,12 +95,16 @@ define('app/controllers/machines', ['app/models/machine'],
                         'location': location.id,
                         // these are only useful for Linode
                         'disk': size.disk,
-                        'image_extra': image.extra
+                        'image_extra': image.extra,
+                        //gce needs these
+                        'size_name': size.name,
+                        'image_name': image.name,
+                        'location_name': location.name
                 }).success(function (machine) {
                     that._createMachine(machine, key);
                 }).error(function (message) {
                     that.removeObject(dummyMachine);
-                    Mist.notificationController.notify('Failed to create machine: ' + message);
+                    Mist.notificationController.timeNotify('Failed to create machine: ' + message, 5000);
                 }).complete(function (success, machine) {
                     that.set('addingMachine', false);
                     that.set('onMachineAdd');

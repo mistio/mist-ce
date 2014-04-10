@@ -1,7 +1,7 @@
 define('app/controllers/locations', ['app/models/location'],
     /**
      *  Locations controller
-     * 
+     *
      *  @returns Class
      */
     function(Location) {
@@ -16,9 +16,9 @@ define('app/controllers/locations', ['app/models/location'],
             backend: null,
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
             load: function() {
@@ -30,7 +30,7 @@ define('app/controllers/locations', ['app/models/location'],
                 Mist.ajax.GET('/backends/' + this.backend.id + '/locations', {
                 }).success(function(locations) {
                     if (!that.backend.enabled) return;
-                    that._setContent(locations);
+                    that._setContent(locations || []);
                 }).error(function() {
                     if (!that.backend.enabled) return;
                     Mist.notificationController.notify('Failed to load locations for ' + that.backend.title);
@@ -45,9 +45,9 @@ define('app/controllers/locations', ['app/models/location'],
 
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
             clear: function() {
@@ -66,9 +66,9 @@ define('app/controllers/locations', ['app/models/location'],
 
 
             /**
-             * 
+             *
              *  Pseudo-Private Methods
-             * 
+             *
              */
 
             _setContent: function(locations) {

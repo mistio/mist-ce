@@ -33,6 +33,13 @@
     background-image: url(../images/nephoscale_sm.png);
 }
 
+
+/* GCE */
+#single-view-provider-icon.provider-gce  {
+    background-image: url(../images/gce.png);
+    background-size: 45px;
+}
+
 /* DigitalOcean */
 #single-view-provider-icon.provider-digitalocean  {
     background-image: url(../images/digitalocean.png);

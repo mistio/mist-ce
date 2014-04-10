@@ -45,6 +45,7 @@ define( 'app', [
     'app/controllers/machine_manual_monitoring',
     'app/controllers/image_search',
     'app/controllers/rules',
+    'app/controllers/file_upload',
     'app/views/templated',
     'app/views/home',
     'app/views/login',
@@ -76,6 +77,7 @@ define( 'app', [
     'app/views/rule',
     'app/views/user_menu',
     'app/views/list_item',
+    'app/views/file_upload',
     'ember'
     ], function($,
                 d3,
@@ -98,6 +100,7 @@ define( 'app', [
                 MachineManualMonitoringController,
                 ImageSearchController,
                 RulesController,
+                FileUploadController,
                 TemplatedView,
                 Home,
                 LoginView,
@@ -128,7 +131,8 @@ define( 'app', [
                 KeyEditDialog,
                 RuleView,
                 UserMenuView,
-                ListItemView
+                ListItemView,
+                FileUploadView
                 ) {
 
     function initialize() {
@@ -278,6 +282,7 @@ define( 'app', [
         App.set('backendAddView', BackendAdd);
         App.set('backendEditView', BackendEdit);
         App.set('imageListView', ImageListView);
+        App.set('fileUploadView', FileUploadView);
         App.set('messageboxView', MessageBoxView);
         App.set('monitoringView', MonitoringView);
         App.set('machineView', SingleMachineView);
@@ -305,6 +310,7 @@ define( 'app', [
         App.set('keyAddController', KeyAddController.create());
         App.set('keyEditController', KeyEditController.create());
         App.set('backendsController', BackendsController.create());
+        App.set('fileUploadController', FileUploadController.create());
         App.set('machineAddController', MachineAddController.create());
         App.set('backendAddController', BackendAddController.create());
         App.set('monitoringController', MonitoringController.create());
@@ -341,6 +347,16 @@ define( 'app', [
             keyUp: function(e) {
                 if(this.get('parentView').keyUp) {
                     this.get('parentView').keyUp(e);
+                }
+            },
+            click: function(e) {
+                if(this.get('parentView').inputClicked) {
+                    this.get('parentView').inputClicked(e);
+                }
+            },
+            focusIn: function(e) {
+                if(this.get('parentView').inputClicked) {
+                    this.get('parentView').inputClicked(e);
                 }
             }
         });

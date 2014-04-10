@@ -5,6 +5,7 @@ if (!JS_BUILD) {
     'text!app/templates/backend_add.html',
     'text!app/templates/backend_edit.html',
     'text!app/templates/confirmation_dialog.html',
+    'text!app/templates/file_upload.html',
     'text!app/templates/home.html',
     'text!app/templates/image_list.html',
     'text!app/templates/image_list_item.html',
@@ -35,31 +36,32 @@ if (!JS_BUILD) {
     Ember.TEMPLATES['backend_add/html'] = Ember.Handlebars.compile(arguments[0]);
     Ember.TEMPLATES['backend_edit/html'] = Ember.Handlebars.compile(arguments[1]);
     Ember.TEMPLATES['confirmation_dialog/html'] = Ember.Handlebars.compile(arguments[2]);
-    Ember.TEMPLATES['home/html'] = Ember.Handlebars.compile(arguments[3]);
-    Ember.TEMPLATES['image_list/html'] = Ember.Handlebars.compile(arguments[4]);
-    Ember.TEMPLATES['image_list_item/html'] = Ember.Handlebars.compile(arguments[5]);
-    Ember.TEMPLATES['key/html'] = Ember.Handlebars.compile(arguments[6]);
-    Ember.TEMPLATES['key_add/html'] = Ember.Handlebars.compile(arguments[7]);
-    Ember.TEMPLATES['key_edit/html'] = Ember.Handlebars.compile(arguments[8]);
-    Ember.TEMPLATES['key_list/html'] = Ember.Handlebars.compile(arguments[9]);
-    Ember.TEMPLATES['key_list_item/html'] = Ember.Handlebars.compile(arguments[10]);
-    Ember.TEMPLATES['login/html'] = Ember.Handlebars.compile(arguments[11]);
-    Ember.TEMPLATES['machine/html'] = Ember.Handlebars.compile(arguments[12]);
-    Ember.TEMPLATES['machine_add/html'] = Ember.Handlebars.compile(arguments[13]);
-    Ember.TEMPLATES['machine_keys/html'] = Ember.Handlebars.compile(arguments[14]);
-    Ember.TEMPLATES['machine_keys_list_item/html'] = Ember.Handlebars.compile(arguments[15]);
-    Ember.TEMPLATES['machine_list/html'] = Ember.Handlebars.compile(arguments[16]);
-    Ember.TEMPLATES['machine_list_item/html'] = Ember.Handlebars.compile(arguments[17]);
-    Ember.TEMPLATES['machine_manual_monitoring/html'] = Ember.Handlebars.compile(arguments[18]);
-    Ember.TEMPLATES['machine_power/html'] = Ember.Handlebars.compile(arguments[19]);
-    Ember.TEMPLATES['machine_shell/html'] = Ember.Handlebars.compile(arguments[20]);
-    Ember.TEMPLATES['machine_shell_list_item/html'] = Ember.Handlebars.compile(arguments[21]);
-    Ember.TEMPLATES['machine_tags/html'] = Ember.Handlebars.compile(arguments[22]);
-    Ember.TEMPLATES['machine_tags_list_item/html'] = Ember.Handlebars.compile(arguments[23]);
-    Ember.TEMPLATES['messagebox/html'] = Ember.Handlebars.compile(arguments[24]);
-    Ember.TEMPLATES['monitoring/html'] = Ember.Handlebars.compile(arguments[25]);
-    Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[26]);
-    Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[27]);
+    Ember.TEMPLATES['file_upload/html'] = Ember.Handlebars.compile(arguments[3]);
+    Ember.TEMPLATES['home/html'] = Ember.Handlebars.compile(arguments[4]);
+    Ember.TEMPLATES['image_list/html'] = Ember.Handlebars.compile(arguments[5]);
+    Ember.TEMPLATES['image_list_item/html'] = Ember.Handlebars.compile(arguments[6]);
+    Ember.TEMPLATES['key/html'] = Ember.Handlebars.compile(arguments[7]);
+    Ember.TEMPLATES['key_add/html'] = Ember.Handlebars.compile(arguments[8]);
+    Ember.TEMPLATES['key_edit/html'] = Ember.Handlebars.compile(arguments[9]);
+    Ember.TEMPLATES['key_list/html'] = Ember.Handlebars.compile(arguments[10]);
+    Ember.TEMPLATES['key_list_item/html'] = Ember.Handlebars.compile(arguments[11]);
+    Ember.TEMPLATES['login/html'] = Ember.Handlebars.compile(arguments[12]);
+    Ember.TEMPLATES['machine/html'] = Ember.Handlebars.compile(arguments[13]);
+    Ember.TEMPLATES['machine_add/html'] = Ember.Handlebars.compile(arguments[14]);
+    Ember.TEMPLATES['machine_keys/html'] = Ember.Handlebars.compile(arguments[15]);
+    Ember.TEMPLATES['machine_keys_list_item/html'] = Ember.Handlebars.compile(arguments[16]);
+    Ember.TEMPLATES['machine_list/html'] = Ember.Handlebars.compile(arguments[17]);
+    Ember.TEMPLATES['machine_list_item/html'] = Ember.Handlebars.compile(arguments[18]);
+    Ember.TEMPLATES['machine_manual_monitoring/html'] = Ember.Handlebars.compile(arguments[19]);
+    Ember.TEMPLATES['machine_power/html'] = Ember.Handlebars.compile(arguments[20]);
+    Ember.TEMPLATES['machine_shell/html'] = Ember.Handlebars.compile(arguments[21]);
+    Ember.TEMPLATES['machine_shell_list_item/html'] = Ember.Handlebars.compile(arguments[22]);
+    Ember.TEMPLATES['machine_tags/html'] = Ember.Handlebars.compile(arguments[23]);
+    Ember.TEMPLATES['machine_tags_list_item/html'] = Ember.Handlebars.compile(arguments[24]);
+    Ember.TEMPLATES['messagebox/html'] = Ember.Handlebars.compile(arguments[25]);
+    Ember.TEMPLATES['monitoring/html'] = Ember.Handlebars.compile(arguments[26]);
+    Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[27]);
+    Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[28]);
   });
   return;
 }
@@ -227,6 +229,10 @@ function program5(depth0,data) {
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.keyAddView", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n\n");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.fileUploadView", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
   data.buffer.push("\n");
   return buffer;
   
@@ -320,6 +326,66 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
   data.buffer.push(">Yes</button>\n        </div>\n    </div>\n\n</div>\n");
+  return buffer;
+  
+});
+Ember.TEMPLATES["file_upload/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+  var buffer = '', stack1, hashTypes, hashContexts, escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  
+  data.buffer.push("\n                <div class=\"ajax-loader add-key-loader\"></div>\n            ");
+  }
+
+  data.buffer.push("<div id=\"file-upload\" class=\"large-popup\" data-role=\"popup\" data-overlay-theme=\"b\" data-transition=\"flip\">\n\n    <div data-role=\"header\" data-theme=\"b\">\n        <h1>");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.fileUploadController.title", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</h1>\n    </div>\n\n    <div data-role=\"content\" data-theme=\"a\">\n\n        <label for=\"textarea-private-key\">");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.fileUploadController.label", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(":\n            ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['if'].call(depth0, "Mist.fileUploadController.uploadingFile", {hash:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n        </label>\n        ");
+  hashContexts = {'id': depth0,'valueBinding': depth0};
+  hashTypes = {'id': "STRING",'valueBinding': "STRING"};
+  data.buffer.push(escapeExpression(helpers.view.call(depth0, "Ember.TextArea", {hash:{
+    'id': ("upload-area"),
+    'valueBinding': ("Mist.fileUploadController.file")
+  },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("\n\n        <a class=\"ui-btn ui-corner-all ui-btn-a\" ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "uploadClicked", {hash:{
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">Upload</a>\n\n        <input id=\"upload-input\" type=\"file\" name=\"file\" ");
+  hashContexts = {'on': depth0,'target': depth0};
+  hashTypes = {'on': "STRING",'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "uploadInputChanged", {hash:{
+    'on': ("change"),
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("/>\n\n        <div class=\"ok-cancel\" data-role=\"controlgroup\" data-type=\"horizontal\">\n            <a class=\"ui-btn ui-corner-all ui-btn-a\" ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "backClicked", {hash:{
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">Back</a>\n            <a class=\"ui-btn ui-corner-all ui-btn-d\" ");
+  hashContexts = {'target': depth0};
+  hashTypes = {'target': "STRING"};
+  data.buffer.push(escapeExpression(helpers.action.call(depth0, "addClicked", {hash:{
+    'target': ("view")
+  },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(">Add</a>\n        </div>\n    </div>\n</div>\n");
   return buffer;
   
 });

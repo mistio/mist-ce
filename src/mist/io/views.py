@@ -444,13 +444,16 @@ def create_machine(request):
         # these are required only for Linode, passing them anyway
         image_extra = request.json_body['image_extra']
         disk = request.json_body['disk']
+        image_name = request.json_body['image_name']
+        size_name = request.json_body['size_name']
+        location_name = request.json_body['location_name']
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
     user = user_from_request(request)
     ret = methods.create_machine(user, backend_id, key_id, machine_name,
                                  location_id, image_id, size_id, script,
-                                 image_extra, disk)
+                                 image_extra, disk, image_name, size_name, location_name)
     return ret
 
 
