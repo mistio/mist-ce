@@ -19,6 +19,7 @@ define('app/controllers/metrics', ['ember'],
 
 
             content: [],
+            addingMetric: null,
 
 
             //
@@ -36,14 +37,15 @@ define('app/controllers/metrics', ['ember'],
                 var that = this;
                 this.set('addingMetric', true);
                 Mist.ajax.POST('/metrics', {
-                    'name': metric.name,
+                    'name': metric.newName,
                     'target': metric.target,
                     'machine_id': machine_id,
                     'backend_id': backend_id,
                 }).success(function(newMetric) {
                     that._addMetric(newMetric);
                 }).error(function(message) {
-                    Mist.notificationController.notify('Failed to add metric: ' + message);
+                    Mist.notificationController.notify(
+                        'Failed to add metric: ' + message);
                 }).complete(function (success, newMetric) {
                     that.set('addingMetric', false);
                     if (callback) callback(success, newMetric);
@@ -52,11 +54,12 @@ define('app/controllers/metrics', ['ember'],
 
 
             setContent: function(metrics) {
-                if (!metrics) return;
                 var that = this;
                 Ember.run(function() {
                     for (var metricId in metrics)
-                        that.content.pushObject(metrics[metricId]);
+                        that.content.pushObject(
+                            metrics[metricId]
+                        );
                 });
             },
 

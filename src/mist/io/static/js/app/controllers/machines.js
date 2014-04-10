@@ -310,15 +310,18 @@ define('app/controllers/machines', ['app/models/machine'],
                         Mist.monitored_machines.some(function(machine_tuple){
                             backend_id = machine_tuple[0];
                             machine_id = machine_tuple[1];
-                            if (machine.backend.id == backend_id && machine.id == machine_id && !machine.hasMonitoring) {
-                                that.getMachine(machine_id, backend_id).set('hasMonitoring', true);
-                                return true;
+                            if (!machine.hasMonitoring &&
+                                machine.id == machine_id &&
+                                machine.backend.id == backend_id) {
+                                    that.getMachine(machine_id, backend_id)
+                                        .set('hasMonitoring', true);
+                                    return true;
                             }
                         });
 
                         Mist.rulesController.content.forEach(function(rule) {
-                            if (!rule.machine.id)
-                                return;
+
+                            if (rule.machine.id) return;
 
                             if (rule.machine == machine.id &&
                                 rule.backend == machine.backend.id)
@@ -326,10 +329,11 @@ define('app/controllers/machines', ['app/models/machine'],
                         });
 
                         Mist.metricsController.content.forEach(function(metric) {
-                            return;
-                            if (metric.machine == machine.id &&
-                                metric.backend == machine.backend.id)
-                                    metric.set('machine', machine);
+                            metric.machines.forEach(function(metricMachine, index) {
+                                if (metricMachine[1] == machine.id &&
+                                    metricMachine[0] == machine.backend.id)
+                                        metric.machines[index] = machine;
+                            });
                         });
                     });
                 }

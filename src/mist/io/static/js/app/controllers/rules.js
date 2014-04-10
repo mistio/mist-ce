@@ -40,7 +40,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 if (!rules) return;
                 var that = this;
                 Ember.run(function() {
-                    for (ruleId in rules) {
+                    for (var ruleId in rules) {
                         var rule = rules[ruleId];
                         rule.id = ruleId;
                         rule.maxValue = rules[ruleId].max_value;
@@ -59,7 +59,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
 
 
             getOperatorByTitle: function(ruleTitle) {
-                return this.content.findBy('title', ruleTitle);
+                return this.operatorList.findBy('title', ruleTitle);
             },
 
 
