@@ -326,9 +326,7 @@ define('app/controllers/machines', ['app/models/machine'],
                         });
 
                         Mist.metricsController.content.forEach(function(metric) {
-                            if (!metric.machine.id)
-                                return;
-
+                            return;
                             if (metric.machine == machine.id &&
                                 metric.backend == machine.backend.id)
                                     metric.set('machine', machine);

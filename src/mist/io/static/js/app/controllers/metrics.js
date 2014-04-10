@@ -55,7 +55,7 @@ define('app/controllers/metrics', ['ember'],
                 if (!metrics) return;
                 var that = this;
                 Ember.run(function() {
-                    for (metricId in metrics)
+                    for (var metricId in metrics)
                         that.content.pushObject(metrics[metricId]);
                 });
             },

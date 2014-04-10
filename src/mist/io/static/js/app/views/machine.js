@@ -157,28 +157,31 @@ define('app/views/machine', ['app/views/mistscreen'],
             },
 
             rulesObserver: function(){
-                var ret = [],
-                    machine = this.get('controller').get('model');
-                Mist.rulesController.forEach(function(rule){
-                    if (rule.machine == machine) {
-                        ret.pushObject(rule);
-                    }
+                var rules = [];
+                var machine = this.machine;
+
+                if (!machine.equals)
+                    return;
+
+                Mist.rulesController.content.forEach(function(rule) {
+                    info(rule);
+                    if (machine.equals(rule.machine))
+                        rules.push(rule);
                 });
-                this.set('rules', ret);
+                this.set('rules', rules);
             }.observes('Mist.rulesController.@each', 'Mist.rulesController.@each.machine', 'machine'),
 
 
             metricsObserver: function () {
                 var metrics = [];
                 var machine = this.machine;
+
+                if (!machine.equals)
+                    return;
+
                 Mist.metricsController.forEach(function(metric) {
-
-                    if (!metric.machine)
-                        return;
-
-                    if (metric.machine.id == machine.id &&
-                        metric.machine.backend.id == machine.backend.id)
-                            metrics.push(metric);
+                    if (machine.equals(metric.machine))
+                        metrics.push(metric);
                 });
                 this.set('metrics', metrics);
                 Ember.run.next(function () {

@@ -54,32 +54,20 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
 
 
             getRuleById: function(ruleId) {
-                for (var i = 0; i < this.content.length; i++) {
-                    if (this.content[i].id == ruleId) {
-                        return this.content[i];
-                    }
-                }
-                return null;
+                return this.content.findBy('id', ruleId);
             },
 
 
-            getOperatorByTitle: function(title) {
-                var ret = null;
-                this.operatorList.forEach(function(op) {
-                    if (op.title == title){
-                        ret = op;
-                    }
-                });
-                return ret;
+            getOperatorByTitle: function(ruleTitle) {
+                return this.content.findBy('title', ruleTitle);
             },
 
 
             creationPendingObserver: function() {
-                if (this.creatingPending) {
+                if (this.creationPending)
                     $('#add-rule-button').addClass('ui-state-disabled');
-                } else {
+                else
                     $('#add-rule-button').removeClass('ui-state-disabled');
-                }
 
             }.observes('creationPending'),
 
