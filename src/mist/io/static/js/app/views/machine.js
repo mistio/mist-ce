@@ -32,12 +32,14 @@ define('app/views/machine', ['app/views/mistscreen'],
 
                 // Add Event listeners
                 Mist.backendsController.on('onMachineListChange', this, 'load');
+                Mist.metricsController.on('onMetricListChange', this, 'updateMetrics');
 
                 Ember.run(this, function() {
                     this.updateCurrentMachine();
                     if (this.machine.id) {
                         this.updateUptime();
                         this.updateFooter();
+                        this.updateMetrics();
                         // TODO: Render stuff
                     }
                 });
@@ -48,6 +50,7 @@ define('app/views/machine', ['app/views/mistscreen'],
 
                 // Remove event listeners
                 Mist.backendsController.off('onMachineListChange', this, 'load');
+                Mist.metricsController.off('onMetricListChange', this, 'updateMetrics');
 
             }.on('willDestroyElement'),
 
@@ -172,12 +175,12 @@ define('app/views/machine', ['app/views/mistscreen'],
             }.observes('Mist.rulesController.@each', 'Mist.rulesController.@each.machine', 'machine'),
 
 
-            metricsObserver: function () {
+            updateMetrics: function () {
 
                 var metrics = [];
                 var machine = this.machine;
 
-                if (!machine.equals)
+                if (!machine.id)
                     return;
 
                 Mist.metricsController.customMetrics.forEach(function(metric) {
@@ -198,9 +201,8 @@ define('app/views/machine', ['app/views/mistscreen'],
                             .listview('refresh');
                 });
 
-            }.observes('Mist.metricsController.customMetrics',
-                'Mist.metricsController.customMetrics.@each',
-                'machine'),
+                info('hi');
+            },
 
 
             stopPolling: function() {

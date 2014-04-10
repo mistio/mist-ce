@@ -331,6 +331,7 @@ define('app/controllers/machines', ['app/models/machine'],
                                 if (metricMachine[1] == machine.id &&
                                     metricMachine[0] == machine.backend.id) {
                                         metric.machines[index] = machine;
+                                        Mist.metricsController.trigger('onMetricListChange');
                                     }
                             });
                         });

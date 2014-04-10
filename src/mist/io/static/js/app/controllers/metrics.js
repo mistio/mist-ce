@@ -42,8 +42,11 @@ define('app/controllers/metrics', ['ember'],
                     'target': metric.target,
                     'machine_id': machine_id,
                     'backend_id': backend_id,
-                }).success(function(newMetric) {
-                    that._addMetric(newMetric);
+                }).success(function(newMetricId) {
+                    metric.id = newMetricId;
+                    metric.name = metric.newName;
+                    metric.machines = machine ? [machine] : [];
+                    that._addMetric(metric, machine);
                 }).error(function(message) {
                     Mist.notificationController.notify(
                         'Failed to add metric: ' + message);
@@ -55,30 +58,29 @@ define('app/controllers/metrics', ['ember'],
 
 
             setCustomMetrics: function(metrics) {
-                var that = this;
-                Ember.run(function() {
+                Ember.run(this, function() {
                     for (var metricId in metrics)
-                        that.customMetrics.pushObject(
+                        this.customMetrics.pushObject(
                             metrics[metricId]
                         );
+                    this.trigger('onMetricListChange');
                 });
             },
 
 
             setBuiltInMetrics: function(metrics) {
-                var that = this;
-                Ember.run(function() {
+                Ember.run(this, function() {
                     for (var metricId in metrics)
-                        that.builtInMetrics.pushObject(
+                        this.builtInMetrics.pushObject(
                             metrics[metricId]
                         );
+                    this.trigger('onMetricListChange');
                 });
             },
 
 
-            _addMetric: function (metric) {
+            _addMetric: function (metric, machine) {
                 Ember.run(this, function () {
-                    metric.machines = [];
                     this.customMetrics.pushObject(metric);
                     this.trigger('onMetricAdd');
                     this.trigger('onMetricListChange');
