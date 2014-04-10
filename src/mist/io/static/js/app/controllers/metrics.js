@@ -57,9 +57,26 @@ define('app/controllers/metrics', ['ember'],
             },
 
 
+            deleteMetric: function (metric, callback) {
+                var that = this;
+                this.set('deletingMetric', true);
+                Mist.ajax.DELETE('/metrics/' + metric.id, {
+                }).success(function() {
+                    that._deleteMetric(metric);
+                }).error(function(message) {
+                    Mist.notificationController.notify(
+                        'Failed to delete metric: ' + message);
+                }).complete(function(success) {
+                    that.set('deletingMetric', false);
+                    if (callback) callback(success, metric);
+                });
+            },
+
+
             setCustomMetrics: function(metrics) {
                 Ember.run(this, function() {
                     for (var metricId in metrics)
+                        metrics[metricId].id = metricId;
                         this.customMetrics.pushObject(
                             metrics[metricId]
                         );
@@ -83,6 +100,17 @@ define('app/controllers/metrics', ['ember'],
                 Ember.run(this, function () {
                     this.customMetrics.pushObject(metric);
                     this.trigger('onMetricAdd');
+                    this.trigger('onMetricListChange');
+                });
+            },
+
+
+            _deleteMetric: function (metric) {
+                Ember.run(this, function () {
+                    this.customMetrics.removeObject(
+                        this.customMetrics.findBy('id', metric.id)
+                    );
+                    this.trigger('onMetricDelete');
                     this.trigger('onMetricListChange');
                 });
             }

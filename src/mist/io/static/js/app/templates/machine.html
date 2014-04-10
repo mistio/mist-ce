@@ -100,7 +100,11 @@
 
                 <div id="metrics-container" data-role="listview">
                     {{#each view.metrics}}
-                        <div>{{this.name}}: {{this.target}}</div>
+                        <div>
+                            <p>{{this.name}}: {{this.target}}
+                                <a {{action "deleteMetric" this target="view"}}>X</a>
+                            </p>
+                        </div>
                     {{/each}}
                 </div>
 

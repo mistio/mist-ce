@@ -278,6 +278,10 @@ define('app/views/machine', ['app/views/mistscreen'],
                 },
 
 
+                deleteMetric: function(metric) {
+                    Mist.metricsController.deleteMetric(metric);
+                },
+
                 enableMonitoringClicked: function () {
 
                     if (Mist.authenticated) {
