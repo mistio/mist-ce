@@ -33,7 +33,7 @@ define('app/controllers/metrics', ['ember'],
                 this.set('addingMetric', true);
                 Mist.ajax.POST('/metrics', {
                     'name': metric.name,
-                    'title': metric.title
+                    'target': metric.target
                 }).success(function(newMetric) {
                     that._addMetric(newMetric);
                 }).error(function(message) {

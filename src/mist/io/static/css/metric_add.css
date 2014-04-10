@@ -13,7 +13,7 @@
 }
 
 @-moz-document url-prefix() {
-    #metric-add  .ajax-loader {
+    #metric-add  .ui-collapsible .ajax-loader {
         margin-top: -19px;
     }
 }
