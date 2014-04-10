@@ -33,7 +33,7 @@ from mist.io.model import Keypair
 from mist.io.shell import Shell
 import mist.io.exceptions as exceptions
 from mist.io.exceptions import *
-from mist.io.helpers import get_auth_header
+from mist.io.helpers import get_auth_header, params_from_request
 
 
 log = logging.getLogger(__name__)
