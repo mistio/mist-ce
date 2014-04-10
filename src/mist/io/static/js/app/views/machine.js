@@ -198,7 +198,8 @@ define('app/views/machine', ['app/views/mistscreen'],
                             .listview('refresh');
                 });
 
-            }.observes('Mist.metricsController.customMetrics.@each',
+            }.observes('Mist.metricsController.customMetrics',
+                'Mist.metricsController.customMetrics.@each',
                 'machine'),
 
 

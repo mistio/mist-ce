@@ -78,6 +78,7 @@ define('app/controllers/metrics', ['ember'],
 
             _addMetric: function (metric) {
                 Ember.run(this, function () {
+                    metric.machines = [];
                     this.customMetrics.pushObject(metric);
                     this.trigger('onMetricAdd');
                     this.trigger('onMetricListChange');
