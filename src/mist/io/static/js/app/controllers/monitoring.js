@@ -547,7 +547,7 @@ define('app/controllers/monitoring', [
 
                             try {
 
-                                if(data.load.length == 0)
+                                if(!data.load || data.load.length == 0)
                                     throw "No Data Received";
 
                                 // TODO: Maybe there is a better to tell if

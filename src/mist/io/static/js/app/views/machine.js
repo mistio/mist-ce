@@ -172,6 +172,10 @@ define('app/views/machine', ['app/views/mistscreen'],
                 var metrics = [];
                 var machine = this.machine;
                 Mist.metricsController.forEach(function(metric) {
+
+                    if (!metric.machine)
+                        return;
+
                     if (metric.machine.id == machine.id &&
                         metric.machine.backend.id == machine.backend.id)
                             metrics.push(metric);

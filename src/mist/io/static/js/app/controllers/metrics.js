@@ -29,11 +29,17 @@ define('app/controllers/metrics', ['ember'],
 
 
             addMetric: function (machine, metric, callback) {
+
+                var machine_id = machine.id || null;
+                var backend_id = machine.backend ? machine.backend.id : null;
+
                 var that = this;
                 this.set('addingMetric', true);
                 Mist.ajax.POST('/metrics', {
                     'name': metric.name,
-                    'target': metric.target
+                    'target': metric.target,
+                    'machine_id': machine_id,
+                    'backend_id': backend_id,
                 }).success(function(newMetric) {
                     that._addMetric(newMetric);
                 }).error(function(message) {
