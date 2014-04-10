@@ -17,7 +17,7 @@
             <label for="metric-add-name">Name:</label>
             {{view Mist.TextField
                    id="metric-add-name"
-                   valueBinding="Mist.metricAddController.newMetricName"}}
+                   valueBinding="Mist.metricAddController.newMetric.newName"}}
 
             <label>Metric:</label>
             <div id="metric-add-metric"
@@ -28,8 +28,8 @@
                  data-theme="a"
                  class="mist-select">
                 <h2>
-                    {{#if Mist.metricAddController.newMetricTarget}}
-                        {{Mist.metricAddController.newMetricTarget.name}}
+                    {{#if Mist.metricAddController.newMetric.target}}
+                        {{Mist.metricAddController.newMetric.name}}
                     {{else}}
                         Select Metric
                     {{/if}}

@@ -44,7 +44,11 @@ define('app/views/metric_add', ['app/views/popup'],
 
 
                 selectMetric: function (metric) {
-                    Mist.metricAddController.set('newMetricTarget', metric);
+                    Mist.metricAddController.set('newMetric', {
+                        name: metric.name,
+                        newName: metric.name,
+                        target: metric.target
+                    });
                     $('#metric-add-metric').collapsible('option', 'collapsedIcon', 'check')
                                                  .collapsible('collapse');
                 }

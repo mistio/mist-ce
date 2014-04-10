@@ -23,8 +23,7 @@ define('app/controllers/metric_add', ['ember'],
             machine: null,
             callback: null,
             formReady: null,
-            newMetricName: null,
-            newMetricTarget: null,
+            newMetric: null,
 
 
             //
@@ -53,8 +52,8 @@ define('app/controllers/metric_add', ['ember'],
             add: function () {
                 var that = this;
                 Mist.metricsController.addMetric(this.machine, {
-                    'name': this.newMetricName,
-                    'target': this.newMetricTarget
+                    'name': this.newMetric.newName,
+                    'target': this.newMetric.target
                 }, function (success) {
                     if (success)
                         that.close();
@@ -84,8 +83,7 @@ define('app/controllers/metric_add', ['ember'],
                 this.set('metrics', [])
                     .set('machine', null)
                     .set('callback', null)
-                    .set('newMetricName', null)
-                    .set('newMetricTarget', null);
+                    .set('newMetric', null);
             },
 
 
@@ -117,13 +115,13 @@ define('app/controllers/metric_add', ['ember'],
 
 
             newMetricObserver: function () {
-                if (this.newMetricTarget &&
-                    this.newMetricName) {
+                if (this.newMetric.target &&
+                    this.newMetric.newName) {
                         this.set('formReady', true);
                 } else {
                     this.set('formReady', false);
                 }
-            }.observes('newMetricTarget', 'newMetricName')
+            }.observes('newMetric.target', 'newMetric.newName', 'newMetric')
         });
     }
 );
