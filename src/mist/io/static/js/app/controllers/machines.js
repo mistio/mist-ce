@@ -320,19 +320,18 @@ define('app/controllers/machines', ['app/models/machine'],
                         });
 
                         Mist.rulesController.content.forEach(function(rule) {
-
                             if (rule.machine.id) return;
-
                             if (rule.machine == machine.id &&
                                 rule.backend == machine.backend.id)
                                     rule.set('machine', machine);
                         });
 
-                        Mist.metricsController.content.forEach(function(metric) {
+                        Mist.metricsController.customMetrics.forEach(function(metric) {
                             metric.machines.forEach(function(metricMachine, index) {
                                 if (metricMachine[1] == machine.id &&
-                                    metricMachine[0] == machine.backend.id)
+                                    metricMachine[0] == machine.backend.id) {
                                         metric.machines[index] = machine;
+                                    }
                             });
                         });
                     });

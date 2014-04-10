@@ -173,23 +173,33 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             metricsObserver: function () {
+
                 var metrics = [];
                 var machine = this.machine;
 
                 if (!machine.equals)
                     return;
 
-                Mist.metricsController.forEach(function(metric) {
-                    if (machine.equals(metric.machine))
-                        metrics.push(metric);
+                Mist.metricsController.customMetrics.forEach(function(metric) {
+                    metric.machines.forEach(function(metricMachine) {
+                        if (machine.equals(metricMachine))
+                            metrics.push(metric);
+                    });
                 });
+                Mist.metricsController.builtInMetrics.forEach(function(metric) {
+                    metrics.push(metric);
+                });
+
                 this.set('metrics', metrics);
+
                 Ember.run.next(function () {
                     if ($('#metrics-container').listview)
                         $('#metrics-container').listview()
                             .listview('refresh');
-                })
-            }.observes('Mist.metricsController.@each', 'Mist.metricsController.@each.machine', 'machine'),
+                });
+
+            }.observes('Mist.metricsController.customMetrics.@each',
+                'machine'),
 
 
             stopPolling: function() {

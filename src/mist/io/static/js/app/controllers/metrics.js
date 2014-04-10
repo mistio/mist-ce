@@ -18,8 +18,9 @@ define('app/controllers/metrics', ['ember'],
             //
 
 
-            content: [],
+            customMetrics: [],
             addingMetric: null,
+            builtInMetrics: [],
 
 
             //
@@ -53,11 +54,22 @@ define('app/controllers/metrics', ['ember'],
             },
 
 
-            setContent: function(metrics) {
+            setCustomMetrics: function(metrics) {
                 var that = this;
                 Ember.run(function() {
                     for (var metricId in metrics)
-                        that.content.pushObject(
+                        that.customMetrics.pushObject(
+                            metrics[metricId]
+                        );
+                });
+            },
+
+
+            setBuiltInMetrics: function(metrics) {
+                var that = this;
+                Ember.run(function() {
+                    for (var metricId in metrics)
+                        that.builtInMetrics.pushObject(
                             metrics[metricId]
                         );
                 });
@@ -66,7 +78,7 @@ define('app/controllers/metrics', ['ember'],
 
             _addMetric: function (metric) {
                 Ember.run(this, function () {
-                    this.content.pushObject(metric);
+                    this.customMetrics.pushObject(metric);
                     this.trigger('onMetricAdd');
                     this.trigger('onMetricListChange');
                 });
