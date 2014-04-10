@@ -727,7 +727,7 @@ def add_metric(request):
     url = "%s/metrics" % config.CORE_URI
     headers={'Authorization': get_auth_header(user)}
     try:
-        resp = requests.get(url, headers=headers, params=parmas,
+        resp = requests.get(url, headers=headers, params=params,
                             verify=config.SSL_VERIFY)
     except requests.exceptions.SSLError as exc:
         raise SSLError()
@@ -748,7 +748,7 @@ def update_metric(request):
     url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
     headers={'Authorization': get_auth_header(user)}
     try:
-        resp = requests.get(url, headers=headers, params=parmas,
+        resp = requests.get(url, headers=headers, params=params,
                             verify=config.SSL_VERIFY)
     except requests.exceptions.SSLError as exc:
         raise SSLError()
