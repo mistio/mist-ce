@@ -727,7 +727,7 @@ def add_metric(request):
     url = "%s/metrics" % config.CORE_URI
     headers={'Authorization': get_auth_header(user)}
     try:
-        resp = requests.get(url, headers=headers, params=params,
+        resp = requests.post(url, headers=headers, params=params,
                             verify=config.SSL_VERIFY)
     except requests.exceptions.SSLError as exc:
         raise SSLError()
@@ -748,7 +748,7 @@ def update_metric(request):
     url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
     headers={'Authorization': get_auth_header(user)}
     try:
-        resp = requests.get(url, headers=headers, params=params,
+        resp = requests.put(url, headers=headers, params=params,
                             verify=config.SSL_VERIFY)
     except requests.exceptions.SSLError as exc:
         raise SSLError()
@@ -768,7 +768,7 @@ def remove_metric(request):
     url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
     headers={'Authorization': get_auth_header(user)}
     try:
-        resp = requests.get(url, headers=headers, verify=config.SSL_VERIFY)
+        resp = requests.delete(url, headers=headers, verify=config.SSL_VERIFY)
     except requests.exceptions.SSLError as exc:
         raise SSLError()
     except Exception as exc:
