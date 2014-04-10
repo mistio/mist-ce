@@ -764,7 +764,7 @@ def update_metric(request):
 @view_config(route_name='metric', request_method='DELETE', renderer='json')
 def remove_metric(request):
     user = user_from_request(request)
-    metric_id = request.matchdict['metric_id']
+    metric_id = request.matchdict['metric']
     url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
     headers={'Authorization': get_auth_header(user)}
     try:

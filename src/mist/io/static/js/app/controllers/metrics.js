@@ -75,11 +75,12 @@ define('app/controllers/metrics', ['ember'],
 
             setCustomMetrics: function(metrics) {
                 Ember.run(this, function() {
-                    for (var metricId in metrics)
+                    for (var metricId in metrics) {
                         metrics[metricId].id = metricId;
                         this.customMetrics.pushObject(
                             metrics[metricId]
                         );
+                    }
                     this.trigger('onMetricListChange');
                 });
             },
