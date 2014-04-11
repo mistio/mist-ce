@@ -88,7 +88,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     var rule = Rule.create({
                         'id': data.id,
                         'value': value,
-                        'metric': metric,
+                        'metric': Mist.metricsController.getMetric(metric),
                         'machine': machine,
                         'operator': operator,
                         'maxValue': data.max_value,
