@@ -8,6 +8,8 @@
 
     <div data-role="header">
         <h1>Add backend</h1>
+        <a class="ui-btn-right" data-icon="info" data-iconpos="notext" data-theme="b"
+            target="_blank" href="https://mistio.zendesk.com/hc/en-us"></a>
     </div>
 
     <div data-role="content" data-theme="b">
@@ -16,9 +18,9 @@
         <div id="new-backend-provider"
              class="mist-select"
              data-role="collapsible"
+             data-collapsed-icon="carat-d"
+             data-expanded-icon="carat-u"
              data-iconpos="right"
-             data-collapsed-icon="arrow-d"
-             data-expanded-icon="arrow-u"
              data-theme="a">
             <h2>{{Mist.backendAddController.newBackendProvider.title}}</h2>
             <ul class="select-listmenu" data-role="listview" data-theme="a">
@@ -36,12 +38,15 @@
                    data-theme="a"
                    valueBinding="Mist.backendAddController.newBackendFirstField"}}
 
-            <label for="new-backend-second-field">3. {{view.secondFieldLabel}}:</label>
-            {{view Mist.TextField
-                   type="password"
-                   id="new-backend-second-field"
-                   data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendSecondField"}}
+            {{#if view.secondFieldLabel}}
+                <label for="new-backend-second-field">3. {{view.secondFieldLabel}}:</label>
+                {{view Mist.TextField
+                       type="password"
+                       id="new-backend-second-field"
+                       data-theme="a"
+                       valueBinding="Mist.backendAddController.newBackendSecondField"}}
+            {{/if}}
+
         </div>
 
         <div id="openstack-bundle" data-theme="a">
@@ -81,6 +86,23 @@
             </div>
         </div>
 
+        <div id="gce-bundle">
+
+            <label for ="new-backend-key">3. Private key:</label>
+
+            <!-- Value is sent to newBackendSecondField -->
+            <a class="ui-btn ui-btn-a ui-corner-all"
+              {{action "privateKeyClicked" target="view"}}>
+                Add key
+            </a>
+
+            <label for="new-backend-port">4. Project ID:</label>
+            {{view Mist.TextField
+                   id="new-backend-project-name"
+                   data-theme="a"
+                   valueBinding="Mist.backendAddController.newBackendProjectName"}}
+        </div>
+
         <div id="baremetal-bundle">
             <label for="new-backend-port">4. Port:</label>
             {{view Mist.TextField
@@ -93,8 +115,8 @@
                  class="mist-select"
                  data-role="collapsible"
                  data-iconpos="right"
-                 data-collapsed-icon="arrow-d"
-                 data-expanded-icon="arrow-u"
+                 data-collapsed-icon="carat-d"
+                 data-expanded-icon="carat-u"
                  data-theme="a">
                 <h2>{{Mist.backendAddController.newBackendKey.id}}</h2>
                 <ul data-role="listview">
@@ -122,3 +144,5 @@
 </div>
 
 {{view Mist.keyAddView}}
+
+{{view Mist.fileUploadView}}

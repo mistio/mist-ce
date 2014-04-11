@@ -16,6 +16,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                 var image = Mist.machineAddController.newMachineImage;
                 var size = Mist.machineAddController.newMachineSize;
                 var provider = Mist.machineAddController.newMachineProvider;
+                var location = Mist.machineAddController.newMachineLocation;                
 
                 if (!image || !image.id || !size || !size.id || !provider || !provider.id) return 0;
 
@@ -33,7 +34,14 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                         if (image.name.indexOf('Vyatta') > -1)
                             return size.price.vyatta;
                         return size.price.linux;
-                    } 
+                    }
+                    if (provider.provider.indexOf('gce') > -1) {
+                        if (location.name.indexOf('europe-') > -1)
+                            return size.price.eu;
+                        if (location.name.indexOf('us-') > -1)
+                            return size.price.us;
+                        return size.price.eu;                            
+                    }
                     return size.price;
 
                 } catch (error) {
@@ -41,7 +49,8 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                 }
             }.property('Mist.machineAddController.newMachineProvider',
                        'Mist.machineAddController.newMachineImage',
-                       'Mist.machineAddController.newMachineSize'),
+                       'Mist.machineAddController.newMachineSize',
+                       'Mist.machineAddController.newMachineLocation'),
 
 
             /**

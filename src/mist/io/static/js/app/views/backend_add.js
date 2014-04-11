@@ -1,24 +1,33 @@
 define('app/views/backend_add', ['app/views/templated', 'ember'],
-    /**
-     *  Add Backend View
-     *
-     *  @returns Class
-     */
+    //
+    //  Add Backend View
+    //
+    //  @returns Class
+    //
     function(TemplatedView) {
+
+        'use strict';
+
         return TemplatedView.extend({
 
-            /**
-             *  Properties
-             */
+
+            //
+            //
+            //  Properties
+            //
+            //
+
 
             firstFieldLabel: 'API Key',
             secondFieldLabel: 'API Secret',
 
-            /**
-             *
-             *  Methods
-             *
-             */
+
+            //
+            //
+            //  Methods
+            //
+            //
+
 
             updateAddButton: function() {
                 if (Mist.backendsController.addingBackend || !Mist.backendAddController.formReady) {
@@ -29,18 +38,36 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
             },
 
 
-            /**
-             *
-             *  Actions
-             *
-             */
+            clear: function () {
+
+                $('#gce-bundle').hide();
+                $('#non-hp-cloud').hide();
+                $('#baremetal-bundle').hide();
+                $('#openstack-bundle').hide();
+                $('#new-backend-provider').collapsible('collapse');
+                $('#new-backend-second-field').attr('type', 'password');
+                $('#gce-bundle a').removeClass('ui-icon-check')
+                    .addClass('ui-icon-carat-u');
+
+                Ember.run.next(function () {
+                    $('#add-backend-panel').trigger('create');
+                });
+            },
+
+
+            //
+            //
+            //  Actions
+            //
+            //
+
 
             actions: {
-
 
                 selectProvider: function(provider) {
 
                     Mist.backendAddController._clear();
+                    this.clear();
 
                     $('#new-backend-second-field').attr('type', 'password');
                     $('#new-backend-provider').collapsible('collapse');
@@ -58,6 +85,10 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                     } else if (provider.provider.indexOf('digitalocean') > -1) {
                         this.set('firstFieldLabel', 'Client ID');
                         this.set('secondFieldLabel', 'API Key');
+                    } else if (provider.provider.indexOf('gce') > -1) {
+                        this.set('firstFieldLabel', 'Email address');
+                        this.set('secondFieldLabel', '');
+                        $('#gce-bundle').show();
                     } else if (provider.provider.indexOf('openstack') > -1) {
                         this.set('firstFieldLabel', 'Username');
                         this.set('secondFieldLabel', 'Password');
@@ -75,9 +106,11 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         this.set('secondFieldLabel', 'User');
                         Mist.backendAddController.set('newBackendSecondField', 'root');
                         Mist.backendAddController.set('newBackendPort', 22);
-                        $('#new-backend-key .ui-listview').listview('refresh');
-                        $('#new-backend-second-field').attr('type', '');
-                        $('#baremetal-bundle').show();
+                        Ember.run.next(function () {
+                            $('#new-backend-key .ui-listview').listview('refresh');
+                            $('#new-backend-second-field').attr('type', '');
+                            $('#baremetal-bundle').show();
+                        });
 
                     } else {
                         this.set('firstFieldLabel', 'API Key');
@@ -98,10 +131,30 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                     });
                 },
 
+
                 selectKey: function(key) {
                     $('#new-backend-key').collapsible('collapse');
                     Mist.backendAddController.set('newBackendKey', key);
                 },
+
+
+                privateKeyClicked: function () {
+                    Mist.fileUploadController.open('Upload private key', 'Key',
+                        function (uploadedFile) {
+
+                            Mist.backendAddController.set('newBackendSecondField', uploadedFile);
+
+                            if (uploadedFile) {
+                                $('#gce-bundle a').addClass('ui-icon-check')
+                                    .removeClass('ui-icon-carat-u');
+                            } else {
+                                $('#gce-bundle a').removeClass('ui-icon-check')
+                                    .addClass('ui-icon-carat-u');
+                            }
+                        }
+                    );
+                },
+
 
                 createKeyClicked: function() {
                     Mist.keyAddController.open( function (success, key) {
@@ -135,11 +188,12 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
             },
 
 
-            /**
-             *
-             *  Observers
-             *
-             */
+            //
+            //
+            //  Observers
+            //
+            //
+
 
             updateDoneButtonObserver: function() {
                 Ember.run.once(this, 'updateAddButton');

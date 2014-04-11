@@ -30,6 +30,7 @@ define( 'app', [
     'app/controllers/backend_edit',
     'app/controllers/backends',
     'app/controllers/confirmation',
+    'app/controllers/file_upload',
     'app/controllers/image_search',
     'app/controllers/key_add',
     'app/controllers/key_edit',
@@ -52,6 +53,7 @@ define( 'app', [
     'app/views/backend_button',
     'app/views/backend_edit',
     'app/views/confirmation_dialog',
+    'app/views/file_upload',
     'app/views/home',
     'app/views/image_list',
     'app/views/image_list_item',
@@ -86,6 +88,7 @@ define( 'app', [
     BackendEditController,
     BackendsController,
     ConfirmationController,
+    FileUploadController,
     ImageSearchController,
     KeyAddController,
     KeyEditController,
@@ -108,6 +111,7 @@ define( 'app', [
     BackendButton,
     BackendEdit,
     ConfirmationDialog,
+    FileUploadView,
     Home,
     ImageListView,
     ImageListItem,
@@ -134,8 +138,7 @@ define( 'app', [
     MonitoringView,
     RuleView,
     RuleEditView,
-    UserMenuView
-    ) {
+    UserMenuView) {
 
     function initialize() {
 
@@ -285,6 +288,7 @@ define( 'app', [
         App.set('metricAddView', MetricAddView);
         App.set('backendEditView', BackendEdit);
         App.set('imageListView', ImageListView);
+        App.set('fileUploadView', FileUploadView);
         App.set('messageboxView', MessageBoxView);
         App.set('monitoringView', MonitoringView);
         App.set('machineView', SingleMachineView);
@@ -315,6 +319,7 @@ define( 'app', [
         App.set('ruleEditController', RuleEditController.create());
         App.set('backendsController', BackendsController.create());
         App.set('metricAddController', MetricAddController.create());
+        App.set('fileUploadController', FileUploadController.create());
         App.set('machineAddController', MachineAddController.create());
         App.set('backendAddController', BackendAddController.create());
         App.set('monitoringController', MonitoringController.create());
@@ -351,6 +356,16 @@ define( 'app', [
             keyUp: function(e) {
                 if(this.get('parentView').keyUp) {
                     this.get('parentView').keyUp(e);
+                }
+            },
+            click: function(e) {
+                if(this.get('parentView').inputClicked) {
+                    this.get('parentView').inputClicked(e);
+                }
+            },
+            focusIn: function(e) {
+                if(this.get('parentView').inputClicked) {
+                    this.get('parentView').inputClicked(e);
                 }
             }
         });
