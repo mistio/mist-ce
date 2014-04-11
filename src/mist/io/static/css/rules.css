@@ -58,6 +58,7 @@
 }
 
 .rule-box div.ui-slider-track {
+    display: none;
     width: 80%;
     position: relative;
     top: 4px;

@@ -11,15 +11,6 @@ define('app/views/rule', ['app/views/templated','ember'],
         return TemplatedView.extend({
 
 
-            didInsertElement: function() {
-                this._super();
-                info(this.rule.metric.name);
-                Ember.run.next(this, function() {
-                    $('#'+this.elementId).find('.ui-slider-track').hide();
-                });
-            },
-
-
             valueObserver: function() {
                 $('#' + this.rule.id + ' .rule-value').val(this.rule.value);
                 $('#' + this.rule.id + ' .rule-value').slider('refresh');
