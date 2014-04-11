@@ -42,17 +42,17 @@ define('app/controllers/metrics', ['ember'],
                     'target': metric.target,
                     'machine_id': machine_id,
                     'backend_id': backend_id,
-                }).success(function(newMetricId) {
-                    metric.id = newMetricId;
+                }).success(function(data) {
+                    metric.id = data.metric_id;
                     metric.name = metric.newName;
                     metric.machines = machine ? [machine] : [];
                     that._addMetric(metric, machine);
                 }).error(function(message) {
                     Mist.notificationController.notify(
                         'Failed to add metric: ' + message);
-                }).complete(function (success, newMetric) {
+                }).complete(function (success, data) {
                     that.set('addingMetric', false);
-                    if (callback) callback(success, newMetric);
+                    if (callback) callback(success, that.getMetric(data.metric_id));
                 });
             },
 

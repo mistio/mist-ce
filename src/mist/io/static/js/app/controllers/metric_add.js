@@ -54,10 +54,10 @@ define('app/controllers/metric_add', ['ember'],
                 Mist.metricsController.addMetric(
                     this.machine,
                     this.newMetric,
-                    function (success) {
+                    function (success, metric) {
                         if (success) {
                             if (that.callback)
-                                that.callback(that.newMetric);
+                                that.callback(metric);
                             that.close();
                         }
                 });
