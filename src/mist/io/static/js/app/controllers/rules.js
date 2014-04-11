@@ -113,26 +113,28 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
 
                 // Make sure parameters are not null
                 if (!value) { value = rule.value; }
-                if (!metric) { metric = rule.metric; }
+                if (!metric) { metric = rule.metric.id; }
                 if (!command) { command = rule.command; }
                 if (!operator) { operator = rule.operator; }
                 if (!actionToTake) { actionToTake = rule.actionToTake; }
 
                 // Check if anything changed
                 if (value == rule.value &&
-                    metric == rule.metric &&
+                    metric == rule.metric.id &&
                     command == rule.command &&
                     actionToTake == rule.actionToTake &&
                     operator.title == rule.operator.title ) {
                         return false;
                 }
 
+                /*
                 // Fix value on metric change
                 if ((metric != 'network-tx') && (metric != 'disk-write')) {
                     if (value > 100) {
                         value = 100;
                     }
                 }
+                */
 
 
                 var that = this;
