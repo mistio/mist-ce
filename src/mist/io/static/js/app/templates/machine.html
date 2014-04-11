@@ -311,16 +311,6 @@
        TODO: These should be in monitoring view
     -->
 
-    <div class="rule-metric-popup"data-role="popup">
-        <ul data-role="listview">
-            {{#each Mist.rulesController.metricList}}
-            <li data-icon="false">
-                <a {{bind-attr title="this"}}>{{this}}</a>
-            </li>
-            {{/each}}
-        </ul>
-    </div>
-
     <div class="rule-operator-popup" data-role="popup">
         <ul data-role="listview">
             {{#each Mist.rulesController.operatorList}}

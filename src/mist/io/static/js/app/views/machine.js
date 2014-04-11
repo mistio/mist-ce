@@ -275,8 +275,15 @@ define('app/views/machine', ['app/views/mistscreen'],
                 },
 
 
-                deleteMetric: function(metric) {
+                deleteMetric: function (metric) {
                     Mist.metricsController.deleteMetric(metric);
+                },
+
+
+                ruleMetricClicked: function (metric) {
+                    info(metric);
+                    Mist.rulesController.updateRule(metric.id, metric.title);
+                    $('.rule-operator-popup').popup('close');
                 },
 
                 enableMonitoringClicked: function () {

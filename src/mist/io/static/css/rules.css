@@ -83,6 +83,11 @@
     padding-left: 9px;
 }
 
+.rule-metric-popup .ui-listview {
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
 
 @media only screen and (max-width: 535px) {
 

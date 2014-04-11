@@ -62,7 +62,6 @@ define('app/views/rule', ['app/views/templated','ember'],
 
                 openMetricPopup: function() {
                     $('.rule-metric-popup').popup('option', 'positionTo', '#' + this.rule.id + ' .rule-button.metric').popup('open');
-                    $('.rule-metric-popup li a').on('click', this.rule, this.selectMetric);
                 },
 
 

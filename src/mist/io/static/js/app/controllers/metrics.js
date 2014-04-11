@@ -88,10 +88,12 @@ define('app/controllers/metrics', ['ember'],
 
             setBuiltInMetrics: function(metrics) {
                 Ember.run(this, function() {
-                    for (var metricId in metrics)
+                    for (var metricId in metrics) {
+                        metrics[metricId].id = metricId;
                         this.builtInMetrics.pushObject(
                             metrics[metricId]
                         );
+                    }
                     this.trigger('onMetricListChange');
                 });
             },
