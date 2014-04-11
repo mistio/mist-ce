@@ -167,7 +167,6 @@ define('app/views/machine', ['app/views/mistscreen'],
                     return;
 
                 Mist.rulesController.content.forEach(function(rule) {
-                    info(rule);
                     if (machine.equals(rule.machine))
                         rules.push(rule);
                 });
@@ -200,8 +199,6 @@ define('app/views/machine', ['app/views/mistscreen'],
                         $('#metrics-container').listview()
                             .listview('refresh');
                 });
-
-                info('hi');
             },
 
 
