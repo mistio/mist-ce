@@ -11,12 +11,6 @@ define('app/views/rule', ['app/views/templated','ember'],
         return TemplatedView.extend({
 
 
-            valueObserver: function() {
-                $('#' + this.rule.id + ' .rule-value').val(this.rule.value);
-                $('#' + this.rule.id + ' .rule-value').slider('refresh');
-            }.observes('this.rule.value'),
-
-
             //
             //
             //  Actions
