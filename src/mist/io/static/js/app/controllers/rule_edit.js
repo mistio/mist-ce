@@ -17,6 +17,11 @@ define('app/controllers/rule_edit', ['ember'],
             //
             //
 
+
+            rule: null,
+            callback: null,
+
+
             //
             //
             //  Methods
@@ -24,11 +29,27 @@ define('app/controllers/rule_edit', ['ember'],
             //
 
 
+            open: function (rule, option, callback) {
+                this.clear();
+                this.set('rule', rule)
+                    .set('callback', callback);
+
+                this.view.open(option);
+            },
+
+
+            clear: function () {
+                this.set('rule', null)
+                    .set('callback', null);
+            },
+
+
             //
             //
             //  Pseudo-Private Methods
             //
             //
+
 
             //
             //

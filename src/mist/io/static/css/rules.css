@@ -83,7 +83,7 @@
     padding-left: 9px;
 }
 
-.rule-metric-popup .ui-listview {
+#rule-metric .ui-listview {
     max-height: 200px;
     overflow-y: scroll;
 }

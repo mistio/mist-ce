@@ -36,44 +36,22 @@ define('app/views/rule', ['app/views/templated','ember'],
                 });
             }.observes('this.rule.pendingAction'),
 
-            selectMetric: function(event) {
-                $('.rule-metric-popup').popup('close');
-                $('.rule-metric-popup li a').off('click');
-                info(event.data.id);
-                info(this.title);
-                Mist.rulesController.updateRule(event.data.id, this.title);
-                return false;
-            },
-
-            selectOperator: function(event) {
-                $('.rule-operator-popup').popup('close');
-                $('.rule-operator-popup li a').off('click');
-                var operator = {
-                    'title': this.title,
-                    'symbol': this.text
-                };
-                Mist.rulesController.updateRule(event.data.id, null, operator);
-                return false;
-            },
-
 
             actions: {
 
 
                 openMetricPopup: function() {
-                    $('.rule-metric-popup').popup('option', 'positionTo', '#' + this.rule.id + ' .rule-button.metric').popup('open');
+                    Mist.ruleEditController.open(this.rule, 'metric');
                 },
 
 
                 openOperatorPopup: function() {
-                    $('.rule-operator-popup').popup('option', 'positionTo', '#' + this.rule.id + ' .rule-button.operator').popup('open');
-                    $('.rule-operator-popup li a').on('click', this.rule, this.selectOperator);
+                    Mist.ruleEditController.open(this.rule, 'operator');
                 },
 
 
                 openActionPopup: function() {
-                    $('.rule-action-popup').popup('option', 'positionTo', '#' + this.rule.id + ' .rule-button.action').popup('open');
-                    $('.rule-action-popup li a').on('click', this.rule, this.selectAction);
+                    Mist.ruleEditController.open(this.rule, 'action');
                 },
 
 
@@ -95,21 +73,7 @@ define('app/views/rule', ['app/views/templated','ember'],
 
 
             selectAction: function(event) {
-                $('.rule-action-popup').popup('close');
-                $('.rule-action-popup li a').off('click');
-                var rule = event.data;
-                var action = this.title;
-                // if 'command' is selected open the popup. Rule is updated by saveCommand()
-                if (action == 'command') {
-                    Mist.rulesController.set('commandRule', rule);
-                    Mist.rulesController.set('command', rule.command);
-                    $('.rule-command-popup textarea').val(rule.command);
-                    $('.rule-command-popup').css('width', 0.7 * $(window).width());
-                    $('.rule-command-popup').popup('open');
-                    return false;
-                };
-                Mist.rulesController.updateRule(rule.id, null, null, null, action);
-                return false;
+
             }
         });
     }
