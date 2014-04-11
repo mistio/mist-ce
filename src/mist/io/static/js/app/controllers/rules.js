@@ -43,9 +43,9 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     for (var ruleId in rules) {
                         var rule = rules[ruleId];
                         rule.id = ruleId;
-                        rule.maxValue = rules[ruleId].max_value;
                         rule.actionToTake = rules[ruleId].action;
                         rule.operator = that.getOperatorByTitle(rules[ruleId].operator);
+                        rule.metric = Mist.metricsController.getMetric(rules[ruleId].metric);
                         rule.machine = Mist.backendsController.getMachine(rule.machine, rule.backend) || rule.machine;
                         that.content.pushObject(Rule.create(rule));
                     }
@@ -135,6 +135,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 }
 
 
+                var that = this;
                 rule.set('pendingAction', true);
                 Mist.ajax.POST('/rules', {
                     'id': id,
@@ -147,7 +148,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     info('Successfully updated rule ', id);
                     rule.set('pendingAction', false);
                     rule.set('value', value);
-                    rule.set('metric', metric);
+                    //rule.set('metric', that.);
                     rule.set('command', command);
                     rule.set('operator', operator);
                     rule.set('actionToTake', actionToTake);

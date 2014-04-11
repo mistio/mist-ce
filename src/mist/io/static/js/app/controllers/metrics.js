@@ -99,6 +99,14 @@ define('app/controllers/metrics', ['ember'],
             },
 
 
+            getMetric: function (id) {
+                var result = this.builtInMetrics.findBy('id', id);
+                if (!result)
+                    result = this.customMetrics.findBy('id', id);
+                return result;
+            },
+
+
             _addMetric: function (metric, machine) {
                 Ember.run(this, function () {
                     this.customMetrics.pushObject(metric);

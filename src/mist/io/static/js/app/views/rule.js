@@ -1,40 +1,43 @@
 define('app/views/rule', ['app/views/templated','ember'],
-    /**
-     *  Rule View
-     *
-     *  @returns Class
-     */
+    //
+    //  Rule View
+    //
+    //  @returns Class
+    //
     function(TemplatedView) {
+
+        'use strict'
+
         return TemplatedView.extend({
 
+
             didInsertElement: function() {
+                this._super();
+                info(this.rule.metric.name);
                 Ember.run.next(this, function() {
-                    this.metricObserver();
                     $('#'+this.elementId).find('.ui-slider-track').hide();
                 });
             },
+
 
             valueObserver: function() {
                 $('#' + this.rule.id + ' .rule-value').val(this.rule.value);
                 $('#' + this.rule.id + ' .rule-value').slider('refresh');
             }.observes('this.rule.value'),
 
-            metricObserver: function() {
-                var metric = this.rule.metric;
-                if (metric == 'network-tx' || metric == 'disk-write') {
-                    this.rule.set('unit','KB/s');
-                } else if (metric == 'cpu' || metric == 'ram') {
-                    this.rule.set('unit','%');
-                } else {
-                    this.rule.set('unit','');
-                }
-            }.observes('this.rule.metric'),
 
             pendingActionObserver: function() {
                 Ember.run.next(function() {
                     $('.delete-rule-container').trigger('create');
                 });
             }.observes('this.rule.pendingAction'),
+
+
+            //
+            //
+            //  Actions
+            //
+            //
 
 
             actions: {
@@ -69,11 +72,6 @@ define('app/views/rule', ['app/views/templated','ember'],
                         that.rule.set('pendingAction', false);
                     });
                 }
-            },
-
-
-            selectAction: function(event) {
-
             }
         });
     }
