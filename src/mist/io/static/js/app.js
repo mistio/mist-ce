@@ -45,6 +45,7 @@ define( 'app', [
     'app/controllers/metrics',
     'app/controllers/monitoring',
     'app/controllers/notification',
+    'app/controllers/rule_edit',
     'app/controllers/rules',
     'app/templates/templates',
     'app/views/backend_add',
@@ -76,6 +77,7 @@ define( 'app', [
     'app/views/metric_add',
     'app/views/monitoring',
     'app/views/rule',
+    'app/views/rule_edit',
     'app/views/user_menu',
     'ember'
 ], function($,
@@ -99,6 +101,7 @@ define( 'app', [
     MetricsController,
     MonitoringController,
     NotificationController,
+    RuleEditController,
     RulesController,
     TemplatesBuild,
     BackendAdd,
@@ -130,6 +133,7 @@ define( 'app', [
     MetricAddView,
     MonitoringView,
     RuleView,
+    RuleEditView,
     UserMenuView
     ) {
 
@@ -277,6 +281,7 @@ define( 'app', [
         App.set('userMenuView', UserMenuView);
         App.set('keyEditView', KeyEditDialog);
         App.set('backendAddView', BackendAdd);
+        App.set('ruleEditView', RuleEditView);
         App.set('metricAddView', MetricAddView);
         App.set('backendEditView', BackendEdit);
         App.set('imageListView', ImageListView);
@@ -307,6 +312,7 @@ define( 'app', [
         App.set('keyAddController', KeyAddController.create());
         App.set('metricsController', MetricsController.create());
         App.set('keyEditController', KeyEditController.create());
+        App.set('ruleEditController', RuleEditController.create());
         App.set('backendsController', BackendsController.create());
         App.set('metricAddController', MetricAddController.create());
         App.set('machineAddController', MachineAddController.create());
