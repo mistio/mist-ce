@@ -148,11 +148,10 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     info('Successfully updated rule ', id);
                     rule.set('pendingAction', false);
                     rule.set('value', value);
-                    //rule.set('metric', that.);
+                    rule.set('metric', Mist.metricsController.getMetric(metric));
                     rule.set('command', command);
                     rule.set('operator', operator);
                     rule.set('actionToTake', actionToTake);
-                    rule.set('maxValue', data.max_value);
 
                     var maxvalue = parseInt(rule.maxValue);
                     var curvalue = parseInt(rule.value);
