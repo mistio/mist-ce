@@ -182,8 +182,12 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
 
             setSliderEventHandlers: function() {
                 function showSlider(event) {
-                    $(event.currentTarget).addClass('open');
-                    $(event.currentTarget).find('.ui-slider-track').fadeIn();
+                    var rule_id = $(event.currentTarget).parent().attr('id');
+                    var rule = Mist.rulesController.getRuleById(rule_id);
+                    if (rule.metric.max_value) {
+                        $(event.currentTarget).addClass('open');
+                        $(event.currentTarget).find('.ui-slider-track').fadeIn();
+                    }
                 }
                 function hideSlider(event) {
                     $(event.currentTarget).find('.ui-slider-track').fadeOut();

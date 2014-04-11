@@ -1,10 +1,10 @@
-define('app/controllers/metrics', ['ember'],
+define('app/controllers/metrics', ['app/models/metric', 'ember'],
     //
     //  Metric Controller
     //
     //  @returns Class
     //
-    function () {
+    function (Metric) {
 
         'use strict';
 
@@ -78,7 +78,7 @@ define('app/controllers/metrics', ['ember'],
                     for (var metricId in metrics) {
                         metrics[metricId].id = metricId;
                         this.customMetrics.pushObject(
-                            metrics[metricId]
+                            Metric.create(metrics[metricId])
                         );
                     }
                     this.trigger('onMetricListChange');
@@ -91,7 +91,7 @@ define('app/controllers/metrics', ['ember'],
                     for (var metricId in metrics) {
                         metrics[metricId].id = metricId;
                         this.builtInMetrics.pushObject(
-                            metrics[metricId]
+                            Metric.create(metrics[metricId])
                         );
                     }
                     this.trigger('onMetricListChange');
@@ -109,7 +109,7 @@ define('app/controllers/metrics', ['ember'],
 
             _addMetric: function (metric, machine) {
                 Ember.run(this, function () {
-                    this.customMetrics.pushObject(metric);
+                    this.customMetrics.pushObject(Metric.create(metric));
                     this.trigger('onMetricAdd');
                     this.trigger('onMetricListChange');
                 });
