@@ -26,13 +26,6 @@ define('app/views/rule', ['app/views/templated','ember'],
             }.observes('this.rule.value'),
 
 
-            pendingActionObserver: function() {
-                Ember.run.next(function() {
-                    $('.delete-rule-container').trigger('create');
-                });
-            }.observes('this.rule.pendingAction'),
-
-
             //
             //
             //  Actions

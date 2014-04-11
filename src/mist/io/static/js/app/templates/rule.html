@@ -37,12 +37,8 @@
     <div class="ajax-loader"></div>
     {{else}}
     <div class="delete-rule-container">
-        <button class="delete-rule-button"
-                data-role="button"
-                data-icon="delete"
-                data-iconpos="notext"
-                data-mini="true"
-                {{action deleteRuleClicked target="view"}}>&nbsp;</button>
+        <a class="delete-rule-button ui-btn ui-btn-icon-notext ui-icon-delete ui-corner-all"
+                {{action deleteRuleClicked target="view"}}>&nbsp;</a>
     </div>
     {{/if}}
 

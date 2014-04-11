@@ -68,7 +68,6 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     $('#add-rule-button').addClass('ui-state-disabled');
                 else
                     $('#add-rule-button').removeClass('ui-state-disabled');
-
             }.observes('creationPending'),
 
 
@@ -127,16 +126,6 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                         return false;
                 }
 
-                /*
-                // Fix value on metric change
-                if ((metric != 'network-tx') && (metric != 'disk-write')) {
-                    if (value > 100) {
-                        value = 100;
-                    }
-                }
-                */
-
-
                 var that = this;
                 rule.set('pendingAction', true);
                 Mist.ajax.POST('/rules', {
@@ -164,12 +153,6 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     Mist.notificationController.notify('Error while updating rule: ' + message);
                     rule.set('pendingAction', false);
                 });
-            },
-
-
-            saveCommand: function() {
-                $('.rule-command-popup').popup('close');
-                this.updateRule(this.commandRule.id, null, null, null, 'command', this.command);
             },
 
 
