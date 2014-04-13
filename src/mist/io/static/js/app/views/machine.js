@@ -104,15 +104,11 @@ define('app/views/machine', ['app/views/mistscreen'],
             },
 
 
-            renderKeysButton: function() {
-                Ember.run.next(this, function() {
-                    $('#mist-manage-keys').trigger('create');
-                    if (this.machine.state == 'running') {
-                        $('#mist-manage-keys').removeClass('ui-state-disabled');
-                    } else {
-                        $('#mist-manage-keys').addClass('ui-state-disabled');
-                    }
-                });
+            updateKeysButton: function() {
+                if (this.machine.state == 'running')
+                    $('#mist-manage-keys').removeClass('ui-state-disabled');
+                else
+                    $('#mist-manage-keys').addClass('ui-state-disabled');
             },
 
 
@@ -503,13 +499,8 @@ define('app/views/machine', ['app/views/mistscreen'],
             }.observes('machine.probed', 'machine.can_tag'),
 
 
-            keysCountObserver: function() {
-                Ember.run.once(this, 'renderKeysButton');
-            }.observes('machine.keysCount'),
-
-
             stateObserver: function () {
-                Ember.run.once(this, 'renderKeysButton');
+                Ember.run.once(this, 'updateKeysButton');
                 Ember.run.once(this, 'updateEnableButton');
             }.observes('machine.state'),
 

@@ -29,16 +29,20 @@
 
         <span class="ui-btn-right" id="mist-manage-keys">
             {{#if pendingCreation}}
-                <a class="ui-state-disabled" data-role="button" data-icon="plus" data-iconpos="right">Add key</a>
+                <a class="ui-btn ui-btn-icon-right ui-icon-plus
+                    ui-corner-all ui-state-disabled">
+                        Add key
+                </a>
             {{else}} {{#if keysCount}}
-                <a data-role="button" {{action "manageKeysClicked" target="view"}}>{{keysCount}} keys</a>
+                <a class="ui-btn ui-shadow ui-corner-all"
+                    {{action "manageKeysClicked" target="view"}}>
+                        {{keysCount}} keys
+                </a>
             {{else}}
-                <a data-role="button"
-                   data-theme="d"
-                   data-icon="plus"
-                   data-iconpos="right"
-                   data-mini="false"
-                   {{action "addKeyClicked" target="view"}}>Add key</a>
+                <a class="ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all"
+                    {{action "addKeyClicked" target="view"}}>
+                        Add key
+                </a>
             {{/if}}{{/if}}
         </span>
     </div>
