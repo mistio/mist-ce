@@ -20,7 +20,6 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
             actions: {
 
-
                 openMetricPopup: function () {
                     Mist.ruleEditController.open(this.rule, 'metric');
                 },
@@ -37,7 +36,7 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
 
                 deleteRuleClicked: function () {
-                    Mist.rulesController.deleteRule(this.rule.id);
+                    Mist.rulesController.deleteRule(this.rule);
                 }
             }
         });

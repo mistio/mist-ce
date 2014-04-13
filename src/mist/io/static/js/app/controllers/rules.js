@@ -1,10 +1,13 @@
 define('app/controllers/rules', ['app/models/rule', 'ember'],
-    /**
-     *  Rules Controller
-     *
-     *  @returns Class
-     */
+    //
+    //  Rules Controller
+    //
+    //  @returns Class
+    //
     function(Rule) {
+
+        'use strict';
+
         return Ember.ArrayController.extend({
 
             content: [],
@@ -20,18 +23,18 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 'network-tx'
             ],
 
-
-            operatorList: [
-                {'title': 'gt', 'symbol': '>'},
-                {'title': 'lt', 'symbol': '<'}
-            ],
-
+            operatorList: [{
+                'title': 'gt',
+                'symbol': '>'
+            }, {
+                'title': 'lt',
+                'symbol': '<'
+            }],
 
             actionList: [
                 'alert',
                 'reboot',
                 'destroy',
-                //'launch',
                 'command'
             ],
 
@@ -102,13 +105,10 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             },
 
 
-            deleteRule: function (ruleId) {
-
-                var rule = this.getRuleById(ruleId);
-
+            deleteRule: function (rule) {
                 var that = this;
                 rule.set('pendingAction', true);
-                Mist.ajax.DELETE('/rules/' + rule.id, {
+                Mist.ajax.DELETE('/rules/' + rule, {
                 }).success(function(){
                     Mist.rulesController.removeObject(rule);
                     Mist.rulesController.redrawRules();
