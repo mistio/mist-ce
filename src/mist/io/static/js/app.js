@@ -151,6 +151,7 @@ define( 'app', [
             $.mobile.pushStateEnabled = false;
             $.mobile.linkBindingEnabled = false;
             $.mobile.hashListeningEnabled = false;
+            //$.mobile.ignoreContentEnabled = true;
             $.mobile.panel.prototype._bindUpdateLayout = function(){};
             $('body').css('overflow','auto');
 
@@ -709,7 +710,6 @@ function error() {
     } catch(err) {console.log(err);}
 }
 
-var collectd_install_target = false, collectd_uninstall_target = false, collectd_lastlog="";
 
 function appendShell(output, command_id) {
 
@@ -737,15 +737,3 @@ function completeShell(ret, command_id) {
     $('iframe#' + command_id).remove();
     Mist.machineShellController.machine.commandHistory.findBy('id', command_id).set('pendingResponse', false);
 }
-
-function getTemplate(name) {
-    if (JS_BUILD || true) { // The "|| true" part is just for debuging as for now
-        //info('Getting precompiled template for: ' + name);
-        // Return precompiled template
-        return Ember.TEMPLATES[name + '/html'];
-    } else {
-        info('Compiling template for: ' + name);
-        return Ember.Handlebars.compile('text!app/templates/'+ name + '.html');
-    }
-};
-

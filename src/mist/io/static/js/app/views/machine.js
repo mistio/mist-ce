@@ -22,17 +22,13 @@ define('app/views/machine', ['app/views/mistscreen'],
             metrics: [],
             machine: null,
 
-            providerIconClass: function() {
-                if (this.machine && this.machine.backend)
-                    return 'provider-' + this.machine.backend.provider;
-            }.property('machine'),
-
 
             //
             //
             //  Initialization
             //
             //
+
 
             load: function() {
 
@@ -192,9 +188,8 @@ define('app/views/machine', ['app/views/mistscreen'],
 
             stopPolling: function() {
                 // if it polls for stats, stop it
-                if ('context' in Mist) {
+                if ('context' in Mist)
                     Mist.context.stop();
-                }
             }.observes('controller.model.hasMonitoring'),
 
 
@@ -261,12 +256,6 @@ define('app/views/machine', ['app/views/mistscreen'],
                 },
 
 
-                ruleMetricClicked: function (metric) {
-                    info(metric);
-                    Mist.rulesController.updateRule(metric.id, metric.title);
-                    $('.rule-operator-popup').popup('close');
-                },
-
                 enableMonitoringClicked: function () {
 
                     if (Mist.authenticated) {
@@ -308,34 +297,15 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
                 addRuleClicked: function() {
-                    // initialize the rule to some sensible defaults
-                    var machine = this.machine;
-                    var metric = 'load';
                     var operator = {'title': 'gt', 'symbol': '>'};
-                    var value = 5;
-                    var actionToTake = 'alert';
-
-                    Mist.rulesController.newRule(machine, metric, operator, value, actionToTake);
-                },
-
-
-                buttonBackMonitoring: function() {
-                     $("#monitoring-dialog").popup('close');
-                },
-
-
-                buttonChangeMonitoring: function() {
-                    var machine = this.get('controller').get('model');
-                    machine.changeMonitoring();
-                    $("#monitoring-dialog").popup('close');
+                    Mist.rulesController.newRule(this.machine, 'load', operator, 5, 'alert');
                 },
 
 
                 probeClicked: function() {
                     this.machine.probe(null, function(success) {
-                        if (!success) {
+                        if (!success)
                             Mist.notificationController.notify('Failed to probe machine');
-                        }
                     })
                 },
 
@@ -346,11 +316,18 @@ define('app/views/machine', ['app/views/mistscreen'],
             },
 
 
-            /**
-             *
-             *  Computed Properties
-             *
-             */
+            //
+            //
+            //  Computed Properties
+            //
+            //
+
+
+            providerIconClass: function() {
+                if (this.machine && this.machine.backend)
+                    return 'provider-' + this.machine.backend.provider;
+            }.property('machine'),
+
 
             upFor: function() {
                 var ret = '';
@@ -466,7 +443,7 @@ define('app/views/machine', ['app/views/mistscreen'],
 
             footerObserver: function() {
                 Ember.run.once(this, 'updateFooter');
-            }.observes('machine.probed', 'machine.can_tag'),
+            }.observes('machine.probed', 'machine.can_tag'  ),
 
 
             stateObserver: function () {
