@@ -185,10 +185,12 @@
                              probing... <div class="ajax-loader"></div>
                          {{else}}
                              {{view.lastProbe}}
-                             <button id="machine-probe-btn"
-                                    data-theme="a"
-                                    data-mini="true"
-                                    {{action "probeClicked" target="view"}}>Probe</button>
+                             <a id="machine-probe-btn"
+                                class="ui-btn ui-shadow ui-corner-all"
+                                data-mini="true"
+                                {{action "probeClicked" target="view"}}>
+                                    Probe
+                            </a>
                          {{/if}}
                     </td>
                 </tr>
