@@ -1638,6 +1638,7 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
 
     # run SSH commands
     command = (
+       "echo \""
        "sudo -n uptime 2>&1|"
        "grep load|"
        "wc -l && "
@@ -1652,6 +1653,7 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "else sysctl hw.ncpu | awk '{print $2}';"
        "fi;"
        "echo --------"
+       "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
        #"cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null |"
        #"awk '{print $2}'` 2> /dev/null || "
        #"cat ~/.ssh/authorized_keys 2> /dev/null"
