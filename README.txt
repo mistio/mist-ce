@@ -37,7 +37,8 @@ create a virtualenv and run buildout::
     ./bin/python bootstrap.py
     ./bin/buildout -v
 
-In case you are using an older version of setuptools, bootstrap will fail. To solve this you need to::
+In case you are using an older version of setuptools, bootstrap will fail. To 
+solve this you need to::
 
    ./bin/pip install setuptools --upgrade
 
