@@ -711,7 +711,7 @@ define('app/models/graph', ['ember'],
                     function appendGraph(id,width,height){
 
                         // Generate graph's placeholder
-                        d3.select('#GraphsArea')
+                        d3.select('#graphs')
                             .insert('div')
                             .attr('id', 'metric-' + id)
                             .attr('class','graph')
@@ -724,11 +724,19 @@ define('app/models/graph', ['ember'],
                             .select('.header')
                             .insert('div')
                             .attr('class','closeBtn')
-                            .attr('onClick',"Mist.monitoringController.UI.collapsePressed('#metric-" + id + "')")
+                            .attr('onclick',"Mist.monitoringController.UI.collapsePressed('#metric-" + id + "')")
                             .text('-');
 
                         // Generate graph's open button
-                        // TODO
+                        d3.select('#graphBar')
+                            .insert('div')
+                            .attr('id', 'metric-'+id+'Btn')
+                            .attr('class', 'graphBtn')
+                            .insert('a')
+                            .attr('class', 'ui-btn ui-btn-icon-left ui-icon-carat-u ui-corner-all')
+                            .attr('onclick',"Mist.monitoringController.UI.expandPressed('#metric-" + id + "')")
+                            .text(id);
+
 
                         d3svg =  d3.select("#"+id)
                             .append('svg')
