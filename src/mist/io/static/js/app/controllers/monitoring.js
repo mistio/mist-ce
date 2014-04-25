@@ -825,14 +825,13 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *  Collapse selected metrics
                 *  Possible to set animation duration
                 */
-                collapse : function(metrics,duration) {
+                collapse : function(metrics, duration) {
 
                     // Mobile Hide Animation is slow, disabling animation
-                    var hideDuration = (typeof duration == 'undefined') ? 400 : duration;
-                    if (Mist.isClientMobile) {
+                    var hideDuration = duration || 400;
 
+                    if (Mist.isClientMobile)
                         hideDuration = 0;
-                    }
 
                     // Add graph to the end of the list
                     metrics.forEach(function(metric){

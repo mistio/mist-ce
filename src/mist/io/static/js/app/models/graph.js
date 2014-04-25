@@ -713,28 +713,28 @@ define('app/models/graph', ['ember'],
                         // Generate graph's placeholder
                         d3.select('#graphs')
                             .insert('div')
-                            .attr('id', 'metric-' + id)
+                            .attr('id', 'metric-' + id + 'Graph')
                             .attr('class','graph')
                             .insert('div').attr('class','header')
                             .insert('div').attr('class','title')
                             .text(id);
 
                         // Generate graph's close button
-                        d3.select('#metric-' + id)
+                        d3.select('#metric-' + id + 'Graph')
                             .select('.header')
                             .insert('div')
                             .attr('class','closeBtn')
-                            .attr('onclick',"Mist.monitoringController.UI.collapsePressed('#metric-" + id + "')")
+                            .attr('onclick',"Mist.monitoringController.UI.collapsePressed('metric-" + id + "')")
                             .text('-');
 
                         // Generate graph's open button
                         d3.select('#graphBar')
                             .insert('div')
-                            .attr('id', 'metric-'+id+'Btn')
+                            .attr('id', 'metric-' + id +'GraphBtn')
                             .attr('class', 'graphBtn')
                             .insert('a')
                             .attr('class', 'ui-btn ui-btn-icon-left ui-icon-carat-u ui-corner-all')
-                            .attr('onclick',"Mist.monitoringController.UI.expandPressed('#metric-" + id + "')")
+                            .attr('onclick',"Mist.monitoringController.UI.expandPressed('metric-" + id + "')")
                             .text(id);
 
 
