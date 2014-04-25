@@ -650,19 +650,19 @@ define('app/controllers/monitoring', [
 
                                 for (var metric in data) {
 
-                                    if (metric in receivedData)
+                                    if (['cpu','load','memory','disk','network'].indexOf(metric) > -1)
                                         continue;
-                                    continue;
+
                                     receivedData[metric] = [];
                                     data[metric].forEach(function(item) {
                                         var metricObj = {
                                             time : new Date(item[0]*1000),
                                             value : item[1]
                                         };
-                                        receivedData[metric].push(networkTxObj);
+                                        receivedData[metric].push(metricObj);
                                     });
 
-                                    self.addGraph(metric);
+                                    Mist.monitoringController.grahps.addGraph(metric);
                                 }
 
                                 self.lastMetrictime = receivedData.load[receivedData.load.length-1].time;
@@ -1410,8 +1410,16 @@ define('app/controllers/monitoring', [
                     if (this.graphExists(graphId))
                         throw new Error('Graph "' + graphId + '" exists already');
 
-                    this.graphs.instances[graphId] = new Graph(graphId , width, timeToDisplay);
+                    /* BAD UGLY CODE!!!! */
+                    var width = $("#GraphsArea").width() -2;
+                    var timeToDisplay = 600000; // (10*60*1000)
+                    /* CHANGE ME!!! */
 
+                    this.graphs[graphId] = Graph.create({
+                                                id: graphId,
+                                                width: width,
+                                                timeToDisplay: timeToDisplay
+                                            });
                 },
 
 
