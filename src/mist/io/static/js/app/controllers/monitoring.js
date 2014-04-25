@@ -582,7 +582,6 @@ define('app/controllers/monitoring', ['app/models/graph',
                                 });
 
                                 self.lastMetrictime = receivedData.load[receivedData.load.length-1].time;
-                                info(receivedData.load[receivedData.load.length-1].time);
 
                                 callback({
                                     status: 'success',
@@ -938,10 +937,10 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *
                 */
                 graphExists: function (graphId) {
-                    var graphs = this.instances;
-                    for (var graph in graphs)
-                        if (graphs[graph] == graphId)
+                    for (var graph in this.instances){
+                        if (graph == graphId)
                             return true;
+                    }
                     return false;
                 },
 
@@ -954,7 +953,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                 addGraph: function (graphId) {
 
                     if (this.graphExists(graphId))
-                        throw new Error('Graph "' + graphId + '" exists already');
+                        return;
 
                     /* BAD UGLY CODE!!!! */
                     var width = $("#GraphsArea").width() -2;
