@@ -27,6 +27,7 @@ define('app/models/graph', ['ember'],
                     var NUM_OF_MEASUREMENT = 60;
                     var MAX_BUFFER_DATA    = 60;
 
+                    Mist.set('d3', require('d3'));
                     var d3 = require('d3');
 
                     // Calculate Aspect Ratio Of Height
@@ -257,10 +258,8 @@ define('app/models/graph', ['ember'],
                     */
                     this.updateData = function(newData) {
 
-
                         // Fix for duplicate timestamps
                         if(newData.length > 0 && this.data.length > 0){
-
                             if(newData[0].time <= this.data[this.data.length-1].time){
                                 newData = newData.slice(1);
                             }
@@ -269,7 +268,6 @@ define('app/models/graph', ['ember'],
 
                         // On first run append the Graph
                         if(!this.isAppended){
-
                             appendGraph(this.id,this.width,this.height);
                             this.isAppended = true;
 
@@ -310,7 +308,7 @@ define('app/models/graph', ['ember'],
                     */
                     this.updateView = function() {
 
-                        var self           = this;
+                        var self = this;
 
                         var labelTicksFixed = function(axisInstance,format) {
 
@@ -348,6 +346,8 @@ define('app/models/graph', ['ember'],
 
                             this.displayedData = this.data;
                         }
+
+                        Mist.set(self.id, this.displayedData);
 
                         // If min & max == 0 y axis will not display values. max=1 fixes this.
                         var maxValue = d3.max(this.displayedData, function(d) { return d.value; });
@@ -441,7 +441,6 @@ define('app/models/graph', ['ember'],
                         // Animate line, axis and grid
                         if(this.animationEnabled && !this.clearAnimPending)
                         {
-
                             // Animation values
                             var fps  = 12;
                             var duration = 10;
@@ -462,6 +461,7 @@ define('app/models/graph', ['ember'],
                                              .points(this.valuesDistance,0, 0,0)
                                              .data(valueAreaPath)
                                              .before(function(data){
+
                                                 this.d3Selector.attr("d", data);
                                              })
                                              .push();
@@ -493,7 +493,6 @@ define('app/models/graph', ['ember'],
                                              .push();
                         }
                         else {
-
                             // Update Graph Elements
                             d3vLine.attr("d", valueLinePath);
                             d3vArea.attr("d", valueAreaPath);
@@ -710,46 +709,48 @@ define('app/models/graph', ['ember'],
                     */
                     function appendGraph(id,width,height){
 
+                        id = 'metric-' + id + 'Graph';
+
                         // Generate graph's placeholder
                         d3.select('#graphs')
                             .insert('div')
-                            .attr('id', 'metric-' + id + 'Graph')
+                            .attr('id', id)
                             .attr('class','graph')
                             .insert('div').attr('class','header')
                             .insert('div').attr('class','title')
                             .text(id);
 
-                        // Generate graph's close button
-                        d3.select('#metric-' + id + 'Graph')
+                        // Generate graph's collapse button
+                        d3.select('#' + id)
                             .select('.header')
                             .insert('div')
                             .attr('class','closeBtn')
-                            .attr('onclick',"Mist.monitoringController.UI.collapsePressed('metric-" + id + "')")
+                            .attr('onclick',"Mist.monitoringController.UI.collapsePressed('" + id + "')")
                             .text('-');
 
-                        // Generate graph's open button
+                        // Generate graph's expand button
                         d3.select('#graphBar')
                             .insert('div')
-                            .attr('id', 'metric-' + id +'GraphBtn')
+                            .attr('id', id +'Btn')
                             .attr('class', 'graphBtn')
                             .insert('a')
                             .attr('class', 'ui-btn ui-btn-icon-left ui-icon-carat-u ui-corner-all')
-                            .attr('onclick',"Mist.monitoringController.UI.expandPressed('metric-" + id + "')")
+                            .attr('onclick',"Mist.monitoringController.UI.expandPressed('" + id + "')")
                             .text(id);
 
 
-                        d3svg =  d3.select("#"+id)
+                        d3svg =  d3.select('#' + id)
                             .append('svg')
                             .attr('width',width)
                             .attr('height',height);
 
-                        d3GridX = d3.select("#"+id)
+                        d3GridX = d3.select('#' + id )
                             .select('svg')
                             .append("g")
                             .attr("class", "grid-x")
                             .attr("transform", "translate(" + margin.left + "," + height + ")");
 
-                        d3GridY = d3.select("#"+id)
+                        d3GridY = d3.select('#' + id)
                             .select('svg')
                             .append("g")
                             .attr("class", "grid-y")
@@ -976,7 +977,6 @@ define('app/models/graph', ['ember'],
                       setupAnimation();
                       setupMouseOver();
                     }
-
                 }
         });
     }

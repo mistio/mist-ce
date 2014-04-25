@@ -581,8 +581,8 @@ define('app/controllers/monitoring', ['app/models/graph',
                                     Mist.monitoringController.graphs.addGraph(id);
                                 });
 
-
                                 self.lastMetrictime = receivedData.load[receivedData.load.length-1].time;
+                                info(receivedData.load[receivedData.load.length-1].time);
 
                                 callback({
                                     status: 'success',
@@ -746,9 +746,9 @@ define('app/controllers/monitoring', ['app/models/graph',
                 disableAnimation : function(stopCurrent) {
 
                     // Default StopCurrent true
-                    stopCurrent = (typeof stopCurrent == 'undefined') ? true : stopCurrent ;
+                    stopCurrent = stopCurrent || true;
 
-                    for(metric in this.instances)
+                    for(var metric in this.instances)
                     {
                         this.instances[metric].disableAnimation(stopCurrent);
                     }
@@ -787,11 +787,8 @@ define('app/controllers/monitoring', ['app/models/graph',
                         action();
                     }
 
-                    // Deleting cpuCores as it is not a metric
-                    delete data.cpuCores;
-
                     // Updating
-                    for(metric in data){
+                    for(var metric in data) {
                         this.instances[metric].updateData(data[metric]);
                     }
 

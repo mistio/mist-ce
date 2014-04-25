@@ -9,18 +9,8 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
 
         return TemplatedView.extend({
 
-            graphs : {
-                cpu: null,
-                load: null,
-                memory: null,
-                diskRead: null,
-                diskWrite: null,
-                networkTX: null,
-                networkRX: null
-            },
-
+            graphs : {},
             viewRendered: false,
-            graphsCreated: false,
 
             /**
             *
@@ -52,9 +42,7 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
 
                 this._super();
                 Mist.monitoringController.request.stop();
-                // Disable animation if graphs are in the dom (we check at least one of them)
-                if(this.graphs.cpu.isAppended)
-                    Mist.monitoringController.graphs.disableAnimation();
+                Mist.monitoringController.graphs.disableAnimation();
                 Mist.monitoringController.reset();
 
                 // Re-Initialize Enable Button Of Jquery Mobile
@@ -80,8 +68,7 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
 
                     Mist.monitoringController.request.stop();
                 }
-                else if(this.viewRendered && machine.hasMonitoring && !this.graphsCreated &&
-                        machine.id != ' '){
+                else if(this.viewRendered && machine.hasMonitoring && machine.id != ' '){
 
                     var self = this;
                     var controller = Mist.monitoringController;
@@ -95,14 +82,11 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
                         }
                         else{
 
-                            Em.run.next(function() {
+                            Ember.run.next(function() {
 
                                 // Re-Initialize jquery components and hide buttons
                                 self.redrawJQMComponents();
                                 $('.graphBtn').hide(0);
-
-                                self.createGraphs(600000); // (10*60*1000)
-
 
                                 controller.initialize({
                                     machineModel    : machine,      // Send Current Machine
@@ -113,8 +97,12 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
                                 $(window).resize(function(){
 
                                     var newWidth = $("#GraphsArea").width() -2;
-                                    for(metric in self.graphs){
+                                    for(var metric in self.graphs){
+                                        try {
                                          self.graphs[metric].changeWidth(newWidth);
+                                        } catch(e) {
+                                            info(metric);
+                                        }
                                     }
                                 })
 
@@ -146,19 +134,6 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
                 // Disable History
                 $('#graphsGoForward').addClass('ui-disabled');
                 $('#graphsResetHistory').addClass('ui-disabled');
-            },
-
-            /**
-            *
-            * Creates graph instances
-            * @param {number} timeToDisplay  - The graphs timeWindow in miliseconds
-            *
-            */
-            createGraphs: function(timeToDisplay){
-
-                // Get Width, -2 left & right border
-                var width = $("#GraphsArea").width() -2;
-                self.graphsCreated = true;
             }
         });
     }
