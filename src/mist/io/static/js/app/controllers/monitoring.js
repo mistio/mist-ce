@@ -937,11 +937,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *
                 */
                 graphExists: function (graphId) {
-                    for (var graph in this.instances){
-                        if (graph == graphId)
-                            return true;
-                    }
-                    return false;
+                    return graphId in this.instances
                 },
 
 
