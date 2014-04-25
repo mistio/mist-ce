@@ -832,19 +832,19 @@ define('app/controllers/monitoring', ['app/models/graph',
                     // Add graph to the end of the list
                     metrics.forEach(function(metric){
 
-                        $("#" + metric + 'GraphBtn').insertAfter($('.graphBtn').last());
+                        $("#" + metric + 'Btn').insertAfter($('.graphBtn').last());
 
                         // Hide the Graphs
-                        $("#" + metric + "Graph").hide(hideDuration,function(){
+                        $("#" + metric).hide(hideDuration,function(){
 
                             // Show Graphs Buttons
-                            $("#" + metric + 'GraphBtn').show(0, function(){
+                            $("#" + metric + 'Btn').show(0, function(){
 
                                 // Set Cookie
                                 var graphBtns = [];
                                 $('.graphBtn').toArray().forEach(function(entry){
                                     if($(entry).css('display') != 'none')
-                                        graphBtns.push($(entry).attr('id').replace('GraphBtn','').replace('#',''));
+                                        graphBtns.push($(entry).attr('id').replace('Btn','').replace('#',''));
                                 });
 
                                 Mist.monitoringController.cookies.setCollapsedMetrics(graphBtns);
@@ -872,19 +872,19 @@ define('app/controllers/monitoring', ['app/models/graph',
                     // Add graph to the end of the list
                     metrics.forEach(function(metric){
 
-                        $("#" + metric + 'Graph').insertAfter($('.graph').last());
+                        $("#" + metric).insertAfter($('.graph').last());
 
                         // Hide the buttons
-                        $("#" + metric + "GraphBtn").hide(0);
+                        $("#" + metric + "Btn").hide(0);
 
                         // Show Graphs
-                        $("#" + metric + 'Graph').show(hideDuration, function(){
+                        $("#" + metric).show(hideDuration, function(){
 
                             // Set Cookie
                             var graphBtns = [];
                             $('.graphBtn').toArray().forEach(function(entry){
                                 if($(entry).css('display') != 'none')
-                                    graphBtns.push($(entry).attr('id').replace('GraphBtn','').replace('#',''));
+                                    graphBtns.push($(entry).attr('id').replace('Btn','').replace('#',''));
                             });
 
                             Mist.monitoringController.cookies.setCollapsedMetrics(graphBtns);
