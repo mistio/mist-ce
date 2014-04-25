@@ -573,8 +573,8 @@ define('app/controllers/monitoring', ['app/models/graph',
 
                                     metric.datapoints.forEach(function(datapoint) {
                                         receivedData[id].push({
-                                            time: new Date(datapoint[0]*1000),
-                                            value: datapoint[1]
+                                            time: new Date(datapoint[1]*1000),
+                                            value: datapoint[0]
                                         });
                                     });
 
