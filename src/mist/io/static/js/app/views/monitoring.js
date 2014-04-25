@@ -158,51 +158,6 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
 
                 // Get Width, -2 left & right border
                 var width = $("#GraphsArea").width() -2;
-
-                this.graphs['cpu'] = Graph.create({
-                                        id:'cpuGraph',
-                                        format:"%",
-                                        width: width,
-                                        timeToDisplay: timeToDisplay
-                                    });
-
-                this.graphs['load'] = Graph.create({
-                                        id:'loadGraph',
-                                        width: width,
-                                        timeToDisplay: timeToDisplay
-                                    });
-
-                this.graphs['memory'] = Graph.create({
-                                            id:'memoryGraph',
-                                            format: "%",
-                                            width: width,
-                                            timeToDisplay: timeToDisplay
-                                        });
-
-                this.graphs['diskRead'] = Graph.create({
-                                            id:'diskReadGraph',
-                                            width: width,
-                                            timeToDisplay: timeToDisplay
-                                        });
-
-                this.graphs['diskWrite'] = Graph.create({
-                                            id:'diskWriteGraph',
-                                            width: width,
-                                            timeToDisplay: timeToDisplay
-                                        });
-
-                this.graphs['networkRX'] = Graph.create({
-                                            id:'networkRXGraph',
-                                            width: width,
-                                            timeToDisplay: timeToDisplay
-                                        });
-
-                this.graphs['networkTX'] = Graph.create({
-                                            id:'networkTXGraph',
-                                            width: width,
-                                            timeToDisplay: timeToDisplay
-                                        });
-
                 self.graphsCreated = true;
             }
         });

@@ -1,4 +1,4 @@
-define('app/controllers/monitoring', [
+define('app/controllers/monitoring', ['app/models/graph',
     'ember'
     ],
     /**
@@ -6,7 +6,7 @@ define('app/controllers/monitoring', [
      *
      * @returns Class
      */
-    function() {
+    function(Graph) {
         return Ember.Object.extend(Ember.Evented,{
 
             /**
@@ -546,124 +546,41 @@ define('app/controllers/monitoring', [
                         timeout: 8000,
                         success: function (data, status, xhr){
 
+                            Mist.set('data', data);
+
                             try {
 
-                                if(!data.load || data.load.length == 0)
+                                if (!data.length)
                                     throw "No Data Received";
 
-                                // TODO: Maybe there is a better to tell if
-                                // we have data
+
+                                /* TODO: Maybe there is a better to tell if
+                                 we have data
                                 data.load.some(function(tuple) {
                                     if (tuple[1] != null) {
                                         self.machine.set('pendingFirstData', false);
                                         return true;
                                     }
-                                });
+                                });*/
 
-                                var disks = [];
-                                var netInterfaces = [];
+                                var receivedData = {};
 
-                                // Get Disks Names
-                                for(disk in data.disk.read)
-                                {
-                                    disks.push(disk);
-                                }
+                                data.forEach(function(metric) {
 
-                                // Get Network Interfaces Names
-                                for(netInterface in data.network)
-                                {
-                                     netInterfaces.push(netInterface);
-                                }
+                                    var id = metric.target;
 
+                                    receivedData[id] = [];
 
-                                var receivedData = {
-                                    cpuCores:   0,
-                                    cpu:       [],
-                                    load:      [],
-                                    memory:    [],
-                                    diskRead:  [],
-                                    diskWrite: [],
-                                    networkRX: [],
-                                    networkTX: []
-                                };
-
-
-                                // Set CPU Cores
-                                receivedData.cpuCores = data.cpu.cores
-
-                                // Create time-value objects to be used with d3
-                                data.cpu.utilization.forEach(function(item) {
-                                    var cpuObj = {
-                                        time: new Date(item[0]*1000),
-                                        value: item[1]
-                                    };
-                                    receivedData.cpu.push(cpuObj);
-                                });
-
-                                data.load.forEach(function(item) {
-                                    var loadObj = {
-                                        time : new Date(item[0]*1000),
-                                        value : item[1]
-                                    };
-                                    receivedData.load.push(loadObj);
-                                });
-
-                                data.memory.forEach(function(item) {
-                                    var memoryObj = {
-                                        time : new Date(item[0]*1000),
-                                        value : item[1]
-                                    };
-                                    receivedData.memory.push(memoryObj);
-                                });
-
-                                data.disk.read[disks[0]].disk_octets.forEach(function(item) {
-                                    var diskReadObj = {
-                                        time : new Date(item[0]*1000),
-                                        value : item[1]
-                                    };
-                                    receivedData.diskRead.push(diskReadObj);
-                                });
-
-                                data.disk.write[disks[0]].disk_octets.forEach(function(item) {
-                                    var diskWriteObj = {
-                                        time : new Date(item[0]*1000),
-                                        value : item[1]
-                                    };
-                                    receivedData.diskWrite.push(diskWriteObj);
-                                });
-
-                                data.network[netInterfaces[0]].rx.forEach(function(item) {
-                                    var networkRxObj = {
-                                        time : new Date(item[0]*1000),
-                                        value : item[1]
-                                    };
-                                    receivedData.networkRX.push(networkRxObj);
-                                });
-
-                               data.network[netInterfaces[0]].tx.forEach(function(item) {
-                                    var networkTxObj = {
-                                        time : new Date(item[0]*1000),
-                                        value : item[1]
-                                    };
-                                    receivedData.networkTX.push(networkTxObj);
-                                });
-
-                                for (var metric in data) {
-
-                                    if (['cpu','load','memory','disk','network'].indexOf(metric) > -1)
-                                        continue;
-
-                                    receivedData[metric] = [];
-                                    data[metric].forEach(function(item) {
-                                        var metricObj = {
-                                            time : new Date(item[0]*1000),
-                                            value : item[1]
-                                        };
-                                        receivedData[metric].push(metricObj);
+                                    metric.datapoints.forEach(function(datapoint) {
+                                        receivedData[id].push({
+                                            time: new Date(datapoint[0]*1000),
+                                            value: datapoint[1]
+                                        });
                                     });
 
-                                    Mist.monitoringController.grahps.addGraph(metric);
-                                }
+                                    Mist.monitoringController.graphs.addGraph(id);
+                                });
+
 
                                 self.lastMetrictime = receivedData.load[receivedData.load.length-1].time;
 
@@ -1017,6 +934,44 @@ define('app/controllers/monitoring', [
                         after  : []
                     };
                 },
+
+
+                /**
+                *
+                *
+                *
+                */
+                graphExists: function (graphId) {
+                    var graphs = this.instances;
+                    for (var graph in graphs)
+                        if (graphs[graph] == graphId)
+                            return true;
+                    return false;
+                },
+
+
+                /**
+                *
+                *
+                *
+                */
+                addGraph: function (graphId) {
+
+                    if (this.graphExists(graphId))
+                        throw new Error('Graph "' + graphId + '" exists already');
+
+                    /* BAD UGLY CODE!!!! */
+                    var width = $("#GraphsArea").width() -2;
+                    var timeToDisplay = 600000; // (10*60*1000)
+                    /* CHANGE ME!!! */
+
+                    this.instances[graphId] = Graph.create({
+                                                id: graphId,
+                                                width: width,
+                                                timeToDisplay: timeToDisplay
+                                            });
+                },
+
 
                 instances        : null,    // Graph Objects created by the view
                 animationEnabled : true,
@@ -1383,43 +1338,6 @@ define('app/controllers/monitoring', [
                     this.lastMetrictime  = null;
                     this.timeWindow      = 0;
                     this.currentStopTime = null;
-                },
-
-
-                /**
-                *
-                *
-                *
-                */
-                graphExists: function (graphId) {
-                    var graphs = this.graphs.instances;
-                    for (var graph in graphs)
-                        if (graphs[graph] == id)
-                            return true;
-                    return false;
-                },
-
-
-                /**
-                *
-                *
-                *
-                */
-                addGraph: function (graphId) {
-
-                    if (this.graphExists(graphId))
-                        throw new Error('Graph "' + graphId + '" exists already');
-
-                    /* BAD UGLY CODE!!!! */
-                    var width = $("#GraphsArea").width() -2;
-                    var timeToDisplay = 600000; // (10*60*1000)
-                    /* CHANGE ME!!! */
-
-                    this.graphs[graphId] = Graph.create({
-                                                id: graphId,
-                                                width: width,
-                                                timeToDisplay: timeToDisplay
-                                            });
                 },
 
 

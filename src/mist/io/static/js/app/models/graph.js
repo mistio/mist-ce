@@ -1,11 +1,11 @@
 define('app/models/graph', ['ember'],
-	//
-	//  Graph Model
-	//
-	//  @returns class
-	function () {
+    //
+    //  Graph Model
+    //
+    //  @returns class
+    function () {
 
-		return Ember.Object.extend({
+        return Ember.Object.extend({
 
             /**
              * Represents a Graph.
@@ -15,12 +15,14 @@ define('app/models/graph', ['ember'],
              * @param {number} timeToDisplayms  - The TimeWindow in miliseconds
              * @param {string} yAxisValueFormat - Format for Left axis values ex. 10%
              */
-            Graph: function() {
+            init: function() {
 
-            		var divID = this.id;
-            		var width = this.width;
-            		var timeToDisplayms = this.timeToDisplay;
-            		var yAxisValueFormat = this.format
+                    this._super();
+
+                    var divID = this.id;
+                    var width = this.width;
+                    var timeToDisplayms = this.timeToDisplay;
+                    var yAxisValueFormat = this.format
 
                     var NUM_OF_MEASUREMENT = 60;
                     var MAX_BUFFER_DATA    = 60;
@@ -708,75 +710,79 @@ define('app/models/graph', ['ember'],
                     */
                     function appendGraph(id,width,height){
 
-                        if (! d3.select("#"+id)) {
-                          // for custom metrics
-                          d3.select('#GraphsArea').insert('div','#metric-' + id)
+                        // Generate graph's placeholder
+                        d3.select('#GraphsArea')
+                            .insert('div')
+                            .attr('id', 'metric-' + id)
                             .attr('class','graph')
                             .insert('div').attr('class','header')
                             .insert('div').attr('class','title')
                             .text(id);
 
-                          d3.select('#metric-' + id)
+                        // Generate graph's close button
+                        d3.select('#metric-' + id)
                             .select('.header')
                             .insert('div')
                             .attr('class','closeBtn')
                             .attr('onClick',"Mist.monitoringController.UI.collapsePressed('#metric-" + id + "')")
                             .text('-');
-                        }
 
-                      d3svg =   d3.select("#"+id)
-                                  .append('svg')
-                                  .attr('width',width)
-                                  .attr('height',height);
+                        // Generate graph's open button
+                        // TODO
 
-                      d3GridX = d3.select("#"+id)
-                                  .select('svg')
-                                  .append("g")
-                                  .attr("class", "grid-x")
-                                  .attr("transform", "translate(" + margin.left + "," + height + ")");
+                        d3svg =  d3.select("#"+id)
+                            .append('svg')
+                            .attr('width',width)
+                            .attr('height',height);
 
-                      d3GridY = d3.select("#"+id)
-                                  .select('svg')
-                                  .append("g")
-                                  .attr("class", "grid-y")
-                                  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                        d3GridX = d3.select("#"+id)
+                            .select('svg')
+                            .append("g")
+                            .attr("class", "grid-x")
+                            .attr("transform", "translate(" + margin.left + "," + height + ")");
 
-                      d3vArea = d3svg.append('g')
-                                     .attr('class','valueArea')
-                                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                                     .append('path');
+                        d3GridY = d3.select("#"+id)
+                            .select('svg')
+                            .append("g")
+                            .attr("class", "grid-y")
+                            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-                      d3vLine = d3svg.append('g')
-                                     .attr('class','valueLine')
-                                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                                     .append('path');
+                        d3vArea = d3svg.append('g')
+                            .attr('class','valueArea')
+                            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                            .append('path');
 
-                      d3xAxis = d3svg.append('g')
-                                     .attr('class','x-axis')
-                                     .attr("transform", "translate(" + margin.left + "," + (height - margin.bottom +2) + ")");
+                        d3vLine = d3svg.append('g')
+                            .attr('class','valueLine')
+                            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                            .append('path');
 
-                      d3HideAnimeLine = d3svg.append('rect')
-                                             .attr('class','hideAnimeLine')
-                                             .attr('width',margin.left-1)
-                                             .attr('height',height+margin.top);
+                        d3xAxis = d3svg.append('g')
+                            .attr('class','x-axis')
+                            .attr("transform", "translate(" + margin.left + "," + (height - margin.bottom +2) + ")");
 
-                      d3xAxisLine = d3svg.append('line')
-                                         .attr('class','axisLine')
-                                         .attr('x1',"" + margin.left)
-                                         .attr('y1',""+ (height - margin.bottom +2) )
-                                         .attr('x2', width + margin.left + margin.right)
-                                         .attr('y2',""+ (height - margin.bottom +2));
+                        d3HideAnimeLine = d3svg.append('rect')
+                            .attr('class','hideAnimeLine')
+                            .attr('width',margin.left-1)
+                            .attr('height',height+margin.top);
 
-                      d3yAxisLine = d3svg.append('line')
-                                         .attr('class','axisLine')
-                                         .attr('x1',"" + margin.left)
-                                         .attr('y1',"0" )
-                                         .attr('x2',"" + margin.left)
-                                         .attr('y2',""+ (height - margin.bottom +3));
+                        d3xAxisLine = d3svg.append('line')
+                            .attr('class','axisLine')
+                            .attr('x1',"" + margin.left)
+                            .attr('y1',""+ (height - margin.bottom +2) )
+                            .attr('x2', width + margin.left + margin.right)
+                            .attr('y2',""+ (height - margin.bottom +2));
 
-                      d3yAxis = d3svg.append('g')
-                                     .attr('class','y-axis')
-                                     .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
+                        d3yAxisLine = d3svg.append('line')
+                            .attr('class','axisLine')
+                            .attr('x1',"" + margin.left)
+                            .attr('y1',"0" )
+                            .attr('x2',"" + margin.left)
+                            .attr('y2',""+ (height - margin.bottom +3));
+
+                        d3yAxis = d3svg.append('g')
+                            .attr('class','y-axis')
+                            .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
                     }
 
                     /*
@@ -963,7 +969,7 @@ define('app/models/graph', ['ember'],
                       setupMouseOver();
                     }
 
-                }.on('init')
-		});
-	}
+                }
+        });
+    }
 )
