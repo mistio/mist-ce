@@ -8,7 +8,7 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
 
         'use strict';
 
-        return Ember.ArrayController.extend(Ember.Evented, {
+        return Ember.Object.extend(Ember.Evented, {
 
 
             //

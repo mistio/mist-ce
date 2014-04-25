@@ -648,6 +648,23 @@ define('app/controllers/monitoring', [
                                     receivedData.networkTX.push(networkTxObj);
                                 });
 
+                                for (var metric in data) {
+
+                                    if (metric in receivedData)
+                                        continue;
+                                    continue;
+                                    receivedData[metric] = [];
+                                    data[metric].forEach(function(item) {
+                                        var metricObj = {
+                                            time : new Date(item[0]*1000),
+                                            value : item[1]
+                                        };
+                                        receivedData[metric].push(networkTxObj);
+                                    });
+
+                                    self.addGraph(metric);
+                                }
+
                                 self.lastMetrictime = receivedData.load[receivedData.load.length-1].time;
 
                                 callback({
@@ -784,7 +801,7 @@ define('app/controllers/monitoring', [
             /**
             *
             *   Controlls all graphs,
-            *   It has instances of graphs past by the view
+            *   It has instances of graphs pased by the view
             */
             graphs : {
 
@@ -1367,6 +1384,36 @@ define('app/controllers/monitoring', [
                     this.timeWindow      = 0;
                     this.currentStopTime = null;
                 },
+
+
+                /**
+                *
+                *
+                *
+                */
+                graphExists: function (graphId) {
+                    var graphs = this.graphs.instances;
+                    for (var graph in graphs)
+                        if (graphs[graph] == id)
+                            return true;
+                    return false;
+                },
+
+
+                /**
+                *
+                *
+                *
+                */
+                addGraph: function (graphId) {
+
+                    if (this.graphExists(graphId))
+                        throw new Error('Graph "' + graphId + '" exists already');
+
+                    this.graphs.instances[graphId] = new Graph(graphId , width, timeToDisplay);
+
+                },
+
 
                 isEnabled       : false,
                 lastMetrictime  : null,
