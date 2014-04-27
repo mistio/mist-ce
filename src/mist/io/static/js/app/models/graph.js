@@ -3,7 +3,10 @@ define('app/models/graph', ['ember'],
     //  Graph Model
     //
     //  @returns class
+    //
     function () {
+
+        'use strict';
 
         return Ember.Object.extend({
 
@@ -54,8 +57,8 @@ define('app/models/graph', ['ember'],
 
 
                     // Scale Functions will scale graph to defined width and height
-                    width = this.width - margin.left - margin.right;
-                    height= this.height - margin.top - margin.bottom;
+                    var width = this.width - margin.left - margin.right;
+                    var height= this.height - margin.top - margin.bottom;
                     var xScale = d3.time.scale().range([0, width]);
                     var yScale = d3.scale.linear().range([height, 0]);
 
@@ -421,8 +424,8 @@ define('app/models/graph', ['ember'],
 
 
                         // Get path values for value line and area
-                        valueLinePath = valueline(this.displayedData);
-                        valueAreaPath = valuearea(this.displayedData);
+                        var valueLinePath = valueline(this.displayedData);
+                        var valueAreaPath = valuearea(this.displayedData);
 
 
                         // Fix for "Error: Problem parsing d="" " in webkit
