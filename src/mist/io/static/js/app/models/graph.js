@@ -18,6 +18,7 @@ define('app/models/graph', ['ember'],
             init: function() {
 
                     this._super();
+                    this.set('id', this.metric.target);
 
                     var divID = this.id;
                     var width = this.width;
@@ -268,7 +269,7 @@ define('app/models/graph', ['ember'],
 
                         // On first run append the Graph
                         if(!this.isAppended){
-                            appendGraph(this.id,this.width,this.height);
+                            appendGraph(this.metric, this.width, this.height);
                             this.isAppended = true;
 
                             // Do staff after Graph is in the dom and we have data
@@ -707,9 +708,11 @@ define('app/models/graph', ['ember'],
                     * @param {number} width  - the width of the graph
                     * @param {height} height - the height of the graph
                     */
-                    function appendGraph(id,width,height){
+                    function appendGraph(metric, width, height){
 
-                        id = 'metric-' + id + 'Graph';
+                        var id = metric.target + '-graph';
+                        var fullMetric = Mist.metricsController.getMetric(metric.target);
+                        var name = fullMetric ? fullMetric.name : metric.target;
 
                         // Generate graph's placeholder
                         d3.select('#graphs')
@@ -718,7 +721,7 @@ define('app/models/graph', ['ember'],
                             .attr('class','graph')
                             .insert('div').attr('class','header')
                             .insert('div').attr('class','title')
-                            .text(id);
+                            .text(name);
 
                         // Generate graph's collapse button
                         d3.select('#' + id)
@@ -731,12 +734,12 @@ define('app/models/graph', ['ember'],
                         // Generate graph's expand button
                         d3.select('#graphBar')
                             .insert('div')
-                            .attr('id', id +'Btn')
+                            .attr('id', id + '-btn')
                             .attr('class', 'graphBtn')
                             .insert('a')
                             .attr('class', 'ui-btn ui-btn-icon-left ui-icon-carat-u ui-corner-all')
                             .attr('onclick',"Mist.monitoringController.UI.expandPressed('" + id + "')")
-                            .text(id);
+                            .text(name);
 
 
                         d3svg =  d3.select('#' + id)

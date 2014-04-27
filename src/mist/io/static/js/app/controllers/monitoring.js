@@ -578,7 +578,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                                         });
                                     });
 
-                                    Mist.monitoringController.graphs.addGraph(id);
+                                    Mist.monitoringController.graphs.addGraph(metric);
                                 });
 
                                 self.lastMetrictime = receivedData.load[receivedData.load.length-1].time;
@@ -832,19 +832,19 @@ define('app/controllers/monitoring', ['app/models/graph',
                     // Add graph to the end of the list
                     metrics.forEach(function(metric){
 
-                        $("#" + metric + 'Btn').insertAfter($('.graphBtn').last());
+                        $("#" + metric + '-btn').insertAfter($('.graphBtn').last());
 
                         // Hide the Graphs
                         $("#" + metric).hide(hideDuration,function(){
 
                             // Show Graphs Buttons
-                            $("#" + metric + 'Btn').show(0, function(){
+                            $("#" + metric + '-btn').show(0, function(){
 
                                 // Set Cookie
                                 var graphBtns = [];
                                 $('.graphBtn').toArray().forEach(function(entry){
                                     if($(entry).css('display') != 'none')
-                                        graphBtns.push($(entry).attr('id').replace('Btn','').replace('#',''));
+                                        graphBtns.push($(entry).attr('id').replace('-btn','').replace('#',''));
                                 });
 
                                 Mist.monitoringController.cookies.setCollapsedMetrics(graphBtns);
@@ -875,7 +875,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                         $("#" + metric).insertAfter($('.graph').last());
 
                         // Hide the buttons
-                        $("#" + metric + "Btn").hide(0);
+                        $("#" + metric + "-btn").hide(0);
 
                         // Show Graphs
                         $("#" + metric).show(hideDuration, function(){
@@ -884,7 +884,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                             var graphBtns = [];
                             $('.graphBtn').toArray().forEach(function(entry){
                                 if($(entry).css('display') != 'none')
-                                    graphBtns.push($(entry).attr('id').replace('Btn','').replace('#',''));
+                                    graphBtns.push($(entry).attr('id').replace('-btn','').replace('#',''));
                             });
 
                             Mist.monitoringController.cookies.setCollapsedMetrics(graphBtns);
@@ -946,9 +946,9 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *
                 *
                 */
-                addGraph: function (graphId) {
+                addGraph: function (metric) {
 
-                    if (this.graphExists(graphId))
+                    if (this.graphExists(metric.target))
                         return;
 
                     /* BAD UGLY CODE!!!! */
@@ -956,8 +956,8 @@ define('app/controllers/monitoring', ['app/models/graph',
                     var timeToDisplay = 600000; // (10*60*1000)
                     /* CHANGE ME!!! */
 
-                    this.instances[graphId] = Graph.create({
-                                                id: graphId,
+                    this.instances[metric.target] = Graph.create({
+                                                metric: metric,
                                                 width: width,
                                                 timeToDisplay: timeToDisplay
                                             });
