@@ -22,8 +22,6 @@ define('app/models/graph', ['ember'],
 
                 this._super();
 
-                this.set('id', this.metric.target);
-
                 var divID = this.id;
                 var width = $("#GraphsArea").width() -2;
                 var timeToDisplayms = 600000;
@@ -267,7 +265,6 @@ define('app/models/graph', ['ember'],
                             newData = newData.slice(1);
                         }
                     }
-
 
                     // On first run append the Graph
                     if(!this.isAppended){
@@ -709,8 +706,8 @@ define('app/models/graph', ['ember'],
                 */
                 function appendGraph(id, metric, width, height){
 
-                    id += '-graph';
-                    var name = metric.name;
+                    id = '_' + id + '-graph';
+                    var name = ''+metric.name;
 
                     // Generate graph's placeholder
                     d3.select('#graphs')

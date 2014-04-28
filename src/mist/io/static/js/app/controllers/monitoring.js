@@ -7,6 +7,9 @@ define('app/controllers/monitoring', ['app/models/graph',
      * @returns Class
      */
     function(Graph) {
+
+        'use strict';
+
         return Ember.Object.extend(Ember.Evented,{
 
             /**
@@ -140,9 +143,9 @@ define('app/controllers/monitoring', ['app/models/graph',
             *
             * Initalizes Request,Graphs,History objects
             * Loads cookies and hides collapsed graphs
-            * @param {object} arguments - machine,timeWindow,step,updateInterval,updatesEnabled,timeGap,callback
+            * @param {object} args - machine,timeWindow,step,updateInterval,updatesEnabled,timeGap,callback
             */
-            initialize: function(arguments){
+            initialize: function(args){
 
                 var self = this;
 
@@ -150,7 +153,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                 this.reset();
 
                 // Get graphs from view
-                this.graphs.instances = arguments.graphs;
+                this.graphs.instances = args.graphs;
 
                 // Get cookies and show graphs that are not collapsed
                 var collapsedMetrics = this.cookies.getCollapsedMetrics();
@@ -175,7 +178,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                 // TODO Change Step to seconds
                 // Create and Start the request
                 this.request.create({
-                    machine         : arguments.machineModel, // Send Current Machine
+                    machine         : args.machineModel, // Send Current Machine
                     timeWindow      : 10*60*1000,                // Display 10 Minutes
                     step            : 10000,                     // Metrics Step in miliseconds
                     updateInterval  : 10000,                     // Get Updates Every x Miliseconds
@@ -188,7 +191,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                     }
                 });
                 // Disable updates if machine is being destroyed
-                arguments.machineModel.addObserver("beingDestroyed",function(){
+                args.machineModel.addObserver("beingDestroyed",function(){
                     if(self.request.machine && self.request.machine.beingDestroyed)
                         self.request.disableUpdates(false);
                 });
@@ -227,21 +230,21 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *   @param {number}  updateinterval - Update every updateInterval miliseconds
                 *   @param {boolean} enableUpdates  - Enable/Disable updates
                 */
-                create : function(arguments){
+                create : function(args){
 
                     this.reset();
 
                     var self             = this;
                     var controller       = Mist.monitoringController;
 
-                    this.step            = arguments.step;
-                    this.timeWindow      = arguments.timeWindow;
-                    this.updateInterval  = arguments.updateInterval;
-                    this.machine         = arguments.machine;
-                    this.updateData      = arguments.updatesEnabled;
-                    this.step            = arguments.step;
-                    this.callback        = ('callback' in arguments) ? arguments.callback : null;
-                    this.timeGap         = arguments.timeGap; // Temporary Fix , Give some time to server to collect data
+                    this.step            = args.step;
+                    this.timeWindow      = args.timeWindow;
+                    this.updateInterval  = args.updateInterval;
+                    this.machine         = args.machine;
+                    this.updateData      = args.updatesEnabled;
+                    this.step            = args.step;
+                    this.callback        = ('callback' in args) ? args.callback : null;
+                    this.timeGap         = args.timeGap; // Temporary Fix , Give some time to server to collect data
 
                     // Calculate Start And Stop
                     this.timeStop        = Math.floor( ( (new Date()).getTime() - this.timeGap * 1000) / 1000 );
@@ -546,8 +549,6 @@ define('app/controllers/monitoring', ['app/models/graph',
                         timeout: 8000,
                         success: function (data, status, xhr){
 
-                            Mist.set('data', data);
-
                             try {
 
                                 if (!data.length)
@@ -555,13 +556,21 @@ define('app/controllers/monitoring', ['app/models/graph',
 
 
                                 /* TODO: Maybe there is a better to tell if
-                                 we have data
-                                data.load.some(function(tuple) {
-                                    if (tuple[1] != null) {
-                                        self.machine.set('pendingFirstData', false);
-                                        return true;
-                                    }
-                                });*/
+                                 we have data */
+
+                                if (self.machine.pendingFirstData) {
+                                    var hasFirstData = false;
+                                    data.some(function(metric) {
+                                        metric.datapoints.some(function(datapoint) {
+                                            if (datapoint[0] != null) {
+                                                self.machine.set('pendingFirstData', false);
+                                                return hasFirstData = true;
+                                            }
+                                        });
+                                        return hasFirstData;
+                                    });
+                                }
+
 
                                 var receivedData = {};
 
@@ -783,10 +792,8 @@ define('app/controllers/monitoring', ['app/models/graph',
                     }
 
                     // Updating
-                    for(var metric in data) {
+                    for(var metric in data)
                         this.instances[metric].updateData(data[metric]);
-                    }
-
 
                     // Run after queued actions
                     var numOfActions = this.updateActions.after.length;

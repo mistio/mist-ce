@@ -101,7 +101,6 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
                                         try {
                                          self.graphs[metric].changeWidth(newWidth);
                                         } catch(e) {
-                                            info(metric);
                                         }
                                     }
                                 })
