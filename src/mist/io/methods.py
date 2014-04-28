@@ -739,9 +739,25 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
     key = SSHKeyDeployment(str(public_key))
     deploy_script = ScriptDeployment(script)
     msd = MultiStepDeployment([key, deploy_script])
+    key = str(public_key).replace('\n','')
+
+    try:
+        server_key = ''
+        keys = conn.ex_list_keypairs()
+        for k in keys:
+            if key == k.public_key:
+                server_key = k.name
+                break
+        if not server_key:
+            server_key = conn.ex_import_keypair_from_string(name=machine_name, key_material=key)
+            server_key = server_key.name
+    except:
+        server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
+        server_key = server_key.name
+
     try:
         node = conn.deploy_node(name=machine_name, image=image, size=size,
-                                location=location, deploy=msd)
+                                location=location, deploy=msd, ex_keyname=server_key)
     except Exception as e:
         raise MachineCreationError("Rackspace, got exception %s" % e)
     return node
