@@ -257,7 +257,7 @@ class TestClass(unittest.TestCase):
             return
 
         for prov in providers:
-            if "SOUTHEAST" in prov['title']:
+            if "NORTHEAST" in prov['title']:
                 title = prov['title']
                 provider = prov['provider']
                 print "\n>>>Adding %s backend" % title
@@ -494,7 +494,7 @@ class TestClass(unittest.TestCase):
 
 
         for b_id in self.test_config['BACKENDS']:
-            if "EC2" in self.test_config['BACKENDS'][b_id]['title']:
+            if "EC2 AP SOUTHEAST" in self.test_config['BACKENDS'][b_id]['title']:
                 backend_id = b_id
                 break
 
