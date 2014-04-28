@@ -13,11 +13,11 @@ Feature: Images
     Scenario: Advance Search - Star Image
         When I click the "Add backend" button
         And I click the "Select provider" button
-        And i click the "EC2 AP Sydney" button
+        And i click the "EC2 AP SOUTHEAST" button
         And I use my "EC2" credentials
         And I click the "Add" button
         And I wait for 1 seconds
-            Then I should see the "EC2 AP Sydney" Backend added within 30 seconds
+            Then I should see the "EC2 AP SOUTHEAST" Backend added within 30 seconds
 
         When the images are loaded within 30 seconds
         When I click the "Images" button
