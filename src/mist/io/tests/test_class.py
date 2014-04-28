@@ -241,40 +241,6 @@ class TestClass(unittest.TestCase):
         for back in backends.list_backends(self.uri, cookie=self.cookie):
             print back['title']
 
-    def test_025_rename_backend(self):
-        """
-        --->Rename Backend
-
-        Adds a EC2 SOUTHEAST backend and renames it.
-        """
-        providers = self.test_config['SUPPORTED_PROVIDERS']
-        creds = self.credentials['EC2']
-        apikey = creds['api_key']
-        apisecret = creds['api_secret']
-
-        if not apikey or not apisecret:
-            print "\n>>>Could not find credentials for EC2, will not add backend"
-            return
-
-        for prov in providers:
-            if "NORTHEAST" in prov['title']:
-                title = prov['title']
-                provider = prov['provider']
-                print "\n>>>Adding %s backend" % title
-                backend = backends.add_backend(self.uri, title, provider, apikey, apisecret, cookie=self.cookie)
-                self.test_config['BACKENDS'][backend['id']] = backend
-                #TODO erase the break
-                break
-
-        backend_id = backend['id']
-        new_name = "Renamed Backend"
-        print "\n>>>Rename %s backend to %s" % (prov['title'], new_name)
-        backends.rename_backend(self.uri, backend_id, new_name, cookie=self.cookie)
-
-        print"\nList all backends:"
-        for back in backends.list_backends(self.uri, cookie=self.cookie):
-            print back['title']
-
 
     ###########KEYS ACTIONS#####################################
 
