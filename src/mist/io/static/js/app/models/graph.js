@@ -2,7 +2,7 @@ define('app/models/graph', ['ember'],
     //
     //  Graph Model
     //
-    //  @returns class
+    //  @returns Class
     //
     function () {
 
@@ -25,8 +25,8 @@ define('app/models/graph', ['ember'],
                 this.set('id', this.metric.target);
 
                 var divID = this.id;
-                var width = this.width;
-                var timeToDisplayms = this.timeToDisplay;
+                var width = $("#GraphsArea").width() -2;
+                var timeToDisplayms = 600000;
                 var yAxisValueFormat = this.format
 
                 var NUM_OF_MEASUREMENT = 60;
@@ -50,6 +50,7 @@ define('app/models/graph', ['ember'],
                 this.displayedData    = [];
                 this.xCordinates      = [];
                 this.clearAnimPending = false;
+
                 // Distance of two values in graph (pixels), Important For Animation
                 this.valuesDistance = 0;
 
@@ -98,7 +99,7 @@ define('app/models/graph', ['ember'],
                  */
                 function Animation(bufferSize){
 
-                    function _Animation(){
+                    function _Animation() {
                         this.d3Selector = null;
                         this.fps        = null;
                         this.duration   = null;
@@ -129,7 +130,6 @@ define('app/models/graph', ['ember'],
                             var animation_interval = window.setInterval(function(){
 
                                 frame++;
-
 
                                 // Get transform Value and aply it to the DOM
                                 var transformValue = interpolate(frame/(self.fps * self.duration));
@@ -271,7 +271,7 @@ define('app/models/graph', ['ember'],
 
                     // On first run append the Graph
                     if(!this.isAppended){
-                        appendGraph(this.metric, this.width, this.height);
+                        appendGraph(this.id, this.metric, this.width, this.height);
                         this.isAppended = true;
 
                         // Do staff after Graph is in the dom and we have data
@@ -664,7 +664,7 @@ define('app/models/graph', ['ember'],
                         }
                     }
 
-                        return null;
+                    return null;
                 }
 
 
@@ -707,11 +707,10 @@ define('app/models/graph', ['ember'],
                 * @param {number} width  - the width of the graph
                 * @param {height} height - the height of the graph
                 */
-                function appendGraph(metric, width, height){
+                function appendGraph(id, metric, width, height){
 
-                    var id = metric.target + '-graph';
-                    var fullMetric = Mist.metricsController.getMetric(metric.target);
-                    var name = fullMetric ? fullMetric.name : metric.target;
+                    id += '-graph';
+                    var name = metric.name;
 
                     // Generate graph's placeholder
                     d3.select('#graphs')
@@ -739,7 +738,6 @@ define('app/models/graph', ['ember'],
                         .attr('class', 'ui-btn ui-btn-icon-left ui-icon-carat-u ui-corner-all')
                         .attr('onclick',"Mist.monitoringController.UI.expandPressed('" + id + "')")
                         .text(name);
-
 
                     d3svg =  d3.select('#' + id)
                         .append('svg')

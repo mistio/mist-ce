@@ -10,11 +10,27 @@ define('app/models/metric', ['ember'],
 
         return Ember.Object.extend({
 
+
+            //
+            //
+            //  Properties
+            //
+            //
+
+
             id: null,
             unit: null,
             name: null,
             target: null,
             maxValue: null,
+
+
+            //
+            //
+            //  Initialization
+            //
+            //
+
 
             init: function () {
                 this._super();

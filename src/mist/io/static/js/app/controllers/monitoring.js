@@ -567,7 +567,8 @@ define('app/controllers/monitoring', ['app/models/graph',
 
                                 data.forEach(function(metric) {
 
-                                    var id = metric.target;
+                                    var id = metric.metric_id;
+                                    metric.id = id;
 
                                     receivedData[id] = [];
 
@@ -717,7 +718,7 @@ define('app/controllers/monitoring', ['app/models/graph',
             /**
             *
             *   Controlls all graphs,
-            *   It has instances of graphs pased by the view
+            *   It has instances of graphs passed by the view
             */
             graphs : {
 
@@ -744,13 +745,10 @@ define('app/controllers/monitoring', ['app/models/graph',
                 */
                 disableAnimation : function(stopCurrent) {
 
-                    // Default StopCurrent true
                     stopCurrent = stopCurrent || true;
 
-                    for(var metric in this.instances)
-                    {
+                    for (var metric in this.instances)
                         this.instances[metric].disableAnimation(stopCurrent);
-                    }
 
                     this.animationEnabled = false;
                 },
@@ -762,10 +760,8 @@ define('app/controllers/monitoring', ['app/models/graph',
                 */
                 changeTimeWindow : function(newTimeWindow) {
 
-                    for(metric in this.instances)
-                    {
+                    for (var metric in this.instances)
                         this.instances[metric].changeTimeWindow(newTimeWindow);
-                    }
                 },
 
 
@@ -808,11 +804,8 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *
                 */
                 clearData  : function() {
-
-                    for(metric in this.instances)
-                    {
+                    for (var metric in this.instances)
                         this.instances[metric].clearData();
-                    }
                 },
 
 
@@ -863,11 +856,10 @@ define('app/controllers/monitoring', ['app/models/graph',
                 expand : function(metrics,duration) {
 
                     // Mobile Hide Animation is slow, disabling animation
-                    var hideDuration = (typeof duration == 'undefined') ? 400 : duration;
-                    if (Mist.isClientMobile) {
+                    var hideDuration = duration || 400;
 
+                    if (Mist.isClientMobile)
                         hideDuration = 0;
-                    }
 
                     // Add graph to the end of the list
                     metrics.forEach(function(metric){
@@ -931,38 +923,23 @@ define('app/controllers/monitoring', ['app/models/graph',
                 },
 
 
-                /**
-                *
-                *
-                *
-                */
                 graphExists: function (graphId) {
                     return graphId in this.instances
                 },
 
 
-                /**
-                *
-                *
-                *
-                */
                 addGraph: function (metric) {
 
-                    if (this.graphExists(metric.target))
+                    var graphId = metric.id;
+
+                    if (this.graphExists(graphId))
                         return;
 
-                    /* BAD UGLY CODE!!!! */
-                    var width = $("#GraphsArea").width() -2;
-                    var timeToDisplay = 600000; // (10*60*1000)
-                    /* CHANGE ME!!! */
-
-                    this.instances[metric.target] = Graph.create({
+                    this.instances[graphId] = Graph.create({
+                                                id: graphId,
                                                 metric: metric,
-                                                width: width,
-                                                timeToDisplay: timeToDisplay
                                             });
                 },
-
 
                 instances        : null,    // Graph Objects created by the view
                 animationEnabled : true,
