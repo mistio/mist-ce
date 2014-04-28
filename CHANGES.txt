@@ -1,3 +1,24 @@
+0.9.8
+-----
+
+- add support for GCE, SoftLayer, HP Cloud, DigitalOcean & NephoScale
+- add support for bare metal servers
+- major improvements in graphs
+- major performance improvements
+- update dependencies (libcloud, jQueryMobile, Ember.js, d3.js)
+- allow custom ssh ports and usernames
+- allow manual installation of monitoring
+- major refactoring of backend and frontend code
+- added API & browser tests
+- improved image management
+- get additional info when probing machines
+
+...and many more smaller changes.
+ 
+A complete listing of merged pull requests is available at: 
+https://github.com/mistio/mist.io/pulls?direction=desc&sort=created&state=closed
+
+
 0.9.5
 -----
 

@@ -151,7 +151,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
             try:
                 conn = connect_provider(backend)
             except:
-                raise BackendUnauthorizedError() 
+                raise BackendUnauthorizedError()
             try:
                 machines = conn.list_nodes()
             except InvalidCredsError:
@@ -231,7 +231,7 @@ def add_key(user, key_id, private_key):
     keypair.machines = []
 
     if not keypair.isvalid():
-        raise KeyValidationError("Keypair could not be validated")
+        raise KeyValidationError()
 
     with user.lock_n_load():
         user.keypairs[key_id] = keypair
@@ -492,7 +492,7 @@ def connect_provider(backend):
     elif backend.provider == Provider.LINODE:
         conn = driver(backend.apisecret)
     elif backend.provider == Provider.GCE:
-        conn = driver(backend.apikey, backend.apisecret, project=backend.tenant_name)        
+        conn = driver(backend.apikey, backend.apisecret, project=backend.tenant_name)
     elif backend.provider in [Provider.RACKSPACE_FIRST_GEN,
                               Provider.RACKSPACE]:
         conn = driver(backend.apikey, backend.apisecret,
@@ -591,7 +591,7 @@ def list_machines(user, backend_id):
             tags = m.extra.get('tags')
         else:
             tags = m.extra.get('tags') or m.extra.get('metadata') or {}
-        if type(tags) == dict:            
+        if type(tags) == dict:
             tags = [value for key, value in tags.iteritems() if key != 'Name']
 
         if m.extra.get('availability', None):
@@ -1066,7 +1066,7 @@ def _machine_action(user, backend_id, machine_id, action):
             if node.id == machine_id:
                 machine = node
                 break
-    except:       
+    except:
         machine = Node(machine_id,
                    name=machine_id,
                    state=0,
@@ -1314,7 +1314,7 @@ def list_sizes(user, backend_id):
             sizes = conn.list_sizes(location='us-central1-a')
             sizes = [s for s in sizes if s.name and not s.name.endswith('-d')]
             #deprecated sizes for GCE
-            
+
         else:
             sizes = conn.list_sizes()
     except:
@@ -1419,9 +1419,9 @@ def set_machine_metadata(user, backend_id, machine_id, tag):
         if conn.type == 'gce':
             try:
                 machine.extra['tags'].append(tag)
-                conn.ex_set_node_tags(machine, machine.extra['tags'])            
+                conn.ex_set_node_tags(machine, machine.extra['tags'])
             except:
-                raise InternalServerError("error creating tag")            
+                raise InternalServerError("error creating tag")
         else:
             try:
                 machine.extra['metadata'].update(pair)
@@ -1488,10 +1488,10 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
         if conn.type == 'gce':
             try:
                 machine.extra['tags'].remove(tag)
-                conn.ex_set_node_tags(machine, machine.extra['tags'])            
+                conn.ex_set_node_tags(machine, machine.extra['tags'])
             except:
-                raise InternalServerError("Error while updating metadata")            
-        else:    
+                raise InternalServerError("Error while updating metadata")
+        else:
             tags = machine.extra.get('metadata', None)
             key = None
             for mkey, mdata in tags.iteritems():

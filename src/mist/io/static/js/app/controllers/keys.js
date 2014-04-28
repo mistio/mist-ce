@@ -60,8 +60,8 @@ define(['app/models/key'],
                     'priv': keyPrivate
                 }).success(function(key) {
                     that._addKey(key);
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to create key');
+                }).error(function(message) {
+                    Mist.notificationController.notify(message);
                 }).complete(function(success, key) {
                     that.set('addingKey', false);
                     if (callback) callback(success, key);
