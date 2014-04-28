@@ -759,7 +759,10 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
         node = conn.deploy_node(name=machine_name, image=image, size=size,
                                 location=location, deploy=msd, ex_keyname=server_key)
     except Exception as e:
-        raise MachineCreationError("Rackspace, got exception %s" % e)
+        if script:
+            raise MachineCreationError("Rackspace, got exception %s" % e)
+        else:
+            pass
     return node
 
 
