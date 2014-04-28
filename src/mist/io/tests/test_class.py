@@ -126,7 +126,7 @@ class TestClass(unittest.TestCase):
             return
 
         for prov in providers:
-            if "EC2" in prov['title']:
+            if "EC2 AP SOUTHEAST" in prov['title']:
                 title = prov['title']
                 provider = prov['provider']
                 print "\n>>>Adding %s backend" % title
