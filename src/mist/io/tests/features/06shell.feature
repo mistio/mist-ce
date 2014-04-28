@@ -15,7 +15,7 @@ Feature: Shell
         And I wait for 1 seconds
         And I click the "Select provider" button
         And I wait for 1 seconds
-        And i click the "EC2 AP NORTHEAST" button
+        And i click the "EC2 AP SOUTHEAST" button
         And I wait for 1 seconds
         And I use my "EC2" credentials
         And I wait for 1 seconds
