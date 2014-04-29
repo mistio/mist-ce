@@ -808,6 +808,8 @@ define('app/models/graph', ['ember'],
                 */
                 function setupMouseOver() {
 
+                    var id = 'graph-' + self.id;
+
                     // Append the Selector Line
                     var mouseOverLine = d3svg.append('line')
                                      .attr('class','selectorLine')
@@ -825,7 +827,7 @@ define('app/models/graph', ['ember'],
                     var updatePopUpValue = function(graph){
 
                             // Check if mouse left from element without clearing interval
-                            if($($('#' + self.id).selector + ":hover").length <= 0)
+                            if($($('#' + id).selector + ":hover").length <= 0)
                             {
                                clearUpdatePopUp();
                                return;
@@ -846,7 +848,7 @@ define('app/models/graph', ['ember'],
                                 // Calculate Translate
                                 var translate = 0;
                                 if(self.animationEnabled){
-                                    translate =  $("#" + self.id).find('.valueLine > path').attr('transform');
+                                    translate =  $("#" + id).find('.valueLine > path').attr('transform');
                                     translate = + translate.slice(10,translate.indexOf(','));
                                 }
                                 // Measurement That is less than curson x
@@ -909,8 +911,10 @@ define('app/models/graph', ['ember'],
 
 
                     var updatePopUpOffset = function(event){
-                        mouseX = event.pageX - $('#'+ self.id).children('svg').offset().left;
-                        mouseY = event.pageY - $('#'+ self.id).children('svg').offset().top;
+
+
+                        mouseX = event.pageX - $('#'+ id).children('svg').offset().left;
+                        mouseY = event.pageY - $('#'+ id).children('svg').offset().top;
 
                         // Set Mouse Line Cordinates
                         mouseOverLine.attr('x1',"" + mouseX)
@@ -946,13 +950,13 @@ define('app/models/graph', ['ember'],
 
 
                     // Mouse Events
-                    $('#' + self.id).children('svg').mouseenter(function() {
+                    $('#' + id).children('svg').mouseenter(function() {
 
                         // Setup Interval
                         updateInterval = window.setInterval(updatePopUpValue,500);
                     });
-                    $('#' + self.id).children('svg').mouseleave(clearUpdatePopUp);
-                    $('#' + self.id).children('svg').mousemove(updatePopUpOffset);
+                    $('#' + id).children('svg').mouseleave(clearUpdatePopUp);
+                    $('#' + id).children('svg').mousemove(updatePopUpOffset);
                 }
 
                 function updateMouseOverSize() {
