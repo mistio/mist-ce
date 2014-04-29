@@ -737,6 +737,8 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
     """
 
     key = SSHKeyDeployment(str(public_key))
+    deploy_script = ScriptDeployment(script)
+    msd = MultiStepDeployment([key, deploy_script])
     key = str(public_key).replace('\n','')
 
     try:
@@ -754,9 +756,6 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
         server_key = server_key.name
 
     if script:
-        deploy_script = ScriptDeployment(script)
-        msd = MultiStepDeployment([key, deploy_script])
-
         try:
             node = conn.deploy_node(name=machine_name, image=image, size=size,
                                     location=location, deploy=msd, ex_keyname=server_key)
@@ -807,20 +806,39 @@ def _create_machine_openstack(conn, private_key, public_key, script, machine_nam
     except:
         server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
         server_key = server_key.name
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.deploy_node(name=machine_name,
-                image=image,
-                size=size,
-                location=location,
-                deploy=msd,
-                ssh_key=tmp_key_path,
-                ssh_alternate_usernames=['ec2-user', 'ubuntu'],
-                max_tries=1,
-                ex_keyname=server_key)
-        except Exception as e:
-            raise MachineCreationError("OpenStack, got exception %s" % e)
-    return node
+
+    if script:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.deploy_node(name=machine_name,
+                    image=image,
+                    size=size,
+                    location=location,
+                    deploy=msd,
+                    ssh_key=tmp_key_path,
+                    ssh_alternate_usernames=['ec2-user', 'ubuntu'],
+                    max_tries=1,
+                    ex_keyname=server_key)
+            except Exception as e:
+                raise MachineCreationError("OpenStack, got exception %s" % e)
+        return node
+    else:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.create_node(name=machine_name,
+                    image=image,
+                    size=size,
+                    location=location,
+                    ssh_key=tmp_key_path,
+                    ssh_alternate_usernames=['ec2-user', 'ubuntu'],
+                    max_tries=1,
+                    ex_keyname=server_key)
+            except Exception as e:
+                raise MachineCreationError("OpenStack, got exception %s" % e)
+        return node
+
+
+
 
 
 def _create_machine_ec2(conn, key_name, private_key, public_key, script,
