@@ -10,7 +10,10 @@ define('app/controllers/monitoring', ['app/models/graph',
 
         'use strict';
 
-        return Ember.Object.extend(Ember.Evented,{
+        return Ember.Object.extend(Ember.Evented, {
+
+
+            _graphs: [], // Direct access to instances.graphs
 
             /**
              *
@@ -154,6 +157,7 @@ define('app/controllers/monitoring', ['app/models/graph',
 
                 // Get graphs from view
                 this.graphs.instances = args.graphs;
+                this.set('_graphs', this.graphs.instances);
 
                 // Get cookies and show graphs that are not collapsed
                 var collapsedMetrics = this.cookies.getCollapsedMetrics();
@@ -163,16 +167,13 @@ define('app/controllers/monitoring', ['app/models/graph',
                 } else{
 
                     // Hide graphs
-                    var metrics     = this.graphs.instances;
-                    var metricsKeys = [];
+                    var grahps = this.graphs.instances;
 
-                    for(var key in metrics){
-
-                        if(key == 'load') continue;
-                        metricsKeys.push(key);
-                    }
-
-                    this.graphs.collapse(metricsKeys,0);
+                    graph.forEach(function(graph) {
+                        if (grpah.id == 'grpah-load')
+                            return;
+                        slef.graphs.collapse(graph.id, 0);
+                    });
                 }
 
                 // TODO Change Step to seconds
@@ -738,10 +739,10 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *
                 */
                 enableAnimation  : function() {
-                    for(metric in this.instances)
-                    {
-                        this.instances[metric].enableAnimation();
-                    }
+
+                    this.instances.forEach(function (graph) {
+                        graph.enableAnimation();
+                    });
 
                     this.animationEnabled = true;
                 },
@@ -756,8 +757,9 @@ define('app/controllers/monitoring', ['app/models/graph',
 
                     stopCurrent = stopCurrent || true;
 
-                    for (var metric in this.instances)
-                        this.instances[metric].disableAnimation(stopCurrent);
+                    this.instances.forEach(function (graph) {
+                        graph.disableAnimation(stopCurrent);
+                    });
 
                     this.animationEnabled = false;
                 },
@@ -768,9 +770,9 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *   @param {number} newTimeWindow - The new time window in miliseconds
                 */
                 changeTimeWindow : function(newTimeWindow) {
-
-                    for (var metric in this.instances)
-                        this.instances[metric].changeTimeWindow(newTimeWindow);
+                    this.instances.forEach(function (graph) {
+                        graph.changeTimeWindow(newTimeWindow);
+                    });
                 },
 
 
@@ -792,8 +794,9 @@ define('app/controllers/monitoring', ['app/models/graph',
                     }
 
                     // Updating
-                    for(var metric in data)
-                        this.instances[metric].updateData(data[metric]);
+                    this.instances.forEach(function (graph) {
+                        graph.updateData(data[graph.id]);
+                    });
 
                     // Run after queued actions
                     var numOfActions = this.updateActions.after.length;
@@ -811,8 +814,9 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *
                 */
                 clearData  : function() {
-                    for (var metric in this.instances)
-                        this.instances[metric].clearData();
+                    this.instances.forEach(function (graph) {
+                        graph.clearData();
+                    });
                 },
 
 
@@ -921,7 +925,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *
                 */
                 reset: function() {
-                    this.instances        = null;
+                    Mist.monitoringController.set('_graphs', []);
                     this.animationEnabled = true;
                     this.updateActions    = {
                         before : [],
@@ -931,7 +935,7 @@ define('app/controllers/monitoring', ['app/models/graph',
 
 
                 graphExists: function (graphId) {
-                    return graphId in this.instances
+                    return !!this.instances.findBy('id', graphId);
                 },
 
 
@@ -942,13 +946,16 @@ define('app/controllers/monitoring', ['app/models/graph',
                     if (this.graphExists(graphId))
                         return;
 
-                    this.instances[graphId] = Graph.create({
-                                                id: graphId,
-                                                metric: metric,
-                                            });
+                    this.instances.pushObject(
+                        Graph.create({
+                            id: graphId,
+                            title: metric.name,
+                            metric: metric,
+                        })
+                    );
                 },
 
-                instances        : null,    // Graph Objects created by the view
+                instances        : [],    // Graph Objects created by the view
                 animationEnabled : true,
                 updateActions    : {
                     before : [],

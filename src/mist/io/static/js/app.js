@@ -54,6 +54,7 @@ define( 'app', [
     'app/views/backend_edit',
     'app/views/confirmation_dialog',
     'app/views/file_upload',
+    'app/views/graph',
     'app/views/home',
     'app/views/image_list',
     'app/views/image_list_item',
@@ -112,6 +113,7 @@ define( 'app', [
     BackendEdit,
     ConfirmationDialog,
     FileUploadView,
+    GraphView,
     Home,
     ImageListView,
     ImageListItem,
@@ -278,6 +280,7 @@ define( 'app', [
 
         App.set('homeView', Home);
         App.set('ruleView', RuleView);
+        App.set('graphView', GraphView);
         App.set('loginView', LoginView);
         App.set('keyAddView', KeyAddView);
         App.set('keyView', SingleKeyView);

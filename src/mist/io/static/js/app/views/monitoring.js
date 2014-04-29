@@ -9,7 +9,7 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
 
         return TemplatedView.extend({
 
-            graphs : {},
+            graphs : [],
             viewRendered: false,
 
             /**
@@ -97,12 +97,9 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
                                 $(window).resize(function(){
 
                                     var newWidth = $("#GraphsArea").width() -2;
-                                    for(var metric in self.graphs){
-                                        try {
-                                         self.graphs[metric].changeWidth(newWidth);
-                                        } catch(e) {
-                                        }
-                                    }
+                                    self.graphs.forEach(function (graph) {
+                                        graph.changeWidth(newWidth);
+                                    });
                                 })
 
                             });

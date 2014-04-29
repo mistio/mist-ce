@@ -26,7 +26,11 @@
 
     <div class="valuePopUp"></div>
 
-    <div id="graphs"></div>
+    <div id="graphs">
+        {{#each Mist.monitoringController._graphs}}
+            {{view Mist.graphView graphBinding="this"}}
+        {{/each}}
+    </div>
 
     <div id="graphBar"></div>
 </div>

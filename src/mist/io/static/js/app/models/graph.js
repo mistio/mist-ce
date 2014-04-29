@@ -267,13 +267,15 @@ define('app/models/graph', ['ember'],
                     }
 
                     // On first run append the Graph
+                    /*
                     if(!this.isAppended){
-                        appendGraph(this.id, this.metric, this.width, this.height);
+                        this.appendGraph(this.id, this.metric, this.width, this.height);
                         this.isAppended = true;
 
                         // Do staff after Graph is in the dom and we have data
                         onInitialized();
                     }
+                    */
 
                     // Set Our New Data
                     this.data = this.data.concat(newData);
@@ -307,6 +309,15 @@ define('app/models/graph', ['ember'],
                 * redraws value line, x-axis, labels and grid
                 */
                 this.updateView = function() {
+
+                    // Delay update until graph
+                    // has been appended into the DOM
+                    if (!this.isAppended) {
+                        Ember.run.later(this, function () {
+                            this.updateView();
+                        }, 100);
+                        return;
+                    }
 
                     var self = this;
 
@@ -433,7 +444,6 @@ define('app/models/graph', ['ember'],
                         console.log("time updated");
                         this.clearAnimation();
                     }*/
-
 
 
                     // Animate line, axis and grid
@@ -704,27 +714,10 @@ define('app/models/graph', ['ember'],
                 * @param {number} width  - the width of the graph
                 * @param {height} height - the height of the graph
                 */
-                function appendGraph(id, metric, width, height){
+                this.appendGraph = function(id, metric, width, height){
 
                     id = 'graph-' + id;
                     var name = metric.name;
-
-                    // Generate graph's placeholder
-                    d3.select('#graphs')
-                        .insert('div')
-                        .attr('id', id)
-                        .attr('class','graph')
-                        .insert('div').attr('class','header')
-                        .insert('div').attr('class','title')
-                        .text(name);
-
-                    // Generate graph's collapse button
-                    d3.select('#' + id)
-                        .select('.header')
-                        .insert('div')
-                        .attr('class','closeBtn')
-                        .attr('onclick',"Mist.monitoringController.UI.collapsePressed('" + id + "')")
-                        .text('-');
 
                     // Generate graph's expand button
                     d3.select('#graphBar')
@@ -789,6 +782,9 @@ define('app/models/graph', ['ember'],
                     d3yAxis = d3svg.append('g')
                         .attr('class','y-axis')
                         .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
+
+                    this.isAppended = true;
+                    onInitialized();
                 }
 
                 /*

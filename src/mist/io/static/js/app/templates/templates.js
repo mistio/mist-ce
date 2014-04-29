@@ -6,6 +6,7 @@ if (!JS_BUILD) {
     'text!app/templates/backend_edit.html',
     'text!app/templates/confirmation_dialog.html',
     'text!app/templates/file_upload.html',
+    'text!app/templates/graph.html',
     'text!app/templates/home.html',
     'text!app/templates/image_list.html',
     'text!app/templates/image_list_item.html',
@@ -39,33 +40,34 @@ if (!JS_BUILD) {
     Ember.TEMPLATES['backend_edit/html'] = Ember.Handlebars.compile(arguments[1]);
     Ember.TEMPLATES['confirmation_dialog/html'] = Ember.Handlebars.compile(arguments[2]);
     Ember.TEMPLATES['file_upload/html'] = Ember.Handlebars.compile(arguments[3]);
-    Ember.TEMPLATES['home/html'] = Ember.Handlebars.compile(arguments[4]);
-    Ember.TEMPLATES['image_list/html'] = Ember.Handlebars.compile(arguments[5]);
-    Ember.TEMPLATES['image_list_item/html'] = Ember.Handlebars.compile(arguments[6]);
-    Ember.TEMPLATES['key/html'] = Ember.Handlebars.compile(arguments[7]);
-    Ember.TEMPLATES['key_add/html'] = Ember.Handlebars.compile(arguments[8]);
-    Ember.TEMPLATES['key_edit/html'] = Ember.Handlebars.compile(arguments[9]);
-    Ember.TEMPLATES['key_list/html'] = Ember.Handlebars.compile(arguments[10]);
-    Ember.TEMPLATES['key_list_item/html'] = Ember.Handlebars.compile(arguments[11]);
-    Ember.TEMPLATES['login/html'] = Ember.Handlebars.compile(arguments[12]);
-    Ember.TEMPLATES['machine/html'] = Ember.Handlebars.compile(arguments[13]);
-    Ember.TEMPLATES['machine_add/html'] = Ember.Handlebars.compile(arguments[14]);
-    Ember.TEMPLATES['machine_keys/html'] = Ember.Handlebars.compile(arguments[15]);
-    Ember.TEMPLATES['machine_keys_list_item/html'] = Ember.Handlebars.compile(arguments[16]);
-    Ember.TEMPLATES['machine_list/html'] = Ember.Handlebars.compile(arguments[17]);
-    Ember.TEMPLATES['machine_list_item/html'] = Ember.Handlebars.compile(arguments[18]);
-    Ember.TEMPLATES['machine_manual_monitoring/html'] = Ember.Handlebars.compile(arguments[19]);
-    Ember.TEMPLATES['machine_power/html'] = Ember.Handlebars.compile(arguments[20]);
-    Ember.TEMPLATES['machine_shell/html'] = Ember.Handlebars.compile(arguments[21]);
-    Ember.TEMPLATES['machine_shell_list_item/html'] = Ember.Handlebars.compile(arguments[22]);
-    Ember.TEMPLATES['machine_tags/html'] = Ember.Handlebars.compile(arguments[23]);
-    Ember.TEMPLATES['machine_tags_list_item/html'] = Ember.Handlebars.compile(arguments[24]);
-    Ember.TEMPLATES['messagebox/html'] = Ember.Handlebars.compile(arguments[25]);
-    Ember.TEMPLATES['metric_add/html'] = Ember.Handlebars.compile(arguments[26]);
-    Ember.TEMPLATES['monitoring/html'] = Ember.Handlebars.compile(arguments[27]);
-    Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[28]);
-    Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[29]);
-    Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[30]);
+    Ember.TEMPLATES['graph/html'] = Ember.Handlebars.compile(arguments[4]);
+    Ember.TEMPLATES['home/html'] = Ember.Handlebars.compile(arguments[5]);
+    Ember.TEMPLATES['image_list/html'] = Ember.Handlebars.compile(arguments[6]);
+    Ember.TEMPLATES['image_list_item/html'] = Ember.Handlebars.compile(arguments[7]);
+    Ember.TEMPLATES['key/html'] = Ember.Handlebars.compile(arguments[8]);
+    Ember.TEMPLATES['key_add/html'] = Ember.Handlebars.compile(arguments[9]);
+    Ember.TEMPLATES['key_edit/html'] = Ember.Handlebars.compile(arguments[10]);
+    Ember.TEMPLATES['key_list/html'] = Ember.Handlebars.compile(arguments[11]);
+    Ember.TEMPLATES['key_list_item/html'] = Ember.Handlebars.compile(arguments[12]);
+    Ember.TEMPLATES['login/html'] = Ember.Handlebars.compile(arguments[13]);
+    Ember.TEMPLATES['machine/html'] = Ember.Handlebars.compile(arguments[14]);
+    Ember.TEMPLATES['machine_add/html'] = Ember.Handlebars.compile(arguments[15]);
+    Ember.TEMPLATES['machine_keys/html'] = Ember.Handlebars.compile(arguments[16]);
+    Ember.TEMPLATES['machine_keys_list_item/html'] = Ember.Handlebars.compile(arguments[17]);
+    Ember.TEMPLATES['machine_list/html'] = Ember.Handlebars.compile(arguments[18]);
+    Ember.TEMPLATES['machine_list_item/html'] = Ember.Handlebars.compile(arguments[19]);
+    Ember.TEMPLATES['machine_manual_monitoring/html'] = Ember.Handlebars.compile(arguments[20]);
+    Ember.TEMPLATES['machine_power/html'] = Ember.Handlebars.compile(arguments[21]);
+    Ember.TEMPLATES['machine_shell/html'] = Ember.Handlebars.compile(arguments[22]);
+    Ember.TEMPLATES['machine_shell_list_item/html'] = Ember.Handlebars.compile(arguments[23]);
+    Ember.TEMPLATES['machine_tags/html'] = Ember.Handlebars.compile(arguments[24]);
+    Ember.TEMPLATES['machine_tags_list_item/html'] = Ember.Handlebars.compile(arguments[25]);
+    Ember.TEMPLATES['messagebox/html'] = Ember.Handlebars.compile(arguments[26]);
+    Ember.TEMPLATES['metric_add/html'] = Ember.Handlebars.compile(arguments[27]);
+    Ember.TEMPLATES['monitoring/html'] = Ember.Handlebars.compile(arguments[28]);
+    Ember.TEMPLATES['rule/html'] = Ember.Handlebars.compile(arguments[29]);
+    Ember.TEMPLATES['rule_edit/html'] = Ember.Handlebars.compile(arguments[30]);
+    Ember.TEMPLATES['user_menu/html'] = Ember.Handlebars.compile(arguments[31]);
   });
   return;
 }
@@ -416,6 +418,15 @@ function program1(depth0,data) {
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
   data.buffer.push(">Done</a>\n        </div>\n    </div>\n</div>\n");
+  return buffer;
+  
+});
+Ember.TEMPLATES["graph/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
+this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
+  var buffer = '';
+
+
   return buffer;
   
 });
@@ -1102,7 +1113,7 @@ function program2(depth0,data) {
 function program4(depth0,data) {
   
   
-  data.buffer.push("\n                <a class=\"ui-state-disabled\" data-role=\"button\" data-icon=\"plus\" data-iconpos=\"right\">Add key</a>\n            ");
+  data.buffer.push("\n                <a class=\"ui-btn ui-btn-icon-right ui-icon-plus\n                    ui-corner-all ui-state-disabled\">\n                        Add key\n                </a>\n            ");
   }
 
 function program6(depth0,data) {
@@ -1118,30 +1129,30 @@ function program6(depth0,data) {
 function program7(depth0,data) {
   
   var buffer = '', hashContexts, hashTypes;
-  data.buffer.push("\n                <a data-role=\"button\" ");
+  data.buffer.push("\n                <a class=\"ui-btn ui-shadow ui-corner-all\"\n                    ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "manageKeysClicked", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">");
+  data.buffer.push(">\n                        ");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "keysCount", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(" keys</a>\n            ");
+  data.buffer.push(" keys\n                </a>\n            ");
   return buffer;
   }
 
 function program9(depth0,data) {
   
   var buffer = '', hashContexts, hashTypes;
-  data.buffer.push("\n                <a data-role=\"button\"\n                   data-theme=\"d\"\n                   data-icon=\"plus\"\n                   data-iconpos=\"right\"\n                   data-mini=\"false\"\n                   ");
+  data.buffer.push("\n                <a class=\"ui-btn ui-btn-d ui-btn-icon-right ui-icon-plus ui-corner-all\"\n                    ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "addKeyClicked", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Add key</a>\n            ");
+  data.buffer.push(">\n                        Add key\n                </a>\n            ");
   return buffer;
   }
 
@@ -1315,13 +1326,13 @@ function program33(depth0,data) {
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "view.lastProbe", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n                             <button id=\"machine-probe-btn\"\n                                    data-theme=\"a\"\n                                    data-mini=\"true\"\n                                    ");
+  data.buffer.push("\n                             <a id=\"machine-probe-btn\"\n                                class=\"ui-btn ui-shadow ui-corner-all\"\n                                data-mini=\"true\"\n                                ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "probeClicked", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Probe</button>\n                         ");
+  data.buffer.push(">\n                                    Probe\n                            </a>\n                         ");
   return buffer;
   }
 
@@ -2842,109 +2853,25 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   var buffer = '', hashContexts, hashTypes, escapeExpression=this.escapeExpression;
 
 
-  data.buffer.push("<div class=\"graphControls\">\n\n    <div class=\"graphZoomer\">\n        <select id='zoomSelect' data-inline='true' onChange=\"Mist.monitoringController.UI.zoomChange()\">\n            <option value='0' selected='true'>Last 10 Minutes</option>\n            <option value='1' >Last 1 Hour</option>\n            <option value='2' >Last 1 Day</option>\n            <option value='3' >Last 1 Week</option>\n            <option value='4' >Last 1 Month</option>\n        </select> \n    </div>\n\n    <div class=\"graphMover\">\n        <a id='graphsGoBack' href=\"#\" data-role=\"button\" data-inline=\"true\" \n           ");
+  data.buffer.push("<div class=\"graphControls\">\n\n    <div class=\"graphZoomer\">\n        <select id='zoomSelect' data-inline='true' onChange=\"Mist.monitoringController.UI.zoomChange()\">\n            <option value='0' selected='true'>Last 10 Minutes</option>\n            <option value='1' >Last 1 Hour</option>\n            <option value='2' >Last 1 Day</option>\n            <option value='3' >Last 1 Week</option>\n            <option value='4' >Last 1 Month</option>\n        </select>\n    </div>\n\n    <div class=\"graphMover\">\n        <a id='graphsGoBack' href=\"#\" data-role=\"button\" data-inline=\"true\"\n           ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "goBack", {hash:{
     'target': ("Mist.monitoringController.history")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">&lt;&lt;</a>\n                          \n        <a id='graphsResetHistory' href=\"#\" data-role=\"button\" data-theme=\"b\" data-inline=\"true\" \n            ");
+  data.buffer.push(">&lt;&lt;</a>\n\n        <a id='graphsResetHistory' href=\"#\" data-role=\"button\" data-theme=\"b\" data-inline=\"true\"\n            ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "disable", {hash:{
     'target': ("Mist.monitoringController.history")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Reset</a>\n        <a id='graphsGoForward' href=\"#\" data-role=\"button\" data-inline=\"true\" \n            ");
+  data.buffer.push(">Reset</a>\n        <a id='graphsGoForward' href=\"#\" data-role=\"button\" data-inline=\"true\"\n            ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "goForward", {hash:{
     'target': ("Mist.monitoringController.history")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">&gt;&gt;</a>\n    </div>\n   \n</div>\n\n<div id=\"GraphsArea\">\n  \n    <div class=\"valuePopUp\"></div>\n        \n    <!-- Graphs -->\n    <div id=\"cpuGraph\" class=\"graph\">\n        <div class='header'>\n          <div class=\"title\">CPU</div>\n          <div class='closeBtn' ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "collapsePressed", "view.graphs.cpu.name", {hash:{
-    'target': ("Mist.monitoringController.UI")
-  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">-</div>\n        </div>\n    </div>\n    <div id=\"loadGraph\" class=\"graph\">\n        <div class='header'>\n          <div class=\"title\">Load</div>\n          <div class='closeBtn' ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "collapsePressed", "view.graphs.load.name", {hash:{
-    'target': ("Mist.monitoringController.UI")
-  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">-</div>\n        </div>\n    </div>\n    <div id=\"memoryGraph\" class=\"graph\">\n        <div class='header'>\n          <div class=\"title\">Memory</div>\n          <div class='closeBtn' ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "collapsePressed", "view.graphs.memory.name", {hash:{
-    'target': ("Mist.monitoringController.UI")
-  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">-</div>\n        </div>\n    </div>\n    <div id=\"diskReadGraph\" class=\"graph\">\n        <div class='header'>\n          <div class=\"title\">Disk Read (B/s)</div>\n          <div class='closeBtn' ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "collapsePressed", "view.graphs.diskRead.name", {hash:{
-    'target': ("Mist.monitoringController.UI")
-  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">-</div>\n        </div>\n    </div>\n    <div id=\"diskWriteGraph\" class=\"graph\">\n        <div class='header'>\n          <div class=\"title\">Disk Write (B/s)</div>\n          <div class='closeBtn' ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "collapsePressed", "view.graphs.diskWrite.name", {hash:{
-    'target': ("Mist.monitoringController.UI")
-  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">-</div>\n        </div>\n    </div>\n\n    <div id=\"networkTXGraph\" class=\"graph\">\n        <div class='header'>\n          <div class=\"title\">Network Tx (B/s)</div>\n          <div class='closeBtn' ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "collapsePressed", "view.graphs.networkTX.name", {hash:{
-    'target': ("Mist.monitoringController.UI")
-  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">-</div>\n        </div>\n    </div>\n\n    <div id=\"networkRXGraph\" class=\"graph\">\n        <div class='header'>\n          <div class=\"title\">Network Rx (B/s)</div>\n          <div class='closeBtn' ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "collapsePressed", "view.graphs.networkRX.name", {hash:{
-    'target': ("Mist.monitoringController.UI")
-  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">-</div>\n        </div>\n    </div>\n\n\n    <!-- Graph Buttons -->\n    <div id=\"graphBar\">\n        <div id=\"cpuGraphBtn\" class=\"graphBtn\">\n            <button data-icon=\"carat-u\" data-theme=\"c\" \n                ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "expandPressed", "view.graphs.cpu.name", {hash:{
-    'target': ("Mist.monitoringController.UI")
-  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">CPU</button>\n        </div>\n\n        <div id=\"loadGraphBtn\" class=\"graphBtn\">\n            <button data-icon=\"carat-u\" data-theme=\"c\"\n                ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "expandPressed", "view.graphs.load.name", {hash:{
-    'target': ("Mist.monitoringController.UI")
-  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Load</button>\n        </div>\n    \n        <div id=\"memoryGraphBtn\" class=\"graphBtn\">\n            <button data-icon=\"carat-u\" data-theme=\"c\"\n                ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "expandPressed", "view.graphs.memory.name", {hash:{
-    'target': ("Mist.monitoringController.UI")
-  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Memory</button>\n        </div>\n    \n        <div id=\"diskReadGraphBtn\" class=\"graphBtn\">\n            <button data-icon=\"carat-u\" data-theme=\"c\"\n                ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "expandPressed", "view.graphs.diskRead.name", {hash:{
-    'target': ("Mist.monitoringController.UI")
-  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Disk Read</button>\n        </div>\n    \n        <div id=\"diskWriteGraphBtn\" class=\"graphBtn\">\n            <button data-icon=\"carat-u\" data-theme=\"c\"\n                ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "expandPressed", "view.graphs.diskWrite.name", {hash:{
-    'target': ("Mist.monitoringController.UI")
-  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Disk Write</button>\n        </div>\n    \n        <div id=\"networkTXGraphBtn\" class=\"graphBtn\">\n            <button data-icon=\"carat-u\" data-theme=\"c\"\n                ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "expandPressed", "view.graphs.networkTX.name", {hash:{
-    'target': ("Mist.monitoringController.UI")
-  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Network Tx</button>\n        </div>\n    \n        <div  id=\"networkRXGraphBtn\" class=\"graphBtn\">\n            <button data-icon=\"carat-u\" data-theme=\"c\"\n                ");
-  hashContexts = {'target': depth0};
-  hashTypes = {'target': "STRING"};
-  data.buffer.push(escapeExpression(helpers.action.call(depth0, "expandPressed", "view.graphs.networkRX.name", {hash:{
-    'target': ("Mist.monitoringController.UI")
-  },contexts:[depth0,depth0],types:["STRING","ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Network Rx</button>\n        </div>\n    </div>\n</div>");
+  data.buffer.push(">&gt;&gt;</a>\n    </div>\n\n</div>\n\n<div id=\"GraphsArea\">\n\n    <div class=\"valuePopUp\"></div>\n\n    <div id=\"graphs\"></div>\n\n    <div id=\"graphBar\"></div>\n</div>");
   return buffer;
   
 });
@@ -2956,19 +2883,19 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   
-  data.buffer.push("\n    <div class=\"ajax-loader\"></div>\n    ");
+  data.buffer.push("\n        <div class=\"ajax-loader\"></div>\n    ");
   }
 
 function program3(depth0,data) {
   
   var buffer = '', hashContexts, hashTypes;
-  data.buffer.push("\n    <div class=\"delete-rule-container\">\n        <button class=\"delete-rule-button\"\n                data-role=\"button\"\n                data-icon=\"delete\"\n                data-iconpos=\"notext\"\n                data-mini=\"true\"\n                ");
+  data.buffer.push("\n        <div class=\"delete-rule-container\">\n            <a class=\"delete-rule-button ui-btn ui-btn-icon-notext ui-icon-delete ui-corner-all\"\n                    ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "deleteRuleClicked", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">&nbsp;</button>\n    </div>\n    ");
+  data.buffer.push(">&nbsp;</a>\n        </div>\n    ");
   return buffer;
   }
 
@@ -2976,58 +2903,58 @@ function program3(depth0,data) {
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers.unbound.call(depth0, "id", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\">\n    <div class=\"rule-if\">if</div>\n\n    <a href=\"#\"\n        class=\"rule-button metric\"\n        data-role=\"button\"\n        data-iconpos=\"right\"\n        data-inline=\"true\"\n        ");
+  data.buffer.push("\">\n\n    <div class=\"rule-if\">if</div>\n\n    <a class=\"rule-button metric ui-btn ui-btn-inline ui-shadow ui-corner-all\"\n        ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "openMetricPopup", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">");
+  data.buffer.push(">\n            ");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "metric.name", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("</a>\n\n    <a href=\"#\"\n        class=\"rule-button operator\"\n        data-role=\"button\"\n        data-icon=\"false\"\n        data-inline=\"true\"\n        ");
+  data.buffer.push("\n    </a>\n\n    <a class=\"rule-button operator ui-btn ui-btn-inline ui-shadow ui-corner-all\"\n        ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "openOperatorPopup", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">");
+  data.buffer.push(">\n            ");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "operator.symbol", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("</a>\n\n    <div class=\"rule-unit\">");
+  data.buffer.push("\n    </a>\n\n    <div class=\"rule-unit\">\n        ");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "metric.unit", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("</div>\n    <input type=\"number\"\n        data-type=\"range\"\n        data-highlight=\"true\"\n        class=\"rule-value\"\n        ");
-  hashContexts = {'value': depth0};
-  hashTypes = {'value': "STRING"};
-  data.buffer.push(escapeExpression(helpers.bindAttr.call(depth0, {hash:{
-    'value': ("value")
-  },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n        min=\"0\"\n        ");
+  data.buffer.push("\n    </div>\n\n    <input class=\"rule-value\" data-highlight=\"true\" min=\"0\" type=\"range\"\n        ");
   hashContexts = {'max': depth0};
   hashTypes = {'max': "STRING"};
   data.buffer.push(escapeExpression(helpers.bindAttr.call(depth0, {hash:{
     'max': ("metric.maxValue")
   },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(" />\n\n    <div class=\"rule-then\">then</div>\n\n    <a href=\"#\"\n        class=\"rule-button action\"\n        data-role=\"button\"\n        data-icon=\"false\"\n        data-inline=\"true\"\n        ");
+  data.buffer.push("\n        ");
+  hashContexts = {'value': depth0};
+  hashTypes = {'value': "STRING"};
+  data.buffer.push(escapeExpression(helpers.bindAttr.call(depth0, {hash:{
+    'value': ("value")
+  },contexts:[],types:[],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push(" />\n\n    <div class=\"rule-then\">then</div>\n\n    <a class=\"rule-button action ui-btn ui-btn-inline ui-shadow ui-corner-all\"\n        ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "openActionPopup", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">");
+  data.buffer.push(">\n            ");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "actionToTake", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("</a>\n\n    ");
+  data.buffer.push("\n    </a>\n\n    ");
   hashTypes = {};
   hashContexts = {};
   stack1 = helpers['if'].call(depth0, "pendingAction", {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
   if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
-  data.buffer.push("\n\n</div>\n");
+  data.buffer.push("\n</div>\n");
   return buffer;
   
 });
