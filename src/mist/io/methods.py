@@ -964,24 +964,44 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
         if console_keys:
             console_key = console_keys[0].id
 
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.deploy_node(
-                name=machine_name,
-                hostname=machine_name[:15],
-                image=image,
-                size=size,
-                zone=location.id,
-                server_key=server_key,
-                console_key=console_key,
-                ssh_key=tmp_key_path,
-                connect_attempts=20,
-                ex_wait=True,
-                deploy=deploy_script
-            )
-        except Exception as e:
-            raise MachineCreationError("Nephoscale, got exception %s" % e)
-    return node
+    if script:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.deploy_node(
+                    name=machine_name,
+                    hostname=machine_name[:15],
+                    image=image,
+                    size=size,
+                    zone=location.id,
+                    server_key=server_key,
+                    console_key=console_key,
+                    ssh_key=tmp_key_path,
+                    connect_attempts=20,
+                    ex_wait=True,
+                    deploy=deploy_script
+                )
+            except Exception as e:
+                raise MachineCreationError("Nephoscale, got exception %s" % e)
+        return node
+    else:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.create_node(
+                    name=machine_name,
+                    hostname=machine_name[:15],
+                    image=image,
+                    size=size,
+                    zone=location.id,
+                    server_key=server_key,
+                    console_key=console_key,
+                    ssh_key=tmp_key_path,
+                    connect_attempts=20,
+                    nowait=True,
+                    deploy=deploy_script
+                )
+            except Exception as e:
+                raise MachineCreationError("Nephoscale, got exception %s" % e)
+        return node
 
 
 def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
