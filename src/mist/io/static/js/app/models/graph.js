@@ -64,7 +64,8 @@ define('app/models/graph', ['ember'],
                 var valueline = d3.svg.line()
                                 .x(function(d) {return xScale(d.time); })
                                 .y(function(d) {return yScale(d.value); })
-                                .defined(function(d) {return d.value != null });
+                                .defined(function(d) {return d.value != null })
+                                .interpolate('monotone');
 
 
                 // valuearea is function that fills the space under the main line
@@ -72,7 +73,8 @@ define('app/models/graph', ['ember'],
                                 .x(function(d) {return xScale(d.time); })
                                 .y1(function(d) {return yScale(d.value); })
                                 .y0(height)
-                                .defined(function(d) {return d.value != null });
+                                .defined(function(d) {return d.value != null })
+                                .interpolate('monotone');
 
                 // ---------------  SVG elements for graph manipulation --------------------- //
                 // Elements will be added to the dom after first updateData().
