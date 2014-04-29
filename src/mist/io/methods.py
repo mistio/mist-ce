@@ -1071,26 +1071,47 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
     except:
         key = conn.ex_create_ssh_key('mist.io', key)
 
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.deploy_node(
-                name=machine_name,
-                image=image,
-                size=size,
-                ex_ssh_key_ids=[str(key.id)],
-                location=location,
-                ssh_key=tmp_key_path,
-                ssh_alternate_usernames=['root']*5,
-                #attempt to fix the Connection reset by peer exception
-                #that is (most probably) created due to a race condition
-                #while deploy_node establishes a connection and the
-                #ssh server is restarted on the created node
-                private_networking=True,
-                deploy=deploy_script
-            )
-        except Exception as e:
-            raise MachineCreationError("Digital Ocean, got exception %s" % e)
-    return node
+    if script:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.deploy_node(
+                    name=machine_name,
+                    image=image,
+                    size=size,
+                    ex_ssh_key_ids=[str(key.id)],
+                    location=location,
+                    ssh_key=tmp_key_path,
+                    ssh_alternate_usernames=['root']*5,
+                    #attempt to fix the Connection reset by peer exception
+                    #that is (most probably) created due to a race condition
+                    #while deploy_node establishes a connection and the
+                    #ssh server is restarted on the created node
+                    private_networking=True,
+                    deploy=deploy_script
+                )
+            except Exception as e:
+                raise MachineCreationError("Digital Ocean, got exception %s" % e)
+        return node
+    else:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.create_node(
+                    name=machine_name,
+                    image=image,
+                    size=size,
+                    ex_ssh_key_ids=[str(key.id)],
+                    location=location,
+                    ssh_key=tmp_key_path,
+                    ssh_alternate_usernames=['root']*5,
+                    #attempt to fix the Connection reset by peer exception
+                    #that is (most probably) created due to a race condition
+                    #while deploy_node establishes a connection and the
+                    #ssh server is restarted on the created node
+                    private_networking=True,
+                )
+            except Exception as e:
+                raise MachineCreationError("Digital Ocean, got exception %s" % e)
+        return node
 
 
 def _create_machine_gce(conn, key_name, private_key, public_key,
