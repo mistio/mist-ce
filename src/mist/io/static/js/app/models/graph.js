@@ -706,8 +706,8 @@ define('app/models/graph', ['ember'],
                 */
                 function appendGraph(id, metric, width, height){
 
-                    id = '_' + id + '-graph';
-                    var name = ''+metric.name;
+                    id = 'graph-' + id;
+                    var name = metric.name;
 
                     // Generate graph's placeholder
                     d3.select('#graphs')
