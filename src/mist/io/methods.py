@@ -1022,20 +1022,36 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
     else:
         domain = None
         name = machine_name
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.deploy_node(
-                name=name,
-                ex_domain=domain,
-                image=image,
-                size=size,
-                deploy=msd,
-                location=location,
-                ssh_key=tmp_key_path
-            )
-        except Exception as e:
-            raise MachineCreationError("Softlayer, got exception %s" % e)
-    return node
+
+    if script:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.deploy_node(
+                    name=name,
+                    ex_domain=domain,
+                    image=image,
+                    size=size,
+                    deploy=msd,
+                    location=location,
+                    ssh_key=tmp_key_path
+                )
+            except Exception as e:
+                raise MachineCreationError("Softlayer, got exception %s" % e)
+        return node
+    else:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.create_node(
+                    name=name,
+                    ex_domain=domain,
+                    image=image,
+                    size=size,
+                    location=location,
+                    ssh_key=tmp_key_path
+                )
+            except Exception as e:
+                raise MachineCreationError("Softlayer, got exception %s" % e)
+        return node
 
 
 def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
