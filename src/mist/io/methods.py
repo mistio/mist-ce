@@ -737,8 +737,6 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
     """
 
     key = SSHKeyDeployment(str(public_key))
-    deploy_script = ScriptDeployment(script)
-    msd = MultiStepDeployment([key, deploy_script])
     key = str(public_key).replace('\n','')
 
     try:
@@ -755,16 +753,32 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
         server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
         server_key = server_key.name
 
-    try:
-        node = conn.deploy_node(name=machine_name, image=image, size=size,
-                                location=location, deploy=msd, ex_keyname=server_key)
+    if script:
+        deploy_script = ScriptDeployment(script)
+        msd = MultiStepDeployment([key, deploy_script])
 
-        return node
-    except Exception as e:
-        if script:
-            raise MachineCreationError("Script Deployment got exception: %r" % e)
-        else:
-            raise MachineCreationError("Rackspace, got exception %r" % e)
+        try:
+            node = conn.deploy_node(name=machine_name, image=image, size=size,
+                                    location=location, deploy=msd, ex_keyname=server_key)
+
+            return node
+        except Exception as e:
+            if script:
+                raise MachineCreationError("Script Deployment got exception: %r" % e)
+            else:
+                raise MachineCreationError("Rackspace, got exception %r" % e)
+
+    else:
+        try:
+            node = conn.create_node(name=machine_name, image=image, size=size,
+                                    location=location, ex_keyname=server_key)
+
+            return node
+        except Exception as e:
+            if script:
+                raise MachineCreationError("Script Deployment got exception: %r" % e)
+            else:
+                raise MachineCreationError("Rackspace, got exception %r" % e)
 
 
 def _create_machine_openstack(conn, private_key, public_key, script, machine_name,
