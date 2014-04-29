@@ -23,18 +23,6 @@ define('app/views/graph', ['app/views/templated'],
 
             //
             //
-            //  Computed Properties
-            //
-            //
-
-
-            graphId: function () {
-                return 'graph-' + this.graph.id;
-            }.property('graph'),
-
-
-            //
-            //
             //  Initialization
             //
             //

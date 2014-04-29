@@ -572,7 +572,6 @@ define('app/controllers/monitoring', ['app/models/graph',
                                     });
                                 }
 
-
                                 var receivedData = {};
 
                                 data.forEach(function(metric) {
@@ -795,7 +794,7 @@ define('app/controllers/monitoring', ['app/models/graph',
 
                     // Updating
                     this.instances.forEach(function (graph) {
-                        graph.updateData(data[graph.id]);
+                        graph.updateData(data[graph.id.replace('graph-', '')]);
                     });
 
                     // Run after queued actions
@@ -941,7 +940,7 @@ define('app/controllers/monitoring', ['app/models/graph',
 
                 addGraph: function (metric) {
 
-                    var graphId = metric.id;
+                    var graphId = 'graph-' + metric.id;
 
                     if (this.graphExists(graphId))
                         return;

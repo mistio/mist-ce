@@ -716,7 +716,6 @@ define('app/models/graph', ['ember'],
                 */
                 this.appendGraph = function(id, metric, width, height){
 
-                    id = 'graph-' + id;
                     var name = metric.name;
 
                     // Generate graph's expand button
@@ -808,7 +807,7 @@ define('app/models/graph', ['ember'],
                 */
                 function setupMouseOver() {
 
-                    var id = 'graph-' + self.id;
+                    var id = self.id;
 
                     // Append the Selector Line
                     var mouseOverLine = d3svg.append('line')
