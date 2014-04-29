@@ -17,12 +17,12 @@ Feature: Machines
         And I wait for 1 seconds
         And I click the "Select provider" button
         And I wait for 1 seconds
-        And i click the "EC2 AP NORTHEAST" button
+        And i click the "EC2 AP SOUTHEAST" button
         And I wait for 1 seconds
         And I use my "EC2" credentials
         And I click the "Add" button
         And I wait for 1 seconds
-            Then I should see the "EC2 AP NORTHEAST" Backend added within 30 seconds
+            Then I should see the "EC2 AP SOUTHEAST" Backend added within 30 seconds
 
         When I wait for 3 seconds
         And I click the "Keys" button
@@ -37,7 +37,7 @@ Feature: Machines
         And I wait for 1 seconds
         And I click the "Select Provider" button
         And I wait for 1 seconds
-        And I click the "EC2 AP NORTHEAST" button within "create-machine-panel" panel
+        And I click the "EC2 AP SOUTHEAST" button within "create-machine-panel" panel
         And I wait for 1 seconds
         And I click the "Select Image" button
         And I wait for 1 seconds
@@ -49,7 +49,7 @@ Feature: Machines
         And I wait for 1 seconds
         And I click the "Select Location" button
         And I wait for 1 seconds
-        And I click the "ap-northeast-1a" button within "create-machine-panel" panel
+        And I click the "ap-southeast-1a" button within "create-machine-panel" panel
         And I wait for 1 seconds
         And I click the "Select Key" button
         And I wait for 1 seconds

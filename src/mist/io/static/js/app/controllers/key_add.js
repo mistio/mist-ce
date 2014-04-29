@@ -46,21 +46,6 @@ define('app/controllers/key_add', ['ember'],
                     return;
                 }
 
-                // Basic private key validation
-                var privateKey = this.newKeyPrivate;
-                var beginning = '-----BEGIN RSA PRIVATE KEY-----';
-                var ending = '-----END RSA PRIVATE KEY-----';
-
-                if (privateKey.indexOf(beginning) != 0) {
-                    Mist.notificationController.notify('Private key should begin with: ' + beginning);
-                    this._giveCallback(false);
-                    return;
-                } else if (privateKey.indexOf(ending) != privateKey.length - ending.length) {
-                    Mist.notificationController.notify('Private key should end with: ' + ending);
-                    this._giveCallback(false);
-                    return;
-                }
-
                 var that = this;
                 Mist.keysController.addKey(this.newKeyId, this.newKeyPrivate,
                     function (success, newKeyId) {

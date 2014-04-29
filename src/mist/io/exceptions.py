@@ -59,7 +59,7 @@ class KeypairParameterMissingError(RequiredParameterMissingError):
 
 
 class KeyValidationError(BadRequestError):
-    msg = "Keypair could not be validated"
+    msg = "Invalid private key"
 
 
 # UNAUTHORIZED (translated as 401 in views)
