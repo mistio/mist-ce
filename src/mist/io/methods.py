@@ -844,26 +844,43 @@ def _create_machine_ec2(conn, key_name, private_key, public_key, script,
         else:
             raise InternalServerError("Couldn't create security group")
 
-    deploy_script = ScriptDeployment(script)
-    with get_temp_file(private_key) as tmp_key_path:
-        #deploy_node wants path for ssh private key
-        try:
-            node = conn.deploy_node(
-                name=machine_name,
-                image=image,
-                size=size,
-                deploy=deploy_script,
-                location=location,
-                ssh_key=tmp_key_path,
-                ssh_alternate_usernames=['ec2-user', 'ubuntu'],
-                max_tries=1,
-                ex_keyname=key_name,
-                ex_securitygroup=config.EC2_SECURITYGROUP['name']
-            )
-        except Exception as e:
-            raise MachineCreationError("EC2, got exception %s" % e)
-    return node
-
+    if script:
+        deploy_script = ScriptDeployment(script)
+        with get_temp_file(private_key) as tmp_key_path:
+            #deploy_node wants path for ssh private key
+            try:
+                node = conn.deploy_node(
+                    name=machine_name,
+                    image=image,
+                    size=size,
+                    deploy=deploy_script,
+                    location=location,
+                    ssh_key=tmp_key_path,
+                    ssh_alternate_usernames=['ec2-user', 'ubuntu'],
+                    max_tries=1,
+                    ex_keyname=key_name,
+                    ex_securitygroup=config.EC2_SECURITYGROUP['name']
+                )
+            except Exception as e:
+                raise MachineCreationError("EC2, got exception %s" % e)
+        return node
+    else:
+        with get_temp_file(private_key) as tmp_key_path:
+            #deploy_node wants path for ssh private key
+            try:
+                node = conn.create_node(
+                    name=machine_name,
+                    image=image,
+                    size=size,
+                    location=location,
+                    ssh_key=tmp_key_path,
+                    max_tries=1,
+                    ex_keyname=key_name,
+                    ex_securitygroup=config.EC2_SECURITYGROUP['name']
+                )
+            except Exception as e:
+                raise MachineCreationError("EC2, got exception %s" % e)
+        return node
 
 def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
                               machine_name, image, size, location):

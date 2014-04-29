@@ -82,8 +82,9 @@ define('app/controllers/machines', ['app/models/machine'],
                     'id': -1,
                     'pendingCreation': true
                 });
-                this.addObject(dummyMachine);
-
+                //if (script) {
+                    this.addObject(dummyMachine);
+                //}
                 var that = this;
                 this.set('addingMachine', true);
                 Mist.ajax.POST('backends/' + this.backend.id + '/machines', {
@@ -101,6 +102,8 @@ define('app/controllers/machines', ['app/models/machine'],
                         'image_name': image.name,
                         'location_name': location.name
                 }).success(function (machine) {
+                    if (!script)
+                        that.removeObject(dummyMachine);
                     that._createMachine(machine, key);
                 }).error(function (message) {
                     that.removeObject(dummyMachine);
@@ -281,7 +284,14 @@ define('app/controllers/machines', ['app/models/machine'],
 
 
             _createMachine: function(machine, key) {
+
+                if (!this.machineExists(machine.id)) {
+                    machine.backend = this.backend;
+                    this.pushObject(Machine.create(machine));
+                }
+
                 var machine = this.getMachine(machine.id);
+
                 Ember.run(this, function() {
                     machine.set('pendingCreation', false);
                     Mist.keysController._associateKey(key.id, machine);
