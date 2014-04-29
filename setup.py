@@ -17,7 +17,8 @@ requires = [
     'nose',
     'behaving',
     'sphinxcontrib-httpdomain',
-    'sphinx-bootstrap-theme'
+    'sphinx-bootstrap-theme',
+    'celery',
 ]
 
 setup(name='mist.io',
