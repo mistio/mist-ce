@@ -20,11 +20,13 @@ define('app/views/graph', ['app/views/templated'],
             //
             //
 
-            data: null,
-            animationEnabled: true,
+
             graph: null,
-            d3elements: {},
             instance: null,
+
+            data: null,
+            timeDisplayed: null,
+            animationEnabled: true,
 
 
             //
@@ -38,12 +40,12 @@ define('app/views/graph', ['app/views/templated'],
 
                 Ember.run.next(this, function () {
 
-                    this.set('data', []);
                     this.graph.set('view', this);
                     this.graph.on('onDataUpdate', this, 'updateData');
                     //this.graph.on('onMetricAdd', this, 'renderGraph');
                     //this.graph.on('onMetricRemove', this, 'renderGraph');
 
+                    this.clearData();
                     this.set('instance', new this.renderGraph(this.graph.id, '', this));
                     this.instance.appendGraph(this.graph.id, this.graph.metrics[0],
                         this.instance.width, this.instance.height);
@@ -69,8 +71,18 @@ define('app/views/graph', ['app/views/templated'],
             //
 
 
-            clearData: function() {
+            clearData: function () {
                 this.set('data', []);
+            },
+
+
+            updateView: function () {
+                this.instance.updateView();
+            },
+
+
+            getTimeWindow: function () {
+                return this.timeDisplayed;
             },
 
 
@@ -79,9 +91,27 @@ define('app/views/graph', ['app/views/templated'],
             },
 
 
-            disableAnimation: function(immediately) {
+            disableAnimation: function (immediately) {
                 this.set('animationEnabled', false);
                 this.instance.clearAnimation(immediately);
+            },
+
+
+            getLastMeasurementTime: function () {
+                if (this.data.length)
+                    return this.data[this.data.length - 1].time;
+            },
+
+
+            getLastValue: function () {
+                if(this.data.length)
+                    return this.data[this.data.length - 1];
+            },
+
+
+            changeTimeWindow: function (newTimeWindow) {
+                this.set('timeDisplayed', newTimeWindow / 1000);
+                this.clearData();
             },
 
 
@@ -108,9 +138,6 @@ define('app/views/graph', ['app/views/templated'],
                 this.updateView();
             },
 
-            updateView: function () {
-                this.instance.updateView();
-            },
 
             renderGraph: function (id, format, that) {
 
@@ -125,13 +152,11 @@ define('app/views/graph', ['app/views/templated'],
                 var fixedHeight = width * 0.125; // (160 / 1280)
                 var margin      = {top: 10, right: 0, bottom: 24, left: 52};
 
-                this.id               = divID;
                 this.name             = divID.replace('Graph','');
                 this.width            = width;
                 this.height           = fixedHeight < 85 ? 85 : fixedHeight;
-                this.timeDisplayed    = timeToDisplayms/1000;
+                that.timeDisplayed    = timeToDisplayms/1000;
                 this.yAxisValueFormat = yAxisValueFormat;
-                this.isAppended       = false;
                 this.displayedData    = [];
                 this.xCordinates      = [];
                 this.clearAnimPending = false;
@@ -153,7 +178,6 @@ define('app/views/graph', ['app/views/templated'],
                                 .y(function(d) {return yScale(d.value); })
                                 .defined(function(d) {return d.value != null })
                                 .interpolate('monotone');
-
 
                 // valuearea is function that fills the space under the main line
                 var valuearea = d3.svg.area()
@@ -353,15 +377,15 @@ define('app/views/graph', ['app/views/templated'],
 
                         // Check Time Displayed
                         var labelStep;
-                        if(self.timeDisplayed <= 600)           // 10 Minutes (10*60)
+                        if(that.timeDisplayed <= 600)           // 10 Minutes (10*60)
                             axisInstance.ticks(d3.time.minutes,2);
-                        else if(self.timeDisplayed <= 3600)     // 1 Hour (1*60*60)
+                        else if(that.timeDisplayed <= 3600)     // 1 Hour (1*60*60)
                             axisInstance.ticks(d3.time.minutes,12);
-                        else if(self.timeDisplayed <= 86400)    // 1 Day (24*60*60)
+                        else if(that.timeDisplayed <= 86400)    // 1 Day (24*60*60)
                             axisInstance.ticks(d3.time.hours,6);
-                        else if(self.timeDisplayed <= 604800)   // 1 Week (7*24*60*60)
+                        else if(that.timeDisplayed <= 604800)   // 1 Week (7*24*60*60)
                             axisInstance.ticks(d3.time.days,1);
-                        else if(self.timeDisplayed <= 18144000) // 1 Month (30*7*24*60*60)
+                        else if(that.timeDisplayed <= 18144000) // 1 Month (30*7*24*60*60)
                             axisInstance.ticks(d3.time.days,7);
 
                         if( typeof format != 'undefined')
@@ -447,11 +471,11 @@ define('app/views/graph', ['app/views/templated'],
                     // Timestamp fix for small screens
                     // 1 Week || 1 Month
                     var tLabelFormat = "%I:%M%p";
-                    if( (this.width <= 700 && this.timeDisplayed == 604800) ||  (this.width <= 521 && this.timeDisplayed == 2592000) )
+                    if( (this.width <= 700 && that.timeDisplayed == 604800) ||  (this.width <= 521 && that.timeDisplayed == 2592000) )
                         tLabelFormat = "%d-%b";
-                    else if(this.width <= 560 && this.timeDisplayed == 86400) // 1 Day
+                    else if(this.width <= 560 && that.timeDisplayed == 86400) // 1 Day
                         tLabelFormat = "%I:%M%p";
-                    else  if (this.timeDisplayed >= 86400) // 1 Day (24*60*60) >=, should display date as well
+                    else  if (that.timeDisplayed >= 86400) // 1 Day (24*60*60) >=, should display date as well
                             tLabelFormat = "%d-%m | %I:%M%p";
 
 
@@ -599,9 +623,6 @@ define('app/views/graph', ['app/views/templated'],
                 * Enables animation of graph
                 *
                 */
-
-
-
                 this.clearAnimation = function(stopCurrent) {
 
                     d3vLine.animation.clearBuffer(stopCurrent)
@@ -612,45 +633,6 @@ define('app/views/graph', ['app/views/templated'],
                     // Reset Transform
                     if(stopCurrent)
                         this.clearAnimPending = true;
-                }
-
-                /**
-                *
-                * Finds last measurement of graph data
-                * @return {date} Measurements time or null on failure
-                */
-                this.getLastMeasurementTime = function(){
-
-                    if(that.data.length == 0)
-                        return null;
-                    else {
-                        var lastObject = that.data[that.data.length-1];
-                        return lastObject.time;
-                    }
-                };
-
-
-                /**
-                *
-                * Current time window
-                * @return {number} time window in seconds
-                */
-                this.getTimeWindow = function(){
-
-                    return this.timeDisplayed;
-                };
-
-
-                /**
-                *
-                * Last received values
-                * @return {object} metric object or null on failure
-                */
-                this.getLastValue = function(){
-                    if(that.data)
-                        return that.data[that.data.length - 1];
-                    else
-                        return null;
                 }
 
 
@@ -666,7 +648,7 @@ define('app/views/graph', ['app/views/templated'],
                         if(that.data.length > 2) {
 
                             // Get Translate Value
-                            var translate =  $("#" + this.id).find('.valueLine > path').attr('transform');
+                            var translate =  $("#" + id).find('.valueLine > path').attr('transform');
                             translate = + translate.slice(10,translate.indexOf(','));
 
                             if(translate == 0)
@@ -702,20 +684,6 @@ define('app/views/graph', ['app/views/templated'],
                         var xValueB = xScale(that.data[that.data.length-1].time);
                         this.valuesDistance = xValueB - xValueA;
                     }
-                };
-
-
-                /*
-                *
-                * Changes time window
-                * @param {number} newTimems - New timewindow in miliseconds
-                */
-                this.changeTimeWindow = function(newTimeWindow){
-
-                    this.timeDisplayed = newTimeWindow/1000;
-
-                    this.clearData();
-
                 };
 
 
@@ -795,7 +763,6 @@ define('app/views/graph', ['app/views/templated'],
                         .attr('class','y-axis')
                         .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
 
-                    this.isAppended = true;
                     onInitialized();
                 }
 
