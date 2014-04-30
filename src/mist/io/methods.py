@@ -16,6 +16,7 @@ from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
 from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider, NodeState
 from libcloud.common.types import InvalidCredsError
+from libcloud.utils.networking import is_private_subnet
 
 
 try:
@@ -1672,6 +1673,8 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;"
        "else sysctl hw.ncpu | awk '{print $2}';"
        "fi;"
+       "echo -------- && "
+       "/sbin/ifconfig;"       
        "echo --------"
        "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
        #"cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null |"
@@ -1705,10 +1708,17 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
         users = re.split(' users?', uptime_output)[0].split(', ')[-1].strip()
         uptime = cmd_output[2]
         cores = cmd_output[3]
+        ips = re.findall('inet addr:(\S+)', cmd_output[4])
+        if '127.0.0.1' in ips:
+            ips.remove('127.0.0.1')
+        pub_ips = find_public_ips(ips)
+        priv_ips = [ip for ip in ips if ip not in pub_ips]
         ret = {'uptime': uptime,
                'loadavg': loadavg,
                'cores': cores,
                'users': users,
+               'pub_ips': pub_ips, 
+               'priv_ips': priv_ips
                }
         # if len(cmd_output) > 4:
         #     updated_keys = update_available_keys(user, backend_id,
@@ -1760,3 +1770,14 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
 #             } for key in updated_keypairs]
 #
 #     return ret
+
+def find_public_ips(ips):
+    public_ips = []
+    for ip in ips:
+        #is_private_subnet does not check for ipv6
+        try:
+            if not is_private_subnet(ip):
+                public_ips.append(ip)
+        except:
+            pass
+    return public_ips

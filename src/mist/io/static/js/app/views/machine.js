@@ -392,7 +392,7 @@ define('app/views/machine', ['app/views/mistscreen'],
                     }
                 }
                 return ret;
-            }.property('machine'),
+            }.property('machine', 'machine.public_ips', 'machine.private_ips'),
 
 
             metadata: function() {
