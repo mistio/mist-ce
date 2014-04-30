@@ -463,7 +463,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                 */
                 changeStep: function(newStep,reloadAfter){
                     this.step = newStep;
-                    reload = (typeof reloadAfter == 'undefined' ? true : reloadAfter);
+                    var reload = reloadAfter || true;
                     if(reload)
                         this.reload('stepChanged');
                 },
@@ -477,7 +477,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                 */
                 changeTimeWindow: function(newTimeWindow,reloadAfter){
                     this.timeWindow = newTimeWindow;
-                    reload = (typeof reloadAfter == 'undefined' ? true : reloadAfter);
+                    var reload = reloadAfter || true;
                     if(reload)
                         this.reload('timeWindowChanged');
                 },
@@ -489,7 +489,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *
                 */
                 enableUpdates: function(reloadAfter){
-                    reload = (typeof reloadAfter == 'undefined' ? true : reloadAfter);
+                    var reload = reloadAfter || true;
                     this.updateData = true;
                     if(reload)
                         this.reload('updatesEnabled');
@@ -502,7 +502,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *
                 */
                 disableUpdates: function(reloadAfter){
-                    reload = (typeof reloadAfter == 'undefined' ? true : reloadAfter);
+                    var reload = reloadAfter || true;
                     this.updateData = false;
                     if(reload)
                         this.reload('updatesDisabled');
@@ -588,6 +588,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                                         });
                                     });
 
+                                    metric.datapoints = receivedData[id];
                                     Mist.monitoringController.graphs.addGraph(metric);
                                 });
 
@@ -744,7 +745,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                 enableAnimation  : function() {
 
                     this.instances.forEach(function (graph) {
-                        graph.enableAnimation();
+                        graph.view.enableAnimation();
                     });
 
                     this.animationEnabled = true;
@@ -761,7 +762,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                     stopCurrent = stopCurrent || true;
 
                     this.instances.forEach(function (graph) {
-                        graph.disableAnimation(stopCurrent);
+                        graph.view.disableAnimation(stopCurrent);
                     });
 
                     this.animationEnabled = false;
@@ -798,7 +799,7 @@ define('app/controllers/monitoring', ['app/models/graph',
 
                     // Updating
                     this.instances.forEach(function (graph) {
-                        graph.updateData(data[graph.id.replace('graph-', '')]);
+                        graph.updateData(data);
                     });
 
                     // Run after queued actions
@@ -818,7 +819,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                 */
                 clearData  : function() {
                     this.instances.forEach(function (graph) {
-                        graph.clearData();
+                        graph.view.clearData();
                     });
                 },
 
@@ -953,6 +954,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                             id: graphId,
                             title: metric.name,
                         });
+
                     graph.addMetric(metric);
                     this.instances.pushObject(graph);
                 },
@@ -1088,8 +1090,8 @@ define('app/controllers/monitoring', ['app/models/graph',
 
 
                             var measurements = 60;
-                            timeWindowInMinutes = timeWindow /60000;
-                            newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 );
+                            var timeWindowInMinutes = timeWindow /60000;
+                            var newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 );
                             controller.request.changeStep(newStep,false);
                             controller.request.changeTimeWindow(timeWindow,false);
 

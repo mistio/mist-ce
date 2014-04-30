@@ -18,9 +18,11 @@ define('app/models/graph', ['ember'],
             //
 
 
+            view: null,
+
             id: null,
             title: null,
-            metrics: [],
+            metrics: null,
 
 
             //
@@ -31,7 +33,7 @@ define('app/models/graph', ['ember'],
 
 
             load: function () {
-
+                this.set('metrics', []);
             }.on('init'),
 
 
@@ -54,8 +56,9 @@ define('app/models/graph', ['ember'],
 
             addMetric: function (metric) {
                 Ember.run(this, function () {
-                    this.metrics.addObject(metric);
+                    this.metrics.pushObject(metric);
                     this.trigger('onMetricAdd');
+                    this.trigger('onDataUpdate', metric.datapoints);
                 });
             },
 
@@ -75,12 +78,10 @@ define('app/models/graph', ['ember'],
                     for (var metricId in data)
                         if (this.hasMetric(metricId))
                             this.getMetric(metricId)
-                                .datapoints
-                                .concat(data[metricId]);
-                    this.trigger('onDataUpdate');
+                                .datapoints.pushObjects(data[metricId]);
+                    this.trigger('onDataUpdate', this.metrics[0].datapoints);
                 });
-            },
-
+            }
 
 /*
             init: function () {
