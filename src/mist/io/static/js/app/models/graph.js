@@ -8,7 +8,19 @@ define('app/models/graph', ['ember'],
 
         'use strict';
 
-        return Ember.Object.extend({
+        return Ember.Object.extend(Ember.Evented, {
+
+
+            //
+            //
+            //  Properties
+            //
+            //
+
+
+            id: null,
+            title: null,
+            metrics: [],
 
 
             //
@@ -18,9 +30,63 @@ define('app/models/graph', ['ember'],
             //
 
 
+            load: function () {
+
+            }.on('init'),
+
+
+            //
+            //
+            //  Methods
+            //
+            //
+
+
+            getMetric: function(metricId) {
+                return this.metrics.findBy('id', metricId);
+            },
+
+
+            hasMetric: function (metricId) {
+                return !!this.getMetric(metricId);
+            },
+
+
+            addMetric: function (metric) {
+                Ember.run(this, function () {
+                    this.metrics.addObject(metric);
+                    this.trigger('onMetricAdd');
+                });
+            },
+
+
+            removeMetric: function (metricId) {
+                Ember.run(this, function () {
+                    this.metrics.removeObject(
+                        this.getMetric(metricId)
+                    );
+                    this.trigger('onMetricRemove');
+                });
+            },
+
+
+            updateData: function (data) {
+                Ember.run(this, function () {
+                    for (var metricId in data)
+                        if (this.hasMetric(metricId))
+                            this.getMetric(metricId)
+                                .datapoints
+                                .concat(data[metricId]);
+                    this.trigger('onDataUpdate');
+                });
+            },
+
+
+/*
             init: function () {
 
                 this._super();
+
 
                 var divID = this.id;
                 var width = $("#GraphsArea").width() -2;
@@ -82,6 +148,7 @@ define('app/models/graph', ['ember'],
                 var d3GridX;          // Horizontal grid lines g element
                 var d3GridY;          // Vertical   grid lines g element
                 var d3vLine;          // Main Line that will show the values
+                var d3dots;
                 var d3vArea;          // The are fill underneath d3vLine
                 var d3xAxis;          // Vertical/X Axis With Text(Time)
                 var d3HideAnimeLine;  // A Rectangle that hides the valueline when it's animated
@@ -96,7 +163,7 @@ define('app/models/graph', ['ember'],
                  * Represents an Animations series
                  * @constructor
                  * @param {number} bufferSize - The max length of the buffer (default : 3 animations)
-                 */
+                 *
                 function Animation(bufferSize){
 
                     function _Animation() {
@@ -258,7 +325,7 @@ define('app/models/graph', ['ember'],
                 * Also appends graphs on initial request
                 * @param {number} timeToDisplay  - The graphs timeWindow in miliseconds
                 *
-                */
+                *
                 this.updateData = function(newData) {
 
                     // Fix for duplicate timestamps
@@ -277,7 +344,7 @@ define('app/models/graph', ['ember'],
                         // Do staff after Graph is in the dom and we have data
                         onInitialized();
                     }
-                    */
+                    *
 
                     // Set Our New Data
                     this.data = this.data.concat(newData);
@@ -299,7 +366,7 @@ define('app/models/graph', ['ember'],
                 *
                 * Deletes current graph data
                 *
-                */
+                *
                 this.clearData = function() {
                     this.data = [];
                 };
@@ -309,7 +376,7 @@ define('app/models/graph', ['ember'],
                 *
                 * Updates graph by selecting data from data instance
                 * redraws value line, x-axis, labels and grid
-                */
+                *
                 this.updateView = function() {
 
                     // Delay update until graph
@@ -445,7 +512,7 @@ define('app/models/graph', ['ember'],
                     /*if(this.timeUpdated){
                         console.log("time updated");
                         this.clearAnimation();
-                    }*/
+                    }*
 
 
                     // Animate line, axis and grid
@@ -534,7 +601,7 @@ define('app/models/graph', ['ember'],
                 * Changes the width of svg element, sets new scale values
                 * and updates height to keep aspect ratio
                 * @param {number} width - Graph new width
-                */
+                *
                 this.changeWidth = function (width) {
 
                     if (!d3svg)
@@ -574,7 +641,7 @@ define('app/models/graph', ['ember'],
                 *
                 * Enables animation of graph
                 *
-                */
+                *
                 this.enableAnimation = function() {
 
                     this.animationEnabled = true;
@@ -584,7 +651,7 @@ define('app/models/graph', ['ember'],
                 *
                 * Disables animation of graph
                 * @param {boolean} immediately - if set to false will not stop current animation
-                */
+                *
                 this.disableAnimation = function(immediately) {
 
                     this.animationEnabled = false;
@@ -607,7 +674,7 @@ define('app/models/graph', ['ember'],
                 *
                 * Finds last measurement of graph data
                 * @return {date} Measurements time or null on failure
-                */
+                *
                 this.getLastMeasurementTime = function(){
 
                     if(this.data.length == 0)
@@ -623,7 +690,7 @@ define('app/models/graph', ['ember'],
                 *
                 * Current time window
                 * @return {number} time window in seconds
-                */
+                *
                 this.getTimeWindow = function(){
 
                     return this.timeDisplayed;
@@ -634,7 +701,7 @@ define('app/models/graph', ['ember'],
                 *
                 * Last received values
                 * @return {object} metric object or null on failure
-                */
+                *
                 this.getLastValue = function(){
                     if(this.data)
                         return this.data[this.data.length - 1];
@@ -647,7 +714,7 @@ define('app/models/graph', ['ember'],
                 *
                 * Last visible metric
                 * @return {object} metric object or null on failure
-                */
+                *
                 this.getLastDisplayedValue = function(){
 
                     if(this.data){
@@ -681,7 +748,7 @@ define('app/models/graph', ['ember'],
                 *
                 * Calculates the distance between the last two points
                 * Important for animated graph
-                */
+                *
                 this.calcValueDistance = function() {
 
                     // Get last 2 data
@@ -698,7 +765,7 @@ define('app/models/graph', ['ember'],
                 *
                 * Changes time window
                 * @param {number} newTimems - New timewindow in miliseconds
-                */
+                *
                 this.changeTimeWindow = function(newTimeWindow){
 
                     this.timeDisplayed = newTimeWindow/1000;
@@ -715,7 +782,7 @@ define('app/models/graph', ['ember'],
                 * @param {string} id     - the div where graph will be
                 * @param {number} width  - the width of the graph
                 * @param {height} height - the height of the graph
-                */
+                *
                 this.appendGraph = function(id, metric, width, height){
 
                     var name = metric.name;
@@ -792,7 +859,7 @@ define('app/models/graph', ['ember'],
                 *
                 *   Creates animation instances
                 *
-                */
+                *
                 function setupAnimation() {
 
                     d3vLine.animation = new Animation();
@@ -806,7 +873,7 @@ define('app/models/graph', ['ember'],
                 *
                 * Setups event listeners for mouse,
                 * also creates interval for popup value update
-                */
+                *
                 function setupMouseOver() {
 
                     var id = self.id;
@@ -969,13 +1036,14 @@ define('app/models/graph', ['ember'],
                 *
                 * Is being called after first data received and
                 * svg elements are in the dom
-                */
+                *
                 function onInitialized(){
 
                   setupAnimation();
                   setupMouseOver();
                 }
             }
+            */
         });
     }
 )

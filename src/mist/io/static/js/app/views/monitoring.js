@@ -98,7 +98,7 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
 
                                     var newWidth = $("#GraphsArea").width() -2;
                                     self.graphs.forEach(function (graph) {
-                                        graph.changeWidth(newWidth);
+                                        //graph.changeWidth(newWidth);
                                     });
                                 })
 

@@ -591,7 +591,11 @@ define('app/controllers/monitoring', ['app/models/graph',
                                     Mist.monitoringController.graphs.addGraph(metric);
                                 });
 
-                                self.lastMetrictime = receivedData.load[receivedData.load.length-1].time;
+                                try {
+                                    self.lastMetrictime = receivedData.load[receivedData.load.length-1].time;
+                                } catch (e) {
+
+                                }
 
                                 callback({
                                     status: 'success',
@@ -945,13 +949,12 @@ define('app/controllers/monitoring', ['app/models/graph',
                     if (this.graphExists(graphId))
                         return;
 
-                    this.instances.pushObject(
-                        Graph.create({
+                    var graph = Graph.create({
                             id: graphId,
                             title: metric.name,
-                            metric: metric,
-                        })
-                    );
+                        });
+                    graph.addMetric(metric);
+                    this.instances.pushObject(graph);
                 },
 
                 instances        : [],    // Graph Objects created by the view
