@@ -1,7 +1,7 @@
 define('app/controllers/machines', ['app/models/machine'],
     /**
      *  Machines Controller
-     * 
+     *
      *  @returns Class
      */
     function(Machine) {
@@ -25,11 +25,11 @@ define('app/controllers/machines', ['app/models/machine'],
             sortProperties: ['hasMonitoring', 'probed'],
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
-            
+
             load: function() {
 
                 if (!this.backend.enabled) return;
@@ -64,13 +64,13 @@ define('app/controllers/machines', ['app/models/machine'],
 
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
             newMachine: function(name, image, size, location, key, script) {
-                
+
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
                 // the server
@@ -219,9 +219,9 @@ define('app/controllers/machines', ['app/models/machine'],
 
 
             /**
-             * 
+             *
              *  Pseudo-Private Methods
-             * 
+             *
              */
 
             _reload: function() {
@@ -263,7 +263,12 @@ define('app/controllers/machines', ['app/models/machine'],
                         if (that.machineExists(machine.id)) {
                             // Update existing machines
                             var old_machine = that.getMachine(machine.id);
-                            for (attr in machine){
+                            for (var attr in machine) {
+
+                                // Do not overwrite ips
+                                if (attr == 'private_ips') continue;
+                                if (attr == 'pubic_ips') continue;
+
                                 old_machine.set(attr, machine[attr]);
                             }
                         } else {
@@ -310,7 +315,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 if (Mist.monitored_machines) {
 
                     that.content.forEach(function(machine) {
-                        
+
                         Mist.monitored_machines.some(function(machine_tuple){
                             backend_id = machine_tuple[0];
                             machine_id = machine_tuple[1];
@@ -333,9 +338,9 @@ define('app/controllers/machines', ['app/models/machine'],
 
 
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
             selectedMachinesObserver: function() {
