@@ -576,7 +576,7 @@ define('app/controllers/monitoring', ['app/models/graph',
 
                                 data.forEach(function(metric) {
 
-                                    var id = metric.metric_id;
+                                    var id = md5(metric.target);
                                     metric.id = id;
 
                                     receivedData[id] = [];
