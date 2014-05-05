@@ -28,7 +28,6 @@ define('app/models/machine', ['ember'],
             prevState: null,
             waitState: null,
             lockState: null,
-            waitForCallback: null,
             
             stats: {'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
@@ -89,17 +88,6 @@ define('app/models/machine', ['ember'],
             load: function() {
                 this.set('commandHistory', []);
                 this.probe();
-
-                // For instantly created machines
-                if (this.state == 'stopped') {
-                    var that = this;
-                    this.set('state', 'running');
-                    this.lockOn('pending');
-                    this.waitFor('running', function () {
-                        that.restoreState();
-                        that.probe();
-                    });
-                }
             }.on('init'),
 
 
@@ -129,9 +117,8 @@ define('app/models/machine', ['ember'],
             },
 
 
-            waitFor: function(state, callback) {
+            waitFor: function(state) {
                 this.set('waitState', state);
-                this.set('waitForCallback', callback);
             },
 
 
@@ -219,7 +206,7 @@ define('app/models/machine', ['ember'],
              * 
              */
 
-            stateObserver: function(callback) {
+            stateObserver: function() {
                 if (this.waitState) {
                     if (this.waitState != this.state) {
                         this.set('state', this.lockState);
@@ -227,10 +214,6 @@ define('app/models/machine', ['ember'],
                         this.set('waitState', null);
                         if (this.state == 'running') {
                             Mist.backendsController.probeMachine(this);
-                        }
-                        if (this.waitForCallback) {
-                            this.waitForCallback();
-                            this.set('waitForCallback', null);
                         }
                     }
                 }
