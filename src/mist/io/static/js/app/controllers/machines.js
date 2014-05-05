@@ -1,7 +1,7 @@
 define('app/controllers/machines', ['app/models/machine'],
     /**
      *  Machines Controller
-     * 
+     *
      *  @returns Class
      */
     function(Machine) {
@@ -25,11 +25,11 @@ define('app/controllers/machines', ['app/models/machine'],
             sortProperties: ['hasMonitoring', 'probed'],
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
-            
+
             load: function() {
 
                 if (!this.backend.enabled) return;
@@ -64,13 +64,13 @@ define('app/controllers/machines', ['app/models/machine'],
 
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
             newMachine: function(name, image, size, location, key, script) {
-                
+
                 // Create a fake machine model for the user
                 // to see until we get the real machine from
                 // the server
@@ -82,6 +82,7 @@ define('app/controllers/machines', ['app/models/machine'],
                     'id': -1,
                     'pendingCreation': true
                 });
+
                 this.addObject(dummyMachine);
 
                 var that = this;
@@ -93,15 +94,16 @@ define('app/controllers/machines', ['app/models/machine'],
                         'script': script,
                         'image': image.id,
                         'location': location.id,
-                        // these are only useful for Linode
+                        // Linode specific
                         'disk': size.disk,
                         'image_extra': image.extra,
-                        //gce needs these
+                        // Gce specific
                         'size_name': size.name,
                         'image_name': image.name,
                         'location_name': location.name
                 }).success(function (machine) {
-                    that._createMachine(machine, key);
+                    machine.backend = that.backend;
+                    that._createMachine(machine, key, dummyMachine);
                 }).error(function (message) {
                     that.removeObject(dummyMachine);
                     Mist.notificationController.timeNotify('Failed to create machine: ' + message, 5000);
@@ -219,9 +221,9 @@ define('app/controllers/machines', ['app/models/machine'],
 
 
             /**
-             * 
+             *
              *  Pseudo-Private Methods
-             * 
+             *
              */
 
             _reload: function() {
@@ -241,32 +243,41 @@ define('app/controllers/machines', ['app/models/machine'],
 
                     dummyMachines.forEach(function(machine) {
                         var realMachine = machines.findBy('name', machine.name);
-                        if (realMachine) {
-                            for (attr in realMachine)
+                        if (realMachine)
+                            for (var attr in realMachine)
                                 machine.set(attr, realMachine[attr]);
-                        }
                     });
 
                     // Remove deleted machines
 
                     that.content.forEach(function(machine) {
-                        if (!machines.findBy('id', machine.id)) {
-                            if (machine.id != -1) {
+                        if (!machines.findBy('id', machine.id))
+                            if (machine.id != -1)
                                 that.content.removeObject(machine);
-                            }
-                        }
                     });
 
                     // Update content
 
                     machines.forEach(function(machine) {
                         if (that.machineExists(machine.id)) {
+
                             // Update existing machines
                             var old_machine = that.getMachine(machine.id);
-                            for (attr in machine){
+
+                            // We save previous state here because it will
+                            // be overwritten by the following for loop
+                            var prevState = old_machine.state;
+
+                            for (var attr in machine)
                                 old_machine.set(attr, machine[attr]);
-                            }
+
+                            // Set machine on probing loop
+                            if (prevState != 'running'
+                                && machine.state == 'running')
+                                    old_machine.probe();
+
                         } else {
+
                             // Add new machine
                             machine.backend = that.backend;
                             that.content.pushObject(Machine.create(machine));
@@ -280,12 +291,12 @@ define('app/controllers/machines', ['app/models/machine'],
             },
 
 
-            _createMachine: function(machine, key) {
-                var machine = this.getMachine(machine.id);
+            _createMachine: function(machine, key, dummyMachine) {
                 Ember.run(this, function() {
-                    machine.set('pendingCreation', false);
+                    machine = Machine.create(machine);
+                    this.content.pushObject(machine);
+                    this.content.removeObject(dummyMachine);
                     Mist.keysController._associateKey(key.id, machine);
-                    machine.probe(key.id);
                     this.trigger('onMachineListChange');
                 });
             },
@@ -310,7 +321,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 if (Mist.monitored_machines) {
 
                     that.content.forEach(function(machine) {
-                        
+
                         Mist.monitored_machines.some(function(machine_tuple){
                             backend_id = machine_tuple[0];
                             machine_id = machine_tuple[1];
@@ -333,9 +344,9 @@ define('app/controllers/machines', ['app/models/machine'],
 
 
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
             selectedMachinesObserver: function() {
