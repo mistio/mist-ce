@@ -762,11 +762,7 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
 
             return node
         except Exception as e:
-            if script:
-                raise MachineCreationError("Script Deployment got exception: %r" % e)
-            else:
-                raise MachineCreationError("Rackspace, got exception %r" % e)
-
+            raise MachineCreationError("Script Deployment got exception: %r" % e)
     else:
         try:
             node = conn.create_node(name=machine_name, image=image, size=size,
@@ -774,10 +770,7 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
 
             return node
         except Exception as e:
-            if script:
-                raise MachineCreationError("Script Deployment got exception: %r" % e)
-            else:
-                raise MachineCreationError("Rackspace, got exception %r" % e)
+            raise MachineCreationError("Rackspace, got exception %r" % e)
 
 
 def _create_machine_openstack(conn, private_key, public_key, script, machine_name,
