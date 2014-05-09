@@ -193,6 +193,11 @@ SUPPORTED_PROVIDERS = [
     {
         'title': 'HP Cloud US East',
         'provider' : "%s:%s" % (Provider.OPENSTACK,'region-b.geo-1')
+    },
+    # Docker
+    {
+        'title': 'Docker',
+        'provider' : Provider.DOCKER
     }
 ]
 
