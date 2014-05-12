@@ -294,6 +294,8 @@ define('app/controllers/machines', ['app/models/machine'],
             _createMachine: function(machine, key, dummyMachine) {
                 Ember.run(this, function() {
                     machine = Machine.create(machine);
+                    if (machine.state == 'stopped')
+                        machine.set('state', 'pending');
                     this.content.pushObject(machine);
                     this.content.removeObject(dummyMachine);
                     Mist.keysController._associateKey(key.id, machine);
