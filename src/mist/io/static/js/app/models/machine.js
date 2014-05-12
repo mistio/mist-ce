@@ -23,48 +23,48 @@ define('app/models/machine', ['ember'],
             probeInterval: 30000,
             pendingCreation: null,
             isDestroying : false,
-            
+
             state: 'stopped',
             prevState: null,
             waitState: null,
             lockState: null,
-            
+
             stats: {'cpu': [], 'load': [], 'disk': []},
             graphdata: {},
-            
+
             commandHistory: null,
-            
+
             loss: null,
             latency: null,
             loadavg: null,
             loadavg1: null,
             loadavg5: null,
             loadavg15: null,
-            
-            
+
+
             /**
              *  Computed Properties
              */
-            
+
             netled1: function() {
-                if (this.latency > 0 &&  this.latency < 1000) return 'on'; 
+                if (this.latency > 0 &&  this.latency < 1000) return 'on';
             }.property('latency'),
-            
+
             netled2: function() {
-                if (this.latency > 0 &&  this.latency < 500) return 'on'; 
+                if (this.latency > 0 &&  this.latency < 500) return 'on';
             }.property('latency'),
-            
+
             netled3: function() {
-                if (this.latency > 0 &&  this.latency < 250) return 'on'; 
+                if (this.latency > 0 &&  this.latency < 250) return 'on';
             }.property('latency'),
 
             netled4: function() {
-                if (this.latency > 0 &&  this.latency < 100) return 'on'; 
+                if (this.latency > 0 &&  this.latency < 100) return 'on';
             }.property('latency'),
-                        
+
             netled4: function() {
-                if (this.latency > 0 &&  this.latency < 40) return 'on'; 
-            }.property('latency'),  
+                if (this.latency > 0 &&  this.latency < 40) return 'on';
+            }.property('latency'),
 
             lossled: function() {
                 if (this.loss > 0.5) {
@@ -73,16 +73,16 @@ define('app/models/machine', ['ember'],
                     return 'low-loss';
                 }
             },
-                              
+
             image: function() {
                 return this.backend.images.getImage(this.imageId);
             }.property('imageId'),
-            
-            
+
+
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
             load: function() {
@@ -92,9 +92,9 @@ define('app/models/machine', ['ember'],
 
 
             /**
-             * 
+             *
              *  Methods
-             * 
+             *
              */
 
             shutdown: function(callback) {
@@ -136,7 +136,7 @@ define('app/models/machine', ['ember'],
 
 
             getHost: function() {
-               
+
                 if (this.extra && this.extra.dns_name) {
                     // it is an ec2 machine so it has dns_name
                     return this.extra.dns_name;
@@ -163,7 +163,7 @@ define('app/models/machine', ['ember'],
 
                 if (!this.backend.enabled) return;
                 if (this.state != 'running') return;
-                
+
                 // If there are many pending requests, reschedule for a bit later
                 if ($.active > 4) {
                     Ember.run.later(this, function() {
@@ -174,7 +174,7 @@ define('app/models/machine', ['ember'],
 
                 var that = this;
                 Mist.backendsController.probeMachine(that, keyId, function(success) {
-                    
+
 
                     // If the function was not called by the scheduled probing
                     // procedure, then only call the callback function
@@ -201,9 +201,9 @@ define('app/models/machine', ['ember'],
 
 
             /**
-             * 
+             *
              *  Observers
-             * 
+             *
              */
 
             stateObserver: function() {
