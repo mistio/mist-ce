@@ -42,6 +42,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
 
                 $('#gce-bundle').hide();
                 $('#non-hp-cloud').hide();
+                $('#docker-bundle').hide();
                 $('#baremetal-bundle').hide();
                 $('#openstack-bundle').hide();
                 $('#new-backend-provider').collapsible('collapse');
@@ -74,6 +75,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                     $('#opentack-advanced-wrapper').hide();
                     $('#openstack-bundle').hide();
                     $('#baremetal-bundle').hide();
+                    $('#docker-bundle').hide();
                     $('#non-hp-cloud').hide();
 
                     if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('linode') > -1) {
@@ -89,6 +91,11 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         this.set('firstFieldLabel', 'Email address');
                         this.set('secondFieldLabel', '');
                         $('#gce-bundle').show();
+                    } else if (provider.provider.indexOf('docker') > -1) {
+                        this.set('firstFieldLabel', 'Auth User');
+                        this.set('secondFieldLabel', 'Auth Password');
+                        $('#docker-bundle').show();
+                        Mist.backendAddController.set('newBackendPort', 4243);
                     } else if (provider.provider.indexOf('openstack') > -1) {
                         this.set('firstFieldLabel', 'Username');
                         this.set('secondFieldLabel', 'Password');

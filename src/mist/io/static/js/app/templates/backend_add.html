@@ -132,6 +132,20 @@
             </div>
         </div>
 
+        <div id="docker-bundle">
+            <label for="new-backend-docker-url">3. Docker URL:</label>
+            {{view Mist.TextField
+                   id="new-backend-docker-url"
+                   data-theme="a"
+                   valueBinding="Mist.backendAddController.newBackendDockerURL"}}
+
+            <label for="new-backend-docker-port">4. Docker Port:</label>
+            {{view Mist.TextField
+                   id="new-backend-docker-port"
+                   data-theme="a"
+                   valueBinding="Mist.backendAddController.newBackendPort"}}
+        </div>
+
         {{#if Mist.backendsController.addingBackend}}
         <div class="ajax-loader"></div>
         {{/if}}

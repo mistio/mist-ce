@@ -34,3 +34,7 @@
 #add-backend-panel #gce-bundle {
     display: none;
 }
+
+#add-backend-panel #docker-bundle {
+    display: none;
+}
