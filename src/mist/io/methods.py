@@ -493,6 +493,8 @@ def connect_provider(backend):
         conn = driver(backend.apisecret)
     elif backend.provider == Provider.GCE:
         conn = driver(backend.apikey, backend.apisecret, project=backend.tenant_name)
+    elif backend.provider == Provider.DOCKER:
+        conn = driver(backend.apikey, backend.apisecret, backend.apiurl, backend.docker_port)
     elif backend.provider in [Provider.RACKSPACE_FIRST_GEN,
                               Provider.RACKSPACE]:
         conn = driver(backend.apikey, backend.apisecret,

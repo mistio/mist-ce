@@ -93,7 +93,7 @@ class Backend(OODict):
     provider = HtmlSafeStrField()
     ## datacenter = StrField()
     compute_endpoint = StrField()
-
+    docker_port = IntField(4243)
     machines = make_field(Machines)()
     starred = ListField()
     unstarred = ListField()
