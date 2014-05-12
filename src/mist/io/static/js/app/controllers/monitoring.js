@@ -592,11 +592,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                                     Mist.monitoringController.graphs.addGraph(metric);
                                 });
 
-                                try {
-                                    self.lastMetrictime = receivedData.load[receivedData.load.length-1].time;
-                                } catch (e) {
-
-                                }
+                                self.lastMetrictime = receivedData[0][receivedData.length-1].time;
 
                                 callback({
                                     status: 'success',
