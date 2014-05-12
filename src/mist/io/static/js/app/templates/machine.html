@@ -102,16 +102,6 @@
 
                 {{view Mist.monitoringView}}
 
-                <div id="metrics-container" data-role="listview">
-                    {{#each view.metrics}}
-                        <div>
-                            <p>{{this.name}}: {{this.target}}
-                                <a {{action "deleteMetric" this target="view"}}>X</a>
-                            </p>
-                        </div>
-                    {{/each}}
-                </div>
-
                 <div class="rules-container" data-role="listview">
                     {{#each view.rules}}
                         {{view Mist.ruleView ruleBinding="this"}}
