@@ -42,7 +42,8 @@
 #single-machine-page #monitoring-bottom-btns .ui-block-a,
 #single-machine-page #monitoring-bottom-btns .ui-block-b,
 #single-machine-page #monitoring-bottom-btns .ui-block-c {
-    width: 33.33%;
+    /*width: 33.33%;*/
+    width: 49%;
 }
 
 #single-machine-page #monitoring-bottom-btns a {
