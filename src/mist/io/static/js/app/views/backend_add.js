@@ -92,8 +92,8 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         this.set('secondFieldLabel', '');
                         $('#gce-bundle').show();
                     } else if (provider.provider.indexOf('docker') > -1) {
-                        this.set('firstFieldLabel', 'Auth User');
-                        this.set('secondFieldLabel', 'Auth Password');
+                        this.set('firstFieldLabel', 'BasicAuth User (optional)');
+                        this.set('secondFieldLabel', 'BasicAuth Password (optional)');
                         $('#docker-bundle').show();
                         Mist.backendAddController.set('newBackendPort', 4243);
                     } else if (provider.provider.indexOf('openstack') > -1) {
