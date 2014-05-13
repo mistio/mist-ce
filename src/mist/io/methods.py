@@ -16,6 +16,7 @@ from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
 from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider, NodeState
 from libcloud.common.types import InvalidCredsError
+from libcloud.utils.networking import is_private_subnet
 
 
 try:
@@ -739,12 +740,32 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
     key = SSHKeyDeployment(str(public_key))
     deploy_script = ScriptDeployment(script)
     msd = MultiStepDeployment([key, deploy_script])
+    key = str(public_key).replace('\n','')
+
+    try:
+        server_key = ''
+        keys = conn.ex_list_keypairs()
+        for k in keys:
+            if key == k.public_key:
+                server_key = k.name
+                break
+        if not server_key:
+            server_key = conn.ex_import_keypair_from_string(name=machine_name, key_material=key)
+            server_key = server_key.name
+    except:
+        server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
+        server_key = server_key.name
+
     try:
         node = conn.deploy_node(name=machine_name, image=image, size=size,
-                                location=location, deploy=msd)
+                                location=location, deploy=msd, ex_keyname=server_key)
+
+        return node
     except Exception as e:
-        raise MachineCreationError("Rackspace, got exception %s" % e)
-    return node
+        if script:
+            raise MachineCreationError("Script Deployment got exception: %r" % e)
+        else:
+            raise MachineCreationError("Rackspace, got exception %r" % e)
 
 
 def _create_machine_openstack(conn, private_key, public_key, script, machine_name,
@@ -1638,6 +1659,7 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
 
     # run SSH commands
     command = (
+       "echo \""
        "sudo -n uptime 2>&1|"
        "grep load|"
        "wc -l && "
@@ -1651,7 +1673,10 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;"
        "else sysctl hw.ncpu | awk '{print $2}';"
        "fi;"
+       "echo -------- && "
+       "/sbin/ifconfig;"       
        "echo --------"
+       "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
        #"cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null |"
        #"awk '{print $2}'` 2> /dev/null || "
        #"cat ~/.ssh/authorized_keys 2> /dev/null"
@@ -1683,10 +1708,17 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
         users = re.split(' users?', uptime_output)[0].split(', ')[-1].strip()
         uptime = cmd_output[2]
         cores = cmd_output[3]
+        ips = re.findall('inet addr:(\S+)', cmd_output[4])
+        if '127.0.0.1' in ips:
+            ips.remove('127.0.0.1')
+        pub_ips = find_public_ips(ips)
+        priv_ips = [ip for ip in ips if ip not in pub_ips]
         ret = {'uptime': uptime,
                'loadavg': loadavg,
                'cores': cores,
                'users': users,
+               'pub_ips': pub_ips, 
+               'priv_ips': priv_ips
                }
         # if len(cmd_output) > 4:
         #     updated_keys = update_available_keys(user, backend_id,
@@ -1738,3 +1770,14 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
 #             } for key in updated_keypairs]
 #
 #     return ret
+
+def find_public_ips(ips):
+    public_ips = []
+    for ip in ips:
+        #is_private_subnet does not check for ipv6
+        try:
+            if not is_private_subnet(ip):
+                public_ips.append(ip)
+        except:
+            pass
+    return public_ips
