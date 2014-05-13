@@ -45,7 +45,7 @@ GCE_IMAGES = ['debian-cloud', 'centos-cloud', 'suse-cloud', 'rhel-cloud']
 @core_wrapper
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 machine_hostname="", region="", machine_key="", machine_user="",
-                compute_endpoint="", port=22, remove_on_error=True):
+                compute_endpoint="", port=22, docker_port=4243, remove_on_error=True):
     """Adds a new backend to the user and returns the new backend_id."""
 
     if not provider:
@@ -107,7 +107,8 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if not provider.__class__ is int and ':' in provider:
             provider, region = provider.split(':')[0], provider.split(':')[1]
 
-        if remove_on_error:
+        if remove_on_error and provider != 'docker':
+            #docker url is the only piece needed in docker
             if not apikey:
                 raise RequiredParameterMissingError("apikey")
             if not apisecret:
@@ -121,6 +122,8 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         backend.apiurl = apiurl
         backend.tenant_name = tenant_name
         backend.region = region
+        if provider == 'docker':
+            backend.docker_port = docker_port
 
         #OpenStack specific: compute_endpoint is passed only when there is a
         # custom endpoint for the compute/nova-compute service
