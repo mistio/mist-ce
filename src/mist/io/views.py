@@ -192,6 +192,10 @@ def add_backend(request):
     machine_key = params.get('machine_key', '')
     machine_user = params.get('machine_user', '')
     try:
+        docker_port = int(params.get('docker_port', 4243))
+    except:
+        docker_port = 4243
+    try:
         ssh_port = int(params.get('machine_port', 22))
     except:
         ssh_port = 22
@@ -203,7 +207,7 @@ def add_backend(request):
     backend_id = methods.add_backend(
         user, title, provider, apikey, apisecret, apiurl, tenant_name=tenant_name,
         machine_hostname=machine_hostname, machine_key=machine_key, machine_user=machine_user,
-        region=region, compute_endpoint=compute_endpoint, port=ssh_port
+        region=region, compute_endpoint=compute_endpoint, port=ssh_port, docker_port=docker_port
     )
     backend = user.backends[backend_id]
     return {
