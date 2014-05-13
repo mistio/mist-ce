@@ -31,23 +31,37 @@
                 {{/each}}
             </ul>
         </div>
-        <div data-theme="a">
-            <label for="new-backend-first-field">2. {{view.firstFieldLabel}}:</label>
-            {{view Mist.TextField
-                   id="new-backend-first-field"
-                   data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendFirstField"}}
 
-            {{#if view.secondFieldLabel}}
-                <label for="new-backend-second-field">3. {{view.secondFieldLabel}}:</label>
+        <!--
+
+            COMMON
+
+        -->
+
+        <div id="common-bundle">
+            <div data-theme="a">
+                <label for="new-backend-first-field">2. {{view.firstFieldLabel}}:</label>
                 {{view Mist.TextField
-                       type="password"
-                       id="new-backend-second-field"
+                       id="new-backend-first-field"
                        data-theme="a"
-                       valueBinding="Mist.backendAddController.newBackendSecondField"}}
-            {{/if}}
+                       valueBinding="Mist.backendAddController.newBackendFirstField"}}
 
+                {{#if view.secondFieldLabel}}
+                    <label for="new-backend-second-field">3. {{view.secondFieldLabel}}:</label>
+                    {{view Mist.TextField
+                           type="password"
+                           id="new-backend-second-field"
+                           data-theme="a"
+                           valueBinding="Mist.backendAddController.newBackendSecondField"}}
+                {{/if}}
+            </div>
         </div>
+
+        <!--
+
+            OPENSTACK
+
+        -->
 
         <div id="openstack-bundle" data-theme="a">
             <label for="new-backend-openstack-url">4. Auth URL:</label>
@@ -86,6 +100,12 @@
             </div>
         </div>
 
+        <!--
+
+            GCE
+
+        -->
+
         <div id="gce-bundle">
 
             <label for ="new-backend-key">3. Private key:</label>
@@ -102,6 +122,12 @@
                    data-theme="a"
                    valueBinding="Mist.backendAddController.newBackendProjectName"}}
         </div>
+
+        <!--
+
+            BAREMETAL
+
+        -->
 
         <div id="baremetal-bundle">
             <label for="new-backend-port">4. Port:</label>
@@ -132,18 +158,37 @@
             </div>
         </div>
 
+        <!--
+
+            DOCKER
+
+        -->
+
         <div id="docker-bundle">
-            <label for="new-backend-docker-url">3. Docker URL:</label>
+
+            <label for="new-backend-docker-url">1. BasicAuth User:</label>
             {{view Mist.TextField
                    id="new-backend-docker-url"
                    data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendDockerURL"}}
+                   valueBinding="Mist.backendAddController.newBackendFirstField"}}
 
-            <label for="new-backend-docker-port">4. Docker Port:</label>
+            <label for="new-backend-docker-port">2. BasicAuth Password:</label>
             {{view Mist.TextField
                    id="new-backend-docker-port"
                    data-theme="a"
+                   valueBinding="Mist.backendAddController.newBackendSecondField"}}
+
+            <label for="new-backend-first-field">3. Docker Port:</label>
+            {{view Mist.TextField
+                   id="new-backend-first-field"
+                   data-theme="a"
                    valueBinding="Mist.backendAddController.newBackendPort"}}
+
+            <label for="new-backend-second-field">4. UserDocker URL:</label>
+            {{view Mist.TextField
+                   id="new-backend-second-field"
+                   data-theme="a"
+                   valueBinding="Mist.backendAddController.newBackendDockerURL"}}
         </div>
 
         {{#if Mist.backendsController.addingBackend}}

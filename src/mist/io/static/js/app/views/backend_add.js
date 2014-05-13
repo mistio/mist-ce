@@ -49,7 +49,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                 $('#new-backend-second-field').attr('type', 'password');
                 $('#gce-bundle a').removeClass('ui-icon-check')
                     .addClass('ui-icon-carat-u');
-
+                $('#common-bundle').show();
                 Ember.run.next(function () {
                     $('#add-backend-panel').trigger('create');
                 });
@@ -94,6 +94,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                     } else if (provider.provider.indexOf('docker') > -1) {
                         this.set('firstFieldLabel', 'BasicAuth User (optional)');
                         this.set('secondFieldLabel', 'BasicAuth Password (optional)');
+                        $('#common-bundle').hide();
                         $('#docker-bundle').show();
                         Mist.backendAddController.set('newBackendPort', 4243);
                     } else if (provider.provider.indexOf('openstack') > -1) {

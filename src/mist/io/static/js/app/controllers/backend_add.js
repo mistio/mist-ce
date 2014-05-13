@@ -112,7 +112,13 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                 var ready = false;
                 if ('provider' in this.newBackendProvider) { // Filters out the "Select provider" dummy provider
 
-                    if (this.newBackendFirstField && this.newBackendSecondField) {
+                    if (this.newBackendProvider.provider == 'docker') {
+
+                        if (this.newBackendDockerURL && this.newBackendPort) {
+                            ready = true;
+                        }
+
+                    } else if (this.newBackendFirstField && this.newBackendSecondField) {
 
                         ready = true;
 
