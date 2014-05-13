@@ -533,7 +533,7 @@ def get_machine_actions(machine_from_api, conn):
 
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                     Provider.DIGITAL_OCEAN):
+                     Provider.DIGITAL_OCEAN, Provider.DOCKER):
         can_tag = False
 
     # for other states
