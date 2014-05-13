@@ -166,29 +166,29 @@
 
         <div id="docker-bundle">
 
-            <label for="new-backend-docker-url">1. BasicAuth User:</label>
+            <label for="new-backend-docker-url">1. Docker URL:</label>
             {{view Mist.TextField
                    id="new-backend-docker-url"
                    data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendFirstField"}}
+                   valueBinding="Mist.backendAddController.newBackendDockerURL"}}
 
-            <label for="new-backend-docker-port">2. BasicAuth Password:</label>
+            <label for="new-backend-docker-port">2. Docker Port:</label>
             {{view Mist.TextField
                    id="new-backend-docker-port"
                    data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendSecondField"}}
-
-            <label for="new-backend-first-field">3. Docker Port:</label>
-            {{view Mist.TextField
-                   id="new-backend-first-field"
-                   data-theme="a"
                    valueBinding="Mist.backendAddController.newBackendPort"}}
 
-            <label for="new-backend-second-field">4. UserDocker URL:</label>
+            <label for="new-backend-docker-user">3. BasicAuth User:</label>
             {{view Mist.TextField
-                   id="new-backend-second-field"
+                   id="new-backend-docker-user"
                    data-theme="a"
-                   valueBinding="Mist.backendAddController.newBackendDockerURL"}}
+                   valueBinding="Mist.backendAddController.newBackendFirstField"}}
+
+            <label for="new-backend-docker-pass">4. BasicAuth Password:</label>
+            {{view Mist.TextField
+                   id="new-backend-docker-pass"
+                   data-theme="a"
+                   valueBinding="Mist.backendAddController.newBackendSecondField"}}
         </div>
 
         {{#if Mist.backendsController.addingBackend}}
