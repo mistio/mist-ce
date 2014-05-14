@@ -719,6 +719,8 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         node = _create_machine_linode(conn, key_id, private_key, public_key,
                                      script, machine_name, image, size,
                                      location)
+    elif conn.type is Provider.DOCKER:
+        node = _create_machine_docker(conn, machine_name, image, size, script)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -973,6 +975,20 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
             raise MachineCreationError("Softlayer, got exception %s" % e)
     return node
 
+def _create_machine_docker(conn, machine_name, image, size, script):
+    """Create a machine in docker.
+
+    """
+    try:
+        node = conn.create_node(
+            name=name,
+            image=image,
+            size=size,
+            script=script
+        )
+    except Exception as e:
+        raise MachineCreationError("docker, got exception %s" % e)
+    return node
 
 def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                                  script, machine_name, image, size, location):
