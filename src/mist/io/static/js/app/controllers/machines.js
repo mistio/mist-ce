@@ -263,12 +263,15 @@ define('app/controllers/machines', ['app/models/machine'],
 
                             // Update existing machines
                             var old_machine = that.getMachine(machine.id);
-
                             // We save previous state here because it will
                             // be overwritten by the following for loop
                             var prevState = old_machine.state;
 
-                            for (var attr in machine)
+                            for (var attr in machine) {
+
+                                // Do not overwrite ips
+                                if (attr == 'private_ips') continue;
+                                if (attr == 'pubic_ips') continue;
                                 old_machine.set(attr, machine[attr]);
 
                             // Set machine on probing loop
