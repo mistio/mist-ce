@@ -981,7 +981,7 @@ def _create_machine_docker(conn, machine_name, image, size, script):
     """
     try:
         node = conn.create_node(
-            name=name,
+            name=machine_name,
             image=image,
             size=size,
             script=script
