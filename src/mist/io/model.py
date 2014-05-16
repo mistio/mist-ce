@@ -104,8 +104,10 @@ class Backend(OODict):
 
     def get_id(self):
         from mist.io.helpers import b58_encode
-        if self.provider != 'bare_metal':
+        if self.provider != 'bare_metal' and self.provider != 'docker':
             concat = '%s%s%s' % (self.provider, self.region, self.apikey)
+        elif self.provider == 'docker':
+            concat = '%s%s%s' % (self.provider, self.title, self.apiurl)
         else:
             name = self.machines.values()[0].name
             concat = '%s%s%s' % (self.provider, '', name)
