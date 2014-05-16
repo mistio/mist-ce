@@ -331,12 +331,12 @@ define('app/views/graph', ['app/views/templated'],
                         return this;
                     }
 
-                    this.data = function(data){
+                    this.data = function(data) {
                         current_animation.data = data;
                         return this;
                     }
 
-                    this.before = function(callback){
+                    this.before = function(callback) {
                         current_animation.before = callback;
                         return this;
                     }
@@ -954,6 +954,7 @@ define('app/views/graph', ['app/views/templated'],
                   setupMouseOver();
                 }
             },
+
 
             //
             //

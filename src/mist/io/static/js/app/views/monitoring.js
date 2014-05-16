@@ -88,7 +88,7 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
 
                             controller.initialize({
                                 graphs: that.graphs,
-                                machineModel: machine,
+                                machineModel: machine
                             });
 
                             // Set Up Resolution Change Event

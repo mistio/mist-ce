@@ -856,7 +856,6 @@ define('app/controllers/monitoring', ['app/models/graph',
                             });
                         });
                     });
-
                 },
 
 
