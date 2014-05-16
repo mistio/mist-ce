@@ -11,12 +11,13 @@
     </div>
 
     <div class="graphMover">
-        <a id='graphsGoBack' href="#" data-role="button" data-inline="true"
+        <a id='graphsGoBack' class="ui-btn ui-corner-all ui-btn-inline"
            {{action "goBack" target="Mist.monitoringController.history"}}>&lt;&lt;</a>
 
-        <a id='graphsResetHistory' href="#" data-role="button" data-theme="b" data-inline="true"
+        <a id='graphsResetHistory' class="ui-btn ui-btn-b ui-corner-all ui-disabled ui-btn-inline"
             {{action "disable" target="Mist.monitoringController.history"}}>Reset</a>
-        <a id='graphsGoForward' href="#" data-role="button" data-inline="true"
+
+        <a id='graphsGoForward' class="ui-btn ui-corner-all ui-disabled ui-btn-inline"
             {{action "goForward" target="Mist.monitoringController.history"}}>&gt;&gt;</a>
     </div>
 

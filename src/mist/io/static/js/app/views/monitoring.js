@@ -1,46 +1,40 @@
 define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
-    /**
-     *
-     * Monitoring View
-     *
-     * @returns Class
-     */
+    //
+    //  Monitoring View
+    //
+    // @returns Class
+    //
     function(TemplatedView, Graph) {
+
+        'use strict';
 
         return TemplatedView.extend({
 
+
+            //
+            //
+            //  Properties
+            //
+            //
+
+
             graphs : [],
-            viewRendered: false,
 
-            /**
-            *
-            * Initialize monitoring view. Automatically called by ember
-            *
-            */
-            init: function() {
-                this._super();
+
+            //
+            //
+            //  Initialization
+            //
+            //
+
+
+            load: function(){
                 this.setUpGraphs();
-            },
+            }.on('didInsertElement'),
 
-            /**
-            *
-            * Called by ember when view is rendered
-            *
-            */
-            didInsertElement: function(){
-                this._super();
-                this.set('viewRendered',true);
-            },
 
-            /**
-            *
-            * Called by ember when view will be destroyed
-            * Stops data request and re-initializes enable button
-            *
-            */
-            willDestroyElement: function(){
+            unload: function(){
 
-                this._super();
                 Mist.monitoringController.request.stop();
                 Mist.monitoringController.graphs.disableAnimation();
                 Mist.monitoringController.reset();
@@ -49,11 +43,19 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
                 Em.run.next(function() {
                     $('.monitoring-button').button();
                 });
-            },
+            }.on('willDestroyElement'),
+
+
+
+            //
+            //
+            //  Methods
+            //
+            //
+
 
             /**
             *
-            * If monitoring is enabled Re-draws jqm components,
             * creates graph instances, initializes controller and
             * setups resize event
             *
@@ -64,73 +66,47 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
 
                 // Check if disable button pressed
                 // Then check if everything is ok to render the graphs
-                if(machine.id != ' ' && this.viewRendered && !machine.hasMonitoring){
+                if (machine.id != ' ' && !machine.hasMonitoring) {
 
                     Mist.monitoringController.request.stop();
-                }
-                else if(this.viewRendered && machine.hasMonitoring && machine.id != ' '){
 
-                    var self = this;
+                } else if (machine.hasMonitoring && machine.id != ' ') {
+
+                    var that = this;
                     var controller = Mist.monitoringController;
 
                     var setup = function() {
 
-                        // Check if jqm is initialized
-                        if(!Mist.isJQMInitialized){
-
-                            window.setTimeout(setup,1000);
+                        if(!Mist.isJQMInitialized) {
+                            Ember.run.later(setup, 1000);
+                            return;
                         }
-                        else{
 
-                            Ember.run.next(function() {
+                        Ember.run.next(function() {
 
-                                // Re-Initialize jquery components and hide buttons
-                                self.redrawJQMComponents();
-                                $('.graphBtn').hide(0);
+                            $('.graphBtn').hide(0);
 
-                                controller.initialize({
-                                    machineModel    : machine,      // Send Current Machine
-                                    graphs          : self.graphs,  // Send Graphs Instances
-                                });
-
-                                // Set Up Resolution Change Event
-                                $(window).resize(function(){
-
-                                    var newWidth = $("#GraphsArea").width() -2;
-                                    self.graphs.forEach(function (graph) {
-                                        //graph.changeWidth(newWidth);
-                                    });
-                                })
-
+                            controller.initialize({
+                                graphs: that.graphs,
+                                machineModel: machine,
                             });
-                        }
+
+                            // Set Up Resolution Change Event
+                            $(window).resize(function(){
+
+                                var newWidth = $('#GraphsArea').width() -2;
+                                that.graphs.forEach(function (graph) {
+                                    //graph.changeWidth(newWidth);
+                                });
+                            })
+
+                        });
                     }
 
                     setup();
                     Mist.rulesController.redrawRules();
                 }
-            }.observes('controller.model.hasMonitoring','viewRendered'),
-
-            /**
-            *
-            * Re-draws JQM Components of monitoring
-            *
-            */
-            redrawJQMComponents: function(){
-
-                $('.monitoring-button').trigger('create');
-                $('#add-rule-button').trigger('create');
-                $('#monitoring-dialog').trigger('create');
-
-                $('#graphBar').trigger('create');
-
-                // History And Zoom Buttons
-                $('.graphControls').trigger('create');
-
-                // Disable History
-                $('#graphsGoForward').addClass('ui-disabled');
-                $('#graphsResetHistory').addClass('ui-disabled');
-            }
+            }.observes('controller.model.hasMonitoring'),
         });
     }
 );

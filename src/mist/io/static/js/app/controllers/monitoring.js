@@ -708,16 +708,15 @@ define('app/controllers/monitoring', ['app/models/graph',
             *
             */
             UI : {
-                collapsePressed : function(graph){
+                collapsePressed: function(graph){
                     Mist.monitoringController.graphs.collapse([graph]);
                 },
 
-                expandPressed : function(graph){
+                expandPressed: function(graph){
                     Mist.monitoringController.graphs.expand([graph]);
                 },
 
-                zoomChange : function(){
-
+                zoomChange: function(){
 
                     var zoomIndex = $('#zoomSelect :selected').val();
 
@@ -740,7 +739,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *   Enable animation of all graphs
                 *
                 */
-                enableAnimation  : function() {
+                enableAnimation: function() {
 
                     this.instances.forEach(function (graph) {
                         graph.view.enableAnimation();
@@ -755,7 +754,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *   Disable animation of all graphs
                 *   @param {boolean} stopCurrent - Stop current animation or Stop animation on next update
                 */
-                disableAnimation : function(stopCurrent) {
+                disableAnimation: function(stopCurrent) {
 
                     stopCurrent = stopCurrent || true;
 
@@ -771,7 +770,7 @@ define('app/controllers/monitoring', ['app/models/graph',
                 *   Change time window
                 *   @param {number} newTimeWindow - The new time window in miliseconds
                 */
-                changeTimeWindow : function(newTimeWindow) {
+                changeTimeWindow: function(newTimeWindow) {
                     this.instances.forEach(function (graph) {
                         graph.changeTimeWindow(newTimeWindow);
                     });
