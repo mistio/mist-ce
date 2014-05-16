@@ -1145,12 +1145,12 @@ define('app/controllers/monitoring', ['app/models/graph',
 
                 disable: function(){
 
-                    $('#zoomSelect-button *').addClass('ui-disabled');
+                    $('#zoomSelect-button *').addClass('ui-state-disabled');
                 },
 
                 enable: function(){
 
-                    $('#zoomSelect-button *').removeClass('ui-disabled');
+                    $('#zoomSelect-button *').removeClass('ui-state-disabled');
                 },
 
                 reset: function(){
@@ -1273,8 +1273,8 @@ define('app/controllers/monitoring', ['app/models/graph',
                         this.lastMetrictime  = request.lastMetrictime;
                         this.currentStopTime =  new Date(this.lastMetrictime.getTime() - this.timeWindow);
 
-                        $('#graphsGoForward').removeClass('ui-disabled');
-                        $('#graphsResetHistory').removeClass('ui-disabled');
+                        $('#graphsGoForward').removeClass('ui-state-disabled');
+                        $('#graphsResetHistory').removeClass('ui-state-disabled');
 
                         Mist.monitoringController.zoom.disable();
                     }
@@ -1290,23 +1290,23 @@ define('app/controllers/monitoring', ['app/models/graph',
                     this.isEnabled = false;
                     Mist.monitoringController.request.customReset();
 
-                    $('#graphsGoForward').addClass('ui-disabled');
-                    $('#graphsResetHistory').addClass('ui-disabled');
+                    $('#graphsGoForward').addClass('ui-state-disabled');
+                    $('#graphsResetHistory').addClass('ui-state-disabled');
 
                     Mist.monitoringController.zoom.enable();
                 },
 
                 disableControls: function() {
-                    $('#graphsGoBack').addClass('ui-disabled');
-                    $('#graphsGoForward').addClass('ui-disabled');
-                    $('#graphsResetHistory').addClass('ui-disabled');
+                    $('#graphsGoBack').addClass('ui-state-disabled');
+                    $('#graphsGoForward').addClass('ui-state-disabled');
+                    $('#graphsResetHistory').addClass('ui-state-disabled');
                 },
 
                 enableControls: function() {
-                    $('#graphsGoBack').removeClass('ui-disabled');
+                    $('#graphsGoBack').removeClass('ui-state-disabled');
                     if(this.isEnabled){
-                        $('#graphsGoForward').removeClass('ui-disabled');
-                        $('#graphsResetHistory').removeClass('ui-disabled');
+                        $('#graphsGoForward').removeClass('ui-state-disabled');
+                        $('#graphsResetHistory').removeClass('ui-state-disabled');
                     }
                 },
 

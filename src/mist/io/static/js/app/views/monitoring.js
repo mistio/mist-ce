@@ -58,6 +58,8 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
                     return;
                 }
 
+                var that = this;
+
                 var setup = function () {
 
                     if (!Mist.isJQMInitialized) {
@@ -67,7 +69,6 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
 
                     Ember.run.next(function () {
 
-                        var that = this;
                         Mist.monitoringController.initialize({
                             graphs: that.graphs,
                             machineModel: machine
