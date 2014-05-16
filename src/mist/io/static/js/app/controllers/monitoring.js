@@ -1,11 +1,9 @@
-define('app/controllers/monitoring', ['app/models/graph',
-    'ember'
-    ],
-    /**
-     * Monitoring Controller
-     *
-     * @returns Class
-     */
+define('app/controllers/monitoring', ['app/models/graph', 'ember'],
+    //
+    //  Monitoring Controller
+    //
+    //  @returns Class
+    //
     function(Graph) {
 
         'use strict';
@@ -13,13 +11,24 @@ define('app/controllers/monitoring', ['app/models/graph',
         return Ember.Object.extend(Ember.Evented, {
 
 
-            _graphs: [], // Direct access to instances.graphs
+            //
+            //
+            //  Properties
+            //
+            //
 
-            /**
-             *
-             * Gets all monitoring related data from
-             * the server
-             */
+
+            _graphs: [],              // Direct access to this.instances.graphs
+            checkingMonitoring: null,
+
+
+            //
+            //
+            //  Initialization
+            //
+            //
+
+
             load: function(callback) {
 
                 if (!Mist.authenticated) {
@@ -28,14 +37,15 @@ define('app/controllers/monitoring', ['app/models/graph',
                 }
 
                 var that = this;
-                this.checkingMonitoring = true;
+                this.set('checkingMonitoring', true);
                 Mist.ajax.GET('/monitoring', {
                 }).success(function(data) {
                     that._updateMonitoringData(data);
                 }).error(function() {
-                    Mist.notificationController.notify('Failed to get monitoring data');
+                    Mist.notificationController.notify(
+                        'Failed to get monitoring data');
                 }).complete(function(success, data) {
-                    that.checkingMonitoring = false;
+                    that.set('checkingMonitoring', false);
                     Mist.backendsController.set('checkedMonitoring', true);
                     that.trigger('onMonitoringDataUpdate');
                     if (callback) callback(success, data);
@@ -43,32 +53,31 @@ define('app/controllers/monitoring', ['app/models/graph',
             }.on('init'),
 
 
-            enableMonitoring: function(machine, callback, no_ssh) {
+            enableMonitoring: function(machine, callback, noSsh) {
 
                 var that = this;
                 machine.set('enablingMonitoring', true);
-                Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring', {
+                Mist.ajax.POST('/backends/' + machine.backend.id +
+                    '/machines/' + machine.id + '/monitoring',
+                {
                     'action': 'enable',
-                    'dns_name': machine.extra.dns_name ? machine.extra.dns_name : 'n/a',
-                    'public_ips': machine.public_ips ? machine.public_ips : [],
-                    'name': machine.name ? machine.name : machine.id,
-                    'no_ssh': no_ssh || false,
+                    'no_ssh': noSsh || false,
+                    'name': machine.name || machine.id,
+                    'public_ips': machine.public_ips || [],
+                    'dns_name': machine.extra.dns_name || 'n/a',
                 }).success(function(data) {
-
                     Mist.set('authenticated', true);
-                    machine.set('hasMonitoring', true);
-                    machine.set('pendingFirstData', true);
-                    machine.set('enablingMonitoring', false);
-
+                    that._enableMonitoring(machine);
                 }).error(function(message, statusCode) {
 
-                    machine.set('enablingMonitoring', false);
-                    if (statusCode == 402) {
+                    if (statusCode == 402)
                         Mist.notificationController.timeNotify(message, 5000);
-                    } else {
-                        Mist.notificationController.notify('Error when changing monitoring to ' + machine.name);
-                    }
+                    else
+                        Mist.notificationController.notify(
+                            'Error when changing monitoring to ' + machine.name);
+
                 }).complete(function(success, data) {
+                    machine.set('enablingMonitoring', false);
                     if (callback) callback(success, data);
                 });
             },
@@ -78,68 +87,83 @@ define('app/controllers/monitoring', ['app/models/graph',
 
                 var that = this;
                 machine.set('disablingMonitoring', true);
-                Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/monitoring', {
+                Mist.ajax.POST('/backends/' + machine.backend.id +
+                    '/machines/' + machine.id + '/monitoring',
+                {
                     'action': 'disable',
-                    'dns_name': machine.extra.dns_name ? machine.extra.dns_name : 'n/a',
-                    'public_ips': machine.public_ips ? machine.public_ips : [],
-                    'name': machine.name ? machine.name : machine.id
+                    'name': machine.name || machine.id,
+                    'public_ips': machine.public_ips || [],
+                    'dns_name': machine.extra.dns_name || 'n/a',
                 }).success(function(data) {
-
-                    machine.set('hasMonitoring', false);
-                    // Remove machine from monitored_machines
-                    Mist.monitored_machines.some(function(machine_tupple) {
-                        if (machine_tupple[1] == machine.id &&
-                            machine_tupple[0] == machine.backend.id) {
-                                Mist.monitored_machines.removeObject(machine_tupple);
-                        }
-                    });
-                    machine.set('disablingMonitoring', false);
                     Mist.set('authenticated', true);
-
+                    that._disableMonitoring(machine);
                 }).error(function(message, statusCode) {
 
-                    machine.set('disablingMonitoring', false);
-                    if (statusCode == 402) {
+                    if (statusCode == 402)
                         Mist.notificationController.timeNotify(message, 5000);
-                    } else {
-                        Mist.notificationController.notify('Error when changing monitoring to ' + machine.name);
-                    }
+                    else
+                        Mist.notificationController.notify(
+                            'Error when changing monitoring to ' + machine.name);
+
                 }).complete(function(success, data) {
+                    machine.set('disablingMonitoring', false);
                     if (callback) callback(success, data);
                 });
             },
 
 
             changeMonitoring: function(machine, callback) {
-
-                if (machine.hasMonitoring) {
+                if (machine.hasMonitoring)
                     this.disableMonitoring(machine, callback);
-                } else {
+                else
                     this.enableMonitoring(machine, callback);
-                }
             },
 
-             /**
-             *
-             * Updates everything in the app that has
-             * to do with monitoring
-             */
-             _updateMonitoringData: function(data) {
 
-                 Mist.set('monitored_machines', data.machines);
-                 Mist.set('current_plan', data.current_plan);
-                 Mist.metricsController.setCustomMetrics(data.custom_metrics);
-                 Mist.metricsController.setBuiltInMetrics(data.builtin_metrics);
-                 Mist.rulesController.setContent(data.rules);
-                 data.machines.forEach(function(machine_tuple) {
-                     var machine = Mist.backendsController.getMachine(machine_tuple[1], machine_tuple[0]);
-                     if (machine)
-                         machine.set('hasMonitoring', true);
-                 });
-                 Mist.backendsController.content.forEach(function(backend) {
-                    backend.machines._updateMonitoredMachines();
-                 });
-             },
+            _enableMonitoring: function (machine) {
+                Ember.run(this, function () {
+                    machine.set('hasMonitoring', true);
+                    machine.set('pendingFirstData', true);
+                    this.trigger('onMonitoringEnable', machine);
+                });
+            },
+
+
+            _disableMonitoring: function (machine) {
+                Ember.run(this, function () {
+                    machine.set('hasMonitoring', false);
+                    Mist.monitored_machines.some(function(machine_tupple) {
+                        if (machine.equals(machine_tupple))
+                            Mist.monitored_machines.removeObject(machine_tupple);
+                    });
+                    this.trigger('onMonitoringDisable', machine);
+                });
+            },
+
+
+
+
+            /**
+            *
+            * Updates everything in the app that has
+            * to do with monitoring
+            */
+            _updateMonitoringData: function(data) {
+
+                Mist.set('monitored_machines', data.machines);
+                Mist.set('current_plan', data.current_plan);
+                Mist.metricsController.setCustomMetrics(data.custom_metrics);
+                Mist.metricsController.setBuiltInMetrics(data.builtin_metrics);
+                Mist.rulesController.setContent(data.rules);
+                data.machines.forEach(function(machine_tuple) {
+                    var machine = Mist.backendsController.getMachine(machine_tuple[1], machine_tuple[0]);
+                    if (machine)
+                        machine.set('hasMonitoring', true);
+                });
+                Mist.backendsController.content.forEach(function(backend) {
+                   backend.machines._updateMonitoredMachines();
+                });
+            },
 
 
             /*

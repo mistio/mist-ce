@@ -1,10 +1,10 @@
-define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
+define('app/views/monitoring', ['app/views/templated'],
     //
     //  Monitoring View
     //
-    // @returns Class
+    //  @returns Class
     //
-    function (TemplatedView, Graph) {
+    function (TemplatedView) {
 
         'use strict';
 

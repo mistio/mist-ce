@@ -337,7 +337,6 @@ define( 'app', [
         App.set('machinePowerController', MachinePowerController.create());
         App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
 
-
         // Ember custom widgets
 
         App.Select = Ember.Select.extend({
