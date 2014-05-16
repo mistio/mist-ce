@@ -4,7 +4,7 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
     //
     // @returns Class
     //
-    function(TemplatedView, Graph) {
+    function (TemplatedView, Graph) {
 
         'use strict';
 
@@ -18,7 +18,7 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
             //
 
 
-            graphs : [],
+            graphs: [],
 
 
             //
@@ -28,23 +28,16 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
             //
 
 
-            load: function(){
+            load: function () {
                 this.setUpGraphs();
             }.on('didInsertElement'),
 
 
-            unload: function(){
-
+            unload: function () {
                 Mist.monitoringController.request.stop();
                 Mist.monitoringController.graphs.disableAnimation();
                 Mist.monitoringController.reset();
-
-                // Re-Initialize Enable Button Of Jquery Mobile
-                Em.run.next(function() {
-                    $('.monitoring-button').button();
-                });
             }.on('willDestroyElement'),
-
 
 
             //
@@ -54,59 +47,46 @@ define('app/views/monitoring', ['app/views/templated', 'app/models/graph'],
             //
 
 
-            /**
-            *
-            * creates graph instances, initializes controller and
-            * setups resize event
-            *
-            */
-            setUpGraphs: function() {
+            setUpGraphs: function () {
 
                 var machine = this.get('controller').get('model');
 
-                // Check if disable button pressed
-                // Then check if everything is ok to render the graphs
-                if (machine.id != ' ' && !machine.hasMonitoring) {
-
+                if (machine.id == ' ')
+                    return;
+                if (!machine.hasMonitoring) {
                     Mist.monitoringController.request.stop();
+                    return;
+                }
 
-                } else if (machine.hasMonitoring && machine.id != ' ') {
+                var setup = function () {
 
-                    var that = this;
-                    var controller = Mist.monitoringController;
-
-                    var setup = function() {
-
-                        if(!Mist.isJQMInitialized) {
-                            Ember.run.later(setup, 1000);
-                            return;
-                        }
-
-                        Ember.run.next(function() {
-
-                            $('.graphBtn').hide(0);
-
-                            controller.initialize({
-                                graphs: that.graphs,
-                                machineModel: machine
-                            });
-
-                            // Set Up Resolution Change Event
-                            $(window).resize(function(){
-
-                                var newWidth = $('#GraphsArea').width() -2;
-                                that.graphs.forEach(function (graph) {
-                                    //graph.changeWidth(newWidth);
-                                });
-                            })
-
-                        });
+                    if (!Mist.isJQMInitialized) {
+                        Ember.run.later(setup, 1000);
+                        return;
                     }
 
-                    setup();
-                    Mist.rulesController.redrawRules();
+                    Ember.run.next(function () {
+
+                        var that = this;
+                        Mist.monitoringController.initialize({
+                            graphs: that.graphs,
+                            machineModel: machine
+                        });
+
+                        // Set Up Resolution Change Event
+                        $(window).resize(function () {
+
+                            var newWidth = $('#GraphsArea').width() - 2;
+                            that.graphs.forEach(function (graph) {
+                                //graph.changeWidth(newWidth);
+                            });
+                        })
+                    });
                 }
-            }.observes('controller.model.hasMonitoring'),
+
+                setup();
+                Mist.rulesController.redrawRules();
+            }.observes('controller.model.hasMonitoring')
         });
     }
 );
