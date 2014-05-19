@@ -18,7 +18,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
             //
 
 
-            _graphs: [],              // Direct access to this.instances.graphs
+            _graphs: [],        // Points to this.instances.graphs so that
+                                // handlebars can access it in monitoring.html
             checkingMonitoring: null,
 
 
@@ -57,9 +58,11 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                 var that = this;
                 machine.set('enablingMonitoring', true);
-                Mist.ajax.POST('/backends/' + machine.backend.id +
-                    '/machines/' + machine.id + '/monitoring',
-                {
+
+                var url = '/backends/' + machine.backend.id +
+                    '/machines/' + machine.id + '/monitoring';
+
+                Mist.ajax.POST(url, {
                     'action': 'enable',
                     'no_ssh': noSsh || false,
                     'name': machine.name || machine.id,
@@ -87,9 +90,11 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                 var that = this;
                 machine.set('disablingMonitoring', true);
-                Mist.ajax.POST('/backends/' + machine.backend.id +
-                    '/machines/' + machine.id + '/monitoring',
-                {
+
+                var url = '/backends/' + machine.backend.id +
+                    '/machines/' + machine.id + '/monitoring';
+
+                Mist.ajax.POST(url, {
                     'action': 'disable',
                     'name': machine.name || machine.id,
                     'public_ips': machine.public_ips || [],
@@ -141,25 +146,22 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
             },
 
 
-
-
-            /**
-            *
-            * Updates everything in the app that has
-            * to do with monitoring
-            */
             _updateMonitoringData: function(data) {
 
-                Mist.set('monitored_machines', data.machines);
                 Mist.set('current_plan', data.current_plan);
+                Mist.set('monitored_machines', data.machines);
+
                 Mist.metricsController.setCustomMetrics(data.custom_metrics);
                 Mist.metricsController.setBuiltInMetrics(data.builtin_metrics);
                 Mist.rulesController.setContent(data.rules);
-                data.machines.forEach(function(machine_tuple) {
-                    var machine = Mist.backendsController.getMachine(machine_tuple[1], machine_tuple[0]);
+
+                data.machines.forEach(function(machineTuple) {
+                    var machine = Mist.backendsController.getMachine(
+                                    machineTuple[1], machineTuple[0]);
                     if (machine)
                         machine.set('hasMonitoring', true);
                 });
+
                 Mist.backendsController.content.forEach(function(backend) {
                    backend.machines._updateMonitoredMachines();
                 });
@@ -226,12 +228,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
             },
 
 
-            /**
-            *
-            *   Resets all controller instances to the default state
-            *
-            */
-            reset: function(){
+            reset: function () {
 
                 this.request.reset();
                 this.history.reset();
@@ -255,7 +252,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 *   @param {number}  updateinterval - Update every updateInterval miliseconds
                 *   @param {boolean} enableUpdates  - Enable/Disable updates
                 */
-                create : function(args){
+                create: function (args) {
 
                     this.reset();
 
@@ -268,27 +265,27 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     this.machine         = args.machine;
                     this.updateData      = args.updatesEnabled;
                     this.step            = args.step;
-                    this.callback        = ('callback' in args) ? args.callback : null;
+                    this.callback        = args.callback || function () {};
                     this.timeGap         = args.timeGap; // Temporary Fix , Give some time to server to collect data
 
                     // Calculate Start And Stop
-                    this.timeStop        = Math.floor( ( (new Date()).getTime() - this.timeGap * 1000) / 1000 );
+                    this.timeStop        = Math.floor((new Date().getTime() - this.timeGap * 1000) / 1000 );
 
-                    // Align time to be a multiply of 10
-                    var secToRemove =(new Date(this.timeStop*1000)).getSeconds() % 10;
+                    // Align time to be a multiple of 10
+                    var secToRemove = new Date(this.timeStop * 1000).getSeconds() % 10;
                     this.timeStop -= secToRemove;
 
-                    this.timeStart       = Math.floor(this.timeStop - this.timeWindow/1000);
-                    this.lastMetrictime  = new Date(this.timeStart*1000);
+                    this.timeStart       = Math.floor(this.timeStop - this.timeWindow / 1000);
+                    this.lastMetrictime  = new Date(this.timeStart * 1000);
                 },
 
 
                 /**
                 *
-                *   Starts the request. User create() first
+                *   Starts the request. Use create() first
                 *
                 */
-                start : function(){
+                start: function () {
 
                     var self = this;
 
@@ -297,12 +294,12 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     // If request stopped Re-calculate start and stop
                     if(this.initialized && !this.running){
 
-                        this.timeStart = Math.floor( this.lastMetrictime.getTime() /1000 ) ;
-                        this.timeStop  =  Math.floor( ((new Date()).getTime() - this.timeGap * 1000 ) / 1000 );
+                        this.timeStart = Math.floor( this.lastMetrictime.getTime() / 1000 ) ;
+                        this.timeStop  = Math.floor( (new Date().getTime() - this.timeGap * 1000 ) / 1000 );
 
                         // Fix time when lossing precision
-                        var stopRemainder = (this.timeStop - this.timeStart) % (this.step/1000);
-                        this.timeStop     = this.timeStop - stopRemainder;
+                        var stopRemainder = (this.timeStop - this.timeStart) % (this.step / 1000);
+                        this.timeStop    -= stopRemainder;
                     } else {
 
                         this.initialized = true;
@@ -313,8 +310,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                     // Do the ajax call
                     this.requestID++;
-                    this.receiveData(this.timeStart, this.timeStop, this.step,this.callback);
-
+                    this.receiveData(this.timeStart, this.timeStop, this.step,
+                        this.callback);
 
                     // Check if Data Updates Are Enabled
                     if(this.updateData && !this.running){
@@ -329,17 +326,17 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                             // Calculate Start and Stop
                             self.timeStart = Math.floor( self.lastMetrictime.getTime() /1000 ) ;
-                            self.timeStop  =  Math.floor( ((new Date()).getTime() - self.timeGap * 1000 ) / 1000 );
+                            self.timeStop  = Math.floor( (new Date().getTime() - self.timeGap * 1000 ) / 1000 );
 
                             // Fix time when lossing precision
                             var stopRemainder = (self.timeStop - self.timeStart) % (self.step/1000);
-                            self.timeStop     = self.timeStop - stopRemainder;
+                            self.timeStop    -= stopRemainder;
 
                             // Do the ajax call
                             this.requestID++;
                             self.receiveData(self.timeStart, self.timeStop, self.step,self.callback);
 
-                        },this.step);
+                        }, this.step);
                     }
 
                     this.running = true;
@@ -380,7 +377,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                            // Stop Current Request
                            self.stop();
 
-                           reason = (typeof reason == 'undefined' ? 'manualReload' : reason);
+                           reason = reason || 'manualReload'; // Not used at all?
 
                            // Enable/Disable updates
                            if(!self.updateData && Mist.monitoringController.graphs.animationEnabled)
@@ -434,8 +431,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                             //var timeGap          = 60;
                             var timeWindow  = self.timeWindow;
                             var step        = self.step;
-                            var stop        = Math.floor( ( new Date()).getTime() / 1000 );
-                            var start       = Math.floor( stop - timeWindow/1000 );
+                            var stop        = Math.floor( new Date().getTime() / 1000 );
+                            var start       = Math.floor( stop - timeWindow / 1000 );
                             var callback    = null;
 
                             if(options){
@@ -487,9 +484,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 */
                 changeStep: function(newStep,reloadAfter){
                     this.step = newStep;
-                    var reload = reloadAfter || true;
-                    if(reload)
-                        this.reload('stepChanged');
+                    if(!reloadAfter) return;
+                    this.reload('stepChanged');
                 },
 
 
@@ -501,9 +497,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 */
                 changeTimeWindow: function(newTimeWindow,reloadAfter){
                     this.timeWindow = newTimeWindow;
-                    var reload = reloadAfter || true;
-                    if(reload)
-                        this.reload('timeWindowChanged');
+                    if(!reloadAfter) return;
+                    this.reload('timeWindowChanged');
                 },
 
 
@@ -513,10 +508,9 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 *
                 */
                 enableUpdates: function(reloadAfter){
-                    var reload = reloadAfter || true;
                     this.updateData = true;
-                    if(reload)
-                        this.reload('updatesEnabled');
+                    if(!reloadAfter) return;
+                    this.reload('updatesEnabled');
                 },
 
 
@@ -526,11 +520,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 *
                 */
                 disableUpdates: function(reloadAfter){
-                    var reload = reloadAfter || true;
                     this.updateData = false;
-                    if(reload)
-                        this.reload('updatesDisabled');
-                }.observes("machine.isDestroying"),
+                    if(!reloadAfter) return;
+                    this.reload('updatesDisabled');
+                }.observes('machine.isDestroying'),
 
 
                 /**
@@ -538,7 +531,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 *   Stops data updates by clearing the interval
                 *
                 */
-                stopDataUpdates: function(){
+                stopDataUpdates: function() {
                     window.clearInterval(window.monitoringInterval);
                 },
 
@@ -550,16 +543,11 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 *   @param {number} step  - The step in miliseconds of requested measurements
                 *   @param {function} callback - The function that will be called when request has finished.
                 */
-                receiveData: function(start,stop,step,callback){
+                receiveData: function(start,stop,step,callback) {
 
                     var requestID  = this.requestID;
                     var controller = Mist.monitoringController;
                     var self = this;
-
-                    // Set an empty function for null callbacks
-                    if (callback == null) {
-                      callback = function(){};
-                    }
 
                     $.ajax({
                         url: '/backends/' + self.machine.backend.id +
@@ -569,10 +557,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                         dataType: 'json',
                         data: { 'start': start,
                                 'stop': stop,
-                                'step': step/1000
+                                'step': step / 1000
                               },
                         timeout: 8000,
-                        success: function (data, status, xhr){
+                        success: function (data) {
 
                             try {
 
@@ -580,8 +568,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                     throw "No Data Received";
 
 
-                                /* TODO: Maybe there is a better to tell if
-                                 we have data */
+                                // TODO: Maybe there is a better to tell if
+                                // we have data
 
                                 if (self.machine.pendingFirstData) {
                                     var hasFirstData = false;
@@ -599,6 +587,9 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                 var receivedData = {};
 
                                 data.forEach(function(metric) {
+
+                                    // Hash the target to get rid of
+                                    // funky characters
 
                                     var id = md5(metric.target);
                                     metric.id = id;
@@ -625,7 +616,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                     data  : receivedData
                                 });
 
-                                $(document).trigger('finishedFetching',[requestID,'success']);
+                                $(document).trigger('finishedFetching', [
+                                    requestID,
+                                    'success'
+                                ]);
                             }
                             catch(err) {
                                 error(err);
@@ -635,34 +629,40 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                     error: err
                                 });
 
-                                $(document).trigger('finishedFetching',[requestID,'failure']);
+                                $(document).trigger('finishedFetching', [
+                                    requestID,
+                                    'failure'
+                                ]);
                             }
-
-                            self.machine.set('pendingStats', false);
-                            self.locked = false;
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
 
-                            if(errorThrown == 'timeout'){
+                            if (errorThrown == 'timeout')
 
                                 // When monitoring is disabled ajax call may be still run one time.
                                 // So we won't display error if it is disabled
-                                if(self.machine.hasMonitoring){
-                                    Mist.notificationController.timeNotify("Data request timed out. " +
-                                                                           "Network connection is down or server doesn't respond",4000);
-                                }
-                            }
-                            else{
 
+                                if (self.machine.hasMonitoring)
+
+                                    Mist.notificationController.timeNotify(
+                                        "Data request timed out. " +
+                                        "Network connection is down or server doesn't respond",
+                                        4000);
+
+                            else
                                 error(textStatus);
-                            };
 
                             callback({
                                 status: 'error',
                                 error: errorThrown
                             });
-                            $(document).trigger('finishedFetching',[requestID,'failure']);
 
+                            $(document).trigger('finishedFetching', [
+                                requestID,
+                                'failure'
+                            ]);
+                        },
+                        complete: function () {
                             self.machine.set('pendingStats', false);
                             self.locked = false;
                         }
@@ -675,12 +675,12 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 *   Prints some debug information
                 *
                 */
-                printInfo: function(){
-                    console.log("Time Window    : " + (this.timeWindow/1000) + " seconds");
+                printInfo: function () {
+                    console.log("Time Window    : " + (this.timeWindow / 1000) + " seconds");
                     console.log("Last Metric    : " + this.lastMetrictime);
-                    console.log("Start          : " + (new Date(this.timeStart*1000)));
-                    console.log("Stop           : " + (new Date(this.timeStop *1000)));
-                    console.log("Step           : " + (this.step/1000) + " seconds");
+                    console.log("Start          : " + (new Date(this.timeStart * 1000)));
+                    console.log("Stop           : " + (new Date(this.timeStop * 1000)));
+                    console.log("Step           : " + (this.step / 1000) + " seconds");
                     console.log("Update Interval: " + this.updateInterval)
                 },
 
@@ -690,7 +690,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 *   Resets current object into the default state
                 *
                 */
-                reset: function(){
+                reset: function () {
                     this.machine        = null;
                     this.lastMetrictime = null;
                     this.callback       = null;
@@ -722,7 +722,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 initialized    : false, // boolean
                 requestID      : 0,     // integer index
 
-            },
+            }, // Request Object
 
 
             /**
@@ -732,22 +732,21 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
             *
             */
             UI : {
-                collapsePressed: function(graph){
+
+                collapsePressed: function (graph) {
                     Mist.monitoringController.graphs.collapse([graph]);
                 },
 
-                expandPressed: function(graph){
+                expandPressed: function (graph) {
                     Mist.monitoringController.graphs.expand([graph]);
                 },
 
-                zoomChange: function(){
-
+                zoomChange: function () {
                     var zoomIndex = $('#zoomSelect :selected').val();
-
                     Mist.monitoringController.zoom.toIndex(zoomIndex);
-
                 }
-            },
+
+            }, // UI Object
 
 
             /**
@@ -758,17 +757,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
             graphs : {
 
 
-                /**
-                *
-                *   Enable animation of all graphs
-                *
-                */
-                enableAnimation: function() {
-
+                enableAnimation: function () {
                     this.instances.forEach(function (graph) {
                         graph.view.enableAnimation();
                     });
-
                     this.animationEnabled = true;
                 },
 
@@ -778,9 +770,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 *   Disable animation of all graphs
                 *   @param {boolean} stopCurrent - Stop current animation or Stop animation on next update
                 */
-                disableAnimation: function(stopCurrent) {
+                disableAnimation: function (stopCurrent) {
 
-                    stopCurrent = stopCurrent || true;
+                    if (typeof stopCurrent == 'undefinded')
+                        stopCurrent = true;
 
                     this.instances.forEach(function (graph) {
                         graph.view.disableAnimation(stopCurrent);
@@ -789,26 +782,15 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     this.animationEnabled = false;
                 },
 
-                /**
-                *
-                *   Change time window
-                *   @param {number} newTimeWindow - The new time window in miliseconds
-                */
-                changeTimeWindow: function(newTimeWindow) {
+
+                changeTimeWindow: function (newTimeWindow) {
                     this.instances.forEach(function (graph) {
                         graph.changeTimeWindow(newTimeWindow);
                     });
                 },
 
 
-                /**
-                *
-                *  Updates graphs data
-                *   @param {object} data - Metrics objects in associative array
-                */
-                updateData : function(data){
-
-                    // TODO something with cpuCores property
+                updateData: function (data) {
 
                     // Run before queued actions
                     var numOfActions = this.updateActions.before.length;
@@ -833,12 +815,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 },
 
 
-                /**
-                *
-                *   Clears all data from graphs
-                *
-                */
-                clearData  : function() {
+                clearData: function () {
                     this.instances.forEach(function (graph) {
                         graph.view.clearData();
                     });
@@ -850,7 +827,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 *  Collapse selected metrics
                 *  Possible to set animation duration
                 */
-                collapse : function(metrics, duration) {
+                collapse: function (metrics, duration) {
 
                     // Mobile Hide Animation is slow, disabling animation
                     var hideDuration = duration || 400;
@@ -888,7 +865,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 *  Expands selected metrics
                 *  Possible to set animation duration
                 */
-                expand : function(metrics,duration) {
+                expand: function (metrics,duration) {
 
                     // Mobile Hide Animation is slow, disabling animation
                     var hideDuration = duration || 400;
@@ -897,7 +874,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                         hideDuration = 0;
 
                     // Add graph to the end of the list
-                    metrics.forEach(function(metric){
+                    metrics.forEach(function (metric) {
 
                         $("#" + metric).insertAfter($('.graph').last());
 
@@ -921,40 +898,31 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                 },
 
+
                 /*
                 * add a function to be called before or after updating graphs
                 * @param {string}   when   - Posible values 'before' or 'after' (updating)
                 * @param {function} action - The function that will run before or after updating
                 */
-                addNextUpdateAction: function(when,action){
+                addNextUpdateAction: function (when, action) {
 
-                    if(when == 'before')
+                    if (when == 'before')
                         this.updateActions.before.push(action);
                     else
                         this.updateActions.after.push(action);
                 },
 
-                /*
-                *
-                *  Remove all actions from queue
-                */
-                clearNextUpdateActions: function(){
+
+                clearNextUpdateActions: function (){
                     this.updateActions.before = [];
                     this.updateActions.after  = [];
                 },
 
-                /**
-                *
-                *  Resets current object to the default state
-                *
-                */
-                reset: function() {
+
+                reset: function () {
                     Mist.monitoringController.set('_graphs', []);
+                    this.clearNextUpdateActions();
                     this.animationEnabled = true;
-                    this.updateActions    = {
-                        before : [],
-                        after  : []
-                    };
                 },
 
 
@@ -972,6 +940,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                     var graph = Graph.create({
                             id: graphId,
+                            unit: metric.unit,
                             title: metric.name,
                         });
 
@@ -979,58 +948,44 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     this.instances.pushObject(graph);
                 },
 
-                instances        : [],    // Graph Objects created by the view
+                instances        : [],
                 animationEnabled : true,
                 updateActions    : {
                     before : [],
                     after  : []
                 }
-            },
+
+            }, // Graphs Object
 
 
-            /**
-            *
-            *   Controls for cookies in monitoring
-            *
-            */
             cookies : {
 
+                // TODO:
+                // Cookies should be JSONified so that
+                // don't have to manipulate the string
+                // to get it's values
 
-                /**
-                *
-                *  Returns collapsed metrics retrieved for cookies
-                *
-                */
-                getCollapsedMetrics : function(){
+                getCollapsedMetrics : function () {
 
-                    if(document.cookie.indexOf("collapsedGraphs")  == -1)
-                        return null
+                    if(document.cookie.indexOf('collapsedGraphs') == -1)
+                        return null;
 
-                    var cookieValue     = "";
+                    var cookieValue     = '';
                     var collapsedGraphs = [];
 
                     // Get Graph List Cookie
-                    var parts = document.cookie.split("collapsedGraphs=");
+                    var parts = document.cookie.split('collapsedGraphs=');
+
                     if (parts.length == 2)
                         cookieValue = parts.pop().split(";").shift();
 
-                    if(cookieValue.length > 0){
-
-                        // Create Array Of IDs
+                    if(cookieValue.length > 0)
                         collapsedGraphs = cookieValue.split('|');
-                    }
-
 
                     return collapsedGraphs;
                 },
 
-
-                /**
-                *
-                *  Write collapsed metrics to cookies
-                *  @param {array} metrics - Metric names
-                */
-                setCollapsedMetrics : function(metrics){
+                setCollapsedMetrics : function (metrics) {
 
                     var graphBtnIdList  = [];
                     var collapsedGraphs = [];
@@ -1044,40 +999,38 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 },
 
 
-                getCurrentTimeWindow: function(){
-                    if(document.cookie.indexOf("collapsedGraphs")  == -1) {
-                        console.log("No Time Window saved");
-                        return null
+                getCurrentTimeWindow: function () {
+                    if(document.cookie.indexOf("collapsedGraphs") == -1) {
+                        return null;
                     }
+                    // TODO: Else?
                 },
 
-                setCurrentTimeWindow: function(zoomIndex){
-
+                setCurrentTimeWindow: function (zoomIndex) {
+                    // TODO: this thing...
                 }
-            },
+
+            }, // Cookies Object
 
 
-            /*
-            *
-            *   Zoom Feature, Make time window bigger or smaller
-            *
-            */
             zoom : {
 
-                in  : function(){
-                    if(this.zoomIndex > 0){
+                in: function () {
+                    if (this.zoomIndex > 0) {
                         this.zoomIndex--;
                         this.to(this.zoomValues[this.zoomIndex].value * 60000); // (60*1000)
                     }
                 },
-                out : function(){
 
-                    if(this.zoomIndex < this.zoomValues.length-1){
+                out: function () {
+
+                    if(this.zoomIndex < this.zoomValues.length-1) {
                         this.zoomIndex++;
                         this.to(this.zoomValues[this.zoomIndex].value * 60000); // (60*1000)
                     }
                 },
-                toIndex : function(zoomIndex){
+
+                toIndex: function (zoomIndex) {
 
                     if(zoomIndex != this.zoomIndex) {
 
@@ -1086,98 +1039,95 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                         this.to(this.zoomValues[zoomIndex].value * 60000,'to'); // (60*1000)
                     }
                 },
+
                 // direction is optional, used for in and out
-                to  : function(timeWindow,direction){
+                to: function (timeWindow, direction) {
 
                     var controller = Mist.monitoringController;
                     var self = this;
-                    direction = (typeof direction == 'undefined' ? null : direction);
+                    //direction = (typeof direction == 'undefined' ? null : direction);
 
-                    var zoom = function(){
+                    var zoom = function () {
 
                         // Check if request is pending
-                        if (controller.request.locked){
-
+                        if (controller.request.locked) {
                             window.setTimeout(zoom,1000);
+                            return;
                         }
-                        else{
 
-                            var changeTimeWindow = function(){
-                                controller.graphs.changeTimeWindow(timeWindow);
+                        var changeTimeWindow = function () {
+                            controller.graphs.changeTimeWindow(timeWindow);
+                        }
+
+                        controller.graphs.addNextUpdateAction('before', changeTimeWindow);
+
+                        var measurements = 60;
+                        var timeWindowInMinutes = timeWindow / 60000;
+                        var newStep = Math.round((timeWindowInMinutes * 60 / measurements) * 1000);
+                        controller.request.changeStep(newStep, false);
+                        controller.request.changeTimeWindow(timeWindow, false);
+
+                        // When we have more than 10 minutes time window we don't really need updates
+                        if(timeWindowInMinutes > 10)
+                            controller.request.disableUpdates(false);
+                        else
+                            controller.request.enableUpdates(false);
+
+                        var zoomID = controller.request.reload();
+
+                        $(document).one('finishedFetching',function(event,requestID,status){
+
+                            if (zoomID == requestID)
+                                self.enable();
+
+                            if (status != 'success') {
+
+                                // Revert Index
+                                if(direction == 'in')
+                                    self.zoomIndex++;
+                                else if(direction == 'out')
+                                    self.zoomIndex--;
+                                else if(direction == 'to')
+                                    self.zoomIndex = self.prevZoomIndex;
+
+                                self.setZoomUI(self.zoomIndex);
                             }
 
-                            controller.graphs.addNextUpdateAction('before',changeTimeWindow);
-
-
-                            var measurements = 60;
-                            var timeWindowInMinutes = timeWindow /60000;
-                            var newStep = Math.round( (timeWindowInMinutes*60 / measurements)*1000 );
-                            controller.request.changeStep(newStep,false);
-                            controller.request.changeTimeWindow(timeWindow,false);
-
-                            // When we have more than 10 minutes time window we don't really need updates
-                            if(timeWindowInMinutes > 10)
-                                controller.request.disableUpdates(false);
-                            else
-                                controller.request.enableUpdates(false);
-
-                            var zoomID = controller.request.reload();
-
-                            $(document).one('finishedFetching',function(event,requestID,status){
-
-                                if(zoomID==requestID)
-                                    self.enable();
-                                if(status!='success'){
-
-                                    // Revert Index
-                                    if(direction == 'in')
-                                        self.zoomIndex++;
-                                    else if(direction =='out')
-                                        self.zoomIndex--;
-                                    else if(direction == 'to')
-                                        self.zoomIndex = self.prevZoomIndex;
-
-                                    self.setZoomUI(self.zoomIndex);
-                                }
-
-                                self.enable();
-                                Mist.monitoringController.history.enableControls();
-                            })
-                        }
+                            self.enable();
+                            Mist.monitoringController.history.enableControls();
+                        });
                     };
-
 
                     controller.request.stop();
 
                     // Show pending stats popup before data request because if previous request
-                    // takes place because this feature may appear as broken
+                    // takes place this feature may appear as broken
                     Mist.monitoringController.request.machine.set('pendingStats', true);
+
                     // Disable change time window button
                     this.disable();
+
                     // Temporary Disable History Controls
                     Mist.monitoringController.history.disableControls();
                     zoom();
                 },
 
 
-
-                setZoomUI : function(index){
+                setZoomUI: function (index) {
 
                     document.getElementById('zoomSelect').options[this.zoomIndex].selected = 'selected';
-                    $('#zoomSelect-button').find("span").text($('#zoomSelect').find(":selected").text());
+                    $('#zoomSelect-button').find('span').text($('#zoomSelect').find(':selected').text());
                 },
 
-                disable: function(){
-
+                disable: function () {
                     $('#zoomSelect-button *').addClass('ui-state-disabled');
                 },
 
-                enable: function(){
-
+                enable: function () {
                     $('#zoomSelect-button *').removeClass('ui-state-disabled');
                 },
 
-                reset: function(){
+                reset: function () {
 
                     this.zoomIndex     = 0;
                     this.prevZoomIndex = 0;
@@ -1194,14 +1144,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                 zoomIndex    : 0,
                 prevZoomIndex: 0
-            },
+
+            }, // Zoom object
 
 
-            /**
-            *
-            *   History feature, get previous graph data and display them
-            *
-            */
             history : {
 
 
@@ -1210,36 +1156,32 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 *  Go a timewindow back,
                 *  Also enables history if not enabled
                 */
-                goBack: function() {
+                goBack: function () {
 
                     var self    = this;
                     var request = Mist.monitoringController.request;
 
                     // When we enable history we must get last measurement and time window
-                    if(!this.isEnabled) {
+                    if(!this.isEnabled)
                         this.enable();
-                    }
-                    else {
-                        this.currentStopTime = new Date(this.currentStopTime - this.timeWindow);
-
-                    }
+                    else
+                        this.currentStopTime = new Date(
+                            this.currentStopTime - this.timeWindow);
 
 
                     request.custom({
                         stop     : (+this.currentStopTime / 1000),
-                        callback : function(result){
+                        callback : function (result) {
                             // On error set currentStop where it was
                             if(result.status == 'success')
                                 Mist.monitoringController.graphs.updateData(result.data);
-                            else{
+                            else {
                                 self.currentStopTime = new Date(+self.currentStopTime + self.timeWindow);
-                                if(self.currentStopTime.getTime() == self.lastMetrictime.getTime()){
+                                if(self.currentStopTime.getTime() == self.lastMetrictime.getTime())
                                     self.disable();
-                                }
                             }
                         }
                     });
-
                 },
 
 
@@ -1248,69 +1190,54 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 *   Go a timewindow forward
                 *   Also disables history if it is in the last history block
                 */
-                goForward: function() {
+                goForward: function () {
+
+                    if(!this.isEnabled) return;
 
                     var self    = this;
                     var request = Mist.monitoringController.request;
 
-                    if(this.isEnabled) {
+                    this.currentStopTime = new Date(+this.currentStopTime + this.timeWindow);
 
-                        this.currentStopTime = new Date(+this.currentStopTime + this.timeWindow);
-
-                        // If Next Block of time is ahead of last Metric Disable Monitoring
-                        if( (+this.currentStopTime) > (+this.lastMetrictime) ) {
-
-                            this.disable();
-                        }
-                        else{
-
-                            request.custom({
-                                stop     : (+this.currentStopTime / 1000),
-                                callback : function(result){
-                                    // On error set currentStop where it was
-                                    if(result.status == 'success')
-                                        Mist.monitoringController.graphs.updateData(result.data);
-                                    else
-                                        self.currentStopTime = new Date(+self.currentStopTime - self.timeWindow);
-                                }
-                            });
-                        }
+                    // If Next Block of time is ahead of last Metric Disable Monitoring
+                    if((+this.currentStopTime) > (+this.lastMetrictime))
+                        this.disable();
+                    else
+                        request.custom({
+                            stop     : (+this.currentStopTime / 1000),
+                            callback : function (result) {
+                                // On error set currentStop where it was
+                                if(result.status == 'success')
+                                    Mist.monitoringController.graphs.updateData(result.data);
+                                else
+                                    self.currentStopTime = new Date(+self.currentStopTime - self.timeWindow);
+                            }
+                        });
                     }
-
                 },
 
 
-                /**
-                *
-                *   Enable history feature
-                *
-                */
-                enable : function() {
+                enable: function () {
+
+                    if(this.isEnabled) return;
 
                     var self    = this;
                     var request = Mist.monitoringController.request;
 
-                    if(!this.isEnabled) {
+                    this.isEnabled       = true;
+                    this.timeWindow      = request.timeWindow;
+                    this.lastMetrictime  = request.lastMetrictime;
+                    this.currentStopTime = new Date(this.lastMetrictime.getTime() - this.timeWindow);
 
-                        this.isEnabled       = true;
-                        this.timeWindow      = request.timeWindow;
-                        this.lastMetrictime  = request.lastMetrictime;
-                        this.currentStopTime =  new Date(this.lastMetrictime.getTime() - this.timeWindow);
+                    $('#graphsGoForward').removeClass('ui-state-disabled');
+                    $('#graphsResetHistory').removeClass('ui-state-disabled');
 
-                        $('#graphsGoForward').removeClass('ui-state-disabled');
-                        $('#graphsResetHistory').removeClass('ui-state-disabled');
-
-                        Mist.monitoringController.zoom.disable();
-                    }
+                    Mist.monitoringController.zoom.disable();
                 },
 
 
-                /**
-                *
-                *  Disable History Feature
-                *
-                */
-                disable: function() {
+                disable: function () {
+
                     this.isEnabled = false;
                     Mist.monitoringController.request.customReset();
 
@@ -1320,13 +1247,15 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     Mist.monitoringController.zoom.enable();
                 },
 
-                disableControls: function() {
+
+                disableControls: function () {
                     $('#graphsGoBack').addClass('ui-state-disabled');
                     $('#graphsGoForward').addClass('ui-state-disabled');
                     $('#graphsResetHistory').addClass('ui-state-disabled');
                 },
 
-                enableControls: function() {
+
+                enableControls: function () {
                     $('#graphsGoBack').removeClass('ui-state-disabled');
                     if(this.isEnabled){
                         $('#graphsGoForward').removeClass('ui-state-disabled');
@@ -1334,12 +1263,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     }
                 },
 
-                /**
-                *
-                *   Resets history object to the default state
-                *
-                */
-                reset: function() {
+
+                reset: function () {
                     this.isEnabled       = false;
                     this.lastMetrictime  = null;
                     this.timeWindow      = 0;
@@ -1351,8 +1276,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 lastMetrictime  : null,
                 timeWindow      : 0,
                 currentStopTime : null
-            }
 
+            } // History Object
         })
     }
 );
