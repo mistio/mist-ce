@@ -153,7 +153,7 @@ define( 'app', [
             $.mobile.pushStateEnabled = false;
             $.mobile.linkBindingEnabled = false;
             $.mobile.hashListeningEnabled = false;
-            //$.mobile.ignoreContentEnabled = true;
+            $.mobile.ignoreContentEnabled = true;
             $.mobile.panel.prototype._bindUpdateLayout = function(){};
             $('body').css('overflow','auto');
 
