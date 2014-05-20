@@ -19,6 +19,7 @@ define('app/views/monitoring', ['app/views/templated'],
 
 
             graphs: [],
+            machine: null,
 
 
             //
@@ -29,7 +30,7 @@ define('app/views/monitoring', ['app/views/templated'],
 
 
             load: function () {
-                this.setUpGraphs();
+                this.set('machine', this.get('controller').get('model'));
             }.on('didInsertElement'),
 
 
@@ -37,6 +38,7 @@ define('app/views/monitoring', ['app/views/templated'],
                 Mist.monitoringController.request.stop();
                 Mist.monitoringController.graphs.disableAnimation();
                 Mist.monitoringController.reset();
+                this.unhandleWindowResize();
             }.on('willDestroyElement'),
 
 
@@ -48,46 +50,44 @@ define('app/views/monitoring', ['app/views/templated'],
 
 
             setUpGraphs: function () {
-
-                var machine = this.get('controller').get('model');
-
-                if (machine.id == ' ')
-                    return;
-                if (!machine.hasMonitoring) {
-                    Mist.monitoringController.request.stop();
-                    return;
-                }
-
-                var that = this;
-
-                var setup = function () {
-
-                    if (!Mist.isJQMInitialized) {
-                        Ember.run.later(setup, 1000);
-                        return;
-                    }
-
-                    Ember.run.next(function () {
-
-                        Mist.monitoringController.initialize({
-                            graphs: that.graphs,
-                            machineModel: machine
-                        });
-
-                        // Set Up Resolution Change Event
-                        $(window).resize(function () {
-
-                            var newWidth = $('#GraphsArea').width() - 2;
-                            that.graphs.forEach(function (graph) {
-                                //graph.changeWidth(newWidth);
-                            });
-                        })
-                    });
-                }
-
-                setup();
+                this.handleWindowResize();
                 Mist.rulesController.redrawRules();
-            }.observes('controller.model.hasMonitoring')
+                Mist.monitoringController.initialize({
+                    graphs: this.graphs,
+                    machineModel: this.machine
+                });
+            },
+
+
+            handleWindowResize: function () {
+                var that = this;
+                $(window).on('resize', function () {
+                    var newWidth = $('#GraphsArea').width() - 2;
+                    that.graphs.forEach(function (graph) {
+                        graph.view.instance.changeWidth(newWidth);
+                    });
+                });
+            },
+
+
+            unhandleWindowResize: function () {
+                $(window).off('resize');
+            },
+
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
+            hasMonitoringObserver: function () {
+                if (this.machine.hasMonitoring)
+                    this.setUpGraphs();
+                else
+                    Mist.monitoringController.request.stop();
+            }.observes('machine.hasMonitoring')
         });
     }
 );

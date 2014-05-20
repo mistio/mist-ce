@@ -663,8 +663,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                             ]);
                         },
                         complete: function () {
-                            self.machine.set('pendingStats', false);
-                            self.locked = false;
+                            if (self.machine) { // machine may not exist
+                                self.machine.set('pendingStats', false);
+                                self.locked = false;
+                            }
                         }
                     });
                 },
