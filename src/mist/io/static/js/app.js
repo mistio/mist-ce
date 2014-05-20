@@ -232,7 +232,7 @@ define( 'app', [
             },
             model: function() {
                 if (Mist.backendsController.loading || Mist.backendsController.loadingMachines) {
-                    return {id: ''};
+                    return {id: '', backend: {}};
                 }
                 return Mist.backendsController.getMachine(Mist.getMachineIdByUrl());
             }
