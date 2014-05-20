@@ -18,8 +18,6 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
             //
 
 
-            _graphs: [],        // Points to this.instances.graphs so that
-                                // handlebars can access it in monitoring.html
             checkingMonitoring: null,
 
 
@@ -183,7 +181,6 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                 // Get graphs from view
                 this.graphs.instances = args.graphs;
-                this.set('_graphs', this.graphs.instances);
 
                 // Get cookies and show graphs that are not collapsed
                 var collapsedMetrics = this.cookies.getCollapsedMetrics();
@@ -922,7 +919,6 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
 
                 reset: function () {
-                    Mist.monitoringController.set('_graphs', []);
                     this.clearNextUpdateActions();
                     this.animationEnabled = true;
                 },
