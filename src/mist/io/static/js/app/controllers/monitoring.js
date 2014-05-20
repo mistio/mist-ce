@@ -188,8 +188,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 // TODO: Change Step to seconds
                 // Create and Start the request
                 this.request.create({
-                    machine         : args.machineModel, // Send Current Machine
-                    timeWindow      : 10*60*1000,                // Display 10 Minutes
+                    machine         : args.machineModel,         // Send Current Machine
+                    timeWindow      : this.cookies.timeWindow,
                     step            : 10000,                     // Metrics Step in miliseconds
                     updateInterval  : 10000,                     // Get Updates Every x Miliseconds
                     updatesEnabled  : true,                      // Get Updates
@@ -479,6 +479,12 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 */
                 changeTimeWindow: function(newTimeWindow,reloadAfter){
                     this.timeWindow = newTimeWindow;
+
+                    // Save cookies
+                    var cookies = Mist.monitoringController.cookies;
+                    cookies.timeWindow = newTimeWindow;
+                    cookies.save();
+
                     if(!reloadAfter) return;
                     this.reload('timeWindowChanged');
                 },
@@ -954,7 +960,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                         document.cookie.split('mistio-monitoring=')[1]
                     );
 
-                    this.timeWindow = info.timeWindow || 60000;
+                    this.timeWindow = info.timeWindow || 600000;
                     this.collapsedGraphs = info.collapsedGraphs || [];
                 },
 

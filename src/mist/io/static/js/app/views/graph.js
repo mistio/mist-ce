@@ -765,10 +765,6 @@ define('app/views/graph', ['app/views/templated'],
 
                     // Set graph and button visibility
                     var cookies = Mist.monitoringController.cookies;
-
-                    info(metric.id);
-                    info(cookies.collapsedGraphs.indexOf(metric.id) > -1);
-
                     if (cookies.collapsedGraphs.indexOf(metric.id) > -1) {
                         $('#' + id + '-btn').show();
                         $('#' + id).hide();
