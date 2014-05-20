@@ -172,7 +172,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
             * Loads cookies and hides collapsed graphs
             * @param {object} args - machine,timeWindow,step,updateInterval,updatesEnabled,timeGap,callback
             */
-            initialize: function(args){
+            initialize: function (args) {
 
                 var self = this;
 
@@ -182,24 +182,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 // Get graphs from view
                 this.graphs.instances = args.graphs;
 
-                // Get cookies and show graphs that are not collapsed
-                var collapsedMetrics = this.cookies.getCollapsedMetrics();
+                // Load cookies
+                this.cookies.load();
 
-                if(collapsedMetrics != null) {
-                    this.graphs.collapse(collapsedMetrics,0);
-                } else{
-
-                    // Hide graphs
-                    var grahps = this.graphs.instances;
-
-                    graph.forEach(function(graph) {
-                        if (grpah.id == 'grpah-load')
-                            return;
-                        slef.graphs.collapse(graph.id, 0);
-                    });
-                }
-
-                // TODO Change Step to seconds
+                // TODO: Change Step to seconds
                 // Create and Start the request
                 this.request.create({
                     machine         : args.machineModel, // Send Current Machine
@@ -208,12 +194,12 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     updateInterval  : 10000,                     // Get Updates Every x Miliseconds
                     updatesEnabled  : true,                      // Get Updates
                     timeGap         : 60,                        // Gap between current time and requested
-                    callback        : function(result){
-                        if(result.status == 'success'){
+                    callback        : function (result) {
+                        if (result.status == 'success')
                             self.graphs.updateData(result.data);
-                        }
                     }
                 });
+
                 // Disable updates if machine is being destroyed
                 args.machineModel.addObserver("beingDestroyed",function(){
                     if(self.request.machine && self.request.machine.beingDestroyed)
@@ -221,7 +207,6 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 });
 
                 this.request.start();
-
             },
 
 
@@ -784,7 +769,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                 changeTimeWindow: function (newTimeWindow) {
                     this.instances.forEach(function (graph) {
-                        graph.changeTimeWindow(newTimeWindow);
+                        //graph.changeTimeWindow(newTimeWindow);
                     });
                 },
 
@@ -835,25 +820,18 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                         hideDuration = 0;
 
                     // Add graph to the end of the list
-                    metrics.forEach(function(metric){
-
-                        $("#" + metric + '-btn').insertAfter($('.graphBtn').last());
+                    metrics.forEach(function (metric) {
 
                         // Hide the Graphs
-                        $("#" + metric).hide(hideDuration,function(){
+                        $("#" + metric).hide(hideDuration, function () {
 
-                            // Show Graphs Buttons
-                            $("#" + metric + '-btn').show(0, function(){
+                            // Show button
+                            $("#" + metric + '-btn').show();
 
-                                // Set Cookie
-                                var graphBtns = [];
-                                $('.graphBtn').toArray().forEach(function(entry){
-                                    if($(entry).css('display') != 'none')
-                                        graphBtns.push($(entry).attr('id').replace('-btn','').replace('#',''));
-                                });
-
-                                Mist.monitoringController.cookies.setCollapsedMetrics(graphBtns);
-                            });
+                            // Save cookies
+                            var cookies = Mist.monitoringController.cookies
+                            cookies.collapsedGraphs.addObject(metric.replace('graph-', ''));
+                            cookies.save();
                         });
                     });
                 },
@@ -875,26 +853,18 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     // Add graph to the end of the list
                     metrics.forEach(function (metric) {
 
-                        $("#" + metric).insertAfter($('.graph').last());
+                        // Hide button
+                        $("#" + metric + "-btn").hide();
 
-                        // Hide the buttons
-                        $("#" + metric + "-btn").hide(0);
-
-                        // Show Graphs
+                        // Show Graph
                         $("#" + metric).show(hideDuration, function(){
 
-                            // Set Cookie
-                            var graphBtns = [];
-                            $('.graphBtn').toArray().forEach(function(entry){
-                                if($(entry).css('display') != 'none')
-                                    graphBtns.push($(entry).attr('id').replace('-btn','').replace('#',''));
-                            });
-
-                            Mist.monitoringController.cookies.setCollapsedMetrics(graphBtns);
-
+                            // Save cookies
+                            var cookies = Mist.monitoringController.cookies
+                            cookies.collapsedGraphs.removeObject(metric.replace('graph-', ''));
+                            cookies.save();
                         });
                     });
-
                 },
 
 
@@ -921,6 +891,17 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 reset: function () {
                     this.clearNextUpdateActions();
                     this.animationEnabled = true;
+                },
+
+
+                getGraphByMetricName: function (metric) {
+                    var retGraph = null;
+                    this.instances.some(function (graph) {
+                        if (graph.metrics.findBy('name', metric)) {
+                            return retGraph = graph;
+                        }
+                    });
+                    return retGraph;
                 },
 
 
@@ -956,58 +937,100 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
             }, // Graphs Object
 
 
-            cookies : {
+            cookies: {
 
-                // TODO:
-                // Cookies should be JSONified so that
-                // don't have to manipulate the string
-                // to get it's values
 
-                getCollapsedMetrics : function () {
+                timeWindow: null,
+                collapsedGraphs: null,
 
-                    if(document.cookie.indexOf('collapsedGraphs') == -1)
-                        return null;
 
-                    var cookieValue     = '';
+                load: function () {
+
+                    if (document.cookie.indexOf('collapsedGraphs') > -1)
+                        this.convertCookie();
+                    if (document.cookie.indexOf('mistio-monitoring') == -1)
+                        this.save();
+                    var info = JSON.parse(
+                        document.cookie.split('mistio-monitoring=')[1]
+                    );
+
+                    this.timeWindow = info.timeWindow || 60000;
+                    this.collapsedGraphs = info.collapsedGraphs || [];
+                },
+
+
+                save: function (metrics) {
+                    document.cookie = "mistio-monitoring=" + JSON.stringify({
+                        timeWindow: this.timeWindow,
+                        collapsedGraphs: this.collapsedGraphs
+                    });
+                },
+
+
+                get: function () {
+
+                },
+
+
+                convertCookie: function () {
+
+                    // Convert previous cookie for backwards compatibility
+
+                    var cookieValue = '';
                     var collapsedGraphs = [];
 
-                    // Get Graph List Cookie
                     var parts = document.cookie.split('collapsedGraphs=');
-
                     if (parts.length == 2)
                         cookieValue = parts.pop().split(";").shift();
-
-                    if(cookieValue.length > 0)
+                    if (cookieValue.length > 0)
                         collapsedGraphs = cookieValue.split('|');
-
-                    return collapsedGraphs;
-                },
-
-                setCollapsedMetrics : function (metrics) {
-
-                    var graphBtnIdList  = [];
-                    var collapsedGraphs = [];
-                    var cookieExpire    = new Date();
-                    cookieExpire.setFullYear(cookieExpire.getFullYear() + 2);
-
-
-                    document.cookie = "collapsedGraphs=" + metrics.join('|') + "; " +
-                                      "expires=" + cookieExpire.toUTCString() +"; " +
-                                      "path=/";
-                },
-
-
-                getCurrentTimeWindow: function () {
-                    if(document.cookie.indexOf("collapsedGraphs") == -1) {
-                        return null;
+                    if (collapsedGraphs.length) {
+                        var convertedGraphs = [];
+                        if (collapsedGraphs.indexOf('cpu') > -1)
+                            convertedGraphs.push(Mist.monitoringController
+                                    .graphs.getGraphByMetricName('CPU').id
+                                    .replace('graph-', ''));
+                        if (collapsedGraphs.indexOf('memory') > -1)
+                            convertedGraphs.push(Mist.monitoringController
+                                    .graphs.getGraphByMetricName('RAM').id
+                                    .replace('graph-', ''));
+                        if (collapsedGraphs.indexOf('load') > -1)
+                            convertedGraphs.push(Mist.monitoringController
+                                    .graphs.getGraphByMetricName('Load').id
+                                    .replace('graph-', ''));
+                        if (collapsedGraphs.indexOf('networkTX') > -1)
+                            convertedGraphs.push(Mist.monitoringController
+                                    .graphs.getGraphByMetricName('Ifaces Tx').id
+                                    .replace('graph-', ''));
+                        if (collapsedGraphs.indexOf('networkRX') > -1)
+                            convertedGraphs.push(Mist.monitoringController
+                                    .graphs.getGraphByMetricName('Ifaces Rx').id
+                                    .replace('graph-', ''));
+                        if (collapsedGraphs.indexOf('diskRead') > -1)
+                            convertedGraphs.push(Mist.monitoringController
+                                    .graphs.getGraphByMetricName('Disks Read').id
+                                    .replace('graph-', ''));
+                        if (collapsedGraphs.indexOf('diskWrite') > -1)
+                            convertedGraphs.push(Mist.monitoringController
+                                    .graphs.getGraphByMetricName('Disks Write').id
+                                    .replace('graph-', ''));
+                        // Disable previous cookie
+                        document.cookie = 'collapsedGraphs=;' +
+                            'expires=Thu, 01 Jan 1970 00:00:01 GMT';
+                        this.info.collapsedGraphs = collapsedGraphs;
+                        this.save();
                     }
-                    // TODO: Else?
                 },
 
-                setCurrentTimeWindow: function (zoomIndex) {
-                    // TODO: this thing...
+                // TODO: Delete
+                getCollapsedMetrics: function () {
+                },
+                setCollapsedMetrics : function () {
+                },
+                getCurrentTimeWindow: function () {
+                },
+                setCurrentTimeWindow: function () {
                 }
-
             }, // Cookies Object
 
 

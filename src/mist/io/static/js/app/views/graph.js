@@ -763,6 +763,20 @@ define('app/views/graph', ['app/views/templated'],
                         .attr('class','y-axis')
                         .attr("transform", "translate(" + margin.left + "," + (margin.top) + ")");
 
+                    // Set graph and button visibility
+                    var cookies = Mist.monitoringController.cookies;
+
+                    info(metric.id);
+                    info(cookies.collapsedGraphs.indexOf(metric.id) > -1);
+
+                    if (cookies.collapsedGraphs.indexOf(metric.id) > -1) {
+                        $('#' + id + '-btn').show();
+                        $('#' + id).hide();
+                    } else {
+                        $('#' + id + '-btn').hide();
+                        $('#' + id).show();
+                    }
+
                     onInitialized();
                 }
 
