@@ -1213,7 +1213,6 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                     self.currentStopTime = new Date(+self.currentStopTime - self.timeWindow);
                             }
                         });
-                    }
                 },
 
 
