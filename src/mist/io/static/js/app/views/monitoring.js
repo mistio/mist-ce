@@ -49,7 +49,15 @@ define('app/views/monitoring', ['app/views/templated'],
             //
 
 
+            renderControls: function () {
+                Ember.run.next(function () {
+                    $('.graphZoomer').trigger('create');
+                });
+            },
+
+
             setUpGraphs: function () {
+                this.renderControls();
                 this.handleWindowResize();
                 Mist.rulesController.redrawRules();
                 Mist.monitoringController.initialize({

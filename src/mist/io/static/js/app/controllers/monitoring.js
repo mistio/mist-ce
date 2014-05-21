@@ -189,7 +189,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 // Create and Start the request
                 this.request.create({
                     machine         : args.machineModel,         // Send Current Machine
-                    timeWindow      : this.cookies.timeWindow,
+                    timeWindow      : 600000,
                     step            : 10000,                     // Metrics Step in miliseconds
                     updateInterval  : 10000,                     // Get Updates Every x Miliseconds
                     updatesEnabled  : true,                      // Get Updates
@@ -199,6 +199,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                             self.graphs.updateData(result.data);
                     }
                 });
+
+                this.UI.zoomChange()
 
                 // Disable updates if machine is being destroyed
                 args.machineModel.addObserver("beingDestroyed",function(){

@@ -8,8 +8,7 @@ define('app/views/graph', ['app/views/templated'],
 
         'use strict';
 
-        var NUM_OF_MEASUREMENT = 60;
-        var MAX_BUFFER_DATA    = 60;
+        var MAX_BUFFER_DATA = 60;
 
         return TemplatedView.extend({
 
@@ -25,6 +24,8 @@ define('app/views/graph', ['app/views/templated'],
             instance: null,
 
             data: null,
+            dots: [],
+            lines: [],
             timeDisplayed: null,
             animationEnabled: true,
 
