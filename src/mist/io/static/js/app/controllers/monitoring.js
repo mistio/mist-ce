@@ -259,7 +259,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     var secToRemove =(new Date(this.timeStop*1000)).getSeconds() % 10;
                     this.timeStop -= secToRemove;
 
-                    this.timeStart = Math.floor(this.timeStop - this.timeWindow/1000);
+                    this.timeStart = Math.floor(this.timeStop - this.timeWindow / 1000);
                     this.lastMetrictime = new Date(this.timeStart*1000);
                 },
 
@@ -310,7 +310,17 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                             self.locked = true;
 
                             // Calculate Start and Stop
-                            self.timeStart = Math.floor( self.lastMetrictime.getTime() /1000 ) ;
+                            self.timeStart = Math.floor(self.lastMetrictime.getTime() / 1000);
+/*
+                            self.timeStop = new Date().getTime() / 1000;
+                            self.timeStop -= (self.timeStop - self.timeStart) % (self.step/1000);
+
+                            while (self.timeStop <= self.timeStart) {
+                                self.timeStop += self.step/1000;
+                            }
+*/
+
+
                             self.timeStop = Math.floor( ((new Date()).getTime() - self.timeGap * 1000 ) / 1000 );
 
                             // Fix time when lossing precision
@@ -319,9 +329,11 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                             // Temporary
                             // Try to fix wrong datapoints
-                            if (self.timeStart == self.timeStop) {
-                                self.timeStart -= self.step/1000;
-                            }
+                            //if (self.timeStart == self.timeStop) {
+                            //    self.timeStart -= self.step/1000;
+                            // }
+
+
 
                             // Do the ajax call
                             this.requestID++;
@@ -552,8 +564,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                         type: 'GET',
                         async: true,
                         dataType: 'json',
-                        data: { 'start': start,
-                                'stop': stop,
+                        data: { 'start': start - 50, // just to be sure we get the data in the range we need
+                                'stop': stop + 50,   // -- same --
                                 'step': step / 1000
                               },
                         timeout: 8000,
@@ -582,7 +594,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                 }
 
                                 var receivedData = {};
-                                var lastMetric = new Date(0);
+                                var lastTime = 0;
 
                                 data.forEach(function(metric) {
 
@@ -595,22 +607,27 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                     receivedData[id] = [];
 
                                     metric.datapoints.forEach(function(datapoint) {
-                                        var time = new Date(datapoint[1]*1000);
+                                        if (datapoint[1] > stop)
+                                            return;
+                                        if (datapoint[1] < start)
+                                            return;
+                                        if (datapoint[1] > lastTime)
+                                            lastTime = datapoint[1];
+
                                         receivedData[id].push({
-                                            time: time,
+                                            time: new Date(datapoint[1]*1000),
                                             value: datapoint[0]
                                         });
 
-                                        if (time > lastMetric)
-                                            lastMetric = time;
                                     });
 
                                     metric.datapoints = receivedData[id];
                                     Mist.monitoringController.graphs.addGraph(metric);
                                 });
 
-                                info('lastMetric', lastMetric.getTime() / 1000);
-                                self.lastMetrictime = lastMetric;
+
+                                self.lastMetrictime = new Date(lastTime * 1000);
+                                info('lastMetric', self.lastMetrictime.getTime() / 1000);
 
                                 callback({
                                     status: 'success',

@@ -175,16 +175,16 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 var valueline = d3.svg.line()
                                 .x(function(d) {return xScale(d.time); })
                                 .y(function(d) {return yScale(d.value); })
-                                .defined(function(d) {return d.value != null })
-                                .interpolate('monotone');
+                                .defined(function(d) {return d.value != null });
+                                //.interpolate('monotone');
 
                 // valuearea is function that fills the space under the main line
                 var valuearea = d3.svg.area()
                                 .x(function(d) {return xScale(d.time); })
                                 .y1(function(d) {return yScale(d.value); })
                                 .y0(height)
-                                .defined(function(d) {return d.value != null })
-                                .interpolate('monotone');
+                                .defined(function(d) {return d.value != null });
+                                //.interpolate('monotone');
 
 
                 /**
@@ -321,56 +321,60 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     // Animate line, axis and grid
                     if(that.animationEnabled && !this.clearAnimPending)
                     {
+
                         // Animation values
                         var fps  = 12;
                         var duration = 10;
 
-                        that.svg.value.line.animation.select(that.svg.value.line)
-                                         .fps(fps)
-                                         .duration(duration)
-                                         .points(this.valuesDistance,0, 0,0)
-                                         .data(valueLinePath)
-                                         .before(function(data){
+                        that.svg.value.line.animation
+                                        .select(that.svg.value.line)
+                                        .fps(fps)
+                                        .duration(duration)
+                                        .points(this.valuesDistance,0, 0,0)
+                                        .data(valueLinePath)
+                                        .before(function(data){
                                             this.d3Selector.attr("d", data);
-                                         })
-                                         .push();
+                                        })
+                                        .push();
 
-                        that.svg.value.area.animation.select(that.svg.value.area)
-                                         .fps(fps)
-                                         .duration(duration)
-                                         .points(this.valuesDistance,0, 0,0)
-                                         .data(valueAreaPath)
-                                         .before(function(data){
-
+                        that.svg.value.area.animation
+                                        .select(that.svg.value.area)
+                                        .fps(fps)
+                                        .duration(duration)
+                                        .points(this.valuesDistance,0, 0,0)
+                                        .data(valueAreaPath)
+                                        .before(function(data){
                                             this.d3Selector.attr("d", data);
-                                         })
-                                         .push();
+                                        })
+                                        .push();
 
-                        that.svg.axis.x.legend.animation.select(that.svg.axis.x.legend)
-                                         .fps(fps)
-                                         .duration(duration)
-                                         .points(( margin.left + this.valuesDistance),(this.height - margin.bottom +2), margin.left,(this.height - margin.bottom +2))
-                                         .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: tLabelFormat})
-                                         .before(function(data){
+                        that.svg.axis.x.legend.animation
+                                        .select(that.svg.axis.x.legend)
+                                        .fps(fps)
+                                        .duration(duration)
+                                        .points(( margin.left + this.valuesDistance),(this.height - margin.bottom +2), margin.left,(this.height - margin.bottom +2))
+                                        .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: tLabelFormat})
+                                        .before(function(data){
                                             this.d3Selector.call(labelTicksFixed(data.modelX,data.labelFormat));
                                             this.d3Selector.selectAll("text")
                                                            .style("text-anchor", "end")
                                                            .attr('x','-10');
                                             that.svg.axis.y.legend.call(data.modelY);
-                                         })
-                                         .push();
+                                        })
+                                        .push();
 
-                        that.svg.grid.x.animation.select(that.svg.grid.x)
-                                         .fps(fps)
-                                         .duration(duration)
-                                         .points((margin.left + this.valuesDistance),this.height, margin.left,this.height)
-                                         .data({modelX: modelGridX,modelY: modelGridY})
-                                         .before(function(data){
+                        that.svg.grid.x.animation
+                                        .select(that.svg.grid.x)
+                                        .fps(fps)
+                                        .duration(duration)
+                                        .points((margin.left + this.valuesDistance),this.height, margin.left,this.height)
+                                        .data({modelX: modelGridX,modelY: modelGridY})
+                                        .before(function(data){
                                             this.d3Selector.call(labelTicksFixed(data.modelX));
                                             // Y grid should change when x changes
                                             that.svg.grid.y.call(data.modelY);
-                                         })
-                                         .push();
+                                        })
+                                        .push();
                     }
                     else {
                         // Update Graph Elements
