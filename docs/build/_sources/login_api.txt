@@ -42,7 +42,7 @@
 
    Using this api token in your header you can now use all of mist.io's API by passing in your headers::
 
-    Authorized: 4a2c2j08099809709as098087832843e561abb495c4a30726a8590f73adad
+    Authorization: mist_1 user376@mail.com:4a2c2j08099809709as098087832843e561abb495c4a30726a8590f73adad
 
    In case you have your own installation of mist, you do not have to authenticate and get
    a token to use mist.io's RESTful API. However by doing so you can have your own setup and
