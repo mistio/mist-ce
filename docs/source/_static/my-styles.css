@@ -18,12 +18,14 @@ a.headerlink {
     display: none;
 }
 
-.navbar-form, .navbar-nav {
-    padding-top: 20px;
-}
-
 .navbar-brand {
     font-size: 0px;
+}
+
+
+.navbar-brand img {
+    margin-top: -10px;
+    height: 42px;
 }
 
 .navbar-default {

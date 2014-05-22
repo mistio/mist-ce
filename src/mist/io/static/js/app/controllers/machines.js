@@ -273,6 +273,7 @@ define('app/controllers/machines', ['app/models/machine'],
                                 if (attr == 'private_ips') continue;
                                 if (attr == 'pubic_ips') continue;
                                 old_machine.set(attr, machine[attr]);
+                            }
 
                             // Set machine on probing loop
                             if (prevState != 'running'
