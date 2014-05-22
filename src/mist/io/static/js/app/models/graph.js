@@ -21,8 +21,13 @@ define('app/models/graph', ['ember'],
             view: null,
 
             id: null,
+            unit: null,
             title: null,
             metrics: null,
+
+            grids: null,
+            lines: null,
+            points: null,
 
 
             //
@@ -33,7 +38,10 @@ define('app/models/graph', ['ember'],
 
 
             load: function () {
-                this.set('metrics', []);
+                this.set('grids', [])
+                    .set('lines', [])
+                    .set('points', [])
+                    .set('metrics', []);
             }.on('init'),
 
 
@@ -82,6 +90,8 @@ define('app/models/graph', ['ember'],
                     this.trigger('onDataUpdate', this.metrics[0].datapoints);
                 });
             }
+
+
 
 /*
             init: function () {
@@ -1046,5 +1056,73 @@ define('app/models/graph', ['ember'],
             }
             */
         });
+
+
+        //
+        //
+        //  SVG Element Classes
+        //
+        //
+
+
+        function Canvas (args) {
+
+            return
+            d3.select('#' + args.id + ' svg')
+                .attr('width', args.size.width)
+                .attr('height', args.size.height);
+        };
+
+
+        function Line (xScale, yScale, args) {
+
+            var values = d3.svg.line()
+                .x(function(d) {return xScale(d.time); })
+                .y(function(d) {return yScale(d.value); })
+                .defined(function(d) {return d.value != null })
+                .interpolate('monotone');
+
+            return d3.select('#' + args.id + ' valueLine')
+            .attr('transform', 'translate(' +
+                args.margin.left + ',' + args.margin.top +
+            ')')
+            .select('path');
+        };
+
+
+        function Area (xScale, yScale, args) {
+
+            var values = d3.svg.area()
+                .x(function(d) {return xScale(d.time); })
+                .y1(function(d) {return yScale(d.value); })
+                .y0(args.size.height)
+                .defined(function(d) {return d.value != null })
+                .interpolate('monotone');
+
+            return d3.select('#' + args.id + ' valueArea')
+            .attr('transform', 'translate(' +
+                args.margin.left + ',' + args.margin.top +
+            ')')
+            .select('path');
+        };
+
+
+        function xGrid (args) {
+
+            return d3.select('#' + args.id + ' grix-x')
+            .attr('transform', 'translate(' +
+                args.margin.left + ',' + args.size.height +
+            ')');
+        };
+
+
+        function yGrid (args) {
+
+            return d3.select('#' + args.id + ' grid-y')
+            .attr('transform', 'translate(' +
+                args.margin.left + ',' + args.margin.top +
+            ')');
+        };
+
     }
 )

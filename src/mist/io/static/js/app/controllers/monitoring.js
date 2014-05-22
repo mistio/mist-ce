@@ -240,27 +240,27 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                     this.reset();
 
-                    var self             = this;
-                    var controller       = Mist.monitoringController;
+                    var self = this;
+                    var controller = Mist.monitoringController;
 
-                    this.step            = args.step;
-                    this.timeWindow      = args.timeWindow;
-                    this.updateInterval  = args.updateInterval;
-                    this.machine         = args.machine;
-                    this.updateData      = args.updatesEnabled;
-                    this.step            = args.step;
-                    this.callback        = args.callback || function () {};
-                    this.timeGap         = args.timeGap; // Temporary Fix , Give some time to server to collect data
+                    this.step           = args.step;
+                    this.timeWindow     = args.timeWindow;
+                    this.updateInterval = args.updateInterval;
+                    this.machine        = args.machine;
+                    this.updateData     = args.updatesEnabled;
+                    this.step           = args.step;
+                    this.callback       = args.callback || function () {};
+                    this.timeGap        = args.timeGap; // Temporary Fix , Give some time to server to collect data
 
                     // Calculate Start And Stop
-                    this.timeStop        = Math.floor((new Date().getTime() - this.timeGap * 1000) / 1000 );
+                    this.timeStop = Math.floor( ( (new Date()).getTime() - this.timeGap * 1000) / 1000 );
 
-                    // Align time to be a multiple of 10
-                    var secToRemove = new Date(this.timeStop * 1000).getSeconds() % 10;
+                    // Align time to be a multiply of 10
+                    var secToRemove =(new Date(this.timeStop*1000)).getSeconds() % 10;
                     this.timeStop -= secToRemove;
 
-                    this.timeStart       = Math.floor(this.timeStop - this.timeWindow / 1000);
-                    this.lastMetrictime  = new Date(this.timeStart * 1000);
+                    this.timeStart = Math.floor(this.timeStop - this.timeWindow/1000);
+                    this.lastMetrictime = new Date(this.timeStart*1000);
                 },
 
 
@@ -272,18 +272,19 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 start: function () {
 
                     var self = this;
+                    var that = this;
 
                     this.locked = true;
 
                     // If request stopped Re-calculate start and stop
                     if(this.initialized && !this.running){
 
-                        this.timeStart = Math.floor( this.lastMetrictime.getTime() / 1000 ) ;
-                        this.timeStop  = Math.floor( (new Date().getTime() - this.timeGap * 1000 ) / 1000 );
+                        this.timeStart = Math.floor( this.lastMetrictime.getTime() /1000 ) ;
+                        this.timeStop = Math.floor( ((new Date()).getTime() - this.timeGap * 1000 ) / 1000 );
 
                         // Fix time when lossing precision
-                        var stopRemainder = (this.timeStop - this.timeStart) % (this.step / 1000);
-                        this.timeStop    -= stopRemainder;
+                        var stopRemainder = (this.timeStop - this.timeStart) % (this.step/1000);
+                        this.timeStop = this.timeStop - stopRemainder;
                     } else {
 
                         this.initialized = true;
@@ -310,15 +311,21 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                             // Calculate Start and Stop
                             self.timeStart = Math.floor( self.lastMetrictime.getTime() /1000 ) ;
-                            self.timeStop  = Math.floor( (new Date().getTime() - self.timeGap * 1000 ) / 1000 );
+                            self.timeStop = Math.floor( ((new Date()).getTime() - self.timeGap * 1000 ) / 1000 );
 
                             // Fix time when lossing precision
                             var stopRemainder = (self.timeStop - self.timeStart) % (self.step/1000);
-                            self.timeStop    -= stopRemainder;
+                            self.timeStop = self.timeStop - stopRemainder;
+
+                            // Temporary
+                            // Try to fix wrong datapoints
+                            if (self.timeStart == self.timeStop) {
+                                self.timeStart -= self.step/1000;
+                            }
 
                             // Do the ajax call
                             this.requestID++;
-                            self.receiveData(self.timeStart, self.timeStop, self.step,self.callback);
+                            self.receiveData(self.timeStart, self.timeStop, self.step, self.callback);
 
                         }, this.step);
                     }
@@ -415,8 +422,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                             //var timeGap          = 60;
                             var timeWindow  = self.timeWindow;
                             var step        = self.step;
-                            var stop        = Math.floor( new Date().getTime() / 1000 );
-                            var start       = Math.floor( stop - timeWindow / 1000 );
+                            var stop        = Math.floor( ( new Date()).getTime() / 1000 );
+                            var start       = Math.floor( stop - timeWindow/1000 );
                             var callback    = null;
 
                             if(options){
@@ -575,6 +582,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                 }
 
                                 var receivedData = {};
+                                var lastMetric = new Date(0);
 
                                 data.forEach(function(metric) {
 
@@ -587,19 +595,22 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                     receivedData[id] = [];
 
                                     metric.datapoints.forEach(function(datapoint) {
+                                        var time = new Date(datapoint[1]*1000);
                                         receivedData[id].push({
-                                            time: new Date(datapoint[1]*1000),
+                                            time: time,
                                             value: datapoint[0]
                                         });
+
+                                        if (time > lastMetric)
+                                            lastMetric = time;
                                     });
 
                                     metric.datapoints = receivedData[id];
                                     Mist.monitoringController.graphs.addGraph(metric);
                                 });
 
-                                try {
-                                    self.lastMetrictime = receivedData[0][receivedData.length-1].time;
-                                } catch (e) {}
+                                info('lastMetric', lastMetric.getTime() / 1000);
+                                self.lastMetrictime = lastMetric;
 
                                 callback({
                                     status: 'success',
@@ -612,6 +623,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                 ]);
                             }
                             catch(err) {
+
                                 error(err);
 
                                 callback({
@@ -993,40 +1005,9 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     if (cookieValue.length > 0)
                         collapsedGraphs = cookieValue.split('|');
                     if (collapsedGraphs.length) {
-                        var convertedGraphs = [];
-                        if (collapsedGraphs.indexOf('cpu') > -1)
-                            convertedGraphs.push(Mist.monitoringController
-                                    .graphs.getGraphByMetricName('CPU').id
-                                    .replace('graph-', ''));
-                        if (collapsedGraphs.indexOf('memory') > -1)
-                            convertedGraphs.push(Mist.monitoringController
-                                    .graphs.getGraphByMetricName('RAM').id
-                                    .replace('graph-', ''));
-                        if (collapsedGraphs.indexOf('load') > -1)
-                            convertedGraphs.push(Mist.monitoringController
-                                    .graphs.getGraphByMetricName('Load').id
-                                    .replace('graph-', ''));
-                        if (collapsedGraphs.indexOf('networkTX') > -1)
-                            convertedGraphs.push(Mist.monitoringController
-                                    .graphs.getGraphByMetricName('Ifaces Tx').id
-                                    .replace('graph-', ''));
-                        if (collapsedGraphs.indexOf('networkRX') > -1)
-                            convertedGraphs.push(Mist.monitoringController
-                                    .graphs.getGraphByMetricName('Ifaces Rx').id
-                                    .replace('graph-', ''));
-                        if (collapsedGraphs.indexOf('diskRead') > -1)
-                            convertedGraphs.push(Mist.monitoringController
-                                    .graphs.getGraphByMetricName('Disks Read').id
-                                    .replace('graph-', ''));
-                        if (collapsedGraphs.indexOf('diskWrite') > -1)
-                            convertedGraphs.push(Mist.monitoringController
-                                    .graphs.getGraphByMetricName('Disks Write').id
-                                    .replace('graph-', ''));
                         // Disable previous cookie
                         document.cookie = 'collapsedGraphs=;' +
                             'expires=Thu, 01 Jan 1970 00:00:01 GMT';
-                        this.info.collapsedGraphs = collapsedGraphs;
-                        this.save();
                     }
                 },
 
