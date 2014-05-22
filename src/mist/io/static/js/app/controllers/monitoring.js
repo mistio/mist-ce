@@ -311,29 +311,11 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                             // Calculate Start and Stop
                             self.timeStart = Math.floor(self.lastMetrictime.getTime() / 1000);
-/*
-                            self.timeStop = new Date().getTime() / 1000;
-                            self.timeStop -= (self.timeStop - self.timeStart) % (self.step/1000);
-
-                            while (self.timeStop <= self.timeStart) {
-                                self.timeStop += self.step/1000;
-                            }
-*/
-
-
                             self.timeStop = Math.floor( ((new Date()).getTime() - self.timeGap * 1000 ) / 1000 );
 
                             // Fix time when lossing precision
                             var stopRemainder = (self.timeStop - self.timeStart) % (self.step/1000);
                             self.timeStop = self.timeStop - stopRemainder;
-
-                            // Temporary
-                            // Try to fix wrong datapoints
-                            //if (self.timeStart == self.timeStop) {
-                            //    self.timeStart -= self.step/1000;
-                            // }
-
-
 
                             // Do the ajax call
                             this.requestID++;
@@ -439,19 +421,11 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                             var callback    = null;
 
                             if(options){
-                                if ('stop' in options){
-                                    stop  = Math.floor(options.stop);
-                                    start = Math.floor( stop - timeWindow/1000 );
-                                }
-
-                                if ('step' in options)
-                                    step = options.step;
-
-                                if ('timeWindow' in options)
-                                    timeWindowSize = options.timeWindow;
-
-                                if('callback' in options)
-                                    callback = options.callback;
+                                stop  = Math.floor(options.stop);
+                                start = Math.floor( stop - timeWindow/1000 );
+                                step = options.step;
+                                timeWindowSize = options.timeWindow;
+                                callback = options.callback;
                             }
 
                             self.locked = true;
@@ -485,7 +459,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 *   @param {number}  newStep     - The new step
                 *   @param {boolean} reloadAfter - Change Step And Reload, Default: true
                 */
-                changeStep: function(newStep,reloadAfter){
+                changeStep: function(newStep, reloadAfter){
                     this.step = newStep;
                     if(!reloadAfter) return;
                     this.reload('stepChanged');
@@ -500,7 +474,6 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 */
                 changeTimeWindow: function(newTimeWindow,reloadAfter){
                     this.timeWindow = newTimeWindow;
-
                     // Save cookies
                     var cookies = Mist.monitoringController.cookies;
                     cookies.timeWindow = newTimeWindow;
@@ -564,10 +537,11 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                         type: 'GET',
                         async: true,
                         dataType: 'json',
-                        data: { 'start': start - 50, // just to be sure we get the data in the range we need
-                                'stop': stop + 50,   // -- same --
-                                'step': step / 1000
-                              },
+                        data: {
+                            start: start - 50,
+                            stop: stop + 50,
+                            step: step / 1000
+                        },
                         timeout: 8000,
                         success: function (data) {
 
@@ -576,58 +550,42 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                 if (!data.length)
                                     throw "No Data Received";
 
-
-                                // TODO: Maybe there is a better to tell if
-                                // we have data
-
-                                if (self.machine.pendingFirstData) {
-                                    var hasFirstData = false;
-                                    data.some(function(metric) {
-                                        metric.datapoints.some(function(datapoint) {
-                                            if (datapoint[0] != null) {
-                                                self.machine.set('pendingFirstData', false);
-                                                return hasFirstData = true;
-                                            }
-                                        });
-                                        return hasFirstData;
-                                    });
-                                }
-
                                 var receivedData = {};
-                                var lastTime = 0;
+                                var hasFirstData = false;
 
                                 data.forEach(function(metric) {
 
-                                    // Hash the target to get rid of
-                                    // funky characters
-
+                                    // Hash the target to get rid of funky characters
                                     var id = md5(metric.target);
                                     metric.id = id;
 
                                     receivedData[id] = [];
 
-                                    metric.datapoints.forEach(function(datapoint) {
+                                    metric.datapoints.forEach(function (datapoint) {
+
                                         if (datapoint[1] > stop)
                                             return;
                                         if (datapoint[1] < start)
                                             return;
-                                        if (datapoint[1] > lastTime)
-                                            lastTime = datapoint[1];
+                                        if (datapoint[0] != null)
+                                            hasFirstData = true;
 
                                         receivedData[id].push({
                                             time: new Date(datapoint[1]*1000),
                                             value: datapoint[0]
                                         });
-
                                     });
 
                                     metric.datapoints = receivedData[id];
                                     Mist.monitoringController.graphs.addGraph(metric);
                                 });
 
+                                var metric = Object.keys(receivedData)[0];
+                                var datapoints = receivedData[metric];
+                                self.lastMetrictime = datapoints[datapoints.length - 1].time;
 
-                                self.lastMetrictime = new Date(lastTime * 1000);
-                                info('lastMetric', self.lastMetrictime.getTime() / 1000);
+                                if (self.machine.pendingFirstData)
+                                    self.machine.set('pendingFirstData', !hasFirstData);
 
                                 callback({
                                     status: 'success',
@@ -806,7 +764,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                 changeTimeWindow: function (newTimeWindow) {
                     this.instances.forEach(function (graph) {
-                        //graph.changeTimeWindow(newTimeWindow);
+                        graph.view.changeTimeWindow(newTimeWindow);
                     });
                 },
 

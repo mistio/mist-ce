@@ -142,7 +142,6 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             renderGraph: function (id, format, that) {
 
-                var divID = id;
                 var width = $("#GraphsArea").width() - 2;
                 var timeToDisplayms = 600000;
                 var yAxisValueFormat = format;
@@ -151,10 +150,9 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 var fixedHeight = width * 0.125; // (160 / 1280)
                 var margin      = {top: 10, right: 0, bottom: 24, left: 52};
 
-                this.name             = divID.replace('Graph','');
                 this.width            = width;
                 this.height           = fixedHeight < 85 ? 85 : fixedHeight;
-                that.timeDisplayed    = timeToDisplayms/1000;
+                that.timeDisplayed    = timeToDisplayms / 1000;
                 this.yAxisValueFormat = yAxisValueFormat;
                 this.displayedData    = [];
                 this.xCordinates      = [];
@@ -253,6 +251,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     this.displayedData.forEach(function (d) {
                         self.xCordinates.push(xScale(d.time));
                     });
+
 
                     // Change grid lines and labels based on time displayed
                     var modelXAxis = d3.svg.axis()
@@ -447,6 +446,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     this.updateView();
                 };
 
+
                 /**
                 *
                 * Enables animation of graph
@@ -454,10 +454,10 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 */
                 this.clearAnimation = function(stopCurrent) {
 
-                    that.svg.value.line.animation.clearBuffer(stopCurrent)
-                    that.svg.value.area.animation.clearBuffer(stopCurrent)
-                    that.svg.axis.x.legend.animation.clearBuffer(stopCurrent)
-                    that.svg.grid.x.animation.clearBuffer(stopCurrent)
+                    that.svg.value.line.animation.clearBuffer(stopCurrent);
+                    that.svg.value.area.animation.clearBuffer(stopCurrent);
+                    that.svg.axis.x.legend.animation.clearBuffer(stopCurrent);
+                    that.svg.grid.x.animation.clearBuffer(stopCurrent);
 
                     // Reset Transform
                     if (stopCurrent)
@@ -516,14 +516,6 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 };
 
 
-                /*
-                *
-                * Appends the graph into the DOM.
-                * Graph will be inside the id specified.
-                * @param {string} id     - the div where graph will be
-                * @param {number} width  - the width of the graph
-                * @param {height} height - the height of the graph
-                */
                 this.appendGraph = function(id, metric, width, height){
 
                     var name = metric.name;
@@ -538,16 +530,14 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                         .attr('onclick',"Mist.monitoringController.UI.expandPressed('" + id + "')")
                         .text(name);
 
-                    var args = {
+                    that.set('svg', new SvgSet({
                         id: id,
                         margin: margin,
                         size: {
                             width: width,
                             height: height
                         }
-                    };
-
-                    that.set('svg', new SvgSet(args));
+                    }));
 
                     // Set graph and button visibility
                     var cookies = Mist.monitoringController.cookies;
@@ -616,11 +606,10 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                             var minValueIndex = 0;
                             var currentValue = 0;
 
-                            for(var i=0; i < self.xCordinates.length; i++)
-                            {
-                                if(self.xCordinates[i]+translate > virtualMouseX){
+                            for (var i = 0; i < self.xCordinates.length; i++) {
+
+                                if (self.xCordinates[i]+translate > virtualMouseX)
                                     break;
-                                }
                                 else
                                     minValueIndex = i;
                             }
@@ -673,21 +662,23 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                     var updatePopUpOffset = function(event){
 
-
                         mouseX = event.pageX - $('#'+ id).children('svg').offset().left;
                         mouseY = event.pageY - $('#'+ id).children('svg').offset().top;
 
                         // Set Mouse Line Cordinates
-                        mouseOverLine.attr('x1',"" + mouseX)
-                                     .attr('x2',"" + mouseX);
+                        mouseOverLine.attr('x1', mouseX)
+                                     .attr('x2', mouseX);
 
                         // Make popup appear at left side when it is at the right edge
                         var popupWidth = $('#GraphsArea').children('.valuePopUp').width();
-                        var xAlign = (event.pageX + popupWidth >= window.innerWidth-25) ? -(popupWidth + 15) : 15;
+                        var xAlign = (event.pageX + popupWidth >= window.innerWidth-25) ? - (popupWidth + 15) : 15;
 
                         // Update popup cords
-                        $('#GraphsArea').children('.valuePopUp').css('left',(event.clientX+xAlign) +"px");
-                        $('#GraphsArea').children('.valuePopUp').css('top',(event.clientY-35)+"px");
+                        $('#GraphsArea').children('.valuePopUp')
+                            .css('left', (event.clientX + xAlign) + 'px');
+
+                        $('#GraphsArea').children('.valuePopUp')
+                            .css('top', (event.clientY - 35) + 'px');
 
                         updatePopUpValue(this);
 
@@ -712,17 +703,17 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                     // Mouse Events
                     $('#' + id).children('svg').mouseenter(function() {
-
                         // Setup Interval
                         updateInterval = window.setInterval(updatePopUpValue,500);
                     });
+
                     $('#' + id).children('svg').mouseleave(clearUpdatePopUp);
                     $('#' + id).children('svg').mousemove(updatePopUpOffset);
                 }
 
-                function updateMouseOverSize() {
+                function updateMouseOverSize () {
                     that.svg.canvas
-                        .select('.selectorLine').attr('y2',""+ (self.height - margin.bottom +3));
+                        .select('.selectorLine').attr('y2', self.height - margin.bottom + 3);
                 }
             },
 
