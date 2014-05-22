@@ -256,7 +256,7 @@ COOKIE:
 css and js files and inside the _template you can tweak the layout.html file. Every time you change a static file and run
 sphinx-build again it may not add anything (adds only if there are changes in .py or .rst files). In order to consider the
 changes in static files you have to use the -a flag.:</p>
-<div class="highlight-python"><div class="highlight"><pre>mist.io$ ./bin/sphinx-build docs/source/ docs/build/
+<div class="highlight-python"><div class="highlight"><pre>mist.io$ ./bin/sphinx-build -a docs/source/ docs/build/
 </pre></div>
 </div>
 <p>Finally there is the -b flag which decides the builder. By default it is html, but you could easily choose between other
