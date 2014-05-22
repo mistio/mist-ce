@@ -126,7 +126,7 @@ css and js files and inside the _template you can tweak the layout.html file. Ev
 sphinx-build again it may not add anything (adds only if there are changes in .py or .rst files). In order to consider the
 changes in static files you have to use the -a flag.::
 
-    mist.io$ ./bin/sphinx-build docs/source/ docs/build/
+    mist.io$ ./bin/sphinx-build -a docs/source/ docs/build/
 
 
 Finally there is the -b flag which decides the builder. By default it is html, but you could easily choose between other
