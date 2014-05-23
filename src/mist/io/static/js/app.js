@@ -153,7 +153,7 @@ define( 'app', [
             $.mobile.pushStateEnabled = false;
             $.mobile.linkBindingEnabled = false;
             $.mobile.hashListeningEnabled = false;
-            //$.mobile.ignoreContentEnabled = true;
+            $.mobile.ignoreContentEnabled = true;
             $.mobile.panel.prototype._bindUpdateLayout = function(){};
             $('body').css('overflow','auto');
 
@@ -336,7 +336,6 @@ define( 'app', [
         App.set('notificationController', NotificationController.create());
         App.set('machinePowerController', MachinePowerController.create());
         App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
-
 
         // Ember custom widgets
 

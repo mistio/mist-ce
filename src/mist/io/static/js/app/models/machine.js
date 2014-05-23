@@ -136,12 +136,14 @@ define('app/models/machine', ['ember'],
 
 
             equals: function (machine) {
-                if (machine)
-                    if (machine.backend)
-                        if (machine.id == this.id &&
-                            machine.backend.id == this.backend.id)
-                                return true;
-
+                if (machine instanceof Array)
+                    if (machine[1] == this.id &&
+                        machine[0] == this.backend.id)
+                            return true;
+                if (machine instanceof Object)
+                    if (machine.id == this.id &&
+                        machine.backend.id == this.backend.id)
+                            return true;
                 return false;
             },
 

@@ -1,14 +1,27 @@
 <div class="graph" {{bind-attr id="view.graph.id"}}>
+
     <div class="header">
         <div class="title">
             {{view.graph.title}}
-            {{#if view.graph.metric.unit}}
-                ({{view.graph.metric.unit}})
-            {{/if}}
         </div>
-        <div class="closeBtn"
-            {{action "collapseClicked" target="view"}}>
+        <div class="closeBtn" {{action "collapseClicked" target="view"}}>
             -
         </div>
     </div>
+
+    <svg>
+    	<g class="grid-x"></g>
+    	<g class="grid-y"></g>
+        <g class="valueArea">
+            <path></path>
+        </g>
+        <g class="valueLine">
+            <path></path>
+        </g>
+        <g class="x-axis"></g>
+        <rect class="hideAnimeLine"></rect>
+        <line class="axisLine x"></line>
+        <line class="axisLine y"></line>
+        <g class="y-axis"></g>
+    </svg>
 </div>
