@@ -16,6 +16,7 @@ from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
 from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider, NodeState
 from libcloud.common.types import InvalidCredsError
+from libcloud.utils.networking import is_private_subnet
 
 
 try:
@@ -739,12 +740,38 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
     key = SSHKeyDeployment(str(public_key))
     deploy_script = ScriptDeployment(script)
     msd = MultiStepDeployment([key, deploy_script])
+    key = str(public_key).replace('\n','')
+
     try:
-        node = conn.deploy_node(name=machine_name, image=image, size=size,
-                                location=location, deploy=msd)
-    except Exception as e:
-        raise MachineCreationError("Rackspace, got exception %s" % e)
-    return node
+        server_key = ''
+        keys = conn.ex_list_keypairs()
+        for k in keys:
+            if key == k.public_key:
+                server_key = k.name
+                break
+        if not server_key:
+            server_key = conn.ex_import_keypair_from_string(name=machine_name, key_material=key)
+            server_key = server_key.name
+    except:
+        server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
+        server_key = server_key.name
+
+    if script:
+        try:
+            node = conn.deploy_node(name=machine_name, image=image, size=size,
+                                    location=location, deploy=msd, ex_keyname=server_key)
+
+            return node
+        except Exception as e:
+            raise MachineCreationError("Script Deployment got exception: %r" % e)
+    else:
+        try:
+            node = conn.create_node(name=machine_name, image=image, size=size,
+                                    location=location, ex_keyname=server_key)
+
+            return node
+        except Exception as e:
+            raise MachineCreationError("Rackspace, got exception %r" % e)
 
 
 def _create_machine_openstack(conn, private_key, public_key, script, machine_name,
@@ -773,20 +800,39 @@ def _create_machine_openstack(conn, private_key, public_key, script, machine_nam
     except:
         server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
         server_key = server_key.name
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.deploy_node(name=machine_name,
-                image=image,
-                size=size,
-                location=location,
-                deploy=msd,
-                ssh_key=tmp_key_path,
-                ssh_alternate_usernames=['ec2-user', 'ubuntu'],
-                max_tries=1,
-                ex_keyname=server_key)
-        except Exception as e:
-            raise MachineCreationError("OpenStack, got exception %s" % e)
-    return node
+
+    if script:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.deploy_node(name=machine_name,
+                    image=image,
+                    size=size,
+                    location=location,
+                    deploy=msd,
+                    ssh_key=tmp_key_path,
+                    ssh_alternate_usernames=['ec2-user', 'ubuntu'],
+                    max_tries=1,
+                    ex_keyname=server_key)
+            except Exception as e:
+                raise MachineCreationError("OpenStack, got exception %s" % e)
+        return node
+    else:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.create_node(name=machine_name,
+                    image=image,
+                    size=size,
+                    location=location,
+                    ssh_key=tmp_key_path,
+                    ssh_alternate_usernames=['ec2-user', 'ubuntu'],
+                    max_tries=1,
+                    ex_keyname=server_key)
+            except Exception as e:
+                raise MachineCreationError("OpenStack, got exception %s" % e)
+        return node
+
+
+
 
 
 def _create_machine_ec2(conn, key_name, private_key, public_key, script,
@@ -824,26 +870,43 @@ def _create_machine_ec2(conn, key_name, private_key, public_key, script,
         else:
             raise InternalServerError("Couldn't create security group")
 
-    deploy_script = ScriptDeployment(script)
-    with get_temp_file(private_key) as tmp_key_path:
-        #deploy_node wants path for ssh private key
-        try:
-            node = conn.deploy_node(
-                name=machine_name,
-                image=image,
-                size=size,
-                deploy=deploy_script,
-                location=location,
-                ssh_key=tmp_key_path,
-                ssh_alternate_usernames=['ec2-user', 'ubuntu'],
-                max_tries=1,
-                ex_keyname=key_name,
-                ex_securitygroup=config.EC2_SECURITYGROUP['name']
-            )
-        except Exception as e:
-            raise MachineCreationError("EC2, got exception %s" % e)
-    return node
-
+    if script:
+        deploy_script = ScriptDeployment(script)
+        with get_temp_file(private_key) as tmp_key_path:
+            #deploy_node wants path for ssh private key
+            try:
+                node = conn.deploy_node(
+                    name=machine_name,
+                    image=image,
+                    size=size,
+                    deploy=deploy_script,
+                    location=location,
+                    ssh_key=tmp_key_path,
+                    ssh_alternate_usernames=['ec2-user', 'ubuntu'],
+                    max_tries=1,
+                    ex_keyname=key_name,
+                    ex_securitygroup=config.EC2_SECURITYGROUP['name']
+                )
+            except Exception as e:
+                raise MachineCreationError("EC2, got exception %s" % e)
+        return node
+    else:
+        with get_temp_file(private_key) as tmp_key_path:
+            #deploy_node wants path for ssh private key
+            try:
+                node = conn.create_node(
+                    name=machine_name,
+                    image=image,
+                    size=size,
+                    location=location,
+                    ssh_key=tmp_key_path,
+                    max_tries=1,
+                    ex_keyname=key_name,
+                    ex_securitygroup=config.EC2_SECURITYGROUP['name']
+                )
+            except Exception as e:
+                raise MachineCreationError("EC2, got exception %s" % e)
+        return node
 
 def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
                               machine_name, image, size, location):
@@ -895,24 +958,44 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
         if console_keys:
             console_key = console_keys[0].id
 
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.deploy_node(
-                name=machine_name,
-                hostname=machine_name[:15],
-                image=image,
-                size=size,
-                zone=location.id,
-                server_key=server_key,
-                console_key=console_key,
-                ssh_key=tmp_key_path,
-                connect_attempts=20,
-                ex_wait=True,
-                deploy=deploy_script
-            )
-        except Exception as e:
-            raise MachineCreationError("Nephoscale, got exception %s" % e)
-    return node
+    if script:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.deploy_node(
+                    name=machine_name,
+                    hostname=machine_name[:15],
+                    image=image,
+                    size=size,
+                    zone=location.id,
+                    server_key=server_key,
+                    console_key=console_key,
+                    ssh_key=tmp_key_path,
+                    connect_attempts=20,
+                    ex_wait=True,
+                    deploy=deploy_script
+                )
+            except Exception as e:
+                raise MachineCreationError("Nephoscale, got exception %s" % e)
+        return node
+    else:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.create_node(
+                    name=machine_name,
+                    hostname=machine_name[:15],
+                    image=image,
+                    size=size,
+                    zone=location.id,
+                    server_key=server_key,
+                    console_key=console_key,
+                    ssh_key=tmp_key_path,
+                    connect_attempts=20,
+                    nowait=True,
+                    deploy=deploy_script
+                )
+            except Exception as e:
+                raise MachineCreationError("Nephoscale, got exception %s" % e)
+        return node
 
 
 def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
@@ -933,20 +1016,36 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
     else:
         domain = None
         name = machine_name
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.deploy_node(
-                name=name,
-                ex_domain=domain,
-                image=image,
-                size=size,
-                deploy=msd,
-                location=location,
-                ssh_key=tmp_key_path
-            )
-        except Exception as e:
-            raise MachineCreationError("Softlayer, got exception %s" % e)
-    return node
+
+    if script:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.deploy_node(
+                    name=name,
+                    ex_domain=domain,
+                    image=image,
+                    size=size,
+                    deploy=msd,
+                    location=location,
+                    ssh_key=tmp_key_path
+                )
+            except Exception as e:
+                raise MachineCreationError("Softlayer, got exception %s" % e)
+        return node
+    else:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.create_node(
+                    name=name,
+                    ex_domain=domain,
+                    image=image,
+                    size=size,
+                    location=location,
+                    ssh_key=tmp_key_path
+                )
+            except Exception as e:
+                raise MachineCreationError("Softlayer, got exception %s" % e)
+        return node
 
 
 def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
@@ -966,26 +1065,47 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
     except:
         key = conn.ex_create_ssh_key('mist.io', key)
 
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.deploy_node(
-                name=machine_name,
-                image=image,
-                size=size,
-                ex_ssh_key_ids=[str(key.id)],
-                location=location,
-                ssh_key=tmp_key_path,
-                ssh_alternate_usernames=['root']*5,
-                #attempt to fix the Connection reset by peer exception
-                #that is (most probably) created due to a race condition
-                #while deploy_node establishes a connection and the
-                #ssh server is restarted on the created node
-                private_networking=True,
-                deploy=deploy_script
-            )
-        except Exception as e:
-            raise MachineCreationError("Digital Ocean, got exception %s" % e)
-    return node
+    if script:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.deploy_node(
+                    name=machine_name,
+                    image=image,
+                    size=size,
+                    ex_ssh_key_ids=[str(key.id)],
+                    location=location,
+                    ssh_key=tmp_key_path,
+                    ssh_alternate_usernames=['root']*5,
+                    #attempt to fix the Connection reset by peer exception
+                    #that is (most probably) created due to a race condition
+                    #while deploy_node establishes a connection and the
+                    #ssh server is restarted on the created node
+                    private_networking=True,
+                    deploy=deploy_script
+                )
+            except Exception as e:
+                raise MachineCreationError("Digital Ocean, got exception %s" % e)
+        return node
+    else:
+        with get_temp_file(private_key) as tmp_key_path:
+            try:
+                node = conn.create_node(
+                    name=machine_name,
+                    image=image,
+                    size=size,
+                    ex_ssh_key_ids=[str(key.id)],
+                    location=location,
+                    ssh_key=tmp_key_path,
+                    ssh_alternate_usernames=['root']*5,
+                    #attempt to fix the Connection reset by peer exception
+                    #that is (most probably) created due to a race condition
+                    #while deploy_node establishes a connection and the
+                    #ssh server is restarted on the created node
+                    private_networking=True,
+                )
+            except Exception as e:
+                raise MachineCreationError("Digital Ocean, got exception %s" % e)
+        return node
 
 
 def _create_machine_gce(conn, key_name, private_key, public_key,
@@ -1638,6 +1758,7 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
 
     # run SSH commands
     command = (
+       "echo \""
        "sudo -n uptime 2>&1|"
        "grep load|"
        "wc -l && "
@@ -1651,7 +1772,10 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;"
        "else sysctl hw.ncpu | awk '{print $2}';"
        "fi;"
+       "echo -------- && "
+       "/sbin/ifconfig;"       
        "echo --------"
+       "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
        #"cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null |"
        #"awk '{print $2}'` 2> /dev/null || "
        #"cat ~/.ssh/authorized_keys 2> /dev/null"
@@ -1683,10 +1807,17 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
         users = re.split(' users?', uptime_output)[0].split(', ')[-1].strip()
         uptime = cmd_output[2]
         cores = cmd_output[3]
+        ips = re.findall('inet addr:(\S+)', cmd_output[4])
+        if '127.0.0.1' in ips:
+            ips.remove('127.0.0.1')
+        pub_ips = find_public_ips(ips)
+        priv_ips = [ip for ip in ips if ip not in pub_ips]
         ret = {'uptime': uptime,
                'loadavg': loadavg,
                'cores': cores,
                'users': users,
+               'pub_ips': pub_ips, 
+               'priv_ips': priv_ips
                }
         # if len(cmd_output) > 4:
         #     updated_keys = update_available_keys(user, backend_id,
@@ -1738,3 +1869,14 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
 #             } for key in updated_keypairs]
 #
 #     return ret
+
+def find_public_ips(ips):
+    public_ips = []
+    for ip in ips:
+        #is_private_subnet does not check for ipv6
+        try:
+            if not is_private_subnet(ip):
+                public_ips.append(ip)
+        except:
+            pass
+    return public_ips

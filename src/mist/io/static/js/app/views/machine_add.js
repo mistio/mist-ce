@@ -40,6 +40,8 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                             return size.price.eu;
                         if (location.name.indexOf('us-') > -1)
                             return size.price.us;
+                        if (location.name.indexOf('asia-') > -1)
+                            return size.price.as;
                         return size.price.eu;                            
                     }
                     return size.price;
