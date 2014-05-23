@@ -59,11 +59,11 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     //this.graph.on('onMetricAdd', this, 'renderGraph');
                     //this.graph.on('onMetricRemove', this, 'renderGraph');
 
+                    this.set('metric', this.graph.metrics[0]);
+
                     this.clearData();
-                    this.set('instance', {});
                     this.renderGraph(this.graph.id, '', this);
-                    this.appendGraph(this.graph.id, this.graph.metrics[0],
-                        this.width, this.height, this.margin);
+                    this.appendGraph();
                     this.updateData(this.graph.metrics[0].datapoints);
                 });
 
@@ -171,9 +171,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     this.clearAnimPending = true;
             },
 
-            appendGraph: function(id, metric, width, height, margin){
-
-                var name = metric.name;
+            appendGraph: function() {
 
                 // Generate graph's expand button
                 d3.select('#graphBar')
@@ -183,20 +181,21 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     .insert('a')
                     .attr('class', 'ui-btn ui-btn-icon-left ui-icon-carat-u ui-corner-all')
                     .attr('onclick',"Mist.monitoringController.UI.expandPressed('" + id + "')")
-                    .text(name);
+                    .text(this.metric.name);
 
+                var id = this.graph.id;
                 this.set('svg', new SvgSet({
                     id: id,
-                    margin: margin,
+                    margin: this.margin,
                     size: {
-                        width: width,
-                        height: height
+                        width: this.width,
+                        height: this.height
                     }
                 }));
 
                 // Set graph and button visibility
                 var cookies = Mist.monitoringController.cookies;
-                if (cookies.collapsedGraphs.indexOf(metric.id) > -1) {
+                if (cookies.collapsedGraphs.indexOf(this.metric.id) > -1) {
                     $('#' + id + '-btn').show();
                     $('#' + id).hide();
                 } else {
