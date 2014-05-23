@@ -173,17 +173,16 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 var valueline = d3.svg.line()
                                 .x(function(d) {return xScale(d.time); })
                                 .y(function(d) {return yScale(d.value); })
-                                .defined(function(d) {return d.value != null });
-                                //.interpolate('monotone');
+                                .defined(function(d) {return d.value != null })
+                                .interpolate('monotone');
 
                 // valuearea is function that fills the space under the main line
                 var valuearea = d3.svg.area()
                                 .x(function(d) {return xScale(d.time); })
                                 .y1(function(d) {return yScale(d.value); })
                                 .y0(height)
-                                .defined(function(d) {return d.value != null });
-                                //.interpolate('monotone');
-
+                                .defined(function(d) {return d.value != null })
+                                .interpolate('monotone');
 
                 /**
                 *
