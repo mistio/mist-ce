@@ -272,7 +272,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                                 .attr('x1',"" + this.margin.left)
                                 .attr('y1',"0" )
                                 .attr('x2',"" + this.margin.left)
-                                .attr('y2',""+ (self.height - this.margin.bottom +3))
+                                .attr('y2',""+ (this.height - this.margin.bottom +3))
                                 .style("display", "none");
 
                 var mouseX = 0;
@@ -280,7 +280,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 var isVisible = false;
                 var updateInterval;
 
-                var updatePopUpValue = function(graph){
+                var updatePopUpValue = function(graph) {
 
                     // Check if mouse left from element without clearing interval
                     if($($('#' + that.graph.id).selector + ":hover").length <= 0)
@@ -293,7 +293,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     if(mouseX > that.margin.left)
                     {
                         if(!isVisible){
-
+                            Mist.graph = $(graph);
                             $(graph).find('.selectorLine').show(0);
                             $("#GraphsArea").find('.valuePopUp').show(0);
                             isVisible = true;
@@ -303,7 +303,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                         // Calculate Translate
                         var translate = 0;
-                        if(self.animationEnabled){
+                        if(that.animationEnabled){
                             translate =  $("#" + that.graph.id).find('.valueLine > path').attr('transform');
                             translate = + translate.slice(10,translate.indexOf(','));
                         }
@@ -365,7 +365,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 };
 
 
-                var updatePopUpOffset = function(event){
+                var updatePopUpOffset = function(event) {
 
                     mouseX = event.pageX - $('#'+ that.graph.id).children('svg').offset().left;
                     mouseY = event.pageY - $('#'+ that.graph.id).children('svg').offset().top;
