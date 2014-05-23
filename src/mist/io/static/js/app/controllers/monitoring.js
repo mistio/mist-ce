@@ -278,6 +278,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     this.machine.set('pendingStats', true);
 
                     // Do the ajax call
+
                     this.requestID++;
                     this.receiveData(this.timeStart, this.timeStop, this.step,
                         this.callback);
@@ -295,10 +296,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                             // Calculate Start and Stop
                             self.timeStart = Math.floor(self.lastMetrictime.getTime() / 1000);
-                            self.timeStop = Math.floor((new Date().getTime() - self.timeGap * 1000 ) / 1000 );
+                            self.timeStop = Math.floor(((new Date().getTime()) - self.timeGap * 1000 ) / 1000 );
 
                             // Fix time when lossing precision
-                            self.timeStop = (self.timeStop - self.timeStart) % (self.step/1000);
+                            self.timeStop -= (self.timeStop - self.timeStart) % (self.step/1000);
 
                             // Do the ajax call
                             self.requestID++;
@@ -488,7 +489,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     var requestID  = this.requestID;
                     var controller = Mist.monitoringController;
                     var self = this;
-
+                    info('start', start - 50 , 'stop', stop + 50, 'step', step / 1000);
                     $.ajax({
                         url: '/backends/' + self.machine.backend.id +
                              '/machines/' + self.machine.id + '/stats',
@@ -541,6 +542,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                 var metric = Object.keys(receivedData)[0];
                                 var datapoints = receivedData[metric];
                                 self.lastMetrictime = datapoints[datapoints.length - 1].time;
+                                info(self.lastMetrictime);
 
                                 if (self.machine.pendingFirstData)
                                     self.machine.set('pendingFirstData', !hasFirstData);
