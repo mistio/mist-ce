@@ -4,12 +4,11 @@ define('app/views/graph', ['app/views/templated', 'd3'],
     //
     //  @returns Class
     //
-    function(TemplatedView) {
+    function(TemplatedView, d3) {
 
         'use strict';
 
         var MAX_BUFFER_DATA = 60;
-        var d3 = require('d3');
 
         return TemplatedView.extend({
 
@@ -24,10 +23,20 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             graph: null,
             instance: null,
 
+            scale: {
+                x: null,
+                y: null,
+            },
+
             svg: null,
             data: null,
+            margin: null,
             timeDisplayed: null,
+            valuesDistance: null,
             animationEnabled: true,
+            clearAnimPending: null,
+            xCordinates: null,
+            displayedData: null,
 
 
             //
@@ -48,8 +57,8 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                     this.clearData();
                     this.set('instance', new this.renderGraph(this.graph.id, '', this));
-                    this.instance.appendGraph(this.graph.id, this.graph.metrics[0],
-                        this.instance.width, this.instance.height);
+                    this.appendGraph(this.graph.id, this.graph.metrics[0],
+                        this.instance.width, this.instance.height, this.instance.margin);
                     this.updateData(this.graph.metrics[0].datapoints);
                 });
 
@@ -94,7 +103,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             disableAnimation: function (immediately) {
                 this.set('animationEnabled', false);
-                this.instance.clearAnimation(immediately);
+                this.clearAnimation(immediately);
             },
 
 
@@ -113,6 +122,17 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             changeTimeWindow: function (newTimeWindow) {
                 this.set('timeDisplayed', newTimeWindow / 1000);
                 this.clearData();
+            },
+
+
+            calcValueDistance: function (xScale) {
+
+                // Get last 2 data
+                if(this.data.length < 2) return
+
+                var xValueA = xScale(this.data[this.data.length-2].time);
+                var xValueB = xScale(this.data[this.data.length-1].time);
+                this.valuesDistance = xValueB - xValueA;
             },
 
 
@@ -139,6 +159,215 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 this.updateView();
             },
 
+            clearAnimation: function(stopCurrent) {
+
+                this.svg.value.line.animation.clearBuffer(stopCurrent);
+                this.svg.value.area.animation.clearBuffer(stopCurrent);
+                this.svg.axis.x.legend.animation.clearBuffer(stopCurrent);
+                this.svg.grid.x.animation.clearBuffer(stopCurrent);
+
+                // Reset Transform
+                if (stopCurrent)
+                    this.clearAnimPending = true;
+            },
+
+            appendGraph: function(id, metric, width, height, margin){
+
+                var name = metric.name;
+
+                // Generate graph's expand button
+                d3.select('#graphBar')
+                    .insert('div')
+                    .attr('id', id + '-btn')
+                    .attr('class', 'graphBtn')
+                    .insert('a')
+                    .attr('class', 'ui-btn ui-btn-icon-left ui-icon-carat-u ui-corner-all')
+                    .attr('onclick',"Mist.monitoringController.UI.expandPressed('" + id + "')")
+                    .text(name);
+
+                this.set('svg', new SvgSet({
+                    id: id,
+                    margin: margin,
+                    size: {
+                        width: width,
+                        height: height
+                    }
+                }));
+
+                // Set graph and button visibility
+                var cookies = Mist.monitoringController.cookies;
+                if (cookies.collapsedGraphs.indexOf(metric.id) > -1) {
+                    $('#' + id + '-btn').show();
+                    $('#' + id).hide();
+                } else {
+                    $('#' + id + '-btn').hide();
+                    $('#' + id).show();
+                }
+
+                this.setupMouseOver();
+            },
+
+
+            /*
+            *
+            * Setups event listeners for mouse,
+            * also creates interval for popup value update
+            */
+            setupMouseOver: function () {
+
+                var that = this;
+
+                // Append the Selector Line
+                var mouseOverLine = this.svg.canvas
+                                .append('line')
+                                .attr('class','selectorLine')
+                                .attr('x1',"" + this.margin.left)
+                                .attr('y1',"0" )
+                                .attr('x2',"" + this.margin.left)
+                                .attr('y2',""+ (self.height - this.margin.bottom +3))
+                                .style("display", "none");
+
+                var mouseX = 0;
+                var mouseY = 0;
+                var isVisible = false;
+                var updateInterval;
+
+                var updatePopUpValue = function(graph){
+
+                    // Check if mouse left from element without clearing interval
+                    if($($('#' + that.graph.id).selector + ":hover").length <= 0)
+                    {
+                       clearUpdatePopUp();
+                       return;
+                    }
+
+                    // Update popup when it is over value line
+                    if(mouseX > that.margin.left)
+                    {
+                        if(!isVisible){
+
+                            $(graph).find('.selectorLine').show(0);
+                            $("#GraphsArea").find('.valuePopUp').show(0);
+                            isVisible = true;
+                        }
+                        // Mouse X inside value line area
+                        var virtualMouseX = mouseX - that.margin.left;
+
+                        // Calculate Translate
+                        var translate = 0;
+                        if(self.animationEnabled){
+                            translate =  $("#" + that.graph.id).find('.valueLine > path').attr('transform');
+                            translate = + translate.slice(10,translate.indexOf(','));
+                        }
+                        // Measurement That is less than curson x
+                        var minValueIndex = 0;
+                        var currentValue = 0;
+
+                        for (var i = 0; i < that.xCordinates.length; i++) {
+
+                            if (that.xCordinates[i]+translate > virtualMouseX)
+                                break;
+                            else
+                                minValueIndex = i;
+                        }
+
+
+                        // Fix for the area that has not defined data
+                        if(that.displayedData.length == 0 || that.displayedData[minValueIndex].value == null || that.displayedData[minValueIndex+1].value == null ){
+                            $('#GraphsArea').children('.valuePopUp').text("No Data");
+                            return;
+                        }
+
+
+                        // Distanse between value before curson and after curson
+                        var distance = that.displayedData[minValueIndex+1].value  - that.displayedData[minValueIndex].value;
+                        // Mouse offset between this two values
+                        var mouseOffset = (virtualMouseX -(that.xCordinates[minValueIndex]+translate))/that.valuesDistance ;
+                        // Cursor's measurement value is the value before the curson +
+                        // the mouse percentage after the first point * the distance between the values
+                        currentValue = that.displayedData[minValueIndex].value + distance * mouseOffset;
+
+                        // Value has a small loss of presition. We don't let it be less than 0
+                        currentValue < 0 ? 0 : currentValue;
+
+                        // Fix For Big Numbers
+                        var valueText = "";
+                        if(currentValue>=1073741824)                               // (1024*1024*1024)
+                            valueText = (currentValue/1073741824).toFixed(2) +"G"; // (1024*1024*1024)
+                        else if(currentValue>=1048576)                             // (1024*1024)
+                            valueText = (currentValue/1048576).toFixed(2) +"M";    // (1024*1024)
+                        else if(currentValue>=1024)
+                            valueText = (currentValue/1024).toFixed(2) + "K";
+                        else if(self.yAxisValueFormat == "%")
+                            valueText = currentValue.toFixed(2) + "%";
+                        else
+                            valueText = currentValue.toFixed(2);
+
+                        // Update Value Text
+                        $('#GraphsArea').children('.valuePopUp').text(valueText);
+                    } else {
+
+                        if(isVisible){
+
+                            $(graph).find('.selectorLine').hide(0);
+                            $("#GraphsArea").find('.valuePopUp').hide(0);
+                            isVisible = false;
+                        }
+                    }
+                };
+
+
+                var updatePopUpOffset = function(event){
+
+                    mouseX = event.pageX - $('#'+ that.graph.id).children('svg').offset().left;
+                    mouseY = event.pageY - $('#'+ that.graph.id).children('svg').offset().top;
+
+                    // Set Mouse Line Cordinates
+                    mouseOverLine.attr('x1', mouseX)
+                                 .attr('x2', mouseX);
+
+                    // Make popup appear at left side when it is at the right edge
+                    var popupWidth = $('#GraphsArea').children('.valuePopUp').width();
+                    var xAlign = (event.pageX + popupWidth >= window.innerWidth-25) ? - (popupWidth + 15) : 15;
+
+                    // Update popup cords
+                    $('#GraphsArea').children('.valuePopUp')
+                        .css('left', (event.clientX + xAlign) + 'px');
+
+                    $('#GraphsArea').children('.valuePopUp')
+                        .css('top', (event.clientY - 35) + 'px');
+
+                    updatePopUpValue(this);
+
+                };
+
+                var clearUpdatePopUp = function() {
+
+                    isVisible = false;
+
+                    // We check for none display before we hide because jquery will 'show' the element instead
+                    // (possible jquery bug ?)
+                    var selectorLine = $(this).find('.selectorLine');
+                    if($(selectorLine).css('display') != 'none')
+                        $(selectorLine).hide(0);
+
+                    $("#GraphsArea").find('.valuePopUp').hide(0);
+
+                    // Clear Interval
+                    window.clearInterval(updateInterval);
+                };
+
+
+                // Mouse Events
+                $('#' + this.graph.id).children('svg').mouseenter(function() {
+                    // Setup Interval
+                    updateInterval = window.setInterval(updatePopUpValue,500);
+                });
+
+                $('#' + this.graph.id).children('svg').mouseleave(clearUpdatePopUp);
+                $('#' + this.graph.id).children('svg').mousemove(updatePopUpOffset);
+            },
+
 
             renderGraph: function (id, format, that) {
 
@@ -150,16 +379,19 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 var fixedHeight = width * 0.125; // (160 / 1280)
                 var margin      = {top: 10, right: 0, bottom: 24, left: 52};
 
+                this.margin = margin;
+                that.margin = margin;
+
                 this.width            = width;
                 this.height           = fixedHeight < 85 ? 85 : fixedHeight;
                 that.timeDisplayed    = timeToDisplayms / 1000;
                 this.yAxisValueFormat = yAxisValueFormat;
-                this.displayedData    = [];
-                this.xCordinates      = [];
-                this.clearAnimPending = false;
+                that.displayedData    = [];
+                that.xCordinates      = [];
+                that.clearAnimPending = false;
 
                 // Distance of two values in graph (pixels), Important For Animation
-                this.valuesDistance = 0;
+                that.valuesDistance = 0;
 
                 var self = this;
 
@@ -168,6 +400,9 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 var height= this.height - margin.top - margin.bottom;
                 var xScale = d3.time.scale().range([0, width]);
                 var yScale = d3.scale.linear().range([height, 0]);
+
+                that.scale.x = xScale;
+                that.scale.y = yScale;
 
                 // valueline is function that creates the main line based on data
                 var valueline = d3.svg.line()
@@ -215,40 +450,39 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     };
 
 
-
-                    this.displayedData = [];
-                    this.xCordinates   = [];
+                    that.displayedData = [];
+                    that.xCordinates   = [];
                     var num_of_displayed_measurements = 60;
 
                     // Get only data that will be displayed
                     if(that.data.length > num_of_displayed_measurements) {
 
-                        this.displayedData = that.data.slice(that.data.length - num_of_displayed_measurements);
+                        that.displayedData = that.data.slice(that.data.length - num_of_displayed_measurements);
                     }
                     else {
 
-                        this.displayedData = that.data;
+                        that.displayedData = that.data;
                     }
 
                     // If min & max == 0 y axis will not display values. max=1 fixes this.
-                    var maxValue = d3.max(this.displayedData, function(d) { return d.value; });
+                    var maxValue = d3.max(that.displayedData, function(d) { return d.value; });
                     var fixedMaxValue =  maxValue || 1;
 
                     // Set Possible min/max x & y values
-                    xScale.domain(d3.extent(this.displayedData , function(d) { return d.time;  }));
+                    xScale.domain(d3.extent(that.displayedData , function(d) { return d.time;  }));
                     yScale.domain([0, fixedMaxValue]);
 
                     // Set the range
-                    this.calcValueDistance();
+                    that.calcValueDistance(xScale);
                     if(that.animationEnabled)
-                        xScale.range([-this.valuesDistance, this.width - margin.left - margin.right]);
+                        xScale.range([-that.valuesDistance, this.width - margin.left - margin.right]);
                     else
                         xScale.range([0, this.width - margin.left - margin.right]);
 
 
                     // Create Array Of Cordinates
-                    this.displayedData.forEach(function (d) {
-                        self.xCordinates.push(xScale(d.time));
+                    that.displayedData.forEach(function (d) {
+                        that.xCordinates.push(xScale(d.time));
                     });
 
 
@@ -300,8 +534,8 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
 
                     // Get path values for value line and area
-                    var valueLinePath = valueline(this.displayedData);
-                    var valueAreaPath = valuearea(this.displayedData);
+                    var valueLinePath = valueline(that.displayedData);
+                    var valueAreaPath = valuearea(that.displayedData);
 
                     // Fix for "Error: Problem parsing d="" " in webkit
                     if(!valueLinePath){
@@ -317,7 +551,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
 
                     // Animate line, axis and grid
-                    if(that.animationEnabled && !this.clearAnimPending)
+                    if(that.animationEnabled && !that.clearAnimPending)
                     {
 
                         // Animation values
@@ -328,7 +562,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                                         .select(that.svg.value.line)
                                         .fps(fps)
                                         .duration(duration)
-                                        .points(this.valuesDistance,0, 0,0)
+                                        .points(that.valuesDistance,0, 0,0)
                                         .data(valueLinePath)
                                         .before(function(data){
                                             this.d3Selector.attr("d", data);
@@ -339,7 +573,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                                         .select(that.svg.value.area)
                                         .fps(fps)
                                         .duration(duration)
-                                        .points(this.valuesDistance,0, 0,0)
+                                        .points(that.valuesDistance,0, 0,0)
                                         .data(valueAreaPath)
                                         .before(function(data){
                                             this.d3Selector.attr("d", data);
@@ -350,7 +584,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                                         .select(that.svg.axis.x.legend)
                                         .fps(fps)
                                         .duration(duration)
-                                        .points(( margin.left + this.valuesDistance),(this.height - margin.bottom +2), margin.left,(this.height - margin.bottom +2))
+                                        .points(( margin.left + that.valuesDistance),(this.height - margin.bottom +2), margin.left,(this.height - margin.bottom +2))
                                         .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: tLabelFormat})
                                         .before(function(data){
                                             this.d3Selector.call(labelTicksFixed(data.modelX,data.labelFormat));
@@ -365,7 +599,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                                         .select(that.svg.grid.x)
                                         .fps(fps)
                                         .duration(duration)
-                                        .points((margin.left + this.valuesDistance),this.height, margin.left,this.height)
+                                        .points((margin.left + that.valuesDistance),this.height, margin.left,this.height)
                                         .data({modelX: modelGridX,modelY: modelGridY})
                                         .before(function(data){
                                             this.d3Selector.call(labelTicksFixed(data.modelX));
@@ -386,18 +620,17 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                         that.svg.grid.x.call(labelTicksFixed(modelGridX));
                         that.svg.grid.y.call(modelGridY);
 
-                        if(this.clearAnimPending) {
+                        if(that.clearAnimPending) {
                             // Wait for 50ms for animation to finishes its changes
                             window.setTimeout(function(){
                                 that.svg.value.line.attr("transform", "translate(" + 0 + ")");
                                 that.svg.value.area.attr("transform", "translate(" + 0 + ")");
                                 that.svg.axis.x.legend.attr("transform", "translate(" + margin.left + "," + (self.height - margin.bottom +2) + ")");
                                 that.svg.grid.x.attr("transform", "translate(" + margin.left + "," + self.height + ")");
-                                self.clearAnimPending = false;
+                                that.clearAnimPending = false;
                             },50);
                         }
                     }
-
                 };
 
 
@@ -441,274 +674,10 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     that.svg.axis.y.line.attr('y2',""+ (this.height - margin.bottom +3));
 
                     updateMouseOverSize();
-                    this.clearAnimation(true);
+                    that.clearAnimation(true);
                     this.updateView();
                 };
 
-
-                /**
-                *
-                * Enables animation of graph
-                *
-                */
-                this.clearAnimation = function(stopCurrent) {
-
-                    that.svg.value.line.animation.clearBuffer(stopCurrent);
-                    that.svg.value.area.animation.clearBuffer(stopCurrent);
-                    that.svg.axis.x.legend.animation.clearBuffer(stopCurrent);
-                    that.svg.grid.x.animation.clearBuffer(stopCurrent);
-
-                    // Reset Transform
-                    if (stopCurrent)
-                        this.clearAnimPending = true;
-                }
-
-
-                /**
-                *
-                * Last visible metric
-                * @return {object} metric object or null on failure
-                */
-                this.getLastDisplayedValue = function(){
-
-                    if(that.data){
-
-                        if(that.data.length > 2) {
-
-                            // Get Translate Value
-                            var translate =  $("#" + id).find('.valueLine > path').attr('transform');
-                            translate = + translate.slice(10,translate.indexOf(','));
-
-                            if(translate == 0)
-                                return that.data[that.data.length-1].value;
-                            else if(translate == this.valuesDistance)
-                                return that.data[that.data.length-2].value;
-                            else {
-                                var distance = that.data[that.data.length-1].value  - that.data[that.data.length-2].value;
-
-                                // Last value + the part that has been translated
-                                return that.data[that.data.length-2].value +
-                                        (distance * (this.valuesDistance-translate) / this.valuesDistance);
-                            }
-
-                        }
-                    }
-
-                    return null;
-                }
-
-
-                /**
-                *
-                * Calculates the distance between the last two points
-                * Important for animated graph
-                */
-                this.calcValueDistance = function() {
-
-                    // Get last 2 data
-                    if(that.data.length >= 2) {
-
-                        var xValueA = xScale(that.data[that.data.length-2].time);
-                        var xValueB = xScale(that.data[that.data.length-1].time);
-                        this.valuesDistance = xValueB - xValueA;
-                    }
-                };
-
-
-                this.appendGraph = function(id, metric, width, height){
-
-                    var name = metric.name;
-
-                    // Generate graph's expand button
-                    d3.select('#graphBar')
-                        .insert('div')
-                        .attr('id', id + '-btn')
-                        .attr('class', 'graphBtn')
-                        .insert('a')
-                        .attr('class', 'ui-btn ui-btn-icon-left ui-icon-carat-u ui-corner-all')
-                        .attr('onclick',"Mist.monitoringController.UI.expandPressed('" + id + "')")
-                        .text(name);
-
-                    that.set('svg', new SvgSet({
-                        id: id,
-                        margin: margin,
-                        size: {
-                            width: width,
-                            height: height
-                        }
-                    }));
-
-                    // Set graph and button visibility
-                    var cookies = Mist.monitoringController.cookies;
-                    if (cookies.collapsedGraphs.indexOf(metric.id) > -1) {
-                        $('#' + id + '-btn').show();
-                        $('#' + id).hide();
-                    } else {
-                        $('#' + id + '-btn').hide();
-                        $('#' + id).show();
-                    }
-
-                    setupMouseOver();
-                }
-
-
-                /*
-                *
-                * Setups event listeners for mouse,
-                * also creates interval for popup value update
-                */
-                function setupMouseOver() {
-
-                    // Append the Selector Line
-                    var mouseOverLine = that.svg.canvas
-                                    .append('line')
-                                    .attr('class','selectorLine')
-                                    .attr('x1',"" + margin.left)
-                                    .attr('y1',"0" )
-                                    .attr('x2',"" + margin.left)
-                                    .attr('y2',""+ (self.height - margin.bottom +3))
-                                    .style("display", "none");
-
-                    var mouseX = 0;
-                    var mouseY = 0;
-                    var isVisible = false;
-                    var updateInterval;
-
-                    var updatePopUpValue = function(graph){
-
-                        // Check if mouse left from element without clearing interval
-                        if($($('#' + id).selector + ":hover").length <= 0)
-                        {
-                           clearUpdatePopUp();
-                           return;
-                        }
-
-                        // Update popup when it is over value line
-                        if(mouseX > margin.left)
-                        {
-                            if(!isVisible){
-
-                                $(graph).find('.selectorLine').show(0);
-                                $("#GraphsArea").find('.valuePopUp').show(0);
-                                isVisible = true;
-                            }
-                            // Mouse X inside value line area
-                            var virtualMouseX = mouseX - margin.left;
-
-                            // Calculate Translate
-                            var translate = 0;
-                            if(self.animationEnabled){
-                                translate =  $("#" + id).find('.valueLine > path').attr('transform');
-                                translate = + translate.slice(10,translate.indexOf(','));
-                            }
-                            // Measurement That is less than curson x
-                            var minValueIndex = 0;
-                            var currentValue = 0;
-
-                            for (var i = 0; i < self.xCordinates.length; i++) {
-
-                                if (self.xCordinates[i]+translate > virtualMouseX)
-                                    break;
-                                else
-                                    minValueIndex = i;
-                            }
-
-
-                            // Fix for the area that has not defined data
-                            if(self.displayedData.length == 0 || self.displayedData[minValueIndex].value == null || self.displayedData[minValueIndex+1].value == null ){
-                                $('#GraphsArea').children('.valuePopUp').text("No Data");
-                                return;
-                            }
-
-
-                            // Distanse between value before curson and after curson
-                            var distance = self.displayedData[minValueIndex+1].value  - self.displayedData[minValueIndex].value;
-                            // Mouse offset between this two values
-                            var mouseOffset = (virtualMouseX -(self.xCordinates[minValueIndex]+translate))/self.valuesDistance ;
-                            // Cursor's measurement value is the value before the curson +
-                            // the mouse percentage after the first point * the distance between the values
-                            currentValue = self.displayedData[minValueIndex].value + distance * mouseOffset;
-
-                            // Value has a small loss of presition. We don't let it be less than 0
-                            currentValue < 0 ? 0 : currentValue;
-
-                            // Fix For Big Numbers
-                            var valueText = "";
-                            if(currentValue>=1073741824)                               // (1024*1024*1024)
-                                valueText = (currentValue/1073741824).toFixed(2) +"G"; // (1024*1024*1024)
-                            else if(currentValue>=1048576)                             // (1024*1024)
-                                valueText = (currentValue/1048576).toFixed(2) +"M";    // (1024*1024)
-                            else if(currentValue>=1024)
-                                valueText = (currentValue/1024).toFixed(2) + "K";
-                            else if(self.yAxisValueFormat == "%")
-                                valueText = currentValue.toFixed(2) + "%";
-                            else
-                                valueText = currentValue.toFixed(2);
-
-                            // Update Value Text
-                            $('#GraphsArea').children('.valuePopUp').text(valueText);
-                        } else {
-
-                            if(isVisible){
-
-                                $(graph).find('.selectorLine').hide(0);
-                                $("#GraphsArea").find('.valuePopUp').hide(0);
-                                isVisible = false;
-                            }
-                        }
-                    };
-
-
-                    var updatePopUpOffset = function(event){
-
-                        mouseX = event.pageX - $('#'+ id).children('svg').offset().left;
-                        mouseY = event.pageY - $('#'+ id).children('svg').offset().top;
-
-                        // Set Mouse Line Cordinates
-                        mouseOverLine.attr('x1', mouseX)
-                                     .attr('x2', mouseX);
-
-                        // Make popup appear at left side when it is at the right edge
-                        var popupWidth = $('#GraphsArea').children('.valuePopUp').width();
-                        var xAlign = (event.pageX + popupWidth >= window.innerWidth-25) ? - (popupWidth + 15) : 15;
-
-                        // Update popup cords
-                        $('#GraphsArea').children('.valuePopUp')
-                            .css('left', (event.clientX + xAlign) + 'px');
-
-                        $('#GraphsArea').children('.valuePopUp')
-                            .css('top', (event.clientY - 35) + 'px');
-
-                        updatePopUpValue(this);
-
-                    };
-
-                    var clearUpdatePopUp = function() {
-
-                        isVisible = false;
-
-                        // We check for none display before we hide because jquery will 'show' the element instead
-                        // (possible jquery bug ?)
-                        var selectorLine = $(this).find('.selectorLine');
-                        if($(selectorLine).css('display') != 'none')
-                            $(selectorLine).hide(0);
-
-                        $("#GraphsArea").find('.valuePopUp').hide(0);
-
-                        // Clear Interval
-                        window.clearInterval(updateInterval);
-                    };
-
-
-                    // Mouse Events
-                    $('#' + id).children('svg').mouseenter(function() {
-                        // Setup Interval
-                        updateInterval = window.setInterval(updatePopUpValue,500);
-                    });
-
-                    $('#' + id).children('svg').mouseleave(clearUpdatePopUp);
-                    $('#' + id).children('svg').mousemove(updatePopUpOffset);
-                }
 
                 function updateMouseOverSize () {
                     that.svg.canvas
