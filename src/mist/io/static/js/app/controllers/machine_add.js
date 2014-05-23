@@ -6,7 +6,7 @@ define('app/controllers/machine_add', ['ember'],
      */
     function() {
         return Ember.Object.extend({
-            
+
             /**
              *  Properties
              */
@@ -38,7 +38,7 @@ define('app/controllers/machine_add', ['ember'],
                 $('#create-machine-panel').panel('open');
                 $('.ui-panel-dismiss-position-right').css('right',($('.ui-panel-position-right.ui-panel-open').width()));
                 Ember.run.next(function(){
-                    var panelHeight = $('.ui-panel-open').height(), 
+                    var panelHeight = $('.ui-panel-open').height(),
                         pageHeight = $('.ui-page-active').height();
                     if ( panelHeight > pageHeight) {
                         $('.ui-page-active').height(panelHeight);
@@ -48,8 +48,8 @@ define('app/controllers/machine_add', ['ember'],
                $('#create-machine-image').addClass('ui-state-disabled');
                $('#create-machine-size').addClass('ui-state-disabled');
                $('#create-machine-key').addClass('ui-state-disabled');
-                
-                
+
+
                 this._clear();
                 this._updateFormReady();
                 this.set('callback', callback);
@@ -87,21 +87,21 @@ define('app/controllers/machine_add', ['ember'],
                             (machineImage !='Linux CentOS 6.2 64-bit')) {
 
                                 Mist.notificationController.timeNotify(
-                                    'On CS025 size you can only create one of the two images: ' + 
+                                    'On CS025 size you can only create one of the two images: ' +
                                     'Linux Ubuntu Server 10.04 LTS 64-bit or Linux CentOS 6.2 64-bit', 7000);
                                 return;
                         }
                     }
                 }
                 if (providerName == 'DigitalOcean') {
-                    var re = /^[0-9a-zA-Z-.]*$/; 
+                    var re = /^[0-9a-zA-Z-.]*$/;
                     if (!re.test(machineName)) {
                         Mist.notificationController.timeNotify('Characters allowed are a-z, A-Z, 0-9, . and -', 7000);
                         return;
                     }
                 }
                 if (providerName == 'Google Compute Engine') {
-                    var re = /^[0-9a-z-]*$/; 
+                    var re = /^[0-9a-z-]*$/;
                     if (!re.test(machineName)) {
                         Mist.notificationController.timeNotify('Name must be lowercase letters, numbers, and hyphens', 7000);
                         return;
@@ -120,7 +120,7 @@ define('app/controllers/machine_add', ['ember'],
                     var re = /^[0-9a-zA-Z.-]*$/;
                     if (machineName.length > 253 || !re.test(machineName)) {
                         Mist.notificationController.timeNotify(
-                            'Server name in Softlayer must be an alphanumeric string,' + 
+                            'Server name in Softlayer must be an alphanumeric string,' +
                             ' that may contain period (\'.\') and dash (\'-\') special characters.', 7000);
                         return;
                     }
@@ -167,15 +167,21 @@ define('app/controllers/machine_add', ['ember'],
 
 
             _updateFormReady: function() {
+
                 var formReady = false;
                 if (this.newMachineName &&
                     this.newMachineSize.id &&
                     this.newMachineImage.id &&
-                    this.newMachineLocation.id &&
-                    this.newMachineProvider.id &&
-                    Mist.keysController.keyExists(this.newMachineKey.id)) {
+                    this.newMachineProvider.id) {
                         formReady = true;
-                } 
+                }
+
+                // SSH key and location is optional for docker
+                if (this.newMachineProvider.provider != 'docker')
+                    if (Mist.keysController.keyExists(this.newMachineKey.id) &&
+                        this.newMachineLocation.id)
+                            formReady = true;
+
                 this.set('formReady', formReady);
             },
 
