@@ -21,7 +21,6 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
 
             graph: null,
-            instance: null,
 
             scale: {
                 x: null,
@@ -30,17 +29,17 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             svg: null,
             data: null,
-            margin: null,
             width: null,
             height: null,
+            margin: null,
             valuearea: null,
             valueline: null,
+            xCordinates: null,
+            displayedData: null,
             timeDisplayed: null,
             valuesDistance: null,
             animationEnabled: true,
             clearAnimPending: null,
-            xCordinates: null,
-            displayedData: null,
 
 
             //
@@ -62,8 +61,8 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     this.set('metric', this.graph.metrics[0]);
 
                     this.clearData();
-                    this.renderGraph(this.graph.id, '', this);
-                    this.appendGraph();
+                    this.setupGraph();
+                    this.setupMouseOver();
                     this.updateData(this.graph.metrics[0].datapoints);
                 });
 
@@ -91,11 +90,6 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             },
 
 
-            getTimeWindow: function () {
-                return this.timeDisplayed;
-            },
-
-
             enableAnimation: function () {
                 this.set('animationEnabled', true);
             },
@@ -104,18 +98,6 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             disableAnimation: function (immediately) {
                 this.set('animationEnabled', false);
                 this.clearAnimation(immediately);
-            },
-
-
-            getLastMeasurementTime: function () {
-                if (this.data.length)
-                    return this.data[this.data.length - 1].time;
-            },
-
-
-            getLastValue: function () {
-                if(this.data.length)
-                    return this.data[this.data.length - 1];
             },
 
 
@@ -159,6 +141,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 this.updateView();
             },
 
+
             clearAnimation: function(stopCurrent) {
 
                 this.svg.value.line.animation.clearBuffer(stopCurrent);
@@ -169,41 +152,6 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 // Reset Transform
                 if (stopCurrent)
                     this.clearAnimPending = true;
-            },
-
-            appendGraph: function() {
-
-                // Generate graph's expand button
-                d3.select('#graphBar')
-                    .insert('div')
-                    .attr('id', id + '-btn')
-                    .attr('class', 'graphBtn')
-                    .insert('a')
-                    .attr('class', 'ui-btn ui-btn-icon-left ui-icon-carat-u ui-corner-all')
-                    .attr('onclick',"Mist.monitoringController.UI.expandPressed('" + id + "')")
-                    .text(this.metric.name);
-
-                var id = this.graph.id;
-                this.set('svg', new SvgSet({
-                    id: id,
-                    margin: this.margin,
-                    size: {
-                        width: this.width,
-                        height: this.height
-                    }
-                }));
-
-                // Set graph and button visibility
-                var cookies = Mist.monitoringController.cookies;
-                if (cookies.collapsedGraphs.indexOf(this.metric.id) > -1) {
-                    $('#' + id + '-btn').show();
-                    $('#' + id).hide();
-                } else {
-                    $('#' + id + '-btn').hide();
-                    $('#' + id).show();
-                }
-
-                this.setupMouseOver();
             },
 
 
@@ -416,23 +364,17 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             },
 
 
-            renderGraph: function (id, format) {
+            setupGraph: function () {
 
-                var that = this;
+                this.width = $("#GraphsArea").width() - 2;
 
-                var width = $("#GraphsArea").width() - 2;
-                var timeToDisplayms = 600000;
-                var yAxisValueFormat = format;
+                 // Calculate Aspect Ratio Of Height
+                var fixedHeight = this.width * 0.125; // (160 / 1280)
 
-                // Calculate Aspect Ratio Of Height
-                var fixedHeight = width * 0.125; // (160 / 1280)
-                var margin      = {top: 10, right: 0, bottom: 24, left: 52};
-
-                this.margin = margin;
-                this.width = width;
                 this.height = fixedHeight < 85 ? 85 : fixedHeight;
-                this.timeDisplayed    = timeToDisplayms / 1000;
-                this.yAxisValueFormat = yAxisValueFormat;
+                this.margin = {top: 10, right: 0, bottom: 24, left: 52};;
+                this.timeDisplayed    = 600;  // 10 minutes
+                this.yAxisValueFormat = '';
                 this.displayedData    = [];
                 this.xCordinates      = [];
                 this.clearAnimPending = false;
@@ -442,10 +384,12 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                 // Scale Functions will scale graph to defined width and height
                 var width = this.width - this.margin.left - this.margin.right;
-                var height= this.height - this.margin.top - this.margin.bottom;
+                var height = this.height - this.margin.top - this.margin.bottom;
 
                 this.scale.x = d3.time.scale().range([0, width]);
                 this.scale.y = d3.scale.linear().range([height, 0]);
+
+                var that = this;
 
                 // valueline is function that creates the main line based on data
                 this.valueline = d3.svg.line()
@@ -461,6 +405,37 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                                 .y0(height)
                                 .defined(function(d) {return d.value != null })
                                 .interpolate('monotone');
+
+                var id = this.graph.id;
+
+                // Generate graph's expand button
+                d3.select('#graphBar')
+                    .insert('div')
+                    .attr('id', id + '-btn')
+                    .attr('class', 'graphBtn')
+                    .insert('a')
+                    .attr('class', 'ui-btn ui-btn-icon-left ui-icon-carat-u ui-corner-all')
+                    .attr('onclick',"Mist.monitoringController.UI.expandPressed('" + id + "')")
+                    .text(this.metric.name);
+
+                this.set('svg', new SvgSet({
+                    id: id,
+                    margin: this.margin,
+                    size: {
+                        width: this.width,
+                        height: this.height
+                    }
+                }));
+
+                // Set graph and button visibility
+                var cookies = Mist.monitoringController.cookies;
+                if (cookies.collapsedGraphs.indexOf(this.metric.id) > -1) {
+                    $('#' + id + '-btn').show();
+                    $('#' + id).hide();
+                } else {
+                    $('#' + id + '-btn').hide();
+                    $('#' + id).show();
+                }
             },
 
             /**
