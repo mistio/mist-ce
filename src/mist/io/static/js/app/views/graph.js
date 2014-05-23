@@ -31,6 +31,10 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             svg: null,
             data: null,
             margin: null,
+            width: null,
+            height: null,
+            valuearea: null,
+            valueline: null,
             timeDisplayed: null,
             valuesDistance: null,
             animationEnabled: true,
@@ -56,9 +60,10 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     //this.graph.on('onMetricRemove', this, 'renderGraph');
 
                     this.clearData();
-                    this.set('instance', new this.renderGraph(this.graph.id, '', this));
+                    this.set('instance', {});
+                    this.renderGraph(this.graph.id, '', this);
                     this.appendGraph(this.graph.id, this.graph.metrics[0],
-                        this.instance.width, this.instance.height, this.instance.margin);
+                        this.width, this.height, this.margin);
                     this.updateData(this.graph.metrics[0].datapoints);
                 });
 
@@ -83,11 +88,6 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             clearData: function () {
                 this.set('data', []);
-            },
-
-
-            updateView: function () {
-                this.instance.updateView();
             },
 
 
@@ -125,13 +125,13 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             },
 
 
-            calcValueDistance: function (xScale) {
+            calcValueDistance: function () {
 
                 // Get last 2 data
                 if(this.data.length < 2) return
 
-                var xValueA = xScale(this.data[this.data.length-2].time);
-                var xValueB = xScale(this.data[this.data.length-1].time);
+                var xValueA = this.scale.x(this.data[this.data.length-2].time);
+                var xValueB = this.scale.x(this.data[this.data.length-1].time);
                 this.valuesDistance = xValueB - xValueA;
             },
 
@@ -205,6 +205,54 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 }
 
                 this.setupMouseOver();
+            },
+
+
+            /**
+            *
+            * Changes the width of svg element, sets new scale values
+            * and updates height to keep aspect ratio
+            * @param {number} width - Graph new width
+            */
+            changeWidth: function (width) {
+
+                if (!this.svg.canvas)
+                    return;
+
+                // Create an aspect ratio
+                var newHeight = width * 0.125; // (160 / 1280)
+
+                this.height = (newHeight < 85 ? 85 : newHeight);
+                this.width = width;
+
+                // Set new values to SVG element
+                this.svg.canvas
+                    .attr('width', this.width)
+                    .attr('height', this.height);
+
+                // Set new height for value are
+                this.valuearea.y0(this.height - this.margin.top - this.margin.bottom);
+
+                // Update scale to new values
+                this.scale.y = d3.scale.linear().range([this.height - this.margin.top - this.margin.bottom, 0]);
+                this.scale.x = d3.time.scale().range([0, this.width - this.margin.left - this.margin.right]);
+
+                // Update x-axis based on new height
+                this.svg.axis.x.legend.attr("transform", "translate(0," + (this.height - this.margin.bottom) + ")");
+
+                // Update y-axis line
+                this.svg.axis.x.line.attr('y1',""+(this.height - this.margin.bottom +2))
+                           .attr('y2',""+(this.height - this.margin.bottom +2))
+                           .attr('x2',""+(this.width + this.margin.left + this.margin.right));
+
+                this.svg.axis.y.line.attr('y2',""+ (this.height - this.margin.bottom +3));
+
+                // Update mouse over size
+                this.svg.canvas
+                    .select('.selectorLine').attr('y2', self.height - this.margin.bottom + 3);
+
+                this.clearAnimation(true);
+                this.updateView();
             },
 
 
@@ -298,7 +346,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                             valueText = (currentValue/1048576).toFixed(2) +"M";    // (1024*1024)
                         else if(currentValue>=1024)
                             valueText = (currentValue/1024).toFixed(2) + "K";
-                        else if(self.yAxisValueFormat == "%")
+                        else if(that.yAxisValueFormat == "%")
                             valueText = currentValue.toFixed(2) + "%";
                         else
                             valueText = currentValue.toFixed(2);
@@ -369,7 +417,9 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             },
 
 
-            renderGraph: function (id, format, that) {
+            renderGraph: function (id, format) {
+
+                var that = this;
 
                 var width = $("#GraphsArea").width() - 2;
                 var timeToDisplayms = 600000;
@@ -380,311 +430,252 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 var margin      = {top: 10, right: 0, bottom: 24, left: 52};
 
                 this.margin = margin;
-                that.margin = margin;
-
-                this.width            = width;
-                this.height           = fixedHeight < 85 ? 85 : fixedHeight;
-                that.timeDisplayed    = timeToDisplayms / 1000;
+                this.width = width;
+                this.height = fixedHeight < 85 ? 85 : fixedHeight;
+                this.timeDisplayed    = timeToDisplayms / 1000;
                 this.yAxisValueFormat = yAxisValueFormat;
-                that.displayedData    = [];
-                that.xCordinates      = [];
-                that.clearAnimPending = false;
+                this.displayedData    = [];
+                this.xCordinates      = [];
+                this.clearAnimPending = false;
 
                 // Distance of two values in graph (pixels), Important For Animation
-                that.valuesDistance = 0;
-
-                var self = this;
+                this.valuesDistance = 0;
 
                 // Scale Functions will scale graph to defined width and height
-                var width = this.width - margin.left - margin.right;
-                var height= this.height - margin.top - margin.bottom;
-                var xScale = d3.time.scale().range([0, width]);
-                var yScale = d3.scale.linear().range([height, 0]);
+                var width = this.width - this.margin.left - this.margin.right;
+                var height= this.height - this.margin.top - this.margin.bottom;
 
-                that.scale.x = xScale;
-                that.scale.y = yScale;
+                this.scale.x = d3.time.scale().range([0, width]);
+                this.scale.y = d3.scale.linear().range([height, 0]);
 
                 // valueline is function that creates the main line based on data
-                var valueline = d3.svg.line()
-                                .x(function(d) {return xScale(d.time); })
-                                .y(function(d) {return yScale(d.value); })
+                this.valueline = d3.svg.line()
+                                .x(function(d) {return that.scale.x(d.time); })
+                                .y(function(d) {return that.scale.y(d.value); })
                                 .defined(function(d) {return d.value != null })
                                 .interpolate('monotone');
 
                 // valuearea is function that fills the space under the main line
-                var valuearea = d3.svg.area()
-                                .x(function(d) {return xScale(d.time); })
-                                .y1(function(d) {return yScale(d.value); })
+                this.valuearea = d3.svg.area()
+                                .x(function(d) {return that.scale.x(d.time); })
+                                .y1(function(d) {return that.scale.y(d.value); })
                                 .y0(height)
                                 .defined(function(d) {return d.value != null })
                                 .interpolate('monotone');
-
-                /**
-                *
-                * Updates graph by selecting data from data instance
-                * redraws value line, x-axis, labels and grid
-                */
-                this.updateView = function() {
-
-                    var self = this;
-
-                    var labelTicksFixed = function(axisInstance,format) {
-
-                        // Check Time Displayed
-                        var labelStep;
-                        if(that.timeDisplayed <= 600)           // 10 Minutes (10*60)
-                            axisInstance.ticks(d3.time.minutes,2);
-                        else if(that.timeDisplayed <= 3600)     // 1 Hour (1*60*60)
-                            axisInstance.ticks(d3.time.minutes,12);
-                        else if(that.timeDisplayed <= 86400)    // 1 Day (24*60*60)
-                            axisInstance.ticks(d3.time.hours,6);
-                        else if(that.timeDisplayed <= 604800)   // 1 Week (7*24*60*60)
-                            axisInstance.ticks(d3.time.days,1);
-                        else if(that.timeDisplayed <= 18144000) // 1 Month (30*7*24*60*60)
-                            axisInstance.ticks(d3.time.days,7);
-
-                        if( typeof format != 'undefined')
-                            axisInstance.tickFormat(d3.time.format(format));
-
-                        return axisInstance;
-                    };
-
-
-                    that.displayedData = [];
-                    that.xCordinates   = [];
-                    var num_of_displayed_measurements = 60;
-
-                    // Get only data that will be displayed
-                    if(that.data.length > num_of_displayed_measurements) {
-
-                        that.displayedData = that.data.slice(that.data.length - num_of_displayed_measurements);
-                    }
-                    else {
-
-                        that.displayedData = that.data;
-                    }
-
-                    // If min & max == 0 y axis will not display values. max=1 fixes this.
-                    var maxValue = d3.max(that.displayedData, function(d) { return d.value; });
-                    var fixedMaxValue =  maxValue || 1;
-
-                    // Set Possible min/max x & y values
-                    xScale.domain(d3.extent(that.displayedData , function(d) { return d.time;  }));
-                    yScale.domain([0, fixedMaxValue]);
-
-                    // Set the range
-                    that.calcValueDistance(xScale);
-                    if(that.animationEnabled)
-                        xScale.range([-that.valuesDistance, this.width - margin.left - margin.right]);
-                    else
-                        xScale.range([0, this.width - margin.left - margin.right]);
-
-
-                    // Create Array Of Cordinates
-                    that.displayedData.forEach(function (d) {
-                        that.xCordinates.push(xScale(d.time));
-                    });
-
-
-                    // Change grid lines and labels based on time displayed
-                    var modelXAxis = d3.svg.axis()
-                                            .scale(xScale)
-                                            .orient('bottom');
-
-                    var modelGridX = d3.svg.axis()
-                                           .scale(xScale)
-                                           .orient('bottom')
-                                           .tickSize(-this.height, 0, 0)
-                                           .tickFormat('');
-
-                    var modelGridY = d3.svg.axis()
-                                      .scale(yScale)
-                                      .orient('left')
-                                      .ticks(5)
-                                      .tickSize(-this.width, 0, 0)
-                                      .tickFormat('');
-
-                    var modelYAxis = d3.svg.axis()
-                                      .scale(yScale)
-                                      .orient('left')
-                                      .ticks(5)
-                                      .tickFormat(function(d){
-                                        // Custom Y-Axis label formater
-                                        if(d>=1073741824)                           // (1024*1024*1024)
-                                            return (d/1073741824).toFixed(1) + 'G'; // (1024*1024*1024)
-                                        else if(d>=1048576)                         // (1024*1024)
-                                            return (d/1048576).toFixed(1) + 'M';    // (1024*1024)
-                                        else if(d>=1024)
-                                            return (d/1024).toFixed(1) + 'K';
-                                        else if(yAxisValueFormat == '%')
-                                            return d + '%';
-                                        else
-                                            return d;
-                                      });
-
-                    // Timestamp fix for small screens
-                    // 1 Week || 1 Month
-                    var tLabelFormat = "%I:%M%p";
-                    if( (this.width <= 700 && that.timeDisplayed == 604800) ||  (this.width <= 521 && that.timeDisplayed == 2592000) )
-                        tLabelFormat = "%d-%b";
-                    else if(this.width <= 560 && that.timeDisplayed == 86400) // 1 Day
-                        tLabelFormat = "%I:%M%p";
-                    else  if (that.timeDisplayed >= 86400) // 1 Day (24*60*60) >=, should display date as well
-                            tLabelFormat = "%d-%m | %I:%M%p";
-
-
-                    // Get path values for value line and area
-                    var valueLinePath = valueline(that.displayedData);
-                    var valueAreaPath = valuearea(that.displayedData);
-
-                    // Fix for "Error: Problem parsing d="" " in webkit
-                    if(!valueLinePath){
-                        valueLinePath = "M 0 0";
-                        valueAreaPath = "M 0 0";
-                    }
-
-                    // If we changed time window, clear animation buffer
-                    /*if(this.timeUpdated){
-                        console.log("time updated");
-                        this.clearAnimation();
-                    }*/
-
-
-                    // Animate line, axis and grid
-                    if(that.animationEnabled && !that.clearAnimPending)
-                    {
-
-                        // Animation values
-                        var fps  = 12;
-                        var duration = 10;
-
-                        that.svg.value.line.animation
-                                        .select(that.svg.value.line)
-                                        .fps(fps)
-                                        .duration(duration)
-                                        .points(that.valuesDistance,0, 0,0)
-                                        .data(valueLinePath)
-                                        .before(function(data){
-                                            this.d3Selector.attr("d", data);
-                                        })
-                                        .push();
-
-                        that.svg.value.area.animation
-                                        .select(that.svg.value.area)
-                                        .fps(fps)
-                                        .duration(duration)
-                                        .points(that.valuesDistance,0, 0,0)
-                                        .data(valueAreaPath)
-                                        .before(function(data){
-                                            this.d3Selector.attr("d", data);
-                                        })
-                                        .push();
-
-                        that.svg.axis.x.legend.animation
-                                        .select(that.svg.axis.x.legend)
-                                        .fps(fps)
-                                        .duration(duration)
-                                        .points(( margin.left + that.valuesDistance),(this.height - margin.bottom +2), margin.left,(this.height - margin.bottom +2))
-                                        .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: tLabelFormat})
-                                        .before(function(data){
-                                            this.d3Selector.call(labelTicksFixed(data.modelX,data.labelFormat));
-                                            this.d3Selector.selectAll("text")
-                                                           .style("text-anchor", "end")
-                                                           .attr('x','-10');
-                                            that.svg.axis.y.legend.call(data.modelY);
-                                        })
-                                        .push();
-
-                        that.svg.grid.x.animation
-                                        .select(that.svg.grid.x)
-                                        .fps(fps)
-                                        .duration(duration)
-                                        .points((margin.left + that.valuesDistance),this.height, margin.left,this.height)
-                                        .data({modelX: modelGridX,modelY: modelGridY})
-                                        .before(function(data){
-                                            this.d3Selector.call(labelTicksFixed(data.modelX));
-                                            // Y grid should change when x changes
-                                            that.svg.grid.y.call(data.modelY);
-                                        })
-                                        .push();
-                    }
-                    else {
-                        // Update Graph Elements
-                        that.svg.value.line.attr("d", valueLinePath);
-                        that.svg.value.area.attr("d", valueAreaPath);
-                        that.svg.axis.x.legend.call(labelTicksFixed(modelXAxis,tLabelFormat));
-                        that.svg.axis.x.legend.selectAll("text")
-                               .style("text-anchor", "end")
-                               .attr('x','-10');
-                        that.svg.axis.y.legend.call(modelYAxis);
-                        that.svg.grid.x.call(labelTicksFixed(modelGridX));
-                        that.svg.grid.y.call(modelGridY);
-
-                        if(that.clearAnimPending) {
-                            // Wait for 50ms for animation to finishes its changes
-                            window.setTimeout(function(){
-                                that.svg.value.line.attr("transform", "translate(" + 0 + ")");
-                                that.svg.value.area.attr("transform", "translate(" + 0 + ")");
-                                that.svg.axis.x.legend.attr("transform", "translate(" + margin.left + "," + (self.height - margin.bottom +2) + ")");
-                                that.svg.grid.x.attr("transform", "translate(" + margin.left + "," + self.height + ")");
-                                that.clearAnimPending = false;
-                            },50);
-                        }
-                    }
-                };
-
-
-                /**
-                *
-                * Changes the width of svg element, sets new scale values
-                * and updates height to keep aspect ratio
-                * @param {number} width - Graph new width
-                */
-                this.changeWidth = function (width) {
-
-                    if (!that.svg.canvas)
-                        return;
-
-                    // Create an aspect ratio
-                    var newHeight = width * 0.125; // (160 / 1280)
-
-                    this.height = (newHeight < 85 ? 85 : newHeight);
-                    this.width = width;
-
-                    // Set new values to SVG element
-                    that.svg.canvas
-                        .attr('width', this.width)
-                        .attr('height', this.height);
-
-                    // Set new height for value are
-                    valuearea.y0(this.height - margin.top - margin.bottom);
-
-                    // Update scale to new values
-                    yScale = d3.scale.linear().range([this.height - margin.top - margin.bottom, 0]);
-                    xScale = d3.time.scale().range([0, this.width - margin.left - margin.right]);
-
-                    // Update x-axis based on new height
-                    that.svg.axis.x.legend.attr("transform", "translate(0," + (this.height - margin.bottom) + ")");
-
-                    // Update y-axis line
-                    that.svg.axis.x.line.attr('y1',""+(this.height - margin.bottom +2))
-                               .attr('y2',""+(this.height - margin.bottom +2))
-                               .attr('x2',""+(this.width + margin.left + margin.right));
-
-                    that.svg.axis.y.line.attr('y2',""+ (this.height - margin.bottom +3));
-
-                    updateMouseOverSize();
-                    that.clearAnimation(true);
-                    this.updateView();
-                };
-
-
-                function updateMouseOverSize () {
-                    that.svg.canvas
-                        .select('.selectorLine').attr('y2', self.height - margin.bottom + 3);
-                }
             },
 
+            /**
+            *
+            * Updates graph by selecting data from data instance
+            * redraws value line, x-axis, labels and grid
+            */
+            updateView: function () {
+
+                var that = this;
+                var labelTicksFixed = function(axisInstance,format) {
+
+                    // Check Time Displayed
+                    var labelStep;
+                    if(that.timeDisplayed <= 600)           // 10 Minutes (10*60)
+                        axisInstance.ticks(d3.time.minutes,2);
+                    else if(that.timeDisplayed <= 3600)     // 1 Hour (1*60*60)
+                        axisInstance.ticks(d3.time.minutes,12);
+                    else if(that.timeDisplayed <= 86400)    // 1 Day (24*60*60)
+                        axisInstance.ticks(d3.time.hours,6);
+                    else if(that.timeDisplayed <= 604800)   // 1 Week (7*24*60*60)
+                        axisInstance.ticks(d3.time.days,1);
+                    else if(that.timeDisplayed <= 18144000) // 1 Month (30*7*24*60*60)
+                        axisInstance.ticks(d3.time.days,7);
+
+                    if( typeof format != 'undefined')
+                        axisInstance.tickFormat(d3.time.format(format));
+
+                    return axisInstance;
+                };
+
+
+                this.displayedData = [];
+                this.xCordinates   = [];
+                var num_of_displayed_measurements = 60;
+
+                // Get only data this will be displayed
+                if(this.data.length > num_of_displayed_measurements) {
+
+                    this.displayedData = this.data.slice(this.data.length - num_of_displayed_measurements);
+                }
+                else {
+
+                    this.displayedData = this.data;
+                }
+
+                // If min & max == 0 y axis will not display values. max=1 fixes this.
+                var maxValue = d3.max(this.displayedData, function(d) { return d.value; });
+                var fixedMaxValue =  maxValue || 1;
+
+                // Set Possible min/max x & y values
+                this.scale.x.domain(d3.extent(this.displayedData , function(d) { return d.time;  }));
+                this.scale.y.domain([0, fixedMaxValue]);
+
+                // Set the range
+                this.calcValueDistance(this.scale.x);
+                if(this.animationEnabled)
+                    this.scale.x.range([-this.valuesDistance, this.width - this.margin.left - this.margin.right]);
+                else
+                    this.scale.x.range([0, this.width - this.margin.left - this.margin.right]);
+
+
+                // Create Array Of Cordinates
+                this.displayedData.forEach(function (d) {
+                    that.xCordinates.push(that.scale.x(d.time));
+                });
+
+
+                // Change grid lines and labels based on time displayed
+                var modelXAxis = d3.svg.axis()
+                                        .scale(this.scale.x)
+                                        .orient('bottom');
+
+                var modelGridX = d3.svg.axis()
+                                       .scale(this.scale.x)
+                                       .orient('bottom')
+                                       .tickSize(-this.height, 0, 0)
+                                       .tickFormat('');
+
+                var modelGridY = d3.svg.axis()
+                                  .scale(this.scale.y)
+                                  .orient('left')
+                                  .ticks(5)
+                                  .tickSize(-this.width, 0, 0)
+                                  .tickFormat('');
+
+                var modelYAxis = d3.svg.axis()
+                                  .scale(this.scale.y)
+                                  .orient('left')
+                                  .ticks(5)
+                                  .tickFormat(function(d){
+                                    // Custom Y-Axis label formater
+                                    if(d>=1073741824)                           // (1024*1024*1024)
+                                        return (d/1073741824).toFixed(1) + 'G'; // (1024*1024*1024)
+                                    else if(d>=1048576)                         // (1024*1024)
+                                        return (d/1048576).toFixed(1) + 'M';    // (1024*1024)
+                                    else if(d>=1024)
+                                        return (d/1024).toFixed(1) + 'K';
+                                    else if(that.yAxisValueFormat == '%')
+                                        return d + '%';
+                                    else
+                                        return d;
+                                  });
+
+                // Timestamp fix for small screens
+                // 1 Week || 1 Month
+                var tLabelFormat = "%I:%M%p";
+                if( (this.width <= 700 && this.timeDisplayed == 604800) ||  (this.width <= 521 && this.timeDisplayed == 2592000) )
+                    tLabelFormat = "%d-%b";
+                else if(this.width <= 560 && this.timeDisplayed == 86400) // 1 Day
+                    tLabelFormat = "%I:%M%p";
+                else  if (this.timeDisplayed >= 86400) // 1 Day (24*60*60) >=, should display date as well
+                        tLabelFormat = "%d-%m | %I:%M%p";
+
+
+                // Get path values for value line and area
+                var valueLinePath = this.valueline(this.displayedData);
+                var valueAreaPath = this.valuearea(this.displayedData);
+
+                // Fix for "Error: Problem parsing d="" " in webkit
+                if(!valueLinePath){
+                    valueLinePath = "M 0 0";
+                    valueAreaPath = "M 0 0";
+                }
+
+                // If we changed time window, clear animation buffer
+                /*if(this.timeUpdated){
+                    console.log("time updated");
+                    this.clearAnimation();
+                }*/
+
+
+                // Animate line, axis and grid
+                if(this.animationEnabled && !this.clearAnimPending)
+                {
+
+                    // Animation values
+                    var fps  = 12;
+                    var duration = 10;
+
+                    this.svg.value.line.animation
+                                    .select(this.svg.value.line)
+                                    .fps(fps)
+                                    .duration(duration)
+                                    .points(this.valuesDistance,0, 0,0)
+                                    .data(valueLinePath)
+                                    .before(function(data){
+                                        this.d3Selector.attr("d", data);
+                                    })
+                                    .push();
+
+                    this.svg.value.area.animation
+                                    .select(this.svg.value.area)
+                                    .fps(fps)
+                                    .duration(duration)
+                                    .points(this.valuesDistance,0, 0,0)
+                                    .data(valueAreaPath)
+                                    .before(function(data){
+                                        this.d3Selector.attr("d", data);
+                                    })
+                                    .push();
+
+                    this.svg.axis.x.legend.animation
+                                    .select(this.svg.axis.x.legend)
+                                    .fps(fps)
+                                    .duration(duration)
+                                    .points(( this.margin.left + this.valuesDistance),(this.height - this.margin.bottom +2), this.margin.left,(this.height - this.margin.bottom +2))
+                                    .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: tLabelFormat})
+                                    .before(function(data){
+                                        this.d3Selector.call(labelTicksFixed(data.modelX,data.labelFormat));
+                                        this.d3Selector.selectAll("text")
+                                                       .style("text-anchor", "end")
+                                                       .attr('x','-10');
+                                        that.svg.axis.y.legend.call(data.modelY);
+                                    })
+                                    .push();
+
+                    this.svg.grid.x.animation
+                                    .select(this.svg.grid.x)
+                                    .fps(fps)
+                                    .duration(duration)
+                                    .points((this.margin.left + this.valuesDistance),this.height, this.margin.left,this.height)
+                                    .data({modelX: modelGridX,modelY: modelGridY})
+                                    .before(function(data){
+                                        this.d3Selector.call(labelTicksFixed(data.modelX));
+                                        // Y grid should change when x changes
+                                        that.svg.grid.y.call(data.modelY);
+                                    })
+                                    .push();
+                }
+                else {
+                    // Update Graph Elements
+                    this.svg.value.line.attr("d", valueLinePath);
+                    this.svg.value.area.attr("d", valueAreaPath);
+                    this.svg.axis.x.legend.call(labelTicksFixed(modelXAxis,tLabelFormat));
+                    this.svg.axis.x.legend.selectAll("text")
+                           .style("text-anchor", "end")
+                           .attr('x','-10');
+                    this.svg.axis.y.legend.call(modelYAxis);
+                    this.svg.grid.x.call(labelTicksFixed(modelGridX));
+                    this.svg.grid.y.call(modelGridY);
+
+                    if(this.clearAnimPending) {
+                        // Wait for 50ms for animation to finishes its changes
+                        window.setTimeout(function(){
+                            that.svg.value.line.attr("transform", "translate(" + 0 + ")");
+                            that.svg.value.area.attr("transform", "translate(" + 0 + ")");
+                            that.svg.axis.x.legend.attr("transform", "translate(" + that.margin.left + "," + (that.height - that.margin.bottom +2) + ")");
+                            that.svg.grid.x.attr("transform", "translate(" + that.margin.left + "," + that.height + ")");
+                            that.clearAnimPending = false;
+                        },50);
+                    }
+                }
+            },
 
             //
             //
