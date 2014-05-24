@@ -185,18 +185,18 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 this.scale.x = d3.time.scale().range([0, this.width - this.margin.left - this.margin.right]);
 
                 // Update x-axis based on new height
-                this.svg.axis.x.legend.attr("transform", "translate(0," + (this.height - this.margin.bottom) + ")");
+                this.svg.axis.x.legend.attr('transform', 'translate(0,' + (this.height - this.margin.bottom) + ')');
 
                 // Update y-axis line
-                this.svg.axis.x.line.attr('y1',""+(this.height - this.margin.bottom +2))
-                           .attr('y2',""+(this.height - this.margin.bottom +2))
-                           .attr('x2',""+(this.width + this.margin.left + this.margin.right));
+                this.svg.axis.x.line.attr('y1', this.height - this.margin.bottom + 2)
+                           .attr('y2', this.height - this.margin.bottom + 2)
+                           .attr('x2', this.width + this.margin.left + this.margin.right);
 
-                this.svg.axis.y.line.attr('y2',""+ (this.height - this.margin.bottom +3));
+                this.svg.axis.y.line.attr('y2', this.height - this.margin.bottom + 3);
 
                 // Update mouse over size
                 this.svg.canvas
-                    .select('.selectorLine').attr('y2', self.height - this.margin.bottom + 3);
+                    .select('.selectorLine').attr('y2', this.height - this.margin.bottom + 3);
 
                 this.clearAnimation(true);
                 this.updateView();
@@ -216,11 +216,11 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 var mouseOverLine = this.svg.canvas
                                 .append('line')
                                 .attr('class','selectorLine')
-                                .attr('x1',"" + this.margin.left)
-                                .attr('y1',"0" )
-                                .attr('x2',"" + this.margin.left)
-                                .attr('y2',""+ (this.height - this.margin.bottom +3))
-                                .style("display", "none");
+                                .attr('x1', this.margin.left)
+                                .attr('y1','0' )
+                                .attr('x2', this.margin.left)
+                                .attr('y2', this.height - this.margin.bottom + 3)
+                                .style('display', 'none');
 
                 var mouseX = 0;
                 var mouseY = 0;
@@ -230,7 +230,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 var updatePopUpValue = function(graph) {
 
                     // Check if mouse left from element without clearing interval
-                    if($($('#' + that.graph.id).selector + ":hover").length <= 0)
+                    if($($('#' + that.graph.id).selector + ':hover').length <= 0)
                     {
                        clearUpdatePopUp();
                        return;
@@ -242,7 +242,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                         if(!isVisible){
                             Mist.graph = $(graph);
                             $(graph).find('.selectorLine').show(0);
-                            $("#GraphsArea").find('.valuePopUp').show(0);
+                            $('#GraphsArea').find('.valuePopUp').show(0);
                             isVisible = true;
                         }
                         // Mouse X inside value line area
@@ -251,7 +251,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                         // Calculate Translate
                         var translate = 0;
                         if(that.animationEnabled){
-                            translate =  $("#" + that.graph.id).find('.valueLine > path').attr('transform');
+                            translate =  $('#' + that.graph.id).find('.valueLine > path').attr('transform');
                             translate = + translate.slice(10,translate.indexOf(','));
                         }
                         // Measurement That is less than curson x
@@ -269,7 +269,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                         // Fix for the area that has not defined data
                         if(that.displayedData.length == 0 || that.displayedData[minValueIndex].value == null || that.displayedData[minValueIndex+1].value == null ){
-                            $('#GraphsArea').children('.valuePopUp').text("No Data");
+                            $('#GraphsArea').children('.valuePopUp').text('No Data');
                             return;
                         }
 
@@ -286,15 +286,15 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                         currentValue < 0 ? 0 : currentValue;
 
                         // Fix For Big Numbers
-                        var valueText = "";
+                        var valueText = '';
                         if(currentValue>=1073741824)                               // (1024*1024*1024)
-                            valueText = (currentValue/1073741824).toFixed(2) +"G"; // (1024*1024*1024)
+                            valueText = (currentValue/1073741824).toFixed(2) +'G'; // (1024*1024*1024)
                         else if(currentValue>=1048576)                             // (1024*1024)
-                            valueText = (currentValue/1048576).toFixed(2) +"M";    // (1024*1024)
+                            valueText = (currentValue/1048576).toFixed(2) +'M';    // (1024*1024)
                         else if(currentValue>=1024)
-                            valueText = (currentValue/1024).toFixed(2) + "K";
-                        else if(that.yAxisValueFormat == "%")
-                            valueText = currentValue.toFixed(2) + "%";
+                            valueText = (currentValue/1024).toFixed(2) + 'K';
+                        else if(that.yAxisValueFormat == '%')
+                            valueText = currentValue.toFixed(2) + '%';
                         else
                             valueText = currentValue.toFixed(2);
 
@@ -305,7 +305,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                         if(isVisible){
 
                             $(graph).find('.selectorLine').hide(0);
-                            $("#GraphsArea").find('.valuePopUp').hide(0);
+                            $('#GraphsArea').find('.valuePopUp').hide(0);
                             isVisible = false;
                         }
                     }
@@ -346,7 +346,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     if($(selectorLine).css('display') != 'none')
                         $(selectorLine).hide(0);
 
-                    $("#GraphsArea").find('.valuePopUp').hide(0);
+                    $('#GraphsArea').find('.valuePopUp').hide(0);
 
                     // Clear Interval
                     window.clearInterval(updateInterval);
@@ -366,7 +366,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             setupGraph: function () {
 
-                this.width = $("#GraphsArea").width() - 2;
+                this.width = $('#GraphsArea').width() - 2;
 
                  // Calculate Aspect Ratio Of Height
                 var fixedHeight = this.width * 0.125; // (160 / 1280)
@@ -415,7 +415,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     .attr('class', 'graphBtn')
                     .insert('a')
                     .attr('class', 'ui-btn ui-btn-icon-left ui-icon-carat-u ui-corner-all')
-                    .attr('onclick',"Mist.monitoringController.UI.expandPressed('" + id + "')")
+                    .attr('onclick','Mist.monitoringController.UI.expandPressed('' + id + '')')
                     .text(this.metric.name);
 
                 this.set('svg', new SvgSet({
@@ -542,28 +542,28 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                 // Timestamp fix for small screens
                 // 1 Week || 1 Month
-                var tLabelFormat = "%I:%M%p";
+                var tLabelFormat = '%I:%M%p';
                 if( (this.width <= 700 && this.timeDisplayed == 604800) ||  (this.width <= 521 && this.timeDisplayed == 2592000) )
-                    tLabelFormat = "%d-%b";
+                    tLabelFormat = '%d-%b';
                 else if(this.width <= 560 && this.timeDisplayed == 86400) // 1 Day
-                    tLabelFormat = "%I:%M%p";
+                    tLabelFormat = '%I:%M%p';
                 else  if (this.timeDisplayed >= 86400) // 1 Day (24*60*60) >=, should display date as well
-                        tLabelFormat = "%d-%m | %I:%M%p";
+                        tLabelFormat = '%d-%m | %I:%M%p';
 
 
                 // Get path values for value line and area
                 var valueLinePath = this.valueline(this.displayedData);
                 var valueAreaPath = this.valuearea(this.displayedData);
 
-                // Fix for "Error: Problem parsing d="" " in webkit
+                // Fix for 'Error: Problem parsing d='' ' in webkit
                 if(!valueLinePath){
-                    valueLinePath = "M 0 0";
-                    valueAreaPath = "M 0 0";
+                    valueLinePath = 'M 0 0';
+                    valueAreaPath = 'M 0 0';
                 }
 
                 // If we changed time window, clear animation buffer
                 /*if(this.timeUpdated){
-                    console.log("time updated");
+                    console.log('time updated');
                     this.clearAnimation();
                 }*/
 
@@ -583,7 +583,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                                     .points(this.valuesDistance,0, 0,0)
                                     .data(valueLinePath)
                                     .before(function(data){
-                                        this.d3Selector.attr("d", data);
+                                        this.d3Selector.attr('d', data);
                                     })
                                     .push();
 
@@ -594,7 +594,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                                     .points(this.valuesDistance,0, 0,0)
                                     .data(valueAreaPath)
                                     .before(function(data){
-                                        this.d3Selector.attr("d", data);
+                                        this.d3Selector.attr('d', data);
                                     })
                                     .push();
 
@@ -606,8 +606,8 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                                     .data({modelX:modelXAxis,modelY: modelYAxis, labelFormat: tLabelFormat})
                                     .before(function(data){
                                         this.d3Selector.call(labelTicksFixed(data.modelX,data.labelFormat));
-                                        this.d3Selector.selectAll("text")
-                                                       .style("text-anchor", "end")
+                                        this.d3Selector.selectAll('text')
+                                                       .style('text-anchor', 'end')
                                                        .attr('x','-10');
                                         that.svg.axis.y.legend.call(data.modelY);
                                     })
@@ -628,11 +628,11 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 }
                 else {
                     // Update Graph Elements
-                    this.svg.value.line.attr("d", valueLinePath);
-                    this.svg.value.area.attr("d", valueAreaPath);
+                    this.svg.value.line.attr('d', valueLinePath);
+                    this.svg.value.area.attr('d', valueAreaPath);
                     this.svg.axis.x.legend.call(labelTicksFixed(modelXAxis,tLabelFormat));
-                    this.svg.axis.x.legend.selectAll("text")
-                           .style("text-anchor", "end")
+                    this.svg.axis.x.legend.selectAll('text')
+                           .style('text-anchor', 'end')
                            .attr('x','-10');
                     this.svg.axis.y.legend.call(modelYAxis);
                     this.svg.grid.x.call(labelTicksFixed(modelGridX));
@@ -641,10 +641,10 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     if(this.clearAnimPending) {
                         // Wait for 50ms for animation to finishes its changes
                         window.setTimeout(function(){
-                            that.svg.value.line.attr("transform", "translate(" + 0 + ")");
-                            that.svg.value.area.attr("transform", "translate(" + 0 + ")");
-                            that.svg.axis.x.legend.attr("transform", "translate(" + that.margin.left + "," + (that.height - that.margin.bottom +2) + ")");
-                            that.svg.grid.x.attr("transform", "translate(" + that.margin.left + "," + that.height + ")");
+                            that.svg.value.line.attr('transform', 'translate(' + 0 + ')');
+                            that.svg.value.area.attr('transform', 'translate(' + 0 + ')');
+                            that.svg.axis.x.legend.attr('transform', 'translate(' + that.margin.left + ',' + (that.height - that.margin.bottom +2) + ')');
+                            that.svg.grid.x.attr('transform', 'translate(' + that.margin.left + ',' + that.height + ')');
                             that.clearAnimPending = false;
                         },50);
                     }
@@ -834,7 +834,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     var interpolate = d3.interpolateTransform(start,stop);
 
                     // Initial Start
-                    this.d3Selector.attr("transform", interpolate(0));
+                    this.d3Selector.attr('transform', interpolate(0));
 
                     // TODO: This interval should not be that
                     // deep into the code.
@@ -855,7 +855,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                             // Make sure transform is in the final form
                             //var transformValue = interpolate(1);
-                            //self.d3Selector.attr("transform", transformValue);
+                            //self.d3Selector.attr('transform', transformValue);
                             window.clearInterval(animation_interval);
                             animationFinished();
                             return;
@@ -952,7 +952,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             }
 
             this.clearBuffer = function(stopCurrent) {
-                if ((typeof stopCurrent == "undefined" || stopCurrent) && buffer.length > 0 ) {
+                if ((typeof stopCurrent == 'undefined' || stopCurrent) && buffer.length > 0 ) {
                     buffer[0].stop();
                 }
 
