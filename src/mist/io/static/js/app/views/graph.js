@@ -415,7 +415,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     .attr('class', 'graphBtn')
                     .insert('a')
                     .attr('class', 'ui-btn ui-btn-icon-left ui-icon-carat-u ui-corner-all')
-                    .attr('onclick','Mist.monitoringController.UI.expandPressed('' + id + '')')
+                    .attr('onclick','Mist.monitoringController.UI.expandPressed("' + id + '")')
                     .text(this.metric.name);
 
                 this.set('svg', new SvgSet({
