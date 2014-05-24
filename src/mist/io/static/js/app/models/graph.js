@@ -8,6 +8,8 @@ define('app/models/graph', ['ember'],
 
         'use strict';
 
+        var MAX_BUFFER_DATA = 60;
+
         return Ember.Object.extend(Ember.Evented, {
 
 
@@ -25,10 +27,6 @@ define('app/models/graph', ['ember'],
             title: null,
             metrics: null,
 
-            grids: null,
-            lines: null,
-            points: null,
-
 
             //
             //
@@ -38,10 +36,7 @@ define('app/models/graph', ['ember'],
 
 
             load: function () {
-                this.set('grids', [])
-                    .set('lines', [])
-                    .set('points', [])
-                    .set('metrics', []);
+                this.set('metrics', []);
             }.on('init'),
 
 
@@ -83,10 +78,17 @@ define('app/models/graph', ['ember'],
 
             updateData: function (data) {
                 Ember.run(this, function () {
-                    for (var metricId in data)
-                        if (this.hasMetric(metricId))
-                            this.getMetric(metricId)
-                                .datapoints.pushObjects(data[metricId]);
+                    for (var metricId in data) {
+                        var metric = this.getMetric(metricId);
+                        if (metric) {
+                            metric.datapoints.addObjects(data[metricId]);
+                            var datapoints = metric.datapoints;
+                            if (datapoints.length > MAX_BUFFER_DATA) {
+                                var spare = datapoints.length - MAX_BUFFER_DATA;
+                                datapoints = datapoints.slice(spare);
+                            }
+                        }
+                    }
                     this.trigger('onDataUpdate', this.metrics[0].datapoints);
                 });
             }

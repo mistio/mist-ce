@@ -110,33 +110,17 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             calcValueDistance: function () {
 
                 // Get last 2 data
-                if(this.data.length < 2) return
+                if(this.data.length < 2) return;
 
-                var xValueA = this.scale.x(this.data[this.data.length-2].time);
-                var xValueB = this.scale.x(this.data[this.data.length-1].time);
-                this.valuesDistance = xValueB - xValueA;
+                var valueA = this.scale.x(this.data[this.data.length - 1].time);
+                var valueB = this.scale.x(this.data[this.data.length - 2].time);
+                this.valuesDistance = valueA - valueB;
             },
 
 
             updateData: function(newData) {
 
-                // Fix for duplicate timestamps
-                if(newData.length > 0 && this.data.length > 0){
-                    if(newData[0].time <= this.data[this.data.length-1].time){
-                        newData = newData.slice(1);
-                    }
-                }
-
-                // Set Our New Data
-                this.data = this.data.concat(newData);
-
-                // We don't let the buffer have more values than we need.
-                // Check If We Have Overflow , Clip Older Measurement
-                if(this.data.length > MAX_BUFFER_DATA) {
-
-                    var num_of_overflow_Objs = this.data.length - MAX_BUFFER_DATA;
-                    this.data = this.data.slice(num_of_overflow_Objs);
-                }
+                this.data = newData;
 
                 this.updateView();
             },
@@ -561,16 +545,8 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     valueAreaPath = 'M 0 0';
                 }
 
-                // If we changed time window, clear animation buffer
-                /*if(this.timeUpdated){
-                    console.log('time updated');
-                    this.clearAnimation();
-                }*/
-
-
                 // Animate line, axis and grid
-                if(this.animationEnabled && !this.clearAnimPending)
-                {
+                if (this.animationEnabled && !this.clearAnimPending) {
 
                     // Animation values
                     var fps  = 12;
@@ -625,8 +601,9 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                                         that.svg.grid.y.call(data.modelY);
                                     })
                                     .push();
-                }
-                else {
+
+                } else {
+
                     // Update Graph Elements
                     this.svg.value.line.attr('d', valueLinePath);
                     this.svg.value.area.attr('d', valueAreaPath);
@@ -638,15 +615,15 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     this.svg.grid.x.call(labelTicksFixed(modelGridX));
                     this.svg.grid.y.call(modelGridY);
 
-                    if(this.clearAnimPending) {
+                    if (this.clearAnimPending) {
                         // Wait for 50ms for animation to finishes its changes
                         window.setTimeout(function(){
                             that.svg.value.line.attr('transform', 'translate(' + 0 + ')');
                             that.svg.value.area.attr('transform', 'translate(' + 0 + ')');
-                            that.svg.axis.x.legend.attr('transform', 'translate(' + that.margin.left + ',' + (that.height - that.margin.bottom +2) + ')');
+                            that.svg.axis.x.legend.attr('transform', 'translate(' + that.margin.left + ',' + (that.height - that.margin.bottom + 2) + ')');
                             that.svg.grid.x.attr('transform', 'translate(' + that.margin.left + ',' + that.height + ')');
                             that.clearAnimPending = false;
-                        },50);
+                        }, 50);
                     }
                 }
             },
