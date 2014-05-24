@@ -83,9 +83,12 @@ define('app/models/graph', ['ember'],
                         if (metric) {
                             metric.datapoints.addObjects(data[metricId]);
                             var datapoints = metric.datapoints;
-                            if (datapoints.length > MAX_BUFFER_DATA) {
+                            if (datapoints.length > MAX_BUFFER_DATA * 2) {
+                                // If we don't multiply by two, the code will
+                                // end up trimming a single datapoint on each
+                                // update, which consumes resources for nothing
                                 var spare = datapoints.length - MAX_BUFFER_DATA;
-                                datapoints = datapoints.slice(spare);
+                                metric.datapoints = datapoints.slice(spare);
                             }
                         }
                     }

@@ -705,7 +705,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             return d3.select('#' + args.id + ' .valueArea')
                     .attr('transform', 'translate(' +
-                        args.margin.left + ',' + args.margin.top + ')')
+                        args.margin.left + ',' + (args.margin.top + 3)+ ')')
                     .select('path');
         };
 
