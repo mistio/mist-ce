@@ -55,27 +55,13 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                     this.graph.set('view', this);
                     this.graph.on('onDataUpdate', this, 'updateData');
-                    //this.graph.on('onMetricAdd', this, 'renderGraph');
-                    //this.graph.on('onMetricRemove', this, 'renderGraph');
 
-                    this.set('metric', this.graph.metrics[0]);
-
-                    this.clearData();
                     this.setupGraph();
                     this.setupMouseOver();
                     this.updateData(this.graph.metrics[0].datapoints);
                 });
 
             }.on('didInsertElement'),
-
-
-            unload: function () {
-
-                /*this.graph.off('onDataUpdate', this, 'drawGraph');
-                this.graph.off('onMetricAdd', this, 'renderGraph');
-                this.graph.off('onMetricRemove', this, 'renderGraph');*/
-
-            }.on('willDestroyElement'),
 
 
             //
@@ -92,6 +78,18 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             enableAnimation: function () {
                 this.set('animationEnabled', true);
+            },
+
+
+            updateData: function(newData) {
+                this.data = newData;
+                this.updateView();
+            },
+
+
+            updateScale: function () {
+                this.scale.x = ScaleX(this);
+                this.scale.y = ScaleY(this);
             },
 
 
@@ -115,14 +113,6 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 var valueA = this.scale.x(this.data[this.data.length - 1].time);
                 var valueB = this.scale.x(this.data[this.data.length - 2].time);
                 this.valuesDistance = valueA - valueB;
-            },
-
-
-            updateData: function(newData) {
-
-                this.data = newData;
-
-                this.updateView();
             },
 
 
@@ -165,8 +155,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 this.valuearea.y0(this.height - this.margin.top - this.margin.bottom);
 
                 // Update scale to new values
-                this.scale.y = d3.scale.linear().range([this.height - this.margin.top - this.margin.bottom, 0]);
-                this.scale.x = d3.time.scale().range([0, this.width - this.margin.left - this.margin.right]);
+                this.updateScale();
 
                 // Update x-axis based on new height
                 this.svg.axis.x.legend.attr('transform', 'translate(0,' + (this.height - this.margin.bottom) + ')');
@@ -352,6 +341,8 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                 this.width = $('#GraphsArea').width() - 2;
 
+                var id = this.graph.id;
+                this.id = id;
                  // Calculate Aspect Ratio Of Height
                 var fixedHeight = this.width * 0.125; // (160 / 1280)
 
@@ -366,31 +357,15 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 // Distance of two values in graph (pixels), Important For Animation
                 this.valuesDistance = 0;
 
-                // Scale Functions will scale graph to defined width and height
-                var width = this.width - this.margin.left - this.margin.right;
-                var height = this.height - this.margin.top - this.margin.bottom;
-
-                this.scale.x = d3.time.scale().range([0, width]);
-                this.scale.y = d3.scale.linear().range([height, 0]);
-
-                var that = this;
+                this.updateScale();
 
                 // valueline is function that creates the main line based on data
-                this.valueline = d3.svg.line()
-                                .x(function(d) {return that.scale.x(d.time); })
-                                .y(function(d) {return that.scale.y(d.value); })
-                                .defined(function(d) {return d.value != null })
-                                .interpolate('monotone');
+                this.set('valueline', ValueLine(this));
 
                 // valuearea is function that fills the space under the main line
-                this.valuearea = d3.svg.area()
-                                .x(function(d) {return that.scale.x(d.time); })
-                                .y1(function(d) {return that.scale.y(d.value); })
-                                .y0(height)
-                                .defined(function(d) {return d.value != null })
-                                .interpolate('monotone');
+                this.set('valuearea', ValueArea(this));
 
-                var id = this.graph.id;
+                this.set('svg', SvgSet(this));
 
                 // Generate graph's expand button
                 d3.select('#graphBar')
@@ -400,20 +375,11 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     .insert('a')
                     .attr('class', 'ui-btn ui-btn-icon-left ui-icon-carat-u ui-corner-all')
                     .attr('onclick','Mist.monitoringController.UI.expandPressed("' + id + '")')
-                    .text(this.metric.name);
-
-                this.set('svg', new SvgSet({
-                    id: id,
-                    margin: this.margin,
-                    size: {
-                        width: this.width,
-                        height: this.height
-                    }
-                }));
+                    .text(this.graph.metrics[0].name);
 
                 // Set graph and button visibility
                 var cookies = Mist.monitoringController.cookies;
-                if (cookies.collapsedGraphs.indexOf(this.metric.id) > -1) {
+                if (cookies.collapsedGraphs.indexOf(this.graph.metrics[0].id) > -1) {
                     $('#' + id + '-btn').show();
                     $('#' + id).hide();
                 } else {
@@ -421,6 +387,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     $('#' + id).show();
                 }
             },
+
 
             /**
             *
@@ -646,34 +613,39 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
         function SvgSet (args) {
 
-            this.canvas = Canvas(args),
+            var svg = {
 
-            this.grid = {
-                x: GridX(args),
-                y: GridY(args)
-            };
+                canvas: Canvas(args),
 
-            this.value = {
-                line: Line(args),
-                area: Area(args),
-                curtain: Curtain(args)
-            };
-
-            this.axis = {
-                x: {
-                    line: AxisLineX(args),
-                    legend: AxisX(args)
+                grid: {
+                    x: GridX(args),
+                    y: GridY(args)
                 },
-                y: {
-                    line: AxisLineY(args),
-                    legend: AxisY(args)
+
+                value: {
+                    line: Line(args),
+                    area: Area(args),
+                    curtain: Curtain(args)
+                },
+
+                axis: {
+                    x: {
+                        line: AxisLineX(args),
+                        legend: AxisX(args)
+                    },
+                    y: {
+                        line: AxisLineY(args),
+                        legend: AxisY(args)
+                    }
                 }
             };
 
-            this.grid.x.animation = new Animation();
-            this.value.line.animation = new Animation();
-            this.value.area.animation = new Animation();
-            this.axis.x.legend.animation = new Animation();
+            svg.grid.x.animation = new Animation();
+            svg.value.line.animation = new Animation();
+            svg.value.area.animation = new Animation();
+            svg.axis.x.legend.animation = new Animation();
+
+            return svg;
         };
 
 
@@ -687,8 +659,8 @@ define('app/views/graph', ['app/views/templated', 'd3'],
         function Canvas (args) {
 
             return d3.select('#' + args.id + ' svg')
-                    .attr('width', args.size.width)
-                    .attr('height', args.size.height);
+                    .attr('width', args.width)
+                    .attr('height', args.height);
         };
 
 
@@ -710,11 +682,25 @@ define('app/views/graph', ['app/views/templated', 'd3'],
         };
 
 
+        function ScaleX (args) {
+
+            return d3.time.scale().range([
+                    0, args.width - args.margin.left - args.margin.right]);
+        };
+
+
+        function ScaleY (args) {
+
+            return d3.scale.linear().range([
+                    args.height - args.margin.top - args.margin.bottom, 0]);
+        };
+
+
         function GridX (args) {
 
             return d3.select('#' + args.id + ' .grid-x')
                     .attr('transform', 'translate(' +
-                        args.margin.left + ',' + args.size.height + ')');
+                        args.margin.left + ',' + args.height + ')');
         };
 
 
@@ -731,7 +717,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             return d3.select('#' + args.id + ' .x-axis')
                 .attr('transform', 'translate(' +
                     args.margin.left + ',' +
-                        (args.size.height - args.margin.bottom + 2) + ')');
+                        (args.height - args.margin.bottom + 2) + ')');
         };
 
 
@@ -743,13 +729,21 @@ define('app/views/graph', ['app/views/templated', 'd3'],
         };
 
 
+        function Curtain (args) {
+
+            return d3.select('#' + args.id + ' .hideAnimeLine')
+                .attr('width', args.margin.left - 1)
+                .attr('height',args.height + args.margin.top);
+        };
+
+
         function AxisLineX (args) {
 
             return d3.select('#' + args.id + ' .axisLine.x')
                 .attr('x1', args.margin.left)
-                .attr('y1', args.size.height - args.margin.bottom + 2)
-                .attr('x2', args.size.width + args.margin.left + args.margin.right)
-                .attr('y2', args.size.height - args.margin.bottom + 2);
+                .attr('y1', args.height - args.margin.bottom + 2)
+                .attr('x2', args.width + args.margin.left + args.margin.right)
+                .attr('y2', args.height - args.margin.bottom + 2);
         };
 
 
@@ -759,15 +753,28 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 .attr('x1', args.margin.left)
                 .attr('y1', 0)
                 .attr('x2', args.margin.left)
-                .attr('y2', args.size.height - args.margin.bottom + 3);
+                .attr('y2', args.height - args.margin.bottom + 3);
         };
 
 
-        function Curtain (args) {
+        function ValueLine (args) {
 
-            return d3.select('#' + args.id + ' .hideAnimeLine')
-                .attr('width', args.margin.left - 1)
-                .attr('height',args.size.height + args.margin.top);
+            return d3.svg.line()
+                    .x(function(d) {return args.scale.x(d.time); })
+                    .y(function(d) {return args.scale.y(d.value); })
+                    .defined(function(d) {return d.value != null })
+                    .interpolate('monotone');
+        };
+
+
+        function ValueArea (args) {
+
+            return d3.svg.area()
+                    .x(function(d) {return args.scale.x(d.time); })
+                    .y1(function(d) {return args.scale.y(d.value); })
+                    .y0(args.height - args.margin.top - args.margin.bottom)
+                    .defined(function(d) {return d.value != null })
+                    .interpolate('monotone');
         };
 
 
