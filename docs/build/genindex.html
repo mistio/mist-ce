@@ -11,7 +11,7 @@
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootswatch-3.0.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.1.0/cosmo/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/my-styles.css" type="text/css" />
     
@@ -28,9 +28,9 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/myscript.js"></script>
-    <script type="text/javascript" src="_static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="top" title="mist.io 1.0b1 documentation" href="index.html" />
@@ -62,11 +62,14 @@
             
             
               <li class="dropdown globaltoc-container">
-  <a href="index.html"
-     class="dropdown-toggle"
-     data-toggle="dropdown">Site <b class="caret"></b></a>
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
   <ul class="dropdown-menu globaltoc"
-    ><ul>
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rest_api.html">RESTful API</a></li>
@@ -75,8 +78,14 @@
 </li>
               
                 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"></ul>
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"></ul>
 </li>
               
             
@@ -284,14 +293,18 @@
   <dt><a href="modules.html#mist.io.shell.Shell.check_sudo">check_sudo() (mist.io.shell.Shell method)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="modules.html#mist.io.shell.Shell.command">command() (mist.io.shell.Shell method)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="modules.html#mist.io.shell.Shell.command_stream">command_stream() (mist.io.shell.Shell method)</a>
+  </dt>
+
+      
+  <dt><a href="modules.html#mist.io.model.Backend.compute_endpoint">compute_endpoint (mist.io.model.Backend attribute)</a>
   </dt>
 
       
@@ -340,6 +353,10 @@
       </dl></dd>
       
   <dt><a href="modules.html#mist.io.views.delete_rule">delete_rule() (in module mist.io.views)</a>
+  </dt>
+
+      
+  <dt><a href="modules.html#mist.io.methods.deploy_collectd_command">deploy_collectd_command() (in module mist.io.methods)</a>
   </dt>
 
   </dl></td>
@@ -424,6 +441,10 @@
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="modules.html#mist.io.dal.FileLock">FileLock (class in mist.io.dal)</a>
+  </dt>
+
+      
+  <dt><a href="modules.html#mist.io.methods.find_public_ips">find_public_ips() (in module mist.io.methods)</a>
   </dt>
 
       
@@ -885,9 +906,15 @@
   </dt>
 
       
-  <dt><a href="modules.html#mist.io.views.star_image">star_image() (in module mist.io.views)</a>
+  <dt><a href="modules.html#mist.io.methods.star_image">star_image() (in module mist.io.methods)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="modules.html#mist.io.views.star_image">(in module mist.io.views)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="modules.html#mist.io.model.Backend.starred">starred (mist.io.model.Backend attribute)</a>
   </dt>
@@ -931,6 +958,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="modules.html#mist.io.model.Backend.unstarred">unstarred (mist.io.model.Backend attribute)</a>
+  </dt>
+
+      
   <dt><a href="modules.html#mist.io.views.update_monitoring">update_monitoring() (in module mist.io.views)</a>
   </dt>
 
@@ -938,12 +969,12 @@
   <dt><a href="modules.html#mist.io.views.update_rule">update_rule() (in module mist.io.views)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="modules.html#mist.io.views.update_user_settings">update_user_settings() (in module mist.io.views)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="modules.html#mist.io.dal.User">User (class in mist.io.dal)</a>
   </dt>
@@ -976,7 +1007,7 @@
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.1.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.2.<br/>
     </p>
   </div>
 </footer>

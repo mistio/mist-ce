@@ -10,7 +10,7 @@
     
     <link rel="stylesheet" href="_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/bootswatch-3.0.0/cosmo/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.1.0/cosmo/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/my-styles.css" type="text/css" />
     
@@ -27,9 +27,9 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/myscript.js"></script>
-    <script type="text/javascript" src="_static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
     <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
-    <script type="text/javascript" src="_static/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.1.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
     <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="top" title="mist.io 1.0b1 documentation" href="index.html" />
@@ -62,11 +62,14 @@
             
             
               <li class="dropdown globaltoc-container">
-  <a href="index.html"
-     class="dropdown-toggle"
-     data-toggle="dropdown">Site <b class="caret"></b></a>
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
   <ul class="dropdown-menu globaltoc"
-    ><ul class="current">
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="developer_guide.html">Developer Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">RESTful API</a></li>
@@ -75,8 +78,14 @@
 </li>
               
                 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"><ul>
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">RESTful API</a><ul>
 <li><a class="reference internal" href="#authenticate-through-https-mist-io">Authenticate through https://mist.io</a></li>
 <li><a class="reference internal" href="#supported-providers">Supported Providers</a></li>
@@ -176,7 +185,7 @@ Accept: application/json; charset=UTF-8
 </pre></div>
 </div>
 <p>Using this api token in your header you can now use all of mist.io&#8217;s API by passing in your headers:</p>
-<div class="highlight-python"><div class="highlight"><pre>Authorized: 4a2c2j08099809709as098087832843e561abb495c4a30726a8590f73adad
+<div class="highlight-python"><div class="highlight"><pre>Authorization: mist_1 user376@mail.com:4a2c2j08099809709as098087832843e561abb495c4a30726a8590f73adad
 </pre></div>
 </div>
 <p>In case you have your own installation of mist, you do not have to authenticate and get
@@ -375,7 +384,7 @@ Accept: application/json; charset=UTF-8
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
 <li><strong>title</strong> (<em>string</em>) &#8211; <em>required</em> Title of the backend</li>
 <li><strong>provider</strong> (<em>string</em>) &#8211; <em>required</em> Provider as found in supported providers list</li>
@@ -440,7 +449,7 @@ Accept: application/json; charset=UTF-8
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
 <li><strong>new_name</strong> (<em>string</em>) &#8211; <em>required</em> New name for backend</li>
 </ul>
@@ -468,7 +477,7 @@ Accept: application/json; charset=UTF-8
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
 <li><strong>newState</strong> (<em>string</em>) &#8211; <em>required</em> True to enable, False to disable backend</li>
 </ul>
@@ -708,7 +717,7 @@ Accept: application/json; charset=UTF-8
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
 <li><strong>id</strong> (<em>string</em>) &#8211; <em>required</em> Name of new key</li>
 <li><strong>priv</strong> (<em>string</em>) &#8211; <em>required</em> Private ssh key</li>
@@ -767,7 +776,7 @@ Accept: application/json; charset=UTF-8
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
 <li><strong>new_id</strong> (<em>string</em>) &#8211; <em>required</em> New name for key</li>
 </ul>
@@ -842,7 +851,7 @@ Accept: application/json; charset=UTF-8
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
 <li><strong>search_term</strong> (<em>string</em>) &#8211; <em>not required</em></li>
 </ul>
@@ -995,7 +1004,7 @@ Accept: application/json; charset=UTF-8
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
 <li><strong>name</strong> (<em>string</em>) &#8211; <em>required</em> Name of the machine</li>
 <li><strong>key</strong> (<em>string</em>) &#8211; <em>required</em> The id of the key to be associated with the machine</li>
@@ -1073,7 +1082,7 @@ Accept: application/json; charset=UTF-8
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
 <li><strong>action</strong> (<em>string</em>) &#8211; <em>required</em> Can be reboot, shutdown, start or destroy depending on the available actions for each machine</li>
 </ul>
@@ -1101,7 +1110,7 @@ Accept: application/json; charset=UTF-8
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name" colspan="2">Json Parameters:</th></tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">JSON Parameters:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><ul class="first last simple">
 <li><strong>tag</strong> (<em>string</em>) &#8211; <em>required</em> Tags are used as metadata for each machine and can be handy to group machines with same tags</li>
 </ul>
@@ -1181,7 +1190,7 @@ Accept: application/json; charset=UTF-8
     </p>
     <p>
         &copy; Copyright 2014, Mist.io Inc.<br/>
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.1.<br/>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.2.<br/>
     </p>
   </div>
 </footer>
