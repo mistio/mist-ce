@@ -33,5 +33,9 @@
         {{/each}}
     </div>
 
-    <div id="graphBar"></div>
+    <div id="graphBar">
+        {{#each view.graphs}}
+            {{view Mist.graphButtonView graphBinding="this"}}
+        {{/each}}
+    </div>
 </div>

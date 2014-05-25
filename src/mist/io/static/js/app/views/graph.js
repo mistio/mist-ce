@@ -367,25 +367,14 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                 this.set('svg', SvgSet(this));
 
-                // Generate graph's expand button
-                d3.select('#graphBar')
-                    .insert('div')
-                    .attr('id', id + '-btn')
-                    .attr('class', 'graphBtn')
-                    .insert('a')
-                    .attr('class', 'ui-btn ui-btn-icon-left ui-icon-carat-u ui-corner-all')
-                    .attr('onclick','Mist.monitoringController.UI.expandPressed("' + id + '")')
-                    .text(this.graph.metrics[0].name);
-
-                // Set graph and button visibility
-                var cookies = Mist.monitoringController.cookies;
-                if (cookies.collapsedGraphs.indexOf(this.graph.metrics[0].id) > -1) {
-                    $('#' + id + '-btn').show();
-                    $('#' + id).hide();
-                } else {
-                    $('#' + id + '-btn').hide();
-                    $('#' + id).show();
-                }
+                // Set graph visibility
+                Ember.run.next(this, function () {
+                    var cookies = Mist.monitoringController.cookies;
+                    if (cookies.collapsedGraphs.indexOf(this.graph.metrics[0].id) > -1)
+                        $('#' + id).hide();
+                    else
+                        $('#' + id).show();
+                });
             },
 
 

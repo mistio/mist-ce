@@ -55,6 +55,7 @@ define( 'app', [
     'app/views/confirmation_dialog',
     'app/views/file_upload',
     'app/views/graph',
+    'app/views/graph_button',
     'app/views/home',
     'app/views/image_list',
     'app/views/image_list_item',
@@ -114,6 +115,7 @@ define( 'app', [
     ConfirmationDialog,
     FileUploadView,
     GraphView,
+    GraphButtonView,
     Home,
     ImageListView,
     ImageListItem,
@@ -303,6 +305,7 @@ define( 'app', [
         App.set('imageListItemView', ImageListItem);
         App.set('machineAddView', MachineAddDialog);
         App.set('backendButtonView', BackendButton);
+        App.set('graphButtonView', GraphButtonView);
         App.set('machinePowerView', MachinePowerView);
         App.set('machineShellView', MachineShellView);
         App.set('machineListItemView', MachineListItem);
