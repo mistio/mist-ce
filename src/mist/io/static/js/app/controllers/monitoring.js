@@ -489,7 +489,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     var requestID  = this.requestID;
                     var controller = Mist.monitoringController;
                     var self = this;
-                    info('start', start - 50 , 'stop', stop + 50, 'step', step / 1000);
+
                     $.ajax({
                         url: '/backends/' + self.machine.backend.id +
                              '/machines/' + self.machine.id + '/stats',
@@ -542,7 +542,6 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                 var metric = Object.keys(receivedData)[0];
                                 var datapoints = receivedData[metric];
                                 self.lastMetrictime = datapoints[datapoints.length - 1].time;
-                                info(self.lastMetrictime);
 
                                 if (self.machine.pendingFirstData)
                                     self.machine.set('pendingFirstData', !hasFirstData);
