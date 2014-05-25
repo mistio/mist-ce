@@ -595,6 +595,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 }
             },
 
+
             //
             //
             //  Actions
@@ -613,7 +614,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
         function SvgSet (args) {
 
-            var svg = {
+            var svg = new Object({
 
                 canvas: Canvas(args),
 
@@ -638,7 +639,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                         legend: AxisY(args)
                     }
                 }
-            };
+            });
 
             svg.grid.x.animation = new Animation();
             svg.value.line.animation = new Animation();
@@ -804,7 +805,6 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     if (this.before)
                         this.before(this.data);
 
-                    var self = this;
                     var that = this;
 
                     var frame = 0;
@@ -832,14 +832,13 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                         var transformValue = interpolate(
                             frame / (that.fps * that.duration));
 
-                        self.d3Selector.attr('transform', transformValue);
+                        that.d3Selector.attr('transform', transformValue);
 
                         // Check if animation should stop
                         if(frame >= that.fps * that.duration || that.stopFlag){
 
                             // Make sure transform is in the final form
                             //var transformValue = interpolate(1);
-                            //self.d3Selector.attr('transform', transformValue);
                             window.clearInterval(animation_interval);
                             animationFinished();
                             return;
