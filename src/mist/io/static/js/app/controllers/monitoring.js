@@ -173,24 +173,13 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
             },
 
 
-            /*
-            *
-            * Initalizes Request,Graphs,History objects
-            * Loads cookies and hides collapsed graphs
-            * @param {object} args - machine,timeWindow,step,updateInterval,updatesEnabled,timeGap,callback
-            */
-            initialize: function (args) {
+            initGraphs: function (args) {
 
-                var self = this;
-
-                // Reset all controller values
                 this.reset();
+                this.cookies.load();
 
                 // Get graphs from view
                 this.graphs.instances = args.graphs;
-
-                // Load cookies
-                this.cookies.load();
 
                 // TODO: Change Step to seconds
                 // Create and Start the request
@@ -203,17 +192,12 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     timeGap         : 60,                        // Gap between current time and requested
                     callback        : function (result) {
                         if (result.status == 'success')
-                            self.graphs.updateData(result.data);
+                            Mist.monitoringController
+                                .graphs.updateData(result.data);
                     }
                 });
 
                 this.UI.zoomChange()
-
-                // Disable updates if machine is being destroyed
-                args.machineModel.addObserver("beingDestroyed",function(){
-                    if(self.request.machine && self.request.machine.beingDestroyed)
-                        self.request.disableUpdates(false);
-                });
 
                 this.request.start();
             },

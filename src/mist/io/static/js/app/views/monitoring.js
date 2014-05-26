@@ -60,7 +60,7 @@ define('app/views/monitoring', ['app/views/templated'],
                 this.renderControls();
                 this.handleWindowResize();
                 Mist.rulesController.redrawRules();
-                Mist.monitoringController.initialize({
+                Mist.monitoringController.initGraphs({
                     graphs: this.graphs,
                     machineModel: this.machine
                 });
@@ -95,7 +95,12 @@ define('app/views/monitoring', ['app/views/templated'],
                     this.setUpGraphs();
                 else
                     Mist.monitoringController.request.stop();
-            }.observes('machine.hasMonitoring')
+            }.observes('machine.hasMonitoring'),
+
+
+            beingDestroyedObserver: function () {
+                Mist.monitoringController.disableUpdates(false);
+            }.observes('beingDestroyed'),
         });
     }
 );

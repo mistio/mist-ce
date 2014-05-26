@@ -21,7 +21,7 @@ define('app/controllers/machines', ['app/models/machine'],
             rebootingMachine: null,
             destroyingMachine: null,
             shutingdownMachine: null,
-            
+
             /* Let's disable sorting for now
             sortAscending: true,
             sortProperties: ['hasMonitoring', 'probed'],
@@ -144,7 +144,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.waitFor('terminated');
                 machine.lockOn('pending');
                 this.set('destroyingMachine', true);
-                machine.set("beingDestroyed",true);
+                machine.set('beingDestroyed', true);
                 Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
                     'action' : 'destroy'
                 }).success(function() {

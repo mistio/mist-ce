@@ -58,15 +58,7 @@ define('app/views/graph_button', ['app/views/templated'],
                 expandClicked: function () {
                     Mist.monitoringController.UI.expandPressed(this.graph.id);
                 }
-            },
-
-
-            //
-            //
-            //  Observers
-            //
-            //
-
+            }
         });
     }
 );

@@ -88,8 +88,10 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
 
             updateScale: function () {
-                this.scale.x = ScaleX(this);
-                this.scale.y = ScaleY(this);
+                this.scale = new Object({
+                    x: ScaleX(this),
+                    y: ScaleY(this),
+                });
             },
 
 
@@ -368,13 +370,11 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 this.set('svg', SvgSet(this));
 
                 // Set graph visibility
-                Ember.run.next(this, function () {
-                    var cookies = Mist.monitoringController.cookies;
-                    if (cookies.collapsedGraphs.indexOf(this.graph.metrics[0].id) > -1)
-                        $('#' + id).hide();
-                    else
-                        $('#' + id).show();
-                });
+                var cookies = Mist.monitoringController.cookies;
+                if (cookies.collapsedGraphs.indexOf(this.graph.metrics[0].id) > -1)
+                    $('#' + id).hide();
+                else
+                    $('#' + id).show();
             },
 
 
@@ -607,27 +607,27 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                 canvas: Canvas(args),
 
-                grid: {
+                grid: new Object({
                     x: GridX(args),
                     y: GridY(args)
-                },
+                }),
 
-                value: {
+                value: new Object({
                     line: Line(args),
                     area: Area(args),
                     curtain: Curtain(args)
-                },
+                }),
 
-                axis: {
-                    x: {
+                axis: new Object({
+                    x: new Object({
                         line: AxisLineX(args),
                         legend: AxisX(args)
-                    },
-                    y: {
+                    }),
+                    y: new Object({
                         line: AxisLineY(args),
                         legend: AxisY(args)
-                    }
-                }
+                    })
+                })
             });
 
             svg.grid.x.animation = new Animation();
