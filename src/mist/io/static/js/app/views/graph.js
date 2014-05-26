@@ -28,6 +28,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             },
 
             svg: null,
+            unit: null,
             data: null,
             width: null,
             height: null,

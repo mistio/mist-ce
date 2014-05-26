@@ -3,6 +3,9 @@
     <div class="header">
         <div class="title">
             {{view.graph.title}}
+            {{#if view.graph.unit}}
+                ({{view.graph.unit}})
+            {{/if}}
         </div>
         <div class="closeBtn" {{action "collapseClicked" target="view"}}>
             -
