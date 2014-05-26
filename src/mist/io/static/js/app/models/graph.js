@@ -76,24 +76,12 @@ define('app/models/graph', ['ember'],
             },
 
 
-            pushDatapoints: function (metric, datapoints) {
-
-                datapoints.forEach(function (datapoint) {
-
-                    if (datapoint.time > metric.datapoints[metric.datapoints.length -1].time)
-                        metric.datapoints.push(datapoint);
-                    else
-                        info('Gotcha fuzzy maker!');
-                });
-            },
-
-
             updateData: function (data) {
                 Ember.run(this, function () {
                     for (var metricId in data) {
                         var metric = this.getMetric(metricId);
                         if (metric) {
-                            this.pushDatapoints(metric, data[metricId]);
+                            metric.datapoints.addObjects(data[metricId]);
                             var datapoints = metric.datapoints;
                             if (datapoints.length > MAX_BUFFER_DATA * 2) {
                                 // If we don't multiply by two, the code will
