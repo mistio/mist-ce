@@ -881,10 +881,17 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
 
                 save: function (metrics) {
-                    document.cookie = "mistio-monitoring=" + JSON.stringify({
+
+                    var cookieExpire = new Date();
+                    cookieExpire.setFullYear(cookieExpire.getFullYear() + 2);
+                    cookieExpire = cookieExpire.toUTCString();
+
+                    var cookie = "mistio-monitoring=" + JSON.stringify({
                         timeWindow: this.timeWindow,
                         collapsedGraphs: this.collapsedGraphs
-                    });
+                    }) + '; expires=' + cookieExpire + ';';
+
+                    document.cookie = cookie;
                 },
 
 
