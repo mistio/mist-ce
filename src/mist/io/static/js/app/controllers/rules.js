@@ -108,7 +108,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             deleteRule: function (rule) {
                 var that = this;
                 rule.set('pendingAction', true);
-                Mist.ajax.DELETE('/rules/' + rule, {
+                Mist.ajax.DELETE('/rules/' + rule.id, {
                 }).success(function(){
                     Mist.rulesController.removeObject(rule);
                     Mist.rulesController.redrawRules();
