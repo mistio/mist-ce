@@ -126,7 +126,7 @@ class Shell(object):
 
         """
         # FIXME
-        stdout, stderr = self.command("which sudo", pty=False)
+        stdout, stderr, channel = self.command("which sudo", pty=False)
         if not stderr:
             self.sudo = True
             return True
@@ -144,7 +144,7 @@ class Shell(object):
             channel.get_pty()
         # command starts being executed in the background
         channel.exec_command(cmd)
-        return stdout, stderr
+        return stdout, stderr, channel
 
     def command(self, cmd, pty=True):
         """Run command and return output.
@@ -157,11 +157,12 @@ class Shell(object):
 
         """
         log.info("running command: '%s'", cmd)
-        stdout, stderr = self._command(cmd, pty)
+        stdout, stderr, channel = self._command(cmd, pty)
+        retval = channel.recv_exit_status()
         if pty:
-            return stdout.read()
+            return retval, stdout.read()
         else:
-            return stdout.read(), stderr.read()
+            return retval, stdout.read(), stderr.read()
 
     def command_stream(self, cmd):
         """Run command and stream output line by line.
@@ -171,7 +172,7 @@ class Shell(object):
 
         """
         log.info("running command: '%s'", cmd)
-        stdout, stderr = self._command(cmd)
+        stdout, stderr, channel = self._command(cmd)
         line = stdout.readline()
         while line:
             yield line

@@ -1210,7 +1210,7 @@ def ssh_command(user, backend_id, machine_id, host, command,
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
                                            key_id, username, password, port)
-    output = shell.command(command)
+    retval, output = shell.command(command)
     shell.disconnect()
     return output
 
@@ -1781,3 +1781,10 @@ def find_public_ips(ips):
         except:
             pass
     return public_ips
+
+def notify_admin(title, message):
+    try:
+        from mist.core.helpers import send_email
+        send_email(title, message, config.NOTIFICATION_EMAIL)
+    except ImportError:
+        pass
