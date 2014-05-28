@@ -804,6 +804,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 reset: function () {
                     this.clearUpdateActions();
                     this.animationEnabled = true;
+                    this.instances = [];
                 },
 
 
@@ -893,12 +894,13 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                     var cookieExpire = new Date();
                     cookieExpire.setFullYear(cookieExpire.getFullYear() + 2);
-                    cookieExpire = cookieExpire.toUTCString();
 
                     var cookie = "mistio-monitoring=" + JSON.stringify({
                         timeWindow: this.timeWindow,
                         collapsedGraphs: this.collapsedGraphs
-                    }) + '; expires=' + cookieExpire + ';';
+                    }) +
+                    '; expires=' + cookieExpire.toUTCString() +
+                    '; path=/';
 
                     document.cookie = cookie;
                 },

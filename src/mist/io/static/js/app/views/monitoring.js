@@ -30,6 +30,7 @@ define('app/views/monitoring', ['app/views/templated'],
 
 
             load: function () {
+                this.set('graphs', []);
                 this.set('machine', this.get('controller').get('model'));
             }.on('didInsertElement'),
 
@@ -39,6 +40,7 @@ define('app/views/monitoring', ['app/views/templated'],
                 Mist.monitoringController.graphs.disableAnimation();
                 Mist.monitoringController.reset();
                 this.unhandleWindowResize();
+                this.set('graphs', []);
             }.on('willDestroyElement'),
 
 
