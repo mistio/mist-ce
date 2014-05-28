@@ -32,6 +32,7 @@ def run_deploy_script(self, email, backend_id, machine_id, command,
     
         print email, backend_id, machine_id, command, key_id
         try:
+            from mist.io.shell import Shell
             shell = Shell(host)
             key_id, ssh_user = shell.autoconfigure(user, backend_id, node.id,
                                                    key_id, username, password, port)

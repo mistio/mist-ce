@@ -271,7 +271,7 @@ class Shell(object):
                 # This hack tries to identify when such a thing is happening
                 # and then tries to connect with the username suggested in
                 # the prompt.
-                resp = self.command('uptime')
+                retval, resp = self.command('uptime')
                 new_ssh_user = None
                 if 'Please login as the user ' in resp:
                     new_ssh_user = resp.split()[5].strip('"')
