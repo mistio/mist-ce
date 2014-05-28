@@ -181,6 +181,20 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     }
                     machine.set('cores', data.cores);
                     machine.set('users', data.users);
+                    if (data.pub_ips) {
+                        data.pub_ips.forEach(function (ip) {
+                            if (machine.public_ips instanceof Array)
+                                machine.public_ips.addObject(ip);
+                        });
+                        machine.notifyPropertyChange('public_ips');
+                    }
+                    if (data.priv_ips) {
+                        data.priv_ips.forEach(function (ip) {
+                            if (machine.private_ips instanceof Array)
+                                machine.private_ips.addObject(ip);
+                        });
+                        machine.notifyPropertyChange('private_ips');
+                    }
                     if (data.loadavg) {
                         machine.set('loadavg1', loadToColor(data.loadavg[0], data.cores));
                         machine.set('loadavg5', loadToColor(data.loadavg[1], data.cores));

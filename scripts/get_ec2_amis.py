@@ -28,8 +28,8 @@ for provider in ['us-east-1', 'us-west-2', 'us-west-1', 'eu-west-1', 'ap-southea
     browser.find_by_css('.gwt-Button').click()
     time.sleep(6)
 
-    divs = browser.find_by_css('.GGA2BSSBCC')
-    divs.extend(browser.find_by_css('.GGA2BSSBEC'))
+    divs = browser.find_by_css('.GK2GQILBNB')
+    divs.extend(browser.find_by_css('.GK2GQILBPB'))
 
 
     print '    \'%s\': {' % provider      

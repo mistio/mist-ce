@@ -131,12 +131,13 @@ def check_probed(context, machine_name, timeout):
             if leds.has_class('probed'):
                 return
         except:
-            sleep(5)
-            machines = context.browser.find_by_css('#machines li')
-            for machine in machines:
-                if machine_name in machine.text:
-                    break
-            leds = machine.find_by_css('a .machine-leds > div')
+            pass
+            # sleep(5)
+            # machines = context.browser.find_by_css('#machines li')
+            # for machine in machines:
+            #     if machine_name in machine.text:
+            #         break
+            # leds = machine.find_by_css('a .machine-leds > div')
 
         sleep(2)
 
