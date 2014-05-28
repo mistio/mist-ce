@@ -871,9 +871,18 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     if (document.cookie.indexOf('mistio-monitoring') == -1)
                         this.save();
 
-                    var info = JSON.parse(
-                        document.cookie.split('mistio-monitoring=')[1]
-                    );
+                    var info = {};
+
+                    // Seperate monitoring information out of
+                    // cookie values
+
+                    var values = document.cookie.split(';');
+
+                    values.some(function (value) {
+                        if (value.indexOf('mistio-monitoring=') > -1)
+                            return info = JSON.parse(
+                                value.replace('mistio-monitoring=', ''));
+                    });
 
                     this.timeWindow = info.timeWindow || 600000;
                     this.collapsedGraphs = info.collapsedGraphs || [];
