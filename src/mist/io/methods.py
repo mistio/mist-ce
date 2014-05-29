@@ -1733,18 +1733,16 @@ def _undeploy_collectd(user, backend_id, machine_id, host):
     """Uninstall collectd from the machine and return command's output"""
 
     #FIXME: do not hard-code stuff!
-    check_collectd_dist = "if [ ! -d /opt/mistio-collectd/ ]; then $(command -v sudo) /etc/init.d/collectd stop ; $(command -v sudo) chmod -x /etc/init.d/collectd ; fi"
-    disable_collectd = (
-        "$(command -v sudo) rm -f /etc/cron.d/mistio-collectd "
-        "&& $(command -v sudo) kill -9 "
-        "`cat /opt/mistio-collectd/collectd.pid`"
+    command = (
+        "sudo=$(command -v sudo); "
+        "[ -f /etc/cron.d/mistio-collectd ] && $sudo rm -f /etc/cron.d/mistio-collectd || "
+        "$sudo su -c 'cat /etc/rc.local | grep -v mistio-collectd > /etc/rc.local';"
+        "$sudo /opt/mistio-collectd/collectd.sh stop; "
+        "sleep 2; $sudo kill -9 `cat /opt/mistio-collectd/collectd.pid`"
     )
 
-    shell = Shell(host)
-    shell.autoconfigure(user, backend_id, machine_id)
+    stdout = ssh_command(user, backend_id, machine_id, host, command)
     #FIXME: parse output and check for success/failure
-    stdout = shell.command(check_collectd_dist)
-    stdout += shell.command(disable_collectd)
 
     return stdout
 
@@ -1773,7 +1771,7 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "else sysctl hw.ncpu | awk '{print $2}';"
        "fi;"
        "echo -------- && "
-       "/sbin/ifconfig;"       
+       "/sbin/ifconfig;"
        "echo --------"
        "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
        #"cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null |"
@@ -1816,7 +1814,7 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
                'loadavg': loadavg,
                'cores': cores,
                'users': users,
-               'pub_ips': pub_ips, 
+               'pub_ips': pub_ips,
                'priv_ips': priv_ips
                }
         # if len(cmd_output) > 4:
