@@ -1730,47 +1730,6 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
     return ret
 
 
-# def update_available_keys(user, backend_id, machine_id, authorized_keys):
-#     keypairs = user.keypairs
-#
-#     # track which keypairs will be updated
-#     updated_keypairs = {}
-#     # get the actual public keys from the blob
-#     ak = [k for k in authorized_keys.split('\n') if k.startswith('ssh')]
-#
-#     # for each public key
-#     for pk in ak:
-#         exists = False
-#         pub_key = pk.strip().split(' ')
-#         for k in keypairs:
-#             # check if the public key already exists in our keypairs
-#             if keypairs[k].public.strip().split(' ')[:2] == pub_key[:2]:
-#                 exists = True
-#                 associated = False
-#                 # check if it is already associated with this machine
-#                 for machine in keypairs[k].machines:
-#                     if machine[:2] == [backend_id, machine_id]:
-#                         associated = True
-#                         break
-#                 if not associated:
-#                     with user.lock_n_load():
-#                         keypairs[k].machines.append([backend_id, machine_id])
-#                         user.save()
-#                     updated_keypairs[k] = keypairs[k]
-#             if exists:
-#                 break
-#
-#     if updated_keypairs:
-#         log.debug('update keypairs')
-#
-#     ret = [{'name': key,
-#             'machines': keypairs[key].machines,
-#             'pub': keypairs[key].public,
-#             'default_key': keypairs[key].default
-#             } for key in updated_keypairs]
-#
-#     return ret
-
 def find_public_ips(ips):
     public_ips = []
     for ip in ips:
@@ -1782,9 +1741,17 @@ def find_public_ips(ips):
             pass
     return public_ips
 
-def notify_admin(title, message):
+
+def notify_admin(title, message=""):
     try:
         from mist.core.helpers import send_email
         send_email(title, message, config.NOTIFICATION_EMAIL)
+    except ImportError:
+        pass
+
+def notify_user(user, title, message=""):
+    try:
+        from mist.core.helpers import send_email
+        send_email(title, message, user.email)
     except ImportError:
         pass
