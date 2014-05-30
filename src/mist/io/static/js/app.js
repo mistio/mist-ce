@@ -11,7 +11,7 @@ require.config({
         md5: 'lib/md5',
         d3: 'lib/d3.min',
         sha256: 'lib/sha256',
-        socketio: 'lib/socket.io-1.0.1'
+        socketio: 'lib/socket.io'
     },
     shim: {
         'ember': {
@@ -27,7 +27,6 @@ require.config({
 define( 'app', [
     'jquery',
     'd3',
-    'socketio',
     'app/templates/templates',
     'app/controllers/login',
     'app/controllers/backends',
@@ -83,7 +82,6 @@ define( 'app', [
     'ember'
     ], function($,
                 d3,
-                io,
                 TemplatesBuild,
                 LoginController,
                 BackendsController,
@@ -152,16 +150,18 @@ define( 'app', [
             $.mobile.panel.prototype._bindUpdateLayout = function(){};
             $('body').css('overflow','auto');
 
-            App.set('isJQMInitialized',true);
-            
-            warn("We're in!");
-            App.set('io', io);
-            //App.set('socket', io.connect('/stat'));
-            
-            //App.socket.on('test', function(msg){warn(msg)});
-            //App.socket.emit('boo', 'bla');
+            App.set('isJQMInitialized',true); 
         });
 
+        $(document).bind('ready', function(){
+            warn("We're in!");
+            App.set('socket', io.connect('/stat'));
+            
+            App.socket.on('test', function(msg){
+                warn(msg);
+            });
+            App.socket.emit('boo', 'bla');
+        });
 
         // Hide error boxes on page unload
 

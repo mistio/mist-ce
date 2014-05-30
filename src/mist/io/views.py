@@ -859,7 +859,6 @@ class StatNamespace(BaseNamespace):
 @view_config(route_name='socketio')
 def socketio(request):
     from socketio import socketio_manage
-    #import pdb;pdb.set_trace()
     socketio_manage(request.environ,
                     namespaces={'/stat': StatNamespace},
                     request=request)
