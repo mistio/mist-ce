@@ -19,6 +19,9 @@ requires = [
     'sphinxcontrib-httpdomain',
     'sphinx-bootstrap-theme',
     'celery',
+    'gevent',
+    'gevent-socketio',
+    'gevent-subprocess',
 ]
 
 setup(name='mist.io',

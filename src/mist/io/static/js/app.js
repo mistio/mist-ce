@@ -11,10 +11,11 @@ require.config({
         md5: 'lib/md5',
         d3: 'lib/d3.min',
         sha256: 'lib/sha256',
+        socketio: 'lib/socket.io-1.0.1'
     },
     shim: {
         'ember': {
-            deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256']
+            deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256', 'socketio']
         },
         'd3': {
             deps: ['jquery']
@@ -26,6 +27,7 @@ require.config({
 define( 'app', [
     'jquery',
     'd3',
+    'socketio',
     'app/templates/templates',
     'app/controllers/login',
     'app/controllers/backends',
@@ -81,6 +83,7 @@ define( 'app', [
     'ember'
     ], function($,
                 d3,
+                io,
                 TemplatesBuild,
                 LoginController,
                 BackendsController,
@@ -136,7 +139,7 @@ define( 'app', [
                 ) {
 
     function initialize() {
-
+        
 
         // JQM init event
 
@@ -150,6 +153,13 @@ define( 'app', [
             $('body').css('overflow','auto');
 
             App.set('isJQMInitialized',true);
+            
+            warn("We're in!");
+            App.set('io', io);
+            //App.set('socket', io.connect('/stat'));
+            
+            //App.socket.on('test', function(msg){warn(msg)});
+            //App.socket.emit('boo', 'bla');
         });
 
 

@@ -841,3 +841,26 @@ def list_supported_providers(request):
     @return: Return all of our SUPPORTED PROVIDERS
     """
     return {'supported_providers': config.SUPPORTED_PROVIDERS}
+
+
+from socketio.mixins import BroadcastMixin
+
+
+from socketio.namespace import BaseNamespace
+class StatNamespace(BaseNamespace):
+    def initialize(self):
+        print "INIT"
+        
+    def on_boo(self, data):
+        print "BOO", data
+        self.emit("Boo")
+
+
+@view_config(route_name='socketio')
+def socketio(request):
+    from socketio import socketio_manage
+    #import pdb;pdb.set_trace()
+    socketio_manage(request.environ,
+                    namespaces={'/stat': StatNamespace},
+                    request=request)
+    return {}
