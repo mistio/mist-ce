@@ -155,12 +155,55 @@ define( 'app', [
 
         $(document).bind('ready', function(){
             warn("We're in!");
+
             App.set('socket', io.connect('/stat'));
             
             App.socket.on('test', function(msg){
                 warn(msg);
             });
-            App.socket.emit('boo', 'bla');
+            
+            App.socket.on('list_backends', function(backends){
+                Mist.backendsController._setContent(backends);
+                Mist.backendsController.set('loading', false); 
+            });
+
+            App.socket.on('list_keys', function(keys){
+                Mist.keysController._setContent(keys);
+                Mist.keysController.set('loading', false); 
+            });
+                        
+            App.socket.on('list_sizes', function(data){
+                Mist.backendsController.getBackend(data.backend_id).get('sizes')._setContent(data.sizes);
+                Mist.backendsController.getBackend(data.backend_id).get('sizes').set('loading', false); 
+            });
+
+            App.socket.on('list_locations', function(data){
+                Mist.backendsController.getBackend(data.backend_id).get('locations')._setContent(data.locations);
+                Mist.backendsController.getBackend(data.backend_id).get('locations').set('loading', false);
+                Mist.backendsController.getBackend(data.backend_id).set('loadingLocations', false);
+            });
+            
+            App.socket.on('list_images', function(data){
+                Mist.backendsController.getBackend(data.backend_id).get('images')._setContent(data.images);
+                Mist.backendsController.getBackend(data.backend_id).get('images').set('loading', false); 
+            });
+            
+            App.socket.on('list_machines', function(data){
+                Ember.run.next(function(){
+                    Mist.backendsController.getBackend(data.backend_id).get('machines')._updateContent(data.machines);
+                    Mist.backendsController.getBackend(data.backend_id).get('machines').set('loading', false);
+                });
+            });
+            
+            App.socket.on('probe', function(data){
+                Ember.run.next(function(){
+                    Mist.backendsController.getMachine(data.machine_id, data.backend_id).probeSuccess(data.result);
+                });
+            });
+                        
+            Mist.socket.on('logs',function(data){
+                Mist.notificationController.notify(data);
+            });
         });
 
         // Hide error boxes on page unload

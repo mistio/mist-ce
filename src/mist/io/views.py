@@ -159,21 +159,7 @@ def list_backends(request):
     """
 
     user = user_from_request(request)
-    ret = []
-    for backend_id in user.backends:
-        backend = user.backends[backend_id]
-        ret.append({'id': backend_id,
-                    'apikey': backend.apikey,
-                    'title': backend.title or backend.provider,
-                    'provider': backend.provider,
-                    'poll_interval': backend.poll_interval,
-                    'state': 'wait' if backend.enabled else 'offline',
-                    # for Provider.RACKSPACE_FIRST_GEN
-                    'region': backend.region,
-                    # for Provider.RACKSPACE (the new Nova provider)
-                    ## 'datacenter': backend.datacenter,
-                    'enabled': backend.enabled})
-    return ret
+    return methods.list_backends(user)
 
 
 @view_config(route_name='backends', request_method='POST', renderer='json')
@@ -279,10 +265,7 @@ def list_keys(request):
 
     """
     user = user_from_request(request)
-    return [{'id': key,
-             'machines': user.keypairs[key].machines,
-             'isDefault': user.keypairs[key].default}
-            for key in user.keypairs]
+    return methods.list_keys(user)
 
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
@@ -846,15 +829,134 @@ def list_supported_providers(request):
 from socketio.mixins import BroadcastMixin
 
 
+def log_subscriber(namespace):
+    import pika
+    
+    connection = pika.BlockingConnection(pika.ConnectionParameters(
+            host='localhost'))
+    channel = connection.channel()
+    
+    channel.exchange_declare(exchange='logs',
+                             type='fanout')
+    result = channel.queue_declare(exclusive=True)
+    queue_name = result.method.queue
+    
+    channel.queue_bind(exchange='logs',
+                       queue=queue_name)
+    
+    print ' [*] Waiting for logs. To exit press CTRL+C'
+    
+    def callback(ch, method, properties, body):
+        namespace.emit('logs', body)
+        print " [x] %r" % (body,)
+    
+    channel.basic_consume(callback,
+                          queue=queue_name,
+                          no_ack=True)
+    
+    channel.start_consuming()
+
+    
 from socketio.namespace import BaseNamespace
+import gevent
+
 class StatNamespace(BaseNamespace):
     def initialize(self):
         print "INIT"
+        self.spawn(log_subscriber, self)
+        user = user_from_request(self.request)
+        
+        def list_backends_from_socket(namespace, user):
+            backends = methods.list_backends(user)
+            namespace.emit('list_backends', backends)
+            sizes = [namespace.spawn(list_sizes_from_socket,
+                                     namespace,
+                                     user, 
+                                     b['id']) for b in backends]
+            locations = [namespace.spawn(list_locations_from_socket,
+                                         namespace, 
+                                         user, 
+                                         b['id']) for b in backends]
+                                        
+            images = [namespace.spawn(list_images_from_socket, 
+                                      namespace,
+                                      user, 
+                                      b['id']) for b in backends]
+            machines = [namespace.spawn(list_machines_from_socket, 
+                                        namespace,
+                                        user, 
+                                        b['id']) for b in backends]
+            
+        def list_keys_from_socket(namespace, user):
+            keys = methods.list_keys(user)
+            namespace.emit('list_keys', keys)
+        
+        def list_sizes_from_socket(namespace, user, backend_id):
+            sizes = methods.list_sizes(user, backend_id)
+            namespace.emit('list_sizes', {'backend_id': backend_id, 
+                                          'sizes': sizes}) 
+
+        def list_locations_from_socket(namespace, user, backend_id):
+            locations = methods.list_locations(user, backend_id)
+            namespace.emit('list_locations', {'backend_id': backend_id, 
+                                              'locations': locations})
+        
+        def list_images_from_socket(namespace, user, backend_id):
+            images = methods.list_images(user, backend_id)
+            namespace.emit('list_images', {'backend_id': backend_id, 
+                                           'images': images})
+        
+        def list_machines_from_socket(namespace, user, backend_id, probe=True):
+            machines = methods.list_machines(user, backend_id)
+            namespace.emit('list_machines', {'backend_id': backend_id, 
+                                             'machines': machines})
+            if probe:
+                probes = [namespace.spawn(probe_machine_from_socket, 
+                                          namespace, user, 
+                                          backend_id, 
+                                          machine['id'], 
+                                          machine['public_ips'][0]) \
+                          for machine in machines]
+            namespace.spawn_later(10, 
+                                  list_machines_from_socket,
+                                  namespace, 
+                                  user, 
+                                  backend_id,  
+                                  False)
+        
+        def probe_machine_from_socket(namespace, user, backend_id, machine_id, host, key_id='', ssh_user=''):
+            result = methods.probe(user, backend_id, machine_id, host, key_id, ssh_user)
+            namespace.emit('probe', {'backend_id': backend_id,
+                                     'machine_id': machine_id,
+                                     'result': result})
+            
+        self.spawn(list_backends_from_socket, self, user)
+        self.spawn(list_keys_from_socket, self, user)
+        
         
     def on_boo(self, data):
         print "BOO", data
         self.emit("Boo")
 
+
+    def spawn_later(self, delay, fn, *args, **kwargs):
+        """Spawn a new process, attached to this Namespace.
+
+        It will be monitored by the "watcher" process in the Socket. If the
+        socket disconnects, all these greenlets are going to be killed, after
+        calling BaseNamespace.disconnect()
+
+        This method uses the ``exception_handler_decorator``.  See
+        Namespace documentation for more information.
+
+        """
+        # self.log.debug("Spawning sub-Namespace Greenlet: %s" % fn.__name__)
+        if hasattr(self, 'exception_handler_decorator'):
+            fn = self.exception_handler_decorator(fn)
+        new = gevent.spawn_later(delay, fn, *args, **kwargs)
+        self.jobs.append(new)
+        return new
+    
 
 @view_config(route_name='socketio')
 def socketio(request):

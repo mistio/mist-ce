@@ -605,6 +605,13 @@ def list_machines(user, backend_id):
         image_id = m.image or m.extra.get('imageId', None)
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
+        
+        for k in m.extra.keys():
+            try:
+                json.dumps(m.extra[k])
+            except TypeError:
+                m.extra[k] = str(m.extra[k])
+                
         machine = {'id': m.id,
                    'uuid': m.get_uuid(),
                    'name': m.name,
@@ -1320,6 +1327,31 @@ def star_image(user, backend_id, image_id):
     return not star
 
 
+def list_backends(user):
+    ret = []
+    for backend_id in user.backends:
+        backend = user.backends[backend_id]
+        ret.append({'id': backend_id,
+                    'apikey': backend.apikey,
+                    'title': backend.title or backend.provider,
+                    'provider': backend.provider,
+                    'poll_interval': backend.poll_interval,
+                    'state': 'wait' if backend.enabled else 'offline',
+                    # for Provider.RACKSPACE_FIRST_GEN
+                    'region': backend.region,
+                    # for Provider.RACKSPACE (the new Nova provider)
+                    ## 'datacenter': backend.datacenter,
+                    'enabled': backend.enabled})
+    return ret
+
+
+def list_keys(user):
+    return [{'id': key,
+             'machines': user.keypairs[key].machines,
+             'isDefault': user.keypairs[key].default}
+            for key in user.keypairs]
+
+
 def list_sizes(user, backend_id):
     """List sizes (aka flavors) from each backend."""
 
@@ -1677,9 +1709,6 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "/sbin/ifconfig;"       
        "echo --------"
        "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
-       #"cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null |"
-       #"awk '{print $2}'` 2> /dev/null || "
-       #"cat ~/.ssh/authorized_keys 2> /dev/null"
     )
 
     log.warn('probing with key %s' % key_id)
@@ -1691,10 +1720,6 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
         log.warning("SSH failed when probing, let's see what ping has to say.")
         cmd_output = ""
 
-    # stop pinging
-    #ping.send_signal(2)  # SIGINT to print stats and exit
-    #sleep(0.1)
-    #ping.kill()  # better safe than sorry
     ping_out = ping.stdout.read()
     ping.wait()
     log.info("ping output: %s" % ping_out)
@@ -1720,10 +1745,6 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
                'pub_ips': pub_ips, 
                'priv_ips': priv_ips
                }
-        # if len(cmd_output) > 4:
-        #     updated_keys = update_available_keys(user, backend_id,
-        #                                          machine_id, cmd_output[4])
-        #     ret['updated_keys'] = updated_keys
 
     ret.update(parse_ping(ping_out))
 
@@ -1749,9 +1770,23 @@ def notify_admin(title, message=""):
     except ImportError:
         pass
 
-def notify_user(user, title, message=""):
-    try:
+
+def notify_user(user, title, message=""):      
+    try:        
         from mist.core.helpers import send_email
         send_email(title, message, user.email)
     except ImportError:
         pass
+        
+    import pika
+    connection = pika.BlockingConnection(pika.ConnectionParameters(
+               'localhost'))
+    channel = connection.channel()
+    channel.exchange_declare(exchange='logs',
+                         type='fanout')
+    channel.queue_declare(queue='add')
+    channel.basic_publish(exchange='logs',
+                      routing_key='',
+                      body="%s\n%s" % (title,message))
+    
+    connection.close()  

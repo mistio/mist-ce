@@ -87,7 +87,7 @@ define('app/models/machine', ['ember'],
 
             load: function() {
                 this.set('commandHistory', []);
-                this.probe();
+                //this.probe();
             }.on('init'),
 
 
@@ -199,7 +199,56 @@ define('app/models/machine', ['ember'],
                 });
             },
 
-
+            probeSuccess: function(data) {
+                function loadToColor(load, cores) {
+                    var weightedLoad = load / cores;
+                    if (weightedLoad > 1.2) {
+                        return 'hot';
+                    } else if (weightedLoad > 0.8) {
+                        return 'warm';
+                    } else if (weightedLoad > 0.4) {
+                        return 'eco';
+                    } else if (weightedLoad > 0.1) {
+                        return 'cool';
+                    } else {
+                        return 'cold';
+                    }
+                }                
+                if (!this.backend || !this.backend.enabled) return;
+                if (data.uptime) {
+                    uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
+                    this.set('uptimeChecked', Date.now());
+                    this.set('uptimeFromServer', uptime);
+                    this.set('probed', true);
+                } else {
+                    this.set('uptimeChecked', -Date.now());
+                }
+                this.set('cores', data.cores);
+                this.set('users', data.users);
+                if (data.pub_ips) {
+                    data.pub_ips.forEach(function (ip) {
+                        if (this.public_ips instanceof Array)
+                            this.public_ips.addObject(ip);
+                    });
+                    this.notifyPropertyChange('public_ips');
+                }
+                if (data.priv_ips) {
+                    data.priv_ips.forEach(function (ip) {
+                        if (this.private_ips instanceof Array)
+                            this.private_ips.addObject(ip);
+                    });
+                    this.notifyPropertyChange('private_ips');
+                }
+                if (data.loadavg) {
+                    this.set('loadavg1', loadToColor(data.loadavg[0], data.cores));
+                    this.set('loadavg5', loadToColor(data.loadavg[1], data.cores));
+                    this.set('loadavg15', loadToColor(data.loadavg[2], data.cores));
+                }
+                this.set('loadavg', data.loadavg);
+                this.set('loss', data.packets_loss);
+                this.set('latency', Math.floor(data.rtt_avg));
+                Mist.backendsController.trigger('onMachineProbe', this);
+            },
             /**
              *
              *  Observers

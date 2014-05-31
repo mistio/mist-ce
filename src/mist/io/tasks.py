@@ -1,3 +1,5 @@
+import pika
+
 from celery import logging
 
 import libcloud.security
@@ -13,6 +15,20 @@ log = logging.getLogger(__name__)
 
 @app.task
 def add(x,y):
+    msg = '%s + %s' % (x,y)
+    connection = pika.BlockingConnection(pika.ConnectionParameters(
+               'localhost'))
+    channel = connection.channel()
+    channel.exchange_declare(exchange='logs',
+                         type='fanout')
+    channel.queue_declare(queue='add')
+    channel.basic_publish(exchange='logs',
+                      routing_key='',
+                      body=msg)
+    
+    print "sent: ", msg
+    connection.close()
+
     return x+y
 
 
@@ -49,7 +65,7 @@ def run_deploy_script(self, email, backend_id, machine_id, command,
     
         try:
             from mist.io.shell import Shell
-            shell = Shell('google.com')
+            shell = Shell(host)
             key_id, ssh_user = shell.autoconfigure(user, backend_id, node.id,
                                                    key_id, username, password, port)
             import time

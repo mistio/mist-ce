@@ -30,19 +30,6 @@ define('app/controllers/images', ['app/models/image'],
 
                 var that = this;
                 this.set('loading', true);
-                Mist.ajax.GET('/backends/' + this.backend.id + '/images', {
-                }).success(function(images) {
-                    if (!that.backend.enabled) return;
-                    that._setContent(images || []);
-                }).error(function() {
-                    if (!that.backend.enabled) return;
-                    Mist.notificationController.notify('Failed to load images for ' + that.backend.title);
-                    that.backend.set('enabled', false);
-                }).complete(function(success) {
-                    if (!that.backend.enabled) return;
-                    that.set('loading', false);
-                    that.trigger('onLoad');
-                });
             },
 
 

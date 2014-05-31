@@ -36,15 +36,6 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
             load: function() {
                 var that = this;
                 this.set('loading', true);
-                Mist.ajax.GET('/backends', {
-                }).success(function(backends) {
-                    that._setContent(backends);
-                }).error(function() {
-                    that._reload();
-                }).complete(function() {
-                    that.set('loading', false);
-                    that.trigger('onLoad');
-                });
             }.on('init'),
 
 
@@ -132,23 +123,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
 
 
             probeMachine: function(machine, keyId, callback) {
-
                 // TODO: This should be moved inside machines controller
-
-                function loadToColor(load, cores) {
-                    var weightedLoad = load / cores;
-                    if (weightedLoad > 1.2) {
-                        return 'hot';
-                    } else if (weightedLoad > 0.8) {
-                        return 'warm';
-                    } else if (weightedLoad > 0.4) {
-                        return 'eco';
-                    } else if (weightedLoad > 0.1) {
-                        return 'cool';
-                    } else {
-                        return 'cold';
-                    }
-                }
 
                 if (!machine.id || machine.id == -1) return;
                 if (!machine.state == 'running') return;
@@ -168,42 +143,7 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/probe', {
                     'host': host,
                     'key': keyId
-                }).success(function(data) {
-                    if (!machine.backend || !machine.backend.enabled) return;
-                    if (data.uptime) {
-                        uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
-                        machine.set('uptimeChecked', Date.now());
-                        machine.set('uptimeFromServer', uptime);
-                        machine.set('probed', true);
-                    } else {
-                        machine.set('uptimeChecked', -Date.now());
-                    }
-                    machine.set('cores', data.cores);
-                    machine.set('users', data.users);
-                    if (data.pub_ips) {
-                        data.pub_ips.forEach(function (ip) {
-                            if (machine.public_ips instanceof Array)
-                                machine.public_ips.addObject(ip);
-                        });
-                        machine.notifyPropertyChange('public_ips');
-                    }
-                    if (data.priv_ips) {
-                        data.priv_ips.forEach(function (ip) {
-                            if (machine.private_ips instanceof Array)
-                                machine.private_ips.addObject(ip);
-                        });
-                        machine.notifyPropertyChange('private_ips');
-                    }
-                    if (data.loadavg) {
-                        machine.set('loadavg1', loadToColor(data.loadavg[0], data.cores));
-                        machine.set('loadavg5', loadToColor(data.loadavg[1], data.cores));
-                        machine.set('loadavg15', loadToColor(data.loadavg[2], data.cores));
-                    }
-                    machine.set('loadavg', data.loadavg);
-                    machine.set('loss', data.packets_loss);
-                    machine.set('latency', Math.floor(data.rtt_avg));
-                    that.trigger('onMachineProbe', machine, keyId);
-                }).error(function(message) {
+                }).success(machine.probeSuccess).error(function(message) {
                     if (!machine.backend || !machine.backend.enabled) return;
                     if (key) Mist.notificationController.notify(message);
                 }).complete(function(success, data) {
