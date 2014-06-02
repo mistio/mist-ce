@@ -655,6 +655,15 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         raise BackendNotFoundError(backend_id)
     conn = connect_provider(user.backends[backend_id])
 
+    if conn.type is Provider.DOCKER:
+        node = _create_machine_docker(conn, machine_name, image_id, script)
+        return {'id': node.id,
+                'name': node.name,
+                'extra': node.extra,
+                'public_ips': node.public_ips,
+                'private_ips': node.private_ips,
+                }
+                    
     if key_id and key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
 
@@ -670,10 +679,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     keypair = user.keypairs[key_id]
     private_key = keypair.private
     public_key = keypair.public
-
-    #print "Key id: " + key_id
-    #print "Public: " + public_key
-    #print "Private: " + private_key
 
     size = NodeSize(size_id, name=size_name, ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
@@ -720,8 +725,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         node = _create_machine_linode(conn, key_id, private_key, public_key,
                                      script, machine_name, image, size,
                                      location)
-    elif conn.type is Provider.DOCKER:
-        node = _create_machine_docker(conn, machine_name, image, size, script)
     else:
         raise BadRequestError("Provider unknown.")
 
@@ -1054,7 +1057,7 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
                 raise MachineCreationError("Softlayer, got exception %s" % e)
         return node
 
-def _create_machine_docker(conn, machine_name, image, size, script):
+def _create_machine_docker(conn, machine_name, image, script):
     """Create a machine in docker.
 
     """
@@ -1062,11 +1065,10 @@ def _create_machine_docker(conn, machine_name, image, size, script):
         node = conn.create_node(
             name=machine_name,
             image=image,
-            size=size,
-            script=script
+            command=script
         )
     except Exception as e:
-        raise MachineCreationError("docker, got exception %s" % e)
+        raise MachineCreationError("Docker, got exception %s" % e)
     return node
 
 def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
