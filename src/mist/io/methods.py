@@ -1390,6 +1390,9 @@ def list_images(user, backend_id, term=None):
                   and 'windows' not in img.name.lower()
                   and 'hvm' not in img.name.lower()]
 
+        if term and conn.type == 'docker':
+            images = conn.search_images(term=term)
+
         if term:
             images = [img for img in images
                       if term in img.id.lower()
@@ -1839,7 +1842,7 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
                'loadavg': loadavg,
                'cores': cores,
                'users': users,
-               'pub_ips': pub_ips, 
+               'pub_ips': pub_ips,
                'priv_ips': priv_ips
                }
         # if len(cmd_output) > 4:
