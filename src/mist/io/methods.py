@@ -32,6 +32,7 @@ from mist.io.helpers import get_auth_header
 from mist.io.helpers import parse_ping
 from mist.io.bare_metal import BareMetalDriver
 from mist.io.exceptions import *
+from mist.io.tasks import trigger_session_update
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
@@ -95,7 +96,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                     del user.backends[backend_id]
                     user.save()
                     raise BackendUnauthorizedError(exc)
-            user.save()
+            user.save()            
     else:
         # if api secret not given, search if we already know it
         # FIXME: just pass along an empty apisecret
@@ -165,6 +166,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
             user.backends[backend_id] = backend
             user.save()
     log.info("Backend with id '%s' added succesfully.", backend_id)
+    trigger_session_update.delay(user.email, ['backends'])
     return backend_id
 
 
@@ -181,6 +183,7 @@ def rename_backend(user, backend_id, new_name):
         user.backends[backend_id].title = new_name
         user.save()
     log.info("Succesfully renamed backend '%s'", backend_id)
+    trigger_session_update.delay(user.email, ['backends'])
 
 
 @core_wrapper
@@ -210,6 +213,7 @@ def delete_backend(user, backend_id):
         del user.backends[backend_id]
         user.save()
     log.info("Succesfully deleted backend '%s'", backend_id)
+    trigger_session_update.delay(user.email, ['backends'])
 
 
 @core_wrapper
@@ -239,6 +243,7 @@ def add_key(user, key_id, private_key):
         user.save()
 
     log.info("Added key with id '%s'", key_id)
+    trigger_session_update.delay(user.email, ['keys'])
     return key_id
 
 
@@ -271,6 +276,7 @@ def delete_key(user, key_id):
 
         user.save()
     log.info("Deleted key with id '%s'.", key_id)
+    trigger_session_update.delay(user.email, ['keys'])    
 
 
 def set_default_key(user, key_id):
@@ -296,6 +302,7 @@ def set_default_key(user, key_id):
         keypairs[key_id].default = True
         user.save()
     log.info("Succesfully set key with id '%s' as default.", key_id)
+    trigger_session_update.delay(user.email, ['keys'])    
 
 
 def edit_key(user, new_key, old_key):
@@ -324,6 +331,7 @@ def edit_key(user, new_key, old_key):
         user.keypairs[new_key] = old_keypair
         user.save()
     log.info("Renamed key '%s' to '%s'.", old_key, new_key)
+    trigger_session_update.delay(user.email, ['keys'])    
 
 
 @core_wrapper
@@ -336,7 +344,7 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
 
     """
 
-    log.info("Associating key %s to host %s", key_id, host)
+    log.info("Associating key %s to host %s", key_id, host)    
     if not host:
         log.info("Host not given so will only create association without "
                  "actually deploying the key to the server.")
@@ -364,6 +372,7 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
             with user.lock_n_load():
                 user.keypairs[key_id].machines.append(machine_uid)
                 user.save()
+            trigger_session_update.delay(user.email, ['keys'])
         return
 
     # if host is specified, try to actually deploy
@@ -452,6 +461,7 @@ def disassociate_key(user, key_id, backend_id, machine_id, host=None):
                 keypair.machines.remove(machine)
                 user.save()
                 break
+    trigger_session_update.delay(user.email, ['keys'])            
 
 
 def connect_provider(backend):
@@ -818,9 +828,6 @@ def _create_machine_openstack(conn, private_key, public_key, script, machine_nam
     return node
 
 
-
-
-
 def _create_machine_ec2(conn, key_name, private_key, public_key, script,
                        machine_name, image, size, location):
     """Create a machine in Amazon EC2.
@@ -873,6 +880,7 @@ def _create_machine_ec2(conn, key_name, private_key, public_key, script,
             raise MachineCreationError("EC2, got exception %s" % e)
     
     return node
+
 
 def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
                               machine_name, image, size, location):
@@ -1561,6 +1569,22 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
                 BackendUnavailableError("Error while updating metadata")
 
 
+def check_monitoring(user):
+    """Ask the mist.io service if monitoring is enabled for this machine."""
+    try:
+        ret = requests.get(config.CORE_URI + '/monitoring',
+                           headers={'Authorization': get_auth_header(user)},
+                           verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        log.error("%r", exc)
+        raise SSLError()
+    if ret.status_code == 200:
+        return ret.json()
+    else:
+        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
+        raise ServiceUnavailableError()
+    
+    
 def enable_monitoring(user, backend_id, machine_id,
                       name='', dns_name='', public_ips=None,
                       no_ssh=False, dry=False):
@@ -1607,6 +1631,7 @@ def enable_monitoring(user, backend_id, machine_id,
         'deploy_kwargs': deploy_kwargs,
         'command': command,
     }
+    trigger_session_update.delay(user.email, ['monitoring'])
     if dry:
         return ret_dict
     stdout = ''
@@ -1645,6 +1670,7 @@ def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
             stdout = _undeploy_collectd(user, backend_id, machine_id, host)
     except:
         pass
+    trigger_session_update.delay(user.email, ['monitoring'])    
     return stdout
 
 
@@ -1782,11 +1808,11 @@ def notify_user(user, title, message=""):
     connection = pika.BlockingConnection(pika.ConnectionParameters(
                'localhost'))
     channel = connection.channel()
-    channel.exchange_declare(exchange='logs',
+    channel.exchange_declare(exchange=user.email,
                          type='fanout')
-    channel.queue_declare(queue='add')
-    channel.basic_publish(exchange='logs',
-                      routing_key='',
+    channel.queue_declare(queue='notify')
+    channel.basic_publish(exchange=user.email,
+                      routing_key='notify',
                       body="%s\n%s" % (title,message))
     
     connection.close()  

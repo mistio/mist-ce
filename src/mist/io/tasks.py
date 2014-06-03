@@ -1,12 +1,12 @@
+import json
+
 import pika
 
 from celery import logging
 
 import libcloud.security
 
-from mist.io.celery import app
-from mist.io.methods import ssh_command, connect_provider
-from mist.io.methods import notify_user, notify_admin
+from mist.io.celery_app import app
 from mist.io.exceptions import ServiceUnavailableError
 
 
@@ -32,10 +32,28 @@ def add(x,y):
     return x+y
 
 
+@app.task
+def trigger_session_update(email, sections=['backends','keys','monitoring']):
+    connection = pika.BlockingConnection(pika.ConnectionParameters(
+               'localhost'))
+    channel = connection.channel()
+    channel.exchange_declare(exchange=email,
+                         type='fanout')
+    channel.queue_declare(queue='update')
+    channel.basic_publish(exchange=email,
+                      routing_key='update',                          
+                      body=json.dumps(sections))
+    
+    print "update: ", email, sections
+    connection.close()    
+
+
 @app.task(bind=True, default_retry_delay=3*60)
 def run_deploy_script(self, email, backend_id, machine_id, command, 
                       key_id=None, username=None, password=None, port=22):
-    
+    from mist.io.methods import ssh_command, connect_provider
+    from mist.io.methods import notify_user, notify_admin  
+      
     try: # Multi-user environment
         from mist.core.helpers import user_from_email
         user = user_from_email(email)

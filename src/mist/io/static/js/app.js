@@ -156,12 +156,8 @@ define( 'app', [
         $(document).bind('ready', function(){
             warn("We're in!");
 
-            App.set('socket', io.connect('/stat'));
-            
-            App.socket.on('test', function(msg){
-                warn(msg);
-            });
-            
+            App.set('socket', io.connect('/mist'));
+
             App.socket.on('list_backends', function(backends){
                 Mist.backendsController._setContent(backends);
                 Mist.backendsController.set('loading', false); 
@@ -173,35 +169,58 @@ define( 'app', [
             });
                         
             App.socket.on('list_sizes', function(data){
-                Mist.backendsController.getBackend(data.backend_id).get('sizes')._setContent(data.sizes);
-                Mist.backendsController.getBackend(data.backend_id).get('sizes').set('loading', false); 
+                var backend = Mist.backendsController.getBackend(data.backend_id);
+                if (backend) {
+                    backend.get('sizes')._setContent(data.sizes);
+                    backend.get('sizes').set('loading', false);
+                } 
             });
 
             App.socket.on('list_locations', function(data){
-                Mist.backendsController.getBackend(data.backend_id).get('locations')._setContent(data.locations);
-                Mist.backendsController.getBackend(data.backend_id).get('locations').set('loading', false);
-                Mist.backendsController.getBackend(data.backend_id).set('loadingLocations', false);
+                var backend = Mist.backendsController.getBackend(data.backend_id);
+                if (backend) {
+                    backend.get('locations')._setContent(data.locations);
+                    backend.get('locations').set('loading', false);
+                    backend.set('loadingLocations', false);
+                }
             });
             
             App.socket.on('list_images', function(data){
-                Mist.backendsController.getBackend(data.backend_id).get('images')._setContent(data.images);
-                Mist.backendsController.getBackend(data.backend_id).get('images').set('loading', false); 
+                var backend = Mist.backendsController.getBackend(data.backend_id);
+                if (backend) {
+                    backend.get('images')._setContent(data.images);
+                    backend.get('images').set('loading', false); 
+                }
             });
             
             App.socket.on('list_machines', function(data){
                 Ember.run.next(function(){
-                    Mist.backendsController.getBackend(data.backend_id).get('machines')._updateContent(data.machines);
-                    Mist.backendsController.getBackend(data.backend_id).get('machines').set('loading', false);
+                    var backend = Mist.backendsController.getBackend(data.backend_id);
+                    if (backend) {
+                        backend.get('machines')._updateContent(data.machines);
+                        backend.get('machines').set('loading', false);                        
+                    }
+
                 });
             });
             
             App.socket.on('probe', function(data){
                 Ember.run.next(function(){
-                    Mist.backendsController.getMachine(data.machine_id, data.backend_id).probeSuccess(data.result);
+                    var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
+                    if (machine)
+                        machine.probeSuccess(data.result);
                 });
             });
-                        
-            Mist.socket.on('logs',function(data){
+            
+            Mist.socket.on('monitoring',function(data){
+                warn(data);
+            });
+            
+            Mist.socket.on('update',function(data){
+                warn(data);
+            });            
+                                    
+            Mist.socket.on('notify',function(data){
                 Mist.notificationController.notify(data);
             });
         });
