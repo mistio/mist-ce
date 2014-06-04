@@ -2,14 +2,28 @@ import json
 
 import pika
 
+from time import time
+
 from celery import logging
 
 import libcloud.security
 
 from mist.io.celery_app import app
 from mist.io.exceptions import ServiceUnavailableError
+from mist.io.shell import Shell
 
+try: # Multi-user environment
+    from mist.core.helpers import user_from_email
+    cert_path = "src/mist.io/cacert.pem"
+    multiuser = True
+except ImportError: # Standalone mist.io
+    from mist.io.model import User
+    cert_path = "cacert.pem"
+    multiuser = False
 
+# libcloud certificate fix for OS X
+libcloud.security.CA_CERTS_PATH.append(cert_path)  
+  
 log = logging.getLogger(__name__)
 
 
@@ -24,8 +38,7 @@ def add(x,y):
     channel.queue_declare(queue='add')
     channel.basic_publish(exchange='logs',
                       routing_key='',
-                      body=msg)
-    
+                      body=msg)    
     print "sent: ", msg
     connection.close()
 
@@ -52,20 +65,13 @@ def trigger_session_update(email, sections=['backends','keys','monitoring']):
 def run_deploy_script(self, email, backend_id, machine_id, command, 
                       key_id=None, username=None, password=None, port=22):
     from mist.io.methods import ssh_command, connect_provider
-    from mist.io.methods import notify_user, notify_admin  
-      
-    try: # Multi-user environment
-        from mist.core.helpers import user_from_email
+    from mist.io.methods import notify_user, notify_admin    
+    
+    if multiuser:  
         user = user_from_email(email)
-        cert_path = "src/mist.io/cacert.pem"
-    except ImportError: # Standalone mist.io
-        from mist.io.model import User
+    else:
         user = User()
-        cert_path = "cacert.pem"
-
-    # libcloud certificate fix for OS X
-    libcloud.security.CA_CERTS_PATH.append(cert_path)
-        
+    
     try:
         # find the node we're looking for and get its hostname
         conn = connect_provider(user.backends[backend_id])
@@ -82,14 +88,13 @@ def run_deploy_script(self, email, backend_id, machine_id, command,
             raise self.retry(exc=Exception(), countdown=60, max_retries=5)
     
         try:
-            from mist.io.shell import Shell
             shell = Shell(host)
             key_id, ssh_user = shell.autoconfigure(user, backend_id, node.id,
                                                    key_id, username, password, port)
-            import time
-            start_time = time.time()
+            
+            start_time = time()
             retval, output = shell.command(command)
-            execution_time = time.time() - start_time
+            execution_time = time() - start_time
             shell.disconnect()
             msg = """
 Command: %s
