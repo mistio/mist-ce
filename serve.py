@@ -3,9 +3,13 @@ from pyramid.paster import get_app
 from gevent import monkey; monkey.patch_all()
 
 if __name__ == '__main__':
-
-    app = get_app('development.ini')
-    print 'Listening on port http://127.0.0.1:6543'
+    import sys
+    if len(sys.argv) > 1:
+        port = int(sys.argv[1])
+    else:
+        port = 8081
+    app = get_app('uwsgi1.ini')
+    print 'Listening on port http://127.0.0.1:%s' % port
     # TODO: try flashsocket transport
-    SocketIOServer(('127.0.0.1', 6543), app, policy_server=False,
+    SocketIOServer(('127.0.0.1', port), app, policy_server=False,
                    transports=['websocket', 'xhr-polling']).serve_forever()
