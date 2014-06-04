@@ -32,7 +32,7 @@ from mist.io.helpers import get_auth_header
 from mist.io.helpers import parse_ping
 from mist.io.bare_metal import BareMetalDriver
 from mist.io.exceptions import *
-from mist.io.tasks import trigger_session_update
+from mist.io.tasks import trigger_session_update, async_ssh_command
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
@@ -1631,13 +1631,14 @@ def enable_monitoring(user, backend_id, machine_id,
         'deploy_kwargs': deploy_kwargs,
         'command': command,
     }
-    trigger_session_update.delay(user.email, ['monitoring'])
     if dry:
         return ret_dict
     stdout = ''
     if not no_ssh:
-        stdout = ssh_command(user, backend_id, machine_id, host, command)
-    ret_dict['cmd_output'] = stdout
+        async_ssh_command.delay(user, backend_id, machine_id, host, command)
+
+    trigger_session_update.delay(user.email, ['monitoring'])
+    
     return ret_dict
 
 
@@ -1691,21 +1692,14 @@ def deploy_collectd_command(deploy_kwargs):
 def _undeploy_collectd(user, backend_id, machine_id, host):
     """Uninstall collectd from the machine and return command's output"""
 
-    #FIXME: do not hard-code stuff!
-    check_collectd_dist = "if [ ! -d /opt/mistio-collectd/ ]; then $(command -v sudo) /etc/init.d/collectd stop ; $(command -v sudo) chmod -x /etc/init.d/collectd ; fi"
-    disable_collectd = (
+    command = (
         "$(command -v sudo) rm -f /etc/cron.d/mistio-collectd "
         "&& $(command -v sudo) kill -9 "
         "`cat /opt/mistio-collectd/collectd.pid`"
     )
 
-    shell = Shell(host)
-    shell.autoconfigure(user, backend_id, machine_id)
-    #FIXME: parse output and check for success/failure
-    stdout = shell.command(check_collectd_dist)
-    stdout += shell.command(disable_collectd)
-
-    return stdout
+    return async_ssh_command.delay(user, backend_id, machine_id, host, command)
+    
 
 
 def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):

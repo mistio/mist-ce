@@ -44,6 +44,18 @@ def add(x,y):
 
     return x+y
 
+@app.task
+def async_ssh_command(user, backend_id, machine_id, host, command,
+                      key_id=None, username=None, password=None, port=22):
+    shell = Shell(host)
+    key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
+                                           key_id, username, password, port)
+    retval, output = shell.command(command)
+    shell.disconnect()    
+    if retval:
+        from mist.io.methods import notify_user
+        notify_user(user, "[mist.io] Async command failed for machine %s (%s)" % (machine_id, host), output)    
+
 
 @app.task
 def trigger_session_update(email, sections=['backends','keys','monitoring']):
