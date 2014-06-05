@@ -1,55 +1,13 @@
 <div id="metric-add-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-b"></div>
 <div id="metric-add-popup"
-     class="ui-popup-container ui-popup-hidden ui-body-inherit ui-overlay-shadow ui-corner-all mid-popup">
+     class="ui-popup-container mid-popup ui-popup-hidden ui-body-inherit ui-corner-all ui-overlay-shadow">
 
     <div id="metric-add"
          class="ui-popup ui-corner-all"
          data-role="popup"
          data-enhanced="true"
-         data-transition="flip">
-
-        <div data-role="header" data-theme="b">
-            <h1>Add metric</h1>
-        </div>
-
-        <div role="main" class="ui-content" data-theme="a">
-
-            <label for="metric-add-name">Name:</label>
-            {{view Mist.TextField
-                   id="metric-add-name"
-                   valueBinding="Mist.metricAddController.newMetric.newName"}}
-
-            <label>Metric:</label>
-            <div id="metric-add-metric"
-                 data-role="collapsible"
-                 data-iconpos="right"
-                 data-collapsed-icon="arrow-d"
-                 data-expanded-icon="arrow-u"
-                 data-theme="a"
-                 class="mist-select">
-                <h2>
-                    {{#if Mist.metricAddController.newMetric.target}}
-                        {{Mist.metricAddController.newMetric.name}}
-                    {{else}}
-                        Select Metric
-                    {{/if}}
-                    {{#if Mist.metricAddController.loadingMetrics}}
-                        <div class="ajax-loader"></div>
-                    {{/if}}
-                </h2>
-                <ul data-role="listview" data-theme="a">
-                </ul>
-            </div>
-
-            {{#if Mist.metricsController.addingMetric}}
-                <div class="ajax-loader"></div>
-            {{/if}}
-
-            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-                <a class="ui-btn ui-btn-a ui-corner-all" {{action "backClicked" target="view"}}>Back</a>
-                <a class="ui-btn ui-btn-d ui-corner-all ui-state-disabled"
-                    id="metric-add-ok" {{action "addClicked" target="view"}}>Add</a>
-            </div>
-        </div>
+         data-transition="flip"
+         data-position-to="#add-metric-btn">
+            {{view Mist.metricNodeView nodeBinding="Mist.metricAddController.metricsTree"}}
     </div>
 </div>

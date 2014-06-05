@@ -79,6 +79,7 @@ define( 'app', [
     'app/views/machine_tags_list_item',
     'app/views/messagebox',
     'app/views/metric_add',
+    'app/views/metric_node',
     'app/views/monitoring',
     'app/views/rule',
     'app/views/rule_edit',
@@ -139,6 +140,7 @@ define( 'app', [
     MachineTagsListItemView,
     MessageBoxView,
     MetricAddView,
+    MetricNodeView,
     MonitoringView,
     RuleView,
     RuleEditView,
@@ -286,6 +288,7 @@ define( 'app', [
         App.set('loginView', LoginView);
         App.set('keyAddView', KeyAddView);
         App.set('keyView', SingleKeyView);
+        App.set('metricNodeView', MetricNodeView);
         App.set('keyListView', KeyListView);
         App.set('userMenuView', UserMenuView);
         App.set('keyEditView', KeyEditDialog);

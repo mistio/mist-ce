@@ -6,22 +6,6 @@ define('app/controllers/metric_add', ['ember'],
     //
     function () {
 
-    function Node (dict, text) {
-
-        var subTargets = new Array();
-        for (var key in dict) {
-            if (dict[key] instanceof Object) {
-                subTargets.push(new Node(dict[key], key));
-            }
-            else {
-                subTargets.push({}, key);
-            }
-        }
-
-        this.text = text;
-        this.subTargets = subTargets;
-    };
-
         'use strict';
 
         return Ember.Object.extend({
@@ -90,6 +74,7 @@ define('app/controllers/metric_add', ['ember'],
                 Mist.ajax.GET(url, {
                 }).success(function(metrics) {
                     that._setMetrics(metrics);
+                    that._setMetricsTree();
                 }).error(function(message) {
                     Mist.notificationController.notify(
                         'Failed to load metrics: ' + message);
@@ -146,7 +131,7 @@ define('app/controllers/metric_add', ['ember'],
 
 
             _metricsObjectToNodeTree: function (object) {
-                var root = new Node(object, 'collectd');
+                var root = new Node(object, 'collectd', 0);
                 return root;
             },
 
@@ -159,6 +144,13 @@ define('app/controllers/metric_add', ['ember'],
                     });
                     this.set('metrics', newMetrics);
                 });
+            },
+
+
+            _setMetricsTree: function () {
+                var tree = this._metricListToObject(this.metrics);
+                tree = this._metricsObjectToNodeTree(tree);
+                this.set('metricsTree', tree);
             },
 
 
@@ -175,6 +167,22 @@ define('app/controllers/metric_add', ['ember'],
                 else
                     this.set('formReady', false);
             }.observes('newMetric.target', 'newMetric.newName', 'newMetric'),
-        }
-    )
+        });
+
+        function Node (dict, text, index) {
+
+            var subTargets = new Array();
+            for (var key in dict) {
+                if (dict[key] instanceof Object) {
+                    subTargets.push(new Node(dict[key], key, index+1));
+                }
+                else {
+                    subTargets.push(new Node({}, key, index + 1));
+                }
+            }
+
+            this.text = text;
+            this.nestIndex = index;
+            this.subTargets = subTargets;
+        };
 });
