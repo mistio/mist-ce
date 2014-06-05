@@ -213,7 +213,9 @@ define( 'app', [
             });
             
             Mist.socket.on('monitoring',function(data){
-                warn(data);
+                Mist.monitoringController._updateMonitoringData(data);
+                Mist.monitoringController.trigger('onMonitoringDataUpdate');
+                Mist.backendsController.set('checkedMonitoring', true);
             });
             
             Mist.socket.on('update',function(data){

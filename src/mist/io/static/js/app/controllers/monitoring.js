@@ -20,20 +20,6 @@ define('app/controllers/monitoring', [
                     Mist.backendsController.set('checkedMonitoring', true);
                     return;
                 }
-
-                var that = this;
-                this.checkingMonitoring = true;
-                Mist.ajax.GET('/monitoring', {
-                }).success(function(data) {
-                    that._updateMonitoringData(data);
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to get monitoring data');
-                }).complete(function(success, data) {
-                    that.checkingMonitoring = false;
-                    Mist.backendsController.set('checkedMonitoring', true);
-                    that.trigger('onMonitoringDataUpdate');
-                    if (callback) callback(success, data);
-                });
             }.on('init'),
 
 
@@ -119,6 +105,14 @@ define('app/controllers/monitoring', [
              * to do with monitoring
              */
              _updateMonitoringData: function(data) {
+
+                if (Mist.monitored_machines) {
+                    Mist.monitored_machines.forEach(function(machine_tuple) {
+                         var machine = Mist.backendsController.getMachine(machine_tuple[1], machine_tuple[0]);
+                         if (machine)
+                             machine.set('hasMonitoring', false);
+                     });                    
+                }
 
                  Mist.set('monitored_machines', data.machines);
                  Mist.set('current_plan', data.current_plan);
