@@ -102,6 +102,37 @@ define('app/controllers/metric_add', ['ember'],
             //
 
 
+            _metricListToObject: function (metrics) {
+
+                var ret = new Object();
+                metrics.forEach(function (metric) {
+                    var prevParent = ret;
+                    var list = metric.alias.split('.');
+                    var lastIndex = list.length - 1;
+                    list.forEach(function (subTarget, index) {
+
+                        // Check if this property exists in the object already
+                        if (!prevParent[subTarget]) {
+
+                            // if this is the last node, append a
+                            // string instead of an object
+                            if (index == lastIndex)
+                                prevParent[subTarget] = metric.alias;
+                            else
+                                prevParent[subTarget] = new Object();
+                        }
+                        prevParent = prevParent[subTarget];
+                    });
+                });
+                return ret;
+            },
+
+
+            _metricsObjectToNodeTree: function (object) {
+                var root = new Node(object, 'collectd');
+            },
+
+
             _setMetrics: function (metrics) {
                 Ember.run(this, function () {
                     var newMetrics = [];
@@ -128,4 +159,19 @@ define('app/controllers/metric_add', ['ember'],
             }.observes('newMetric.target', 'newMetric.newName', 'newMetric')
         });
     }
+
+
+    function Node (dict, text) {
+
+        var subTargets = new Array();
+        for (var key in dict) {
+            if (dict[key] instanceof Object)
+                subTargets.push(new Node(dict[key], key));
+            else
+                subTargets.push({}, key);
+        }
+
+        this.text = text;
+        this.subTargets = subTargets;
+    };
 );

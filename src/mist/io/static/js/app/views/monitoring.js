@@ -92,6 +92,21 @@ define('app/views/monitoring', ['app/views/templated'],
             //
 
 
+            actions: {
+
+                addMetricClicked: function () {
+                    Mist.metricAddController.open(this.machine);
+                }
+            },
+
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
             hasMonitoringObserver: function () {
                 if (this.machine.hasMonitoring)
                     this.setUpGraphs();
