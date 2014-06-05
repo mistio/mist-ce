@@ -1,0 +1,13 @@
+{{#if view.node.subTargets.length}}
+
+    <a class="ui-btn parent-node ui-corner-all" {{action "toggleUnfold" target="view"}}> {{view.node.text}} </a>
+
+    {{#if view.unfold}}
+        {{#each view.node.subTargets}}
+            {{view Mist.metricNodeView nodeBinding="this"}}
+        {{/each}}
+    {{/if}}
+
+{{else}}
+    <a class="ui-btn ui-btn-b end-node ui-corner-all">{{view.node.text}}</a>
+{{/if}}
