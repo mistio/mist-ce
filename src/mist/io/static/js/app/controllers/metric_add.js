@@ -6,6 +6,22 @@ define('app/controllers/metric_add', ['ember'],
     //
     function () {
 
+    function Node (dict, text) {
+
+        var subTargets = new Array();
+        for (var key in dict) {
+            if (dict[key] instanceof Object) {
+                subTargets.push(new Node(dict[key], key));
+            }
+            else {
+                subTargets.push({}, key);
+            }
+        }
+
+        this.text = text;
+        this.subTargets = subTargets;
+    };
+
         'use strict';
 
         return Ember.Object.extend({
@@ -102,6 +118,7 @@ define('app/controllers/metric_add', ['ember'],
             //
 
 
+
             _metricListToObject: function (metrics) {
 
                 var ret = new Object();
@@ -130,6 +147,7 @@ define('app/controllers/metric_add', ['ember'],
 
             _metricsObjectToNodeTree: function (object) {
                 var root = new Node(object, 'collectd');
+                return root;
             },
 
 
@@ -156,22 +174,7 @@ define('app/controllers/metric_add', ['ember'],
                     this.set('formReady', true);
                 else
                     this.set('formReady', false);
-            }.observes('newMetric.target', 'newMetric.newName', 'newMetric')
-        });
-    }
-
-
-    function Node (dict, text) {
-
-        var subTargets = new Array();
-        for (var key in dict) {
-            if (dict[key] instanceof Object)
-                subTargets.push(new Node(dict[key], key));
-            else
-                subTargets.push({}, key);
+            }.observes('newMetric.target', 'newMetric.newName', 'newMetric'),
         }
-
-        this.text = text;
-        this.subTargets = subTargets;
-    };
-);
+    )
+});
