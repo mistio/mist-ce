@@ -42,7 +42,29 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 $(window).trigger('resize');
                 Ember.run.next(function(){
                     $('#shell-input input').focus();
-                });                
+                });
+                warn('opened');
+                var term = new Terminal({
+                  cols: 80,
+                  rows: 24,
+                  screenKeys: true
+                });
+                term.on('data', function(data) {
+                    warn(data);
+                    //term.write(data);
+                    Mist.socket.emit('shell_data', data);
+                });
+                term.open(document.getElementById('shell-return'));
+                var payload = {'backend_id': machine.backend.id, 
+                                                'machine_id': machine.id,
+                                                'host': machine.public_ips[0]
+                                            };
+                warn(payload);
+                Mist.socket.emit('shell_open', payload);
+                Mist.socket.on('shell_data', function(data){
+                    term.write(data);
+                });
+                                                
             },
 
 

@@ -14,6 +14,8 @@ import pika
 
 from time import time
 
+from gevent.socket import wait_read, wait_write
+
 from socketio.namespace import BaseNamespace
 
 try:
@@ -22,6 +24,7 @@ except ImportError:
     from mist.io.helpers import user_from_request
 
 from mist.io import methods
+from mist.io.shell import Shell
 
 
 class MistNamespace(BaseNamespace):
@@ -53,10 +56,41 @@ class MistNamespace(BaseNamespace):
         new = gevent.spawn_later(delay, fn, *args, **kwargs)
         self.jobs.append(new)
         return new
+    
+    def on_shell_open(self, data):
+        print "opened shell! %s" % data
+        self.shell = Shell(data['host'])
+        key_id, ssh_user = self.shell.autoconfigure(self.user, data['backend_id'], data['machine_id'])
+        #self.channel = self.shell.ssh.get_transport().open_session()
+        #self.channel.settimeout(10800)
+        #stdout = self.channel.makefile()
+        #stderr = self.channel.makefile_stderr()  
+        #self.channel.get_pty()
+        self.channel = self.shell.ssh.invoke_shell('xterm')
+        self.spawn(get_ssh_data, self)
+    
+    def on_shell_close(self, data):
+        self.shell.disconnect()
+    
+    def on_shell_data(self, data):
+        self.channel.send(data)
         
     def on_boo(self, data):
         print "BOO", data
         self.emit("Boo")
+
+
+def get_ssh_data(namespace):
+    channel = namespace.channel
+    try:
+        while True:
+            wait_read(channel.fileno())
+            data = channel.recv(1024)
+            if not len(data):
+                return
+            namespace.emit('shell_data', data)
+    finally:
+        channel.close()
 
 
 def update_subscriber(namespace):

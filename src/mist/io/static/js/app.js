@@ -11,11 +11,12 @@ require.config({
         md5: 'lib/md5',
         d3: 'lib/d3.min',
         sha256: 'lib/sha256',
-        socketio: 'lib/socket.io'
+        socketio: 'lib/socket.io',
+        term: 'lib/term'
     },
     shim: {
         'ember': {
-            deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256', 'socketio']
+            deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256', 'socketio', 'term']
         },
         'd3': {
             deps: ['jquery']
