@@ -4,7 +4,7 @@ import pika
 
 from time import time
 
-from celery import logging
+#from celery import logging
 
 import libcloud.security
 
@@ -24,7 +24,7 @@ except ImportError: # Standalone mist.io
 # libcloud certificate fix for OS X
 libcloud.security.CA_CERTS_PATH.append(cert_path)  
   
-log = logging.getLogger(__name__)
+#log = logging.getLogger(__name__)
 
 
 @app.task
