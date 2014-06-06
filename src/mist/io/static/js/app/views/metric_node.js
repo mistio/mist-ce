@@ -24,22 +24,35 @@ define('app/views/metric_node', ['app/views/templated'],
 
             //
             //
+            //  Initialization
+            //
+            //
+
+
+            load: function () {
+                this.indentNode();
+            }.on('didInsertElement'),
+
+
+            //
+            //
             //  Methods
             //
             //
 
-            load: function () {
-                try{
-                    var nestIndex = this.node.nestIndex;
-                    var element = $('#'+this.elementId);
-                    for (var i = 0; i < nestIndex; i++) {
-                        $('<div class="margin"></div>').insertBefore(element);
-                    }
-                } catch(e) {
 
-                }
-                //$('#'+this.elementId).parent().trigger('create');
-            }.on('didInsertElement'),
+            indentNode: function () {
+                var element = $('#'+this.elementId);
+                for (var i = 0; i < this.node.nestIndex; i++)
+                    $('<div class="margin"></div>').insertBefore(element);
+            },
+
+
+            //
+            //
+            //  Actions
+            //
+            //
 
 
             actions: {
@@ -47,8 +60,12 @@ define('app/views/metric_node', ['app/views/templated'],
                 toggleUnfold: function () {
                     this.set('unfold', !this.unfold);
                     Ember.run.next(this, function () {
+
+                        // Reposition popup
                         $('#metric-add').popup('reposition',
                             {positionTo: '#add-metric-btn'});
+
+                        // Change icons
                         var a = $('#'+this.elementId).find('a.parent-node').eq(0);
                         if (this.unfold) {
                             a.removeClass('ui-icon-carat-d');
@@ -58,6 +75,10 @@ define('app/views/metric_node', ['app/views/templated'],
                             a.addClass('ui-icon-carat-d');
                         }
                     });
+                },
+
+
+                selectMetric: function () {
 
                 },
             }

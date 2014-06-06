@@ -74,7 +74,6 @@ define('app/controllers/metric_add', ['ember'],
                 Mist.ajax.GET(url, {
                 }).success(function(metrics) {
                     that._setMetrics(metrics);
-                    that._setMetricsTree();
                 }).error(function(message) {
                     Mist.notificationController.notify(
                         'Failed to load metrics: ' + message);
@@ -103,11 +102,29 @@ define('app/controllers/metric_add', ['ember'],
             //
 
 
+            _setMetrics: function (metrics) {
+                Ember.run(this, function () {
+                    var newMetrics = [];
+                    metrics.forEach(function(metric) {
+                        newMetrics.push(metric);
+                    });
+                    this.set('metrics', newMetrics);
+                    this._setMetricsTree();
+                });
+            },
 
-            _metricListToObject: function (metrics) {
+
+            _setMetricsTree: function () {
+                var metricsObject = this._metricsToObject();
+                var metricsTree = new Node(metricsObject, 'collectd', 0, '', '');
+                this.set('metricsTree', metricsTree);
+            },
+
+
+            _metricsToObject: function () {
 
                 var ret = new Object();
-                metrics.forEach(function (metric) {
+                this.metrics.forEach(function (metric) {
                     var prevParent = ret;
                     var list = metric.alias.split('.');
                     var lastIndex = list.length - 1;
@@ -130,30 +147,6 @@ define('app/controllers/metric_add', ['ember'],
             },
 
 
-            _metricsObjectToNodeTree: function (object) {
-                var root = new Node(object, 'collectd', 0);
-                return root;
-            },
-
-
-            _setMetrics: function (metrics) {
-                Ember.run(this, function () {
-                    var newMetrics = [];
-                    metrics.forEach(function(metric) {
-                        newMetrics.push(metric);
-                    });
-                    this.set('metrics', newMetrics);
-                });
-            },
-
-
-            _setMetricsTree: function () {
-                var tree = this._metricListToObject(this.metrics);
-                tree = this._metricsObjectToNodeTree(tree);
-                this.set('metricsTree', tree);
-            },
-
-
             //
             //
             //  Observers
@@ -167,22 +160,34 @@ define('app/controllers/metric_add', ['ember'],
                 else
                     this.set('formReady', false);
             }.observes('newMetric.target', 'newMetric.newName', 'newMetric'),
+
         });
 
-        function Node (dict, text, index) {
 
-            var subTargets = new Array();
-            for (var key in dict) {
-                if (dict[key] instanceof Object) {
-                    subTargets.push(new Node(dict[key], key, index+1));
-                }
-                else {
-                    subTargets.push(new Node({}, key, index + 1));
-                }
-            }
+        function Node (dict, text, nestIndex, target, parentTarget) {
 
             this.text = text;
-            this.nestIndex = index;
+            this.nestIndex = nestIndex;
+
+            this.target = parentTarget ? parentTarget + '.' : '';
+            this.target += target;
+
+            var subTargets = new Array();
+
+            for (var key in dict) {
+
+                // if dict[key] is an object, there are more nested targets to
+                // parse. Therfore we create another Node() using dict[key].
+                // Else, we pass an empty object to signify an ending node.
+
+                var childObject = dict[key] instanceof Object ? dict[key] : {};
+
+                subTargets.push(
+                    new Node(childObject, key, nestIndex + 1, key, this.target)
+                );
+            }
+
             this.subTargets = subTargets;
+            this.isEndNode = !subTargets.length;
         };
 });
