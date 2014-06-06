@@ -116,7 +116,8 @@ define('app/controllers/metric_add', ['ember'],
 
             _setMetricsTree: function () {
                 var metricsObject = this._metricsToObject();
-                var metricsTree = new Node(metricsObject, 'collectd', 0, '', '');
+                var metricsTree = new Node(
+                    metricsObject, 'collectd', 0, '', '');
                 this.set('metricsTree', metricsTree);
             },
 
@@ -168,9 +169,8 @@ define('app/controllers/metric_add', ['ember'],
 
             this.text = text;
             this.nestIndex = nestIndex;
-
-            this.target = parentTarget ? parentTarget + '.' : '';
-            this.target += target;
+            this.isRootNode = !nestIndex;
+            this.target = this.isRootNode ? '' : parentTarget + '.' + target;
 
             var subTargets = new Array();
 

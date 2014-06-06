@@ -31,6 +31,7 @@ define('app/views/metric_node', ['app/views/templated'],
 
             load: function () {
                 this.indentNode();
+                this.set('unfold',this.node.isRootNode );
             }.on('didInsertElement'),
 
 
@@ -43,7 +44,7 @@ define('app/views/metric_node', ['app/views/templated'],
 
             indentNode: function () {
                 var element = $('#'+this.elementId);
-                for (var i = 0; i < this.node.nestIndex; i++)
+                for (var i = 1; i < this.node.nestIndex; i++)
                     $('<div class="margin"></div>').insertBefore(element);
             },
 

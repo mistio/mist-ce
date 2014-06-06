@@ -2,18 +2,19 @@
 
     <a class="end-node
         ui-btn
-        ui-btn-b
         ui-corner-all"
         {{action "selectMetric" target="view"}}>{{view.node.text}}</a>
 
 {{else}}
 
-    <a class="parent-node
-        ui-btn
-        ui-corner-all
-        ui-btn-icon-left
-        ui-icon-carat-d"
-        {{action "toggleUnfold" target="view"}}>{{view.node.text}}</a>
+    {{#unless view.node.isRootNode}}
+        <a class="parent-node
+            ui-btn
+            ui-corner-all
+            ui-btn-icon-left
+            ui-icon-carat-d"
+            {{action "toggleUnfold" target="view"}}>{{view.node.text}}</a>
+    {{/unless}}
 
     {{#if view.unfold}}
         {{#each view.node.subTargets}}
