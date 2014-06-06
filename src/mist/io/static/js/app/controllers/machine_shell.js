@@ -27,11 +27,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 this.set('machine', machine);
                 $('#machine-shell-popup').on('popupafteropen',
                     function(){
-                        var ua = navigator.userAgent.toLowerCase();
-                        var isAndroid = ua.indexOf("android") > -1;
-                        if (!isAndroid){ // Chrome for Android doesn't like input focus 
-                            $('#shell-input input').focus();
-                        }                        
+                                               
                     }
                 ).popup( "option", "dismissible", false ).popup('open');
                 
@@ -40,18 +36,13 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                         return true;
                 });
                 $(window).trigger('resize');
-                Ember.run.next(function(){
-                    $('#shell-input input').focus();
-                });
-                warn('opened');
+                
                 var term = new Terminal({
                   cols: 80,
-                  rows: 24,
+                  rows: Math.floor($('#shell-return').height() / $('#shell-return').css('line-height').replace('px','')),
                   screenKeys: true
                 });
                 term.on('data', function(data) {
-                    warn(data);
-                    //term.write(data);
                     Mist.socket.emit('shell_data', data);
                 });
                 term.open(document.getElementById('shell-return'));
@@ -64,11 +55,13 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 Mist.socket.on('shell_data', function(data){
                     term.write(data);
                 });
+                Mist.set('term', term);
                                                 
             },
 
 
             close: function () {
+                Mist.socket.emit('shell_close');
                 $('#machine-shell-popup').popup('close');
                 $(window).off('resize');
                 this._clear();

@@ -29,7 +29,6 @@ from mist.io.shell import Shell
 
 class MistNamespace(BaseNamespace):
     def initialize(self):
-        print "INIT"
         self.user = user_from_request(self.request)
         self.probes = {}
         self.monitoring_greenlet = self.spawn(check_monitoring_from_socket, self)
@@ -61,15 +60,10 @@ class MistNamespace(BaseNamespace):
         print "opened shell! %s" % data
         self.shell = Shell(data['host'])
         key_id, ssh_user = self.shell.autoconfigure(self.user, data['backend_id'], data['machine_id'])
-        #self.channel = self.shell.ssh.get_transport().open_session()
-        #self.channel.settimeout(10800)
-        #stdout = self.channel.makefile()
-        #stderr = self.channel.makefile_stderr()  
-        #self.channel.get_pty()
         self.channel = self.shell.ssh.invoke_shell('xterm')
         self.spawn(get_ssh_data, self)
     
-    def on_shell_close(self, data):
+    def on_shell_close(self):
         self.shell.disconnect()
     
     def on_shell_data(self, data):
