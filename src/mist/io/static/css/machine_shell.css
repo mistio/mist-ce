@@ -57,10 +57,10 @@
 }
 #machine-shell-popup #shell-return {
     background: #444 !important;
-    width: 100%;
+    width: 99%;
     border: 1px solid #AAA;
     font-family: monospace;
-    font-size: 100%;
+    font-size: 150%;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -76,6 +76,10 @@
 
 #shell-return .terminal {
     background-color: transparent !important;
+}
+
+span.terminal-cursor {
+    background-color: rgb(240, 240, 240);
 }
 
 #machine-shell-popup #shell-response {

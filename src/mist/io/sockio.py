@@ -64,7 +64,8 @@ class MistNamespace(BaseNamespace):
         self.spawn(get_ssh_data, self)
     
     def on_shell_close(self):
-        self.shell.disconnect()
+        print "closing shell"
+        self.channel.disconnect()
     
     def on_shell_data(self, data):
         self.channel.send(data)

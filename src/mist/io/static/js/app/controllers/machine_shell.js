@@ -27,7 +27,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 this.set('machine', machine);
                 $('#machine-shell-popup').on('popupafteropen',
                     function(){
-                                               
+                                      
                     }
                 ).popup( "option", "dismissible", false ).popup('open');
                 
@@ -52,11 +52,17 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                                             };
                 warn(payload);
                 Mist.socket.emit('shell_open', payload);
+                var firstData = true;
                 Mist.socket.on('shell_data', function(data){
                     term.write(data);
+                    if (firstData){
+                        $('.terminal').focus();
+                        term.focus();
+                    }
                 });
+                term.focus();
+                term.write('Connecting to ' + machine.public_ips[0] + '...\r\n');
                 Mist.set('term', term);
-                                                
             },
 
 
