@@ -46,10 +46,19 @@ define('app/views/metric_node', ['app/views/templated'],
 
                 toggleUnfold: function () {
                     this.set('unfold', !this.unfold);
-                    Ember.run.next(function () {
+                    Ember.run.next(this, function () {
                         $('#metric-add').popup('reposition',
                             {positionTo: '#add-metric-btn'});
+                        var a = $('#'+this.elementId).find('a.parent-node').eq(0);
+                        if (this.unfold) {
+                            a.removeClass('ui-icon-carat-d');
+                            a.addClass('ui-icon-carat-u');
+                        } else {
+                            a.removeClass('ui-icon-carat-u');
+                            a.addClass('ui-icon-carat-d');
+                        }
                     });
+
                 },
             }
         });

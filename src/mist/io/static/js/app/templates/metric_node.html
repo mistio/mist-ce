@@ -1,6 +1,6 @@
 {{#if view.node.subTargets.length}}
 
-    <a class="ui-btn parent-node ui-corner-all" {{action "toggleUnfold" target="view"}}> {{view.node.text}} </a>
+    <a class="ui-btn parent-node ui-corner-all ui-btn-icon-left ui-icon-carat-d" {{action "toggleUnfold" target="view"}}> {{view.node.text}} </a>
 
     {{#if view.unfold}}
         {{#each view.node.subTargets}}

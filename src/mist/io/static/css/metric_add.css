@@ -23,7 +23,10 @@
     float: left;
 }
 
+#metric-add {
+}
+
 #metric-add-popup {
-    max-height: 30% !important;
+    max-height: 350px !important;
     overflow: scroll;
 }
