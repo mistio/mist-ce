@@ -17,6 +17,12 @@ define('app/views/metric_add', ['app/views/popup'],
             //
             //
 
+            open: function () {
+                this._super();
+                Ember.run.later(this, function () {
+                    $(this.popupId).popup('reposition', {positionTo: '#add-metric-btn'});
+                }, 200);
+            },
 
             clear: function () {
             },
