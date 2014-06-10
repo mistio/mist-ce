@@ -100,27 +100,24 @@ define('app/models/graph', ['ember'],
 
             insertDummyData: function (metric) {
 
-                if (!metric.datapoints || !metric.datapoints.length)
-                    metric.datapoints = [{
-                        time: new Date(),
-                        value: null,
-                    }];
+                // If metric doesn't have any datapoints, add one
+                if (!metric.datapoints.length)
+                    metric.datapoints =
+                        [new Datapoint(prevTimestamp - step)];
 
                 var datapoints = metric.datapoints;
-
                 var step = Mist.monitoringController.request.step;
-                var prevTimestamp = datapoints[0].time;
-                var counter = 0;
-                while (datapoints.length < MAX_BUFFER_DATA) {
-                    var newDatapoint = {
-                        time: new Date(prevTimestamp - step),
-                        value: null,
-                    };
-                    datapoints.unshift(newDatapoint);
-                    prevTimestamp = datapoints[0].time;
-                    counter++;
-                }
-            }
+
+                while (datapoints.length < MAX_BUFFER_DATA)
+                    datapoints.unshift(
+                        new Datapoint(datapoints[0].time - step));
+            },
         });
+
+
+        function Datapoint(timestamp, value) {
+           this.time = new Date(timestamp || null);
+           this.value = value || null;
+        };
     }
 );
