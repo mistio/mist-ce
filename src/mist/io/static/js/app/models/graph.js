@@ -60,6 +60,7 @@ define('app/models/graph', ['ember'],
             addMetric: function (metric) {
                 Ember.run(this, function () {
                     this.metrics.pushObject(metric);
+                    this.insertDummyData(metric);
                     this.trigger('onMetricAdd');
                     this.trigger('onDataUpdate', metric.datapoints);
                 });
@@ -94,6 +95,31 @@ define('app/models/graph', ['ember'],
                     }
                     this.trigger('onDataUpdate', this.metrics[0].datapoints);
                 });
+            },
+
+
+            insertDummyData: function (metric) {
+
+                if (!metric.datapoints || !metric.datapoints.length)
+                    metric.datapoints = [{
+                        time: new Date(),
+                        value: null,
+                    }];
+
+                var datapoints = metric.datapoints;
+
+                var step = Mist.monitoringController.request.step;
+                var prevTimestamp = datapoints[0].time;
+                var counter = 0;
+                while (datapoints.length < MAX_BUFFER_DATA) {
+                    var newDatapoint = {
+                        time: new Date(prevTimestamp - step),
+                        value: null,
+                    };
+                    datapoints.unshift(newDatapoint);
+                    prevTimestamp = datapoints[0].time;
+                    counter++;
+                }
             }
         });
     }
