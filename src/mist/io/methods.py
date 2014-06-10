@@ -654,7 +654,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
     conn = connect_provider(user.backends[backend_id])
-
     if conn.type is Provider.DOCKER:
         node = _create_machine_docker(conn, machine_name, image_id, script)
         return {'id': node.id,
@@ -1376,11 +1375,15 @@ def list_images(user, backend_id, term=None):
                     #eg ResourceNotFoundError
                     pass
             rest_images = [image for image in rest_images if not image.extra['deprecated']]
+        elif conn.type == Provider.DOCKER:
+            #get mist.io default docker images from config
+            rest_images = [NodeImage(id=image, name=name, driver=conn, extra={}) 
+                              for image, name in config.DOCKER_IMAGES.items()]
+            rest_images += conn.list_images()
         else:
             rest_images = conn.list_images()
             starred_images = [image for image in rest_images
                               if image.id in starred]
-
         if term and conn.type in config.EC2_PROVIDERS:
             ec2_images += conn.list_images(ex_owner="aws-marketplace")
 
@@ -1417,6 +1420,11 @@ def _image_starred(user, backend_id, image_id):
         if backend.provider in config.EC2_IMAGES:
             if image_id in config.EC2_IMAGES[backend.provider]:
                 default = True
+    elif backend.provider == 'docker':
+        # do not consider docker backend's images as default
+        default = False
+        if image_id in config.DOCKER_IMAGES:
+            default = True
     else:
         # consider all images default for backends with few images
         default = True
