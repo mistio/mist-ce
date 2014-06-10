@@ -770,6 +770,14 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                         $("#" + metric + "-btn").hide();
 
                         // Show Graph
+                        var parent = $("#" + metric).parent();
+                        var prev = parent.prev();
+                        var next = parent.next();
+
+                        moveToEnd(prev);
+                        moveToEnd(parent);
+                        moveToEnd(next);
+
                         $("#" + metric).show(hideDuration, function(){
 
                             // Save cookies
@@ -778,6 +786,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                             cookies.save();
                         });
                     });
+
+                    function moveToEnd(element) {
+                        element.detach().appendTo('#graphs');
+                    };
                 },
 
 
