@@ -76,12 +76,29 @@ define('app/views/metric_node', ['app/views/templated'],
             },
 
 
+            preCenterNode: function () {
+                this.set('prevOffsetTop', this.element.offset().top);
+                this.set('prevWinScrollTop', $(window).scrollTop());
+            },
+
+
             centerNode: function () {
 
+                var afterOffsetTop = this.element.offset().top;
+                var afterWinScrollTop = $(window).scrollTop();
+
+                var prevTop = this.prevOffsetTop - this.prevWinScrollTop;
+                var afterTop = afterOffsetTop - afterWinScrollTop;
+                if (afterOffsetTop < afterWinScrollTop) {
+                    var scrollTo = prevTop - afterTop;
+                    Mist.smoothScroll($(window).scrollTop() - scrollTo);
+                }
             },
 
 
             unfoldChildren: function () {
+
+                this.preCenterNode();
 
                 this.set('unfold', true);
 
@@ -96,8 +113,12 @@ define('app/views/metric_node', ['app/views/templated'],
                 }
 
                 this.foldSiblings();
-                this.element.find('.nest').eq(0).slideDown();
-                this.centerNode();
+                var that = this;
+                Ember.run.next(function () {
+                    that.element.find('.nest').eq(0).slideDown(400, function () {
+                        that.centerNode();
+                    });
+                });
             },
 
 

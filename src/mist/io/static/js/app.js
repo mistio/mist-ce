@@ -465,6 +465,44 @@ define( 'app', [
             sel.addRange(range);
         };
 
+        App.smoothScroll = function (scrollTo, timeout) {
+
+            timeout = timeout || 100;
+
+            var startingTop = $(window).scrollTop();
+
+            var distance = Math.abs(startingTop - scrollTo);
+
+            var scrollTimes;
+            if (distance < 10)
+                scrollTimes = 1;
+            else if (distance < 100)
+                scrollTimes = 10;
+            else
+                scrollTimes = 100;
+
+            var scrollCounter = scrollTimes;
+            var scrollInterval = timeout / scrollTimes;
+
+            var scrollChunks = distance / scrollTimes;
+            var sign = startingTop < scrollTo ? +1 : -1;
+
+            function partialScroll () {
+                if (Math.abs($(window).scrollTop() - scrollTo) < 10 ||
+                    scrollCounter == 0) {
+                    window.scrollTo(0, scrollTo);
+                } else {
+                    scrollCounter--;
+                    window.scrollTo(0, $(window).scrollTop() + (sign * scrollChunks));
+                    setTimeout(function () {
+                        partialScroll();
+                    }, scrollInterval);
+                }
+            };
+
+            partialScroll();
+        };
+
         App.switchElementVisibility = function(elementSelector) {
             var element = $('#' + elementSelector);
             if (element.css('display') == 'none')
