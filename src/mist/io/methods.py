@@ -46,7 +46,7 @@ GCE_IMAGES = ['debian-cloud', 'centos-cloud', 'suse-cloud', 'rhel-cloud']
 @core_wrapper
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 machine_hostname="", region="", machine_key="", machine_user="",
-                compute_endpoint="", port=22, remove_on_error=True):
+                compute_endpoint="", port=22, docker_port=4243, remove_on_error=True):
     """Adds a new backend to the user and returns the new backend_id."""
 
     if not provider:
@@ -108,7 +108,8 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if not provider.__class__ is int and ':' in provider:
             provider, region = provider.split(':')[0], provider.split(':')[1]
 
-        if remove_on_error:
+        if remove_on_error and provider != 'docker':
+            #docker url is the only piece needed in docker
             if not apikey:
                 raise RequiredParameterMissingError("apikey")
             if not apisecret:
@@ -122,6 +123,8 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         backend.apiurl = apiurl
         backend.tenant_name = tenant_name
         backend.region = region
+        if provider == 'docker':
+            backend.docker_port = docker_port
 
         #OpenStack specific: compute_endpoint is passed only when there is a
         # custom endpoint for the compute/nova-compute service
@@ -494,6 +497,8 @@ def connect_provider(backend):
         conn = driver(backend.apisecret)
     elif backend.provider == Provider.GCE:
         conn = driver(backend.apikey, backend.apisecret, project=backend.tenant_name)
+    elif backend.provider == Provider.DOCKER:
+        conn = driver(backend.apikey, backend.apisecret, backend.apiurl, backend.docker_port)
     elif backend.provider in [Provider.RACKSPACE_FIRST_GEN,
                               Provider.RACKSPACE]:
         conn = driver(backend.apikey, backend.apisecret,
@@ -532,7 +537,7 @@ def get_machine_actions(machine_from_api, conn):
 
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                     Provider.DIGITAL_OCEAN):
+                     Provider.DIGITAL_OCEAN, Provider.DOCKER):
         can_tag = False
 
     # for other states
@@ -650,6 +655,15 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         raise BackendNotFoundError(backend_id)
     conn = connect_provider(user.backends[backend_id])
 
+    if conn.type is Provider.DOCKER:
+        node = _create_machine_docker(conn, machine_name, image_id, script)
+        return {'id': node.id,
+                'name': node.name,
+                'extra': node.extra,
+                'public_ips': node.public_ips,
+                'private_ips': node.private_ips,
+                }
+                    
     if key_id and key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
 
@@ -665,10 +679,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     keypair = user.keypairs[key_id]
     private_key = keypair.private
     public_key = keypair.public
-
-    #print "Key id: " + key_id
-    #print "Public: " + public_key
-    #print "Private: " + private_key
 
     size = NodeSize(size_id, name=size_name, ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
@@ -1047,6 +1057,19 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
                 raise MachineCreationError("Softlayer, got exception %s" % e)
         return node
 
+def _create_machine_docker(conn, machine_name, image, script):
+    """Create a machine in docker.
+
+    """
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            image=image,
+            command=script
+        )
+    except Exception as e:
+        raise MachineCreationError("Docker, got exception %s" % e)
+    return node
 
 def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                                  script, machine_name, image, size, location):
@@ -1366,6 +1389,9 @@ def list_images(user, backend_id, term=None):
                   if img.name and img.id[:3] not in ['aki', 'ari']
                   and 'windows' not in img.name.lower()
                   and 'hvm' not in img.name.lower()]
+
+        if term and conn.type == 'docker':
+            images = conn.search_images(term=term)
 
         if term:
             images = [img for img in images
