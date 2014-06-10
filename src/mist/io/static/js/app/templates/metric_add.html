@@ -8,8 +8,10 @@
          data-enhanced="true"
          data-transition="flip"
          data-position-to="#add-metric-btn">
-            {{#if Mist.metricAddController.metricsTree}}
+            {{#if Mist.metricAddController.metrics.length}}
                 {{view Mist.metricNodeView nodeBinding="Mist.metricAddController.metricsTree"}}
+            {{else}}
+                <div class="ajax-loader"></div>
             {{/if}}
     </div>
 </div>
