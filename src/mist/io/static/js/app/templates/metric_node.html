@@ -16,10 +16,10 @@
             {{action "toggleUnfold" target="view"}}>{{view.node.text}}</a>
     {{/unless}}
 
-    {{#if view.unfold}}
+    <div class="nest">
         {{#each view.node.subTargets}}
             {{view Mist.metricNodeView nodeBinding="this"}}
         {{/each}}
-    {{/if}}
+    </div>
 
 {{/if}}

@@ -26,5 +26,9 @@
 #metric-add {
 }
 
+#metric-add .nest {
+    display: none;
+}
+
 #metric-add-popup {
 }

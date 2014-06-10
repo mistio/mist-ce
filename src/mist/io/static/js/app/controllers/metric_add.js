@@ -170,7 +170,7 @@ define('app/controllers/metric_add', ['ember'],
             this.text = text;
             this.nestIndex = nestIndex;
             this.isRootNode = !nestIndex;
-            this.target = this.isRootNode ? '' : parentTarget + '.' + target;
+            this.target = (parentTarget ? parentTarget + '.' : '') + target;
 
             var subTargets = new Array();
 
