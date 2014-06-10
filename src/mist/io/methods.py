@@ -655,7 +655,10 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         raise BackendNotFoundError(backend_id)
     conn = connect_provider(user.backends[backend_id])
     if conn.type is Provider.DOCKER:
-        node = _create_machine_docker(conn, machine_name, image_id, script)
+        #FIXME DOCKER: environment
+        node = _create_machine_docker(conn, machine_name, image_id, script, environment=None)
+        #FIXME DOCKER: associate key/port with container    
+        #associate_key(user, key_id, backend_id, node.id, port)        
         return {'id': node.id,
                 'name': node.name,
                 'extra': node.extra,
@@ -1064,7 +1067,9 @@ def _create_machine_docker(conn, machine_name, image, script):
         node = conn.create_node(
             name=machine_name,
             image=image,
-            command=script
+            command=script,
+            environment=None
+            #FIXME DOCKER: environment            
         )
     except Exception as e:
         raise MachineCreationError("Docker, got exception %s" % e)
