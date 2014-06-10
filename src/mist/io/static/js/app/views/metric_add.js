@@ -19,8 +19,8 @@ define('app/views/metric_add', ['app/views/popup'],
 
 
             clear: function () {
-                $('#metric-add-metric').collapsible('option', 'collapsedIcon', 'arrow-d')
-                             .collapsible('collapse');
+                //$('#metric-add-metric').collapsible('option', 'collapsedIcon', 'arrow-d')
+                //             .collapsible('collapse');
             },
 
 

@@ -38,7 +38,7 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
                 var that = this;
                 this.set('addingMetric', true);
                 Mist.ajax.POST('/metrics', {
-                    'name': metric.newName,
+                    'name': metric.name,
                     'target': metric.target,
                     'machine_id': machine_id,
                     'backend_id': backend_id,
@@ -107,10 +107,10 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
             },
 
 
-            getMetricByTarget: function (target) {
-                var result = this.builtInMetrics.findBy('target', target);
+            getMetricByAlias: function (alias) {
+                var result = this.builtInMetrics.findBy('alias', alias);
                 if (!result)
-                    result = this.customMetrics.findBy('target', target);
+                    result = this.customMetrics.findBy('alias', alias);
                 return result;
             },
 

@@ -41,7 +41,7 @@ define('app/views/metric_node', ['app/views/templated'],
 
                 if (this.node.isEndNode)
                     this.set('metric',
-                        Mist.metricsController.getMetricByTarget(
+                        Mist.metricAddController.getMetricByAlias(
                             this.node.target));
 
             }.on('didInsertElement'),
@@ -62,9 +62,22 @@ define('app/views/metric_node', ['app/views/templated'],
             },
 
 
+            foldChildren: function () {
+                this.set('unfold', false);
+                this.element.find('.nest').eq(0).slideUp();
+            },
+
+
+            foldSiblings: function () {
+                var siblings = this.element.siblings().filter('.ember-view');
+                siblings.toArray().forEach(function (sibling) {
+                    Ember.View.views[sibling.id].foldChildren();
+                });
+            },
+
+
             unfoldChildren: function () {
 
-                this.foldSiblings();
                 this.set('unfold', true);
 
                 // Change icons
@@ -78,18 +91,13 @@ define('app/views/metric_node', ['app/views/templated'],
                 }
 
                 // Show children
-                this.element.find('.nest').eq(0).slideDown();
-            },
+                var that = this;
+                this.element.find('.nest').eq(0).slideDown(400, function () {
+                    Ember.run.next(function () {
+                        that.foldSiblings();
+                    });
+                });
 
-
-            foldChildren: function () {
-                this.set('unfold', false);
-                $('#'+this.elementId).find('.nest').eq(0).slideUp();
-            },
-
-
-            foldSiblings: function () {
-                //$('#'+this.elementId).find('.nest').eq(0).slideUp();
             },
 
 
@@ -111,7 +119,10 @@ define('app/views/metric_node', ['app/views/templated'],
 
 
                 selectMetric: function () {
-                    alert(this.metric.name);
+                    var that = this;
+                    Mist.metricAddController.set('newMetric', this.metric);
+                    Mist.metricAddController.add(function (success) {
+                    });
                 },
             }
         });

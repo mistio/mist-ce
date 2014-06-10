@@ -95,6 +95,11 @@ define('app/controllers/metric_add', ['ember'],
             },
 
 
+            getMetricByAlias: function (alias) {
+                return this.metrics.findBy('alias', alias);
+            },
+
+
             //
             //
             //  Pseudo-Private Methods
