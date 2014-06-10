@@ -24,6 +24,8 @@ define('app/controllers/metric_add', ['ember'],
             callback: null,
             formReady: null,
             newMetric: null,
+            metricsTree: [],
+
 
 
             //
@@ -86,6 +88,7 @@ define('app/controllers/metric_add', ['ember'],
             clear: function () {
                 this.view.clear();
                 this.set('metrics', [])
+                    .set('metricsTree', [])
                     .set('machine', null)
                     .set('callback', null)
                     .set('newMetric', {

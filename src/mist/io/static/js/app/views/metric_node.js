@@ -76,6 +76,11 @@ define('app/views/metric_node', ['app/views/templated'],
             },
 
 
+            centerNode: function () {
+
+            },
+
+
             unfoldChildren: function () {
 
                 this.set('unfold', true);
@@ -90,14 +95,9 @@ define('app/views/metric_node', ['app/views/templated'],
                     a.addClass('ui-icon-carat-d');
                 }
 
-                // Show children
-                var that = this;
-                this.element.find('.nest').eq(0).slideDown(400, function () {
-                    Ember.run.next(function () {
-                        that.foldSiblings();
-                    });
-                });
-
+                this.foldSiblings();
+                this.element.find('.nest').eq(0).slideDown();
+                this.centerNode();
             },
 
 
@@ -121,8 +121,7 @@ define('app/views/metric_node', ['app/views/templated'],
                 selectMetric: function () {
                     var that = this;
                     Mist.metricAddController.set('newMetric', this.metric);
-                    Mist.metricAddController.add(function (success) {
-                    });
+                    Mist.metricAddController.add();
                 },
             }
         });
