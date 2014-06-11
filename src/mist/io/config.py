@@ -346,6 +346,7 @@ EC2_IMAGES[Provider.EC2_US_EAST] = EC2_IMAGES['us-east-1']
 # 'ap-southeast-1', 'ap-northeast-1', 'ap-southeast-2','sa-east-1']
 
 DOCKER_IMAGES = {
-    'mist/ubuntu14.04': 'Ubuntu 14.04',
-    'mist/ubuntu13.04': 'Ubuntu 13.04'
+    'mist/ubuntu-14.04': 'Ubuntu 14.04',
+    'mist/debian-wheezy': 'Debian Wheezy',
+    'mist/opensuse-13.1': 'OpenSUSE 13.1',
 }
