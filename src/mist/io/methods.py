@@ -654,18 +654,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
     conn = connect_provider(user.backends[backend_id])
-    if conn.type is Provider.DOCKER:
-        #FIXME DOCKER: environment
-        node = _create_machine_docker(conn, machine_name, image_id, script, environment=None)
-        #FIXME DOCKER: associate key/port with container    
-        #associate_key(user, key_id, backend_id, node.id, port)        
-        return {'id': node.id,
-                'name': node.name,
-                'extra': node.extra,
-                'public_ips': node.public_ips,
-                'private_ips': node.private_ips,
-                }
-                    
+
     if key_id and key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
 
@@ -681,6 +670,18 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     keypair = user.keypairs[key_id]
     private_key = keypair.private
     public_key = keypair.public
+
+    if conn.type is Provider.DOCKER:
+        #FIXME DOCKER: environment
+        node = _create_machine_docker(conn, machine_name, image_id, script, public_key=public_key)
+        #FIXME DOCKER: associate key/port with container
+        #associate_key(user, key_id, backend_id, node.id, port)
+        return {'id': node.id,
+                'name': node.name,
+                'extra': node.extra,
+                'public_ips': node.public_ips,
+                'private_ips': node.private_ips,
+                }
 
     size = NodeSize(size_id, name=size_name, ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
@@ -1059,17 +1060,17 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
                 raise MachineCreationError("Softlayer, got exception %s" % e)
         return node
 
-def _create_machine_docker(conn, machine_name, image, script):
+def _create_machine_docker(conn, machine_name, image, script, public_key=None):
     """Create a machine in docker.
 
     """
     try:
+        environment = ['PUBLIC_KEY=%s' % public_key.strip()]
         node = conn.create_node(
             name=machine_name,
             image=image,
             command=script,
-            environment=None
-            #FIXME DOCKER: environment            
+            environment=environment,
         )
     except Exception as e:
         raise MachineCreationError("Docker, got exception %s" % e)
