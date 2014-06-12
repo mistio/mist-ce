@@ -1250,7 +1250,11 @@ def _machine_action(user, backend_id, machine_id, action):
             else:
                 machine.reboot()
         elif action is 'destroy':
-            machine.destroy()
+            if conn.type is Provider.DOCKER and node.state == 0:
+                conn.ex_stop_node(node)
+                machine.destroy()
+            else:
+                machine.destroy()
     except AttributeError:
         raise BadRequestError("Action %s not supported for this machine"
                               % action)
