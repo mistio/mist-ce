@@ -138,12 +138,12 @@
                     type:
                     <select name="plugin_type">
                         <option value="gauge">gauge</option>
-                        <option value="derivative">derivative</option>
+                        <option value="derive">derive</option>
                     </select>
                     <br />
                     target: <input type="text" name="target"><br />
                     script: <textarea name="read_function">
-def counter = -1
+counter = -1
 
 def read():
     global counter
