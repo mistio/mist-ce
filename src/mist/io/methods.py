@@ -365,7 +365,13 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
     if not host:
         if not associated:
             with user.lock_n_load():
-                user.keypairs[key_id].machines.append(machine_uid)
+                assoc = [backend_id,
+                         machine_id,
+                         0,
+                         username,
+                         False,
+                         port]
+                user.keypairs[key_id].machines.append(assoc)
                 user.save()
         return
 
@@ -672,16 +678,20 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     public_key = keypair.public
 
     if conn.type is Provider.DOCKER:
-        #FIXME DOCKER: environment
         node = _create_machine_docker(conn, machine_name, image_id, script, public_key=public_key)
-        #FIXME DOCKER: associate key/port with container
-        #associate_key(user, key_id, backend_id, node.id, port)
-        return {'id': node.id,
-                'name': node.name,
-                'extra': node.extra,
-                'public_ips': node.public_ips,
-                'private_ips': node.private_ips,
-                }
+
+        if key_id:
+            node_info = conn.inspect_node(node)
+            port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
+            associate_key(user, key_id, backend_id, node.id, port=int(port))
+
+        return {
+            'id': node.id,
+            'name': node.name,
+            'extra': node.extra,
+            'public_ips': node.public_ips,
+            'private_ips': node.private_ips,
+        }
 
     size = NodeSize(size_id, name=size_name, ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
