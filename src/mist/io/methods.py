@@ -682,7 +682,10 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
 
         if key_id:
             node_info = conn.inspect_node(node)
-            port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
+            try:
+                port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
+            except KeyError:
+                port = 22
             associate_key(user, key_id, backend_id, node.id, port=int(port))
 
         return {
