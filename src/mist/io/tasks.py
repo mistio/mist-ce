@@ -43,7 +43,9 @@ def run_deploy_script(self, email, backend_id, machine_id, command,
                 break
     
         if node and len(node.public_ips):
-            host = node.public_ips[0]
+            # filter out IPv6 addresses
+            ips = filter(lambda ip: ':' not in ip, node.public_ips)
+            host = ips[0]
         else:
             raise self.retry(exc=Exception(), countdown=60, max_retries=5)
     
