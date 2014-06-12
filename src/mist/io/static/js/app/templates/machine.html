@@ -142,7 +142,15 @@
                     </select>
                     <br />
                     target: <input type="text" name="target"><br />
-                    script: <input type="text" name="read_function"><br />
+                    script: <textarea name="read_function">
+def counter = -1
+
+def read():
+    global counter
+    counter += 1
+    return counter
+
+                    </textarea><br />
                     name: <input type="text" name="name"><br />
                     unit: <input type="text" name="unit"><br />
                     <input type="submit" text="Deploy plugin" {{action "deploy_plugin" target="view"}}>
