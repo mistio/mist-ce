@@ -769,11 +769,14 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                         // Hide button
                         $("#" + metric + "-btn").hide();
 
-                        // Show Graph
+                        // Get graph
                         var parent = $("#" + metric).parent();
+
+                        // Get script tags
                         var prev = parent.prev();
                         var next = parent.next();
 
+                        // Move to end
                         moveToEnd(prev);
                         moveToEnd(parent);
                         moveToEnd(next);
