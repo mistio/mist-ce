@@ -134,6 +134,22 @@
                     </div>
                 </div>
 
+                <div>
+                    <form {{bind-attr action="view.deploy_plugin_url"}}>
+                        type:
+                        <select name="plugin_type">
+                            <option value="gauge">gauge</option>
+                            <option value="derivative">derivative</option>
+                        </select>
+                        <br />
+                        target: <input type="text" name="target"><br />
+                        script: <input type="text" name="read_function"><br />
+                        name: <input type="text" name="name"><br />
+                        unit: <input type="text" name="unit"><br />
+
+                    </form>
+                </div>
+
             {{/unless}}
 
             {{else}}

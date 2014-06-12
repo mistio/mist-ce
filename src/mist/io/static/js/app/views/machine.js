@@ -28,6 +28,9 @@ define('app/views/machine', ['app/views/mistscreen'],
             //  Initialization
             //
             //
+            deploy_plugin_url: function() {
+                return "/backends/" + this.machine.backend.id + "/machines/" + this.machine.id + "/deploy_plugin";
+            }.property('machine'),
 
 
             load: function() {
