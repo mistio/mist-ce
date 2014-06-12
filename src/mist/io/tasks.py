@@ -51,7 +51,7 @@ def run_deploy_script(self, email, backend_id, machine_id, command,
     
         try:
             from mist.io.shell import Shell
-            shell = Shell('google.com')
+            shell = Shell(host)
             key_id, ssh_user = shell.autoconfigure(user, backend_id, node.id,
                                                    key_id, username, password, port)
             import time
