@@ -413,6 +413,13 @@ define( 'app', [
         });
 
         App.Checkbox = Ember.Checkbox;
+        App.TextArea = Ember.TextArea.extend({
+            autocapitalize: 'off',
+            attributeBindings: [
+                'data-theme',
+                'autocapitalize'
+            ]            
+        });
         App.TextField = Ember.TextField.extend({
             autocapitalize: 'off',
             attributeBindings: [
