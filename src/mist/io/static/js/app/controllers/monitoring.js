@@ -499,8 +499,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                 data.forEach(function(metric) {
 
                                     // Hash the target to get rid of funky characters
-                                    var id = md5(metric.target);
+                                    var id = md5(metric.metric_id);
                                     metric.id = id;
+                                    metric.alias = metric.metric_id;
+                                    metric.target = metric._target;
 
                                     receivedData[id] = [];
 

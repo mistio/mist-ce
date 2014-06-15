@@ -34,6 +34,10 @@ define('app/models/metric', ['ember'],
 
             init: function () {
                 this._super();
+                info(this.metric_id);
+                this.set('id', this.metric_id);
+                this.set('alias', this.id);
+                this.set('target', this._target);
                 this.set('maxValue', this.max_value || 99999999);
             }
         });
