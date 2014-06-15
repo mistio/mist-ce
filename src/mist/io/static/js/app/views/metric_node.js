@@ -64,6 +64,12 @@ define('app/views/metric_node', ['app/views/templated'],
 
             foldChildren: function () {
                 this.set('unfold', false);
+
+                // Change icons
+                var a = this.element.find('> a.parent-node').eq(0);
+                a.removeClass('ui-icon-minus');
+                a.addClass('ui-icon-carat-d');
+
                 this.element.find('.nest').eq(0).slideUp();
             },
 
@@ -103,14 +109,9 @@ define('app/views/metric_node', ['app/views/templated'],
                 this.set('unfold', true);
 
                 // Change icons
-                var a = this.element.find('a.parent-node').eq(0);
-                if (this.unfold) {
-                    a.removeClass('ui-icon-carat-d');
-                    a.addClass('ui-icon-carat-u');
-                } else {
-                    a.removeClass('ui-icon-carat-u');
-                    a.addClass('ui-icon-carat-d');
-                }
+                var a = this.element.find('> a.parent-node').eq(0);
+                a.removeClass('ui-icon-carat-d');
+                a.addClass('ui-icon-minus');
 
                 this.foldSiblings();
                 var that = this;

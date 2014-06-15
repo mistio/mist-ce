@@ -8,6 +8,9 @@
          data-enhanced="true"
          data-transition="flip"
          data-position-to="#add-metric-btn">
+            <div class="ui-header ui-bar-b">
+                <h1 class="ui-title">Select Metric</h1>
+            </div>
             {{#if Mist.metricAddController.metrics.length}}
                 {{view Mist.metricNodeView nodeBinding="Mist.metricAddController.metricsTree"}}
             {{else}}
