@@ -38,7 +38,7 @@ define('app/views/graph_button', ['app/views/templated'],
                 Ember.run.next(this, function () {
 
                     var cookies = Mist.monitoringController.cookies;
-                    if (cookies.collapsedGraphs.indexOf(this.graph.metrics[0].id) > -1)
+                    if (cookies.collapsedGraphs.indexOf(this.graph.metrics[0].hashedId) > -1)
                         $('#' + this.buttonId).show();
                     else
                         $('#' + this.buttonId).hide();

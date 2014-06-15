@@ -789,6 +789,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                             cookies.collapsedGraphs.removeObject(metric.replace('graph-', ''));
                             cookies.save();
                         });
+
+                        Mist.monitoringController.graphs
+                            .instances.findBy('id', metric)
+                            .view.updateView();
                     });
 
                     function moveToEnd(element) {

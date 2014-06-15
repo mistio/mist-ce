@@ -132,6 +132,11 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             },
 
 
+            isVisible: function () {
+                return $('#' + this.graph.id).css('display') != 'none';
+            },
+
+
             /**
             *
             * Changes the width of svg element, sets new scale values
@@ -372,7 +377,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                 // Set graph visibility
                 var cookies = Mist.monitoringController.cookies;
-                if (cookies.collapsedGraphs.indexOf(this.graph.metrics[0].id) > -1)
+                if (cookies.collapsedGraphs.indexOf(this.graph.metrics[0].hashedId) > -1)
                     $('#' + id).hide();
                 else
                     $('#' + id).show();
@@ -385,6 +390,11 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             * redraws value line, x-axis, labels and grid
             */
             updateView: function () {
+
+                if (!this.isVisible()) {
+                    info('skipping');
+                    return;
+                }
 
                 var that = this;
                 var labelTicksFixed = function(axisInstance,format) {
