@@ -39,7 +39,7 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
                 this.set('addingMetric', true);
                 Mist.ajax.POST('/metrics', {
                     'name': metric.name,
-                    'target': metric.alias,
+                    'target': metric.id,
                     'machine_id': machine_id,
                     'backend_id': backend_id,
                 }).success(function(data) {

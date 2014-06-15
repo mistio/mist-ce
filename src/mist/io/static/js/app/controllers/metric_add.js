@@ -1,10 +1,10 @@
-define('app/controllers/metric_add', ['ember'],
+define('app/controllers/metric_add', ['app/models/metric', 'ember'],
     //
     //  Metric Add Controller
     //
     //  @returns Class
     //
-    function () {
+    function (Metric) {
 
         'use strict';
 
@@ -25,7 +25,6 @@ define('app/controllers/metric_add', ['ember'],
             formReady: null,
             newMetric: null,
             metricsTree: [],
-
 
 
             //
@@ -53,6 +52,8 @@ define('app/controllers/metric_add', ['ember'],
 
             add: function () {
                 var that = this;
+                info(this.newMetric);
+                return;
                 Mist.metricsController.addMetric(
                     this.machine,
                     this.newMetric,
@@ -98,8 +99,8 @@ define('app/controllers/metric_add', ['ember'],
             },
 
 
-            getMetricByAlias: function (alias) {
-                return this.metrics.findBy('alias', alias);
+            getMetric: function (id) {
+                return this.metrics.findBy('id', id);
             },
 
 
@@ -113,9 +114,11 @@ define('app/controllers/metric_add', ['ember'],
             _setMetrics: function (metrics) {
                 Ember.run(this, function () {
                     var newMetrics = [];
-                    metrics.forEach(function(metric) {
-                        newMetrics.push(metric);
-                    });
+                    for (var metricId in metrics) {
+                        var metric = metrics[metricId];
+                        metric.id = metricId;
+                        newMetrics.push(Metric.create(metric));
+                    }
                     this.set('metrics', newMetrics);
                     this._setMetricsTree();
                 });
@@ -135,17 +138,16 @@ define('app/controllers/metric_add', ['ember'],
                 var ret = new Object();
                 this.metrics.forEach(function (metric) {
                     var prevParent = ret;
-                    var list = metric.alias.split('.');
+                    var list = metric.id.split('.');
                     var lastIndex = list.length - 1;
                     list.forEach(function (subTarget, index) {
 
                         // Check if this property exists in the object already
                         if (!prevParent[subTarget]) {
 
-                            // if this is the last node, append a
-                            // string instead of an object
+                            // if this is the last node, append the id
                             if (index == lastIndex)
-                                prevParent[subTarget] = metric.alias;
+                                prevParent[subTarget] = metric.id;
                             else
                                 prevParent[subTarget] = new Object();
                         }

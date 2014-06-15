@@ -41,7 +41,7 @@ define('app/views/metric_node', ['app/views/templated'],
 
                 if (this.node.isEndNode)
                     this.set('metric',
-                        Mist.metricAddController.getMetricByAlias(
+                        Mist.metricAddController.getMetric(
                             this.node.target));
 
             }.on('didInsertElement'),

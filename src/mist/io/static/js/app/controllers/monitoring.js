@@ -856,7 +856,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                             unit: metric.unit,
                             title: metric.name,
                             isBuiltIn: Mist.metricsController
-                                .isBuiltInMetric(metric.id);
+                                .isBuiltInMetric(metric.id)
                         });
 
                     graph.addMetric(metric);
