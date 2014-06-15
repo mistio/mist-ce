@@ -107,6 +107,16 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
             },
 
 
+            isBuiltInMetric: function (id) {
+                return !!this.builtInMetrics.findBy('id', id);
+            },
+
+
+            isCustomMetric: function (id) {
+                return !!this.customMetrics.findBy('id', id);
+            },
+
+
             getMetricByAlias: function (alias) {
                 var result = this.builtInMetrics.findBy('alias', alias);
                 if (!result)

@@ -7,12 +7,14 @@
                 ({{view.graph.unit}})
             {{/if}}
         </div>
-        <a class="ui-btn ui-btn-icon-notext ui-icon-minus"
-            {{action "collapseClicked" target="view"}}>
+        <a class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-minus"
+            {{action "collapseClicked" target="view"}}>-
         </a>
-        <a class="ui-btn ui-btn-icon-notext ui-icon-delete"
-            {{action "removeClicked" target="view"}}>
-        </a>
+        {{#unless view.graph.isBuiltIn}}
+            <a class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext"
+                {{action "removeClicked" target="view"}}>x
+            </a>
+        {{/unless}}
     </div>
 
     <svg>

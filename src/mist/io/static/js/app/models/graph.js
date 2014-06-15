@@ -26,6 +26,7 @@ define('app/models/graph', ['ember'],
             unit: null,
             title: null,
             metrics: null,
+            isBuiltIn: null,
 
 
             //

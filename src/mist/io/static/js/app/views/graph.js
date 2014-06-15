@@ -391,10 +391,8 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             */
             updateView: function () {
 
-                if (!this.isVisible()) {
-                    info('skipping');
+                if (!this.isVisible())
                     return;
-                }
 
                 var that = this;
                 var labelTicksFixed = function(axisInstance,format) {
