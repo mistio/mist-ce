@@ -486,23 +486,21 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                             step: step / 1000
                         },
                         timeout: 8000,
-                        success: function (data) {
+                        success: function (metrics) {
 
                             try {
 
-                                if (!data.length)
+                                if (!Object.keys(metrics).length)
                                     throw "No Data Received";
 
                                 var receivedData = {};
                                 var hasFirstData = false;
 
-                                data.forEach(function(metric) {
+                                for (var metricId in metrics) {
 
-                                    // Hash the target to get rid of funky characters
-                                    var id = md5(metric.metric_id);
+                                    var metric = metrics[metricId];
+                                    var id = md5(metricId);
                                     metric.id = id;
-                                    metric.alias = metric.metric_id;
-                                    metric.target = metric._target;
 
                                     receivedData[id] = [];
 
@@ -523,7 +521,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                                     metric.datapoints = receivedData[id];
                                     Mist.monitoringController.graphs.addGraph(metric);
-                                });
+                                }
 
                                 var metric = Object.keys(receivedData)[0];
                                 var datapoints = receivedData[metric];
