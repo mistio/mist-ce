@@ -198,7 +198,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                 });
 
                 this.UI.zoomChange()
-
+                this.graphs.machine = args.machineModel;
                 this.request.start();
             },
 
@@ -856,6 +856,26 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                     this.instances.pushObject(graph);
                 },
 
+
+                removeGraph: function (graph) {
+
+                    Mint.notificationController.notify('Operation not supported yet' +
+                        '. Please contact dr');
+
+                    return;
+                    var url = '/metrics/' + graph.metrics[0].alias;
+                    Mist.ajax.DELETE(url, {
+                        machine: this.machine.id
+                    }).error(function (message) {
+                        alert(message);
+                    }).complete(function (success, data) {
+                        if (success)
+                            info(data);
+                    });
+                    this.instances.removeObject(graph);
+                },
+
+                machine          : null,
                 instances        : [],
                 animationEnabled : true,
                 updateActions    : {

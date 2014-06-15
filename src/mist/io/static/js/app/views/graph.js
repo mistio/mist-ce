@@ -597,6 +597,10 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                 collapseClicked: function () {
                     Mist.monitoringController.UI.collapsePressed(this.graph.id);
+                },
+
+                removeClicked: function () {
+                    Mist.monitoringController.graphs.removeGraph(this.graph);
                 }
             }
         });

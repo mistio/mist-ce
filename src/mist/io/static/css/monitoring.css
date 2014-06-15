@@ -106,22 +106,10 @@
     color: #404040;
 }
 
-.graph > .header > .closeBtn{
-    position: absolute;
-    cursor: pointer;
-
-    border-left: 1px solid #ccc;
-
-    right: 0px;
-    bottom: 0px;
-    width: 60px;
-    height: 30px;
-
-    color: #404040;
-    font-size: 1.75em;
-    text-align: center;
-
-
+.graph > .header > .ui-btn {
+    float: right;
+    margin: 0;
+    padding: 0 10px
 }
 
 .graph > .header > .closeBtn:hover{

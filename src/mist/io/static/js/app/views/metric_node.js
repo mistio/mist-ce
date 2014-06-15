@@ -63,6 +63,7 @@ define('app/views/metric_node', ['app/views/templated'],
 
 
             foldChildren: function () {
+
                 this.set('unfold', false);
 
                 // Change icons

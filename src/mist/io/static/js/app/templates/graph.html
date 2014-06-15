@@ -7,9 +7,12 @@
                 ({{view.graph.unit}})
             {{/if}}
         </div>
-        <div class="closeBtn" {{action "collapseClicked" target="view"}}>
-            -
-        </div>
+        <a class="ui-btn ui-btn-icon-notext ui-icon-minus"
+            {{action "collapseClicked" target="view"}}>
+        </a>
+        <a class="ui-btn ui-btn-icon-notext ui-icon-delete"
+            {{action "removeClicked" target="view"}}>
+        </a>
     </div>
 
     <svg>
