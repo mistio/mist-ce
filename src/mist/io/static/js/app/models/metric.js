@@ -19,10 +19,11 @@ define('app/models/metric', ['ember'],
 
 
             id: null,
-            unit: null,
             name: null,
-            target: null,
+            unit: null,
             maxValue: null,
+            minValue: null,
+            hasRange: null,
 
 
             //
@@ -34,11 +35,13 @@ define('app/models/metric', ['ember'],
 
             init: function () {
                 this._super();
-                info(this.metric_id);
-                this.set('id', this.metric_id);
-                this.set('alias', this.id);
-                this.set('target', this._target);
-                this.set('maxValue', this.max_value || 99999999);
+                this.set('maxValue', this.max_value)
+                    .set('minValue', this.min_value)
+                    .set('hasRange',
+                        typeof this.maxValue != 'undefined' &&
+                        typeof this.minValue != 'undefined');
+                delete this.max_value;
+                delete this.min_value;
             }
         });
     }
