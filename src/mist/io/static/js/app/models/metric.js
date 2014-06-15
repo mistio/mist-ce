@@ -24,6 +24,8 @@ define('app/models/metric', ['ember'],
             maxValue: null,
             minValue: null,
             hasRange: null,
+            hashedId: null,
+            datapoints: null,
 
 
             //
@@ -35,7 +37,8 @@ define('app/models/metric', ['ember'],
 
             init: function () {
                 this._super();
-                this.set('maxValue', this.max_value)
+                this.set('hashedId', md5(this.id))
+                    .set('maxValue', this.max_value)
                     .set('minValue', this.min_value)
                     .set('hasRange',
                         typeof this.maxValue != 'undefined' &&

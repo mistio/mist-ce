@@ -1,10 +1,10 @@
-define('app/controllers/monitoring', ['app/models/graph', 'ember'],
+define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', 'ember'],
     //
     //  Monitoring Controller
     //
     //  @returns Class
     //
-    function(Graph) {
+    function(Graph, Metric) {
 
         'use strict';
 
@@ -499,8 +499,9 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
                                 for (var metricId in metrics) {
 
                                     var metric = metrics[metricId];
-                                    var id = md5(metricId);
+                                    var id = metricId;
                                     metric.id = id;
+                                    metric = Metric.create(metric);
 
                                     receivedData[id] = [];
 
@@ -841,7 +842,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'ember'],
 
                 addGraph: function (metric) {
 
-                    var graphId = 'graph-' + metric.id;
+                    var graphId = 'graph-' + metric.hashedId;
 
                     if (this.graphExists(graphId))
                         return;
