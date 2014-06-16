@@ -26,6 +26,11 @@ define('app/controllers/metric_add', ['app/models/metric', 'ember'],
             newMetric: null,
             metricsTree: [],
 
+            customPluginTarget: null,
+            customPluginName: null,
+            customPluginUnit: null,
+            customPluginScript: null,
+
 
             //
             //
@@ -62,6 +67,25 @@ define('app/controllers/metric_add', ['app/models/metric', 'ember'],
                             that.close();
                         }
                 });
+            },
+
+
+            deploy: function () {
+
+                var url = "/backends/" + this.machine.backend.id + "/machines/" +
+                    this.machine.id + "/deploy_plugin";
+                info(this.customPluginTarget);
+                info(this.customPluginScript);
+                info(this.customPluginName);
+                info(this.customPluginUnit);
+                Mist.ajax.POST(url, {
+                    plugin_type: $('#metric-custom select').val(),
+                    target: this.customPluginTarget,
+                    read_function: this.customPluginScript,
+                    name: this.customPluginName,
+                    unit: this.customPluginUnit
+                });
+                this.close();
             },
 
 

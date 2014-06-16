@@ -8,16 +8,82 @@
          data-enhanced="true"
          data-transition="flip"
          data-position-to="#add-metric-btn">
+
+        <div class="ui-header ui-bar-b">
+            <h1 class="ui-title">Select Metric</h1>
+        </div>
+
+        {{#if Mist.metricAddController.metrics.length}}
+
+            <a class="ui-btn ui-btn-d ui-corner-all ui-btn-icon-left ui-icon-plus"
+                {{action "customClicked" target="view"}}>Custom</a>
+
+            {{view Mist.metricNodeView
+                nodeBinding="Mist.metricAddController.metricsTree"}}
+
+        {{else}}
+            <div class="ajax-loader"></div>
+        {{/if}}
+
+        {{#if Mist.metricsController.addingMetric}}
+            <div id="overlay"></div>
+        {{/if}}
+    </div>
+</div>
+
+
+
+<div id="metric-custom-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-a"></div>
+<div id="metric-custom-popup"
+     class="ui-popup-container mid-popup ui-popup-hidden ui-body-inherit ui-corner-all">
+
+    <div id="metric-custom"
+         class="ui-popup ui-corner-all ui-overlay-shadow"
+         data-role="popup"
+         data-enhanced="true"
+         data-transition="flip"
+         data-position-to="#add-metric-btn">
+
+        <div class="ui-header ui-bar-b">
+            <h1 class="ui-title">Custom plugin</h1>
+        </div>
+        <div class="ui-content">
+
+            <label>Type:</label>
+            <select id='plugin-type' data-inline="true">
+                <option value='gauge' selected='true'>gauge</option>
+                <option value='derive' >derive</option>
+            </select>
+
+
+            <label for="custom-plugin-target">Target:</label>
+            {{view Mist.TextField
+                   id="custom-plugin-target"
+                   valueBinding="Mist.metricAddController.customPluginTarget"}}
+
+            <label for="custom-plugin-name">Name:</label>
+            {{view Mist.TextField
+                   id="custom-plugin-name"
+                   valueBinding="Mist.metricAddController.customPluginName"}}
+
+            <label for="custom-plugin-unit">Unit:</label>
+            {{view Mist.TextField
+                   id="custom-plugin-unit"
+                   valueBinding="Mist.metricAddController.customPluginUnit"}}
+
+            <label for="custom-plugin-script">Script:</label>
+            {{view Ember.TextArea
+                   id="custom-plugin-script"
+                   valueBinding="Mist.metricAddController.customPluginScript"}}
+
             {{#if Mist.metricsController.addingMetric}}
-                <div id="overlay"></div>
+            <div class="ajax-loader"></div>
             {{/if}}
-            <div class="ui-header ui-bar-b">
-                <h1 class="ui-title">Select Metric</h1>
+
+            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <a data-role="button" data-theme="a" {{action "backClicked" target="view"}}>Back</a>
+                <button id="deploy-ok" data-theme="d" {{action "deployClicked" target="view"}}>Deploy</button>
             </div>
-            {{#if Mist.metricAddController.metrics.length}}
-                {{view Mist.metricNodeView nodeBinding="Mist.metricAddController.metricsTree"}}
-            {{else}}
-                <div class="ajax-loader"></div>
-            {{/if}}
+        </div>
     </div>
 </div>

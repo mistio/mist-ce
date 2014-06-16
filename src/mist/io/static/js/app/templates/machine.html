@@ -134,28 +134,6 @@
                     </div>
                 </div>
 
-                <div id="deploy-plugin-form">
-                    type:
-                    <select name="plugin_type">
-                        <option value="gauge">gauge</option>
-                        <option value="derive">derive</option>
-                    </select>
-                    <br />
-                    target: <input type="text" name="target"><br />
-                    script: <textarea name="read_function">
-counter = -1
-
-def read():
-    global counter
-    counter += 1
-    return counter
-
-                    </textarea><br />
-                    name: <input type="text" name="name"><br />
-                    unit: <input type="text" name="unit"><br />
-                    <input type="submit" text="Deploy plugin" {{action "deploy_plugin" target="view"}}>
-                </div>
-
             {{/unless}}
 
             {{else}}

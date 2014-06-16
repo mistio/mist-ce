@@ -219,20 +219,6 @@ define('app/views/machine', ['app/views/mistscreen'],
 
             actions: {
 
-                deploy_plugin: function() {
-                
-                    var form = $('#deploy-plugin-form');
-                    
-                    var url = "/backends/" + this.machine.backend.id + "/machines/" + this.machine.id + "/deploy_plugin";
-                    Mist.ajax.POST(url, {
-                        plugin_type: form.find('select').val(),
-                        target: form.find('[name=target]').val(),
-                        read_function: form.find('[name=read_function]').val(),
-                        'name': form.find('[name=name]').val(),
-                        unit: form.find('[name=unit]').val()
-                    });
-                },
-
                 manageKeysClicked: function() {
                     Mist.machineKeysController.open(this.machine);
                 },

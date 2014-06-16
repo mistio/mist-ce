@@ -32,6 +32,28 @@ define('app/views/metric_add', ['app/views/popup'],
             },
 
 
+            actions: {
+
+                customClicked: function () {
+                    this.close();
+                    Ember.run.later(this, function () {
+                        $('#metric-custom').popup('open');
+                    }, 400);
+                },
+
+                backClicked: function () {
+                    $('#metric-custom').popup('close');
+                    Ember.run.later(this, function () {
+                        this.open();
+                    }, 400);
+                },
+
+                deployClicked: function () {
+                    Mist.metricAddController.deploy();
+                },
+            },
+
+
             //
             //
             //  Observers
