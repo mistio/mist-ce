@@ -1424,9 +1424,9 @@ def list_images(user, backend_id, term=None):
                   and 'hvm' not in img.name.lower()]
 
         if term and conn.type == 'docker':
-            images = conn.search_images(term=term)
-
-        if term:
+            images = conn.search_images(term=term)[:40]
+        #search directly on docker registry for the query
+        elif term:
             images = [img for img in images
                       if term in img.id.lower()
                       or term in img.name.lower()][:40]
