@@ -51,9 +51,6 @@ define('app/controllers/metric_add', ['app/models/metric', 'ember'],
 
 
             add: function () {
-                var that = this;
-                info(this.newMetric);
-                return;
                 Mist.metricsController.addMetric(
                     this.machine,
                     this.newMetric,
