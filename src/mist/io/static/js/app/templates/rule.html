@@ -16,8 +16,9 @@
         {{metric.unit}}
     </div>
 
-    <input class="rule-value" data-highlight="true" min="0" type="range"
+    <input class="rule-value" data-highlight="true" type="range"
         {{bindAttr max="metric.maxValue"}}
+        {{bindAttr min="metric.minValue"}}
         {{bindAttr value="value"}} />
 
     <div class="rule-then">then</div>

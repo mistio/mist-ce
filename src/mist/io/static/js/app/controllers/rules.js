@@ -49,7 +49,6 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                         rule.actionToTake = rules[ruleId].action;
                         rule.operator = that.getOperatorByTitle(rules[ruleId].operator);
                         rule.metric = Mist.metricsController.getMetric(rules[ruleId].metric);
-                        info(rule.metric);
                         rule.machine = Mist.backendsController.getMachine(rule.machine, rule.backend) || rule.machine;
                         that.content.pushObject(Rule.create(rule));
                     }
@@ -185,7 +184,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 function showSlider(event) {
                     var rule_id = $(event.currentTarget).parent().attr('id');
                     var rule = Mist.rulesController.getRuleById(rule_id);
-                    if (rule.metric.max_value) {
+                    if (rule.metric.hasRange) {
                         $(event.currentTarget).addClass('open');
                         $(event.currentTarget).find('.ui-slider-track').fadeIn();
                     }
