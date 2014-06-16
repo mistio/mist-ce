@@ -866,9 +866,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                         MetricsCon._addMetric(metric, this.machine);
                     }
 
-                    var metric = MetricsCon.getMetric(metric.id);
+                    var metricModel = MetricsCon.getMetric(metric.id);
+                    metricModel.set('datapoints', metric.datapoints);
 
-                    graph.addMetric(metric);
+                    graph.addMetric(metricModel);
                     this.instances.pushObject(graph);
                 },
 
