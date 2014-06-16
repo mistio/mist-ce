@@ -661,6 +661,32 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         raise BackendNotFoundError(backend_id)
     conn = connect_provider(user.backends[backend_id])
 
+    if conn.type is Provider.DOCKER:
+
+        if key_id and key_id in user.keypairs:
+            keypair = user.keypairs[key_id]
+            public_key = keypair.public
+        else:
+            public_key = ""
+
+        node = _create_machine_docker(conn, machine_name, image_id, script, public_key=public_key)
+
+        if key_id and key_id in user.keypairs:
+            node_info = conn.inspect_node(node)
+            try:
+                port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
+            except KeyError:
+                port = 22
+            associate_key(user, key_id, backend_id, node.id, port=int(port))
+
+        return {
+            'id': node.id,
+            'name': node.name,
+            'extra': node.extra,
+            'public_ips': node.public_ips,
+            'private_ips': node.private_ips,
+        }
+
     if key_id and key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
 
@@ -676,25 +702,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     keypair = user.keypairs[key_id]
     private_key = keypair.private
     public_key = keypair.public
-
-    if conn.type is Provider.DOCKER:
-        node = _create_machine_docker(conn, machine_name, image_id, script, public_key=public_key)
-
-        if key_id:
-            node_info = conn.inspect_node(node)
-            try:
-                port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
-            except KeyError:
-                port = 22
-            associate_key(user, key_id, backend_id, node.id, port=int(port))
-
-        return {
-            'id': node.id,
-            'name': node.name,
-            'extra': node.extra,
-            'public_ips': node.public_ips,
-            'private_ips': node.private_ips,
-        }
 
     size = NodeSize(size_id, name=size_name, ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
