@@ -851,13 +851,20 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                     if (this.graphExists(graphId))
                         return;
 
+                    var MetricsCon = Mist.metricsController;
+
                     var graph = Graph.create({
                             id: graphId,
                             unit: metric.unit,
                             title: metric.name,
-                            isBuiltIn: Mist.metricsController
-                                .isBuiltInMetric(metric.id)
+                            isBuiltIn: MetricsCon.isBuiltInMetric(metric.id)
                         });
+
+                    // If metric does not exist, add it
+                    if (!MetricsCon.getMetric(metric.id)) {
+                        info('Doesnt exist ', metric.id);
+                        MetricsCon._addMetric(metric, this.machine);
+                    }
 
                     graph.addMetric(metric);
                     this.instances.pushObject(graph);

@@ -49,6 +49,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                         rule.actionToTake = rules[ruleId].action;
                         rule.operator = that.getOperatorByTitle(rules[ruleId].operator);
                         rule.metric = Mist.metricsController.getMetric(rules[ruleId].metric);
+                        info(rule.metric);
                         rule.machine = Mist.backendsController.getMachine(rule.machine, rule.backend) || rule.machine;
                         that.content.pushObject(Rule.create(rule));
                     }
@@ -80,7 +81,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 Mist.ajax.POST('/rules', {
                     'backendId': machine.backend.id,
                     'machineId': machine.id,
-                    'metric': metric,
+                    'metric': metric.id,
                     'operator': operator.title,
                     'value': value,
                     'action': actionToTake
@@ -90,7 +91,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     var rule = Rule.create({
                         'id': data.id,
                         'value': value,
-                        'metric': Mist.metricsController.getMetric(metric),
+                        'metric': metric,
                         'machine': machine,
                         'operator': operator,
                         'maxValue': data.max_value,
