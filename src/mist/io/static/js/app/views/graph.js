@@ -608,7 +608,14 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 },
 
                 removeClicked: function () {
-                    Mist.monitoringController.graphs.removeGraph(this.graph);
+                    var graph = this.graph;
+                    Mist.confirmationController.set('title', 'Remove graph');
+                    Mist.confirmationController.set('text', 'Are you sure you want to remove "'
+                        + graph.metrics[0].name + '" ?');
+                    Mist.confirmationController.set('callback', function () {
+                        Mist.monitoringController.graphs.removeGraph(graph);
+                    });
+                    Mist.confirmationController.show();
                 }
             }
         });
