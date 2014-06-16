@@ -1410,6 +1410,11 @@ def list_images(user, backend_id, term=None):
             rest_images = [NodeImage(id=image, name=name, driver=conn, extra={}) 
                               for image, name in config.DOCKER_IMAGES.items()]
             rest_images += conn.list_images()
+            #include a NodeImage for starred Docker images that are
+            # on the registry, so they can be used to create containers
+            rest_images_ids = [image.id for image in rest_images]
+            rest_images += [NodeImage(id=image_id, name=image_id, driver=conn, extra={}) 
+                              for image_id in starred if image_id not in rest_images_ids]
         else:
             rest_images = conn.list_images()
             starred_images = [image for image in rest_images
@@ -1439,6 +1444,9 @@ def list_images(user, backend_id, term=None):
             'name': image.name,
             'star': _image_starred(user, backend_id, image.id)}
            for image in images]
+
+    #ret = {r.get('id'):r for r in ret}.values()
+    #return unique objects only, to avoid dups
     return ret
 
 
