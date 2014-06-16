@@ -38,6 +38,7 @@ define('app/models/metric', ['ember'],
             init: function () {
                 this._super();
                 this.set('hashedId', md5(this.id))
+                    .set('machines', this.machines || []);
                     .set('maxValue', this.max_value)
                     .set('minValue', this.min_value)
                     .set('hasRange',

@@ -866,6 +866,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                         MetricsCon._addMetric(metric, this.machine);
                     }
 
+                    var metric = MetricsCon.getMetric(metric.id);
+
                     graph.addMetric(metric);
                     this.instances.pushObject(graph);
                 },

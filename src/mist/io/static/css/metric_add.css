@@ -39,3 +39,13 @@
     margin-top: 1em;
     margin-bottom: -1.5em;
 }
+
+#metric-add #overlay {
+    height: 100%;
+    width: 100%;
+    z-index: 10000000;
+    background-color: black;
+    display: inline-block;
+    position: absolute;
+    opacity: 0.35;
+}
