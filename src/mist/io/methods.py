@@ -675,7 +675,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             node_info = conn.inspect_node(node)
             try:
                 port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
-            except:
+            except KeyError:
                 port = 22
             associate_key(user, key_id, backend_id, node.id, port=int(port))
 
@@ -1245,6 +1245,24 @@ def _machine_action(user, backend_id, machine_id, action):
         if action is 'start':
             # In liblcoud it is not possible to call this with machine.start()
             conn.ex_start_node(machine)
+
+            if conn.type is Provider.DOCKER:
+                node_info = conn.inspect_node(node)
+                try:
+                    port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
+                except KeyError:
+                    port = 22
+
+            with user.lock_n_load():
+                machine_uid = [backend_id, machine_id]
+
+                for keypair in user.keypairs:
+                    for machine in user.keypairs[keypair].machines:
+                        if machine[:2] == machine_uid:
+                            key_id = keypair
+                            machine[-1] = int(port)
+                user.save()
+
         elif action is 'stop':
             # In libcloud it is not possible to call this with machine.stop()
             conn.ex_stop_node(machine)
@@ -1259,6 +1277,22 @@ def _machine_action(user, backend_id, machine_id, action):
                     return False
             else:
                 machine.reboot()
+                if conn.type is Provider.DOCKER:
+                    node_info = conn.inspect_node(node)
+                    try:
+                        port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
+                    except KeyError:
+                        port = 22
+
+                with user.lock_n_load():
+                    machine_uid = [backend_id, machine_id]
+
+                    for keypair in user.keypairs:
+                        for machine in user.keypairs[keypair].machines:
+                            if machine[:2] == machine_uid:
+                                key_id = keypair
+                                machine[-1] = int(port)
+                    user.save()
         elif action is 'destroy':
             if conn.type is Provider.DOCKER and node.state == 0:
                 conn.ex_stop_node(node)
@@ -1410,11 +1444,6 @@ def list_images(user, backend_id, term=None):
             rest_images = [NodeImage(id=image, name=name, driver=conn, extra={}) 
                               for image, name in config.DOCKER_IMAGES.items()]
             rest_images += conn.list_images()
-            #include a NodeImage for starred Docker images that are
-            # on the registry, so they can be used to create containers
-            rest_images_ids = [image.id for image in rest_images]
-            rest_images += [NodeImage(id=image_id, name=image_id, driver=conn, extra={}) 
-                              for image_id in starred if image_id not in rest_images_ids]
         else:
             rest_images = conn.list_images()
             starred_images = [image for image in rest_images
@@ -1444,9 +1473,6 @@ def list_images(user, backend_id, term=None):
             'name': image.name,
             'star': _image_starred(user, backend_id, image.id)}
            for image in images]
-
-    #ret = {r.get('id'):r for r in ret}.values()
-    #return unique objects only, to avoid dups
     return ret
 
 
