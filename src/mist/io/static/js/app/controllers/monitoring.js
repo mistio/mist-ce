@@ -865,21 +865,15 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
 
                 removeGraph: function (graph) {
-
-                    Mint.notificationController.notify('Operation not supported yet' +
-                        '. Please contact dr');
-
-                    return;
-                    var url = '/metrics/' + graph.metrics[0].alias;
-                    Mist.ajax.DELETE(url, {
-                        machine: this.machine.id
-                    }).error(function (message) {
-                        alert(message);
-                    }).complete(function (success, data) {
-                        if (success)
-                            info(data);
+                    var that = this;
+                    Mist.metricsController.disassociateMetric(
+                        graph.metrics[0],
+                        this.machine,
+                        function (success) {
+                            if (success) {
+                                that.instances.removeObject(graph);
+                            }
                     });
-                    this.instances.removeObject(graph);
                 },
 
                 machine          : null,

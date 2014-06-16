@@ -73,6 +73,30 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
             },
 
 
+            disassociateMetric: function (metric, machine, callback) {
+
+                var machine_id = machine.id || null;
+                var backend_id = machine.backend ? machine.backend.id : null;
+                var url = '/backends/' + backend_id +
+                        '/machines/' + machine_id +
+                        '/metrics';
+
+                var that = this;
+                this.set('disassociatingMetric', true);
+                Mist.ajax.DELETE(url, {
+                    'metric_id': metric.id
+                }).success(function(data) {
+                    that._disassociateMetric(metric, machine);
+                }).error(function(message) {
+                    Mist.notificationController.notify(
+                        'Failed to disassociate metric: ' + message);
+                }).complete(function (success, data) {
+                    that.set('disassociatingMetric', false);
+                    if (callback) callback(success, metric);
+                });
+            },
+
+
             setCustomMetrics: function(metrics) {
                 Ember.run(this, function() {
                     for (var metricId in metrics) {
@@ -130,6 +154,15 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
                     this.customMetrics.pushObject(Metric.create(metric));
                     this.trigger('onMetricAdd');
                     this.trigger('onMetricListChange');
+                });
+            },
+
+
+            _disassociateMetric: function (metric, machine) {
+                Ember.run(this, function () {
+                    metric = this.getMetric(metric.id);
+                    metric.machines.removeObject(machine);
+                    this.trigger('onMetricDisassociate');
                 });
             },
 
