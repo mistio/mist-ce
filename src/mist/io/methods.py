@@ -675,7 +675,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             node_info = conn.inspect_node(node)
             try:
                 port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
-            except KeyError:
+            except:
                 port = 22
             associate_key(user, key_id, backend_id, node.id, port=int(port))
 
