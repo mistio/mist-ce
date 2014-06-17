@@ -33,6 +33,17 @@ define('app/views/metric_add_custom', ['app/views/popup'],
             },
 
 
+            updateDeployButton: function () {
+                if (Mist.metricAddCustomController.addingMetric ||
+                    !Mist.metricAddCustomController.formReady) {
+                    $('#deploy').addClass('ui-state-disabled');
+                } else {
+                    $('#deploy').removeClass('ui-state-disabled');
+                }
+            },
+
+
+
             //
             //
             //  Actions
@@ -57,7 +68,20 @@ define('app/views/metric_add_custom', ['app/views/popup'],
                         $('#custom-plugin-advanced').slideUp();
                     }
                 }
-            }
+            },
+
+
+            //
+            //
+            //  Observers
+            //
+            //
+
+
+            updateDoneButtonObserver: function () {
+                Ember.run.once(this, 'updateDeployButton');
+            }.observes('Mist.metricAddCustomController.addingMetric',
+                'Mist.metricAddCustomController.formReady')
         });
     }
 );
