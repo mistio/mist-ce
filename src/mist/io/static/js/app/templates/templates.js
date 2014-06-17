@@ -234,7 +234,7 @@ function program7(depth0,data) {
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "createKeyClicked", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">Add Key</a>\n                    </li>\n                </ul>\n            </div>\n        </div>\n\n        <!--\n\n            DOCKER\n\n        -->\n\n        <div id=\"docker-bundle\">\n\n            <label for=\"new-backend-docker-url\">1. Docker URL:</label>\n            ");
+  data.buffer.push(">Add Key</a>\n                    </li>\n                </ul>\n            </div>\n        </div>\n\n        <!--\n\n            DOCKER\n\n        -->\n\n        <div id=\"docker-bundle\">\n\n            <label for=\"new-backend-docker-url\">2. Host:</label>\n            ");
   hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
   hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
@@ -242,7 +242,7 @@ function program7(depth0,data) {
     'data-theme': ("a"),
     'valueBinding': ("Mist.backendAddController.newBackendDockerURL")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n\n            <label for=\"new-backend-docker-port\">2. Docker Port:</label>\n            ");
+  data.buffer.push("\n\n            <label for=\"new-backend-docker-port\">3. Port:</label>\n            ");
   hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
   hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
@@ -250,7 +250,7 @@ function program7(depth0,data) {
     'data-theme': ("a"),
     'valueBinding': ("Mist.backendAddController.newBackendPort")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n\n            <label for=\"new-backend-docker-user\">3. BasicAuth User:</label>\n            ");
+  data.buffer.push("\n\n            <label for=\"new-backend-docker-user\">4. BasicAuth User:</label>\n            ");
   hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
   hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
@@ -258,7 +258,7 @@ function program7(depth0,data) {
     'data-theme': ("a"),
     'valueBinding': ("Mist.backendAddController.newBackendFirstField")
   },contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n\n            <label for=\"new-backend-docker-pass\">4. BasicAuth Password:</label>\n            ");
+  data.buffer.push("\n\n            <label for=\"new-backend-docker-pass\">5. BasicAuth Password:</label>\n            ");
   hashContexts = {'id': depth0,'data-theme': depth0,'valueBinding': depth0};
   hashTypes = {'id': "STRING",'data-theme': "STRING",'valueBinding': "STRING"};
   data.buffer.push(escapeExpression(helpers.view.call(depth0, "Mist.TextField", {hash:{
