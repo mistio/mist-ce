@@ -43,6 +43,7 @@ define( 'app', [
     'app/controllers/machine_shell',
     'app/controllers/machine_tags',
     'app/controllers/metric_add',
+    'app/Controllers/metric_add_custom',
     'app/controllers/metrics',
     'app/controllers/monitoring',
     'app/controllers/notification',
@@ -79,6 +80,7 @@ define( 'app', [
     'app/views/machine_tags_list_item',
     'app/views/messagebox',
     'app/views/metric_add',
+    'app/views/metric_add_custom',
     'app/views/metric_node',
     'app/views/monitoring',
     'app/views/rule',
@@ -104,6 +106,7 @@ define( 'app', [
     MachineShellController,
     MachineTagsController,
     MetricAddController,
+    MetricAddCustomController,
     MetricsController,
     MonitoringController,
     NotificationController,
@@ -140,6 +143,7 @@ define( 'app', [
     MachineTagsListItemView,
     MessageBoxView,
     MetricAddView,
+    MetricAddCustomView,
     MetricNodeView,
     MonitoringView,
     RuleView,
@@ -313,6 +317,7 @@ define( 'app', [
         App.set('machineShellView', MachineShellView);
         App.set('machineListItemView', MachineListItem);
         App.set('confirmationDialog', ConfirmationDialog);
+        App.set('metricAddCustomView', MetricAddCustomView);
         App.set('machineKeysListItemView', MachineKeysListItemView);
         App.set('machineTagsListItemView', MachineTagsListItemView);
         App.set('machineShellListItemView', MachineShellListItemView);
@@ -341,6 +346,7 @@ define( 'app', [
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
         App.set('machinePowerController', MachinePowerController.create());
+        App.set('metricAddCustomController', MetricAddCustomController.create());
         App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
 
         // Ember custom widgets

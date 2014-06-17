@@ -1,6 +1,6 @@
-define('app/views/metric_add', ['app/views/popup'],
+define('app/views/metric_add_custom', ['app/views/popup'],
     //
-    //  Metric Add View
+    //  Metric Add Custom View
     //
     //  @returns Class
     //
@@ -29,6 +29,7 @@ define('app/views/metric_add', ['app/views/popup'],
 
 
             clear: function () {
+
             },
 
 
@@ -41,19 +42,13 @@ define('app/views/metric_add', ['app/views/popup'],
 
             actions: {
 
-                customClicked: function () {
-                    this.close();
-                    var that = this;
-                    Ember.run.later(function () {
-                        Mist.metricAddCustomController.open(
-                            this.machine,
-                            function (success, metric) {
-                                if (success)
-                                    that.controller.close();
-                            }
-                        );
-                    }, 400);
-                }
+                backClicked: function () {
+                    this.controller.close();
+                },
+
+                deployClicked: function () {
+                    this.controller.add();
+                },
             }
         });
     }

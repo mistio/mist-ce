@@ -26,11 +26,6 @@ define('app/controllers/metric_add', ['app/models/metric', 'ember'],
             newMetric: null,
             metricsTree: [],
 
-            customPluginTarget: null,
-            customPluginName: null,
-            customPluginUnit: null,
-            customPluginScript: null,
-
 
             //
             //
@@ -66,29 +61,6 @@ define('app/controllers/metric_add', ['app/models/metric', 'ember'],
                                 that.callback(metric);
                             that.close();
                         }
-                });
-            },
-
-
-            deploy: function () {
-
-                var url = "/backends/" + this.machine.backend.id + "/machines/" +
-                    this.machine.id + "/deploy_plugin";
-                var that = this;
-                Mist.ajax.POST(url, {
-                    plugin_type: $('#metric-custom select').val(),
-                    target: this.customPluginTarget,
-                    read_function: this.customPluginScript,
-                    name: this.customPluginName,
-                    unit: this.customPluginUnit
-                }).success(function () {
-                    that.close();
-                    $('#metric-custom').popup('close');
-                }).error(function (message) {
-                    Mist.notificationController.notify('Failed to deploy ' +
-                        'custom plugin: ' + message);
-                }).complete(function () {
-
                 });
             },
 
@@ -226,4 +198,5 @@ define('app/controllers/metric_add', ['app/models/metric', 'ember'],
             this.subTargets = subTargets;
             this.isEndNode = !subTargets.length;
         };
-});
+    }
+);
