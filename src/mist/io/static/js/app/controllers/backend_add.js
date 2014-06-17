@@ -20,6 +20,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
             newBackendFirstField: null,
             newBackendSecondField: null,
             newBackendProjectName: null,
+            newBackendDockerURL: null,
             newBackendOpenStackURL: null,
             newBackendOpenStackRegion: null,
             newBackendOpenStackTenant: null,
@@ -68,6 +69,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     this.newBackendOpenStackRegion,
                     projectName,
                     this.newBackendOpenStackComputeEndpoint,
+                    this.newBackendDockerURL,
                     this.newBackendPort,
                     this.newBackendKey.id,
                     function (success, backend) {
@@ -96,6 +98,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     .set('newBackendOpenStackRegion', null)
                     .set('newBackendOpenStackTenant', null)
                     .set('newBackendOpenStackComputeEndpoint', null)
+                    .set('newBackendDockerURL', null)
                     .set('newBackendKey', {id: 'Select SSH Key'})
                     .set('newBackendProvider', {title: 'Select provider'});
 
@@ -107,9 +110,16 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
 
             _updateFormReady: function () {
                 var ready = false;
+                info('hi', this.newBackendProvider.provider , this.newBackendDockerURL, this.newBackendPort)
                 if ('provider' in this.newBackendProvider) { // Filters out the "Select provider" dummy provider
 
-                    if (this.newBackendFirstField && this.newBackendSecondField) {
+                    if (this.newBackendProvider.provider == 'docker') {
+
+                        if (this.newBackendDockerURL && this.newBackendPort) {
+                            ready = true;
+                        }
+
+                    } else if (this.newBackendFirstField && this.newBackendSecondField) {
 
                         ready = true;
 
@@ -154,6 +164,8 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                        'newBackendFirstField',
                        'newBackendSecondField',
                        'newBackendProjectName',
+                       'newBackendDockerURL',
+                       'newBackendPort',
                        'newBackendOpenStackURL',
                        'newBackendOpenStackTenant')
         });

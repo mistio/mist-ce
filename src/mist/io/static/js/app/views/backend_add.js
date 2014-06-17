@@ -42,13 +42,14 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
 
                 $('#gce-bundle').hide();
                 $('#non-hp-cloud').hide();
+                $('#docker-bundle').hide();
                 $('#baremetal-bundle').hide();
                 $('#openstack-bundle').hide();
                 $('#new-backend-provider').collapsible('collapse');
                 $('#new-backend-second-field').attr('type', 'password');
                 $('#gce-bundle a').removeClass('ui-icon-check')
                     .addClass('ui-icon-carat-u');
-
+                $('#common-bundle').show();
                 Ember.run.next(function () {
                     $('#add-backend-panel').trigger('create');
                 });
@@ -74,6 +75,7 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                     $('#opentack-advanced-wrapper').hide();
                     $('#openstack-bundle').hide();
                     $('#baremetal-bundle').hide();
+                    $('#docker-bundle').hide();
                     $('#non-hp-cloud').hide();
 
                     if (provider.provider.indexOf('rackspace') > -1 || provider.provider.indexOf('linode') > -1) {
@@ -89,6 +91,12 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                         this.set('firstFieldLabel', 'Email address');
                         this.set('secondFieldLabel', '');
                         $('#gce-bundle').show();
+                    } else if (provider.provider.indexOf('docker') > -1) {
+                        this.set('firstFieldLabel', 'BasicAuth User (optional)');
+                        this.set('secondFieldLabel', 'BasicAuth Password (optional)');
+                        $('#common-bundle').hide();
+                        $('#docker-bundle').show();
+                        Mist.backendAddController.set('newBackendPort', 4243);
                     } else if (provider.provider.indexOf('openstack') > -1) {
                         this.set('firstFieldLabel', 'Username');
                         this.set('secondFieldLabel', 'Password');
