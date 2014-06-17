@@ -365,7 +365,13 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
     if not host:
         if not associated:
             with user.lock_n_load():
-                user.keypairs[key_id].machines.append(machine_uid)
+                assoc = [backend_id,
+                         machine_id,
+                         0,
+                         username,
+                         False,
+                         port]
+                user.keypairs[key_id].machines.append(assoc)
                 user.save()
         return
 
@@ -654,18 +660,39 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     if backend_id not in user.backends:
         raise BackendNotFoundError(backend_id)
     conn = connect_provider(user.backends[backend_id])
+
     if conn.type is Provider.DOCKER:
-        #FIXME DOCKER: environment
-        node = _create_machine_docker(conn, machine_name, image_id, script, environment=None)
-        #FIXME DOCKER: associate key/port with container    
-        #associate_key(user, key_id, backend_id, node.id, port)        
-        return {'id': node.id,
-                'name': node.name,
-                'extra': node.extra,
-                'public_ips': node.public_ips,
-                'private_ips': node.private_ips,
-                }
-                    
+        if key_id and key_id in user.keypairs:
+            keypair = user.keypairs[key_id]
+            public_key = keypair.public
+        else:
+            public_key = None
+
+        node = _create_machine_docker(conn, machine_name, image_id, script, public_key=public_key)
+
+        if key_id and key_id in user.keypairs:
+            node_info = conn.inspect_node(node)
+            try:
+                port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
+            except:
+                port = 22
+            associate_key(user, key_id, backend_id, node.id, port=int(port))
+
+        if script and public_key:
+            host = conn.connection.host           
+            #consider public ip of docker server as container's ip too
+            #run script
+            ssh_command(user, backend_id=backend_id, machine_id=node.id, key_id=key_id, host=host,
+                        command=script, port=port)
+
+        return {
+            'id': node.id,
+            'name': node.name,
+            'extra': node.extra,
+            'public_ips': node.public_ips,
+            'private_ips': node.private_ips,
+        }
+
     if key_id and key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
 
@@ -1059,20 +1086,25 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
                 raise MachineCreationError("Softlayer, got exception %s" % e)
         return node
 
-def _create_machine_docker(conn, machine_name, image, script):
+def _create_machine_docker(conn, machine_name, image, script, public_key=None):
     """Create a machine in docker.
 
     """
+
     try:
+        if public_key:
+            environment = ['PUBLIC_KEY=%s' % public_key.strip()]
+        else:
+            environment = None
         node = conn.create_node(
             name=machine_name,
             image=image,
             command=script,
-            environment=None
-            #FIXME DOCKER: environment            
+            environment=environment,
         )
     except Exception as e:
         raise MachineCreationError("Docker, got exception %s" % e)
+
     return node
 
 def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
@@ -1224,6 +1256,24 @@ def _machine_action(user, backend_id, machine_id, action):
         if action is 'start':
             # In liblcoud it is not possible to call this with machine.start()
             conn.ex_start_node(machine)
+
+            if conn.type is Provider.DOCKER:
+                node_info = conn.inspect_node(node)
+                try:
+                    port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
+                except KeyError:
+                    port = 22
+
+            with user.lock_n_load():
+                machine_uid = [backend_id, machine_id]
+
+                for keypair in user.keypairs:
+                    for machine in user.keypairs[keypair].machines:
+                        if machine[:2] == machine_uid:
+                            key_id = keypair
+                            machine[-1] = int(port)
+                user.save()
+
         elif action is 'stop':
             # In libcloud it is not possible to call this with machine.stop()
             conn.ex_stop_node(machine)
@@ -1238,8 +1288,28 @@ def _machine_action(user, backend_id, machine_id, action):
                     return False
             else:
                 machine.reboot()
+                if conn.type is Provider.DOCKER:
+                    node_info = conn.inspect_node(node)
+                    try:
+                        port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
+                    except KeyError:
+                        port = 22
+
+                with user.lock_n_load():
+                    machine_uid = [backend_id, machine_id]
+
+                    for keypair in user.keypairs:
+                        for machine in user.keypairs[keypair].machines:
+                            if machine[:2] == machine_uid:
+                                key_id = keypair
+                                machine[-1] = int(port)
+                    user.save()
         elif action is 'destroy':
-            machine.destroy()
+            if conn.type is Provider.DOCKER and node.state == 0:
+                conn.ex_stop_node(node)
+                machine.destroy()
+            else:
+                machine.destroy()
     except AttributeError:
         raise BadRequestError("Action %s not supported for this machine"
                               % action)
@@ -1399,9 +1469,9 @@ def list_images(user, backend_id, term=None):
                   and 'hvm' not in img.name.lower()]
 
         if term and conn.type == 'docker':
-            images = conn.search_images(term=term)
-
-        if term:
+            images = conn.search_images(term=term)[:40]
+        #search directly on docker registry for the query
+        elif term:
             images = [img for img in images
                       if term in img.id.lower()
                       or term in img.name.lower()][:40]
