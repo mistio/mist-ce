@@ -349,4 +349,5 @@ DOCKER_IMAGES = {
     'mist/ubuntu-14.04': 'Ubuntu 14.04',
     'mist/debian-wheezy': 'Debian Wheezy',
     'mist/opensuse-13.1': 'OpenSUSE 13.1',
+    'mist/fedora-20': 'Fedora 20',
 }
