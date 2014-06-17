@@ -43,11 +43,11 @@ define('app/views/metric_add_custom', ['app/views/popup'],
             actions: {
 
                 backClicked: function () {
-                    this.controller.close();
+                    Mist.metricAddCustomController.close();
                 },
 
                 deployClicked: function () {
-                    this.controller.add();
+                    Mist.metricAddCustomController.add();
                 },
             }
         });

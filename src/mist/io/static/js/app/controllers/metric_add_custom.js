@@ -51,6 +51,8 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
 
 
             close: function () {
+                if (this.callback)
+                    this.callback(false);
                 this.clear();
                 this.view.close();
             },
@@ -92,7 +94,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                     Mist.notificationController.notify('Failed to deploy ' +
                         'custom plugin: ' + message);
                 }).complete(function (success, data) {
-                    if (callback) callback(success, data);
+                    if (that.callback) that.callback(success, data);
                     that.set('addingMetric', false);
                     that.close();
                 });

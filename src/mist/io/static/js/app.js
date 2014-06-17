@@ -43,7 +43,7 @@ define( 'app', [
     'app/controllers/machine_shell',
     'app/controllers/machine_tags',
     'app/controllers/metric_add',
-    'app/Controllers/metric_add_custom',
+    'app/controllers/metric_add_custom',
     'app/controllers/metrics',
     'app/controllers/monitoring',
     'app/controllers/notification',
