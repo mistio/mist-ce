@@ -679,11 +679,9 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             associate_key(user, key_id, backend_id, node.id, port=int(port))
 
         if script and public_key:
-            all_nodes = conn.list_nodes()
-            for created_node in all_nodes:
-                if node.id in created_node.id:
-                    host = created_node.public_ips[0]
-
+            host = conn.connection.host           
+            #consider public ip of docker server as container's ip too
+            #run script
             ssh_command(user, backend_id=backend_id, machine_id=node.id, key_id=key_id, host=host,
                         command=script, port=port)
 
