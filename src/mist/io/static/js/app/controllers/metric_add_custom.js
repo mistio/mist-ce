@@ -116,6 +116,9 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
 
             updateTarget: function () {
 
+                if (!this.metric.target)
+                    return;
+
                 this.set('metric.target',
                     this.metric.target.replace(/[^a-z0-9_.]/g, ''));
 
