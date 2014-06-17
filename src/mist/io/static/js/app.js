@@ -366,6 +366,7 @@ define( 'app', [
             autocapitalize: 'off',
             attributeBindings: [
                 'data-theme',
+                'placeholder',
                 'autocapitalize'
             ],
             keyUp: function(e) {

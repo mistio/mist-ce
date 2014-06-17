@@ -10,7 +10,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
 
         var newLine = String.fromCharCode(13);
         var SCRIPT_EXAMPLE =
-            "import random" + newLine +
+            "import random" + newLine + newLine +
             "def read():" + newLine +
             "    return random.random()" + newLine;
 
@@ -114,8 +114,10 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
             //
 
 
-            formReadyObserver: function () {
-            }.observes('metric.name', 'metric.unit', 'metric.target', 'metric.script')
+            metricObserver: function () {
+                this.set('formReady',
+                    this.metric.target && this.metric.name && this.metric.script);
+            }.observes('metric.name', 'metric.script')
         });
     }
 );
