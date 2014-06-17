@@ -49,6 +49,14 @@ define('app/views/metric_add_custom', ['app/views/popup'],
                 deployClicked: function () {
                     Mist.metricAddCustomController.add();
                 },
+
+                advancedToggled: function () {
+                    if ($('#custom-plugin-advanced-toggle').val() == '1') {
+                        $('#custom-plugin-advanced').slideDown();
+                    } else {
+                        $('#custom-plugin-advanced').slideUp();
+                    }
+                }
             }
         });
     }

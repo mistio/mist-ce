@@ -3,5 +3,23 @@
 -----------------------------------------------------------------------------------------------------------*/
 
 #custom-plugin-script {
-	height: 120px !important;
+    height: 120px !important;
+}
+
+#custom-plugin-advanced {
+    display: none;
+}
+
+#custom-plugin-advanced-toggle {
+    text-align: center;
+    margin-bottom: -20px;
+}
+
+
+#metric-add-custom .ui-slider {
+    width: 100%;
+}
+
+#metric-add-custom .ui-select {
+    width: 100%;
 }

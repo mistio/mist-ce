@@ -31,6 +31,12 @@
                    id="custom-plugin-script"
                    valueBinding="Mist.metricAddCustomController.metric.script"}}
 
+            <select id="custom-plugin-advanced-toggle" data-role="slider" data-theme="a"
+            {{action "advancedToggled" target="view" on="change"}}>
+                <option value="0">Basic settings</option>
+                <option value="1">Advanced settings</option>
+            </select>
+
             <div id="custom-plugin-advanced">
 
                 <label>Type:</label>
