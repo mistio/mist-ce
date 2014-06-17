@@ -140,6 +140,8 @@ def add_routes(config):
     config.add_route('metrics',
                      '/backends/{backend}/machines/{machine}/metrics')
     config.add_route('metric', '/metrics/{metric}')
+    config.add_route('deploy_plugin',
+                     '/backends/{backend}/machines/{machine}/deploy_plugin')
     config.add_route('loadavg',
                      '/backends/{backend}/machines/{machine}/loadavg.png')
 
