@@ -8,6 +8,12 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
 
         'use strict';
 
+        var newLine = String.fromCharCode(13);
+        var SCRIPT_EXAMPLE =
+            "import random" + newLine +
+            "def read():" + newLine +
+            "    return random.random()" + newLine;
+
         return Ember.Object.extend({
 
 
@@ -67,7 +73,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                         'unit': null,
                         'type': null,
                         'target': null,
-                        'script': null,
+                        'script': SCRIPT_EXAMPLE,
                         'minValue': null,
                         'maxValue': null,
                     }))
@@ -109,7 +115,6 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
 
 
             formReadyObserver: function () {
-                info('changed');
             }.observes('metric.name', 'metric.unit', 'metric.target', 'metric.script')
         });
     }
