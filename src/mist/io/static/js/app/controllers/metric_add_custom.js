@@ -114,10 +114,25 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
             //
 
 
+            updateTarget: function () {
+
+                this.set('metric.target',
+                    this.metric.target.replace(/[^a-z0-9_.]/g, ''));
+
+                this.set('metric.name',
+                    this.metric.target.replace(/[_.]/g, ' '));
+            },
+
+
             metricObserver: function () {
                 this.set('formReady',
                     this.metric.target && this.metric.name && this.metric.script);
-            }.observes('metric.name', 'metric.script')
+            }.observes('metric.name', 'metric.script'),
+
+
+            targetObserver: function () {
+                Ember.run.once(this, 'updateTarget');
+            }.observes('metric.target'),
         });
     }
 );
