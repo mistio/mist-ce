@@ -662,12 +662,11 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     conn = connect_provider(user.backends[backend_id])
 
     if conn.type is Provider.DOCKER:
-
         if key_id and key_id in user.keypairs:
             keypair = user.keypairs[key_id]
             public_key = keypair.public
         else:
-            public_key = ""
+            public_key = None
 
         node = _create_machine_docker(conn, machine_name, image_id, script, public_key=public_key)
 
@@ -678,6 +677,15 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             except KeyError:
                 port = 22
             associate_key(user, key_id, backend_id, node.id, port=int(port))
+
+        if script and public_key:
+            all_nodes = conn.list_nodes()
+            for created_node in all_nodes:
+                if node.id in created_node.id:
+                    host = created_node.public_ips[0]
+
+            ssh_command(user, backend_id=backend_id, machine_id=node.id, key_id=key_id, host=host,
+                        command=script, port=port)
 
         return {
             'id': node.id,
@@ -1084,8 +1092,12 @@ def _create_machine_docker(conn, machine_name, image, script, public_key=None):
     """Create a machine in docker.
 
     """
+
     try:
-        environment = ['PUBLIC_KEY=%s' % public_key.strip()]
+        if public_key:
+            environment = ['PUBLIC_KEY=%s' % public_key.strip()]
+        else:
+            environment = None
         node = conn.create_node(
             name=machine_name,
             image=image,
@@ -1094,6 +1106,7 @@ def _create_machine_docker(conn, machine_name, image, script, public_key=None):
         )
     except Exception as e:
         raise MachineCreationError("Docker, got exception %s" % e)
+
     return node
 
 def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
