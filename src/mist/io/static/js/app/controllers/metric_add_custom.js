@@ -10,7 +10,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
 
         var newLine = String.fromCharCode(13);
         var SCRIPT_EXAMPLE =
-            "import random" + newLine + newLine +
+            "import random" + newLine +
             "def read():" + newLine +
             "    return random.random()" + newLine;
 
@@ -114,28 +114,10 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
             //
 
 
-            updateTarget: function () {
-
-                if (!this.metric.target)
-                    return;
-
-                this.set('metric.target',
-                    this.metric.target.replace(/[^a-z0-9_.]/g, ''));
-
-                this.set('metric.name',
-                    this.metric.target.replace(/[_.]/g, ' '));
-            },
-
-
             metricObserver: function () {
                 this.set('formReady',
-                    this.metric.target && this.metric.name && this.metric.script);
-            }.observes('metric.name', 'metric.script'),
-
-
-            targetObserver: function () {
-                Ember.run.once(this, 'updateTarget');
-            }.observes('metric.target'),
+                    this.metric.name && this.metric.script);
+            }.observes('metric.name', 'metric.script')
         });
     }
 );
