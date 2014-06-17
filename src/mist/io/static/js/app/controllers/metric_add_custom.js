@@ -86,6 +86,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                 var url = '/backends/' + this.machine.backend.id +
                           '/machines/' + this.machine.id + '/deploy_plugin';
 
+                this.metric.set('plugin_type', $('#plugin-type').val());
                 var that = this;
                 this.set('addingMetric', true);
                 Mist.ajax.POST(url, {
