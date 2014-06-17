@@ -1295,15 +1295,16 @@ def _machine_action(user, backend_id, machine_id, action):
                     except KeyError:
                         port = 22
 
-                with user.lock_n_load():
-                    machine_uid = [backend_id, machine_id]
+                    with user.lock_n_load():
+                        machine_uid = [backend_id, machine_id]
 
-                    for keypair in user.keypairs:
-                        for machine in user.keypairs[keypair].machines:
-                            if machine[:2] == machine_uid:
-                                key_id = keypair
-                                machine[-1] = int(port)
-                    user.save()
+                        for keypair in user.keypairs:
+                            for machine in user.keypairs[keypair].machines:
+                                if machine[:2] == machine_uid:
+                                    key_id = keypair
+                                    machine[-1] = int(port)
+                        user.save()
+                        
         elif action is 'destroy':
             if conn.type is Provider.DOCKER and node.state == 0:
                 conn.ex_stop_node(node)
