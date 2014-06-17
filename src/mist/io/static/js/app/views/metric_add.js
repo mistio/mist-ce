@@ -46,7 +46,7 @@ define('app/views/metric_add', ['app/views/popup'],
                     var that = this;
                     Ember.run.later(function () {
                         Mist.metricAddCustomController.open(
-                            that.machine,
+                            Mist.metricAddController.machine,
                             function (success, metric) {
                                 if (success)
                                     Mist.metricAddController.close();
