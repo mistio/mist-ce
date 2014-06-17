@@ -74,18 +74,22 @@ define('app/controllers/metric_add', ['app/models/metric', 'ember'],
 
                 var url = "/backends/" + this.machine.backend.id + "/machines/" +
                     this.machine.id + "/deploy_plugin";
-                info(this.customPluginTarget);
-                info(this.customPluginScript);
-                info(this.customPluginName);
-                info(this.customPluginUnit);
+                var that = this;
                 Mist.ajax.POST(url, {
                     plugin_type: $('#metric-custom select').val(),
                     target: this.customPluginTarget,
                     read_function: this.customPluginScript,
                     name: this.customPluginName,
                     unit: this.customPluginUnit
+                }).success(function () {
+                    that.close();
+                    $('#metric-custom').popup('close');
+                }).error(function (message) {
+                    Mist.notificationController.notify('Failed to deploy ' +
+                        'custom plugin: ' + message);
+                }).complete(function () {
+
                 });
-                this.close();
             },
 
 
