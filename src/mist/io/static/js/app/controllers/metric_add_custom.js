@@ -101,7 +101,8 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                 }).complete(function (success, data) {
                     if (that.callback) that.callback(success, data);
                     that.set('addingMetric', false);
-                    that.close();
+                    if (success)
+                        that.close();
                 });
             },
 
@@ -110,15 +111,12 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
 
                 if (!this.metric.name) return;
 
-                var newPluginId = this.metric.name;
-                newPluginId = newPluginId.toLowerCase();
-                newPluginId = newPluginId.replace(/[^a-z0-9_]/g, '_');
-                newPluginId = newPluginId.replace(/__/g, '_');
-
-                if (newPluginId.indexOf('_') == 0)
-                    newPluginId = newPluginId.substring(1);
-                if (newPluginId.lastIndexOf('_') == newPluginId.length - 1)
-                    newPluginId = newPluginId.substring(0, newPluginId.length -1);
+                var newPluginId = this.metric.name
+                    .toLowerCase();
+                    .replace(/[^\w]/g, '_')
+                    .replace(/__*/g, '_')
+                    .replace(/^_/. '')
+                    .replace(/_$/, '');
 
                 this.metric.set('pluginId', newPluginId);
             },
