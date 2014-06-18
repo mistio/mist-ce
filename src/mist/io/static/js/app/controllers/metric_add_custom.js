@@ -40,8 +40,6 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                 type: null,
                 script: null,
                 pluginId: null,
-                minValue: null,
-                maxValue: null,
             },
 
 
@@ -93,7 +91,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                 var that = this;
                 this.set('addingMetric', true);
                 Mist.ajax.POST(url, {
-                    'plygin_type'   : 'python',
+                    'plugin_type'   : 'python',
                     'name'          : this.metric.name,
                     'unit'          : this.metric.unit,
                     'value_type'    : this.metric.type ? 'derive' : 'gauge',
@@ -114,6 +112,16 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                 if (!this.metric.name) return;
 
                 var newPluginId = this.metric.name;
+                newPluginId = newPluginId.toLowerCase();
+                newPluginId = newPluginId.replace(/[^a-z0-9_]/g, '_');
+                newPluginId = newPluginId.replace(/__/g, '_');
+
+                if (newPluginId.indexOf('_') == 0)
+                    newPluginId = newPluginId.substring(1);
+                if (newPluginId.lastIndexOf('_') == newPluginId.length - 1)
+                    newPluginId = newPluginId.substring(0, newPluginId.length -1);
+
+                this.metric.set('pluginId', newPluginId);
             },
 
 

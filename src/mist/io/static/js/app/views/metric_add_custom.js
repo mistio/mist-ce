@@ -35,6 +35,7 @@ define('app/views/metric_add_custom', ['app/views/popup'],
                     $('#custom-plugin-script').scrollTop();
                     $('#advanced-toggle').val(0);
                     $('#advanced-toggle').slider('refresh')
+                        .trigger('change');
                 });
             },
 
@@ -68,7 +69,7 @@ define('app/views/metric_add_custom', ['app/views/popup'],
                 },
 
                 advancedToggled: function () {
-                    if ($('#custom-plugin-advanced-toggle').val() == '1') {
+                    if ($('#advanced-toggle').val() == '1') {
                         $('#custom-plugin-advanced').slideDown();
                     } else {
                         $('#custom-plugin-advanced').slideUp();
