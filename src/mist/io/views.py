@@ -774,6 +774,7 @@ def undeploy_plugin(request):
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
     plugin_id = request.matchdict['plugin']
+    params = params_from_request(request)
     plugin_type = params.get('plugin_type')
     if plugin_type == 'python':
         ret = methods.undeploy_python_plugin(user, backend_id,
