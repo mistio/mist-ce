@@ -2054,7 +2054,7 @@ $sudo /opt/mistio-collectd/collectd.sh restart
 
     # Add custom metric in the db
     parts = ["mist", "python"]  # strip duplicates (bucky also does this)
-    for part in target.split("."):
+    for part in plugin_id.split("."):
         if part != parts[-1]:
             parts.append(part)
     parts.append(plugin_type)
