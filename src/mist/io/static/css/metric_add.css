@@ -23,7 +23,8 @@
     float: left;
 }
 
-#metric-add {
+#metric-add .end-node {
+    padding-left: 40px;
 }
 
 #metric-add .nest {
