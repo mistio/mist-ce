@@ -115,7 +115,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                     .toLowerCase()
                     .replace(/[^\w]/g, '_')
                     .replace(/__*/g, '_')
-                    .replace(/^_/. '')
+                    .replace(/^_/, '')
                     .replace(/_$/, '');
 
                 this.metric.set('pluginId', newPluginId);
