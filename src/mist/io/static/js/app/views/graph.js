@@ -515,7 +515,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                     // Animation values
                     var fps  = 12;
-                    var duration = 10;
+                    var duration = 9;
 
                     this.svg.value.line.animation
                                     .select(this.svg.value.line)
