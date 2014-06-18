@@ -2086,7 +2086,7 @@ echo "Restarting collectd"
 $sudo /opt/mistio-collectd/collectd.sh restart
 """ % {'plugin_id': plugin_id}
 
-    stdout = shell.command()
+    stdout = shell.command(script)
 
     shell.disconnect()
 
