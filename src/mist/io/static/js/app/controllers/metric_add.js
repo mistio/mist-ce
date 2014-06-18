@@ -202,7 +202,7 @@ define('app/controllers/metric_add', ['app/models/metric', 'ember'],
 
         function sortNodes (nodes) {
 
-            // Bubble short
+            // Bubble sort
             var changed = true;
             while (changed) {
                 changed = false;
