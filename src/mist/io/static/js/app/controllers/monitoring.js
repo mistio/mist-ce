@@ -727,14 +727,26 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 */
                 collapse: function (metrics, duration) {
 
-                    // Mobile Hide Animation is slow, disabling animation
                     var hideDuration = duration || 400;
 
+                    // Mobile Hide Animation is slow, disabling animation
                     if (Mist.isClientMobile)
                         hideDuration = 0;
 
                     // Add graph to the end of the list
                     metrics.forEach(function (metric) {
+
+                        // Get button
+                        var parent = $('#' + metric + '-btn').parent();
+
+                        // Get script tags
+                        var prev = parent.prev();
+                        var next = parent.next();
+
+                        // Move to end
+                        moveToEnd(prev);
+                        moveToEnd(parent);
+                        moveToEnd(next);
 
                         // Hide the Graphs
                         $("#" + metric).hide(hideDuration, function () {
@@ -748,6 +760,10 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                             cookies.save();
                         });
                     });
+
+                    function moveToEnd(element) {
+                        element.detach().insertBefore($('#add-metric-btn'));
+                    };
                 },
 
 
@@ -758,9 +774,9 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 */
                 expand: function (metrics,duration) {
 
-                    // Mobile Hide Animation is slow, disabling animation
                     var hideDuration = duration || 400;
 
+                    // Mobile Hide Animation is slow, disabling animation
                     if (Mist.isClientMobile)
                         hideDuration = 0;
 
