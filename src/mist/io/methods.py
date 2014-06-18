@@ -1962,6 +1962,8 @@ def update_metric(user, metric_id, name=None, unit=None,
 def deploy_python_plugin(user, backend_id, machine_id, plugin_id,
                          value_type, read_function):
 
+    machine = user.backends[backend_id].machines[machine_id]
+
     # Sanity checks
     if not plugin_id:
         raise RequiredParameterMissingError('plugin_id')
