@@ -202,20 +202,13 @@ define('app/controllers/metric_add', ['app/models/metric', 'ember'],
 
         function sortNodes (nodes) {
 
-            // Bubble sort
-            var changed = true;
-            while (changed) {
-                changed = false;
-                for (var i = 0; i < nodes.length - 1; i++) {
-                    if (nodes[i].text > nodes[i+1].text) {
-                        var tmp = nodes[i];
-                        nodes[i] = nodes[i+1];
-                        nodes[i+1] = tmp;
-                        changed = true;
-                    }
-                }
-            }
-            return nodes;
+            return nodes.sort(function (a, b) {
+                if (a.text > b.text)
+                    return 1;
+                if (a.text < b.text)
+                    return -1;
+                return 0;
+            });
         }
     }
 );
