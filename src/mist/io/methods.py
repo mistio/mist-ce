@@ -1959,25 +1959,28 @@ def update_metric(user, metric_id, name=None, unit=None,
         raise BadRequestError(resp.text)
 
 
-def deploy_plugin(user, backend_id, machine_id,
-                  target, plugin_type, read_function):
+def deploy_python_plugin(user, backend_id, machine_id, plugin_id,
+                         value_type, read_function):
 
     # Sanity checks
-    lc = [chr(ord('a') + i) for i in range(26)]
-    nums = list('0123456789')
-    chars = lc + nums + ['_', '.']
-    for c in target:
+    if not plugin_id:
+        raise RequiredParameterMissingError('plugin_id')
+    if not value_type:
+        raise RequiredParameterMissingError('value_type')
+    if not read_function:
+        raise RequiredParameterMissingError('read_function')
+    chars = [chr(ord('a') + i) for i in range(26)] + list('0123456789_')
+    for c in plugin_id:
         if c not in chars:
-            raise BadRequestError("Invalid target '%s'. Target can only "
-                                  "lower case chars, numeric digits, "
-                                  "underscores and dots" % target)
-    if target.startswith('.') or target.endswith('.'):
-        raise BadRequestError("Invalid target '%s'. Target can't start or end "
-                              "with a period." % target)
-    if plugin_type not in ('gauge', 'derive'):
-        raise BadRequestError("Invalid plugin_type '%s'. Must be 'gauge' or "
-                              "'derive'." % plugin_type)
-    plugin_id = target.replace('.', '_')
+            raise BadRequestError("Invalid plugin_id '%s'.plugin_id can only "
+                                  "lower case chars, numeric digits and"
+                                  "underscores" % plugin_id)
+    if plugin_id.startswith('_') or plugin_id.endswith('_'):
+        raise BadRequestError("Invalid plugin_id '%s'. plugin_id can't start "
+                              "or end with an underscore." % plugin_id)
+    if value_type not in ('gauge', 'derive'):
+        raise BadRequestError("Invalid value_type '%s'. Must be 'gauge' or "
+                              "'derive'." % value_type)
 
     # Iniatilize SSH connection
     shell = Shell(machine.dns_name)
@@ -1993,15 +1996,15 @@ import collectd
 %(read_function)s
 
 def read_callback():
-    vl = collectd.Values(type="%(type)s")
+    vl = collectd.Values(type="%(value_type)s")
     vl.plugin = "mist.python"
     vl.plugin_instance = "%(plugin_instance)s"
     vl.dispatch(values=[read()])
 
 collectd.register_read(read_callback)
 """ % {'read_function': read_function,
-       'type': plugin_type,
-       'plugin_instance': target}
+       'value_type': value_type,
+       'plugin_instance': plugin_id}
 
     sftp = shell.ssh.open_sftp()
     sftp.putfo(StringIO(plugin), "/tmp/%s.py" % plugin_id)
@@ -2040,8 +2043,6 @@ fi
 echo "Restarting collectd"
 $sudo /opt/mistio-collectd/collectd.sh restart
 """ % {'plugin_id': plugin_id}
-
-    print script
 
     for line in shell.command_stream(script):
         print line

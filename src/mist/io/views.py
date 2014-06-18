@@ -744,27 +744,28 @@ def update_metric(request):
 @view_config(route_name='deploy_plugin', request_method='POST', renderer='json')
 def deploy_plugin(request):
     user = user_from_request(request)
-    params = params_from_request(request)
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-    for key in ('target', 'plugin_type', 'read_function'):
-        if key not in params:
-            raise RequiredParameterMissingError(key)
-    ret = methods.deploy_plugin(
-        user, backend_id, machine_id,
-        target=params['target'],
-        plugin_type=params['plugin_type'],
-        read_function=params['read_function'],
-    )
-    update_metric(
-        user,
-        metric_id=ret['metric_id'],
-        name=params.get('name'),
-        unit=params.get('unit'),
-        backend_id=backend_id,
-        machine_id=machine_id,
-    )
-    return ret
+    plugin_id = request.matchdict['plugin']
+    params = params_from_request(request)
+    plugin_type = params.get('plugin_type')
+    if plugin_type == 'python':
+        ret = methods.deploy_python_plugin(
+            user, backend_id, machine_id, plugin_id,
+            value_type=params.get('value_type', 'gauge'),
+            read_function=params.get('read_function'),
+        )
+        methods.update_metric(
+            user,
+            metric_id=ret['metric_id'],
+            name=params.get('name'),
+            unit=params.get('unit'),
+            backend_id=backend_id,
+            machine_id=machine_id,
+        )
+        return ret
+    else:
+        raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
 
 
 ## @view_config(route_name='metric', request_method='DELETE', renderer='json')
