@@ -112,11 +112,11 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                 if (!this.metric.name) return;
 
                 var newPluginId = this.metric.name
-                    .toLowerCase()
-                    .replace(/[^\w]/g, '_')
-                    .replace(/__*/g, '_')
-                    .replace(/^_/, '')
-                    .replace(/_$/, '');
+                    .toLowerCase()           // Remove upper case letters
+                    .replace(/[^\w]/g, '_')  // keep only alphanumeric and _ chars
+                    .replace(/__*/g, '_')    // don't allow double underscores
+                    .replace(/^_/, '')       // trim heading underscore
+                    .replace(/_$/, '');      // trim trailing underscore
 
                 this.metric.set('pluginId', newPluginId);
             },

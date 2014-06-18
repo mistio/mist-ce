@@ -21,6 +21,9 @@
                    placeholder="My Metric"
                    valueBinding="Mist.metricAddCustomController.metric.name"}}
 
+            <!--debugging only -->
+            <p>{{!Mist.metricAddCustomController.metric.pluginId}}</p>
+
             <label for="custom-plugin-script">Python script:</label>
             {{view Ember.TextArea
                    id="custom-plugin-script"
@@ -39,14 +42,9 @@
             </select>
 
             <div id="custom-plugin-advanced">
-
-                <label for="custom-plugin-target">Plugin Id:</label>
-                {{view Mist.TextField
-                       id="custom-plugin-target"
-                       valueBinding="Mist.metricAddCustomController.metric.pluginId"}}
-
                 <label>
                 {{view Mist.Checkbox
+                       data-mini="true"
                        checkedBinding="Mist.metricAddCustomController.metric.type"}}
                 Derivative
                 </label>

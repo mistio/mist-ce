@@ -361,7 +361,11 @@ define( 'app', [
             ]
         });
 
-        App.Checkbox = Ember.Checkbox;
+        App.Checkbox = Ember.Checkbox.extend({
+            attributeBindings: [
+                'data-mini'
+            ]
+        });
         App.TextField = Ember.TextField.extend({
             autocapitalize: 'off',
             attributeBindings: [

@@ -5,19 +5,23 @@
     width: 360px;
 }
 
+#metric-add-custom-popup label {
+    margin-bottom: -8px;
+    margin-top: 20px;
+}
+
+#metric-add-custom-popup label:first-child {
+    margin-top: 0;
+}
+
 #custom-plugin-script {
     height: 145px !important;
 }
 
 #custom-plugin-advanced {
     display: none;
+    margin-bottom: 25px;
 }
-
-#custom-plugin-advanced-toggle {
-    text-align: center;
-    margin-bottom: -20px;
-}
-
 
 #metric-add-custom .ui-slider {
     width: 100%;
