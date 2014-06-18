@@ -1962,6 +1962,8 @@ def update_metric(user, metric_id, name=None, unit=None,
 def deploy_python_plugin(user, backend_id, machine_id, plugin_id,
                          value_type, read_function):
 
+    machine = user.backends[backend_id].machines[machine_id]
+
     # Sanity checks
     if not plugin_id:
         raise RequiredParameterMissingError('plugin_id')
@@ -2052,10 +2054,10 @@ $sudo /opt/mistio-collectd/collectd.sh restart
 
     # Add custom metric in the db
     parts = ["mist", "python"]  # strip duplicates (bucky also does this)
-    for part in target.split("."):
+    for part in plugin_id.split("."):
         if part != parts[-1]:
             parts.append(part)
-    parts.append(plugin_type)
+    parts.append(value_type)
     metric_id = ".".join(parts)
 
     return {'metric_id': metric_id, 'stdout': stdout}
