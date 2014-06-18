@@ -112,7 +112,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                 if (!this.metric.name) return;
 
                 var newPluginId = this.metric.name
-                    .toLowerCase();
+                    .toLowerCase()
                     .replace(/[^\w]/g, '_')
                     .replace(/__*/g, '_')
                     .replace(/^_/. '')
