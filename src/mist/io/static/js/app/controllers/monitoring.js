@@ -737,7 +737,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                     metrics.forEach(function (metric) {
 
                         // Hide the Graphs
-                        $("#" + metric).hide(0, function () {
+                        $("#" + metric).hide(hideDuration, function () {
 
                             // Show button
                             $("#" + metric + '-btn').show();
@@ -782,7 +782,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                         moveToEnd(parent);
                         moveToEnd(next);
 
-                        $("#" + metric).show(0, function(){
+                        $("#" + metric).show(hideDuration, function(){
 
                             // Save cookies
                             var cookies = Mist.monitoringController.cookies
