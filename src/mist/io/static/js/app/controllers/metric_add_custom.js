@@ -54,8 +54,8 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
             },
 
 
-            close: function () {
-                if (this.callback)
+            close: function (noCallback) {
+                if (this.callback && !noCallback)
                     this.callback(false);
                 this.clear();
                 this.view.close();
@@ -98,7 +98,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                     if (that.callback) that.callback(success, data);
                     that.set('addingMetric', false);
                     if (success)
-                        that.close();
+                        that.close(true);
                 });
             },
 
