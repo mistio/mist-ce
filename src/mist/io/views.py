@@ -696,20 +696,7 @@ def find_metrics(request):
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-    url = "%s/backends/%s/machines/%s/metrics" % (config.CORE_URI,
-                                                  backend_id, machine_id)
-    headers={'Authorization': get_auth_header(user)}
-    try:
-        resp = requests.get(url, headers=headers, verify=config.SSL_VERIFY)
-    except requests.exceptions.SSLError as exc:
-        raise SSLError()
-    except Exception as exc:
-        log.error("Exception requesting find_metrics: %r", exc)
-        raise ServiceUnavailableError()
-    if not resp.ok:
-        log.error("Error in find_metrics %d:%s", resp.status_code, resp.text)
-        raise ServiceUnavailableError(resp.text)
-    return resp.json()
+    return methods.find_metrics(user, backend_id, machine_id)
 
 
 @view_config(route_name='metrics', request_method='PUT', renderer='json')
@@ -717,22 +704,12 @@ def assoc_metric(request):
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-    url = "%s/backends/%s/machines/%s/metrics" % (config.CORE_URI,
-                                                  backend_id, machine_id)
-    try:
-        resp = requests.put(url,
-                            headers={'Authorization': get_auth_header(user)},
-                            params=params_from_request(request),
-                            verify=config.SSL_VERIFY)
-    except requests.exceptions.SSLError as exc:
-        raise SSLError()
-    except Exception as exc:
-        log.error("Exception requesting assoc_metric: %r", exc)
-        raise ServiceUnavailableError()
-    if not resp.ok:
-        log.error("Error in assoc_metric %d:%s", resp.status_code, resp.text)
-        raise ServiceUnavailableError(resp.text)
-    return resp.json()
+    params = params_from_request(request)
+    metric_id = params.get('metric_id')
+    if not metric_id:
+        raise RequiredParameterMissingError('metric_id')
+    methods.assoc_metric(user, backend_id, machine_id, metric_id)
+    return {}
 
 
 @view_config(route_name='metrics', request_method='DELETE', renderer='json')
@@ -740,22 +717,12 @@ def disassoc_metric(request):
     user = user_from_request(request)
     backend_id = request.matchdict['backend']
     machine_id = request.matchdict['machine']
-    url = "%s/backends/%s/machines/%s/metrics" % (config.CORE_URI,
-                                                  backend_id, machine_id)
-    try:
-        resp = requests.delete(url,
-                               headers={'Authorization': get_auth_header(user)},
-                               params=params_from_request(request),
-                               verify=config.SSL_VERIFY)
-    except requests.exceptions.SSLError as exc:
-        raise SSLError()
-    except Exception as exc:
-        log.error("Exception requesting disassoc_metric: %r", exc)
-        raise ServiceUnavailableError()
-    if not resp.ok:
-        log.error("Error in disassoc_metric %d:%s", resp.status_code, resp.text)
-        raise ServiceUnavailableError(resp.text)
-    return resp.json()
+    params = params_from_request(request)
+    metric_id = params.get('metric_id')
+    if not metric_id:
+        raise RequiredParameterMissingError('metric_id')
+    methods.disassoc_metric(user, backend_id, machine_id, metric_id)
+    return {}
 
 
 @view_config(route_name='metric', request_method='PUT', renderer='json')
@@ -763,20 +730,41 @@ def update_metric(request):
     user = user_from_request(request)
     metric_id = request.matchdict['metric']
     params = params_from_request(request)
-    url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
-    headers={'Authorization': get_auth_header(user)}
-    try:
-        resp = requests.put(url, headers=headers, params=params,
-                            verify=config.SSL_VERIFY)
-    except requests.exceptions.SSLError as exc:
-        raise SSLError()
-    except Exception as exc:
-        log.error("Exception updating metric: %r", exc)
-        raise ServiceUnavailableError()
-    if not resp.ok:
-        log.error("Error updating metric %d:%s", resp.status_code, resp.text)
-        raise BadRequestError(resp.text)
-    return resp.json()
+    methods.update_metric(
+        user,
+        metric_id,
+        name=params.get('name'),
+        unit=params.get('unit'),
+        backend_id=params.get('backend_id'),
+        machine_id=params.get('machine_id'),
+    )
+    return {}
+
+
+@view_config(route_name='deploy_plugin', request_method='POST', renderer='json')
+def deploy_plugin(request):
+    user = user_from_request(request)
+    params = params_from_request(request)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    for key in ('target', 'plugin_type', 'read_function'):
+        if key not in params:
+            raise RequiredParameterMissingError(key)
+    ret = methods.deploy_plugin(
+        user, backend_id, machine_id,
+        target=params['target'],
+        plugin_type=params['plugin_type'],
+        read_function=params['read_function'],
+    )
+    update_metric(
+        user,
+        metric_id=ret['metric_id'],
+        name=params.get('name'),
+        unit=params.get('unit'),
+        backend_id=backend_id,
+        machine_id=machine_id,
+    )
+    return ret
 
 
 ## @view_config(route_name='metric', request_method='DELETE', renderer='json')

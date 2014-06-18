@@ -7,6 +7,7 @@ import re
 from time import sleep
 from datetime import datetime
 from hashlib import sha256
+from StringIO import StringIO
 
 
 from libcloud.compute.providers import get_driver
@@ -1773,7 +1774,7 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "else sysctl hw.ncpu | awk '{print $2}';"
        "fi;"
        "echo -------- && "
-       "/sbin/ifconfig;"       
+       "/sbin/ifconfig;"
        "echo --------"
        "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
        #"cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null |"
@@ -1816,7 +1817,7 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
                'loadavg': loadavg,
                'cores': cores,
                'users': users,
-               'pub_ips': pub_ips, 
+               'pub_ips': pub_ips,
                'priv_ips': priv_ips
                }
         # if len(cmd_output) > 4:
@@ -1880,3 +1881,180 @@ def find_public_ips(ips):
         except:
             pass
     return public_ips
+
+
+def find_metrics(user, backend_id, machine_id):
+    url = "%s/backends/%s/machines/%s/metrics" % (config.CORE_URI,
+                                                  backend_id, machine_id)
+    headers={'Authorization': get_auth_header(user)}
+    try:
+        resp = requests.get(url, headers=headers, verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        raise SSLError()
+    except Exception as exc:
+        log.error("Exception requesting find_metrics: %r", exc)
+        raise ServiceUnavailableError()
+    if not resp.ok:
+        log.error("Error in find_metrics %d:%s", resp.status_code, resp.text)
+        raise ServiceUnavailableError(resp.text)
+    return resp.json()
+
+
+def assoc_metric(user, backend_id, machine_id, metric_id):
+    url = "%s/backends/%s/machines/%s/metrics" % (config.CORE_URI,
+                                                  backend_id, machine_id)
+    try:
+        resp = requests.put(url,
+                            headers={'Authorization': get_auth_header(user)},
+                            params={'metric_id': metric_id},
+                            verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        raise SSLError()
+    except Exception as exc:
+        log.error("Exception requesting assoc_metric: %r", exc)
+        raise ServiceUnavailableError()
+    if not resp.ok:
+        log.error("Error in assoc_metric %d:%s", resp.status_code, resp.text)
+        raise ServiceUnavailableError(resp.text)
+
+
+def disassoc_metric(user, backend_id, machine_id, metric_id):
+    url = "%s/backends/%s/machines/%s/metrics" % (config.CORE_URI,
+                                                  backend_id, machine_id)
+    try:
+        resp = requests.delete(url,
+                               headers={'Authorization': get_auth_header(user)},
+                               params={'metric_id': metric_id},
+                               verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        raise SSLError()
+    except Exception as exc:
+        log.error("Exception requesting disassoc_metric: %r", exc)
+        raise ServiceUnavailableError()
+    if not resp.ok:
+        log.error("Error in disassoc_metric %d:%s", resp.status_code, resp.text)
+        raise ServiceUnavailableError(resp.text)
+
+
+def update_metric(user, metric_id, name=None, unit=None,
+                  backend_id=None, machine_id=None):
+    url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
+    headers={'Authorization': get_auth_header(user)}
+    params = {
+        'name': name,
+        'unit': unit,
+        'backend_id': backend_id,
+        'machine_id': machine_id,
+    }
+    try:
+        resp = requests.put(url, headers=headers, params=params,
+                            verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        raise SSLError()
+    except Exception as exc:
+        log.error("Exception updating metric: %r", exc)
+        raise ServiceUnavailableError()
+    if not resp.ok:
+        log.error("Error updating metric %d:%s", resp.status_code, resp.text)
+        raise BadRequestError(resp.text)
+
+
+def deploy_plugin(user, backend_id, machine_id,
+                  target, plugin_type, read_function):
+
+    # Sanity checks
+    lc = [chr(ord('a') + i) for i in range(26)]
+    nums = list('0123456789')
+    chars = lc + nums + ['_', '.']
+    for c in target:
+        if c not in chars:
+            raise BadRequestError("Invalid target '%s'. Target can only "
+                                  "lower case chars, numeric digits, "
+                                  "underscores and dots" % target)
+    if target.startswith('.') or target.endswith('.'):
+        raise BadRequestError("Invalid target '%s'. Target can't start or end "
+                              "with a period." % target)
+    if plugin_type not in ('gauge', 'derive'):
+        raise BadRequestError("Invalid plugin_type '%s'. Must be 'gauge' or "
+                              "'derive'." % plugin_type)
+    plugin_id = target.replace('.', '_')
+
+    # Iniatilize SSH connection
+    shell = Shell(machine.dns_name)
+    key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id)
+
+    # TODO: test read function
+
+    # Generate plugin script
+    plugin = """# Generated by mist.io web ui
+
+import collectd
+
+%(read_function)s
+
+def read_callback():
+    vl = collectd.Values(type="%(type)s")
+    vl.plugin = "mist.python"
+    vl.plugin_instance = "%(plugin_instance)s"
+    vl.dispatch(values=[read()])
+
+collectd.register_read(read_callback)
+""" % {'read_function': read_function,
+       'type': plugin_type,
+       'plugin_instance': target}
+
+    sftp = shell.ssh.open_sftp()
+    sftp.putfo(StringIO(plugin), "/tmp/%s.py" % plugin_id)
+    stdout = shell.command(
+        "cd /opt/mistio-collectd/; "
+        "$(command -v sudo) mkdir -p mist/python; "
+        "$(command -v sudo) mv /tmp/%s.py mist/python/; "
+        "$(command -v sudo) chown -R root mist/python; " % plugin_id
+    )
+
+    # Prepare collectd.conf
+    script = """
+sudo=$(command -v sudo)
+cd /opt/mistio-collectd/
+$sudo mkdir -p mist/python/conf
+
+if ! grep '^Include.*mist/python' collectd.conf; then
+    echo "Adding Include line in collectd.conf for mist/python/include.conf"
+    $sudo su -c 'echo Include \\"/opt/mistio-collectd/mist/python/include.conf\\" >> collectd.conf'
+else
+    echo "mist/python/include.conf is already included in collectd.conf"
+fi
+if [ ! -f mist/python/include.conf ]; then
+    echo "Generating mist/python/include.conf"
+    $sudo su -c 'echo -e "<LoadPlugin python>\n    Globals true\n</LoadPlugin>\n" > mist/python/include.conf'
+else
+    echo "mist/python/include.conf already exists, continuing"
+fi
+
+echo "Generating config file for plugin"
+$sudo su -c 'echo -e "<Plugin python>\n    ModulePath \\"/opt/mistio-collectd/mist/python/\\"\n    LogTraces true\n    Interactive false\n    Import %(plugin_id)s\n</Plugin>\n" > mist/python/conf/%(plugin_id)s.conf'
+echo "Adding Include line for plugin conf in mist/python/include.conf"
+if ! grep '^Include.*%(plugin_id)s' mist/python/include.conf; then
+    $sudo su -c 'echo Include \\"/opt/mistio-collectd/mist/python/conf/%(plugin_id)s.conf\\" >> mist/python/include.conf'
+fi
+echo "Restarting collectd"
+$sudo /opt/mistio-collectd/collectd.sh restart
+""" % {'plugin_id': plugin_id}
+
+    print script
+
+    for line in shell.command_stream(script):
+        print line
+        stdout += line
+
+    shell.disconnect()
+
+    # Add custom metric in the db
+    parts = ["mist", "python"]  # strip duplicates (bucky also does this)
+    for part in target.split("."):
+        if part != parts[-1]:
+            parts.append(part)
+    parts.append(plugin_type)
+    metric_id = ".".join(parts)
+
+    return {'metric_id': metric_id, 'stdout': stdout}
