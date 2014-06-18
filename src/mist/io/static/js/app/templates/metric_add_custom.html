@@ -1,7 +1,7 @@
 
 <div id="metric-add-custom-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-a"></div>
 <div id="metric-add-custom-popup"
-     class="ui-popup-container large-popup ui-popup-hidden ui-body-inherit ui-corner-all">
+     class="ui-popup-container ui-popup-hidden ui-body-inherit ui-corner-all">
 
     <div id="metric-add-custom"
          class="ui-popup ui-corner-all ui-overlay-shadow"
@@ -32,7 +32,7 @@
                    placeholder="Example: B/s (optional)"
                    valueBinding="Mist.metricAddCustomController.metric.unit"}}
 
-            <select id="custom-plugin-advanced-toggle" data-role="slider" data-theme="a"
+            <select id="advanced-toggle" data-role="slider" data-theme="a"
             {{action "advancedToggled" target="view" on="change"}}>
                 <option value="0">Basic settings</option>
                 <option value="1">Advanced settings</option>

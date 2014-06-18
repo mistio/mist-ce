@@ -32,6 +32,9 @@ define('app/views/metric_add_custom', ['app/views/popup'],
                 Ember.run.next(this, function () {
                     $(this.popupId + ' .ember-checkbox')
                         .checkboxradio('refresh');
+                    $('#custom-plugin-script').scrollTop();
+                    $('#advanced-toggle').val(0);
+                    $('#advanced-toggle').slider('refresh')
                 });
             },
 

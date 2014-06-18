@@ -1,9 +1,12 @@
 
 /* Metric Add Custom Popup CSS
 -----------------------------------------------------------------------------------------------------------*/
+#metric-add-custom-popup {
+    width: 360px;
+}
 
 #custom-plugin-script {
-    height: 120px !important;
+    height: 145px !important;
 }
 
 #custom-plugin-advanced {
@@ -22,4 +25,19 @@
 
 #metric-add-custom .ui-select {
     width: 100%;
+}
+
+#metric-add-custom-popup .ok-cancel a {
+    width: 130px;
+}
+
+@media only screen and (max-width: 360px) {
+
+    #metric-add-custom-popup {
+        width: 320px;
+    }
+
+    #metric-add-custom-popup .ok-cancel a {
+        width: 103px;
+    }
 }
