@@ -2057,7 +2057,7 @@ $sudo /opt/mistio-collectd/collectd.sh restart
     for part in plugin_id.split("."):
         if part != parts[-1]:
             parts.append(part)
-    parts.append(plugin_type)
+    parts.append(value_type)
     metric_id = ".".join(parts)
 
     return {'metric_id': metric_id, 'stdout': stdout}
