@@ -768,6 +768,21 @@ def deploy_plugin(request):
         raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
 
 
+@view_config(route_name='deploy_plugin', request_method='DELETE', renderer='json')
+def undeploy_plugin(request):
+    user = user_from_request(request)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    plugin_id = request.matchdict['plugin']
+    plugin_type = params.get('plugin_type')
+    if plugin_type == 'python':
+        ret = methods.undeploy_python_plugin(user, backend_id,
+                                             machine_id, plugin_id)
+        return ret
+    else:
+        raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
+
+
 ## @view_config(route_name='metric', request_method='DELETE', renderer='json')
 ## def remove_metric(request):
     ## user = user_from_request(request)
