@@ -18,12 +18,19 @@
             <label for="custom-plugin-name">Name:</label>
             {{view Mist.TextField
                    id="custom-plugin-name"
+                   placeholder="My Metric"
                    valueBinding="Mist.metricAddCustomController.metric.name"}}
 
             <label for="custom-plugin-script">Python script:</label>
             {{view Ember.TextArea
                    id="custom-plugin-script"
                    valueBinding="Mist.metricAddCustomController.metric.script"}}
+
+            <label for="custom-plugin-unit">Unit:</label>
+            {{view Mist.TextField
+                   id="custom-plugin-unit"
+                   placeholder="Example: B/s (optional)"
+                   valueBinding="Mist.metricAddCustomController.metric.unit"}}
 
             <select id="custom-plugin-advanced-toggle" data-role="slider" data-theme="a"
             {{action "advancedToggled" target="view" on="change"}}>
@@ -33,21 +40,16 @@
 
             <div id="custom-plugin-advanced">
 
-                <label for="custom-plugin-target">Target:</label>
+                <label for="custom-plugin-target">Plugin Id:</label>
                 {{view Mist.TextField
                        id="custom-plugin-target"
-                       valueBinding="Mist.metricAddCustomController.metric.target"}}
+                       valueBinding="Mist.metricAddCustomController.metric.pluginId"}}
 
-                <label for="custom-plugin-unit">Unit:</label>
-                {{view Mist.TextField
-                       id="custom-plugin-unit"
-                       valueBinding="Mist.metricAddCustomController.metric.unit"}}
-
-                <label>Type:</label>
-                <select id='plugin-type' data-inline="true">
-                    <option value='gauge' selected='true'>gauge</option>
-                    <option value='derive' >derive</option>
-                </select>
+                <label>
+                {{view Mist.Checkbox
+                       checkedBinding="Mist.metricAddCustomController.metric.type"}}
+                Derivative
+                </label>
             </div>
 
             {{#if Mist.metricAddCustomController.addingMetric}}

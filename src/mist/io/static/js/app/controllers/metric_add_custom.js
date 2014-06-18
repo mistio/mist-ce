@@ -10,9 +10,12 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
 
         var newLine = String.fromCharCode(13);
         var SCRIPT_EXAMPLE =
-            "import random" + newLine +
-            "def read():" + newLine +
-            "    return random.random()" + newLine;
+        '"""A read() callable must be defined that' + newLine +
+        'returns a number every time it\'s called."""' + newLine + newLine +
+        'import random' + newLine + newLine +
+        'def read():' + newLine +
+        '    """Return a number to be submitted to collectd"""' + newLine +
+        '    return random.random()';
 
         return Ember.Object.extend({
 
@@ -34,8 +37,8 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                 name: null,
                 unit: null,
                 type: null,
-                target: null,
                 script: null,
+                pluginId: null,
                 minValue: null,
                 maxValue: null,
             },
@@ -72,10 +75,8 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                         'name': null,
                         'unit': null,
                         'type': null,
-                        'target': null,
                         'script': SCRIPT_EXAMPLE,
-                        'minValue': null,
-                        'maxValue': null,
+                        'pluginId': null,
                     }))
                     .set('addingMetric', null);
             },
@@ -84,19 +85,18 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
             add: function () {
 
                 var url = '/backends/' + this.machine.backend.id +
-                          '/machines/' + this.machine.id + '/deploy_plugin';
+                          '/machines/' + this.machine.id +
+                          '/plugins/' + this.metric.pluginId;
 
                 this.metric.set('plugin_type', $('#plugin-type').val());
                 var that = this;
                 this.set('addingMetric', true);
                 Mist.ajax.POST(url, {
+                    'plygin_type'   : 'python',
                     'name'          : this.metric.name,
                     'unit'          : this.metric.unit,
-                    'plugin_type'   : this.metric.type,
-                    'target'        : this.metric.target,
+                    'value_type'    : this.metric.type ? 'derive' : 'gauge',
                     'read_function' : this.metric.script,
-                    'min_value'     : this.metric.minValue,
-                    'max_value'     : this.metric.maxValue,
                 }).error(function (message) {
                     Mist.notificationController.notify('Failed to deploy ' +
                         'custom plugin: ' + message);
@@ -105,6 +105,14 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                     that.set('addingMetric', false);
                     that.close();
                 });
+            },
+
+
+            generatePluginId: function () {
+
+                if (!this.metric.name) return;
+
+                var newPluginId = this.metric.name;
             },
 
 
@@ -118,7 +126,12 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
             metricObserver: function () {
                 this.set('formReady',
                     this.metric.name && this.metric.script);
-            }.observes('metric.name', 'metric.script')
+            }.observes('metric.name', 'metric.script'),
+
+
+            nameObserver: function () {
+                Ember.run.once(this, 'generatePluginId');
+            }.observes('metric.name')
         });
     }
 );

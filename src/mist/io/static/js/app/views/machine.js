@@ -447,7 +447,7 @@ define('app/views/machine', ['app/views/mistscreen'],
 
             footerObserver: function() {
                 Ember.run.once(this, 'updateFooter');
-            }.observes('machine.probed', 'machine.can_tag'  ),
+            }.observes('machine.probed', 'machine.can_tag'),
 
 
             stateObserver: function () {
