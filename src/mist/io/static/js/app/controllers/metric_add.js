@@ -195,8 +195,27 @@ define('app/controllers/metric_add', ['app/models/metric', 'ember'],
                 );
             }
 
-            this.subTargets = subTargets;
+            this.subTargets = sortNodes(subTargets);
             this.isEndNode = !subTargets.length;
         };
+
+
+        function sortNodes (nodes) {
+
+            // Bubble short
+            var changed = true;
+            while (changed) {
+                changed = false;
+                for (var i = 0; i < nodes.length - 1; i++) {
+                    if (nodes[i].text > nodes[i+1].text) {
+                        var tmp = nodes[i];
+                        nodes[i] = nodes[i+1];
+                        nodes[i+1] = tmp;
+                        changed = true;
+                    }
+                }
+            }
+            return nodes;
+        }
     }
 );
