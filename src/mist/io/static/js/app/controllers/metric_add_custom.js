@@ -10,13 +10,9 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
 
         var newLine = String.fromCharCode(13);
         var SCRIPT_EXAMPLE =
-        '"""A read() callable must be defined that' + newLine +
-        'returns a number every time it\'s called."""' + newLine + newLine +
-        'import random' + newLine +
-        'def read():' + newLine +
-        '    """Return a number to be submitted ' + newLine +
-        '    to collectd"""' + newLine +
-        '    return random.random()';
+        "import random" + newLine + newLine +
+        "def read():" + newLine +
+        " return random.random()" + newLine;
 
         return Ember.Object.extend({
 

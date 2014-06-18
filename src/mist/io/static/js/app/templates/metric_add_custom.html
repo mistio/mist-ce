@@ -18,7 +18,6 @@
             <label for="custom-plugin-name">Name:</label>
             {{view Mist.TextField
                    id="custom-plugin-name"
-                   placeholder="My Metric"
                    valueBinding="Mist.metricAddCustomController.metric.name"}}
 
             <!--debugging only -->
@@ -32,7 +31,7 @@
             <label for="custom-plugin-unit">Unit:</label>
             {{view Mist.TextField
                    id="custom-plugin-unit"
-                   placeholder="Example: % (optional)"
+                   placeholder="bytes"
                    valueBinding="Mist.metricAddCustomController.metric.unit"}}
 
             <select id="advanced-toggle" data-role="slider" data-theme="a"
@@ -46,7 +45,7 @@
                 {{view Mist.Checkbox
                        data-mini="true"
                        checkedBinding="Mist.metricAddCustomController.metric.type"}}
-                Derivative
+                Calculate derivative
                 </label>
             </div>
 
