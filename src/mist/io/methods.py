@@ -2067,6 +2067,7 @@ def undeploy_python_plugin(user, backend_id, machine_id, plugin_id):
     # Sanity checks
     if not plugin_id:
         raise RequiredParameterMissingError('plugin_id')
+    machine = user.backends[backend_id].machines[machine_id]
 
     # Iniatilize SSH connection
     shell = Shell(machine.dns_name)
