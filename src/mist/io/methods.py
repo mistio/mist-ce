@@ -2120,9 +2120,9 @@ def undeploy_python_plugin(user, backend_id, machine_id, plugin_id):
 sudo=$(command -v sudo)
 cd /opt/mistio-collectd/
 
-echo "Removing Include line for plugin conf from mist/python/include.conf"
-$sudo grep -v 'Include \\"/opt/mistio-collectd/mist/python/conf/%(plugin_id)s.conf\\"' mist/python/include.conf > /tmp/include.conf
-$sudo mv /tmp/include.conf mist/python/include.conf
+echo "Removing Include line for plugin conf from plugins/mist-python/include.conf"
+$sudo grep -v 'Include \\"/opt/mistio-collectd/plugins/mist-python/conf/%(plugin_id)s.conf\\"' plugins/mist-python/include.conf > /tmp/include.conf
+$sudo mv /tmp/include.conf plugins/mist-python/include.conf
 
 echo "Restarting collectd"
 $sudo /opt/mistio-collectd/collectd.sh restart
