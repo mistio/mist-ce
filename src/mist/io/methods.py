@@ -2012,7 +2012,7 @@ for i in range(3):
         raise Exception("read() must return a single int or float "
                         "(or None to not submit any sample to collectd)")
     time.sleep(1)
-    print("READ FUNCTION TEST PASSED")
+print("READ FUNCTION TEST PASSED")
     """ % plugin_id
 
     sftp.putfo(StringIO(read_function), "%s/%s_read.py" % (tmp_dir, plugin_id))
@@ -2074,10 +2074,17 @@ echo "Generating config file for plugin"
 $sudo su -c 'echo -e "<Plugin python>\n    ModulePath \\"/opt/mistio-collectd/plugins/mist-python/\\"\n    LogTraces true\n    Interactive false\n    Import %(plugin_id)s\n</Plugin>\n" > plugins/mist-python/conf/%(plugin_id)s.conf'
 echo "Adding Include line for plugin conf in plugins/mist-python/include.conf"
 if ! grep '^Include.*%(plugin_id)s' plugins/mist-python/include.conf; then
+    $sudo cp plugins/mist-python/include.conf plugins/mist-python/include.conf.backup
     $sudo su -c 'echo Include \\"/opt/mistio-collectd/plugins/mist-python/conf/%(plugin_id)s.conf\\" >> plugins/mist-python/include.conf'
+    echo "Restarting collectd"
+    if ! $sudo /opt/mistio-collectd/collectd.sh restart; then
+        echo "Restarting collectd failed, restoring include.conf"
+        $sudo cp plugins/mist-python/include.conf.backup plugins/mist-python/include.conf
+        $sudo /opt/mistio-collectd/collectd.sh restart
+    fi
+else
+    echo "Plugin conf already included in include.conf"
 fi
-echo "Restarting collectd"
-$sudo /opt/mistio-collectd/collectd.sh restart
 """ % {'plugin_id': plugin_id}
 
     for line in shell.command_stream(script):
