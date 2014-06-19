@@ -2052,7 +2052,6 @@ $sudo /opt/mistio-collectd/collectd.sh restart
 
     shell.disconnect()
 
-    # Add custom metric in the db
     parts = ["mist", "python"]  # strip duplicates (bucky also does this)
     for part in plugin_id.split("."):
         if part != parts[-1]:
@@ -2061,3 +2060,34 @@ $sudo /opt/mistio-collectd/collectd.sh restart
     metric_id = ".".join(parts)
 
     return {'metric_id': metric_id, 'stdout': stdout}
+
+
+def undeploy_python_plugin(user, backend_id, machine_id, plugin_id):
+
+    # Sanity checks
+    if not plugin_id:
+        raise RequiredParameterMissingError('plugin_id')
+    machine = user.backends[backend_id].machines[machine_id]
+
+    # Iniatilize SSH connection
+    shell = Shell(machine.dns_name)
+    key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id)
+
+    # Prepare collectd.conf
+    script = """
+sudo=$(command -v sudo)
+cd /opt/mistio-collectd/
+
+echo "Removing Include line for plugin conf from mist/python/include.conf"
+$sudo grep -v 'Include \\"/opt/mistio-collectd/mist/python/conf/%(plugin_id)s.conf\\"' mist/python/include.conf > /tmp/include.conf
+$sudo mv /tmp/include.conf mist/python/include.conf
+
+echo "Restarting collectd"
+$sudo /opt/mistio-collectd/collectd.sh restart
+""" % {'plugin_id': plugin_id}
+
+    stdout = shell.command(script)
+
+    shell.disconnect()
+
+    return {'metric_id': None, 'stdout': stdout}
