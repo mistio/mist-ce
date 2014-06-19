@@ -8,6 +8,7 @@ from time import sleep
 from datetime import datetime
 from hashlib import sha256
 
+from amqp.connection import Connection
 
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
@@ -1797,16 +1798,18 @@ def notify_user(user, title, message=""):
         send_email(title, message, user.email)
     except ImportError:
         pass
-        
-    import pika
-    connection = pika.BlockingConnection(pika.ConnectionParameters(
-               'localhost'))
-    channel = connection.channel()
-    channel.exchange_declare(exchange=user.email,
-                         type='fanout')
-    channel.queue_declare(queue='notify')
-    channel.basic_publish(exchange=user.email,
-                      routing_key='notify',
-                      body="%s\n%s" % (title,message))
     
-    connection.close()  
+    msg = Message("%s\n%s" % (title,message))
+    connection = Connection()
+    channel = connection.channel()
+    
+    channel.exchange_declare(exchange=user.email,
+                             type='fanout', 
+                             auto_delete=False)
+    channel.queue_declare('notify')   
+    channel.queue_bind('notify', user.email)    
+    channel.basic_publish(msg,
+                          exchange=user.email,
+                          routing_key='notify')    
+    channel.close()
+    connection.close()
