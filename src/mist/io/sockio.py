@@ -10,10 +10,11 @@ greenlet.
 
 import json
 
-import pika
+from amqp.connection import Connection
 
 from time import time
 
+import gevent
 from gevent.socket import wait_read, wait_write
 
 from socketio.namespace import BaseNamespace
@@ -24,17 +25,49 @@ except ImportError:
     from mist.io.helpers import user_from_request
 
 from mist.io import methods
+from mist.io import tasks
 from mist.io.shell import Shell
+
+
+class ShellNamespace(BaseNamespace):
+    def initialize(self):
+        self.user = user_from_request(self.request)
+        self.channel = None
+        print "opening shell socket"         
+    
+    def on_shell_open(self, data):
+        print "opened shell"
+        self.shell = Shell(data['host'])
+        key_id, ssh_user = self.shell.autoconfigure(self.user, data['backend_id'], data['machine_id'])
+        self.channel = self.shell.ssh.invoke_shell('xterm')
+        self.spawn(self.get_ssh_data)           
+    
+    def on_shell_close(self):
+        print "closing shell"
+        if self.channel:
+            self.channel.close()
+    
+    def on_shell_data(self, data):
+        self.channel.send(data)
+
+    def get_ssh_data(self):
+        try:
+            while True:
+                wait_read(self.channel.fileno())
+                data = self.channel.recv(1024)
+                if not len(data):
+                    return
+                self.emit('shell_data', data)
+        finally:
+            self.channel.close()    
 
 
 class MistNamespace(BaseNamespace):
     def initialize(self):
+        print "init"
         self.user = user_from_request(self.request)
         self.probes = {}
-        self.monitoring_greenlet = self.spawn(check_monitoring_from_socket, self)
-        self.backends_greenlet = self.spawn(list_backends_from_socket, self)
-        self.keys_greenlet = self.spawn(list_keys_from_socket, self)
-        self.update_greenlet = self.spawn(update_subscriber, self)
+        self.channel = None
         
     def spawn_later(self, delay, fn, *args, **kwargs):
         """Spawn a new process, attached to this Namespace after no less than
@@ -56,36 +89,42 @@ class MistNamespace(BaseNamespace):
         self.jobs.append(new)
         return new
     
-    def on_shell_open(self, data):
-        print "opened shell! %s" % data
-        self.shell = Shell(data['host'])
-        key_id, ssh_user = self.shell.autoconfigure(self.user, data['backend_id'], data['machine_id'])
-        self.channel = self.shell.ssh.invoke_shell('xterm')
-        self.spawn(get_ssh_data, self)
-    
-    def on_shell_close(self):
-        print "closing shell"
-        self.channel.disconnect()
-    
-    def on_shell_data(self, data):
-        self.channel.send(data)
-        
+    def on_ready(self):
+        print "Ready to go!"
+        self.monitoring_greenlet = self.spawn(check_monitoring_from_socket, self)
+        self.backends_greenlet = self.spawn(list_backends_from_socket, self)
+        self.keys_greenlet = self.spawn(list_keys_from_socket, self)
+        self.update_greenlet = self.spawn(update_subscriber, self)
+        #self.probe_greenlet = self.spawn(probe_subscriber, self)
+                
     def on_boo(self, data):
         print "BOO", data
         self.emit("Boo")
-
-
-def get_ssh_data(namespace):
-    channel = namespace.channel
-    try:
-        while True:
-            wait_read(channel.fileno())
-            data = channel.recv(1024)
-            if not len(data):
-                return
-            namespace.emit('shell_data', data)
-    finally:
-        channel.close()
+        
+    def process_update(self, msg):        
+        routing_key = msg.delivery_info.get('routing_key')
+        if routing_key == 'notify':
+            self.emit('notify', msg.body)
+        elif routing_key == 'probe':
+            print "Got probe"
+            print msg.body
+            self.emit('probe', json.loads(msg.body));
+        elif routing_key == 'update':
+            self.user.refresh()
+            self.emit('update', msg.body)
+            sections = json.loads(msg.body)
+            if 'backends' in sections:
+                self.backends_greenlet.kill()
+                self.backends_greenlet = self.spawn(list_backends_from_socket, 
+                                                    self)
+            if 'keys' in sections:
+                self.keys_greenlet.kill()
+                self.keys_greenlet = self.spawn(list_keys_from_socket, 
+                                                self)
+            if 'monitoring' in sections:
+                self.monitoring_greenlet.kill()
+                self.monitoring_greenlet = self.spawn(check_monitoring_from_socket, 
+                                                      self)           
 
 
 def update_subscriber(namespace):
@@ -93,46 +132,23 @@ def update_subscriber(namespace):
     the browser.
         
     """
-    connection = pika.BlockingConnection(pika.ConnectionParameters(
-            host='localhost'))
+    connection = Connection()
     channel = connection.channel()
     
     channel.exchange_declare(exchange=namespace.user.email,
-                             type='fanout')
-    result = channel.queue_declare(exclusive=True)
-    queue_name = result.method.queue
-    
-    channel.queue_bind(exchange=namespace.user.email,
-                       queue=queue_name)
+                             type='fanout', auto_delete=False)
+    result = channel.queue_declare('update')   
+    channel.queue_bind('update', exchange=namespace.user.email)
     
     print ' [*] Waiting for logs. To exit press CTRL+C'
-    
-    def callback(ch, method, properties, body):
-        if method.routing_key == 'notify':
-            namespace.emit('notify', body)
-        elif method.routing_key == 'update':
-            namespace.user.refresh()
-            namespace.emit('update', body)
-            sections = json.loads(body)
-            if 'backends' in sections:
-                namespace.backends_greenlet.kill()
-                namespace.backends_greenlet = namespace.spawn(list_backends_from_socket, 
-                                                              namespace)
-            if 'keys' in sections:
-                namespace.keys_greenlet.kill()
-                namespace.keys_greenlet = namespace.spawn(list_keys_from_socket, 
-                                                          namespace)
-            if 'monitoring' in sections:
-                namespace.monitoring_greenlet.kill()
-                namespace.monitoring_greenlet = namespace.spawn(check_monitoring_from_socket, 
-                                                                namespace)
-        
-            
-    channel.basic_consume(callback,
-                          queue=queue_name,
+                    
+    channel.basic_consume(queue='update',
+                          callback=namespace.process_update,
                           no_ack=True)
     
-    channel.start_consuming()
+    while True:
+        channel.wait()
+        gevent.sleep()
 
 
 def check_monitoring_from_socket(namespace):
@@ -194,28 +210,16 @@ def list_machines_from_socket(namespace, backend_id, probe=True):
     namespace.emit('list_machines', {'backend_id': backend_id, 
                                      'machines': machines})
     if probe:
-        probes = [namespace.spawn(probe_machine_from_socket, 
-                                  namespace, 
-                                  backend_id, 
-                                  machine['id'], 
-                                  machine['public_ips'][0]) \
-                  for machine in machines if machine.get('public_ips', None)]
+        probes = []
+        for machine in machines:
+            ips = filter(lambda ip: ':' not in ip, 
+                         machine.get('public_ips', []))
+            if not ips:
+                continue
+            tasks.async_probe.delay(user, backend_id, machine['id'], ips[0])
+        
     namespace.spawn_later(10, 
                           list_machines_from_socket,
                           namespace, 
                           backend_id,  
-                          probe)
-
-
-def probe_machine_from_socket(namespace, backend_id, machine_id, host, key_id='', ssh_user=''):
-    user = namespace.user
-    if namespace.probes.get(host, None) and time() - namespace.probes[host]['time'] < 5*60:
-        # Do not reprobe in less than 5 mins
-        # TODO: make this smarter
-        return
-    result = methods.probe(user, backend_id, machine_id, host, key_id, ssh_user)
-    namespace.emit('probe', {'backend_id': backend_id,
-                             'machine_id': machine_id,
-                             'result': result})
-    namespace.probes[host] = {'time': time(),
-                               'result': result}
+                          False)

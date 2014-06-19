@@ -36,7 +36,7 @@ from mist.io.shell import Shell
 import mist.io.exceptions as exceptions
 from mist.io.exceptions import *
 from mist.io.helpers import get_auth_header
-from mist.io.sockio import MistNamespace
+from mist.io.sockio import MistNamespace, ShellNamespace
 
 
 log = logging.getLogger(__name__)
@@ -821,6 +821,7 @@ def list_supported_providers(request):
 @view_config(route_name='socketio')
 def socketio(request):
     socketio_manage(request.environ,
-                    namespaces={'/mist': MistNamespace},
+                    namespaces={'/mist': MistNamespace,
+                                '/shell': ShellNamespace},
                     request=request)
     return {}

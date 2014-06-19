@@ -1,6 +1,8 @@
 import json
 
-import pika
+from amqp import Message
+from amqp.connection import Connection
+
 
 from time import time
 
@@ -29,17 +31,20 @@ libcloud.security.CA_CERTS_PATH.append(cert_path)
 
 @app.task
 def add(x,y):
-    msg = '%s + %s' % (x,y)
-    connection = pika.BlockingConnection(pika.ConnectionParameters(
-               'localhost'))
+    msg = Message('%s + %s' % (x,y))
+    
+    connection = Connection()
     channel = connection.channel()
     channel.exchange_declare(exchange='logs',
-                         type='fanout')
-    channel.queue_declare(queue='add')
-    channel.basic_publish(exchange='logs',
-                      routing_key='',
-                      body=msg)    
+                             type='fanout', 
+                             auto_delete=False)
+    channel.queue_declare('add')   
+    channel.queue_bind('add', 'logs')    
+    channel.basic_publish(msg,
+                          exchange='logs',
+                          routing_key='')    
     print "sent: ", msg
+    channel.close()
     connection.close()
 
     return x+y
@@ -58,18 +63,53 @@ def async_ssh_command(user, backend_id, machine_id, host, command,
 
 
 @app.task
-def trigger_session_update(email, sections=['backends','keys','monitoring']):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(
-               'localhost'))
+def async_probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
+    from mist.io.methods import probe
+    try:
+        res = probe(user, backend_id, machine_id, host, key_id, ssh_user)
+    except Exception as e:
+        print "probe failed with %s" % repr(e)
+        return
+
+    ret = {'backend_id': backend_id,
+           'machine_id': machine_id,
+           'host': host,
+           'result': res}
+    email = user.email
+    msg = Message(json.dumps(ret))
+    
+    connection = Connection()
     channel = connection.channel()
     channel.exchange_declare(exchange=email,
-                         type='fanout')
-    channel.queue_declare(queue='update')
-    channel.basic_publish(exchange=email,
-                      routing_key='update',                          
-                      body=json.dumps(sections))
+                             type='fanout', 
+                             auto_delete=False)
+    channel.queue_declare('update')   
+    channel.queue_bind('update', email)    
+    channel.basic_publish(msg,
+                          exchange=email,
+                          routing_key='probe') 
     
+    print "probed: ", email, ret
+    channel.close()
+    connection.close()      
+
+
+@app.task
+def trigger_session_update(email, sections=['backends','keys','monitoring']):
+    connection = Connection()
+    channel = connection.channel()
+    channel.exchange_declare(exchange=email,
+                             type='fanout', 
+                             auto_delete=False)
+    channel.queue_declare('update')   
+    channel.queue_bind('update', email)    
+ 
+    msg = Message(json.dumps(sections))
+    channel.basic_publish(msg, exchange=email, routing_key='update')
+  
     print "update: ", email, sections
+    
+    channel.close()
     connection.close()    
 
 

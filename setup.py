@@ -22,7 +22,7 @@ requires = [
     'gevent',
     'gevent-socketio',
     'gevent-subprocess',
-    'pika',
+    'amqp',
 ]
 
 setup(name='mist.io',
