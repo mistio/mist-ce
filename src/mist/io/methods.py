@@ -2081,15 +2081,16 @@ if ! grep '^Include.*%(plugin_id)s' plugins/mist-python/include.conf; then
         echo "Restarting collectd failed, restoring include.conf"
         $sudo cp plugins/mist-python/include.conf.backup plugins/mist-python/include.conf
         $sudo /opt/mistio-collectd/collectd.sh restart
+        echo FAILURE
     fi
 else
     echo "Plugin conf already included in include.conf"
 fi
 """ % {'plugin_id': plugin_id}
 
-    for line in shell.command_stream(script):
-        print line
-        stdout += line
+    stdout += shell.command(script)
+    if stdout.strip().endswith("FAILURE"):
+        raise BadRequestError(stdout)
 
     shell.disconnect()
 
