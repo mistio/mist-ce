@@ -153,7 +153,11 @@ def update_subscriber(namespace):
 
 def check_monitoring_from_socket(namespace):
     user = namespace.user
-    ret = methods.check_monitoring(user)
+    try:
+        from mist.core import methods as core_methods
+        ret = core_methods.check_monitoring(user)
+    except ImportError:
+        ret = methods.check_monitoring(user)
     namespace.emit('monitoring', ret)
 
     
@@ -216,7 +220,7 @@ def list_machines_from_socket(namespace, backend_id, probe=True):
                          machine.get('public_ips', []))
             if not ips:
                 continue
-            tasks.async_probe.delay(user, backend_id, machine['id'], ips[0])
+            tasks.async_probe.delay(user.email, backend_id, machine['id'], ips[0])
         
     namespace.spawn_later(10, 
                           list_machines_from_socket,

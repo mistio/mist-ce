@@ -63,8 +63,14 @@ def async_ssh_command(user, backend_id, machine_id, host, command,
 
 
 @app.task
-def async_probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
+def async_probe(email, backend_id, machine_id, host, key_id='', ssh_user=''):
     from mist.io.methods import probe
+    try:
+        from mist.core.helpers import user_from_email
+        user = user_from_email(email)
+    except ImportError:
+        from mist.io.model import User
+        user = User()
     try:
         res = probe(user, backend_id, machine_id, host, key_id, ssh_user)
     except Exception as e:
@@ -75,7 +81,7 @@ def async_probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
            'machine_id': machine_id,
            'host': host,
            'result': res}
-    email = user.email
+
     msg = Message(json.dumps(ret))
     
     connection = Connection()
