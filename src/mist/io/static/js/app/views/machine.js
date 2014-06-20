@@ -79,7 +79,7 @@ define('app/views/machine', ['app/views/mistscreen'],
                     $('#single-machine-page #single-machine-tags-btn').addClass('ui-state-disabled');
                 }
 
-                if (this.machine.probed && this.machine.state == 'running') {
+                if (this.machine.state == 'running') {
                     $('#single-machine-page #single-machine-shell-btn').removeClass('ui-state-disabled');
                 } else {
                     $('#single-machine-page #single-machine-shell-btn').addClass('ui-state-disabled');
@@ -303,7 +303,7 @@ define('app/views/machine', ['app/views/mistscreen'],
                         if (!success) {
                             Mist.notificationController.notify('Failed to probe machine');
                         }
-                    })
+                    });
                 },
 
 
@@ -417,7 +417,7 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
             rules: function(){
-                var ret = Ember.ArrayController.create()
+                var ret = Ember.ArrayController.create();
                 var machine = this.machine;
                 Mist.rulesController.forEach(function(rule){
                     if (rule.machine == machine) {

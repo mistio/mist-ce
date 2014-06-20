@@ -54,7 +54,7 @@ class ShellNamespace(BaseNamespace):
         try:
             while True:
                 wait_read(self.channel.fileno())
-                data = self.channel.recv(1024)
+                data = self.channel.recv(1024).decode('utf-8','ignore')
                 if not len(data):
                     return
                 self.emit('shell_data', data)
