@@ -2086,7 +2086,8 @@ if ! grep '^Include.*%(plugin_id)s' plugins/mist-python/include.conf; then
 else
     echo "Plugin conf already included in include.conf"
 fi
-""" % {'plugin_id': plugin_id}
+$sudo rm -rf %(tmp_dir)s
+""" % {'plugin_id': plugin_id, 'tmp_dir': tmp_dir}
 
     stdout += shell.command(script)
     if stdout.strip().endswith("FAILURE"):
