@@ -181,6 +181,10 @@ def add_backend(request):
     machine_key = params.get('machine_key', '')
     machine_user = params.get('machine_user', '')
     try:
+        docker_port = int(params.get('docker_port', 4243))
+    except:
+        docker_port = 4243
+    try:
         ssh_port = int(params.get('machine_port', 22))
     except:
         ssh_port = 22
@@ -190,9 +194,12 @@ def add_backend(request):
 
     user = user_from_request(request)
     backend_id = methods.add_backend(
-        user, title, provider, apikey, apisecret, apiurl, tenant_name=tenant_name,
-        machine_hostname=machine_hostname, machine_key=machine_key, machine_user=machine_user,
-        region=region, compute_endpoint=compute_endpoint, port=ssh_port
+        user, title, provider, apikey, apisecret, apiurl,
+        tenant_name=tenant_name,
+        machine_hostname=machine_hostname, machine_key=machine_key,
+        machine_user=machine_user, region=region,
+        compute_endpoint=compute_endpoint, port=ssh_port,
+        docker_port=docker_port
     )
     backend = user.backends[backend_id]
     return {
@@ -385,7 +392,8 @@ def associate_key(request):
     if not host:
         raise RequiredParameterMissingError('host')
     user = user_from_request(request)
-    methods.associate_key(user, key_id, backend_id, machine_id, host, username=ssh_user, port=ssh_port)
+    methods.associate_key(user, key_id, backend_id, machine_id, host,
+                          username=ssh_user, port=ssh_port)
     return user.keypairs[key_id].machines
 
 
@@ -439,7 +447,8 @@ def create_machine(request):
     user = user_from_request(request)
     ret = methods.create_machine(user, backend_id, key_id, machine_name,
                                  location_id, image_id, size_id, script,
-                                 image_extra, disk, image_name, size_name, location_name)
+                                 image_extra, disk, image_name, size_name,
+                                 location_name)
     return ret
 
 
@@ -797,10 +806,10 @@ def shell_stream(request):
         shell = Shell(host)
         shell.autoconfigure(user, backend_id, machine_id)
         # stdout_lines is a generator that spits out lines of combined
-        # stdout and stderr output. cmd is executed via the shell on the background
-        # and the stdout_lines generator is immediately available. stdout_lines
-        # will block if no line is in the buffer and will stop iterating once the
-        # command is completed and the pipe is closed.
+        # stdout and stderr output. cmd is executed via the shell on the
+        # background and the stdout_lines generator is immediately available.
+        # stdout_lines will block if no line is in the buffer and will stop
+        # iterating once the command is completed and the pipe is closed.
         stdout_lines = shell.command_stream(cmd)
     except Exception as e:
         message = ["Failed to execute command\n", "Error: %s \n" % e]

@@ -256,8 +256,8 @@ class Shell(object):
                         users.append(name)
             for ssh_user in users:
                 try:
-                    log.info("ssh -i %s %s@%s",
-                             key_id, ssh_user, self.host)
+                    log.info("ssh -i %s %s@%s:%s",
+                             key_id, ssh_user, self.host, port)
                     self.connect(username=ssh_user,
                                  key=keypair.private,
                                  password=password,

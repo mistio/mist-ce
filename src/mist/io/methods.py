@@ -48,7 +48,7 @@ GCE_IMAGES = ['debian-cloud', 'centos-cloud', 'suse-cloud', 'rhel-cloud']
 @core_wrapper
 def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 machine_hostname="", region="", machine_key="", machine_user="",
-                compute_endpoint="", port=22, remove_on_error=True):
+                compute_endpoint="", port=22, docker_port=4243, remove_on_error=True):
     """Adds a new backend to the user and returns the new backend_id."""
 
     if not provider:
@@ -110,7 +110,8 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if not provider.__class__ is int and ':' in provider:
             provider, region = provider.split(':')[0], provider.split(':')[1]
 
-        if remove_on_error:
+        if remove_on_error and provider != 'docker':
+            #docker url is the only piece needed in docker
             if not apikey:
                 raise RequiredParameterMissingError("apikey")
             if not apisecret:
@@ -124,6 +125,8 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         backend.apiurl = apiurl
         backend.tenant_name = tenant_name
         backend.region = region
+        if provider == 'docker':
+            backend.docker_port = docker_port
 
         #OpenStack specific: compute_endpoint is passed only when there is a
         # custom endpoint for the compute/nova-compute service
@@ -371,7 +374,13 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
     if not host:
         if not associated:
             with user.lock_n_load():
-                user.keypairs[key_id].machines.append(machine_uid)
+                assoc = [backend_id,
+                         machine_id,
+                         0,
+                         username,
+                         False,
+                         port]
+                user.keypairs[key_id].machines.append(assoc)
                 user.save()
             trigger_session_update.delay(user.email, ['keys'])
         return
@@ -505,6 +514,8 @@ def connect_provider(backend):
         conn = driver(backend.apisecret)
     elif backend.provider == Provider.GCE:
         conn = driver(backend.apikey, backend.apisecret, project=backend.tenant_name)
+    elif backend.provider == Provider.DOCKER:
+        conn = driver(backend.apikey, backend.apisecret, backend.apiurl, backend.docker_port)
     elif backend.provider in [Provider.RACKSPACE_FIRST_GEN,
                               Provider.RACKSPACE]:
         conn = driver(backend.apikey, backend.apisecret,
@@ -543,7 +554,7 @@ def get_machine_actions(machine_from_api, conn):
 
     if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
                      Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                     Provider.DIGITAL_OCEAN):
+                     Provider.DIGITAL_OCEAN, Provider.DOCKER):
         can_tag = False
 
     # for other states
@@ -668,6 +679,38 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
         raise BackendNotFoundError(backend_id)
     conn = connect_provider(user.backends[backend_id])
 
+    if conn.type is Provider.DOCKER:
+        if key_id and key_id in user.keypairs:
+            keypair = user.keypairs[key_id]
+            public_key = keypair.public
+        else:
+            public_key = None
+
+        node = _create_machine_docker(conn, machine_name, image_id, script, public_key=public_key)
+
+        if key_id and key_id in user.keypairs:
+            node_info = conn.inspect_node(node)
+            try:
+                port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
+            except:
+                port = 22
+            associate_key(user, key_id, backend_id, node.id, port=int(port))
+
+        if script and public_key:
+            host = conn.connection.host           
+            #consider public ip of docker server as container's ip too
+            #run script
+            ssh_command(user, backend_id=backend_id, machine_id=node.id, key_id=key_id, host=host,
+                        command=script, port=port)
+
+        return {
+            'id': node.id,
+            'name': node.name,
+            'extra': node.extra,
+            'public_ips': node.public_ips,
+            'private_ips': node.private_ips,
+        }
+
     if key_id and key_id not in user.keypairs:
         raise KeypairNotFoundError(key_id)
 
@@ -683,10 +726,6 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     keypair = user.keypairs[key_id]
     private_key = keypair.private
     public_key = keypair.public
-
-    #print "Key id: " + key_id
-    #print "Public: " + public_key
-    #print "Private: " + private_key
 
     size = NodeSize(size_id, name=size_name, ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
@@ -986,6 +1025,26 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
             raise MachineCreationError("Softlayer, got exception %s" % e)
     return node
 
+def _create_machine_docker(conn, machine_name, image, script, public_key=None):
+    """Create a machine in docker.
+
+    """
+
+    try:
+        if public_key:
+            environment = ['PUBLIC_KEY=%s' % public_key.strip()]
+        else:
+            environment = None
+        node = conn.create_node(
+            name=machine_name,
+            image=image,
+            command=script,
+            environment=environment,
+        )
+    except Exception as e:
+        raise MachineCreationError("Docker, got exception %s" % e)
+
+    return node
 
 def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                                  script, machine_name, image, size, location):
@@ -1114,6 +1173,24 @@ def _machine_action(user, backend_id, machine_id, action):
         if action is 'start':
             # In liblcoud it is not possible to call this with machine.start()
             conn.ex_start_node(machine)
+
+            if conn.type is Provider.DOCKER:
+                node_info = conn.inspect_node(node)
+                try:
+                    port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
+                except KeyError:
+                    port = 22
+
+            with user.lock_n_load():
+                machine_uid = [backend_id, machine_id]
+
+                for keypair in user.keypairs:
+                    for machine in user.keypairs[keypair].machines:
+                        if machine[:2] == machine_uid:
+                            key_id = keypair
+                            machine[-1] = int(port)
+                user.save()
+
         elif action is 'stop':
             # In libcloud it is not possible to call this with machine.stop()
             conn.ex_stop_node(machine)
@@ -1128,8 +1205,29 @@ def _machine_action(user, backend_id, machine_id, action):
                     return False
             else:
                 machine.reboot()
+                if conn.type is Provider.DOCKER:
+                    node_info = conn.inspect_node(node)
+                    try:
+                        port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
+                    except KeyError:
+                        port = 22
+
+                    with user.lock_n_load():
+                        machine_uid = [backend_id, machine_id]
+
+                        for keypair in user.keypairs:
+                            for machine in user.keypairs[keypair].machines:
+                                if machine[:2] == machine_uid:
+                                    key_id = keypair
+                                    machine[-1] = int(port)
+                        user.save()
+                        
         elif action is 'destroy':
-            machine.destroy()
+            if conn.type is Provider.DOCKER and node.state == 0:
+                conn.ex_stop_node(node)
+                machine.destroy()
+            else:
+                machine.destroy()
     except AttributeError:
         raise BadRequestError("Action %s not supported for this machine"
                               % action)
@@ -1270,11 +1368,15 @@ def list_images(user, backend_id, term=None):
                     #eg ResourceNotFoundError
                     pass
             rest_images = [image for image in rest_images if not image.extra['deprecated']]
+        elif conn.type == Provider.DOCKER:
+            #get mist.io default docker images from config
+            rest_images = [NodeImage(id=image, name=name, driver=conn, extra={}) 
+                              for image, name in config.DOCKER_IMAGES.items()]
+            rest_images += conn.list_images()
         else:
             rest_images = conn.list_images()
             starred_images = [image for image in rest_images
                               if image.id in starred]
-
         if term and conn.type in config.EC2_PROVIDERS:
             ec2_images += conn.list_images(ex_owner="aws-marketplace")
 
@@ -1284,7 +1386,10 @@ def list_images(user, backend_id, term=None):
                   and 'windows' not in img.name.lower()
                   and 'hvm' not in img.name.lower()]
 
-        if term:
+        if term and conn.type == 'docker':
+            images = conn.search_images(term=term)[:40]
+        #search directly on docker registry for the query
+        elif term:
             images = [img for img in images
                       if term in img.id.lower()
                       or term in img.name.lower()][:40]
@@ -1308,6 +1413,11 @@ def _image_starred(user, backend_id, image_id):
         if backend.provider in config.EC2_IMAGES:
             if image_id in config.EC2_IMAGES[backend.provider]:
                 default = True
+    elif backend.provider == 'docker':
+        # do not consider docker backend's images as default
+        default = False
+        if image_id in config.DOCKER_IMAGES:
+            default = True
     else:
         # consider all images default for backends with few images
         default = True
@@ -1692,15 +1802,16 @@ def deploy_collectd_command(deploy_kwargs):
 
 def _undeploy_collectd(user, backend_id, machine_id, host):
     """Uninstall collectd from the machine and return command's output"""
-
+    #FIXME: do not hard-code stuff!
     command = (
-        "$(command -v sudo) rm -f /etc/cron.d/mistio-collectd "
-        "&& $(command -v sudo) kill -9 "
-        "`cat /opt/mistio-collectd/collectd.pid`"
+        "sudo=$(command -v sudo); "
+        "[ -f /etc/cron.d/mistio-collectd ] && $sudo rm -f /etc/cron.d/mistio-collectd || "
+        "$sudo su -c 'cat /etc/rc.local | grep -v mistio-collectd > /etc/rc.local';"
+        "$sudo /opt/mistio-collectd/collectd.sh stop; "
+        "sleep 2; $sudo kill -9 `cat /opt/mistio-collectd/collectd.pid`"
     )
 
     return async_ssh_command.delay(user, backend_id, machine_id, host, command)
-    
 
 
 def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
@@ -1727,7 +1838,7 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "else sysctl hw.ncpu | awk '{print $2}';"
        "fi;"
        "echo -------- && "
-       "/sbin/ifconfig;"       
+       "/sbin/ifconfig;"
        "echo --------"
        "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
     )
@@ -1763,7 +1874,7 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
                'loadavg': loadavg,
                'cores': cores,
                'users': users,
-               'pub_ips': pub_ips, 
+               'pub_ips': pub_ips,
                'priv_ips': priv_ips
                }
 

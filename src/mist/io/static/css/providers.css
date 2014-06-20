@@ -33,6 +33,10 @@
     background-image: url(../images/nephoscale_sm.png);
 }
 
+/* Docker */
+#single-view-provider-icon.provider-docker  {
+    background-image: url(../images/docker_sm.png);
+}
 
 /* GCE */
 #single-view-provider-icon.provider-gce  {

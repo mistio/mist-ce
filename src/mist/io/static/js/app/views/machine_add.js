@@ -16,7 +16,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                 var image = Mist.machineAddController.newMachineImage;
                 var size = Mist.machineAddController.newMachineSize;
                 var provider = Mist.machineAddController.newMachineProvider;
-                var location = Mist.machineAddController.newMachineLocation;                
+                var location = Mist.machineAddController.newMachineLocation;
 
                 if (!image || !image.id || !size || !size.id || !provider || !provider.id) return 0;
 
@@ -42,7 +42,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                             return size.price.us;
                         if (location.name.indexOf('asia-') > -1)
                             return size.price.as;
-                        return size.price.eu;                            
+                        return size.price.eu;
                     }
                     return size.price;
 
@@ -56,9 +56,9 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
 
             /**
-             * 
+             *
              *  Initialization
-             * 
+             *
              */
 
              load: function () {
@@ -138,7 +138,7 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
                                              .set('newMachineImage', {'name' : 'Select Image'})
                                              .set('newMachineSize', {'name' : 'Select Size'})
                                              .set('newMachineProvider', backend);
-                   
+
                    $('#create-machine-image').removeClass('ui-state-disabled');
                    $('#create-machine-location').addClass('ui-state-disabled');
                    $('#create-machine-size').addClass('ui-state-disabled');
@@ -168,9 +168,14 @@ define('app/views/machine_add', ['app/views/templated', 'ember'],
 
                     Mist.machineAddController.set('newMachineLocation', {'name' : 'Select Location'})
                                              .set('newMachineSize', size);
-                    
+
                     $('#create-machine-location').removeClass('ui-state-disabled');
                     $('#create-machine-key').addClass('ui-state-disabled');
+
+                    // Docker specific
+                    if (Mist.machineAddController.newMachineProvider.provider == 'docker')
+                        // Because SSH key is optional for docker, so is location
+                        $('#create-machine-key').removeClass('ui-state-disabled');
                 },
 
 
