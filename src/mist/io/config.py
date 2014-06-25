@@ -184,7 +184,7 @@ SUPPORTED_PROVIDERS = [
     },
     {
         'title': 'HP Helion Cloud - US East',
-        'provider' : "%s:%s" % (Provider.OPENSTACK,'region-b.geo-1')
+        'provider' : "%s:%s" % (Provider.HPCLOUD,'region-b.geo-1')
     },
     # Docker
     {
