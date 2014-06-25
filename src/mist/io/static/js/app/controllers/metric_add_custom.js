@@ -92,6 +92,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                     'unit'          : this.metric.unit,
                     'value_type'    : $('#plugin-type').val() == '1' ? 'derive' : 'gauge',
                     'read_function' : this.metric.script,
+                    'host'          : machine.getHost(),
                 }).error(function (message) {
                     Mist.notificationController.notify('Failed to deploy ' +
                         'custom plugin: ' + message);

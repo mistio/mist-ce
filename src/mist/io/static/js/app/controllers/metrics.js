@@ -85,7 +85,8 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
                 var that = this;
                 this.set('disablingMetric', true);
                 Mist.ajax.DELETE(url, {
-                    'metric_id': metric.id
+                    'metric_id': metric.id,
+                    'host': machine.getHost();
                 }).success(function() {
                     //that._deleteMetric(metric);
                 }).error(function(message) {
