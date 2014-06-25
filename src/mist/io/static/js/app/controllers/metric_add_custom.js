@@ -14,6 +14,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
         "def read():" + newLine +
         "   # return random value" + newLine +
         "   return random.random()" + newLine;
+        var SYNTAX_ERROR_INDENTIFIER = 'ERROR DEPLOYING PLUGIN';
 
         return Ember.Object.extend({
 
@@ -84,13 +85,23 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                           '/machines/' + this.machine.id +
                           '/plugins/' + this.metric.pluginId;
 
+                var valueType = $('#plugin-type').val() == '1' ? 'derive' : 'gauge';
+
+                if (Mist.metricsController.getMetric(
+                    'mist_python.' + this.metric.pluginId + '.' + valueType)) {
+
+                    Mist.notificationController.notify('Metric "' +
+                        this.metric.name + '" exists already.');
+                    return;
+                }
+
                 var that = this;
                 this.set('addingMetric', true);
                 Mist.ajax.POST(url, {
                     'plugin_type'   : 'python',
                     'name'          : this.metric.name,
                     'unit'          : this.metric.unit,
-                    'value_type'    : $('#plugin-type').val() == '1' ? 'derive' : 'gauge',
+                    'value_type'    : valueType,
                     'read_function' : this.metric.script,
                     'host'          : this.machine.getHost(),
                 }).success(function (data) {
@@ -127,7 +138,6 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
 
 
             handleSyntaxError: function (error) {
-                var SYNTAX_ERROR_INDENTIFIER = 'ERROR DEPLOYING PLUGIN';
                 var errorIndex = error.lastIndexOf(SYNTAX_ERROR_INDENTIFIER);
                 if (errorIndex == error.length - SYNTAX_ERROR_INDENTIFIER.length - 1) {
                     error = error.replace(SYNTAX_ERROR_INDENTIFIER, '')

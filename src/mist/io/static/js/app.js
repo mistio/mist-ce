@@ -592,16 +592,11 @@ define( 'app', [
             };
             call.ajax = function() {
 
-//                if (type != 'GET') {
-//                    if (data) { data.csrf_token = csrfToken; }
-//                    else { data = {'csrf_token': csrfToken}; }
-//                }
-
                 var ajaxObject = {
                     url: url,
                     type: type,
                     headers: {
-                        'Csrf-Token': csrfToken
+                        'Csrf-Token': csrfToken,
                     },
                     data: JSON.stringify(data),
                     complete: function(jqXHR) {
