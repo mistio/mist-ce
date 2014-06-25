@@ -91,6 +91,7 @@ define('app/views/metric_node', ['app/views/templated'],
 
             centerNode: function () {
 
+                if (!this.element) return;
                 var afterOffsetTop = this.element.offset().top;
                 var afterWinScrollTop = $(window).scrollTop();
 
