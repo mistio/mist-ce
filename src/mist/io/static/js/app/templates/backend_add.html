@@ -59,6 +59,20 @@
 
         <!--
 
+           HP Cloud
+
+        -->
+
+        <div id="hpcloud-bundle" data-theme="a">
+            <label for="new-backend-openstack-tenant">4. Tenant Name:</label>
+            {{view Mist.TextField
+                   id="new-backend-openstack-tenant"
+                   data-theme="a"
+                   valueBinding="Mist.backendAddController.newBackendOpenStackTenant"}}
+        </div>
+
+        <!--
+
             OPENSTACK
 
         -->
