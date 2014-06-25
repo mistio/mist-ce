@@ -384,12 +384,20 @@ define('app/views/machine', ['app/views/mistscreen'],
                 } else if (typeof this.machine.public_ips == 'string') {
                     basicInfo['Public IPs']  = this.machine.public_ips;
                 }
-                if (this.machine.private_ips instanceof Array) {
-                    basicInfo['Private IPs']  = this.machine.private_ips.join();
-                } else if (typeof this.machine.private_ips == 'string') {
-                    basicInfo['Private IPs']  = this.machine.private_ips;
+                
+                if (this.machine.backend.provider != 'docker') {
+                    if (this.machine.private_ips instanceof Array) {
+                        basicInfo['Private IPs']  = this.machine.private_ips.join();
+                    } else if (typeof this.machine.private_ips == 'string') {
+                        basicInfo['Private IPs']  = this.machine.private_ips;
+                    }
                 }
                 if (this.machine.extra) {
+                    if (this.machine.backend.provider == 'docker') {
+                        basicInfo['Image'] = this.machine.extra.image;   
+                        basicInfo['Status'] = this.machine.extra.status;
+                        basicInfo['Command'] = this.machine.extra.command;                                                                 
+                    }
                     if (this.machine.extra.dns_name) {
                         basicInfo['DNS Name'] = this.machine.extra.dns_name;
                     }

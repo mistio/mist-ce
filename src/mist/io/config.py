@@ -193,6 +193,11 @@ SUPPORTED_PROVIDERS = [
     {
         'title': 'HP Cloud US East',
         'provider' : "%s:%s" % (Provider.OPENSTACK,'region-b.geo-1')
+    },
+    # Docker
+    {
+        'title': 'Docker',
+        'provider' : Provider.DOCKER
     }
 ]
 
@@ -339,3 +344,10 @@ EC2_IMAGES[Provider.EC2_US_EAST] = EC2_IMAGES['us-east-1']
 #
 # EC2 datacenters are ['us-east-1', 'us-west-2', 'us-west-1', 'eu-west-1',
 # 'ap-southeast-1', 'ap-northeast-1', 'ap-southeast-2','sa-east-1']
+
+DOCKER_IMAGES = {
+    'mist/ubuntu-14.04': 'Ubuntu 14.04',
+    'mist/debian-wheezy': 'Debian Wheezy',
+    'mist/opensuse-13.1': 'OpenSUSE 13.1',
+    'mist/fedora-20': 'Fedora 20',
+}

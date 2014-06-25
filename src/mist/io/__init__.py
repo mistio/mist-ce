@@ -146,7 +146,7 @@ def add_routes(config):
                      '/backends/{backend}/machines/{machine}/loadavg.png')
 
     config.add_route('images', '/backends/{backend}/images')
-    config.add_route('image', '/backends/{backend}/images/{image}')
+    config.add_route('image', '/backends/{backend}/images/{image:.*}')
     config.add_route('sizes', '/backends/{backend}/sizes')
     config.add_route('locations', '/backends/{backend}/locations')
 
