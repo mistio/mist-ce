@@ -890,15 +890,16 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 },
 
 
-                removeGraph: function (graph) {
+                removeGraph: function (graph, callback) {
                     var that = this;
                     Mist.metricsController.disassociateMetric(
                         graph.metrics[0],
                         this.machine,
                         function (success) {
-                            if (success) {
+                            if (success)
                                 that.instances.removeObject(graph);
-                            }
+                            if (callback)
+                                callback(success);
                     });
                 },
 
