@@ -2022,7 +2022,7 @@ print("READ FUNCTION TEST PASSED")
     stdout += test_out
 
     if not test_out.strip().endswith("READ FUNCTION TEST PASSED"):
-        stdout += "\nREAD FUNCTION TEST FAILED\n"
+        stdout += "\nERROR DEPLOYING PLUGIN\n"
         raise BadRequestError(stdout)
 
     # Generate plugin script
@@ -2081,7 +2081,7 @@ if ! grep '^Include.*%(plugin_id)s' plugins/mist-python/include.conf; then
         echo "Restarting collectd failed, restoring include.conf"
         $sudo cp plugins/mist-python/include.conf.backup plugins/mist-python/include.conf
         $sudo /opt/mistio-collectd/collectd.sh restart
-        echo FAILURE
+        echo "ERROR DEPLOYING PLUGIN"
     fi
 else
     echo "Plugin conf already included in include.conf"
@@ -2090,7 +2090,7 @@ $sudo rm -rf %(tmp_dir)s
 """ % {'plugin_id': plugin_id, 'tmp_dir': tmp_dir}
 
     stdout += shell.command(script)
-    if stdout.strip().endswith("FAILURE"):
+    if stdout.strip().endswith("ERROR DEPLOYING PLUGIN"):
         raise BadRequestError(stdout)
 
     shell.disconnect()
