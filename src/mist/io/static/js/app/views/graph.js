@@ -611,7 +611,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                     Mist.confirmationController.set('title', 'Remove graph');
 
-                    var machine = Mist.monitoringController.machine;
+                    var machine = Mist.monitoringController.request.machine;
                     var graph = this.graph;
 
                     var message = 'Are you sure you want to remove "' +
