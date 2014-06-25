@@ -620,21 +620,24 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     var callback = null;
                     var metric = graph.metrics[0];
 
-                    if (graph.metrics[0].isPlugin) {
+                    if (metric.isPlugin) {
                         message += ' and disable it from server ' + machine.name;
-                        var callback = function () {
-                            Mist.metricsController.disablePlugin(
-                                graphs.metrics[0], machine);
-                            Mist.metricsController.disableMetric(
-                                metric, machine);
-                        }
                     }
 
                     message += ' ?';
 
+                    var removeGraph = function () {
+                        Mist.monitoringController.graphs.removeGraph(graph);
+                    }
+
                     Mist.confirmationController.set('text', message);
                     Mist.confirmationController.set('callback', function () {
-                        Mist.monitoringController.graphs.removeGraph(graph, callback);
+                        if (metric.isPlugin) {
+                            Mist.metricsController.disableMetric(
+                                metric, machine, removeGraph);
+                        } else {
+                            removeGraph();
+                        }
                     });
                     Mist.confirmationController.show();
                 }
