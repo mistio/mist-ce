@@ -20,10 +20,8 @@
                    id="custom-plugin-name"
                    valueBinding="Mist.metricAddCustomController.metric.name"}}
 
-            <!--debugging only -->
-            <p>{{!Mist.metricAddCustomController.metric.pluginId}}</p>
-
             <label for="custom-plugin-script">Python script:</label>
+            <pre id="custom-plugin-error"></pre>
             {{view Ember.TextArea
                    id="custom-plugin-script"
                    valueBinding="Mist.metricAddCustomController.metric.script"}}
@@ -31,7 +29,7 @@
             <label for="custom-plugin-unit">Unit:</label>
             {{view Mist.TextField
                    id="custom-plugin-unit"
-                   placeholder="e.g. bytes"
+                   placeholder="e.g. bytes (optional)"
                    valueBinding="Mist.metricAddCustomController.metric.unit"}}
 
             <select id="advanced-toggle" data-role="slider" data-theme="a"

@@ -104,7 +104,7 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
                 var backend_id = machine.backend ? machine.backend.id : null;
                 var url = '/backends/' + backend_id +
                         '/machines/' + machine_id +
-                        '/metrics';
+                        '/plugins/' + metric.pluginId;
 
                 var that = this;
                 this.set('disassociatingMetric', true);

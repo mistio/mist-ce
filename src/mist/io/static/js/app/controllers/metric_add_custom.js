@@ -98,6 +98,8 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                     that.metric.machines = that.machine ? [that.machine] : [];
                     Mist.metricsController._addMetric(that.metric, that.machine);
                 }).error(function (message) {
+                    if (that.handleSyntaxError(message))
+                        return;
                     Mist.notificationController.notify('Failed to deploy ' +
                         'custom plugin: ' + message);
                 }).complete(function (success, data) {
@@ -121,6 +123,21 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                     .replace(/_$/, '');      // trim trailing underscore
 
                 this.metric.set('pluginId', newPluginId);
+            },
+
+
+            handleSyntaxError: function (error) {
+                var SYNTAX_ERROR_INDENTIFIER = 'ERROR DEPLOYING PLUGIN';
+                var errorIndex = error.lastIndexOf(SYNTAX_ERROR_INDENTIFIER);
+                if (errorIndex == error.length - SYNTAX_ERROR_INDENTIFIER.length - 1) {
+                    error = error.replace(SYNTAX_ERROR_INDENTIFIER, '')
+                        .replace('Bad Request: ', '')
+                        .trim();
+                    $('#custom-plugin-error').slideDown().text(error);
+                    $('#custom-plugin-script').focus();
+                    return true;
+                }
+                return false;
             },
 
 

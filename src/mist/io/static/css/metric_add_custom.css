@@ -14,10 +14,6 @@
     margin-top: 0;
 }
 
-#custom-plugin-script {
-    height: 145px !important;
-}
-
 #custom-plugin-advanced {
     display: none;
     margin-bottom: 25px;
@@ -45,3 +41,24 @@
         width: 103px;
     }
 }
+
+#custom-plugin-script {
+    max-height: 145px !important;
+    font-family: monospace;
+}
+
+#metric-add-custom-popup #custom-plugin-error {
+    font-family: monospace;
+    display: none;
+    height: auto;
+    margin-top: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #FFFFBF;
+    border-radius: 5px;
+    padding: 2px 8px;
+    border: 2px solid #FF0;
+    overflow: scroll;
+    max-height: 9em;
+}
+

@@ -65,6 +65,8 @@ define('app/views/metric_add_custom', ['app/views/popup'],
                 },
 
                 deployClicked: function () {
+                    $('#custom-plugin-error').slideUp().text('');
+                    $('#custom-plugin-script').removeClass('error');
                     Mist.metricAddCustomController.add();
                 },
 
