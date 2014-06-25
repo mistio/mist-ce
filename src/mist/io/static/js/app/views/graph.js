@@ -617,13 +617,19 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                     var message = 'Are you sure you want to remove "' +
                         graph.metrics[0].name + '"';
 
+                    var callback = null;
+                    var metric = graph.metrics[0];
+
                     if (graph.metrics[0].isPlugin) {
                         message += ' and disable it from server ' + machine.name;
                         var callback = function () {
                             Mist.metricsController.disablePlugin(
                                 graphs.metrics[0], machine);
+                            Mist.metricsController.disableMetric(
+                                metric, machine);
                         }
                     }
+
                     message += ' ?';
 
                     Mist.confirmationController.set('text', message);
