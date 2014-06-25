@@ -675,6 +675,7 @@ def get_stats(request):
     core_uri = config.CORE_URI
     user = user_from_request(request)
     data = {key: request.params.get(key) for key in ('start', 'stop', 'step')}
+    data['v'] = 2
     try:
         resp = requests.get(config.CORE_URI + request.path,
                            params=data,
