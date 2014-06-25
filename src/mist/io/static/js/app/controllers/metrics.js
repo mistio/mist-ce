@@ -74,6 +74,29 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
             },
 
 
+            disableMetric: function (metric, machine, callback) {
+
+                var machine_id = machine.id || null;
+                var backend_id = machine.backend ? machine.backend.id : null;
+                var url = '/backends/' + backend_id +
+                        '/machines/' + machine_id +
+                        '/metrics';
+
+                var that = this;
+                this.set('disablingMetric', true);
+                Mist.ajax.DELETE(url, {
+                    'metric_id': metric.id
+                }).success(function() {
+                    //that._deleteMetric(metric);
+                }).error(function(message) {
+                    Mist.notificationController.notify(
+                        'Failed to disable metric: ' + message);
+                }).complete(function(success) {
+                    that.set('disablingMetric', false);
+                    if (callback) callback(success, metric);
+                });
+            },
+
             disassociateMetric: function (metric, machine, callback) {
 
                 var machine_id = machine.id || null;

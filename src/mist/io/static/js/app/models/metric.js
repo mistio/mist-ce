@@ -25,6 +25,7 @@ define('app/models/metric', ['ember'],
             minValue: null,
             hasRange: null,
             hashedId: null,
+            isPlugin: null,
             datapoints: null,
 
 
@@ -43,7 +44,8 @@ define('app/models/metric', ['ember'],
                     .set('minValue', this.min_value)
                     .set('hasRange',
                         typeof this.maxValue != 'undefined' &&
-                        typeof this.minValue != 'undefined');
+                        typeof this.minValue != 'undefined')
+                    .set('isPlugin', this.id.indexOf('mist_python') == 0);
                 delete this.max_value;
                 delete this.min_value;
             }
