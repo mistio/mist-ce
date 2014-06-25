@@ -1960,10 +1960,7 @@ def update_metric(user, metric_id, name=None, unit=None,
 
 
 def deploy_python_plugin(user, backend_id, machine_id, plugin_id,
-                         value_type, read_function):
-
-    machine = user.backends[backend_id].machines[machine_id]
-
+                         value_type, read_function, host):
     # Sanity checks
     if not plugin_id:
         raise RequiredParameterMissingError('plugin_id')
@@ -1971,6 +1968,8 @@ def deploy_python_plugin(user, backend_id, machine_id, plugin_id,
         raise RequiredParameterMissingError('value_type')
     if not read_function:
         raise RequiredParameterMissingError('read_function')
+    if not host:
+        raise RequiredParameterMissingError('host')
     chars = [chr(ord('a') + i) for i in range(26)] + list('0123456789_')
     for c in plugin_id:
         if c not in chars:
@@ -1985,7 +1984,7 @@ def deploy_python_plugin(user, backend_id, machine_id, plugin_id,
                               "'derive'." % value_type)
 
     # Iniatilize SSH connection
-    shell = Shell(machine.dns_name)
+    shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id)
     sftp = shell.ssh.open_sftp()
 
@@ -2105,15 +2104,16 @@ $sudo rm -rf %(tmp_dir)s
     return {'metric_id': metric_id, 'stdout': stdout}
 
 
-def undeploy_python_plugin(user, backend_id, machine_id, plugin_id):
+def undeploy_python_plugin(user, backend_id, machine_id, plugin_id, host):
 
     # Sanity checks
     if not plugin_id:
         raise RequiredParameterMissingError('plugin_id')
-    machine = user.backends[backend_id].machines[machine_id]
+    if not host:
+        raise RequiredParameterMissingError('host')
 
     # Iniatilize SSH connection
-    shell = Shell(machine.dns_name)
+    shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id)
 
     # Prepare collectd.conf

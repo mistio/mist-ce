@@ -749,11 +749,13 @@ def deploy_plugin(request):
     plugin_id = request.matchdict['plugin']
     params = params_from_request(request)
     plugin_type = params.get('plugin_type')
+    host = params.get('host')
     if plugin_type == 'python':
         ret = methods.deploy_python_plugin(
             user, backend_id, machine_id, plugin_id,
             value_type=params.get('value_type', 'gauge'),
             read_function=params.get('read_function'),
+            host=host,
         )
         methods.update_metric(
             user,
@@ -776,9 +778,10 @@ def undeploy_plugin(request):
     plugin_id = request.matchdict['plugin']
     params = params_from_request(request)
     plugin_type = params.get('plugin_type')
+    host = params.get('host')
     if plugin_type == 'python':
         ret = methods.undeploy_python_plugin(user, backend_id,
-                                             machine_id, plugin_id)
+                                             machine_id, plugin_id, host)
         return ret
     else:
         raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
