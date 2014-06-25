@@ -17,6 +17,7 @@
     </div>
 
     <input class="rule-value" data-highlight="true" type="range"
+        {{action "valueChange" on="change" target="view"}}
         {{bindAttr max="metric.maxValue"}}
         {{bindAttr min="metric.minValue"}}
         {{bindAttr value="value"}} />

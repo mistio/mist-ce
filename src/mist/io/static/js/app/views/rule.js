@@ -13,6 +13,17 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
             //
             //
+            //  Properties
+            //
+            //
+
+
+            rule: null,
+            isUpdatingValue: null,
+
+
+            //
+            //
             //  Actions
             //
             //
@@ -37,6 +48,24 @@ define('app/views/rule', ['app/views/templated', 'ember'],
 
                 deleteRuleClicked: function () {
                     Mist.rulesController.deleteRule(this.rule);
+                },
+
+                valueChange: function () {
+
+                    // Prevent multiple requests
+                    if (this.isUpdatingValue)
+                        return;
+
+                    this.set('isUpdatingValue', true);
+                    Ember.run.later(this, function () {
+                        this.set('isUpdatingValue', false);
+
+                        var value = $('#' + this.rule.id)
+                            .find('.ui-slider input').val();
+
+                        Mist.rulesController.updateRule(
+                            this.rule.id, null, null, value);
+                    }, 500);
                 }
             }
         });

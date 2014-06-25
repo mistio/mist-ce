@@ -173,26 +173,18 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             },
 
 
-            changeRuleValue: function(event) {
-                var rule_id = $(event.currentTarget).attr('id');
-                var rule_value = $(event.currentTarget).find('.ui-slider-handle').attr('aria-valuenow');
-                this.updateRule(rule_id, null, null, rule_value);
-            },
-
-
             setSliderEventHandlers: function() {
                 function showSlider(event) {
                     var rule_id = $(event.currentTarget).parent().attr('id');
                     var rule = Mist.rulesController.getRuleById(rule_id);
                     if (rule.metric.hasRange) {
                         $(event.currentTarget).addClass('open');
-                        $(event.currentTarget).find('.ui-slider-track').fadeIn();
+                        $(event.currentTarget).find('.ui-slider-track').fadeIn(100);
                     }
                 }
                 function hideSlider(event) {
-                    $(event.currentTarget).find('.ui-slider-track').fadeOut();
+                    $(event.currentTarget).find('.ui-slider-track').fadeOut(100);
                     $(event.currentTarget).find('.ui-slider').removeClass('open');
-                    Mist.rulesController.changeRuleValue(event);
                 }
                 $('.rules-container .ui-slider').on('tap', showSlider);
                 $('.rules-container .ui-slider').on('click', showSlider);
