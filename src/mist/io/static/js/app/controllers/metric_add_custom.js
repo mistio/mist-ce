@@ -88,7 +88,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                 var valueType = $('#plugin-type').val() == '1' ? 'derive' : 'gauge';
 
                 if (Mist.metricsController.getMetric(
-                    'mist_python.' + this.metric.pluginId + '.' + valueType)) {
+                    'mist.python.' + this.metric.pluginId + '.' + valueType)) {
 
                     Mist.notificationController.notify('Metric "' +
                         this.metric.name + '" exists already.');
