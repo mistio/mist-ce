@@ -676,17 +676,17 @@ def get_stats(request):
     user = user_from_request(request)
     data = {key: request.params.get(key) for key in ('start', 'stop', 'step')}
     try:
-        ret = requests.get(config.CORE_URI + request.path,
+        resp = requests.get(config.CORE_URI + request.path,
                            params=data,
                            headers={'Authorization': get_auth_header(user)},
                            verify=config.SSL_VERIFY)
     except requests.exceptions.SSLError as exc:
         log.error("%r", exc)
         raise SSLError()
-    if ret.status_code == 200:
-        return ret.json()
+    if resp.status_code == 200:
+        return resp.json()
     else:
-        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
+        log.error("Error getting stats %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
 
 
