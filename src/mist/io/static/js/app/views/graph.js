@@ -52,6 +52,9 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             load: function () {
 
+                if (this.graph.pendingCreation)
+                    return;
+
                 Ember.run.next(this, function () {
 
                     this.graph.set('view', this);

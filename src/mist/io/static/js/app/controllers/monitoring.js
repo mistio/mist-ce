@@ -483,7 +483,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                         data: {
                             start: start - 50,
                             stop: stop + 50,
-                            step: step / 1000
+                            step: step / 1000,
+                            v: 2,
                         },
                         timeout: 8000,
                         success: function (metrics) {
@@ -860,7 +861,28 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 },
 
 
+                addDummyGraph: function (title) {
+                    var graphId = 'graph-' + title;
+                    var graph = Graph.create({
+                            id: graphId,
+                            title: title,
+                            pendingCreation: true,
+                        });
+                    this.instances.pushObject(graph);
+                },
+
+
+                removeDummyGraph: function (title) {
+                    var graph = this.instances.findBy('id', 'graph-' + title)
+                    if (graph) {
+                        this.instances.removeObject(graph);
+                    }
+                },
+
+
                 addGraph: function (metric) {
+
+                    this.removeDummyGraph(metric.name);
 
                     var graphId = 'graph-' + metric.hashedId;
 

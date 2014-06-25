@@ -48,6 +48,7 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
                     //metric.name = metric.newName;
                     metric.machines = machine ? [machine] : [];
                     that._addMetric(metric, machine);
+                    Mist.monitoringController.graphs.addDummyGraph(metric.name);
                 }).error(function(message) {
                     Mist.notificationController.notify(
                         'Failed to add metric: ' + message);
@@ -75,20 +76,18 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
 
 
             disableMetric: function (metric, machine, callback) {
-
                 var machine_id = machine.id || null;
                 var backend_id = machine.backend ? machine.backend.id : null;
                 var url = '/backends/' + backend_id +
                         '/machines/' + machine_id +
-                        '/metrics';
+                        '/plugins/' + metric.pluginId;
 
                 var that = this;
                 this.set('disablingMetric', true);
                 Mist.ajax.DELETE(url, {
-                    'metric_id': metric.id,
+                    'plugin_type': 'python',
                     'host': machine.getHost()
                 }).success(function() {
-                    //that._deleteMetric(metric);
                 }).error(function(message) {
                     Mist.notificationController.notify(
                         'Failed to disable metric: ' + message);
@@ -104,7 +103,7 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
                 var backend_id = machine.backend ? machine.backend.id : null;
                 var url = '/backends/' + backend_id +
                         '/machines/' + machine_id +
-                        '/plugins/' + metric.pluginId;
+                        '/metrics';
 
                 var that = this;
                 this.set('disassociatingMetric', true);

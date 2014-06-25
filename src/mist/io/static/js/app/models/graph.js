@@ -79,6 +79,9 @@ define('app/models/graph', ['ember'],
 
 
             updateData: function (data) {
+
+                if (this.pendingCreation) return;
+
                 Ember.run(this, function () {
                     for (var metricId in data) {
                         var metric = this.getMetric(metricId);

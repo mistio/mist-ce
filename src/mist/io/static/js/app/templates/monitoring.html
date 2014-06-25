@@ -36,7 +36,9 @@
     <div id="graphBar">
 
         {{#each view.graphs}}
-            {{view Mist.graphButtonView graphBinding="this"}}
+            {{#unless this.pendingCreation}}
+                {{view Mist.graphButtonView graphBinding="this"}}
+            {{/unless}}
         {{/each}}
 
         <div class="graphBtn" id="add-metric-btn">
