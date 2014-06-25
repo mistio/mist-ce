@@ -94,8 +94,9 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                     'read_function' : this.metric.script,
                     'host'          : this.machine.getHost(),
                 }).success(function (data) {
-                    metric.machines = this.machine ? [this.machine] : [];
-                    Mist.metricsController._addMetric(metric, this.machine);
+                    that.metric.id = data.metric_id;
+                    that.metric.machines = that.machine ? [that.machine] : [];
+                    Mist.metricsController._addMetric(that.metric, that.machine);
                 }).error(function (message) {
                     Mist.notificationController.notify('Failed to deploy ' +
                         'custom plugin: ' + message);
