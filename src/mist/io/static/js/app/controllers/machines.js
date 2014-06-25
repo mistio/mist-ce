@@ -88,11 +88,13 @@ define('app/controllers/machines', ['app/models/machine'],
 
                 this.addObject(dummyMachine);
 
+                // Don't send dummy key text
+                key = Mist.keysController.keyExists(key.id) ? key : null;
                 var that = this;
                 this.set('addingMachine', true);
                 Mist.ajax.POST('backends/' + this.backend.id + '/machines', {
                         'name': name,
-                        'key': key.id,
+                        'key': key ? key.id : null,
                         'size': size.id,
                         'script': script,
                         'image': image.id,
