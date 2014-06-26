@@ -139,7 +139,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
             handleSyntaxError: function (error) {
                 error = error.trim();
                 var errorIndex = error.lastIndexOf(SYNTAX_ERROR_INDENTIFIER);
-                if (errorIndex == error.length - SYNTAX_ERROR_INDENTIFIER.length - 1) {
+                if (errorIndex == error.length - SYNTAX_ERROR_INDENTIFIER.length) {
                     error = error.replace(SYNTAX_ERROR_INDENTIFIER, '')
                         .replace('Bad Request: ', '')
                         .trim();

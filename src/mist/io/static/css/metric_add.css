@@ -48,5 +48,6 @@
     background-color: black;
     display: inline-block;
     position: absolute;
+    top: 0;
     opacity: 0.35;
 }
