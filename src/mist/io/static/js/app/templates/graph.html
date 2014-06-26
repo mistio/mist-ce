@@ -6,11 +6,10 @@
             {{#if view.graph.unit}}
                 ({{view.graph.unit}})
             {{/if}}
-            {{#if view.graph.pendingCreation}}
-                <div class="ajax-loader"></div>
-            {{/if}}
         </div>
-        {{#unless view.graph.pendingCreation}}
+        {{#if view.graph.pendingCreation}}
+            <div class="ajax-loader"></div>
+        {{else}}
             {{#unless view.graph.isBuiltIn}}
                 <a class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext"
                     {{action "removeClicked" target="view"}}>x
@@ -19,7 +18,7 @@
             <a class="ui-btn ui-btn-icon-notext ui-corner-all ui-icon-carat-d"
                 {{action "collapseClicked" target="view"}}>-
             </a>
-        {{/unless}}
+        {{/if}}
     </div>
 
     {{#if view.graph.metrics.length}}
