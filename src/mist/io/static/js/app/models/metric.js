@@ -21,6 +21,7 @@ define('app/models/metric', ['ember'],
             id: null,
             name: null,
             unit: null,
+            machines: null,
             maxValue: null,
             minValue: null,
             hasRange: null,
@@ -51,6 +52,23 @@ define('app/models/metric', ['ember'],
 
                 delete this.max_value;
                 delete this.min_value;
+            },
+
+
+            //
+            //
+            //  Methods
+            //
+            //
+
+
+            hasMachine: function (machine) {
+                var hasMachine = false;
+                this.machines.some(function (metricMachine) {
+                    if (metricMachine.equals(machine))
+                        return hasMachine = true;
+                });
+                return hasMachine;
             }
         });
     }

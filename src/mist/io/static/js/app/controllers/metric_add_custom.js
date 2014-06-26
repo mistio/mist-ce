@@ -87,9 +87,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
 
                 var valueType = $('#plugin-type').val() == '1' ? 'derive' : 'gauge';
 
-                if (Mist.metricsController.getMetric(
-                    'mist.python.' + this.metric.pluginId + '.' + valueType)) {
-
+                if (this.newMetricExists(this.metric, this.machine)) {
                     Mist.notificationController.notify('Metric "' +
                         this.metric.name + '" exists already.');
                     return;
@@ -139,6 +137,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
 
 
             handleSyntaxError: function (error) {
+                error = error.trim();
                 var errorIndex = error.lastIndexOf(SYNTAX_ERROR_INDENTIFIER);
                 if (errorIndex == error.length - SYNTAX_ERROR_INDENTIFIER.length - 1) {
                     error = error.replace(SYNTAX_ERROR_INDENTIFIER, '')
@@ -148,6 +147,15 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                     $('#custom-plugin-script').focus();
                     return true;
                 }
+                return false;
+            },
+
+
+            newMetricExists: function (metric, machine) {
+                var newMetricId = 'mist.python.' + this.metric.pluginId;
+                var newMetric = Mist.metricsController.getMetric(newMetricId)
+                if (newMetric && newMetric.hasMachine(machine))
+                    return true;
                 return false;
             },
 
