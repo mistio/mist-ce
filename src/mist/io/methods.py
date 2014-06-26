@@ -2141,7 +2141,7 @@ import collectd
 
 def read_callback():
     vl = collectd.Values(type="%(value_type)s")
-    vl.plugin = "mist_python"
+    vl.plugin = "mist.python"
     vl.plugin_instance = "%(plugin_instance)s"
     vl.dispatch(values=[read()])
 
@@ -2202,7 +2202,7 @@ $sudo rm -rf %(tmp_dir)s
 
     shell.disconnect()
 
-    parts = ["mist_python"]  # strip duplicates (bucky also does this)
+    parts = ["mist", "python"]  # strip duplicates (bucky also does this)
     for part in plugin_id.split("."):
         if part != parts[-1]:
             parts.append(part)
