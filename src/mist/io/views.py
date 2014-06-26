@@ -33,7 +33,7 @@ from mist.io.model import Keypair
 from mist.io.shell import Shell
 import mist.io.exceptions as exceptions
 from mist.io.exceptions import *
-from mist.io.helpers import get_auth_header
+from mist.io.helpers import get_auth_header, params_from_request
 
 
 log = logging.getLogger(__name__)
@@ -683,31 +683,137 @@ def update_monitoring(request):
 def get_stats(request):
     core_uri = config.CORE_URI
     user = user_from_request(request)
-    params = request.params
-    start = params.get('start')
-    stop = params.get('stop')
-    step = params.get('step')
-    expression = params.get('expression')
-
-    params = {
-        'start': start,
-        'stop': stop,
-        'step': step,
-        'expression': expression,
-    }
+    data = {key: request.params.get(key) for key in ('start', 'stop', 'step')}
+    data['v'] = 2
     try:
-        ret = requests.get(config.CORE_URI + request.path,
-                           params=params,
+        resp = requests.get(config.CORE_URI + request.path,
+                           params=data,
                            headers={'Authorization': get_auth_header(user)},
                            verify=config.SSL_VERIFY)
     except requests.exceptions.SSLError as exc:
         log.error("%r", exc)
         raise SSLError()
-    if ret.status_code == 200:
-        return ret.json()
+    if resp.status_code == 200:
+        return resp.json()
     else:
-        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
-        raise ServiceUnavailableError()
+        log.error("Error getting stats %d:%s", resp.status_code, resp.text)
+        raise ServiceUnavailableError(resp.text)
+
+
+@view_config(route_name='metrics', request_method='GET',
+             renderer='json')
+def find_metrics(request):
+    user = user_from_request(request)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    return methods.find_metrics(user, backend_id, machine_id)
+
+
+@view_config(route_name='metrics', request_method='PUT', renderer='json')
+def assoc_metric(request):
+    user = user_from_request(request)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    params = params_from_request(request)
+    metric_id = params.get('metric_id')
+    if not metric_id:
+        raise RequiredParameterMissingError('metric_id')
+    methods.assoc_metric(user, backend_id, machine_id, metric_id)
+    return {}
+
+
+@view_config(route_name='metrics', request_method='DELETE', renderer='json')
+def disassoc_metric(request):
+    user = user_from_request(request)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    params = params_from_request(request)
+    metric_id = params.get('metric_id')
+    if not metric_id:
+        raise RequiredParameterMissingError('metric_id')
+    methods.disassoc_metric(user, backend_id, machine_id, metric_id)
+    return {}
+
+
+@view_config(route_name='metric', request_method='PUT', renderer='json')
+def update_metric(request):
+    user = user_from_request(request)
+    metric_id = request.matchdict['metric']
+    params = params_from_request(request)
+    methods.update_metric(
+        user,
+        metric_id,
+        name=params.get('name'),
+        unit=params.get('unit'),
+        backend_id=params.get('backend_id'),
+        machine_id=params.get('machine_id'),
+    )
+    return {}
+
+
+@view_config(route_name='deploy_plugin', request_method='POST', renderer='json')
+def deploy_plugin(request):
+    user = user_from_request(request)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    plugin_id = request.matchdict['plugin']
+    params = params_from_request(request)
+    plugin_type = params.get('plugin_type')
+    host = params.get('host')
+    if plugin_type == 'python':
+        ret = methods.deploy_python_plugin(
+            user, backend_id, machine_id, plugin_id,
+            value_type=params.get('value_type', 'gauge'),
+            read_function=params.get('read_function'),
+            host=host,
+        )
+        methods.update_metric(
+            user,
+            metric_id=ret['metric_id'],
+            name=params.get('name'),
+            unit=params.get('unit'),
+            backend_id=backend_id,
+            machine_id=machine_id,
+        )
+        return ret
+    else:
+        raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
+
+
+@view_config(route_name='deploy_plugin', request_method='DELETE', renderer='json')
+def undeploy_plugin(request):
+    user = user_from_request(request)
+    backend_id = request.matchdict['backend']
+    machine_id = request.matchdict['machine']
+    plugin_id = request.matchdict['plugin']
+    params = params_from_request(request)
+    plugin_type = params.get('plugin_type')
+    host = params.get('host')
+    if plugin_type == 'python':
+        ret = methods.undeploy_python_plugin(user, backend_id,
+                                             machine_id, plugin_id, host)
+        return ret
+    else:
+        raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
+
+
+## @view_config(route_name='metric', request_method='DELETE', renderer='json')
+## def remove_metric(request):
+    ## user = user_from_request(request)
+    ## metric_id = request.matchdict['metric']
+    ## url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
+    ## headers={'Authorization': get_auth_header(user)}
+    ## try:
+        ## resp = requests.delete(url, headers=headers, verify=config.SSL_VERIFY)
+    ## except requests.exceptions.SSLError as exc:
+        ## raise SSLError()
+    ## except Exception as exc:
+        ## log.error("Exception removing metric: %r", exc)
+        ## raise ServiceUnavailableError()
+    ## if not resp.ok:
+        ## log.error("Error removing metric %d:%s", resp.status_code, resp.text)
+        ## raise BadRequestError(resp.text)
+    ## return resp.json()
 
 
 @view_config(route_name='loadavg', request_method='GET')

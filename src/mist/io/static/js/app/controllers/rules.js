@@ -1,10 +1,13 @@
 define('app/controllers/rules', ['app/models/rule', 'ember'],
-    /**
-     *  Rules Controller
-     *
-     *  @returns Class
-     */
+    //
+    //  Rules Controller
+    //
+    //  @returns Class
+    //
     function(Rule) {
+
+        'use strict';
+
         return Ember.ArrayController.extend({
 
             content: [],
@@ -20,18 +23,18 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 'network-tx'
             ],
 
-
-            operatorList: [
-                {'title': 'gt', 'symbol': '>'},
-                {'title': 'lt', 'symbol': '<'}
-            ],
-
+            operatorList: [{
+                'title': 'gt',
+                'symbol': '>'
+            }, {
+                'title': 'lt',
+                'symbol': '<'
+            }],
 
             actionList: [
                 'alert',
                 'reboot',
                 'destroy',
-                //'launch',
                 'command'
             ],
 
@@ -40,12 +43,12 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 if (!rules) return;
                 var that = this;
                 Ember.run(function() {
-                    for (ruleId in rules) {
+                    for (var ruleId in rules) {
                         var rule = rules[ruleId];
                         rule.id = ruleId;
-                        rule.maxValue = rules[ruleId].max_value;
                         rule.actionToTake = rules[ruleId].action;
                         rule.operator = that.getOperatorByTitle(rules[ruleId].operator);
+                        rule.metric = Mist.metricsController.getMetric(rules[ruleId].metric);
                         rule.machine = Mist.backendsController.getMachine(rule.machine, rule.backend) || rule.machine;
                         that.content.pushObject(Rule.create(rule));
                     }
@@ -54,33 +57,20 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
 
 
             getRuleById: function(ruleId) {
-                for (var i = 0; i < this.content.length; i++) {
-                    if (this.content[i].id == ruleId) {
-                        return this.content[i];
-                    }
-                }
-                return null;
+                return this.content.findBy('id', ruleId);
             },
 
 
-            getOperatorByTitle: function(title) {
-                var ret = null;
-                this.operatorList.forEach(function(op) {
-                    if (op.title == title){
-                        ret = op;
-                    }
-                });
-                return ret;
+            getOperatorByTitle: function(ruleTitle) {
+                return this.operatorList.findBy('title', ruleTitle);
             },
 
 
             creationPendingObserver: function() {
-                if (this.creatingPending) {
+                if (this.creationPending)
                     $('#add-rule-button').addClass('ui-state-disabled');
-                } else {
+                else
                     $('#add-rule-button').removeClass('ui-state-disabled');
-                }
-
             }.observes('creationPending'),
 
 
@@ -90,7 +80,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 Mist.ajax.POST('/rules', {
                     'backendId': machine.backend.id,
                     'machineId': machine.id,
-                    'metric': metric,
+                    'metric': metric.id,
                     'operator': operator.title,
                     'value': value,
                     'action': actionToTake
@@ -115,6 +105,20 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             },
 
 
+            deleteRule: function (rule) {
+                var that = this;
+                rule.set('pendingAction', true);
+                Mist.ajax.DELETE('/rules/' + rule.id, {
+                }).success(function(){
+                    Mist.rulesController.removeObject(rule);
+                    Mist.rulesController.redrawRules();
+                }).error(function(message) {
+                    Mist.notificationController.notify('Error while deleting rule: ' + message);
+                    rule.set('pendingAction', false);
+                });
+            },
+
+
             updateRule: function(id, metric, operator, value, actionToTake, command) {
 
                 var rule = this.getRuleById(id);
@@ -125,28 +129,21 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
 
                 // Make sure parameters are not null
                 if (!value) { value = rule.value; }
-                if (!metric) { metric = rule.metric; }
+                if (!metric) { metric = rule.metric.id; }
                 if (!command) { command = rule.command; }
                 if (!operator) { operator = rule.operator; }
                 if (!actionToTake) { actionToTake = rule.actionToTake; }
 
                 // Check if anything changed
                 if (value == rule.value &&
-                    metric == rule.metric &&
+                    metric == rule.metric.id &&
                     command == rule.command &&
                     actionToTake == rule.actionToTake &&
                     operator.title == rule.operator.title ) {
                         return false;
                 }
 
-                // Fix value on metric change
-                if ((metric != 'network-tx') && (metric != 'disk-write')) {
-                    if (value > 100) {
-                        value = 100;
-                    }
-                }
-
-
+                var that = this;
                 rule.set('pendingAction', true);
                 Mist.ajax.POST('/rules', {
                     'id': id,
@@ -159,11 +156,10 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                     info('Successfully updated rule ', id);
                     rule.set('pendingAction', false);
                     rule.set('value', value);
-                    rule.set('metric', metric);
+                    rule.set('metric', Mist.metricsController.getMetric(metric));
                     rule.set('command', command);
                     rule.set('operator', operator);
                     rule.set('actionToTake', actionToTake);
-                    rule.set('maxValue', data.max_value);
 
                     var maxvalue = parseInt(rule.maxValue);
                     var curvalue = parseInt(rule.value);
@@ -177,28 +173,18 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
             },
 
 
-            saveCommand: function() {
-                $('.rule-command-popup').popup('close');
-                this.updateRule(this.commandRule.id, null, null, null, 'command', this.command);
-            },
-
-
-            changeRuleValue: function(event) {
-                var rule_id = $(event.currentTarget).attr('id');
-                var rule_value = $(event.currentTarget).find('.ui-slider-handle').attr('aria-valuenow');
-                this.updateRule(rule_id, null, null, rule_value);
-            },
-
-
             setSliderEventHandlers: function() {
                 function showSlider(event) {
-                    $(event.currentTarget).addClass('open');
-                    $(event.currentTarget).find('.ui-slider-track').fadeIn();
+                    var rule_id = $(event.currentTarget).parent().attr('id');
+                    var rule = Mist.rulesController.getRuleById(rule_id);
+                    if (rule.metric.hasRange) {
+                        $(event.currentTarget).addClass('open');
+                        $(event.currentTarget).find('.ui-slider-track').fadeIn(100);
+                    }
                 }
                 function hideSlider(event) {
-                    $(event.currentTarget).find('.ui-slider-track').fadeOut();
+                    $(event.currentTarget).find('.ui-slider-track').fadeOut(100);
                     $(event.currentTarget).find('.ui-slider').removeClass('open');
-                    Mist.rulesController.changeRuleValue(event);
                 }
                 $('.rules-container .ui-slider').on('tap', showSlider);
                 $('.rules-container .ui-slider').on('click', showSlider);
