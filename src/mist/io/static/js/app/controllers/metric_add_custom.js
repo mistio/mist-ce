@@ -12,8 +12,8 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
         var SCRIPT_EXAMPLE =
         "import random" + newLine + newLine +
         "def read():" + newLine +
-        "   # return random value" + newLine +
-        "   return random.random()" + newLine;
+        "    # return random value" + newLine +
+        "    return random.random()" + newLine;
         var SYNTAX_ERROR_INDENTIFIER = 'ERROR DEPLOYING PLUGIN';
 
         return Ember.Object.extend({
