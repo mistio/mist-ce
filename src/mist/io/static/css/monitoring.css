@@ -106,6 +106,12 @@
     color: #404040;
 }
 
+.graph .title .ajax-loader {
+    float: right;
+    margin-left: 10px;
+    margin-top: 2px;
+}
+
 .graph > .header > .ui-btn {
     float: right;
     margin: 0;

@@ -108,6 +108,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                     that.metric.id = data.metric_id;
                     that.metric.machines = that.machine ? [that.machine] : [];
                     Mist.metricsController._addMetric(that.metric, that.machine);
+                    Mist.monitoringController.graphs.addDummyGraph(that.metric.name);
                 }).error(function (message) {
                     if (that.handleSyntaxError(message))
                         return;
