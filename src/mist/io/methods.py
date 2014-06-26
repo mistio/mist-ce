@@ -680,7 +680,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             associate_key(user, key_id, backend_id, node.id, port=int(port))
 
         if script and public_key:
-            host = conn.connection.host           
+            host = conn.connection.host
             #consider public ip of docker server as container's ip too
             #run script
             ssh_command(user, backend_id=backend_id, machine_id=node.id, key_id=key_id, host=host,
@@ -1305,7 +1305,7 @@ def _machine_action(user, backend_id, machine_id, action):
                                     key_id = keypair
                                     machine[-1] = int(port)
                         user.save()
-                        
+
         elif action is 'destroy':
             if conn.type is Provider.DOCKER and node.state == 0:
                 conn.ex_stop_node(node)
@@ -1454,7 +1454,7 @@ def list_images(user, backend_id, term=None):
             rest_images = [image for image in rest_images if not image.extra['deprecated']]
         elif conn.type == Provider.DOCKER:
             #get mist.io default docker images from config
-            rest_images = [NodeImage(id=image, name=name, driver=conn, extra={}) 
+            rest_images = [NodeImage(id=image, name=name, driver=conn, extra={})
                               for image, name in config.DOCKER_IMAGES.items()]
             rest_images += conn.list_images()
         else:
@@ -2216,7 +2216,7 @@ $sudo rm -rf %(tmp_dir)s
     for part in plugin_id.split("."):
         if part != parts[-1]:
             parts.append(part)
-    parts.append(value_type)
+    ## parts.append(value_type)  # not needed since MistPythonConverter in bucky
     metric_id = ".".join(parts)
 
     return {'metric_id': metric_id, 'stdout': stdout}
