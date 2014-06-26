@@ -1,0 +1,62 @@
+
+<div id="metric-add-custom-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-a"></div>
+<div id="metric-add-custom-popup"
+     class="ui-popup-container ui-popup-hidden ui-body-inherit ui-corner-all">
+
+    <div id="metric-add-custom"
+         class="ui-popup ui-corner-all ui-overlay-shadow"
+         data-role="popup"
+         data-enhanced="true"
+         data-transition="flip"
+         data-position-to="#add-metric-btn">
+
+        <div class="ui-header ui-bar-b">
+            <h1 class="ui-title">Add custom metric</h1>
+        </div>
+        <div class="ui-content">
+
+            <label for="custom-plugin-name">Name:</label>
+            {{view Mist.TextField
+                   id="custom-plugin-name"
+                   valueBinding="Mist.metricAddCustomController.metric.name"}}
+
+            <label for="custom-plugin-script">Python script:</label>
+            <pre id="custom-plugin-error"></pre>
+            {{view Ember.TextArea
+                   id="custom-plugin-script"
+                   valueBinding="Mist.metricAddCustomController.metric.script"}}
+
+            <label for="custom-plugin-unit">Unit:</label>
+            {{view Mist.TextField
+                   id="custom-plugin-unit"
+                   placeholder="e.g. bytes (optional)"
+                   valueBinding="Mist.metricAddCustomController.metric.unit"}}
+
+            <select id="advanced-toggle" data-role="slider" data-theme="a"
+            {{action "advancedToggled" target="view" on="change"}}>
+                <option value="0">Basic settings</option>
+                <option value="1">Advanced settings</option>
+            </select>
+
+            <div id="custom-plugin-advanced">
+                <label>
+                {{view Mist.Checkbox
+                       data-mini="true"
+                       checkedBinding="Mist.metricAddCustomController.metric.type"}}
+                Calculate derivative
+                </label>
+            </div>
+
+            {{#if Mist.metricAddCustomController.addingMetric}}
+                <div class="ajax-loader"></div>
+            {{/if}}
+
+            <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
+                <a class="ui-btn ui-corner-all"
+                    {{action "backClicked" target="view"}}>Back</a>
+                <a class="ui-btn ui-corner-all ui-btn-d ui-state-disabled"
+                    id="deploy" {{action "deployClicked" target="view"}}>Deploy</a>
+            </div>
+        </div>
+    </div>
+</div>

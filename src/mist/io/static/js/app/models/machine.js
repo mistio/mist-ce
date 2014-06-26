@@ -135,6 +135,19 @@ define('app/models/machine', ['ember'],
             },
 
 
+            equals: function (machine) {
+                if (machine instanceof Array)
+                    if (machine[1] == this.id &&
+                        machine[0] == this.backend.id)
+                            return true;
+                if (machine instanceof Object)
+                    if (machine.id == this.id &&
+                        machine.backend.id == this.backend.id)
+                            return true;
+                return false;
+            },
+
+
             getHost: function() {
 
                 if (this.extra && this.extra.dns_name) {

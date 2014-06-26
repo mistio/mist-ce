@@ -21,7 +21,7 @@ define('app/controllers/machines', ['app/models/machine'],
             rebootingMachine: null,
             destroyingMachine: null,
             shutingdownMachine: null,
-            
+
             /* Let's disable sorting for now
             sortAscending: true,
             sortProperties: ['hasMonitoring', 'probed'],
@@ -61,11 +61,13 @@ define('app/controllers/machines', ['app/models/machine'],
 
                 this.addObject(dummyMachine);
 
+                // Don't send dummy key text
+                key = Mist.keysController.keyExists(key.id) ? key : null;
                 var that = this;
                 this.set('addingMachine', true);
                 Mist.ajax.POST('backends/' + this.backend.id + '/machines', {
                         'name': name,
-                        'key': key.id,
+                        'key': key ? key.id : null,
                         'size': size.id,
                         'script': script,
                         'image': image.id,
@@ -117,7 +119,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.waitFor('terminated');
                 machine.lockOn('pending');
                 this.set('destroyingMachine', true);
-                machine.set("beingDestroyed",true);
+                machine.set('beingDestroyed', true);
                 Mist.ajax.POST('/backends/' + this.backend.id + '/machines/' + machineId, {
                     'action' : 'destroy'
                 }).success(function() {
@@ -307,18 +309,30 @@ define('app/controllers/machines', ['app/models/machine'],
                         Mist.monitored_machines.some(function(machine_tuple){
                             backend_id = machine_tuple[0];
                             machine_id = machine_tuple[1];
-                            if (machine.backend.id == backend_id && machine.id == machine_id && !machine.hasMonitoring) {
-                                that.getMachine(machine_id, backend_id).set('hasMonitoring', true);
-                                return true;
+                            if (!machine.hasMonitoring &&
+                                machine.id == machine_id &&
+                                machine.backend.id == backend_id) {
+                                    that.getMachine(machine_id, backend_id)
+                                        .set('hasMonitoring', true);
+                                    return true;
                             }
                         });
 
                         Mist.rulesController.content.forEach(function(rule) {
-                            if (!rule.machine.id) {
-                                if (rule.machine == machine.id && rule.backend == machine.backend.id) {
+                            if (rule.machine.id) return;
+                            if (rule.machine == machine.id &&
+                                rule.backend == machine.backend.id)
                                     rule.set('machine', machine);
-                                }
-                            }
+                        });
+
+                        Mist.metricsController.customMetrics.forEach(function(metric) {
+                            metric.machines.forEach(function(metricMachine, index) {
+                                if (metricMachine[1] == machine.id &&
+                                    metricMachine[0] == machine.backend.id) {
+                                        metric.machines[index] = machine;
+                                        Mist.metricsController.trigger('onMetricListChange');
+                                    }
+                            });
                         });
                     });
                 }
