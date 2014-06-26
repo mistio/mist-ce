@@ -591,7 +591,14 @@ def list_machines(user, backend_id):
     conn = connect_provider(user.backends[backend_id])
 
     try:
-        machines = conn.list_nodes()
+        if conn.type == 'azure':
+            services = conn.ex_list_cloud_services()
+            machines = []
+            for service in services:
+                machines.extend(conn.list_nodes(ex_cloud_service_name=service))
+            #FIXME: Azure does not return list of virtual machines directly
+        else:
+            machines = conn.list_nodes()
     except InvalidCredsError:
         raise BackendUnauthorizedError()
     except Exception as exc:
