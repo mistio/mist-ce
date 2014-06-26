@@ -436,11 +436,13 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                 // If min & max == 0 y axis will not display values. max=1 fixes this.
                 var maxValue = d3.max(this.displayedData, function(d) { return d.value; });
-                var fixedMaxValue =  maxValue || 1;
+                var minValue = d3.min(this.displayedData, function(d) { return d.value; });
+                var fixedMaxValue = maxValue || 1;
+                var fixedMinValue = minValue || 0;
 
                 // Set Possible min/max x & y values
                 this.scale.x.domain(d3.extent(this.displayedData , function(d) { return d.time;  }));
-                this.scale.y.domain([0, fixedMaxValue]);
+                this.scale.y.domain([fixedMinValue, fixedMaxValue]);
 
                 // Set the range
                 this.calcValueDistance(this.scale.x);
