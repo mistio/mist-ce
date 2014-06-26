@@ -85,7 +85,7 @@ define('app/controllers/metric_add_custom', ['app/models/metric', 'ember'],
                           '/machines/' + this.machine.id +
                           '/plugins/' + this.metric.pluginId;
 
-                var valueType = $('#plugin-type').val() == '1' ? 'derive' : 'gauge';
+                var valueType = this.metric.type ? 'derive' : 'gauge';
 
                 if (this.newMetricExists(this.metric, this.machine)) {
                     Mist.notificationController.notify('Metric "' +
