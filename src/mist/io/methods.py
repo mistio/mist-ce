@@ -2183,6 +2183,16 @@ echo "Adding Include line for plugin conf in plugins/mist-python/include.conf"
 if ! grep '^Include.*%(plugin_id)s' plugins/mist-python/include.conf; then
     $sudo cp plugins/mist-python/include.conf plugins/mist-python/include.conf.backup
     $sudo su -c 'echo Include \\"/opt/mistio-collectd/plugins/mist-python/conf/%(plugin_id)s.conf\\" >> plugins/mist-python/include.conf'
+    echo "Checking that python plugin is available"
+    if $sudo /usr/bin/collectd -C /opt/mistio-collectd/collectd.conf -t 2>&1 | grep 'Could not find plugin python'; then
+        echo "WARNING: collectd python plugin is not installed, will attempt to install it"
+        zypper in -y collectd-plugin-python
+        if $sudo /usr/bin/collectd -C /opt/mistio-collectd/collectd.conf -t 2>&1 | grep 'Could not find plugin python'; then
+            echo "Install collectd-plugin-python failed"
+            $sudo cp plugins/mist-python/include.conf.backup plugins/mist-python/include.conf
+            echo "ERROR DEPLOYING PLUGIN"
+        fi
+    fi
     echo "Restarting collectd"
     if ! $sudo /opt/mistio-collectd/collectd.sh restart; then
         echo "Restarting collectd failed, restoring include.conf"
