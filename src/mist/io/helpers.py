@@ -46,6 +46,19 @@ def core_wrapper(func):
     return wrapped_func
 
 
+def params_from_request(request):
+    """Get the parameters dict from request.
+
+    Searches if there is a json payload or http parameters and returns
+    the dict.
+
+    """
+    try:
+        params = request.json_body
+    except:
+        params = request.params
+    return params
+
 def user_from_request(request):
     return User()
 
@@ -77,7 +90,7 @@ def get_auth_header(user):
 def parse_ping(stdout):
     """Parse ping's stdout and return dict of extracted metrics."""
     re_header = "^--- (.*) ping statistics ---$"
-    re_packets = "^([\d]+) packets transmitted, ([\d]+)" 
+    re_packets = "^([\d]+) packets transmitted, ([\d]+)"
     re_rtt = ".*min/avg/max/[a-z]* = ([\d]+\.[\d]+)/([\d]+\.[\d]+)/([\d]+\.[\d]+)"
     lines = stdout.split("\n")
     for i in range(len(lines) - 2):

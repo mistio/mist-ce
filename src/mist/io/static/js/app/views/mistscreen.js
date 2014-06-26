@@ -1,20 +1,26 @@
 define('app/views/mistscreen', ['app/views/templated', 'ember'],
-    /**
-     *  Mistscreen View
-     *
-     *  @returns Class
-     */
+    //
+    //  Page View
+    //
+    //  @returns Class
+    //
     function (TemplatedView) {
+
+        'use strict';
+
         return TemplatedView.extend({
 
-            /**
-             *  Initialization
-             */
-            
+
+            //
+            //
+            //  Initialization
+            //
+            //
+
+
             didInsertElement: function () {
-                if ($('.ui-page-active').page) {
-                    $('.ui-page-active').page();
-                }
+                this._super();
+                $('.ui-page-active').parent().trigger('create');
             }
         });
     }

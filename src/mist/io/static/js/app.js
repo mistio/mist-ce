@@ -26,114 +26,129 @@ require.config({
 define( 'app', [
     'jquery',
     'd3',
-    'app/templates/templates',
-    'app/controllers/login',
-    'app/controllers/backends',
-    'app/controllers/confirmation',
-    'app/controllers/notification',
     'app/controllers/backend_add',
     'app/controllers/backend_edit',
-    'app/controllers/machine_add',
-    'app/controllers/machine_keys',
-    'app/controllers/machine_power',
-    'app/controllers/monitoring',
+    'app/controllers/backends',
+    'app/controllers/confirmation',
+    'app/controllers/file_upload',
+    'app/controllers/image_search',
     'app/controllers/key_add',
     'app/controllers/key_edit',
     'app/controllers/keys',
-    'app/controllers/machine_tags',
-    'app/controllers/machine_shell',
+    'app/controllers/login',
+    'app/controllers/machine_add',
+    'app/controllers/machine_keys',
     'app/controllers/machine_manual_monitoring',
-    'app/controllers/image_search',
+    'app/controllers/machine_power',
+    'app/controllers/machine_shell',
+    'app/controllers/machine_tags',
+    'app/controllers/metric_add',
+    'app/controllers/metric_add_custom',
+    'app/controllers/metrics',
+    'app/controllers/monitoring',
+    'app/controllers/notification',
+    'app/controllers/rule_edit',
     'app/controllers/rules',
-    'app/controllers/file_upload',
-    'app/views/templated',
-    'app/views/home',
-    'app/views/login',
-    'app/views/backend_button',
+    'app/templates/templates',
     'app/views/backend_add',
+    'app/views/backend_button',
     'app/views/backend_edit',
-    'app/views/monitoring',
-    'app/views/machine_list_item',
-    'app/views/image_list_item',
-    'app/views/machine_add',
-    'app/views/machine',
-    'app/views/messagebox',
-    'app/views/machine_list',
     'app/views/confirmation_dialog',
-    'app/views/machine_shell',
-    'app/views/machine_shell_list_item',
+    'app/views/file_upload',
+    'app/views/graph',
+    'app/views/graph_button',
+    'app/views/home',
     'app/views/image_list',
-    'app/views/machine_power',
-    'app/views/machine_tags',
-    'app/views/machine_keys',
-    'app/views/machine_keys_list_item',
-    'app/views/machine_tags_list_item',
-    'app/views/machine_manual_monitoring',
-    'app/views/key_list_item',
-    'app/views/key_list',
+    'app/views/image_list_item',
     'app/views/key',
     'app/views/key_add',
     'app/views/key_edit',
+    'app/views/key_list',
+    'app/views/key_list_item',
+    'app/views/login',
+    'app/views/machine',
+    'app/views/machine_add',
+    'app/views/machine_keys',
+    'app/views/machine_keys_list_item',
+    'app/views/machine_list',
+    'app/views/machine_list_item',
+    'app/views/machine_manual_monitoring',
+    'app/views/machine_power',
+    'app/views/machine_shell',
+    'app/views/machine_shell_list_item',
+    'app/views/machine_tags',
+    'app/views/machine_tags_list_item',
+    'app/views/messagebox',
+    'app/views/metric_add',
+    'app/views/metric_add_custom',
+    'app/views/metric_node',
+    'app/views/monitoring',
     'app/views/rule',
+    'app/views/rule_edit',
     'app/views/user_menu',
-    'app/views/list_item',
-    'app/views/file_upload',
     'ember'
-    ], function($,
-                d3,
-                TemplatesBuild,
-                LoginController,
-                BackendsController,
-                ConfirmationController,
-                NotificationController,
-                BackendAddController,
-                BackendEditController,
-                MachineAddController,
-                MachineKeysController,
-                MachinePowerController,
-                MonitoringController,
-                KeyAddController,
-                KeyEditController,
-                KeysController,
-                MachineTagsController,
-                MachineShellController,
-                MachineManualMonitoringController,
-                ImageSearchController,
-                RulesController,
-                FileUploadController,
-                TemplatedView,
-                Home,
-                LoginView,
-                BackendButton,
-                BackendAdd,
-                BackendEdit,
-                MonitoringView,
-                MachineListItem,
-                ImageListItem,
-                MachineAddDialog,
-                SingleMachineView,
-                MessageBoxView,
-                MachineListView,
-                ConfirmationDialog,
-                MachineShellView,
-                MachineShellListItemView,
-                ImageListView,
-                MachinePowerView,
-                MachineTagsView,
-                MachineKeysView,
-                MachineKeysListItemView,
-                MachineTagsListItemView,
-                MachineManualMonitoringView,
-                KeyListItemView,
-                KeyListView,
-                SingleKeyView,
-                KeyAddView,
-                KeyEditDialog,
-                RuleView,
-                UserMenuView,
-                ListItemView,
-                FileUploadView
-                ) {
+], function($,
+    d3,
+    BackendAddController,
+    BackendEditController,
+    BackendsController,
+    ConfirmationController,
+    FileUploadController,
+    ImageSearchController,
+    KeyAddController,
+    KeyEditController,
+    KeysController,
+    LoginController,
+    MachineAddController,
+    MachineKeysController,
+    MachineManualMonitoringController,
+    MachinePowerController,
+    MachineShellController,
+    MachineTagsController,
+    MetricAddController,
+    MetricAddCustomController,
+    MetricsController,
+    MonitoringController,
+    NotificationController,
+    RuleEditController,
+    RulesController,
+    TemplatesBuild,
+    BackendAdd,
+    BackendButton,
+    BackendEdit,
+    ConfirmationDialog,
+    FileUploadView,
+    GraphView,
+    GraphButtonView,
+    Home,
+    ImageListView,
+    ImageListItem,
+    SingleKeyView,
+    KeyAddView,
+    KeyEditDialog,
+    KeyListView,
+    KeyListItemView,
+    LoginView,
+    SingleMachineView,
+    MachineAddDialog,
+    MachineKeysView,
+    MachineKeysListItemView,
+    MachineListView,
+    MachineListItem,
+    MachineManualMonitoringView,
+    MachinePowerView,
+    MachineShellView,
+    MachineShellListItemView,
+    MachineTagsView,
+    MachineTagsListItemView,
+    MessageBoxView,
+    MetricAddView,
+    MetricAddCustomView,
+    MetricNodeView,
+    MonitoringView,
+    RuleView,
+    RuleEditView,
+    UserMenuView) {
 
     function initialize() {
 
@@ -146,6 +161,7 @@ define( 'app', [
             $.mobile.pushStateEnabled = false;
             $.mobile.linkBindingEnabled = false;
             $.mobile.hashListeningEnabled = false;
+            $.mobile.ignoreContentEnabled = true;
             $.mobile.panel.prototype._bindUpdateLayout = function(){};
             $('body').css('overflow','auto');
 
@@ -272,14 +288,17 @@ define( 'app', [
 
         App.set('homeView', Home);
         App.set('ruleView', RuleView);
+        App.set('graphView', GraphView);
         App.set('loginView', LoginView);
         App.set('keyAddView', KeyAddView);
         App.set('keyView', SingleKeyView);
+        App.set('metricNodeView', MetricNodeView);
         App.set('keyListView', KeyListView);
-        App.set('listItemView', ListItemView);
         App.set('userMenuView', UserMenuView);
         App.set('keyEditView', KeyEditDialog);
         App.set('backendAddView', BackendAdd);
+        App.set('ruleEditView', RuleEditView);
+        App.set('metricAddView', MetricAddView);
         App.set('backendEditView', BackendEdit);
         App.set('imageListView', ImageListView);
         App.set('fileUploadView', FileUploadView);
@@ -293,10 +312,12 @@ define( 'app', [
         App.set('imageListItemView', ImageListItem);
         App.set('machineAddView', MachineAddDialog);
         App.set('backendButtonView', BackendButton);
+        App.set('graphButtonView', GraphButtonView);
         App.set('machinePowerView', MachinePowerView);
         App.set('machineShellView', MachineShellView);
         App.set('machineListItemView', MachineListItem);
         App.set('confirmationDialog', ConfirmationDialog);
+        App.set('metricAddCustomView', MetricAddCustomView);
         App.set('machineKeysListItemView', MachineKeysListItemView);
         App.set('machineTagsListItemView', MachineTagsListItemView);
         App.set('machineShellListItemView', MachineShellListItemView);
@@ -308,8 +329,11 @@ define( 'app', [
         App.set('loginController', LoginController.create());
         App.set('rulesController', RulesController.create());
         App.set('keyAddController', KeyAddController.create());
+        App.set('metricsController', MetricsController.create());
         App.set('keyEditController', KeyEditController.create());
+        App.set('ruleEditController', RuleEditController.create());
         App.set('backendsController', BackendsController.create());
+        App.set('metricAddController', MetricAddController.create());
         App.set('fileUploadController', FileUploadController.create());
         App.set('machineAddController', MachineAddController.create());
         App.set('backendAddController', BackendAddController.create());
@@ -322,8 +346,8 @@ define( 'app', [
         App.set('confirmationController', ConfirmationController.create());
         App.set('notificationController', NotificationController.create());
         App.set('machinePowerController', MachinePowerController.create());
+        App.set('metricAddCustomController', MetricAddCustomController.create());
         App.set('machineManualMonitoringController', MachineManualMonitoringController.create());
-
 
         // Ember custom widgets
 
@@ -337,11 +361,16 @@ define( 'app', [
             ]
         });
 
-        App.Checkbox = Ember.Checkbox;
+        App.Checkbox = Ember.Checkbox.extend({
+            attributeBindings: [
+                'data-mini'
+            ]
+        });
         App.TextField = Ember.TextField.extend({
             autocapitalize: 'off',
             attributeBindings: [
                 'data-theme',
+                'placeholder',
                 'autocapitalize'
             ],
             keyUp: function(e) {
@@ -396,11 +425,48 @@ define( 'app', [
 
         // Mist functions
 
+        App.getKeyIdByUrl = function() {
+            return window.location.href.split('/')[5];
+        };
+
+        App.getMachineIdByUrl = function() {
+            return window.location.href.split('/')[5];
+        };
+
+        App.getViewName = function (view) {
+            return view.constructor.toString().split('.')[1].split('View')[0];
+        };
+
+        App.capitalize = function (string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        };
+
+        App.decapitalize = function (string) {
+            return string.charAt(0).toLowerCase() + string.slice(1);
+        };
+
+        App.capitalizeArray = function (array) {
+            var newArray = [];
+            array.forEach(function(string) {
+                newArray.push(App.capitalize(string));
+            });
+            return newArray;
+        };
+
+        App.decapitalizeArray = function (array) {
+            var newArray = [];
+            array.forEach(function(string) {
+                newArray.push(App.decapitalize(string));
+            });
+            return newArray;
+        };
+
         App.isScrolledToBottom = function(){
             var distanceToTop = $(document).height() - $(window).height()
             var top = $(document).scrollTop();
             return distanceToTop - top < 20;
         };
+
         App.selectElementContents = function(elementId) {
             var el = document.getElementById(elementId);
             var range = document.createRange();
@@ -410,29 +476,78 @@ define( 'app', [
             sel.addRange(range);
         };
 
-        App.getKeyIdByUrl = function() {
-            return window.location.href.split('/')[5];
+        App.smoothScroll = function (scrollTo, timeout) {
+
+            timeout = timeout || 100;
+
+            var startingTop = $(window).scrollTop();
+
+            var distance = Math.abs(startingTop - scrollTo);
+
+            var scrollTimes;
+            if (distance < 10)
+                scrollTimes = 1;
+            else if (distance < 100)
+                scrollTimes = 10;
+            else
+                scrollTimes = 100;
+
+            var scrollCounter = scrollTimes;
+            var scrollInterval = timeout / scrollTimes;
+
+            var scrollChunks = distance / scrollTimes;
+            var sign = startingTop < scrollTo ? +1 : -1;
+
+            function partialScroll () {
+                if (Math.abs($(window).scrollTop() - scrollTo) < 10 ||
+                    scrollCounter == 0) {
+                    window.scrollTo(0, scrollTo);
+                } else {
+                    scrollCounter--;
+                    window.scrollTo(0, $(window).scrollTop() + (sign * scrollChunks));
+                    setTimeout(function () {
+                        partialScroll();
+                    }, scrollInterval);
+                }
+            };
+
+            partialScroll();
         };
 
-        App.getMachineIdByUrl = function() {
-            return window.location.href.split('/')[5];
+        App.switchElementVisibility = function(elementSelector) {
+            var element = $('#' + elementSelector);
+            if (element.css('display') == 'none')
+                element.slideDown();
+            else
+                element.slideUp();
         };
 
         App.arrayToListString = function(array, attribute) {
-
-            if (! array instanceof Array )
-                return '';
-
             var listString = '';
             array.forEach(function(item, index) {
                 listString += item[attribute];
                 if (index < array.length - 1)
                     listString += ', ';
             });
-
             return listString;
         };
 
+        App.splitWords = function (string) {
+            if (string.indexOf('-') > -1)
+                return string.split('-');
+            else if (string.indexOf('_') > -1)
+                return string.split('_');
+            else if (string.indexOf(' ') > -1)
+                return string.split(' ');
+            else if (string.match(/([a-z])([A-Z])/g)) {
+                var wordJoints = string.match(/([a-z])([A-Z])/g);
+                wordJoints.forEach(function(joint) {
+                    string = string.replace(joint, joint[0] + '_' + joint[1]);
+                });
+                return App.splitWords(string);
+            }
+            return [string];
+        };
 
         return App;
     }
@@ -477,16 +592,11 @@ define( 'app', [
             };
             call.ajax = function() {
 
-//                if (type != 'GET') {
-//                    if (data) { data.csrf_token = csrfToken; }
-//                    else { data = {'csrf_token': csrfToken}; }
-//                }
-
                 var ajaxObject = {
                     url: url,
                     type: type,
                     headers: {
-                        'Csrf-Token': csrfToken
+                        'Csrf-Token': csrfToken,
                     },
                     data: JSON.stringify(data),
                     complete: function(jqXHR) {
@@ -652,7 +762,6 @@ function error() {
     } catch(err) {console.log(err);}
 }
 
-var collectd_install_target = false, collectd_uninstall_target = false, collectd_lastlog="";
 
 function appendShell(output, command_id) {
 
@@ -680,15 +789,3 @@ function completeShell(ret, command_id) {
     $('iframe#' + command_id).remove();
     Mist.machineShellController.machine.commandHistory.findBy('id', command_id).set('pendingResponse', false);
 }
-
-function getTemplate(name) {
-    if (JS_BUILD || true) { // The "|| true" part is just for debuging as for now
-        //info('Getting precompiled template for: ' + name);
-        // Return precompiled template
-        return Ember.TEMPLATES[name + '/html'];
-    } else {
-        info('Compiling template for: ' + name);
-        return Ember.Handlebars.compile('text!app/templates/'+ name + '.html');
-    }
-};
-
