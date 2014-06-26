@@ -2140,10 +2140,13 @@ import collectd
 %(read_function)s
 
 def read_callback():
+    val = read()
+    if val is None:
+        return
     vl = collectd.Values(type="%(value_type)s")
     vl.plugin = "mist.python"
     vl.plugin_instance = "%(plugin_instance)s"
-    vl.dispatch(values=[read()])
+    vl.dispatch(values=[val])
 
 collectd.register_read(read_callback)
 """ % {'read_function': read_function,
