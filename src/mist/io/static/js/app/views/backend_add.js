@@ -87,6 +87,9 @@ define('app/views/backend_add', ['app/views/templated', 'ember'],
                     } else if (provider.provider.indexOf('digitalocean') > -1) {
                         this.set('firstFieldLabel', 'Client ID');
                         this.set('secondFieldLabel', 'API Key');
+                    } else if (provider.provider.indexOf('azure') > -1) {
+                        this.set('firstFieldLabel', 'Subscription ID');
+                        this.set('secondFieldLabel', 'Certificate file');                        
                     } else if (provider.provider.indexOf('gce') > -1) {
                         this.set('firstFieldLabel', 'Email address');
                         this.set('secondFieldLabel', '');

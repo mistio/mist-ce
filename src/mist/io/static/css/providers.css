@@ -33,6 +33,11 @@
     background-image: url(../images/nephoscale_sm.png);
 }
 
+/* Azure */
+#single-view-provider-icon.provider-azure  {
+    background-image: url(../images/azure.png);
+}
+
 /* Docker */
 #single-view-provider-icon.provider-docker  {
     background-image: url(../images/docker_sm.png);
