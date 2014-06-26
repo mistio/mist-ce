@@ -478,6 +478,8 @@ def connect_provider(backend):
     """
     if backend.provider != 'bare_metal':
         driver = get_driver(backend.provider)
+    elif backend.provider == Provider.AZURE:
+        conn = driver(backend.key, backend.secret)        
     if backend.provider == Provider.OPENSTACK:
         if 'hpcloudsvc' in backend.apiurl:
             conn = driver(
