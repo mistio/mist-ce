@@ -2194,7 +2194,8 @@ if ! grep '^Include.*%(plugin_id)s' plugins/mist-python/include.conf; then
         fi
     fi
     echo "Restarting collectd"
-    if ! $sudo /opt/mistio-collectd/collectd.sh restart; then
+    $sudo /opt/mistio-collectd/collectd.sh restart
+    if ! $sudo /opt/mistio-collectd/collectd.sh status; then
         echo "Restarting collectd failed, restoring include.conf"
         $sudo cp plugins/mist-python/include.conf.backup plugins/mist-python/include.conf
         $sudo /opt/mistio-collectd/collectd.sh restart
