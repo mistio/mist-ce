@@ -631,19 +631,29 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
                     message += ' ?';
 
-                    var removeGraph = function () {
-                        Mist.monitoringController.graphs.removeGraph(graph);
+                    var removeGraph = function (success) {
+                        if (success) {
+                            Mist.monitoringController.graphs.removeGraph(graph,
+                                function (success) {
+                                    if (success)
+                                        that.graph.set('pendingRemoval', false);
+                            });
+                        } else {
+                            that.graph.set('pendingRemoval', false);
+                        }
                     }
 
+                    var that = this;
                     Mist.confirmationController.set('text', message);
                     Mist.confirmationController.set('callback', function () {
                         if (metric.isPlugin) {
                             Mist.metricsController.disableMetric(
                                 metric, machine, removeGraph);
                         } else {
-                            removeGraph();
+                            removeGraph(true);
                         }
                     });
+                    this.graph.set('pendingRemoval', true);
                     Mist.confirmationController.show();
                 }
             }

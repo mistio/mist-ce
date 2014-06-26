@@ -10,6 +10,9 @@
         {{#if view.graph.pendingCreation}}
             <div class="ajax-loader"></div>
         {{else}}
+            {{#if view.graph.pendingRemoval}}
+                <div class="ajax-loader"></div>
+            {{/if}}
             {{#unless view.graph.isBuiltIn}}
                 <a class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext"
                     {{action "removeClicked" target="view"}}>x
