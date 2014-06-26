@@ -62,12 +62,11 @@
     min-height: 50px;
     border:1px solid #ccc;
     background: #e0e0e1;
-    padding-right: 12px;
+    padding: 5px 10px 0px;
 }
 
 .graphBtn {
     display: inline-block;
-    margin: 0 5px;
     width: 150px;
 }
 
