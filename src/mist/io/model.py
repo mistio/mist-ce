@@ -130,20 +130,16 @@ class Keypair(OODict):
 
     def generate(self):
         """Generates a new RSA keypair and assignes to self."""
-
-        try:
-            key = RSA.generate(2048)
-        except Exception as exc:
-            log.warn("Error generating RSA key, retrying: %r", exc)
-            from Crypto import Random
-            Random.atfork()
-            key = RSA.generate(2048)
+        from Crypto import Random
+        Random.atfork()
+        key = RSA.generate(2048)
         self.private = key.exportKey()
         self.public = key.exportKey('OpenSSH')
 
     def isvalid(self):
         """Checks if self is a valid RSA keypair."""
-
+        from Crypto import Random
+        Random.atfork()
         message = 'Message 1234567890'
         if 'ssh-rsa' in self.public:
             public_key_container = RSA.importKey(self.public)
@@ -159,7 +155,8 @@ class Keypair(OODict):
         Only works for RSA.
 
         """
-
+        from Crypto import Random
+        Random.atfork()
         if 'RSA' in self.private:
             try:
                 key = RSA.importKey(self.private)
