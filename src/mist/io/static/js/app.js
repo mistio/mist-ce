@@ -4,9 +4,9 @@ require.config({
     waitSeconds: 200,
     paths: {
         text: 'lib/require/text',
-        ember: 'lib/ember-1.4.1.min',
-        jquery: 'lib/jquery-2.1.0.min',
-        mobile: 'lib/jquery.mobile-1.4.1.min',
+        ember: 'lib/ember-1.5.1.min',
+        jquery: 'lib/jquery-2.1.1.min',
+        mobile: 'lib/jquery.mobile-1.4.2.min',
         handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
