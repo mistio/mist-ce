@@ -109,13 +109,13 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
 
 
             _updateFormReady: function () {
-   
+
                 // Filter out the "Select provider" dummy provider
-                if (! ('provider' in this.newBackendProvider)) { 
+                if (! ('provider' in this.newBackendProvider)) {
                     this.set('formReady', false);
                     return;
                 }
-                
+
                 var ready = false;
 
                 if (this.newBackendProvider.provider == 'docker') {
@@ -127,7 +127,7 @@ define('app/controllers/backend_add', ['app/models/backend', 'ember'],
                     ready = true;
 
                     if (this.newBackendProvider.provider == 'openstack') { // Openstack
-                        if (!this.newBackendOpenStackURL) {
+                        if (!this.newBackendOpenStackURL || !this.newBackendOpenStackTenant) {
                             ready = false;
                         }
                     } else if (this.newBackendProvider.provider.indexOf('hpcloud') > -1) { // HpCloud
