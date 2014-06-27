@@ -13,13 +13,19 @@ from time import time
 import gevent
 from gevent.socket import wait_read, wait_write
 
+import requests
+
 from socketio.namespace import BaseNamespace
 
 try:
     from mist.core.helpers import user_from_request
+    from mist.core import config
 except ImportError:
     from mist.io.helpers import user_from_request
+    from mist.io import config
+
 from mist.io.helpers import amqp_subscribe
+from mist.io.helpers import get_auth_header
 
 from mist.io import methods
 from mist.io import tasks
@@ -94,7 +100,38 @@ class MistNamespace(BaseNamespace):
         self.update_greenlet = self.spawn(update_subscriber, self)
         #self.probe_greenlet = self.spawn(probe_subscriber, self)
 
-    def process_update(self, msg):
+    def on_stats(self, backend_id, machine_id, start, stop, step):
+        print "STATS!!", backend_id, machine_id, start, stop, step
+        data = {'start': start-50,
+                'stop': stop+50,
+                'step': step/1000}
+        data['v'] = 2
+        try:
+            uri = config.CORE_URI + '/backends/' + backend_id + '/machines/' + machine_id + '/stats'
+            print uri
+            resp = requests.get(uri,
+                                params=data,
+                                headers={'Authorization': get_auth_header(self.user)},
+                                verify=config.SSL_VERIFY)
+        except requests.exceptions.SSLError as exc:
+            print exc
+            #log.error("%r", exc)
+    
+        if resp.ok:
+            ret = {}
+            ret['metrics'] = resp.json()
+            ret['backend_id'] = backend_id
+            ret['machine_id'] = machine_id
+            ret['start'] = start
+            ret['stop'] = stop
+            self.emit('stats', ret)
+            print ret
+        else:
+            print "Error getting stats %d:%s", resp.status_code, resp.text  
+            from mist.io.methods import notify_user    
+            notify_user(self.user, "Error getting stats %d:%s" % (resp.status_code, resp.text))        
+        
+    def process_update(self, msg):        
         routing_key = msg.delivery_info.get('routing_key')
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
                                'list_machines', 'list_locations']):
@@ -171,4 +208,3 @@ def list_keys_from_socket(namespace):
     user = namespace.user
     keys = methods.list_keys(user)
     namespace.emit('list_keys', keys)
-

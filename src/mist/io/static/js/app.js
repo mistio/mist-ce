@@ -153,14 +153,14 @@ define( 'app', [
     UserMenuView) {
 
     function initialize() {
-        
+
         warn('Init');
-        
+
         // JQM init event
 
         $(document).bind('mobileinit', function() {
             warn('Mobile Init');
-            
+
             $('#splash').fadeOut(650);
             $.mobile.ajaxEnabled = false;
             $.mobile.pushStateEnabled = false;
@@ -170,7 +170,7 @@ define( 'app', [
             $.mobile.panel.prototype._bindUpdateLayout = function(){};
             $('body').css('overflow','auto');
 
-            App.set('isJQMInitialized',true); 
+            App.set('isJQMInitialized',true);
 
             initSocket();
             setInterval(function() {
@@ -182,7 +182,7 @@ define( 'app', [
                     warn('Socket not connected! Connecting...');
                     Mist.socket.socket.connect();
                 }
-            }, 1000);            
+            }, 1000);
         });
 
         // Hide error boxes on page unload
@@ -383,8 +383,8 @@ define( 'app', [
             attributeBindings: [
                 'data-theme',
                 'autocapitalize'
-            ]   
-        });                     
+            ]
+        });
         App.Checkbox = Ember.Checkbox.extend({
             attributeBindings: [
                 'data-mini'
@@ -828,35 +828,35 @@ function getTemplate(name) {
 function initSocket() {
     warn('Socket init');
     var sock = undefined, retry = 0;
-    while (!sock) {        
-        sock = io.connect('/mist');            
+    while (!sock) {
+        sock = io.connect('/mist');
         retry += 1;
         if (retry > 5){
             alert('failed to connect after ' + retry + ' retries');
             return false;
         }
     }
-    
+
     Mist.set('socket', sock);
 
     Mist.socket.emit('ready');
-    
+
     Mist.socket.on('list_backends', function(backends){
         Mist.backendsController._setContent(backends);
-        Mist.backendsController.set('loading', false); 
+        Mist.backendsController.set('loading', false);
     });
 
     Mist.socket.on('list_keys', function(keys){
         Mist.keysController._setContent(keys);
-        Mist.keysController.set('loading', false); 
+        Mist.keysController.set('loading', false);
     });
-                
+
     Mist.socket.on('list_sizes', function(data){
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend) {
             backend.get('sizes')._setContent(data.sizes);
             backend.get('sizes').set('loading', false);
-        } 
+        }
     });
 
     Mist.socket.on('list_locations', function(data){
@@ -867,26 +867,26 @@ function initSocket() {
             backend.set('loadingLocations', false);
         }
     });
-    
+
     Mist.socket.on('list_images', function(data){
         var backend = Mist.backendsController.getBackend(data.backend_id);
         if (backend) {
             backend.get('images')._setContent(data.images);
-            backend.get('images').set('loading', false); 
+            backend.get('images').set('loading', false);
         }
     });
-    
+
     Mist.socket.on('list_machines', function(data){
         Ember.run.next(function(){
             var backend = Mist.backendsController.getBackend(data.backend_id);
             if (backend) {
                 backend.get('machines')._updateContent(data.machines);
-                backend.get('machines').set('loading', false);                        
+                backend.get('machines').set('loading', false);
             }
 
         });
     });
-    
+
     Mist.socket.on('probe', function(data){
         Ember.run.next(function(){
             var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
@@ -894,31 +894,39 @@ function initSocket() {
                 machine.probeSuccess(data.result);
         });
     });
-    
+
     Mist.socket.on('monitoring',function(data){
         Mist.monitoringController._updateMonitoringData(data);
         Mist.monitoringController.trigger('onMonitoringDataUpdate');
         Mist.backendsController.set('checkedMonitoring', true);
     });
-    
-    Mist.socket.on('update',function(data){
+
+    Mist.socket.on('update', function(data){
         warn(data);
-    });            
-                            
+    });
+
     Mist.socket.on('notify',function(data){
         Mist.notificationController.notify(data);
     });
-    
-    if (!Mist.socket.socket.connected) 
+
+    Mist.socket.on('stats', function(data){
+        warn('stats!');
+        warn(data);
+        //var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
+        Mist.monitoringController.request.updateMetrics(data.metrics, data.start, data.stop);
+
+    });
+
+    if (!Mist.socket.socket.connected)
         Mist.socket.socket.connect();
 }
 
 
 var virtualKeyboardHeight = function () {
     var keyboardHeight = 0;
-    
-    if (!Mist.term) return 0;                    
-    
+
+    if (!Mist.term) return 0;
+
     if (Mist.term.isIpad || Mist.term.isIphone){
         var sx = document.body.scrollLeft, sy = document.body.scrollTop;
         var naturalHeight = window.innerHeight;
@@ -926,8 +934,8 @@ var virtualKeyboardHeight = function () {
         keyboardHeight = naturalHeight - window.innerHeight;
         window.scrollTo(sx, sy);
     } else if (Mist.term.isAndroid) {
-        keyboardHeight = 0;    
+        keyboardHeight = 0;
     }
     return keyboardHeight;
-}; 
+};
 

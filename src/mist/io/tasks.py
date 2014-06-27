@@ -6,13 +6,15 @@ from amqp.connection import Connection
 
 from time import time
 
-#from celery import logging
+
+from celery import logging
 
 import libcloud.security
 
 from mist.io.celery_app import app
 from mist.io.exceptions import ServiceUnavailableError
 from mist.io.shell import Shell
+from mist.io.helpers import get_auth_header
 
 try: # Multi-user environment
     from mist.core.helpers import user_from_email
@@ -26,7 +28,7 @@ from mist.io.helpers import amqp_publish
 # libcloud certificate fix for OS X
 libcloud.security.CA_CERTS_PATH.append(cert_path)
 
-#log = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 @app.task
