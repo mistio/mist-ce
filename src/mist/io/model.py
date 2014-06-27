@@ -131,7 +131,13 @@ class Keypair(OODict):
     def generate(self):
         """Generates a new RSA keypair and assignes to self."""
 
-        key = RSA.generate(2048, os.urandom)
+        try:
+            key = RSA.generate(2048)
+        except Exception as exc:
+            log.warn("Error generating RSA key, retrying: %r", exc)
+            from Crypto import Random
+            Random.atfork()
+            key = RSA.generate(2048)
         self.private = key.exportKey()
         self.public = key.exportKey('OpenSSH')
 
