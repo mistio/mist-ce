@@ -2,15 +2,11 @@
 
 Here we define the socketio namespace and handlers.
 
-When a user loads mist.io or comes back online, their browser will request a 
-new socket and the initialize function will be triggered on the server within a 
+When a user loads mist.io or comes back online, their browser will request a
+new socket and the initialize function will be triggered on the server within a
 greenlet.
 
 """
-
-import json
-
-from amqp.connection import Connection
 
 from time import time
 
@@ -23,6 +19,7 @@ try:
     from mist.core.helpers import user_from_request
 except ImportError:
     from mist.io.helpers import user_from_request
+from mist.io.helpers import amqp_subscribe
 
 from mist.io import methods
 from mist.io import tasks
@@ -33,20 +30,20 @@ class ShellNamespace(BaseNamespace):
     def initialize(self):
         self.user = user_from_request(self.request)
         self.channel = None
-        print "opening shell socket"         
-    
+        print "opening shell socket"
+
     def on_shell_open(self, data):
         print "opened shell"
         self.shell = Shell(data['host'])
         key_id, ssh_user = self.shell.autoconfigure(self.user, data['backend_id'], data['machine_id'])
         self.channel = self.shell.ssh.invoke_shell('xterm')
-        self.spawn(self.get_ssh_data)           
-    
+        self.spawn(self.get_ssh_data)
+
     def on_shell_close(self):
         print "closing shell"
         if self.channel:
             self.channel.close()
-    
+
     def on_shell_data(self, data):
         self.channel.send(data)
 
@@ -59,7 +56,7 @@ class ShellNamespace(BaseNamespace):
                     return
                 self.emit('shell_data', data)
         finally:
-            self.channel.close()    
+            self.channel.close()
 
 
 class MistNamespace(BaseNamespace):
@@ -68,7 +65,7 @@ class MistNamespace(BaseNamespace):
         self.user = user_from_request(self.request)
         self.probes = {}
         self.channel = None
-        
+
     def spawn_later(self, delay, fn, *args, **kwargs):
         """Spawn a new process, attached to this Namespace after no less than
         delay seconds.
@@ -88,7 +85,7 @@ class MistNamespace(BaseNamespace):
         new = gevent.spawn_later(delay, fn, *args, **kwargs)
         self.jobs.append(new)
         return new
-    
+
     def on_ready(self):
         print "Ready to go!"
         self.monitoring_greenlet = self.spawn(check_monitoring_from_socket, self)
@@ -96,59 +93,42 @@ class MistNamespace(BaseNamespace):
         self.keys_greenlet = self.spawn(list_keys_from_socket, self)
         self.update_greenlet = self.spawn(update_subscriber, self)
         #self.probe_greenlet = self.spawn(probe_subscriber, self)
-                
-    def on_boo(self, data):
-        print "BOO", data
-        self.emit("Boo")
-        
-    def process_update(self, msg):        
+
+    def process_update(self, msg):
         routing_key = msg.delivery_info.get('routing_key')
         if routing_key == 'notify':
             self.emit('notify', msg.body)
         elif routing_key == 'probe':
             print "Got probe"
             print msg.body
-            self.emit('probe', json.loads(msg.body));
+            self.emit('probe', msg.body);
         elif routing_key == 'update':
             self.user.refresh()
-            self.emit('update', msg.body)
-            sections = json.loads(msg.body)
+            sections = msg.body
             if 'backends' in sections:
                 self.backends_greenlet.kill()
-                self.backends_greenlet = self.spawn(list_backends_from_socket, 
+                self.backends_greenlet = self.spawn(list_backends_from_socket,
                                                     self)
             if 'keys' in sections:
                 self.keys_greenlet.kill()
-                self.keys_greenlet = self.spawn(list_keys_from_socket, 
+                self.keys_greenlet = self.spawn(list_keys_from_socket,
                                                 self)
             if 'monitoring' in sections:
                 self.monitoring_greenlet.kill()
-                self.monitoring_greenlet = self.spawn(check_monitoring_from_socket, 
-                                                      self)           
+                self.monitoring_greenlet = self.spawn(check_monitoring_from_socket,
+                                                      self)
 
 
 def update_subscriber(namespace):
     """Subscribe to RabbitMQ for updates of user data and emit notificaions to
     the browser.
-        
+
     """
-    connection = Connection()
-    channel = connection.channel()
-    
-    channel.exchange_declare(exchange=namespace.user.email,
-                             type='fanout', auto_delete=False)
-    result = channel.queue_declare('update')   
-    channel.queue_bind('update', exchange=namespace.user.email)
-    
-    print ' [*] Waiting for logs. To exit press CTRL+C'
-                    
-    channel.basic_consume(queue='update',
-                          callback=namespace.process_update,
-                          no_ack=True)
-    
-    while True:
-        channel.wait()
-        gevent.sleep()
+    amqp_subscribe(
+        exchange=namespace.user.email or 'mist',
+        queue='update',
+        callback=namespace.process_update,
+    )
 
 
 def check_monitoring_from_socket(namespace):
@@ -160,7 +140,7 @@ def check_monitoring_from_socket(namespace):
         ret = methods.check_monitoring(user)
     namespace.emit('monitoring', ret)
 
-    
+
 def list_backends_from_socket(namespace):
     user = namespace.user
     backends = methods.list_backends(user)
@@ -170,19 +150,19 @@ def list_backends_from_socket(namespace):
                              namespace,
                              b['id']) for b in backends]
     locations = [namespace.spawn(list_locations_from_socket,
-                                 namespace, 
+                                 namespace,
                                  b['id']) for b in backends]
-                                
-    images = [namespace.spawn(list_images_from_socket, 
+
+    images = [namespace.spawn(list_images_from_socket,
                               namespace,
                               b['id']) for b in backends]
-    machines = [namespace.spawn(list_machines_from_socket, 
+    machines = [namespace.spawn(list_machines_from_socket,
                                 namespace,
                                 b['id']) for b in backends]
 
 
 def list_keys_from_socket(namespace):
-    user = namespace.user    
+    user = namespace.user
     keys = methods.list_keys(user)
     namespace.emit('list_keys', keys)
 
@@ -190,40 +170,41 @@ def list_keys_from_socket(namespace):
 def list_sizes_from_socket(namespace, backend_id):
     user = namespace.user
     sizes = methods.list_sizes(user, backend_id)
-    namespace.emit('list_sizes', {'backend_id': backend_id, 
-                                  'sizes': sizes}) 
+    namespace.emit('list_sizes', {'backend_id': backend_id,
+                                  'sizes': sizes})
 
 
 def list_locations_from_socket(namespace, backend_id):
     user = namespace.user
     locations = methods.list_locations(user, backend_id)
-    namespace.emit('list_locations', {'backend_id': backend_id, 
+    namespace.emit('list_locations', {'backend_id': backend_id,
                                       'locations': locations})
 
 
 def list_images_from_socket(namespace, backend_id):
-    user = namespace.user    
+    user = namespace.user
     images = methods.list_images(user, backend_id)
-    namespace.emit('list_images', {'backend_id': backend_id, 
+    namespace.emit('list_images', {'backend_id': backend_id,
                                    'images': images})
 
 
 def list_machines_from_socket(namespace, backend_id, probe=True):
-    user = namespace.user    
+    print "list_machines_from_socket"
+    user = namespace.user
     machines = methods.list_machines(user, backend_id)
-    namespace.emit('list_machines', {'backend_id': backend_id, 
+    namespace.emit('list_machines', {'backend_id': backend_id,
                                      'machines': machines})
     if probe:
         probes = []
         for machine in machines:
-            ips = filter(lambda ip: ':' not in ip, 
+            ips = filter(lambda ip: ':' not in ip,
                          machine.get('public_ips', []))
             if not ips:
                 continue
             tasks.async_probe.delay(user.email, backend_id, machine['id'], ips[0])
-        
-    namespace.spawn_later(10, 
+
+    namespace.spawn_later(10,
                           list_machines_from_socket,
-                          namespace, 
-                          backend_id,  
+                          namespace,
+                          backend_id,
                           False)

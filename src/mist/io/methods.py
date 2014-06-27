@@ -9,8 +9,6 @@ from datetime import datetime
 from hashlib import sha256
 from StringIO import StringIO
 
-from amqp.connection import Connection
-
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
 from libcloud.compute.base import NodeAuthSSHKey
@@ -19,7 +17,6 @@ from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider, NodeState
 from libcloud.common.types import InvalidCredsError
 from libcloud.utils.networking import is_private_subnet
-
 
 try:
     from mist.core import config, model
@@ -34,7 +31,11 @@ from mist.io.helpers import get_auth_header
 from mist.io.helpers import parse_ping
 from mist.io.bare_metal import BareMetalDriver
 from mist.io.exceptions import *
-from mist.io.tasks import trigger_session_update, async_ssh_command
+
+
+from mist.io.helpers import trigger_session_update
+from mist.io.helpers import amqp_publish
+from mist.io.tasks import async_ssh_command
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
@@ -98,7 +99,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                     del user.backends[backend_id]
                     user.save()
                     raise BackendUnauthorizedError(exc)
-            user.save()            
+            user.save()
     else:
         # if api secret not given, search if we already know it
         # FIXME: just pass along an empty apisecret
@@ -171,7 +172,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
             user.backends[backend_id] = backend
             user.save()
     log.info("Backend with id '%s' added succesfully.", backend_id)
-    trigger_session_update.delay(user.email, ['backends'])
+    trigger_session_update(user.email, ['backends'])
     return backend_id
 
 
@@ -188,7 +189,7 @@ def rename_backend(user, backend_id, new_name):
         user.backends[backend_id].title = new_name
         user.save()
     log.info("Succesfully renamed backend '%s'", backend_id)
-    trigger_session_update.delay(user.email, ['backends'])
+    trigger_session_update(user.email, ['backends'])
 
 
 @core_wrapper
@@ -218,7 +219,7 @@ def delete_backend(user, backend_id):
         del user.backends[backend_id]
         user.save()
     log.info("Succesfully deleted backend '%s'", backend_id)
-    trigger_session_update.delay(user.email, ['backends'])
+    trigger_session_update(user.email, ['backends'])
 
 
 @core_wrapper
@@ -248,7 +249,7 @@ def add_key(user, key_id, private_key):
         user.save()
 
     log.info("Added key with id '%s'", key_id)
-    trigger_session_update.delay(user.email, ['keys'])
+    trigger_session_update(user.email, ['keys'])
     return key_id
 
 
@@ -281,7 +282,7 @@ def delete_key(user, key_id):
 
         user.save()
     log.info("Deleted key with id '%s'.", key_id)
-    trigger_session_update.delay(user.email, ['keys'])    
+    trigger_session_update(user.email, ['keys'])
 
 
 def set_default_key(user, key_id):
@@ -307,7 +308,7 @@ def set_default_key(user, key_id):
         keypairs[key_id].default = True
         user.save()
     log.info("Succesfully set key with id '%s' as default.", key_id)
-    trigger_session_update.delay(user.email, ['keys'])    
+    trigger_session_update(user.email, ['keys'])
 
 
 def edit_key(user, new_key, old_key):
@@ -336,7 +337,7 @@ def edit_key(user, new_key, old_key):
         user.keypairs[new_key] = old_keypair
         user.save()
     log.info("Renamed key '%s' to '%s'.", old_key, new_key)
-    trigger_session_update.delay(user.email, ['keys'])    
+    trigger_session_update(user.email, ['keys'])
 
 
 @core_wrapper
@@ -349,7 +350,7 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
 
     """
 
-    log.info("Associating key %s to host %s", key_id, host)    
+    log.info("Associating key %s to host %s", key_id, host)
     if not host:
         log.info("Host not given so will only create association without "
                  "actually deploying the key to the server.")
@@ -383,7 +384,7 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
                          port]
                 user.keypairs[key_id].machines.append(assoc)
                 user.save()
-            trigger_session_update.delay(user.email, ['keys'])
+            trigger_session_update(user.email, ['keys'])
         return
 
     # if host is specified, try to actually deploy
@@ -472,7 +473,7 @@ def disassociate_key(user, key_id, backend_id, machine_id, host=None):
                 keypair.machines.remove(machine)
                 user.save()
                 break
-    trigger_session_update.delay(user.email, ['keys'])            
+    trigger_session_update(user.email, ['keys'])
 
 
 def connect_provider(backend):
@@ -628,13 +629,13 @@ def list_machines(user, backend_id):
         image_id = m.image or m.extra.get('imageId', None)
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
-        
+
         for k in m.extra.keys():
             try:
                 json.dumps(m.extra[k])
             except TypeError:
                 m.extra[k] = str(m.extra[k])
-                
+
         machine = {'id': m.id,
                    'uuid': m.get_uuid(),
                    'name': m.name,
@@ -781,7 +782,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
     if script:
         from mist.io.tasks import run_deploy_script
         run_deploy_script.delay(user.email, backend_id, node.id, script, key_id)
-        
+
     return {'id': node.id,
             'name': node.name,
             'extra': node.extra,
@@ -919,7 +920,7 @@ def _create_machine_ec2(conn, key_name, private_key, public_key, script,
             )
         except Exception as e:
             raise MachineCreationError("EC2, got exception %s" % e)
-    
+
     return node
 
 
@@ -1082,7 +1083,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
             )
         except Exception as e:
             raise MachineCreationError("Digital Ocean, got exception %s" % e)
-        
+
         return node
 
 
@@ -1695,8 +1696,8 @@ def check_monitoring(user):
     else:
         log.error("Error getting stats %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
-    
-    
+
+
 def enable_monitoring(user, backend_id, machine_id,
                       name='', dns_name='', public_ips=None,
                       no_ssh=False, dry=False):
@@ -1749,8 +1750,8 @@ def enable_monitoring(user, backend_id, machine_id,
     if not no_ssh:
         async_ssh_command.delay(user, backend_id, machine_id, host, command)
 
-    trigger_session_update.delay(user.email, ['monitoring'])
-    
+    trigger_session_update(user.email, ['monitoring'])
+
     return ret_dict
 
 
@@ -1783,7 +1784,7 @@ def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
             stdout = _undeploy_collectd(user, backend_id, machine_id, host)
     except:
         pass
-    trigger_session_update.delay(user.email, ['monitoring'])    
+    trigger_session_update(user.email, ['monitoring'])
     return stdout
 
 
@@ -1904,27 +1905,20 @@ def notify_admin(title, message=""):
         pass
 
 
-def notify_user(user, title, message=""):      
-    try:        
+def notify_user(user, title, message="", **kwargs):
+    try:
         from mist.core.helpers import send_email
         send_email(title, message, user.email)
     except ImportError:
         pass
-    
-    msg = Message("%s\n%s" % (title,message))
-    connection = Connection()
-    channel = connection.channel()
-    
-    channel.exchange_declare(exchange=user.email,
-                             type='fanout', 
-                             auto_delete=False)
-    channel.queue_declare('notify')   
-    channel.queue_bind('notify', user.email)    
-    channel.basic_publish(msg,
-                          exchange=user.email,
-                          routing_key='notify')    
-    channel.close()
-    connection.close()
+    payload = {'title': title, 'message': message}
+    payload.update(kwargs)
+    amqp_publish(
+        exchange=user.email or 'mist',
+        queue='update',
+        routing_key='notify',
+        data=payload,
+    )
 
 
 def find_metrics(user, backend_id, machine_id):

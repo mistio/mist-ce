@@ -2,11 +2,15 @@
 
 import os
 import re
+import json
 import tempfile
 import logging
+import functools
 from hashlib import sha1
 from contextlib import contextmanager
 
+from amqp import Message
+from amqp.connection import Connection
 
 from mist.io.model import User
 
@@ -86,7 +90,6 @@ def get_auth_header(user):
     return "mist_1 %s:%s" % (user.email, user.mist_api_token)
 
 
-
 def parse_ping(stdout):
     """Parse ping's stdout and return dict of extracted metrics."""
     re_header = "^--- (.*) ping statistics ---$"
@@ -128,3 +131,49 @@ def parse_ping(stdout):
     # parsing failed. good job..
     log.error("Ping parsing failed for stdout '%s'", stdout)
     return {}
+
+
+def amqp_publish(exchange, queue, routing_key, data):
+    connection = Connection()
+    channel = connection.channel()
+    channel.exchange_declare(exchange=exchange, type='fanout',
+                             auto_delete=False)
+    channel.queue_declare(queue)
+    channel.queue_bind(queue, exchange)
+    msg = Message(json.dumps(data))
+    channel.basic_publish(msg, exchange=exchange, routing_key=routing_key)
+    channel.close()
+    connection.close()
+
+
+def amqp_subscribe(exchange, queue, callback):
+    def json_parse_dec(func):
+        @functools.wraps(func)
+        def wrapped(msg):
+            try:
+                msg.body = json.loads(msg.body)
+            except:
+                pass
+            return func(msg)
+        return wrapped
+    connection = Connection()
+    channel = connection.channel()
+    channel.exchange_declare(exchange=exchange, type='fanout',
+                             auto_delete=False)
+    channel.queue_declare(queue)
+    channel.queue_bind(queue, exchange)
+    channel.basic_consume(queue=queue,
+                          callback=json_parse_dec(callback),
+                          no_ack=True)
+    while True:
+        channel.wait()
+        # gevent.sleep()  # probably not required
+
+
+def trigger_session_update(email, sections=['backends','keys','monitoring']):
+    amqp_publish(
+        exchange=email or 'mist',
+        queue='update',
+        routing_key='update',
+        data=sections,
+    )
