@@ -81,9 +81,9 @@ define('app/views/rule_edit', ['app/views/controlled'],
                     $('#rule-action').popup('close');
                     var rule = Mist.ruleEditController.rule;
                     if (action == 'command') {
-                        Ember.run.next(function () {
+                        Ember.run.later(function () {
                             Mist.ruleEditController.open(rule, 'command');
-                        });
+                        }, 500);
                         return;
                     };
                     Mist.rulesController.updateRule(
