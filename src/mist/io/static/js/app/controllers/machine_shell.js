@@ -86,7 +86,12 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
 
                     // Put popup it in the center
                     $('#machine-shell-popup-popup').css('left', ((window.innerWidth - $('#machine-shell-popup-popup').width())/2)+'px');
-                    if (!Terminal._textarea)
+
+                    if (Terminal._textarea){ // Tap should trigger resize on touchscreens
+                        $('#shell-return').bind('tap',function(){
+                            $(window).trigger('resize');
+                        });
+                    } else
                         $('.terminal').focus();
 
                     // Make the hidden textfield focusable on android
