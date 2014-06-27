@@ -35,7 +35,7 @@ from mist.io.exceptions import *
 
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import amqp_publish
-from mist.io.tasks import async_ssh_command
+from mist.io.tasks import ssh_command as async_ssh_command
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security

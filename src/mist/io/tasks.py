@@ -17,11 +17,9 @@ from mist.io.shell import Shell
 try: # Multi-user environment
     from mist.core.helpers import user_from_email
     cert_path = "src/mist.io/cacert.pem"
-    multiuser = True
 except ImportError: # Standalone mist.io
-    from mist.io.model import User
+    from mist.io.helpers import user_from_email
     cert_path = "cacert.pem"
-    multiuser = False
 
 from mist.io.helpers import amqp_publish
 
@@ -32,7 +30,7 @@ libcloud.security.CA_CERTS_PATH.append(cert_path)
 
 
 @app.task
-def async_ssh_command(user, backend_id, machine_id, host, command,
+def ssh_command(user, backend_id, machine_id, host, command,
                       key_id=None, username=None, password=None, port=22):
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
@@ -45,16 +43,12 @@ def async_ssh_command(user, backend_id, machine_id, host, command,
 
 
 @app.task
-def async_probe(email, backend_id, machine_id, host, key_id='', ssh_user=''):
-    from mist.io.methods import probe
+def probe(email, backend_id, machine_id, host, key_id='', ssh_user=''):
+    from mist.io import methods
+    user = user_from_email(email)
     try:
-        from mist.core.helpers import user_from_email
-        user = user_from_email(email)
-    except ImportError:
-        from mist.io.model import User
-        user = User()
-    try:
-        res = probe(user, backend_id, machine_id, host, key_id, ssh_user)
+        res = methods.probe(user, backend_id, machine_id, host,
+                            key_id=key_id, ssh_user=ssh_user)
     except Exception as e:
         print "probe failed with %s" % repr(e)
         return
@@ -80,10 +74,7 @@ def run_deploy_script(self, email, backend_id, machine_id, command,
     from mist.io.methods import ssh_command, connect_provider
     from mist.io.methods import notify_user, notify_admin
 
-    if multiuser:
-        user = user_from_email(email)
-    else:
-        user = User()
+    user = user_from_email(email)
 
     try:
         # find the node we're looking for and get its hostname
@@ -133,3 +124,67 @@ Output:
         notify_user(user, "Deployment script failed for machine %s after 5 retries" % node.id)
         notify_admin("Deployment script failed for machine %s in backend %s by user %s after 5 retries" % (node.id, backend_id, email), repr(exc))
 
+
+@app.task
+def ssh_command(user, backend_id, machine_id, host, command,
+                      key_id=None, username=None, password=None, port=22):
+    shell = Shell(host)
+    key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
+                                           key_id, username, password, port)
+    retval, output = shell.command(command)
+    shell.disconnect()
+    if retval:
+        from mist.io.methods import notify_user
+        notify_user(user, "[mist.io] Async command failed for machine %s (%s)" % (machine_id, host), output)
+
+
+@app.task
+def list_sizes(email, backend_id):
+    from mist.io import methods
+    user = user_from_email(email)
+    sizes = methods.list_sizes(user, backend_id)
+    amqp_publish(
+        exchange=email or 'mist',
+        queue='update',
+        routing_key='list_sizes',
+        data={'backend_id': backend_id, 'sizes': sizes},
+    )
+
+
+@app.task
+def list_locations(email, backend_id):
+    from mist.io import methods
+    user = user_from_email(email)
+    locations = methods.list_locations(user, backend_id)
+    amqp_publish(
+        exchange=email or 'mist',
+        queue='update',
+        routing_key='list_locations',
+        data={'backend_id': backend_id, 'locations': locations},
+    )
+
+
+@app.task
+def list_images(email, backend_id):
+    from mist.io import methods
+    user = user_from_email(email)
+    images = methods.list_images(user, backend_id)
+    amqp_publish(
+        exchange=email or 'mist',
+        queue='update',
+        routing_key='list_images',
+        data={'backend_id': backend_id, 'images': images},
+    )
+
+
+@app.task
+def list_machines(email, backend_id):
+    from mist.io import methods
+    user = user_from_email(email)
+    machines = methods.list_machines(user, backend_id)
+    amqp_publish(
+        exchange=email or 'mist',
+        queue='update',
+        routing_key='list_machines',
+        data={'backend_id': backend_id, 'machines': machines},
+    )

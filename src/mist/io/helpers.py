@@ -63,7 +63,12 @@ def params_from_request(request):
         params = request.params
     return params
 
+
 def user_from_request(request):
+    return User()
+
+
+def user_from_email(email):
     return User()
 
 

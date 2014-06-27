@@ -96,12 +96,26 @@ class MistNamespace(BaseNamespace):
 
     def process_update(self, msg):
         routing_key = msg.delivery_info.get('routing_key')
-        if routing_key == 'notify':
-            self.emit('notify', msg.body)
-        elif routing_key == 'probe':
-            print "Got probe"
-            print msg.body
-            self.emit('probe', msg.body);
+        if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
+                               'list_machines', 'list_locations']):
+            print "Got %s" % routing_key
+            self.emit(routing_key, msg.body)
+            if routing_key == 'probe':
+                args = (self.user.email, msg.body['backend_id'],
+                        msg.body['machine_id'], msg.body['host'])
+                tasks.probe.apply_async(args, countdown=120)
+            elif routing_key == 'list_machines':
+                machines = msg.body['machines']
+                backend_id = msg.body['backend_id']
+                for machine in machines:
+                    ips = filter(lambda ip: ':' not in ip,
+                                 machine.get('public_ips', []))
+                    if not ips:
+                        continue
+                    tasks.probe.delay(self.user.email, backend_id,
+                                      machine['id'], ips[0])
+                tasks.list_machines.apply_async((self.user.email, backend_id),
+                                                countdown=10)
         elif routing_key == 'update':
             self.user.refresh()
             sections = msg.body
@@ -146,19 +160,11 @@ def list_backends_from_socket(namespace):
     backends = methods.list_backends(user)
     namespace.emit('list_backends', backends)
     print "New backends: ", backends
-    sizes = [namespace.spawn(list_sizes_from_socket,
-                             namespace,
-                             b['id']) for b in backends]
-    locations = [namespace.spawn(list_locations_from_socket,
-                                 namespace,
-                                 b['id']) for b in backends]
 
-    images = [namespace.spawn(list_images_from_socket,
-                              namespace,
-                              b['id']) for b in backends]
-    machines = [namespace.spawn(list_machines_from_socket,
-                                namespace,
-                                b['id']) for b in backends]
+    for task in (tasks.list_machines, tasks.list_sizes,
+                 tasks.list_locations, tasks.list_images):
+        for backend_id in user.backends:
+            task.delay(user.email, backend_id)
 
 
 def list_keys_from_socket(namespace):
@@ -166,45 +172,3 @@ def list_keys_from_socket(namespace):
     keys = methods.list_keys(user)
     namespace.emit('list_keys', keys)
 
-
-def list_sizes_from_socket(namespace, backend_id):
-    user = namespace.user
-    sizes = methods.list_sizes(user, backend_id)
-    namespace.emit('list_sizes', {'backend_id': backend_id,
-                                  'sizes': sizes})
-
-
-def list_locations_from_socket(namespace, backend_id):
-    user = namespace.user
-    locations = methods.list_locations(user, backend_id)
-    namespace.emit('list_locations', {'backend_id': backend_id,
-                                      'locations': locations})
-
-
-def list_images_from_socket(namespace, backend_id):
-    user = namespace.user
-    images = methods.list_images(user, backend_id)
-    namespace.emit('list_images', {'backend_id': backend_id,
-                                   'images': images})
-
-
-def list_machines_from_socket(namespace, backend_id, probe=True):
-    print "list_machines_from_socket"
-    user = namespace.user
-    machines = methods.list_machines(user, backend_id)
-    namespace.emit('list_machines', {'backend_id': backend_id,
-                                     'machines': machines})
-    if probe:
-        probes = []
-        for machine in machines:
-            ips = filter(lambda ip: ':' not in ip,
-                         machine.get('public_ips', []))
-            if not ips:
-                continue
-            tasks.async_probe.delay(user.email, backend_id, machine['id'], ips[0])
-
-    namespace.spawn_later(10,
-                          list_machines_from_socket,
-                          namespace,
-                          backend_id,
-                          False)
