@@ -1,44 +1,46 @@
 define('app/views/machine', ['app/views/mistscreen'],
-    /**
-     *  Single Machine View
-     *
-     *  @returns Class
-     */
+    //
+    //  Machine View
+    //
+    //  @returns Class
+    //
     function(MistScreen) {
+
+        'use strict';
+
         return MistScreen.extend({
 
-            /**
-             *  Properties
-             */
+
+            //
+            //
+            //  Properties
+            //
+            //
+
 
             rules: [],
+            metrics: [],
             machine: null,
 
-            providerIconClass: function() {
-                if (!this.machine || !this.machine.backend) {
-                    return '';
-                }
-                return 'provider-' + this.machine.backend.provider;
-            }.property('machine'),
 
-
-            /**
-             *
-             *  Initialization
-             *
-             */
+            //
+            //
+            //  Initialization
+            //
+            //
 
             load: function() {
 
                 // Add Event listeners
                 Mist.backendsController.on('onMachineListChange', this, 'load');
+                Mist.metricsController.on('onMetricListChange', this, 'updateMetrics');
 
                 Ember.run(this, function() {
                     this.updateCurrentMachine();
                     if (this.machine.id) {
                         this.updateUptime();
                         this.updateFooter();
-                        // TODO: Render stuff
+                        this.updateMetrics();
                     }
                 });
             }.on('didInsertElement'),
@@ -48,77 +50,61 @@ define('app/views/machine', ['app/views/mistscreen'],
 
                 // Remove event listeners
                 Mist.backendsController.off('onMachineListChange', this, 'load');
+                Mist.metricsController.off('onMetricListChange', this, 'updateMetrics');
+
+                this.stopPolling();
 
             }.on('willDestroyElement'),
 
 
-            /**
-             *
-             *  Methods
-             *
-             */
+            //
+            //
+            //  Methods
+            //
+            //
+
 
             updateCurrentMachine: function() {
                 Ember.run(this, function() {
                     var machine = Mist.backendsController.getRequestedMachine();
-                    if (machine) {
+                    if (machine)
                         this.get('controller').set('model', machine);
-                    }
+
                     this.set('machine', this.get('controller').get('model'));
-                    if (this.machine.id) {
-                        this.machine.set('keysCount', Mist.keysController.getMachineKeysCount(this.machine));
-                    }
+                    if (this.machine.id)
+                        this.machine.set('keysCount',
+                            Mist.keysController.getMachineKeysCount(this.machine)
+                        );
                 });
             },
 
 
             updateFooter: function() {
-                if (this.machine.can_tag) {
-                    $('#single-machine-page #single-machine-tags-btn').removeClass('ui-state-disabled');
-                } else {
-                    $('#single-machine-page #single-machine-tags-btn').addClass('ui-state-disabled');
-                }
 
-                if (this.machine.probed && this.machine.state == 'running') {
-                    $('#single-machine-page #single-machine-shell-btn').removeClass('ui-state-disabled');
-                } else {
-                    $('#single-machine-page #single-machine-shell-btn').addClass('ui-state-disabled');
-                }
+                if (this.machine.can_tag)
+                    $('#single-machine-tags-btn').removeClass('ui-state-disabled');
+                else
+                    $('#single-machine-tags-btn').addClass('ui-state-disabled');
 
-                if (this.machine.id) {
-                    $('#single-machine-page #single-machine-power-btn').removeClass('ui-state-disabled');
-                } else {
-                    $('#single-machine-page #single-machine-power-btn').addClass('ui-state-disabled');
-                }
+                if (this.machine.probed && this.machine.state == 'running')
+                    $('#single-machine-shell-btn').removeClass('ui-state-disabled');
+                else
+                    $('#single-machine-shell-btn').addClass('ui-state-disabled');
+
+                if (this.machine.id)
+                    $('#single-machine-power-btn').removeClass('ui-state-disabled');
+                else
+                    $('#single-machine-power-btn').addClass('ui-state-disabled');
             },
 
 
-            renderMachine: function() {
-                var machine = this.get('controller').get('model');
-                if (machine.id != ' ') { // This is the dummy machine. It exists when machine hasn't loaded yet
-                    this.setGraph();
-                }
+            updateKeysButton: function() {
+                if (this.machine.state == 'running')
+                    $('#mist-manage-keys').removeClass('ui-state-disabled');
+                else
+                    $('#mist-manage-keys').addClass('ui-state-disabled');
             },
 
-
-            renderKeysButton: function() {
-                Ember.run.next(this, function() {
-                    $('#mist-manage-keys').trigger('create');
-                    if (this.machine.state == 'running') {
-                        $('#mist-manage-keys').removeClass('ui-state-disabled');
-                    } else {
-                        $('#mist-manage-keys').addClass('ui-state-disabled');
-                    }
-                });
-            },
-
-
-            renderMonitoringButtons: function() {
-                Ember.run.next(this, function() {
-                    $('#add-rule-button').parent().trigger('create');
-                    $('#disable-monitor-btn').parent().trigger('create');
-                });
-            },
 
             updateEnableButton: function() {
                 Ember.run.next(this, function() {
@@ -157,22 +143,52 @@ define('app/views/machine', ['app/views/mistscreen'],
             },
 
             rulesObserver: function(){
-                var ret = Ember.ArrayController.create(),
-                    machine = this.get('controller').get('model');
-                Mist.rulesController.forEach(function(rule){
-                    if (rule.machine == machine) {
-                        ret.pushObject(rule);
-                    }
+                var rules = [];
+                var machine = this.machine;
+
+                if (!machine.equals)
+                    return;
+
+                Mist.rulesController.content.forEach(function(rule) {
+                    if (machine.equals(rule.machine))
+                        rules.push(rule);
                 });
-                this.set('rules', ret);
+                this.set('rules', rules);
             }.observes('Mist.rulesController.@each', 'Mist.rulesController.@each.machine', 'machine'),
+
+
+            updateMetrics: function () {
+
+                var metrics = [];
+                var machine = this.machine;
+
+                if (!machine.id)
+                    return;
+
+                Mist.metricsController.customMetrics.forEach(function(metric) {
+                    metric.machines.forEach(function(metricMachine) {
+                        if (machine.equals(metricMachine))
+                            metrics.push(metric);
+                    });
+                });
+                Mist.metricsController.builtInMetrics.forEach(function(metric) {
+                    metrics.push(metric);
+                });
+
+                this.set('metrics', metrics);
+
+                Ember.run.next(function () {
+                    if ($('#metrics-container').listview)
+                        $('#metrics-container').listview()
+                            .listview('refresh');
+                });
+            },
 
 
             stopPolling: function() {
                 // if it polls for stats, stop it
-                if ('context' in Mist) {
+                if ('context' in Mist)
                     Mist.context.stop();
-                }
             }.observes('controller.model.hasMonitoring'),
 
 
@@ -194,21 +210,14 @@ define('app/views/machine', ['app/views/mistscreen'],
             },
 
 
-            backClicked: function() {
-                this.stopPolling();
-                // then get back to machines' list
-                Mist.Router.router.transitionTo('machines');
-            },
+            //
+            //
+            //  Actions
+            //
+            //
 
-
-            /**
-             *
-             *  Actions
-             *
-             */
 
             actions: {
-
 
                 manageKeysClicked: function() {
                     Mist.machineKeysController.open(this.machine);
@@ -233,6 +242,17 @@ define('app/views/machine', ['app/views/mistscreen'],
                 shellClicked: function () {
                     Mist.machineShellController.open(this.machine);
                 },
+
+
+                addMetricClicked: function () {
+                    Mist.metricAddController.open(this.machine);
+                },
+
+
+                deleteMetric: function (metric) {
+                    Mist.metricsController.deleteMetric(metric);
+                },
+
 
                 enableMonitoringClicked: function () {
 
@@ -275,34 +295,21 @@ define('app/views/machine', ['app/views/mistscreen'],
 
 
                 addRuleClicked: function() {
-                    // initialize the rule to some sensible defaults
-                    var machine = this.machine;
-                    var metric = 'load';
                     var operator = {'title': 'gt', 'symbol': '>'};
-                    var value = 5;
-                    var actionToTake = 'alert';
-
-                    Mist.rulesController.newRule(machine, metric, operator, value, actionToTake);
-                },
-
-
-                buttonBackMonitoring: function() {
-                     $("#monitoring-dialog").popup('close');
-                },
-
-
-                buttonChangeMonitoring: function() {
-                    var machine = this.get('controller').get('model');
-                    machine.changeMonitoring();
-                    $("#monitoring-dialog").popup('close');
+                    Mist.rulesController.newRule(
+                        this.machine,
+                        Mist.metricsController.getMetric('load.shortterm'),
+                        operator,
+                        5,
+                        'alert'
+                    );
                 },
 
 
                 probeClicked: function() {
                     this.machine.probe(null, function(success) {
-                        if (!success) {
+                        if (!success)
                             Mist.notificationController.notify('Failed to probe machine');
-                        }
                     })
                 },
 
@@ -313,11 +320,18 @@ define('app/views/machine', ['app/views/mistscreen'],
             },
 
 
-            /**
-             *
-             *  Computed Properties
-             *
-             */
+            //
+            //
+            //  Computed Properties
+            //
+            //
+
+
+            providerIconClass: function() {
+                if (this.machine && this.machine.backend)
+                    return 'provider-' + this.machine.backend.provider;
+            }.property('machine'),
+
 
             upFor: function() {
                 var ret = '';
@@ -343,6 +357,7 @@ define('app/views/machine', ['app/views/mistscreen'],
                 return ret;
             }.property('machine.uptime'),
 
+
             lastProbe: function(){
                 var ret = 'never';
                 if (this.machine && this.machine.uptimeChecked > 0) {
@@ -358,6 +373,7 @@ define('app/views/machine', ['app/views/mistscreen'],
                 return ret;
             }.property('machine.uptime'),
 
+
             basicInfo: function() {
                 if (!this.machine) return;
 
@@ -368,12 +384,20 @@ define('app/views/machine', ['app/views/mistscreen'],
                 } else if (typeof this.machine.public_ips == 'string') {
                     basicInfo['Public IPs']  = this.machine.public_ips;
                 }
-                if (this.machine.private_ips instanceof Array) {
-                    basicInfo['Private IPs']  = this.machine.private_ips.join();
-                } else if (typeof this.machine.private_ips == 'string') {
-                    basicInfo['Private IPs']  = this.machine.private_ips;
+                
+                if (this.machine.backend.provider != 'docker') {
+                    if (this.machine.private_ips instanceof Array) {
+                        basicInfo['Private IPs']  = this.machine.private_ips.join();
+                    } else if (typeof this.machine.private_ips == 'string') {
+                        basicInfo['Private IPs']  = this.machine.private_ips;
+                    }
                 }
                 if (this.machine.extra) {
+                    if (this.machine.backend.provider == 'docker') {
+                        basicInfo['Image'] = this.machine.extra.image;   
+                        basicInfo['Status'] = this.machine.extra.status;
+                        basicInfo['Command'] = this.machine.extra.command;                                                                 
+                    }
                     if (this.machine.extra.dns_name) {
                         basicInfo['DNS Name'] = this.machine.extra.dns_name;
                     }
@@ -386,20 +410,20 @@ define('app/views/machine', ['app/views/mistscreen'],
                 }
 
                 var ret = [];
-                for (item in basicInfo) {
+                for (var item in basicInfo) {
                     if (typeof basicInfo[item] == 'string') {
                         ret.push({key:item, value: basicInfo[item]});
                     }
                 }
                 return ret;
-            }.property('machine'),
+            }.property('machine', 'machine.public_ips', 'machine.private_ips'),
 
 
             metadata: function() {
                 if (!this.machine || !this.machine.extra) return;
                 var ret = [];
 
-                for (item in this.machine.extra) {
+                for (var item in this.machine.extra) {
                     var value = this.machine.extra[item];
                     if (typeof value == 'string' || typeof value == 'number') {
                         ret.push({key:item, value: value});
@@ -416,23 +440,12 @@ define('app/views/machine', ['app/views/mistscreen'],
             }.property('machine', 'machine.extra'),
 
 
-            rules: function(){
-                var ret = Ember.ArrayController.create()
-                var machine = this.machine;
-                Mist.rulesController.forEach(function(rule){
-                    if (rule.machine == machine) {
-                        ret.pushObject(rule);
-                    }
-                });
-                return ret;
-            }.property('Mist.rulesController.@each', 'Mist.rulesController.@each.machine'),
+            //
+            //
+            //  Observers
+            //
+            //
 
-
-            /**
-             *
-             *  Observers
-             *
-             */
 
             modelObserver: function() {
                 Ember.run.once(this, 'load');
@@ -440,31 +453,15 @@ define('app/views/machine', ['app/views/mistscreen'],
             }.observes('controller.model'),
 
 
-            probingObserver: function() {
-                Ember.run.next(function() {
-                    $('#machine-probe-btn').parent().trigger('create');
-                });
-            }.observes('machine.probing'),
-
             footerObserver: function() {
                 Ember.run.once(this, 'updateFooter');
             }.observes('machine.probed', 'machine.can_tag'),
 
 
-            keysCountObserver: function() {
-                Ember.run.once(this, 'renderKeysButton');
-            }.observes('machine.keysCount'),
-
-
             stateObserver: function () {
-                Ember.run.once(this, 'renderKeysButton');
+                Ember.run.once(this, 'updateKeysButton');
                 Ember.run.once(this, 'updateEnableButton');
             }.observes('machine.state'),
-
-
-            hasMonitoringObserver: function() {
-                Ember.run.once(this, 'renderMonitoringButtons');
-            }.observes('machine.hasMonitoring'),
 
 
             changeMonitoringObserver: function() {

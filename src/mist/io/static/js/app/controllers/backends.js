@@ -55,8 +55,8 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
              */
 
             addBackend: function(title, provider, apiKey, apiSecret, apiUrl,
-                                 region, tenant, compute_endpoint, port, key,
-                                 callback) {
+                                 region, tenant, computeEndpoint, dockerUrl,
+                                 port, key, callback) {
                 var that = this;
                 this.set('addingBackend', true);
                 Mist.ajax.POST('/backends', {
@@ -64,11 +64,12 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     'provider'    : provider,
                     'apikey'      : apiKey,
                     'apisecret'   : apiSecret,
-                    'apiurl'      : apiUrl,
+                    'apiurl'      : apiUrl || dockerUrl,
                     'tenant_name' : tenant,
                     'region'      : region,
                     'machine_key' : key,
-                    'compute_endpoint' : compute_endpoint,
+                    'compute_endpoint' : computeEndpoint,
+                    'docker_port' : port,
                     'machine_port': port,      // For bare-metal
                     'machine_ip'  : apiKey,    // For bare-metal
                     'machine_user': apiSecret  // For bare-metal
@@ -180,6 +181,20 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                     }
                     machine.set('cores', data.cores);
                     machine.set('users', data.users);
+                    if (data.pub_ips) {
+                        data.pub_ips.forEach(function (ip) {
+                            if (machine.public_ips instanceof Array)
+                                machine.public_ips.addObject(ip);
+                        });
+                        machine.notifyPropertyChange('public_ips');
+                    }
+                    if (data.priv_ips) {
+                        data.priv_ips.forEach(function (ip) {
+                            if (machine.private_ips instanceof Array)
+                                machine.private_ips.addObject(ip);
+                        });
+                        machine.notifyPropertyChange('private_ips');
+                    }
                     if (data.loadavg) {
                         machine.set('loadavg1', loadToColor(data.loadavg[0], data.cores));
                         machine.set('loadavg5', loadToColor(data.loadavg[1], data.cores));

@@ -13,6 +13,7 @@
 @import url("css/key_add.css");
 @import url("css/key_list.css");
 @import url("css/providers.css");
+@import url("css/metric_add.css");
 @import url("css/monitoring.css");
 @import url("css/file_upload.css");
 @import url("css/backend_add.css");
@@ -24,6 +25,7 @@
 @import url("css/machine_power.css");
 @import url("css/machine_shell.css");
 @import url("css/backend_button.css");
+@import url("css/metric_add_custom.css");
 
 
 /* Splash
@@ -89,7 +91,7 @@ body {
 
 /* Text fields
 -----------------------------------------------------------------------------------------------------------*/
-textarea {
+#private-key, #manual-monitoring-popup textarea {
     height: 75px !important;
 }
 

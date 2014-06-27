@@ -1,0 +1,53 @@
+/* Metric Add view CSS
+-----------------------------------------------------------------------------------------------------------*/
+
+#metric-add  .ajax-loader {
+    display: inline;
+    float: right;
+    margin-top: 1px;
+}
+
+@-moz-document url-prefix() {
+    #metric-add  .ui-collapsible .ajax-loader {
+        margin-top: -19px;
+    }
+}
+
+#metric-add .ui-btn {
+	margin: 0;
+}
+
+#metric-add .margin {
+    width: 20px;
+    height: 1em;
+    float: left;
+}
+
+#metric-add .end-node {
+    padding-left: 40px;
+}
+
+#metric-add .nest {
+    display: none;
+}
+
+#metric-add-popup {
+    padding-bottom: 40px !important;
+}
+
+#metric-add .ajax-loader {
+    width: 100%;
+    margin-top: 1em;
+    margin-bottom: -1.5em;
+}
+
+#metric-add #overlay {
+    height: 100%;
+    width: 100%;
+    z-index: 10000000;
+    background-color: black;
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    opacity: 0.35;
+}

@@ -101,7 +101,7 @@ def main(global_config, **settings):
     def string_adapter(obj, request):
         return str(obj)
     json_renderer.add_adapter(object, string_adapter)
-    config.add_renderer('json', json_renderer)    
+    config.add_renderer('json', json_renderer)
     config.add_static_view('resources', 'mist.io:static')
     config.add_static_view('docs', path='../../../docs/build')
     config.include(add_routes)
@@ -137,11 +137,16 @@ def add_routes(config):
     config.add_route('update_monitoring',
                      '/backends/{backend}/machines/{machine}/monitoring')
     config.add_route('stats', '/backends/{backend}/machines/{machine}/stats')
+    config.add_route('metrics',
+                     '/backends/{backend}/machines/{machine}/metrics')
+    config.add_route('metric', '/metrics/{metric}')
+    config.add_route('deploy_plugin',
+                     '/backends/{backend}/machines/{machine}/plugins/{plugin}')
     config.add_route('loadavg',
                      '/backends/{backend}/machines/{machine}/loadavg.png')
 
     config.add_route('images', '/backends/{backend}/images')
-    config.add_route('image', '/backends/{backend}/images/{image}')
+    config.add_route('image', '/backends/{backend}/images/{image:.*}')
     config.add_route('sizes', '/backends/{backend}/sizes')
     config.add_route('locations', '/backends/{backend}/locations')
 

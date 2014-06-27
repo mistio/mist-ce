@@ -58,6 +58,7 @@
 }
 
 .rule-box div.ui-slider-track {
+    display: none;
     width: 80%;
     position: relative;
     top: 4px;
@@ -81,6 +82,11 @@
 
 .delete-rule-container div.ui-btn span.ui-btn-inner {
     padding-left: 9px;
+}
+
+#rule-metric .ui-listview {
+    max-height: 200px;
+    overflow-y: scroll;
 }
 
 

@@ -93,7 +93,7 @@ class Backend(OODict):
     provider = HtmlSafeStrField()
     ## datacenter = StrField()
     compute_endpoint = StrField()
-
+    docker_port = IntField(4243)
     machines = make_field(Machines)()
     starred = ListField()
     unstarred = ListField()
@@ -104,11 +104,13 @@ class Backend(OODict):
 
     def get_id(self):
         from mist.io.helpers import b58_encode
-        if self.provider != 'bare_metal':
-            concat = '%s%s%s' % (self.provider, self.region, self.apikey)
-        else:
+        if self.provider == 'docker':
+            concat = '%s%s%s' % (self.provider, self.title, self.apiurl)
+        elif self.provider == 'bare_metal':
             name = self.machines.values()[0].name
             concat = '%s%s%s' % (self.provider, '', name)
+        else:
+            concat = '%s%s%s' % (self.provider, self.region, self.apikey)
         return b58_encode(int(sha1(concat).hexdigest(), 16))
 
 
