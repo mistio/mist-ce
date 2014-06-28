@@ -21,10 +21,12 @@ Feature: Machines
     And I click the "ap-northeast-1a" button inside the "Create Machine" panel
     And I click the "Select Key" button inside the "Create Machine" panel
     And I click the "Add Key" button inside the "Create Machine" panel
-    And I fill "TESTLIKEAPROKEY" as key name
+    And I fill "randomly_created" as key name
     And I click the "Generate" button inside the "Add key" popup
     And I wait for 5 seconds
     And I click the "Add" button inside the "Add key" popup
     And I wait for 2 seconds
     And I click the "Launch" button inside the "Create Machine" panel
-    Then I should see the "randomly_created" machine added within 30 seconds
+    Then I should see the "randomly_created" machine added within 10 seconds
+    And "randomly_created" machine state should be "running" within 400 seconds
+    And "randomly_created" machine should be probed within 400 seconds
