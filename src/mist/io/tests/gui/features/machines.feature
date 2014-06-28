@@ -30,3 +30,16 @@ Feature: Machines
     Then I should see the "randomly_created" machine added within 10 seconds
     And "randomly_created" machine state should be "running" within 400 seconds
     And "randomly_created" machine should be probed within 400 seconds
+
+    When I choose the "randomly_created" machine
+    And I click the "Power" button
+    And I click the "Reboot" button
+    And I click the "Yes" button
+    Then "randomly_created" machine state should be "running" within 200 seconds
+
+    When I click the "Power" button
+    And I click the "Destroy" button
+    And I click the "Yes" button
+    Then "randomly_created" machine state should be "terminated" within 200 seconds
+
+

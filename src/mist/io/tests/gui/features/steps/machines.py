@@ -15,6 +15,16 @@ def fill_machine_mame(context):
     context.random_name = random_name
 
 
+@when(u'I choose the "{name}" machine')
+def choose_machine(context, name):
+    if "randomly_created" in name:
+        name = context.random_name
+
+    machine = get_machine(context, name)
+    checkbox = machine.find_element_by_class_name("ui-checkbox")
+    checkbox.click()
+
+
 @then(u'I should see the "{name}" machine added within {seconds} seconds')
 def assert_machine_added(context, name, seconds):
     if "randomly_created" in name:
