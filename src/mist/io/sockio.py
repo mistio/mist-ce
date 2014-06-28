@@ -71,6 +71,7 @@ class MistNamespace(BaseNamespace):
         self.user = user_from_request(self.request)
         self.probes = {}
         self.channel = None
+        self._old_machines = set()
 
     def spawn_later(self, delay, fn, *args, **kwargs):
         """Spawn a new process, attached to this Namespace after no less than
@@ -116,7 +117,7 @@ class MistNamespace(BaseNamespace):
         except requests.exceptions.SSLError as exc:
             print exc
             #log.error("%r", exc)
-    
+
         if resp.ok:
             ret = {}
             ret['metrics'] = resp.json()
@@ -127,11 +128,11 @@ class MistNamespace(BaseNamespace):
             self.emit('stats', ret)
             print ret
         else:
-            print "Error getting stats %d:%s", resp.status_code, resp.text  
-            from mist.io.methods import notify_user    
-            notify_user(self.user, "Error getting stats %d:%s" % (resp.status_code, resp.text))        
-        
-    def process_update(self, msg):        
+            print "Error getting stats %d:%s", resp.status_code, resp.text
+            from mist.io.methods import notify_user
+            notify_user(self.user, "Error getting stats %d:%s" % (resp.status_code, resp.text))
+
+    def process_update(self, msg):
         routing_key = msg.delivery_info.get('routing_key')
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
                                'list_machines', 'list_locations']):
@@ -145,6 +146,9 @@ class MistNamespace(BaseNamespace):
                 machines = msg.body['machines']
                 backend_id = msg.body['backend_id']
                 for machine in machines:
+                    if (backend_id, machine['id']) in self._old_machines:
+                        continue
+                    self._old_machines.add((backend_id, machine['id']))
                     ips = filter(lambda ip: ':' not in ip,
                                  machine.get('public_ips', []))
                     if not ips:
