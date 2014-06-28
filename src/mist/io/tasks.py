@@ -1,13 +1,13 @@
 import json
+from time import time
+from base64 import b64encode
+
+from memcache import Client as MemcacheClient
 
 from amqp import Message
 from amqp.connection import Connection
 
-
-from time import time
-
-
-from celery import logging
+## from celery import logging
 
 import libcloud.security
 
@@ -18,9 +18,11 @@ from mist.io.helpers import get_auth_header
 
 try: # Multi-user environment
     from mist.core.helpers import user_from_email
+    from mist.core import config
     cert_path = "src/mist.io/cacert.pem"
 except ImportError: # Standalone mist.io
     from mist.io.helpers import user_from_email
+    from mist.io import config
     cert_path = "cacert.pem"
 
 from mist.io.helpers import amqp_publish
@@ -28,7 +30,7 @@ from mist.io.helpers import amqp_publish
 # libcloud certificate fix for OS X
 libcloud.security.CA_CERTS_PATH.append(cert_path)
 
-log = logging.getLogger(__name__)
+## log = logging.getLogger(__name__)
 
 
 @app.task
@@ -45,9 +47,26 @@ def ssh_command(user, backend_id, machine_id, host, command,
 
 
 @app.task
-def probe(email, backend_id, machine_id, host, key_id='', ssh_user=''):
-    from mist.io import methods
+def probe(email, backend_id, machine_id, host, key_id='', ssh_user='', flush=False):
+
+    cache = MemcacheClient(["127.0.0.1:11211"])
+    cache_key = b64encode(":".join((email, 'probe', backend_id, machine_id,
+                                    host, key_id, ssh_user)))
+    cached = cache.get(cache_key)
+    if cached:
+        age = time() - cached['timestamp']
+        if age < 90:
+            # emit cached result
+            print "emitting cached probe result"
+            amqp_publish(
+                exchange=email or 'mist', queue='update',
+                routing_key='probe', data=cached['payload'],
+            )
+            if age < 30:
+                print "result too fresh, returning"
+                return
     user = user_from_email(email)
+    from mist.io import methods
     try:
         res = methods.probe(user, backend_id, machine_id, host,
                             key_id=key_id, ssh_user=ssh_user)
@@ -59,6 +78,10 @@ def probe(email, backend_id, machine_id, host, key_id='', ssh_user=''):
            'machine_id': machine_id,
            'host': host,
            'result': res}
+
+    print "caching result"
+    cached = {'timestamp': time(), 'payload': ret}
+    cache.set(cache_key, cached)
 
     amqp_publish(
         exchange=email or 'mist',

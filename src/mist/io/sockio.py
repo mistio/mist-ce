@@ -134,9 +134,9 @@ class MistNamespace(BaseNamespace):
 
     def process_update(self, msg):
         routing_key = msg.delivery_info.get('routing_key')
+        print "Got %s" % routing_key
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
                                'list_machines', 'list_locations']):
-            print "Got %s" % routing_key
             self.emit(routing_key, msg.body)
             if routing_key == 'probe':
                 args = (self.user.email, msg.body['backend_id'],
