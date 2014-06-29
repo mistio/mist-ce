@@ -190,10 +190,14 @@ def check_monitoring_from_socket(namespace):
     user = namespace.user
     try:
         from mist.core import methods as core_methods
-        ret = core_methods.check_monitoring(user)
+        func = core_methods.check_monitoring
     except ImportError:
-        ret = methods.check_monitoring(user)
-    namespace.emit('monitoring', ret)
+        func = methods.check_monitoring
+    try:
+        ret = func(user)
+        namespace.emit('monitoring', ret)
+    except:
+        pass
 
 
 def list_backends_from_socket(namespace):
