@@ -8,6 +8,7 @@ greenlet.
 
 """
 
+import random
 from time import time
 
 import gevent
@@ -24,7 +25,7 @@ except ImportError:
     from mist.io.helpers import user_from_request
     from mist.io import config
 
-from mist.io.helpers import amqp_subscribe
+from mist.io.helpers import amqp_subscribe_user
 from mist.io.helpers import get_auth_header
 
 from mist.io import methods
@@ -95,10 +96,11 @@ class MistNamespace(BaseNamespace):
 
     def on_ready(self):
         print "Ready to go!"
-        self.monitoring_greenlet = self.spawn(check_monitoring_from_socket, self)
-        self.backends_greenlet = self.spawn(list_backends_from_socket, self)
-        self.keys_greenlet = self.spawn(list_keys_from_socket, self)
         self.update_greenlet = self.spawn(update_subscriber, self)
+
+        self.monitoring_greenlet = self.spawn_later(2, check_monitoring_from_socket, self)
+        self.backends_greenlet = self.spawn_later(2, list_backends_from_socket, self)
+        self.keys_greenlet = self.spawn_later(2, list_keys_from_socket, self)
         #self.probe_greenlet = self.spawn(probe_subscriber, self)
 
     def on_stats(self, backend_id, machine_id, start, stop, step):
@@ -175,15 +177,15 @@ class MistNamespace(BaseNamespace):
 
 
 def update_subscriber(namespace):
-    """Subscribe to RabbitMQ for updates of user data and emit notificaions to
+    """Subscribe to RabbitMQ for updates of user data and emit notifications to
     the browser.
 
     """
-    amqp_subscribe(
-        exchange=namespace.user.email or 'mist',
-        queue='update',
-        callback=namespace.process_update,
-    )
+    # The exchange/queue name consists of a non-empty sequence of these
+    # characters: letters, digits, hyphen, underscore, period, or colon.
+    user = namespace.user
+    queue = "mist-socket-%d" % random.randrange(2 ** 20)
+    amqp_subscribe_user(user, queue=queue, callback=namespace.process_update)
 
 
 def check_monitoring_from_socket(namespace):

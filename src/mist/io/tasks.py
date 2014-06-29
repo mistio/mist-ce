@@ -25,7 +25,7 @@ except ImportError: # Standalone mist.io
     from mist.io import config
     cert_path = "cacert.pem"
 
-from mist.io.helpers import amqp_publish
+from mist.io.helpers import amqp_publish_user
 
 # libcloud certificate fix for OS X
 libcloud.security.CA_CERTS_PATH.append(cert_path)
@@ -55,13 +55,11 @@ def probe(email, backend_id, machine_id, host, key_id='', ssh_user='', flush=Fal
     cached = cache.get(cache_key)
     if cached:
         age = time() - cached['timestamp']
+        data = cached['payload']
         if age < 90:
             # emit cached result
             print "emitting cached probe result"
-            amqp_publish(
-                exchange=email or 'mist', queue='update',
-                routing_key='probe', data=cached['payload'],
-            )
+            amqp_publish_user(email, routing_key='probe', data=data)
             if age < 30:
                 print "result too fresh, returning"
                 return
@@ -83,12 +81,7 @@ def probe(email, backend_id, machine_id, host, key_id='', ssh_user='', flush=Fal
     cached = {'timestamp': time(), 'payload': ret}
     cache.set(cache_key, cached)
 
-    amqp_publish(
-        exchange=email or 'mist',
-        queue='update',
-        routing_key='probe',
-        data=ret,
-    )
+    amqp_publish_user(email, routing_key='probe', data=ret)
 
     print "probed: ", email, ret
 
@@ -168,12 +161,8 @@ def list_sizes(email, backend_id):
     from mist.io import methods
     user = user_from_email(email)
     sizes = methods.list_sizes(user, backend_id)
-    amqp_publish(
-        exchange=email or 'mist',
-        queue='update',
-        routing_key='list_sizes',
-        data={'backend_id': backend_id, 'sizes': sizes},
-    )
+    amqp_publish_user(user, routing_key='list_sizes',
+                      data={'backend_id': backend_id, 'sizes': sizes})
 
 
 @app.task
@@ -181,12 +170,8 @@ def list_locations(email, backend_id):
     from mist.io import methods
     user = user_from_email(email)
     locations = methods.list_locations(user, backend_id)
-    amqp_publish(
-        exchange=email or 'mist',
-        queue='update',
-        routing_key='list_locations',
-        data={'backend_id': backend_id, 'locations': locations},
-    )
+    amqp_publish_user(user, routing_key='list_locations',
+                      data={'backend_id': backend_id, 'locations': locations})
 
 
 @app.task
@@ -194,12 +179,8 @@ def list_images(email, backend_id):
     from mist.io import methods
     user = user_from_email(email)
     images = methods.list_images(user, backend_id)
-    amqp_publish(
-        exchange=email or 'mist',
-        queue='update',
-        routing_key='list_images',
-        data={'backend_id': backend_id, 'images': images},
-    )
+    amqp_publish_user(user, routing_key='list_images',
+                      data={'backend_id': backend_id, 'images': images})
 
 
 @app.task
@@ -207,9 +188,5 @@ def list_machines(email, backend_id):
     from mist.io import methods
     user = user_from_email(email)
     machines = methods.list_machines(user, backend_id)
-    amqp_publish(
-        exchange=email or 'mist',
-        queue='update',
-        routing_key='list_machines',
-        data={'backend_id': backend_id, 'machines': machines},
-    )
+    amqp_publish_user(user, routing_key='list_machines',
+                      data={'backend_id': backend_id, 'machines': machines})

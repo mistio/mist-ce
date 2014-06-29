@@ -3,6 +3,7 @@
 import os
 import re
 import json
+import random
 import tempfile
 import logging
 import functools
@@ -11,6 +12,7 @@ from contextlib import contextmanager
 
 from amqp import Message
 from amqp.connection import Connection
+from amqp.exceptions import NotFound as AmqpNotFound
 
 from mist.io.model import User
 
@@ -138,13 +140,9 @@ def parse_ping(stdout):
     return {}
 
 
-def amqp_publish(exchange, queue, routing_key, data):
+def amqp_publish(exchange, routing_key, data):
     connection = Connection()
     channel = connection.channel()
-    channel.exchange_declare(exchange=exchange, type='fanout',
-                             auto_delete=False)
-    channel.queue_declare(queue)
-    channel.queue_bind(queue, exchange)
     msg = Message(json.dumps(data))
     channel.basic_publish(msg, exchange=exchange, routing_key=routing_key)
     channel.close()
@@ -161,24 +159,62 @@ def amqp_subscribe(exchange, queue, callback):
                 pass
             return func(msg)
         return wrapped
+
+    if not queue:
+        queue = "mist-tmp_%d" % random.randrange(2 ** 20)
+
     connection = Connection()
     channel = connection.channel()
-    channel.exchange_declare(exchange=exchange, type='fanout',
-                             auto_delete=False)
+    channel.exchange_declare(exchange=exchange, type='fanout')
     channel.queue_declare(queue)
     channel.queue_bind(queue, exchange)
     channel.basic_consume(queue=queue,
                           callback=json_parse_dec(callback),
                           no_ack=True)
-    while True:
-        channel.wait()
-        # gevent.sleep()  # probably not required
+    try:
+        while True:
+            channel.wait()
+    except:
+        channel.close()
+        connection.close()
+
+
+def _amqp_user_exchange(user):
+    # The exchange/queue name consists of a non-empty sequence of these
+    # characters: letters, digits, hyphen, underscore, period, or colon.
+    if isinstance(user, basestring):
+        email = user
+    else:
+        email = user.email
+    tag = email.replace('@', ':') or 'noone'
+    return "mist-user_%s" % tag
+
+
+def amqp_publish_user(user, routing_key, data):
+    try:
+        amqp_publish(_amqp_user_exchange(user), routing_key, data)
+    except AmqpNotFound:
+        return False
+    except Exception:
+        return False
+    return True
+
+
+def amqp_subscribe_user(user, queue, callback):
+    amqp_subscribe(_amqp_user_exchange(user), queue, callback)
 
 
 def trigger_session_update(email, sections=['backends','keys','monitoring']):
-    amqp_publish(
-        exchange=email or 'mist',
-        queue='update',
-        routing_key='update',
-        data=sections,
-    )
+    amqp_publish_user(user, routing_key='update', data=sections)
+
+
+def amqp_log(msg):
+    amqp_publish('mist_debug', '', msg)
+
+
+def amqp_log_listen():
+    def echo(msg):
+        ## print msg.delivery_info.get('routing_key')
+        print msg.body
+
+    amqp_subscribe('mist_debug', None, echo)

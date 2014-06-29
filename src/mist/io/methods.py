@@ -34,7 +34,7 @@ from mist.io.exceptions import *
 
 
 from mist.io.helpers import trigger_session_update
-from mist.io.helpers import amqp_publish
+from mist.io.helpers import amqp_publish_user
 from mist.io.tasks import ssh_command as async_ssh_command
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
@@ -1913,12 +1913,7 @@ def notify_user(user, title, message="", **kwargs):
         pass
     payload = {'title': title, 'message': message}
     payload.update(kwargs)
-    amqp_publish(
-        exchange=user.email or 'mist',
-        queue='update',
-        routing_key='notify',
-        data=payload,
-    )
+    amqp_publish_user(user, routing_key='notify', data=payload)
 
 
 def find_metrics(user, backend_id, machine_id):
