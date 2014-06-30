@@ -174,7 +174,6 @@ define( 'app', [
 
             initSocket();
             setInterval(function() {
-                log('checking socket');
                 if (Mist.socket == undefined){
                     warn('socket undefined! Initializing...');
                     initSocket();
@@ -901,10 +900,6 @@ function initSocket() {
         Mist.backendsController.set('checkedMonitoring', true);
     });
 
-    Mist.socket.on('update', function(data){
-        warn(data);
-    });
-
     Mist.socket.on('notify',function(data){
         Mist.notificationController.notify(data);
     });
@@ -913,12 +908,9 @@ function initSocket() {
         warn('stats!');
         warn(data);
         //var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
-        Mist.monitoringController.request.updateMetrics(data.metrics, data.start, data.stop);
+        Mist.monitoringController.request.updateMetrics(data.metrics, data.start, data.stop, data.requestID);
 
     });
-
-    if (!Mist.socket.socket.connected)
-        Mist.socket.socket.connect();
 }
 
 

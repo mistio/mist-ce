@@ -248,8 +248,8 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                     // Do the ajax call
 
                     this.requestID++;
-                    this.receiveData(this.timeStart, this.timeStop, this.step,
-                        this.callback);
+                    this.receiveDataFromSocket(this.timeStart, this.timeStop, this.step,
+                        this.callback, this.requestId);
 
                     // Check if Data Updates Are Enabled
                     if (this.updateData && !this.running){
@@ -271,7 +271,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
 
                             // Do the ajax call
                             self.requestID++;
-                            self.receiveDataFromSocket(self.timeStart, self.timeStop, self.step, self.callback);
+                            self.receiveDataFromSocket(self.timeStart, self.timeStop, self.step, self.callback, self.requestId);
 
                         }, this.step);
                     }
@@ -454,7 +454,6 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                 */
                 receiveData: function(start, stop, step, callback) {
                     var self = this;
-
                     $.ajax({
                         url: '/backends/' + self.machine.backend.id +
                              '/machines/' + self.machine.id + '/stats',
@@ -502,12 +501,16 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                     });
                 },
 
-                receiveDataFromSocket: function(start, stop, step, callback) {
+                receiveDataFromSocket: function(start, stop, step, callback, requestID) {
                     Mist.socket.statsCallback = callback;
-                    Mist.socket.emit('stats', this.machine.backend.id, this.machine.id, start, stop, step);
+                    Mist.socket.emit('stats', this.machine.backend.id, this.machine.id, start, stop, step, requestID);
                 },
 
-                updateMetrics: function (metrics, start, stop, callback) {
+                updateMetrics: function (metrics, start, stop, callback, requestID) {
+
+                    var controller = Mist.monitoringController;
+                    var self = this;
+
                     if (callback == undefined && Mist.socket.statsCallback)
                         callback = Mist.socket.statsCallback;
                     else if (callback == undefined)
@@ -560,7 +563,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                             data  : receivedData
                         });
                         $(document).trigger('finishedFetching', [
-                            this.requestID,
+                            requestID,
                             'success'
                         ]);
 
@@ -571,9 +574,13 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                             error: err
                         });
                         $(document).trigger('finishedFetching', [
-                            this.requestID,
+                            requestID,
                             'failure'
                         ]);
+                    }
+                    if (self.machine) { // machine may not exist
+                        self.machine.set('pendingStats', false);
+                        self.locked = false;
                     }
                 },
 
