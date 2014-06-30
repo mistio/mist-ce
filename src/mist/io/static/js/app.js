@@ -4,17 +4,19 @@ require.config({
     waitSeconds: 200,
     paths: {
         text: 'lib/require/text',
-        ember: 'lib/ember-1.4.1.min',
-        jquery: 'lib/jquery-2.1.0.min',
-        mobile: 'lib/jquery.mobile-1.4.1.min',
+        ember: 'lib/ember-1.5.1.min',
+        jquery: 'lib/jquery-2.1.1.min',
+        mobile: 'lib/jquery.mobile-1.4.2.min',
         handlebars: 'lib/handlebars-1.3.0.min',
         md5: 'lib/md5',
         d3: 'lib/d3.min',
         sha256: 'lib/sha256',
+        socketio: 'lib/socket.io',
+        term: 'lib/term'
     },
     shim: {
         'ember': {
-            deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256']
+            deps: ['handlebars', 'text', 'jquery', 'md5', 'sha256', 'socketio', 'term']
         },
         'd3': {
             deps: ['jquery']
@@ -152,10 +154,13 @@ define( 'app', [
 
     function initialize() {
 
+        warn('Init');
 
         // JQM init event
 
         $(document).bind('mobileinit', function() {
+            warn('Mobile Init');
+
             $('#splash').fadeOut(650);
             $.mobile.ajaxEnabled = false;
             $.mobile.pushStateEnabled = false;
@@ -166,8 +171,18 @@ define( 'app', [
             $('body').css('overflow','auto');
 
             App.set('isJQMInitialized',true);
-        });
 
+            initSocket();
+            setInterval(function() {
+                if (Mist.socket == undefined){
+                    warn('socket undefined! Initializing...');
+                    initSocket();
+                } else if (!Mist.socket.socket.connected){
+                    warn('Socket not connected! Connecting...');
+                    Mist.socket.socket.connect();
+                }
+            }, 1000);
+        });
 
         // Hide error boxes on page unload
 
@@ -361,6 +376,14 @@ define( 'app', [
             ]
         });
 
+
+        App.TextArea = Ember.TextArea.extend({
+            autocapitalize: 'off',
+            attributeBindings: [
+                'data-theme',
+                'autocapitalize'
+            ]
+        });
         App.Checkbox = Ember.Checkbox.extend({
             attributeBindings: [
                 'data-mini'
@@ -462,7 +485,7 @@ define( 'app', [
         };
 
         App.isScrolledToBottom = function(){
-            var distanceToTop = $(document).height() - $(window).height()
+            var distanceToTop = $(document).height() - $(window).height();
             var top = $(document).scrollTop();
             return distanceToTop - top < 20;
         };
@@ -789,3 +812,122 @@ function completeShell(ret, command_id) {
     $('iframe#' + command_id).remove();
     Mist.machineShellController.machine.commandHistory.findBy('id', command_id).set('pendingResponse', false);
 }
+
+function getTemplate(name) {
+    if (JS_BUILD || true) { // The "|| true" part is just for debuging as for now
+        //info('Getting precompiled template for: ' + name);
+        // Return precompiled template
+        return Ember.TEMPLATES[name + '/html'];
+    } else {
+        info('Compiling template for: ' + name);
+        return Ember.Handlebars.compile('text!app/templates/'+ name + '.html');
+    }
+};
+
+function initSocket() {
+    warn('Socket init');
+    var sock = undefined, retry = 0;
+    while (!sock) {
+        sock = io.connect('/mist');
+        retry += 1;
+        if (retry > 5){
+            alert('failed to connect after ' + retry + ' retries');
+            return false;
+        }
+    }
+
+    Mist.set('socket', sock);
+
+    Mist.socket.emit('ready');
+
+    Mist.socket.on('list_backends', function(backends){
+        Mist.backendsController._setContent(backends);
+        Mist.backendsController.set('loading', false);
+    });
+
+    Mist.socket.on('list_keys', function(keys){
+        Mist.keysController._setContent(keys);
+        Mist.keysController.set('loading', false);
+    });
+
+    Mist.socket.on('list_sizes', function(data){
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend) {
+            backend.get('sizes')._setContent(data.sizes);
+            backend.get('sizes').set('loading', false);
+        }
+    });
+
+    Mist.socket.on('list_locations', function(data){
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend) {
+            backend.get('locations')._setContent(data.locations);
+            backend.get('locations').set('loading', false);
+            backend.set('loadingLocations', false);
+        }
+    });
+
+    Mist.socket.on('list_images', function(data){
+        var backend = Mist.backendsController.getBackend(data.backend_id);
+        if (backend) {
+            backend.get('images')._setContent(data.images);
+            backend.get('images').set('loading', false);
+        }
+    });
+
+    Mist.socket.on('list_machines', function(data){
+        Ember.run.next(function(){
+            var backend = Mist.backendsController.getBackend(data.backend_id);
+            if (backend) {
+                backend.get('machines')._updateContent(data.machines);
+                backend.get('machines').set('loading', false);
+            }
+
+        });
+    });
+
+    Mist.socket.on('probe', function(data){
+        Ember.run.next(function(){
+            var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
+            if (machine)
+                machine.probeSuccess(data.result);
+        });
+    });
+
+    Mist.socket.on('monitoring',function(data){
+        Mist.monitoringController._updateMonitoringData(data);
+        Mist.monitoringController.trigger('onMonitoringDataUpdate');
+        Mist.backendsController.set('checkedMonitoring', true);
+    });
+
+    Mist.socket.on('notify',function(data){
+        Mist.notificationController.notify(data);
+    });
+
+    Mist.socket.on('stats', function(data){
+        warn('stats!');
+        warn(data);
+        //var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
+        Mist.monitoringController.request.updateMetrics(data.metrics, data.start, data.stop, data.requestID);
+
+    });
+}
+
+
+var virtualKeyboardHeight = function () {
+    var keyboardHeight = 0;
+
+    if (!Mist.term) return 0;
+
+    if (Mist.term.isIpad || Mist.term.isIphone){
+        var sx = document.body.scrollLeft, sy = document.body.scrollTop;
+        var naturalHeight = window.innerHeight;
+        window.scrollTo(sx, document.body.scrollHeight);
+        keyboardHeight = naturalHeight - window.innerHeight;
+        window.scrollTo(sx, sy);
+    } else if (Mist.term.isAndroid) {
+        keyboardHeight = 0;
+    }
+    return keyboardHeight;
+};
+

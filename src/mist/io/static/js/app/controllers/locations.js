@@ -27,19 +27,6 @@ define('app/controllers/locations', ['app/models/location'],
 
                 var that = this;
                 this.set('loading', true);
-                Mist.ajax.GET('/backends/' + this.backend.id + '/locations', {
-                }).success(function(locations) {
-                    if (!that.backend.enabled) return;
-                    that._setContent(locations || []);
-                }).error(function() {
-                    if (!that.backend.enabled) return;
-                    Mist.notificationController.notify('Failed to load locations for ' + that.backend.title);
-                    that.backend.set('enabled', false);
-                }).complete(function(success) {
-                    if (!that.backend.enabled) return;
-                    that.set('loading', false);
-                    that.trigger('onLoad');
-                });
             },
 
 

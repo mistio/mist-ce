@@ -7,6 +7,7 @@ README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
+    'python-memcached',
     'pyramid',
     'apache-libcloud',
     'PasteScript',
@@ -17,7 +18,12 @@ requires = [
     'nose',
     'behaving',
     'sphinxcontrib-httpdomain',
-    'sphinx-bootstrap-theme'
+    'sphinx-bootstrap-theme',
+    'celery',
+    'gevent',
+    'gevent-socketio',
+    'gevent-subprocess',
+    'amqp',
 ]
 
 setup(name='mist.io',

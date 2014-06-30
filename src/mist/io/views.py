@@ -28,12 +28,16 @@ except ImportError:
     from mist.io.helpers import user_from_request
     from pyramid.view import view_config
 
+from socketio import socketio_manage
+
 from mist.io import methods
 from mist.io.model import Keypair
 from mist.io.shell import Shell
 import mist.io.exceptions as exceptions
 from mist.io.exceptions import *
+
 from mist.io.helpers import get_auth_header, params_from_request
+from mist.io.sockio import MistNamespace, ShellNamespace
 
 
 log = logging.getLogger(__name__)
@@ -159,21 +163,7 @@ def list_backends(request):
     """
 
     user = user_from_request(request)
-    ret = []
-    for backend_id in user.backends:
-        backend = user.backends[backend_id]
-        ret.append({'id': backend_id,
-                    'apikey': backend.apikey,
-                    'title': backend.title or backend.provider,
-                    'provider': backend.provider,
-                    'poll_interval': backend.poll_interval,
-                    'state': 'wait' if backend.enabled else 'offline',
-                    # for Provider.RACKSPACE_FIRST_GEN
-                    'region': backend.region,
-                    # for Provider.RACKSPACE (the new Nova provider)
-                    ## 'datacenter': backend.datacenter,
-                    'enabled': backend.enabled})
-    return ret
+    return methods.list_backends(user)
 
 
 @view_config(route_name='backends', request_method='POST', renderer='json')
@@ -286,10 +276,7 @@ def list_keys(request):
 
     """
     user = user_from_request(request)
-    return [{'id': key,
-             'machines': user.keypairs[key].machines,
-             'isDefault': user.keypairs[key].default}
-            for key in user.keypairs]
+    return methods.list_keys(user)
 
 
 @view_config(route_name='keys', request_method='PUT', renderer='json')
@@ -599,19 +586,8 @@ def check_monitoring(request):
 
     """
     user = user_from_request(request)
-
-    try:
-        ret = requests.get(config.CORE_URI + request.path,
-                           headers={'Authorization': get_auth_header(user)},
-                           verify=config.SSL_VERIFY)
-    except requests.exceptions.SSLError as exc:
-        log.error("%r", exc)
-        raise SSLError()
-    if ret.status_code == 200:
-        return ret.json()
-    else:
-        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
-        raise ServiceUnavailableError()
+    ret = methods.check_monitoring(user)
+    return ret
 
 
 @view_config(route_name='update_monitoring', request_method='POST',
@@ -956,3 +932,12 @@ def list_supported_providers(request):
     @return: Return all of our SUPPORTED PROVIDERS
     """
     return {'supported_providers': config.SUPPORTED_PROVIDERS}
+    
+
+@view_config(route_name='socketio')
+def socketio(request):
+    socketio_manage(request.environ,
+                    namespaces={'/mist': MistNamespace,
+                                '/shell': ShellNamespace},
+                    request=request)
+    return {}

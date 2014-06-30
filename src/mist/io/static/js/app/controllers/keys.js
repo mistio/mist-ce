@@ -34,15 +34,6 @@ define(['app/models/key'],
             load: function() {
                 var that = this;
                 this.set('loading', true);
-                Mist.ajax.GET('/keys', {
-                }).success(function(keys) {
-                    that._setContent(keys);
-                }).error(function() {
-                    that._reload();
-                }).complete(function(success) {
-                    that.set('loading', false);
-                    that.trigger('onLoad');
-                });
             }.on('init'),
 
 

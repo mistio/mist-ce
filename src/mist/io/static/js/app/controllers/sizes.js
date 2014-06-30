@@ -27,19 +27,6 @@ define('app/controllers/sizes', ['app/models/size'],
 
                 var that = this;
                 this.set('loading', true);
-                Mist.ajax.GET('/backends/' + this.backend.id + '/sizes', {
-                }).success(function (sizes) {
-                    if (!that.backend.enabled) return;
-                    that._setContent(sizes || []);
-                }).error(function () {
-                    if (!that.backend.enabled) return;
-                    Mist.notificationController.notify('Failed to load sizes for ' + that.backend.title);
-                    that.backend.set('enabled', false);
-                }).complete(function (success) {
-                    if (!that.backend.enabled) return;
-                    that.set('loading', false);
-                    that.trigger('onLoad');
-                });
             },
 
 

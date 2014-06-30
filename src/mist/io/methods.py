@@ -9,7 +9,6 @@ from datetime import datetime
 from hashlib import sha256
 from StringIO import StringIO
 
-
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
 from libcloud.compute.base import NodeAuthSSHKey
@@ -18,7 +17,6 @@ from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider, NodeState
 from libcloud.common.types import InvalidCredsError
 from libcloud.utils.networking import is_private_subnet
-
 
 try:
     from mist.core import config, model
@@ -33,6 +31,11 @@ from mist.io.helpers import get_auth_header
 from mist.io.helpers import parse_ping
 from mist.io.bare_metal import BareMetalDriver
 from mist.io.exceptions import *
+
+
+from mist.io.helpers import trigger_session_update
+from mist.io.helpers import amqp_publish_user
+from mist.io.tasks import ssh_command as async_ssh_command
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
@@ -169,6 +172,7 @@ def add_backend(user, title, provider, apikey, apisecret, apiurl, tenant_name,
             user.backends[backend_id] = backend
             user.save()
     log.info("Backend with id '%s' added succesfully.", backend_id)
+    trigger_session_update(user.email, ['backends'])
     return backend_id
 
 
@@ -185,6 +189,7 @@ def rename_backend(user, backend_id, new_name):
         user.backends[backend_id].title = new_name
         user.save()
     log.info("Succesfully renamed backend '%s'", backend_id)
+    trigger_session_update(user.email, ['backends'])
 
 
 @core_wrapper
@@ -214,6 +219,7 @@ def delete_backend(user, backend_id):
         del user.backends[backend_id]
         user.save()
     log.info("Succesfully deleted backend '%s'", backend_id)
+    trigger_session_update(user.email, ['backends'])
 
 
 @core_wrapper
@@ -243,6 +249,7 @@ def add_key(user, key_id, private_key):
         user.save()
 
     log.info("Added key with id '%s'", key_id)
+    trigger_session_update(user.email, ['keys'])
     return key_id
 
 
@@ -275,6 +282,7 @@ def delete_key(user, key_id):
 
         user.save()
     log.info("Deleted key with id '%s'.", key_id)
+    trigger_session_update(user.email, ['keys'])
 
 
 def set_default_key(user, key_id):
@@ -300,6 +308,7 @@ def set_default_key(user, key_id):
         keypairs[key_id].default = True
         user.save()
     log.info("Succesfully set key with id '%s' as default.", key_id)
+    trigger_session_update(user.email, ['keys'])
 
 
 def edit_key(user, new_key, old_key):
@@ -328,6 +337,7 @@ def edit_key(user, new_key, old_key):
         user.keypairs[new_key] = old_keypair
         user.save()
     log.info("Renamed key '%s' to '%s'.", old_key, new_key)
+    trigger_session_update(user.email, ['keys'])
 
 
 @core_wrapper
@@ -374,6 +384,7 @@ def associate_key(user, key_id, backend_id, machine_id, host='', username=None, 
                          port]
                 user.keypairs[key_id].machines.append(assoc)
                 user.save()
+            trigger_session_update(user.email, ['keys'])
         return
 
     # if host is specified, try to actually deploy
@@ -462,6 +473,7 @@ def disassociate_key(user, key_id, backend_id, machine_id, host=None):
                 keypair.machines.remove(machine)
                 user.save()
                 break
+    trigger_session_update(user.email, ['keys'])
 
 
 def connect_provider(backend):
@@ -617,6 +629,13 @@ def list_machines(user, backend_id):
         image_id = m.image or m.extra.get('imageId', None)
         size = m.size or m.extra.get('flavorId', None)
         size = size or m.extra.get('instancetype', None)
+
+        for k in m.extra.keys():
+            try:
+                json.dumps(m.extra[k])
+            except TypeError:
+                m.extra[k] = str(m.extra[k])
+
         machine = {'id': m.id,
                    'uuid': m.get_uuid(),
                    'name': m.name,
@@ -760,6 +779,10 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
 
     associate_key(user, key_id, backend_id, node.id)
 
+    if script:
+        from mist.io.tasks import run_deploy_script
+        run_deploy_script.delay(user.email, backend_id, node.id, script, key_id)
+
     return {'id': node.id,
             'name': node.name,
             'extra': node.extra,
@@ -796,22 +819,13 @@ def _create_machine_rackspace(conn, public_key, script, machine_name,
         server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
         server_key = server_key.name
 
-    if script:
-        try:
-            node = conn.deploy_node(name=machine_name, image=image, size=size,
-                                    location=location, deploy=msd, ex_keyname=server_key)
+    try:
+        node = conn.create_node(name=machine_name, image=image, size=size,
+                                location=location, ex_keyname=server_key)
 
-            return node
-        except Exception as e:
-            raise MachineCreationError("Script Deployment got exception: %r" % e)
-    else:
-        try:
-            node = conn.create_node(name=machine_name, image=image, size=size,
-                                    location=location, ex_keyname=server_key)
-
-            return node
-        except Exception as e:
-            raise MachineCreationError("Rackspace, got exception %r" % e)
+        return node
+    except Exception as e:
+        raise MachineCreationError("Rackspace, got exception %r" % e)
 
 
 def _create_machine_openstack(conn, private_key, public_key, script, machine_name,
@@ -841,38 +855,19 @@ def _create_machine_openstack(conn, private_key, public_key, script, machine_nam
         server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
         server_key = server_key.name
 
-    if script:
-        with get_temp_file(private_key) as tmp_key_path:
-            try:
-                node = conn.deploy_node(name=machine_name,
-                    image=image,
-                    size=size,
-                    location=location,
-                    deploy=msd,
-                    ssh_key=tmp_key_path,
-                    ssh_alternate_usernames=['ec2-user', 'ubuntu'],
-                    max_tries=1,
-                    ex_keyname=server_key)
-            except Exception as e:
-                raise MachineCreationError("OpenStack, got exception %s" % e)
-        return node
-    else:
-        with get_temp_file(private_key) as tmp_key_path:
-            try:
-                node = conn.create_node(name=machine_name,
-                    image=image,
-                    size=size,
-                    location=location,
-                    ssh_key=tmp_key_path,
-                    ssh_alternate_usernames=['ec2-user', 'ubuntu'],
-                    max_tries=1,
-                    ex_keyname=server_key)
-            except Exception as e:
-                raise MachineCreationError("OpenStack, got exception %s" % e)
-        return node
-
-
-
+    with get_temp_file(private_key) as tmp_key_path:
+        try:
+            node = conn.create_node(name=machine_name,
+                image=image,
+                size=size,
+                location=location,
+                ssh_key=tmp_key_path,
+                ssh_alternate_usernames=['ec2-user', 'ubuntu'],
+                max_tries=1,
+                ex_keyname=server_key)
+        except Exception as e:
+            raise MachineCreationError("OpenStack, got exception %s" % e)
+    return node
 
 
 def _create_machine_ec2(conn, key_name, private_key, public_key, script,
@@ -910,43 +905,24 @@ def _create_machine_ec2(conn, key_name, private_key, public_key, script,
         else:
             raise InternalServerError("Couldn't create security group")
 
-    if script:
-        deploy_script = ScriptDeployment(script)
-        with get_temp_file(private_key) as tmp_key_path:
-            #deploy_node wants path for ssh private key
-            try:
-                node = conn.deploy_node(
-                    name=machine_name,
-                    image=image,
-                    size=size,
-                    deploy=deploy_script,
-                    location=location,
-                    ssh_key=tmp_key_path,
-                    ssh_alternate_usernames=['ec2-user', 'ubuntu'],
-                    max_tries=1,
-                    ex_keyname=key_name,
-                    ex_securitygroup=config.EC2_SECURITYGROUP['name']
-                )
-            except Exception as e:
-                raise MachineCreationError("EC2, got exception %s" % e)
-        return node
-    else:
-        with get_temp_file(private_key) as tmp_key_path:
-            #deploy_node wants path for ssh private key
-            try:
-                node = conn.create_node(
-                    name=machine_name,
-                    image=image,
-                    size=size,
-                    location=location,
-                    ssh_key=tmp_key_path,
-                    max_tries=1,
-                    ex_keyname=key_name,
-                    ex_securitygroup=config.EC2_SECURITYGROUP['name']
-                )
-            except Exception as e:
-                raise MachineCreationError("EC2, got exception %s" % e)
-        return node
+    with get_temp_file(private_key) as tmp_key_path:
+        #deploy_node wants path for ssh private key
+        try:
+            node = conn.create_node(
+                name=machine_name,
+                image=image,
+                size=size,
+                location=location,
+                ssh_key=tmp_key_path,
+                max_tries=1,
+                ex_keyname=key_name,
+                ex_securitygroup=config.EC2_SECURITYGROUP['name']
+            )
+        except Exception as e:
+            raise MachineCreationError("EC2, got exception %s" % e)
+
+    return node
+
 
 def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
                               machine_name, image, size, location):
@@ -998,43 +974,23 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key, script,
         if console_keys:
             console_key = console_keys[0].id
 
-    if script:
-        with get_temp_file(private_key) as tmp_key_path:
-            try:
-                node = conn.deploy_node(
-                    name=machine_name,
-                    hostname=machine_name[:15],
-                    image=image,
-                    size=size,
-                    zone=location.id,
-                    server_key=server_key,
-                    console_key=console_key,
-                    ssh_key=tmp_key_path,
-                    connect_attempts=20,
-                    ex_wait=True,
-                    deploy=deploy_script
-                )
-            except Exception as e:
-                raise MachineCreationError("Nephoscale, got exception %s" % e)
-        return node
-    else:
-        with get_temp_file(private_key) as tmp_key_path:
-            try:
-                node = conn.create_node(
-                    name=machine_name,
-                    hostname=machine_name[:15],
-                    image=image,
-                    size=size,
-                    zone=location.id,
-                    server_key=server_key,
-                    console_key=console_key,
-                    ssh_key=tmp_key_path,
-                    connect_attempts=20,
-                    nowait=True,
-                    deploy=deploy_script
-                )
-            except Exception as e:
-                raise MachineCreationError("Nephoscale, got exception %s" % e)
+    with get_temp_file(private_key) as tmp_key_path:
+        try:
+            node = conn.create_node(
+                name=machine_name,
+                hostname=machine_name[:15],
+                image=image,
+                size=size,
+                zone=location.id,
+                server_key=server_key,
+                console_key=console_key,
+                ssh_key=tmp_key_path,
+                connect_attempts=20,
+                nowait=True,
+                deploy=deploy_script
+            )
+        except Exception as e:
+            raise MachineCreationError("Nephoscale, got exception %s" % e)
         return node
 
 
@@ -1057,35 +1013,19 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key, script,
         domain = None
         name = machine_name
 
-    if script:
-        with get_temp_file(private_key) as tmp_key_path:
-            try:
-                node = conn.deploy_node(
-                    name=name,
-                    ex_domain=domain,
-                    image=image,
-                    size=size,
-                    deploy=msd,
-                    location=location,
-                    ssh_key=tmp_key_path
-                )
-            except Exception as e:
-                raise MachineCreationError("Softlayer, got exception %s" % e)
-        return node
-    else:
-        with get_temp_file(private_key) as tmp_key_path:
-            try:
-                node = conn.create_node(
-                    name=name,
-                    ex_domain=domain,
-                    image=image,
-                    size=size,
-                    location=location,
-                    ssh_key=tmp_key_path
-                )
-            except Exception as e:
-                raise MachineCreationError("Softlayer, got exception %s" % e)
-        return node
+    with get_temp_file(private_key) as tmp_key_path:
+        try:
+            node = conn.create_node(
+                name=name,
+                ex_domain=domain,
+                image=image,
+                size=size,
+                location=location,
+                ssh_key=tmp_key_path
+            )
+        except Exception as e:
+            raise MachineCreationError("Softlayer, got exception %s" % e)
+    return node
 
 def _create_machine_docker(conn, machine_name, image, script, public_key=None):
     """Create a machine in docker.
@@ -1125,46 +1065,25 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
     except:
         key = conn.ex_create_ssh_key('mist.io', key)
 
-    if script:
-        with get_temp_file(private_key) as tmp_key_path:
-            try:
-                node = conn.deploy_node(
-                    name=machine_name,
-                    image=image,
-                    size=size,
-                    ex_ssh_key_ids=[str(key.id)],
-                    location=location,
-                    ssh_key=tmp_key_path,
-                    ssh_alternate_usernames=['root']*5,
-                    #attempt to fix the Connection reset by peer exception
-                    #that is (most probably) created due to a race condition
-                    #while deploy_node establishes a connection and the
-                    #ssh server is restarted on the created node
-                    private_networking=True,
-                    deploy=deploy_script
-                )
-            except Exception as e:
-                raise MachineCreationError("Digital Ocean, got exception %s" % e)
-        return node
-    else:
-        with get_temp_file(private_key) as tmp_key_path:
-            try:
-                node = conn.create_node(
-                    name=machine_name,
-                    image=image,
-                    size=size,
-                    ex_ssh_key_ids=[str(key.id)],
-                    location=location,
-                    ssh_key=tmp_key_path,
-                    ssh_alternate_usernames=['root']*5,
-                    #attempt to fix the Connection reset by peer exception
-                    #that is (most probably) created due to a race condition
-                    #while deploy_node establishes a connection and the
-                    #ssh server is restarted on the created node
-                    private_networking=True,
-                )
-            except Exception as e:
-                raise MachineCreationError("Digital Ocean, got exception %s" % e)
+    with get_temp_file(private_key) as tmp_key_path:
+        try:
+            node = conn.create_node(
+                name=machine_name,
+                image=image,
+                size=size,
+                ex_ssh_key_ids=[str(key.id)],
+                location=location,
+                ssh_key=tmp_key_path,
+                ssh_alternate_usernames=['root']*5,
+                #attempt to fix the Connection reset by peer exception
+                #that is (most probably) created due to a race condition
+                #while deploy_node establishes a connection and the
+                #ssh server is restarted on the created node
+                private_networking=True,
+            )
+        except Exception as e:
+            raise MachineCreationError("Digital Ocean, got exception %s" % e)
+
         return node
 
 
@@ -1208,11 +1127,10 @@ def _create_machine_linode(conn, key_name, private_key, public_key, script,
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
-            node = conn.deploy_node(
+            node = conn.create_node(
                 name=machine_name,
                 image=image,
                 size=size,
-                deploy=deploy_script,
                 location=location,
                 auth=auth,
                 ssh_key=tmp_key_path
@@ -1408,7 +1326,7 @@ def ssh_command(user, backend_id, machine_id, host, command,
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
                                            key_id, username, password, port)
-    output = shell.command(command)
+    retval, output = shell.command(command)
     shell.disconnect()
     return output
 
@@ -1528,6 +1446,31 @@ def star_image(user, backend_id, image_id):
                 backend.unstarred.remove(image_id)
         user.save()
     return not star
+
+
+def list_backends(user):
+    ret = []
+    for backend_id in user.backends:
+        backend = user.backends[backend_id]
+        ret.append({'id': backend_id,
+                    'apikey': backend.apikey,
+                    'title': backend.title or backend.provider,
+                    'provider': backend.provider,
+                    'poll_interval': backend.poll_interval,
+                    'state': 'wait' if backend.enabled else 'offline',
+                    # for Provider.RACKSPACE_FIRST_GEN
+                    'region': backend.region,
+                    # for Provider.RACKSPACE (the new Nova provider)
+                    ## 'datacenter': backend.datacenter,
+                    'enabled': backend.enabled})
+    return ret
+
+
+def list_keys(user):
+    return [{'id': key,
+             'machines': user.keypairs[key].machines,
+             'isDefault': user.keypairs[key].default}
+            for key in user.keypairs]
 
 
 def list_sizes(user, backend_id):
@@ -1739,6 +1682,22 @@ def delete_machine_metadata(user, backend_id, machine_id, tag):
                 BackendUnavailableError("Error while updating metadata")
 
 
+def check_monitoring(user):
+    """Ask the mist.io service if monitoring is enabled for this machine."""
+    try:
+        ret = requests.get(config.CORE_URI + '/monitoring',
+                           headers={'Authorization': get_auth_header(user)},
+                           verify=config.SSL_VERIFY)
+    except requests.exceptions.SSLError as exc:
+        log.error("%r", exc)
+        raise SSLError()
+    if ret.status_code == 200:
+        return ret.json()
+    else:
+        log.error("Error getting stats %d:%s", ret.status_code, ret.text)
+        raise ServiceUnavailableError()
+
+
 def enable_monitoring(user, backend_id, machine_id,
                       name='', dns_name='', public_ips=None,
                       no_ssh=False, dry=False):
@@ -1789,8 +1748,10 @@ def enable_monitoring(user, backend_id, machine_id,
         return ret_dict
     stdout = ''
     if not no_ssh:
-        stdout = ssh_command(user, backend_id, machine_id, host, command)
-    ret_dict['cmd_output'] = stdout
+        async_ssh_command.delay(user, backend_id, machine_id, host, command)
+
+    trigger_session_update(user.email, ['monitoring'])
+
     return ret_dict
 
 
@@ -1823,6 +1784,7 @@ def disable_monitoring(user, backend_id, machine_id, no_ssh=False):
             stdout = _undeploy_collectd(user, backend_id, machine_id, host)
     except:
         pass
+    trigger_session_update(user.email, ['monitoring'])
     return stdout
 
 
@@ -1842,7 +1804,6 @@ def deploy_collectd_command(deploy_kwargs):
 
 def _undeploy_collectd(user, backend_id, machine_id, host):
     """Uninstall collectd from the machine and return command's output"""
-
     #FIXME: do not hard-code stuff!
     command = (
         "sudo=$(command -v sudo); "
@@ -1852,10 +1813,7 @@ def _undeploy_collectd(user, backend_id, machine_id, host):
         "sleep 2; $sudo kill -9 `cat /opt/mistio-collectd/collectd.pid`"
     )
 
-    stdout = ssh_command(user, backend_id, machine_id, host, command)
-    #FIXME: parse output and check for success/failure
-
-    return stdout
+    return async_ssh_command.delay(user, backend_id, machine_id, host, command)
 
 
 def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
@@ -1885,9 +1843,6 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
        "/sbin/ifconfig;"
        "echo --------"
        "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
-       #"cat ~/`grep '^AuthorizedKeysFile' /etc/ssh/sshd_config /etc/sshd_config 2> /dev/null |"
-       #"awk '{print $2}'` 2> /dev/null || "
-       #"cat ~/.ssh/authorized_keys 2> /dev/null"
     )
 
     log.warn('probing with key %s' % key_id)
@@ -1899,10 +1854,6 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
         log.warning("SSH failed when probing, let's see what ping has to say.")
         cmd_output = ""
 
-    # stop pinging
-    #ping.send_signal(2)  # SIGINT to print stats and exit
-    #sleep(0.1)
-    #ping.kill()  # better safe than sorry
     ping_out = ping.stdout.read()
     ping.wait()
     log.info("ping output: %s" % ping_out)
@@ -1928,56 +1879,11 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
                'pub_ips': pub_ips,
                'priv_ips': priv_ips
                }
-        # if len(cmd_output) > 4:
-        #     updated_keys = update_available_keys(user, backend_id,
-        #                                          machine_id, cmd_output[4])
-        #     ret['updated_keys'] = updated_keys
 
     ret.update(parse_ping(ping_out))
 
     return ret
 
-
-# def update_available_keys(user, backend_id, machine_id, authorized_keys):
-#     keypairs = user.keypairs
-#
-#     # track which keypairs will be updated
-#     updated_keypairs = {}
-#     # get the actual public keys from the blob
-#     ak = [k for k in authorized_keys.split('\n') if k.startswith('ssh')]
-#
-#     # for each public key
-#     for pk in ak:
-#         exists = False
-#         pub_key = pk.strip().split(' ')
-#         for k in keypairs:
-#             # check if the public key already exists in our keypairs
-#             if keypairs[k].public.strip().split(' ')[:2] == pub_key[:2]:
-#                 exists = True
-#                 associated = False
-#                 # check if it is already associated with this machine
-#                 for machine in keypairs[k].machines:
-#                     if machine[:2] == [backend_id, machine_id]:
-#                         associated = True
-#                         break
-#                 if not associated:
-#                     with user.lock_n_load():
-#                         keypairs[k].machines.append([backend_id, machine_id])
-#                         user.save()
-#                     updated_keypairs[k] = keypairs[k]
-#             if exists:
-#                 break
-#
-#     if updated_keypairs:
-#         log.debug('update keypairs')
-#
-#     ret = [{'name': key,
-#             'machines': keypairs[key].machines,
-#             'pub': keypairs[key].public,
-#             'default_key': keypairs[key].default
-#             } for key in updated_keypairs]
-#
-#     return ret
 
 def find_public_ips(ips):
     public_ips = []
@@ -1989,6 +1895,25 @@ def find_public_ips(ips):
         except:
             pass
     return public_ips
+
+
+def notify_admin(title, message=""):
+    try:
+        from mist.core.helpers import send_email
+        send_email(title, message, config.NOTIFICATION_EMAIL)
+    except ImportError:
+        pass
+
+
+def notify_user(user, title, message="", **kwargs):
+    try:
+        from mist.core.helpers import send_email
+        send_email(title, message, user.email)
+    except ImportError:
+        pass
+    payload = {'title': title, 'message': message}
+    payload.update(kwargs)
+    amqp_publish_user(user, routing_key='notify', data=payload)
 
 
 def find_metrics(user, backend_id, machine_id):

@@ -1,0 +1,2 @@
+RABBITMQ_PLUGINS_DIR=${buildout:directory}/parts/rabbitmq/plugins
+RABBITMQ_ENABLED_PLUGINS_FILE=${buildout:directory}/templates/rabbitmq-plugins

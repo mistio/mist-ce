@@ -34,35 +34,8 @@ define('app/controllers/machines', ['app/models/machine'],
              */
 
             load: function() {
-
                 if (!this.backend.enabled) return;
-
-                var that = this;
-                this.set('loading', true);
-                Mist.ajax.GET('/backends/' + this.backend.id + '/machines', {
-                }).success(function(machines) {
-                    if (!that.backend.enabled) return;
-                    that.set('failCounter', 0);
-                    that._updateContent(machines);
-                    that._reload();
-                }).error(function() {
-                    if (!that.backend.enabled) return;
-                    Mist.notificationController.notify('Failed to load machines for ' + that.backend.title);
-
-                    // Increase machine load fail counter
-                    // If counter reaches 5, disable backend
-                    that.set('failCounter', that.failCounter + 1);
-                    if (that.failCounter == 5) {
-                        that.set('failCounter', 0);
-                        that.backend.set('enabled', false);
-                    } else {
-                        that._reload();
-                    }
-                }).complete(function(success) {
-                    if (!that.backend.enabled) return;
-                    that.set('loading', false);
-                    that.trigger('onLoad');
-                });
+                this.set('loading', true);                
             },
 
 
