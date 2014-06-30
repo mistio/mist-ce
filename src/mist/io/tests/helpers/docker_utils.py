@@ -9,7 +9,7 @@ def select_docker():
     """
     nodes = []
     for node in docker_nodes:
-        nodes.append(docker.Client(base_url=node))
+        nodes.append(docker.Client(base_url=node, version='1.10'))
 
     if len(nodes) == 1:
         chosen_node = nodes[0]

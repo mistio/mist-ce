@@ -5,14 +5,8 @@ from time import time, sleep
 @when(u'I visit mist.io')
 def visit(context):
     end_time = time() + 60
-    while time() < end_time:
-        context.browser.get(context.mist_url)
-        sleep(1)
-        state = context.browser.execute_script("return document.readyState")
-        if state == "complete":
-            return
-        sleep(1)
-    assert False, u'Splash page took longer than 40 seconds to load'
+    context.browser.get(context.mist_url)
+    splash_loadout(context)
 
 @when(u'I wait for {seconds} seconds')
 def wait(context, seconds):
@@ -21,6 +15,7 @@ def wait(context, seconds):
 
 @when(u'I click the "{text}" button')
 def click_button(context, text):
+    splash_loadout(context)
     buttons = context.browser.find_elements_by_class_name("ui-btn")
     for button in buttons:
         if button.text == text:
@@ -91,3 +86,14 @@ def assert_title_is(context, text):
 @then(u'the title should contain "{text}"')
 def assert_title_contains(context, text):
     assert text in context.browser.title
+
+
+def splash_loadout(context, timeout=20):
+    end_time = time() + timeout
+    while time() < end_time:
+        splash_page = context.browser.find_element_by_id("splash")
+        display = splash_page.value_of_css_property("display")
+        if 'none' in display:
+            return
+        sleep(2)
+    assert False, u'Page took longer than %s seconds to load' % str(timeout)

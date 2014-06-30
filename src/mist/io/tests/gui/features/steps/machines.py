@@ -20,9 +20,16 @@ def choose_machine(context, name):
     if "randomly_created" in name:
         name = context.random_name
 
-    machine = get_machine(context, name)
-    checkbox = machine.find_element_by_class_name("ui-checkbox")
-    checkbox.click()
+    end_time = time() + 20
+    while time() < end_time:
+        machine = get_machine(context, name)
+        if machine:
+            checkbox = machine.find_element_by_class_name("ui-checkbox")
+            checkbox.click()
+            return
+
+        sleep(2)
+    assert False, u'Could not choose/tick %s machine' % name
 
 
 @then(u'I should see the "{name}" machine added within {seconds} seconds')
@@ -34,12 +41,9 @@ def assert_machine_added(context, name, seconds):
 
     end_time = time() + int(seconds)
     while time() < end_time:
-        placeholder = context.browser.find_element_by_id("machines")
-        machines = placeholder.find_elements_by_tag_name("li")
-
-        for machine in machines:
-            if machine_name in machine.text:
-                return
+        machine = get_machine(context, machine_name)
+        if machine:
+            return
         sleep(2)
 
     assert False, u'%s is not added' % name
@@ -59,7 +63,9 @@ def assert_machine_state(context, name, state, seconds):
             try:
                 if state in machine.text:
                     return
-            except NoSuchElementException, StaleElementReferenceException:
+            except NoSuchElementException:
+                pass
+            except StaleElementReferenceException:
                 pass
         sleep(2)
 
@@ -80,7 +86,9 @@ def assert_machine_probed(context, name, seconds):
             try:
                 probed = machine.find_element_by_class_name("probed")
                 return
-            except NoSuchElementException, StaleElementReferenceException:
+            except NoSuchElementException:
+                pass
+            except StaleElementReferenceException:
                 pass
             sleep(3)
 
@@ -97,5 +105,7 @@ def get_machine(context, name):
                 return machine
 
         return None
-    except NoSuchElementException, StaleElementReferenceException:
+    except NoSuchElementException:
+        return None
+    except StaleElementReferenceException:
         return None

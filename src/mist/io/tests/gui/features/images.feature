@@ -12,7 +12,7 @@ Feature: Actions for Images
     And there should be starred Images
     When I search for a "django" Image
     And I click the button that contains "Continue search on server"
-    Then Images should be loaded within 60 seconds
+    Then Images list should be loaded within 60 seconds
 
     When I star an Image that contains "django"
     And I clear the Images search bar

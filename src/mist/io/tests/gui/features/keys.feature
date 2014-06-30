@@ -27,5 +27,6 @@ Feature: Actions for Keys
     When I click the button that contains "Keys"
     When I click the button that contains "RenamedFirstKey"
     And I click the "Delete" button
-    And I click the "Yes" button inside the "Delete key" popup
+    And I click the "Yes" button
+#    And I click the "Yes" button inside the "Delete key" popup
     Then "RenamedFirstKey" key should be deleted
