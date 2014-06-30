@@ -54,7 +54,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
 
                 Mist.set('shell', sock);
 
-                $('#single-machine-page .ui-footer').hide(500);
+                $('.ui-footer').hide(500);
                 $('#machine-shell-popup').on('popupafteropen',
                     function(){
                         $('#machine-shell-popup').off('blur');
@@ -152,7 +152,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 $('#machine-shell-popup').popup('close');
                 $(window).off('resize');
                 this._clear();
-                $('#single-machine-page .ui-footer').show(500);
+                $('.ui-footer').show(500);
             },
 
             /**
