@@ -1,46 +1,53 @@
 #SETTINGS FOR THE TESTS
 #
 #****     **** **  ******** **********
-#/**/**   **/**/** **////// /////**/// 
-#/**//** ** /**/**/**           /**    
-#/** //***  /**/**/*********    /**    
-#/**  //*   /**/**////////**    /**    
-#/**   /    /**/**       /**    /**    
-#/**        /**/** ********     /**    
-#//         // // ////////      //     
+#/**/**   **/**/** **////// /////**///
+#/**//** ** /**/**/**           /**
+#/** //***  /**/**/*********    /**
+#/**  //*   /**/**////////**    /**
+#/**   /    /**/**       /**    /**
+#/**        /**/** ********     /**
+#//         // // ////////      //
 #
 #********** ********  ******** ******************
-#/////**/// /**/////  **////// /////**///**////// 
-#    /**    /**      /**           /**    /**       
+#/////**/// /**/////  **////// /////**///**//////
+#    /**    /**      /**           /**    /**
 #    /**    /******* /*********    /**    /*********
+#    /**    /**////  ////////**    /**    ////////**
 #    /**    /**             /**    /**           /**
-#    /**    /******** ********     /**     ******** 
+#    /**    /******** ********     /**     ********
 #    //     //////// ////////      //     ////////
 
 import os
+from sys import platform as _platform
 
 BASE_DIR = os.getcwd()
-TEST_DIR = os.path.join(BASE_DIR, '/src/mist/io/tests')
+TEST_DIR = os.path.join(BASE_DIR, 'src/mist/io/tests')
 
 #-------LOCAL Vs REMOTE TESTING
 #While developing tests you'd like the LOCAL to be True.
 #This will initialize local instances of Firefox or Chrome
 #
-#However, when you want tests to be run in our selenium-grid, 
+#However, when you want tests to be run in our selenium-grid,
 #you have to provide the corresponding url (e.g. http://23.253.37.12:4444/wd/hub)
 #If you look in your ansible_hosts file you'll find the machine that acts as the
 #selenium hub
 LOCAL = True
-DEBUG = True
+DEBUG = False
 #If LOCAL == False, you have to provide the selenium-hub
 selenium_hub = ""
 
-#The chromedriver executable is needed by local tests in order to spawn 
+#The chromedriver executable is needed by local tests in order to spawn
 #a chrome instance. By default it will be in the ansible/roles/selenium-node/files dir
 #cause it is used by ansible to copy it to our servers in the selenium grid.
 #However you can put in another path OR if you have chrome installed, you can put in
 #the absolute path of your chrome executable (e.g. /usr/bin/google-chrome)
-CHROMEDRIVER_PATH = os.path.join(TEST_DIR, '/addons/files/chromedriver')
+if 'darwin' in _platform:
+    CHROMEDRIVER_PATH = os.path.join(TEST_DIR, 'addons/chromedriver-mac')
+else:
+    CHROMEDRIVER_PATH = os.path.join(TEST_DIR, 'addons/chromedriver')
+
+PHANTOMJS_PATH = os.path.join(TEST_DIR, 'addons/phantomjs')
 
 #----------DOCKERS---------------
 #DOCKERS is a list of all our docker nodes. It will be used to spawn docker
@@ -84,5 +91,5 @@ CREDENTIALS = {
 
 #AUTHENTICATION TO MIST.IO
 #Used for testing the production, with a user especially for tests
-#TEST_EMAIL = 
+#TEST_EMAIL =
 #TEST_PASSWORD =
