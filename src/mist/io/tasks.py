@@ -26,6 +26,7 @@ except ImportError: # Standalone mist.io
     cert_path = "cacert.pem"
 
 from mist.io.helpers import amqp_publish_user
+from mist.io.helpers import amqp_log
 
 # libcloud certificate fix for OS X
 libcloud.security.CA_CERTS_PATH.append(cert_path)
@@ -49,41 +50,49 @@ def ssh_command(user, backend_id, machine_id, host, command,
 @app.task
 def probe(email, backend_id, machine_id, host, key_id='', ssh_user='', flush=False):
 
+    id_str = ":".join((email, 'probe', backend_id, machine_id,
+                       host, key_id, ssh_user))
     cache = MemcacheClient(["127.0.0.1:11211"])
-    cache_key = b64encode(":".join((email, 'probe', backend_id, machine_id,
-                                    host, key_id, ssh_user)))
+    cache_key = b64encode(id_str)
     cached = cache.get(cache_key)
     if cached:
         age = time() - cached['timestamp']
         data = cached['payload']
         if age < 90:
             # emit cached result
-            print "emitting cached probe result"
-            amqp_publish_user(email, routing_key='probe', data=data)
-            if age < 30:
-                print "result too fresh, returning"
-                return
+            amqp_log("%s: emitting cached result - age = %.1f" % (id_str, age))
+            ok = amqp_publish_user(email, routing_key='probe', data=data)
+            if not ok:
+                amqp_log("%s: exchange closed, stopping scheduling" % id_str)
+            return
+
     user = user_from_email(email)
     from mist.io import methods
     try:
         res = methods.probe(user, backend_id, machine_id, host,
                             key_id=key_id, ssh_user=ssh_user)
     except Exception as e:
-        print "probe failed with %s" % repr(e)
+        amqp_log("%s: %r" % (id_str, repr(e)))
         return
 
-    ret = {'backend_id': backend_id,
+    data = {'backend_id': backend_id,
            'machine_id': machine_id,
            'host': host,
            'result': res}
 
-    print "caching result"
-    cached = {'timestamp': time(), 'payload': ret}
+
+
+    ok = amqp_publish_user(user, routing_key='probe', data=data)
+    if not ok:
+        amqp_log("%s: exchange closed, stopping scheduling" % id_str)
+        return
+
+    cached = {'timestamp': time(), 'payload': data}
     cache.set(cache_key, cached)
 
-    amqp_publish_user(email, routing_key='probe', data=ret)
-
-    print "probed: ", email, ret
+    amqp_log("%s: will rerun in 120 secs" % id_str)
+    args = (email, backend_id, machine_id, host, key_id, ssh_user)
+    probe.apply_async(args, countdown=120)
 
 
 @app.task(bind=True, default_retry_delay=3*60)
@@ -184,9 +193,37 @@ def list_images(email, backend_id):
 
 
 @app.task
-def list_machines(email, backend_id):
+def list_machines(email, backend_id, repeat=False):
+    id_str = ":".join((email, 'list_machines', backend_id))
+    cache = MemcacheClient(["127.0.0.1:11211"])
+    cache_key = b64encode(id_str)
+    rescheduled = False
+    if not repeat:
+        cached = cache.get(cache_key)
+        if cached:
+            age = time() - cached['timestamp']
+            rescheduled = cached['rescheduled']
+            if age < 20:
+                # emit cached result
+                amqp_log("%s: cache hit - age = %.1fsecs" % (id_str, age))
+                ok = amqp_publish_user(email, routing_key='list_machines',
+                                       data=cached['payload'])
+                if not ok:
+                    amqp_log("%s: exchange closed" % id_str)
+                return
+
     from mist.io import methods
     user = user_from_email(email)
     machines = methods.list_machines(user, backend_id)
-    amqp_publish_user(user, routing_key='list_machines',
-                      data={'backend_id': backend_id, 'machines': machines})
+    timestamp = time()
+    data = {'backend_id': backend_id, 'machines': machines}
+    cached = {'timestamp': timestamp, 'payload': data, 'rescheduled': False}
+    ok = amqp_publish_user(user, routing_key='list_machines', data=data)
+    repeat = ok and (repeat or not rescheduled)
+    if repeat:
+        cached['rescheduled'] = True
+    cache.set(cache_key, cached)
+    if repeat:
+        amqp_log("%s: will rerun in 10 secs" % id_str)
+        list_machines.apply_async((email, backend_id), {'repeat': True},
+                                   countdown=10)
