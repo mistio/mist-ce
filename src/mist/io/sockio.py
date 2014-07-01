@@ -144,7 +144,6 @@ class MistNamespace(BaseNamespace):
             if routing_key == 'probe':
                 args = (self.user.email, msg.body['backend_id'],
                         msg.body['machine_id'], msg.body['host'])
-                ## tasks.probe.apply_async(args, countdown=120)
             elif routing_key == 'list_machines':
                 machines = msg.body['machines']
                 backend_id = msg.body['backend_id']
@@ -158,8 +157,6 @@ class MistNamespace(BaseNamespace):
                         continue
                     tasks.probe.delay(self.user.email, backend_id,
                                       machine['id'], ips[0])
-                ## tasks.list_machines.apply_async((self.user.email, backend_id),
-                                                ## countdown=10)
         elif routing_key == 'update':
             self.user.refresh()
             sections = msg.body
