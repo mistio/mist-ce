@@ -555,7 +555,7 @@ define('app/controllers/monitoring', ['app/models/graph', 'app/models/metric', '
                         if (datapoints[datapoints.length - 1] && datapoints[datapoints.length - 1].time)
                             this.lastMetrictime = datapoints[datapoints.length - 1].time;
 
-                        if (this.machine.pendingFirstData)
+                        if (this.machine && this.machine.pendingFirstData)
                             this.machine.set('pendingFirstData', !hasFirstData);
 
                         callback({
