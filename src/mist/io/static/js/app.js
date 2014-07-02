@@ -180,6 +180,8 @@ define( 'app', [
                 } else if (!Mist.socket.socket.connected){
                     warn('Socket not connected! Connecting...');
                     Mist.socket.socket.connect();
+                    if (Mist.socket.socket.connected)
+                        Mist.socket.emit('ready');
                 }
             }, 1000);
         });

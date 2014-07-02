@@ -2,6 +2,7 @@
 
 import os
 import re
+import time
 import json
 import random
 import tempfile
@@ -205,10 +206,11 @@ def amqp_subscribe_user(user, queue, callback):
 
 
 def trigger_session_update(email, sections=['backends','keys','monitoring']):
-    amqp_publish_user(user, routing_key='update', data=sections)
+    amqp_publish_user(email, routing_key='update', data=sections)
 
 
 def amqp_log(msg):
+    msg = "[%s] %s" % (time.strftime("%Y-%m-%d %H:%M:%S %Z"), msg)
     amqp_publish('mist_debug', '', msg)
 
 
