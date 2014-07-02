@@ -211,7 +211,10 @@ def trigger_session_update(email, sections=['backends','keys','monitoring']):
 
 def amqp_log(msg):
     msg = "[%s] %s" % (time.strftime("%Y-%m-%d %H:%M:%S %Z"), msg)
-    amqp_publish('mist_debug', '', msg)
+    try:
+        amqp_publish('mist_debug', '', msg)
+    except:
+        pass
 
 
 def amqp_log_listen():
