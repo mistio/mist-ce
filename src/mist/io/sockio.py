@@ -21,12 +21,14 @@ from socketio.namespace import BaseNamespace
 try:
     from mist.core.helpers import user_from_request
     from mist.core import config
+    from mist.core.methods import get_stats
 except ImportError:
     from mist.io.helpers import user_from_request
     from mist.io import config
+    from mist.io.methods import get_stats
 
 from mist.io.helpers import amqp_subscribe_user
-from mist.io.helpers import get_auth_header
+from mist.io.methods import notify_user
 
 from mist.io import methods
 from mist.io import tasks
@@ -104,36 +106,22 @@ class MistNamespace(BaseNamespace):
         #self.probe_greenlet = self.spawn(probe_subscriber, self)
 
     def on_stats(self, backend_id, machine_id, start, stop, step, requestID):
-        print "STATS!!", backend_id, machine_id, start, stop, step
-        data = {'start': start-50,
-                'stop': stop+50,
-                'step': step/1000}
-        data['v'] = 2
-        try:
-            uri = config.CORE_URI + '/backends/' + backend_id + '/machines/' + machine_id + '/stats'
-            print uri
-            resp = requests.get(uri,
-                                params=data,
-                                headers={'Authorization': get_auth_header(self.user)},
-                                verify=config.SSL_VERIFY)
-        except requests.exceptions.SSLError as exc:
-            print exc
-            #log.error("%r", exc)
 
-        if resp.ok:
-            ret = {}
-            ret['metrics'] = resp.json()
-            ret['backend_id'] = backend_id
-            ret['machine_id'] = machine_id
-            ret['start'] = start
-            ret['stop'] = stop
-            ret['requestID'] = requestID
-            self.emit('stats', ret)
-            print ret
-        else:
-            print "Error getting stats %d:%s", resp.status_code, resp.text
-            from mist.io.methods import notify_user
-            notify_user(self.user, "Error getting stats %d:%s" % (resp.status_code, resp.text))
+        try:
+            data = get_stats(user, backend_id, machine_id,
+                             start - 50, stop + 50, step / 1000)
+        except Exception as exc:
+            self.emit('notify', {'title': 'Error getting stats: %s' % exc})
+            return
+        ret = {
+            'backend_id': backend_id,
+            'machine_id': machine_id,
+            'start': start,
+            'stop': stop,
+            'requestID': requestID,
+            'metrics': data,
+        }
+        self.emit('stats', ret)
 
     def process_update(self, msg):
         routing_key = msg.delivery_info.get('routing_key')
