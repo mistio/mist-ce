@@ -112,7 +112,6 @@ class MistNamespace(BaseNamespace):
                              start - 50, stop + 50, step / 1000)
         except Exception as exc:
             amqp_log("Error getting stats: %r" % exc)
-            self.emit("notify", "Error getting stats: %s" % exc)
             return
         ret = {
             'backend_id': backend_id,
