@@ -28,6 +28,7 @@ except ImportError:
     from mist.io.methods import get_stats
 
 from mist.io.helpers import amqp_subscribe_user
+from mist.io.helpers import amqp_log
 from mist.io.methods import notify_user
 
 from mist.io import methods
@@ -106,12 +107,12 @@ class MistNamespace(BaseNamespace):
         #self.probe_greenlet = self.spawn(probe_subscriber, self)
 
     def on_stats(self, backend_id, machine_id, start, stop, step, requestID):
-
         try:
-            data = get_stats(user, backend_id, machine_id,
+            data = get_stats(self.user, backend_id, machine_id,
                              start - 50, stop + 50, step / 1000)
         except Exception as exc:
-            self.emit('notify', {'title': 'Error getting stats: %s' % exc})
+            amqp_log("Error getting stats: %r" % exc)
+            self.emit("notify", "Error getting stats: %s" % exc)
             return
         ret = {
             'backend_id': backend_id,
