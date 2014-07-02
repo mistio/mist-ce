@@ -11,11 +11,22 @@ def load_backend_credentials(context):
 
 @given(u'"{backend}" backend added')
 def given_backend(context, backend):
-    backends = context.browser.find_element_by_id("backend-buttons")
-    backend_buttons = backends.find_elements_by_class_name("ui-btn")
-    for button in backend_buttons:
-        if backend in button.text:
-            return
+    end_time = time() + 5
+    while time() < end_time:
+        try:
+            backends = context.browser.find_element_by_id("backend-buttons")
+            backend_buttons = backends.find_elements_by_class_name("ui-btn")
+            if backend_buttons:
+                break
+        except:
+            pass
+
+        sleep(2)
+
+    if backend_buttons:
+        for button in backend_buttons:
+            if backend in button.text:
+                return
 
     if "openstack" in backend.lower():
         creds = "OPENSTACK"
@@ -83,6 +94,7 @@ def rename_backend(context, new_name):
 
     for letter in new_name:
         textfield.send_keys(letter)
+        sleep(1)
 
 
 @then(u'the "{backend}" backend should be added within {seconds} seconds')
@@ -101,8 +113,10 @@ def backend_added(context, backend, seconds):
 
 @then(u'the "{backend}" backend should be deleted')
 def backend_deleted(context, backend):
+    sleep(1)
     backends = context.browser.find_element_by_id("backend-buttons")
     backend_buttons = backends.find_elements_by_class_name("ui-btn")
+
     for button in backend_buttons:
         if backend in button.text:
             assert False, u'%s backend is not deleted' % backend

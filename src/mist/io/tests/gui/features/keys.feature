@@ -4,6 +4,7 @@ Feature: Actions for Keys
   Background:
     When I visit mist.io
 
+  @keys-actions
   Scenario: Add Key
     When I click the button that contains "Keys"
     When I click the "Add" button
@@ -14,6 +15,7 @@ Feature: Actions for Keys
     And I wait for 5 seconds
     Then "FirstKey" key should be added within 5 seconds
 
+  @keys-actions
   Scenario: Rename Key
     When I click the button that contains "Keys"
     When I click the button that contains "FirstKey"
@@ -23,10 +25,15 @@ Feature: Actions for Keys
     And I click the "Keys" button
     Then "RenamedFirstKey" key should be added within 5 seconds
 
+  @keys-actions
   Scenario: Delete Key
     When I click the button that contains "Keys"
     When I click the button that contains "RenamedFirstKey"
     And I click the "Delete" button
     And I click the "Yes" button
-#    And I click the "Yes" button inside the "Delete key" popup
     Then "RenamedFirstKey" key should be deleted
+
+  @key-association
+  Scenario: Key association to machine
+    Given backends credentials
+    Given "EC2 AP NORTHEAST" backend added

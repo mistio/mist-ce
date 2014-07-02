@@ -12,7 +12,7 @@ def before_all(context):
     benv.before_all(context)
     context.browser = choose_driver()
     if LOCAL:
-        context.mist_url = "http://localhost:6543"
+        context.mist_url = "http://localhost:8000"
     else:
         docker_info = docker_all_in_one(flavor="io")
         context.remote_info = docker_info

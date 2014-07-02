@@ -22,11 +22,11 @@ Feature: Add second-tier backends
 
     @backend-actions
     Scenario: Backend Actions
-      Given "Rackspace ORD" backend added
+      Given "Rackspace DFW" backend added
 
-    When I click the "Rackspace ORD" button
+    When I click the "Rackspace DFW" button
     And I rename the backend to "Renamed"
-    And I click the "Back" button
+    And I click the "Back" button inside the "Edit backend" popup
     Then the "Renamed" backend should be added within 3 seconds
 
     When I click the "Renamed" button
