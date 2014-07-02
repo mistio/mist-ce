@@ -19,7 +19,7 @@ def images_counter_loaded(context, counter_number, seconds):
         else:
             sleep(2)
 
-    assert False, u'The counter did not say that %s images were loaded' % counter_number
+    assert False, u'The counter did not say that more than %s images were loaded' % counter_number
 
 
 @then(u'Images list should be loaded within {seconds} seconds')

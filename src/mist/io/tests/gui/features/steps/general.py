@@ -8,6 +8,7 @@ def visit(context):
     context.browser.get(context.mist_url)
     splash_loadout(context)
 
+
 @when(u'I wait for {seconds} seconds')
 def wait(context, seconds):
     sleep(int(seconds))
@@ -15,12 +16,19 @@ def wait(context, seconds):
 
 @when(u'I click the "{text}" button')
 def click_button(context, text):
-    splash_loadout(context)
-    buttons = context.browser.find_elements_by_class_name("ui-btn")
-    for button in buttons:
-        if button.text == text:
-            button.click()
-            return
+    try:
+        buttons = context.browser.find_elements_by_class_name("ui-btn")
+        for button in buttons:
+            if button.text == text:
+                button.click()
+                return
+    except:
+        sleep(1)
+        buttons = context.browser.find_elements_by_class_name("ui-btn")
+        for button in buttons:
+            if button.text == text:
+                button.click()
+                return
 
     assert False, u'Could not find %s button' % text
 

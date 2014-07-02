@@ -17,8 +17,9 @@ Feature: Actions for Keys
 
   @keys-actions
   Scenario: Rename Key
+    Then Keys counter should be greater than 0 within 10 seconds
     When I click the button that contains "Keys"
-    When I click the button that contains "FirstKey"
+    And I click the button that contains "FirstKey"
     And I click the "Rename" button
     And I fill "RenamedFirstKey" as new key name
     And I click the "Save" button inside the "Rename key" popup
@@ -27,8 +28,9 @@ Feature: Actions for Keys
 
   @keys-actions
   Scenario: Delete Key
+    Then Keys counter should be greater than 0 within 10 seconds
     When I click the button that contains "Keys"
-    When I click the button that contains "RenamedFirstKey"
+    And I click the button that contains "RenamedFirstKey"
     And I click the "Delete" button
     And I click the "Yes" button
     Then "RenamedFirstKey" key should be deleted
