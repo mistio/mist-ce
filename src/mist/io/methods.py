@@ -4,7 +4,7 @@ import json
 import requests
 import subprocess
 import re
-from time import sleep
+from time import sleep, time
 from datetime import datetime
 from hashlib import sha256
 from StringIO import StringIO
@@ -1886,6 +1886,7 @@ def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
         'users': users,
         'pub_ips': pub_ips,
         'priv_ips': priv_ips,
+        'timestamp': time(),
     }
 
 
