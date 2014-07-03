@@ -230,11 +230,9 @@ define('app/models/machine', ['ember'],
                 if (!this.backend || !this.backend.enabled) return;
                 if (data.uptime) {
                     uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
-                    this.set('uptimeChecked', Date.now());
+                    this.set('uptimeChecked', new Date(data.timestamp * 1000));
                     this.set('uptimeFromServer', uptime);
                     this.set('probed', true);
-                } else {
-                    this.set('uptimeChecked', -Date.now());
                 }
                 this.set('cores', data.cores || this.cores);
                 this.set('users', data.users || this.users);
