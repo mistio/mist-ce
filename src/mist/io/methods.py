@@ -2181,3 +2181,22 @@ $sudo /opt/mistio-collectd/collectd.sh restart
     shell.disconnect()
 
     return {'metric_id': None, 'stdout': stdout}
+
+
+def get_stats(user, backend_id, machine_id, start, stop, step):
+    try:
+        resp = requests.get(
+            "%s/backends/%s/machines/%s/stats" % (config.CORE_URI,
+                                                  backend_id, machine_id),
+            params={'start': start, 'stop': stop, 'step': step, 'v': 2},
+            headers={'Authorization': get_auth_header(user)},
+            verify=config.SSL_VERIFY
+        )
+    except requests.exceptions.SSLError as exc:
+        log.error("%r", exc)
+        raise SSLError()
+    if resp.status_code == 200:
+        return resp.json()
+    else:
+        log.error("Error getting stats %d:%s", resp.status_code, resp.text)
+        raise ServiceUnavailableError(resp.text)

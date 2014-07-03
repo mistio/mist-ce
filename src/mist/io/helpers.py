@@ -167,7 +167,7 @@ def amqp_subscribe(exchange, queue, callback):
     connection = Connection()
     channel = connection.channel()
     channel.exchange_declare(exchange=exchange, type='fanout')
-    channel.queue_declare(queue)
+    channel.queue_declare(queue, exclusive=True)
     channel.queue_bind(queue, exchange)
     channel.basic_consume(queue=queue,
                           callback=json_parse_dec(callback),
@@ -175,9 +175,10 @@ def amqp_subscribe(exchange, queue, callback):
     try:
         while True:
             channel.wait()
-    except:
+    except Exception as exc:
         channel.close()
         connection.close()
+        amqp_log("SUBSCRIPTION ENDED: %s %s %r" % (exchange, queue, exc))
 
 
 def _amqp_user_exchange(user):

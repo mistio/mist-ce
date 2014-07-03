@@ -657,23 +657,14 @@ def update_monitoring(request):
 
 @view_config(route_name='stats', request_method='GET', renderer='json')
 def get_stats(request):
-    core_uri = config.CORE_URI
-    user = user_from_request(request)
-    data = {key: request.params.get(key) for key in ('start', 'stop', 'step')}
-    data['v'] = 2
-    try:
-        resp = requests.get(config.CORE_URI + request.path,
-                           params=data,
-                           headers={'Authorization': get_auth_header(user)},
-                           verify=config.SSL_VERIFY)
-    except requests.exceptions.SSLError as exc:
-        log.error("%r", exc)
-        raise SSLError()
-    if resp.status_code == 200:
-        return resp.json()
-    else:
-        log.error("Error getting stats %d:%s", resp.status_code, resp.text)
-        raise ServiceUnavailableError(resp.text)
+    return methods.get_stats(
+        user_from_request(request),
+        request.matchdict['backend'],
+        request.matchdict['machine'],
+        request.params.get('start'),
+        request.params.get('stop'),
+        request.params.get('step')
+    )
 
 
 @view_config(route_name='metrics', request_method='GET',
@@ -932,7 +923,7 @@ def list_supported_providers(request):
     @return: Return all of our SUPPORTED PROVIDERS
     """
     return {'supported_providers': config.SUPPORTED_PROVIDERS}
-    
+
 
 @view_config(route_name='socketio')
 def socketio(request):

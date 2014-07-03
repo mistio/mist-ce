@@ -160,8 +160,6 @@ define( 'app', [
 
         $(document).bind('mobileinit', function() {
             warn('Mobile Init');
-
-            $('#splash').fadeOut(650);
             $.mobile.ajaxEnabled = false;
             $.mobile.pushStateEnabled = false;
             $.mobile.linkBindingEnabled = false;
@@ -845,6 +843,7 @@ function initSocket() {
     Mist.socket.on('list_backends', function(backends){
         Mist.backendsController._setContent(backends);
         Mist.backendsController.set('loading', false);
+        $('#splash').fadeOut(650);
     });
 
     Mist.socket.on('list_keys', function(keys){

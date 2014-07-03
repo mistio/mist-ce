@@ -21,12 +21,15 @@ from socketio.namespace import BaseNamespace
 try:
     from mist.core.helpers import user_from_request
     from mist.core import config
+    from mist.core.methods import get_stats
 except ImportError:
     from mist.io.helpers import user_from_request
     from mist.io import config
+    from mist.io.methods import get_stats
 
 from mist.io.helpers import amqp_subscribe_user
-from mist.io.helpers import get_auth_header
+from mist.io.helpers import amqp_log
+from mist.io.methods import notify_user
 
 from mist.io import methods
 from mist.io import tasks
@@ -104,36 +107,21 @@ class MistNamespace(BaseNamespace):
         #self.probe_greenlet = self.spawn(probe_subscriber, self)
 
     def on_stats(self, backend_id, machine_id, start, stop, step, requestID):
-        print "STATS!!", backend_id, machine_id, start, stop, step
-        data = {'start': start-50,
-                'stop': stop+50,
-                'step': step/1000}
-        data['v'] = 2
         try:
-            uri = config.CORE_URI + '/backends/' + backend_id + '/machines/' + machine_id + '/stats'
-            print uri
-            resp = requests.get(uri,
-                                params=data,
-                                headers={'Authorization': get_auth_header(self.user)},
-                                verify=config.SSL_VERIFY)
-        except requests.exceptions.SSLError as exc:
-            print exc
-            #log.error("%r", exc)
-
-        if resp.ok:
-            ret = {}
-            ret['metrics'] = resp.json()
-            ret['backend_id'] = backend_id
-            ret['machine_id'] = machine_id
-            ret['start'] = start
-            ret['stop'] = stop
-            ret['requestID'] = requestID
-            self.emit('stats', ret)
-            print ret
-        else:
-            print "Error getting stats %d:%s", resp.status_code, resp.text
-            from mist.io.methods import notify_user
-            notify_user(self.user, "Error getting stats %d:%s" % (resp.status_code, resp.text))
+            data = get_stats(self.user, backend_id, machine_id,
+                             start - 50, stop + 50, step / 1000)
+        except Exception as exc:
+            amqp_log("Error getting stats: %r" % exc)
+            return
+        ret = {
+            'backend_id': backend_id,
+            'machine_id': machine_id,
+            'start': start,
+            'stop': stop,
+            'requestID': requestID,
+            'metrics': data,
+        }
+        self.emit('stats', ret)
 
     def process_update(self, msg):
         routing_key = msg.delivery_info.get('routing_key')
@@ -141,10 +129,8 @@ class MistNamespace(BaseNamespace):
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
                                'list_machines', 'list_locations']):
             self.emit(routing_key, msg.body)
-            if routing_key == 'probe':
-                args = (self.user.email, msg.body['backend_id'],
-                        msg.body['machine_id'], msg.body['host'])
-            elif routing_key == 'list_machines':
+            if routing_key == 'list_machines':
+                # probe newly discovered machines
                 machines = msg.body['machines']
                 backend_id = msg.body['backend_id']
                 for machine in machines:
@@ -155,8 +141,11 @@ class MistNamespace(BaseNamespace):
                                  machine.get('public_ips', []))
                     if not ips:
                         continue
-                    tasks.probe.delay(self.user.email, backend_id,
-                                      machine['id'], ips[0])
+                    cached = tasks.Probe().smart_delay(
+                        self.user.email, backend_id, machine['id'], ips[0]
+                    )
+                    if cached is not None:
+                        self.emit('probe', cached)
         elif routing_key == 'update':
             self.user.refresh()
             sections = msg.body
@@ -166,8 +155,7 @@ class MistNamespace(BaseNamespace):
                                                     self)
             if 'keys' in sections:
                 self.keys_greenlet.kill()
-                self.keys_greenlet = self.spawn(list_keys_from_socket,
-                                                self)
+                self.keys_greenlet = self.spawn(list_keys_from_socket, self)
             if 'monitoring' in sections:
                 self.monitoring_greenlet.kill()
                 self.monitoring_greenlet = self.spawn(check_monitoring_from_socket,
@@ -204,12 +192,15 @@ def list_backends_from_socket(namespace):
     user = namespace.user
     backends = methods.list_backends(user)
     namespace.emit('list_backends', backends)
-    print "New backends: ", backends
-
-    for task in (tasks.list_machines, tasks.list_sizes,
-                 tasks.list_locations, tasks.list_images):
+    for key, task in (('list_machines', tasks.ListMachines),
+                      ('list_images', tasks.ListImages),
+                      ('list_sizes', tasks.ListSizes),
+                      ('list_locations', tasks.ListLocations)):
         for backend_id in user.backends:
-            task.delay(user.email, backend_id)
+            if user.backends[backend_id].enabled:
+                cached = task().smart_delay(user.email, backend_id)
+                if cached is not None:
+                    namespace.emit(key, cached)
 
 
 def list_keys_from_socket(namespace):
