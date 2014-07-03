@@ -1949,6 +1949,7 @@ def assoc_metric(user, backend_id, machine_id, metric_id):
     if not resp.ok:
         log.error("Error in assoc_metric %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
+    trigger_session_update(user.email, [])
 
 
 def disassoc_metric(user, backend_id, machine_id, metric_id):
@@ -1967,6 +1968,7 @@ def disassoc_metric(user, backend_id, machine_id, metric_id):
     if not resp.ok:
         log.error("Error in disassoc_metric %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
+    trigger_session_update(user.email, [])
 
 
 def update_metric(user, metric_id, name=None, unit=None,
@@ -1990,6 +1992,7 @@ def update_metric(user, metric_id, name=None, unit=None,
     if not resp.ok:
         log.error("Error updating metric %d:%s", resp.status_code, resp.text)
         raise BadRequestError(resp.text)
+    trigger_session_update(user.email, [])
 
 
 def deploy_python_plugin(user, backend_id, machine_id, plugin_id,
