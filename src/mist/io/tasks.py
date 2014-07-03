@@ -161,9 +161,10 @@ class UserTask(Task):
             return
         kwargs['seq_id'] = seq_id
         self.memcache.set(cache_key, cached)
-        amqp_log("%s: will rerun in %d secs [%s]" % (id_str, self.ut_fresh,
-                                                     seq_id))
-        self.apply_async(args, kwargs, countdown=self.ut_fresh)
+        if self.ut_keep_fresh:
+            amqp_log("%s: will rerun in %d secs [%s]" % (id_str, self.ut_fresh,
+                                                         seq_id))
+            self.apply_async(args, kwargs, countdown=self.ut_fresh)
 
     def run_inner(self, *args, **kwargs):
         raise NotImplementedError()
