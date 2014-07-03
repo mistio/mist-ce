@@ -192,13 +192,13 @@ def list_backends_from_socket(namespace):
     user = namespace.user
     backends = methods.list_backends(user)
     namespace.emit('list_backends', backends)
-    for key, task in (('list_machines', tasks.ListMachines),
-                      ('list_images', tasks.ListImages),
-                      ('list_sizes', tasks.ListSizes),
-                      ('list_locations', tasks.ListLocations)):
+    for key, task in (('list_machines', tasks.ListMachines()),
+                      ('list_images', tasks.ListImages()),
+                      ('list_sizes', tasks.ListSizes()),
+                      ('list_locations', tasks.ListLocations())):
         for backend_id in user.backends:
             if user.backends[backend_id].enabled:
-                cached = task().smart_delay(user.email, backend_id)
+                cached = task.smart_delay(user.email, backend_id)
                 if cached is not None:
                     namespace.emit(key, cached)
 
