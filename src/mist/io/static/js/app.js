@@ -848,9 +848,9 @@ function initSocket() {
             if (Mist.debugSocket)
                 info(data);
             cb(data);
-        }
+        };
         sockon.apply(Mist.socket, arguments);
-    }
+    };
 
     Mist.keysController.load();
     Mist.backendsController.load();
@@ -874,11 +874,7 @@ function initSocket() {
     });
 
     Mist.socket.on('stats', function(data){
-        warn('stats!');
-        warn(data);
-        //var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
         Mist.monitoringController.request.updateMetrics(data.metrics, data.start, data.stop, data.requestID);
-
     });
 }
 

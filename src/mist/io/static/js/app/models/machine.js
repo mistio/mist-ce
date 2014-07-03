@@ -173,46 +173,18 @@ define('app/models/machine', ['ember'],
             },
 
             probe: function(keyId, callback) {
-
                 if (!this.backend.enabled) return;
                 if (this.state != 'running') return;
-
-                // If there are many pending requests, reschedule for a bit later
-                if ($.active > 4) {
-                    Ember.run.later(this, function() {
-                        this.probe(keyId, callback);
-                    }, 1000);
-                    return;
-                }
-
                 var that = this;
                 Mist.backendsController.probeMachine(that, keyId, function(success) {
-
-
-                    // If the function was not called by the scheduled probing
-                    // procedure, then only call the callback function
                     if (callback) {
-
                         callback(success);
-
-                    } else {
-
-                        if (success) { // Reprobe in 100 seconds on success
-                            Ember.run.later(function() {
-                                that.probe(keyId);
-                            }, 100000);
-                        } else {  // Reprobe with double interval on failure
-                            Ember.run.later(function() {
-                                that.probe(keyId);
-                                that.set('probeInterval', that.probeInterval * 2);
-                            }, that.probeInterval);
-                        }
                     }
-
                 });
             },
 
             probeSuccess: function(data) {
+
                 function loadToColor(load, cores) {
                     var weightedLoad = load / cores;
                     if (weightedLoad > 1.2) {
@@ -251,11 +223,11 @@ define('app/models/machine', ['ember'],
                     this.notifyPropertyChange('private_ips');
                 }
                 if (data.loadavg) {
+                    this.set('loadavg', data.loadavg);
                     this.set('loadavg1', loadToColor(data.loadavg[0], data.cores));
                     this.set('loadavg5', loadToColor(data.loadavg[1], data.cores));
                     this.set('loadavg15', loadToColor(data.loadavg[2], data.cores));
                 }
-                this.set('loadavg', data.loadavg || this.loadavg);
                 this.set('loss', data.packets_loss || this.loss);
                 this.set('latency', data.rtt_avg ? Math.floor(data.rtt_avg) : this.latency);
                 Mist.backendsController.trigger('onMachineProbe', this);
