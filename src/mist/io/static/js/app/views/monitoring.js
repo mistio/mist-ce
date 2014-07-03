@@ -74,7 +74,8 @@ define('app/views/monitoring', ['app/views/templated'],
                 $(window).on('resize', function () {
                     var newWidth = $('#GraphsArea').width() - 2;
                     that.graphs.forEach(function (graph) {
-                        graph.view.changeWidth(newWidth);
+                        if (graph.view)
+                            graph.view.changeWidth(newWidth);
                     });
                 });
             },
