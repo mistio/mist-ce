@@ -852,49 +852,8 @@ function initSocket() {
         sockon.apply(Mist.socket, arguments);
     }
 
-    Mist.socket.on('list_backends', function(backends){
-        Mist.backendsController._setContent(backends);
-        Mist.backendsController.set('loading', false);
-        $('#splash').fadeOut(650);
-    });
-
     Mist.keysController.load();
-
-    Mist.socket.on('list_sizes', function(data){
-        var backend = Mist.backendsController.getBackend(data.backend_id);
-        if (backend) {
-            backend.get('sizes')._setContent(data.sizes);
-            backend.get('sizes').set('loading', false);
-        }
-    });
-
-    Mist.socket.on('list_locations', function(data){
-        var backend = Mist.backendsController.getBackend(data.backend_id);
-        if (backend) {
-            backend.get('locations')._setContent(data.locations);
-            backend.get('locations').set('loading', false);
-            backend.set('loadingLocations', false);
-        }
-    });
-
-    Mist.socket.on('list_images', function(data){
-        var backend = Mist.backendsController.getBackend(data.backend_id);
-        if (backend) {
-            backend.get('images')._setContent(data.images);
-            backend.get('images').set('loading', false);
-        }
-    });
-
-    Mist.socket.on('list_machines', function(data){
-        Ember.run.next(function(){
-            var backend = Mist.backendsController.getBackend(data.backend_id);
-            if (backend) {
-                backend.get('machines')._updateContent(data.machines);
-                backend.get('machines').set('loading', false);
-            }
-
-        });
-    });
+    Mist.backendsController.load();
 
     Mist.socket.on('probe', onProbe);
     Mist.socket.on('ping', onProbe);
