@@ -175,7 +175,8 @@ def amqp_subscribe(exchange, queue, callback):
     try:
         while True:
             channel.wait()
-    except:
+    except Exception as exc:
+        amqp_log("SUBSCRIPTION ENDED: %s %s %r" % (exchange, queue, exc))
         channel.close()
         connection.close()
 

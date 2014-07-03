@@ -129,10 +129,8 @@ class MistNamespace(BaseNamespace):
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
                                'list_machines', 'list_locations']):
             self.emit(routing_key, msg.body)
-            if routing_key == 'probe':
-                args = (self.user.email, msg.body['backend_id'],
-                        msg.body['machine_id'], msg.body['host'])
-            elif routing_key == 'list_machines':
+            if routing_key == 'list_machines':
+                # probe newly discovered machines
                 machines = msg.body['machines']
                 backend_id = msg.body['backend_id']
                 for machine in machines:
@@ -143,8 +141,11 @@ class MistNamespace(BaseNamespace):
                                  machine.get('public_ips', []))
                     if not ips:
                         continue
-                    tasks.probe.delay(self.user.email, backend_id,
-                                      machine['id'], ips[0])
+                    cached = tasks.Probe().smart_delay(
+                        self.user.email, backend_id, machine['id'], ips[0]
+                    )
+                    if cached is not None:
+                        self.emit('probe', cached)
         elif routing_key == 'update':
             self.user.refresh()
             sections = msg.body
@@ -154,8 +155,7 @@ class MistNamespace(BaseNamespace):
                                                     self)
             if 'keys' in sections:
                 self.keys_greenlet.kill()
-                self.keys_greenlet = self.spawn(list_keys_from_socket,
-                                                self)
+                self.keys_greenlet = self.spawn(list_keys_from_socket, self)
             if 'monitoring' in sections:
                 self.monitoring_greenlet.kill()
                 self.monitoring_greenlet = self.spawn(check_monitoring_from_socket,
@@ -192,12 +192,14 @@ def list_backends_from_socket(namespace):
     user = namespace.user
     backends = methods.list_backends(user)
     namespace.emit('list_backends', backends)
-    print "New backends: ", backends
-
-    for task in (tasks.list_machines, tasks.list_sizes,
-                 tasks.list_locations, tasks.list_images):
+    for key, task in (('list_machines', tasks.ListMachines),
+                      ('list_images', tasks.ListImages),
+                      ('list_sizes', tasks.ListSizes),
+                      ('list_locations', tasks.ListLocations)):
         for backend_id in user.backends:
-            task.delay(user.email, backend_id)
+            cached = task().smart_delay(user.email, backend_id)
+            if cached is not None:
+                namespace.emit(key, cached)
 
 
 def list_keys_from_socket(namespace):
