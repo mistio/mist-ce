@@ -37,6 +37,7 @@ import mist.io.exceptions as exceptions
 from mist.io.exceptions import *
 
 from mist.io.helpers import get_auth_header, params_from_request
+from mist.io.helpers import trigger_session_update
 from mist.io.sockio import MistNamespace, ShellNamespace
 
 
@@ -263,7 +264,7 @@ def toggle_backend(request):
     with user.lock_n_load():
         user.backends[backend_id].enabled = bool(int(new_state))
         user.save()
-
+    trigger_session_update(user.email, [])
     return OK
 
 
