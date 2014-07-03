@@ -2040,7 +2040,7 @@ def deploy_python_plugin(user, backend_id, machine_id, plugin_id,
     sftp = shell.ssh.open_sftp()
 
     tmp_dir = "/tmp/mist-python-plugin-%d" % random.randrange(2 ** 20)
-    stdout = shell.command(
+    retval, stdout = shell.command(
 """
 sudo=$(command -v sudo)
 mkdir -p %s
@@ -2068,7 +2068,7 @@ print("READ FUNCTION TEST PASSED")
     sftp.putfo(StringIO(read_function), "%s/%s_read.py" % (tmp_dir, plugin_id))
     sftp.putfo(StringIO(test_code), "%s/test.py" % tmp_dir)
 
-    test_out = shell.command("$(command -v sudo) python %s/test.py" % tmp_dir)
+    retval, test_out = shell.command("$(command -v sudo) python %s/test.py" % tmp_dir)
     stdout += test_out
 
     if not test_out.strip().endswith("READ FUNCTION TEST PASSED"):
@@ -2097,13 +2097,15 @@ collectd.register_read(read_callback)
        'plugin_instance': plugin_id}
 
     sftp.putfo(StringIO(plugin), "%s/%s.py" % (tmp_dir, plugin_id))
-    stdout += shell.command("""
+    retval, cmd_out = shell.command("""
 cd /opt/mistio-collectd/
 $(command -v sudo) mv %s/%s.py plugins/mist-python/
 $(command -v sudo) chown -R root plugins/mist-python/
 """ % (tmp_dir, plugin_id)
     )
 
+    stdout += cmd_out
+    
     # Prepare collectd.conf
     script = """
 sudo=$(command -v sudo)
@@ -2153,7 +2155,8 @@ fi
 $sudo rm -rf %(tmp_dir)s
 """ % {'plugin_id': plugin_id, 'tmp_dir': tmp_dir}
 
-    stdout += shell.command(script)
+    retval, cmd_out = shell.command(script)
+    stdout += cmd_out
     if stdout.strip().endswith("ERROR DEPLOYING PLUGIN"):
         raise BadRequestError(stdout)
 
@@ -2194,7 +2197,7 @@ echo "Restarting collectd"
 $sudo /opt/mistio-collectd/collectd.sh restart
 """ % {'plugin_id': plugin_id}
 
-    stdout = shell.command(script)
+    retval, stdout = shell.command(script)
 
     shell.disconnect()
 
