@@ -8,7 +8,7 @@ if __name__ == '__main__':
         port = int(sys.argv[1])
     else:
         port = 8081
-    app = get_app('uwsgi1.ini')
+    app = get_app('uwsgi.ini')
     print 'Listening on port http://127.0.0.1:%s' % port
     # TODO: try flashsocket transport
     SocketIOServer(('127.0.0.1', port), app, policy_server=False,
