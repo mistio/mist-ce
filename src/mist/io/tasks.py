@@ -38,63 +38,6 @@ libcloud.security.CA_CERTS_PATH.append(cert_path)
 ## log = logging.getLogger(__name__)
 
 
-def task_wrap(key, expires, interval):
-    def dec(func):
-        @functools.wraps(func)
-        def wrapped(self, email, *args, **kwargs):
-            args = [email] + list(args)
-            # seq_id is an id for the sequence of periodic tasks, to avoid
-            # running multiple concurrent sequences of the same task with the
-            # same arguments. it is empty on first run, constant afterwards
-            seq_id = kwargs.pop('seq_id', '')
-
-            # check cache
-            id_str = json.dumps([key, args, kwargs])
-            cache_key = b64encode(id_str)
-            cache = MemcacheClient(["127.0.0.1:11211"])
-            cached = cache.get(cache_key)
-            cached_seq_id = ''
-            if cached:
-                age = time() - cached['timestamp']
-                cached_seq_id = cached['seq_id']
-                if seq_id and seq_id != cached_seq_id:
-                    # another sequence of series has started, stop iterating
-                    return
-                if not seq_id and age < expires:
-                    # first run, fresh result, will emit
-                    amqp_log("%s: cache hit, age=%.1fs" % (id_str, age))
-                    ok = amqp_publish_user(email, routing_key=key,
-                                           data=cached['payload'])
-                    if not ok:
-                        # Task: i don't why i bother
-                        amqp_log("%s: exchange closed" % id_str)
-                        return
-                    if age < interval:
-                        # then this task has already been rescheduled for sure
-                        # and the result is very fresh
-                        return
-            assert not seq_id or seq_id == cached_seq_id
-
-            # if not cached, or expired, or not really that fresh,
-            # then actually run the task
-            data = func(self, *args, **kwargs)
-            cached = {'timestamp': time(), 'payload': data, 'seq_id': seq_id}
-            ok = amqp_publish_user(email, routing_key=key, data=data)
-            if not ok:
-                # echange closed, no one gives a shit, stop repeating, why try?
-                amqp_log("%s: exchange closed" % id_str)
-                return
-            if not seq_id:
-                # this task is called externally, not a rerun
-                seq_id = uuid4().hex
-            kwargs['seq_id'] = seq_id
-            cache.set(cache_key, cached)
-            amqp_log("%s: will rerun in %d secs" % (id_str, interval))
-            self.apply_async(args, kwargs, countdown=interval)
-        return wrapped
-    return dec
-
-
 class UserTask(Task):
     abstract = True
     ut_key = ''
