@@ -858,10 +858,7 @@ function initSocket() {
         $('#splash').fadeOut(650);
     });
 
-    Mist.socket.on('list_keys', function(keys){
-        Mist.keysController._setContent(keys);
-        Mist.keysController.set('loading', false);
-    });
+    Mist.keysController.load();
 
     Mist.socket.on('list_sizes', function(data){
         var backend = Mist.backendsController.getBackend(data.backend_id);
