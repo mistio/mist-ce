@@ -43,6 +43,7 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                 if (!rules) return;
                 var that = this;
                 Ember.run(function() {
+                    var newRules = [];
                     for (var ruleId in rules) {
                         var rule = rules[ruleId];
                         rule.id = ruleId;
@@ -50,8 +51,9 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
                         rule.operator = that.getOperatorByTitle(rules[ruleId].operator);
                         rule.metric = Mist.metricsController.getMetric(rules[ruleId].metric);
                         rule.machine = Mist.backendsController.getMachine(rule.machine, rule.backend) || rule.machine;
-                        that.content.pushObject(Rule.create(rule));
+                        newRules.push(Rule.create(rule));
                     }
+                    that.set('content', newRules);
                 });
             },
 
