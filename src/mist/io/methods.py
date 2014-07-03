@@ -2105,12 +2105,11 @@ $(command -v sudo) chown -R root plugins/mist-python/
     )
 
     stdout += cmd_out
-    
+
     # Prepare collectd.conf
     script = """
 sudo=$(command -v sudo)
 cd /opt/mistio-collectd/
-$sudo mkdir -p plugins/mist-python/conf
 
 if ! grep '^Include.*plugins/mist-python' collectd.conf; then
     echo "Adding Include line in collectd.conf for plugins/mist-python/include.conf"
@@ -2120,17 +2119,15 @@ else
 fi
 if [ ! -f plugins/mist-python/include.conf ]; then
     echo "Generating plugins/mist-python/include.conf"
-    $sudo su -c 'echo -e "<LoadPlugin python>\n    Globals true\n</LoadPlugin>\n" > plugins/mist-python/include.conf'
+    $sudo su -c 'echo -e "<LoadPlugin python>\n    Globals true\n</LoadPlugin>\n\n\n<Plugin python>\n    ModulePath \\"/opt/mistio-collectd/plugins/mist-python/\\"\n    LogTraces true\n    Interactive false\n</Plugin>\n" > plugins/mist-python/include.conf'
 else
     echo "plugins/mist-python/include.conf already exists, continuing"
 fi
 
-echo "Generating config file for plugin"
-$sudo su -c 'echo -e "<Plugin python>\n    ModulePath \\"/opt/mistio-collectd/plugins/mist-python/\\"\n    LogTraces true\n    Interactive false\n    Import %(plugin_id)s\n</Plugin>\n" > plugins/mist-python/conf/%(plugin_id)s.conf'
-echo "Adding Include line for plugin conf in plugins/mist-python/include.conf"
-if ! grep '^Include.*%(plugin_id)s' plugins/mist-python/include.conf; then
+echo "Adding Import line for plugin in plugins/mist-python/include.conf"
+if ! grep '^ *Import %(plugin_id)s *$' plugins/mist-python/include.conf; then
     $sudo cp plugins/mist-python/include.conf plugins/mist-python/include.conf.backup
-    $sudo su -c 'echo Include \\"/opt/mistio-collectd/plugins/mist-python/conf/%(plugin_id)s.conf\\" >> plugins/mist-python/include.conf'
+    $sudo sed -i 's/^<\/Plugin>$/    Import %(plugin_id)s\\n<\/Plugin>/' plugins/mist-python/include.conf
     echo "Checking that python plugin is available"
     if $sudo /usr/bin/collectd -C /opt/mistio-collectd/collectd.conf -t 2>&1 | grep 'Could not find plugin python'; then
         echo "WARNING: collectd python plugin is not installed, will attempt to install it"
@@ -2143,6 +2140,7 @@ if ! grep '^Include.*%(plugin_id)s' plugins/mist-python/include.conf; then
     fi
     echo "Restarting collectd"
     $sudo /opt/mistio-collectd/collectd.sh restart
+    sleep 2
     if ! $sudo /opt/mistio-collectd/collectd.sh status; then
         echo "Restarting collectd failed, restoring include.conf"
         $sudo cp plugins/mist-python/include.conf.backup plugins/mist-python/include.conf
@@ -2150,7 +2148,7 @@ if ! grep '^Include.*%(plugin_id)s' plugins/mist-python/include.conf; then
         echo "ERROR DEPLOYING PLUGIN"
     fi
 else
-    echo "Plugin conf already included in include.conf"
+    echo "Plugin already imported in include.conf"
 fi
 $sudo rm -rf %(tmp_dir)s
 """ % {'plugin_id': plugin_id, 'tmp_dir': tmp_dir}
@@ -2190,7 +2188,7 @@ sudo=$(command -v sudo)
 cd /opt/mistio-collectd/
 
 echo "Removing Include line for plugin conf from plugins/mist-python/include.conf"
-$sudo grep -v 'Include \\"/opt/mistio-collectd/plugins/mist-python/conf/%(plugin_id)s.conf\\"' plugins/mist-python/include.conf > /tmp/include.conf
+$sudo grep -v 'Import %(plugin_id)s$' plugins/mist-python/include.conf > /tmp/include.conf
 $sudo mv /tmp/include.conf plugins/mist-python/include.conf
 
 echo "Restarting collectd"
