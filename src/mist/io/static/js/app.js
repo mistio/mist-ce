@@ -899,13 +899,13 @@ function initSocket() {
         });
     });
 
-    Mist.socket.on('probe', function(data){
-        Ember.run.next(function(){
-            var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
-            if (machine)
-                machine.probeSuccess(data.result);
-        });
-    });
+    Mist.socket.on('probe', onProbe);
+    Mist.socket.on('ping', onProbe);
+    function onProbe(data) {
+        var machine = Mist.backendsController.getMachine(data.machine_id, data.backend_id);
+        if (machine)
+            machine.probeSuccess(data.result);
+    }
 
     Mist.socket.on('monitoring',function(data){
         Mist.monitoringController._updateMonitoringData(data);
