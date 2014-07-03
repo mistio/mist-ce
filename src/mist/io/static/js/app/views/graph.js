@@ -52,12 +52,11 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             load: function () {
 
-                if (this.graph.pendingCreation)
-                    return;
-
                 Ember.run.next(this, function () {
 
                     this.graph.set('view', this);
+                    if (this.graph.pendingCreation)
+                        return;
                     this.graph.on('onDataUpdate', this, 'updateData');
 
                     this.setupGraph();
@@ -124,6 +123,9 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             clearAnimation: function(stopCurrent) {
 
+                if (this.graph.pendingCreation)
+                    return;
+
                 this.svg.value.line.animation.clearBuffer(stopCurrent);
                 this.svg.value.area.animation.clearBuffer(stopCurrent);
                 this.svg.axis.x.legend.animation.clearBuffer(stopCurrent);
@@ -147,6 +149,9 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             * @param {number} width - Graph new width
             */
             changeWidth: function (width) {
+
+                if (this.graph.pendingCreation)
+                    return;
 
                 if (!this.svg.canvas)
                     return;
