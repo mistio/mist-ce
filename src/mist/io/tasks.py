@@ -202,7 +202,7 @@ class UserTask(Task):
         kwargs['seq_id'] = seq_id
         self.memcache.set(cache_key, cached)
         if self.polling:
-            amqp_log("%s: will rerun in %d secs [%s]" % (id_str, 
+            amqp_log("%s: will rerun in %d secs [%s]" % (id_str,
                                                          self.result_fresh,
                                                          seq_id))
             self.apply_async(args, kwargs, countdown=self.result_fresh)
@@ -246,7 +246,7 @@ class ListLocations(UserTask):
         from mist.io import methods
         user = user_from_email(email)
         locations = methods.list_locations(user, backend_id)
-        return {'backend_id': backend_id, 'locations': locations}     
+        return {'backend_id': backend_id, 'locations': locations}
 
 
 class ListImages(UserTask):
@@ -285,33 +285,43 @@ class ListMachines(UserTask):
             user.save()
 
 
-class Probe(UserTask):
+class ProbeSSH(UserTask):
     abstract = False
     task_key = 'probe'
     result_expires = 60 * 60 * 2
     result_fresh = 60 * 2
     polling = True
 
-    def execute(self, email, backend_id, machine_id, host,
-                  key_id='', ssh_user=''):
+    def execute(self, email, backend_id, machine_id, host):
         user = user_from_email(email)
         from mist.io import methods
-        try:
-            res = methods.probe(user, backend_id, machine_id, host,
-                                key_id=key_id, ssh_user=ssh_user)
-        except Exception as e:
-            amqp_log("%s: %r" % (id_str, repr(e)))
-            raise
-        data = {'backend_id': backend_id,
+        res = methods.probe_ssh_only(user, backend_id, machine_id, host)
+        return {'backend_id': backend_id,
                 'machine_id': machine_id,
                 'host': host,
                 'result': res}
-        if 'uptime' not in res:
-            amqp_publish_user(email, routing_key='probe', data=data)
-            raise Exception("Probe didn't get uptime")
-        return data
 
     def error_rerun_handler(self, exc, errors, *args, **kwargs):
         # Retry in 2, 4, 8, 16, 32, 32, 32, 32, 32, 32 minutes
         t = 60 * 2 ** (len(errors) + 1)
         return t if t < 60 * 32 else 60 * 32
+
+
+class Ping(UserTask):
+    abstract = False
+    task_key = 'ping'
+    result_expires = 60 * 60 * 2
+    result_fresh = 60 * 15
+    polling = True
+
+    def execute(self, email, backend_id, machine_id, host):
+        from mist.io import methods
+        res = methods.ping(host)
+        return {'backend_id': backend_id,
+                'machine_id': machine_id,
+                'host': host,
+                'result': res}
+
+    def error_rerun_handler(self, exc, errors, *args, **kwargs):
+        return self.result_fresh
+

@@ -127,7 +127,7 @@ class MistNamespace(BaseNamespace):
         routing_key = msg.delivery_info.get('routing_key')
         print "Got %s" % routing_key
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
-                               'list_machines', 'list_locations']):
+                               'list_machines', 'list_locations', 'ping']):
             self.emit(routing_key, msg.body)
             if routing_key == 'list_machines':
                 # probe newly discovered machines
@@ -141,11 +141,16 @@ class MistNamespace(BaseNamespace):
                                  machine.get('public_ips', []))
                     if not ips:
                         continue
-                    cached = tasks.Probe().smart_delay(
+                    cached = tasks.ProbeSSH().smart_delay(
                         self.user.email, backend_id, machine['id'], ips[0]
                     )
                     if cached is not None:
                         self.emit('probe', cached)
+                    cached = tasks.Ping().smart_delay(
+                        self.user.email, backend_id, machine['id'], ips[0]
+                    )
+                    if cached is not None:
+                        self.emit('ping', cached)
         elif routing_key == 'update':
             self.user.refresh()
             sections = msg.body
