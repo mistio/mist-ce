@@ -147,17 +147,18 @@ define('app/controllers/backends', ['app/models/backend', 'app/models/rule', 'em
                 Mist.ajax.POST('/backends/' + machine.backend.id + '/machines/' + machine.id + '/probe', {
                     'host': host,
                     'key': keyId
-                }).success(machine.probeSuccess).error(function(message) {
+                }).success(function (data) {
+                    machine.probeSuccess(data);
+                }).error(function(message) {
                     if (!machine.backend || !machine.backend.enabled) return;
                     if (key) Mist.notificationController.notify(message);
                 }).complete(function(success, data) {
                     if (!machine.backend || !machine.backend.enabled) return;
-                    if (key) {
+                    if (key)
                         key.set('probing', false);
-                    }
                     machine.set('probing', false);
                     that.trigger('onMachineProbe');
-                    if (callback) callback(!!uptime, data);
+                    if (callback) callback(!!data.uptime, data);
                 });
             },
 
