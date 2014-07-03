@@ -202,6 +202,7 @@ define( 'app', [
 
         // Globals
 
+        App.set('debugSocket', false);
         App.set('isCore', !!IS_CORE);
         App.set('authenticated', AUTH || IS_CORE);
         App.set('ajax', new AJAX(CSRF_TOKEN));
@@ -839,6 +840,17 @@ function initSocket() {
     Mist.set('socket', sock);
 
     Mist.socket.emit('ready');
+
+    var sockon = Mist.socket.on;
+    Mist.socket.on = function (event, callback)  {
+        var cb = callback;
+        callback = function (data) {
+            if (Mist.debugSocket)
+                info(data);
+            cb(data);
+        }
+        sockon.apply(Mist.socket, arguments);
+    }
 
     Mist.socket.on('list_backends', function(backends){
         Mist.backendsController._setContent(backends);
