@@ -1821,7 +1821,25 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
 
     # start pinging the machine in the background
     log.info("Starting ping in the background for host %s", host)
-    ping = subprocess.Popen(["ping", "-c", "10", "-i", "0.4", "-W", "1", "-q", host], stdout=subprocess.PIPE)
+    ping = subprocess.Popen(
+        ["ping", "-c", "10", "-i", "0.4", "-W", "1", "-q", host],
+        stdout=subprocess.PIPE
+    )
+    try:
+        ret = probe_ssh_only(user, backend_id, machine_id, host,
+                             key_id=key_id, ssh_user=ssh_user)
+    except:
+        log.warning("SSH failed when probing, let's see what ping has to say.")
+        ret = {}
+    ping_out = ping.stdout.read()
+    ping.wait()
+    log.info("ping output: %s" % ping_out)
+    ret.update(parse_ping(ping_out))
+    return ret
+
+
+def probe_ssh_only(user, backend_id, machine_id, host, key_id='', ssh_user=''):
+    """Ping and SSH to machine and collect various metrics."""
 
     # run SSH commands
     command = (
@@ -1847,42 +1865,38 @@ def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
 
     log.warn('probing with key %s' % key_id)
 
-    try:
-        cmd_output = ssh_command(user, backend_id, machine_id,
-                                 host, command, key_id=key_id)
-    except:
-        log.warning("SSH failed when probing, let's see what ping has to say.")
-        cmd_output = ""
+    cmd_output = ssh_command(user, backend_id, machine_id,
+                             host, command, key_id=key_id)
+    cmd_output = cmd_output.replace('\r\n','').split('--------')
+    log.warn(cmd_output)
+    uptime_output = cmd_output[1]
+    loadavg = re.split('load averages?: ', uptime_output)[1].split(', ')
+    users = re.split(' users?', uptime_output)[0].split(', ')[-1].strip()
+    uptime = cmd_output[2]
+    cores = cmd_output[3]
+    ips = re.findall('inet addr:(\S+)', cmd_output[4])
+    if '127.0.0.1' in ips:
+        ips.remove('127.0.0.1')
+    pub_ips = find_public_ips(ips)
+    priv_ips = [ip for ip in ips if ip not in pub_ips]
+    return {
+        'uptime': uptime,
+        'loadavg': loadavg,
+        'cores': cores,
+        'users': users,
+        'pub_ips': pub_ips,
+        'priv_ips': priv_ips,
+    }
 
+
+def ping(host):
+    ping = subprocess.Popen(
+        ["ping", "-c", "10", "-i", "0.4", "-W", "1", "-q", host],
+        stdout=subprocess.PIPE
+    )
     ping_out = ping.stdout.read()
     ping.wait()
-    log.info("ping output: %s" % ping_out)
-
-    ret = {}
-    if cmd_output:
-        cmd_output = cmd_output.replace('\r\n','').split('--------')
-        log.warn(cmd_output)
-        uptime_output = cmd_output[1]
-        loadavg = re.split('load averages?: ', uptime_output)[1].split(', ')
-        users = re.split(' users?', uptime_output)[0].split(', ')[-1].strip()
-        uptime = cmd_output[2]
-        cores = cmd_output[3]
-        ips = re.findall('inet addr:(\S+)', cmd_output[4])
-        if '127.0.0.1' in ips:
-            ips.remove('127.0.0.1')
-        pub_ips = find_public_ips(ips)
-        priv_ips = [ip for ip in ips if ip not in pub_ips]
-        ret = {'uptime': uptime,
-               'loadavg': loadavg,
-               'cores': cores,
-               'users': users,
-               'pub_ips': pub_ips,
-               'priv_ips': priv_ips
-               }
-
-    ret.update(parse_ping(ping_out))
-
-    return ret
+    return parse_ping(ping_out)
 
 
 def find_public_ips(ips):
