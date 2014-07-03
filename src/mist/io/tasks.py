@@ -147,12 +147,39 @@ class UserTask(Task):
                 amqp_log("%s: fresh task submitted with fresh cached result "
                          ", dropping" % id_str)
                 return
+        cached_err = self.memcache.get(cache_key + 'error')
+        if cached_err:
+            # task has been failing recently
+            if seq_id != cached_err['seq_id']:
+                # other sequence of task already handling this error flow
+                return
         if not seq_id:
             # this task is called externally, not a rerun, create a seq_id
             amqp_log("%s: fresh task submitted [%s]" % (id_str, seq_id))
             seq_id = uuid4().hex
         # actually run the task
-        data = self.run_inner(*args, **kwargs)
+        try:
+            data = self.run_inner(*args, **kwargs)
+        except Exception as exc:
+            # error handling
+            now = time()
+            if not cached_err:
+                cached_err = {'seq_id': seq_id, 'timestamps': []}
+            cached_err['timestamps'].append(now)
+            x0 = cached_err['timestamps'][0]
+            rel_points = [x - x0 for x in cached_err['timestamps']]
+            rerun = self.error_rerun_handler(rel_points, *args, **kwargs)
+            if rerun is not None:
+                self.memcache.set(cache_key + 'error', cached_err)
+                kwargs['seq_id'] = seq_id
+                self.apply_async(args, kwargs, countdown=rerun)
+            else:
+                self.memcache.delete(cache_key + 'error')
+            amqp_log("%s: error %r, rerun %s" % (id_str, exc, rerun))
+            return
+        else:
+            if cached_err:
+                self.memcache.delete(cache_key + 'error')
         cached = {'timestamp': time(), 'payload': data, 'seq_id': seq_id}
         ok = amqp_publish_user(email, routing_key=self.ut_key, data=data)
         if not ok:
@@ -168,6 +195,11 @@ class UserTask(Task):
 
     def run_inner(self, *args, **kwargs):
         raise NotImplementedError()
+
+    def error_rerun_handler(self, points, *args, **kwargs):
+        """Accepts a list of relative time points of consecutive errors,
+        returns number of seconds to retry in or None to stop retrying."""
+        return None
 
 
 @app.task
@@ -199,11 +231,19 @@ class Probe(UserTask):
                                 key_id=key_id, ssh_user=ssh_user)
         except Exception as e:
             amqp_log("%s: %r" % (id_str, repr(e)))
-            return
-        return {'backend_id': backend_id,
+            raise
+        data = {'backend_id': backend_id,
                 'machine_id': machine_id,
                 'host': host,
                 'result': res}
+        if 'uptime' not in res:
+            amqp_publish_user(email, routing_key='probe', data=data)
+            raise Exception("Probe didn't get uptime")
+        return data
+
+    def error_rerun_handler(self, points, *args, **kwargs):
+        t = 60 * 2 ** (len(points) + 1)  # 0, 2, 4, 8, 16, 32, 32, 32, 32 ...
+        return t if t < 60 * 32 else 60 * 32
 
 
 @app.task(bind=True, default_retry_delay=3*60)
@@ -276,6 +316,11 @@ class ListSizes(UserTask):
         sizes = methods.list_sizes(user, backend_id)
         return {'backend_id': backend_id, 'sizes': sizes}
 
+    def error_rerun_handler(self, points, *args, **kwargs):
+        if len(points) < 3:
+            return [30, 120, 60 * 10][len(points) - 1]
+        return None
+
 
 class ListLocations(UserTask):
     abstract = False
@@ -289,6 +334,11 @@ class ListLocations(UserTask):
         user = user_from_email(email)
         locations = methods.list_locations(user, backend_id)
         return {'backend_id': backend_id, 'locations': locations}
+
+    def error_rerun_handler(self, points, *args, **kwargs):
+        if len(points) < 3:
+            return [30, 120, 60 * 10][len(points) - 1]
+        return None
 
 
 class ListImages(UserTask):
@@ -304,6 +354,11 @@ class ListImages(UserTask):
         images = methods.list_images(user, backend_id)
         return {'backend_id': backend_id, 'images': images}
 
+    def error_rerun_handler(self, points, *args, **kwargs):
+        if len(points) < 3:
+            return [30, 120, 60 * 10][len(points) - 1]
+        return None
+
 
 class ListMachines(UserTask):
     abstract = False
@@ -317,3 +372,11 @@ class ListMachines(UserTask):
         user = user_from_email(email)
         machines = methods.list_machines(user, backend_id)
         return {'backend_id': backend_id, 'machines': machines}
+
+    def error_rerun_handler(self, points, email, backend_id):
+        if len(points) < 6:
+            return self.ut_fresh
+        user = user_from_email(email)
+        with user.lock_n_load():
+            user.backends[backend_id].enabled = False
+            user.save()

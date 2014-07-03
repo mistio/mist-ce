@@ -197,9 +197,10 @@ def list_backends_from_socket(namespace):
                       ('list_sizes', tasks.ListSizes),
                       ('list_locations', tasks.ListLocations)):
         for backend_id in user.backends:
-            cached = task().smart_delay(user.email, backend_id)
-            if cached is not None:
-                namespace.emit(key, cached)
+            if user.backends[backend_id].enabled:
+                cached = task().smart_delay(user.email, backend_id)
+                if cached is not None:
+                    namespace.emit(key, cached)
 
 
 def list_keys_from_socket(namespace):
