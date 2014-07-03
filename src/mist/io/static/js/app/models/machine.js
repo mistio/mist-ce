@@ -226,7 +226,7 @@ define('app/models/machine', ['ember'],
                     } else {
                         return 'cold';
                     }
-                }                
+                }
                 if (!this.backend || !this.backend.enabled) return;
                 if (data.uptime) {
                     uptime = parseFloat(data.uptime.split(' ')[0]) * 1000;
@@ -236,8 +236,8 @@ define('app/models/machine', ['ember'],
                 } else {
                     this.set('uptimeChecked', -Date.now());
                 }
-                this.set('cores', data.cores);
-                this.set('users', data.users);
+                this.set('cores', data.cores || this.cores);
+                this.set('users', data.users || this.users);
                 if (data.pub_ips) {
                     data.pub_ips.forEach(function (ip) {
                         if (this.public_ips instanceof Array)
@@ -257,9 +257,9 @@ define('app/models/machine', ['ember'],
                     this.set('loadavg5', loadToColor(data.loadavg[1], data.cores));
                     this.set('loadavg15', loadToColor(data.loadavg[2], data.cores));
                 }
-                this.set('loadavg', data.loadavg);
-                this.set('loss', data.packets_loss);
-                this.set('latency', Math.floor(data.rtt_avg));
+                this.set('loadavg', data.loadavg || this.loadavg);
+                this.set('loss', data.packets_loss || this.loss);
+                this.set('latency', data.rtt_avg ? Math.floor(data.rtt_avg) : this.latency);
                 Mist.backendsController.trigger('onMachineProbe', this);
             },
             /**
