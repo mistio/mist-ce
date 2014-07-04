@@ -657,11 +657,8 @@ Terminal.fixAndroid = function(document) {
     textarea.focus();
   }, 1000);
 
-  on(Terminal._textarea, 'keydown', textAreaChange);
-  on(Terminal._textarea, 'change', textAreaChange);
-
-  function textAreaChange(ev){
-      console.log(ev);
+  on(Terminal._textarea, 'keydown', function(ev){
+    // console.log(ev);
     if (Terminal._textarea.value == Terminal.oldValue)
       return true;
 
@@ -682,7 +679,7 @@ Terminal.fixAndroid = function(document) {
     range.select();
 
     return true;
-  };
+  });
 };
 
 /**

@@ -347,6 +347,27 @@ ul.checkbox-list li label {
     margin-top: 0px;
 }
 
+#message-box-popup {
+    width: auto !important;
+    max-width: 600px;
+}
+
+#message-box-popup h1 {
+    padding: 12px;
+}
+
+#message-box-popup p {
+    white-space: pre;
+    background: #444 !important;
+    color: rgb(240, 240, 240);
+    text-shadow: none;
+    font-family: monospace;
+    overflow: scroll;
+    max-height: 400px !important;
+    padding: 0 10px;
+}
+
+
 /* Confirmation popup
 -----------------------------------------------------------------------------------------------------------*/
 #confirmation-popup {

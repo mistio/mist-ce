@@ -37,7 +37,10 @@ from mist.io.shell import Shell
 
 import logging
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(msg)s")
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s.%(msecs)d %(levelname)s %(module)s - %(funcName)s: %(message)s', 
+                    datefmt="%Y-%m-%d %H:%M:%S")
+
 log = logging.getLogger(__name__)
 
 
@@ -130,7 +133,7 @@ class MistNamespace(BaseNamespace):
 
     def process_update(self, msg):
         routing_key = msg.delivery_info.get('routing_key')
-        log.info("Got %s" % routing_key)
+        log.info("Got %s", routing_key)
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
                                'list_machines', 'list_locations', 'ping']):
             self.emit(routing_key, msg.body)
