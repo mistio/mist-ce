@@ -52,12 +52,11 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             load: function () {
 
-                if (this.graph.pendingCreation)
-                    return;
-
                 Ember.run.next(this, function () {
 
                     this.graph.set('view', this);
+                    if (this.graph.pendingCreation)
+                        return;
                     this.graph.on('onDataUpdate', this, 'updateData');
 
                     this.setupGraph();
@@ -124,6 +123,9 @@ define('app/views/graph', ['app/views/templated', 'd3'],
 
             clearAnimation: function(stopCurrent) {
 
+                if (this.graph.pendingCreation)
+                    return;
+
                 this.svg.value.line.animation.clearBuffer(stopCurrent);
                 this.svg.value.area.animation.clearBuffer(stopCurrent);
                 this.svg.axis.x.legend.animation.clearBuffer(stopCurrent);
@@ -147,6 +149,9 @@ define('app/views/graph', ['app/views/templated', 'd3'],
             * @param {number} width - Graph new width
             */
             changeWidth: function (width) {
+
+                if (this.graph.pendingCreation)
+                    return;
 
                 if (!this.svg.canvas)
                     return;
@@ -438,7 +443,7 @@ define('app/views/graph', ['app/views/templated', 'd3'],
                 var maxValue = d3.max(this.displayedData, function(d) { return d.value; });
                 var minValue = d3.min(this.displayedData, function(d) { return d.value; });
                 var fixedMaxValue = maxValue || 1;
-                var fixedMinValue = minValue || 0;
+                var fixedMinValue = minValue < 0 ? minValue : 0;
 
                 // Set Possible min/max x & y values
                 this.scale.x.domain(d3.extent(this.displayedData , function(d) { return d.time;  }));

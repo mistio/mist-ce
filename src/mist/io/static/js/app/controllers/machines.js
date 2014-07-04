@@ -35,7 +35,7 @@ define('app/controllers/machines', ['app/models/machine'],
 
             load: function() {
                 if (!this.backend.enabled) return;
-                this.set('loading', true);                
+                this.set('loading', true);
             },
 
 

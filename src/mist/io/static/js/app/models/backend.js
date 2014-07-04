@@ -46,7 +46,10 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
              */
 
             load: function () {
+
                 Ember.run(this, function () {
+
+                    this.set('isBareMetal', this.provider == 'bare_metal');
 
                     // Add controllers
                     this.sizes = SizesController.create({backend: this, content: []});
@@ -162,7 +165,7 @@ define('app/models/backend', ['app/controllers/machines', 'app/controllers/image
                     this.images.clear();
                     this.machines.clear();
                     this.locations.clear();
-                } 
+                }
             },
 
             _updateSizeCount: function () {

@@ -127,7 +127,7 @@ class MistNamespace(BaseNamespace):
         routing_key = msg.delivery_info.get('routing_key')
         print "Got %s" % routing_key
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
-                               'list_machines', 'list_locations']):
+                               'list_machines', 'list_locations', 'ping']):
             self.emit(routing_key, msg.body)
             if routing_key == 'list_machines':
                 # probe newly discovered machines
@@ -141,11 +141,16 @@ class MistNamespace(BaseNamespace):
                                  machine.get('public_ips', []))
                     if not ips:
                         continue
-                    cached = tasks.Probe().smart_delay(
+                    cached = tasks.ProbeSSH().smart_delay(
                         self.user.email, backend_id, machine['id'], ips[0]
                     )
                     if cached is not None:
                         self.emit('probe', cached)
+                    cached = tasks.Ping().smart_delay(
+                        self.user.email, backend_id, machine['id'], ips[0]
+                    )
+                    if cached is not None:
+                        self.emit('ping', cached)
         elif routing_key == 'update':
             self.user.refresh()
             sections = msg.body
@@ -192,13 +197,13 @@ def list_backends_from_socket(namespace):
     user = namespace.user
     backends = methods.list_backends(user)
     namespace.emit('list_backends', backends)
-    for key, task in (('list_machines', tasks.ListMachines),
-                      ('list_images', tasks.ListImages),
-                      ('list_sizes', tasks.ListSizes),
-                      ('list_locations', tasks.ListLocations)):
+    for key, task in (('list_machines', tasks.ListMachines()),
+                      ('list_images', tasks.ListImages()),
+                      ('list_sizes', tasks.ListSizes()),
+                      ('list_locations', tasks.ListLocations())):
         for backend_id in user.backends:
             if user.backends[backend_id].enabled:
-                cached = task().smart_delay(user.email, backend_id)
+                cached = task.smart_delay(user.email, backend_id)
                 if cached is not None:
                     namespace.emit(key, cached)
 

@@ -14,7 +14,7 @@ define(['app/models/key'],
             content: [],
             selectedKeys: [],
 
-            loading: false,
+            loading: true,
             addingKey: false,
             keyRequest: false,
             renamingKey: false,
@@ -31,10 +31,14 @@ define(['app/models/key'],
              *
              */
 
+
             load: function() {
                 var that = this;
-                this.set('loading', true);
-            }.on('init'),
+                Mist.socket.on('list_keys', function (keys) {
+                    that._setContent(keys);
+                    that.set('loading', false);
+                });
+            },
 
 
             /**
@@ -220,13 +224,6 @@ define(['app/models/key'],
              *  Pseudo-Private Methods
              *
              */
-
-            _reload: function() {
-                Ember.run.later(this, function() {
-                    this.load();
-                }, 2000);
-            },
-
 
             _setContent: function(keys) {
                 var that = this;
