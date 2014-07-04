@@ -207,6 +207,21 @@ def amqp_subscribe_user(user, queue, callback):
     amqp_subscribe(_amqp_user_exchange(user), queue, callback)
 
 
+def amqp_user_listening(user):
+    connection = Connection()
+    channel = connection.channel()
+    try:
+        channel.exchange_declare(exchange=_amqp_user_exchange(user),
+                                 type='fanout', passive=True)
+    except AmqpNotFound:
+        return False
+    else:
+        return True
+    finally:
+        channel.close()
+        connection.close()
+
+
 def trigger_session_update(email, sections=['backends','keys','monitoring']):
     amqp_publish_user(email, routing_key='update', data=sections)
 
