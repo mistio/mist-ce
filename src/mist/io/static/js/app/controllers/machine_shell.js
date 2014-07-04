@@ -63,34 +63,44 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 ).popup( "option", "dismissible", false ).popup('open');
 
                 $(window).on('resize', function(){
+                    var w, h, fontSize=18, wc, hc;
 
-                    if (window.innerWidth/(window.innerHeight-virtualKeyboardHeight()) > 1.5){
-                        warn('height constrained');
-                        var height = window.innerHeight - Math.max(virtualKeyboardHeight()+70, 160);
-                        var h = Math.max(height, 130);
-                        var fontSize = Math.max(h/33, 6);
-                    } else {
-                        warn('width constrained');
-                        var width = window.innerWidth - 40;
-                        var w = Math.max(width, 200);
-                        var fontSize = Math.max((w-60)/47.6 , 6);
+                    while (true){
+                        wc = hc = false;
+                        $('.fontSizeTest').css('font-size', fontSize + 'px');
+
+                        w = $('.fontSizeTest').width() * 80;
+
+                        if (w > window.innerWidth - 46){
+                            wc = true;
+                            warn('width constrained');
+                        }
+
+                        h = $('.fontSizeTest').height() * 24;
+
+                        if (h > window.innerHeight-virtualKeyboardHeight() - 135){ //42.4 + 16 + 8 + 1 + 11.2 + 20 + 11.2 + 1 + 8 + 16
+                            hc = true;
+                            warn('height constrained');
+                        }
+
+                        if ((!wc && !hc) || fontSize <= 6){
+                            break;
+                        }
+
+                        fontSize -= 1;
                     }
 
                     $('#shell-return').css('font-size', fontSize + 'px');
-                    var lineHeight = $('#shell-return').css('line-height').split('px')[0];
-                    fontSize = $('#shell-return').css('font-size').split('px')[0];
 
-                    // Set width & height
-                    $('#shell-return').height(24*lineHeight+20); // Makes some sense, right?
-                    $('#shell-return').width(fontSize*47.6+40); // Just because!
+                    $('#shell-return').width(w);
+                    $('#shell-return').height(h);
 
                     // Put popup it in the center
                     $('#machine-shell-popup-popup').css('left', ((window.innerWidth - $('#machine-shell-popup-popup').width())/2)+'px');
 
+
                     if (Terminal._textarea){ // Tap should trigger resize on touchscreens
-                        $('#shell-return').bind('tap',function(){
-                            $(window).trigger('resize');
-                        });
+
                     } else
                         $('.terminal').focus();
 
@@ -137,9 +147,17 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 term.write('Connecting to ' + host + '...\r\n');
                 Mist.set('term', term);
 
+
+
                 if(Terminal._textarea) {
                     // iOS virtual keyboard focus fix
                     $(document).off('focusin');
+
+                    if (Mist.term && Mist.term.isAndroid){
+                        $('#shell-return').bind('tap',function(){
+                            $(window).trigger('resize');
+                        });
+                    }
                 }
 
             },

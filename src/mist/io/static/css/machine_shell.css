@@ -1,6 +1,10 @@
 
 /* Shell View CSS
 -----------------------------------------------------------------------------------------------------------*/
+.fontSizeTest {
+    display: none;
+}
+
 #machine-shell-popup .ui-content {
     background: transparent;
 }
@@ -24,7 +28,7 @@
     color: #efeff1;
     padding: 6px;
     text-shadow: none;
-    overflow-y: scroll !important;
+    overflow: hidden !important;
     max-width: 98%;
 }
 
@@ -44,7 +48,7 @@ span.terminal-cursor {
     right: 0;
     bottom: 0;
     position: absolute;
-    
+
 }
 #machine-shell-popup .ajax-loader {
     display: inline-block;
