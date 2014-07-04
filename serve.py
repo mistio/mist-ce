@@ -12,4 +12,4 @@ if __name__ == '__main__':
     print 'Listening on port http://127.0.0.1:%s' % port
     # TODO: try flashsocket transport
     SocketIOServer(('127.0.0.1', port), app, policy_server=False,
-                   transports=['websocket', 'xhr-polling']).serve_forever()
+                   transports=['xhr-polling']).serve_forever()

@@ -81,11 +81,6 @@ class MistNamespace(BaseNamespace):
         self.probes = {}
         self.channel = None
         self._old_machines = set()
-        
-    def disconnect(self, silent=False):
-        import pdb;pdb.set_trace()
-        super(MistNamespace, self).disconnect(silent)
-        
 
     def spawn_later(self, delay, fn, *args, **kwargs):
         """Spawn a new process, attached to this Namespace after no less than

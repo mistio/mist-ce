@@ -358,6 +358,11 @@ ul.checkbox-list li label {
     width: 127px !important;
 }
 
+.ui-controlgroup-horizontal .ui-controlgroup-controls .ui-btn.ui-last-child {
+    border-right-width: 2px;
+    margin-left: -1px;
+}
+
 #confirmation-popup p {
     text-align: center;
 }
