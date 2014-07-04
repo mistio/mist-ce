@@ -30,6 +30,7 @@ except ImportError:  # Standalone mist.io
     cert_path = "cacert.pem"
 
 from mist.io.helpers import amqp_publish_user
+from mist.io.helpers import amqp_user_listening
 from mist.io.helpers import amqp_log
 
 # libcloud certificate fix for OS X
@@ -147,6 +148,17 @@ class UserTask(Task):
         seq_id = kwargs.pop('seq_id', '')
         id_str = json.dumps([self.task_key, args, kwargs])
         cache_key = b64encode(id_str)
+        cached_err = self.memcache.get(cache_key + 'error')
+        if cached_err:
+            # task has been failing recently
+            if seq_id != cached_err['seq_id']:
+                # other sequence of task already handling this error flow
+                return
+        if not amqp_user_listening(email):
+            # noone is waiting for result, stop trying, but flush cached erros
+            if cached_err:
+                self.memcache.delete(cache_key + 'error')
+            return
         # check cache to stop iteration if other sequence has started
         cached = self.memcache.get(cache_key)
         if cached:
@@ -159,12 +171,6 @@ class UserTask(Task):
             elif not seq_id and time() - cached['timestamp'] < self.result_fresh:
                 amqp_log("%s: fresh task submitted with fresh cached result "
                          ", dropping" % id_str)
-                return
-        cached_err = self.memcache.get(cache_key + 'error')
-        if cached_err:
-            # task has been failing recently
-            if seq_id != cached_err['seq_id']:
-                # other sequence of task already handling this error flow
                 return
         if not seq_id:
             # this task is called externally, not a rerun, create a seq_id
