@@ -70,17 +70,16 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                         $('.fontSizeTest').css('font-size', fontSize + 'px');
 
                         w = $('.fontSizeTest').width() * 80;
-
-                        if (w > window.innerWidth - 46){
-                            wc = true;
-                            warn('width constrained');
-                        }
-
                         h = $('.fontSizeTest').height() * 24;
 
+                        if (w > window.innerWidth - 46){
+                            // log('width constrained');
+                            wc = true;
+                        }
+
                         if (h > window.innerHeight-virtualKeyboardHeight() - 135){ //42.4 + 16 + 8 + 1 + 11.2 + 20 + 11.2 + 1 + 8 + 16
+                            // log('height constrained');
                             hc = true;
-                            warn('height constrained');
                         }
 
                         if ((!wc && !hc) || fontSize <= 6){
@@ -92,16 +91,13 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
 
                     $('#shell-return').css('font-size', fontSize + 'px');
 
-                    $('#shell-return').width(w);
+                    $('#shell-return').width(w+2);
                     $('#shell-return').height(h);
 
                     // Put popup it in the center
                     $('#machine-shell-popup-popup').css('left', ((window.innerWidth - $('#machine-shell-popup-popup').width())/2)+'px');
 
-
-                    if (Terminal._textarea){ // Tap should trigger resize on touchscreens
-
-                    } else
+                    if (!Terminal._textarea)
                         $('.terminal').focus();
 
                     // Make the hidden textfield focusable on android
@@ -109,12 +105,6 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                         $(Terminal._textarea).width('100%');
                         $(Terminal._textarea).height($('#shell-return').height() + 60);
                     }
-                    /*
-                    if (Terminal._textarea){
-                        $('html, body').animate({
-                                            scrollTop: $('#shell-return').offset().top+(Mist.term.y-5)*$('#shell-return').height()/24
-                                        }, 500);
-                    }*/
 
                     return true;
                 });
@@ -147,17 +137,17 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 term.write('Connecting to ' + host + '...\r\n');
                 Mist.set('term', term);
 
-
-
                 if(Terminal._textarea) {
                     // iOS virtual keyboard focus fix
                     $(document).off('focusin');
 
+                    // Tap should trigger resize on Android for virtual keyboard to appear
                     if (Mist.term && Mist.term.isAndroid){
                         $('#shell-return').bind('tap',function(){
                             $(window).trigger('resize');
                         });
                     }
+                    $(Terminal._textarea).show();
                 }
 
             },
@@ -171,6 +161,9 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 $(window).off('resize');
                 this._clear();
                 $('.ui-footer').show(500);
+                if (Terminal._textarea)
+                    $(Terminal._textarea).hide();
+
             },
 
             /**
