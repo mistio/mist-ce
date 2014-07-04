@@ -655,7 +655,7 @@ def list_machines(user, backend_id):
 
 @core_wrapper
 def create_machine(user, backend_id, key_id, machine_name, location_id,
-                   image_id, size_id, script, image_extra, disk, image_name, 
+                   image_id, size_id, script, image_extra, disk, image_name,
                    size_name, location_name, ssh_port=22):
 
     """Creates a new virtual machine on the specified backend.
@@ -711,7 +711,7 @@ def create_machine(user, backend_id, key_id, machine_name, location_id,
             try:
                 ssh_port = int(node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort'])
             except:
-                pass       
+                pass
     elif conn.type in [Provider.RACKSPACE_FIRST_GEN,
                      Provider.RACKSPACE]:
         node = _create_machine_rackspace(conn, public_key, script, machine_name,
@@ -1726,7 +1726,7 @@ def enable_monitoring(user, backend_id, machine_id,
         return ret_dict
     stdout = ''
     if not no_ssh:
-        async_ssh_command.delay(user, backend_id, machine_id, host, command)
+        async_ssh_command.delay(user.email, backend_id, machine_id, host, command)
 
     trigger_session_update(user.email, ['monitoring'])
 
@@ -1791,7 +1791,7 @@ def _undeploy_collectd(user, backend_id, machine_id, host):
         "sleep 2; $sudo kill -9 `cat /opt/mistio-collectd/collectd.pid`"
     )
 
-    return async_ssh_command.delay(user, backend_id, machine_id, host, command)
+    async_ssh_command.delay(user.email, backend_id, machine_id, host, command)
 
 
 def probe(user, backend_id, machine_id, host, key_id='', ssh_user=''):
@@ -1904,7 +1904,7 @@ def notify_user(user, title, message="", **kwargs):
     payload = {'title': title, 'message': message}
     payload.update(kwargs)
     amqp_publish_user(user, routing_key='notify', data=payload)
-    
+
     try: # Send email in multi-user env
         from mist.core.helpers import send_email
         send_email("[mist.io] %s" % title, message, user.email)

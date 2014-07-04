@@ -41,8 +41,9 @@ log = logging.getLogger(__name__)
 
 
 @app.task
-def ssh_command(user, backend_id, machine_id, host, command,
+def ssh_command(email, backend_id, machine_id, host, command,
                       key_id=None, username=None, password=None, port=22):
+    user = user_from_email(email)
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, backend_id, machine_id,
                                            key_id, username, password, port)
