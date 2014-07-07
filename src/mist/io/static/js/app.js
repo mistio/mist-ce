@@ -757,7 +757,7 @@ define( 'app', [
 
 /**
  *
- *  Socket wrapper constructor
+ *  Socket wrapper
  *
  */
 
@@ -833,11 +833,11 @@ function Socket (args) {
 
             // ii. overide callback to first print the debugging
             // information and then call the original callback function
-            // (which is saved in cb variabled)
+            // (which is saved in cb variable)
             callback = function (data) {
                 if (Mist.debugSocket)
-                    info(Mist.prettyTime(new Date()),
-                        ' | ', namespace + '/' + event, data);
+                    info(Mist.prettyTime(new Date()) +
+                        ' | ' + namespace + '/' + event + ' ', data);
                 cb(data);
             };
 
