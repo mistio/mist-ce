@@ -699,14 +699,33 @@ define( 'app', [
 
             if (initialized) return;
 
+            // This process basically overrides the .on()
+            // function to enable debugging info on every
+            // response received by the client
+
+            // 1. keep a copy of the original socket.on() function
             var sockon = socket.on;
+
+            // 2. overide the socket's .on() function
             socket.on = function (event, callback)  {
+
+                // i. keep a copy of the original callback
+                // This is the function written by us to handle
+                // the response data
                 var cb = callback;
+
+                // ii. overide callback to first print the debugging
+                // information and then call the original callback function
+                // (which is saved in cb variabled)
                 callback = function (data) {
                     if (Mist.debugSocket)
-                        info(Mist.prettyTime(new Date()), ' | ', namespace + '/' + event, data);
+                        info(Mist.prettyTime(new Date()),
+                            ' | ', namespace + '/' + event, data);
                     cb(data);
                 };
+
+                // iii. Call the original .on() function using the modified
+                // callback function
                 sockon.apply(socket, arguments);
             };
         }
