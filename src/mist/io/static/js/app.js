@@ -937,6 +937,27 @@ function initSocket(sock, initialized) {
         if (machine)
             machine.probeSuccess(data.result);
     }
+    Mist.socket.on('monitoring',function(data){
+        Mist.monitoringController._updateMonitoringData(data);
+        Mist.monitoringController.trigger('onMonitoringDataUpdate');
+        Mist.backendsController.set('checkedMonitoring', true);
+    });
+
+    Mist.socket.on('notify',function(data){
+        if (data.message) {
+            warn(data);
+            Mist.notificationController.set('msgHeader', data.title);
+            Mist.notificationController.set('msgCmd', data.message.substr(1));
+            Mist.notificationController.showMessagebox();
+        } else {
+            Mist.notificationController.notify(data.title);
+        }
+
+    });
+
+    Mist.socket.on('stats', function(data){
+        Mist.monitoringController.request.updateMetrics(data.metrics, data.start, data.stop, data.requestID);
+    });
 }
 
 
