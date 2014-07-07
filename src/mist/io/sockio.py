@@ -84,6 +84,7 @@ class MistNamespace(BaseNamespace):
         self.probes = {}
         self.channel = None
         self._old_machines = set()
+        self.update_greenlet = None
 
     def spawn_later(self, delay, fn, *args, **kwargs):
         """Spawn a new process, attached to this Namespace after no less than
@@ -107,6 +108,8 @@ class MistNamespace(BaseNamespace):
 
     def on_ready(self):
         log.info("Ready to go!")
+        if self.update_greenlet is not None:
+            self.update_greenlet.kill()
         self.update_greenlet = self.spawn(update_subscriber, self)
 
         self.monitoring_greenlet = self.spawn_later(2, check_monitoring_from_socket, self)
