@@ -41,17 +41,18 @@ define('app/controllers/rules', ['app/models/rule', 'ember'],
 
             setContent: function(rules) {
                 if (!rules) return;
-                var that = this;
-                Ember.run(function() {
-                    for (var ruleId in rules) {
-                        var rule = rules[ruleId];
+                Ember.run(this, function() {
+                    var newRules = [];
+                    forIn(this, rules, function (rule, ruleId) {
                         rule.id = ruleId;
-                        rule.actionToTake = rules[ruleId].action;
-                        rule.operator = that.getOperatorByTitle(rules[ruleId].operator);
-                        rule.metric = Mist.metricsController.getMetric(rules[ruleId].metric);
-                        rule.machine = Mist.backendsController.getMachine(rule.machine, rule.backend) || rule.machine;
-                        that.content.pushObject(Rule.create(rule));
-                    }
+                        rule.actionToTake = rule.action;
+                        rule.operator = this.getOperatorByTitle(rule.operator);
+                        rule.metric = Mist.metricsController.getMetric(rule.metric);
+                        rule.machine = Mist.backendsController.getMachine(
+                            rule.machine, rule.backend) || rule.machine;
+                        newRules.push(Rule.create(rule));
+                    });
+                    this.set('content', newRules);
                 });
             },
 
