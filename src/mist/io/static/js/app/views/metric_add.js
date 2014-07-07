@@ -80,7 +80,7 @@ define('app/views/metric_add', ['app/views/popup'],
 
                 customClicked: function () {
                     if (Mist.metricAddController.machine.probed)
-                        this.addCustomMetrc();
+                        this.addCustomMetric();
                     else
                         this.showSSHError();
                 }
