@@ -57,7 +57,7 @@ define('app/views/metric_add', ['app/views/popup'],
                 var that = this;
                 Mist.notificationController.set('msgHeader', 'SSH key missing');
                 Mist.notificationController.set('msgPart1', 'Please add a key to ' +
-                    ' your server to deploy custom metrics to deploy custom plugins.');
+                    ' your server to deploy custom metrics.');
                 Mist.notificationController.set('msgCallback', function () {
                     Ember.run.later(function () {
                         that.open();

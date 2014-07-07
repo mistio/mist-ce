@@ -63,7 +63,9 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 ).popup( "option", "dismissible", false ).popup('open');
 
                 $(window).on('resize', function(){
-                    var w, h, fontSize=18, wc, hc;
+                    var w, h, // Estimated width & height
+                        wc, hc;  // Width - Height constrained
+                        fontSize=18; // Initial font size before adjustment
 
                     while (true){
                         wc = hc = false;
@@ -91,9 +93,6 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
 
                     $('#shell-return').css('font-size', fontSize + 'px');
 
-                    $('#shell-return').width(w+2);
-                    $('#shell-return').height(h);
-
                     // Put popup it in the center
                     $('#machine-shell-popup-popup').css('left', ((window.innerWidth - $('#machine-shell-popup-popup').width())/2)+'px');
 
@@ -108,13 +107,14 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
 
                     return true;
                 });
-                $(window).trigger('resize');
 
                 var term = new Terminal({
                   cols: 80,
                   rows: 24,
                   screenKeys: true
                 });
+
+
                 term.on('data', function(data) {
                     Mist.shell.emit('shell_data', data);
                 });
@@ -136,6 +136,10 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember'],
                 });
                 term.write('Connecting to ' + host + '...\r\n');
                 Mist.set('term', term);
+
+                Ember.run.next(function(){
+                    $(window).trigger('resize');
+                });
 
                 if(Terminal._textarea) {
                     // iOS virtual keyboard focus fix

@@ -356,7 +356,14 @@ ul.checkbox-list li label {
     padding: 12px;
 }
 
-#message-box-popup p {
+#message-box-popup .ui-btn {
+    width: 100%;
+    margin: 0px;
+    padding: 0.7em 0;
+}
+
+#message-box-popup #message-cmd {
+    min-height: 100px;
     white-space: pre;
     background: #444 !important;
     color: rgb(240, 240, 240);

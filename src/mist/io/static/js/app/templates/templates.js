@@ -2811,10 +2811,20 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
 Ember.TEMPLATES["messagebox/html"] = Ember.Handlebars.template(function anonymous(Handlebars,depth0,helpers,partials,data) {
 this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
-  var buffer = '', hashTypes, hashContexts, escapeExpression=this.escapeExpression;
+  var buffer = '', stack1, hashTypes, hashContexts, escapeExpression=this.escapeExpression, self=this;
 
+function program1(depth0,data) {
+  
+  var buffer = '', hashTypes, hashContexts;
+  data.buffer.push("\n            <p id=\"message-cmd\">");
+  hashTypes = {};
+  hashContexts = {};
+  data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.notificationController.msgCmd", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
+  data.buffer.push("</p>\n            ");
+  return buffer;
+  }
 
-  data.buffer.push("<div id=\"message-box-screen\" class=\"ui-popup-screen ui-screen-hidden ui-overlay-a\"></div>\n<div id=\"message-box-popup-popup\"\n     class=\"ui-popup-container ui-popup-hidden large-popup ui-body-inherit ui-corner-all\">\n\n    <div id=\"message-box-popup\"\n         class=\"ui-popup ui-corner-all ui-overlay-shadow large-popup\"\n         data-role=\"popup\"\n         data-enhanced=\"true\"\n         data-transition=\"flip\"\n         data-dismissible=\"false\">\n\n        <div class=\"ui-header ui-bar-b\">\n            <h1 class=\"ui-title\">");
+  data.buffer.push("<div id=\"message-box-screen\" class=\"ui-popup-screen ui-screen-hidden ui-overlay-a\"></div>\n<div id=\"message-box-popup-popup\"\n     class=\"ui-popup-container ui-popup-hidden large-popup ui-body-a ui-corner-all\">\n\n    <div id=\"message-box-popup\"\n         class=\"ui-popup ui-corner-all ui-overlay-shadow large-popup\"\n         data-role=\"popup\"\n         data-enhanced=\"true\"\n         data-transition=\"flip\"\n         data-dismissible=\"false\">\n\n        <div class=\"ui-header ui-bar-b\">\n            <h1 class=\"ui-title\">");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.notificationController.msgHeader", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
@@ -2830,7 +2840,12 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.notificationController.msgPart3", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("</p>\n            <p id=\"message-ps\">");
+  data.buffer.push("</p>\n            ");
+  hashTypes = {};
+  hashContexts = {};
+  stack1 = helpers['if'].call(depth0, "Mist.notificationController.msgCmd", {hash:{},inverse:self.noop,fn:self.program(1, program1, data),contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data});
+  if(stack1 || stack1 === 0) { data.buffer.push(stack1); }
+  data.buffer.push("\n            <p id=\"message-ps\">");
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.notificationController.msgPart4", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
@@ -2838,13 +2853,13 @@ helpers = this.merge(helpers, Ember.Handlebars.helpers); data = data || {};
   hashTypes = {};
   hashContexts = {};
   data.buffer.push(escapeExpression(helpers._triageMustache.call(depth0, "Mist.notificationController.msgLink", {hash:{},contexts:[depth0],types:["ID"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push("\n            </a>\n            <button ");
+  data.buffer.push("\n            </a>\n            <a class=\"ui-btn ui-btn-a ui-corner-all\"\n                ");
   hashContexts = {'target': depth0};
   hashTypes = {'target': "STRING"};
   data.buffer.push(escapeExpression(helpers.action.call(depth0, "closeMessage", {hash:{
     'target': ("view")
   },contexts:[depth0],types:["STRING"],hashContexts:hashContexts,hashTypes:hashTypes,data:data})));
-  data.buffer.push(">OK</button>\n        </div>\n    </div>\n</div>\n");
+  data.buffer.push(">OK</a>\n        </div>\n    </div>\n</div>\n");
   return buffer;
   
 });
