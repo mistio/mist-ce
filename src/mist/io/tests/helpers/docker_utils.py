@@ -1,6 +1,8 @@
-import docker
-
-from mist.io.tests.settings import docker_nodes
+try:
+    import docker
+    from mist.io.tests.settings import docker_nodes
+except ImportError:
+    pass
 
 
 def select_docker():
