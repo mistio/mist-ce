@@ -763,20 +763,17 @@ define( 'app', [
 
 function Socket (args) {
 
-    var namespace = args.namespace;
-    var initCallback = args.onInit;
-    var keepAlive = args.keepAlive !== undefined ? keepAlive : true;
-
-    var socket;
+    var socket = undefined;
     var initialized = false;
+    var namespace = args.namespace;
 
     function init () {
         if (!initialized) {
             info(namespace, 'initializing');
             handleDisconneciton();
             addDebuggingWrapper();
-            if (typeof initCallback === 'function')
-                initCallback(socket);
+            if (args.onInit instanceof Function)
+                args.onInit(socket);
         }
         socket.emit('ready');
         initialized = true;
@@ -805,7 +802,8 @@ function Socket (args) {
 
     function handleDisconneciton () {
 
-        if (keepAlive) {
+        // keep socket connections alive by default
+        if (args.keepAlive !== undefined ? keepAlive : true) {
             // Reconnect if connection fails
             socket.on('disconnect', function () {
                 warn(namespace, 'disconnected');
