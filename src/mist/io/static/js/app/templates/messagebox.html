@@ -17,7 +17,9 @@
             <p>{{Mist.notificationController.msgPart1}}</p>
             <p>{{Mist.notificationController.msgPart2}}</p>
             <p>{{Mist.notificationController.msgPart3}}</p>
+            {{#if Mist.notificationController.msgCmd}}
             <p id="message-cmd">{{Mist.notificationController.msgCmd}}</p>
+            {{/if}}
             <p id="message-ps">{{Mist.notificationController.msgPart4}}</p>
             <a id="message-link" target="_blank">
                 {{Mist.notificationController.msgLink}}
