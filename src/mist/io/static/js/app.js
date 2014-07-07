@@ -823,24 +823,12 @@ function completeShell(ret, command_id) {
     Mist.machineShellController.machine.commandHistory.findBy('id', command_id).set('pendingResponse', false);
 }
 
-function getTemplate(name) {
-    if (JS_BUILD || true) { // The "|| true" part is just for debuging as for now
-        //info('Getting precompiled template for: ' + name);
-        // Return precompiled template
-        return Ember.TEMPLATES[name + '/html'];
-    } else {
-        info('Compiling template for: ' + name);
-        return Ember.Handlebars.compile('text!app/templates/'+ name + '.html');
-    }
-};
-
 function initSocket() {
     warn('Socket init');
     var sock = undefined, retry = 0;
     while (!sock) {
         sock = io.connect('/mist');
-        retry += 1;
-        if (retry > 5){
+        if (++retry > 5){
             alert('failed to connect after ' + retry + ' retries');
             return false;
         }
@@ -855,7 +843,7 @@ function initSocket() {
         var cb = callback;
         callback = function (data) {
             if (Mist.debugSocket)
-                info(data);
+                info(event, data);
             cb(data);
         };
         sockon.apply(Mist.socket, arguments);
