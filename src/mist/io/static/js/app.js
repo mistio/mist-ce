@@ -171,6 +171,15 @@ define( 'app', [
             App.set('isJQMInitialized',true);
 
             initSocket();
+            Mist.socket.on('connect', function () {
+                info('connected');
+            });
+            Mist.socket.on('disconnect', function () {
+                info('disconnected');
+            });
+            Mist.socket.on('connect_failed', function () {
+                info('failed to connect');
+            });
             setInterval(function() {
                 if (Mist.socket == undefined){
                     warn('socket undefined! Initializing...');
