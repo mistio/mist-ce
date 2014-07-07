@@ -2,7 +2,10 @@ import random
 
 from behaving import environment as benv
 
-from mist.io.tests.settings import CREDENTIALS, LOCAL, DEBUG, BASE_DIR
+try:
+    from mist.io.tests.settings import CREDENTIALS, LOCAL, DEBUG, BASE_DIR
+except ImportError:
+    pass
 
 from mist.io.tests.helpers.docker_utils import docker_all_in_one
 from mist.io.tests.helpers.selenium_utils import choose_driver
